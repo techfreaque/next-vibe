@@ -179,7 +179,7 @@
     "lint": "workspace:*",
     "supertest": "7.1.4",
     "ts-node": "10.9.2",
-    "tsx": "4.20.6",
+    "tsx": "^4.20.6",
     "vite-tsconfig-paths": "5.1.4",
     "vitest": "3.2.4"
   },
