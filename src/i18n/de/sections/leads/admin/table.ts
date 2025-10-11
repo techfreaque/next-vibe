@@ -1,0 +1,35 @@
+import type { tableTranslations as EnglishTableTranslations } from "../../../../en/sections/leads/admin/table";
+
+export const tableTranslations: typeof EnglishTableTranslations = {
+  title: "Leads",
+  total: "Gesamt Leads",
+  email: "E-Mail",
+  business: "Unternehmen",
+  status: "Status",
+  stage: "Kampagnen-Phase",
+  campaign_stage: "Kampagnen-Phase",
+  country: "Land",
+  language: "Sprache",
+  phone: "Telefon",
+  website: "Website",
+  emails: "E-Mails",
+  emails_sent: "E-Mails Gesendet",
+  emails_opened: "E-Mails Geöffnet",
+  emails_clicked: "E-Mails Geklickt",
+  last_engagement: "Letztes Engagement",
+  last_email_sent: "Letzte E-Mail Gesendet",
+  created: "Erstellt",
+  updated: "Aktualisiert",
+  source: "Quelle",
+  notes: "Notizen",
+  actions: "Aktionen",
+  scroll_hint:
+    "💡 Horizontal scrollen, um alle Lead-Details und Spalten zu sehen",
+  select_all: "Alle Leads auswählen",
+  select_lead: "{{business}} auswählen",
+  description: {
+    recent: "Kürzlich zu Ihrer Datenbank hinzugefügte Leads",
+    complete: "Vollständige Liste der Leads mit Verwaltungsaktionen",
+    overview: "Die zuletzt hinzugefügten Leads zu Ihrer Datenbank",
+  },
+};

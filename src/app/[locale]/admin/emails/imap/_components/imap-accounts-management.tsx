@@ -1,0 +1,79 @@
+/**
+ * IMAP Accounts Management Component
+ * Component for managing IMAP accounts with list and forms
+ * Follows leads/cron patterns - no useState, all state through useEndpoint
+ */
+
+"use client";
+
+import { Plus } from "lucide-react";
+import { Button } from "next-vibe-ui/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "next-vibe-ui/ui/dialog";
+import type { JSX } from "react";
+import { useState } from "react";
+
+import { useTranslation } from "@/i18n/core/client";
+
+import { ImapAccountCreateForm } from "./imap-account-create-form";
+import { ImapAccountsList } from "./imap-accounts-list";
+
+/**
+ * IMAP Accounts Management Component
+ * Uses useEndpoint for all state management following leads/cron patterns
+ */
+export function ImapAccountsManagement(): JSX.Element {
+  const { t } = useTranslation();
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+
+  const handleCreateSuccess = (): void => {
+    setShowCreateDialog(false);
+    // The list will automatically refresh due to useEndpoint
+  };
+
+  const handleCreateCancel = (): void => {
+    setShowCreateDialog(false);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header with Create Button */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>{t("imap.admin.accounts.management.title")}</CardTitle>
+            <Button
+              onClick={() => setShowCreateDialog(true)}
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              {t("imap.account.create")}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {/* Accounts List - all state managed through useEndpoint */}
+          <ImapAccountsList />
+        </CardContent>
+      </Card>
+
+      {/* Create Account Dialog */}
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t("imap.account.create")}</DialogTitle>
+          </DialogHeader>
+          <ImapAccountCreateForm
+            onSuccess={handleCreateSuccess}
+            onCancel={handleCreateCancel}
+          />
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

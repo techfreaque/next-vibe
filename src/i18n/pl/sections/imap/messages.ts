@@ -1,0 +1,35 @@
+import type { messagesTranslations as EnglishMessagesTranslations } from "../../../en/sections/imap/messages";
+
+export const messagesTranslations: typeof EnglishMessagesTranslations = {
+  unread: "Nieprzeczytane",
+  read: "Przeczytane",
+  flagged: "Oznaczone",
+  withAttachments: "Z załącznikami",
+  totalMessages: "Łączna liczba wiadomości",
+  noMessages: "Nie znaleziono wiadomości",
+  noSubject: "(Brak tematu)",
+  subject: "Temat",
+  sender: "Nadawca",
+  recipient: "Odbiorca",
+  sentAt: "Wysłano",
+  attachments: "Załączniki",
+  searchPlaceholder: "Szukaj wiadomości według tematu, nadawcy lub treści...",
+  detail: {
+    title: "Szczegóły wiadomości",
+  },
+  edit: {
+    title: "Edytuj wiadomość",
+  },
+  from: "Od",
+  to: "Do",
+  size: "Rozmiar",
+  content: "Treść wiadomości",
+  technicalDetails: "Szczegóły techniczne",
+  messageId: "ID wiadomości",
+  returnPath: "Ścieżka zwrotna",
+  receivedAt: "Odebrano",
+  markAsRead: "Oznacz jako przeczytane",
+  noContent: "Brak dostępnej treści",
+  createdAt: "Utworzono",
+  lastSync: "Ostatnia synchronizacja",
+};

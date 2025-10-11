@@ -1,0 +1,325 @@
+/**
+ * Leads Stats Filters Component
+ * Provides filtering controls for leads statistics following email stats pattern
+ */
+
+"use client";
+
+import { RefreshCw } from "lucide-react";
+import {
+  ChartType,
+  DateRangePreset,
+  TimePeriod,
+} from "next-vibe/shared/types/stats-filtering.schema";
+import { Form } from "next-vibe-ui/ui";
+import { Button } from "next-vibe-ui/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import type { JSX, ReactNode } from "react";
+import type { Control } from "react-hook-form";
+
+import {
+  LeadSourceFilter,
+  LeadStatusFilter,
+} from "@/app/api/[locale]/v1/core/leads/enum";
+import type { LeadsStatsRequestType } from "@/app/api/[locale]/v1/core/leads/stats/definition";
+import type statsEndpoints from "@/app/api/[locale]/v1/core/leads/stats/definition";
+import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
+import { CountryFilter, type CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
+interface LeadsStatsFiltersContainerProps {
+  locale: CountryLanguage;
+  children: ReactNode;
+  onRefresh?: () => void;
+  title?: string;
+  form: EndpointReturn<typeof statsEndpoints>["read"]["form"];
+}
+
+interface LeadsStatsFiltersProps {
+  control: Control<Partial<LeadsStatsRequestType>>;
+}
+
+export function LeadsStatsFilters({
+  control,
+}: LeadsStatsFiltersProps): JSX.Element {
+  return (
+    <div className="space-y-4">
+      {/* Base time and chart filters */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Time Period */}
+        <EndpointFormField
+          control={control}
+          name="timePeriod"
+          config={{
+            type: "select",
+            label: "leads.admin.filters.timePeriod",
+            options: [
+              {
+                value: TimePeriod.HOUR,
+                label: "leads.admin.filters.timePeriods.hour",
+              },
+              {
+                value: TimePeriod.DAY,
+                label: "leads.admin.filters.timePeriods.day",
+              },
+              {
+                value: TimePeriod.WEEK,
+                label: "leads.admin.filters.timePeriods.week",
+              },
+              {
+                value: TimePeriod.MONTH,
+                label: "leads.admin.filters.timePeriods.month",
+              },
+              {
+                value: TimePeriod.QUARTER,
+                label: "leads.admin.filters.timePeriods.quarter",
+              },
+              {
+                value: TimePeriod.YEAR,
+                label: "leads.admin.filters.timePeriods.year",
+              },
+            ],
+          }}
+        />
+
+        {/* Date Range Preset */}
+        <EndpointFormField
+          control={control}
+          name="dateRangePreset"
+          config={{
+            type: "select",
+            label: "leads.admin.filters.dateRange",
+            options: [
+              {
+                value: DateRangePreset.TODAY,
+                label: "leads.admin.filters.dateRanges.today",
+              },
+              {
+                value: DateRangePreset.YESTERDAY,
+                label: "leads.admin.filters.dateRanges.yesterday",
+              },
+              {
+                value: DateRangePreset.LAST_7_DAYS,
+                label: "leads.admin.filters.dateRanges.last7Days",
+              },
+              {
+                value: DateRangePreset.LAST_30_DAYS,
+                label: "leads.admin.filters.dateRanges.last30Days",
+              },
+              {
+                value: DateRangePreset.LAST_90_DAYS,
+                label: "leads.admin.filters.dateRanges.last90Days",
+              },
+              {
+                value: DateRangePreset.THIS_MONTH,
+                label: "leads.admin.filters.dateRanges.thisMonth",
+              },
+              {
+                value: DateRangePreset.LAST_MONTH,
+                label: "leads.admin.filters.dateRanges.lastMonth",
+              },
+              {
+                value: DateRangePreset.THIS_QUARTER,
+                label: "leads.admin.filters.dateRanges.thisQuarter",
+              },
+              {
+                value: DateRangePreset.LAST_QUARTER,
+                label: "leads.admin.filters.dateRanges.lastQuarter",
+              },
+              {
+                value: DateRangePreset.THIS_YEAR,
+                label: "leads.admin.filters.dateRanges.thisYear",
+              },
+              {
+                value: DateRangePreset.LAST_YEAR,
+                label: "leads.admin.filters.dateRanges.lastYear",
+              },
+            ],
+          }}
+        />
+
+        {/* Chart Type */}
+        <EndpointFormField
+          control={control}
+          name="chartType"
+          config={{
+            type: "select",
+            label: "leads.admin.filters.chartType",
+            options: [
+              {
+                value: ChartType.LINE,
+                label: "leads.admin.filters.chartTypes.line",
+              },
+              {
+                value: ChartType.BAR,
+                label: "leads.admin.filters.chartTypes.bar",
+              },
+              {
+                value: ChartType.AREA,
+                label: "leads.admin.filters.chartTypes.area",
+              },
+            ],
+          }}
+        />
+
+        {/* Status Filter */}
+        <EndpointFormField
+          control={control}
+          name="status"
+          config={{
+            type: "select",
+            label: "leads.admin.filters.statuses.title",
+            options: [
+              {
+                value: LeadStatusFilter.ALL,
+                label: "leads.admin.filters.statuses.all",
+              },
+              {
+                value: LeadStatusFilter.NEW,
+                label: "leads.admin.filters.statuses.new",
+              },
+              {
+                value: LeadStatusFilter.PENDING,
+                label: "leads.admin.filters.statuses.pending",
+              },
+              {
+                value: LeadStatusFilter.CAMPAIGN_RUNNING,
+                label: "leads.admin.filters.statuses.campaign_running",
+              },
+              {
+                value: LeadStatusFilter.WEBSITE_USER,
+                label: "leads.admin.filters.statuses.website_user",
+              },
+              {
+                value: LeadStatusFilter.NEWSLETTER_SUBSCRIBER,
+                label: "leads.admin.filters.statuses.newsletter_subscriber",
+              },
+              {
+                value: LeadStatusFilter.SIGNED_UP,
+                label: "leads.admin.filters.statuses.signed_up",
+              },
+              {
+                value: LeadStatusFilter.CONSULTATION_BOOKED,
+                label: "leads.admin.filters.statuses.consultation_booked",
+              },
+              {
+                value: LeadStatusFilter.SUBSCRIPTION_CONFIRMED,
+                label: "leads.admin.filters.statuses.subscription_confirmed",
+              },
+              {
+                value: LeadStatusFilter.UNSUBSCRIBED,
+                label: "leads.admin.filters.statuses.unsubscribed",
+              },
+              {
+                value: LeadStatusFilter.BOUNCED,
+                label: "leads.admin.filters.statuses.bounced",
+              },
+            ],
+          }}
+        />
+
+        {/* Country Filter */}
+        <EndpointFormField
+          control={control}
+          name="country"
+          config={{
+            type: "select",
+            label: "leads.admin.filters.countries.title",
+            options: [
+              {
+                value: CountryFilter.ALL,
+                label: "leads.admin.filters.countries.all",
+              },
+              {
+                value: CountryFilter.GLOBAL,
+                label: "leads.admin.filters.countries.global",
+              },
+              {
+                value: CountryFilter.DE,
+                label: "leads.admin.filters.countries.de",
+              },
+              {
+                value: CountryFilter.PL,
+                label: "leads.admin.filters.countries.pl",
+              },
+            ],
+          }}
+        />
+
+        {/* Source Filter */}
+        <EndpointFormField
+          control={control}
+          name="source"
+          config={{
+            type: "select",
+            label: "leads.admin.filters.sources.title",
+            options: [
+              {
+                value: LeadSourceFilter.ALL,
+                label: "leads.admin.filters.sources.all",
+              },
+              {
+                value: LeadSourceFilter.WEBSITE,
+                label: "leads.admin.filters.sources.website",
+              },
+              {
+                value: LeadSourceFilter.SOCIAL_MEDIA,
+                label: "leads.admin.filters.sources.socialMedia",
+              },
+              {
+                value: LeadSourceFilter.EMAIL_CAMPAIGN,
+                label: "leads.admin.filters.sources.emailCampaign",
+              },
+              {
+                value: LeadSourceFilter.REFERRAL,
+                label: "leads.admin.filters.sources.referral",
+              },
+              {
+                value: LeadSourceFilter.CSV_IMPORT,
+                label: "leads.admin.filters.sources.csvImport",
+              },
+            ],
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Container for leads stats filters with refresh functionality
+ */
+export function LeadsStatsFiltersContainer({
+  locale,
+  children,
+  onRefresh,
+  title,
+  form,
+}: LeadsStatsFiltersContainerProps): JSX.Element {
+  const { t } = simpleT(locale);
+
+  return (
+    <Form form={form} onSubmit={() => {}} className="space-y-4">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+          <CardTitle className="text-lg font-semibold">
+            {title || t("common.filter")}
+          </CardTitle>
+          {onRefresh && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onRefresh}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              {t("common.refresh")}
+            </Button>
+          )}
+        </CardHeader>
+        <CardContent className="space-y-4">{children}</CardContent>
+      </Card>
+    </Form>
+  );
+}

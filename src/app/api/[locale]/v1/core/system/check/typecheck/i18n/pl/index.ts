@@ -1,0 +1,94 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  // Main endpoint properties
+  title: "Sprawdzanie typów TypeScript",
+  description:
+    "Uruchom sprawdzanie typów TypeScript dla określonych plików lub katalogów",
+  category: "Sprawdzenia systemowe",
+  tag: "sprawdzanie-typów",
+
+  // Container
+  container: {
+    title: "Konfiguracja sprawdzania typów TypeScript",
+    description:
+      "Skonfiguruj parametry dla uruchomienia sprawdzania typów TypeScript",
+  },
+
+  // Request fields
+  fields: {
+    path: {
+      label: "Ścieżka",
+      description:
+        "Ścieżka pliku lub katalogu do sprawdzenia (opcjonalne, domyślnie bieżący katalog)",
+      placeholder: "src/components",
+    },
+    verbose: {
+      label: "Szczegółowy",
+      description: "Włącz szczegółowe wyjście z dodatkowymi informacjami",
+    },
+    disableFilter: {
+      label: "Wyłącz filtr",
+      description: "Wyłącz filtrowanie i pokaż wszystkie problemy TypeScript",
+    },
+  },
+
+  // Response fields
+  response: {
+    issue: {
+      title: "Problem TypeScript",
+      description: "Indywidualny problem sprawdzania typów TypeScript",
+      file: "Ścieżka pliku, w którym znaleziono problem",
+      line: "Numer linii problemu",
+      column: "Numer kolumny problemu",
+      code: "Kod błędu TypeScript",
+      message: "Komunikat opisu problemu",
+    },
+  },
+
+  // Error messages
+  errors: {
+    validation: {
+      title: "Błąd walidacji",
+      description: "Podano nieprawidłowe parametry żądania",
+    },
+    internal: {
+      title: "Błąd wewnętrzny",
+      description: "Wystąpił wewnętrzny błąd serwera podczas sprawdzania typów",
+    },
+    unauthorized: {
+      title: "Brak autoryzacji",
+      description: "Wymagana autoryzacja, aby uzyskać dostęp do tego endpointu",
+    },
+    forbidden: {
+      title: "Zabronione",
+      description: "Dostęp do tego endpointu jest zabroniony",
+    },
+    notFound: {
+      title: "Nie znaleziono",
+      description: "Określony zasób nie został znaleziony",
+    },
+    server: {
+      title: "Błąd serwera",
+      description: "Wystąpił wewnętrzny błąd serwera",
+    },
+    unknown: {
+      title: "Nieznany błąd",
+      description: "Wystąpił nieznany błąd",
+    },
+    unsaved: {
+      title: "Niezapisane zmiany",
+      description: "Istnieją niezapisane zmiany, które muszą zostać obsłużone",
+    },
+    conflict: {
+      title: "Konflikt",
+      description: "Wystąpił konflikt danych",
+    },
+  },
+
+  // Success messages
+  success: {
+    title: "Sprawdzanie typów zakończone",
+    description: "Sprawdzanie typów TypeScript zakończone pomyślnie",
+  },
+};

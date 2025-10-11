@@ -1,4 +1,5 @@
 {
+  "typescript.experimental.useTsgo": false,
   "cSpell.words": [
     "openeats",
     "sovendus",
@@ -15,7 +16,7 @@
     "typescript",
     "typescriptreact"
   ],
-  "prettier.enable": false, // we use eslint for formatting
+  "prettier.enable": false,
   "typescript.validate.enable": true,
   "typescript.suggest.autoImports": true,
   "prettier.requireConfig": true,
@@ -32,10 +33,13 @@
     "editor.formatOnSave": false
   },
   "files.eol": "\n",
-  "files.associations": {
-    "schema.prisma.template": "prisma"
-  },
   "files.exclude": {
     "postgres_data": true
-  }
+  },
+  // "terminal.integrated.profiles.linux": {
+  //   "Vibe Guard": {
+  //     "path": "${workspaceFolder}/.vibe-guard-instance/.guard.sh"
+  //   }
+  // },
+  "terminal.integrated.defaultProfile.linux": "Vibe Guard"
 }

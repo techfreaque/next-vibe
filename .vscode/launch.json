@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Next.js: Client",
+            "name": "Vibe Dev Client",
             "type": "chrome",
             "request": "launch",
             "url": "http://localhost:3000",
@@ -10,10 +10,10 @@
             "sourceMaps": true
         },
         {
-            "name": "Next.js: Server",
+            "name": "Vibe Dev Server",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceFolder}/node_modules/next/dist/bin/next",
+            "program": "${workspaceFolder}/src/packages/next-vibe/cli/bin/vibe.js",
             "args": [
                 "dev"
             ],
@@ -22,34 +22,24 @@
             "internalConsoleOptions": "neverOpen"
         },
         {
-            "name": "Debug TS File",
+            "name": "Vibe Fast Dev Server",
             "type": "node",
             "request": "launch",
-            "runtimeExecutor": "node",
+            "runtimeExecutable": "npx",
             "runtimeArgs": [
-                "--import",
-                "tsx"
+                "next",
+                "dev",
+                "--turbo"
             ],
-            "args": [
-                "${file}"
-            ],
-            "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "env": {
-                "NODE_ENV": "development"
-            }
         },
         {
-            "name": "Debug Vitest Tests",
+            "name": "Vibe Test",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
+            "program": "${workspaceFolder}/src/packages/next-vibe/cli/bin/vibe.js",
             "args": [
-                "run"
+                "test"
             ],
             "smartStep": true,
             "console": "integratedTerminal",
@@ -65,10 +55,10 @@
     ],
     "compounds": [
         {
-            "name": "Next.js: Server & Client",
+            "name": "Vibe Dev Server & Client",
             "configurations": [
-                "Next.js: Server",
-                "Next.js: Client"
+                "Vibe Dev Server",
+                "Vibe Dev Client"
             ]
         }
     ]

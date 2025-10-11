@@ -1,0 +1,15 @@
+export const platformNamesTranslations = {
+  facebook: "Facebook",
+  instagram: "Instagram",
+  twitter: "Twitter/X",
+  linkedin: "LinkedIn",
+  youtube: "YouTube",
+  tiktok: "TikTok",
+  pinterest: "Pinterest",
+  snapchat: "Snapchat",
+  discord: "Discord",
+  reddit: "Reddit",
+  telegram: "Telegram",
+  whatsapp: "WhatsApp Business",
+  other: "Other",
+};

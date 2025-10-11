@@ -1,10 +1,8 @@
-import { envClient } from "next-vibe/client/env-client";
+export const LOCALE_COOKIE_NAME = "locale";
 
-export const APP_NAME = envClient.NEXT_PUBLIC_APP_NAME;
-export const APP_DOMAIN = envClient.NEXT_PUBLIC_FRONTEND_APP_URL;
-
-export const ENDPOINT_DOMAINS = {
-  prod: envClient.NEXT_PUBLIC_BACKEND_PROD,
-  dev: envClient.NEXT_PUBLIC_BACKEND_DEV,
-  test: envClient.NEXT_PUBLIC_BACKEND_TEST,
-};
+export const AUTH_TOKEN_COOKIE_MAX_AGE_DAYS = 30;
+export const AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS =
+  60 * 60 * 24 * AUTH_TOKEN_COOKIE_MAX_AGE_DAYS; // 30 days
+export const AUTH_TOKEN_COOKIE_NAME = "token";
+export const AUTH_STATUS_COOKIE_NAME = "auth_status";
+export const RESET_TOKEN_EXPIRY = 4; // hours

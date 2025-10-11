@@ -1,0 +1,52 @@
+{
+  "name": "launchpad",
+  "version": "1.0.0",
+  "description": "Tool for managing and orchestrating multiple packages in a monorepo",
+  "license": "GPL-3.0-only",
+  "bin": {
+    "launchpad": ".dist/launchpad.mjs"
+  },
+  "private": false,
+  "type": "module",
+  "files": [
+    ".dist/**/*"
+  ],
+  "exports": {
+    "./types": {
+      "types": "./.dist/index.d.ts",
+      "import": "./.dist/index.mjs",
+      "require": "./.dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "builder build && chmod +x .dist/launchpad.mjs",
+    "prepare": "builder build && chmod +x .dist/launchpad.mjs",
+    "dev": "bun src/scripts/launchpad.ts",
+    "lint": "eslint --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "pub": "release-tool"
+  },
+  "keywords": [
+    "aw",
+    "anywhere-widgets",
+    "git",
+    "repository"
+  ],
+  "author": "Marcus Brandstaetter - Anywhere Widgets",
+  "dependencies": {
+    "chalk": "5.6.2",
+    "commander": "14.0.1",
+    "inquirer": "12.9.6",
+    "simple-git": "3.28.0",
+    "vite": "7.1.6"
+  },
+  "devDependencies": {
+    "@types/inquirer": "9.0.9",
+    "@types/node": "24.5.2",
+    "lint": "workspace:*",
+    "builder": "workspace:*",
+    "release-tool": "workspace:*",
+    "typescript": "5.9.2"
+  }
+}

@@ -1,0 +1,285 @@
+"use client";
+
+import { Check, Mail, Send, TrendingUp, Users, X, Zap } from "lucide-react";
+import { Button } from "next-vibe-ui/ui/button";
+import { Input } from "next-vibe-ui/ui/input";
+import type { JSX } from "react";
+import { useEffect, useRef } from "react";
+
+import { useNewsletterManager } from "@/app/api/[locale]/v1/core/newsletter/hooks";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
+interface NewsletterPageProps {
+  locale: CountryLanguage;
+  prefilledEmail?: string;
+}
+
+export function NewsletterPage({
+  locale,
+  prefilledEmail,
+}: NewsletterPageProps): JSX.Element {
+  const { t } = simpleT(locale);
+
+  const {
+    email,
+    setEmail,
+    isLoggedIn,
+    isSubmitting,
+    isUnsubscribing,
+    isAnyOperationInProgress,
+    notification,
+    showConfirmUnsubscribe,
+    subscribe,
+    unsubscribe,
+    isSubscribed,
+    handleEmailChange,
+  } = useNewsletterManager();
+
+  // Track if we've already set the prefilled email to prevent infinite loops
+  const hasSetPrefilledEmail = useRef(false);
+  const lastPrefilledEmail = useRef<string | undefined>(undefined);
+
+  // Set prefilled email when component mounts
+  useEffect(() => {
+    if (
+      prefilledEmail !== undefined &&
+      prefilledEmail.length > 0 &&
+      !isLoggedIn &&
+      !hasSetPrefilledEmail.current &&
+      lastPrefilledEmail.current !== prefilledEmail
+    ) {
+      setEmail(prefilledEmail);
+      hasSetPrefilledEmail.current = true;
+      lastPrefilledEmail.current = prefilledEmail;
+    }
+    // eslint-disable-next-line react-compiler/react-compiler
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefilledEmail, isLoggedIn]);
+
+  const benefits = [
+    {
+      icon: TrendingUp,
+      title: t("newsletter.page.benefits.benefit1.title"),
+      description: t("newsletter.page.benefits.benefit1.description"),
+    },
+    {
+      icon: Zap,
+      title: t("newsletter.page.benefits.benefit2.title"),
+      description: t("newsletter.page.benefits.benefit2.description"),
+    },
+    {
+      icon: Mail,
+      title: t("newsletter.page.benefits.benefit3.title"),
+      description: t("newsletter.page.benefits.benefit3.description"),
+    },
+    {
+      icon: Users,
+      title: t("newsletter.page.benefits.benefit4.title"),
+      description: t("newsletter.page.benefits.benefit4.description"),
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-blue-50 bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      {/* Hero Section */}
+      <section className="relative py-20 px-4 md:px-6">
+        <div className="container mx-auto max-w-4xl text-center">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+            {prefilledEmail !== undefined && prefilledEmail.length > 0
+              ? t("newsletter.page.emailProvided.title")
+              : t("newsletter.page.title")}
+          </h1>
+          <h2 className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8">
+            {t("newsletter.page.subtitle")}
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
+            {prefilledEmail !== undefined && prefilledEmail.length > 0
+              ? t("newsletter.page.emailProvided.description")
+              : t("newsletter.page.heroDescription")}
+          </p>
+
+          {/* Newsletter Form */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-16 max-w-md mx-auto">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                // Validate email before submission
+                if (!email.includes("@")) {
+                  return;
+                }
+                if (isSubscribed) {
+                  unsubscribe(email);
+                } else {
+                  subscribe(email);
+                }
+              }}
+              className="space-y-4"
+            >
+              <div className="flex flex-col space-y-3">
+                <Input
+                  type="email"
+                  placeholder={t("newsletter.emailPlaceholder")}
+                  className="text-center text-lg py-3"
+                  autoComplete="email"
+                  autoCorrect="off"
+                  spellCheck="false"
+                  value={email}
+                  onChange={handleEmailChange}
+                  aria-label={t("newsletter.emailPlaceholder")}
+                  disabled={isAnyOperationInProgress || isLoggedIn}
+                  name="email"
+                  id="newsletter-email-page"
+                />
+
+                <Button
+                  type="submit"
+                  className={`py-3 text-lg font-semibold ${
+                    isSubscribed
+                      ? showConfirmUnsubscribe
+                        ? "bg-red-600 hover:bg-red-700"
+                        : "border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+                      : "bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
+                  }`}
+                  variant={
+                    isSubscribed && !showConfirmUnsubscribe
+                      ? "outline"
+                      : "default"
+                  }
+                  aria-label={
+                    isSubscribed
+                      ? showConfirmUnsubscribe
+                        ? t("newsletter.subscription.unsubscribe.confirmButton")
+                        : t("newsletter.subscription.unsubscribe.title")
+                      : t("newsletter.page.cta.subscribeButton")
+                  }
+                  disabled={isAnyOperationInProgress}
+                >
+                  {isSubmitting || isUnsubscribing ? (
+                    <div className="animate-spin mr-2">
+                      <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
+                    </div>
+                  ) : isSubscribed ? (
+                    showConfirmUnsubscribe ? (
+                      <Check className="h-5 w-5 mr-2" />
+                    ) : (
+                      <X className="h-5 w-5 mr-2" />
+                    )
+                  ) : (
+                    <Send className="h-5 w-5 mr-2" />
+                  )}
+                  {isSubscribed
+                    ? showConfirmUnsubscribe
+                      ? t("newsletter.subscription.unsubscribe.confirmButton")
+                      : t("newsletter.subscription.unsubscribe.title")
+                    : t("newsletter.page.cta.subscribeButton")}
+                </Button>
+              </div>
+
+              {/* Notification display */}
+              {notification && (
+                <div
+                  className={`text-sm p-3 rounded-lg ${
+                    notification.type === "error"
+                      ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
+                      : notification.type === "success"
+                        ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                        : notification.type === "info"
+                          ? "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400"
+                          : "bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400"
+                  }`}
+                >
+                  {t(notification.message)}
+                </div>
+              )}
+            </form>
+
+            {/* Unsubscribe link */}
+            <div className="text-center mt-4">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t("newsletter.page.unsubscribeText")}{" "}
+                <a
+                  href={`/${locale}/newsletter/unsubscribe`}
+                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+                >
+                  {t("newsletter.page.unsubscribeLink")}
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="py-20 px-4 md:px-6 bg-white dark:bg-gray-800">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              {t("newsletter.page.benefits.title")}
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400">
+              {t("newsletter.page.benefits.subtitle")}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {benefits.map((benefit, index) => {
+              const IconComponent = benefit.icon;
+              return (
+                <div
+                  key={`benefit_${index}_${benefit.title}`}
+                  className="text-center p-6 rounded-xl bg-gray-50 dark:bg-gray-700 hover:shadow-lg transition-shadow"
+                >
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full mb-4">
+                    <IconComponent className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-3">
+                    {benefit.title}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {benefit.description}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Frequency Section */}
+      <section className="py-16 px-4 md:px-6">
+        <div className="container mx-auto max-w-4xl text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">
+            {t("newsletter.page.frequency.title")}
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400">
+            {t("newsletter.page.frequency.description")}
+          </p>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-20 px-4 md:px-6 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600">
+        <div className="container mx-auto max-w-4xl text-center text-white">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            {t("newsletter.page.cta.title")}
+          </h2>
+          <p className="text-xl mb-8 opacity-90">
+            {t("newsletter.page.cta.description")}
+          </p>
+          <Button
+            onClick={() => {
+              // Scroll to top form
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            variant="secondary"
+            size="lg"
+            className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-3"
+          >
+            {t("newsletter.page.cta.subscribeButton")}
+          </Button>
+        </div>
+      </section>
+    </div>
+  );
+}

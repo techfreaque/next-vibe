@@ -1,0 +1,697 @@
+/**
+ * IMAP Sync Repository
+ * Core service for synchronizing IMAP accounts, folders, and messages
+ */
+
+import "server-only";
+
+import { eq } from "drizzle-orm";
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "next-vibe/shared/types/response.schema";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
+
+import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+
+import type { JwtPayloadType } from "../../../user/auth/definition";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { NewEmail, NewImapFolder } from "../../messages/db";
+import { emails, imapAccounts, imapFolders } from "../../messages/db";
+import { EmailType } from "../../messages/enum";
+import { imapConnectionRepository } from "../connection/repository";
+import { ImapSyncStatus } from "../enum";
+import type {
+  SyncAccountFoldersRequestTypeOutput,
+  SyncAccountFoldersResponseTypeOutput,
+  SyncAccountRequestTypeOutput,
+  SyncAccountResponseTypeOutput,
+  SyncAllAccountsRequestTypeOutput,
+  SyncAllAccountsResponseTypeOutput,
+  SyncFolderMessagesRequestTypeOutput,
+  SyncFolderMessagesResponseTypeOutput,
+  SyncResult,
+} from "./definition";
+
+/**
+ * IMAP Flag Constants
+ */
+const IMAP_FLAGS = {
+  SEEN: "\\Seen",
+  FLAGGED: "\\Flagged",
+  DELETED: "\\Deleted",
+  DRAFT: "\\Draft",
+  ANSWERED: "\\Answered",
+} as const;
+
+/**
+ * IMAP Sync Repository Interface
+ */
+export interface ImapSyncRepository {
+  syncAllAccounts(
+    data: SyncAllAccountsRequestTypeOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SyncAllAccountsResponseTypeOutput>>;
+
+  syncAccount(
+    data: SyncAccountRequestTypeOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SyncAccountResponseTypeOutput>>;
+
+  syncAccountFolders(
+    data: SyncAccountFoldersRequestTypeOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SyncAccountFoldersResponseTypeOutput>>;
+
+  syncFolderMessages(
+    data: SyncFolderMessagesRequestTypeOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SyncFolderMessagesResponseTypeOutput>>;
+}
+
+/**
+ * IMAP Sync Repository Implementation
+ */
+export class ImapSyncRepositoryImpl implements ImapSyncRepository {
+  /**
+   * Sync all enabled IMAP accounts
+   */
+  async syncAllAccounts(
+    data: SyncAllAccountsRequestTypeOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SyncAllAccountsResponseTypeOutput>> {
+    const startTime = Date.now();
+    let accountsProcessed = 0;
+    let foldersProcessed = 0;
+    let messagesProcessed = 0;
+    let foldersAdded = 0;
+    let foldersUpdated = 0;
+    let foldersDeleted = 0;
+    let messagesAdded = 0;
+    let messagesUpdated = 0;
+    let messagesDeleted = 0;
+    const errors: ErrorResponseType[] = [];
+
+    try {
+      logger.debug("Starting sync for all enabled IMAP accounts");
+
+      // Get all enabled accounts
+      const enabledAccounts = await db
+        .select()
+        .from(imapAccounts)
+        .where(eq(imapAccounts.enabled, true));
+
+      logger.debug(`Found ${enabledAccounts.length} enabled IMAP accounts`);
+
+      for (const account of enabledAccounts) {
+        try {
+          accountsProcessed++;
+          logger.debug(`Syncing account: ${account.email}`);
+
+          // Update account sync status
+          await db
+            .update(imapAccounts)
+            .set({
+              syncStatus: ImapSyncStatus.SYNCING,
+              syncError: null,
+            })
+            .where(eq(imapAccounts.id, account.id));
+
+          // Sync account
+          const accountResult = await this.syncAccount(
+            { account },
+            user,
+            locale,
+            logger,
+          );
+
+          if (accountResult.success) {
+            foldersProcessed +=
+              accountResult.data.result.results.foldersProcessed;
+            messagesProcessed +=
+              accountResult.data.result.results.messagesProcessed;
+            foldersAdded += accountResult.data.result.results.foldersAdded;
+            foldersUpdated += accountResult.data.result.results.foldersUpdated;
+            foldersDeleted += accountResult.data.result.results.foldersDeleted;
+            messagesAdded += accountResult.data.result.results.messagesAdded;
+            messagesUpdated +=
+              accountResult.data.result.results.messagesUpdated;
+            messagesDeleted +=
+              accountResult.data.result.results.messagesDeleted;
+            errors.push(...accountResult.data.result.results.errors);
+
+            // Update account sync status to success
+            await db
+              .update(imapAccounts)
+              .set({
+                syncStatus: ImapSyncStatus.SYNCED,
+                lastSyncAt: new Date(),
+                syncError: null,
+              })
+              .where(eq(imapAccounts.id, account.id));
+
+            logger.debug(`Successfully synced account: ${account.email}`);
+          } else {
+            errors.push(
+              createErrorResponse(
+                "imap.sync.errors.account_failed",
+                ErrorResponseTypes.UNKNOWN_ERROR,
+                { error: accountResult.message },
+              ),
+            );
+
+            // Update account sync status to error
+            await db
+              .update(imapAccounts)
+              .set({
+                syncStatus: ImapSyncStatus.ERROR,
+                syncError: accountResult.message,
+              })
+              .where(eq(imapAccounts.id, account.id));
+
+            logger.error(
+              `Failed to sync account: ${account.email}`,
+              accountResult.message,
+            );
+          }
+        } catch (error) {
+          const errorMessage = parseError(error).message;
+          errors.push(
+            createErrorResponse(
+              "imapErrors.sync.account.failed",
+              ErrorResponseTypes.INTERNAL_ERROR,
+              { error: errorMessage },
+            ),
+          );
+
+          // Update account sync status to error
+          await db
+            .update(imapAccounts)
+            .set({
+              syncStatus: ImapSyncStatus.ERROR,
+              syncError: errorMessage,
+            })
+            .where(eq(imapAccounts.id, account.id));
+
+          logger.error(`Error syncing account ${account.email}`, error);
+        }
+      }
+
+      const duration = Date.now() - startTime;
+      const success = errors.length === 0;
+
+      const result: SyncResult = {
+        success,
+        message: success
+          ? "imap.sync.messages.accounts.success"
+          : "imap.sync.messages.accounts.successWithErrors",
+        results: {
+          accountsProcessed,
+          foldersProcessed,
+          messagesProcessed,
+          foldersAdded,
+          foldersUpdated,
+          foldersDeleted,
+          messagesAdded,
+          messagesUpdated,
+          messagesDeleted,
+          duration,
+          errors,
+        },
+      };
+
+      logger.debug("Completed sync for all accounts", result.results);
+      return createSuccessResponse({ result });
+    } catch (error) {
+      logger.error("Error in syncAllAccounts", error);
+
+      return createErrorResponse(
+        "imapErrors.sync.failed",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Sync a specific IMAP account
+   */
+  async syncAccount(
+    data: SyncAccountRequestTypeOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SyncAccountResponseTypeOutput>> {
+    const startTime = Date.now();
+    let foldersProcessed = 0;
+    let messagesProcessed = 0;
+    let foldersAdded = 0;
+    let foldersUpdated = 0;
+    let foldersDeleted = 0;
+    let messagesAdded = 0;
+    let messagesUpdated = 0;
+    let messagesDeleted = 0;
+    const errors: ErrorResponseType[] = [];
+
+    try {
+      logger.debug(`Starting sync for account: ${data.account.email}`);
+
+      // Test connection first
+      const connectionResult = await imapConnectionRepository.testConnection(
+        { account: data.account },
+        user,
+        locale,
+        logger,
+      );
+      if (!connectionResult.success) {
+        return createErrorResponse(
+          "imapErrors.connection.test.failed",
+          ErrorResponseTypes.INTERNAL_ERROR,
+        );
+      }
+
+      // Sync folders
+      const folderResult = await this.syncAccountFolders(
+        { account: data.account },
+        user,
+        locale,
+        logger,
+      );
+      if (folderResult.success) {
+        foldersProcessed += folderResult.data.result.results.foldersProcessed;
+        foldersAdded += folderResult.data.result.results.foldersAdded;
+        foldersUpdated += folderResult.data.result.results.foldersUpdated;
+        foldersDeleted += folderResult.data.result.results.foldersDeleted;
+      } else {
+        errors.push(
+          createErrorResponse(
+            "imapErrors.sync.folder.failed",
+            ErrorResponseTypes.INTERNAL_ERROR,
+          ),
+        );
+      }
+
+      // Sync messages for each folder
+      const folders = await db
+        .select()
+        .from(imapFolders)
+        .where(eq(imapFolders.accountId, data.account.id));
+
+      for (const folder of folders) {
+        try {
+          const messageResult = await this.syncFolderMessages(
+            { account: data.account, folder },
+            user,
+            locale,
+            logger,
+          );
+          if (messageResult.success) {
+            messagesProcessed +=
+              messageResult.data.result.results.messagesProcessed;
+            messagesAdded += messageResult.data.result.results.messagesAdded;
+            messagesUpdated +=
+              messageResult.data.result.results.messagesUpdated;
+            messagesDeleted +=
+              messageResult.data.result.results.messagesDeleted;
+            errors.push(...messageResult.data.result.results.errors);
+          } else {
+            errors.push(
+              createErrorResponse(
+                "imap.sync.errors.message_sync_failed",
+                ErrorResponseTypes.UNKNOWN_ERROR,
+              ),
+            );
+          }
+        } catch (error) {
+          logger.error("Error syncing folder messages", error);
+          errors.push(
+            createErrorResponse(
+              "imap.sync.errors.message_sync_error",
+              ErrorResponseTypes.UNKNOWN_ERROR,
+            ),
+          );
+          logger.error(`Error syncing folder ${folder.name}`, error);
+        }
+      }
+
+      const duration = Date.now() - startTime;
+      const success = errors.length === 0;
+
+      const result: SyncResult = {
+        success,
+        message: success
+          ? "imap.sync.messages.account.success"
+          : "imap.sync.messages.account.successWithErrors",
+        results: {
+          accountsProcessed: 1,
+          foldersProcessed,
+          messagesProcessed,
+          foldersAdded,
+          foldersUpdated,
+          foldersDeleted,
+          messagesAdded,
+          messagesUpdated,
+          messagesDeleted,
+          duration,
+          errors,
+        },
+      };
+
+      logger.debug(
+        `Completed sync for account: ${data.account.email}`,
+        result.results,
+      );
+      return createSuccessResponse({ result });
+    } catch (error) {
+      logger.error(`Error syncing account ${data.account.email}`, error);
+
+      return createErrorResponse(
+        "imapErrors.sync.account.failed",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Sync folders for an account
+   */
+  async syncAccountFolders(
+    data: SyncAccountFoldersRequestTypeOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SyncAccountFoldersResponseTypeOutput>> {
+    const startTime = Date.now();
+    let foldersProcessed = 0;
+    let foldersAdded = 0;
+    let foldersUpdated = 0;
+    const errors: ErrorResponseType[] = [];
+
+    try {
+      logger.debug(`Syncing folders for account: ${data.account.email}`);
+
+      // Get folders from IMAP server
+      const remoteFoldersResult = await imapConnectionRepository.listFolders(
+        { account: data.account },
+        user,
+        locale,
+        logger,
+      );
+
+      if (!remoteFoldersResult.success) {
+        return createErrorResponse(
+          "imapErrors.connection.folders.list.failed",
+          ErrorResponseTypes.INTERNAL_ERROR,
+        );
+      }
+
+      const remoteFolders = remoteFoldersResult.data.folders;
+
+      for (const remoteFolder of remoteFolders) {
+        try {
+          foldersProcessed++;
+
+          // Check if folder exists in database
+          const [existingFolder] = await db
+            .select()
+            .from(imapFolders)
+            .where(eq(imapFolders.path, remoteFolder.path))
+            .limit(1);
+
+          if (existingFolder) {
+            // Update existing folder
+            await db
+              .update(imapFolders)
+              .set({
+                displayName: remoteFolder.displayName,
+                delimiter: remoteFolder.delimiter,
+                isSelectable: remoteFolder.isSelectable,
+                hasChildren: remoteFolder.hasChildren,
+                isSpecialUse: remoteFolder.isSpecialUse,
+                specialUseType: remoteFolder.specialUseType,
+                uidValidity: remoteFolder.uidValidity,
+                uidNext: remoteFolder.uidNext,
+                messageCount: remoteFolder.messageCount,
+                recentCount: remoteFolder.recentCount,
+                unseenCount: remoteFolder.unseenCount,
+                syncStatus: ImapSyncStatus.SYNCED,
+                lastSyncAt: new Date(),
+                updatedAt: new Date(),
+              })
+              .where(eq(imapFolders.id, existingFolder.id));
+
+            foldersUpdated++;
+            logger.debug(`Updated folder: ${remoteFolder.name}`);
+          } else {
+            // Create new folder
+            const newFolder: NewImapFolder = {
+              name: remoteFolder.name,
+              displayName: remoteFolder.displayName,
+              path: remoteFolder.path,
+              delimiter: remoteFolder.delimiter,
+              isSelectable: remoteFolder.isSelectable,
+              hasChildren: remoteFolder.hasChildren,
+              isSpecialUse: remoteFolder.isSpecialUse,
+              specialUseType: remoteFolder.specialUseType,
+              uidValidity: remoteFolder.uidValidity,
+              uidNext: remoteFolder.uidNext,
+              messageCount: remoteFolder.messageCount,
+              recentCount: remoteFolder.recentCount,
+              unseenCount: remoteFolder.unseenCount,
+              accountId: data.account.id,
+              syncStatus: ImapSyncStatus.SYNCED,
+              lastSyncAt: new Date(),
+            };
+
+            await db.insert(imapFolders).values(newFolder);
+            foldersAdded++;
+            logger.debug(`Added folder: ${remoteFolder.name}`);
+          }
+        } catch (error) {
+          logger.error("Error syncing folder", error);
+          errors.push(
+            createErrorResponse(
+              "imap.sync.errors.folder_sync_failed",
+              ErrorResponseTypes.UNKNOWN_ERROR,
+              { error: parseError(error).message },
+            ),
+          );
+          logger.error(`Error syncing folder ${remoteFolder.name}`, error);
+        }
+      }
+
+      const duration = Date.now() - startTime;
+      const success = errors.length === 0;
+
+      const result: SyncResult = {
+        success,
+        message: success
+          ? "imap.sync.messages.folders.success"
+          : "imap.sync.messages.folders.successWithErrors",
+        results: {
+          accountsProcessed: 0,
+          foldersProcessed,
+          messagesProcessed: 0,
+          foldersAdded,
+          foldersUpdated,
+          foldersDeleted: 0,
+          messagesAdded: 0,
+          messagesUpdated: 0,
+          messagesDeleted: 0,
+          duration,
+          errors,
+        },
+      };
+
+      logger.debug(
+        `Completed folder sync for account: ${data.account.email}`,
+        result.results,
+      );
+      return createSuccessResponse({ result });
+    } catch (error) {
+      logger.error(
+        `Error syncing folders for account ${data.account.email}`,
+        error,
+      );
+
+      return createErrorResponse(
+        "imapErrors.sync.folder.failed",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Sync messages for a folder
+   */
+  async syncFolderMessages(
+    data: SyncFolderMessagesRequestTypeOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SyncFolderMessagesResponseTypeOutput>> {
+    const startTime = Date.now();
+    let messagesProcessed = 0;
+    let messagesAdded = 0;
+    let messagesUpdated = 0;
+    const errors: ErrorResponseType[] = [];
+
+    try {
+      logger.debug(`Syncing messages for folder: ${data.folder.name}`);
+
+      // Get messages from IMAP server
+      const remoteMessagesResponse =
+        await imapConnectionRepository.listMessages(
+          {
+            account: data.account,
+            folderPath: data.folder.path,
+            options: { limit: data.account.maxMessages || 1000 },
+          },
+          user,
+          locale,
+          logger,
+        );
+      if (!remoteMessagesResponse.success) {
+        return createErrorResponse(
+          "imapErrors.connection.messages.list.failed",
+          ErrorResponseTypes.INTERNAL_ERROR,
+        );
+      }
+      const remoteMessages = remoteMessagesResponse.data.messages;
+
+      for (const remoteMessage of remoteMessages) {
+        try {
+          messagesProcessed++;
+
+          // Check if message exists in database
+          const [existingMessage] = await db
+            .select()
+            .from(emails)
+            .where(eq(emails.imapMessageId, remoteMessage.messageId))
+            .limit(1);
+
+          if (existingMessage) {
+            // Update existing message
+            await db
+              .update(emails)
+              .set({
+                subject: remoteMessage.subject,
+                isRead: remoteMessage.flags.includes(IMAP_FLAGS.SEEN),
+                isFlagged: remoteMessage.flags.includes(IMAP_FLAGS.FLAGGED),
+                isDeleted: remoteMessage.flags.includes(IMAP_FLAGS.DELETED),
+                isDraft: remoteMessage.flags.includes(IMAP_FLAGS.DRAFT),
+                isAnswered: remoteMessage.flags.includes(IMAP_FLAGS.ANSWERED),
+                messageSize: remoteMessage.size,
+                hasAttachments: remoteMessage.hasAttachments,
+                attachmentCount: remoteMessage.attachmentCount,
+                syncStatus: ImapSyncStatus.SYNCED,
+                lastSyncAt: new Date(),
+                updatedAt: new Date(),
+              })
+              .where(eq(emails.id, existingMessage.id));
+
+            messagesUpdated++;
+          } else {
+            // Create new message
+            const newMessage: NewEmail = {
+              type: EmailType.USER_COMMUNICATION,
+              subject: remoteMessage.subject,
+              recipientEmail: remoteMessage.to,
+              senderEmail: remoteMessage.from,
+              imapUid: remoteMessage.uid,
+              imapMessageId: remoteMessage.messageId,
+              imapFolderId: data.folder.id,
+              imapAccountId: data.account.id,
+              bodyText: remoteMessage.bodyText,
+              bodyHtml: remoteMessage.bodyHtml,
+              headers: remoteMessage.headers,
+              isRead: remoteMessage.flags.includes(IMAP_FLAGS.SEEN),
+              isFlagged: remoteMessage.flags.includes(IMAP_FLAGS.FLAGGED),
+              isDeleted: remoteMessage.flags.includes(IMAP_FLAGS.DELETED),
+              isDraft: remoteMessage.flags.includes(IMAP_FLAGS.DRAFT),
+              isAnswered: remoteMessage.flags.includes(IMAP_FLAGS.ANSWERED),
+              messageSize: remoteMessage.size,
+              hasAttachments: remoteMessage.hasAttachments,
+              attachmentCount: remoteMessage.attachmentCount,
+              sentAt: remoteMessage.date,
+              syncStatus: ImapSyncStatus.SYNCED,
+              lastSyncAt: new Date(),
+            };
+
+            await db.insert(emails).values(newMessage);
+            messagesAdded++;
+          }
+        } catch (error) {
+          logger.error("Error syncing message", error);
+          errors.push(
+            createErrorResponse(
+              "imapErrors.sync.message.failed",
+              ErrorResponseTypes.INTERNAL_ERROR,
+            ),
+          );
+          logger.error(
+            `Error syncing message ${remoteMessage.messageId}`,
+            error,
+          );
+        }
+      }
+
+      const duration = Date.now() - startTime;
+      const success = errors.length === 0;
+
+      const result: SyncResult = {
+        success,
+        message: success
+          ? "imap.sync.messages.messages.success"
+          : "imap.sync.messages.messages.successWithErrors",
+        results: {
+          accountsProcessed: 0,
+          foldersProcessed: 0,
+          messagesProcessed,
+          foldersAdded: 0,
+          foldersUpdated: 0,
+          foldersDeleted: 0,
+          messagesAdded,
+          messagesUpdated,
+          messagesDeleted: 0,
+          duration,
+          errors,
+        },
+      };
+
+      logger.debug(
+        `Completed message sync for folder: ${data.folder.name}`,
+        result.results,
+      );
+      return createSuccessResponse({ result });
+    } catch (error) {
+      logger.error(
+        `Error syncing messages for folder ${data.folder.name}`,
+        error,
+      );
+
+      return createErrorResponse(
+        "imapErrors.sync.message.failed",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
+  }
+}
+
+// Export singleton instance
+export const imapSyncRepository = new ImapSyncRepositoryImpl();

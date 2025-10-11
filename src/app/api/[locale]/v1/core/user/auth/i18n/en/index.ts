@@ -1,0 +1,182 @@
+export const translations = {
+  errors: {
+    token_generation_failed: {
+      title: "Token Generation Failed",
+      description: "Failed to generate authentication token",
+    },
+    invalid_session: {
+      title: "Invalid Session",
+      description: "The session is invalid or expired",
+    },
+    missing_request_context: {
+      title: "Missing Request Context",
+      description: "Request context is missing",
+    },
+    unsupported_platform: {
+      title: "Unsupported Platform",
+      description: "Platform is not supported",
+    },
+    session_retrieval_failed: {
+      title: "Session Retrieval Failed",
+      description: "Failed to retrieve session",
+    },
+    missing_token: {
+      title: "Missing Token",
+      description: "Authentication token is missing",
+    },
+    invalid_token_signature: {
+      title: "Invalid Token Signature",
+      description: "Token signature is invalid",
+    },
+    jwt_payload_missing_id: {
+      title: "JWT Payload Missing ID",
+      description: "JWT payload is missing user ID",
+    },
+    cookie_set_failed: {
+      title: "Cookie Set Failed",
+      description: "Failed to set authentication cookie",
+    },
+    cookie_clear_failed: {
+      title: "Cookie Clear Failed",
+      description: "Failed to clear authentication cookie",
+    },
+  },
+  post: {
+    title: "Auth",
+    description: "Auth endpoint",
+    form: {
+      title: "Auth Configuration",
+      description: "Configure auth parameters",
+    },
+    response: {
+      title: "Response",
+      description: "Auth response data",
+    },
+    errors: {
+      unauthorized: {
+        title: "Unauthorized",
+        description: "Authentication required",
+      },
+      validation: {
+        title: "Validation Error",
+        description: "Invalid request parameters",
+      },
+      server: {
+        title: "Server Error",
+        description: "Internal server error occurred",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unknown error occurred",
+      },
+      network: {
+        title: "Network Error",
+        description: "Network error occurred",
+      },
+      forbidden: {
+        title: "Forbidden",
+        description: "Access forbidden",
+      },
+      notFound: {
+        title: "Not Found",
+        description: "Resource not found",
+      },
+      conflict: {
+        title: "Conflict",
+        description: "Data conflict occurred",
+      },
+      token_generation_failed: {
+        title: "Token Generation Failed",
+        description: "Failed to generate authentication token",
+      },
+      invalid_session: {
+        title: "Invalid Session",
+        description: "The session is invalid or expired",
+      },
+      missing_request_context: {
+        title: "Missing Request Context",
+        description: "Request context is missing",
+      },
+      unsupported_platform: {
+        title: "Unsupported Platform",
+        description: "Platform is not supported",
+      },
+      session_retrieval_failed: {
+        title: "Session Retrieval Failed",
+        description: "Failed to retrieve session",
+      },
+      missing_token: {
+        title: "Missing Token",
+        description: "Authentication token is missing",
+      },
+      invalid_token_signature: {
+        title: "Invalid Token Signature",
+        description: "Token signature is invalid",
+      },
+      jwt_payload_missing_id: {
+        title: "JWT Payload Missing ID",
+        description: "JWT payload is missing user ID",
+      },
+      cookie_set_failed: {
+        title: "Cookie Set Failed",
+        description: "Failed to set authentication cookie",
+      },
+      cookie_clear_failed: {
+        title: "Cookie Clear Failed",
+        description: "Failed to clear authentication cookie",
+      },
+    },
+    success: {
+      title: "Success",
+      description: "Operation completed successfully",
+    },
+  },
+  enums: {
+    webSocketErrorCode: {
+      unauthorized: "Unauthorized",
+      forbidden: "Forbidden",
+      invalidToken: "Invalid Token",
+      tokenExpired: "Token Expired",
+      serverError: "Server Error",
+    },
+  },
+  debug: {
+    signingJwt: "Signing JWT",
+    jwtSignedSuccessfully: "JWT signed successfully",
+    errorSigningJwt: "Error signing JWT",
+    verifyingJwt: "Verifying JWT",
+    invalidTokenPayload: "Invalid token payload",
+    jwtVerifiedSuccessfully: "JWT verified successfully",
+    errorVerifyingJwt: "Error verifying JWT",
+    userIdNotExistsInDb: "User ID does not exist in database",
+    sessionNotFound: "Session not found",
+    sessionExpired: "Session expired",
+    errorValidatingUserSession: "Error validating user session",
+    errorGettingUserRoles: "Error getting user roles",
+    errorCheckingUserAuth: "Error checking user authentication",
+    gettingCurrentUserFromTrpc: "Getting current user from tRPC",
+    errorGettingAuthUserForTrpc: "Error getting auth user for tRPC",
+    errorGettingUserRolesForTrpc: "Error getting user roles for tRPC",
+    authenticatingCliUserWithPayload: "Authenticating CLI user with payload",
+    errorAuthenticatingCliUserWithPayload:
+      "Error authenticating CLI user with payload",
+    creatingCliToken: "Creating CLI token",
+    errorCreatingCliToken: "Error creating CLI token",
+    validatingCliToken: "Validating CLI token",
+    errorValidatingCliToken: "Error validating CLI token",
+    gettingCurrentUserFromNextjs: "Getting current user from Next.js",
+    errorGettingAuthUserForNextjs: "Error getting auth user for Next.js",
+    settingNextjsAuthCookies: "Setting Next.js auth cookies",
+    clearingNextjsAuthCookies: "Clearing Next.js auth cookies",
+    gettingCurrentUserFromToken: "Getting current user from token",
+    errorGettingCurrentUserFromCli: "Error getting current user from CLI",
+    errorGettingAuthUserForCli: "Error getting auth user for CLI",
+    errorGettingUserRolesForCli: "Error getting user roles for CLI",
+    tokenFromAuthHeader: "Token from auth header",
+    tokenFromCookie: "Token from cookie",
+    noTokenFound: "No token found",
+    errorExtractingToken: "Error extracting token",
+    errorParsingCookies: "Error parsing cookies",
+    errorGettingCurrentUserFromTrpc: "Error getting current user from tRPC",
+  },
+};

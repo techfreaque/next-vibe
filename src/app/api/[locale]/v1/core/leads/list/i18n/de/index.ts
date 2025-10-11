@@ -1,0 +1,142 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  get: {
+    title: "Leads auflisten",
+    description: "Abrufen einer paginierten Liste von Leads mit Filterung",
+    form: {
+      title: "Lead-Listen-Filter",
+      description: "Filter für Lead-Liste konfigurieren",
+    },
+    page: {
+      label: "Seitennummer",
+      description: "Seitennummer für Paginierung",
+      placeholder: "Seitennummer eingeben",
+    },
+    limit: {
+      label: "Ergebnisse pro Seite",
+      description: "Anzahl der Ergebnisse pro Seite",
+      placeholder: "Limit eingeben",
+    },
+    status: {
+      label: "Lead-Status",
+      description: "Nach Lead-Status filtern",
+      placeholder: "Status auswählen",
+    },
+    currentCampaignStage: {
+      label: "Kampagnenstufe",
+      description: "Nach aktueller Kampagnenstufe filtern",
+      placeholder: "Kampagnenstufe auswählen",
+    },
+    source: {
+      label: "Lead-Quelle",
+      description: "Nach Lead-Quelle filtern",
+      placeholder: "Quelle auswählen",
+    },
+    country: {
+      label: "Land",
+      description: "Nach Land filtern",
+      placeholder: "Länder auswählen",
+    },
+    language: {
+      label: "Sprache",
+      description: "Nach Sprache filtern",
+      placeholder: "Sprachen auswählen",
+    },
+    search: {
+      label: "Suche",
+      description: "Leads nach Name, E-Mail oder Firma suchen",
+      placeholder: "Suchbegriff eingeben",
+    },
+    sortBy: {
+      label: "Sortieren nach",
+      description: "Feld zum Sortieren der Ergebnisse",
+      placeholder: "Sortierfeld auswählen",
+    },
+    sortOrder: {
+      label: "Sortierreihenfolge",
+      description: "Sortierreihenfolge für Ergebnisse",
+      placeholder: "Sortierreihenfolge auswählen",
+    },
+    response: {
+      title: "Lead-Listen-Antwort",
+      description: "Paginierte Liste von Leads mit Metadaten",
+      leads: {
+        title: "Lead-Details",
+        description: "Einzelne Lead-Informationen",
+        id: "Lead-ID",
+        email: "E-Mail-Adresse",
+        businessName: "Firmenname",
+        contactName: "Kontaktname",
+        phone: "Telefonnummer",
+        website: "Webseite",
+        country: "Land",
+        language: "Sprache",
+        status: "Status",
+        source: "Quelle",
+        notes: "Notizen",
+        convertedUserId: "Konvertierte Benutzer-ID",
+        convertedAt: "Konvertiert am",
+        signedUpAt: "Angemeldet am",
+        consultationBookedAt: "Beratung gebucht am",
+        subscriptionConfirmedAt: "Abonnement bestätigt am",
+        currentCampaignStage: "Aktuelle Kampagnenstufe",
+        emailsSent: "E-Mails gesendet",
+        lastEmailSentAt: "Letzte E-Mail gesendet am",
+        unsubscribedAt: "Abgemeldet am",
+        emailsOpened: "E-Mails geöffnet",
+        emailsClicked: "E-Mails geklickt",
+        lastEngagementAt: "Letztes Engagement am",
+        metadata: "Metadaten",
+        createdAt: "Erstellt am",
+        updatedAt: "Aktualisiert am",
+      },
+      total: "Gesamt Leads",
+      page: "Aktuelle Seite",
+      limit: "Seitengröße",
+      totalPages: "Gesamtseiten",
+    },
+    errors: {
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Authentifizierung erforderlich um Leads aufzulisten",
+      },
+      validation: {
+        title: "Validierungsfehler",
+        description: "Ungültige Filterparameter",
+      },
+      server: {
+        title: "Serverfehler",
+        description: "Interner Serverfehler beim Abrufen der Leads",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unbekannter Fehler beim Abrufen der Leads",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Netzwerkfehler beim Abrufen der Leads",
+      },
+      forbidden: {
+        title: "Verboten",
+        description: "Zugriff auf Lead-Liste verboten",
+      },
+      notFound: {
+        title: "Nicht gefunden",
+        description: "Leads nicht gefunden",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Datenkonflikt beim Abrufen der Leads",
+      },
+      unsavedChanges: {
+        title: "Ungespeicherte Änderungen",
+        description: "Es gibt ungespeicherte Änderungen in der Lead-Liste",
+      },
+    },
+    success: {
+      title: "Erfolg",
+      description: "Lead-Liste erfolgreich abgerufen",
+    },
+  },
+};

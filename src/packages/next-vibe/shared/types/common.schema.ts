@@ -3,15 +3,28 @@ import { z } from "zod";
 // Common reusable schemas
 
 export const dateSchema = z
-  .string()
-  .or(z.date())
-  .transform((val) => (val instanceof Date ? val.toISOString() : val));
-export type DateType = z.input<typeof dateRangeSchema>;
+  .union([z.string(), z.date(), z.number()])
+  .transform((val): string | Date | number => {
+    if (val instanceof Date) {
+      return val;
+    }
+    return new Date(val);
+  });
+
+export type DateInputType = z.input<typeof dateRangeSchema>;
 
 export const idSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
 });
 export type IdType = z.infer<typeof idSchema>;
+
+export const stringToIntSchema = (
+  errorMessage: string,
+): ReturnType<typeof z.coerce.number> => {
+  return z.coerce.number().int({
+    message: errorMessage,
+  });
+};
 
 export const paginationSchema = z.object({
   page: z.coerce.number().int().positive().default(1),
@@ -32,3 +45,8 @@ export type DateRangeType = z.infer<typeof dateRangeSchema>;
 
 export const undefinedSchema = z.undefined();
 export type UndefinedType = z.input<typeof undefinedSchema>;
+
+export const booleanSchema = z.object({
+  exists: z.boolean(),
+});
+export type BooleanType = z.input<typeof booleanSchema>;

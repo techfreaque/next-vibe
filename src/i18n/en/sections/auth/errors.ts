@@ -1,0 +1,16 @@
+export const errorsTranslations = {
+  jwt_signing_failed: "Failed to create authentication token",
+  token_expired: "Authentication token has expired",
+  invalid_token_signature: "Invalid authentication token signature",
+  token_verification_failed: "Failed to verify authentication token: {{error}}",
+  missing_token: "Authentication token is missing",
+  session_retrieval_failed: "Failed to retrieve session information",
+  cookie_set_failed: "Failed to set authentication cookies",
+  cookie_clear_failed: "Failed to clear authentication cookies",
+  jwt_payload_missing_id: "JWT payload is missing user ID",
+  invalid_session: "The session is invalid or expired",
+  missing_request_context: "Request context is missing",
+  unsupported_platform: "Platform is not supported",
+  email_send_failed: "Failed to send email",
+  validation_failed: "Validation failed",
+};

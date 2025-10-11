@@ -1,0 +1,17 @@
+export const navigationTranslations = {
+  dashboard: "Dashboard",
+  leadManagement: "Lead Management",
+  users: "Users",
+  emails: "Emails",
+  consultations: "Consultations",
+  cronTasks: "Cron Tasks",
+  analytics: "Analytics",
+  emailCampaigns: "Email Campaigns",
+  database: "Database",
+  settings: "Settings",
+  adminPanel: "Admin Panel",
+  admin: "Admin",
+  adminDashboard: "Admin Dashboard",
+  backToApp: "Back to App",
+  administrator: "Administrator",
+};

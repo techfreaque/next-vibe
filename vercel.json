@@ -1,0 +1,13 @@
+{
+    "buildCommand": "vibe build",
+    "outputDirectory": ".next",
+    "framework": "nextjs",
+    "installCommand": "yarn setup",
+    "env": {},
+    "crons": [
+        {
+            "path": "/api/cron/pulse",
+            "schedule": "* * * * *"
+        }
+    ]
+}

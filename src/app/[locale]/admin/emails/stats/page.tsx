@@ -1,0 +1,56 @@
+/**
+ * Emails Stats Page
+ * Server component for email statistics and analytics
+ */
+
+import { BarChart3 } from "lucide-react";
+import type { Metadata } from "next";
+import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import type React from "react";
+
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
+import { EmailsStatsClient } from "./_components/emails-stats-client";
+
+interface EmailsStatsPageProps {
+  params: Promise<{
+    locale: CountryLanguage;
+  }>;
+}
+
+export async function generateMetadata({
+  params,
+}: EmailsStatsPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const { t } = simpleT(locale);
+
+  return {
+    title: t("emails.admin.stats.title"),
+    description: t("emails.admin.description"),
+  };
+}
+
+export default async function EmailsStatsPage({
+  params,
+}: EmailsStatsPageProps): Promise<React.JSX.Element> {
+  const { locale } = await params;
+  const { t } = simpleT(locale);
+
+  return (
+    <div className="space-y-6">
+      {/* Stats Content */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5" />
+            {t("emails.admin.stats.title")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <EmailsStatsClient locale={locale} />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

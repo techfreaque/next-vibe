@@ -1,0 +1,27 @@
+import type { statsTranslations as EnglishStatsTranslations } from "../../../en/sections/dashboard/stats";
+
+export const statsTranslations: typeof EnglishStatsTranslations = {
+  subscription: "Abonnement",
+  active: "Aktiv",
+  inactive: "Inaktiv",
+  renewsOn: "Verlängert sich am {{date}}",
+  noSubscription: "Kein aktives Abonnement",
+  manageSubscription: "Abonnement verwalten",
+  subscribe: "Abonnieren",
+  platforms: "Social Plattformen",
+  platformsConnected: "Plattformen verbunden",
+  noPlatforms: "Keine Plattformen verbunden",
+  managePlatforms: "Plattformen verwalten",
+  connectPlatforms: "Plattformen verbinden",
+  consultations: "Beratungen",
+  consultationScheduled: "Beratung geplant",
+  noConsultation: "Keine Beratung geplant",
+  manageConsultation: "Beratung verwalten",
+  scheduleConsultation: "Beratung planen",
+  analytics: "Analytics",
+  available: "Verfügbar",
+  unavailable: "Nicht verfügbar",
+  analyticsReady: "Analytics bereit",
+  connectPlatformsFirst: "Verbinden Sie zuerst Plattformen",
+  viewAnalytics: "Analytics anzeigen",
+};

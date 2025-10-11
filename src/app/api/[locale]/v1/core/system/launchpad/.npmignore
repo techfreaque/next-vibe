@@ -1,0 +1,7 @@
+.github
+.vscode
+node_modules/
+eslint.config.mjs
+build.config.ts
+release.config.ts
+bun.lock

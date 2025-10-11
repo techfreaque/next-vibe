@@ -1,0 +1,182 @@
+import type { translations as enTranslations } from "../en";
+
+/**
+*
+
+* Contact API translations (Polish)
+*/
+
+export const translations: typeof enTranslations = {
+  title: "Przesłanie formularza kontaktowego",
+  description: "Prześlij formularz kontaktowy i obsługuj powiadomienia e-mail",
+  category: "Podstawowe API",
+  summary: "Przetwarzaj przesłania formularzy kontaktowych z śledzeniem leadów",
+  tags: {
+    contactForm: "Formularz kontaktowy",
+    contactUs: "Skontaktuj się z nami",
+    contactSubmission: "Przesłanie kontaktu",
+    helpSupport: "Pomoc i wsparcie",
+  },
+
+  form: {
+    label: "Formularz kontaktowy",
+    description: "Wypełnij formularz, aby skontaktować się z naszym zespołem",
+    fields: {
+      name: {
+        label: "Pełne imię i nazwisko",
+        description: "Wprowadź swoje pełne imię i nazwisko",
+        placeholder: "Jan Kowalski",
+      },
+      email: {
+        label: "Adres e-mail",
+        description: "Wprowadź swój adres e-mail",
+        placeholder: "jan.kowalski@przyklad.pl",
+      },
+      company: {
+        label: "Firma",
+        description: "Wprowadź nazwę swojej firmy (opcjonalne)",
+        placeholder: "Przykładowa Sp. z o.o.",
+      },
+      subject: {
+        label: "Temat",
+        description: "Krótki opis Twojego zapytania",
+        placeholder: "Ogólne zapytanie o usługi",
+      },
+      message: {
+        label: "Wiadomość",
+        description: "Szczegółowy opis Twojego zapytania",
+        placeholder:
+          "Proszę podać więcej szczegółów dotyczących Twoich potrzeb...",
+      },
+      priority: {
+        label: "Priorytet",
+        description: "Wybierz poziom pilności Twojego zapytania",
+        placeholder: "Wybierz poziom priorytetu",
+      },
+      leadId: {
+        label: "ID leada",
+        description: "Wewnętrzne ID śledzenia leada (wypełniane automatycznie)",
+        placeholder: "lead_123",
+      },
+    },
+  },
+
+  subject: {
+    helpSupport: "Pomoc i wsparcie",
+    generalInquiry: "Ogólne zapytanie",
+    technicalSupport: "Wsparcie techniczne",
+    accountQuestion: "Pytanie o konto",
+    billingQuestion: "Pytanie o rozliczenia",
+    salesInquiry: "Zapytanie sprzedażowe",
+    featureRequest: "Prośba o funkcję",
+    bugReport: "Zgłoszenie błędu",
+    feedback: "Opinia",
+    complaint: "Skarga",
+    partnership: "Partnerstwo",
+    other: "Inne",
+  },
+
+  priority: {
+    low: "Niski",
+    medium: "Średni",
+    high: "Wysoki",
+    urgent: "Pilne",
+  },
+
+  status: {
+    new: "Nowy",
+    inProgress: "W trakcie",
+    resolved: "Rozwiązany",
+    closed: "Zamknięty",
+  },
+
+  response: {
+    label: "Odpowiedź na przesłanie kontaktu",
+    description: "Wynik przesłania formularza kontaktowego",
+    success: "Formularz kontaktowy przesłany pomyślnie",
+    messageId: "ID wiadomości do śledzenia",
+    status: "Aktualny status kontaktu",
+  },
+
+  examples: {
+    requests: {
+      general: {
+        title: "Ogólne zapytanie kontaktowe",
+        description: "Przykład ogólnego przesłania formularza kontaktowego",
+      },
+    },
+    responses: {
+      success: {
+        title: "Pomyślne przesłanie",
+        description: "Przykład pomyślnej odpowiedzi formularza kontaktowego",
+      },
+    },
+  },
+
+  errors: {
+    createFailed: {
+      title: "Przesłanie kontaktu nie powiodło się",
+      description:
+        "Nie można obecnie przetworzyć Twojego formularza kontaktowego. Spróbuj ponownie później.",
+    },
+    repositoryCreateFailed: "Nie udało się utworzyć żądania kontaktu",
+    repositoryCreateDetails:
+      "Nie można obecnie przetworzyć Twojego formularza kontaktowego. Spróbuj ponownie później.",
+    validation: {
+      title: "Błąd walidacji",
+      description: "Sprawdź swoje dane i spróbuj ponownie",
+      nameMinLength: "Imię i nazwisko musi mieć co najmniej 2 znaki",
+      emailInvalid: "Wprowadź prawidłowy adres e-mail",
+      subjectRequired: "Temat jest wymagany",
+      messageMinLength: "Wiadomość musi mieć co najmniej 10 znaków",
+      priorityInvalid: "Wybierz prawidłowy poziom priorytetu",
+      statusInvalid: "Nieprawidłowa wartość statusu",
+    },
+    network: {
+      title: "Błąd sieci",
+      description: "Wystąpił błąd sieci podczas przetwarzania Twojego żądania",
+    },
+    unauthorized: {
+      title: "Brak autoryzacji",
+      description: "Nie jesteś uprawniony do wykonania tej akcji",
+    },
+    forbidden: {
+      title: "Zabronione",
+      description: "Ta akcja jest zabroniona",
+    },
+    notFound: {
+      title: "Nie znaleziono",
+      description: "Żądany zasób nie został znaleziony",
+    },
+    serverError: {
+      title: "Błąd serwera",
+      description: "Wystąpił wewnętrzny błąd serwera",
+    },
+    unknown: {
+      title: "Nieznany błąd",
+      description: "Wystąpił nieznany błąd",
+    },
+    unsavedChanges: {
+      title: "Niezapisane zmiany",
+      description: "Masz niezapisane zmiany",
+    },
+    conflict: {
+      title: "Konflikt",
+      description: "Wystąpił konflikt podczas przetwarzania Twojego żądania",
+    },
+  },
+
+  sms: {
+    admin: {
+      notification: "Nowe zapytanie kontaktowe: {name} ({email}) - {subject}",
+    },
+    confirmation: {
+      message: "{name}, dziękujemy za wiadomość! Skontaktujemy się wkrótce.",
+    },
+  },
+
+  success: {
+    title: "Sukces",
+    description: "Twój formularz kontaktowy został pomyślnie przesłany",
+  },
+};

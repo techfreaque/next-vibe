@@ -1,0 +1,42 @@
+/**
+ * Cron Tasks Management Page
+ * Dedicated page for managing cron tasks
+ */
+
+import type { Metadata } from "next";
+import type { JSX } from "react";
+
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
+import { CronTasksClient } from "./_components/cron-tasks-client";
+
+interface CronTasksPageProps {
+  params: Promise<{
+    locale: CountryLanguage;
+  }>;
+}
+
+export async function generateMetadata({
+  params,
+}: CronTasksPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const { t } = simpleT(locale);
+
+  return {
+    title: t("admin.dashboard.cron.nav.tasks"),
+    description: t("admin.dashboard.cron.nav.tasks_description"),
+  };
+}
+
+export default async function CronTasksPage({
+  params,
+}: CronTasksPageProps): Promise<JSX.Element> {
+  const { locale } = await params;
+
+  return (
+    <div className="space-y-6">
+      <CronTasksClient locale={locale} />
+    </div>
+  );
+}

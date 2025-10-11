@@ -1,0 +1,20 @@
+export const filtersTranslations = {
+  title: "Filters",
+  search: "Search emails...",
+  status: "Status",
+  type: "Type",
+  stage: "Campaign Stage",
+  journeyVariant: "Journey Variant",
+  dateRange: "Date Range",
+  dateFrom: "From",
+  dateTo: "To",
+  clear: "Clear Filters",
+  apply: "Apply Filters",
+  quick_filters: "Quick Filters",
+  quick: {
+    sent: "Sent",
+    opened: "Opened",
+    bounced: "Bounced",
+    lead_campaigns: "Lead Campaigns",
+  },
+};

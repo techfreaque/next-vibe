@@ -1,0 +1,78 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop, 'feature/*', 'fix/*']
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+jobs:
+  # For main branch: check + migrate + deploy
+  # main-deploy:
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '22'
+  #         cache: 'yarn'
+  #         cache-dependency-path: 'yarn.lock'
+
+  #     - name: Setup environment variables
+  #       run: cp .env.example .env
+
+  #     - name: Install dependencies
+  #       run: yarn setup
+
+  #     # - name: Run vibe check (lint, typecheck, tests)
+  #     #   run: vibe check
+
+  #     - name: Run vibe build with migrations and seeding
+  #       env:
+  #         DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  #         NODE_ENV: production
+  #         CRON_SECRET: ${{ secrets.CRON_SECRET }}
+  #         NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+  #         # TODO figureout a better way to handle this
+  #         NODE_TLS_REJECT_UNAUTHORIZED: 0
+  #       run: vibe build
+
+
+  #     - name: Deploy to Vercel
+  #       uses: amondnet/vercel-action@v25
+  #       with:
+  #         vercel-token: ${{ secrets.VERCEL_TOKEN }}
+  #         vercel-org-id: ${{ secrets.VERCEL_TEAM_ID }}
+  #         vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+  #         vercel-args: '--prod'
+
+
+  # For all other branches: just check and build (skip migrations/seeding)
+  other-check:
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'yarn'
+          cache-dependency-path: 'yarn.lock'
+
+      - name: Setup environment variables
+        run: cp .env.example .env
+
+      - name: Install dependencies
+        run: yarn setup
+
+      # - name: Run vibe check (lint, typecheck, tests)
+      #   run: vibe check
+
+      - name: Run vibe build (skip database operations)
+        run: vibe build --run-prod-database=false

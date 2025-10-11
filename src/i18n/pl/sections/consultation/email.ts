@@ -1,0 +1,68 @@
+import type { emailTranslations as EnglishEmailTranslations } from "../../../en/sections/consultation/email";
+
+export const emailTranslations: typeof EnglishEmailTranslations = {
+  subject: "Nowe Żądanie Konsultacji - {{appName}}",
+  title: "Żądanie Konsultacji - {{appName}}",
+  previewText: "Nowe żądanie konsultacji {{businessType}}",
+  greeting: "Witaj Administratorze,",
+  details: "Szczegóły Żądania:",
+  businessType: "Typ Biznesu",
+  contactEmail: "E-mail Kontaktowy",
+  contactPhone: "Telefon Kontaktowy",
+  preferredDate: "Preferowana Data",
+  preferredTime: "Preferowany Czas",
+  message: "Wiadomość",
+  viewRequest: "Zobacz Szczegóły Żądania",
+  closing: "Dziękujemy za uwagę poświęconą temu żądaniu.",
+  noScheduledDate: "Brak dostępnej zaplanowanej daty",
+  noScheduledTime: "Brak dostępnego zaplanowanego czasu",
+  admin: {
+    partner: {
+      subject: "Żądanie Konsultacji dla {{businessName}}",
+      previewText: "Żądanie konsultacji dla {{businessName}}",
+      header: "Usługi Konsultacyjne",
+      greeting: "Witaj {{name}},",
+      intro:
+        "Dziękujemy za zainteresowanie naszymi usługami konsultacyjnymi dla {{businessName}}. Otrzymaliśmy Twoje żądanie i wkrótce się z Tobą skontaktujemy.",
+      messageLabel: "Twoja Wiadomość",
+      nextStepsTitle: "Następne Kroki",
+      nextStep1: "Przejrzymy Twoje żądanie w ciągu 24 godzin",
+      nextStep2:
+        "Członek zespołu skontaktuje się z Tobą, aby zaplanować konsultację",
+      nextStep3:
+        "Przygotujemy spersonalizowane podejście do potrzeb Twojego biznesu",
+      closing: "Cieszymy się na współpracę w rozwoju Twojego biznesu.",
+      contactTitle: "Informacje Kontaktowe",
+      contactEmail: "E-mail",
+      contactPhone: "Telefon",
+      contactWebsite: "Strona internetowa",
+      footer: "Z poważaniem,\nZespół {{companyName}}",
+      disclaimer:
+        "Ten e-mail został wysłany w związku z Twoim żądaniem konsultacji. Jeśli masz pytania, skontaktuj się z nami.",
+    },
+  },
+  scheduled: {
+    subject: "Konsultacja Zaplanowana - {{appName}}",
+    title: "Twoja Konsultacja Jest Zaplanowana - {{appName}}",
+    previewText: "Twoja konsultacja jest zaplanowana na {{date}} o {{time}}",
+    greeting: "Witaj,",
+    confirmation: "Twoja konsultacja została pomyślnie zaplanowana.",
+    details: "Szczegóły Konsultacji:",
+    date: "Data",
+    time: "Czas",
+    businessType: "Typ Biznesu",
+    meetingLink: "Link do Spotkania",
+    originalMessage: "Twoja Oryginalna Wiadomość",
+    joinMeeting: "Dołącz do Spotkania",
+    icsNote: "Zaproszenie kalendarzowe zostało załączone do tego e-maila.",
+    closing: "Cieszymy się na rozmowę z Tobą!",
+    admin: {
+      subject: "Nowa Konsultacja Zaplanowana - {{appName}}",
+      title: "Konsultacja Zaplanowana - {{appName}}",
+      previewText: "Nowa konsultacja {{businessType}} zaplanowana na {{date}}",
+      notification: "Konsultacja została zaplanowana.",
+      details: "Szczegóły Konsultacji:",
+      viewConsultation: "Zobacz Szczegóły Konsultacji",
+    },
+  },
+};

@@ -1,0 +1,576 @@
+/**
+ * IMAP Folders Repository
+ * Data access layer for IMAP folder management functionality
+ */
+
+import "server-only";
+
+import { and, count, desc, eq, ilike } from "drizzle-orm";
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "next-vibe/shared/types/response.schema";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
+
+import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import type { ImapFolder } from "../../messages/db";
+import { imapAccounts, imapFolders } from "../../messages/db";
+// Note: Removed problematic type imports from definition.ts
+// These types should be defined locally or imported from proper sources
+import {
+  ImapSyncStatus,
+  ImapSyncStatusFilter,
+  type ImapSyncStatusValue,
+} from "../enum";
+
+/**
+ * Local type definitions for folders repository
+ */
+interface ImapFolderResponseType {
+  id: string;
+  name: string;
+  displayName: string | null;
+  path: string;
+  delimiter: string;
+  isSelectable: boolean;
+  hasChildren: boolean;
+  isSpecialUse: boolean;
+  specialUseType: string | null;
+  uidValidity: number | null;
+  uidNext: number | null;
+  messageCount: number;
+  recentCount: number;
+  unseenCount: number;
+  accountId: string;
+  syncStatus: string;
+  syncError: string | null;
+  lastSyncAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ImapFolderListResponseType {
+  folders: ImapFolderResponseType[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+interface ImapFolderQueryType {
+  accountId?: string;
+  search?: string;
+  syncStatus?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: string;
+}
+
+interface ImapFolderSyncType {
+  accountId: string;
+  folderId?: string;
+  force?: boolean;
+}
+
+// Removed unused SyncAccountFoldersResult interface
+// Using SyncResults type directly instead
+
+/**
+ * Sync Results Interface
+ */
+interface SyncResults {
+  accountsProcessed: number;
+  foldersProcessed: number;
+  messagesProcessed: number;
+  foldersAdded: number;
+  foldersUpdated: number;
+  foldersDeleted: number;
+  messagesAdded: number;
+  messagesUpdated: number;
+  messagesDeleted: number;
+  duration: number;
+  errors: ErrorResponseType[];
+}
+
+export interface ImapFoldersRepository {
+  listFolders(
+    data: ImapFolderQueryType,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ImapFolderListResponseType>>;
+
+  getFolderById(
+    data: { id: string },
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ImapFolderResponseType>>;
+
+  syncFolders(
+    data: ImapFolderSyncType,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SyncResults>>;
+
+  getFoldersByAccountId(
+    data: { accountId: string },
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ImapFolderListResponseType>>;
+
+  updateFolderSyncStatus(
+    folderId: string,
+    syncStatus: string,
+    syncError: string | null,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ success: boolean }>>;
+
+  updateFolderMessageCounts(
+    folderId: string,
+    counts: { totalMessages: number; unreadMessages: number },
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ success: boolean }>>;
+}
+
+/**
+ * IMAP Folders Repository Implementation
+ */
+class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
+  /**
+   * Format IMAP folder for response
+   */
+  private formatFolderResponse(folder: ImapFolder): ImapFolderResponseType {
+    return {
+      id: folder.id,
+      name: folder.name,
+      displayName: folder.displayName || null,
+      path: folder.path,
+      delimiter: folder.delimiter || "/",
+      isSelectable: folder.isSelectable || true,
+      hasChildren: folder.hasChildren || false,
+      isSpecialUse: folder.isSpecialUse || false,
+      specialUseType: folder.specialUseType || null,
+      uidValidity: folder.uidValidity || null,
+      uidNext: folder.uidNext || null,
+      messageCount: folder.messageCount || 0,
+      recentCount: folder.recentCount || 0,
+      unseenCount: folder.unseenCount || 0,
+      accountId: folder.accountId,
+      lastSyncAt: folder.lastSyncAt?.toISOString() || null,
+      syncStatus: folder.syncStatus || ImapSyncStatus.PENDING,
+      syncError: folder.syncError || null,
+      createdAt: folder.createdAt.toISOString(),
+      updatedAt: folder.updatedAt.toISOString(),
+    };
+  }
+
+  /**
+   * List IMAP folders with filtering and pagination
+   */
+  async listFolders(
+    data: ImapFolderQueryType,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ImapFolderListResponseType>> {
+    try {
+      logger.debug(
+        "app.api.v1.core.emails.imapClient.folders.list.info.start",
+        {
+          accountId: data.accountId,
+          userId: user.id,
+        },
+      );
+
+      const page = data.page || 1;
+      const limit = Math.min(data.limit || 20, 100);
+      const offset = (page - 1) * limit;
+
+      // Build where conditions
+      const whereConditions = [];
+
+      // Account filter (required)
+      if (data.accountId) {
+        whereConditions.push(eq(imapFolders.accountId, data.accountId));
+      }
+
+      // Search filter
+      if (data.search) {
+        const searchTerm = `%${data.search.toLowerCase()}%`;
+        whereConditions.push(ilike(imapFolders.name, searchTerm));
+      }
+
+      // Sync status filter
+      if (data.syncStatus && data.syncStatus !== ImapSyncStatusFilter.ALL) {
+        // Convert filter to database enum value
+        let syncStatusValue: string;
+        switch (data.syncStatus) {
+          case ImapSyncStatusFilter.PENDING:
+            syncStatusValue = ImapSyncStatus.PENDING;
+            break;
+          case ImapSyncStatusFilter.SYNCING:
+            syncStatusValue = ImapSyncStatus.SYNCING;
+            break;
+          case ImapSyncStatusFilter.SYNCED:
+            syncStatusValue = ImapSyncStatus.SYNCED;
+            break;
+          case ImapSyncStatusFilter.ERROR:
+            syncStatusValue = ImapSyncStatus.ERROR;
+            break;
+          default:
+            syncStatusValue = ImapSyncStatus.PENDING;
+        }
+        whereConditions.push(eq(imapFolders.syncStatus, syncStatusValue));
+      }
+
+      const whereClause =
+        whereConditions.length > 0 ? and(...whereConditions) : undefined;
+
+      // Get total count
+      const [{ count: totalCount }] = await db
+        .select({ count: count() })
+        .from(imapFolders)
+        .where(whereClause);
+
+      // Get folders with pagination
+      const folders = await db
+        .select()
+        .from(imapFolders)
+        .where(whereClause)
+        .orderBy(desc(imapFolders.createdAt))
+        .limit(limit)
+        .offset(offset);
+
+      const totalPages = Math.ceil(totalCount / limit);
+
+      return createSuccessResponse({
+        folders: folders.map((folder) => this.formatFolderResponse(folder)),
+        total: totalCount,
+        page,
+        limit,
+        totalPages,
+      });
+    } catch (error) {
+      logger.error(
+        "app.api.v1.core.emails.imapClient.folders.list.error.server",
+        error,
+      );
+      return createErrorResponse(
+        "imapErrors.folders.get.error.server.title",
+        ErrorResponseTypes.INTERNAL_ERROR,
+        { error: parseError(error).message },
+      );
+    }
+  }
+
+  /**
+   * Get IMAP folder by ID
+   */
+  async getFolderById(
+    data: { id: string },
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ImapFolderResponseType>> {
+    try {
+      logger.debug("app.api.v1.core.emails.imapClient.folders.get.info.start", {
+        id: data.id,
+        userId: user.id,
+      });
+
+      const [folder] = await db
+        .select()
+        .from(imapFolders)
+        .where(eq(imapFolders.id, data.id))
+        .limit(1);
+
+      if (!folder) {
+        return createErrorResponse(
+          "imapErrors.folders.get.error.not_found.title",
+          ErrorResponseTypes.NOT_FOUND,
+        );
+      }
+
+      return createSuccessResponse(this.formatFolderResponse(folder));
+    } catch (error) {
+      logger.error(
+        "app.api.v1.core.emails.imapClient.folders.get.error.server",
+        error,
+      );
+      return createErrorResponse(
+        "imapErrors.folders.get.error.server.title",
+        ErrorResponseTypes.INTERNAL_ERROR,
+        { error: parseError(error).message },
+      );
+    }
+  }
+
+  /**
+   * Sync IMAP folders
+   */
+  async syncFolders(
+    data: ImapFolderSyncType,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SyncResults>> {
+    try {
+      logger.debug(
+        "app.api.v1.core.emails.imapClient.folders.sync.info.start",
+        {
+          accountId: data.accountId,
+          userId: user.id,
+        },
+      );
+
+      // Implement actual folder sync using the sync service
+      const { imapSyncRepository } = await import("../sync-service/repository");
+
+      if (data.accountId) {
+        // Get the account first
+        const account = await db
+          .select()
+          .from(imapAccounts)
+          .where(eq(imapAccounts.id, data.accountId))
+          .limit(1);
+
+        if (account.length === 0) {
+          return createErrorResponse(
+            "imapErrors.accounts.get.error.not_found.title",
+            ErrorResponseTypes.NOT_FOUND,
+          );
+        }
+
+        // Sync folders for the specific account
+        const syncResult = await imapSyncRepository.syncAccountFolders(
+          { account: account[0] },
+          user,
+          locale,
+          logger,
+        );
+
+        if (syncResult.success && syncResult.data?.result) {
+          // Type guard for sync result
+          const result = syncResult.data.result;
+          const isValidResult = (
+            r: unknown,
+          ): r is {
+            foldersProcessed?: number;
+            foldersAdded?: number;
+            foldersUpdated?: number;
+            foldersDeleted?: number;
+            duration?: number;
+          } => {
+            return typeof r === "object" && r !== null;
+          };
+
+          const validResult = isValidResult(result) ? result : {};
+          const syncResults: SyncResults = {
+            accountsProcessed: 1,
+            foldersProcessed: validResult.foldersProcessed ?? 0,
+            messagesProcessed: 0,
+            foldersAdded: validResult.foldersAdded ?? 0,
+            foldersUpdated: validResult.foldersUpdated ?? 0,
+            foldersDeleted: validResult.foldersDeleted ?? 0,
+            messagesAdded: 0,
+            messagesUpdated: 0,
+            messagesDeleted: 0,
+            duration: validResult.duration ?? 0,
+            errors: [],
+          };
+          return createSuccessResponse(syncResults);
+        } else {
+          return createErrorResponse(
+            "imapErrors.sync.folder.failed",
+            ErrorResponseTypes.INTERNAL_ERROR,
+          );
+        }
+      } else {
+        return createErrorResponse(
+          "imapErrors.folders.sync.error.missing_account.title",
+          ErrorResponseTypes.BAD_REQUEST,
+        );
+      }
+    } catch (error) {
+      logger.error(
+        "app.api.v1.core.emails.imapClient.folders.sync.error.server",
+        error,
+      );
+      return createErrorResponse(
+        "imapErrors.folders.get.error.server.title",
+        ErrorResponseTypes.INTERNAL_ERROR,
+        { error: parseError(error).message },
+      );
+    }
+  }
+
+  /**
+   * Get folders by account ID
+   */
+  async getFoldersByAccountId(
+    data: { accountId: string },
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ImapFolderListResponseType>> {
+    try {
+      logger.debug(
+        "app.api.v1.core.emails.imapClient.folders.byAccount.info.start",
+        {
+          accountId: data.accountId,
+          userId: user.id,
+        },
+      );
+
+      const folders = await db
+        .select()
+        .from(imapFolders)
+        .where(eq(imapFolders.accountId, data.accountId))
+        .orderBy(imapFolders.path);
+
+      return createSuccessResponse({
+        folders: folders.map((folder) => this.formatFolderResponse(folder)),
+        total: folders.length,
+        page: 1,
+        limit: folders.length,
+        totalPages: 1,
+      });
+    } catch (error) {
+      logger.error(
+        "app.api.v1.core.emails.imapClient.folders.byAccount.error.server",
+        parseError(error),
+      );
+      return createErrorResponse(
+        "imapErrors.folders.get.error.server.title",
+        ErrorResponseTypes.INTERNAL_ERROR,
+        { error: parseError(error).message },
+      );
+    }
+  }
+
+  /**
+   * Update folder sync status
+   */
+  async updateFolderSyncStatus(
+    folderId: string,
+    syncStatus: keyof typeof ImapSyncStatus,
+    syncError: string | null,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ success: boolean }>> {
+    try {
+      logger.debug(
+        "app.api.v1.core.emails.imapClient.folders.updateSyncStatus.info.start",
+        {
+          folderId,
+          syncStatus,
+          userId: user.id,
+        },
+      );
+
+      const [updatedFolder] = await db
+        .update(imapFolders)
+        .set({
+          syncStatus: ImapSyncStatus[syncStatus],
+          syncError: syncError,
+          lastSyncAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(imapFolders.id, folderId))
+        .returning();
+
+      if (!updatedFolder) {
+        return createErrorResponse(
+          "imapErrors.folders.get.error.not_found.title",
+          ErrorResponseTypes.NOT_FOUND,
+        );
+      }
+
+      return createSuccessResponse({ success: true });
+    } catch (error) {
+      logger.error(
+        "app.api.v1.core.emails.imapClient.folders.updateSyncStatus.error.server",
+        error,
+      );
+      return createErrorResponse(
+        "imapErrors.folders.get.error.server.title",
+        ErrorResponseTypes.INTERNAL_ERROR,
+        { error: parseError(error).message },
+      );
+    }
+  }
+
+  /**
+   * Update folder message counts
+   */
+  async updateFolderMessageCounts(
+    folderId: string,
+    counts: { totalMessages: number; unreadMessages: number },
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ success: boolean }>> {
+    try {
+      logger.debug(
+        "app.api.v1.core.emails.imapClient.folders.updateCounts.info.start",
+        {
+          folderId,
+          counts,
+          userId: user.id,
+        },
+      );
+
+      const [updatedFolder] = await db
+        .update(imapFolders)
+        .set({
+          messageCount: counts.totalMessages,
+          unseenCount: counts.unreadMessages,
+          updatedAt: new Date(),
+        })
+        .where(eq(imapFolders.id, folderId))
+        .returning();
+
+      if (!updatedFolder) {
+        return createErrorResponse(
+          "imapErrors.folders.get.error.not_found.title",
+          ErrorResponseTypes.NOT_FOUND,
+        );
+      }
+
+      return createSuccessResponse({ success: true });
+    } catch (error) {
+      logger.error(
+        "app.api.v1.core.emails.imapClient.folders.updateCounts.error.server",
+        error,
+      );
+      return createErrorResponse(
+        "imapErrors.folders.get.error.server.title",
+        ErrorResponseTypes.INTERNAL_ERROR,
+        { error: parseError(error).message },
+      );
+    }
+  }
+}
+
+/**
+ * Export singleton instance
+ */
+export const imapFoldersRepository = new ImapFoldersRepositoryImpl();

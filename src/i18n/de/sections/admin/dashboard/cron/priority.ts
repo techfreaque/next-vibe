@@ -1,0 +1,9 @@
+import type { priorityTranslations as EnglishPriorityTranslations } from "../../../../../en/sections/admin/dashboard/cron/priority";
+
+export const priorityTranslations: typeof EnglishPriorityTranslations = {
+  low: "Niedrig",
+  normal: "Normal",
+  high: "Hoch",
+  critical: "Kritisch",
+  unknown: "Unbekannt",
+};

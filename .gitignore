@@ -1,9 +1,14 @@
 **/node_modules
 dist
+.dist
 .next
 .env
+.env.staging
 
 # Generated files
-src/app/api/generated/endpoints.ts
-prisma/db/dev.db
 postgres_data
+
+# system temporary files
+.tmp
+code-server
+.vibe-guard-instance/

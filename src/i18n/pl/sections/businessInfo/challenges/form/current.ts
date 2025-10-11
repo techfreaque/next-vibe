@@ -1,0 +1,6 @@
+import type { currentTranslations as EnglishCurrentTranslations } from "../../../../../en/sections/businessInfo/challenges/form/current";
+
+export const currentTranslations: typeof EnglishCurrentTranslations = {
+  title: "Obecne Wyzwania",
+  description: "Jakie wyzwania obecnie napotykasz?",
+};

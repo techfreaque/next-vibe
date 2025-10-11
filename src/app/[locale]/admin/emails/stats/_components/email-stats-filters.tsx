@@ -1,0 +1,367 @@
+/**
+ * Email Stats Filters Component
+ * Filter component specifically for email statistics
+ */
+
+"use client";
+
+import { RefreshCw } from "lucide-react";
+import {
+  ChartType,
+  DateRangePreset,
+  TimePeriod,
+} from "next-vibe/shared/types/stats-filtering.schema";
+import { Form } from "next-vibe-ui/ui";
+import { Button } from "next-vibe-ui/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import type { JSX, ReactNode } from "react";
+import type { Control } from "react-hook-form";
+
+import {
+  EmailSortField,
+  EmailStatusFilter,
+  EmailTypeFilter,
+} from "@/app/api/[locale]/v1/core/emails/messages/enum";
+import type { EmailStatsRequestType } from "@/app/api/[locale]/v1/core/emails/messages/stats/definition";
+import type emailStatsEndpoint from "@/app/api/[locale]/v1/core/emails/messages/stats/definition";
+import { SortOrder } from "@/app/api/[locale]/v1/core/leads/enum";
+import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
+interface EmailStatsFiltersContainerProps {
+  locale: CountryLanguage;
+  children: ReactNode;
+  onRefresh?: () => void;
+  title?: string;
+  form: EndpointReturn<typeof emailStatsEndpoint>["read"]["form"];
+}
+
+interface EmailStatsFiltersProps {
+  control: Control<Partial<EmailStatsRequestType>>;
+}
+
+/**
+ * Container for email stats filters with refresh functionality
+ */
+export function EmailStatsFiltersContainer({
+  locale,
+  children,
+  onRefresh,
+  title,
+  form,
+}: EmailStatsFiltersContainerProps): JSX.Element {
+  const { t } = simpleT(locale);
+
+  return (
+    <Form form={form} onSubmit={() => {}} className="space-y-4">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+          <CardTitle className="text-lg font-semibold">
+            {title || t("common.filter")}
+          </CardTitle>
+          {onRefresh && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onRefresh}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              {t("common.refresh")}
+            </Button>
+          )}
+        </CardHeader>
+        <CardContent className="space-y-4">{children}</CardContent>
+      </Card>
+    </Form>
+  );
+}
+
+/**
+ * Email-specific stats filters
+ */
+export function EmailStatsFilters({
+  control,
+}: EmailStatsFiltersProps): JSX.Element {
+  return (
+    <div className="space-y-4">
+      {/* Base time and chart filters */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Time Period */}
+        <EndpointFormField
+          control={control}
+          name="timePeriod"
+          config={{
+            type: "select",
+            label: "emails.admin.stats.filters.timePeriod",
+            options: [
+              {
+                value: TimePeriod.HOUR,
+                label: "emails.admin.stats.filters.timePeriods.hour",
+              },
+              {
+                value: TimePeriod.DAY,
+                label: "emails.admin.stats.filters.timePeriods.day",
+              },
+              {
+                value: TimePeriod.WEEK,
+                label: "emails.admin.stats.filters.timePeriods.week",
+              },
+              {
+                value: TimePeriod.MONTH,
+                label: "emails.admin.stats.filters.timePeriods.month",
+              },
+              {
+                value: TimePeriod.QUARTER,
+                label: "emails.admin.stats.filters.timePeriods.quarter",
+              },
+              {
+                value: TimePeriod.YEAR,
+                label: "emails.admin.stats.filters.timePeriods.year",
+              },
+            ],
+          }}
+        />
+
+        {/* Date Range Preset */}
+        <EndpointFormField
+          control={control}
+          name="dateRangePreset"
+          config={{
+            type: "select",
+            label: "emails.admin.stats.filters.dateRange",
+            options: [
+              {
+                value: DateRangePreset.TODAY,
+                label: "emails.admin.stats.filters.dateRanges.today",
+              },
+              {
+                value: DateRangePreset.YESTERDAY,
+                label: "emails.admin.stats.filters.dateRanges.yesterday",
+              },
+              {
+                value: DateRangePreset.LAST_7_DAYS,
+                label: "emails.admin.stats.filters.dateRanges.last7Days",
+              },
+              {
+                value: DateRangePreset.LAST_30_DAYS,
+                label: "emails.admin.stats.filters.dateRanges.last30Days",
+              },
+              {
+                value: DateRangePreset.LAST_90_DAYS,
+                label: "emails.admin.stats.filters.dateRanges.last90Days",
+              },
+              {
+                value: DateRangePreset.THIS_MONTH,
+                label: "emails.admin.stats.filters.dateRanges.thisMonth",
+              },
+              {
+                value: DateRangePreset.LAST_MONTH,
+                label: "emails.admin.stats.filters.dateRanges.lastMonth",
+              },
+              {
+                value: DateRangePreset.THIS_QUARTER,
+                label: "emails.admin.stats.filters.dateRanges.thisQuarter",
+              },
+              {
+                value: DateRangePreset.LAST_QUARTER,
+                label: "emails.admin.stats.filters.dateRanges.lastQuarter",
+              },
+              {
+                value: DateRangePreset.THIS_YEAR,
+                label: "emails.admin.stats.filters.dateRanges.thisYear",
+              },
+              {
+                value: DateRangePreset.LAST_YEAR,
+                label: "emails.admin.stats.filters.dateRanges.lastYear",
+              },
+            ],
+          }}
+        />
+
+        {/* Chart Type */}
+        <EndpointFormField
+          control={control}
+          name="chartType"
+          config={{
+            type: "select",
+            label: "emails.admin.stats.filters.chartType",
+            options: [
+              {
+                value: ChartType.LINE,
+                label: "emails.admin.stats.filters.chartTypes.line",
+              },
+              {
+                value: ChartType.BAR,
+                label: "emails.admin.stats.filters.chartTypes.bar",
+              },
+              {
+                value: ChartType.AREA,
+                label: "emails.admin.stats.filters.chartTypes.area",
+              },
+            ],
+          }}
+        />
+      </div>
+
+      {/* Email-specific filters */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Email Status Filter */}
+        <EndpointFormField
+          control={control}
+          name="status"
+          config={{
+            type: "select",
+            label: "emails.admin.stats.filters.statuses.title",
+            options: [
+              {
+                value: EmailStatusFilter.ALL,
+                label: "emails.admin.stats.filters.statuses.all",
+              },
+              {
+                value: EmailStatusFilter.SENT,
+                label: "emails.admin.stats.filters.statuses.sent",
+              },
+              {
+                value: EmailStatusFilter.DELIVERED,
+                label: "emails.admin.stats.filters.statuses.delivered",
+              },
+              {
+                value: EmailStatusFilter.OPENED,
+                label: "emails.admin.stats.filters.statuses.opened",
+              },
+              {
+                value: EmailStatusFilter.CLICKED,
+                label: "emails.admin.stats.filters.statuses.clicked",
+              },
+              {
+                value: EmailStatusFilter.BOUNCED,
+                label: "emails.admin.stats.filters.statuses.bounced",
+              },
+              {
+                value: EmailStatusFilter.FAILED,
+                label: "emails.admin.stats.filters.statuses.failed",
+              },
+              {
+                value: EmailStatusFilter.UNSUBSCRIBED,
+                label: "emails.admin.stats.filters.statuses.unsubscribed",
+              },
+            ],
+          }}
+        />
+
+        {/* Email Type Filter */}
+        <EndpointFormField
+          control={control}
+          name="type"
+          config={{
+            type: "select",
+            label: "emails.admin.stats.filters.types.title",
+            options: [
+              {
+                value: EmailTypeFilter.ALL,
+                label: "emails.admin.stats.filters.types.all",
+              },
+              {
+                value: EmailTypeFilter.LEAD_CAMPAIGN,
+                label: "emails.admin.stats.filters.types.leadCampaign",
+              },
+              {
+                value: EmailTypeFilter.TRANSACTIONAL,
+                label: "emails.admin.stats.filters.types.transactional",
+              },
+              {
+                value: EmailTypeFilter.MARKETING,
+                label: "emails.admin.stats.filters.types.marketing",
+              },
+              {
+                value: EmailTypeFilter.NOTIFICATION,
+                label: "emails.admin.stats.filters.types.notification",
+              },
+              {
+                value: EmailTypeFilter.SYSTEM,
+                label: "emails.admin.stats.filters.types.system",
+              },
+            ],
+          }}
+        />
+
+        {/* Sort By */}
+        <EndpointFormField
+          control={control}
+          name="sortBy"
+          config={{
+            type: "select",
+            label: "emails.admin.stats.filters.sortBy.title",
+            options: [
+              {
+                value: EmailSortField.CREATED_AT,
+                label: "emails.admin.stats.filters.sortBy.createdAt",
+              },
+              {
+                value: EmailSortField.SENT_AT,
+                label: "emails.admin.stats.filters.sortBy.sentAt",
+              },
+              {
+                value: EmailSortField.STATUS,
+                label: "emails.admin.stats.filters.sortBy.status",
+              },
+              {
+                value: EmailSortField.TYPE,
+                label: "emails.admin.stats.filters.sortBy.type",
+              },
+            ],
+          }}
+        />
+      </div>
+
+      {/* Additional filters */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Sort Order */}
+        <EndpointFormField
+          control={control}
+          name="sortOrder"
+          config={{
+            type: "select",
+            label: "emails.admin.stats.filters.sortOrder.title",
+            options: [
+              {
+                value: SortOrder.DESC,
+                label: "emails.admin.stats.filters.sortOrder.desc",
+              },
+              {
+                value: SortOrder.ASC,
+                label: "emails.admin.stats.filters.sortOrder.asc",
+              },
+            ],
+          }}
+        />
+
+        {/* Include Comparison Toggle */}
+        <EndpointFormField
+          control={control}
+          name="includeComparison"
+          config={{
+            type: "checkbox",
+            label: "emails.admin.stats.filters.includeComparison",
+            description:
+              "emails.admin.stats.filters.includeComparisonDescription",
+          }}
+        />
+      </div>
+
+      {/* Search */}
+      <EndpointFormField
+        control={control}
+        name="search"
+        config={{
+          type: "text",
+          label: "emails.admin.stats.filters.search",
+          placeholder: "emails.admin.stats.filters.searchPlaceholder",
+        }}
+      />
+    </div>
+  );
+}

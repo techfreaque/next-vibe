@@ -1,0 +1,18 @@
+export const errorsTranslations = {
+  batch_send_failed: "Failed to send multiple emails: {{errors}}",
+  sending_failed: "Email sending failed: {{error}}",
+  rejected_recipient: "Rejected recipient: {{email}}",
+  no_recipients_accepted: "No recipients accepted by SMTP server",
+  recipient_not_accepted: "Recipient {{email}} was not accepted by SMTP server",
+  email_sending_failed: "Email sending failed",
+  email_failed_subject: "Email Failed",
+  system_sender: "System",
+  email_render_exception: "Email template rendering error",
+  unknown_recipient: "Unknown recipient",
+  smtp_connection_failed: "SMTP connection failed",
+  rendering_failed: "Failed to render email template",
+  send_failed: "Failed to send email",
+  template_rendering_failed: "Email template rendering failed",
+  authentication_failed: "Email authentication failed",
+  quota_exceeded: "Email quota exceeded",
+};

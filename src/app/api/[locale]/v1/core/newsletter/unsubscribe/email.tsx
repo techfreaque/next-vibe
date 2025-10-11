@@ -1,0 +1,286 @@
+/**
+ * Newsletter Unsubscribe API Email Templates
+ * React Email templates for newsletter unsubscription operations
+ */
+
+import { Button, Hr, Section, Text } from "@react-email/components";
+import type { JSX } from "react";
+
+import { env } from "@/config/env";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { TFunction } from "@/i18n/core/static-types";
+import type { UndefinedType } from "next-vibe/shared/types/common.schema";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
+
+import { contactClientRepository } from "../../contact/repository-client";
+import {
+  createTrackingContext,
+  EmailTemplate,
+} from "../../emails/smtp-client/components";
+import type { EmailFunctionType } from "../../emails/smtp-client/email-handling/definition";
+import type {
+  UnsubscribePostRequestOutput as NewsletterUnsubscribeType,
+  UnsubscribePostResponseOutput as NewsletterUnsubscribeResponseType,
+} from "./definition";
+
+/**
+ * Unsubscribe Confirmation Email Template Component
+ */
+function UnsubscribeConfirmationEmailContent({
+  requestData,
+  t,
+  locale,
+}: {
+  requestData: NewsletterUnsubscribeType;
+  t: TFunction;
+  locale: CountryLanguage;
+}): JSX.Element {
+  // Create tracking context for unsubscribe emails
+  const tracking = createTrackingContext(
+    locale,
+    undefined, // no leadId for unsubscribe emails
+    undefined, // no userId for unsubscribe emails
+    undefined, // no campaignId for transactional emails
+  );
+
+  return (
+    <EmailTemplate
+      t={t}
+      locale={locale}
+      title={t("app.api.v1.core.newsletter.email.unsubscribe.title")}
+      previewText={t("app.api.v1.core.newsletter.email.unsubscribe.preview")}
+      tracking={tracking}
+    >
+      <Text
+        style={{
+          fontSize: "16px",
+          lineHeight: "1.6",
+          color: "#374151",
+          marginBottom: "16px",
+        }}
+      >
+        {t("app.api.v1.core.newsletter.email.unsubscribe.greeting")}
+      </Text>
+
+      <Text
+        style={{
+          fontSize: "16px",
+          lineHeight: "1.6",
+          color: "#374151",
+          marginBottom: "16px",
+        }}
+      >
+        {t("app.api.v1.core.newsletter.email.unsubscribe.confirmation", {
+          email: requestData.email,
+        })}
+      </Text>
+
+      <Text
+        style={{
+          fontSize: "16px",
+          lineHeight: "1.6",
+          color: "#374151",
+          marginBottom: "24px",
+        }}
+      >
+        {t("app.api.v1.core.newsletter.email.unsubscribe.resubscribe_info")}
+      </Text>
+
+      <Section style={{ textAlign: "center", marginTop: "32px" }}>
+        <Button
+          href={`${env.NEXT_PUBLIC_APP_URL}/${locale}/newsletter/subscribe`}
+          style={{
+            backgroundColor: "#4f46e5",
+            borderRadius: "6px",
+            color: "#ffffff",
+            fontSize: "14px",
+            padding: "12px 24px",
+            textDecoration: "none",
+            display: "inline-block",
+          }}
+        >
+          {t("app.api.v1.core.newsletter.email.unsubscribe.resubscribe_button")}
+        </Button>
+      </Section>
+
+      <Hr style={{ borderColor: "#e5e7eb", margin: "32px 0" }} />
+
+      <Text
+        style={{
+          fontSize: "12px",
+          color: "#6b7280",
+          textAlign: "center",
+        }}
+      >
+        {t("app.api.v1.core.newsletter.email.unsubscribe.support_message")}
+      </Text>
+    </EmailTemplate>
+  );
+}
+
+/**
+ * Admin Notification Email Template Component
+ */
+function AdminUnsubscribeNotificationEmailContent({
+  requestData,
+  t,
+  locale,
+}: {
+  requestData: NewsletterUnsubscribeType;
+  t: TFunction;
+  locale: CountryLanguage;
+}): JSX.Element {
+  // Create tracking context for admin emails
+  const tracking = createTrackingContext(
+    locale,
+    undefined, // no leadId for admin emails
+    undefined, // no userId for admin emails
+    undefined, // no campaignId for transactional emails
+  );
+
+  return (
+    <EmailTemplate
+      t={t}
+      locale={locale}
+      title={t(
+        "app.api.v1.core.newsletter.email.unsubscribe.admin_unsubscribe_notification.title",
+      )}
+      previewText={t(
+        "app.api.v1.core.newsletter.email.unsubscribe.admin_unsubscribe_notification.preview",
+      )}
+      tracking={tracking}
+    >
+      <Text
+        style={{
+          fontSize: "16px",
+          lineHeight: "1.6",
+          color: "#374151",
+          marginBottom: "16px",
+        }}
+      >
+        {t(
+          "app.api.v1.core.newsletter.email.unsubscribe.admin_unsubscribe_notification.message",
+        )}
+      </Text>
+
+      <Hr style={{ borderColor: "#e5e7eb", margin: "16px 0" }} />
+
+      <Text
+        style={{
+          fontSize: "14px",
+          lineHeight: "1.6",
+          color: "#4b5563",
+          marginBottom: "8px",
+        }}
+      >
+        <strong>
+          {t(
+            "app.api.v1.core.newsletter.email.unsubscribe.admin_unsubscribe_notification.email",
+          )}
+          :
+        </strong>{" "}
+        {requestData.email}
+      </Text>
+
+      <Text
+        style={{
+          fontSize: "14px",
+          lineHeight: "1.6",
+          color: "#4b5563",
+          marginBottom: "8px",
+        }}
+      >
+        <strong>
+          {t(
+            "app.api.v1.core.newsletter.email.unsubscribe.admin_unsubscribe_notification.date",
+          )}
+          :
+        </strong>{" "}
+        {new Date().toLocaleDateString()}
+      </Text>
+
+      <Hr style={{ borderColor: "#e5e7eb", margin: "16px 0" }} />
+
+      <Section style={{ textAlign: "center", marginTop: "24px" }}>
+        <Button
+          href={`${env.NEXT_PUBLIC_APP_URL}/admin/newsletter`}
+          style={{
+            backgroundColor: "#4f46e5",
+            borderRadius: "6px",
+            color: "#ffffff",
+            fontSize: "14px",
+            padding: "10px 20px",
+            textDecoration: "none",
+            display: "inline-block",
+          }}
+        >
+          {t(
+            "app.api.v1.core.newsletter.email.unsubscribe.admin_unsubscribe_notification.view_dashboard",
+          )}
+        </Button>
+      </Section>
+    </EmailTemplate>
+  );
+}
+
+/**
+ * Unsubscribe Confirmation Email for Users
+ * Renders a confirmation email when users unsubscribe from newsletter
+ */
+export const renderUnsubscribeConfirmationMail: EmailFunctionType<
+  NewsletterUnsubscribeType,
+  NewsletterUnsubscribeResponseType,
+  UndefinedType
+> = ({ requestData, locale, t }) => {
+  try {
+    return createSuccessResponse({
+      toEmail: requestData.email,
+      toName: requestData.email,
+      subject: t("app.api.v1.core.newsletter.email.unsubscribe.subject"),
+      jsx: UnsubscribeConfirmationEmailContent({
+        requestData,
+        t,
+        locale,
+      }),
+    });
+  } catch {
+    return createErrorResponse(
+      "newsletter.errors.email_generation_failed",
+      ErrorResponseTypes.INTERNAL_ERROR,
+    );
+  }
+};
+
+/**
+ * Admin Notification Email for Unsubscribe
+ * Sends a notification to the admin when a user unsubscribes
+ */
+export const renderAdminUnsubscribeNotificationMail: EmailFunctionType<
+  NewsletterUnsubscribeType,
+  NewsletterUnsubscribeResponseType,
+  UndefinedType
+> = ({ requestData, locale, t }) => {
+  try {
+    return createSuccessResponse({
+      toEmail: contactClientRepository.getSupportEmail(locale),
+      toName: t("common.appName"),
+      subject: t(
+        "app.api.v1.core.newsletter.email.unsubscribe.admin_unsubscribe_notification.subject",
+      ),
+      jsx: AdminUnsubscribeNotificationEmailContent({
+        requestData,
+        t,
+        locale,
+      }),
+    });
+  } catch {
+    return createErrorResponse(
+      "newsletter.errors.email_generation_failed",
+      ErrorResponseTypes.INTERNAL_ERROR,
+    );
+  }
+};

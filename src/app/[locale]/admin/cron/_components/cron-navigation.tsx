@@ -1,0 +1,98 @@
+/**
+ * Cron Navigation Component
+ * Navigation component for switching between different cron management pages
+ */
+
+"use client";
+
+import { History, List, TrendingUp } from "lucide-react";
+import Link from "next/link";
+import { cn } from "next-vibe/shared/utils/utils";
+import { Badge } from "next-vibe-ui/ui/badge";
+import { Button } from "next-vibe-ui/ui/button";
+import { Card, CardContent } from "next-vibe-ui/ui/card";
+import type React from "react";
+
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
+interface CronNavigationProps {
+  locale: CountryLanguage;
+  currentPage?: "overview" | "tasks" | "history" | "stats" | "settings";
+  children?: React.ReactNode;
+}
+
+export function CronNavigation({
+  locale,
+  currentPage = "overview",
+  children,
+}: CronNavigationProps): React.JSX.Element {
+  const { t } = simpleT(locale);
+
+  const navigationItems = [
+    {
+      key: "stats",
+      href: `/${locale}/admin/stats` as const,
+      icon: TrendingUp,
+      label: t("admin.dashboard.cron.nav.stats"),
+      description: t("admin.dashboard.cron.nav.stats_description"),
+    },
+    {
+      key: "tasks",
+      href: `/${locale}/admin/cron/tasks` as const,
+      icon: List,
+      label: t("admin.dashboard.cron.nav.tasks"),
+      description: t("admin.dashboard.cron.nav.tasks_description"),
+    },
+    {
+      key: "history",
+      href: `/${locale}/admin/cron/history` as const,
+      icon: History,
+      label: t("admin.dashboard.cron.nav.history"),
+      description: t("admin.dashboard.cron.nav.history_description"),
+    },
+  ] as const;
+
+  return (
+    <>
+      <Card>
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
+            {navigationItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = item.key === currentPage;
+
+              return (
+                <Link key={item.key} href={item.href}>
+                  <Button
+                    variant={isActive ? "default" : "outline"}
+                    className={cn(
+                      "h-auto p-4 flex flex-col items-start space-y-2 w-full",
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "hover:bg-muted/50",
+                    )}
+                  >
+                    <div className="flex items-center space-x-2 w-full">
+                      <Icon className="h-5 w-5" />
+                      <span className="font-medium">{item.label}</span>
+                      {isActive && (
+                        <Badge variant="secondary" className="ml-auto">
+                          {t("common.active")}
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-left opacity-80">
+                      {item.description}
+                    </p>
+                  </Button>
+                </Link>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+      {children}
+    </>
+  );
+}

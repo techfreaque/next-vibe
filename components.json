@@ -5,17 +5,17 @@
   "tsx": true,
   "tailwind": {
     "config": "tailwind.config.ts",
-    "css": "src/app/globals.css",
+    "css": "src/app/[locale]/globals.css",
     "baseColor": "neutral",
     "cssVariables": true,
     "prefix": ""
   },
   "aliases": {
-    "components": "@/library/components",
-    "utils": "@/library/lib/utils",
-    "ui": "@/components/ui",
-    "lib": "@/library/lib",
-    "hooks": "@/library/hooks"
+    "components": "next-vibe-ui",
+    "utils": "next-vibe/shared/utils/utils",
+    "ui": "next-vibe-ui/ui",
+    "lib": "next-vibe/shared/utils",
+    "hooks": "@/hooks"
   },
   "iconLibrary": "lucide"
 }

@@ -1,5 +1,9 @@
 {
     "recommendations": [
-        "github.vscode-github-actions"
+        "github.vscode-github-actions",
+        "bierner.markdown-mermaid",
+        "bpruitt-goddard.mermaid-markdown-syntax-highlighting",
+        "davidanson.vscode-markdownlint",
+        "typescriptteam.native-preview"
     ]
 }

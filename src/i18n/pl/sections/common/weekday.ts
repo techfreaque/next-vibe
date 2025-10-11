@@ -1,0 +1,25 @@
+import type { weekdayTranslations as EnglishWeekdayTranslations } from "../../../en/sections/common/weekday";
+
+export const weekdayTranslations: typeof EnglishWeekdayTranslations = {
+  "0": "Niedziela",
+  "1": "Poniedziałek",
+  "2": "Wtorek",
+  "3": "Środa",
+  "4": "Czwartek",
+  "5": "Piątek",
+  "6": "Sobota",
+  "monday": "Poniedziałek",
+  "tuesday": "Wtorek",
+  "wednesday": "Środa",
+  "thursday": "Czwartek",
+  "friday": "Piątek",
+  "saturday": "Sobota",
+  "sunday": "Niedziela",
+  "mon": "Pon",
+  "tue": "Wt",
+  "wed": "Śr",
+  "thu": "Czw",
+  "fri": "Pt",
+  "sat": "Sob",
+  "sun": "Ndz",
+};

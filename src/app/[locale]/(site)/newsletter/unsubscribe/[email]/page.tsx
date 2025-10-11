@@ -1,0 +1,67 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import type { JSX } from "react";
+
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
+import { UnsubscribePage } from "../_components/unsubscribe-page";
+
+interface PageProps {
+  params: Promise<{
+    locale: CountryLanguage;
+    email: string;
+  }>;
+}
+
+// Simple email validation function
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(decodeURIComponent(email));
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { locale, email } = await params;
+  const { t } = simpleT(locale);
+
+  // Validate email parameter
+  if (!isValidEmail(email)) {
+    return {
+      title: t("newsletter.page.invalidEmail.title"),
+      description: t("newsletter.page.invalidEmail.description"),
+    };
+  }
+
+  return {
+    title: t("newsletter.unsubscribe.page.emailProvided.title"),
+    description: t("newsletter.unsubscribe.page.emailProvided.description"),
+    openGraph: {
+      title: t("newsletter.unsubscribe.page.emailProvided.title"),
+      description: t("newsletter.unsubscribe.page.emailProvided.description"),
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t("newsletter.unsubscribe.page.emailProvided.title"),
+      description: t("newsletter.unsubscribe.page.emailProvided.description"),
+    },
+  };
+}
+
+export default async function NewsletterUnsubscribeWithEmail({
+  params,
+}: PageProps): Promise<JSX.Element> {
+  const { locale, email } = await params;
+
+  // Decode the email parameter
+  const decodedEmail = decodeURIComponent(email);
+
+  // Validate email parameter
+  if (!isValidEmail(decodedEmail)) {
+    notFound();
+  }
+
+  return <UnsubscribePage locale={locale} prefilledEmail={decodedEmail} />;
+}

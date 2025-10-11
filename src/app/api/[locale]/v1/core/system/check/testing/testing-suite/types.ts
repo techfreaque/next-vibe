@@ -1,0 +1,92 @@
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type z from "zod";
+
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
+import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+
+import type { UnifiedField } from "../../../unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
+
+/**
+ * Options for testing an API endpoint
+ */
+export interface TestEndpointOptions<
+  TRequestInput,
+  TRequestOutput,
+  TResponseInput,
+  TResponseOutput,
+  TUrlVariablesInput,
+  TUrlVariablesOutput,
+  TExampleKey extends string,
+  TMethod extends Methods,
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TFields extends UnifiedField<z.ZodTypeAny>,
+> {
+  /**
+   * Custom test cases to run in addition to (or instead of) example tests
+   */
+  customTests?: {
+    [testName: string]: (
+      test: TestRunner<
+        TRequestInput,
+        TRequestOutput,
+        TResponseInput,
+        TResponseOutput,
+        TUrlVariablesInput,
+        TUrlVariablesOutput,
+        TExampleKey,
+        TMethod,
+        TUserRoleValue,
+        TFields
+      >,
+    ) => Promise<void> | void;
+  };
+
+  /**
+   * Whether to skip automatic tests based on endpoint examples
+   * @default false
+   */
+  skipExampleTests?: boolean;
+}
+
+/**
+ * Test runner for executing API endpoint tests
+ */
+export interface TestRunner<
+  TRequestInput,
+  TRequestOutput,
+  TResponseInput,
+  TResponseOutput,
+  TUrlVariablesInput,
+  TUrlVariablesOutput,
+  TExampleKey extends string,
+  TMethod extends Methods,
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TFields extends UnifiedField<z.ZodTypeAny>,
+> {
+  /**
+   * Execute the endpoint with the given data and URL params
+   */
+  executeWith: (options: {
+    data: TRequestOutput;
+    urlParams: TUrlVariablesOutput;
+    user: JwtPayloadType;
+  }) => Promise<ResponseType<TResponseOutput>>;
+
+  /**
+   * The endpoint being tested
+   */
+  endpoint: CreateApiEndpoint<
+    TExampleKey,
+    TMethod,
+    TUserRoleValue,
+    TFields,
+    TRequestInput,
+    TRequestOutput,
+    TResponseInput,
+    TResponseOutput,
+    TUrlVariablesInput,
+    TUrlVariablesOutput
+  >;
+}

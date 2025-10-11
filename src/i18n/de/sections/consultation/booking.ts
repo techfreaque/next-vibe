@@ -1,0 +1,32 @@
+import type { bookingTranslations as EnglishBookingTranslations } from "../../../en/sections/consultation/booking";
+
+export const bookingTranslations: typeof EnglishBookingTranslations = {
+  title: "Eine Beratung buchen",
+  description: "Planen Sie eine Beratung mit unseren Experten",
+  type: "Beratungstyp",
+  date: "Datum",
+  time: "Zeit",
+  dateAndTime: "Datum & Zeit",
+  selectDate: "Datum auswählen",
+  selectTime: "Zeit auswählen",
+  dateDescription: "Wählen Sie Ihr bevorzugtes Beratungsdatum",
+  timeDescription: "Verfügbare Zeitslots für Ihr gewähltes Datum",
+  selectDateFirst: "Bitte wählen Sie zuerst ein Datum",
+  noAvailableTimes: "Keine verfügbaren Zeiten für dieses Datum",
+  tryAnotherDate: "Bitte versuchen Sie ein anderes Datum",
+  selectDateToSeeTime: "Wählen Sie ein Datum, um verfügbare Zeiten zu sehen",
+  consultationScheduled: "Beratung Geplant",
+  topic: "Thema",
+  topicPlaceholder: "Worüber möchten Sie sprechen?",
+  additionalDetails: "Zusätzliche Details",
+  topicAndDetails: "Thema & Details",
+  descriptionPlaceholder: "Weitere Informationen...",
+  descriptionSeparator: "\n\n{{description}}",
+  messagePlaceholder: "Erzählen Sie uns von Ihren Beratungsbedürfnissen...",
+  messageDescription:
+    "Teilen Sie spezifische Themen oder Fragen mit, die Sie während der Beratung besprechen möchten",
+  messagePreview: "Nachrichtenvorschau",
+  cancel: "Abbrechen",
+  confirm: "Beratung buchen",
+  submitting: "Buchung läuft...",
+};

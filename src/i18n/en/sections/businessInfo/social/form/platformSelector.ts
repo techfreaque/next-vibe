@@ -1,0 +1,42 @@
+export const platformSelectorTranslations = {
+  tabs: {
+    platforms: "Select Platforms",
+    details: "Platform Details",
+  },
+  availablePlatforms: "Available Platforms",
+  selectedPlatforms: "Selected Platforms",
+  noPlatformsSelected: "No platforms selected yet",
+  switchToPlatformsTab: "Switch to the Platforms tab to add some",
+  usernameLabel: "Username/Handle",
+  usernamePlaceholder: "@username",
+  priorityLabel: "Priority",
+  priorities: {
+    high: "High Priority",
+    medium: "Medium Priority",
+    low: "Low Priority",
+  },
+  activeLabel: "Currently active on this platform",
+  usernameDisplay: "(@{{username}})",
+  addPlatforms: "Add Social Media Platforms",
+  multipleAccountsAllowed: "Multiple accounts per platform allowed",
+  addPlatform: "Add {{platformName}}",
+  addPlatformWithCount: "Add {{platformName}} ({{count}} already added)",
+  yourPlatforms: "Your Social Media Platforms",
+  usernameHandle: "Username/Handle",
+  priority: "Priority",
+  highPriority: "High Priority",
+  mediumPriority: "Medium Priority",
+  lowPriority: "Low Priority",
+  visitProfile: "Visit profile",
+  editPlatform: "Edit platform",
+  removePlatform: "Remove platform",
+  platformSingular: "platform",
+  platformPlural: "platforms",
+  emptyState: {
+    title: "No social media platforms added yet",
+    description:
+      "Add your social media platforms to get started with your social media strategy.",
+    instruction:
+      "Choose from {{count}} available platforms above. You can add multiple accounts per platform.",
+  },
+};

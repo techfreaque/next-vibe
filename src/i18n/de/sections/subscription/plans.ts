@@ -1,0 +1,52 @@
+import type { plansTranslations as EnglishPlansTranslations } from "../../../en/sections/subscription/plans";
+
+export const plansTranslations: typeof EnglishPlansTranslations = {
+  starter: {
+    title: "Starter",
+    feature1: "Grundlegende Konto-Features",
+    feature2: "1 Benutzer",
+    feature3: "Eingeschränkter API-Zugang",
+    feature4: "Community-Support",
+    feature5: "Grundlegende Analytics",
+  },
+  basic: {
+    title: "Basic",
+    feature1: "Alle Starter Features",
+    feature2: "5 Benutzer",
+    feature3: "Standard Analytics",
+    feature4: "E-Mail-Support",
+    feature5: "Grundlegender API-Zugang",
+  },
+  professional: {
+    title: "Professional",
+    feature1: "Alle Basic Features",
+    feature2: "10 Benutzer",
+    feature3: "Erweiterte Analytics",
+    feature4: "Prioritäts-Support",
+    feature5: "Vollständiger API-Zugang",
+  },
+  premium: {
+    title: "Premium",
+    feature1: "Alle Professional Features",
+    feature2: "Unbegrenzte Benutzer",
+    feature3: "Individuelle Integrationen",
+    feature4: "Dedizierter Account Manager",
+    feature5: "24/7 Telefon-Support",
+  },
+  enterprise: {
+    title: "Enterprise",
+    feature1: "Alle Premium Features",
+    feature2: "Individuelle Features",
+    feature3: "On-Premise-Bereitstellungsoptionen",
+    feature4: "Service-Level-Agreement",
+    feature5: "Enterprise-Sicherheit",
+  },
+  popular: "Beliebtester",
+  current: "Aktueller Plan",
+  subscribing: "Abonnieren...",
+  upgrade: "Upgrade",
+  subscribe: "Abonnieren",
+  choose: "Plan wählen",
+  description: "Wählen Sie den perfekten Plan für Ihre Bedürfnisse",
+  plan: "Plan",
+};

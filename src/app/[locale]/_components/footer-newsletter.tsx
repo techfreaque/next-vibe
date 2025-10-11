@@ -1,0 +1,139 @@
+"use client";
+
+import { Check, Send, X } from "lucide-react";
+import { Button } from "next-vibe-ui/ui/button";
+import { Input } from "next-vibe-ui/ui/input";
+import type { JSX } from "react";
+
+import { useNewsletterManager } from "@/app/api/[locale]/v1/core/newsletter/hooks";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
+import CountrySelector from "./country-selector";
+
+export function NewsletterSignupFooter({
+  locale,
+}: {
+  locale: CountryLanguage;
+}): JSX.Element {
+  const { t } = simpleT(locale);
+
+  const {
+    email,
+    isLoggedIn,
+    isSubmitting,
+    isUnsubscribing,
+    isAnyOperationInProgress,
+    notification,
+    showConfirmUnsubscribe,
+    subscribe,
+    unsubscribe,
+    isSubscribed,
+    handleEmailChange,
+  } = useNewsletterManager();
+
+  return (
+    <div>
+      <div className="mb-6">
+        <h3 className="font-semibold text-lg mb-4">{t("newsletter.title")}</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          {t("newsletter.description")}
+        </p>
+
+        {/* Email input and action button */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            // Validate email before submission
+            if (!email?.includes("@")) {
+              return;
+            }
+            if (isSubscribed) {
+              unsubscribe(email);
+            } else {
+              subscribe(email);
+            }
+          }}
+          className="flex items-center space-x-2 mb-3"
+        >
+          <Input
+            type="email"
+            placeholder={t("newsletter.emailPlaceholder")}
+            className="max-w-[220px]"
+            autoComplete="email"
+            autoCorrect="off"
+            spellCheck="false"
+            value={email}
+            onChange={handleEmailChange}
+            aria-label={t("newsletter.emailPlaceholder")}
+            disabled={isAnyOperationInProgress || isLoggedIn}
+            name="email"
+            id="newsletter-email-footer"
+          />
+
+          <Button
+            type="submit"
+            className={`h-10 w-10 ${
+              isSubscribed
+                ? showConfirmUnsubscribe
+                  ? "bg-red-600 hover:bg-red-700"
+                  : "border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+                : "bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
+            }`}
+            variant={
+              isSubscribed && !showConfirmUnsubscribe ? "outline" : "default"
+            }
+            aria-label={
+              isSubscribed
+                ? showConfirmUnsubscribe
+                  ? t("newsletter.subscription.unsubscribe.confirmButton")
+                  : t("newsletter.subscription.unsubscribe.title")
+                : t("newsletter.subscribe")
+            }
+            disabled={isAnyOperationInProgress}
+          >
+            {isSubmitting || isUnsubscribing ? (
+              <div className="animate-spin">
+                <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+              </div>
+            ) : isSubscribed ? (
+              showConfirmUnsubscribe ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <X className="h-4 w-4" />
+              )
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </Button>
+        </form>
+
+        {/* Single notification display */}
+        {notification && (
+          <div
+            className={`text-xs mb-2 ${
+              notification.type === "error"
+                ? "text-red-600 dark:text-red-400"
+                : notification.type === "success"
+                  ? "text-green-600 dark:text-green-400"
+                  : notification.type === "info"
+                    ? "text-blue-600 dark:text-blue-400"
+                    : "text-orange-600 dark:text-orange-400"
+            }`}
+          >
+            {t(notification.message)}
+          </div>
+        )}
+      </div>
+
+      <div className="mt-8">
+        <h3 className="font-semibold text-lg mb-4">
+          {t("common.selector.country")} / {t("common.selector.language")}
+        </h3>
+        <div className="inline-block">
+          <CountrySelector locale={locale} />
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,108 @@
+import { AlertCircle } from "lucide-react";
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui";
+import type { JSX } from "react";
+import { Suspense } from "react";
+
+import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { passwordRepository } from "@/app/api/[locale]/v1/core/user/public/reset-password/repository";
+import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { metadataGenerator } from "@/i18n/core/metadata";
+import { simpleT } from "@/i18n/core/shared";
+
+import ResetPasswordConfirmForm from "./_components/reset-password-confirm-form";
+
+/**
+ * Generate metadata for the Reset Password Confirm page with translations
+ */
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  return metadataGenerator(locale, {
+    path: "reset-password-confirm",
+    title: "meta.passwordReset.title",
+    description: "meta.passwordReset.description",
+    image:
+      "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200&h=630&auto=format&fit=crop",
+    imageAlt: "meta.passwordReset.imageAlt",
+    keywords: ["meta.passwordReset.keywords"],
+    category: "meta.passwordReset.category",
+    additionalMetadata: {
+      openGraph: {
+        title: "meta.passwordReset.title",
+        description: "meta.passwordReset.description",
+        url: `https://nextvibe.dev/${locale}/reset-password`,
+        type: "website",
+        images: [
+          {
+            url: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200&h=630&auto=format&fit=crop",
+            width: 1200,
+            height: 630,
+            alt: "meta.passwordReset.imageAlt",
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "meta.passwordReset.title",
+        description: "meta.passwordReset.description",
+        images: [
+          "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200&h=630&auto=format&fit=crop",
+        ],
+      },
+    },
+  });
+}
+
+interface Props {
+  params: Promise<{ locale: CountryLanguage; token: string }>;
+}
+
+export default async function ResetPasswordConfirmPage({
+  params,
+}: Props): Promise<JSX.Element> {
+  const { locale, token } = await params;
+  const { t } = simpleT(locale);
+
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  // Check if user is already logged in using repository-first pattern
+  const verifiedUserResponse = await userRepository.getUserByAuth({}, logger);
+
+  // Redirect to dashboard if already authenticated
+  if (verifiedUserResponse.success && verifiedUserResponse.data) {
+    redirect(`/${locale}/dashboard`);
+  }
+
+  // Validate token on the server side
+  const tokenValidationResponse = await passwordRepository.verifyResetToken(
+    token,
+    logger,
+  );
+
+  return (
+    <ErrorBoundary
+      fallback={
+        <Alert variant="destructive" className="mb-8">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>{t("common.error.title")}</AlertTitle>
+          <AlertDescription>
+            {t("auth.resetPassword.errors.loadingError")}
+          </AlertDescription>
+        </Alert>
+      }
+      locale={locale}
+    >
+      <Suspense fallback={<div>{t("common.loading")}</div>}>
+        <div className="max-w-md mx-auto">
+          <ResetPasswordConfirmForm
+            locale={locale}
+            token={token}
+            tokenValidationResponse={tokenValidationResponse}
+          />
+        </div>
+      </Suspense>
+    </ErrorBoundary>
+  );
+}

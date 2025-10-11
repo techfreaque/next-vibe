@@ -1,0 +1,14 @@
+# Ignore node_modules
+node_modules/
+
+# Ignore test files
+src/build.test.ts
+test-files/
+
+# Ignore configuration files
+tsconfig.json
+tsconfig-build.json
+.vscode/
+eslint.config.mjs
+vitest.config.ts
+release.config.ts

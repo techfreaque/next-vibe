@@ -1,0 +1,193 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  errors: {
+    token_generation_failed: {
+      title: "Token-Generierung fehlgeschlagen",
+      description: "Authentifizierungs-Token konnte nicht generiert werden",
+    },
+    invalid_session: {
+      title: "Ungültige Sitzung",
+      description: "Die Sitzung ist ungültig oder abgelaufen",
+    },
+    missing_request_context: {
+      title: "Fehlender Request-Kontext",
+      description: "Request-Kontext fehlt",
+    },
+    unsupported_platform: {
+      title: "Nicht unterstützte Plattform",
+      description: "Plattform wird nicht unterstützt",
+    },
+    session_retrieval_failed: {
+      title: "Sitzungsabruf fehlgeschlagen",
+      description: "Sitzung konnte nicht abgerufen werden",
+    },
+    missing_token: {
+      title: "Fehlender Token",
+      description: "Authentifizierungs-Token fehlt",
+    },
+    invalid_token_signature: {
+      title: "Ungültige Token-Signatur",
+      description: "Token-Signatur ist ungültig",
+    },
+    jwt_payload_missing_id: {
+      title: "JWT-Payload fehlt ID",
+      description: "JWT-Payload fehlt Benutzer-ID",
+    },
+    cookie_set_failed: {
+      title: "Cookie setzen fehlgeschlagen",
+      description: "Authentifizierungs-Cookie konnte nicht gesetzt werden",
+    },
+    cookie_clear_failed: {
+      title: "Cookie löschen fehlgeschlagen",
+      description: "Authentifizierungs-Cookie konnte nicht gelöscht werden",
+    },
+  },
+  post: {
+    title: "Titel",
+    description: "Endpunkt-Beschreibung",
+    form: {
+      title: "Konfiguration",
+      description: "Parameter konfigurieren",
+    },
+    response: {
+      title: "Antwort",
+      description: "Antwortdaten",
+    },
+    errors: {
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Authentifizierung erforderlich",
+      },
+      validation: {
+        title: "Validierungsfehler",
+        description: "Ungültige Anfrageparameter",
+      },
+      server: {
+        title: "Serverfehler",
+        description: "Interner Serverfehler",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unbekannter Fehler ist aufgetreten",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Netzwerkfehler aufgetreten",
+      },
+      forbidden: {
+        title: "Verboten",
+        description: "Zugriff verboten",
+      },
+      notFound: {
+        title: "Nicht gefunden",
+        description: "Ressource nicht gefunden",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Datenkonflikt aufgetreten",
+      },
+      token_generation_failed: {
+        title: "Token-Generierung fehlgeschlagen",
+        description: "Authentifizierungstoken konnte nicht generiert werden",
+      },
+      invalid_session: {
+        title: "Ungültige Sitzung",
+        description: "Die Sitzung ist ungültig oder abgelaufen",
+      },
+      missing_request_context: {
+        title: "Fehlender Anfrage-Kontext",
+        description: "Anfrage-Kontext fehlt",
+      },
+      unsupported_platform: {
+        title: "Nicht unterstützte Plattform",
+        description: "Plattform wird nicht unterstützt",
+      },
+      session_retrieval_failed: {
+        title: "Sitzungsabruf fehlgeschlagen",
+        description: "Sitzung konnte nicht abgerufen werden",
+      },
+      missing_token: {
+        title: "Fehlender Token",
+        description: "Authentifizierungstoken fehlt",
+      },
+      invalid_token_signature: {
+        title: "Ungültige Token-Signatur",
+        description: "Token-Signatur ist ungültig",
+      },
+      jwt_payload_missing_id: {
+        title: "JWT-Payload fehlt ID",
+        description: "JWT-Payload fehlt Benutzer-ID",
+      },
+      cookie_set_failed: {
+        title: "Cookie-Setzung fehlgeschlagen",
+        description: "Authentifizierungs-Cookie konnte nicht gesetzt werden",
+      },
+      cookie_clear_failed: {
+        title: "Cookie-Löschung fehlgeschlagen",
+        description: "Authentifizierungs-Cookie konnte nicht gelöscht werden",
+      },
+    },
+    success: {
+      title: "Erfolg",
+      description: "Vorgang erfolgreich abgeschlossen",
+    },
+  },
+  enums: {
+    webSocketErrorCode: {
+      unauthorized: "Nicht autorisiert",
+      forbidden: "Verboten",
+      invalidToken: "Ungültiger Token",
+      tokenExpired: "Token abgelaufen",
+      serverError: "Serverfehler",
+    },
+  },
+  debug: {
+    signingJwt: "JWT wird signiert",
+    jwtSignedSuccessfully: "JWT erfolgreich signiert",
+    errorSigningJwt: "Fehler beim Signieren von JWT",
+    verifyingJwt: "JWT wird verifiziert",
+    invalidTokenPayload: "Ungültige Token-Nutzdaten",
+    jwtVerifiedSuccessfully: "JWT erfolgreich verifiziert",
+    errorVerifyingJwt: "Fehler beim Verifizieren von JWT",
+    userIdNotExistsInDb: "Benutzer-ID existiert nicht in der Datenbank",
+    sessionNotFound: "Sitzung nicht gefunden",
+    sessionExpired: "Sitzung abgelaufen",
+    errorValidatingUserSession: "Fehler beim Validieren der Benutzersitzung",
+    errorGettingUserRoles: "Fehler beim Abrufen der Benutzerrollen",
+    errorCheckingUserAuth: "Fehler beim Prüfen der Benutzerauthentifizierung",
+    gettingCurrentUserFromTrpc: "Aktueller Benutzer wird von tRPC abgerufen",
+    errorGettingAuthUserForTrpc:
+      "Fehler beim Abrufen des Auth-Benutzers für tRPC",
+    errorGettingUserRolesForTrpc:
+      "Fehler beim Abrufen der Benutzerrollen für tRPC",
+    authenticatingCliUserWithPayload:
+      "CLI-Benutzer wird mit Nutzdaten authentifiziert",
+    errorAuthenticatingCliUserWithPayload:
+      "Fehler beim Authentifizieren des CLI-Benutzers mit Nutzdaten",
+    creatingCliToken: "CLI-Token wird erstellt",
+    errorCreatingCliToken: "Fehler beim Erstellen des CLI-Tokens",
+    validatingCliToken: "CLI-Token wird validiert",
+    errorValidatingCliToken: "Fehler beim Validieren des CLI-Tokens",
+    gettingCurrentUserFromNextjs:
+      "Aktueller Benutzer wird von Next.js abgerufen",
+    errorGettingAuthUserForNextjs:
+      "Fehler beim Abrufen des Auth-Benutzers für Next.js",
+    settingNextjsAuthCookies: "Next.js Auth-Cookies werden gesetzt",
+    clearingNextjsAuthCookies: "Next.js Auth-Cookies werden gelöscht",
+    gettingCurrentUserFromToken: "Aktueller Benutzer wird von Token abgerufen",
+    errorGettingCurrentUserFromCli:
+      "Fehler beim Abrufen des aktuellen Benutzers von CLI",
+    errorGettingAuthUserForCli:
+      "Fehler beim Abrufen des Auth-Benutzers für CLI",
+    errorGettingUserRolesForCli:
+      "Fehler beim Abrufen der Benutzerrollen für CLI",
+    tokenFromAuthHeader: "Token aus Auth-Header",
+    tokenFromCookie: "Token aus Cookie",
+    noTokenFound: "Kein Token gefunden",
+    errorExtractingToken: "Fehler beim Extrahieren des Tokens",
+    errorParsingCookies: "Fehler beim Parsen der Cookies",
+    errorGettingCurrentUserFromTrpc:
+      "Fehler beim Abrufen des aktuellen Benutzers von tRPC",
+  },
+};

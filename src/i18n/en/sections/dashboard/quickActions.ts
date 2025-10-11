@@ -1,0 +1,17 @@
+export const quickActionsTranslations = {
+  title: "Quick Actions",
+  description: "Common tasks and shortcuts",
+  onboarding: "Onboarding",
+  onboardingComplete: "Setup complete",
+  onboardingIncomplete: "Setup incomplete",
+  social: "Social Media",
+  socialConnected: "{{count}} platforms connected",
+  socialNotConnected: "No platforms connected",
+  consultation: "Consultation",
+  consultationScheduled: "Consultation scheduled",
+  consultationNotScheduled: "No consultation scheduled",
+  scheduleConsultation: "Schedule Consultation",
+  managePlatforms: "Manage Platforms",
+  manageSubscription: "Manage Subscription",
+  accountSettings: "Account Settings",
+};

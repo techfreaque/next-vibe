@@ -1,0 +1,170 @@
+export const formTranslations = {
+  selection: {
+    title: "Selection Type",
+  },
+  selectionType: {
+    label: "How would you like to create this consultation?",
+    new: "Create new contact",
+    user: "Select existing user",
+    lead: "Select existing lead",
+    placeholder: "Select an option...",
+  },
+  userSelect: {
+    label: "Select User",
+    placeholder: "Search users by name or email...",
+    selected: "User selected",
+    noCompany: "No company",
+    displayFormat: "{{name}} ({{email}})",
+  },
+  leadSelect: {
+    label: "Select Lead",
+    placeholder: "Search leads by business name or email...",
+    selected: "Lead selected",
+    displayFormat: "{{businessName}} ({{email}})",
+  },
+  search: {
+    noResults: "No results found",
+  },
+  contact: {
+    title: "Contact Information",
+    basic: "Basic Information",
+    basicDescription: "Primary contact details for the consultation",
+  },
+  business: {
+    title: "Business Information",
+    details: "Business Details",
+    detailsDescription: "Information about the business and industry",
+  },
+  consultation: {
+    title: "Consultation Details",
+    details: "Consultation Information",
+    detailsDescription: "Specific details about the consultation request",
+  },
+  preferences: {
+    title: "Consultation Preferences",
+    scheduling: "Scheduling Preferences",
+    schedulingDescription: "Preferred date and time for the consultation",
+  },
+  admin: {
+    title: "Admin Settings",
+    internal: "Internal Settings",
+    internalDescription: "Admin-only settings and notes",
+  },
+  name: {
+    label: "Full Name",
+    placeholder: "Enter full name",
+  },
+  email: {
+    label: "Email Address",
+    placeholder: "Enter email address",
+  },
+  phone: {
+    label: "Phone Number",
+    placeholder: "Enter phone number (optional)",
+  },
+  businessType: {
+    label: "Business Type",
+    placeholder: "Enter business type or industry",
+  },
+  businessName: {
+    label: "Business Name",
+    placeholder: "Enter business name (optional)",
+  },
+  website: {
+    label: "Website",
+    placeholder: "Enter website URL (optional)",
+  },
+  country: {
+    label: "Country",
+    placeholder: "Select country",
+    options: {
+      GLOBAL: "Global",
+      US: "United States",
+      CA: "Canada",
+      GB: "United Kingdom",
+      DE: "Germany",
+      FR: "France",
+      IT: "Italy",
+      ES: "Spain",
+      NL: "Netherlands",
+      BE: "Belgium",
+      CH: "Switzerland",
+      AT: "Austria",
+      PL: "Poland",
+      CZ: "Czech Republic",
+      SK: "Slovakia",
+      HU: "Hungary",
+      RO: "Romania",
+      BG: "Bulgaria",
+      HR: "Croatia",
+      SI: "Slovenia",
+      LT: "Lithuania",
+      LV: "Latvia",
+      EE: "Estonia",
+      FI: "Finland",
+      SE: "Sweden",
+      DK: "Denmark",
+      NO: "Norway",
+      IS: "Iceland",
+      IE: "Ireland",
+      PT: "Portugal",
+      GR: "Greece",
+      CY: "Cyprus",
+      MT: "Malta",
+      LU: "Luxembourg",
+    },
+  },
+  city: {
+    label: "City",
+    placeholder: "Enter city (optional)",
+  },
+  currentChallenges: {
+    label: "Current Challenges",
+    placeholder: "Describe current business challenges (optional)",
+  },
+  goals: {
+    label: "Goals",
+    placeholder: "Describe business goals and objectives (optional)",
+  },
+  targetAudience: {
+    label: "Target Audience",
+    placeholder: "Describe target audience (optional)",
+  },
+  existingAccounts: {
+    label: "Existing Social Media Accounts",
+    placeholder: "List existing social media accounts (optional)",
+  },
+  competitors: {
+    label: "Main Competitors",
+    placeholder: "List main competitors (optional)",
+  },
+  preferredDate: {
+    label: "Preferred Date",
+    placeholder: "Select preferred date (optional)",
+  },
+  preferredTime: {
+    label: "Preferred Time",
+    placeholder: "Enter preferred time (optional)",
+  },
+  message: {
+    label: "Additional Message",
+    placeholder: "Enter additional notes or requirements (optional)",
+  },
+  status: {
+    label: "Status",
+    placeholder: "Select consultation status",
+  },
+  priority: {
+    label: "Priority",
+    placeholder: "Select priority level",
+    options: {
+      low: "Low",
+      normal: "Normal",
+      high: "High",
+    },
+  },
+  internalNotes: {
+    label: "Internal Notes",
+    placeholder: "Enter internal admin notes (optional)",
+  },
+};

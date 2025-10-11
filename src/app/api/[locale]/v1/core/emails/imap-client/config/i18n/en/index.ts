@@ -1,0 +1,109 @@
+export const translations = {
+  title: "IMAP Configuration",
+  description: "Manage IMAP client configuration settings",
+  category: "API Endpoint",
+  tags: {
+    config: "Config",
+  },
+  form: {
+    title: "IMAP Configuration Form",
+    description: "Configure IMAP client settings",
+  },
+  response: {
+    serverEnabled: "Server Enabled",
+    maxConnections: "Max Connections",
+    connectionTimeout: "Connection Timeout",
+    poolIdleTimeout: "Pool Idle Timeout",
+    keepAlive: "Keep Alive",
+    syncEnabled: "Sync Enabled",
+    syncInterval: "Sync Interval",
+    batchSize: "Batch Size",
+    maxMessages: "Max Messages",
+    concurrentAccounts: "Concurrent Accounts",
+    cacheEnabled: "Cache Enabled",
+    cacheTtl: "Cache TTL",
+    cacheMaxSize: "Cache Max Size",
+    memoryThreshold: "Memory Threshold",
+    maxRetries: "Max Retries",
+    retryDelay: "Retry Delay",
+    circuitBreakerThreshold: "Circuit Breaker Threshold",
+    circuitBreakerTimeout: "Circuit Breaker Timeout",
+    healthCheckInterval: "Health Check Interval",
+    metricsEnabled: "Metrics Enabled",
+    loggingLevel: "Logging Level",
+    rateLimitEnabled: "Rate Limit Enabled",
+    rateLimitRequests: "Rate Limit Requests",
+    rateLimitWindow: "Rate Limit Window",
+    debugMode: "Debug Mode",
+    testMode: "Test Mode",
+  },
+  serverEnabled: {
+    label: "Server Enabled",
+    description: "Enable or disable the IMAP server",
+  },
+  maxConnections: {
+    label: "Max Connections",
+    description: "Maximum number of concurrent connections",
+  },
+  connectionTimeout: {
+    label: "Connection Timeout",
+    description: "Connection timeout in milliseconds",
+  },
+  syncEnabled: {
+    label: "Sync Enabled",
+    description: "Enable or disable automatic synchronization",
+  },
+  syncInterval: {
+    label: "Sync Interval",
+    description: "Time interval between sync operations in minutes",
+  },
+  batchSize: {
+    label: "Batch Size",
+    description: "Number of messages to process in each batch",
+  },
+  loggingLevel: {
+    label: "Logging Level",
+    description: "Set the logging verbosity level",
+    placeholder: "Select logging level",
+  },
+  debugMode: {
+    label: "Debug Mode",
+    description: "Enable debug mode for detailed logging",
+  },
+  errors: {
+    internal: {
+      title: "Internal Error",
+      description: "An internal server error occurred",
+    },
+    unauthorized: {
+      title: "Unauthorized",
+      description: "You are not authorized to access this resource",
+    },
+  },
+  update: {
+    title: "Update IMAP Configuration",
+    description: "Update IMAP client configuration settings",
+    form: {
+      title: "Update Configuration",
+      description: "Modify IMAP configuration settings",
+    },
+    response: {
+      message: "IMAP configuration updated successfully",
+      success: "Configuration updated successfully",
+    },
+    errors: {
+      internal: {
+        title: "Update Failed",
+        description: "Failed to update IMAP configuration",
+      },
+      validation: {
+        title: "Validation Error",
+        description: "Invalid configuration data provided",
+      },
+      unauthorized: {
+        title: "Unauthorized",
+        description: "You are not authorized to update this configuration",
+      },
+    },
+  },
+};

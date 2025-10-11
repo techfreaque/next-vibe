@@ -1,0 +1,14 @@
+{
+    "name": "release-tool-test-package-2",
+    "version": "1.0.0",
+    "license": "GPL-3.0-only",
+    "scripts": {
+        "lint": "echo linting...",
+        "build": "echo building...",
+        "test": "echo testing..."
+    },
+    "dependencies": {
+        "react": "18.0.0",
+        "release-tool-test-package-1": "1.0.0"
+    }
+}

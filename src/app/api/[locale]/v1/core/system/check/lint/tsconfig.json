@@ -1,0 +1,31 @@
+{
+	"include": [
+		"index.ts",
+		"types.d.ts"
+	],
+	"compilerOptions": {
+		"alwaysStrict": true,
+		"baseUrl": ".",
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"resolveJsonModule": true,
+		"noImplicitAny": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"allowSyntheticDefaultImports": true,
+		"skipLibCheck": false,
+		"strict": true,
+		"strictFunctionTypes": true,
+		"strictNullChecks": true,
+		"declaration": true,
+		"types": [
+			"node"
+		],
+		"typeRoots": [
+			"./node_modules/@types",
+			"../node_modules/@types"
+		],
+		"target": "ESNext",
+		"outDir": ".dist"
+	}
+}

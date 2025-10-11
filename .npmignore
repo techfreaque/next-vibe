@@ -1,8 +1,0 @@
-.vscode
-examples
-node_modules
-src
-.npmignore
-eslint.config.mjs
-yarn.lock
-.gitignore

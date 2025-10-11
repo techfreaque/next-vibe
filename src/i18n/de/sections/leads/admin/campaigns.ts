@@ -1,0 +1,33 @@
+import type { campaignsTranslations as EnglishCampaignsTranslations } from "../../../../en/sections/leads/admin/campaigns";
+
+export const campaignsTranslations: typeof EnglishCampaignsTranslations = {
+  title: "E-Mail-Kampagnen",
+  subtitle:
+    "Überwachen und verwalten Sie Ihre automatisierten E-Mail-Kampagnen",
+  description: "Verwalten Sie automatisierte E-Mail-Kampagnen und -Sequenzen",
+  error: "Fehler beim Laden der Kampagnenstatistiken",
+  comingSoon: "Kampagnen-Verwaltungsschnittstelle kommt bald...",
+  coming_soon: "Kampagnen-Verwaltungsschnittstelle kommt bald...",
+  active_campaigns: "Aktive Kampagnen",
+  currently_running: "Derzeit laufend",
+  total_leads: "Gesamt Leads",
+  in_campaigns: "In Kampagnen",
+  conversion_rate: "Konversionsrate",
+  overall_performance: "Gesamtleistung",
+  emails_sent: "E-Mails gesendet",
+  total_sent: "Gesamt gesendet",
+  email_performance: "E-Mail-Performance",
+  open_rate: "Öffnungsrate",
+  click_rate: "Klickrate",
+  bounce_rate: "Bounce-Rate",
+  engagement_breakdown: "Engagement-Aufschlüsselung",
+  emails_opened: "E-Mails geöffnet",
+  emails_clicked: "E-Mails geklickt",
+  unsubscribe_rate: "Abmelderate",
+  lead_status_breakdown: "Lead-Status-Aufschlüsselung",
+  recent_activity: "Letzte Aktivität",
+  leads_this_week: "Leads diese Woche",
+  leads_this_month: "Leads diesen Monat",
+  emails_this_week: "E-Mails diese Woche",
+  emails_this_month: "E-Mails diesen Monat",
+};

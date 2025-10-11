@@ -1,25 +1,13 @@
+import { createEslintConfig } from 'lint';
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
+import { FlatCompat } from '@eslint/eslintrc';
+import { i18nConfig } from "./eslint.i18n.config.mjs";
 
-import js from "@eslint/js";
-import ts from "@typescript-eslint/eslint-plugin";
-import tsParser from "@typescript-eslint/parser";
-import importPlugin from "eslint-plugin-import";
-import eslintPluginPrettier from "eslint-plugin-prettier";
-import reactCompiler from "eslint-plugin-react-compiler";
-import reactHooks from "eslint-plugin-react-hooks";
-import simpleImportSort from "eslint-plugin-simple-import-sort";
-import unusedImports from "eslint-plugin-unused-imports";
-import globals from "globals";
-import nodePlugin from "eslint-plugin-node";
-import { FlatCompat } from '@eslint/eslintrc'
-import reactPlugin from "eslint-plugin-react";
-import jsxA11y from "eslint-plugin-jsx-a11y";
-import promisePlugin from "eslint-plugin-promise";
-
-const compat = new FlatCompat({
-  baseDirectory: import.meta.dirname,
-});
+const enableI18n = true;
+// currently AI's don't like that, as it gets removed before they add the actual code
+// has to be reevaluated over time
+const autoFixUnusedImports = false;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -31,23 +19,38 @@ function cleanGlobals(globalsObj) {
   );
 }
 
-export default [
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
+
+const config = [
   // 1) Files/Folders to ignore
   {
     ignores: [
       "dist",
       ".next",
-      "eslint.config.mjs",
-      "./postcss.config.mjs",
-      "./metro.config.js",
-      "./babel.config.js",
+      ".tmp",
+      // "eslint.config.mjs",
+      "postcss.config.mjs",
       "node_modules",
       ".git",
       "coverage",
-      // just until native is stable
-      "**/*.native.tsx"
+      "public",
+      "drizzle",
+      ".vscode",
+      ".vibe-guard-instance",
+      ".tmp",
+      ".next",
+      ".github",
+      ".claude",
+      "postgres_data",
+      "to_migrate",
+      // tmp
+      "src/packages/next-vibe-ui/native",
     ],
   },
+
+  ...enableI18n ? i18nConfig : [],
 
   // 2) Base configuration for TypeScript files
   {
@@ -68,9 +71,7 @@ export default [
         sourceType: "module",
         project: [resolve(__dirname, "tsconfig.json")],
         tsconfigRootDir: __dirname,
-        ecmaFeatures: {
-          jsx: true,
-        },
+        ecmaFeatures: { jsx: true },
       },
       globals: {
         ...globals.node,
@@ -83,30 +84,25 @@ export default [
         "@typescript-eslint/parser": [".ts", ".tsx"],
       },
       "import/resolver": {
-        typescript: {
-          project: "./tsconfig.json",
-          alwaysTryTypes: true,
-        },
-        node: {
-          extensions: [".ts", ".tsx", ".js", ".jsx"],
-        },
+        typescript: { project: "./tsconfig.json", alwaysTryTypes: true },
+        node: { extensions: [".ts", ".tsx", ".js", ".jsx"] },
       },
-      react: {
-        version: "detect",
-      },
+      react: { version: "detect" },
     },
     plugins: {
-      "@typescript-eslint": ts,
-      "react-hooks": reactHooks,
-      "simple-import-sort": simpleImportSort,
-      "unused-imports": unusedImports,
-      "react-compiler": reactCompiler,
+      js,
+      '@typescript-eslint': ts,
       import: importPlugin,
       prettier: eslintPluginPrettier,
+      'react-compiler': reactCompiler,
+      'react-hooks': reactHooks,
+      'simple-import-sort': simpleImportSort,
+      'unused-imports': unusedImports,
       node: nodePlugin,
       react: reactPlugin,
-      "jsx-a11y": jsxA11y,
+      'jsx-a11y': jsxA11y,
       promise: promisePlugin,
+      '@c-ehrlich/use-server': useServerPlugin,
     },
 
     rules: {
@@ -119,7 +115,10 @@ export default [
       // TypeScript custom rules
       "@typescript-eslint/no-unused-vars": [
         "error",
-        { argsIgnorePattern: "^_" },
+        {
+          // we don't do shit like that
+          // argsIgnorePattern: "^_"
+        },
       ],
       "@typescript-eslint/explicit-function-return-type": "error",
       "@typescript-eslint/no-explicit-any": "error",
@@ -127,27 +126,37 @@ export default [
       "@typescript-eslint/no-floating-promises": "error",
       "@typescript-eslint/no-misused-promises": "error",
       "@typescript-eslint/consistent-type-imports": "error",
-      "@typescript-eslint/no-unsafe-assignment": "off",
-      "@typescript-eslint/restrict-template-expressions": "off",
+      "@typescript-eslint/no-unsafe-assignment": "error",
+      "@typescript-eslint/restrict-template-expressions": "error",
       "@typescript-eslint/no-empty-function": [
         "error",
         { allow: ["arrowFunctions"] },
       ],
       "@typescript-eslint/ban-ts-comment": ["error", { "ts-ignore": "allow-with-description" }],
       "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
-      // "@typescript-eslint/no-unnecessary-condition": "error",
-      "@typescript-eslint/prefer-nullish-coalescing": "error",
+      "@typescript-eslint/no-unnecessary-condition": "off",
+      "@typescript-eslint/prefer-nullish-coalescing": "off",
       "@typescript-eslint/prefer-optional-chain": "error",
-      // "@typescript-eslint/strict-boolean-expressions": "error",
-      // "@typescript-eslint/no-unnecessary-type-assertion": "error",
+      "@typescript-eslint/strict-boolean-expressions": "off",
+      "@typescript-eslint/no-unnecessary-type-assertion": "error",
       "@typescript-eslint/return-await": ["error", "always"],
       "@typescript-eslint/no-floating-promises": ["error", { "ignoreIIFE": true }],
       "@typescript-eslint/no-for-in-array": "error",
-      "@typescript-eslint/no-inferrable-types": "error", 
+      "@typescript-eslint/no-inferrable-types": "error",
       "@typescript-eslint/no-misused-promises": ["error", { "checksVoidReturn": false }],
       "@typescript-eslint/prefer-includes": "error",
       "@typescript-eslint/prefer-string-starts-ends-with": "error",
       "@typescript-eslint/explicit-member-accessibility": ["error", { "accessibility": "no-public" }],
+
+      // Insane Strict rules
+
+      'react/no-unknown-property': 'error',
+      '@typescript-eslint/no-empty-object-type': 'error',
+      '@typescript-eslint/no-unsafe-function-type': 'error',
+      '@typescript-eslint/no-wrapper-object-types': 'error',
+
+      // next
+      "@next/next/no-img-element": "error",
 
       // Node
       "node/no-process-env": "error",
@@ -157,6 +166,7 @@ export default [
       "react-hooks/exhaustive-deps": "error",
 
       // React specific rules
+      "@c-ehrlich/use-server/no-top-level-use-server": "error",
       "react/jsx-key": "error",
       "react/jsx-no-duplicate-props": "error",
       "react/jsx-no-undef": "error",
@@ -167,7 +177,7 @@ export default [
       "react/no-direct-mutation-state": "error",
       "react/no-unknown-property": "error",
       "react/self-closing-comp": "error",
-      "react/react-in-jsx-scope": "off", // Next.js doesn't require React import
+      "react/react-in-jsx-scope": "error", // Next.js doesn't require React import
 
       // Accessibility
       "jsx-a11y/alt-text": "error",
@@ -186,7 +196,8 @@ export default [
       "react-compiler/react-compiler": "error",
       "simple-import-sort/imports": "error",
       "simple-import-sort/exports": "error",
-      "unused-imports/no-unused-imports": "error",
+
+      "unused-imports/no-unused-imports": autoFixUnusedImports ? "error" : "off",
       "import/no-unresolved": "error",
       "import/first": "error",
       "import/no-duplicates": "error",
@@ -194,12 +205,13 @@ export default [
       "import/namespace": "error",
       "import/no-restricted-paths": "error",
 
+
       // General code-quality rules
       curly: "error",
       eqeqeq: ["error", "always"],
       "import/newline-after-import": "error",
       "prefer-template": "error",
-      "no-console": "warn",
+      "no-console": "error",
       "no-debugger": "error",
       "no-template-curly-in-string": "error",
       "no-unsafe-optional-chaining": "error",
@@ -243,7 +255,10 @@ export default [
     },
   },
   ...compat.config({
-    extends: ['next/core-web-vitals'],
+    extends: [
+      "next/core-web-vitals",
+      ...(enableI18n ? ["plugin:i18next/recommended"] : []),
+    ],
   }),
 
   // 3) Configuration for plain JavaScript files
@@ -259,4 +274,70 @@ export default [
       },
     },
   },
+
+  // 2.1) Additional config for restricted syntax
+  {
+    files: [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.d.ts",
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/*.spec.ts",
+      "**/*.spec.tsx",
+    ],
+    ignores: [
+      "src/packages/next-vibe/cli/**",
+      "src/packages/next-vibe/testing/**",
+      "**/seeds.ts",
+    ],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 2021,
+        sourceType: "module",
+        project: [resolve(__dirname, "tsconfig.json")],
+        tsconfigRootDir: __dirname,
+        ecmaFeatures: { jsx: true },
+      },
+    },
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "TSUnknownKeyword",
+          message: "Usage of the 'unknown' type isn't allowed. Consider using generics with interface or type alias for explicit structure.",
+        },
+        {
+          selector: "TSObjectKeyword",
+          message: "Usage of the 'object' type isn't allowed. Consider using generics with interface or type alias for explicit structure.",
+        },
+        {
+          selector: "ThrowStatement",
+          message: "Usage of 'throw' statements is not allowed. Use proper ResponseType<T> patterns instead.",
+        },
+        // Prohibit JSX inside object literals to ensure i18n rules work properly
+        // Exception: Allow JSX in properties named "icon"
+        {
+          selector: "Property[value.type='JSXElement']:not([key.name='icon'])",
+          message: "JSX elements inside object literals are not allowed. Extract JSX to a separate function to ensure i18n rules work properly.",
+        },
+        {
+          selector: "Property[value.type='JSXFragment']:not([key.name='icon'])",
+          message: "JSX fragments inside object literals are not allowed. Extract JSX to a separate function to ensure i18n rules work properly.",
+        },
+        {
+          selector: "Property[value.type='ParenthesizedExpression']:not([key.name='icon']) > ParenthesizedExpression > JSXElement",
+          message: "JSX elements inside object literals are not allowed. Extract JSX to a separate function to ensure i18n rules work properly.",
+        },
+        {
+          selector: "Property[value.type='ParenthesizedExpression']:not([key.name='icon']) > ParenthesizedExpression > JSXFragment",
+          message: "JSX fragments inside object literals are not allowed. Extract JSX to a separate function to ensure i18n rules work properly.",
+        },
+      ],
+    },
+  },
 ];
+
+export default config;
+

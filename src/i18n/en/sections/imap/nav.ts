@@ -1,0 +1,16 @@
+export const navTranslations = {
+  overview: "Overview",
+  overview_description: "IMAP server overview",
+  accounts: "Accounts",
+  accounts_description: "Manage IMAP accounts",
+  messages: "Messages",
+  messages_description: "View and manage email messages",
+  config: "Configuration",
+  config_description: "Server configuration",
+  sync: "Sync",
+  sync_description: "Sync operations",
+  health: "Health",
+  health_description: "Health monitoring",
+  status: "Status",
+  status_description: "Server status",
+};

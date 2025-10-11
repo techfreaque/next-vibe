@@ -1,69 +1,196 @@
 {
-    "name": "next-vibe-template-app",
-    "version": "1.0.0",
-    "private": true,
-    "description": "Next Query Portal Template App",
-    "license": "MIT",
-    "type": "module",
-    "scripts": {
-        "dev": "yarn dev:db-setup && next dev",
-        "dev:debug": "DEBUG=next*,turbo* RUST_LOG=debug next dev",
-        "dev:db-setup": "yarn db:dev && yarn build:pre && yarn db:push && yarn db:generate && yarn db:reset && yarn db:migrate-dev && yarn db:seed-dev && yarn db:seed",
-        "build": "yarn build:pre && next build ./ --no-lint",
-        "build:package": "sovendus-builder build",
-        "start": "next start",
-        "start:pre": "yarn db:migrate && yarn db:seed",
-        "pub": "sovendus-release-tool",
-        "build:pre": "yarn build:db-schema && yarn db:generate && yarn build:endpoints",
-        "build:endpoints": "tsx src/packages/next-vibe/scripts/generate-endpoints.ts",
-        "build:db-schema": "tsx src/app/api/db/scripts/schema-builder.ts",
-        "db:migrate": "prisma migrate deploy",
-        "db:migrate-dev": "prisma migrate dev",
-        "db:dev": "#docker compose -f docker-compose-dev.yml up -d",
-        "db:reset": "prisma migrate reset",
-        "db:generate": "prisma generate",
-        "db:push": "prisma db push",
-        "db:seed": "cross-env tsx src/app/api/db/scripts/seed-prod-db.ts",
-        "db:seed-dev": "cross-env tsx src/app/api/db/scripts/seed-dev-db.ts",
-        "db:studio": "prisma studio",
-        "lint": "eslint --fix",
-        "test": "yarn build:pre && cross-env NODE_ENV=test vitest run --sequence.all",
-        "test:watch": "yarn build:pre && cross-env NODE_ENV=test vitest"
+  "name": "next-vibe-template-app",
+  "version": "2.0.0",
+  "author": "Marcus Brandstätter",
+  "private": true,
+  "description": "Next Vibe Template App",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "bun@1.2.23",
+  "scripts": {
+    "postinstall": "bun src/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/vibe.ts setup --force",
+    "vibe": "echo use vibe directly without any npm run / yarn commands",
+    "dev": "echo rather let the vibes flow with: vibe dev",
+    "build": "echo rather let the vibes flow with: vibe build",
+    "start": "next start",
+    "test": "echo rather let the vibes flow with: vibe test",
+    "check": "echo rather let the vibes flow with: vibe check",
+    "lint": "echo rather let the vibes flow with: vibe lint",
+    "typecheck": "echo rather let the vibes flow with: vibe typecheck"
+  },
+  "contributors": [
+    {
+      "name": "Marcus Brandstaetter",
+      "email": "max@tfq.at"
     },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/techfreaque/next-vibe.git"
+    {
+      "name": "Augment"
     },
-    "bugs": {
-        "url": "https://github.com/techfreaque/next-vibe/issues"
+    {
+      "name": "Claude Code"
     },
-    "homepage": "https://github.com/techfreaque/next-vibe#readme",
-    "keywords": [
-        "next",
-        "portal",
-        "react",
-        "zustand",
-        "tanstack",
-        "react-query",
-        "react-hook-form",
-        "react-native"
-    ],
-    "author": "Marcus Brandstaetter",
-    "contributors": [
-        {
-            "name": "Marcus Brandstaetter",
-            "email": "max@tfq.at"
-        }
-    ],
-    "dependencies": {
-        "@prisma/client": "^6.5.0",
-        "uuid": "^11.1.0"
+    {
+      "name": "ChatGPT (fired)"
     },
-    "devDependencies": {
-        "sovendus-release-tool": "^1.4.2",
-        "vitest": "^3.0.9"
+    {
+      "name": "Copilot (fired)"
     },
-    "workspaces": [
-        "src/packages/*"
-    ]
+    {
+      "name": "v0.dev (fired)"
+    },
+    {
+      "name": "Devin (fired)"
+    },
+    {
+      "name": "Cursor (fired)"
+    }
+  ],
+  "dependencies": {
+    "@ai-sdk/amazon-bedrock": "3.0.34",
+    "@ai-sdk/azure": "2.0.49",
+    "@ai-sdk/cohere": "2.0.14",
+    "@ai-sdk/google-vertex": "3.0.38",
+    "@ai-sdk/mistral": "2.0.19",
+    "@ai-sdk/openai": "2.0.48",
+    "@ai-sdk/react": "2.0.68",
+    "@emotion/is-prop-valid": "1.4.0",
+    "@hookform/resolvers": "5.2.2",
+    "@icons-pack/react-simple-icons": "^13.8.0",
+    "@inquirer/prompts": "7.8.6",
+    "@openrouter/ai-sdk-provider": "^1.2.0",
+    "@radix-ui/react-accordion": "1.2.12",
+    "@radix-ui/react-alert-dialog": "1.1.15",
+    "@radix-ui/react-aspect-ratio": "1.1.7",
+    "@radix-ui/react-avatar": "1.1.10",
+    "@radix-ui/react-checkbox": "1.3.3",
+    "@radix-ui/react-context-menu": "2.2.16",
+    "@radix-ui/react-dropdown-menu": "2.1.16",
+    "@radix-ui/react-hover-card": "1.1.15",
+    "@radix-ui/react-icons": "1.3.2",
+    "@radix-ui/react-label": "2.1.7",
+    "@radix-ui/react-menubar": "1.1.16",
+    "@radix-ui/react-navigation-menu": "1.2.14",
+    "@radix-ui/react-popover": "1.1.15",
+    "@radix-ui/react-progress": "1.1.7",
+    "@radix-ui/react-radio-group": "1.3.8",
+    "@radix-ui/react-scroll-area": "1.2.10",
+    "@radix-ui/react-select": "2.2.6",
+    "@radix-ui/react-separator": "1.1.7",
+    "@radix-ui/react-slider": "1.3.6",
+    "@radix-ui/react-switch": "1.2.6",
+    "@radix-ui/react-tabs": "1.1.13",
+    "@radix-ui/react-toast": "1.2.15",
+    "@radix-ui/react-toggle-group": "1.1.11",
+    "@radix-ui/react-tooltip": "1.2.8",
+    "@react-email/components": "0.5.6",
+    "@react-email/render": "1.3.2",
+    "@stripe/stripe-js": "8.0.0",
+    "@tailwindcss/postcss": "4.1.14",
+    "@tanstack/react-query": "5.90.2",
+    "@trpc/client": "11.6.0",
+    "@trpc/next": "11.6.0",
+    "@trpc/react-query": "11.6.0",
+    "@trpc/server": "11.6.0",
+    "@types/pg": "8.15.5",
+    "@vercel/analytics": "1.5.0",
+    "ai": "5.0.68",
+    "anthropic-vertex-ai": "1.0.2",
+    "argon2": "0.44.0",
+    "canvas-confetti": "1.9.3",
+    "chalk": "5.6.2",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "cmdk": "1.1.1",
+    "cron-parser": "5.4.0",
+    "date-fns": "4.1.0",
+    "dotenv": "17.2.3",
+    "drizzle-kit": "0.31.5",
+    "drizzle-orm": "0.44.6",
+    "drizzle-zod": "0.8.3",
+    "embla-carousel-react": "8.6.0",
+    "framer-motion": "12.23.24",
+    "google-auth-library": "10.4.0",
+    "googleapis": "162.0.0",
+    "gradient-string": "3.0.0",
+    "html2canvas": "1.4.1",
+    "ical-generator": "9.0.0",
+    "imap": "0.8.19",
+    "input-otp": "1.4.2",
+    "ioredis": "5.8.1",
+    "jose": "6.1.0",
+    "lucide-react": "0.545.0",
+    "next": "15.5.4",
+    "next-themes": "0.4.6",
+    "nodemailer": "7.0.9",
+    "pg": "8.16.3",
+    "react": "19.2.0",
+    "react-countup": "6.5.3",
+    "react-day-picker": "9.11.1",
+    "react-dom": "19.2.0",
+    "react-hook-form": "7.64.0",
+    "react-intersection-observer": "9.16.0",
+    "react-is": "19.2.0",
+    "react-markdown": "^10.1.0",
+    "react-resizable-panels": "3.0.6",
+    "react-syntax-highlighter": "15.6.6",
+    "recharts": "3.2.1",
+    "rehype-highlight": "^7.0.2",
+    "remark-gfm": "^4.0.1",
+    "server-only": "0.0.1",
+    "socket.io": "4.8.1",
+    "socket.io-client": "4.8.1",
+    "sonner": "2.0.7",
+    "stripe": "19.1.0",
+    "tailwind-merge": "3.3.1",
+    "tailwindcss": "4.1.14",
+    "tailwindcss-animate": "1.0.7",
+    "typescript": "5.9.3",
+    "uuid": "13.0.0",
+    "vaul": "1.1.2",
+    "vite": "7.1.9",
+    "webpack": "5.102.1",
+    "zod": "4.1.12",
+    "zustand": "5.0.8"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.0",
+    "@testing-library/user-event": "14.6.1",
+    "@types/canvas-confetti": "1.9.0",
+    "@types/gradient-string": "1.1.6",
+    "@types/imap": "0.8.42",
+    "@types/node": "24.7.1",
+    "@types/nodemailer": "7.0.2",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.1",
+    "@types/supertest": "6.0.3",
+    "@types/webpack": "5.28.5",
+    "@typescript/native-preview": "7.0.0-dev.20251010.1",
+    "@vitejs/plugin-react": "5.0.4",
+    "@vitest/coverage-v8": "3.2.4",
+    "@vitest/ui": "3.2.4",
+    "autoprefixer": "10.4.21",
+    "jsdom": "27.0.0",
+    "module-alias": "2.2.3",
+    "postcss": "8",
+    "postcss-preset-env": "10.4.0",
+    "builder": "workspace:*",
+    "release-tool": "workspace:*",
+    "lint": "workspace:*",
+    "supertest": "7.1.4",
+    "ts-node": "10.9.2",
+    "tsx": "4.20.6",
+    "vite-tsconfig-paths": "5.1.4",
+    "vitest": "3.2.4"
+  },
+  "workspaces": [
+    "src/app/api/*/v1/core/system/builder",
+    "src/app/api/*/v1/core/system/check/lint",
+    "src/app/api/*/v1/core/system/release-tool",
+    "src/app/api/*/v1/core/system/launchpad",
+    "src/app/api/*/v1/core/system/guard"
+  ],
+  "bin": {
+    "vibe": "./src/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/vibe.ts"
+  }
 }

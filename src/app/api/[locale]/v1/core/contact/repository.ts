@@ -1,0 +1,211 @@
+/**
+ * Contact Repository
+ * Handles data access and business logic for contact form submissions
+ */
+
+import "server-only";
+
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils/parse-error";
+
+import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import { contacts, type NewContact } from "./db";
+import type { ContactRequestOutput, ContactResponseOutput } from "./definition";
+import { ContactStatus } from "./enum";
+
+/**
+ * Contact Repository Interface
+ * Defines contract for contact operations
+ */
+export interface ContactRepository {
+  /**
+   * Submit contact form
+   */
+  submitContactForm(
+    data: ContactRequestOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ContactResponseOutput>>;
+
+  /**
+   * Create contact directly (for seeds)
+   */
+  create(
+    data: NewContact,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ContactResponseOutput>>;
+}
+
+/**
+ * Contact Repository Implementation
+ * Handles contact form submissions
+ */
+export class ContactRepositoryImpl implements ContactRepository {
+  /**
+   * Submit contact form
+   */
+  async submitContactForm(
+    data: ContactRequestOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ContactResponseOutput>> {
+    try {
+      logger.debug("contact.repository.create.start", {
+        email: data.email,
+        subject: data.subject,
+        userId: !user.isPublic ? user.id : null,
+        leadId: data.leadId,
+      });
+
+      // Handle lead conversion if leadId provided
+      if (data.leadId) {
+        try {
+          logger.debug("contact.repository.lead.conversion.start", {
+            leadId: data.leadId,
+            email: data.email,
+            name: data.name,
+            company: data.company,
+          });
+
+          // Note: Lead conversion logic would go here if needed
+          // For now, we'll just log that we have a lead ID
+          logger.debug("contact.repository.lead.provided", {
+            leadId: data.leadId,
+          });
+        } catch (error) {
+          // Log error but don't fail the contact form submission
+          logger.error("contact.repository.lead.conversion.error", {
+            error,
+            leadId: data.leadId,
+            email: data.email,
+          });
+        }
+      }
+
+      // Create contact record
+      const contactResult = await db
+        .insert(contacts)
+        .values({
+          name: data.name,
+          email: data.email,
+          company: data.company,
+          subject: data.subject,
+          message: data.message,
+          status: ContactStatus.NEW,
+          userId: !user.isPublic ? user.id : null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .returning();
+
+      const contact = contactResult[0];
+
+      if (!contact) {
+        return createErrorResponse(
+          "app.api.v1.core.contact.errors.repositoryCreateFailed",
+          ErrorResponseTypes.DATABASE_ERROR,
+          { email: data.email },
+        );
+      }
+
+      logger.debug("contact.repository.create.success", {
+        contactId: contact.id,
+        email: data.email,
+        leadId: data.leadId,
+      });
+
+      return createSuccessResponse({
+        success: true,
+        messageId: contact.id,
+        status: [ContactStatus.NEW],
+      });
+    } catch (error) {
+      logger.error("contact.repository.create.error", error);
+      const parsedError = parseError(error);
+      return createErrorResponse(
+        "app.api.v1.core.contact.errors.repositoryCreateFailed",
+        ErrorResponseTypes.DATABASE_ERROR,
+        {
+          email: data.email,
+          error: parsedError.message,
+          details: "app.api.v1.core.contact.errors.repositoryCreateDetails",
+        },
+      );
+    }
+  }
+
+  /**
+   * Create contact directly (for seeds)
+   */
+  async create(
+    data: NewContact,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ContactResponseOutput>> {
+    try {
+      logger.debug("contact.repository.seed.create.start", {
+        email: data.email,
+      });
+
+      const contactResult = await db
+        .insert(contacts)
+        .values({
+          name: data.name,
+          email: data.email,
+          company: data.company,
+          subject: data.subject,
+          message: data.message,
+          status: data.status || ContactStatus.NEW,
+          userId: data.userId || null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .returning();
+
+      const contact = contactResult[0];
+
+      if (!contact) {
+        return createErrorResponse(
+          "app.api.v1.core.contact.errors.repositoryCreateFailed",
+          ErrorResponseTypes.DATABASE_ERROR,
+          {
+            email: data.email,
+            error: "app.api.v1.core.contact.errors.noContactReturned",
+          },
+        );
+      }
+
+      return createSuccessResponse({
+        success: true,
+        messageId: contact.id,
+        status: [data.status || ContactStatus.NEW],
+      });
+    } catch (error) {
+      logger.error("contact.repository.seed.create.error", error);
+      const parsedError = parseError(error);
+      return createErrorResponse(
+        "app.api.v1.core.contact.errors.repositoryCreateFailed",
+        ErrorResponseTypes.DATABASE_ERROR,
+        {
+          email: data.email,
+          error: parsedError.message,
+        },
+      );
+    }
+  }
+}
+
+/**
+ * Singleton Repository Instance
+ */
+export const contactRepository = new ContactRepositoryImpl();

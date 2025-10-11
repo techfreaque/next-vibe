@@ -1,0 +1,133 @@
+import { translations as chatTranslations } from "../../chat/i18n/pl";
+import { translations as classificationTranslations } from "../../classification/i18n/pl";
+import { translations as confirmationTranslations } from "../../confirmation/i18n/pl";
+import { translations as executionTranslations } from "../../execution/i18n/pl";
+import { translations as processTranslations } from "../../process/i18n/pl";
+import { translations as statusTranslations } from "../../status/i18n/pl";
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  category: "Agent",
+  tags: {
+    streaming: "Strumieniowanie",
+    chat: "Czat",
+    ai: "AI",
+    status: "Status",
+    processing: "Przetwarzanie",
+    classification: "Klasyfikacja",
+    automation: "Automatyzacja",
+    execution: "Wykonanie",
+    confirmation: "Potwierdzenie",
+  },
+  enums: {
+    emailAgentStatus: {
+      pending: "Oczekujący",
+      processing: "Przetwarzanie",
+      hardRulesComplete: "Twarde Zasady Zakończone",
+      aiProcessing: "Przetwarzanie AI",
+      awaitingConfirmation: "Oczekiwanie na Potwierdzenie",
+      completed: "Zakończone",
+      failed: "Nieudane",
+      skipped: "Pominięte",
+    },
+    emailAgentActionType: {
+      markBounced: "Oznacz jako Odbite",
+      markSpam: "Oznacz jako Spam",
+      classifyDeliveryFailure: "Klasyfikuj Błąd Dostarczenia",
+      respondToEmail: "Odpowiedz na E-mail",
+      deleteEmail: "Usuń E-mail",
+      searchKnowledgeBase: "Przeszukaj Bazę Wiedzy",
+      webSearch: "Wyszukiwanie w Internecie",
+      escalateToHuman: "Przekaż do Człowieka",
+      noAction: "Brak Działania",
+      chainAnalysis: "Analiza Łańcuchowa",
+    },
+    emailAgentToolType: {
+      knowledgeBaseSearch: "Wyszukiwanie w Bazie Wiedzy",
+      emailResponse: "Odpowiedź E-mail",
+      emailDelete: "Usuń E-mail",
+      webSearch: "Wyszukiwanie w Internecie",
+    },
+    bounceCategory: {
+      hardBounce: "Twarde Odbicie",
+      softBounce: "Miękkie Odbicie",
+      spamComplaint: "Skarga na Spam",
+      unsubscribe: "Wypisz się",
+      blockBounce: "Odbicie Blokowe",
+      invalidAddress: "Nieprawidłowy Adres",
+      mailboxFull: "Pełna Skrzynka",
+      contentRejected: "Treść Odrzucona",
+    },
+    confirmationStatus: {
+      pending: "Oczekujący",
+      approved: "Zatwierdzony",
+      rejected: "Odrzucony",
+      expired: "Wygasły",
+    },
+    processingPriority: {
+      low: "Niski",
+      normal: "Normalny",
+      high: "Wysoki",
+      urgent: "Pilny",
+    },
+    sortOrder: {
+      asc: "Rosnąco",
+      desc: "Malejąco",
+    },
+    emailAgentSortField: {
+      emailId: "ID E-maila",
+      status: "Status",
+      lastProcessedAt: "Ostatnio Przetworzony",
+      createdAt: "Utworzony",
+      priority: "Priorytet",
+    },
+    emailAgentStatusFilter: {
+      all: "Wszystkie",
+      pending: "Oczekujący",
+      processing: "Przetwarzanie",
+      hardRulesComplete: "Twarde Zasady Zakończone",
+      aiProcessing: "Przetwarzanie AI",
+      awaitingConfirmation: "Oczekiwanie na Potwierdzenie",
+      completed: "Zakończone",
+      failed: "Nieudane",
+      skipped: "Pominięte",
+    },
+    emailAgentActionTypeFilter: {
+      all: "Wszystkie",
+      markBounced: "Oznacz jako Odbite",
+      markSpam: "Oznacz jako Spam",
+      classifyDeliveryFailure: "Klasyfikuj Błąd Dostarczenia",
+      respondToEmail: "Odpowiedz na E-mail",
+      deleteEmail: "Usuń E-mail",
+      searchKnowledgeBase: "Przeszukaj Bazę Wiedzy",
+      webSearch: "Wyszukiwanie w Internecie",
+      escalateToHuman: "Przekaż do Człowieka",
+      noAction: "Brak Działania",
+      chainAnalysis: "Analiza Łańcuchowa",
+    },
+    confirmationStatusFilter: {
+      all: "Wszystkie",
+      pending: "Oczekujący",
+      approved: "Zatwierdzony",
+      rejected: "Odrzucony",
+      expired: "Wygasły",
+    },
+    processingPriorityFilter: {
+      all: "Wszystkie",
+      low: "Niski",
+      normal: "Normalny",
+      high: "Wysoki",
+      urgent: "Pilny",
+    },
+    confirmationResponseAction: {
+      approve: "Zatwierdź",
+      reject: "Odrzuć",
+    },
+  },
+  chat: chatTranslations,
+  classification: classificationTranslations,
+  confirmation: confirmationTranslations,
+  execution: executionTranslations,
+  process: processTranslations,
+  status: statusTranslations,
+};

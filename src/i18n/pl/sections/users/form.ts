@@ -1,0 +1,42 @@
+import type { formTranslations as EnglishFormTranslations } from "../../../en/sections/users/form";
+
+export const formTranslations: typeof EnglishFormTranslations = {
+  labels: {
+    email: "Adres e-mail",
+    password: "Hasło",
+    firstName: "Imię",
+    lastName: "Nazwisko",
+    company: "Firma",
+    phone: "Numer telefonu",
+    preferredContactMethod: "Preferowana metoda kontaktu",
+    imageUrl: "URL zdjęcia profilowego",
+    bio: "Biografia",
+    website: "Strona internetowa",
+    jobTitle: "Stanowisko",
+    emailVerified: "E-mail zweryfikowany",
+    isActive: "Konto aktywne",
+    leadId: "ID leada",
+    roles: "Role użytkownika",
+  },
+  placeholders: {
+    email: "uzytkownik@przyklad.pl",
+    password: "Wprowadź bezpieczne hasło",
+    firstName: "Jan",
+    lastName: "Kowalski",
+    company: "Przykładowa Firma Sp. z o.o.",
+    phone: "+48123456789",
+    imageUrl: "https://przyklad.pl/avatar.jpg",
+    bio: "Opowiedz nam o sobie...",
+    website: "https://przyklad.pl",
+    jobTitle: "Programista",
+  },
+  buttons: {
+    save: "Zapisz użytkownika",
+    cancel: "Anuluj",
+    create: "Utwórz użytkownika",
+    update: "Zaktualizuj użytkownika",
+    delete: "Usuń użytkownika",
+    reset: "Resetuj formularz",
+    saving: "Zapisywanie...",
+  },
+};

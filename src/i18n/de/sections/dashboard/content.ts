@@ -1,0 +1,102 @@
+import type { contentTranslations as EnglishContentTranslations } from "../../../en/sections/dashboard/content";
+
+export const contentTranslations: typeof EnglishContentTranslations = {
+  title: "Content-Kalender",
+  description: "Verwalten und planen Sie Ihre Social Media Inhalte",
+  createPost: "Beitrag erstellen",
+  createNewPost: "Neuen Beitrag erstellen",
+  createNewPostDescription:
+    "Erstellen Sie einen neuen Beitrag für Ihre Social Media Accounts.",
+  editPost: "Beitrag bearbeiten",
+  editPostDescription: "Bearbeiten Sie Ihren Social Media Beitrag.",
+  updatePost: "Beitrag aktualisieren",
+  platform: "Plattform",
+  content: "Inhalt",
+  scheduledDate: "Geplantes Datum",
+  allPlatforms: "Alle Plattformen",
+  allStatuses: "Alle Status",
+  scheduledPosts: "Geplante Beiträge",
+  scheduledPostsDescription: "Geplante Beiträge anzeigen und verwalten",
+  draftPosts: "Entwürfe",
+  draftPostsDescription: "Ihre Entwürfe anzeigen und verwalten",
+  noPostsFound: "Keine Beiträge gefunden",
+  noDraftPostsFound: "Keine Entwürfe gefunden",
+  confirmDelete: "Sind Sie sicher, dass Sie diesen Beitrag löschen möchten?",
+  status: {
+    label: "Status",
+    draft: "Entwurf",
+    scheduled: "Geplant",
+    published: "Veröffentlicht",
+    failed: "Fehlgeschlagen",
+  },
+  tabs: {
+    calendar: "Kalender",
+    list: "Listenansicht",
+    drafts: "Entwürfe",
+  },
+  detail: {
+    title: "Inhaltsdetails",
+    description: "Ihren Content-Beitrag anzeigen und verwalten",
+    backToCalendar: "Zurück zum Kalender",
+    edit: "Bearbeiten",
+    delete: "Löschen",
+    deleting: "Löscht...",
+    publishNow: "Jetzt veröffentlichen",
+    publishing: "Veröffentlicht...",
+    confirmDelete: "Beitrag löschen",
+    confirmDeleteDescription:
+      "Sind Sie sicher, dass Sie diesen Beitrag löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+    confirmPublish: "Beitrag veröffentlichen",
+    confirmPublishDescription:
+      "Sind Sie sicher, dass Sie diesen Beitrag jetzt veröffentlichen möchten? Er wird sofort für Ihr Publikum sichtbar sein.",
+    media: "Medien",
+    analytics: "Analytics",
+    createdAt: "Erstellt am",
+  },
+  platforms: {
+    instagram: "Instagram",
+    facebook: "Facebook",
+    twitter: "Twitter",
+    linkedin: "LinkedIn",
+    tiktok: "TikTok",
+    pinterest: "Pinterest",
+    youtube: "YouTube",
+  },
+  analytics: {
+    likes: "Likes",
+    comments: "Kommentare",
+    shares: "Shares",
+  },
+  migrateData: "Content-Daten migrieren",
+  migrateDataDescription:
+    "Dies wird Ihre Content-Daten von der alten Datenbank zur neuen migrieren. Dieser Prozess kann je nach Datenmenge einige Momente dauern.",
+  migrateDataNote:
+    "Ihre bestehenden Daten bleiben als Backup in der alten Datenbank. Nach der Migration werden alle neuen Inhalte in der neuen Datenbank gespeichert.",
+  startMigration: "Migration starten",
+  migrating: "Migriert...",
+  toast: {
+    postCreated: "Beitrag erstellt",
+    postCreatedDescription: "Ihr Beitrag wurde erfolgreich erstellt.",
+    errorCreatingPost: "Fehler beim Erstellen des Beitrags",
+    errorCreatingPostDescription:
+      "Ein Fehler ist beim Erstellen Ihres Beitrags aufgetreten.",
+    postUpdated: "Beitrag aktualisiert",
+    postUpdatedDescription: "Ihr Beitrag wurde erfolgreich aktualisiert.",
+    errorUpdatingPost: "Fehler beim Aktualisieren des Beitrags",
+    errorUpdatingPostDescription:
+      "Ein Fehler ist beim Aktualisieren Ihres Beitrags aufgetreten.",
+    postDeleted: "Beitrag gelöscht",
+    postDeletedDescription: "Ihr Beitrag wurde erfolgreich gelöscht.",
+    errorDeletingPost: "Fehler beim Löschen des Beitrags",
+    errorDeletingPostDescription:
+      "Ein Fehler ist beim Löschen Ihres Beitrags aufgetreten.",
+    unexpectedError: "Ein unerwarteter Fehler ist aufgetreten.",
+    migrationSuccessful: "Migration erfolgreich",
+    migrationFailed: "Migration fehlgeschlagen",
+    postPublished: "Beitrag veröffentlicht",
+    postPublishedDescription: "Ihr Beitrag wurde erfolgreich veröffentlicht.",
+    errorPublishingPost: "Fehler beim Veröffentlichen des Beitrags",
+    errorPublishingPostDescription:
+      "Ein Fehler ist beim Veröffentlichen Ihres Beitrags aufgetreten.",
+  },
+};

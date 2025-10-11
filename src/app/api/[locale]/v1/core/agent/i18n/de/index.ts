@@ -1,0 +1,133 @@
+import { translations as chatTranslations } from "../../chat/i18n/de";
+import { translations as classificationTranslations } from "../../classification/i18n/de";
+import { translations as confirmationTranslations } from "../../confirmation/i18n/de";
+import { translations as executionTranslations } from "../../execution/i18n/de";
+import { translations as processTranslations } from "../../process/i18n/de";
+import { translations as statusTranslations } from "../../status/i18n/de";
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  category: "Agent",
+  tags: {
+    streaming: "Streaming",
+    chat: "Chat",
+    ai: "KI",
+    status: "Status",
+    processing: "Verarbeitung",
+    classification: "Klassifikation",
+    automation: "Automatisierung",
+    execution: "Ausführung",
+    confirmation: "Bestätigung",
+  },
+  enums: {
+    emailAgentStatus: {
+      pending: "Ausstehend",
+      processing: "In Bearbeitung",
+      hardRulesComplete: "Feste Regeln Abgeschlossen",
+      aiProcessing: "KI-Verarbeitung",
+      awaitingConfirmation: "Bestätigung Ausstehend",
+      completed: "Abgeschlossen",
+      failed: "Fehlgeschlagen",
+      skipped: "Übersprungen",
+    },
+    emailAgentActionType: {
+      markBounced: "Als Bounce Markieren",
+      markSpam: "Als Spam Markieren",
+      classifyDeliveryFailure: "Zustellfehler Klassifizieren",
+      respondToEmail: "E-Mail Beantworten",
+      deleteEmail: "E-Mail Löschen",
+      searchKnowledgeBase: "Wissensdatenbank Durchsuchen",
+      webSearch: "Web-Suche",
+      escalateToHuman: "An Mensch Weiterleiten",
+      noAction: "Keine Aktion",
+      chainAnalysis: "Ketten-Analyse",
+    },
+    emailAgentToolType: {
+      knowledgeBaseSearch: "Wissensdatenbank-Suche",
+      emailResponse: "E-Mail-Antwort",
+      emailDelete: "E-Mail Löschen",
+      webSearch: "Web-Suche",
+    },
+    bounceCategory: {
+      hardBounce: "Harter Bounce",
+      softBounce: "Weicher Bounce",
+      spamComplaint: "Spam-Beschwerde",
+      unsubscribe: "Abmelden",
+      blockBounce: "Block-Bounce",
+      invalidAddress: "Ungültige Adresse",
+      mailboxFull: "Postfach Voll",
+      contentRejected: "Inhalt Abgelehnt",
+    },
+    confirmationStatus: {
+      pending: "Ausstehend",
+      approved: "Genehmigt",
+      rejected: "Abgelehnt",
+      expired: "Abgelaufen",
+    },
+    processingPriority: {
+      low: "Niedrig",
+      normal: "Normal",
+      high: "Hoch",
+      urgent: "Dringend",
+    },
+    sortOrder: {
+      asc: "Aufsteigend",
+      desc: "Absteigend",
+    },
+    emailAgentSortField: {
+      emailId: "E-Mail-ID",
+      status: "Status",
+      lastProcessedAt: "Zuletzt Verarbeitet Am",
+      createdAt: "Erstellt Am",
+      priority: "Priorität",
+    },
+    emailAgentStatusFilter: {
+      all: "Alle",
+      pending: "Ausstehend",
+      processing: "In Bearbeitung",
+      hardRulesComplete: "Feste Regeln Abgeschlossen",
+      aiProcessing: "KI-Verarbeitung",
+      awaitingConfirmation: "Bestätigung Ausstehend",
+      completed: "Abgeschlossen",
+      failed: "Fehlgeschlagen",
+      skipped: "Übersprungen",
+    },
+    emailAgentActionTypeFilter: {
+      all: "Alle",
+      markBounced: "Als Bounce Markieren",
+      markSpam: "Als Spam Markieren",
+      classifyDeliveryFailure: "Zustellfehler Klassifizieren",
+      respondToEmail: "E-Mail Beantworten",
+      deleteEmail: "E-Mail Löschen",
+      searchKnowledgeBase: "Wissensdatenbank Durchsuchen",
+      webSearch: "Web-Suche",
+      escalateToHuman: "An Mensch Weiterleiten",
+      noAction: "Keine Aktion",
+      chainAnalysis: "Ketten-Analyse",
+    },
+    confirmationStatusFilter: {
+      all: "Alle",
+      pending: "Ausstehend",
+      approved: "Genehmigt",
+      rejected: "Abgelehnt",
+      expired: "Abgelaufen",
+    },
+    processingPriorityFilter: {
+      all: "Alle",
+      low: "Niedrig",
+      normal: "Normal",
+      high: "Hoch",
+      urgent: "Dringend",
+    },
+    confirmationResponseAction: {
+      approve: "Genehmigen",
+      reject: "Ablehnen",
+    },
+  },
+  chat: chatTranslations,
+  classification: classificationTranslations,
+  confirmation: confirmationTranslations,
+  execution: executionTranslations,
+  process: processTranslations,
+  status: statusTranslations,
+};

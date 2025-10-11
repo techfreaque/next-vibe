@@ -1,0 +1,29 @@
+import type { searchTranslations as EnglishSearchTranslations } from "../../../en/sections/leads/search";
+
+export const searchTranslations: typeof EnglishSearchTranslations = {
+  placeholder: "Leads suchen...",
+  error: {
+    validation: {
+      title: "Validierungsfehler",
+      description:
+        "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut.",
+    },
+    unauthorized: {
+      title: "Unbefugter Zugriff",
+      description: "Sie haben keine Berechtigung für diese Aktion.",
+    },
+    server: {
+      title: "Serverfehler",
+      description:
+        "Ein Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+    },
+    unknown: {
+      title: "Unbekannter Fehler",
+      description: "Ein unerwarteter Fehler ist aufgetreten.",
+    },
+  },
+  success: {
+    title: "Suche erfolgreich",
+    description: "Leads erfolgreich gefunden.",
+  },
+};

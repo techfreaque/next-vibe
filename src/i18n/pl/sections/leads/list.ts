@@ -1,0 +1,22 @@
+import type { listTranslations as EnglishListTranslations } from "../../../en/sections/leads/list";
+
+export const listTranslations: typeof EnglishListTranslations = {
+  title: "Lista Leadów",
+  titleWithCount: "Lista Leadów ({{count}})",
+  description:
+    "Przeglądaj i zarządzaj wszystkimi leadami z zaawansowanymi opcjami filtrowania i sortowania",
+  loading: "Ładowanie...",
+  no_results: "Nie znaleziono leadów spełniających Twoje kryteria",
+  noResults: "Nie znaleziono leadów spełniających Twoje kryteria",
+  results: {
+    showing: "Pokazuje {{start}}-{{end}} z {{total}} leadów",
+  },
+  table: {
+    title: "Wszystkie Leady",
+    campaign_stage: "Etap Kampanii",
+    contact: "Kontakt",
+  },
+  filters: {
+    title: "Filtry",
+  },
+};

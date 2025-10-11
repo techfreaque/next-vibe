@@ -1,0 +1,78 @@
+/**
+ * Logout API Hooks
+ *
+ * Hooks for interacting with the Logout API.
+ * Most of the implementation details are handled by the next-vibe package.
+ */
+
+import { useRouter } from "next/navigation";
+import { useCallback } from "react";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import { useApiMutation } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation";
+import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/i18n/core/client";
+
+import { authClientRepository } from "../../auth/repository-client";
+import { useUser } from "../me/hooks";
+import logoutEndpoints from "./definition";
+
+/****************************
+ * MUTATION HOOKS
+ ****************************/
+
+/**
+ * Hook for logout functionality
+ *
+ * Features:
+ * - Handles token removal
+ * - Provides success notifications
+ * - Redirects to login page
+ * - Refreshes user state
+ *
+ * @returns Logout function
+ */
+export function useLogout(logger: EndpointLogger): () => void {
+  const { toast } = useToast();
+  const router = useRouter();
+  const { refetch } = useUser(logger);
+  const { t, locale } = useTranslation();
+
+  const logout = useApiMutation(logoutEndpoints.GET, logger, {
+    onSuccess: async () => {
+      toast({
+        title: t("auth.logout.success.title"),
+        description: t("auth.logout.success.description"),
+        variant: "default",
+      });
+
+      // Remove token AFTER successful API call
+      const removeResponse = authClientRepository.removeAuthStatus(logger);
+      if (!removeResponse.success) {
+        // Note: Error already logged by repository
+      }
+      router.push(`/${locale}/user/login`);
+      await refetch();
+    },
+    onError: async () => {
+      // Even if the API call fails, we still want to log the user out locally
+      toast({
+        title: t("auth.logout.success.title"),
+        description: t("auth.logout.success.description"),
+        variant: "default",
+      });
+
+      // Remove token AFTER API call completes (even with error)
+      const removeResponse = authClientRepository.removeAuthStatus(logger);
+      if (!removeResponse.success) {
+        // Note: Error already logged by repository
+      }
+      router.push(`/${locale}/user/login`);
+      await refetch();
+    },
+  });
+
+  return useCallback((): void => {
+    logout.mutate();
+  }, [logout]);
+}

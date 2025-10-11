@@ -1,0 +1,134 @@
+import type { translations as enTranslations } from "../en";
+
+import { translations as optionsTranslations } from "../../options/i18n/de";
+
+export const translations: typeof enTranslations = {
+  title: "Anmeldung",
+  description: "Benutzeranmeldung Endpunkt",
+  tag: "Authentifizierung",
+  options: optionsTranslations,
+  fields: {
+    email: {
+      label: "E-Mail",
+      description: "Benutzer E-Mail-Adresse",
+      placeholder: "E-Mail eingeben",
+      help: "Geben Sie die E-Mail-Adresse ein, die mit Ihrem Konto verknüpft ist",
+      validation: {
+        invalid: "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      },
+    },
+    password: {
+      label: "Passwort",
+      description: "Benutzerpasswort",
+      placeholder: "Passwort eingeben",
+      help: "Geben Sie Ihr Kontopasswort ein",
+      validation: {
+        minLength: "Passwort muss mindestens 8 Zeichen lang sein",
+      },
+    },
+    rememberMe: {
+      label: "Angemeldet bleiben",
+      description: "Mich angemeldet lassen",
+      placeholder: "Angemeldet bleiben",
+      help: "Auf diesem Gerät angemeldet bleiben für einfacheren Zugang",
+    },
+    leadId: {
+      label: "Lead-ID",
+      description: "Optionale Lead-Kennung",
+      placeholder: "Lead-ID eingeben",
+      help: "Optionale Lead-Kennung für Tracking",
+    },
+  },
+  groups: {
+    credentials: {
+      title: "Anmeldedaten",
+      description: "Geben Sie Ihre Anmeldeinformationen ein",
+    },
+    options: {
+      title: "Anmeldeoptionen",
+      description: "Zusätzliche Anmeldeeinstellungen und Optionen",
+    },
+    preferences: {
+      title: "Anmeldeeinstellungen",
+      description: "Zusätzliche Anmeldeoptionen",
+    },
+    advanced: {
+      title: "Erweiterte Optionen",
+      description: "Erweiterte Anmeldeeinstellungen",
+    },
+  },
+  response: {
+    title: "Anmeldungsantwort",
+    description: "Anmeldungsantwortdaten",
+    success: "Anmeldung erfolgreich",
+    message: "Status-Nachricht",
+    user: {
+      title: "Benutzerdetails",
+      description: "Informationen des angemeldeten Benutzers",
+      id: "Benutzer-ID",
+      email: "E-Mail-Adresse",
+      firstName: "Vorname",
+      lastName: "Nachname",
+      imageUrl: "Profilbild",
+    },
+    sessionInfo: {
+      title: "Sitzungsinformationen",
+      description: "Details der Benutzersitzung",
+      expiresAt: "Sitzung läuft ab",
+      rememberMeActive: "Angemeldet bleiben Status",
+      loginLocation: "Anmeldeort",
+    },
+    nextSteps: {
+      item: "Nächste Schritte",
+    },
+  },
+  errors: {
+    validation: {
+      title: "Validierung fehlgeschlagen",
+      description: "Bitte überprüfen Sie Ihre Eingabe",
+    },
+    unauthorized: {
+      title: "Anmeldung fehlgeschlagen",
+      description: "Ungültige Anmeldedaten",
+    },
+    unknown: {
+      title: "Anmeldungsfehler",
+      description: "Bei der Anmeldung ist ein Fehler aufgetreten",
+    },
+    network: {
+      title: "Netzwerkfehler",
+      description: "Verbindung fehlgeschlagen",
+    },
+    forbidden: {
+      title: "Zugriff verweigert",
+      description: "Anmeldung nicht erlaubt",
+    },
+    notFound: {
+      title: "Benutzer nicht gefunden",
+      description: "Benutzerkonto nicht gefunden",
+    },
+    unsaved: {
+      title: "Nicht gespeicherte Änderungen",
+      description: "Änderungen wurden nicht gespeichert",
+    },
+    conflict: {
+      title: "Anmeldungskonflikt",
+      description: "Anmeldungskonflikt erkannt",
+    },
+    server: {
+      title: "Serverfehler",
+      description: "Interner Serverfehler aufgetreten",
+    },
+  },
+  success: {
+    title: "Anmeldung erfolgreich",
+    description: "Sie wurden erfolgreich angemeldet",
+  },
+  enums: {
+    socialProviders: {
+      google: "Google",
+      github: "GitHub",
+      facebook: "Facebook",
+    },
+  },
+};

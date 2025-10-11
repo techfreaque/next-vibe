@@ -1,0 +1,25 @@
+export const translations = {
+  navigation: {
+    consultations: "Consultations",
+    stats: "Statistics",
+    list: "List",
+    calendar: "Calendar",
+    new: "New Consultation",
+  },
+  common: {
+    loading: "Loading...",
+    error: "An error occurred",
+    retry: "Retry",
+    cancel: "Cancel",
+    save: "Save",
+    delete: "Delete",
+    edit: "Edit",
+    create: "Create",
+    update: "Update",
+    back: "Back",
+    next: "Next",
+    previous: "Previous",
+    close: "Close",
+    confirm: "Confirm",
+  },
+};
