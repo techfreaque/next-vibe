@@ -4,4 +4,4 @@ export const translations = {
     endpoint: "Endpoint",
   },
   // Add endpoint-specific translations here
-} ;
+};

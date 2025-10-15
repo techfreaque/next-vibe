@@ -2,6 +2,7 @@
  * TypeScript checker utilities for file discovery, caching, and path handling
  */
 
+import { createHash } from "node:crypto";
 import {
   existsSync,
   mkdirSync,
@@ -10,8 +11,6 @@ import {
   statSync,
 } from "node:fs";
 import { extname, join, relative, resolve } from "node:path";
-
-import { createHash } from "node:crypto";
 
 /**
  * TypeScript file extensions
@@ -81,8 +80,10 @@ export function determinePathType(path?: string): PathType {
  */
 function getTsConfigExcludePatterns(): string[] {
   try {
-    const tsconfig = JSON.parse(readFileSync("tsconfig.json", "utf8"));
-    return tsconfig.exclude || [];
+    const tsconfig = JSON.parse(readFileSync("tsconfig.json", "utf8")) as {
+      exclude?: string[];
+    };
+    return tsconfig.exclude ?? [];
   } catch {
     return [];
   }
@@ -139,6 +140,7 @@ export function findTypeScriptFiles(
 
   // Get tsconfig exclude patterns and merge with default excludes
   const tsConfigExcludes = getTsConfigExcludePatterns();
+  // Merge exclude patterns for comprehensive filtering
   const allExcludePatterns = [...excludePatterns, ...tsConfigExcludes];
 
   const resolvedDirectory = resolve(directory);
@@ -155,7 +157,7 @@ export function findTypeScriptFiles(
         const fullPath = join(dir, item);
 
         // Skip excluded patterns (simple pattern matching)
-        if (excludePatterns.some((pattern) => item.includes(pattern))) {
+        if (allExcludePatterns.some((pattern) => item.includes(pattern))) {
           continue;
         }
 
@@ -171,7 +173,7 @@ export function findTypeScriptFiles(
             scanDirectory(fullPath);
           } else if (stat.isFile()) {
             const ext = extname(fullPath);
-            if (TS_EXTENSIONS.includes(ext)) {
+            if ((TS_EXTENSIONS as readonly string[]).includes(ext)) {
               // Return relative path from current working directory for TypeScript config
               const relativePath = relative(process.cwd(), fullPath);
               files.push(relativePath);
@@ -194,11 +196,13 @@ export function findTypeScriptFiles(
 
 /**
  * Generate a cache key based on path type and content
+ * Note: Cache keys are internal identifiers, not user-facing strings
  */
 export function generateCacheKey(
   pathType: PathType,
   targetPath?: string,
 ): string {
+  // eslint-disable-next-line i18next/no-literal-string
   const baseKey = `typecheck_${pathType}`;
 
   if (!targetPath) {
@@ -207,13 +211,16 @@ export function generateCacheKey(
       const tsconfigPath = resolve("tsconfig.json");
       const stat = statSync(tsconfigPath);
       const mtime = stat.mtime.getTime();
+      // eslint-disable-next-line i18next/no-literal-string
       return `${baseKey}_project_${mtime}`;
     } catch {
+      // eslint-disable-next-line i18next/no-literal-string
       return `${baseKey}_project`;
     }
   }
 
   // Create hash of the path for consistent cache keys
+  // eslint-disable-next-line i18next/no-literal-string
   const pathHash = createHash("md5")
     .update(targetPath)
     .digest("hex")
@@ -224,8 +231,10 @@ export function generateCacheKey(
     try {
       const stat = statSync(resolve(targetPath));
       const mtime = stat.mtime.getTime();
+      // eslint-disable-next-line i18next/no-literal-string
       return `${baseKey}_file_${pathHash}_${mtime}`;
     } catch {
+      // eslint-disable-next-line i18next/no-literal-string
       return `${baseKey}_file_${pathHash}`;
     }
   }
@@ -239,6 +248,7 @@ export function generateCacheKey(
           try {
             const stat = statSync(file);
             const relativePath = relative(process.cwd(), file);
+
             return `${relativePath}:${stat.mtime.getTime()}`;
           } catch {
             return file;
@@ -246,13 +256,17 @@ export function generateCacheKey(
         })
         .sort();
 
+      // eslint-disable-next-line i18next/no-literal-string
       const contentHash = createHash("md5")
+        // eslint-disable-next-line i18next/no-literal-string
         .update(fileHashes.join("|"))
         .digest("hex")
         .substring(0, 8);
 
+      // eslint-disable-next-line i18next/no-literal-string
       return `${baseKey}_folder_${pathHash}_${contentHash}`;
     } catch {
+      // eslint-disable-next-line i18next/no-literal-string
       return `${baseKey}_folder_${pathHash}`;
     }
   }
@@ -277,11 +291,13 @@ export function createTypecheckConfig(path?: string): TypecheckConfig {
     pathType,
     targetPath: path,
     cacheKey,
+    // eslint-disable-next-line i18next/no-literal-string
     buildInfoFile: join(tmpDir, `tsconfig.${cacheKey}.tsbuildinfo`),
   };
 
   // Create temporary config file for single files and folders (not for no-path scenario)
   if (pathType === PathType.SINGLE_FILE || pathType === PathType.FOLDER) {
+    // eslint-disable-next-line i18next/no-literal-string
     config.tempConfigFile = join(tmpDir, `tsconfig.${cacheKey}.json`);
   }
 

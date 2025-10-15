@@ -3,7 +3,6 @@
  * Database tables for health monitoring and pulse checks
  */
 
-import type { z } from "zod";
 import {
   boolean,
   integer,
@@ -15,13 +14,9 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
+import type { z } from "zod";
 
-import {
-  PulseExecutionStatus,
-  PulseExecutionStatusDB,
-  PulseHealthStatus,
-  PulseHealthStatusDB,
-} from "../enum";
+import { PulseExecutionStatusDB, PulseHealthStatusDB } from "../enum";
 
 /**
  * Pulse Health Table
@@ -117,15 +112,11 @@ export const pulseNotifications = pgTable("pulse_notifications", {
 /**
  * Zod schemas for validation
  */
-export const insertPulseHealthSchema =
-  createInsertSchema(pulseHealth);
-export const selectPulseHealthSchema =
-  createSelectSchema(pulseHealth);
+export const insertPulseHealthSchema = createInsertSchema(pulseHealth);
+export const selectPulseHealthSchema = createSelectSchema(pulseHealth);
 
-export const insertPulseExecutionSchema =
-  createInsertSchema(pulseExecutions);
-export const selectPulseExecutionSchema =
-  createSelectSchema(pulseExecutions);
+export const insertPulseExecutionSchema = createInsertSchema(pulseExecutions);
+export const selectPulseExecutionSchema = createSelectSchema(pulseExecutions);
 
 export const insertPulseNotificationSchema =
   createInsertSchema(pulseNotifications);
@@ -142,4 +133,6 @@ export type PulseExecution = z.infer<typeof selectPulseExecutionSchema>;
 export type NewPulseExecution = z.infer<typeof insertPulseExecutionSchema>;
 
 export type PulseNotification = z.infer<typeof selectPulseNotificationSchema>;
-export type NewPulseNotification = z.infer<typeof insertPulseNotificationSchema>;
+export type NewPulseNotification = z.infer<
+  typeof insertPulseNotificationSchema
+>;

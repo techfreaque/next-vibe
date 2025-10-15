@@ -3,23 +3,19 @@
  * Handles email template rendering and journey management
  */
 
-import { env } from "@/config/env";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type {
-  Countries,
-  CountryLanguage,
-  Languages,
-} from "@/i18n/core/config";
+import { env } from "@/config/env";
+import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import { createTrackingContext } from "../../../../emails/smtp-client/components/tracking_context";
+import type { LeadWithEmailType } from "../../../definition";
 import {
   EmailCampaignStage,
   EmailJourneyVariant,
   LeadSource,
   LeadStatus,
 } from "../../../enum";
-import type { LeadWithEmailType } from "../../../definition";
 import { personalJourneyTemplates } from "../journeys/personal";
 import { personalPracticalJourneyTemplates } from "../journeys/personal-results";
 import { resultsJourneyTemplates } from "../journeys/results/results";
@@ -30,6 +26,18 @@ import type {
   JourneyTemplateMap,
 } from "../types";
 
+/**
+ * No-op logger for preview contexts where logging is not needed
+ */
+const createNoOpLogger = (): EndpointLogger => ({
+  info: (): void => {},
+  error: (): void => {},
+  warn: (): void => {},
+  debug: (): void => {},
+  vibe: (): void => {},
+  isDebugEnabled: false,
+});
+
 // Email preview cache to prevent excessive re-rendering
 interface PreviewCacheEntry {
   result: EmailTemplateResult;
@@ -37,8 +45,8 @@ interface PreviewCacheEntry {
 }
 
 interface PreviewCacheKey {
-  journeyVariant: EmailJourneyVariant;
-  stage: EmailCampaignStage;
+  journeyVariant: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant];
+  stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
   locale: CountryLanguage;
 }
 
@@ -113,7 +121,10 @@ setInterval(
  * Journey Template Registry
  * Maps journey variants to their template functions
  */
-const JOURNEY_TEMPLATES: Record<EmailJourneyVariant, JourneyTemplateMap> = {
+const JOURNEY_TEMPLATES: Record<
+  (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
+  JourneyTemplateMap
+> = {
   [EmailJourneyVariant.PERSONAL_APPROACH]: personalJourneyTemplates,
   [EmailJourneyVariant.RESULTS_FOCUSED]: resultsJourneyTemplates,
   [EmailJourneyVariant.PERSONAL_RESULTS]: personalPracticalJourneyTemplates,
@@ -128,8 +139,8 @@ export class EmailRendererService {
    */
   async renderEmail(
     lead: LeadWithEmailType,
-    journeyVariant: EmailJourneyVariant,
-    stage: EmailCampaignStage,
+    journeyVariant: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
+    stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage],
     context: {
       t: TFunction;
       locale: CountryLanguage;
@@ -139,10 +150,10 @@ export class EmailRendererService {
       unsubscribeUrl: string;
       trackingUrl: string;
     },
-    logger?: EndpointLogger,
+    logger: EndpointLogger,
   ): Promise<EmailTemplateResult | null> {
     try {
-      logger?.info("email.render.start", {
+      logger.info("email.render.start", {
         leadId: lead.id,
         journeyVariant,
         stage,
@@ -151,7 +162,7 @@ export class EmailRendererService {
 
       // Ensure lead has an email address for email operations
       if (!lead.email) {
-        logger?.error("email.render.no.email", {
+        logger.error("email.render.no.email", {
           leadId: lead.id,
           journeyVariant,
           stage,
@@ -168,7 +179,7 @@ export class EmailRendererService {
       // Get the template function for this journey and stage
       const templateFunction = this.getTemplateFunction(journeyVariant, stage);
       if (!templateFunction) {
-        logger?.error("email.render.template.not.found", {
+        logger.error("email.render.template.not.found", {
           journeyVariant,
           stage,
         });
@@ -199,7 +210,7 @@ export class EmailRendererService {
 
       // Ensure we have a valid tracking context
       if (!tracking) {
-        logger?.error("email.render.tracking.context.failed", {
+        logger.error("email.render.tracking.context.failed", {
           leadId: lead.id,
           locale: context.locale,
         });
@@ -216,15 +227,9 @@ export class EmailRendererService {
 
       // Email template rendered with built-in tracking components
       // No HTML manipulation needed - tracking is built into React components
-      console.debug("Email template rendered with built-in tracking", {
-        leadId: lead.id,
-        subject: result.subject,
-        to: result.to,
-      });
-
       return result;
     } catch (error) {
-      logger?.error("email.render.error", {
+      logger.error("email.render.error", {
         error,
         leadId: lead.id,
         journeyVariant,
@@ -238,22 +243,16 @@ export class EmailRendererService {
    * Get template function for a specific journey and stage
    */
   private getTemplateFunction(
-    journeyVariant: EmailJourneyVariant,
-    stage: EmailCampaignStage,
+    journeyVariant: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
+    stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage],
   ): EmailTemplateFunction | null {
     const journeyTemplates = JOURNEY_TEMPLATES[journeyVariant];
     if (!journeyTemplates) {
-      logger?.error("email.render.journey.not.found", { journeyVariant });
       return null;
     }
 
-    const templateFunction =
-      journeyTemplates[stage as keyof typeof journeyTemplates];
+    const templateFunction = journeyTemplates[stage];
     if (!templateFunction) {
-      logger?.error("email.render.stage.not.found", {
-        journeyVariant,
-        stage,
-      });
       return null;
     }
 
@@ -264,22 +263,24 @@ export class EmailRendererService {
    * Get available stages for a journey variant
    */
   getAvailableStages(
-    journeyVariant: EmailJourneyVariant,
-  ): EmailCampaignStage[] {
+    journeyVariant: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
+  ): Array<(typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]> {
     const journeyTemplates = JOURNEY_TEMPLATES[journeyVariant];
     if (!journeyTemplates) {
       return [];
     }
 
-    return Object.keys(journeyTemplates) as EmailCampaignStage[];
+    return Object.keys(journeyTemplates) as Array<
+      (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]
+    >;
   }
 
   /**
    * Check if a template exists for a journey and stage
    */
   hasTemplate(
-    journeyVariant: EmailJourneyVariant,
-    stage: EmailCampaignStage,
+    journeyVariant: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
+    stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage],
   ): boolean {
     return this.getTemplateFunction(journeyVariant, stage) !== null;
   }
@@ -287,20 +288,26 @@ export class EmailRendererService {
   /**
    * Get all available journey variants
    */
-  getAvailableJourneys(): EmailJourneyVariant[] {
-    return Object.keys(JOURNEY_TEMPLATES) as EmailJourneyVariant[];
+  getAvailableJourneys(): Array<
+    (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant]
+  > {
+    return Object.keys(JOURNEY_TEMPLATES) as Array<
+      (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant]
+    >;
   }
 
   /**
    * Get journey information
    */
   getJourneyInfo(
-    journeyVariant: EmailJourneyVariant,
+    journeyVariant: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
     t: TFunction,
   ): {
     name: string;
     description: string;
-    availableStages: EmailCampaignStage[];
+    availableStages: Array<
+      (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]
+    >;
   } {
     const journeyInfo = {
       [EmailJourneyVariant.PERSONAL_APPROACH]: {
@@ -333,8 +340,8 @@ export class EmailRendererService {
    * Generate preview of email template
    */
   async generatePreview(
-    journeyVariant: EmailJourneyVariant,
-    stage: EmailCampaignStage,
+    journeyVariant: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
+    stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage],
     context: {
       t: TFunction;
       locale: CountryLanguage;
@@ -387,22 +394,23 @@ export class EmailRendererService {
       locale: context.locale,
     });
     if (cachedResult) {
-      console.debug("Serving email preview from cache", {
-        leadId: mockLead.id,
-        journeyVariant,
-        stage,
-      });
       return cachedResult;
     }
 
-    const result = await this.renderEmail(mockLead, journeyVariant, stage, {
-      ...context,
-      campaignId: context.t(
-        "emailJourneys.components.defaults.previewCampaignId",
-      ),
-      unsubscribeUrl: `${env.NEXT_PUBLIC_APP_URL}/unsubscribe?preview=true`,
-      trackingUrl: `${env.NEXT_PUBLIC_APP_URL}/track?preview=true`,
-    });
+    const result = await this.renderEmail(
+      mockLead,
+      journeyVariant,
+      stage,
+      {
+        ...context,
+        campaignId: context.t(
+          "emailJourneys.components.defaults.previewCampaignId",
+        ),
+        unsubscribeUrl: `${env.NEXT_PUBLIC_APP_URL}/unsubscribe?preview=true`,
+        trackingUrl: `${env.NEXT_PUBLIC_APP_URL}/track?preview=true`,
+      },
+      createNoOpLogger(),
+    );
 
     // Cache the result
     if (result) {
@@ -425,7 +433,6 @@ export class EmailRendererService {
    */
   clearPreviewCache(): void {
     previewCache.clear();
-    console.debug("Email preview cache cleared");
   }
 
   /**

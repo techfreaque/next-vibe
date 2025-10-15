@@ -4,15 +4,14 @@
  * Implements spec.md unified task registry requirements
  *
  * Generation Info:
- * - Task files: 6
+ * - Task files: 4
  * - Task runner files: 2
  * - Side task config files: 0
- * - Generated at: 2025-10-10T17:39:06.459Z
+ * - Generated at: 2025-10-15T21:34:13.139Z
  */
 
 /* eslint-disable prettier/prettier */
 /* eslint-disable simple-import-sort/imports */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import type { Task, TaskRegistry } from "../types/repository";
 import { UnifiedTaskRunnerRepositoryImpl } from "../unified-runner/repository";
@@ -20,40 +19,36 @@ import { UnifiedTaskRunnerRepositoryImpl } from "../unified-runner/repository";
 import { tasks as taskModule0 } from "../../../newsletter/unsubscribe/task";
 import { tasks as taskModule1 } from "../../../user/session-cleanup/task";
 import { tasks as taskModule2 } from "../../../leads/import/task";
-import { tasks as taskModule3 } from "../../../agent/execution/task";
-import { tasks as taskModule4 } from "../../../agent/classification/task";
-import { tasks as taskModule5 } from "../../../emails/imap-client/sync/task";
-import { taskRunners as runnerModule6 } from "../pulse-runner/task-runner";
-import { taskRunners as runnerModule7 } from "../dev-watcher/task-runner";
+import { tasks as taskModule3 } from "../../../emails/imap-client/sync/task";
+import { taskRunners as runnerModule4 } from "../pulse-runner/task-runner";
+import { taskRunners as runnerModule5 } from "../dev-watcher/task-runner";
 
 const allTasks: Task[] = [
   ...taskModule0,
   ...taskModule1,
   ...taskModule2,
   ...taskModule3,
-  ...taskModule4,
-  ...taskModule5,
-  ...runnerModule6,
-  ...runnerModule7,
+  ...runnerModule4,
+  ...runnerModule5,
 ];
 
 const cronTasks = allTasks.filter((task): task is Task & { type: 'cron' } => task.type === 'cron');
 const sideTasks = allTasks.filter((task): task is Task & { type: 'side' } => task.type === 'side');
 const taskRunners = allTasks.filter((task): task is Task & { type: 'task-runner' } => task.type === 'task-runner');
 
-const tasksByCategory = allTasks.reduce((acc, task) => {
-  const category = task.category as string;
+const tasksByCategory: Record<string, Task[]> = allTasks.reduce((acc, task) => {
+  const category = String(task.category);
   if (!acc[category]) {
     acc[category] = [];
   }
   acc[category].push(task);
   return acc;
-}, {} as Record<string, Task[]>);
+}, {});
 
-const tasksByName = allTasks.reduce((acc, task) => {
+const tasksByName: Record<string, Task> = allTasks.reduce((acc, task) => {
   acc[task.name] = task;
   return acc;
-}, {} as Record<string, Task>);
+}, {});
 
 // Create single unified task runner instance as per spec.md
 const taskRunner = new UnifiedTaskRunnerRepositoryImpl();

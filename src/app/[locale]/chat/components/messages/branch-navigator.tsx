@@ -1,11 +1,11 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, GitBranch } from "lucide-react";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React from "react";
 
 import { Button } from "@/packages/next-vibe-ui/web/ui";
-import { cn } from "next-vibe/shared/utils";
 
 interface BranchNavigatorProps {
   currentBranchIndex: number;
@@ -27,12 +27,14 @@ export function BranchNavigator({
   }
 
   const handlePrevious = () => {
-    const newIndex = currentBranchIndex > 0 ? currentBranchIndex - 1 : totalBranches - 1;
+    const newIndex =
+      currentBranchIndex > 0 ? currentBranchIndex - 1 : totalBranches - 1;
     onSwitchBranch(newIndex);
   };
 
   const handleNext = () => {
-    const newIndex = currentBranchIndex < totalBranches - 1 ? currentBranchIndex + 1 : 0;
+    const newIndex =
+      currentBranchIndex < totalBranches - 1 ? currentBranchIndex + 1 : 0;
     onSwitchBranch(newIndex);
   };
 
@@ -44,7 +46,7 @@ export function BranchNavigator({
       )}
     >
       <GitBranch className="h-3.5 w-3.5 text-muted-foreground" />
-      
+
       <div className="flex items-center gap-1">
         <Button
           variant="ghost"
@@ -81,4 +83,3 @@ export function BranchNavigator({
     </div>
   );
 }
-

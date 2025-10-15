@@ -9,9 +9,10 @@ import type {
 import { useCallback } from "react";
 import type z from "zod";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
-import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { useApiMutation } from "../mutation";
@@ -28,9 +29,15 @@ import type { ApiMutationOptions } from "../types";
  * - Consistent with mutation-form pattern
  */
 export function useEndpointDelete<
-  TEndpoint extends CreateApiEndpoint<any, any, any, any>,
+  TEndpoint extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    any
+  >,
 >(
   deleteEndpoint: TEndpoint | null,
+  logger: EndpointLogger,
   options: {
     mutationOptions?: ApiMutationOptions<
       TEndpoint["TRequestOutput"],
@@ -63,7 +70,7 @@ export function useEndpointDelete<
   } = options;
 
   // Use the existing mutation hook for consistency
-  const mutation = useApiMutation(deleteEndpoint, mutationOptions);
+  const mutation = useApiMutation(deleteEndpoint, logger, mutationOptions);
 
   // Create a submit function that calls the mutation
   const submit = useCallback(

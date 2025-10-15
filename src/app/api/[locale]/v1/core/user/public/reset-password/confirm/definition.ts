@@ -18,6 +18,7 @@ import {
   requestDataField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
+
 import { UserRole } from "../../../user-roles/enum";
 
 /**
@@ -26,17 +27,18 @@ import { UserRole } from "../../../user-roles/enum";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "user", "public", "reset-password", "confirm"],
-  title: "app.api.v1.core.user.public.resetPassword.confirm.title",
-  description: "app.api.v1.core.user.public.resetPassword.confirm.description",
-  category: "app.api.v1.core.user.category",
-  tags: ["app.api.v1.core.user.public.resetPassword.confirm.tag"],
-  allowedRoles: [UserRole.PUBLIC],
+  title: "app.api.v1.core.user.public.resetPassword.confirm.title" as const,
+  description:
+    "app.api.v1.core.user.public.resetPassword.confirm.description" as const,
+  category: "app.api.v1.core.user.category" as const,
+  tags: ["app.api.v1.core.user.public.resetPassword.confirm.tag" as const],
+  allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.user.public.resetPassword.confirm.title",
+      title: "app.api.v1.core.user.public.resetPassword.confirm.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.confirm.description",
+        "app.api.v1.core.user.public.resetPassword.confirm.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -46,9 +48,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title:
-            "app.api.v1.core.user.public.resetPassword.confirm.groups.verification.title",
+            "app.api.v1.core.user.public.resetPassword.confirm.groups.verification.title" as const,
           description:
-            "app.api.v1.core.user.public.resetPassword.confirm.groups.verification.description",
+            "app.api.v1.core.user.public.resetPassword.confirm.groups.verification.description" as const,
           layout: { type: LayoutType.GRID, columns: 2 },
         },
         { request: "data" },
@@ -58,15 +60,15 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label:
-                "app.api.v1.core.user.public.resetPassword.confirm.fields.token.label",
+                "app.api.v1.core.user.public.resetPassword.confirm.fields.token.label" as const,
               description:
-                "app.api.v1.core.user.public.resetPassword.confirm.fields.token.description",
+                "app.api.v1.core.user.public.resetPassword.confirm.fields.token.description" as const,
               placeholder:
-                "app.api.v1.core.user.public.resetPassword.confirm.fields.token.placeholder",
+                "app.api.v1.core.user.public.resetPassword.confirm.fields.token.placeholder" as const,
               required: true,
               layout: { columns: 6 },
               helpText:
-                "app.api.v1.core.user.public.resetPassword.confirm.fields.token.help",
+                "app.api.v1.core.user.public.resetPassword.confirm.fields.token.help" as const,
             },
             z.string().min(1, {
               message:
@@ -79,11 +81,11 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.EMAIL,
               label:
-                "app.api.v1.core.user.public.resetPassword.confirm.fields.email.label",
+                "app.api.v1.core.user.public.resetPassword.confirm.fields.email.label" as const,
               description:
-                "app.api.v1.core.user.public.resetPassword.confirm.fields.email.description",
+                "app.api.v1.core.user.public.resetPassword.confirm.fields.email.description" as const,
               placeholder:
-                "app.api.v1.core.user.public.resetPassword.confirm.fields.email.placeholder",
+                "app.api.v1.core.user.public.resetPassword.confirm.fields.email.placeholder" as const,
               required: true,
               layout: { columns: 6 },
             },
@@ -103,9 +105,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title:
-            "app.api.v1.core.user.public.resetPassword.confirm.groups.newPassword.title",
+            "app.api.v1.core.user.public.resetPassword.confirm.groups.newPassword.title" as const,
           description:
-            "app.api.v1.core.user.public.resetPassword.confirm.groups.newPassword.description",
+            "app.api.v1.core.user.public.resetPassword.confirm.groups.newPassword.description" as const,
           layout: { type: LayoutType.GRID, columns: 12 },
         },
         { request: "data" },
@@ -115,15 +117,15 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.PASSWORD,
               label:
-                "app.api.v1.core.user.public.resetPassword.confirm.fields.password.label",
+                "app.api.v1.core.user.public.resetPassword.confirm.fields.password.label" as const,
               description:
-                "app.api.v1.core.user.public.resetPassword.confirm.fields.password.description",
+                "app.api.v1.core.user.public.resetPassword.confirm.fields.password.description" as const,
               placeholder:
-                "app.api.v1.core.user.public.resetPassword.confirm.fields.password.placeholder",
+                "app.api.v1.core.user.public.resetPassword.confirm.fields.password.placeholder" as const,
               required: true,
               layout: { columns: 12 },
               helpText:
-                "app.api.v1.core.user.public.resetPassword.confirm.fields.password.help",
+                "app.api.v1.core.user.public.resetPassword.confirm.fields.password.help" as const,
             },
             z.string().min(8, {
               message:
@@ -136,11 +138,11 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.PASSWORD,
               label:
-                "app.api.v1.core.user.public.resetPassword.confirm.fields.confirmPassword.label",
+                "app.api.v1.core.user.public.resetPassword.confirm.fields.confirmPassword.label" as const,
               description:
-                "app.api.v1.core.user.public.resetPassword.confirm.fields.confirmPassword.description",
+                "app.api.v1.core.user.public.resetPassword.confirm.fields.confirmPassword.description" as const,
               placeholder:
-                "app.api.v1.core.user.public.resetPassword.confirm.fields.confirmPassword.placeholder",
+                "app.api.v1.core.user.public.resetPassword.confirm.fields.confirmPassword.placeholder" as const,
               required: true,
               layout: { columns: 12 },
             },
@@ -157,9 +159,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title:
-            "app.api.v1.core.user.public.resetPassword.confirm.response.title",
+            "app.api.v1.core.user.public.resetPassword.confirm.response.title" as const,
           description:
-            "app.api.v1.core.user.public.resetPassword.confirm.response.description",
+            "app.api.v1.core.user.public.resetPassword.confirm.response.description" as const,
           layout: { type: LayoutType.GRID, columns: 12 },
         },
         z.object({
@@ -183,65 +185,66 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.validation.title",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.validation.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.validation.description",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.unauthorized.title",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.unauthorized.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.unauthorized.description",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.internal.title",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.internal.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.internal.description",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.unknown.title",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.unknown.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.unknown.description",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.network.title",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.network.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.network.description",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.network.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.forbidden.title",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.forbidden.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.forbidden.description",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.notFound.title",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.notFound.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.notFound.description",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.unsaved.title",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.unsaved.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.unsaved.description",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.unsaved.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.conflict.title",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.conflict.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.confirm.errors.conflict.description",
+        "app.api.v1.core.user.public.resetPassword.confirm.errors.conflict.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.user.public.resetPassword.confirm.success.title",
+    title:
+      "app.api.v1.core.user.public.resetPassword.confirm.success.title" as const,
     description:
-      "app.api.v1.core.user.public.resetPassword.confirm.success.description",
+      "app.api.v1.core.user.public.resetPassword.confirm.success.description" as const,
   },
 
   // === EXAMPLES ===

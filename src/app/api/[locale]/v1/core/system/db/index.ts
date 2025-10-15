@@ -32,14 +32,30 @@ export const db = drizzle(pool);
 export const rawPool = pool;
 
 /**
+ * Track if database has been closed to prevent double-close errors
+ */
+let databaseClosed = false;
+
+/**
  * Gracefully close database connections
  * Should be called when the application is shutting down
  */
 export async function closeDatabase(logger: EndpointLogger): Promise<void> {
+  if (databaseClosed) {
+    return; // Already closed, skip
+  }
+
+  // Check if pool is already ending/ended
+  if (pool.ending || pool.ended) {
+    databaseClosed = true;
+    return;
+  }
+
   try {
+    databaseClosed = true;
     await pool.end();
   } catch (error) {
-    // Ignore errors during shutdown
+    // Ignore errors during shutdown - this is expected when pool is already closed
     logger.error("core.system.db.errors.pool_close_failed", error);
   }
 }

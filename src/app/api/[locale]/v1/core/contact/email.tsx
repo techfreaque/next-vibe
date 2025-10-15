@@ -4,23 +4,23 @@
  */
 
 import { Button, Hr, Link, Section, Text } from "@react-email/components";
-import type { UndefinedType } from "next-vibe/shared/types/common.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import type { JSX } from "react";
+import React from "react";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
-
-import { env } from "../../../../../../config/env";
 import {
   createTrackingContext,
   EmailTemplate,
-} from "../emails/smtp-client/components";
-import type { EmailFunctionType } from "../emails/smtp-client/email-handling/definition";
+} from "@/app/api/[locale]/v1/core/emails/smtp-client/components";
+import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
+import { env } from "@/config/env";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { TFunction } from "@/i18n/core/static-types";
+
 import type { ContactRequestOutput, ContactResponseOutput } from "./definition";
 import { contactClientRepository } from "./repository-client";
 
@@ -220,7 +220,7 @@ function ContactEmailContent({
 export const renderCompanyMail: EmailFunctionType<
   ContactRequestOutput,
   ContactResponseOutput,
-  UndefinedType
+  never
 > = ({ requestData, locale, t }) => {
   try {
     return createSuccessResponse({
@@ -254,7 +254,7 @@ export const renderCompanyMail: EmailFunctionType<
 export const renderPartnerMail: EmailFunctionType<
   ContactRequestOutput,
   ContactResponseOutput,
-  UndefinedType
+  never
 > = ({ requestData, locale, t, user }) => {
   try {
     return createSuccessResponse({

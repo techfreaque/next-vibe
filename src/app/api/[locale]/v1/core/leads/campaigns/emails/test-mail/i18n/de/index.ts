@@ -2,15 +2,94 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
+    title: "Test-Mail",
+    description: "Test-E-Mail mit benutzerdefinierten Lead-Daten senden",
     form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
+      title: "Test-Mail-Konfiguration",
+      description: "Test-Mail-Parameter und Lead-Daten konfigurieren",
+    },
+    campaignType: {
+      label: "Kampagnentyp",
+      description: "Art der E-Mail-Kampagne",
+      placeholder: "Kampagnentyp eingeben",
+    },
+    emailJourneyVariant: {
+      label: "E-Mail-Journey-Variante",
+      description: "A/B-Test-Variante für E-Mail-Journey",
+      placeholder: "Journey-Variante auswählen",
+    },
+    emailCampaignStage: {
+      label: "E-Mail-Kampagnenstufe",
+      description: "Aktuelle Stufe in der E-Mail-Kampagne",
+      placeholder: "Kampagnenstufe auswählen",
+    },
+    testEmail: {
+      label: "Test-E-Mail-Adresse",
+      description: "E-Mail-Adresse, an die Test-Mail gesendet wird",
+      placeholder: "test@example.com",
+    },
+    leadData: {
+      title: "Lead-Daten",
+      description: "Lead-Informationen für Template-Rendering",
+      businessName: {
+        label: "Unternehmensname",
+        description: "Name des Unternehmens",
+        placeholder: "Acme Corporation",
+      },
+      contactName: {
+        label: "Kontaktname",
+        description: "Name der Kontaktperson",
+        placeholder: "Max Mustermann",
+      },
+      website: {
+        label: "Website",
+        description: "Unternehmens-Website-URL",
+        placeholder: "https://example.com",
+      },
+      country: {
+        label: "Land",
+        description: "Ländercode",
+        placeholder: "GLOBAL",
+      },
+      language: {
+        label: "Sprache",
+        description: "Bevorzugter Sprachcode",
+        placeholder: "de",
+      },
+      status: {
+        label: "Status",
+        description: "Lead-Status",
+        placeholder: "NEW",
+      },
+      source: {
+        label: "Quelle",
+        description: "Lead-Quelle",
+        placeholder: "WEBSITE",
+      },
+      notes: {
+        label: "Notizen",
+        description: "Zusätzliche Notizen zum Lead",
+        placeholder: "Zusätzliche Notizen eingeben",
+      },
     },
     response: {
-      title: "Antwort",
-      description: "Antwortdaten",
+      title: "Test-E-Mail-Ergebnis",
+      description: "Ergebnis des Sendens der Test-E-Mail",
+      success: {
+        content: "Erfolg",
+      },
+      messageId: {
+        content: "Nachrichten-ID",
+      },
+      testEmail: {
+        content: "Test-E-Mail",
+      },
+      subject: {
+        content: "E-Mail-Betreff",
+      },
+      sentAt: {
+        content: "Gesendet am",
+      },
     },
     errors: {
       unauthorized: {
@@ -23,7 +102,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description: "Interner Serverfehler",
+        description: "Interner Serverfehler aufgetreten",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -41,6 +120,10 @@ export const translations: typeof enTranslations = {
         title: "Nicht gefunden",
         description: "Ressource nicht gefunden",
       },
+      unsavedChanges: {
+        title: "Ungespeicherte Änderungen",
+        description: "Es gibt ungespeicherte Änderungen",
+      },
       conflict: {
         title: "Konflikt",
         description: "Datenkonflikt aufgetreten",
@@ -48,7 +131,7 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Erfolg",
-      description: "Vorgang erfolgreich abgeschlossen",
+      description: "Test-E-Mail erfolgreich gesendet",
     },
   },
-} ;
+};

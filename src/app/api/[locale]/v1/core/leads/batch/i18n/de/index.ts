@@ -65,6 +65,7 @@ export const translations: typeof enTranslations = {
       totalProcessed: "Gesamt Verarbeitet",
       totalUpdated: "Gesamt Aktualisiert",
       preview: "Vorschau",
+      errors: "Fehler",
     },
     errors: {
       unauthorized: {
@@ -146,6 +147,7 @@ export const translations: typeof enTranslations = {
       totalProcessed: "Gesamt Verarbeitet",
       totalDeleted: "Gesamt Gelöscht",
       preview: "Vorschau",
+      errors: "Fehler",
     },
     errors: {
       unauthorized: {

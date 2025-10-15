@@ -5,20 +5,20 @@
 
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React from "react";
 
-import type { ChatMessage, ChatThread } from "../../lib/storage/types";
 import type { ModelId } from "../../lib/config/models";
+import { chatAnimations } from "../../lib/design-tokens";
 import { getBranchInfo } from "../../lib/storage/message-tree";
-import { BranchNavigator } from "./branch-navigator";
-import { UserMessageBubble } from "./user-message-bubble";
+import type { ChatMessage, ChatThread } from "../../lib/storage/types";
 import { AssistantMessageBubble } from "./assistant-message-bubble";
+import { BranchNavigator } from "./branch-navigator";
 import { ErrorMessageBubble } from "./error-message-bubble";
 import { MessageEditor } from "./message-editor";
 import { ModelPersonaSelectorModal } from "./model-persona-selector-modal";
-import { chatAnimations } from "../../lib/design-tokens";
-import { cn } from "next-vibe/shared/utils";
+import { UserMessageBubble } from "./user-message-bubble";
 
 interface LinearMessageViewProps {
   thread: ChatThread;
@@ -26,12 +26,12 @@ interface LinearMessageViewProps {
   selectedModel: ModelId;
   selectedTone: string;
   showBranchIndicators: boolean;
-  
+
   // Action states
   editingMessageId: string | null;
   retryingMessageId: string | null;
   answeringMessageId: string | null;
-  
+
   // Action handlers
   onEditMessage: (messageId: string, newContent: string) => Promise<void>;
   onDeleteMessage: (messageId: string) => void;
@@ -41,7 +41,7 @@ interface LinearMessageViewProps {
   onAnswerAsModel?: (messageId: string) => Promise<void>;
   onModelChange?: (model: ModelId) => void;
   onToneChange?: (tone: string) => void;
-  
+
   // UI handlers
   onStartEdit: (messageId: string) => void;
   onStartRetry: (messageId: string) => void;
@@ -143,6 +143,7 @@ export function LinearMessageView({
                     onBranch={onStartEdit}
                     onRetry={onStartRetry}
                     onDelete={onDeleteMessage}
+                    showAuthor={true}
                   />
                 )}
                 {message.role === "assistant" && (
@@ -150,6 +151,7 @@ export function LinearMessageView({
                     message={message}
                     onAnswerAsModel={onStartAnswer}
                     onDelete={onDeleteMessage}
+                    showAuthor={true}
                   />
                 )}
                 {message.role === "error" && (
@@ -174,4 +176,3 @@ export function LinearMessageView({
     </>
   );
 }
-

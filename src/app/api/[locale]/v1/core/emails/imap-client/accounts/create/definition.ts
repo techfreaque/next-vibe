@@ -228,7 +228,6 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.emails.imapClient.accounts.create.response.syncConfiguration.description",
           layout: { type: LayoutType.GRID_2_COLUMNS },
-          collapsed: true,
         },
         { request: "data" },
         {
@@ -303,7 +302,6 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.emails.imapClient.accounts.create.container.description",
           layout: { type: LayoutType.GRID_2_COLUMNS },
-          collapsed: true,
         },
         { request: "data" },
         {
@@ -768,13 +766,10 @@ export type ImapAccountCreatePostResponseOutput =
   typeof POST.types.ResponseOutput;
 
 // Repository types for standardized import patterns
-export type ImapAccountCreateRequestTypeInput =
-  ImapAccountCreatePostRequestInput;
-export type ImapAccountCreateRequestTypeOutput =
-  ImapAccountCreatePostRequestOutput;
-export type ImapAccountCreateResponseTypeInput =
-  ImapAccountCreatePostResponseInput;
-export type ImapAccountCreateResponseTypeOutput =
+export type ImapAccountCreateRequestInput = ImapAccountCreatePostRequestInput;
+export type ImapAccountCreateRequestOutput = ImapAccountCreatePostRequestOutput;
+export type ImapAccountCreateResponseInput = ImapAccountCreatePostResponseInput;
+export type ImapAccountCreateResponseOutput =
   ImapAccountCreatePostResponseOutput;
 
 // Export individual endpoints

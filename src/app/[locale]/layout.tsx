@@ -16,6 +16,7 @@ import { simpleT } from "@/i18n/core/shared";
 
 import { ErrorBoundary } from "./_components/error-boundary";
 import ErrorFallback from "./_components/error-fallback";
+import { LeadTrackingProvider } from "./_components/lead-tracking-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,7 +30,7 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-interface RootLayoutProps {
+interface RootLayoutMetaProps {
   params: Promise<{ locale: CountryLanguage }>;
 }
 
@@ -38,7 +39,7 @@ interface RootLayoutProps {
  */
 export async function generateMetadata({
   params,
-}: RootLayoutProps): Promise<Metadata> {
+}: RootLayoutMetaProps): Promise<Metadata> {
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "",
@@ -101,6 +102,7 @@ export default async function RootLayoutServer({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <TranslationProvider currentLocale={locale}>
+            <LeadTrackingProvider />
             <ErrorBoundary fallback={<ErrorFallback />} locale={locale}>
               {children}
             </ErrorBoundary>

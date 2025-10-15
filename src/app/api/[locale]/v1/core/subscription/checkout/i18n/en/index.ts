@@ -104,6 +104,9 @@ export const translations = {
       validation: {
         title: "Validation Error",
         description: "Invalid checkout parameters",
+        reason: {
+          enterpriseCustomPricing: "ENTERPRISE plan requires custom pricing",
+        },
       },
       network: {
         title: "Network Error",

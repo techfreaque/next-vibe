@@ -6,8 +6,6 @@
 
 import "server-only";
 
-import { join } from "node:path";
-
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -115,6 +113,8 @@ export class FunctionalGeneratorsRepositoryImpl
    */
   async runGenerators(
     data: RequestType,
+    _user: JwtPayloadType,
+    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<ResponseOutputType>> {
     try {
@@ -348,11 +348,14 @@ export const functionalGeneratorsRepository =
   new FunctionalGeneratorsRepositoryImpl();
 
 // Export with the expected name for generate-all
+// Note: This export is deprecated and should not be used directly
+// Use functionalGeneratorsRepository.runGenerators() instead with proper logger
 export const endpointsGeneratorRepository = {
   generateEndpoints: (
-    data: any,
+    data: RequestType,
     user: JwtPayloadType,
     locale: CountryLanguage,
+    logger: EndpointLogger,
   ) => functionalGeneratorsRepository.runGenerators(data, user, locale, logger),
 };
 
@@ -363,9 +366,21 @@ export const runFunctionalGenerators = async (
   try {
     const rootDir = options.rootDir || process.cwd();
 
-    const defaultLogger = {
-      debug: (msg: string) => console.log(msg),
-      error: (msg: string, error?: any) => console.error(msg, error),
+    // Create a minimal logger implementation for backward compatibility
+    // TODO: Replace with proper EndpointLogger injection
+    const defaultLogger: Pick<EndpointLogger, "debug" | "error"> = {
+      debug: (msg: string) => {
+        // Silent in production, log in development
+        if (process.env.NODE_ENV === "development") {
+          // eslint-disable-next-line no-console
+          console.log(msg);
+        }
+      },
+      error: (msg: string, error?: unknown) => {
+        // Always log errors
+        // eslint-disable-next-line no-console
+        console.error(msg, error);
+      },
     };
 
     // Step 1: Generate endpoints
@@ -416,7 +431,10 @@ export const runFunctionalGenerators = async (
       defaultLogger.debug("✅ tRPC router generated successfully");
     }
   } catch (error) {
-    console.error("❌ Error running functional generators:", parseError(error));
+    defaultLogger.error(
+      "❌ Error running functional generators:",
+      parseError(error),
+    );
     throw error;
   }
 };

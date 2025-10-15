@@ -14,7 +14,8 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import React from "react";
 
-import { userCreateSchema } from "@/app/api/[locale]/v1/core/users/create/definition";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { UserRoleOptions } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { useUsersCreateEndpoint } from "@/app/api/[locale]/v1/core/users/create/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -30,7 +31,8 @@ export function UserCreateForm({
   const { t } = simpleT(locale);
 
   // Get endpoint for form handling
-  const endpoint = useUsersCreateEndpoint();
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const endpoint = useUsersCreateEndpoint(logger);
 
   const handleSubmit = endpoint.create.onSubmit;
   const isSaving = endpoint.create.isSubmitting;
@@ -75,14 +77,15 @@ export function UserCreateForm({
           >
             <FormFieldGroup>
               <EndpointFormField
-                name="email"
+                name="basicInfo.email"
                 config={{
                   type: "email",
-                  label: "users.form.labels.email",
-                  placeholder: "users.form.placeholders.email",
+                  label: "app.api.v1.core.users.create.post.email.label",
+                  description:
+                    "app.api.v1.core.users.create.post.email.description",
+                  placeholder: "app.api.v1.core.users.create.post.email.label",
                 }}
                 control={endpoint.create.form.control}
-                schema={userCreateSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -90,14 +93,14 @@ export function UserCreateForm({
               />
 
               <EndpointFormField
-                name="password"
+                name="basicInfo.password"
                 config={{
                   type: "password",
-                  label: "users.form.labels.password",
-                  placeholder: "users.form.placeholders.password",
+                  label: "app.api.v1.core.users.create.post.password.label",
+                  description:
+                    "app.api.v1.core.users.create.post.password.description",
                 }}
                 control={endpoint.create.form.control}
-                schema={userCreateSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -105,14 +108,14 @@ export function UserCreateForm({
               />
 
               <EndpointFormField
-                name="firstName"
+                name="basicInfo.privateName"
                 config={{
                   type: "text",
-                  label: "users.form.labels.firstName",
-                  placeholder: "users.form.placeholders.firstName",
+                  label: "app.api.v1.core.users.create.post.privateName.label",
+                  description:
+                    "app.api.v1.core.users.create.post.privateName.description",
                 }}
                 control={endpoint.create.form.control}
-                schema={userCreateSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -120,14 +123,14 @@ export function UserCreateForm({
               />
 
               <EndpointFormField
-                name="lastName"
+                name="basicInfo.publicName"
                 config={{
                   type: "text",
-                  label: "users.form.labels.lastName",
-                  placeholder: "users.form.placeholders.lastName",
+                  label: "app.api.v1.core.users.create.post.publicName.label",
+                  description:
+                    "app.api.v1.core.users.create.post.publicName.description",
                 }}
                 control={endpoint.create.form.control}
-                schema={userCreateSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -135,14 +138,15 @@ export function UserCreateForm({
               />
 
               <EndpointFormField
-                name="company"
+                name="adminSettings.roles"
                 config={{
-                  type: "text",
-                  label: "users.form.labels.company",
-                  placeholder: "users.form.placeholders.company",
+                  type: "multiselect",
+                  label: "app.api.v1.core.users.create.post.roles.label",
+                  description:
+                    "app.api.v1.core.users.create.post.roles.description",
+                  options: UserRoleOptions,
                 }}
                 control={endpoint.create.form.control}
-                schema={userCreateSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -150,74 +154,14 @@ export function UserCreateForm({
               />
 
               <EndpointFormField
-                name="phone"
-                config={{
-                  type: "tel",
-                  label: "users.form.labels.phone",
-                  placeholder: "users.form.placeholders.phone",
-                }}
-                control={endpoint.create.form.control}
-                schema={userCreateSchema}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-
-              <EndpointFormField
-                name="jobTitle"
-                config={{
-                  type: "text",
-                  label: "users.form.labels.jobTitle",
-                  placeholder: "users.form.placeholders.jobTitle",
-                }}
-                control={endpoint.create.form.control}
-                schema={userCreateSchema}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-
-              <EndpointFormField
-                name="website"
-                config={{
-                  type: "url",
-                  label: "users.form.labels.website",
-                  placeholder: "users.form.placeholders.website",
-                }}
-                control={endpoint.create.form.control}
-                schema={userCreateSchema}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-
-              <EndpointFormField
-                name="bio"
-                config={{
-                  type: "textarea",
-                  label: "users.form.labels.bio",
-                  placeholder: "users.form.placeholders.bio",
-                  rows: 4,
-                }}
-                control={endpoint.create.form.control}
-                schema={userCreateSchema}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-
-              <EndpointFormField
-                name="isActive"
+                name="adminSettings.isActive"
                 config={{
                   type: "checkbox",
-                  label: "users.form.labels.isActive",
+                  label: "app.api.v1.core.users.create.post.isActive.label",
+                  description:
+                    "app.api.v1.core.users.create.post.isActive.description",
                 }}
                 control={endpoint.create.form.control}
-                schema={userCreateSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -225,13 +169,30 @@ export function UserCreateForm({
               />
 
               <EndpointFormField
-                name="emailVerified"
+                name="adminSettings.emailVerified"
                 config={{
                   type: "checkbox",
-                  label: "users.form.labels.emailVerified",
+                  label:
+                    "app.api.v1.core.users.create.post.emailVerified.label",
+                  description:
+                    "app.api.v1.core.users.create.post.emailVerified.description",
                 }}
                 control={endpoint.create.form.control}
-                schema={userCreateSchema}
+                theme={{
+                  style: "none",
+                  showAllRequired: false,
+                }}
+              />
+
+              <EndpointFormField
+                name="adminSettings.leadId"
+                config={{
+                  type: "text",
+                  label: "app.api.v1.core.users.create.post.leadId.label",
+                  description:
+                    "app.api.v1.core.users.create.post.leadId.description",
+                }}
+                control={endpoint.create.form.control}
                 theme={{
                   style: "none",
                   showAllRequired: false,

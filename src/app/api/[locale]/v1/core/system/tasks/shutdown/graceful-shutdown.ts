@@ -3,6 +3,8 @@
  * Handles SIGTERM/SIGINT signals to gracefully shutdown all running tasks
  */
 
+/* eslint-disable no-console, i18next/no-literal-string */
+
 import "server-only";
 
 // import { parseError } from "next-vibe/shared/utils/parse-error";

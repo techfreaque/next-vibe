@@ -1,3 +1,4 @@
+import { translations as widgetsTranslations } from "../../widgets/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -51,4 +52,18 @@ export const translations: typeof enTranslations = {
       description: "Vorgang erfolgreich abgeschlossen",
     },
   },
+  helpHandler: {
+    noDescription: "Keine Beschreibung",
+    flagDataDesc: "JSON-Daten-Payload für die Anfrage",
+    flagUserTypeDesc: "Benutzertyp (ADMIN, CUSTOMER, PUBLIC)",
+    flagLocaleDesc: "Gebietsschema für die Anfrage",
+    flagOutputDesc: "Ausgabeformat (json, pretty)",
+    flagVerboseDesc: "Ausführliche Ausgabe anzeigen",
+    flagDryRunDesc: "Anzeigen, was ausgeführt würde, ohne zu laufen",
+    usageLabel: "Verwendung",
+    availableCommandsLabel: "Verfügbare Befehle",
+    globalOptionsLabel: "Globale Optionen",
+    examplesLabel: "Beispiele",
+  },
+  widgets: widgetsTranslations,
 };

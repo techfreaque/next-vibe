@@ -6,8 +6,9 @@
 /* eslint-disable i18next/no-literal-string */
 import "server-only";
 
-import { env } from "@/config/env";
 import { Environment } from "next-vibe/shared/utils/env-util";
+
+import { env } from "@/config/env";
 
 /**
  * Supported server environments

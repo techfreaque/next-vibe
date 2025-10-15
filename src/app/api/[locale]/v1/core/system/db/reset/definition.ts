@@ -54,6 +54,18 @@ const { POST } = createEndpoint({
         skipSeeds: true,
         dryRun: false,
       },
+      dryRun: {
+        force: false,
+        skipMigrations: false,
+        skipSeeds: false,
+        dryRun: true,
+      },
+      forced: {
+        force: true,
+        skipMigrations: false,
+        skipSeeds: false,
+        dryRun: false,
+      },
     },
     urlPathVariables: undefined,
     responses: {
@@ -144,6 +156,64 @@ const { POST } = createEndpoint({
         requiresForce: false,
         duration: 100,
       },
+      destructive: {
+        success: true,
+        operations: [
+          {
+            type: "truncate",
+            status: "success",
+            details: "Truncated all tables",
+            count: 45,
+          },
+          {
+            type: "migrate",
+            status: "success",
+            details: "Applied migrations",
+            count: 24,
+          },
+          {
+            type: "seed",
+            status: "success",
+            details: "Seeded data",
+            count: 12,
+          },
+        ],
+        tablesAffected: 45,
+        migrationsRun: 24,
+        seedsRun: 12,
+        isDryRun: false,
+        requiresForce: false,
+        duration: 1200,
+      },
+      skipSeeds: {
+        success: true,
+        operations: [
+          {
+            type: "truncate",
+            status: "success",
+            details: "Truncated all tables",
+            count: 45,
+          },
+          {
+            type: "migrate",
+            status: "success",
+            details: "Applied migrations",
+            count: 24,
+          },
+          {
+            type: "seed",
+            status: "skipped",
+            details: "Seeds skipped",
+            count: 0,
+          },
+        ],
+        tablesAffected: 45,
+        migrationsRun: 24,
+        seedsRun: 0,
+        isDryRun: false,
+        requiresForce: false,
+        duration: 800,
+      },
     },
   },
 
@@ -217,50 +287,8 @@ const { POST } = createEndpoint({
 
       operations: responseField(
         {
-          type: WidgetType.DATA_LIST,
-          title: "app.api.v1.core.system.db.reset.fields.operations.title",
-          items: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.v1.core.system.db.reset.fields.operations.item.title",
-            },
-            {},
-            {
-              type: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.system.db.reset.fields.operations.type.title",
-                },
-                z.enum(["truncate", "migrate", "seed"]),
-              ),
-              status: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.system.db.reset.fields.operations.status.title",
-                },
-                z.enum(["success", "skipped", "failed", "pending"]),
-              ),
-              details: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.system.db.reset.fields.operations.details.title",
-                },
-                z.string(),
-              ),
-              count: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.system.db.reset.fields.operations.count.title",
-                },
-                z.number(),
-              ),
-            },
-          ),
+          type: WidgetType.TEXT,
+          content: "app.api.v1.core.system.db.reset.fields.operations.title",
         },
         z.array(
           z.object({

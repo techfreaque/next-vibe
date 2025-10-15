@@ -6,8 +6,9 @@
 import { redirect } from "next/navigation";
 import type React from "react";
 
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { requireAdminUser } from "@/app/api/[locale]/v1/core/user/auth/utils";
-import { usersRepository } from "@/app/api/[locale]/v1/core/users/repository";
+import { userByIdRepository } from "@/app/api/[locale]/v1/core/users/user/[id]/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -27,10 +28,19 @@ export default async function UserEditPage({
   const { t } = simpleT(locale);
 
   // Require admin user authentication
-  await requireAdminUser(locale, `/${locale}/admin/users/${id}/edit`);
+  const user = await requireAdminUser(
+    locale,
+    `/${locale}/admin/users/${id}/edit`,
+  );
 
   // Fetch user data
-  const userResponse = await usersRepository.getUserById(id);
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const userResponse = await userByIdRepository.getUserById(
+    { id },
+    user,
+    locale,
+    logger,
+  );
 
   // Handle user not found
   if (!userResponse.success) {

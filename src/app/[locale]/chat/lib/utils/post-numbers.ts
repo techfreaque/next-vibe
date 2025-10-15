@@ -16,8 +16,10 @@ interface PostNumberMap {
  * Get all post numbers from localStorage
  */
 function getPostNumberMap(): PostNumberMap {
-  if (typeof window === "undefined") return {};
-  
+  if (typeof window === "undefined") {
+    return {};
+  }
+
   try {
     const stored = localStorage.getItem(POST_NUMBER_KEY);
     return stored ? JSON.parse(stored) : {};
@@ -31,8 +33,10 @@ function getPostNumberMap(): PostNumberMap {
  * Save post numbers to localStorage
  */
 function savePostNumberMap(map: PostNumberMap): void {
-  if (typeof window === "undefined") return;
-  
+  if (typeof window === "undefined") {
+    return;
+  }
+
   try {
     localStorage.setItem(POST_NUMBER_KEY, JSON.stringify(map));
   } catch (error) {
@@ -44,7 +48,9 @@ function savePostNumberMap(map: PostNumberMap): void {
  * Get current counter value
  */
 function getCounter(): number {
-  if (typeof window === "undefined") return POST_NUMBER_CONFIG.START_NUMBER;
+  if (typeof window === "undefined") {
+    return POST_NUMBER_CONFIG.START_NUMBER;
+  }
 
   try {
     const stored = localStorage.getItem(POST_NUMBER_COUNTER_KEY);
@@ -59,8 +65,10 @@ function getCounter(): number {
  * Save counter value
  */
 function saveCounter(value: number): void {
-  if (typeof window === "undefined") return;
-  
+  if (typeof window === "undefined") {
+    return;
+  }
+
   try {
     localStorage.setItem(POST_NUMBER_COUNTER_KEY, value.toString());
   } catch (error) {
@@ -74,21 +82,21 @@ function saveCounter(value: number): void {
  */
 export function getPostNumber(messageId: string): number {
   const map = getPostNumberMap();
-  
+
   // Return existing number if found
   if (map[messageId]) {
     return map[messageId];
   }
-  
+
   // Generate new number
   const counter = getCounter();
   const newNumber = counter;
-  
+
   // Save new number
   map[messageId] = newNumber;
   savePostNumberMap(map);
   saveCounter(counter + 1);
-  
+
   return newNumber;
 }
 
@@ -100,9 +108,9 @@ export function getPostNumbers(messageIds: string[]): Record<string, number> {
   const map = getPostNumberMap();
   let counter = getCounter();
   let hasNewNumbers = false;
-  
+
   const result: Record<string, number> = {};
-  
+
   for (const messageId of messageIds) {
     if (map[messageId]) {
       result[messageId] = map[messageId];
@@ -113,13 +121,13 @@ export function getPostNumbers(messageIds: string[]): Record<string, number> {
       hasNewNumbers = true;
     }
   }
-  
+
   // Save if we generated any new numbers
   if (hasNewNumbers) {
     savePostNumberMap(map);
     saveCounter(counter);
   }
-  
+
   return result;
 }
 
@@ -127,8 +135,10 @@ export function getPostNumbers(messageIds: string[]): Record<string, number> {
  * Clear all post numbers (for testing/reset)
  */
 export function clearPostNumbers(): void {
-  if (typeof window === "undefined") return;
-  
+  if (typeof window === "undefined") {
+    return;
+  }
+
   try {
     localStorage.removeItem(POST_NUMBER_KEY);
     localStorage.removeItem(POST_NUMBER_COUNTER_KEY);
@@ -143,4 +153,3 @@ export function clearPostNumbers(): void {
 export function formatPostNumber(postNumber: number): string {
   return `No.${postNumber}`;
 }
-

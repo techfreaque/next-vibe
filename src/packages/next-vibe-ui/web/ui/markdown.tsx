@@ -1,55 +1,91 @@
 "use client";
 
-import { cn } from "@/packages/next-vibe/shared/utils";
+import {
+  Brain,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Copy,
+  ExternalLink,
+} from "lucide-react";
 import type { JSX } from "react";
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
-import rehypeHighlight from "rehype-highlight";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { atomDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import remarkGfm from "remark-gfm";
-import { ChevronDown, ChevronRight, Brain } from "lucide-react";
+
+import { cn } from "@/packages/next-vibe/shared/utils";
 
 interface MarkdownProps {
   content: string;
   className?: string;
-  isHover?: boolean;
 }
 
 /**
  * Extract <think> tags and their content from markdown
- * Returns { thinkingSections: Array<string>, contentWithoutThinking: string }
+ * Returns { thinkingSections: Array<string>, contentWithoutThinking: string, incompleteThinking: string | null }
  */
 function extractThinkingSections(content: string): {
   thinkingSections: string[];
   contentWithoutThinking: string;
+  incompleteThinking: string | null;
 } {
   const thinkingSections: string[] = [];
   let processedContent = content;
+  let incompleteThinking: string | null = null;
 
-  // Match <think>...</think> tags (case-insensitive, multiline)
-  const thinkRegex = /<think>([\s\S]*?)<\/think>/gi;
+  // Match complete <think>...</think> tags (case-insensitive, multiline)
+  const completeThinkRegex = /<think>([\s\S]*?)<\/think>/gi;
   let match;
 
-  while ((match = thinkRegex.exec(content)) !== null) {
+  // Extract all complete thinking sections
+  while ((match = completeThinkRegex.exec(content)) !== null) {
     thinkingSections.push(match[1].trim());
   }
 
-  // Remove all <think> tags from content
-  processedContent = content.replace(thinkRegex, '').trim();
+  // Remove all complete <think>...</think> tags from content
+  processedContent = content.replace(completeThinkRegex, "");
 
-  return { thinkingSections, contentWithoutThinking: processedContent };
+  // Check for incomplete <think> tag (streaming case)
+  const incompleteThinkMatch = processedContent.match(/<think>([\s\S]*)$/i);
+  if (incompleteThinkMatch) {
+    incompleteThinking = incompleteThinkMatch[1].trim();
+    // Remove the incomplete <think> tag and its content from processedContent
+    processedContent = processedContent.replace(/<think>[\s\S]*$/i, "");
+  }
+
+  processedContent = processedContent.trim();
+
+  return {
+    thinkingSections,
+    contentWithoutThinking: processedContent,
+    incompleteThinking,
+  };
 }
 
-export function Markdown({
-  content,
-  className,
-  isHover = false,
-}: MarkdownProps): JSX.Element {
-  const [expandedThinking, setExpandedThinking] = useState<Set<number>>(new Set());
+export function Markdown({ content, className }: MarkdownProps): JSX.Element {
+  const { thinkingSections, contentWithoutThinking, incompleteThinking } =
+    extractThinkingSections(content);
 
-  const { thinkingSections, contentWithoutThinking } = extractThinkingSections(content);
+  // Combine complete and incomplete thinking sections
+  const allThinkingSections = [
+    ...thinkingSections,
+    ...(incompleteThinking ? [incompleteThinking] : []),
+  ];
+
+  // Default expanded state: collapsed if there's content, expanded if only thinking
+  const hasContent = contentWithoutThinking.length > 0;
+  const [expandedThinking, setExpandedThinking] = useState<Set<number>>(() => {
+    if (!hasContent && allThinkingSections.length > 0) {
+      // If no content yet, expand all thinking sections by default
+      return new Set(allThinkingSections.map((_, i) => i));
+    }
+    return new Set();
+  });
 
   const toggleThinking = (index: number) => {
-    setExpandedThinking(prev => {
+    setExpandedThinking((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(index)) {
         newSet.delete(index);
@@ -59,36 +95,62 @@ export function Markdown({
       return newSet;
     });
   };
+
   return (
     <div className={cn("leading-relaxed max-w-none", className)}>
       {/* Render thinking sections if any */}
-      {thinkingSections.length > 0 && (
-        <div className="mb-4 space-y-2">
-          {thinkingSections.map((thinking, index) => {
+      {allThinkingSections.length > 0 && (
+        <div className="mb-6 space-y-3">
+          {allThinkingSections.map((thinking, index) => {
             const isExpanded = expandedThinking.has(index);
+            const isIncomplete =
+              index === allThinkingSections.length - 1 && incompleteThinking;
             return (
               <div
                 key={index}
-                className="border border-purple-500/30 rounded-lg overflow-hidden bg-purple-500/5"
+                className={cn(
+                  "group relative border border-purple-500/20 rounded-xl overflow-hidden",
+                  "bg-gradient-to-br from-purple-500/5 to-blue-500/5",
+                  "dark:from-purple-500/10 dark:to-blue-500/10",
+                  "shadow-sm hover:shadow-md transition-all duration-300",
+                  isIncomplete && "animate-pulse",
+                )}
               >
                 {/* Collapsible header */}
                 <button
                   onClick={() => toggleThinking(index)}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-purple-400 hover:bg-purple-500/10 transition-colors"
-                >
-                  <Brain className="h-4 w-4 flex-shrink-0" />
-                  <span className="flex-1 text-left">Reasoning Process</span>
-                  {isExpanded ? (
-                    <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4 flex-shrink-0" />
+                  className={cn(
+                    "w-full flex items-center gap-3 px-4 py-3 text-sm font-medium",
+                    "text-purple-600 dark:text-purple-400",
+                    "hover:bg-purple-500/10 dark:hover:bg-purple-500/20",
+                    "transition-all duration-200",
                   )}
+                >
+                  <Brain className="h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110" />
+                  <span className="flex-1 text-left font-semibold">
+                    Reasoning Process
+                    {isIncomplete && (
+                      <span className="ml-2 text-xs font-normal text-purple-500 dark:text-purple-400">
+                        (streaming...)
+                      </span>
+                    )}
+                  </span>
+                  <div
+                    className={cn(
+                      "transition-transform duration-200",
+                      isExpanded && "rotate-180",
+                    )}
+                  >
+                    <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                  </div>
                 </button>
 
-                {/* Collapsible content */}
+                {/* Collapsible content with animation */}
                 {isExpanded && (
-                  <div className="px-3 py-2 border-t border-purple-500/20 text-xs text-muted-foreground/80 whitespace-pre-wrap">
-                    {thinking}
+                  <div className="border-t border-purple-500/20 bg-purple-500/5 dark:bg-purple-900/10 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="px-4 py-3 text-xs text-slate-600 dark:text-slate-400 whitespace-pre-wrap leading-relaxed font-mono">
+                      {thinking}
+                    </div>
                   </div>
                 )}
               </div>
@@ -100,102 +162,144 @@ export function Markdown({
       {/* Render main content */}
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeHighlight]}
         components={{
           h1: ({ children }) => (
-            <span
-              className="text-xl font-bold mb-3 mt-4 first:mt-0 leading-tight"
-            >
+            <h1 className="text-3xl font-bold mb-4 mt-8 first:mt-0 leading-tight text-slate-900 dark:text-slate-50 tracking-tight">
               {children}
-            </span>
+            </h1>
           ),
           h2: ({ children }) => (
-            <span
-              className="text-lg font-bold mb-2 mt-3 first:mt-0 leading-tight"
-            >
+            <h2 className="text-2xl font-bold mb-3 mt-6 first:mt-0 leading-tight text-slate-900 dark:text-slate-50 tracking-tight border-b border-slate-200 dark:border-slate-800 pb-2">
               {children}
-            </span>
+            </h2>
           ),
           h3: ({ children }) => (
-            <span
-              className="text-base font-semibold mb-2 mt-3 first:mt-0 leading-tight"
-            >
+            <h3 className="text-xl font-semibold mb-3 mt-5 first:mt-0 leading-tight text-slate-900 dark:text-slate-100">
               {children}
-            </span>
+            </h3>
           ),
           h4: ({ children }) => (
-            <span
-              className="text-sm font-semibold mb-1 mt-2 first:mt-0"
-            >
+            <h4 className="text-lg font-semibold mb-2 mt-4 first:mt-0 text-slate-900 dark:text-slate-100">
               {children}
-            </span>
+            </h4>
           ),
           h5: ({ children }) => (
-            <span
-              className="text-sm font-medium mb-1 mt-2 first:mt-0 tracking-wide"
-            >
+            <h5 className="text-base font-semibold mb-2 mt-3 first:mt-0 tracking-wide text-slate-800 dark:text-slate-200">
               {children}
-            </span>
+            </h5>
+          ),
+          h6: ({ children }) => (
+            <h6 className="text-sm font-semibold mb-1 mt-2 first:mt-0 tracking-wide text-slate-700 dark:text-slate-300 uppercase">
+              {children}
+            </h6>
           ),
 
           p: ({ children }) => (
-            <p className="text-sm leading-relaxed mb-3 last:mb-0 text-slate-700 dark:text-slate-300">
+            <p className="text-base leading-7 mb-4 last:mb-0 text-slate-700 dark:text-slate-300">
               {children}
             </p>
           ),
 
           ul: ({ children }) => (
-            <ul className="space-y-2 mb-3 text-sm ml-4">{children}</ul>
+            <ul className="list-disc list-outside ml-0 pl-6 mb-4 mt-2 space-y-2 text-base marker:text-blue-500 dark:marker:text-blue-400">
+              {children}
+            </ul>
           ),
           ol: ({ children }) => (
-            <ol className="space-y-2 mb-3 text-sm ml-4">{children}</ol>
+            <ol className="list-decimal list-outside ml-0 pl-6 mb-4 mt-2 space-y-2 text-base marker:text-blue-500 dark:marker:text-blue-400 marker:font-semibold">
+              {children}
+            </ol>
           ),
-          li: ({ children }) => (
-            <li className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed flex items-start gap-2">
-              <span className="text-blue-500 dark:text-blue-400 mt-1 flex-shrink-0">
-                •
-              </span>
-              <span>{children}</span>
-            </li>
-          ),
+          li: ({ children }) => {
+            // Check if this is a task list item (contains a checkbox)
+            const isTaskListItem = React.Children.toArray(children).some(
+              (child) => {
+                if (React.isValidElement(child) && child.type === "input") {
+                  const props = child.props as { type?: string };
+                  return props.type === "checkbox";
+                }
+                return false;
+              },
+            );
+
+            if (isTaskListItem) {
+              return (
+                <li className="flex items-start gap-2.5 my-1.5 list-none -ml-6">
+                  {React.Children.map(children, (child, index) => {
+                    if (React.isValidElement(child) && child.type === "input") {
+                      const props = child.props as {
+                        type?: string;
+                        checked?: boolean;
+                        disabled?: boolean;
+                      };
+                      if (props.type === "checkbox") {
+                        return (
+                          <input
+                            key={index}
+                            type="checkbox"
+                            checked={props.checked}
+                            disabled={props.disabled}
+                            className="mt-1 h-4 w-4 rounded border-2 border-slate-300 dark:border-slate-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 focus:ring-2 cursor-pointer disabled:cursor-not-allowed accent-blue-600 dark:accent-blue-500 transition-colors"
+                            readOnly
+                          />
+                        );
+                      }
+                    }
+                    return <span key={index}>{child}</span>;
+                  })}
+                </li>
+              );
+            }
+
+            return (
+              <li className="text-base text-slate-700 dark:text-slate-300 leading-7 my-0.5">
+                {children}
+              </li>
+            );
+          },
 
           strong: ({ children }) => (
-            <strong
-              className="font-bold"
-            >
+            <strong className="font-bold text-slate-900 dark:text-slate-50">
               {children}
             </strong>
           ),
           em: ({ children }) => (
-            <em className="italic text-slate-600 dark:text-slate-400">
+            <em className="italic text-slate-600 dark:text-slate-400 font-medium">
               {children}
             </em>
           ),
 
-          // Code with enhanced styling
-          code: ({ children, className }) => {
-            const isInline = !className;
-            if (isInline) {
-              return (
-                <code className="bg-slate-100 dark:bg-slate-800 text-violet-600 dark:text-violet-400 px-2 py-1 rounded-md text-xs font-mono border border-slate-200 dark:border-slate-700">
-                  {children}
-                </code>
-              );
+          // Code with copy button and syntax highlighting
+          code: ({ children, className, ...props }) => {
+            const match = /language-(\w+)/.exec(className || "");
+            // eslint-disable-next-line @typescript-eslint/no-base-to-string
+            const codeString = String(children).replace(/\n$/, "");
+
+            if (match) {
+              return <CodeBlock code={codeString} language={match[1]} />;
             }
+
+            // Inline code
             return (
-              <code className={cn("text-xs font-mono", className)}>
+              <code
+                className="bg-slate-100 dark:bg-slate-800/80 text-violet-600 dark:text-violet-400 px-2 py-0.5 rounded-md text-sm font-mono border border-slate-200 dark:border-slate-700/50 font-medium"
+                {...props}
+              >
                 {children}
               </code>
             );
           },
-          pre: ({ children }) => (
-            <pre className="bg-slate-900 dark:bg-slate-950 text-slate-100 p-4 rounded-lg overflow-x-auto mb-3 text-xs border border-slate-200 dark:border-slate-800">
-              {children}
-            </pre>
-          ),
+
+          pre: ({ children }) => {
+            // Let the code component handle the pre wrapper
+            return <>{children}</>;
+          },
 
           blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-blue-500 pl-4 py-3 bg-gradient-to-r from-blue-50/50 to-violet-50/50 dark:from-blue-900/20 dark:to-violet-900/20 rounded-r-lg mb-3 italic text-sm text-slate-700 dark:text-slate-300 shadow-sm">
+            <blockquote className="relative border-l-4 border-blue-500 dark:border-blue-400 pl-6 pr-4 py-4 my-4 bg-gradient-to-r from-blue-50 via-indigo-50/50 to-transparent dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-transparent rounded-r-xl text-base text-slate-700 dark:text-slate-300 shadow-sm">
+              <div className="absolute left-2 top-4 text-blue-500/20 dark:text-blue-400/20 text-6xl leading-none font-serif">
+                &ldquo;
+              </div>
               {children}
             </blockquote>
           ),
@@ -205,35 +309,180 @@ export function Markdown({
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 inline-flex items-center gap-1 underline underline-offset-2 decoration-2 hover:decoration-blue-600 dark:hover:decoration-blue-400 transition-all duration-200 font-medium"
             >
               {children}
+              <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 opacity-70" />
             </a>
           ),
 
+          img: ({ src, alt }) => <MarkdownImage src={src} alt={alt} />,
+
           table: ({ children }) => (
-            <div className="overflow-x-auto mb-2">
-              <table className="min-w-full border-collapse border border-border text-xs">
+            <div className="overflow-x-auto mb-6 mt-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+              <table className="min-w-full border-collapse text-sm">
                 {children}
               </table>
             </div>
           ),
+          thead: ({ children }) => (
+            <thead className="bg-slate-50 dark:bg-slate-800/50">
+              {children}
+            </thead>
+          ),
           th: ({ children }) => (
-            <th className="border border-border bg-muted px-2 py-1 text-left font-semibold text-foreground">
+            <th className="border-b-2 border-slate-200 dark:border-slate-700 px-4 py-3 text-left font-semibold text-slate-900 dark:text-slate-100 uppercase text-xs tracking-wider">
               {children}
             </th>
           ),
           td: ({ children }) => (
-            <td className="border border-border px-2 py-1 text-foreground">
+            <td className="border-b border-slate-200 dark:border-slate-800 px-4 py-3 text-slate-700 dark:text-slate-300">
               {children}
             </td>
           ),
 
-          hr: () => <hr className="border-border my-3" />,
+          hr: () => (
+            <hr className="border-0 border-t-2 border-slate-200 dark:border-slate-800 my-8" />
+          ),
         }}
       >
         {contentWithoutThinking}
       </ReactMarkdown>
     </div>
+  );
+}
+
+// Code block component with copy button
+function CodeBlock({
+  code,
+  language,
+}: {
+  code: string;
+  language: string;
+}): JSX.Element {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to copy code:", err);
+    }
+  };
+
+  return (
+    <div className="relative my-4 group rounded-xl overflow-hidden shadow-lg border border-slate-800 dark:border-slate-700">
+      {/* Language label */}
+      <div className="flex items-center justify-between bg-slate-800 dark:bg-slate-900 px-4 py-2 border-b border-slate-700">
+        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+          {language}
+        </span>
+        <button
+          onClick={handleCopy}
+          className={cn(
+            "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium",
+            "transition-all duration-200",
+            copied
+              ? "bg-green-500/20 text-green-400 border border-green-500/30"
+              : "bg-slate-700 hover:bg-slate-600 text-slate-300 border border-slate-600",
+          )}
+          title={copied ? "Copied!" : "Copy code"}
+        >
+          {copied ? (
+            <>
+              <Check className="h-3.5 w-3.5" />
+              Copied!
+            </>
+          ) : (
+            <>
+              <Copy className="h-3.5 w-3.5" />
+              Copy
+            </>
+          )}
+        </button>
+      </div>
+      <SyntaxHighlighter
+        language={language}
+        style={atomDark}
+        customStyle={{
+          margin: 0,
+          padding: "1.25rem",
+          fontSize: "0.875rem",
+          background: "rgb(30 41 59)",
+          lineHeight: "1.6",
+        }}
+        showLineNumbers
+        wrapLines
+      >
+        {code}
+      </SyntaxHighlighter>
+    </div>
+  );
+}
+
+// Image component with modal
+function MarkdownImage({
+  src,
+  alt,
+}: {
+  src?: string;
+  alt?: string;
+}): JSX.Element {
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (!src) {
+    return <></>;
+  }
+
+  return (
+    <>
+      <div className="my-6 group">
+        <img
+          src={src}
+          alt={alt}
+          className="max-w-full h-auto rounded-xl border border-slate-200 dark:border-slate-700 shadow-lg cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-300"
+          onClick={() => setIsOpen(true)}
+        />
+        {alt && (
+          <p className="text-sm text-slate-500 dark:text-slate-400 italic mt-2 text-center">
+            {alt}
+          </p>
+        )}
+      </div>
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+          onClick={() => setIsOpen(false)}
+        >
+          <button
+            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+            onClick={() => setIsOpen(false)}
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+          <img
+            src={src}
+            alt={alt}
+            className="max-w-full max-h-full rounded-xl shadow-2xl animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
+    </>
   );
 }

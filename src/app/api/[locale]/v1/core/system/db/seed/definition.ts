@@ -93,7 +93,6 @@ const { POST } = createEndpoint({
       collections: responseField(
         {
           type: WidgetType.DATA_TABLE,
-          title: "app.api.v1.core.system.db.seed.fields.collections.title",
           columns: [
             {
               key: "name",

@@ -10,72 +10,93 @@ import {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import type { UserRoleDB } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import type { UnifiedField } from "../../endpoint-types/core/types";
-import type { CreateApiEndpoint } from "../../endpoint-types/endpoint/create";
 import type {
+  ExtractOutput,
+  ObjectField,
+  UnifiedField,
+} from "../../endpoint-types/core/types";
+import type { CreateApiEndpoint } from "../../endpoint-types/endpoint/create";
+import type { WidgetConfig } from "../../endpoint-types/types";
+import type {
+  RenderableValue,
   ResponseContainerMetadata,
   ResponseFieldMetadata,
 } from "./widgets/types";
 
 /**
- * Widget configuration interface
+ * Convert unknown/any Zod output to RenderableValue safely
  */
-interface WidgetConfig {
-  type?: string;
-  title?: string;
-  description?: string;
-  layout?: {
-    type: string;
-    columns?: number;
-  };
-  columns?: Array<{
-    key: string;
-    label: string;
-    type: string;
-    width?: string;
-    sortable?: boolean;
-    filterable?: boolean;
-  }>;
-  format?: string;
-  unit?: string;
-  precision?: number;
-  options?: string[];
-  choices?: string[];
+function toRenderableValue(
+  value: ExtractOutput<z.ZodTypeAny>,
+): RenderableValue {
+  if (value === null || value === undefined) {
+    return value;
+  }
+  if (typeof value === "string") {
+    return value;
+  }
+  if (typeof value === "number") {
+    return value;
+  }
+  if (typeof value === "boolean") {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => toRenderableValue(item));
+  }
+  if (typeof value === "object") {
+    const result: { [key: string]: RenderableValue } = {};
+    for (const [key, val] of Object.entries(value)) {
+      result[key] = toRenderableValue(val);
+    }
+    return result;
+  }
+  return undefined;
 }
 
 /**
- * Field definition interface
+ * Type guard to check if value is a record with string keys
+ * Properly typed to infer record structure
  */
-interface FieldDefinition {
-  widget?: WidgetConfig;
-  usage?: {
-    response?: boolean;
-    request?: boolean;
-  };
-  schema?: z.ZodTypeAny;
+function isRecord(
+  value: ExtractOutput<z.ZodTypeAny>,
+): value is Record<string, ExtractOutput<z.ZodTypeAny>> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /**
- * Fields container interface
+ * Type guard to check if an object has a response property that is true
  */
-interface FieldsContainer {
-  widget?: WidgetConfig;
-  fields?: Record<string, FieldDefinition>;
+function hasResponseTrue(value: ExtractOutput<z.ZodTypeAny>): boolean {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  if (!("response" in value)) {
+    return false;
+  }
+  if (!isRecord(value)) {
+    return false;
+  }
+  const responseValue = value.response;
+  return responseValue === true;
 }
 
 /**
- * Real endpoint structure from createEndpoint
+ * Type guard to check if a field is an ObjectField with children
  */
-export interface RealEndpointDefinition {
-  title?: string;
-  description?: string;
-  responseSchema?: z.ZodTypeAny;
-  fields?: any; // The actual fields object from createEndpoint
-  examples?: {
-    responses?: Record<string, Record<string, unknown>>;
-  };
+function isObjectField<TSchema extends z.ZodTypeAny>(
+  field: UnifiedField<TSchema>,
+): field is ObjectField<Record<string, any>> {
+  return (
+    typeof field === "object" &&
+    field !== null &&
+    "type" in field &&
+    field.type === "object" &&
+    "children" in field &&
+    typeof field.children === "object"
+  );
 }
 
 /**
@@ -85,14 +106,16 @@ export class ResponseMetadataExtractor {
   /**
    * Extract response metadata from endpoint definition
    */
-  extractResponseMetadata(
-    definition: CreateApiEndpoint<
+  extractResponseMetadata<
+    TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
-      readonly (typeof UserRoleValue)[],
-      UnifiedField<z.ZodTypeAny>
+      readonly (typeof UserRoleDB)[number][],
+      any
     >,
-    responseData?: any,
+  >(
+    definition: TEndpoint,
+    responseData?: ExtractOutput<TEndpoint["responseSchema"]>,
   ): ResponseContainerMetadata | null {
     try {
       // Try to extract from fields definition first
@@ -109,8 +132,8 @@ export class ResponseMetadataExtractor {
       }
 
       return null;
-    } catch (error) {
-      console.warn("Failed to extract response metadata:", error);
+    } catch {
+      // Silent failure - return null if extraction fails
       return null;
     }
   }
@@ -118,16 +141,17 @@ export class ResponseMetadataExtractor {
   /**
    * Extract metadata from fields definition (new endpoint format)
    */
-  private extractFromFieldsDefinition(
-    fieldsDefinition: any,
-    responseData?: any,
+  private extractFromFieldsDefinition<TFields>(
+    fieldsDefinition: TFields,
+    responseData?: ExtractOutput<z.ZodTypeAny>,
   ): ResponseContainerMetadata | null {
     if (!fieldsDefinition || typeof fieldsDefinition !== "object") {
       return null;
     }
 
     // Handle the real createEndpoint structure
-    if (fieldsDefinition.children && fieldsDefinition.ui) {
+    if ("children" in fieldsDefinition && "ui" in fieldsDefinition) {
+      // Type narrowing: if it has children and ui, it's an ObjectField
       return this.extractFromCreateEndpointStructure(
         fieldsDefinition,
         responseData,
@@ -135,7 +159,7 @@ export class ResponseMetadataExtractor {
     }
 
     // Legacy: Check if this is a field object with usage and schema
-    if (fieldsDefinition.usage && fieldsDefinition.schema) {
+    if ("usage" in fieldsDefinition && "schema" in fieldsDefinition) {
       // This is a single field
       const field = this.extractFieldFromDefinition(
         "root",
@@ -148,18 +172,292 @@ export class ResponseMetadataExtractor {
       };
     }
 
-    // Check if this has a widget configuration and nested fields
-    if (fieldsDefinition.widget || fieldsDefinition.type) {
+    // Handle ObjectField with children
+    if (isObjectField(fieldsDefinition)) {
       return this.extractContainerFromDefinition(
         fieldsDefinition,
         responseData,
       );
     }
 
-    // Check if this is an object with field definitions
+    return null;
+  }
+
+  /**
+   * Extract metadata from the real createEndpoint structure
+   */
+  private extractFromCreateEndpointStructure<
+    TChildren extends Record<string, any>,
+  >(
+    fieldsDefinition: ObjectField<TChildren>,
+    responseData?: ExtractOutput<z.ZodTypeAny>,
+  ): ResponseContainerMetadata | null {
+    const ui = fieldsDefinition.ui;
+    const children = fieldsDefinition.children;
+
+    // Get container widget type from ui.type
+    const containerType = this.mapUiTypeToWidgetType(
+      typeof ui.type === "string" ? ui.type : "container",
+    );
+
+    // Extract response fields from children
     const fields: ResponseFieldMetadata[] = [];
-    for (const [fieldName, fieldDef] of Object.entries(fieldsDefinition)) {
-      if (typeof fieldDef === "object" && fieldDef !== null) {
+
+    for (const [fieldName, fieldDef] of Object.entries(children)) {
+      // Only include response fields
+      if ("usage" in fieldDef) {
+        const usage = fieldDef.usage;
+        let hasResponse = false;
+        if (typeof usage === "object" && usage !== null) {
+          if ("response" in usage) {
+            hasResponse = usage.response === true;
+          } else {
+            // Check each method's usage for response field
+            const usageValues = Object.values(usage);
+            hasResponse = usageValues.some((methodUsage) =>
+              hasResponseTrue(methodUsage),
+            );
+          }
+        }
+
+        if (hasResponse) {
+          const responseField = this.extractFieldFromCreateEndpointField(
+            fieldName,
+            fieldDef,
+            responseData,
+          );
+          if (responseField) {
+            fields.push(responseField);
+          }
+        }
+      }
+    }
+
+    const title =
+      "title" in ui && typeof ui.title === "string" ? ui.title : undefined;
+    const description =
+      "description" in ui && typeof ui.description === "string"
+        ? ui.description
+        : undefined;
+    const layout =
+      "layout" in ui && typeof ui.layout === "object" ? ui.layout : undefined;
+
+    return {
+      type: containerType,
+      title,
+      description,
+      layout,
+      fields,
+    };
+  }
+
+  /**
+   * Extract field metadata from createEndpoint field structure
+   */
+  private extractFieldFromCreateEndpointField<TField>(
+    fieldName: string,
+    field: TField,
+    responseData?: ExtractOutput<z.ZodTypeAny>,
+  ): ResponseFieldMetadata | null {
+    const ui = field.ui;
+    if (!ui || typeof ui !== "object") {
+      return null;
+    }
+
+    // Handle array fields specially
+    if (field.type === "array") {
+      // For array fields, the value should be an array from response data
+      let value: ExtractOutput<z.ZodTypeAny> = undefined;
+      if (isRecord(responseData) && fieldName in responseData) {
+        value = responseData[fieldName];
+      }
+
+      // Map ui.type to WidgetType and FieldDataType
+      const uiType =
+        "type" in ui && typeof ui.type === "string" ? ui.type : "text";
+      const widgetType = this.mapUiTypeToWidgetType(uiType);
+      const fieldType = FieldDataType.TAGS; // Arrays are typically rendered as tags/lists
+
+      const label =
+        "title" in ui && typeof ui.title === "string"
+          ? ui.title
+          : "label" in ui && typeof ui.label === "string"
+            ? ui.label
+            : "content" in ui && typeof ui.content === "string"
+              ? ui.content
+              : undefined;
+      const description =
+        "description" in ui && typeof ui.description === "string"
+          ? ui.description
+          : undefined;
+
+      const arrayField: ResponseFieldMetadata = {
+        name: fieldName,
+        type: fieldType,
+        widgetType,
+        value: toRenderableValue(value),
+        label,
+        description,
+        required: false,
+      };
+
+      // Add grouping properties for grouped lists
+      if (widgetType === WidgetType.GROUPED_LIST) {
+        if ("groupBy" in ui && typeof ui.groupBy === "string") {
+          arrayField.groupBy = ui.groupBy;
+        }
+        if ("sortBy" in ui && typeof ui.sortBy === "string") {
+          arrayField.sortBy = ui.sortBy;
+        }
+        if (
+          "showGroupSummary" in ui &&
+          typeof ui.showGroupSummary === "boolean"
+        ) {
+          arrayField.showGroupSummary = ui.showGroupSummary;
+        }
+        if (
+          "maxItemsPerGroup" in ui &&
+          typeof ui.maxItemsPerGroup === "number"
+        ) {
+          arrayField.maxItemsPerGroup = ui.maxItemsPerGroup;
+        }
+      }
+
+      return arrayField;
+    }
+
+    // Handle regular fields
+    // Map ui.type to WidgetType and FieldDataType
+    const regularUiType =
+      "type" in ui && typeof ui.type === "string" ? ui.type : "text";
+    const widgetType = this.mapUiTypeToWidgetType(regularUiType);
+    const fieldType = this.mapUiTypeToFieldDataType(regularUiType);
+
+    // Get value from response data
+    let regularValue: ExtractOutput<z.ZodTypeAny> = undefined;
+    if (isRecord(responseData) && fieldName in responseData) {
+      regularValue = responseData[fieldName];
+    }
+
+    // Handle data table columns
+    let columns: ResponseFieldMetadata["columns"] | undefined;
+    if ("columns" in ui && Array.isArray(ui.columns)) {
+      interface ColumnType {
+        key: string;
+        label: string;
+        type: string;
+        width?: string;
+        sortable?: boolean;
+        filterable?: boolean;
+      }
+
+      const filteredColumns: ColumnType[] = [];
+      for (const col of ui.columns) {
+        if (
+          typeof col === "object" &&
+          col !== null &&
+          "key" in col &&
+          typeof col.key === "string" &&
+          "label" in col &&
+          typeof col.label === "string" &&
+          "type" in col &&
+          typeof col.type === "string"
+        ) {
+          filteredColumns.push({
+            key: col.key,
+            label: col.label,
+            type: col.type,
+            width:
+              "width" in col && typeof col.width === "string"
+                ? col.width
+                : undefined,
+            sortable:
+              "sortable" in col && typeof col.sortable === "boolean"
+                ? col.sortable
+                : undefined,
+            filterable:
+              "filterable" in col && typeof col.filterable === "boolean"
+                ? col.filterable
+                : undefined,
+          });
+        }
+      }
+
+      columns = filteredColumns.map((col) => ({
+        key: col.key,
+        label: col.label,
+        type: this.mapStringToFieldDataType(col.type),
+        width: typeof col.width === "string" ? col.width : undefined,
+        sortable: typeof col.sortable === "boolean" ? col.sortable : undefined,
+        filterable:
+          typeof col.filterable === "boolean" ? col.filterable : undefined,
+      }));
+    }
+
+    const regularLabel =
+      "title" in ui && typeof ui.title === "string"
+        ? ui.title
+        : "label" in ui && typeof ui.label === "string"
+          ? ui.label
+          : "content" in ui && typeof ui.content === "string"
+            ? ui.content
+            : undefined;
+    const regularDescription =
+      "description" in ui && typeof ui.description === "string"
+        ? ui.description
+        : undefined;
+
+    return {
+      name: fieldName,
+      type: fieldType,
+      widgetType,
+      value: toRenderableValue(regularValue),
+      label: regularLabel,
+      description: regularDescription,
+      required: false,
+      columns,
+    };
+  }
+
+  /**
+   * Extract container metadata from definition (legacy support)
+   */
+  private extractContainerFromDefinition<TFields>(
+    definition: TFields,
+    responseData?: ExtractOutput<z.ZodTypeAny>,
+  ): ResponseContainerMetadata {
+    // Extract UI config if present
+    const hasUi = "ui" in definition && typeof definition.ui === "object";
+    const ui = hasUi ? definition.ui : null;
+
+    // Extract type from UI config
+    const typeValue =
+      ui && "type" in ui && typeof ui.type === "string" ? ui.type : undefined;
+    const type = typeValue
+      ? this.mapUiTypeToWidgetType(typeValue)
+      : WidgetType.CONTAINER;
+
+    // Extract other properties from UI config
+    const title =
+      ui && "title" in ui && typeof ui.title === "string"
+        ? ui.title
+        : undefined;
+    const description =
+      ui && "description" in ui && typeof ui.description === "string"
+        ? ui.description
+        : undefined;
+    const layout =
+      ui && "layout" in ui && typeof ui.layout === "object"
+        ? ui.layout
+        : undefined;
+
+    // Extract fields from nested structure
+    const fields: ResponseFieldMetadata[] = [];
+
+    // Look for fields in ObjectField children
+    if (isObjectField(definition)) {
+      // Type narrowing: isObjectField type guard narrows to ObjectField
+      for (const [fieldName, fieldDef] of Object.entries(definition.children)) {
         const field = this.extractFieldFromDefinition(
           fieldName,
           fieldDef,
@@ -171,192 +469,107 @@ export class ResponseMetadataExtractor {
       }
     }
 
-    return {
-      type: WidgetType.CONTAINER,
-      fields,
-    };
-  }
-
-  /**
-   * Extract metadata from the real createEndpoint structure
-   */
-  private extractFromCreateEndpointStructure(
-    fieldsDefinition: any,
-    responseData?: any,
-  ): ResponseContainerMetadata | null {
-    const ui = fieldsDefinition.ui;
-    const children = fieldsDefinition.children;
-
-    // Get container widget type from ui.type
-    const containerType = this.mapUiTypeToWidgetType(ui.type);
-
-    // Extract response fields from children
-    const fields: ResponseFieldMetadata[] = [];
-
-    for (const [fieldName, fieldDef] of Object.entries(children)) {
-      const field = fieldDef;
-
-      // Only include response fields
-      if (field.usage?.response) {
-        const responseField = this.extractFieldFromCreateEndpointField(
-          fieldName,
-          field,
-          responseData,
-        );
-        if (responseField) {
-          fields.push(responseField);
-        }
-      }
-    }
-
-    return {
-      type: containerType,
-      title: ui.title,
-      description: ui.description,
-      layout: ui.layout,
-      fields,
-    };
-  }
-
-  /**
-   * Extract field metadata from createEndpoint field structure
-   */
-  private extractFieldFromCreateEndpointField(
-    fieldName: string,
-    field: any,
-    responseData?: any,
-  ): ResponseFieldMetadata | null {
-    const ui = field.ui;
-    if (!ui) {
-      return null;
-    }
-
-    // Handle array fields specially
-    if (field.type === "array") {
-      // For array fields, the value should be an array from response data
-      const value = responseData ? responseData[fieldName] : undefined;
-
-      // Map ui.type to WidgetType and FieldDataType
-      const widgetType = this.mapUiTypeToWidgetType(ui.type);
-      const fieldType = FieldDataType.TAGS; // Arrays are typically rendered as tags/lists
-
-      const arrayField: ResponseFieldMetadata = {
-        name: fieldName,
-        type: fieldType,
-        widgetType,
-        value,
-        label: ui.title || ui.label || ui.content,
-        description: ui.description,
-        required: false,
-      };
-
-      // Add grouping properties for grouped lists
-      if (widgetType === WidgetType.GROUPED_LIST) {
-        arrayField.groupBy = ui.groupBy;
-        arrayField.sortBy = ui.sortBy;
-        arrayField.showGroupSummary = ui.showGroupSummary;
-        arrayField.maxItemsPerGroup = ui.maxItemsPerGroup;
-      }
-
-      return arrayField;
-    }
-
-    // Handle regular fields
-    // Map ui.type to WidgetType and FieldDataType
-    const widgetType = this.mapUiTypeToWidgetType(ui.type);
-    const fieldType = this.mapUiTypeToFieldDataType(ui.type);
-
-    // Get value from response data
-    const value = responseData ? responseData[fieldName] : undefined;
-
-    // Handle data table columns
-    let columns;
-    if (ui.columns) {
-      columns = ui.columns.map((col: any) => ({
-        key: col.key,
-        label: col.label,
-        type: this.mapStringToFieldDataType(col.type),
-        width: col.width,
-        sortable: col.sortable,
-        filterable: col.filterable,
-      }));
-    }
-
-    return {
-      name: fieldName,
-      type: fieldType,
-      widgetType,
-      value,
-      label: ui.title || ui.label || ui.content,
-      description: ui.description,
-      required: false, // TODO: Extract from schema if needed
-      columns,
-    };
-  }
-
-  /**
-   * Extract container metadata from definition
-   */
-  private extractContainerFromDefinition(
-    definition: any,
-    responseData?: any,
-  ): ResponseContainerMetadata {
-    const widget = definition.widget || {};
-    const type = widget.type || WidgetType.CONTAINER;
-    const title = widget.title;
-    const description = widget.description;
-    const layout = widget.layout;
-
-    // Extract fields from nested structure
-    const fields: ResponseFieldMetadata[] = [];
-    const children: ResponseContainerMetadata[] = [];
-
-    // Look for fields in the definition
-    if (definition.fields) {
-      for (const [fieldName, fieldDef] of Object.entries(definition.fields)) {
-        if (typeof fieldDef === "object" && fieldDef !== null) {
-          const field = this.extractFieldFromDefinition(
-            fieldName,
-            fieldDef,
-            responseData,
-          );
-          if (field) {
-            fields.push(field);
-          }
-        }
-      }
-    }
-
     // Handle special widget types
     if (type === WidgetType.DATA_TABLE) {
       // For data tables, look for array fields and column definitions
-      const arrayField = fields.find(
-        (field) => responseData && Array.isArray(responseData[field.name]),
-      );
+      const arrayField = fields.find((field) => {
+        if (!isRecord(responseData)) {
+          return false;
+        }
+        if (!(field.name in responseData)) {
+          return false;
+        }
+        const value = responseData[field.name];
+        return Array.isArray(value);
+      });
 
-      if (arrayField && widget.columns) {
-        arrayField.columns = widget.columns.map((col: any) => ({
+      if (arrayField && ui && "columns" in ui && Array.isArray(ui.columns)) {
+        interface ColumnType {
+          key: string;
+          label: string;
+          type: string;
+          width?: string;
+          sortable?: boolean;
+          filterable?: boolean;
+        }
+
+        const filteredColumns: ColumnType[] = [];
+        for (const col of ui.columns) {
+          if (
+            typeof col === "object" &&
+            col !== null &&
+            "key" in col &&
+            typeof col.key === "string" &&
+            "label" in col &&
+            typeof col.label === "string" &&
+            "type" in col &&
+            typeof col.type === "string"
+          ) {
+            filteredColumns.push({
+              key: col.key,
+              label: col.label,
+              type: col.type,
+              width:
+                "width" in col && typeof col.width === "string"
+                  ? col.width
+                  : undefined,
+              sortable:
+                "sortable" in col && typeof col.sortable === "boolean"
+                  ? col.sortable
+                  : undefined,
+              filterable:
+                "filterable" in col && typeof col.filterable === "boolean"
+                  ? col.filterable
+                  : undefined,
+            });
+          }
+        }
+
+        arrayField.columns = filteredColumns.map((col) => ({
           key: col.key,
           label: col.label,
-          type: this.mapFieldDataType(col.type),
-          width: col.width,
-          sortable: col.sortable,
-          filterable: col.filterable,
+          type: this.mapStringToFieldDataType(col.type),
+          width: typeof col.width === "string" ? col.width : undefined,
+          sortable:
+            typeof col.sortable === "boolean" ? col.sortable : undefined,
+          filterable:
+            typeof col.filterable === "boolean" ? col.filterable : undefined,
         }));
       }
     }
 
     if (type === WidgetType.GROUPED_LIST) {
       // For grouped lists, look for array fields and transfer grouping properties
-      const arrayField = fields.find(
-        (field) => responseData && Array.isArray(responseData[field.name]),
-      );
+      const arrayField = fields.find((field) => {
+        if (!isRecord(responseData)) {
+          return false;
+        }
+        if (!(field.name in responseData)) {
+          return false;
+        }
+        const value = responseData[field.name];
+        return Array.isArray(value);
+      });
 
-      if (arrayField) {
-        arrayField.groupBy = widget.groupBy;
-        arrayField.sortBy = widget.sortBy;
-        arrayField.showGroupSummary = widget.showGroupSummary;
-        arrayField.maxItemsPerGroup = widget.maxItemsPerGroup;
+      if (arrayField && ui) {
+        if ("groupBy" in ui && typeof ui.groupBy === "string") {
+          arrayField.groupBy = ui.groupBy;
+        }
+        if ("sortBy" in ui && typeof ui.sortBy === "string") {
+          arrayField.sortBy = ui.sortBy;
+        }
+        if (
+          "showGroupSummary" in ui &&
+          typeof ui.showGroupSummary === "boolean"
+        ) {
+          arrayField.showGroupSummary = ui.showGroupSummary;
+        }
+        if (
+          "maxItemsPerGroup" in ui &&
+          typeof ui.maxItemsPerGroup === "number"
+        ) {
+          arrayField.maxItemsPerGroup = ui.maxItemsPerGroup;
+        }
       }
     }
 
@@ -366,52 +579,122 @@ export class ResponseMetadataExtractor {
       description,
       layout,
       fields,
-      children,
     };
   }
 
   /**
    * Extract field metadata from definition
    */
-  private extractFieldFromDefinition(
+  private extractFieldFromDefinition<TField>(
     fieldName: string,
-    definition: any,
-    responseData?: any,
+    definition: TField,
+    responseData?: ExtractOutput<z.ZodTypeAny>,
   ): ResponseFieldMetadata | null {
     if (!definition) {
       return null;
     }
 
     // Check if this field is used in response
-    const usage = definition.usage;
-    if (usage && !usage.response) {
-      return null; // This field is not part of the response
+    if ("usage" in definition) {
+      const usage = definition.usage;
+      let hasResponse = false;
+      if (typeof usage === "object" && usage !== null) {
+        if ("response" in usage) {
+          hasResponse = usage.response === true;
+        } else {
+          // Check each method's usage for response field
+          const usageValues = Object.values(usage);
+          hasResponse = usageValues.some((methodUsage) =>
+            hasResponseTrue(methodUsage),
+          );
+        }
+      }
+
+      if (!hasResponse) {
+        return null; // This field is not part of the response
+      }
     }
 
-    const widget = definition.widget || {};
-    const schema = definition.schema;
+    // Extract UI configuration with proper typing
+    const hasUi = "ui" in definition && typeof definition.ui === "object";
+    const ui = hasUi ? definition.ui : null;
 
-    // Determine field type
-    const fieldType = this.determineFieldType(widget, schema);
-    const widgetType = widget.type || WidgetType.TEXT;
+    const schema =
+      "schema" in definition && definition.schema instanceof z.ZodType
+        ? definition.schema
+        : undefined;
+
+    // Determine field type - pass ui (can be null)
+    const fieldType = this.determineFieldType(ui, schema);
+
+    // Extract widget type from ui
+    const widgetType =
+      ui && "type" in ui && typeof ui.type === "string"
+        ? this.mapUiTypeToWidgetType(ui.type)
+        : WidgetType.TEXT;
 
     // Get value from response data
-    const value = responseData ? responseData[fieldName] : undefined;
+    let value: ExtractOutput<z.ZodTypeAny> = undefined;
+    if (isRecord(responseData) && fieldName in responseData) {
+      value = responseData[fieldName];
+    }
+
+    // Extract label from ui
+    const label =
+      ui && "title" in ui && typeof ui.title === "string"
+        ? ui.title
+        : ui && "label" in ui && typeof ui.label === "string"
+          ? ui.label
+          : undefined;
+
+    // Extract description from ui
+    const description =
+      ui && "description" in ui && typeof ui.description === "string"
+        ? ui.description
+        : undefined;
+
+    // Extract format from ui
+    const format =
+      ui && "format" in ui && typeof ui.format === "string"
+        ? ui.format
+        : undefined;
+
+    // Extract unit from ui
+    const unit =
+      ui && "unit" in ui && typeof ui.unit === "string" ? ui.unit : undefined;
+
+    // Extract precision from ui
+    const precision =
+      ui && "precision" in ui && typeof ui.precision === "number"
+        ? ui.precision
+        : undefined;
+
+    // Extract choices from ui
+    const choices =
+      ui && "options" in ui && Array.isArray(ui.options)
+        ? ui.options
+        : ui && "choices" in ui && Array.isArray(ui.choices)
+          ? ui.choices
+          : undefined;
+
+    // Extract columns from ui - not mapping here as this is legacy path
+    // Proper column mapping is done in extractFromCreateEndpointStructure
+    const columns = undefined;
 
     return {
       name: fieldName,
       type: fieldType,
       widgetType,
-      value,
-      label: widget.title || widget.label,
-      description: widget.description,
+      value: toRenderableValue(value),
+      label,
+      description,
       required: this.isFieldRequired(schema),
       schema,
-      format: widget.format,
-      unit: widget.unit,
-      precision: widget.precision,
-      choices: widget.options || widget.choices,
-      columns: widget.columns,
+      format,
+      unit,
+      precision,
+      choices,
+      columns,
     };
   }
 
@@ -420,7 +703,7 @@ export class ResponseMetadataExtractor {
    */
   private extractFromSchema(
     schema: z.ZodTypeAny,
-    responseData?: any,
+    responseData?: ExtractOutput<z.ZodTypeAny>,
   ): ResponseContainerMetadata | null {
     const fields = this.extractFieldsFromSchema(schema, responseData);
 
@@ -435,19 +718,19 @@ export class ResponseMetadataExtractor {
    */
   private extractFieldsFromSchema(
     schema: z.ZodTypeAny,
-    responseData?: any,
+    responseData?: ExtractOutput<z.ZodTypeAny>,
     prefix = "",
   ): ResponseFieldMetadata[] {
     const fields: ResponseFieldMetadata[] = [];
 
     if (schema instanceof z.ZodObject) {
-      const shape = schema.shape;
+      const shape = schema.shape as Record<string, z.ZodTypeAny>;
 
       for (const [key, fieldSchema] of Object.entries(shape)) {
         const fieldName = prefix ? `${prefix}.${key}` : key;
         const field = this.extractFieldFromSchema(
           fieldName,
-          fieldSchema as z.ZodTypeAny,
+          fieldSchema,
           responseData,
         );
         if (field) {
@@ -465,16 +748,20 @@ export class ResponseMetadataExtractor {
   private extractFieldFromSchema(
     fieldName: string,
     schema: z.ZodTypeAny,
-    responseData?: any,
+    responseData?: ExtractOutput<z.ZodTypeAny>,
   ): ResponseFieldMetadata | null {
     const fieldType = this.mapZodTypeToFieldType(schema);
-    const value = responseData ? responseData[fieldName] : undefined;
+
+    let value: ExtractOutput<z.ZodTypeAny> = undefined;
+    if (isRecord(responseData) && fieldName in responseData) {
+      value = responseData[fieldName];
+    }
 
     return {
       name: fieldName,
       type: fieldType,
       widgetType: WidgetType.TEXT,
-      value,
+      value: toRenderableValue(value),
       required: this.isFieldRequired(schema),
       schema,
     };
@@ -484,16 +771,20 @@ export class ResponseMetadataExtractor {
    * Determine field type from widget and schema
    */
   private determineFieldType(
-    widget: any,
+    widget: WidgetConfig | null,
     schema?: z.ZodTypeAny,
   ): FieldDataType {
     // Check widget fieldType first
-    if (widget.fieldType) {
+    if (
+      widget &&
+      "fieldType" in widget &&
+      typeof widget.fieldType === "string"
+    ) {
       return this.mapFieldDataType(widget.fieldType);
     }
 
     // Check widget type
-    if (widget.type) {
+    if (widget && "type" in widget && typeof widget.type === "string") {
       return this.mapWidgetTypeToFieldType(widget.type);
     }
 
@@ -509,7 +800,10 @@ export class ResponseMetadataExtractor {
    * Map field data type string to enum
    */
   private mapFieldDataType(type: string): FieldDataType {
-    return FieldDataType[type.toUpperCase()] || FieldDataType.TEXT;
+    const upperType = type.toUpperCase() as keyof typeof FieldDataType;
+    return upperType in FieldDataType
+      ? FieldDataType[upperType]
+      : FieldDataType.TEXT;
   }
 
   /**
@@ -530,31 +824,70 @@ export class ResponseMetadataExtractor {
    * Map Zod type to field data type
    */
   private mapZodTypeToFieldType(schema: z.ZodTypeAny): FieldDataType {
-    // Unwrap optional and default schemas
-    let baseSchema = schema;
+    // Check if optional/default and unwrap
     if (schema instanceof z.ZodOptional) {
-      baseSchema = schema._def.innerType;
-    }
-    if (schema instanceof z.ZodDefault) {
-      baseSchema = schema._def.innerType;
-    }
-
-    if (baseSchema instanceof z.ZodString) {
+      const innerType = schema._def.innerType;
+      if (innerType instanceof z.ZodString) {
+        return FieldDataType.TEXT;
+      }
+      if (innerType instanceof z.ZodNumber) {
+        return FieldDataType.NUMBER;
+      }
+      if (innerType instanceof z.ZodBoolean) {
+        return FieldDataType.BOOLEAN;
+      }
+      if (innerType instanceof z.ZodDate) {
+        return FieldDataType.DATE;
+      }
+      if (innerType instanceof z.ZodEnum) {
+        return FieldDataType.SELECT;
+      }
+      if (innerType instanceof z.ZodArray) {
+        return FieldDataType.TAGS;
+      }
       return FieldDataType.TEXT;
     }
-    if (baseSchema instanceof z.ZodNumber) {
+
+    if (schema instanceof z.ZodDefault) {
+      const innerType = schema._def.innerType;
+      if (innerType instanceof z.ZodString) {
+        return FieldDataType.TEXT;
+      }
+      if (innerType instanceof z.ZodNumber) {
+        return FieldDataType.NUMBER;
+      }
+      if (innerType instanceof z.ZodBoolean) {
+        return FieldDataType.BOOLEAN;
+      }
+      if (innerType instanceof z.ZodDate) {
+        return FieldDataType.DATE;
+      }
+      if (innerType instanceof z.ZodEnum) {
+        return FieldDataType.SELECT;
+      }
+      if (innerType instanceof z.ZodArray) {
+        return FieldDataType.TAGS;
+      }
+      return FieldDataType.TEXT;
+    }
+
+    // Direct type checks
+    if (schema instanceof z.ZodString) {
+      return FieldDataType.TEXT;
+    }
+    if (schema instanceof z.ZodNumber) {
       return FieldDataType.NUMBER;
     }
-    if (baseSchema instanceof z.ZodBoolean) {
+    if (schema instanceof z.ZodBoolean) {
       return FieldDataType.BOOLEAN;
     }
-    if (baseSchema instanceof z.ZodDate) {
+    if (schema instanceof z.ZodDate) {
       return FieldDataType.DATE;
     }
-    if (baseSchema instanceof z.ZodEnum || baseSchema instanceof z.ZodEnum) {
+    if (schema instanceof z.ZodEnum) {
       return FieldDataType.SELECT;
     }
-    if (baseSchema instanceof z.ZodArray) {
+    if (schema instanceof z.ZodArray) {
       return FieldDataType.TAGS;
     }
 

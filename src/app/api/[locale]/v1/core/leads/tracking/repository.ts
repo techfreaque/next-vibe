@@ -7,18 +7,18 @@ import "server-only";
 
 import { and, eq, gt, isNull, sql } from "drizzle-orm";
 import type { NextRequest } from "next/server";
-
-// Removed unused import - using direct database operations instead
-import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { Countries, Languages } from "@/i18n/core/config";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+
+// Removed unused import - using direct database operations instead
+import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { Countries, Languages } from "@/i18n/core/config";
 
 import { emails } from "../../emails/messages/db";
 import type { JwtPayloadType } from "../../user/auth/definition";
@@ -32,10 +32,14 @@ import {
 } from "../enum";
 import { leadsRepository } from "../repository";
 import type {
-  ClickTrackingRequestType,
-  LeadEngagementRequestType,
-  LeadEngagementResponseType,
+  ClickTrackingRequestOutput,
+  ClickTrackingResponseOutput,
+  LeadEngagementRequestOutput,
+  LeadEngagementResponseOutput,
 } from "./engagement/definition";
+
+// Type alias for EngagementTypes enum values
+type EngagementType = (typeof EngagementTypes)[keyof typeof EngagementTypes];
 
 /**
  * Client information extracted from request
@@ -58,17 +62,10 @@ export interface TrackingPixelResult {
 }
 
 /**
- * Click tracking result
+ * Click tracking result - use definition type
+ * Type is exported from ./engagement/definition.ts
  */
-export interface ClickTrackingResult {
-  success: boolean;
-  redirectUrl: string;
-  leadId: string;
-  campaignId?: string;
-  engagementRecorded: boolean;
-  leadStatusUpdated: boolean;
-  isLoggedIn: boolean;
-}
+export type ClickTrackingResult = ClickTrackingResponseOutput;
 
 /**
  * Lead Tracking Repository Interface
@@ -84,7 +81,7 @@ export interface ILeadTrackingRepository {
   ): Promise<ResponseType<TrackingPixelResult>>;
 
   handleClickTracking(
-    data: ClickTrackingRequestType,
+    data: ClickTrackingRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -197,29 +194,18 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
 
   /**
    * Record engagement event
+   * Returns LeadEngagementResponseOutput from definition
    */
   static async recordEngagement(
     data: {
       leadId: string;
-      engagementType: EngagementTypes;
+      engagementType: EngagementType;
       campaignId?: string;
       metadata?: Record<string, string | number | boolean>;
     },
     clientInfo: ClientInfo | undefined,
     logger: EndpointLogger,
-  ): Promise<
-    ResponseType<{
-      id: string;
-      leadId: string;
-      engagementType: EngagementTypes;
-      campaignId?: string;
-      metadata?: Record<string, string | number | boolean>;
-      timestamp: string | number | Date;
-      ipAddress?: string;
-      userAgent?: string;
-      createdAt: string | number | Date;
-    }>
-  > {
+  ): Promise<ResponseType<LeadEngagementResponseOutput>> {
     try {
       logger.debug("leads.tracking.engagement.record.start", {
         leadId: data.leadId,
@@ -228,64 +214,76 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         clientInfo,
       });
 
-      const result = await leadsRepository.recordEngagement({
-        leadId: data.leadId,
-        engagementType: data.engagementType,
-        campaignId: data.campaignId,
-        metadata: {
-          ...data.metadata,
-          ...clientInfo,
-        },
-      });
-
-      if (result.success) {
-        logger.debug("leads.tracking.engagement.record.success", {
+      const result = await leadsRepository.recordEngagementInternal(
+        {
           leadId: data.leadId,
           engagementType: data.engagementType,
-          engagementId: result.data.id,
-        });
+          campaignId: data.campaignId,
+          metadata: {
+            ...data.metadata,
+            ...clientInfo,
+          },
+        },
+        logger,
+      );
 
-        // Also update the email engagement in the emails table if campaign is present
-        if (data.campaignId) {
-          await LeadTrackingRepository.updateEmailEngagementRecord(
-            data.campaignId,
-            data.engagementType,
+      if (!result.success || !result.data) {
+        return result.success
+          ? createErrorResponse(
+              "error.default",
+              ErrorResponseTypes.INTERNAL_ERROR,
+            )
+          : result;
+      }
+
+      // Type guard: result is now success response with data
+      const engagementData = result.data;
+
+      logger.debug("leads.tracking.engagement.record.success", {
+        leadId: data.leadId,
+        engagementType: data.engagementType,
+        engagementId: engagementData.id,
+      });
+
+      // Also update the email engagement in the emails table if campaign is present
+      if (data.campaignId) {
+        await LeadTrackingRepository.updateEmailEngagementRecord(
+          data.campaignId,
+          data.engagementType,
+          logger,
+        );
+      }
+
+      // Transition lead status based on engagement type
+      const actionMap: Record<
+        EngagementType,
+        "website_visit" | "email_open" | "email_click" | "form_submit"
+      > = {
+        [EngagementTypes.WEBSITE_VISIT]: "website_visit",
+        [EngagementTypes.EMAIL_OPEN]: "email_open",
+        [EngagementTypes.EMAIL_CLICK]: "email_click",
+        [EngagementTypes.FORM_SUBMIT]: "form_submit",
+      };
+
+      const action = actionMap[data.engagementType];
+      if (action) {
+        try {
+          await LeadTrackingRepository.transitionLeadStatus(
+            data.leadId,
+            action,
             logger,
+            {
+              engagementId: engagementData.id,
+              ...(data.campaignId && { campaignId: data.campaignId }),
+            },
           );
-        }
-
-        // Transition lead status based on engagement type
-        const actionMap: Record<EngagementTypes, string> = {
-          [EngagementTypes.WEBSITE_VISIT]: EngagementTypes.WEBSITE_VISIT,
-          [EngagementTypes.EMAIL_OPEN]: EngagementTypes.EMAIL_OPEN,
-          [EngagementTypes.EMAIL_CLICK]: EngagementTypes.EMAIL_CLICK,
-          [EngagementTypes.FORM_SUBMIT]: EngagementTypes.FORM_SUBMIT,
-        };
-
-        const action = actionMap[data.engagementType];
-        if (action) {
-          try {
-            await LeadTrackingRepository.transitionLeadStatus(
-              data.leadId,
-              action as
-                | "website_visit"
-                | "email_open"
-                | "email_click"
-                | "form_submit",
-              {
-                engagementId: result.data.id,
-                ...(data.campaignId && { campaignId: data.campaignId }),
-              },
-              logger,
-            );
-          } catch (error) {
-            // Don't fail the engagement recording if status transition fails
-            logger.warn("leads.tracking.engagement.status.transition.failed", {
-              error,
-              leadId: data.leadId,
-              engagementType: data.engagementType,
-            });
-          }
+        } catch (error) {
+          // Don't fail the engagement recording if status transition fails
+          logger.warn("leads.tracking.engagement.status.transition.failed", {
+            error,
+            leadId: data.leadId,
+            engagementType: data.engagementType,
+          });
         }
       }
 
@@ -308,7 +306,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    */
   private static async updateEmailEngagementRecord(
     campaignId: string,
-    engagementType: EngagementTypes,
+    engagementType: EngagementType,
     logger: EndpointLogger,
   ): Promise<void> {
     try {
@@ -378,6 +376,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
     leadId: string,
     campaignId: string | undefined,
     clientInfo: ClientInfo,
+    logger: EndpointLogger,
   ): Promise<ResponseType<TrackingPixelResult>> {
     try {
       let engagementRecorded = false;
@@ -395,13 +394,13 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
             },
           },
           clientInfo,
+          logger,
         );
 
         engagementRecorded = engagementResult.success;
       }
 
-      // TODO: Add EndpointLogger parameter to method and use logger.debug instead
-      console.debug("Tracking pixel processed", {
+      logger.debug("leads.tracking.pixel.processed", {
         leadId,
         campaignId,
         engagementRecorded,
@@ -414,8 +413,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         engagementRecorded,
       });
     } catch (error) {
-      // TODO: Add EndpointLogger parameter to method and use logger.error instead
-      console.error("Failed to handle tracking pixel", {
+      logger.error("leads.tracking.pixel.failed", {
         error,
         leadId,
         campaignId,
@@ -431,8 +429,9 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    * Handle click tracking with lead status update for logged-in users
    */
   static async handleClickTracking(
-    params: ClickTrackingRequestType,
+    params: ClickTrackingRequestOutput,
     clientInfo: ClientInfo,
+    logger: EndpointLogger,
     isLoggedIn = false,
     userEmail?: string,
   ): Promise<ResponseType<ClickTrackingResult>> {
@@ -477,6 +476,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
                 },
               },
               clientInfo,
+              logger,
             );
           }
 
@@ -489,17 +489,18 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
               metadata: engagementMetadata,
             },
             clientInfo,
+            logger,
           );
 
           engagementRecorded = clickResult.success;
 
-          console.debug("Email engagement recorded for click tracking", {
+          logger.debug("leads.tracking.click.engagement.recorded", {
             leadId,
             campaignId,
             engagementRecorded,
           });
         } catch (error) {
-          console.error("Failed to record email engagement for click", {
+          logger.error("leads.tracking.click.engagement.failed", {
             error,
             leadId,
             campaignId,
@@ -510,22 +511,29 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       // Update lead status if user is logged in
       if (isLoggedIn) {
         try {
-          const leadResult = await leadsRepository.getLeadById(leadId);
+          const leadResult = await leadsRepository.getLeadByIdInternal(
+            leadId,
+            logger,
+          );
           if (leadResult.success) {
             // For logged-in users clicking tracking links, mark as SIGNED_UP
             // since they are already registered users
-            await leadsRepository.updateLead(leadId, {
-              status: LeadStatus.SIGNED_UP,
-            });
+            await leadsRepository.updateLeadInternal(
+              leadId,
+              {
+                status: LeadStatus.SIGNED_UP,
+              },
+              logger,
+            );
 
             leadStatusUpdated = true;
-            console.debug("Lead status updated to SIGNED_UP for logged-in user", {
+            logger.debug("leads.tracking.click.status.updated", {
               leadId,
               isLoggedIn,
             });
           }
         } catch (error) {
-          console.error("Failed to update lead status", {
+          logger.error("leads.tracking.click.status.failed", {
             error,
             leadId,
             isLoggedIn,
@@ -536,14 +544,14 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       const result: ClickTrackingResult = {
         success: true,
         redirectUrl: url,
-        leadId,
-        campaignId,
+        responseLeadId: leadId,
+        responseCampaignId: campaignId,
         engagementRecorded,
         leadStatusUpdated,
         isLoggedIn,
       };
 
-      console.debug("Click tracking completed", {
+      logger.debug("leads.tracking.click.completed", {
         leadId,
         redirectUrl: url,
         engagementRecorded,
@@ -553,9 +561,8 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
 
       return createSuccessResponse(result);
     } catch (error) {
-      console.error("Failed to handle click tracking", {
-        error,
-        leadId: params.id,
+      logger.error("leads.tracking.click.failed", {
+        error: error instanceof Error ? error.message : String(error),
       });
       return createErrorResponse(
         "error.default",
@@ -569,19 +576,24 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    */
   static async trackConsultationBooking(
     leadId: string,
+    logger: EndpointLogger,
   ): Promise<ResponseType<{ leadStatusUpdated: boolean }>> {
     try {
-      console.debug("Tracking consultation booking", {
+      logger.debug("leads.tracking.consultation.booking", {
         leadId,
       });
 
       // Update lead status to CONSULTATION_BOOKED and set timestamp
-      await leadsRepository.updateLead(leadId, {
-        status: LeadStatus.CONSULTATION_BOOKED,
-        consultationBookedAt: new Date(),
-      });
+      await leadsRepository.updateLeadInternal(
+        leadId,
+        {
+          status: LeadStatus.CONSULTATION_BOOKED,
+          consultationBookedAt: new Date(),
+        },
+        logger,
+      );
 
-      console.debug("Lead status updated to CONSULTATION_BOOKED", {
+      logger.debug("leads.tracking.consultation.updated", {
         leadId,
       });
 
@@ -589,7 +601,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         leadStatusUpdated: true,
       });
     } catch (error) {
-      console.error("Failed to track consultation booking", {
+      logger.error("leads.tracking.consultation.failed", {
         error,
         leadId,
       });
@@ -605,19 +617,24 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    */
   static async trackSubscriptionConfirmation(
     leadId: string,
+    logger: EndpointLogger,
   ): Promise<ResponseType<{ leadStatusUpdated: boolean }>> {
     try {
-      console.debug("Tracking subscription confirmation", {
+      logger.debug("leads.tracking.subscription.confirmation", {
         leadId,
       });
 
       // Update lead status to SUBSCRIPTION_CONFIRMED and set timestamp
-      await leadsRepository.updateLead(leadId, {
-        status: LeadStatus.SUBSCRIPTION_CONFIRMED,
-        subscriptionConfirmedAt: new Date(),
-      });
+      await leadsRepository.updateLeadInternal(
+        leadId,
+        {
+          status: LeadStatus.SUBSCRIPTION_CONFIRMED,
+          subscriptionConfirmedAt: new Date(),
+        },
+        logger,
+      );
 
-      console.debug("Lead status updated to SUBSCRIPTION_CONFIRMED", {
+      logger.debug("leads.tracking.subscription.updated", {
         leadId,
       });
 
@@ -625,7 +642,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         leadStatusUpdated: true,
       });
     } catch (error) {
-      console.error("Failed to track subscription confirmation", {
+      logger.error("leads.tracking.subscription.failed", {
         error,
         leadId,
       });
@@ -642,9 +659,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   static async createAnonymousLead(
     clientInfo: ClientInfo,
     locale: CountryLanguage,
+    logger: EndpointLogger,
   ): Promise<ResponseType<{ leadId: string }>> {
     try {
-      console.debug("Creating anonymous lead for website visitor", {
+      logger.debug("leads.tracking.anonymous.creating", {
         userAgent: clientInfo.userAgent,
         ipAddress: clientInfo.ipAddress,
         locale,
@@ -669,34 +687,24 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         .limit(1);
 
       if (existingLead.length > 0) {
-        console.debug("Found existing anonymous lead, reusing", {
+        logger.debug("leads.tracking.anonymous.existing", {
           leadId: existingLead[0].id,
           createdAt: existingLead[0].createdAt,
         });
         return createSuccessResponse({ leadId: existingLead[0].id });
       }
 
-      // Extract country and language from locale or use defaults
+      // Extract country and language from locale
       const [language, country] = locale.split("-");
 
-      // Create anonymous lead directly in database to ensure WEBSITE_USER status
-      // Don't use the general createLead method as it might override the status
       const newLead = {
-        email: null, // Anonymous leads have no email
-        businessName: "", // Will be set with proper translation when needed
+        email: null,
+        businessName: "",
         contactName: "",
         phone: "",
         website: "",
-        country: Object.values(Countries).includes(
-          country?.toUpperCase() as Countries,
-        )
-          ? (country.toUpperCase() as Countries)
-          : Countries.GLOBAL,
-        language: Object.values(Languages).includes(
-          language?.toLowerCase() as Languages,
-        )
-          ? (language.toLowerCase() as Languages)
-          : Languages.EN,
+        country: country || Countries.GLOBAL,
+        language: language || Languages.EN,
         source: LeadSource.WEBSITE,
         status: LeadStatus.WEBSITE_USER, // Website leads are always WEBSITE_USER
         notes: "", // Will be set with proper translation key when needed
@@ -714,8 +722,8 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       const [createdLead] = await db.insert(leads).values(newLead).returning();
 
       if (!createdLead) {
-        console.error("Failed to create anonymous lead", {
-          error: "No lead returned from database",
+        logger.error("leads.tracking.anonymous.create.failed", {
+          errorKey: "leads.tracking.anonymous.create.noLeadReturned",
           clientInfo,
           locale,
         });
@@ -725,7 +733,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         );
       }
 
-      console.debug("Anonymous lead created successfully", {
+      logger.debug("leads.tracking.anonymous.created", {
         leadId: createdLead.id,
         email: createdLead.email,
         source: createdLead.source,
@@ -735,7 +743,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         leadId: createdLead.id,
       });
     } catch (error) {
-      console.error("Error creating anonymous lead", {
+      logger.error("leads.tracking.anonymous.error", {
         error,
         clientInfo,
         locale,
@@ -784,24 +792,28 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       | "signup"
       | "contact"
       | "newsletter",
+    logger: EndpointLogger,
     metadata?: Record<string, string | number | boolean>,
   ): Promise<
     ResponseType<{
       statusChanged: boolean;
-      newStatus: LeadStatus;
-      previousStatus: LeadStatus;
+      newStatus: (typeof LeadStatus)[keyof typeof LeadStatus];
+      previousStatus: (typeof LeadStatus)[keyof typeof LeadStatus];
     }>
   > {
     try {
-      console.debug("Processing lead status transition", {
+      logger.debug("leads.tracking.status.transition.processing", {
         leadId,
         action,
         metadata,
       });
 
       // Get current lead
-      const leadResult = await leadsRepository.getLeadById(leadId);
-      if (!leadResult.success) {
+      const leadResult = await leadsRepository.getLeadByIdInternal(
+        leadId,
+        logger,
+      );
+      if (!leadResult.success || !leadResult.data) {
         return createErrorResponse(
           "error.default",
           ErrorResponseTypes.NOT_FOUND,
@@ -814,7 +826,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       let statusChanged = false;
 
       // Define target status for each action
-      const actionTargetStatus: Record<string, LeadStatus> = {
+      const actionTargetStatus: Record<
+        string,
+        (typeof LeadStatus)[keyof typeof LeadStatus]
+      > = {
         website_visit: LeadStatus.WEBSITE_USER, // Website visitors become WEBSITE_USER
         email_open: LeadStatus.WEBSITE_USER, // Email engagement keeps them as WEBSITE_USER
         email_click: LeadStatus.WEBSITE_USER, // Email engagement keeps them as WEBSITE_USER
@@ -825,37 +840,77 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       };
 
       // Get target status for this action
-      const targetStatus = actionTargetStatus[action];
-      if (targetStatus) {
+      const targetStatus:
+        | (typeof LeadStatus)[keyof typeof LeadStatus]
+        | undefined = actionTargetStatus[action];
+      if (targetStatus !== undefined) {
         // Check if transition is allowed using centralized validation
         if (isStatusTransitionAllowed(currentStatus, targetStatus)) {
           newStatus = targetStatus;
           statusChanged = currentStatus !== newStatus;
 
           if (statusChanged) {
-            console.debug("Transitioning lead status", {
+            logger.debug("leads.tracking.status.transitioning", {
               leadId,
               action,
               from: currentStatus,
               to: newStatus,
             });
 
+            // Helper to safely extract number from metadata
+            const getMetadataNumber = (
+              meta: Record<string, string | number | boolean> | undefined,
+              key: string,
+            ): number => {
+              if (!meta) {
+                return 0;
+              }
+              const value = meta[key];
+              return typeof value === "number" ? value : 0;
+            };
+
+            // Build properly typed metadata - filter existing metadata to only include valid types
+            const filteredMetadata: Record<string, string | number | boolean> =
+              {};
+            if (lead.metadata) {
+              Object.entries(lead.metadata).forEach(([key, value]) => {
+                if (
+                  typeof value === "string" ||
+                  typeof value === "number" ||
+                  typeof value === "boolean"
+                ) {
+                  filteredMetadata[key] = value;
+                }
+              });
+            }
+
+            const updatedMetadata: Record<string, string | number | boolean> = {
+              ...filteredMetadata,
+              lastAction: action,
+              lastActionAt: new Date().toISOString(),
+              statusTransitionCount:
+                getMetadataNumber(filteredMetadata, "statusTransitionCount") +
+                1,
+              lastTransition: [currentStatus, "to", newStatus].join("_"),
+            };
+
+            // Merge additional metadata if provided
+            if (metadata) {
+              Object.assign(updatedMetadata, metadata);
+            }
+
             // Update lead status
-            const updateResult = await leadsRepository.updateLead(leadId, {
-              status: newStatus,
-              metadata: {
-                ...lead.metadata,
-                lastAction: action,
-                lastActionAt: new Date().toISOString(),
-                statusTransitionCount:
-                  ((lead.metadata?.statusTransitionCount as number) || 0) + 1,
-                lastTransition: [currentStatus, "to", newStatus].join("_"),
-                ...metadata,
-              } as Record<string, string | number | boolean>,
-            });
+            const updateResult = await leadsRepository.updateLeadInternal(
+              leadId,
+              {
+                status: newStatus,
+                metadata: updatedMetadata,
+              },
+              logger,
+            );
 
             if (!updateResult.success) {
-              console.error("Failed to update lead status", {
+              logger.error("leads.tracking.status.update.failed", {
                 leadId,
                 action,
                 from: currentStatus,
@@ -868,21 +923,21 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
               );
             }
 
-            console.debug("Lead status transitioned successfully", {
+            logger.debug("leads.tracking.status.transitioned", {
               leadId,
               action,
               from: currentStatus,
               to: newStatus,
             });
           } else {
-            console.debug("Lead status unchanged", {
+            logger.debug("leads.tracking.status.unchanged", {
               leadId,
               action,
               currentStatus,
             });
           }
         } else {
-          console.debug("Lead status transition not allowed", {
+          logger.debug("leads.tracking.status.transition.notAllowed", {
             leadId,
             action,
             currentStatus,
@@ -890,7 +945,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           });
         }
       } else {
-        console.debug("Unknown action for lead status transition", {
+        logger.debug("leads.tracking.status.unknownAction", {
           leadId,
           action,
           currentStatus,
@@ -903,7 +958,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         previousStatus: currentStatus,
       });
     } catch (error) {
-      console.error("Error transitioning lead status", {
+      logger.error("leads.tracking.status.error", {
         error,
         leadId,
         action,
@@ -920,13 +975,14 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    * Combines engagement recording with lead-user relationship handling
    */
   static async handleEngagementWithRelationship(
-    data: LeadEngagementRequestType,
+    data: LeadEngagementRequestOutput,
     clientInfo: ClientInfo,
     locale: CountryLanguage,
     user: { id?: string; isPublic: boolean; email?: string },
-  ): Promise<ResponseType<LeadEngagementResponseType>> {
+    logger: EndpointLogger,
+  ): Promise<ResponseType<LeadEngagementResponseOutput>> {
     try {
-      console.debug("Handling engagement with relationship", {
+      logger.debug("leads.tracking.engagement.relationship.handling", {
         leadId: data.leadId,
         engagementType: data.engagementType,
         userId: data.userId || user.id,
@@ -939,9 +995,12 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
 
       // Validate existing lead ID if provided
       if (leadId) {
-        const leadResult = await leadsRepository.getLeadById(leadId);
+        const leadResult = await leadsRepository.getLeadByIdInternal(
+          leadId,
+          logger,
+        );
         if (!leadResult.success) {
-          console.debug("Provided lead ID is invalid, creating new lead", {
+          logger.debug("leads.tracking.engagement.invalidLeadId", {
             invalidLeadId: leadId,
           });
           leadId = undefined; // Clear invalid lead ID
@@ -951,12 +1010,16 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       // Create anonymous lead if leadId is missing or invalid
       if (!leadId) {
         const anonymousLeadResult =
-          await LeadTrackingRepository.createAnonymousLead(clientInfo, locale);
+          await LeadTrackingRepository.createAnonymousLead(
+            clientInfo,
+            locale,
+            logger,
+          );
 
-        if (anonymousLeadResult.success) {
+        if (anonymousLeadResult.success && anonymousLeadResult.data) {
           leadId = anonymousLeadResult.data.leadId;
           leadCreated = true;
-          console.debug("Created new anonymous lead", {
+          logger.debug("leads.tracking.engagement.anonymousCreated", {
             newLeadId: leadId,
           });
         } else {
@@ -979,20 +1042,24 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       const currentUserId = data.userId || user.id;
       if (currentUserId && !user.isPublic) {
         try {
-          const convertResult = await leadsRepository.convertLead(leadId, {
-            userId: currentUserId,
-            email: user.email || "", // Use user's email for conversion
-          });
+          const convertResult = await leadsRepository.convertLeadInternal(
+            leadId,
+            {
+              userId: currentUserId,
+              email: user.email || "", // Use user's email for conversion
+            },
+            logger,
+          );
           if (convertResult.success) {
             relationshipEstablished = true;
-            console.debug("Lead-user relationship established", {
+            logger.debug("leads.tracking.engagement.relationshipEstablished", {
               leadId,
               userId: currentUserId,
             });
           }
         } catch (error) {
           // Don't fail the engagement if relationship establishment fails
-          console.debug("Lead-user relationship establishment failed", {
+          logger.debug("leads.tracking.engagement.relationshipFailed", {
             error,
             leadId,
             userId: currentUserId,
@@ -1049,7 +1116,14 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         // Flatten customData if present
         if (data.metadata.customData) {
           Object.entries(data.metadata.customData).forEach(([key, value]) => {
-            flatMetadata[customDataPrefix + key] = value;
+            // Type guard to narrow unknown to allowed types
+            if (
+              typeof value === "string" ||
+              typeof value === "number" ||
+              typeof value === "boolean"
+            ) {
+              flatMetadata[customDataPrefix + key] = value;
+            }
           });
         }
       }
@@ -1063,9 +1137,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           metadata: flatMetadata,
         },
         clientInfo,
+        logger,
       );
 
-      if (result.success) {
+      if (result.success && result.data) {
         return createSuccessResponse({
           ...result.data,
           leadCreated,
@@ -1075,7 +1150,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
 
       return result;
     } catch (error) {
-      console.error("Error handling engagement with relationship", {
+      logger.error("leads.tracking.engagement.relationship.error", {
         error,
         data,
       });
@@ -1084,6 +1159,50 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
+  }
+
+  /**
+   * Instance method: Handle tracking pixel request
+   * Delegates to static method
+   */
+  async handleTrackingPixel(
+    leadId: string,
+    campaignId: string | undefined,
+    clientInfo: ClientInfo,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<TrackingPixelResult>> {
+    return await LeadTrackingRepository.handleTrackingPixel(
+      leadId,
+      campaignId,
+      clientInfo,
+      logger,
+    );
+  }
+
+  /**
+   * Instance method: Handle click tracking
+   * Delegates to static method
+   */
+  async handleClickTracking(
+    data: ClickTrackingRequestOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ClickTrackingResult>> {
+    return await LeadTrackingRepository.handleClickTracking(
+      data,
+      {
+        userAgent: "",
+        referer: "",
+        ipAddress: "",
+        timestamp: new Date().toISOString(),
+      },
+      logger,
+      !user.isPublic,
+      undefined,
+    );
   }
 
   /**
@@ -1134,7 +1253,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       originalUrl.includes(`/api/${locale}/v1/leads/tracking/`) ||
       (originalUrl.includes("/api/") && originalUrl.includes("/tracking/"))
     ) {
-      console.debug("Preventing nested tracking URL", { originalUrl });
+      // Nested tracking URL detected, return as-is
       return originalUrl;
     }
 

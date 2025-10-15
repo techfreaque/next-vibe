@@ -132,10 +132,12 @@ export function createEslintConfig(
       },
       settings: {
         "import/parsers": {
+          // eslint-disable-next-line i18next/no-literal-string
           "@typescript-eslint/parser": [".ts", ".tsx"],
         },
         "import/resolver": {
           node: {
+            // eslint-disable-next-line i18next/no-literal-string
             extensions: [".ts", ".tsx", ".js", ".jsx"],
           },
           typescript: {
@@ -372,8 +374,10 @@ export function createEslintConfig(
           ...(restrictUnknown
             ? [
                 {
+                  // eslint-disable-next-line i18next/no-literal-string
                   selector: "TSUnknownKeyword",
                   message:
+                    // eslint-disable-next-line i18next/no-literal-string
                     "Usage of the 'unknown' type isn't allowed. Consider using generics with interface or type alias for explicit structure.",
                 },
               ]
@@ -381,8 +385,10 @@ export function createEslintConfig(
           ...(restrictObject
             ? [
                 {
+                  // eslint-disable-next-line i18next/no-literal-string
                   selector: "TSObjectKeyword",
                   message:
+                    // eslint-disable-next-line i18next/no-literal-string
                     "Usage of the 'object' type isn't allowed. Consider using generics with interface or type alias for explicit structure.",
                 },
               ]
@@ -390,8 +396,10 @@ export function createEslintConfig(
           ...(restrictThrow
             ? [
                 {
+                  // eslint-disable-next-line i18next/no-literal-string
                   selector: "ThrowStatement",
                   message:
+                    // eslint-disable-next-line i18next/no-literal-string
                     "Usage of 'throw' statements is not allowed. Use proper ResponseType<T> patterns instead.",
                 },
               ]

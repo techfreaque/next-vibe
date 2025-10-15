@@ -37,7 +37,7 @@ const { GET } = createEndpoint({
   description: "app.api.v1.core.user.public.login.options.description",
   category: "app.api.v1.core.user.category",
   tags: ["app.api.v1.core.user.public.login.options.tag"],
-  allowedRoles: [UserRole.PUBLIC],
+  allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
     {
       type: WidgetType.CONTAINER,

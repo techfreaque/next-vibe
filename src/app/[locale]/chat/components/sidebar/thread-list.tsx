@@ -1,11 +1,10 @@
 "use client";
 
-import { MoreVertical, Trash2, Edit2, FolderInput } from "lucide-react";
+import { Edit2, FolderInput, MoreVertical, Trash2 } from "lucide-react";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
-import type { ChatThread, ChatFolder, ChatState } from "../../lib/storage/types";
-import { chatColors, chatTransitions } from "../../lib/design-tokens";
 import {
   Button,
   DropdownMenu,
@@ -21,7 +20,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/packages/next-vibe-ui/web/ui";
-import { cn } from "next-vibe/shared/utils";
+
+import { chatColors, chatTransitions } from "../../lib/design-tokens";
+import type {
+  ChatFolder,
+  ChatState,
+  ChatThread,
+} from "../../lib/storage/types";
 import { formatRelativeTime } from "../../lib/utils/formatting";
 
 interface ThreadListProps {
@@ -89,6 +94,7 @@ function ThreadItem({
   const [editTitle, setEditTitle] = useState(thread.title);
   const [isHovered, setIsHovered] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isTouched, setIsTouched] = useState(false);
 
   // Get model icon (fallback to default model if not set)
   // Model config removed - icons no longer shown in thread list for clean design
@@ -155,6 +161,11 @@ function ThreadItem({
           setIsHovered(false);
         }
       }}
+      onTouchStart={() => setIsTouched(true)}
+      onTouchEnd={() => {
+        // Keep touched state briefly for action visibility
+        setTimeout(() => setIsTouched(false), 3000);
+      }}
     >
       {/* Removed AI provider icon for clean design */}
       <div className="flex-1 min-w-0">
@@ -174,7 +185,12 @@ function ThreadItem({
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex-1 min-w-0">
-                  <div className={cn("text-sm font-medium truncate", compact && "text-xs")}>
+                  <div
+                    className={cn(
+                      "text-sm font-medium truncate",
+                      compact && "text-xs",
+                    )}
+                  >
                     {thread.title}
                   </div>
                   {!compact && thread.metadata?.preview && (
@@ -192,7 +208,9 @@ function ThreadItem({
               <TooltipContent side="right" className="max-w-xs">
                 <p className="text-sm">{thread.title}</p>
                 {thread.metadata?.preview && (
-                  <p className="text-xs text-muted-foreground mt-1">{thread.metadata.preview}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {thread.metadata.preview}
+                  </p>
                 )}
               </TooltipContent>
             </Tooltip>
@@ -200,15 +218,19 @@ function ThreadItem({
         )}
       </div>
 
-      {!isEditing && isHovered && (
-        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+      {!isEditing && (isHovered || isTouched || isActive) && (
+        <div
+          className="flex items-center gap-1"
+          onClick={(e) => e.stopPropagation()}
+        >
           <DropdownMenu
             open={dropdownOpen}
             onOpenChange={(open) => {
               setDropdownOpen(open);
-              // Reset hover state when dropdown closes
+              // Reset hover/touch state when dropdown closes
               if (!open) {
                 setIsHovered(false);
+                setIsTouched(false);
               }
             }}
           >
@@ -246,7 +268,9 @@ function ThreadItem({
                     <DropdownMenuSubContent>
                       {/* Option to move to root (no folder) */}
                       {currentFolderId !== null && (
-                        <DropdownMenuItem onSelect={() => handleMoveToFolder(null)}>
+                        <DropdownMenuItem
+                          onSelect={() => handleMoveToFolder(null)}
+                        >
                           <span className="text-sm">📁 Unfiled</span>
                         </DropdownMenuItem>
                       )}
@@ -266,7 +290,9 @@ function ThreadItem({
                         ))
                       ) : (
                         <DropdownMenuItem disabled>
-                          <span className="text-sm text-muted-foreground">No folders available</span>
+                          <span className="text-sm text-muted-foreground">
+                            No folders available
+                          </span>
                         </DropdownMenuItem>
                       )}
                     </DropdownMenuSubContent>
@@ -275,7 +301,10 @@ function ThreadItem({
               )}
 
               <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={handleDelete} className="text-destructive">
+              <DropdownMenuItem
+                onSelect={handleDelete}
+                className="text-destructive"
+              >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete
               </DropdownMenuItem>
@@ -290,4 +319,3 @@ function ThreadItem({
     </div>
   );
 }
-

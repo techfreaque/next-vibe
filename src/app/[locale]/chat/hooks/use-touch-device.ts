@@ -1,0 +1,62 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+/**
+ * Detects if the device supports touch input
+ * This works on any screen size - tablets, 2-in-1 laptops, phones, etc.
+ *
+ * @returns true if the device supports touch input
+ */
+export function useTouchDevice(): boolean {
+  const [isTouch, setIsTouch] = useState(false);
+
+  useEffect(() => {
+    // Check if touch is supported
+    const checkTouch = () => {
+      // Multiple checks for better compatibility
+      const hasTouch =
+        "ontouchstart" in window ||
+        navigator.maxTouchPoints > 0 ||
+        // @ts-ignore - for older browsers
+        navigator.msMaxTouchPoints > 0;
+
+      setIsTouch(hasTouch);
+    };
+
+    checkTouch();
+
+    // Re-check on resize (for 2-in-1 devices that can switch modes)
+    window.addEventListener("resize", checkTouch);
+    return () => window.removeEventListener("resize", checkTouch);
+  }, []);
+
+  return isTouch;
+}
+
+/**
+ * CSS class helper for touch-aware opacity transitions
+ * Use this to make elements visible on touch devices but hover-only on pointer devices
+ *
+ * @param alwaysVisibleOnTouch - If true, element is always visible on touch devices
+ * @returns CSS classes for touch-aware visibility
+ */
+export function getTouchAwareClasses(alwaysVisibleOnTouch = true): string {
+  if (typeof window === "undefined") {
+    return ""; // SSR
+  }
+
+  const isTouch =
+    "ontouchstart" in window ||
+    navigator.maxTouchPoints > 0 ||
+    // @ts-ignore
+    navigator.msMaxTouchPoints > 0;
+
+  if (isTouch && alwaysVisibleOnTouch) {
+    // On touch devices: always visible but slightly transparent for better UX
+    return "opacity-70 active:opacity-100";
+  } else {
+    // On pointer devices: hidden until hover
+    return "opacity-0 group-hover:opacity-100 focus-within:opacity-100";
+  }
+}

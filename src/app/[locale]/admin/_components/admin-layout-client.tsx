@@ -25,7 +25,7 @@ import { useState } from "react";
 
 import CountrySelector from "@/app/[locale]/_components/country-selector";
 import { ThemeToggle } from "@/app/[locale]/_components/nav/theme-toggle";
-import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/schema";
+import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/definition";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -186,13 +186,12 @@ export function AdminLayoutClient({
             <div className="flex items-center">
               <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
                 <span className="text-sm font-medium text-white">
-                  {user.firstName.charAt(0)}
-                  {user.lastName.charAt(0)}
+                  {user.privateName.charAt(0)}
                 </span>
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                  {user.firstName} {user.lastName}
+                  {user.privateName}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   {t("admin.dashboard.navigation.administrator")}

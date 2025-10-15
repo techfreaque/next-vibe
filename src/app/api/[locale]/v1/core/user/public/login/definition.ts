@@ -181,29 +181,21 @@ const { POST } = createEndpoint({
             },
             z.string().describe("User email address"),
           ),
-          firstName: responseField(
+          privateName: responseField(
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.public.login.response.user.firstName",
+                "app.api.v1.core.user.public.login.response.user.privateName",
             },
-            z.string().describe("User first name"),
+            z.string().describe("User private name"),
           ),
-          lastName: responseField(
+          publicName: responseField(
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.public.login.response.user.lastName",
+                "app.api.v1.core.user.public.login.response.user.publicName",
             },
-            z.string().describe("User last name"),
-          ),
-          imageUrl: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.user.public.login.response.user.imageUrl",
-            },
-            z.string().nullable().describe("User profile image URL"),
+            z.string().describe("User public name"),
           ),
         },
       ),
@@ -361,9 +353,8 @@ const { POST } = createEndpoint({
         user: {
           id: "123e4567-e89b-12d3-a456-426614174000",
           email: "customer@example.com",
-          firstName: "John",
-          lastName: "Doe",
-          imageUrl: "https://example.com/avatar.jpg",
+          privateName: "John Doe",
+          publicName: "John D.",
         },
         sessionInfo: {
           expiresAt: "7 days from now",
@@ -383,9 +374,8 @@ const { POST } = createEndpoint({
         user: {
           id: "",
           email: "",
-          firstName: "",
-          lastName: "",
-          imageUrl: null,
+          privateName: "",
+          publicName: "",
         },
         sessionInfo: {
           expiresAt: "",
@@ -405,9 +395,8 @@ const { POST } = createEndpoint({
         user: {
           id: "123e4567-e89b-12d3-a456-426614174000",
           email: "customer@example.com",
-          firstName: "John",
-          lastName: "Doe",
-          imageUrl: "https://example.com/avatar.jpg",
+          privateName: "John Doe",
+          publicName: "John D.",
         },
         sessionInfo: {
           expiresAt: "7 days from now",
@@ -427,9 +416,8 @@ const { POST } = createEndpoint({
         user: {
           id: "",
           email: "",
-          firstName: "",
-          lastName: "",
-          imageUrl: null,
+          privateName: "",
+          publicName: "",
         },
         sessionInfo: {
           expiresAt: "",
@@ -451,10 +439,6 @@ export type LoginPostRequestInput = typeof POST.types.RequestInput;
 export type LoginPostRequestOutput = typeof POST.types.RequestOutput;
 export type LoginPostResponseInput = typeof POST.types.ResponseInput;
 export type LoginPostResponseOutput = typeof POST.types.ResponseOutput;
-
-// Legacy types for backward compatibility
-export type LoginResponseInputType = LoginPostResponseInput;
-export type LoginResponseOutputType = LoginPostResponseOutput;
 
 const loginDefinitions = {
   POST,

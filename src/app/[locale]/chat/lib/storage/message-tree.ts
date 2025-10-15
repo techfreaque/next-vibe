@@ -22,6 +22,26 @@ import type {
 } from "./types";
 
 /**
+ * Message tree constants
+ */
+const MESSAGE_TREE_CONSTANTS = {
+  /** Start index for random string extraction in message IDs */
+  RANDOM_ID_START: 2,
+
+  /** End index for random string extraction in message IDs */
+  RANDOM_ID_END: 9,
+
+  /** Maximum length for message preview text */
+  PREVIEW_LENGTH: 50,
+
+  /** Maximum length for thread title */
+  TITLE_LENGTH: 50,
+
+  /** Default title for new threads */
+  DEFAULT_TITLE: "New Chat",
+} as const;
+
+/**
  * Generate a unique ID for messages
  *
  * Format: msg-{timestamp}-{random}
@@ -34,7 +54,7 @@ import type {
  * const id = generateMessageId(); // "msg-1234567890-abc123d"
  */
 export function generateMessageId(): string {
-  return `msg-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  return `msg-${Date.now()}-${Math.random().toString(36).substring(MESSAGE_TREE_CONSTANTS.RANDOM_ID_START, MESSAGE_TREE_CONSTANTS.RANDOM_ID_END)}`;
 }
 
 /**
@@ -375,7 +395,9 @@ export function getBranchInfo(
     const child = thread.messages[childId];
     return {
       id: childId,
-      preview: child ? child.content.substring(0, 50) : "",
+      preview: child
+        ? child.content.substring(0, MESSAGE_TREE_CONSTANTS.PREVIEW_LENGTH)
+        : "",
     };
   });
 
@@ -488,11 +510,13 @@ export function generateThreadTitle(thread: ChatThread): string {
   const firstUserMessage = messages.find((msg) => msg.role === "user");
 
   if (!firstUserMessage) {
-    return "New Chat";
+    return MESSAGE_TREE_CONSTANTS.DEFAULT_TITLE;
   }
 
-  // Take first 50 characters of the message
-  const title = firstUserMessage.content.substring(0, 50);
+  // Take first N characters of the message
+  const title = firstUserMessage.content.substring(
+    0,
+    MESSAGE_TREE_CONSTANTS.TITLE_LENGTH,
+  );
   return title.length < firstUserMessage.content.length ? `${title}...` : title;
 }
-

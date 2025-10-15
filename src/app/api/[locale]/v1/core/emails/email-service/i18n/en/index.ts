@@ -176,6 +176,10 @@ export const translations = {
         title: "Conflict",
         description: "A conflict occurred while processing the request",
       },
+      noData: {
+        title: "No Data",
+        description: "SMTP service returned success but no data was provided",
+      },
       server: {
         title: "Server Error",
         description:

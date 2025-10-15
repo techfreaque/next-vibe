@@ -1,5 +1,4 @@
 import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
-
 /**
  * NOTE: Using text() with enum constraint instead of pgEnum() because translation keys
  * exceed PostgreSQL's 63-byte enum label limit. Type safety is maintained through
@@ -23,7 +22,9 @@ export const contacts = pgTable("contact", {
   company: text("company"),
   subject: text("subject").notNull(),
   message: text("message").notNull(),
-  status: text("status", { enum: ContactStatusDB }).notNull().default(ContactStatus.NEW),
+  status: text("status", { enum: ContactStatusDB })
+    .notNull()
+    .default(ContactStatus.NEW),
   userId: uuid("user_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

@@ -6,7 +6,8 @@
 import "server-only";
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import type { Countries } from "@/i18n/core/config";
 
 import { imapMessagesRepository } from "../repository";
 import definitions from "./definition";
@@ -18,19 +19,12 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: async ({ urlVariables, user, locale, logger }) => {
-      // Convert locale to country part for IMAP repository
-      const [, countryPart] = locale.split("-");
-      const country =
-        (countryPart?.toUpperCase() as import("@/i18n/core/config").Countries) ||
-        "GLOBAL";
-
-      return await imapMessagesRepository.listMessages(
+    handler: ({ urlVariables, user, locale, logger }) =>
+      imapMessagesRepository.listMessages(
         urlVariables,
         user,
-        country,
+        (locale.split("-")[1]?.toUpperCase() as Countries) || "GLOBAL",
         logger,
-      );
-    },
+      ),
   },
 });

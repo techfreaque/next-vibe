@@ -1,9 +1,6 @@
 import { translations as chatTranslations } from "../../chat/i18n/de";
-import { translations as classificationTranslations } from "../../classification/i18n/de";
-import { translations as confirmationTranslations } from "../../confirmation/i18n/de";
-import { translations as executionTranslations } from "../../execution/i18n/de";
-import { translations as processTranslations } from "../../process/i18n/de";
-import { translations as statusTranslations } from "../../status/i18n/de";
+import { translations as speechToTextTranslations } from "../../speech-to-text/i18n/de";
+import { translations as textToSpeechTranslations } from "../../text-to-speech/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -18,6 +15,9 @@ export const translations: typeof enTranslations = {
     automation: "Automatisierung",
     execution: "Ausführung",
     confirmation: "Bestätigung",
+    speech: "Sprache",
+    transcription: "Transkription",
+    tts: "Text-zu-Sprache",
   },
   enums: {
     emailAgentStatus: {
@@ -125,9 +125,6 @@ export const translations: typeof enTranslations = {
     },
   },
   chat: chatTranslations,
-  classification: classificationTranslations,
-  confirmation: confirmationTranslations,
-  execution: executionTranslations,
-  process: processTranslations,
-  status: statusTranslations,
+  speechToText: speechToTextTranslations,
+  textToSpeech: textToSpeechTranslations,
 };

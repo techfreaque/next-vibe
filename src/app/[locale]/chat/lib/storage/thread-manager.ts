@@ -1,13 +1,13 @@
+import { defaultModel } from "../config/models";
+import { generateThreadTitle } from "./message-tree";
 import type {
+  ChatFolder,
   ChatState,
   ChatThread,
-  NewThreadInput,
-  ChatFolder,
   NewFolderInput,
+  NewThreadInput,
 } from "./types";
 import { DEFAULT_FOLDERS } from "./types";
-import { generateThreadTitle } from "./message-tree";
-import { defaultModel } from "../config/models";
 
 /**
  * Generate a unique ID with a given prefix
@@ -52,7 +52,7 @@ export function createThread(input?: Partial<NewThreadInput>): ChatThread {
     settings: {
       ...input?.settings,
       // Ensure default model is always set for provider icon and API mapping
-      defaultModel: (input?.settings?.defaultModel) ?? defaultModel,
+      defaultModel: input?.settings?.defaultModel ?? defaultModel,
     },
     metadata: input?.metadata,
   };
@@ -86,6 +86,7 @@ export function createInitialChatState(): ChatState {
     name: "Private Chats",
     parentId: null,
     icon: "folder",
+    expanded: true,
   });
 
   const initialThread = createThread({
@@ -186,7 +187,8 @@ export function deleteThreadFromState(
   let newActiveThreadId = state.activeThreadId;
   if (state.activeThreadId === threadId) {
     const remainingThreadIds = Object.keys(updatedThreads);
-    newActiveThreadId = remainingThreadIds.length > 0 ? remainingThreadIds[0] : null;
+    newActiveThreadId =
+      remainingThreadIds.length > 0 ? remainingThreadIds[0] : null;
   }
 
   return {
@@ -279,7 +281,7 @@ export function addFolderToState(
 export function deleteFolderFromState(
   state: ChatState,
   folderId: string,
-  deleteThreads: boolean = false,
+  deleteThreads = false,
 ): ChatState {
   const folder = state.folders[folderId];
   if (!folder) {
@@ -359,4 +361,3 @@ export function autoUpdateThreadTitle(
     title: newTitle,
   });
 }
-

@@ -1,10 +1,3 @@
-import type z from "zod";
-
-import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
-
 import {
   createErrorResponse,
   ErrorResponseTypes,
@@ -12,6 +5,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { validateData } from "next-vibe/shared/utils";
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import type z from "zod";
+
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+
 import { authClientRepository } from "../../../../user/auth/repository-client";
 import type { EndpointLogger } from "../../cli/vibe/endpoints/endpoint-handler/logger";
 
@@ -20,29 +17,18 @@ import type { EndpointLogger } from "../../cli/vibe/endpoints/endpoint-handler/l
  * Handles request validation, authentication, and response parsing
  */
 export async function callApi<
-  TRequestInput,
-  TRequestOutput,
   TResponseInput,
   TResponseOutput,
-  TUrlVariablesInput,
-  TUrlVariablesOutput,
-  TExampleKey extends string,
-  TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TEndpoint extends {
+    readonly TResponseOutput: TResponseOutput;
+    readonly requestSchema: z.ZodTypeAny;
+    readonly responseSchema: z.ZodTypeAny;
+    readonly method: Methods;
+    readonly path: readonly string[];
+    readonly requiresAuthentication: () => boolean;
+  },
 >(
-  endpoint: CreateApiEndpoint<
-    TExampleKey,
-    TMethod,
-    TUserRoleValue,
-    TFields,
-    TRequestInput,
-    TRequestOutput,
-    TResponseInput,
-    TResponseOutput,
-    TUrlVariablesInput,
-    TUrlVariablesOutput
-  >,
+  endpoint: TEndpoint,
   endpointUrl: string,
   postBody: string | undefined,
   logger: EndpointLogger,

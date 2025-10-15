@@ -87,13 +87,20 @@ export function CronStatsChart({
   // Transform data for chart consumption
   const chartData = Object.entries(data).reduce(
     (acc, [key, series]) => {
-      if (series.length > 0) {
-        series[0].data.forEach((point, index) => {
-          if (!acc[index]) {
-            acc[index] = { date: point.date };
-          }
-          acc[index][key] = point.value;
-        });
+      if (
+        Array.isArray(series) &&
+        series.length > 0 &&
+        series[0] &&
+        Array.isArray(series[0].data)
+      ) {
+        series[0].data.forEach(
+          (point: { date: string; value: number }, index: number) => {
+            if (!acc[index]) {
+              acc[index] = { date: point.date };
+            }
+            acc[index][key] = point.value;
+          },
+        );
       }
       return acc;
     },
@@ -250,7 +257,6 @@ export function CronStatsChart({
  * Distribution chart component for categorical data
  */
 export function CronStatsDistributionChart({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Required for interface consistency
   locale,
   data,
   title,
@@ -316,7 +322,7 @@ export function CronStatsDistributionChart({
           cx={CHART_CONSTANTS.PIE_CENTER_X}
           cy={CHART_CONSTANTS.PIE_CENTER_Y}
           labelLine={false}
-          label={({ name, percent }) =>
+          label={({ name, percent }: { name: string; percent?: number }) =>
             `${name} ${((percent || 0) * 100).toFixed(0)}%`
           }
           outerRadius={80}

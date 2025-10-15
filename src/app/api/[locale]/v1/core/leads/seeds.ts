@@ -6,10 +6,10 @@
 import { sql } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import { registerSeed } from "@/packages/next-vibe/server/db/seed-manager";
 import { Countries, Languages } from "@/i18n/core/config";
-import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import { registerSeed } from "@/packages/next-vibe/server/db/seed-manager";
 
+import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import {
   emailCampaigns,
   leadEngagements,
@@ -240,8 +240,8 @@ function generatePhoneNumber(country: string): string {
  * Generate realistic engagement metrics based on lead status
  */
 function generateEngagementMetrics(
-  status: LeadStatus,
-  campaignStage: EmailCampaignStage,
+  status: (typeof LeadStatus)[keyof typeof LeadStatus],
+  campaignStage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage],
 ): { emailsSent: number; emailsOpened: number; emailsClicked: number } {
   let emailsSent = 0;
   let emailsOpened = 0;
@@ -294,7 +294,9 @@ function generateEngagementMetrics(
 /**
  * Get realistic open rates based on lead status
  */
-function getOpenRateByStatus(status: LeadStatus): number {
+function getOpenRateByStatus(
+  status: (typeof LeadStatus)[keyof typeof LeadStatus],
+): number {
   switch (status) {
     case LeadStatus.NEW:
       return 0.15;
@@ -326,7 +328,9 @@ function getOpenRateByStatus(status: LeadStatus): number {
 /**
  * Get realistic click rates based on lead status
  */
-function getClickRateByStatus(status: LeadStatus): number {
+function getClickRateByStatus(
+  status: (typeof LeadStatus)[keyof typeof LeadStatus],
+): number {
   switch (status) {
     case LeadStatus.NEW:
       return 0.05;
@@ -490,7 +494,10 @@ function generateRandomLead(index: number): NewLead {
 /**
  * Generate sample lead engagements
  */
-async function generateLeadEngagements(leadIds: string[], logger: EndpointLogger): Promise<void> {
+async function generateLeadEngagements(
+  leadIds: string[],
+  logger: EndpointLogger,
+): Promise<void> {
   const engagements: NewLeadEngagement[] = [];
 
   for (const leadId of leadIds) {
@@ -539,7 +546,10 @@ async function generateLeadEngagements(leadIds: string[], logger: EndpointLogger
 /**
  * Generate sample email campaigns
  */
-async function generateEmailCampaigns(leadIds: string[], logger: EndpointLogger): Promise<void> {
+async function generateEmailCampaigns(
+  leadIds: string[],
+  logger: EndpointLogger,
+): Promise<void> {
   const campaigns: NewEmailCampaign[] = [];
 
   for (const leadId of leadIds) {
@@ -639,6 +649,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
  * Production seed data (minimal or none)
  */
 export async function prod(logger: EndpointLogger): Promise<void> {
+  await Promise.resolve();
   logger.debug("🌱 Skipping production leads seeding");
 }
 
@@ -646,7 +657,6 @@ export async function prod(logger: EndpointLogger): Promise<void> {
  * Test seed data
  */
 export async function test(logger: EndpointLogger): Promise<void> {
-  
   logger.debug("🌱 Seeding test leads data");
 
   const testLeads: NewLead[] = [

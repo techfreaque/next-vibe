@@ -20,7 +20,7 @@ import definitions from "./definition";
 export function useSubscription(params: {
   enabled?: boolean;
   logger: EndpointLogger;
-}): ReturnType<typeof useApiQuery> {
+}): ReturnType<typeof useApiQuery<typeof definitions.GET>> {
   return useApiQuery({
     endpoint: definitions.GET,
     logger: params.logger,
@@ -37,7 +37,7 @@ export function useSubscriptionByUserId(params: {
   userId: string;
   enabled?: boolean;
   logger: EndpointLogger;
-}): ReturnType<typeof useApiQuery> {
+}): ReturnType<typeof useApiQuery<typeof definitions.GET>> {
   return useApiQuery({
     endpoint: definitions.GET,
     requestData: { userId: params.userId },

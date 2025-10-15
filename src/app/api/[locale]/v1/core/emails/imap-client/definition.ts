@@ -14,8 +14,8 @@ import {
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 
-// IMAP Message Response Schema for shared use across endpoints - using objectField pattern for UI generation
-export const imapMessageResponseField = objectField(
+// IMAP Message Response Schema using objectField pattern
+export const imapMessageResponseSchema = objectField(
   {
     type: WidgetType.CONTAINER,
     title: "app.api.v1.core.emails.imapClient.messages.sync.title",
@@ -143,29 +143,122 @@ export const imapMessageResponseField = objectField(
       },
       z.uuid().optional(),
     ),
+    bodyText: responseField(
+      {
+        type: WidgetType.TEXT,
+        content: "app.api.v1.core.emails.imapClient.messages.tag",
+      },
+      z.string().optional(),
+    ),
+    bodyHtml: responseField(
+      {
+        type: WidgetType.TEXT,
+        content: "app.api.v1.core.emails.imapClient.messages.tag",
+      },
+      z.string().optional(),
+    ),
+    headers: responseField(
+      {
+        type: WidgetType.TEXT,
+        content: "app.api.v1.core.emails.imapClient.messages.tag",
+      },
+      z.record(z.string(), z.string()).optional(),
+    ),
+    isDeleted: responseField(
+      {
+        type: WidgetType.BADGE,
+        text: "app.api.v1.core.emails.imapClient.messages.tag",
+      },
+      z.boolean().optional(),
+    ),
+    isDraft: responseField(
+      {
+        type: WidgetType.BADGE,
+        text: "app.api.v1.core.emails.imapClient.messages.tag",
+      },
+      z.boolean().optional(),
+    ),
+    isAnswered: responseField(
+      {
+        type: WidgetType.BADGE,
+        text: "app.api.v1.core.emails.imapClient.messages.tag",
+      },
+      z.boolean().optional(),
+    ),
+    inReplyTo: responseField(
+      {
+        type: WidgetType.TEXT,
+        content: "app.api.v1.core.emails.imapClient.messages.tag",
+      },
+      z.string().nullable().optional(),
+    ),
+    references: responseField(
+      {
+        type: WidgetType.TEXT,
+        content: "app.api.v1.core.emails.imapClient.messages.tag",
+      },
+      z.string().nullable().optional(),
+    ),
+    threadId: responseField(
+      {
+        type: WidgetType.TEXT,
+        content: "app.api.v1.core.emails.imapClient.messages.tag",
+      },
+      z.string().optional(),
+    ),
+    messageSize: responseField(
+      {
+        type: WidgetType.TEXT,
+        content: "app.api.v1.core.emails.imapClient.messages.tag",
+      },
+      z.number().optional(),
+    ),
+    attachmentCount: responseField(
+      {
+        type: WidgetType.TEXT,
+        content: "app.api.v1.core.emails.imapClient.messages.tag",
+      },
+      z.number().optional(),
+    ),
+    lastSyncAt: responseField(
+      {
+        type: WidgetType.TEXT,
+        content: "app.api.v1.core.emails.imapClient.messages.tag",
+      },
+      z.string().optional(),
+    ),
+    syncStatus: responseField(
+      {
+        type: WidgetType.BADGE,
+        text: "app.api.v1.core.emails.imapClient.messages.tag",
+      },
+      z.string().optional(),
+    ),
+    syncError: responseField(
+      {
+        type: WidgetType.TEXT,
+        content: "app.api.v1.core.emails.imapClient.messages.tag",
+      },
+      z.string().nullable().optional(),
+    ),
+    createdAt: responseField(
+      {
+        type: WidgetType.TEXT,
+        content: "app.api.v1.core.emails.imapClient.messages.tag",
+      },
+      z.string().optional(),
+    ),
+    updatedAt: responseField(
+      {
+        type: WidgetType.TEXT,
+        content: "app.api.v1.core.emails.imapClient.messages.tag",
+      },
+      z.string().optional(),
+    ),
   },
 );
 
-// Legacy schema export for backward compatibility
-export const imapMessageResponseSchema = z.object({
-  id: z.uuid(),
-  subject: z.string(),
-  senderEmail: z.email(),
-  senderName: z.string().nullable(),
-  recipientEmail: z.email(),
-  recipientName: z.string().nullable(),
-  sentAt: z.string().nullable(),
-  receivedAt: z.string().nullable(),
-  isRead: z.boolean(),
-  isFlagged: z.boolean(),
-  hasAttachments: z.boolean(),
-  folderName: z.string(),
-  accountId: z.uuid(),
-  size: z.number().optional(),
-  imapMessageId: z.string().optional(),
-  imapUid: z.number().optional(),
-  imapFolderId: z.uuid().optional(),
-});
-
 // Export the message response types
-export type ImapMessageResponseType = z.output<typeof imapMessageResponseField>;
+export type ImapMessageResponseType = z.output<
+  typeof imapMessageResponseSchema
+>;

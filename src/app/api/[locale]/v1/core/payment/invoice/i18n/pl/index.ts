@@ -9,6 +9,8 @@ export const translations: typeof enTranslations = {
       description: "Skonfiguruj parametry",
     },
     response: {
+      success: "Faktura utworzona pomyślnie",
+      message: "Wiadomość o statusie",
       invoice: {
         title: "Szczegóły faktury",
         description: "Informacje o wygenerowanej fakturze",
@@ -69,5 +71,35 @@ export const translations: typeof enTranslations = {
       title: "Sukces",
       description: "Operacja zakończona pomyślnie",
     },
+  },
+  customerId: {
+    label: "ID klienta",
+    description: "Identyfikator klienta Stripe",
+    placeholder: "Wprowadź ID klienta",
+  },
+  amount: {
+    label: "Kwota",
+    description: "Kwota faktury",
+    placeholder: "Wprowadź kwotę",
+  },
+  currency: {
+    label: "Waluta",
+    description: "Kod waluty",
+    placeholder: "Wybierz walutę",
+  },
+  description: {
+    label: "Opis",
+    description: "Opis faktury",
+    placeholder: "Wprowadź opis",
+  },
+  dueDate: {
+    label: "Termin płatności",
+    description: "Termin zapłaty",
+    placeholder: "Wybierz termin płatności",
+  },
+  metadata: {
+    label: "Metadane",
+    description: "Dodatkowe metadane",
+    placeholder: "Wprowadź metadane jako JSON",
   },
 };

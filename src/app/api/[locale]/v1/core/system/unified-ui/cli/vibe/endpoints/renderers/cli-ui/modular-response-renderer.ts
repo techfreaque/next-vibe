@@ -8,16 +8,22 @@ import chalk from "chalk";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { FieldDataType } from "../../endpoint-types/core/enums";
+import { FieldDataType, WidgetType } from "../../endpoint-types/core/enums";
 import type {
   CLIRenderingOptions,
   DataFormatter,
+  RenderableValue,
   ResponseContainerMetadata,
   ResponseFieldMetadata,
   WidgetRenderContext,
 } from "./widgets/types";
 import type { WidgetRegistry } from "./widgets/widget-registry";
 import { defaultWidgetRegistry } from "./widgets/widget-registry";
+
+/**
+ * Data record type for response rendering
+ */
+type DataRecord = Record<string, RenderableValue>;
 
 /**
  * Modular CLI response renderer using widget system
@@ -47,7 +53,7 @@ export class ModularCLIResponseRenderer {
    * Render response data using endpoint definition metadata
    */
   render(
-    data: Record<string, any>,
+    data: DataRecord,
     metadata: ResponseContainerMetadata | ResponseFieldMetadata[],
     locale: CountryLanguage,
   ): string {
@@ -75,7 +81,7 @@ export class ModularCLIResponseRenderer {
    * Render a container with multiple fields
    */
   private renderContainer(
-    data: Record<string, any>,
+    data: DataRecord,
     container: ResponseContainerMetadata,
     context: WidgetRenderContext,
   ): string {
@@ -83,6 +89,7 @@ export class ModularCLIResponseRenderer {
 
     if (container.title) {
       const title = context.translate(container.title);
+      // eslint-disable-next-line i18next/no-literal-string
       const titleIcon = "📋 ";
       const titleWithIcon = titleIcon + title;
       const styledTitle = this.styleText(titleWithIcon, "bold", context);
@@ -106,21 +113,155 @@ export class ModularCLIResponseRenderer {
    * Render multiple fields
    */
   private renderFields(
-    data: Record<string, any>,
+    data: DataRecord,
     fields: ResponseFieldMetadata[],
     context: WidgetRenderContext,
   ): string {
     const result: string[] = [];
 
+    // If no metadata provided, auto-detect fields from data
+    if (fields.length === 0 && data && typeof data === "object") {
+      return this.renderAutoDetectedFields(data, context);
+    }
+
     for (const field of fields) {
       const fieldValue = data[field.name];
-      const fieldWithValue = { ...field, value: fieldValue };
+      const fieldWithValue: ResponseFieldMetadata = {
+        ...field,
+        value: fieldValue,
+      };
 
       const renderedField = this.widgetRegistry.render(fieldWithValue, context);
       result.push(renderedField);
     }
 
     return result.join("\n");
+  }
+
+  /**
+   * Auto-detect and render fields when no metadata is provided
+   */
+  private renderAutoDetectedFields(
+    data: DataRecord,
+    context: WidgetRenderContext,
+  ): string {
+    const result: string[] = [];
+
+    for (const [key, value] of Object.entries(data)) {
+      // Skip null/undefined values
+      if (value === null || value === undefined) {
+        continue;
+      }
+
+      // Special handling for arrays (like issues)
+      if (Array.isArray(value)) {
+        if (value.length === 0) {
+          continue; // Skip empty arrays
+        }
+
+        // Check if this looks like a list of issues/errors
+        if (this.looksLikeIssuesList(value)) {
+          const field: ResponseFieldMetadata = {
+            name: key,
+            label: this.formatLabel(key),
+            type: FieldDataType.ARRAY,
+            widgetType: WidgetType.GROUPED_LIST,
+            value: value as RenderableValue,
+            groupBy: "file",
+            sortBy: "severity",
+            showGroupSummary: true,
+          };
+          const rendered = this.widgetRegistry.render(field, context);
+          result.push(rendered);
+        } else {
+          // Generic array rendering
+          const label = this.formatLabel(key);
+          const formattedArray = this.formatter.formatArray(value);
+          result.push(`${label}: ${formattedArray}`);
+        }
+      }
+      // Handle objects
+      else if (typeof value === "object") {
+        const label = this.formatLabel(key);
+        const formattedObject = this.formatter.formatObject(
+          value as Record<string, RenderableValue>,
+        );
+        // eslint-disable-next-line i18next/no-literal-string
+        result.push(`${label}:\n${formattedObject}`);
+      }
+      // Handle primitives
+      else {
+        const formattedValue = this.formatPrimitiveValue(value);
+        const label = this.formatLabel(key);
+        result.push(`${label}: ${formattedValue}`);
+      }
+    }
+
+    return result.join("\n\n");
+  }
+
+  /**
+   * Check if an array looks like a list of issues/errors
+   */
+  private looksLikeIssuesList(arr: RenderableValue[]): boolean {
+    if (arr.length === 0) {
+      return false;
+    }
+
+    const firstItem = arr[0];
+    if (typeof firstItem !== "object" || firstItem === null) {
+      return false;
+    }
+
+    // Check for common issue/error fields
+    const issueFields = [
+      "file",
+      "line",
+      "column",
+      "message",
+      "severity",
+      "code",
+      "rule",
+    ];
+    const hasIssueFields = issueFields.some((field) => field in firstItem);
+
+    return hasIssueFields;
+  }
+
+  /**
+   * Format a field name into a readable label
+   */
+  private formatLabel(fieldName: string): string {
+    /* eslint-disable i18next/no-literal-string */
+    return fieldName
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (str) => str.toUpperCase())
+      .trim();
+    /* eslint-enable i18next/no-literal-string */
+  }
+
+  /**
+   * Format primitive values
+   */
+  private formatPrimitiveValue(value: RenderableValue): string {
+    if (typeof value === "boolean") {
+      return this.formatter.formatBoolean(value);
+    }
+    if (typeof value === "number") {
+      return this.formatter.formatNumber(value);
+    }
+    if (typeof value === "string") {
+      return value;
+    }
+    if (Array.isArray(value)) {
+      return this.formatter.formatArray(value);
+    }
+    if (typeof value === "object" && value !== null) {
+      return this.formatter.formatObject(
+        value as Record<string, RenderableValue>,
+      );
+    }
+    return "";
   }
 
   /**
@@ -131,6 +272,7 @@ export class ModularCLIResponseRenderer {
     value: string | number | boolean | null,
   ): string {
     if (value === null || value === undefined) {
+      // eslint-disable-next-line i18next/no-literal-string
       return this.styleText("(not set)", "dim", {
         options: this.options,
       } as WidgetRenderContext);
@@ -177,6 +319,7 @@ export class ModularCLIResponseRenderer {
       return "";
     }
 
+    /* eslint-disable i18next/no-literal-string */
     switch (type) {
       case FieldDataType.TEXT:
         return "📝 ";
@@ -193,12 +336,14 @@ export class ModularCLIResponseRenderer {
       default:
         return "• ";
     }
+    /* eslint-enable i18next/no-literal-string */
   }
 
   /**
    * Render empty state message
    */
   private renderEmptyState(message: string): string {
+    // eslint-disable-next-line i18next/no-literal-string
     const icon = this.options.useEmojis ? "🔍 " : "";
     const styledMessage = this.styleText(message, "dim", {
       options: this.options,
@@ -265,6 +410,7 @@ class DefaultDataFormatter implements DataFormatter {
   }
 
   formatBoolean(value: boolean): string {
+    // eslint-disable-next-line i18next/no-literal-string
     return value ? "✓" : "✗";
   }
 
@@ -273,27 +419,53 @@ class DefaultDataFormatter implements DataFormatter {
     return date.toLocaleDateString();
   }
 
+  /**
+   * Safely convert RenderableValue to string
+   */
+  private safeItemToString(item: RenderableValue): string {
+    if (typeof item === "string") {
+      return item;
+    }
+    if (typeof item === "number" || typeof item === "boolean") {
+      return String(item);
+    }
+    if (item === null) {
+      return "null";
+    }
+    if (Array.isArray(item)) {
+      return JSON.stringify(item);
+    }
+    if (typeof item === "object") {
+      return JSON.stringify(item);
+    }
+    return "";
+  }
+
   formatArray(
-    value: any[],
+    value: RenderableValue[],
     options?: { separator?: string; maxItems?: number },
   ): string {
     const separator = options?.separator ?? ", ";
     const maxItems = options?.maxItems ?? 10;
 
     const items = value.slice(0, maxItems);
-    const formatted = items.map((item) => String(item)).join(separator);
+    const formatted = items
+      .map((item) => this.safeItemToString(item))
+      .join(separator);
 
     if (value.length > maxItems) {
+      // eslint-disable-next-line i18next/no-literal-string
       return `${formatted}... (+${value.length - maxItems} more)`;
     }
 
     return formatted;
   }
 
-  formatObject(value: object): string {
+  formatObject(value: Record<string, RenderableValue>): string {
     try {
       return JSON.stringify(value, null, 2);
     } catch {
+      // eslint-disable-next-line i18next/no-literal-string
       return "[Object]";
     }
   }

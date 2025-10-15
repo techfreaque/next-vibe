@@ -11,9 +11,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 
-import { clientCount } from "../../(site)/_components/tmp-contants";
 import SignUpForm from "./_components/sign-up-form";
 
+const clientCount = 10000;
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
 }

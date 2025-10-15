@@ -83,10 +83,14 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer {
     }
 
     if (Array.isArray(value)) {
-      return `[${value.length} items]`;
+      const itemsText = context.translate(
+        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.items",
+      );
+      return `[${value.length} ${itemsText}]`;
     }
 
     if (typeof value === "object" && value !== null) {
+      // eslint-disable-next-line i18next/no-literal-string
       return `{${Object.keys(value).length} keys}`;
     }
 
@@ -95,6 +99,7 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer {
 
   private formatStatLabel(key: string): string {
     // Convert camelCase to readable format
+
     return key
       .replace(/([A-Z])/g, " $1")
       .replace(/^./, (str) => str.toUpperCase())
@@ -104,22 +109,28 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer {
   private getStatIcon(value: any, context: WidgetRenderContext): string {
     if (typeof value === "number") {
       if (value === 0) {
+        // eslint-disable-next-line i18next/no-literal-string
         return context.useColors ? "⚪ " : "○ ";
       }
       if (value > 0) {
+        // eslint-disable-next-line i18next/no-literal-string
         return context.useColors ? "🟢 " : "● ";
       }
+      // eslint-disable-next-line i18next/no-literal-string
       return context.useColors ? "🔴 " : "● ";
     }
 
     if (Array.isArray(value)) {
+      // eslint-disable-next-line i18next/no-literal-string
       return context.useColors ? "📋 " : "□ ";
     }
 
     if (typeof value === "object" && value !== null) {
+      // eslint-disable-next-line i18next/no-literal-string
       return context.useColors ? "📊 " : "■ ";
     }
 
+    // eslint-disable-next-line i18next/no-literal-string
     return context.useColors ? "ℹ️ " : "i ";
   }
 

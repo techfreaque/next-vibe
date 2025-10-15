@@ -148,9 +148,7 @@ export function BatchOperationsDialog({
                 </TableCell>
                 <TableCell>{lead.email}</TableCell>
                 <TableCell>
-                  <Badge variant="outline">
-                    {t(lead.currentStatus)}
-                  </Badge>
+                  <Badge variant="outline">{t(lead.currentStatus)}</Badge>
                 </TableCell>
                 <TableCell>
                   {lead.currentCampaignStage ? (

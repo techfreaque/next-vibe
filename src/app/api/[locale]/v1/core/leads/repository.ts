@@ -5,10 +5,6 @@
 
 import type { SQL } from "drizzle-orm";
 import { and, count, desc, eq, gte, ilike, lte, or, sql } from "drizzle-orm";
-
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
 import { withTransaction } from "next-vibe/server/db/repository-helpers";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -17,16 +13,16 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
+
+import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 // TODO: Replace with proper enum imports from core config
 // TODO: Replace with proper filter utilities
 // Temporarily comment out for CLI compatibility
 // import { convertCountryFilter, convertLanguageFilter } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
-import type { CountryLanguage, Countries, Languages } from "@/i18n/core/config";
-
-// Type aliases for filter values
-type CountryFilter = (typeof Countries)[keyof typeof Countries] | "ALL";
-type LanguageFilter = (typeof Languages)[keyof typeof Languages] | "ALL";
 
 import { newsletterSubscriptions } from "../newsletter/db";
 import { NewsletterSubscriptionStatus } from "../newsletter/enum";
@@ -40,16 +36,28 @@ import {
   type NewLead,
 } from "./db";
 import type {
-  EmailCampaignStageFilter,
-  LeadSource,
-  LeadSourceFilter,
-  LeadStatusFilter,
+  LeadCreateType,
+  LeadDetailResponse,
+  LeadListResponseType,
+  LeadQueryType,
+  LeadResponseType,
+  LeadUpdateType,
+  LeadWithEmailType,
+  UnsubscribeType,
+} from "./definition";
+import type {
+  BatchOperationScopeValues,
+  EmailCampaignStageValues,
+  EngagementTypesValues,
+  LeadSortFieldValues,
+  LeadSourceValues,
+  LeadStatusValues,
+  SortOrderValues,
 } from "./enum";
 import {
   BatchOperationScope,
   EmailCampaignStage,
   EngagementTypes,
-  EngagementTypesValues,
   ExportFormat,
   getWebsiteUserStatus,
   isStatusTransitionAllowed,
@@ -62,17 +70,23 @@ import {
   SortOrder,
 } from "./enum";
 import type { ExportQueryType, ExportResponseType } from "./export/definition";
-import type { LeadResponseType as LeadDetailResponseType } from "./lead/[id]/definition";
-import type {
-  LeadCreateType,
-  LeadListResponseType,
-  LeadQueryType,
-  LeadResponseType,
-  LeadUpdateType,
-  LeadWithEmailType,
-  UnsubscribeType,
-} from "./definition";
-import type { LeadEngagementResponseType } from "./tracking/engagement/definition";
+import type { LeadEngagementResponseOutput } from "./tracking/engagement/definition";
+
+// Type aliases for enum values
+type LeadSortFieldType = typeof LeadSortFieldValues;
+type SortOrderType = typeof SortOrderValues;
+type BatchOperationScopeType = typeof BatchOperationScopeValues;
+type LeadStatusType = typeof LeadStatusValues;
+type EmailCampaignStageType = typeof EmailCampaignStageValues;
+type LeadSourceType = typeof LeadSourceValues;
+type EngagementTypesType = typeof EngagementTypesValues;
+
+// Type aliases for filter values
+type CountryFilter = (typeof Countries)[keyof typeof Countries] | "ALL";
+type LanguageFilter = (typeof Languages)[keyof typeof Languages] | "ALL";
+type LeadStatusFilterType = typeof LeadStatusValues | "ALL";
+type EmailCampaignStageFilterType = typeof EmailCampaignStageValues | "ALL";
+type LeadSourceFilterType = typeof LeadSourceValues | "ALL";
 
 const INVALID_STATUS_TRANSITION_ERROR = "Invalid status transition";
 
@@ -85,14 +99,41 @@ export interface LeadsRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LeadResponseType>>;
+  ): Promise<
+    ResponseType<{
+      lead: {
+        summary: {
+          id: string;
+          businessName: string;
+          email: string | null;
+          status: LeadStatusType;
+        };
+        contactDetails: {
+          phone: string | null;
+          website: string | null;
+          country: string;
+          language: string;
+        };
+        trackingInfo: {
+          source: LeadSourceType | null;
+          emailsSent: number;
+          currentCampaignStage: string | null;
+        };
+        metadata: {
+          notes: string | null;
+          createdAt: string;
+          updatedAt: string;
+        };
+      };
+    }>
+  >;
 
   getLeadById(
     id: string,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LeadDetailResponseType>>;
+  ): Promise<ResponseType<LeadDetailResponse>>;
 
   getLeadByTrackingId(
     leadId: string,
@@ -114,7 +155,7 @@ export interface LeadsRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LeadDetailResponseType>>;
+  ): Promise<ResponseType<LeadDetailResponse>>;
 
   listLeads(
     query: Partial<LeadQueryType>,
@@ -145,12 +186,14 @@ export interface LeadsRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<{ success: boolean; message?: string; unsubscribedAt?: Date }>>;
+  ): Promise<
+    ResponseType<{ success: boolean; message?: string; unsubscribedAt?: Date }>
+  >;
 
   recordEngagement(
     data: {
       leadId: string;
-      engagementType: typeof EngagementTypesValues;
+      engagementType: EngagementTypesType;
       campaignId?: string;
       metadata?: Record<string, string | number | boolean>;
       ipAddress?: string;
@@ -159,7 +202,46 @@ export interface LeadsRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LeadEngagementResponseType>>;
+  ): Promise<ResponseType<LeadEngagementResponseOutput>>;
+
+  // Internal methods (no auth required) for use by other services
+  getLeadByIdInternal(
+    id: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<LeadDetailResponse>>;
+
+  updateLeadInternal(
+    id: string,
+    data: Partial<LeadUpdateType>,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<LeadDetailResponse>>;
+
+  convertLeadInternal(
+    leadId: string,
+    options: {
+      userId: DbId;
+      email: string;
+      additionalData?: {
+        businessName?: string;
+        contactName?: string;
+        phone?: string;
+        website?: string;
+      };
+    },
+    logger: EndpointLogger,
+  ): Promise<ResponseType<LeadResponseType>>;
+
+  recordEngagementInternal(
+    data: {
+      leadId: string;
+      engagementType: EngagementTypesType;
+      campaignId?: string;
+      metadata?: Record<string, string | number | boolean>;
+      ipAddress?: string;
+      userAgent?: string;
+    },
+    logger: EndpointLogger,
+  ): Promise<ResponseType<LeadEngagementResponseOutput>>;
 
   exportLeads(
     query: ExportQueryType,
@@ -172,20 +254,20 @@ export interface LeadsRepository {
   batchUpdateLeads(
     data: {
       search?: string;
-      status?: LeadStatusFilter;
-      currentCampaignStage?: EmailCampaignStageFilter;
+      status?: LeadStatusFilterType;
+      currentCampaignStage?: EmailCampaignStageFilterType;
       country?: CountryFilter;
       language?: LanguageFilter;
-      source?: LeadSourceFilter;
-      sortBy?: LeadSortField[];
-      sortOrder?: SortOrder[];
-      scope?: BatchOperationScope;
+      source?: LeadSourceFilterType;
+      sortBy?: LeadSortFieldType[];
+      sortOrder?: SortOrderType[];
+      scope?: BatchOperationScopeType;
       page?: number;
       pageSize?: number;
       updates: {
-        status?: LeadStatus;
-        currentCampaignStage?: EmailCampaignStage;
-        source?: LeadSource;
+        status?: LeadStatusType;
+        currentCampaignStage?: EmailCampaignStageType;
+        source?: LeadSourceType;
         notes?: string;
       };
       dryRun?: boolean;
@@ -205,8 +287,8 @@ export interface LeadsRepository {
         id: string;
         email: string | null;
         businessName: string;
-        currentStatus: LeadStatus;
-        currentCampaignStage: EmailCampaignStage | null;
+        currentStatus: LeadStatusType;
+        currentCampaignStage: EmailCampaignStageType | null;
       }>;
     }>
   >;
@@ -214,14 +296,14 @@ export interface LeadsRepository {
   batchDeleteLeads(
     data: {
       search?: string;
-      status?: LeadStatusFilter;
-      currentCampaignStage?: EmailCampaignStageFilter;
+      status?: LeadStatusFilterType;
+      currentCampaignStage?: EmailCampaignStageFilterType;
       country?: CountryFilter;
       language?: LanguageFilter;
-      source?: LeadSourceFilter;
-      sortBy?: LeadSortField[];
-      sortOrder?: SortOrder[];
-      scope?: BatchOperationScope;
+      source?: LeadSourceFilterType;
+      sortBy?: LeadSortFieldType[];
+      sortOrder?: SortOrderType[];
+      scope?: BatchOperationScopeType;
       page?: number;
       pageSize?: number;
       confirmDelete: boolean;
@@ -242,8 +324,8 @@ export interface LeadsRepository {
         id: string;
         email: string | null;
         businessName: string;
-        currentStatus: LeadStatus;
-        currentCampaignStage: EmailCampaignStage | null;
+        currentStatus: LeadStatusType;
+        currentCampaignStage: EmailCampaignStageType | null;
       }>;
     }>
   >;
@@ -254,11 +336,11 @@ export interface LeadsRepository {
  * Throws an error if the lead doesn't have an email
  */
 export function ensureLeadHasEmail(lead: LeadResponseType): LeadWithEmailType {
-  if (!lead.email) {
+  if (!leadHasEmail(lead)) {
     // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
     throw new Error(`Lead ${lead.id} does not have an email address`);
   }
-  return lead as LeadWithEmailType;
+  return lead;
 }
 
 /**
@@ -292,20 +374,47 @@ class LeadsRepositoryImpl implements LeadsRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LeadResponseType>> {
+  ): Promise<
+    ResponseType<{
+      lead: {
+        summary: {
+          id: string;
+          businessName: string;
+          email: string | null;
+          status: LeadStatusType;
+        };
+        contactDetails: {
+          phone: string | null;
+          website: string | null;
+          country: string;
+          language: string;
+        };
+        trackingInfo: {
+          source: LeadSourceType | null;
+          emailsSent: number;
+          currentCampaignStage: string | null;
+        };
+        metadata: {
+          notes: string | null;
+          createdAt: string;
+          updatedAt: string;
+        };
+      };
+    }>
+  > {
     try {
       logger.debug("Creating new lead", {
-        email: data.email,
-        businessName: data.businessName,
+        email: data.contactInfo?.email,
+        businessName: data.contactInfo?.businessName,
         userId: user?.id,
       });
 
-      if (data.email) {
+      if (data.contactInfo?.email) {
         // Check if lead already exists
         const existingLead = await db
           .select()
           .from(leads)
-          .where(eq(leads.email, data.email.toLowerCase().trim()))
+          .where(eq(leads.email, data.contactInfo.email.toLowerCase().trim()))
           .limit(1);
 
         if (existingLead.length > 0) {
@@ -316,21 +425,27 @@ class LeadsRepositoryImpl implements LeadsRepository {
         }
       }
 
-      const newLead: NewLead = {
-        ...data,
-        status: LeadStatus.PENDING, // Default status for general lead creation
-        language: data.language,
-        currentCampaignStage: EmailCampaignStage.INITIAL,
-        metadata: data.metadata
-          ? (Object.fromEntries(
-              Object.entries(data.metadata).filter(
-                ([, value]) => value !== null,
-              ),
-            ) as Record<string, string | number | boolean>)
-          : {},
-      };
+      // Filter out null values from metadata (if exists in leadDetails)
+      const metadata: Record<string, string | number | boolean> = {};
+      // Note: metadata is not in the current definition, keeping empty for now
 
-      const [createdLead] = await db.insert(leads).values(newLead).returning();
+      // Create lead directly in insert statement to avoid type inference issues
+      const [createdLead] = await db
+        .insert(leads)
+        .values({
+          email: data.contactInfo?.email ?? null,
+          businessName: data.contactInfo?.businessName ?? "",
+          phone: data.contactInfo?.phone ?? null,
+          website: data.contactInfo?.website ?? null,
+          country: data.locationPreferences?.country ?? "",
+          language: data.locationPreferences?.language ?? "",
+          source: data.leadDetails?.source ?? null,
+          notes: data.leadDetails?.notes ?? null,
+          status: LeadStatus.PENDING, // Default status for general lead creation
+          currentCampaignStage: EmailCampaignStage.INITIAL,
+          metadata,
+        })
+        .returning();
 
       logger.debug("Lead created successfully", {
         leadId: createdLead.id,
@@ -339,7 +454,32 @@ class LeadsRepositoryImpl implements LeadsRepository {
         note: "Lead marked as NOT_STARTED - campaign starter cron will process it",
       });
 
-      return createSuccessResponse(this.formatLeadResponse(createdLead));
+      return createSuccessResponse({
+        lead: {
+          summary: {
+            id: createdLead.id,
+            businessName: createdLead.businessName,
+            email: createdLead.email,
+            status: createdLead.status,
+          },
+          contactDetails: {
+            phone: createdLead.phone,
+            website: createdLead.website,
+            country: createdLead.country,
+            language: createdLead.language,
+          },
+          trackingInfo: {
+            source: createdLead.source,
+            emailsSent: createdLead.emailsSent,
+            currentCampaignStage: createdLead.currentCampaignStage,
+          },
+          metadata: {
+            notes: createdLead.notes,
+            createdAt: createdLead.createdAt.toISOString(),
+            updatedAt: createdLead.updatedAt.toISOString(),
+          },
+        },
+      });
     } catch (error) {
       logger.error("Error creating lead", error);
       return createErrorResponse(
@@ -351,39 +491,15 @@ class LeadsRepositoryImpl implements LeadsRepository {
   }
 
   /**
-   * Get lead by ID with business logic
+   * Get lead by ID with business logic (public API with auth)
    */
   async getLeadById(
     id: string,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LeadDetailResponseType>> {
-    try {
-      logger.debug("Fetching lead by ID", { id });
-
-      const [lead] = await db
-        .select()
-        .from(leads)
-        .where(eq(leads.id, id))
-        .limit(1);
-
-      if (!lead) {
-        return createErrorResponse(
-          "leadsErrors.leads.get.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
-      }
-
-      return createSuccessResponse(this.formatLeadDetailResponse(lead));
-    } catch (error) {
-      logger.error("Error fetching lead by ID", error);
-      return createErrorResponse(
-        "leadsErrors.leads.get.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
-    }
+  ): Promise<ResponseType<LeadDetailResponse>> {
+    return await this.getLeadByIdInternal(id, logger);
   }
 
   /**
@@ -458,7 +574,8 @@ class LeadsRepositoryImpl implements LeadsRepository {
   }
 
   /**
-   * Update lead with business logic
+   * Update lead with business logic (public API with auth)
+   * Includes status transition validation
    */
   async updateLead(
     id: string,
@@ -466,14 +583,14 @@ class LeadsRepositoryImpl implements LeadsRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LeadDetailResponseType>> {
+  ): Promise<ResponseType<LeadDetailResponse>> {
     try {
       logger.debug("Updating lead", { id, updates: Object.keys(data) });
 
       // If status is being updated, validate the transition
       if (data.status) {
         // Get current lead to check current status
-        const currentLeadResult = await this.getLeadById(id, user, locale, logger);
+        const currentLeadResult = await this.getLeadByIdInternal(id, logger);
         if (!currentLeadResult.success) {
           return createErrorResponse(
             "leadsErrors.leads.patch.error.not_found.title",
@@ -504,42 +621,8 @@ class LeadsRepositoryImpl implements LeadsRepository {
         });
       }
 
-      // Filter out null values and prepare update data
-      const updateData: Record<
-        string,
-        | string
-        | number
-        | boolean
-        | Date
-        | null
-        | Record<string, string | number | boolean | null>
-      > = {
-        updatedAt: new Date(),
-      };
-
-      // Only include non-null values in the update
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
-          updateData[key] = value;
-        }
-      });
-
-      const [updatedLead] = await db
-        .update(leads)
-        .set(updateData)
-        .where(eq(leads.id, id))
-        .returning();
-
-      if (!updatedLead) {
-        return createErrorResponse(
-          "leadsErrors.leads.patch.error.not_found.title",
-          ErrorResponseTypes.NOT_FOUND,
-        );
-      }
-
-      logger.debug("Lead updated successfully", { id });
-
-      return createSuccessResponse(this.formatLeadDetailResponse(updatedLead));
+      // Delegate to internal method
+      return await this.updateLeadInternal(id, data, logger);
     } catch (error) {
       logger.error("Error updating lead", error);
       return createErrorResponse(
@@ -559,58 +642,87 @@ class LeadsRepositoryImpl implements LeadsRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadListResponseType>> {
     try {
-      const {
-        page = 1,
-        limit = 20,
-        status,
-        currentCampaignStage,
-        country,
-        language,
-        source,
-        search,
-        sortBy = [LeadSortField.CREATED_AT],
-        sortOrder = [SortOrder.DESC],
-      } = query;
+      // Extract values from nested structure with type safety
+      const page = query.searchPagination?.page ?? 1;
+      const limit = query.searchPagination?.limit ?? 20;
+      const search = query.searchPagination?.search;
+      const statusFilters = query.statusFilters?.status;
+      const campaignStageFilters = query.statusFilters?.currentCampaignStage;
+      const sourceFilters = query.statusFilters?.source;
+      const countryFilters = query.locationFilters?.country;
+      const languageFilters = query.locationFilters?.language;
+      const sortByField =
+        query.sortingOptions?.sortBy ?? LeadSortField.CREATED_AT;
+      const sortDirection = query.sortingOptions?.sortOrder ?? SortOrder.DESC;
+
       const offset = (page - 1) * limit;
 
       // Build where conditions
-      const conditions = [];
+      const conditions: SQL[] = [];
 
-      // Convert filter values to database values
-      const dbStatus = mapStatusFilter(status);
-      const dbCampaignStage = mapCampaignStageFilter(currentCampaignStage);
-      const dbSource = mapSourceFilter(source);
-      // const dbCountry = convertCountryFilter(country);
-      const dbCountry = country; // TODO: Fix type conversion
-      // const dbLanguage = convertLanguageFilter(language);
-      const dbLanguage = language; // TODO: Fix type conversion
-
-      if (dbStatus) {
-        conditions.push(eq(leads.status, dbStatus));
+      // Handle status filters (array of filters)
+      if (statusFilters && statusFilters.length > 0) {
+        const mappedStatuses = statusFilters
+          .map((filter) => mapStatusFilter(filter))
+          .filter((status) => status !== null);
+        if (mappedStatuses.length > 0) {
+          conditions.push(
+            or(...mappedStatuses.map((status) => eq(leads.status, status)))!,
+          );
+        }
       }
 
-      if (dbCampaignStage) {
-        conditions.push(eq(leads.currentCampaignStage, dbCampaignStage));
+      // Handle campaign stage filters (array of filters)
+      if (campaignStageFilters && campaignStageFilters.length > 0) {
+        const mappedStages = campaignStageFilters
+          .map((filter) => mapCampaignStageFilter(filter))
+          .filter((stage) => stage !== null);
+        if (mappedStages.length > 0) {
+          conditions.push(
+            or(
+              ...mappedStages.map((stage) =>
+                eq(leads.currentCampaignStage, stage),
+              ),
+            )!,
+          );
+        }
       }
 
-      if (dbCountry) {
-        conditions.push(eq(leads.country, dbCountry));
+      // Handle source filters (array of filters)
+      if (sourceFilters && sourceFilters.length > 0) {
+        const mappedSources = sourceFilters
+          .map((filter) => mapSourceFilter(filter))
+          .filter((source) => source !== null);
+        if (mappedSources.length > 0) {
+          conditions.push(
+            or(...mappedSources.map((source) => eq(leads.source, source)))!,
+          );
+        }
       }
 
-      if (dbLanguage) {
-        conditions.push(eq(leads.language, dbLanguage));
+      // Handle country filters (array of countries)
+      if (countryFilters && countryFilters.length > 0) {
+        conditions.push(
+          or(...countryFilters.map((country) => eq(leads.country, country)))!,
+        );
       }
 
-      if (dbSource) {
-        conditions.push(eq(leads.source, dbSource));
+      // Handle language filters (array of languages)
+      if (languageFilters && languageFilters.length > 0) {
+        conditions.push(
+          or(
+            ...languageFilters.map((language) => eq(leads.language, language)),
+          )!,
+        );
       }
 
+      // Handle search filter
       if (search) {
         conditions.push(
           or(
             ilike(leads.email, `%${search}%`),
             ilike(leads.businessName, `%${search}%`),
-          ),
+          )!,
         );
       }
 
@@ -625,8 +737,6 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       // Get leads with sorting
       let orderClause;
-      const sortByField = sortBy[0] || LeadSortField.CREATED_AT;
-      const sortDirection = sortOrder[0] || SortOrder.DESC;
       switch (sortByField) {
         case LeadSortField.EMAIL:
           orderClause =
@@ -676,11 +786,13 @@ class LeadsRepositoryImpl implements LeadsRepository {
       });
 
       return createSuccessResponse({
-        leads: leadsList.map((lead) => this.formatLeadResponse(lead)),
-        total,
-        page,
-        limit,
-        totalPages,
+        response: {
+          leads: leadsList.map((lead) => this.formatLeadResponse(lead)),
+          total,
+          page,
+          limit,
+          totalPages,
+        },
       });
     } catch (error) {
       logger.error("Error listing leads", error);
@@ -692,7 +804,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
   }
 
   /**
-   * Convert lead - handles both anonymous lead conversion and user-lead relationship establishment
+   * Convert lead - handles both anonymous lead conversion and user-lead relationship establishment (public API with auth)
    */
   async convertLead(
     leadId: string,
@@ -710,143 +822,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadResponseType>> {
-    try {
-      logger.debug("Converting lead", {
-        leadId,
-        userId: options.userId,
-        email: options.email,
-        hasAdditionalData: !!options.additionalData,
-      });
-
-      // Use transaction to ensure data consistency
-      const result = await withTransaction<ResponseType<LeadResponseType>>(
-        async (tx) => {
-          // Find the lead
-          let [existingLead] = await tx
-            .select()
-            .from(leads)
-            .where(eq(leads.id, leadId))
-            .limit(1);
-
-          if (!existingLead) {
-            return createErrorResponse(
-              "leadsErrors.leads.patch.error.not_found.title",
-              ErrorResponseTypes.NOT_FOUND,
-            );
-          }
-
-          // Check if lead is already converted to a user
-          if (existingLead.convertedUserId && options.userId) {
-            logger.debug("Lead already converted to user", {
-              leadId,
-              existingUserId: existingLead.convertedUserId,
-              newUserId: options.userId,
-            });
-            return createSuccessResponse(this.formatLeadResponse(existingLead));
-          }
-
-          // Prepare update data
-          const updateData: Partial<Lead> = {
-            updatedAt: new Date(),
-          };
-
-          // Handle anonymous lead conversion (email update)
-          if (options.email && existingLead.metadata?.anonymous) {
-            logger.debug("Converting anonymous lead with real email", {
-              leadId,
-              oldEmail: existingLead.email,
-              newEmail: options.email,
-            });
-
-            // Check for duplicate email
-            const [duplicateLead] = await tx
-              .select()
-              .from(leads)
-              .where(eq(leads.email, options.email.toLowerCase().trim()))
-              .limit(1);
-
-            if (duplicateLead && duplicateLead.id !== existingLead.id) {
-              return createErrorResponse(
-                "leadsErrors.leads.post.error.duplicate.title",
-                ErrorResponseTypes.CONFLICT,
-              );
-            }
-
-            updateData.email = options.email.toLowerCase().trim();
-            updateData.status = getWebsiteUserStatus(existingLead.status);
-            updateData.metadata = {
-              ...existingLead.metadata,
-              anonymous: false,
-              convertedAt: new Date().toISOString(),
-              originalEmail: existingLead.email,
-            };
-          }
-
-          // Handle additional data updates
-          if (options.additionalData) {
-            if (options.additionalData.businessName) {
-              updateData.businessName = options.additionalData.businessName;
-            }
-            if (options.additionalData.contactName) {
-              updateData.contactName = options.additionalData.contactName;
-            }
-            if (options.additionalData.phone) {
-              updateData.phone = options.additionalData.phone;
-            }
-            if (options.additionalData.website) {
-              updateData.website = options.additionalData.website;
-            }
-          }
-
-          // Handle user-lead relationship establishment
-          if (options.userId) {
-            updateData.status = LeadStatus.SIGNED_UP;
-            updateData.convertedUserId = options.userId;
-            updateData.convertedAt = new Date();
-            updateData.signedUpAt = new Date();
-
-            // Update the user record with the leadId for future tracking
-            await tx
-              .update(users)
-              .set({
-                leadId: existingLead.id,
-                updatedAt: new Date(),
-              })
-              .where(eq(users.id, options.userId));
-
-            logger.debug("User record updated with leadId", {
-              userId: options.userId,
-              leadId: existingLead.id,
-            });
-          }
-
-          // Apply updates
-          const [updatedLead] = await tx
-            .update(leads)
-            .set(updateData)
-            .where(eq(leads.id, existingLead.id))
-            .returning();
-
-          return createSuccessResponse(this.formatLeadResponse(updatedLead));
-        },
-      );
-
-      if (result?.success) {
-        logger.debug("Lead converted successfully", {
-          leadId,
-          userId: options.userId,
-          email: options.email,
-        });
-      }
-
-      return result;
-    } catch (error) {
-      logger.error("Error converting lead", error);
-      return createErrorResponse(
-        "leadsErrors.leads.patch.error.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
-    }
+    return await this.convertLeadInternal(leadId, options, logger);
   }
 
   /**
@@ -883,35 +859,49 @@ class LeadsRepositoryImpl implements LeadsRepository {
     };
   }
 
-  private formatLeadDetailResponse(lead: Lead): LeadDetailResponseType {
+  private formatLeadDetailResponse(lead: Lead): LeadDetailResponse {
     return {
-      id: lead.id,
-      email: lead.email,
-      businessName: lead.businessName,
-      contactName: lead.contactName,
-      phone: lead.phone,
-      website: lead.website,
-      country: lead.country,
-      language: lead.language,
-      status: lead.status,
-      source: lead.source,
-      notes: lead.notes,
-      convertedUserId: lead.convertedUserId,
-      convertedAt: lead.convertedAt,
-      signedUpAt: lead.signedUpAt,
-      consultationBookedAt: lead.consultationBookedAt,
-      subscriptionConfirmedAt: lead.subscriptionConfirmedAt,
-      currentCampaignStage: lead.currentCampaignStage,
-      emailJourneyVariant: lead.emailJourneyVariant,
-      metadata: lead.metadata || {},
-      emailsSent: lead.emailsSent,
-      lastEmailSentAt: lead.lastEmailSentAt,
-      unsubscribedAt: lead.unsubscribedAt,
-      emailsOpened: lead.emailsOpened,
-      emailsClicked: lead.emailsClicked,
-      lastEngagementAt: lead.lastEngagementAt,
-      createdAt: lead.createdAt,
-      updatedAt: lead.updatedAt,
+      lead: {
+        basicInfo: {
+          id: lead.id,
+          email: lead.email,
+          businessName: lead.businessName,
+          contactName: lead.contactName,
+          status: lead.status,
+        },
+        contactDetails: {
+          phone: lead.phone,
+          website: lead.website,
+          country: lead.country,
+          language: lead.language,
+        },
+        campaignTracking: {
+          source: lead.source,
+          currentCampaignStage: lead.currentCampaignStage,
+          emailJourneyVariant: lead.emailJourneyVariant,
+          emailsSent: lead.emailsSent,
+          lastEmailSentAt: lead.lastEmailSentAt,
+        },
+        engagement: {
+          emailsOpened: lead.emailsOpened,
+          emailsClicked: lead.emailsClicked,
+          lastEngagementAt: lead.lastEngagementAt,
+          unsubscribedAt: lead.unsubscribedAt,
+        },
+        conversion: {
+          convertedUserId: lead.convertedUserId,
+          convertedAt: lead.convertedAt,
+          signedUpAt: lead.signedUpAt,
+          consultationBookedAt: lead.consultationBookedAt,
+          subscriptionConfirmedAt: lead.subscriptionConfirmedAt,
+        },
+        metadata: {
+          notes: lead.notes,
+          metadata: lead.metadata || {},
+          createdAt: lead.createdAt,
+          updatedAt: lead.updatedAt,
+        },
+      },
     };
   }
 
@@ -1124,21 +1114,276 @@ class LeadsRepositoryImpl implements LeadsRepository {
   }
 
   /**
-   * Record engagement event for a lead
+   * Internal: Get lead by ID (no auth required)
+   * Used by internal services like tracking
    */
-  async recordEngagement(
+  async getLeadByIdInternal(
+    id: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<LeadDetailResponse>> {
+    try {
+      logger.debug("Fetching lead by ID (internal)", { id });
+
+      const [lead] = await db
+        .select()
+        .from(leads)
+        .where(eq(leads.id, id))
+        .limit(1);
+
+      if (!lead) {
+        return createErrorResponse(
+          "leadsErrors.leads.get.error.not_found.title",
+          ErrorResponseTypes.NOT_FOUND,
+        );
+      }
+
+      return createSuccessResponse(this.formatLeadDetailResponse(lead));
+    } catch (error) {
+      logger.error("Error fetching lead by ID (internal)", error);
+      return createErrorResponse(
+        "leadsErrors.leads.get.error.server.title",
+        ErrorResponseTypes.INTERNAL_ERROR,
+        { error: parseError(error).message },
+      );
+    }
+  }
+
+  /**
+   * Internal: Update lead (no auth required, no status transition validation)
+   * Used by internal services like tracking
+   */
+  async updateLeadInternal(
+    id: string,
+    data: Partial<LeadUpdateType>,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<LeadDetailResponse>> {
+    try {
+      logger.debug("Updating lead (internal)", {
+        id,
+        updates: Object.keys(data),
+      });
+
+      // Filter out null values and prepare update data
+      const updateData: Record<
+        string,
+        | string
+        | number
+        | boolean
+        | Date
+        | null
+        | Record<string, string | number | boolean | null>
+      > = {
+        updatedAt: new Date(),
+      };
+
+      // Only include non-null values in the update
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          updateData[key] = value;
+        }
+      });
+
+      const [updatedLead] = await db
+        .update(leads)
+        .set(updateData)
+        .where(eq(leads.id, id))
+        .returning();
+
+      if (!updatedLead) {
+        return createErrorResponse(
+          "leadsErrors.leads.patch.error.not_found.title",
+          ErrorResponseTypes.NOT_FOUND,
+        );
+      }
+
+      logger.debug("Lead updated successfully (internal)", { id });
+
+      return createSuccessResponse(this.formatLeadDetailResponse(updatedLead));
+    } catch (error) {
+      logger.error("Error updating lead (internal)", error);
+      return createErrorResponse(
+        "leadsErrors.leads.patch.error.server.title",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Internal: Convert lead (no auth required)
+   * Used by internal services like tracking
+   */
+  async convertLeadInternal(
+    leadId: string,
+    options: {
+      userId: DbId;
+      email: string;
+      additionalData?: {
+        businessName?: string;
+        contactName?: string;
+        phone?: string;
+        website?: string;
+      };
+    },
+    logger: EndpointLogger,
+  ): Promise<ResponseType<LeadResponseType>> {
+    try {
+      logger.debug("Converting lead (internal)", {
+        leadId,
+        userId: options.userId,
+        email: options.email,
+        hasAdditionalData: !!options.additionalData,
+      });
+
+      // Use transaction to ensure data consistency
+      const result = await withTransaction<ResponseType<LeadResponseType>>(
+        logger,
+        async (tx) => {
+          // Find the lead
+          const [existingLead] = await tx
+            .select()
+            .from(leads)
+            .where(eq(leads.id, leadId))
+            .limit(1);
+
+          if (!existingLead) {
+            return createErrorResponse(
+              "leadsErrors.leads.patch.error.not_found.title",
+              ErrorResponseTypes.NOT_FOUND,
+            );
+          }
+
+          // Check if lead is already converted to a user
+          if (existingLead.convertedUserId && options.userId) {
+            logger.debug("Lead already converted to user (internal)", {
+              leadId,
+              existingUserId: existingLead.convertedUserId,
+              newUserId: options.userId,
+            });
+            return createSuccessResponse(this.formatLeadResponse(existingLead));
+          }
+
+          // Prepare update data
+          const updateData: Partial<Lead> = {
+            updatedAt: new Date(),
+          };
+
+          // Handle anonymous lead conversion (email update)
+          if (options.email && existingLead.metadata?.anonymous) {
+            logger.debug(
+              "Converting anonymous lead with real email (internal)",
+              {
+                leadId,
+                oldEmail: existingLead.email,
+                newEmail: options.email,
+              },
+            );
+
+            // Check for duplicate email
+            const [duplicateLead] = await tx
+              .select()
+              .from(leads)
+              .where(eq(leads.email, options.email.toLowerCase().trim()))
+              .limit(1);
+
+            if (duplicateLead && duplicateLead.id !== existingLead.id) {
+              return createErrorResponse(
+                "leadsErrors.leads.post.error.duplicate.title",
+                ErrorResponseTypes.CONFLICT,
+              );
+            }
+
+            updateData.email = options.email.toLowerCase().trim();
+            updateData.status = getWebsiteUserStatus(existingLead.status);
+            updateData.metadata = {
+              ...existingLead.metadata,
+              anonymous: false,
+              convertedAt: new Date().toISOString(),
+              originalEmail: existingLead.email,
+            };
+          }
+
+          // Handle additional data updates
+          if (options.additionalData) {
+            if (options.additionalData.businessName) {
+              updateData.businessName = options.additionalData.businessName;
+            }
+            if (options.additionalData.contactName) {
+              updateData.contactName = options.additionalData.contactName;
+            }
+            if (options.additionalData.phone) {
+              updateData.phone = options.additionalData.phone;
+            }
+            if (options.additionalData.website) {
+              updateData.website = options.additionalData.website;
+            }
+          }
+
+          // Handle user-lead relationship establishment
+          if (options.userId) {
+            updateData.status = LeadStatus.SIGNED_UP;
+            updateData.convertedUserId = options.userId;
+            updateData.convertedAt = new Date();
+            updateData.signedUpAt = new Date();
+
+            // Update the user record with the leadId for future tracking
+            await tx
+              .update(users)
+              .set({
+                leadId: existingLead.id,
+                updatedAt: new Date(),
+              })
+              .where(eq(users.id, options.userId));
+
+            logger.debug("User record updated with leadId (internal)", {
+              userId: options.userId,
+              leadId: existingLead.id,
+            });
+          }
+
+          // Apply updates
+          const [updatedLead] = await tx
+            .update(leads)
+            .set(updateData)
+            .where(eq(leads.id, existingLead.id))
+            .returning();
+
+          return createSuccessResponse(this.formatLeadResponse(updatedLead));
+        },
+      );
+
+      if (result?.success) {
+        logger.debug("Lead converted successfully (internal)", {
+          leadId,
+          userId: options.userId,
+          email: options.email,
+        });
+      }
+
+      return result;
+    } catch (error) {
+      logger.error("Error converting lead (internal)", error);
+      return createErrorResponse(
+        "leadsErrors.leads.patch.error.server.title",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Internal: Record engagement event for a lead (no auth required)
+   * Used by internal services like tracking
+   */
+  async recordEngagementInternal(
     data: {
       leadId: string;
-      engagementType: typeof EngagementTypesValues;
+      engagementType: EngagementTypesType;
       campaignId?: string;
       metadata?: Record<string, string | number | boolean>;
       ipAddress?: string;
       userAgent?: string;
     },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LeadEngagementResponseType>> {
+  ): Promise<ResponseType<LeadEngagementResponseOutput>> {
     try {
       logger.debug("Recording lead engagement", {
         leadId: data.leadId,
@@ -1230,15 +1475,15 @@ class LeadsRepositoryImpl implements LeadsRepository {
         engagementType: data.engagementType,
       });
 
-      return createSuccessResponse<LeadEngagementResponseType>({
+      return createSuccessResponse<LeadEngagementResponseOutput>({
         id: engagement.id,
         engagementType: engagement.engagementType,
         campaignId: engagement.campaignId || undefined,
         metadata: engagement.metadata || {},
-        timestamp: engagement.timestamp,
+        timestamp: engagement.timestamp.toISOString(),
         ipAddress: engagement.ipAddress || undefined,
         userAgent: engagement.userAgent || undefined,
-        createdAt: engagement.timestamp,
+        createdAt: engagement.timestamp.toISOString(),
         leadId: engagement.leadId,
       });
     } catch (error) {
@@ -1248,6 +1493,25 @@ class LeadsRepositoryImpl implements LeadsRepository {
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
+  }
+
+  /**
+   * Record engagement event for a lead (public API with auth)
+   */
+  async recordEngagement(
+    data: {
+      leadId: string;
+      engagementType: EngagementTypesType;
+      campaignId?: string;
+      metadata?: Record<string, string | number | boolean>;
+      ipAddress?: string;
+      userAgent?: string;
+    },
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<LeadEngagementResponseOutput>> {
+    return await this.recordEngagementInternal(data, logger);
   }
 
   /**
@@ -1462,20 +1726,20 @@ class LeadsRepositoryImpl implements LeadsRepository {
   async batchUpdateLeads(
     data: {
       search?: string;
-      status?: LeadStatusFilter;
-      currentCampaignStage?: EmailCampaignStageFilter;
+      status?: LeadStatusFilterType;
+      currentCampaignStage?: EmailCampaignStageFilterType;
       country?: CountryFilter;
       language?: LanguageFilter;
-      source?: LeadSourceFilter;
-      sortBy?: LeadSortField[];
-      sortOrder?: SortOrder[];
-      scope?: BatchOperationScope;
+      source?: LeadSourceFilterType;
+      sortBy?: LeadSortFieldType[];
+      sortOrder?: SortOrderType[];
+      scope?: BatchOperationScopeType;
       page?: number;
       pageSize?: number;
       updates: {
-        status?: LeadStatus;
-        currentCampaignStage?: EmailCampaignStage;
-        source?: LeadSource;
+        status?: LeadStatusType;
+        currentCampaignStage?: EmailCampaignStageType;
+        source?: LeadSourceType;
         notes?: string;
       };
       dryRun?: boolean;
@@ -1495,8 +1759,8 @@ class LeadsRepositoryImpl implements LeadsRepository {
         id: string;
         email: string | null;
         businessName: string;
-        currentStatus: LeadStatus;
-        currentCampaignStage: EmailCampaignStage | null;
+        currentStatus: LeadStatusType;
+        currentCampaignStage: EmailCampaignStageType | null;
       }>;
     }>
   > {
@@ -1533,47 +1797,84 @@ class LeadsRepositoryImpl implements LeadsRepository {
       });
 
       // Build where conditions (same logic as listLeads)
-      const conditions = [];
+      const conditions: SQL[] = [];
 
-      // Convert filter values to database values
-      const dbStatus = mapStatusFilter(status);
-      const dbCampaignStage = mapCampaignStageFilter(currentCampaignStage);
-      const dbSource = mapSourceFilter(source);
-      // const dbCountry = convertCountryFilter(country);
-      const dbCountry = country; // TODO: Fix type conversion
-      // const dbLanguage = convertLanguageFilter(language);
-      const dbLanguage = language; // TODO: Fix type conversion
-
-      // Apply filters
-      if (dbStatus !== null) {
-        conditions.push(eq(leads.status, dbStatus));
+      // Handle status filters (can be array)
+      if (status && Array.isArray(status) && status.length > 0) {
+        const mappedStatuses = status
+          .map((filter) => mapStatusFilter(filter))
+          .filter((s) => s !== null);
+        if (mappedStatuses.length > 0) {
+          conditions.push(
+            or(...mappedStatuses.map((s) => eq(leads.status, s)))!,
+          );
+        }
+      } else if (status && !Array.isArray(status)) {
+        const dbStatus = mapStatusFilter(status);
+        if (dbStatus !== null) {
+          conditions.push(eq(leads.status, dbStatus));
+        }
       }
 
-      if (dbCampaignStage !== null) {
-        conditions.push(eq(leads.currentCampaignStage, dbCampaignStage));
+      // Handle campaign stage filters (can be array)
+      if (
+        currentCampaignStage &&
+        Array.isArray(currentCampaignStage) &&
+        currentCampaignStage.length > 0
+      ) {
+        const mappedStages = currentCampaignStage
+          .map((filter) => mapCampaignStageFilter(filter))
+          .filter((s) => s !== null);
+        if (mappedStages.length > 0) {
+          conditions.push(
+            or(...mappedStages.map((s) => eq(leads.currentCampaignStage, s)))!,
+          );
+        }
+      } else if (currentCampaignStage && !Array.isArray(currentCampaignStage)) {
+        const dbStage = mapCampaignStageFilter(currentCampaignStage);
+        if (dbStage !== null) {
+          conditions.push(eq(leads.currentCampaignStage, dbStage));
+        }
       }
 
-      if (dbSource !== null) {
-        conditions.push(eq(leads.source, dbSource));
+      // Handle source filters (can be array)
+      if (source && Array.isArray(source) && source.length > 0) {
+        const mappedSources = source
+          .map((filter) => mapSourceFilter(filter))
+          .filter((s) => s !== null);
+        if (mappedSources.length > 0) {
+          conditions.push(
+            or(...mappedSources.map((s) => eq(leads.source, s)))!,
+          );
+        }
+      } else if (source && !Array.isArray(source)) {
+        const dbSource = mapSourceFilter(source);
+        if (dbSource !== null) {
+          conditions.push(eq(leads.source, dbSource));
+        }
       }
 
-      if (dbCountry !== null) {
-        conditions.push(eq(leads.country, dbCountry));
+      // Handle country filters (can be array)
+      if (country && Array.isArray(country) && country.length > 0) {
+        conditions.push(or(...country.map((c) => eq(leads.country, c)))!);
+      } else if (country && !Array.isArray(country)) {
+        conditions.push(eq(leads.country, country));
       }
 
-      if (dbLanguage !== null) {
-        conditions.push(eq(leads.language, dbLanguage));
+      // Handle language filters (can be array)
+      if (language && Array.isArray(language) && language.length > 0) {
+        conditions.push(or(...language.map((l) => eq(leads.language, l)))!);
+      } else if (language && !Array.isArray(language)) {
+        conditions.push(eq(leads.language, language));
       }
 
       if (search) {
-        const searchConditions = [
-          ilike(leads.email, `%${search}%`),
-          ilike(leads.businessName, `%${search}%`),
-        ];
-        if (leads.contactName) {
-          searchConditions.push(ilike(leads.contactName, `%${search}%`));
-        }
-        conditions.push(or(...searchConditions));
+        conditions.push(
+          or(
+            ilike(leads.email, `%${search}%`),
+            ilike(leads.businessName, `%${search}%`),
+          )!,
+        );
       }
 
       // Build the query
@@ -1585,8 +1886,12 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       // Apply sorting
       let orderClause;
-      const sortByField = sortBy[0] || LeadSortField.CREATED_AT;
-      const sortDirection = sortOrder[0] || SortOrder.DESC;
+      const sortByField = Array.isArray(sortBy)
+        ? sortBy[0]
+        : (sortBy ?? LeadSortField.CREATED_AT);
+      const sortDirection = Array.isArray(sortOrder)
+        ? sortOrder[0]
+        : (sortOrder ?? SortOrder.DESC);
       switch (sortByField) {
         case LeadSortField.EMAIL:
           orderClause =
@@ -1656,22 +1961,38 @@ class LeadsRepositoryImpl implements LeadsRepository {
       const errors: Array<{ leadId: string; error: string }> = [];
       let totalUpdated = 0;
 
-      // Prepare update data
-      const updateData: Partial<NewLead> = {
+      // Prepare update data with proper type safety
+      const updateData: Record<
+        string,
+        | string
+        | number
+        | boolean
+        | Date
+        | null
+        | Record<string, string | number | boolean | null>
+      > = {
         updatedAt: new Date(),
       };
 
       // Only include non-null values in the update
-      Object.entries(updates).forEach(([key, value]) => {
-        if (value !== null && value !== undefined && key in updateData) {
-          (updateData as Record<keyof NewLead, NewLead[keyof NewLead]>)[
-            key as keyof NewLead
-          ] = value;
-        }
-      });
+      if (updates.status !== null && updates.status !== undefined) {
+        updateData.status = updates.status;
+      }
+      if (
+        updates.currentCampaignStage !== null &&
+        updates.currentCampaignStage !== undefined
+      ) {
+        updateData.currentCampaignStage = updates.currentCampaignStage;
+      }
+      if (updates.source !== null && updates.source !== undefined) {
+        updateData.source = updates.source;
+      }
+      if (updates.notes !== null && updates.notes !== undefined) {
+        updateData.notes = updates.notes;
+      }
 
       // Use transaction for batch update
-      await withTransaction(async (tx) => {
+      await withTransaction(logger, async (tx) => {
         for (const lead of matchingLeads) {
           try {
             // If status is being updated, validate the transition
@@ -1727,14 +2048,14 @@ class LeadsRepositoryImpl implements LeadsRepository {
   async batchDeleteLeads(
     data: {
       search?: string;
-      status?: LeadStatusFilter;
-      currentCampaignStage?: EmailCampaignStageFilter;
+      status?: LeadStatusFilterType;
+      currentCampaignStage?: EmailCampaignStageFilterType;
       country?: CountryFilter;
       language?: LanguageFilter;
-      source?: LeadSourceFilter;
-      sortBy?: LeadSortField[];
-      sortOrder?: SortOrder[];
-      scope?: BatchOperationScope;
+      source?: LeadSourceFilterType;
+      sortBy?: LeadSortFieldType[];
+      sortOrder?: SortOrderType[];
+      scope?: BatchOperationScopeType;
       page?: number;
       pageSize?: number;
       confirmDelete: boolean;
@@ -1755,8 +2076,8 @@ class LeadsRepositoryImpl implements LeadsRepository {
         id: string;
         email: string | null;
         businessName: string;
-        currentStatus: LeadStatus;
-        currentCampaignStage: EmailCampaignStage | null;
+        currentStatus: LeadStatusType;
+        currentCampaignStage: EmailCampaignStageType | null;
       }>;
     }>
   > {
@@ -1806,32 +2127,6 @@ class LeadsRepositoryImpl implements LeadsRepository {
       // Build the query using the same logic as list endpoint and batchUpdateLeads
       const conditions: SQL[] = [];
 
-      // Convert filter values to database values (consistent with other methods)
-      const dbStatus = mapStatusFilter(status);
-      const dbCampaignStage = mapCampaignStageFilter(currentCampaignStage);
-      const dbSource = mapSourceFilter(source);
-      // const dbCountry = convertCountryFilter(country);
-      const dbCountry = country; // TODO: Fix type conversion
-      // const dbLanguage = convertLanguageFilter(language);
-      const dbLanguage = language; // TODO: Fix type conversion
-
-      logger.debug("Converted filter values", {
-        originalFilters: {
-          status,
-          currentCampaignStage,
-          country,
-          language,
-          source,
-        },
-        convertedFilters: {
-          dbStatus,
-          dbCampaignStage,
-          dbCountry,
-          dbLanguage,
-          dbSource,
-        },
-      });
-
       // Search filter
       if (search?.trim()) {
         const searchTerm = `%${search.trim().toLowerCase()}%`;
@@ -1844,25 +2139,73 @@ class LeadsRepositoryImpl implements LeadsRepository {
         );
       }
 
-      // Apply filters using converted values (consistent with batchUpdateLeads and listLeads)
-      if (dbStatus !== null) {
-        conditions.push(eq(leads.status, dbStatus));
+      // Handle status filters (can be array)
+      if (status && Array.isArray(status) && status.length > 0) {
+        const mappedStatuses = status
+          .map((filter) => mapStatusFilter(filter))
+          .filter((s) => s !== null);
+        if (mappedStatuses.length > 0) {
+          conditions.push(
+            or(...mappedStatuses.map((s) => eq(leads.status, s)))!,
+          );
+        }
+      } else if (status && !Array.isArray(status)) {
+        const dbStatus = mapStatusFilter(status);
+        if (dbStatus !== null) {
+          conditions.push(eq(leads.status, dbStatus));
+        }
       }
 
-      if (dbCampaignStage !== null) {
-        conditions.push(eq(leads.currentCampaignStage, dbCampaignStage));
+      // Handle campaign stage filters (can be array)
+      if (
+        currentCampaignStage &&
+        Array.isArray(currentCampaignStage) &&
+        currentCampaignStage.length > 0
+      ) {
+        const mappedStages = currentCampaignStage
+          .map((filter) => mapCampaignStageFilter(filter))
+          .filter((s) => s !== null);
+        if (mappedStages.length > 0) {
+          conditions.push(
+            or(...mappedStages.map((s) => eq(leads.currentCampaignStage, s)))!,
+          );
+        }
+      } else if (currentCampaignStage && !Array.isArray(currentCampaignStage)) {
+        const dbStage = mapCampaignStageFilter(currentCampaignStage);
+        if (dbStage !== null) {
+          conditions.push(eq(leads.currentCampaignStage, dbStage));
+        }
       }
 
-      if (dbCountry !== null) {
-        conditions.push(eq(leads.country, dbCountry));
+      // Handle source filters (can be array)
+      if (source && Array.isArray(source) && source.length > 0) {
+        const mappedSources = source
+          .map((filter) => mapSourceFilter(filter))
+          .filter((s) => s !== null);
+        if (mappedSources.length > 0) {
+          conditions.push(
+            or(...mappedSources.map((s) => eq(leads.source, s)))!,
+          );
+        }
+      } else if (source && !Array.isArray(source)) {
+        const dbSource = mapSourceFilter(source);
+        if (dbSource !== null) {
+          conditions.push(eq(leads.source, dbSource));
+        }
       }
 
-      if (dbLanguage !== null) {
-        conditions.push(eq(leads.language, dbLanguage));
+      // Handle country filters (can be array)
+      if (country && Array.isArray(country) && country.length > 0) {
+        conditions.push(or(...country.map((c) => eq(leads.country, c)))!);
+      } else if (country && !Array.isArray(country)) {
+        conditions.push(eq(leads.country, country));
       }
 
-      if (dbSource !== null) {
-        conditions.push(eq(leads.source, dbSource));
+      // Handle language filters (can be array)
+      if (language && Array.isArray(language) && language.length > 0) {
+        conditions.push(or(...language.map((l) => eq(leads.language, l)))!);
+      } else if (language && !Array.isArray(language)) {
+        conditions.push(eq(leads.language, language));
       }
 
       const whereClause =
@@ -1871,20 +2214,16 @@ class LeadsRepositoryImpl implements LeadsRepository {
       logger.debug("Applied filter conditions", {
         totalConditions: conditions.length,
         hasWhereClause: !!whereClause,
-        appliedFilters: {
-          hasSearch: !!search?.trim(),
-          hasStatus: dbStatus !== null,
-          hasCampaignStage: dbCampaignStage !== null,
-          hasCountry: dbCountry !== null,
-          hasLanguage: dbLanguage !== null,
-          hasSource: dbSource !== null,
-        },
       });
 
       // Apply sorting
       let orderClause;
-      const sortByField = sortBy[0] || LeadSortField.CREATED_AT;
-      const sortDirection = sortOrder[0] || SortOrder.DESC;
+      const sortByField = Array.isArray(sortBy)
+        ? sortBy[0]
+        : (sortBy ?? LeadSortField.CREATED_AT);
+      const sortDirection = Array.isArray(sortOrder)
+        ? sortOrder[0]
+        : (sortOrder ?? SortOrder.DESC);
       switch (sortByField) {
         case LeadSortField.EMAIL:
           orderClause =
@@ -1975,7 +2314,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
       });
 
       // Use transaction for batch delete
-      await withTransaction(async (tx) => {
+      await withTransaction(logger, async (tx) => {
         for (const lead of matchingLeads) {
           try {
             logger.debug("Deleting individual lead", {

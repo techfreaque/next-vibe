@@ -4,8 +4,6 @@
 
 import { z } from "zod";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
 /**
  * Distribution Calculation Input
  */

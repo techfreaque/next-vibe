@@ -27,10 +27,11 @@ import { UserRole } from "../../../user-roles/enum";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "user", "private", "me", "avatar"],
-  title: "app.api.v1.core.user.private.me.avatar.upload.title",
-  description: "app.api.v1.core.user.private.me.avatar.upload.description",
-  category: "app.api.v1.core.user.category",
-  tags: ["app.api.v1.core.user.private.me.avatar.tag"],
+  title: "app.api.v1.core.user.private.me.avatar.upload.title" as const,
+  description:
+    "app.api.v1.core.user.private.me.avatar.upload.description" as const,
+  category: "app.api.v1.core.user.category" as const,
+  tags: ["app.api.v1.core.user.private.me.avatar.tag" as const],
   allowedRoles: [
     UserRole.PUBLIC,
     UserRole.CUSTOMER,
@@ -40,12 +41,13 @@ const { POST } = createEndpoint({
     UserRole.CLI_ONLY,
     UserRole.CLI_WEB,
     UserRole.WEB_ONLY,
-  ],
+  ] as const,
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.user.private.me.avatar.upload.title",
-      description: "app.api.v1.core.user.private.me.avatar.upload.description",
+      title: "app.api.v1.core.user.private.me.avatar.upload.title" as const,
+      description:
+        "app.api.v1.core.user.private.me.avatar.upload.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -55,9 +57,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title:
-            "app.api.v1.core.user.private.me.avatar.upload.groups.fileUpload.title",
+            "app.api.v1.core.user.private.me.avatar.upload.groups.fileUpload.title" as const,
           description:
-            "app.api.v1.core.user.private.me.avatar.upload.groups.fileUpload.description",
+            "app.api.v1.core.user.private.me.avatar.upload.groups.fileUpload.description" as const,
           layout: { type: LayoutType.GRID, columns: 12 },
         },
         { request: "data" },
@@ -67,15 +69,15 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.FILE,
               label:
-                "app.api.v1.core.user.private.me.avatar.upload.fields.file.label",
+                "app.api.v1.core.user.private.me.avatar.upload.fields.file.label" as const,
               description:
-                "app.api.v1.core.user.private.me.avatar.upload.fields.file.description",
+                "app.api.v1.core.user.private.me.avatar.upload.fields.file.description" as const,
               placeholder:
-                "app.api.v1.core.user.private.me.avatar.upload.fields.file.placeholder",
+                "app.api.v1.core.user.private.me.avatar.upload.fields.file.placeholder" as const,
               required: true,
               layout: { columns: 12 },
               helpText:
-                "app.api.v1.core.user.private.me.avatar.upload.fields.file.help",
+                "app.api.v1.core.user.private.me.avatar.upload.fields.file.help" as const,
             },
             z
               .instanceof(File)
@@ -110,9 +112,10 @@ const { POST } = createEndpoint({
       response: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.v1.core.user.private.me.avatar.upload.response.title",
+          title:
+            "app.api.v1.core.user.private.me.avatar.upload.response.title" as const,
           description:
-            "app.api.v1.core.user.private.me.avatar.upload.response.description",
+            "app.api.v1.core.user.private.me.avatar.upload.response.description" as const,
           layout: { type: LayoutType.GRID, columns: 12 },
         },
         { response: true },
@@ -121,7 +124,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.private.me.avatar.upload.response.success",
+                "app.api.v1.core.user.private.me.avatar.upload.response.success" as const,
             },
             z.boolean(),
           ),
@@ -129,7 +132,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.private.me.avatar.upload.response.message",
+                "app.api.v1.core.user.private.me.avatar.upload.response.message" as const,
             },
             z.string(),
           ),
@@ -137,7 +140,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.private.me.avatar.upload.response.avatarUrl",
+                "app.api.v1.core.user.private.me.avatar.upload.response.avatarUrl" as const,
             },
             z.string().url().optional(),
           ),
@@ -145,7 +148,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.private.me.avatar.upload.response.uploadTime",
+                "app.api.v1.core.user.private.me.avatar.upload.response.uploadTime" as const,
             },
             z.string().optional(),
           ),
@@ -153,7 +156,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.private.me.avatar.upload.response.nextSteps.item",
+                "app.api.v1.core.user.private.me.avatar.upload.response.nextSteps.item" as const,
             },
             z.array(z.string()),
           ),
@@ -166,65 +169,66 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.validation.title",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.validation.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.validation.description",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.unauthorized.title",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.unauthorized.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.unauthorized.description",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.internal.title",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.internal.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.internal.description",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.unknown.title",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.unknown.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.unknown.description",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.network.title",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.network.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.network.description",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.network.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.forbidden.title",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.forbidden.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.forbidden.description",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.notFound.title",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.notFound.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.notFound.description",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.unsaved.title",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.unsaved.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.unsaved.description",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.unsaved.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.conflict.title",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.conflict.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.upload.errors.conflict.description",
+        "app.api.v1.core.user.private.me.avatar.upload.errors.conflict.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.user.private.me.avatar.upload.success.title",
+    title:
+      "app.api.v1.core.user.private.me.avatar.upload.success.title" as const,
     description:
-      "app.api.v1.core.user.private.me.avatar.upload.success.description",
+      "app.api.v1.core.user.private.me.avatar.upload.success.description" as const,
   },
 
   // === EXAMPLES ===
@@ -294,10 +298,11 @@ const { POST } = createEndpoint({
 const { DELETE } = createEndpoint({
   method: Methods.DELETE,
   path: ["v1", "core", "user", "private", "me", "avatar"],
-  title: "app.api.v1.core.user.private.me.avatar.delete.title",
-  description: "app.api.v1.core.user.private.me.avatar.delete.description",
-  category: "app.api.v1.core.user.category",
-  tags: ["app.api.v1.core.user.private.me.avatar.tag"],
+  title: "app.api.v1.core.user.private.me.avatar.delete.title" as const,
+  description:
+    "app.api.v1.core.user.private.me.avatar.delete.description" as const,
+  category: "app.api.v1.core.user.category" as const,
+  tags: ["app.api.v1.core.user.private.me.avatar.tag" as const],
   allowedRoles: [
     UserRole.PUBLIC,
     UserRole.CUSTOMER,
@@ -307,13 +312,14 @@ const { DELETE } = createEndpoint({
     UserRole.CLI_ONLY,
     UserRole.CLI_WEB,
     UserRole.WEB_ONLY,
-  ],
+  ] as const,
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.user.private.me.avatar.delete.response.title",
+      title:
+        "app.api.v1.core.user.private.me.avatar.delete.response.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.delete.response.description",
+        "app.api.v1.core.user.private.me.avatar.delete.response.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { response: true },
@@ -322,7 +328,7 @@ const { DELETE } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.user.private.me.avatar.delete.response.success",
+            "app.api.v1.core.user.private.me.avatar.delete.response.success" as const,
         },
         z.boolean(),
       ),
@@ -330,7 +336,7 @@ const { DELETE } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.user.private.me.avatar.delete.response.message",
+            "app.api.v1.core.user.private.me.avatar.delete.response.message" as const,
         },
         z.string(),
       ),
@@ -338,7 +344,7 @@ const { DELETE } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.user.private.me.avatar.delete.response.nextSteps.item",
+            "app.api.v1.core.user.private.me.avatar.delete.response.nextSteps.item" as const,
         },
         z.array(z.string()),
       ),
@@ -349,65 +355,66 @@ const { DELETE } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.validation.title",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.validation.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.validation.description",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.unauthorized.title",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.unauthorized.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.unauthorized.description",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.internal.title",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.internal.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.internal.description",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.unknown.title",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.unknown.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.unknown.description",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.network.title",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.network.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.network.description",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.network.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.forbidden.title",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.forbidden.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.forbidden.description",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.notFound.title",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.notFound.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.notFound.description",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.unsaved.title",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.unsaved.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.unsaved.description",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.unsaved.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.conflict.title",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.conflict.title" as const,
       description:
-        "app.api.v1.core.user.private.me.avatar.delete.errors.conflict.description",
+        "app.api.v1.core.user.private.me.avatar.delete.errors.conflict.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.user.private.me.avatar.delete.success.title",
+    title:
+      "app.api.v1.core.user.private.me.avatar.delete.success.title" as const,
     description:
-      "app.api.v1.core.user.private.me.avatar.delete.success.description",
+      "app.api.v1.core.user.private.me.avatar.delete.success.description" as const,
   },
 
   // === EXAMPLES ===

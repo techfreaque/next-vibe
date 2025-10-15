@@ -3,12 +3,18 @@
  * Database tables for task management system
  */
 
-import { relations } from "drizzle-orm";
+/**
+ * NOTE: Using text() with enum constraint instead of pgEnum() because translation keys
+ * exceed PostgreSQL's 63-byte enum label limit. Type safety is maintained through
+ * Drizzle's enum constraint and Zod validation.
+ */
+/**
+ * Tasks Database Schema
+ * Database tables for task management system
+ */
 import {
   boolean,
-  index,
   integer,
-  json,
   jsonb,
   pgTable,
   text,
@@ -18,68 +24,13 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import {
-  CronTaskStatus,
-  CronTaskStatusDB,
-  PulseExecutionStatus,
-  PulseExecutionStatusDB,
-  PulseHealthStatus,
-  PulseHealthStatusDB,
-  TaskPriority,
-  TaskPriorityDB,
-  TaskStatus,
-  TaskStatusDB,
-  TaskType,
-  TaskTypeDB,
-} from "./enum";
+import { CronTaskStatus, TaskPriorityDB, TaskStatusDB } from "./enum";
 
 /**
  * NOTE: Using text() with enum constraint instead of pgEnum() because translation keys
  * exceed PostgreSQL's 63-byte enum label limit. Type safety is maintained through
  * Drizzle's enum constraint and Zod validation.
  */
-
-/**
- * Tasks Database Schema
- * Database tables for task management system
- */
-
-import { relations } from "drizzle-orm";
-import {
-  boolean,
-  index,
-  integer,
-  json,
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { z } from "zod";
-
-import {
-  PulseExecutionStatus,
-  PulseExecutionStatusDB,
-  PulseHealthStatus,
-  PulseHealthStatusDB,
-  TaskPriority,
-  TaskPriorityDB,
-  TaskStatus,
-  TaskStatusDB,
-  TaskType,
-  TaskTypeDB,
-} from "./enum";
-
-/**
- * NOTE: Using text() with enum constraint instead of pgEnum() because translation keys
- * exceed PostgreSQL's 63-byte enum label limit. Type safety is maintained through
- * Drizzle's enum constraint and Zod validation.
- */
-
-
-
-
 
 /**
  * Core Tables as per spec.md database schema
@@ -156,7 +107,9 @@ export const sideTasks = pgTable("side_tasks", {
   monitoring: jsonb("monitoring"),
   documentation: jsonb("documentation"),
   // Status tracking
-  status: text("status", { enum: TaskStatusDB }).default(CronTaskStatus.STOPPED).notNull(),
+  status: text("status", { enum: TaskStatusDB })
+    .default(CronTaskStatus.STOPPED)
+    .notNull(),
   lastStarted: timestamp("last_started"),
   lastStopped: timestamp("last_stopped"),
   restartCount: integer("restart_count").default(0).notNull(),

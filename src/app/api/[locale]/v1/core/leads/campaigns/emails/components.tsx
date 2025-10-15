@@ -526,8 +526,7 @@ export async function EmailImage({
         }}
       />
     );
-  } catch (error) {
-    console.error("Failed to process image", error);
+  } catch {
     // Return a placeholder transparent pixel on error
     return (
       <Img
@@ -564,13 +563,8 @@ export async function LucideEmailIcon(
   // Fetch the SVG
   const response = await fetch(url);
   if (!response.ok) {
-    console.error(`Failed to fetch Lucide icon: ${icon}`, {
-      url,
-      status: response.status,
-      statusText: response.statusText,
-    });
-    // eslint-disable-next-line i18next/no-literal-string
-    return <div>Icon not found: {icon}</div>;
+    // Return empty div if icon fetch fails
+    return <div />;
   }
 
   // Fetch the SVG content

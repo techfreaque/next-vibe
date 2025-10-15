@@ -7,6 +7,8 @@ export const translations = {
       description: "Configure invoice parameters",
     },
     response: {
+      success: "Invoice created successfully",
+      message: "Status message",
       invoice: {
         title: "Invoice Details",
         description: "Generated invoice information",
@@ -67,5 +69,35 @@ export const translations = {
       title: "Success",
       description: "Operation completed successfully",
     },
+  },
+  customerId: {
+    label: "Customer ID",
+    description: "Stripe customer identifier",
+    placeholder: "Enter customer ID",
+  },
+  amount: {
+    label: "Amount",
+    description: "Invoice amount",
+    placeholder: "Enter amount",
+  },
+  currency: {
+    label: "Currency",
+    description: "Currency code",
+    placeholder: "Select currency",
+  },
+  description: {
+    label: "Description",
+    description: "Invoice description",
+    placeholder: "Enter description",
+  },
+  dueDate: {
+    label: "Due Date",
+    description: "Payment due date",
+    placeholder: "Select due date",
+  },
+  metadata: {
+    label: "Metadata",
+    description: "Additional metadata",
+    placeholder: "Enter metadata as JSON",
   },
 };

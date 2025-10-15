@@ -14,13 +14,20 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint";
-import { useApiMutation } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation";
 import type {
   InferApiFormReturn,
   InferEnhancedMutationResult,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
-import type { BillingInterval, SubscriptionPlan } from "../enum";
+import { useApiMutation } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation";
+import { useTranslation } from "@/i18n/core/client";
+
+import type {
+  type BillingIntervalValue,
+  SubscriptionPlan,
+  type SubscriptionPlanValue,
+} from "../enum";
 import type {
   CheckoutRequestInput,
   CheckoutResponseOutput,
@@ -37,7 +44,9 @@ import checkoutEndpoints from "./definition";
 export function useCreateSubscriptionCheckout(
   defaultValues?: CheckoutRequestInput,
 ): InferApiFormReturn<typeof checkoutEndpoints.POST> {
-  return useApiForm(checkoutEndpoints.POST, { defaultValues });
+  const { locale } = useTranslation();
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  return useApiForm(checkoutEndpoints.POST, logger, { defaultValues });
 }
 
 /****************************
@@ -50,7 +59,9 @@ export function useCreateSubscriptionCheckout(
 export function useCreateSubscriptionCheckoutMutation(): InferEnhancedMutationResult<
   typeof checkoutEndpoints.POST
 > {
-  return useApiMutation(checkoutEndpoints.POST);
+  const { locale } = useTranslation();
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  return useApiMutation(checkoutEndpoints.POST, logger);
 }
 
 /****************************
@@ -62,8 +73,8 @@ export function useCreateSubscriptionCheckoutMutation(): InferEnhancedMutationRe
  */
 export function useSubscriptionCheckout(): {
   createCheckout: (
-    planId: Exclude<SubscriptionPlan, SubscriptionPlan.ENTERPRISE>,
-    billingInterval: BillingInterval,
+    planId: Exclude<SubscriptionPlanValue, typeof SubscriptionPlan.ENTERPRISE>,
+    billingInterval: BillingIntervalValue,
     metadata?: Record<string, string>,
   ) => Promise<ResponseType<CheckoutResponseOutput>>;
   isPending: boolean;
@@ -72,8 +83,8 @@ export function useSubscriptionCheckout(): {
   const createMutation = useCreateSubscriptionCheckoutMutation();
 
   const createCheckout = async (
-    planId: Exclude<SubscriptionPlan, SubscriptionPlan.ENTERPRISE>,
-    billingInterval: BillingInterval,
+    planId: Exclude<SubscriptionPlanValue, typeof SubscriptionPlan.ENTERPRISE>,
+    billingInterval: BillingIntervalValue,
     metadata?: Record<string, string>,
   ): Promise<ResponseType<CheckoutResponseOutput>> => {
     try {

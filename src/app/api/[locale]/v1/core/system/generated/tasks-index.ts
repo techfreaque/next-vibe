@@ -10,10 +10,6 @@
  * - Generated at: 2025-10-10T17:19:42.646Z
  */
 
-/* eslint-disable prettier/prettier */
-/* eslint-disable simple-import-sort/imports */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
 import type { Task, TaskRegistry } from "../types/repository";
 import { UnifiedTaskRunnerRepositoryImpl } from "../unified-runner/repository";
 
@@ -68,5 +64,5 @@ export const taskRegistry: TaskRegistry = {
   taskRunner, // Single unified task runner instance
 };
 
-export { allTasks, cronTasks, sideTasks, taskRunners, tasksByCategory, tasksByName, taskRunner };
+export { allTasks, cronTasks, sideTasks, taskRunner,taskRunners, tasksByCategory, tasksByName };
 export default allTasks;

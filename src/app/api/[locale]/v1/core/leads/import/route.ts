@@ -4,7 +4,7 @@
  */
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 
 import definitions from "./definition";
 import { leadsImportRepository } from "./repository";
@@ -14,11 +14,7 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: undefined,
     handler: async ({ data, user, logger }) => {
-      return await leadsImportRepository.importLeadsFromCsv(
-        data,
-        user.id,
-        logger,
-      );
+      return await leadsImportRepository.importLeadsFromCsv(data, user, logger);
     },
   },
 });

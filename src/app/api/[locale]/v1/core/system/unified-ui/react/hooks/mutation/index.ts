@@ -12,10 +12,14 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useMemo, useState } from "react";
+import type { z } from "zod";
 
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { useTranslation } from "@/i18n/core/client";
 
 import type { EndpointLogger } from "../../../cli/vibe/endpoints/endpoint-handler/logger";
+import type { Methods } from "../../../cli/vibe/endpoints/endpoint-types/core/enums";
+import type { UnifiedField } from "../../../cli/vibe/endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "../../../cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { AnyData, ApiStore, MutationStoreType } from "../store";
 import { useApiStore } from "../store";
@@ -23,18 +27,16 @@ import type { ApiMutationOptions } from "../types";
 
 /**
  * Type for mutation variables
+ * When both TRequest and TUrlVariables are never (no request data needed),
+ * the variables should be an empty object
  */
-export interface MutationVariables<TRequest, TUrlVariables> {
-  /**
-   * Request data for the API call
-   */
-  requestData: TRequest;
-
-  /**
-   * URL parameters for the API call
-   */
-  urlParams: TUrlVariables;
-}
+export type MutationVariables<TRequest, TUrlVariables> = [TRequest] extends [
+  never,
+]
+  ? [TUrlVariables] extends [never]
+    ? Record<string, never> // Both are never - empty object
+    : { requestData: TRequest; urlParams: TUrlVariables }
+  : { requestData: TRequest; urlParams: TUrlVariables };
 
 /**
  * Mutation context type for tracking additional mutation state
@@ -174,11 +176,22 @@ export function useApiMutation<
     ) => {
       // Clear any existing error when starting a new mutation
       setLocalError(null);
+
+      // Handle the case where variables is an empty object (for endpoints with no request data)
+      const requestData =
+        "requestData" in variables
+          ? variables.requestData
+          : ({} as TEndpoint["TRequestOutput"]);
+      const urlParams =
+        "urlParams" in variables
+          ? variables.urlParams
+          : ({} as TEndpoint["TUrlVariablesOutput"]);
+
       void executeMutation(
         endpoint,
         logger,
-        variables.requestData,
-        variables.urlParams,
+        requestData,
+        urlParams,
         t,
         locale,
         options,
@@ -199,11 +212,21 @@ export function useApiMutation<
         // Clear any existing error when starting a new mutation
         setLocalError(null);
 
+        // Handle the case where variables is an empty object (for endpoints with no request data)
+        const requestData =
+          "requestData" in variables
+            ? variables.requestData
+            : ({} as TEndpoint["TRequestOutput"]);
+        const urlParams =
+          "urlParams" in variables
+            ? variables.urlParams
+            : ({} as TEndpoint["TUrlVariablesOutput"]);
+
         const response = await executeMutation(
           endpoint,
           logger,
-          variables.requestData,
-          variables.urlParams,
+          requestData,
+          urlParams,
           t,
           locale,
           options,

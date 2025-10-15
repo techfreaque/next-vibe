@@ -2,4 +2,4 @@ import { testEndpoint } from "@/app/api/[locale]/v1/core/system/check/testing/te
 
 import endpoint from "./definition";
 
-testEndpoint(endpoint.GET);
+testEndpoint(endpoint.POST);

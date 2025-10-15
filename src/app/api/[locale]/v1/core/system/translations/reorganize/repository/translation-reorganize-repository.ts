@@ -1,4 +1,6 @@
 import fs from "node:fs";
+import path from "node:path";
+
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -6,7 +8,6 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import path from "node:path";
 
 import { languageDefaults } from "@/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -14,10 +15,6 @@ import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { EndpointLogger } from "../../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type {
-  RestoreBackupRequestOutput,
-  RestoreBackupResponseOutput,
-} from "../../restore-backup/definition";
 import {
   API_TRANSLATIONS_IMPORT,
   API_TRANSLATIONS_KEY,

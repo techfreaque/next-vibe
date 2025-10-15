@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 /**
  * Logger interface for endpoint handlers
  * Provides structured logging with timing information

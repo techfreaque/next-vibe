@@ -117,6 +117,7 @@ export const translations = {
     repositoryCreateFailed: "Failed to create contact request",
     repositoryCreateDetails:
       "Unable to process your contact form at this time. Please try again later.",
+    noContactReturned: "No contact record was returned after creation",
     validation: {
       title: "Validation Error",
       description: "Please check your input and try again",
@@ -164,10 +165,82 @@ export const translations = {
   sms: {
     admin: {
       notification: "New contact inquiry: {name} ({email}) - {subject}",
+      phone: {
+        missing: "No admin phone number configured for contact notifications",
+      },
+      send: {
+        start: "Sending admin notification SMS for contact submission",
+        error: "Error sending admin notification SMS for contact",
+      },
     },
     confirmation: {
       message:
         "{name}, thank you for your message! We'll get back to you soon.",
+      phone: {
+        missing: "No user phone number available for contact confirmation SMS",
+      },
+      send: {
+        start: "Sending confirmation SMS to contact form submitter",
+        error: "Error sending confirmation SMS for contact",
+      },
+    },
+  },
+
+  repository: {
+    create: {
+      start: "Starting contact form submission",
+      success: "Contact form submitted successfully",
+      error: "Error creating contact form submission",
+    },
+    lead: {
+      conversion: {
+        start: "Starting lead conversion for contact",
+        error: "Error during lead conversion for contact",
+      },
+      provided: "Lead ID provided for contact submission",
+    },
+    seed: {
+      create: {
+        start: "Starting contact seed creation",
+        error: "Error creating contact seed",
+      },
+    },
+  },
+
+  route: {
+    sms: {
+      admin: {
+        failed: "Admin notification SMS failed for contact submission",
+      },
+      confirmation: {
+        failed: "Confirmation SMS failed for contact submission",
+      },
+    },
+  },
+
+  seeds: {
+    dev: {
+      start: "Starting contact seeds for development environment",
+      submission: {
+        created: "Contact submission created in development seeds",
+        failed: "Failed to create contact submission in development seeds",
+        error: "Error creating contact submission in development seeds",
+      },
+      complete: "Contact development seeds completed",
+      error: "Error seeding contact development data",
+    },
+    test: {
+      start: "Starting contact seeds for test environment",
+      submission: {
+        created: "Contact submission created in test seeds",
+        failed: "Failed to create contact submission in test seeds",
+      },
+      error: "Error seeding contact test data",
+    },
+    prod: {
+      start: "Starting contact seeds for production environment",
+      ready: "Contact production environment ready",
+      error: "Error seeding contact production data",
     },
   },
 

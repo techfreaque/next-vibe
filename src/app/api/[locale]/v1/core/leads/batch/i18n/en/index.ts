@@ -63,6 +63,7 @@ export const translations = {
       totalProcessed: "Total Processed",
       totalUpdated: "Total Updated",
       preview: "Preview",
+      errors: "Errors",
     },
     errors: {
       unauthorized: {
@@ -142,6 +143,7 @@ export const translations = {
       totalProcessed: "Total Processed",
       totalDeleted: "Total Deleted",
       preview: "Preview",
+      errors: "Errors",
     },
     errors: {
       unauthorized: {

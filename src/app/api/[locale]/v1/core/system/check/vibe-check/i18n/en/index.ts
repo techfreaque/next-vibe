@@ -5,6 +5,36 @@ export const translations = {
   category: "Development Tools",
   tag: "quality",
 
+  // Enum translations
+  checkType: {
+    lint: "Lint",
+    typecheck: "Type Check",
+    test: "Test",
+    structure: "Structure",
+    migration: "Migration",
+    all: "All",
+  },
+  status: {
+    pending: "Pending",
+    running: "Running",
+    passed: "Passed",
+    failed: "Failed",
+    warning: "Warning",
+    skipped: "Skipped",
+  },
+  severity: {
+    error: "Error",
+    warning: "Warning",
+    info: "Info",
+    suggestion: "Suggestion",
+  },
+  fixAction: {
+    autoFix: "Auto Fix",
+    manualFix: "Manual Fix",
+    ignore: "Ignore",
+    review: "Review",
+  },
+
   container: {
     title: "Vibe Check Configuration",
     description: "Configure parameters for comprehensive code quality checking",

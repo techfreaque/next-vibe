@@ -24,21 +24,22 @@ import { UserRole } from "../../../user-roles/enum";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "user", "private", "me", "password"],
-  title: "app.api.v1.core.user.private.me.password.title",
-  description: "app.api.v1.core.user.private.me.password.description",
-  category: "app.api.v1.core.user.category",
-  tags: ["app.api.v1.core.user.private.me.password.tag"],
+  title: "app.api.v1.core.user.private.me.password.title" as const,
+  description: "app.api.v1.core.user.private.me.password.description" as const,
+  category: "app.api.v1.core.user.category" as const,
+  tags: ["app.api.v1.core.user.private.me.password.tag" as const],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
-  ],
+  ] as const,
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.user.private.me.password.title",
-      description: "app.api.v1.core.user.private.me.password.description",
+      title: "app.api.v1.core.user.private.me.password.title" as const,
+      description:
+        "app.api.v1.core.user.private.me.password.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -48,9 +49,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title:
-            "app.api.v1.core.user.private.me.password.groups.currentCredentials.title",
+            "app.api.v1.core.user.private.me.password.groups.currentCredentials.title" as const,
           description:
-            "app.api.v1.core.user.private.me.password.groups.currentCredentials.description",
+            "app.api.v1.core.user.private.me.password.groups.currentCredentials.description" as const,
           layout: { type: LayoutType.GRID, columns: 12 },
         },
         { request: "data" },
@@ -60,15 +61,15 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.PASSWORD,
               label:
-                "app.api.v1.core.user.private.me.password.currentPassword.label",
+                "app.api.v1.core.user.private.me.password.currentPassword.label" as const,
               description:
-                "app.api.v1.core.user.private.me.password.currentPassword.description",
+                "app.api.v1.core.user.private.me.password.currentPassword.description" as const,
               placeholder:
-                "app.api.v1.core.user.private.me.password.currentPassword.placeholder",
+                "app.api.v1.core.user.private.me.password.currentPassword.placeholder" as const,
               required: true,
               layout: { columns: 12 },
               helpText:
-                "app.api.v1.core.user.private.me.password.currentPassword.description",
+                "app.api.v1.core.user.private.me.password.currentPassword.description" as const,
             },
             z.string().min(8, {
               message:
@@ -83,9 +84,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title:
-            "app.api.v1.core.user.private.me.password.groups.newCredentials.title",
+            "app.api.v1.core.user.private.me.password.groups.newCredentials.title" as const,
           description:
-            "app.api.v1.core.user.private.me.password.groups.newCredentials.description",
+            "app.api.v1.core.user.private.me.password.groups.newCredentials.description" as const,
           layout: { type: LayoutType.GRID, columns: 12 },
         },
         { request: "data" },
@@ -95,15 +96,15 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.PASSWORD,
               label:
-                "app.api.v1.core.user.private.me.password.newPassword.label",
+                "app.api.v1.core.user.private.me.password.newPassword.label" as const,
               description:
-                "app.api.v1.core.user.private.me.password.newPassword.description",
+                "app.api.v1.core.user.private.me.password.newPassword.description" as const,
               placeholder:
-                "app.api.v1.core.user.private.me.password.newPassword.placeholder",
+                "app.api.v1.core.user.private.me.password.newPassword.placeholder" as const,
               required: true,
               layout: { columns: 12 },
               helpText:
-                "app.api.v1.core.user.private.me.password.newPassword.description",
+                "app.api.v1.core.user.private.me.password.newPassword.description" as const,
             },
             z.string().min(8, {
               message:
@@ -116,15 +117,15 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.PASSWORD,
               label:
-                "app.api.v1.core.user.private.me.password.confirmPassword.label",
+                "app.api.v1.core.user.private.me.password.confirmPassword.label" as const,
               description:
-                "app.api.v1.core.user.private.me.password.confirmPassword.description",
+                "app.api.v1.core.user.private.me.password.confirmPassword.description" as const,
               placeholder:
-                "app.api.v1.core.user.private.me.password.confirmPassword.placeholder",
+                "app.api.v1.core.user.private.me.password.confirmPassword.placeholder" as const,
               required: true,
               layout: { columns: 12 },
               helpText:
-                "app.api.v1.core.user.private.me.password.confirmPassword.description",
+                "app.api.v1.core.user.private.me.password.confirmPassword.description" as const,
             },
             z.string().min(8, {
               message:
@@ -138,9 +139,10 @@ const { POST } = createEndpoint({
       response: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.v1.core.user.private.me.password.response.title",
+          title:
+            "app.api.v1.core.user.private.me.password.response.title" as const,
           description:
-            "app.api.v1.core.user.private.me.password.response.description",
+            "app.api.v1.core.user.private.me.password.response.description" as const,
           layout: { type: LayoutType.GRID, columns: 12 },
         },
         { response: true },
@@ -149,7 +151,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.private.me.password.response.success",
+                "app.api.v1.core.user.private.me.password.response.success" as const,
             },
             z.boolean(),
           ),
@@ -157,7 +159,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.private.me.password.response.message",
+                "app.api.v1.core.user.private.me.password.response.message" as const,
             },
             z.string(),
           ),
@@ -165,7 +167,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.private.me.password.response.securityTip",
+                "app.api.v1.core.user.private.me.password.response.securityTip" as const,
             },
             z.string().optional(),
           ),
@@ -173,7 +175,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.private.me.password.response.nextSteps.item",
+                "app.api.v1.core.user.private.me.password.response.nextSteps.item" as const,
             },
             z.array(z.string()),
           ),
@@ -185,58 +187,66 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.v1.core.user.private.me.password.errors.validation.title",
+      title:
+        "app.api.v1.core.user.private.me.password.errors.validation.title" as const,
       description:
-        "app.api.v1.core.user.private.me.password.errors.validation.description",
+        "app.api.v1.core.user.private.me.password.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.user.private.me.password.errors.unauthorized.title",
+        "app.api.v1.core.user.private.me.password.errors.unauthorized.title" as const,
       description:
-        "app.api.v1.core.user.private.me.password.errors.unauthorized.description",
+        "app.api.v1.core.user.private.me.password.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.v1.core.user.private.me.password.errors.server.title",
+      title:
+        "app.api.v1.core.user.private.me.password.errors.server.title" as const,
       description:
-        "app.api.v1.core.user.private.me.password.errors.server.description",
+        "app.api.v1.core.user.private.me.password.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.v1.core.user.private.me.password.errors.unknown.title",
+      title:
+        "app.api.v1.core.user.private.me.password.errors.unknown.title" as const,
       description:
-        "app.api.v1.core.user.private.me.password.errors.unknown.description",
+        "app.api.v1.core.user.private.me.password.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.v1.core.user.private.me.password.errors.network.title",
+      title:
+        "app.api.v1.core.user.private.me.password.errors.network.title" as const,
       description:
-        "app.api.v1.core.user.private.me.password.errors.network.description",
+        "app.api.v1.core.user.private.me.password.errors.network.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.v1.core.user.private.me.password.errors.forbidden.title",
+      title:
+        "app.api.v1.core.user.private.me.password.errors.forbidden.title" as const,
       description:
-        "app.api.v1.core.user.private.me.password.errors.forbidden.description",
+        "app.api.v1.core.user.private.me.password.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.v1.core.user.private.me.password.errors.notFound.title",
+      title:
+        "app.api.v1.core.user.private.me.password.errors.notFound.title" as const,
       description:
-        "app.api.v1.core.user.private.me.password.errors.notFound.description",
+        "app.api.v1.core.user.private.me.password.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.user.private.me.password.errors.unsavedChanges.title",
+        "app.api.v1.core.user.private.me.password.errors.unsavedChanges.title" as const,
       description:
-        "app.api.v1.core.user.private.me.password.errors.unsavedChanges.description",
+        "app.api.v1.core.user.private.me.password.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.v1.core.user.private.me.password.errors.conflict.title",
+      title:
+        "app.api.v1.core.user.private.me.password.errors.conflict.title" as const,
       description:
-        "app.api.v1.core.user.private.me.password.errors.conflict.description",
+        "app.api.v1.core.user.private.me.password.errors.conflict.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.user.private.me.password.success.title",
-    description: "app.api.v1.core.user.private.me.password.success.description",
+    title: "app.api.v1.core.user.private.me.password.success.title" as const,
+    description:
+      "app.api.v1.core.user.private.me.password.success.description" as const,
   },
 
   // === EXAMPLES ===

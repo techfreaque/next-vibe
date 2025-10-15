@@ -5,7 +5,6 @@
 // eslint-disable-next-line no-restricted-syntax
 export type ExplicitObjectType = object;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ExplicitAnyType = any;
 
 /**

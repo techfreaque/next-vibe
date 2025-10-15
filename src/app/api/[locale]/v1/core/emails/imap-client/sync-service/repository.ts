@@ -19,23 +19,23 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../user/auth/definition";
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { NewEmail, NewImapFolder } from "../../messages/db";
 import { emails, imapAccounts, imapFolders } from "../../messages/db";
 import { EmailType } from "../../messages/enum";
 import { imapConnectionRepository } from "../connection/repository";
 import { ImapSyncStatus } from "../enum";
 import type {
-  SyncAccountFoldersRequestTypeOutput,
-  SyncAccountFoldersResponseTypeOutput,
-  SyncAccountRequestTypeOutput,
-  SyncAccountResponseTypeOutput,
-  SyncAllAccountsRequestTypeOutput,
-  SyncAllAccountsResponseTypeOutput,
-  SyncFolderMessagesRequestTypeOutput,
-  SyncFolderMessagesResponseTypeOutput,
+  SyncAccountFoldersRequestOutput,
+  SyncAccountFoldersResponseOutput,
+  SyncAccountRequestOutput,
+  SyncAccountResponseOutput,
+  SyncAllAccountsRequestOutput,
+  SyncAllAccountsResponseOutput,
+  SyncFolderMessagesRequestOutput,
+  SyncFolderMessagesResponseOutput,
   SyncResult,
 } from "./definition";
 
@@ -55,32 +55,32 @@ const IMAP_FLAGS = {
  */
 export interface ImapSyncRepository {
   syncAllAccounts(
-    data: SyncAllAccountsRequestTypeOutput,
+    data: SyncAllAccountsRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SyncAllAccountsResponseTypeOutput>>;
+  ): Promise<ResponseType<SyncAllAccountsResponseOutput>>;
 
   syncAccount(
-    data: SyncAccountRequestTypeOutput,
+    data: SyncAccountRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SyncAccountResponseTypeOutput>>;
+  ): Promise<ResponseType<SyncAccountResponseOutput>>;
 
   syncAccountFolders(
-    data: SyncAccountFoldersRequestTypeOutput,
+    data: SyncAccountFoldersRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SyncAccountFoldersResponseTypeOutput>>;
+  ): Promise<ResponseType<SyncAccountFoldersResponseOutput>>;
 
   syncFolderMessages(
-    data: SyncFolderMessagesRequestTypeOutput,
+    data: SyncFolderMessagesRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SyncFolderMessagesResponseTypeOutput>>;
+  ): Promise<ResponseType<SyncFolderMessagesResponseOutput>>;
 }
 
 /**
@@ -91,11 +91,11 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
    * Sync all enabled IMAP accounts
    */
   async syncAllAccounts(
-    data: SyncAllAccountsRequestTypeOutput,
+    data: SyncAllAccountsRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SyncAllAccountsResponseTypeOutput>> {
+  ): Promise<ResponseType<SyncAllAccountsResponseOutput>> {
     const startTime = Date.now();
     let accountsProcessed = 0;
     let foldersProcessed = 0;
@@ -252,11 +252,11 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
    * Sync a specific IMAP account
    */
   async syncAccount(
-    data: SyncAccountRequestTypeOutput,
+    data: SyncAccountRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SyncAccountResponseTypeOutput>> {
+  ): Promise<ResponseType<SyncAccountResponseOutput>> {
     const startTime = Date.now();
     let foldersProcessed = 0;
     let messagesProcessed = 0;
@@ -391,11 +391,11 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
    * Sync folders for an account
    */
   async syncAccountFolders(
-    data: SyncAccountFoldersRequestTypeOutput,
+    data: SyncAccountFoldersRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SyncAccountFoldersResponseTypeOutput>> {
+  ): Promise<ResponseType<SyncAccountFoldersResponseOutput>> {
     const startTime = Date.now();
     let foldersProcessed = 0;
     let foldersAdded = 0;
@@ -540,11 +540,11 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
    * Sync messages for a folder
    */
   async syncFolderMessages(
-    data: SyncFolderMessagesRequestTypeOutput,
+    data: SyncFolderMessagesRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SyncFolderMessagesResponseTypeOutput>> {
+  ): Promise<ResponseType<SyncFolderMessagesResponseOutput>> {
     const startTime = Date.now();
     let messagesProcessed = 0;
     let messagesAdded = 0;

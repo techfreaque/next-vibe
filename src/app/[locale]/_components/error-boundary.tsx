@@ -1,12 +1,10 @@
 "use client";
 
 import { AlertTriangleIcon, RefreshCwIcon } from "lucide-react";
-import { errorLogger } from "next-vibe/shared/utils";
-import { parseError } from "next-vibe/shared/utils/parse-error";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import type { JSX, ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

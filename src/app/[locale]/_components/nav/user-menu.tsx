@@ -14,8 +14,9 @@ import {
 } from "next-vibe-ui/ui/dropdown-menu";
 import type { JSX } from "react";
 
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { StandardUserType } from "@/app/api/[locale]/v1/core/user/definition";
 import { useLogout } from "@/app/api/[locale]/v1/core/user/private/logout/hooks";
-import type { StandardUserType } from "@/app/api/[locale]/v1/core/user/schema";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -31,17 +32,15 @@ export function UserMenu({
   isOnboardingComplete,
 }: UserMenuProps): JSX.Element {
   const { t } = simpleT(locale);
-  const logout = useLogout();
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logout = useLogout(logger);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-9 w-9 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage
-              src={user.imageUrl || undefined}
-              alt={getUserDisplayName(user)}
-            />
+            <AvatarImage src={undefined} alt={getUserDisplayName(user)} />
             <AvatarFallback className="bg-primary text-primary-foreground">
               <User className="h-4 w-4" />
             </AvatarFallback>
@@ -100,11 +99,5 @@ export function UserMenu({
 }
 
 const getUserDisplayName = (user: StandardUserType): string => {
-  if (user.firstName && user.lastName) {
-    return `${user.firstName} ${user.lastName}`;
-  }
-  if (user.firstName) {
-    return user.firstName;
-  }
-  return user.email;
+  return user.privateName || user.email;
 };

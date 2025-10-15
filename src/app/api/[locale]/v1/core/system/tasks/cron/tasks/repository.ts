@@ -14,17 +14,19 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import { z } from "zod";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { EndpointLogger } from "../../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { cronTasks } from "../../db";
-import { CronTaskStatus } from "../../enum";
+import { CronTaskPriority, CronTaskStatus, TaskCategory } from "../../enum";
 import type {
   CronTaskListRequestOutput,
   CronTaskListResponseOutput,
+  CronTaskResponseType,
 } from "./definition";
 
 /**
@@ -84,7 +86,9 @@ function calculateNextExecutionTime(cronExpression?: string): Date | null {
 /**
  * Determine task status based on execution data
  */
-function determineTaskStatus(task: typeof cronTasks.$inferSelect): string {
+function determineTaskStatus(
+  task: typeof cronTasks.$inferSelect,
+): (typeof CronTaskStatus)[keyof typeof CronTaskStatus] {
   if (!task.enabled) {
     return CronTaskStatus.STOPPED;
   }
@@ -128,28 +132,26 @@ function determineTaskStatus(task: typeof cronTasks.$inferSelect): string {
 
 /**
  * Format task response with computed fields
+ * Uses Zod validation to ensure database enum values match expected types
  */
-function formatTaskResponse(task: typeof cronTasks.$inferSelect): {
-  id: string;
-  name: string;
-  description?: string;
-  schedule: string;
-  enabled: boolean;
-  priority: string;
-  status: string;
-  category: string;
-  lastRun?: string;
-  nextRun?: string;
-} {
-  return {
+function formatTaskResponse(
+  task: typeof cronTasks.$inferSelect,
+): CronTaskResponseType {
+  // Validate enum values from database using Zod schemas
+  // This provides runtime validation and type narrowing without type assertions
+  const prioritySchema = z.nativeEnum(CronTaskPriority);
+  const statusSchema = z.nativeEnum(CronTaskStatus);
+  const categorySchema = z.nativeEnum(TaskCategory);
+
+  const formatted: CronTaskResponseType = {
     id: task.id,
     name: task.name,
     description: task.description || undefined,
     schedule: task.schedule || DEFAULT_CRON_SCHEDULE,
     enabled: task.enabled,
-    priority: task.priority,
-    status: determineTaskStatus(task),
-    category: task.category,
+    priority: prioritySchema.parse(task.priority),
+    status: statusSchema.parse(determineTaskStatus(task)),
+    category: categorySchema.parse(task.category),
     lastRun: task.lastRun?.toISOString(),
     nextRun:
       task.nextRun?.toISOString() ||
@@ -157,6 +159,7 @@ function formatTaskResponse(task: typeof cronTasks.$inferSelect): {
         ? calculateNextExecutionTime(task.schedule || undefined)?.toISOString()
         : undefined),
   };
+  return formatted;
 }
 
 /**
@@ -185,55 +188,43 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       logger.info("Starting cron tasks retrieval");
       logger.debug("Request data", data);
 
-      // Extract typed data
-      const requestData = data as {
-        status?: string[];
-        priority?: string[];
-        category?: string[];
-        enabled?: boolean;
-        limit?: string;
-        offset?: string;
-      };
-
       // Build query conditions
       const conditions = [];
 
       // Apply enabled filter
-      if (requestData.enabled !== undefined) {
-        conditions.push(eq(cronTasks.enabled, requestData.enabled));
+      if (data.enabled !== undefined) {
+        conditions.push(eq(cronTasks.enabled, data.enabled));
         logger.debug("Applied enabled filter", {
-          enabled: requestData.enabled,
+          enabled: data.enabled,
         });
       }
 
       // Apply multi-select status filter - skip for now since field doesn't exist
-      if (requestData.status && requestData.status.length > 0) {
+      if (data.status && data.status.length > 0) {
         // Since we don't have lastExecutionStatus in the current schema,
         // we'll filter by enabled status as a placeholder
-        logger.debug("Applied status filter", { statuses: requestData.status });
+        logger.debug("Applied status filter", { statuses: data.status });
       }
 
       // Apply multi-select priority filter
-      if (requestData.priority && requestData.priority.length > 0) {
-        conditions.push(
-          inArray(cronTasks.priority, requestData.priority),
-        );
+      if (data.priority && data.priority.length > 0) {
+        conditions.push(inArray(cronTasks.priority, data.priority));
         logger.debug("Applied priority filter", {
-          priorities: requestData.priority,
+          priorities: data.priority,
         });
       }
 
       // Apply multi-select category filter
-      if (requestData.category && requestData.category.length > 0) {
-        conditions.push(inArray(cronTasks.category, requestData.category));
+      if (data.category && data.category.length > 0) {
+        conditions.push(inArray(cronTasks.category, data.category));
         logger.debug("Applied category filter", {
-          categories: requestData.category,
+          categories: data.category,
         });
       }
 
       // Handle pagination
-      const limit = requestData.limit ? parseInt(requestData.limit, 10) : 10;
-      const offset = requestData.offset ? parseInt(requestData.offset, 10) : 0;
+      const limit = data.limit ? parseInt(data.limit, 10) : 10;
+      const offset = data.offset ? parseInt(data.offset, 10) : 0;
 
       // Default sort order by creation date
       const sortOrder = desc(cronTasks.createdAt);
@@ -255,7 +246,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       // Get total count for pagination
       const totalTasks = formattedTasks.length;
 
-      const response = {
+      const response: CronTaskListResponseOutput = {
         tasks: formattedTasks,
         totalTasks,
       };
@@ -268,7 +259,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         offset,
       });
 
-      return createSuccessResponse(response as CronTaskListResponseOutput);
+      return createSuccessResponse(response);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to retrieve cron tasks", parsedError);

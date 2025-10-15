@@ -19,6 +19,16 @@ export const translations = {
       label: "Hasło",
       description: "Bezpieczne hasło dla konta użytkownika",
     },
+    privateName: {
+      label: "Nazwa prywatna",
+      description:
+        "Pełne imię i nazwisko użytkownika (widoczne tylko dla administratorów)",
+    },
+    publicName: {
+      label: "Nazwa publiczna",
+      description:
+        "Nazwa wyświetlana użytkownika (widoczna dla wszystkich użytkowników)",
+    },
     firstName: {
       label: "Imię",
       description: "Imię użytkownika",
@@ -82,6 +92,12 @@ export const translations = {
       },
       email: {
         content: "Adres e-mail",
+      },
+      privateName: {
+        content: "Nazwa prywatna",
+      },
+      publicName: {
+        content: "Nazwa publiczna",
       },
       firstName: {
         content: "Imię",
@@ -209,6 +225,7 @@ export const translations = {
         accountDetails: "Szczegóły konta",
         email: "E-mail",
         name: "Nazwa",
+        publicName: "Nazwa wyświetlana",
         company: "Firma",
         phone: "Telefon",
         nextSteps: "Następne kroki",
@@ -234,30 +251,31 @@ export const translations = {
         id: "ID:",
         email: "E-mail:",
         name: "Nazwa:",
+        privateName: "Pełna nazwa:",
+        publicName: "Nazwa wyświetlana:",
         company: "Firma:",
         created: "Utworzono:",
         leadId: "ID leada:",
       },
     },
-    sms: {
-      welcome: {
-        message:
-          "Witamy {{firstName}}! Twoje konto zostało pomyślnie utworzone. Odwiedź nas pod adresem {{appUrl}}",
+  },
+  sms: {
+    welcome: {
+      message:
+        "Witamy {{firstName}}! Twoje konto zostało pomyślnie utworzone. Odwiedź nas pod adresem {{appUrl}}",
+    },
+    verification: {
+      message:
+        "{{firstName}}, Twój kod weryfikacyjny to: {{code}}. Wprowadź kod w ciągu 10 minut.",
+    },
+    errors: {
+      welcome_failed: {
+        title: "Nieudane SMS powitalne",
+        description: "Nie udało się wysłać SMS powitalnego do użytkownika",
       },
-      verification: {
-        message:
-          "{{firstName}}, Twój kod weryfikacyjny to: {{code}}. Wprowadź kod w ciągu 10 minut.",
-      },
-      errors: {
-        welcome_failed: {
-          title: "Nieudane SMS powitalne",
-          description: "Nie udało się wysłać SMS powitalnego do użytkownika",
-        },
-        verification_failed: {
-          title: "Nieudane SMS weryfikacyjne",
-          description:
-            "Nie udało się wysłać SMS weryfikacyjnego do użytkownika",
-        },
+      verification_failed: {
+        title: "Nieudane SMS weryfikacyjne",
+        description: "Nie udało się wysłać SMS weryfikacyjnego do użytkownika",
       },
     },
   },

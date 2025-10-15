@@ -13,13 +13,13 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "../../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { EndpointLogger } from "../../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type {
-  PulseExecuteRequestTypeOutput,
-  PulseExecuteResponseTypeOutput,
+  PulseExecuteRequestOutput,
+  PulseExecuteResponseOutput,
 } from "./definition";
 
 /**
@@ -30,11 +30,11 @@ export interface PulseExecuteRepository {
    * Execute pulse health check cycle
    */
   executePulse(
-    data: PulseExecuteRequestTypeOutput,
+    data: PulseExecuteRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<PulseExecuteResponseTypeOutput>>;
+  ): Promise<ResponseType<PulseExecuteResponseOutput>>;
 }
 
 /**
@@ -45,11 +45,11 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
    * Execute pulse health check cycle
    */
   async executePulse(
-    data: PulseExecuteRequestTypeOutput,
+    data: PulseExecuteRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<PulseExecuteResponseTypeOutput>> {
+  ): Promise<ResponseType<PulseExecuteResponseOutput>> {
     try {
       logger.debug("Executing pulse health check cycle", {
         userId: user.id,
@@ -135,7 +135,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
       const totalTasks = results.length;
       const allSuccessful = successfulTasks === totalTasks;
 
-      const response: PulseExecuteResponseTypeOutput = {
+      const response: PulseExecuteResponseOutput = {
         success: allSuccessful,
         message: data.dryRun
           ? t("tasks.success.taskExecuted")

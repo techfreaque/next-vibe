@@ -20,9 +20,9 @@ export interface StoreEmailMetadataParams {
   recipientName: string | null;
   senderEmail: string;
   senderName: string | null;
-  type: EmailType;
+  type: (typeof EmailType)[keyof typeof EmailType];
   templateName?: string | null;
-  status: EmailStatus;
+  status: (typeof EmailStatus)[keyof typeof EmailStatus];
   sentAt?: Date | null;
   deliveredAt?: Date | null;
   openedAt?: Date | null;
@@ -31,7 +31,7 @@ export interface StoreEmailMetadataParams {
   unsubscribedAt?: Date | null;
   error?: string | null;
   retryCount?: string;
-  emailProvider: EmailProvider | null;
+  emailProvider: (typeof EmailProvider)[keyof typeof EmailProvider] | null;
   externalId?: string | null;
   userId?: string | null;
   leadId?: string | null;
@@ -49,34 +49,34 @@ export interface UpdateEmailEngagementParams {
     clickedAt?: Date;
     bouncedAt?: Date;
     unsubscribedAt?: Date;
-    status?: EmailStatus;
+    status?: (typeof EmailStatus)[keyof typeof EmailStatus];
   };
 }
 
 /**
  * Store Email Metadata Request Type
  */
-export interface StoreEmailMetadataRequestTypeOutput {
+export interface StoreEmailMetadataRequestOutput {
   params: StoreEmailMetadataParams;
 }
 
 /**
  * Store Email Metadata Response Type
  */
-export interface StoreEmailMetadataResponseTypeOutput {
+export interface StoreEmailMetadataResponseOutput {
   success: boolean;
 }
 
 /**
  * Update Email Engagement Request Type
  */
-export interface UpdateEmailEngagementRequestTypeOutput {
+export interface UpdateEmailEngagementRequestOutput {
   params: UpdateEmailEngagementParams;
 }
 
 /**
  * Update Email Engagement Response Type
  */
-export interface UpdateEmailEngagementResponseTypeOutput {
+export interface UpdateEmailEngagementResponseOutput {
   success: boolean;
 }

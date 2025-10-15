@@ -5,9 +5,10 @@
 
 import { z } from "zod";
 
-import { UserRoleValue } from "../../../user/user-roles/enum";
+import { UserRole } from "../../../user/user-roles/enum";
 import {
   FieldDataType,
+  LayoutType,
   Methods,
   WidgetType,
 } from "../../unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
@@ -17,7 +18,6 @@ import {
   requestDataField,
   responseField,
 } from "../../unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
-import { LayoutType } from "../../unified-ui/cli/vibe/endpoints/endpoint-types/types";
 
 /**
  * Task Types Endpoint Definition
@@ -145,7 +145,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.v1.core.system.tasks.types.get.response.types.title",
         },
-        z.record(z.unknown()),
+        z.record(z.string(), z.unknown()),
       ),
 
       metadata: responseField(

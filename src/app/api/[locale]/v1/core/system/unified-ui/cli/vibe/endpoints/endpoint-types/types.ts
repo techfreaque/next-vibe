@@ -32,6 +32,9 @@ import type {
   AvatarWidgetConfig,
   BadgeWidgetConfig,
   ButtonGroupWidgetConfig,
+  DataListWidgetConfig,
+  FormGroupWidgetConfig,
+  FormSectionWidgetConfig,
 } from "./ui/types";
 
 // Import all enums from the consolidated core enums file
@@ -292,6 +295,31 @@ export interface BulkAction {
 // ============================================================================
 
 /**
+ * Forward declaration for WidgetConfig to resolve circular references
+ * The actual union type is defined at the end of this file
+ */
+export type WidgetConfig =
+  | FormFieldWidgetConfig
+  | FormGroupWidgetConfig
+  | FormSectionWidgetConfig
+  | DataTableWidgetConfig
+  | DataCardsWidgetConfig
+  | DataListWidgetConfig
+  | GroupedListWidgetConfig
+  | MetricCardWidgetConfig
+  | StatsGridWidgetConfig
+  | ChartWidgetConfig
+  | ContainerWidgetConfig
+  | SectionWidgetConfig
+  | ButtonWidgetConfig
+  | TitleWidgetConfig
+  | BadgeWidgetConfig
+  | AvatarWidgetConfig
+  | ButtonGroupWidgetConfig
+  | ActionBarWidgetConfig
+  | TextWidgetConfig;
+
+/**
  * Layout configuration
  */
 export interface LayoutConfig {
@@ -543,13 +571,13 @@ export interface ChartWidgetConfig extends BaseWidgetConfig {
  */
 export interface ContainerWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.CONTAINER;
-  title: TranslationKey;
-  description: TranslationKey;
+  title?: TranslationKey;
+  description?: TranslationKey;
   layout: LayoutConfig;
+  children: WidgetConfig[];
   border?: boolean;
   shadow?: boolean;
   background?: ComponentVariant;
-  collapsed?: boolean;
 }
 
 /**
@@ -558,7 +586,7 @@ export interface ContainerWidgetConfig extends BaseWidgetConfig {
 export interface SectionWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.SECTION;
   title: TranslationKey;
-  description: TranslationKey;
+  description?: TranslationKey;
   collapsible?: boolean;
   defaultExpanded?: boolean;
   layout: LayoutConfig;
@@ -633,23 +661,5 @@ export interface StatsGridWidgetConfig extends BaseWidgetConfig {
   layout?: LayoutConfig;
 }
 
-/**
- * Union type for all widget configurations
- */
-export type WidgetConfig =
-  | FormFieldWidgetConfig
-  | DataTableWidgetConfig
-  | DataCardsWidgetConfig
-  | GroupedListWidgetConfig
-  | MetricCardWidgetConfig
-  | StatsGridWidgetConfig
-  | ChartWidgetConfig
-  | ContainerWidgetConfig
-  | SectionWidgetConfig
-  | ButtonWidgetConfig
-  | TitleWidgetConfig
-  | BadgeWidgetConfig
-  | AvatarWidgetConfig
-  | ButtonGroupWidgetConfig
-  | ActionBarWidgetConfig
-  | TextWidgetConfig;
+// WidgetConfig union type is declared at the top of the file (line ~300)
+// to resolve circular references with Container and Section widgets

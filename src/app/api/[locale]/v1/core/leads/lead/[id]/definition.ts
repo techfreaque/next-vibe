@@ -6,206 +6,486 @@
 import { z } from "zod";
 
 import {
-  objectField,
-  requestDataField,
-  responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
-import {
   EndpointErrorTypes,
   FieldDataType,
+  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
-import type { ExtractEndpointTypes } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/types";
+import {
+  objectField,
+  requestDataField,
+  requestUrlParamsField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { Countries, Languages } from "@/i18n/core/config";
 
 import {
   EmailCampaignStage,
+  EmailCampaignStageOptions,
   EmailJourneyVariant,
   LeadSource,
   LeadStatus,
+  LeadStatusOptions,
 } from "../../enum";
-
-// Add missing imports
-const undefinedSchema = z.never();
-enum EndpointPattern {
-  CRUD = "CRUD",
-}
-enum ResponseDisplayLayout {
-  DETAIL = "DETAIL",
-}
-
-// Inline schemas to avoid deprecated schema.ts imports
-const leadUpdateSchema = z.object({
-  id: z.uuid(),
-  email: z.email().optional(),
-  businessName: z.string().min(1).optional(),
-  contactName: z.string().optional().nullable(),
-  phone: z.string().optional(),
-  website: z.string().url().optional().or(z.literal("")),
-  country: z.string().optional(),
-  language: z.string().optional(),
-  source: z.string().optional(),
-  notes: z.string().optional(),
-  status: z.string().optional(),
-  currentCampaignStage: z.string().optional(),
-  convertedUserId: z.uuid().nullable().optional(),
-  metadata: z.record(z.any()).optional(),
-}).partial();
-
-const leadResponseSchema = z.object({
-  id: z.uuid(),
-  email: z.email().optional().nullable(),
-  businessName: z.string(),
-  contactName: z.string().nullable(),
-  phone: z.string().nullable(),
-  website: z.string().nullable(),
-  country: z.string(),
-  language: z.string(),
-  status: z.string(),
-  source: z.string().nullable(),
-  notes: z.string().nullable(),
-  convertedUserId: z.string().nullable(),
-  convertedAt: z.date().nullable(),
-  signedUpAt: z.date().nullable(),
-  consultationBookedAt: z.date().nullable(),
-  subscriptionConfirmedAt: z.date().nullable(),
-  currentCampaignStage: z.string().nullable(),
-  emailJourneyVariant: z.string().nullable(),
-  emailsSent: z.number(),
-  lastEmailSentAt: z.date().nullable(),
-  unsubscribedAt: z.date().nullable(),
-  emailsOpened: z.number(),
-  emailsClicked: z.number(),
-  lastEngagementAt: z.date().nullable(),
-  metadata: z.record(z.any()),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-});
 
 /**
  * Get Lead by ID Endpoint (GET)
  * Retrieves a specific lead by ID
  */
-const leadGetEndpoint = createEndpoint({
-  path: ["v1", "leads", "lead", ":id"],
+const { GET } = createEndpoint({
   method: Methods.GET,
-  requestSchema: undefinedSchema,
-  responseSchema: leadResponseSchema,
-  requestUrlSchema: z.object({
-    id: z.uuid(),
-  }),
+  path: ["v1", "core", "leads", "lead", ":id"],
+  title: "app.api.v1.core.leads.lead.id.get.title",
+  description: "app.api.v1.core.leads.lead.id.get.description",
+  category: "app.api.v1.core.leads.category",
+  tags: [
+    "app.api.v1.core.leads.tags.leads",
+    "app.api.v1.core.leads.tags.management",
+  ],
   allowedRoles: [UserRole.ADMIN],
-  config: {
-    pattern: EndpointPattern.CRUD,
-    query: {
-      queryKey: ["v1", "leads", "lead", "GET"],
-      staleTime: 60000, // 1 minute
-      refetchOnWindowFocus: true,
+
+  fields: objectField(
+    {
+      type: WidgetType.CONTAINER,
+      title: "app.api.v1.core.leads.lead.id.get.form.title",
+      description: "app.api.v1.core.leads.lead.id.get.form.description",
+      layout: { type: LayoutType.STACKED },
+    },
+    { request: "urlParams", response: true },
+    {
+      // === URL PARAMETERS ===
+      id: requestUrlParamsField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.UUID,
+          label: "app.api.v1.core.leads.lead.id.get.id.label",
+          description: "app.api.v1.core.leads.lead.id.get.id.description",
+          layout: { columns: 12 },
+          validation: { required: true },
+        },
+        z.string().uuid(),
+      ),
+
+      // === RESPONSE FIELDS ===
+      lead: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          title: "app.api.v1.core.leads.lead.id.get.response.title",
+          description: "app.api.v1.core.leads.lead.id.get.response.description",
+          layout: { type: LayoutType.STACKED },
+        },
+        { response: true },
+        {
+          // Basic Information
+          basicInfo: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.lead.id.get.response.basicInfo.title",
+              description:
+                "app.api.v1.core.leads.lead.id.get.response.basicInfo.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+            },
+            { response: true },
+            {
+              id: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.id.content",
+                },
+                z.string().uuid(),
+              ),
+              email: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.email.content",
+                },
+                z.string().email().nullable(),
+              ),
+              businessName: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.businessName.content",
+                },
+                z.string(),
+              ),
+              contactName: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.contactName.content",
+                },
+                z.string().nullable(),
+              ),
+              status: responseField(
+                {
+                  type: WidgetType.BADGE,
+                  text: "app.api.v1.core.leads.lead.id.get.response.status.content",
+                },
+                z.nativeEnum(LeadStatus),
+              ),
+            },
+          ),
+
+          // Contact Details
+          contactDetails: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.lead.id.get.response.contactDetails.title",
+              description:
+                "app.api.v1.core.leads.lead.id.get.response.contactDetails.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+            },
+            { response: true },
+            {
+              phone: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.phone.content",
+                },
+                z.string().nullable(),
+              ),
+              website: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.website.content",
+                },
+                z.string().nullable(),
+              ),
+              country: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.country.content",
+                },
+                z.nativeEnum(Countries),
+              ),
+              language: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.language.content",
+                },
+                z.nativeEnum(Languages),
+              ),
+            },
+          ),
+
+          // Campaign & Tracking
+          campaignTracking: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.lead.id.get.response.campaignTracking.title",
+              description:
+                "app.api.v1.core.leads.lead.id.get.response.campaignTracking.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+            },
+            { response: true },
+            {
+              source: responseField(
+                {
+                  type: WidgetType.BADGE,
+                  text: "app.api.v1.core.leads.lead.id.get.response.source.content",
+                },
+                z.nativeEnum(LeadSource).nullable(),
+              ),
+              currentCampaignStage: responseField(
+                {
+                  type: WidgetType.BADGE,
+                  text: "app.api.v1.core.leads.lead.id.get.response.currentCampaignStage.content",
+                },
+                z.nativeEnum(EmailCampaignStage).nullable(),
+              ),
+              emailJourneyVariant: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.emailJourneyVariant.content",
+                },
+                z.nativeEnum(EmailJourneyVariant).nullable(),
+              ),
+              emailsSent: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.emailsSent.content",
+                },
+                z.number(),
+              ),
+              lastEmailSentAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.lastEmailSentAt.content",
+                },
+                z.date().nullable(),
+              ),
+            },
+          ),
+
+          // Engagement
+          engagement: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.lead.id.get.response.engagement.title",
+              description:
+                "app.api.v1.core.leads.lead.id.get.response.engagement.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+            },
+            { response: true },
+            {
+              emailsOpened: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.emailsOpened.content",
+                },
+                z.number(),
+              ),
+              emailsClicked: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.emailsClicked.content",
+                },
+                z.number(),
+              ),
+              lastEngagementAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.lastEngagementAt.content",
+                },
+                z.date().nullable(),
+              ),
+              unsubscribedAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.unsubscribedAt.content",
+                },
+                z.date().nullable(),
+              ),
+            },
+          ),
+
+          // Conversion Tracking
+          conversion: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.lead.id.get.response.conversion.title",
+              description:
+                "app.api.v1.core.leads.lead.id.get.response.conversion.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+            },
+            { response: true },
+            {
+              convertedUserId: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.convertedUserId.content",
+                },
+                z.string().nullable(),
+              ),
+              convertedAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.convertedAt.content",
+                },
+                z.date().nullable(),
+              ),
+              signedUpAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.signedUpAt.content",
+                },
+                z.date().nullable(),
+              ),
+              consultationBookedAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.consultationBookedAt.content",
+                },
+                z.date().nullable(),
+              ),
+              subscriptionConfirmedAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.subscriptionConfirmedAt.content",
+                },
+                z.date().nullable(),
+              ),
+            },
+          ),
+
+          // Metadata
+          metadata: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.lead.id.get.response.metadata.title",
+              description:
+                "app.api.v1.core.leads.lead.id.get.response.metadata.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+            },
+            { response: true },
+            {
+              notes: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.notes.content",
+                },
+                z.string().nullable(),
+              ),
+              metadata: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.metadata.content",
+                },
+                z.record(z.string(), z.any()),
+              ),
+              createdAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.createdAt.content",
+                },
+                z.date(),
+              ),
+              updatedAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.get.response.updatedAt.content",
+                },
+                z.date(),
+              ),
+            },
+          ),
+        },
+      ),
+    },
+  ),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "app.api.v1.core.leads.lead.id.get.errors.validation.title",
+      description:
+        "app.api.v1.core.leads.lead.id.get.errors.validation.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "app.api.v1.core.leads.lead.id.get.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.leads.lead.id.get.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "app.api.v1.core.leads.lead.id.get.errors.forbidden.title",
+      description:
+        "app.api.v1.core.leads.lead.id.get.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "app.api.v1.core.leads.lead.id.get.errors.notFound.title",
+      description:
+        "app.api.v1.core.leads.lead.id.get.errors.notFound.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "app.api.v1.core.leads.lead.id.get.errors.server.title",
+      description:
+        "app.api.v1.core.leads.lead.id.get.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "app.api.v1.core.leads.lead.id.get.errors.unknown.title",
+      description:
+        "app.api.v1.core.leads.lead.id.get.errors.unknown.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "app.api.v1.core.leads.lead.id.get.errors.network.title",
+      description:
+        "app.api.v1.core.leads.lead.id.get.errors.network.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "app.api.v1.core.leads.lead.id.get.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.leads.lead.id.get.errors.unsavedChanges.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "app.api.v1.core.leads.lead.id.get.errors.conflict.title",
+      description:
+        "app.api.v1.core.leads.lead.id.get.errors.conflict.description",
     },
   },
-  ui: {
-    title: "leads.admin.title",
-    description: "leads.admin.description",
-    category: "leads",
-    version: "1.0",
-    tags: ["leads", "get", "retrieve"],
-    fields: {
-      id: {
-        label: "leads.edit.form.fields.id.label",
-        description: "leads.edit.form.fields.id.description",
-        type: FieldDataType.UUID,
-        readonly: true,
-        group: "lead-identity",
-        order: 0,
-      },
-    },
 
-    responseDisplay: {
-      layout: ResponseDisplayLayout.DETAIL,
-    },
+  successTypes: {
+    title: "app.api.v1.core.leads.lead.id.get.success.title",
+    description: "app.api.v1.core.leads.lead.id.get.success.description",
+  },
 
-    errorTypes: {
-      [EndpointErrorTypes.VALIDATION_FAILED]: {
-        title: "leadsErrors.leads.get.error.validation.title",
-        description: "leadsErrors.leads.get.error.validation.description",
-      },
-      [EndpointErrorTypes.UNAUTHORIZED]: {
-        title: "leadsErrors.leads.get.error.unauthorized.title",
-        description: "leadsErrors.leads.get.error.unauthorized.description",
-      },
-      [EndpointErrorTypes.SERVER_ERROR]: {
-        title: "leadsErrors.leads.get.error.server.title",
-        description: "leadsErrors.leads.get.error.server.description",
-      },
-      [EndpointErrorTypes.UNKNOWN_ERROR]: {
-        title: "leadsErrors.leads.get.error.unknown.title",
-        description: "leadsErrors.leads.get.error.unknown.description",
-      },
-      [EndpointErrorTypes.NOT_FOUND]: {
-        title: "leadsErrors.leads.get.error.not_found.title",
-        description: "leadsErrors.leads.get.error.not_found.description",
-      },
-      [EndpointErrorTypes.FORBIDDEN]: {
-        title: "leadsErrors.leads.get.error.forbidden.title",
-        description: "leadsErrors.leads.get.error.forbidden.description",
-      },
-      [EndpointErrorTypes.NETWORK_ERROR]: {
-        title: "leadsErrors.leads.get.error.network.title",
-        description: "leadsErrors.leads.get.error.network.description",
-      },
-      [EndpointErrorTypes.UNSAVED_CHANGES]: {
-        title: "leadsErrors.leads.get.error.unsaved_changes.title",
-        description: "leadsErrors.leads.get.error.unsaved_changes.description",
-      },
-      [EndpointErrorTypes.CONFLICT]: {
-        title: "leadsErrors.leads.get.error.conflict.title",
-        description: "leadsErrors.leads.get.error.conflict.description",
-      },
+  examples: {
+    urlPathVariables: {
+      default: { id: "550e8400-e29b-41d4-a716-446655440000" },
     },
-    successTypes: {
-      title: "leadsErrors.leads.get.success.title",
-      description: "leadsErrors.leads.get.success.description",
-    },
-
-    examples: {
-      payloads: undefined,
-      urlPathVariables: {
-        default: {
-          id: "123e4567-e89b-12d3-a456-426614174000",
-        },
-      },
-      responses: {
-        default: {
-          id: "123e4567-e89b-12d3-a456-426614174000",
-          email: "john@example.com",
-          businessName: "Example Corp",
-          contactName: "John Doe",
-          phone: "+1234567890",
-          website: "https://example.com",
-          country: Countries.GLOBAL,
-          language: Languages.EN,
-          status: LeadStatus.NEW,
-          source: LeadSource.WEBSITE,
-          notes: "Lead from contact form",
-          convertedUserId: null,
-          convertedAt: null,
-          signedUpAt: null,
-          consultationBookedAt: null,
-          subscriptionConfirmedAt: null,
-          currentCampaignStage: null,
-          emailJourneyVariant: null,
-          emailsSent: 0,
-          lastEmailSentAt: null,
-          unsubscribedAt: null,
-          emailsOpened: 0,
-          emailsClicked: 0,
-          lastEngagementAt: null,
-          metadata: {},
-          createdAt: new Date("2023-01-01T12:00:00.000Z"),
-          updatedAt: new Date("2023-01-01T12:00:00.000Z"),
+    requests: undefined,
+    responses: {
+      default: {
+        lead: {
+          basicInfo: {
+            id: "550e8400-e29b-41d4-a716-446655440000",
+            email: "contact@example.com",
+            businessName: "Example Business",
+            contactName: "John Doe",
+            status: LeadStatus.CAMPAIGN_RUNNING,
+          },
+          contactDetails: {
+            phone: "+1234567890",
+            website: "https://example.com",
+            country: Countries.DE,
+            language: Languages.EN,
+          },
+          campaignTracking: {
+            source: LeadSource.WEBSITE,
+            currentCampaignStage: EmailCampaignStage.INITIAL,
+            emailJourneyVariant: EmailJourneyVariant.PERSONAL_APPROACH,
+            emailsSent: 5,
+            lastEmailSentAt: new Date("2024-01-15T10:00:00Z"),
+          },
+          engagement: {
+            emailsOpened: 3,
+            emailsClicked: 1,
+            lastEngagementAt: new Date("2024-01-16T14:30:00Z"),
+            unsubscribedAt: null,
+          },
+          conversion: {
+            convertedUserId: null,
+            convertedAt: null,
+            signedUpAt: null,
+            consultationBookedAt: null,
+            subscriptionConfirmedAt: null,
+          },
+          metadata: {
+            notes: "Potential customer for premium plan",
+            metadata: { campaignId: "winter-2024", source: "google-ads" },
+            createdAt: new Date("2024-01-10T09:00:00Z"),
+            updatedAt: new Date("2024-01-16T14:30:00Z"),
+          },
         },
       },
     },
@@ -216,204 +496,808 @@ const leadGetEndpoint = createEndpoint({
  * Update Lead Endpoint (PATCH)
  * Updates an existing lead
  */
-const leadUpdateEndpoint = createEndpoint({
-  path: ["v1", "leads", "lead", ":id"],
+const { PATCH } = createEndpoint({
   method: Methods.PATCH,
-  requestSchema: leadUpdateSchema,
-  responseSchema: leadResponseSchema,
-  requestUrlSchema: z.object({
-    id: z.uuid(),
-  }),
+  path: ["v1", "core", "leads", "lead", ":id"],
+  title: "app.api.v1.core.leads.lead.id.patch.title",
+  description: "app.api.v1.core.leads.lead.id.patch.description",
+  category: "app.api.v1.core.leads.category",
+  tags: [
+    "app.api.v1.core.leads.tags.leads",
+    "app.api.v1.core.leads.tags.management",
+  ],
   allowedRoles: [UserRole.ADMIN],
-  config: {
-    pattern: EndpointPattern.CRUD,
-    query: {
-      queryKey: ["v1", "leads", "lead", "PATCH"],
-      staleTime: 0,
-      refetchOnWindowFocus: false,
+
+  fields: objectField(
+    {
+      type: WidgetType.CONTAINER,
+      title: "app.api.v1.core.leads.lead.id.patch.form.title",
+      description: "app.api.v1.core.leads.lead.id.patch.form.description",
+      layout: { type: LayoutType.STACKED },
     },
-    form: {
-      persistForm: true,
-      resetOnSuccess: true,
-      optimisticUpdates: false,
+    { request: "data", response: true },
+    {
+      // === URL PARAMETERS ===
+      id: requestUrlParamsField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.UUID,
+          label: "app.api.v1.core.leads.lead.id.patch.id.label",
+          description: "app.api.v1.core.leads.lead.id.patch.id.description",
+          layout: { columns: 12 },
+          validation: { required: true },
+        },
+        z.string().uuid(),
+      ),
+
+      // === UPDATE FIELDS ===
+      updates: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          title: "app.api.v1.core.leads.lead.id.patch.updates.title",
+          description:
+            "app.api.v1.core.leads.lead.id.patch.updates.description",
+          layout: { type: LayoutType.STACKED },
+        },
+        { request: "data" },
+        {
+          // Basic Information
+          basicInfo: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title: "app.api.v1.core.leads.lead.id.patch.basicInfo.title",
+              description:
+                "app.api.v1.core.leads.lead.id.patch.basicInfo.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+            },
+            { request: "data" },
+            {
+              email: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.EMAIL,
+                  label: "app.api.v1.core.leads.lead.id.patch.email.label",
+                  description:
+                    "app.api.v1.core.leads.lead.id.patch.email.description",
+                  placeholder:
+                    "app.api.v1.core.leads.lead.id.patch.email.placeholder",
+                  layout: { columns: 6 },
+                },
+                z.string().email().optional(),
+              ),
+              businessName: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.TEXT,
+                  label:
+                    "app.api.v1.core.leads.lead.id.patch.businessName.label",
+                  description:
+                    "app.api.v1.core.leads.lead.id.patch.businessName.description",
+                  placeholder:
+                    "app.api.v1.core.leads.lead.id.patch.businessName.placeholder",
+                  layout: { columns: 6 },
+                  validation: { maxLength: 255 },
+                },
+                z.string().min(1).max(255).optional(),
+              ),
+              contactName: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.TEXT,
+                  label:
+                    "app.api.v1.core.leads.lead.id.patch.contactName.label",
+                  description:
+                    "app.api.v1.core.leads.lead.id.patch.contactName.description",
+                  placeholder:
+                    "app.api.v1.core.leads.lead.id.patch.contactName.placeholder",
+                  layout: { columns: 6 },
+                  validation: { maxLength: 255 },
+                },
+                z.string().optional().nullable(),
+              ),
+              status: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.SELECT,
+                  label: "app.api.v1.core.leads.lead.id.patch.status.label",
+                  description:
+                    "app.api.v1.core.leads.lead.id.patch.status.description",
+                  placeholder:
+                    "app.api.v1.core.leads.lead.id.patch.status.placeholder",
+                  layout: { columns: 6 },
+                  options: LeadStatusOptions,
+                },
+                z.nativeEnum(LeadStatus).optional(),
+              ),
+            },
+          ),
+
+          // Contact Details
+          contactDetails: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title: "app.api.v1.core.leads.lead.id.patch.contactDetails.title",
+              description:
+                "app.api.v1.core.leads.lead.id.patch.contactDetails.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+              collapsed: true,
+            },
+            { request: "data" },
+            {
+              phone: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.PHONE,
+                  label: "app.api.v1.core.leads.lead.id.patch.phone.label",
+                  description:
+                    "app.api.v1.core.leads.lead.id.patch.phone.description",
+                  placeholder:
+                    "app.api.v1.core.leads.lead.id.patch.phone.placeholder",
+                  layout: { columns: 6 },
+                  validation: { pattern: "^\\+?[1-9]\\d{1,14}$" },
+                },
+                z
+                  .string()
+                  .regex(/^\+?[1-9]\d{1,14}$/)
+                  .optional(),
+              ),
+              website: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.URL,
+                  label: "app.api.v1.core.leads.lead.id.patch.website.label",
+                  description:
+                    "app.api.v1.core.leads.lead.id.patch.website.description",
+                  placeholder:
+                    "app.api.v1.core.leads.lead.id.patch.website.placeholder",
+                  layout: { columns: 6 },
+                },
+                z.string().url().optional().or(z.literal("")),
+              ),
+              country: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.SELECT,
+                  label: "app.api.v1.core.leads.lead.id.patch.country.label",
+                  description:
+                    "app.api.v1.core.leads.lead.id.patch.country.description",
+                  placeholder:
+                    "app.api.v1.core.leads.lead.id.patch.country.placeholder",
+                  layout: { columns: 6 },
+                  options: Object.entries(Countries).map(([, value]) => ({
+                    value: value,
+                    label: `app.api.v1.core.leads.enums.country.${String(value).toLowerCase()}`,
+                  })),
+                },
+                z.nativeEnum(Countries).optional(),
+              ),
+              language: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.SELECT,
+                  label: "app.api.v1.core.leads.lead.id.patch.language.label",
+                  description:
+                    "app.api.v1.core.leads.lead.id.patch.language.description",
+                  placeholder:
+                    "app.api.v1.core.leads.lead.id.patch.language.placeholder",
+                  layout: { columns: 6 },
+                  options: Object.entries(Languages).map(([, value]) => ({
+                    value: value,
+                    label: `app.api.v1.core.leads.enums.language.${String(value).toLowerCase()}`,
+                  })),
+                },
+                z.nativeEnum(Languages).optional(),
+              ),
+            },
+          ),
+
+          // Campaign Management
+          campaignManagement: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.lead.id.patch.campaignManagement.title",
+              description:
+                "app.api.v1.core.leads.lead.id.patch.campaignManagement.description",
+              layout: { type: LayoutType.STACKED },
+              collapsed: true,
+            },
+            { request: "data" },
+            {
+              source: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.SELECT,
+                  label: "app.api.v1.core.leads.lead.id.patch.source.label",
+                  description:
+                    "app.api.v1.core.leads.lead.id.patch.source.description",
+                  placeholder:
+                    "app.api.v1.core.leads.lead.id.patch.source.placeholder",
+                  layout: { columns: 12 },
+                  options: Object.values(LeadSource).map((source) => ({
+                    value: source,
+                    label: `app.api.v1.core.leads.enums.source.${String(source).toLowerCase()}`,
+                  })),
+                },
+                z.nativeEnum(LeadSource).optional(),
+              ),
+              currentCampaignStage: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.SELECT,
+                  label:
+                    "app.api.v1.core.leads.lead.id.patch.currentCampaignStage.label",
+                  description:
+                    "app.api.v1.core.leads.lead.id.patch.currentCampaignStage.description",
+                  placeholder:
+                    "app.api.v1.core.leads.lead.id.patch.currentCampaignStage.placeholder",
+                  layout: { columns: 12 },
+                  options: EmailCampaignStageOptions,
+                },
+                z.nativeEnum(EmailCampaignStage).optional(),
+              ),
+            },
+          ),
+
+          // Additional Details
+          additionalDetails: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.lead.id.patch.additionalDetails.title",
+              description:
+                "app.api.v1.core.leads.lead.id.patch.additionalDetails.description",
+              layout: { type: LayoutType.STACKED },
+              collapsed: true,
+            },
+            { request: "data" },
+            {
+              notes: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.TEXTAREA,
+                  label: "app.api.v1.core.leads.lead.id.patch.notes.label",
+                  description:
+                    "app.api.v1.core.leads.lead.id.patch.notes.description",
+                  placeholder:
+                    "app.api.v1.core.leads.lead.id.patch.notes.placeholder",
+                  layout: { columns: 12 },
+                  validation: { maxLength: 2000 },
+                },
+                z.string().optional(),
+              ),
+              metadata: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.JSON,
+                  label: "app.api.v1.core.leads.lead.id.patch.metadata.label",
+                  description:
+                    "app.api.v1.core.leads.lead.id.patch.metadata.description",
+                  placeholder:
+                    "app.api.v1.core.leads.lead.id.patch.metadata.placeholder",
+                  layout: { columns: 12 },
+                },
+                z
+                  .record(z.string(), z.string().or(z.number()).or(z.boolean()))
+                  .optional(),
+              ),
+              convertedUserId: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.UUID,
+                  label:
+                    "app.api.v1.core.leads.lead.id.patch.convertedUserId.label",
+                  description:
+                    "app.api.v1.core.leads.lead.id.patch.convertedUserId.description",
+                  placeholder:
+                    "app.api.v1.core.leads.lead.id.patch.convertedUserId.placeholder",
+                  layout: { columns: 12 },
+                },
+                z.string().uuid().nullable().optional(),
+              ),
+              consultationBookedAt: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.DATETIME,
+                  label:
+                    "app.api.v1.core.leads.lead.id.patch.consultationBookedAt.label",
+                  description:
+                    "app.api.v1.core.leads.lead.id.patch.consultationBookedAt.description",
+                  placeholder:
+                    "app.api.v1.core.leads.lead.id.patch.consultationBookedAt.placeholder",
+                  layout: { columns: 12 },
+                },
+                z.coerce.date().nullable().optional(),
+              ),
+              subscriptionConfirmedAt: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.DATETIME,
+                  label:
+                    "app.api.v1.core.leads.lead.id.patch.subscriptionConfirmedAt.label",
+                  description:
+                    "app.api.v1.core.leads.lead.id.patch.subscriptionConfirmedAt.description",
+                  placeholder:
+                    "app.api.v1.core.leads.lead.id.patch.subscriptionConfirmedAt.placeholder",
+                  layout: { columns: 12 },
+                },
+                z.coerce.date().nullable().optional(),
+              ),
+            },
+          ),
+        },
+      ),
+
+      // === RESPONSE FIELDS (same structure as GET) ===
+      lead: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          title: "app.api.v1.core.leads.lead.id.patch.response.title",
+          description:
+            "app.api.v1.core.leads.lead.id.patch.response.description",
+          layout: { type: LayoutType.STACKED },
+        },
+        { response: true },
+        {
+          // Using same nested response structure as GET endpoint
+          basicInfo: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.lead.id.patch.response.basicInfo.title",
+              description:
+                "app.api.v1.core.leads.lead.id.patch.response.basicInfo.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+            },
+            { response: true },
+            {
+              id: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.id.content",
+                },
+                z.string().uuid(),
+              ),
+              email: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.email.content",
+                },
+                z.string().email().nullable(),
+              ),
+              businessName: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.businessName.content",
+                },
+                z.string(),
+              ),
+              contactName: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.contactName.content",
+                },
+                z.string().nullable(),
+              ),
+              status: responseField(
+                {
+                  type: WidgetType.BADGE,
+                  text: "app.api.v1.core.leads.lead.id.patch.response.status.content",
+                },
+                z.nativeEnum(LeadStatus),
+              ),
+            },
+          ),
+
+          contactDetails: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.lead.id.patch.response.contactDetails.title",
+              description:
+                "app.api.v1.core.leads.lead.id.patch.response.contactDetails.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+            },
+            { response: true },
+            {
+              phone: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.phone.content",
+                },
+                z.string().nullable(),
+              ),
+              website: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.website.content",
+                },
+                z.string().nullable(),
+              ),
+              country: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.country.content",
+                },
+                z.nativeEnum(Countries),
+              ),
+              language: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.language.content",
+                },
+                z.nativeEnum(Languages),
+              ),
+            },
+          ),
+
+          campaignTracking: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.lead.id.patch.response.campaignTracking.title",
+              description:
+                "app.api.v1.core.leads.lead.id.patch.response.campaignTracking.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+            },
+            { response: true },
+            {
+              source: responseField(
+                {
+                  type: WidgetType.BADGE,
+                  text: "app.api.v1.core.leads.lead.id.patch.response.source.content",
+                },
+                z.nativeEnum(LeadSource).nullable(),
+              ),
+              currentCampaignStage: responseField(
+                {
+                  type: WidgetType.BADGE,
+                  text: "app.api.v1.core.leads.lead.id.patch.response.currentCampaignStage.content",
+                },
+                z.nativeEnum(EmailCampaignStage).nullable(),
+              ),
+              emailJourneyVariant: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.emailJourneyVariant.content",
+                },
+                z.nativeEnum(EmailJourneyVariant).nullable(),
+              ),
+              emailsSent: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.emailsSent.content",
+                },
+                z.number(),
+              ),
+              lastEmailSentAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.lastEmailSentAt.content",
+                },
+                z.date().nullable(),
+              ),
+            },
+          ),
+
+          engagement: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.lead.id.patch.response.engagement.title",
+              description:
+                "app.api.v1.core.leads.lead.id.patch.response.engagement.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+            },
+            { response: true },
+            {
+              emailsOpened: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.emailsOpened.content",
+                },
+                z.number(),
+              ),
+              emailsClicked: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.emailsClicked.content",
+                },
+                z.number(),
+              ),
+              lastEngagementAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.lastEngagementAt.content",
+                },
+                z.date().nullable(),
+              ),
+              unsubscribedAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.unsubscribedAt.content",
+                },
+                z.date().nullable(),
+              ),
+            },
+          ),
+
+          conversion: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.lead.id.patch.response.conversion.title",
+              description:
+                "app.api.v1.core.leads.lead.id.patch.response.conversion.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+            },
+            { response: true },
+            {
+              convertedUserId: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.convertedUserId.content",
+                },
+                z.string().nullable(),
+              ),
+              convertedAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.convertedAt.content",
+                },
+                z.date().nullable(),
+              ),
+              signedUpAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.signedUpAt.content",
+                },
+                z.date().nullable(),
+              ),
+              consultationBookedAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.consultationBookedAt.content",
+                },
+                z.date().nullable(),
+              ),
+              subscriptionConfirmedAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.subscriptionConfirmedAt.content",
+                },
+                z.date().nullable(),
+              ),
+            },
+          ),
+
+          metadata: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.lead.id.patch.response.metadata.title",
+              description:
+                "app.api.v1.core.leads.lead.id.patch.response.metadata.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+            },
+            { response: true },
+            {
+              notes: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.notes.content",
+                },
+                z.string().nullable(),
+              ),
+              metadata: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.metadata.content",
+                },
+                z.record(z.string(), z.any()),
+              ),
+              createdAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.createdAt.content",
+                },
+                z.date(),
+              ),
+              updatedAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.lead.id.patch.response.updatedAt.content",
+                },
+                z.date(),
+              ),
+            },
+          ),
+        },
+      ),
+    },
+  ),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "app.api.v1.core.leads.lead.id.patch.errors.validation.title",
+      description:
+        "app.api.v1.core.leads.lead.id.patch.errors.validation.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "app.api.v1.core.leads.lead.id.patch.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.leads.lead.id.patch.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "app.api.v1.core.leads.lead.id.patch.errors.forbidden.title",
+      description:
+        "app.api.v1.core.leads.lead.id.patch.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "app.api.v1.core.leads.lead.id.patch.errors.notFound.title",
+      description:
+        "app.api.v1.core.leads.lead.id.patch.errors.notFound.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "app.api.v1.core.leads.lead.id.patch.errors.conflict.title",
+      description:
+        "app.api.v1.core.leads.lead.id.patch.errors.conflict.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "app.api.v1.core.leads.lead.id.patch.errors.server.title",
+      description:
+        "app.api.v1.core.leads.lead.id.patch.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "app.api.v1.core.leads.lead.id.patch.errors.unknown.title",
+      description:
+        "app.api.v1.core.leads.lead.id.patch.errors.unknown.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "app.api.v1.core.leads.lead.id.patch.errors.network.title",
+      description:
+        "app.api.v1.core.leads.lead.id.patch.errors.network.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "app.api.v1.core.leads.lead.id.patch.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.leads.lead.id.patch.errors.unsavedChanges.description",
     },
   },
-  ui: {
-    title: "leads.admin.title",
-    description: "leads.admin.description",
-    category: "leads",
-    version: "1.0",
-    tags: ["leads", "update"],
-    fields: {
-      id: {
-        label: "leads.edit.form.fields.id.label",
-        description: "leads.edit.form.fields.id.description",
-        type: FieldDataType.UUID,
-        readonly: true,
-        group: "lead-identity",
-        order: 0,
-      },
-      status: {
-        label: "leads.edit.form.fields.status.label",
-        description: "leads.edit.form.fields.status.description",
-        type: FieldDataType.SELECT,
-        required: false,
-        group: "lead-status",
-        order: 1,
-        options: Object.values(LeadStatus).map((status) => ({
-          value: status,
-          label: `leads.edit.form.fields.status.options.${status}`,
-        })),
-      },
-      currentCampaignStage: {
-        label: "leads.edit.form.fields.currentCampaignStage.label",
-        description: "leads.edit.form.fields.currentCampaignStage.description",
-        type: FieldDataType.SELECT,
-        required: false,
-        group: "lead-status",
-        order: 2,
-        options: Object.values(EmailCampaignStage).map((stage) => ({
-          value: stage,
-          label: `leads.edit.form.fields.currentCampaignStage.options.${stage}`,
-        })),
-      },
-      notes: {
-        label: "leads.edit.form.fields.notes.label",
-        description: "leads.edit.form.fields.notes.description",
-        type: FieldDataType.TEXT,
-        required: false,
-        group: "lead-notes",
-        order: 3,
-      },
-      metadata: {
-        label: "leads.edit.form.fields.metadata.label",
-        description: "leads.edit.form.fields.metadata.description",
-        type: FieldDataType.JSON,
-        required: false,
-        group: "lead-metadata",
-        order: 4,
-      },
-    },
-    errorTypes: {
-      [EndpointErrorTypes.VALIDATION_FAILED]: {
-        title: "leadsErrors.leads.patch.error.validation.title",
-        description: "leadsErrors.leads.patch.error.validation.description",
-      },
-      [EndpointErrorTypes.UNAUTHORIZED]: {
-        title: "leadsErrors.leads.patch.error.unauthorized.title",
-        description: "leadsErrors.leads.patch.error.unauthorized.description",
-      },
-      [EndpointErrorTypes.SERVER_ERROR]: {
-        title: "leadsErrors.leads.patch.error.server.title",
-        description: "leadsErrors.leads.patch.error.server.description",
-      },
-      [EndpointErrorTypes.UNKNOWN_ERROR]: {
-        title: "leadsErrors.leads.patch.error.unknown.title",
-        description: "leadsErrors.leads.patch.error.unknown.description",
-      },
-      [EndpointErrorTypes.NOT_FOUND]: {
-        title: "leadsErrors.leads.patch.error.not_found.title",
-        description: "leadsErrors.leads.patch.error.not_found.description",
-      },
-      [EndpointErrorTypes.FORBIDDEN]: {
-        title: "leadsErrors.leads.patch.error.forbidden.title",
-        description: "leadsErrors.leads.patch.error.forbidden.description",
-      },
-      [EndpointErrorTypes.NETWORK_ERROR]: {
-        title: "leadsErrors.leads.patch.error.network.title",
-        description: "leadsErrors.leads.patch.error.network.description",
-      },
-      [EndpointErrorTypes.UNSAVED_CHANGES]: {
-        title: "leadsErrors.leads.patch.error.unsaved_changes.title",
-        description:
-          "leadsErrors.leads.patch.error.unsaved_changes.description",
-      },
-      [EndpointErrorTypes.CONFLICT]: {
-        title: "leadsErrors.leads.patch.error.conflict.title",
-        description: "leadsErrors.leads.patch.error.conflict.description",
-      },
-    },
-    successTypes: {
-      title: "leadsErrors.leads.patch.success.title",
-      description: "leadsErrors.leads.patch.success.description",
-    },
-    examples: {
-      requests: {
-        default: {
-          id: "123e4567-e89b-12d3-a456-426614174000",
-          status: LeadStatus.CAMPAIGN_RUNNING,
-          notes: "Lead qualified after initial contact",
-          metadata: {
-            priority: "high",
-            source_detail: "homepage contact form",
+
+  successTypes: {
+    title: "app.api.v1.core.leads.lead.id.patch.success.title",
+    description: "app.api.v1.core.leads.lead.id.patch.success.description",
+  },
+
+  examples: {
+    urlPathVariables: undefined,
+    requests: {
+      default: {
+        updates: {
+          basicInfo: {
+            email: "newemail@example.com",
+            businessName: "Updated Business Name",
+            contactName: "Jane Smith",
+            status: LeadStatus.SIGNED_UP,
+          },
+          contactDetails: {
+            phone: "+9876543210",
+            website: "https://newwebsite.com",
+            country: Countries.PL,
+            language: Languages.EN,
+          },
+          campaignManagement: {
+            source: LeadSource.REFERRAL,
+            currentCampaignStage: EmailCampaignStage.FOLLOWUP_1,
+          },
+          additionalDetails: {
+            notes: "Updated notes after meeting",
+            metadata: { priority: "high", lastContact: "2024-01-20" },
+            convertedUserId: "660e8400-e29b-41d4-a716-446655440000",
+            consultationBookedAt: new Date("2024-01-25T15:00:00Z"),
+            subscriptionConfirmedAt: null,
           },
         },
       },
-      urlPathVariables: {
-        default: {
-          id: "123e4567-e89b-12d3-a456-426614174000",
-        },
-      },
-      responses: {
-        default: {
-          id: "123e4567-e89b-12d3-a456-426614174000",
-          email: "john@example.com",
-          businessName: "Example Corp",
-          contactName: "John Doe",
-          phone: "+1234567890",
-          website: "https://example.com",
-          country: Countries.GLOBAL,
-          language: Languages.EN,
-          status: LeadStatus.CAMPAIGN_RUNNING,
-          source: LeadSource.WEBSITE,
-          notes: "Lead qualified after initial contact",
-          convertedUserId: null,
-          convertedAt: null,
-          signedUpAt: null,
-          consultationBookedAt: null,
-          subscriptionConfirmedAt: null,
-          currentCampaignStage: null,
-          emailJourneyVariant: EmailJourneyVariant.PERSONAL_APPROACH,
-          emailsSent: 0,
-          lastEmailSentAt: null,
-          unsubscribedAt: null,
-          emailsOpened: 0,
-          emailsClicked: 0,
-          lastEngagementAt: null,
-          metadata: {
-            priority: "high",
-            source_detail: "homepage contact form",
+    },
+    responses: {
+      default: {
+        lead: {
+          basicInfo: {
+            id: "550e8400-e29b-41d4-a716-446655440000",
+            email: "newemail@example.com",
+            businessName: "Updated Business Name",
+            contactName: "Jane Smith",
+            status: LeadStatus.SIGNED_UP,
           },
-          createdAt: new Date("2023-01-01T12:00:00.000Z"),
-          updatedAt: new Date("2023-01-01T12:30:00.000Z"),
+          contactDetails: {
+            phone: "+9876543210",
+            website: "https://newwebsite.com",
+            country: Countries.PL,
+            language: Languages.EN,
+          },
+          campaignTracking: {
+            source: LeadSource.REFERRAL,
+            currentCampaignStage: EmailCampaignStage.FOLLOWUP_1,
+            emailJourneyVariant: EmailJourneyVariant.RESULTS_FOCUSED,
+            emailsSent: 7,
+            lastEmailSentAt: new Date("2024-01-20T10:00:00Z"),
+          },
+          engagement: {
+            emailsOpened: 5,
+            emailsClicked: 2,
+            lastEngagementAt: new Date("2024-01-20T14:30:00Z"),
+            unsubscribedAt: null,
+          },
+          conversion: {
+            convertedUserId: "660e8400-e29b-41d4-a716-446655440000",
+            convertedAt: null,
+            signedUpAt: null,
+            consultationBookedAt: new Date("2024-01-25T15:00:00Z"),
+            subscriptionConfirmedAt: null,
+          },
+          metadata: {
+            notes: "Updated notes after meeting",
+            metadata: { priority: "high", lastContact: "2024-01-20" },
+            createdAt: new Date("2024-01-10T09:00:00Z"),
+            updatedAt: new Date("2024-01-20T16:00:00Z"),
+          },
         },
       },
     },
   },
 });
 
+// Export types following modern pattern
+export type LeadGetRequestInput = typeof GET.types.RequestInput;
+export type LeadGetRequestOutput = typeof GET.types.RequestOutput;
+export type LeadGetResponseInput = typeof GET.types.ResponseInput;
+export type LeadGetResponseOutput = typeof GET.types.ResponseOutput;
+
+export type LeadPatchRequestInput = typeof PATCH.types.RequestInput;
+export type LeadPatchRequestOutput = typeof PATCH.types.RequestOutput;
+export type LeadPatchResponseInput = typeof PATCH.types.ResponseInput;
+export type LeadPatchResponseOutput = typeof PATCH.types.ResponseOutput;
+
+// Repository types for standardized import patterns
+export type LeadUpdateRequestInput = LeadPatchRequestInput;
+export type LeadUpdateRequestOutput = LeadPatchRequestOutput;
+export type LeadUpdateResponseInput = LeadPatchResponseInput;
+export type LeadUpdateResponseOutput = LeadPatchResponseOutput;
+
 /**
  * Export endpoint definitions
  */
-const leadIdEndpoints = {
-  GET: leadGetEndpoint.GET,
-  PATCH: leadUpdateEndpoint.PATCH,
+export { GET, PATCH };
+
+const definitions = {
+  GET,
+  PATCH,
 };
 
-export default leadIdEndpoints;
-export type LeadIdEndpointTypes = ExtractEndpointTypes<typeof leadIdEndpoints>;
-
-// Export types for repository and other files to import
-export type LeadGetRequestInput = typeof leadGetEndpoint.types.RequestInput;
-export type LeadGetRequestOutput = typeof leadGetEndpoint.types.RequestOutput;
-export type LeadGetResponseInput = typeof leadGetEndpoint.types.ResponseInput;
-export type LeadGetResponseOutput = typeof leadGetEndpoint.types.ResponseOutput;
-
-export type LeadUpdateRequestInput = typeof leadUpdateEndpoint.types.RequestInput;
-export type LeadUpdateRequestOutput = typeof leadUpdateEndpoint.types.RequestOutput;
-export type LeadUpdateResponseInput = typeof leadUpdateEndpoint.types.ResponseInput;
-export type LeadUpdateResponseOutput = typeof leadUpdateEndpoint.types.ResponseOutput;
-
-// Backward compatibility type exports (deprecated - use endpoint types above)
-export type LeadUpdateType = z.infer<typeof leadUpdateSchema>;
-export type LeadResponseType = z.infer<typeof leadResponseSchema>;
+export default definitions;

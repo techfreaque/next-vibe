@@ -8,10 +8,10 @@ import "server-only";
 
 import {
   createErrorResponse,
+  createSuccessResponse,
   ErrorResponseTypes,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
 
 import {
   CRON_SCHEDULES,
@@ -20,8 +20,10 @@ import {
 import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 import type { Task } from "@/app/api/[locale]/v1/core/system/tasks/types/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import { defaultLocale } from "@/i18n/core/config";
 
-import type { SessionCleanupResponseTypeOutput } from "./definition";
+import type { JWTPublicPayloadType } from "../auth/definition";
+import type { SessionCleanupResponseOutput } from "./definition";
 import { sessionCleanupRepository } from "./repository";
 
 /**
@@ -30,7 +32,7 @@ import { sessionCleanupRepository } from "./repository";
  */
 export async function executeTask(
   logger: EndpointLogger,
-): Promise<ResponseType<SessionCleanupResponseTypeOutput>> {
+): Promise<ResponseType<SessionCleanupResponseOutput>> {
   logger.debug("Starting session cleanup task execution");
 
   // Get default configuration for automated execution
@@ -47,16 +49,19 @@ export async function executeTask(
       "Session cleanup configuration validation failed",
       validationResult,
     );
-    return validationResult as ResponseType<SessionCleanupResponseTypeOutput>;
+    return createErrorResponse(
+      "error.default",
+      ErrorResponseTypes.VALIDATION_ERROR,
+    );
   }
 
   // Execute session cleanup with system user context
-  const systemUser = { isPublic: true as const, id: undefined };
+  const systemUser: JWTPublicPayloadType = { isPublic: true };
 
   return await sessionCleanupRepository.executeSessionCleanup(
     defaultConfig,
     systemUser,
-    "en-GLOBAL",
+    defaultLocale,
     logger,
   );
 }
@@ -86,21 +91,15 @@ const sessionCleanupTask: Task = {
   timeout: TASK_TIMEOUTS.MEDIUM, // 5 minutes
 
   run: async ({ logger }) => {
-    // Implementation moved to repository
-    try {
-      const result = await executeTask(logger);
+    const result = await executeTask(logger);
 
-      if (!result.success) {
-        return result;
-      }
-    } catch (error) {
-      logger.error("Session cleanup task failed", error);
+    if (!result.success) {
       return createErrorResponse(
-        "user.errors.session_cleanup_execution_failed",
+        "error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
       );
     }
+    // Returns void implicitly on success
   },
 
   onError: ({ error, logger }) => {
@@ -145,7 +144,8 @@ export const taskDefinition = {
 };
 
 export const execute = executeTask;
-export const validate = (
+
+export const validate = async (
   config: {
     sessionRetentionDays: number;
     tokenRetentionDays: number;
@@ -154,12 +154,12 @@ export const validate = (
   },
   logger: EndpointLogger,
 ): Promise<ResponseType<boolean>> =>
-  sessionCleanupRepository.validateConfig(config, logger);
+  await sessionCleanupRepository.validateConfig(config, logger);
 
 /**
  * Rollback function (not applicable for cleanup operations)
  */
 export function rollback(): ResponseType<boolean> {
   // This task only deletes expired data, so rollback is not applicable
-  return { success: true, data: true };
+  return createSuccessResponse(true);
 }

@@ -14,14 +14,14 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import type React from "react";
 
-import type { UserResponseType } from "@/app/api/[locale]/v1/core/users/user/[id]/definition";
-import { userUpdateSchema } from "@/app/api/[locale]/v1/core/users/user/[id]/definition";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { UserGetResponseOutput } from "@/app/api/[locale]/v1/core/users/user/[id]/definition";
 import { useUserByIdEndpoint } from "@/app/api/[locale]/v1/core/users/user/[id]/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface UserEditFormProps {
-  user: UserResponseType;
+  user: UserGetResponseOutput;
   locale: CountryLanguage;
   userId: string;
 }
@@ -35,10 +35,14 @@ export function UserEditForm({
   const { t } = simpleT(locale);
 
   // Get endpoint for form handling
-  const endpoint = useUserByIdEndpoint({
-    userId,
-    enabled: true,
-  });
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const endpoint = useUserByIdEndpoint(
+    {
+      userId,
+      enabled: true,
+    },
+    logger,
+  );
 
   const handleSubmit = endpoint.create.onSubmit;
   const isLoading = endpoint.read.isLoading;
@@ -84,14 +88,16 @@ export function UserEditForm({
           >
             <FormFieldGroup>
               <EndpointFormField
-                name="email"
+                name="basicInfo.email"
                 config={{
                   type: "email",
-                  label: "users.form.labels.email",
-                  placeholder: "users.form.placeholders.email",
+                  label: "app.api.v1.core.users.user.id.id.put.email.label",
+                  description:
+                    "app.api.v1.core.users.user.id.id.put.email.description",
+                  placeholder:
+                    "app.api.v1.core.users.user.id.id.put.email.placeholder",
                 }}
                 control={endpoint.create.form.control}
-                schema={userUpdateSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -99,14 +105,15 @@ export function UserEditForm({
               />
 
               <EndpointFormField
-                name="firstName"
+                name="basicInfo.privateName"
                 config={{
                   type: "text",
-                  label: "users.form.labels.firstName",
-                  placeholder: "users.form.placeholders.firstName",
+                  label:
+                    "app.api.v1.core.users.user.id.id.put.privateName.label",
+                  description:
+                    "app.api.v1.core.users.user.id.id.put.privateName.description",
                 }}
                 control={endpoint.create.form.control}
-                schema={userUpdateSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -114,14 +121,15 @@ export function UserEditForm({
               />
 
               <EndpointFormField
-                name="lastName"
+                name="basicInfo.publicName"
                 config={{
                   type: "text",
-                  label: "users.form.labels.lastName",
-                  placeholder: "users.form.placeholders.lastName",
+                  label:
+                    "app.api.v1.core.users.user.id.id.put.publicName.label",
+                  description:
+                    "app.api.v1.core.users.user.id.id.put.publicName.description",
                 }}
                 control={endpoint.create.form.control}
-                schema={userUpdateSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -129,89 +137,14 @@ export function UserEditForm({
               />
 
               <EndpointFormField
-                name="company"
-                config={{
-                  type: "text",
-                  label: "users.form.labels.company",
-                  placeholder: "users.form.placeholders.company",
-                }}
-                control={endpoint.create.form.control}
-                schema={userUpdateSchema}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-
-              <EndpointFormField
-                name="phone"
-                config={{
-                  type: "tel",
-                  label: "users.form.labels.phone",
-                  placeholder: "users.form.placeholders.phone",
-                }}
-                control={endpoint.create.form.control}
-                schema={userUpdateSchema}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-
-              <EndpointFormField
-                name="jobTitle"
-                config={{
-                  type: "text",
-                  label: "users.form.labels.jobTitle",
-                  placeholder: "users.form.placeholders.jobTitle",
-                }}
-                control={endpoint.create.form.control}
-                schema={userUpdateSchema}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-
-              <EndpointFormField
-                name="website"
-                config={{
-                  type: "url",
-                  label: "users.form.labels.website",
-                  placeholder: "users.form.placeholders.website",
-                }}
-                control={endpoint.create.form.control}
-                schema={userUpdateSchema}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-
-              <EndpointFormField
-                name="bio"
-                config={{
-                  type: "textarea",
-                  label: "users.form.labels.bio",
-                  placeholder: "users.form.placeholders.bio",
-                  rows: 4,
-                }}
-                control={endpoint.create.form.control}
-                schema={userUpdateSchema}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-
-              <EndpointFormField
-                name="isActive"
+                name="adminSettings.isActive"
                 config={{
                   type: "checkbox",
-                  label: "users.form.labels.isActive",
+                  label: "app.api.v1.core.users.user.id.id.put.isActive.label",
+                  description:
+                    "app.api.v1.core.users.user.id.id.put.isActive.description",
                 }}
                 control={endpoint.create.form.control}
-                schema={userUpdateSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -219,13 +152,30 @@ export function UserEditForm({
               />
 
               <EndpointFormField
-                name="emailVerified"
+                name="adminSettings.emailVerified"
                 config={{
                   type: "checkbox",
-                  label: "users.form.labels.emailVerified",
+                  label:
+                    "app.api.v1.core.users.user.id.id.put.emailVerified.label",
+                  description:
+                    "app.api.v1.core.users.user.id.id.put.emailVerified.description",
                 }}
                 control={endpoint.create.form.control}
-                schema={userUpdateSchema}
+                theme={{
+                  style: "none",
+                  showAllRequired: false,
+                }}
+              />
+
+              <EndpointFormField
+                name="adminSettings.leadId"
+                config={{
+                  type: "text",
+                  label: "app.api.v1.core.users.user.id.id.put.leadId.label",
+                  description:
+                    "app.api.v1.core.users.user.id.id.put.leadId.description",
+                }}
+                control={endpoint.create.form.control}
                 theme={{
                   style: "none",
                   showAllRequired: false,

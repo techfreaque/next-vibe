@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { exec } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
@@ -7,11 +6,45 @@ import { promisify } from "node:util";
 import chalk from "chalk";
 import inquirer from "inquirer";
 
-import type { LaunchpadConfig, LaunchpadFolder } from "../types/types.js";
+import type {
+  LaunchpadConfig,
+  LaunchpadFolder,
+  LaunchpadPackage,
+} from "../types/types.js";
 import { logger, loggerError } from "../utils/logger.js";
 import { cloneRepo } from "../utils/repo-utils.js";
 
 const execAsync = promisify(exec);
+
+/**
+ * Type guard to check if an item is a LaunchpadPackage
+ */
+function isLaunchpadPackage(
+  item: LaunchpadPackage | LaunchpadFolder | undefined,
+): item is LaunchpadPackage {
+  return (
+    item !== undefined &&
+    typeof item === "object" &&
+    "branch" in item &&
+    "repoUrl" in item &&
+    typeof item.branch === "string" &&
+    typeof item.repoUrl === "string"
+  );
+}
+
+/**
+ * Type guard to check if an item is a LaunchpadFolder
+ */
+function isLaunchpadFolder(
+  item: LaunchpadPackage | LaunchpadFolder | undefined,
+): item is LaunchpadFolder {
+  return (
+    item !== undefined &&
+    typeof item === "object" &&
+    !("branch" in item) &&
+    !("repoUrl" in item)
+  );
+}
 
 /**
  * Opens a folder in VS Code
@@ -206,16 +239,15 @@ export async function navigateFolders(
       // Add packages with icons and description
       if (packageEntries.length > 0) {
         packageEntries.forEach(([name, item]) => {
-          const packageInfo = item as { branch: string; repoUrl: string };
-          choices.push({
-            name:
-              chalk.magenta("📦 ") +
-              name +
-              chalk.dim(` [${packageInfo.branch}]`),
-            value: name,
-            itemType: "package",
-            short: name,
-          });
+          if (isLaunchpadPackage(item)) {
+            choices.push({
+              name:
+                chalk.magenta("📦 ") + name + chalk.dim(` [${item.branch}]`),
+              value: name,
+              itemType: "package",
+              short: name,
+            });
+          }
         });
       }
 
@@ -252,7 +284,10 @@ export async function navigateFolders(
             // Reset current folder to root and then navigate to current path
             currentFolder = config.packages;
             for (const segment of currentPath) {
-              currentFolder = currentFolder[segment] as LaunchpadFolder;
+              const nextItem = currentFolder[segment];
+              if (isLaunchpadFolder(nextItem)) {
+                currentFolder = nextItem;
+              }
             }
           }
           break;
@@ -287,52 +322,50 @@ export async function navigateFolders(
         default: {
           const selectedItem = currentFolder[selection];
           // Check if it's a folder or package
-          if (selectedItem && typeof selectedItem === "object") {
-            if ("branch" in selectedItem && "repoUrl" in selectedItem) {
-              // It's a package
-              const packagePath = path.join(physicalPath, selection);
-              if (fs.existsSync(packagePath)) {
-                await openInVSCode(packagePath);
-              } else {
-                console.log("\n");
-                console.log(
-                  `⚠️  Package directory does not exist: ${packagePath}`,
-                );
-                const { shouldCloneRepo } = await inquirer.prompt([
-                  {
-                    type: "confirm",
-                    name: "shouldCloneRepo",
-                    message: "Would you like to clone this repository?",
-                    default: true,
-                  },
-                ]);
+          if (isLaunchpadPackage(selectedItem)) {
+            // It's a package
+            const packagePath = path.join(physicalPath, selection);
+            if (fs.existsSync(packagePath)) {
+              await openInVSCode(packagePath);
+            } else {
+              console.log("\n");
+              console.log(
+                `⚠️  Package directory does not exist: ${packagePath}`,
+              );
+              const { shouldCloneRepo } = await inquirer.prompt([
+                {
+                  type: "confirm",
+                  name: "shouldCloneRepo",
+                  message: "Would you like to clone this repository?",
+                  default: true,
+                },
+              ]);
 
-                if (shouldCloneRepo) {
-                  try {
-                    // Use the correct parameters from the selected package info
-                    await cloneRepo(
-                      selectedItem.repoUrl as string,
-                      packagePath,
-                      selectedItem.branch as string,
-                      rootDir,
-                    );
-                    logger(chalk.green(`✅ Repository cloned successfully`));
-                    await openInVSCode(packagePath);
-                  } catch {
-                    logger(chalk.red(`❌ Failed to clone repository`));
-                    console.log(
-                      chalk.yellow(
-                        "You can try cloning manually or check the repository URL and permissions.",
-                      ),
-                    );
-                  }
+              if (shouldCloneRepo) {
+                try {
+                  // Use the correct parameters from the selected package info
+                  await cloneRepo(
+                    selectedItem.repoUrl,
+                    packagePath,
+                    selectedItem.branch,
+                    rootDir,
+                  );
+                  logger(chalk.green(`✅ Repository cloned successfully`));
+                  await openInVSCode(packagePath);
+                } catch {
+                  logger(chalk.red(`❌ Failed to clone repository`));
+                  console.log(
+                    chalk.yellow(
+                      "You can try cloning manually or check the repository URL and permissions.",
+                    ),
+                  );
                 }
               }
-            } else {
-              // It's a folder, navigate into it
-              currentPath.push(selection);
-              currentFolder = selectedItem;
             }
+          } else if (isLaunchpadFolder(selectedItem)) {
+            // It's a folder, navigate into it
+            currentPath.push(selection);
+            currentFolder = selectedItem;
           }
           break;
         }

@@ -8,11 +8,11 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import type { JSX } from "react";
 
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { useLogin } from "@/app/api/[locale]/v1/core/user/public/login/hooks";
 import type { LoginOptions } from "@/app/api/[locale]/v1/core/user/public/login/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 interface LoginFormProps {
   locale: CountryLanguage;
@@ -27,7 +27,7 @@ export function LoginForm({
   },
 }: LoginFormProps): JSX.Element {
   const { t } = simpleT(locale);
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = createEndpointLogger(true, Date.now(), locale);
 
   // Use the enhanced login hook that includes all form logic and state management
   const {
@@ -52,7 +52,7 @@ export function LoginForm({
 
           <Form form={form} onSubmit={submitForm} className="space-y-6">
             <EndpointFormField
-              name="email"
+              name="credentials.email"
               config={{
                 type: "email",
                 label: "auth.login.emailLabel",
@@ -67,7 +67,7 @@ export function LoginForm({
             />
 
             <EndpointFormField
-              name="password"
+              name="credentials.password"
               config={{
                 type: "password",
                 label: "auth.login.passwordLabel",
@@ -83,7 +83,7 @@ export function LoginForm({
 
             <div className="flex justify-between items-center">
               <EndpointFormField
-                name="rememberMe"
+                name="options.rememberMe"
                 config={{
                   type: "checkbox",
                   label: undefined, // Empty label for checkbox

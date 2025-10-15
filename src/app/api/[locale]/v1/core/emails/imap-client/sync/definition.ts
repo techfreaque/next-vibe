@@ -282,12 +282,12 @@ export type ImapSyncPostResponseInput = typeof POST.types.ResponseInput;
 export type ImapSyncPostResponseOutput = typeof POST.types.ResponseOutput;
 
 // Export repository types for import standardization
-export type ImapSyncRequestTypeOutput = ImapSyncPostRequestOutput;
-export type ImapSyncResponseTypeOutput = ImapSyncPostResponseOutput;
+export type ImapSyncRequestOutput = ImapSyncPostRequestOutput;
+export type ImapSyncResponseOutput = ImapSyncPostResponseOutput;
 
 // Additional type exports for repository compatibility
-export type ImapSyncGetRequestTypeOutput = typeof POST.types.RequestOutput;
-export type ImapSyncGetResponseTypeOutput = typeof POST.types.ResponseOutput;
+export type ImapSyncGetRequestOutput = typeof POST.types.RequestOutput;
+export type ImapSyncGetResponseOutput = typeof POST.types.ResponseOutput;
 
 const definitions = {
   POST,

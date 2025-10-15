@@ -7,6 +7,9 @@ import type { NextRequest } from "next/server";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { env } from "@/config/env";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { Environment } from "@/packages/next-vibe/shared/utils/env-util";
+
 import { PixelTrackingRepository } from "./repository";
 
 /**
@@ -20,14 +23,17 @@ import { PixelTrackingRepository } from "./repository";
 export const GET = (request: NextRequest): Response => {
   // Extract locale from URL path for logger initialization
   const url = new URL(request.url);
-  const pathSegments = url.pathname.split('/');
-  const localeSegment = pathSegments.find(segment => /^[a-z]{2}-[A-Z]{2}$/.test(segment)) || 'en-US';
-  
+  const pathSegments = url.pathname.split("/");
+  const localeSegment: CountryLanguage =
+    (pathSegments.find((segment) =>
+      /^[a-z]{2}-[A-Z]{2}$/.test(segment),
+    ) as CountryLanguage) || "en-GLOBAL";
+
   const logger = createEndpointLogger(
-    env.NODE_ENV === "development",
+    env.NODE_ENV === Environment.DEVELOPMENT,
     Date.now(),
     localeSegment,
   );
-  
+
   return PixelTrackingRepository.handlePixelRequest(request, logger);
 };

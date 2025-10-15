@@ -17,10 +17,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { Countries, Languages } from "@/i18n/core/config";
 
-import type {
-  SmsSendRequestTypeOutput,
-  SmsSendResponseTypeOutput,
-} from "./definition";
+import type { SmsSendRequestOutput, SmsSendResponseOutput } from "./definition";
 
 // Define the proper type for locale to match standardized patterns
 type CountryLanguage = `${Lowercase<Languages>}-${Countries}`;
@@ -30,11 +27,11 @@ type CountryLanguage = `${Lowercase<Languages>}-${Countries}`;
  */
 export interface SmsServiceRepository {
   sendSms(
-    data: SmsSendRequestTypeOutput,
+    data: SmsSendRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmsSendResponseTypeOutput>>;
+  ): Promise<ResponseType<SmsSendResponseOutput>>;
 }
 
 /**
@@ -43,11 +40,11 @@ export interface SmsServiceRepository {
  */
 export class SmsServiceRepositoryImpl implements SmsServiceRepository {
   async sendSms(
-    data: SmsSendRequestTypeOutput,
+    data: SmsSendRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmsSendResponseTypeOutput>> {
+  ): Promise<ResponseType<SmsSendResponseOutput>> {
     try {
       logger.debug("SMS service: Sending SMS notification", {
         to: data.to,
@@ -110,7 +107,7 @@ export class SmsServiceRepositoryImpl implements SmsServiceRepository {
    * This would integrate with actual SMS providers (Twilio, AWS SNS, etc.)
    */
   private async sendSmsInternal(
-    data: SmsSendRequestTypeOutput,
+    data: SmsSendRequestOutput,
     logger: EndpointLogger,
   ): Promise<{ messageId: string; provider: string; cost: number }> {
     logger.debug("SMS service: Processing SMS send request", {
@@ -124,10 +121,13 @@ export class SmsServiceRepositoryImpl implements SmsServiceRepository {
     // - AWS SNS
     // - Other SMS providers
 
+    // eslint-disable-next-line i18next/no-literal-string
     const messageId = `sms_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
     // Simulate network delay
-    await new Promise<void>((resolve) => setTimeout(resolve, 100));
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 100);
+    });
 
     return {
       messageId,

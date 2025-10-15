@@ -8,13 +8,17 @@ import type { ModelId } from "../config/models";
 const DRAFT_KEY_PREFIX = "chat-draft-";
 const GLOBAL_MODEL_KEY = "chat-global-model";
 const GLOBAL_TONE_KEY = "chat-global-tone";
+const GLOBAL_ENABLE_SEARCH_KEY = "chat-enable-search";
+const GLOBAL_TTS_AUTOPLAY_KEY = "chat-tts-autoplay";
 
 /**
  * Get draft for a specific thread
  */
 export function getDraft(threadId: string): string {
-  if (typeof window === "undefined") return "";
-  
+  if (typeof window === "undefined") {
+    return "";
+  }
+
   try {
     const key = `${DRAFT_KEY_PREFIX}${threadId}`;
     return localStorage.getItem(key) || "";
@@ -28,8 +32,10 @@ export function getDraft(threadId: string): string {
  * Save draft for a specific thread
  */
 export function saveDraft(threadId: string, content: string): void {
-  if (typeof window === "undefined") return;
-  
+  if (typeof window === "undefined") {
+    return;
+  }
+
   try {
     const key = `${DRAFT_KEY_PREFIX}${threadId}`;
     if (content.trim()) {
@@ -47,8 +53,10 @@ export function saveDraft(threadId: string, content: string): void {
  * Clear draft for a specific thread
  */
 export function clearDraft(threadId: string): void {
-  if (typeof window === "undefined") return;
-  
+  if (typeof window === "undefined") {
+    return;
+  }
+
   try {
     const key = `${DRAFT_KEY_PREFIX}${threadId}`;
     localStorage.removeItem(key);
@@ -61,8 +69,10 @@ export function clearDraft(threadId: string): void {
  * Get global model selection
  */
 export function getGlobalModel(): ModelId | null {
-  if (typeof window === "undefined") return null;
-  
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   try {
     const stored = localStorage.getItem(GLOBAL_MODEL_KEY);
     return stored as ModelId | null;
@@ -76,8 +86,10 @@ export function getGlobalModel(): ModelId | null {
  * Save global model selection
  */
 export function saveGlobalModel(model: ModelId): void {
-  if (typeof window === "undefined") return;
-  
+  if (typeof window === "undefined") {
+    return;
+  }
+
   try {
     localStorage.setItem(GLOBAL_MODEL_KEY, model);
   } catch (error) {
@@ -89,8 +101,10 @@ export function saveGlobalModel(model: ModelId): void {
  * Get global tone selection
  */
 export function getGlobalTone(): string | null {
-  if (typeof window === "undefined") return null;
-  
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   try {
     return localStorage.getItem(GLOBAL_TONE_KEY);
   } catch (error) {
@@ -103,8 +117,10 @@ export function getGlobalTone(): string | null {
  * Save global tone selection
  */
 export function saveGlobalTone(tone: string): void {
-  if (typeof window === "undefined") return;
-  
+  if (typeof window === "undefined") {
+    return;
+  }
+
   try {
     localStorage.setItem(GLOBAL_TONE_KEY, tone);
   } catch (error) {
@@ -112,3 +128,70 @@ export function saveGlobalTone(tone: string): void {
   }
 }
 
+/**
+ * Get global enable search setting (defaults to false)
+ */
+export function getGlobalEnableSearch(): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  try {
+    const stored = localStorage.getItem(GLOBAL_ENABLE_SEARCH_KEY);
+    return stored === "true";
+  } catch (error) {
+    // eslint-disable-next-line no-console, i18next/no-literal-string
+    console.error("[Draft Storage] Error getting enable search:", error);
+    return false;
+  }
+}
+
+/**
+ * Save global enable search setting
+ */
+export function saveGlobalEnableSearch(enabled: boolean): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    localStorage.setItem(GLOBAL_ENABLE_SEARCH_KEY, enabled.toString());
+  } catch (error) {
+    // eslint-disable-next-line no-console, i18next/no-literal-string
+    console.error("[Draft Storage] Error saving enable search:", error);
+  }
+}
+
+/**
+ * Get global TTS autoplay setting (defaults to false)
+ */
+export function getGlobalTTSAutoplay(): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  try {
+    const stored = localStorage.getItem(GLOBAL_TTS_AUTOPLAY_KEY);
+    return stored === "true";
+  } catch (error) {
+    // eslint-disable-next-line no-console, i18next/no-literal-string
+    console.error("[Draft Storage] Error getting TTS autoplay:", error);
+    return false;
+  }
+}
+
+/**
+ * Save global TTS autoplay setting
+ */
+export function saveGlobalTTSAutoplay(enabled: boolean): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    localStorage.setItem(GLOBAL_TTS_AUTOPLAY_KEY, enabled.toString());
+  } catch (error) {
+    // eslint-disable-next-line no-console, i18next/no-literal-string
+    console.error("[Draft Storage] Error saving TTS autoplay:", error);
+  }
+}

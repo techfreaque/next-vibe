@@ -4,24 +4,23 @@
  */
 
 import * as fs from "node:fs";
+import * as path from "node:path";
+
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
-import * as path from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type guardStartEndpoints from "./definition";
-
-type GuardStartRequestType =
-  typeof guardStartEndpoints.POST.types.RequestOutput;
-type GuardStartResponseType =
-  typeof guardStartEndpoints.POST.types.ResponseOutput;
+import type {
+  GuardStartRequestOutput,
+  GuardStartResponseOutput,
+} from "./definition";
 
 interface GuardJailConfig {
   project: {
@@ -490,11 +489,11 @@ function _expandVariables(
  */
 export interface GuardStartRepository {
   startGuard(
-    data: GuardStartRequestType,
+    data: GuardStartRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<GuardStartResponseType>>;
+  ): Promise<ResponseType<GuardStartResponseOutput>>;
 }
 
 /**
@@ -502,11 +501,11 @@ export interface GuardStartRepository {
  */
 export class GuardStartRepositoryImpl implements GuardStartRepository {
   async startGuard(
-    data: GuardStartRequestType,
+    data: GuardStartRequestOutput,
     _user: JwtPayloadType,
     _locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<GuardStartResponseType>> {
+  ): Promise<ResponseType<GuardStartResponseOutput>> {
     try {
       logger.info("Starting guard environment");
       logger.debug("Guard start request data", { data });
@@ -545,7 +544,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
   private async startByGuardId(
     guardId: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<GuardStartResponseType>> {
+  ): Promise<ResponseType<GuardStartResponseOutput>> {
     logger.debug(`Starting guard: ${guardId}`);
 
     // For now, return error - guard ID lookup not implemented yet
@@ -561,7 +560,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
   private async startByProject(
     projectPath: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<GuardStartResponseType>> {
+  ): Promise<ResponseType<GuardStartResponseOutput>> {
     logger.debug(`Starting guard for project: ${projectPath}`);
 
     const projectName = path.basename(projectPath);
@@ -654,7 +653,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
     }
 
     // For API calls, return configuration info
-    const response: GuardStartResponseType = {
+    const response: GuardStartResponseOutput = {
       summary: {
         totalStarted: 1,
         status: "🚀 Guard Ready",
@@ -672,7 +671,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
 
   private startAllGuards(
     logger: EndpointLogger,
-  ): ResponseType<GuardStartResponseType> {
+  ): ResponseType<GuardStartResponseOutput> {
     logger.debug("Starting all guards");
 
     // Mock implementation - in real system would find and start all guards
@@ -687,7 +686,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
       },
     ];
 
-    const response: GuardStartResponseType = {
+    const response: GuardStartResponseOutput = {
       summary: {
         totalStarted: mockGuards.length,
         status: "🚀 Guards Ready",

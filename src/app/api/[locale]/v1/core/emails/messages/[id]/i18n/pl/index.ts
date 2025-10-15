@@ -49,7 +49,8 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Brak autoryzacji",
-        description: "Musisz być uwierzytelniony, aby zobaczyć szczegóły emaila",
+        description:
+          "Musisz być uwierzytelniony, aby zobaczyć szczegóły emaila",
       },
       not_found: {
         title: "Email nie znaleziony",
@@ -61,7 +62,8 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd serwera",
-        description: "Wystąpił wewnętrzny błąd serwera podczas pobierania emaila",
+        description:
+          "Wystąpił wewnętrzny błąd serwera podczas pobierania emaila",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -89,6 +91,18 @@ export const translations: typeof enTranslations = {
     server: {
       title: "Błąd serwera",
       description: "Wystąpił wewnętrzny błąd serwera podczas pobierania emaila",
+    },
+    conflict: {
+      title: "Błąd konfliktu",
+      description: "Wystąpił konflikt podczas przetwarzania żądania emaila",
+    },
+    network: {
+      title: "Błąd sieci",
+      description: "Wystąpił błąd sieci podczas pobierania emaila",
+    },
+    unsavedChanges: {
+      title: "Niezapisane zmiany",
+      description: "Istnieją niezapisane zmiany",
     },
     unknown: {
       title: "Nieznany błąd",

@@ -5,13 +5,7 @@
 
 import "server-only";
 
-import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
-import { type NewUser, users } from "@/app/api/[locale]/v1/core/user/db";
-import { PreferredContactMethod } from "@/app/api/[locale]/v1/core/user/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
+import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -21,55 +15,63 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import { hashPassword } from "next-vibe/shared/utils/password";
 
+import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import {
+  type NewUser,
+  userRoles,
+  users,
+} from "@/app/api/[locale]/v1/core/user/db";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { TFunction } from "@/i18n/core/static-types";
+
 import type {
-  UserCreateRequestTypeOutput,
-  UserCreateResponseTypeOutput,
+  UserCreateRequestOutput,
+  UserCreateResponseOutput,
 } from "./definition";
 import { sendWelcomeSms } from "./sms";
 
 export interface UserCreateRepository {
   createUser(
-    data: UserCreateRequestTypeOutput,
+    data: UserCreateRequestOutput,
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: TFunction,
-  ): Promise<ResponseType<UserCreateResponseTypeOutput>>;
+  ): Promise<ResponseType<UserCreateResponseOutput>>;
 }
 
 export class UserCreateRepositoryImpl implements UserCreateRepository {
   async createUser(
-    data: UserCreateRequestTypeOutput,
+    data: UserCreateRequestOutput,
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: TFunction,
-  ): Promise<ResponseType<UserCreateResponseTypeOutput>> {
+  ): Promise<ResponseType<UserCreateResponseOutput>> {
     try {
       logger.debug("Creating user", {
         email: data.basicInfo.email,
         requestingUser: user.id,
       });
 
-      // Hash password if provided, use a default value if not
-      const hashedPassword = data.basicInfo.password
-        ? await hashPassword(data.basicInfo.password)
-        : null; // Users without passwords will need to set one later
+      // Hash password
+      const hashedPassword = await hashPassword(data.basicInfo.password);
 
-      // Prepare user data
+      // Prepare user data using actual schema fields
       const newUser: NewUser = {
         leadId: data.adminSettings?.leadId || null,
         email: data.basicInfo.email,
-        firstName: data.basicInfo.firstName,
-        lastName: data.basicInfo.lastName,
-        company: data.organizationInfo.company,
-        phone: data.contactInfo?.phone || null,
-        preferredContactMethod: PreferredContactMethod.EMAIL, // Default for now due to type complexity
-        imageUrl: data.profileInfo?.imageUrl || null,
-        bio: data.profileInfo?.bio || null,
+        password: hashedPassword,
+        privateName: data.basicInfo.privateName,
+        publicName: data.basicInfo.publicName,
         isActive: data.adminSettings?.isActive ?? true,
         emailVerified: data.adminSettings?.emailVerified ?? false,
-        password: hashedPassword || "", // Provide empty string as fallback for non-null constraint
+        marketingConsent: false,
+        isBanned: false,
+        bannedReason: null,
+        stripeCustomerId: null,
         createdBy: user.id,
         updatedBy: user.id,
       };
@@ -81,91 +83,81 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
         return createErrorResponse(
           "app.api.v1.core.users.create.post.errors.internal.title",
           ErrorResponseTypes.INTERNAL_ERROR,
-          { error: "app.api.v1.core.users.create.errors.internal.description" },
         );
       }
 
-      // Add roles if provided - skip for now due to type complexity
-      // TODO: Fix role insertion with proper type mapping
-      // if (data.adminSettings?.roles && data.adminSettings.roles.length > 0) {
-      //   const roleInserts = data.adminSettings.roles.map((role) => ({
-      //     userId: createdUser.id,
-      //     role: role,
-      //     assignedBy: user.id,
-      //   }));
-      //
-      //   await db.insert(userRoles).values(roleInserts);
-      // }
+      // Add roles if provided
+      if (data.adminSettings?.roles && data.adminSettings.roles.length > 0) {
+        await db.insert(userRoles).values(
+          data.adminSettings.roles.map((role) => ({
+            userId: createdUser.id,
+            role,
+            assignedBy: user.id,
+          })),
+        );
+      }
+
+      // Fetch user roles for response
+      const userRolesResult = await db
+        .select()
+        .from(userRoles)
+        .where(eq(userRoles.userId, createdUser.id));
 
       logger.debug("User created successfully", { userId: createdUser.id });
 
       // Prepare response data
-      const responseData: UserCreateResponseTypeOutput = {
+      const responseData: UserCreateResponseOutput = {
         success: {
           created: true,
-          message: "app.api.v1.core.users.create.post.success.message.content",
+          message: t(
+            "app.api.v1.core.users.create.post.success.message.content",
+          ),
         },
         userInfo: {
           id: createdUser.id,
           email: createdUser.email,
-          firstName: createdUser.firstName,
-          lastName: createdUser.lastName,
-          company: createdUser.company,
+          privateName: createdUser.privateName,
+          publicName: createdUser.publicName,
           createdAt: createdUser.createdAt.toISOString(),
         },
         responseId: createdUser.id,
         responseLeadId: createdUser.leadId,
         responseEmail: createdUser.email,
-        responseFirstName: createdUser.firstName,
-        responseLastName: createdUser.lastName,
-        responseCompany: createdUser.company,
-        responsePhone: createdUser.phone,
-        responsePreferredContactMethod: createdUser.preferredContactMethod
-          ? ((
-              JSON.parse(createdUser.preferredContactMethod) as string[]
-            )[0] as (typeof PreferredContactMethod)[keyof typeof PreferredContactMethod])
-          : PreferredContactMethod.EMAIL,
-        responseImageUrl: createdUser.imageUrl,
-        responseBio: createdUser.bio,
-        responseWebsite: null,
-        responseJobTitle: null,
+        responsePrivateName: createdUser.privateName,
+        responsePublicName: createdUser.publicName,
         responseEmailVerified: createdUser.emailVerified,
         responseIsActive: createdUser.isActive,
-        responseStripeCustomerId: null,
-        responseUserRoles: [],
+        responseStripeCustomerId: createdUser.stripeCustomerId,
+        responseUserRoles: userRolesResult.map((r) => ({
+          id: r.id,
+          role: r.role,
+        })),
         responseCreatedAt: createdUser.createdAt.toISOString(),
         responseUpdatedAt: createdUser.updatedAt.toISOString(),
       };
 
-      // Send SMS notifications if phone number is provided
-      if (responseData.responsePhone) {
-        logger.debug("Sending SMS notifications for new user", {
-          userId: responseData.responseId,
-          phone: responseData.responsePhone,
-        });
-
-        // Send welcome SMS (fire and forget - don't fail user creation if SMS fails)
-        sendWelcomeSms(responseData, user, locale, logger, t)
-          .then((result) => {
-            if (result.success) {
-              logger.debug("Welcome SMS sent successfully", {
-                userId: responseData.responseId,
-                messageId: result.data.messageId,
-              });
-            } else {
-              logger.warn("Welcome SMS failed to send", {
-                userId: responseData.responseId,
-                error: result.error,
-              });
-            }
-          })
-          .catch((error) => {
-            logger.warn("Welcome SMS sending encountered an error", {
+      // Send SMS notifications (fire and forget - don't fail user creation if SMS fails)
+      void sendWelcomeSms(responseData, user, locale, logger)
+        .then((result) => {
+          if (result.success) {
+            logger.debug("Welcome SMS sent successfully", {
               userId: responseData.responseId,
-              error: parseError(error).message,
             });
+          } else {
+            logger.warn("Welcome SMS failed to send", {
+              userId: responseData.responseId,
+              error: result.message,
+            });
+          }
+          return;
+        })
+        .catch((error) => {
+          logger.warn("Welcome SMS sending encountered an error", {
+            userId: responseData.responseId,
+            error: error instanceof Error ? error.message : String(error),
           });
-      }
+          return;
+        });
 
       return createSuccessResponse(responseData);
     } catch (error) {
@@ -173,7 +165,7 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
       return createErrorResponse(
         "app.api.v1.core.users.create.post.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
+        { details: parseError(error).message },
       );
     }
   }

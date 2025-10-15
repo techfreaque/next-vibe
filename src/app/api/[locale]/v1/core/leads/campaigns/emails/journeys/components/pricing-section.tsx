@@ -6,9 +6,12 @@
 
 import { Section, Text } from "@react-email/components";
 import type * as icons from "lucide-react";
-import type { JSX } from "react";
+import React, { type JSX } from "react";
 
-import { getPricingPlansArray } from "@/app/[locale]/(site)/pricing/_components/pricing";
+import {
+  getPricingPlansArray,
+  type PricingPlan,
+} from "@/app/[locale]/story/pricing/_components/pricing";
 import { SubscriptionPlan } from "@/app/api/[locale]/v1/core/subscription/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
@@ -20,7 +23,9 @@ import { LucideEmailIcon } from "../../components";
 /**
  * Email-compatible plan icons matching the website pricing section
  */
-async function getPlanIcon(planId: SubscriptionPlan): Promise<JSX.Element> {
+async function getPlanIcon(
+  planId: (typeof SubscriptionPlan)[keyof typeof SubscriptionPlan],
+): Promise<JSX.Element> {
   const iconSize = "24";
   const iconColor = "#ffffff";
 
@@ -189,7 +194,7 @@ export async function EmailPricingSection({
     features: string[],
     plan: {
       highlighted: boolean;
-      id: SubscriptionPlan;
+      id: (typeof SubscriptionPlan)[keyof typeof SubscriptionPlan];
     },
   ): Promise<JSX.Element[]> {
     return await Promise.all(
@@ -266,7 +271,7 @@ export async function EmailPricingSection({
       feature: string;
       className: string | undefined;
     }>,
-    planId: SubscriptionPlan,
+    planId: (typeof SubscriptionPlan)[keyof typeof SubscriptionPlan],
   ): Promise<JSX.Element[]> {
     return await Promise.all(
       premiumFeatures.map(async (feature, i) => {
@@ -451,7 +456,7 @@ export async function EmailPricingSection({
   const country = getCountryFromLocale(locale);
 
   // Get all pricing plans using the same structure as main pricing section
-  const allPlans = getPricingPlansArray();
+  const allPlans: PricingPlan[] = getPricingPlansArray();
 
   // Build plans array matching the main pricing section structure
   const plans = allPlans.map((plan) => ({

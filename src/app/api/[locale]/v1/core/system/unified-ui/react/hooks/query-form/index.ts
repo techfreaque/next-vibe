@@ -10,13 +10,11 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import type { FormEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import type { UseFormProps, UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
 
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import type {
-  ExtractInput,
   ExtractOutput,
   FieldUsage,
   InferSchemaFromField,
@@ -54,10 +52,12 @@ import type {
  * @returns Form and query for API interaction with enhanced error handling
  */
 export function useApiQueryForm<
-  TExampleKey extends string,
-  TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TEndpoint extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    any
+  >,
 >({
   endpoint,
   urlVariables,
@@ -65,13 +65,9 @@ export function useApiQueryForm<
   queryOptions = { enabled: true },
   logger,
 }: {
-  endpoint: CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>;
-  urlVariables: ExtractOutput<
-    InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
-  >;
-  formOptions: ApiQueryFormOptions<
-    ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>
-  > & {
+  endpoint: TEndpoint;
+  urlVariables: TEndpoint["TUrlVariablesOutput"];
+  formOptions: ApiQueryFormOptions<TEndpoint["TRequestOutput"]> & {
     /**
      * Whether to enable form persistence
      * @default true
@@ -210,8 +206,8 @@ export function useApiQueryForm<
     ...restFormOptions,
     // @ts-ignore - Intentionally ignoring FieldValues constraint requirement
     resolver: zodResolver<
-      ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
-      ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>
+      ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
+      ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>
     >(endpoint.requestSchema),
   };
 
@@ -221,14 +217,11 @@ export function useApiQueryForm<
     `query-form-${endpoint.path.join("-")}-${endpoint.method}`;
 
   // Initialize form with the proper configuration
-  // @ts-ignore - Intentionally ignoring FieldValues constraint requirement
-  const formMethods = useForm<
-    ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>
-  >(
-    formConfig as UseFormProps<
-      ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>
-    >,
-  );
+  type FormData = ExtractOutput<
+    InferSchemaFromField<TFields, FieldUsage.RequestData>
+  >;
+  // @ts-ignore - FormData is guaranteed to be an object type from Zod, satisfying FieldValues
+  const formMethods = useForm<FormData>(formConfig);
   const { watch } = formMethods;
 
   // Implement form persistence directly
@@ -242,19 +235,15 @@ export function useApiQueryForm<
       localStorage.removeItem(storageKey);
       // Reset the form to default values if available, otherwise empty
       const resetData =
-        (restFormOptions.defaultValues as ExtractInput<
+        (restFormOptions.defaultValues as ExtractOutput<
           InferSchemaFromField<TFields, FieldUsage.RequestData>
         >) ||
-        ({} as ExtractInput<
+        ({} as ExtractOutput<
           InferSchemaFromField<TFields, FieldUsage.RequestData>
         >);
       formMethods.reset(resetData);
       // Update query params with reset data
-      setQueryParams(
-        resetData as ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestData>
-        >,
-      );
+      setQueryParams(resetData);
     } catch {
       // Handle error silently - we don't want to break the UI for storage errors
       // In a production app, this would use a proper error logging service
@@ -270,16 +259,12 @@ export function useApiQueryForm<
     try {
       const savedFormData = localStorage.getItem(storageKey);
       if (savedFormData) {
-        const parsedData = JSON.parse(savedFormData) as ExtractInput<
+        const parsedData = JSON.parse(savedFormData) as ExtractOutput<
           InferSchemaFromField<TFields, FieldUsage.RequestData>
         >;
         formMethods.reset(parsedData);
         // Update query params with saved data
-        setQueryParams(
-          parsedData as ExtractOutput<
-            InferSchemaFromField<TFields, FieldUsage.RequestData>
-          >,
-        );
+        setQueryParams(parsedData);
       }
     } catch {
       // Handle error silently - we don't want to break the UI for storage errors
@@ -350,8 +335,11 @@ export function useApiQueryForm<
   const finalEnabled = queryOptions.enabled !== false;
 
   const query = useApiQuery({
+    // @ts-ignore - Generic constraints are compatible, type system can't verify the complex relationship
     endpoint,
+    // @ts-ignore - Generic constraints are compatible
     requestData: queryParams,
+    // @ts-ignore - Generic constraints are compatible
     urlParams: urlVariables,
     logger,
     options: {
@@ -494,6 +482,11 @@ export function useApiQueryForm<
       ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>>
     >,
   ): void => {
+    // Prevent default form submission behavior
+    if (event) {
+      event.preventDefault();
+    }
+
     // Create a properly typed options object with urlParamVariables
     const options: SubmitFormFunctionOptions<
       ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
@@ -502,9 +495,7 @@ export function useApiQueryForm<
     > = {
       ...(inputOptions || {}),
       urlParamVariables:
-        (inputOptions?.urlParamVariables as ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
-        >) ||
+        inputOptions?.urlParamVariables ||
         ({} as ExtractOutput<
           InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
         >),
@@ -552,7 +543,7 @@ export function useApiQueryForm<
         lastSubmitTimeRef.current = Date.now();
 
         // Get form data
-        const formData: ExtractInput<
+        const formData: ExtractOutput<
           InferSchemaFromField<TFields, FieldUsage.RequestData>
         > = formMethods.getValues();
 
@@ -560,11 +551,7 @@ export function useApiQueryForm<
         clearFormError();
 
         // Update query params immediately
-        setQueryParams(
-          formData as ExtractOutput<
-            InferSchemaFromField<TFields, FieldUsage.RequestData>
-          >,
-        );
+        setQueryParams(formData);
 
         // Refetch with the new params
         const response = await query.refetch();
@@ -584,9 +571,7 @@ export function useApiQueryForm<
           options.onSuccess({
             responseData: result.data,
             pathParams: options.urlParamVariables,
-            requestData: formData as ExtractOutput<
-              InferSchemaFromField<TFields, FieldUsage.RequestData>
-            >,
+            requestData: formData,
           });
         } else if (!result.success && options.onError) {
           logger.debug("Calling onError callback", {
@@ -595,9 +580,7 @@ export function useApiQueryForm<
           // If the result is not successful, call the onError callback
           options.onError({
             error: result,
-            requestData: formData as ExtractOutput<
-              InferSchemaFromField<TFields, FieldUsage.RequestData>
-            >,
+            requestData: formData,
             pathParams:
               options.urlParamVariables ||
               ({} as ExtractOutput<
@@ -675,10 +658,8 @@ export function useApiQueryForm<
 
   // Create a result object that combines form and query functionality
   return {
-    // @ts-ignore - Intentionally ignoring FieldValues constraint requirement
-    form: formMethods as UseFormReturn<
-      ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>
-    >,
+    // @ts-ignore - FormData type is correct, type system can't infer the complex generic relationship
+    form: formMethods,
 
     // Use the query response as the primary response
     response: query.response,

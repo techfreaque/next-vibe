@@ -24,7 +24,9 @@ function Form<TRequest>(props: {
   children: React.ReactNode;
   // @ts-ignore - Intentionally ignoring FieldValues constraint requirement
   form: UseFormReturn<TRequest, ZodType<TRequest, ZodTypeDef, TRequest>>;
-  onSubmit: ((e: React.FormEvent<HTMLFormElement>) => void) | undefined;
+  onSubmit:
+    | ((e: React.FormEvent<HTMLFormElement>) => void | Promise<void>)
+    | undefined;
 }): React.JSX.Element {
   return (
     // @ts-ignore - Intentionally ignoring FieldValues constraint requirement

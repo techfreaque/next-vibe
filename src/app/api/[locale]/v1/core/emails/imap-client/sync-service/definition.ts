@@ -35,7 +35,7 @@ export interface SyncResult {
 /**
  * Sync All Accounts Request Type
  */
-export interface SyncAllAccountsRequestTypeOutput {
+export interface SyncAllAccountsRequestOutput {
   // No specific parameters needed for syncing all accounts
   [key: string]: never;
 }
@@ -43,42 +43,42 @@ export interface SyncAllAccountsRequestTypeOutput {
 /**
  * Sync All Accounts Response Type
  */
-export interface SyncAllAccountsResponseTypeOutput {
+export interface SyncAllAccountsResponseOutput {
   result: SyncResult;
 }
 
 /**
  * Sync Account Request Type
  */
-export interface SyncAccountRequestTypeOutput {
+export interface SyncAccountRequestOutput {
   account: ImapAccount;
 }
 
 /**
  * Sync Account Response Type
  */
-export interface SyncAccountResponseTypeOutput {
+export interface SyncAccountResponseOutput {
   result: SyncResult;
 }
 
 /**
  * Sync Account Folders Request Type
  */
-export interface SyncAccountFoldersRequestTypeOutput {
+export interface SyncAccountFoldersRequestOutput {
   account: ImapAccount;
 }
 
 /**
  * Sync Account Folders Response Type
  */
-export interface SyncAccountFoldersResponseTypeOutput {
+export interface SyncAccountFoldersResponseOutput {
   result: SyncResult;
 }
 
 /**
  * Sync Folder Messages Request Type
  */
-export interface SyncFolderMessagesRequestTypeOutput {
+export interface SyncFolderMessagesRequestOutput {
   account: ImapAccount;
   folder: ImapFolder;
 }
@@ -86,6 +86,6 @@ export interface SyncFolderMessagesRequestTypeOutput {
 /**
  * Sync Folder Messages Response Type
  */
-export interface SyncFolderMessagesResponseTypeOutput {
+export interface SyncFolderMessagesResponseOutput {
   result: SyncResult;
 }

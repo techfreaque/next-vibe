@@ -685,7 +685,7 @@ export class InteractiveModeHandler {
       };
 
       // schemaUIHandler.generateForm returns any, but we know it returns form data
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
       const result = await schemaUIHandler.generateForm(config);
       return result as Record<string, string | number | boolean>;
     } catch (error) {

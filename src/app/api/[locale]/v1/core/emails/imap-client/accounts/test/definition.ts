@@ -236,13 +236,10 @@ const { POST } = createEndpoint({
 });
 
 // Export types following migration guide pattern
-export type ImapAccountTestPostRequestTypeInput =
-  typeof POST.types.RequestInput;
-export type ImapAccountTestPostRequestTypeOutput =
-  typeof POST.types.RequestOutput;
-export type ImapAccountTestPostResponseTypeInput =
-  typeof POST.types.ResponseInput;
-export type ImapAccountTestPostResponseTypeOutput =
+export type ImapAccountTestPostRequestInput = typeof POST.types.RequestInput;
+export type ImapAccountTestPostRequestOutput = typeof POST.types.RequestOutput;
+export type ImapAccountTestPostResponseInput = typeof POST.types.ResponseInput;
+export type ImapAccountTestPostResponseOutput =
   typeof POST.types.ResponseOutput;
 
 // Export individual endpoints

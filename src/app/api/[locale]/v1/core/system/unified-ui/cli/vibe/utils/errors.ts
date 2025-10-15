@@ -5,15 +5,33 @@
 import type { EndpointLogger } from "../endpoints/endpoint-handler/logger";
 
 /**
+ * Error context type
+ */
+interface ErrorContext {
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | string[]
+    | undefined
+    | Record<string, never>;
+}
+
+/**
+ * Unknown error type for error handling
+ */
+type UnknownError = Error | CliError | Record<string, never>;
+
+/**
  * Base CLI error class
  */
 export abstract class CliError extends Error {
   abstract readonly code: string;
   abstract readonly statusCode: number;
   readonly timestamp: Date;
-  readonly context?: Record<string, any>;
+  readonly context?: ErrorContext;
 
-  constructor(message: string, context?: Record<string, any>) {
+  constructor(message: string, context?: ErrorContext) {
     super(message);
     this.name = this.constructor.name;
     this.timestamp = new Date();
@@ -26,9 +44,23 @@ export abstract class CliError extends Error {
   }
 
   /**
+   * Safely get a string value from context
+   */
+  protected getContextString(key: string, fallback = "unknown"): string {
+    const value = this.context?.[key];
+    if (typeof value === "string") {
+      return value;
+    }
+    if (typeof value === "number" || typeof value === "boolean") {
+      return String(value);
+    }
+    return fallback;
+  }
+
+  /**
    * Convert error to JSON for logging/serialization
    */
-  toJSON(): Record<string, any> {
+  toJSON(): ErrorContext {
     return {
       name: this.name,
       code: this.code,
@@ -56,19 +88,28 @@ export class CommandNotFoundError extends CliError {
   readonly statusCode = 404;
 
   constructor(command: string, availableCommands?: string[]) {
+    // eslint-disable-next-line i18next/no-literal-string
     const message = `Command '${command}' not found`;
     super(message, { command, availableCommands });
   }
 
   getUserMessage(): string {
-    const suggestions = this.context?.availableCommands
-      ? `\n\nAvailable commands:\n${this.context.availableCommands
+    // Type guard for availableCommands
+    const commands = this.context?.availableCommands;
+    const isStringArray =
+      Array.isArray(commands) &&
+      commands.every((cmd) => typeof cmd === "string");
+
+    /* eslint-disable i18next/no-literal-string */
+    const suggestions = isStringArray
+      ? `\n\nAvailable commands:\n${commands
           .slice(0, 10)
-          .map((cmd: string) => `  - ${cmd}`)
+          .map((cmd) => `  - ${cmd}`)
           .join("\n")}`
       : "";
 
     return `❌ ${this.message}${suggestions}`;
+    /* eslint-enable i18next/no-literal-string */
   }
 }
 
@@ -79,11 +120,8 @@ export class RouteExecutionError extends CliError {
   readonly code = "ROUTE_EXECUTION_ERROR";
   readonly statusCode = 500;
 
-  constructor(
-    route: string,
-    originalError: Error,
-    context?: Record<string, any>,
-  ) {
+  constructor(route: string, originalError: Error, context?: ErrorContext) {
+    // eslint-disable-next-line i18next/no-literal-string
     const message = `Failed to execute route '${route}': ${originalError.message}`;
     super(message, { route, originalError: originalError.message, ...context });
 
@@ -94,7 +132,10 @@ export class RouteExecutionError extends CliError {
   }
 
   getUserMessage(): string {
-    return `❌ Route execution failed: ${this.context?.route}\n   ${this.context?.originalError}`;
+    const route = this.getContextString("route");
+    const error = this.getContextString("originalError");
+    // eslint-disable-next-line i18next/no-literal-string
+    return `❌ Route execution failed: ${route}\n   ${error}`;
   }
 }
 
@@ -107,17 +148,23 @@ export class ValidationError extends CliError {
 
   constructor(
     field: string,
-    value: any,
+    value: string | number | boolean | undefined,
     expectedType: string,
     details?: string,
   ) {
+    // eslint-disable-next-line i18next/no-literal-string
     const message = `Validation failed for field '${field}': expected ${expectedType}, got ${typeof value}`;
     super(message, { field, value, expectedType, details });
   }
 
   getUserMessage(): string {
-    const details = this.context?.details ? ` (${this.context.details})` : "";
-    return `❌ Invalid input for '${this.context?.field}': expected ${this.context?.expectedType}${details}`;
+    const field = this.getContextString("field");
+    const expectedType = this.getContextString("expectedType");
+    const detailsValue = this.getContextString("details", "");
+    // eslint-disable-next-line i18next/no-literal-string
+    const details = detailsValue ? ` (${detailsValue})` : "";
+    // eslint-disable-next-line i18next/no-literal-string
+    return `❌ Invalid input for '${field}': expected ${expectedType}${details}`;
   }
 }
 
@@ -128,13 +175,16 @@ export class ConfigurationError extends CliError {
   readonly code = "CONFIGURATION_ERROR";
   readonly statusCode = 500;
 
-  constructor(configKey: string, issue: string, context?: Record<string, any>) {
+  constructor(configKey: string, issue: string, context?: ErrorContext) {
+    // eslint-disable-next-line i18next/no-literal-string
     const message = `Configuration error for '${configKey}': ${issue}`;
     super(message, { configKey, issue, ...context });
   }
 
   getUserMessage(): string {
-    return `❌ Configuration error: ${this.context?.issue}`;
+    const issue = this.getContextString("issue");
+    // eslint-disable-next-line i18next/no-literal-string
+    return `❌ Configuration error: ${issue}`;
   }
 }
 
@@ -146,12 +196,15 @@ export class RouteDiscoveryError extends CliError {
   readonly statusCode = 500;
 
   constructor(directory: string, originalError: Error) {
+    // eslint-disable-next-line i18next/no-literal-string
     const message = `Failed to discover routes in '${directory}': ${originalError.message}`;
     super(message, { directory, originalError: originalError.message });
   }
 
   getUserMessage(): string {
-    return `❌ Failed to discover routes in: ${this.context?.directory}`;
+    const directory = this.getContextString("directory");
+    // eslint-disable-next-line i18next/no-literal-string
+    return `❌ Failed to discover routes in: ${directory}`;
   }
 }
 
@@ -163,12 +216,16 @@ export class TimeoutError extends CliError {
   readonly statusCode = 408;
 
   constructor(operation: string, timeout: number) {
+    // eslint-disable-next-line i18next/no-literal-string
     const message = `Operation '${operation}' timed out after ${timeout}ms`;
     super(message, { operation, timeout });
   }
 
   getUserMessage(): string {
-    return `❌ Operation timed out: ${this.context?.operation} (${this.context?.timeout}ms)`;
+    const operation = this.getContextString("operation");
+    const timeout = this.getContextString("timeout");
+    // eslint-disable-next-line i18next/no-literal-string
+    return `❌ Operation timed out: ${operation} (${timeout}ms)`;
   }
 }
 
@@ -179,13 +236,17 @@ export class PermissionError extends CliError {
   readonly code = "PERMISSION_ERROR";
   readonly statusCode = 403;
 
-  constructor(resource: string, action: string, context?: Record<string, any>) {
+  constructor(resource: string, action: string, context?: ErrorContext) {
+    // eslint-disable-next-line i18next/no-literal-string
     const message = `Permission denied: cannot ${action} ${resource}`;
     super(message, { resource, action, ...context });
   }
 
   getUserMessage(): string {
-    return `❌ Permission denied: cannot ${this.context?.action} ${this.context?.resource}`;
+    const action = this.getContextString("action");
+    const resource = this.getContextString("resource");
+    // eslint-disable-next-line i18next/no-literal-string
+    return `❌ Permission denied: cannot ${action} ${resource}`;
   }
 }
 
@@ -199,14 +260,19 @@ export class ResourceNotFoundError extends CliError {
   constructor(
     resourceType: string,
     identifier: string,
-    context?: Record<string, any>,
+    context?: ErrorContext,
   ) {
+    // eslint-disable-next-line i18next/no-literal-string
     const message = `${resourceType} '${identifier}' not found`;
     super(message, { resourceType, identifier, ...context });
   }
 
   getUserMessage(): string {
-    return `❌ ${this.context?.resourceType} not found: ${this.context?.identifier}`;
+    // eslint-disable-next-line i18next/no-literal-string
+    const resourceType = this.getContextString("resourceType", "Resource");
+    const identifier = this.getContextString("identifier");
+    // eslint-disable-next-line i18next/no-literal-string
+    return `❌ ${resourceType} not found: ${identifier}`;
   }
 }
 
@@ -215,10 +281,26 @@ export class ResourceNotFoundError extends CliError {
  */
 export class ErrorHandler {
   /**
+   * Safely convert error to string
+   */
+  private static errorToString(error: UnknownError): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+    if (typeof error === "string") {
+      return error;
+    }
+    if (typeof error === "object" && error !== null) {
+      return JSON.stringify(error);
+    }
+    return String(error);
+  }
+
+  /**
    * Handle and format error for CLI output
    */
   static handleError(
-    error: unknown,
+    error: UnknownError,
     logger: EndpointLogger,
   ): {
     message: string;
@@ -247,10 +329,12 @@ export class ErrorHandler {
     }
 
     // Unknown error type
-    const message = `❌ Unknown error: ${String(error)}`;
+    // eslint-disable-next-line i18next/no-literal-string
+    const message = `❌ Unknown error: ${this.errorToString(error)}`;
     return {
       message: logger.isDebugEnabled
-        ? `${message}\n${JSON.stringify(error, null, 2)}`
+        ? // eslint-disable-next-line i18next/no-literal-string
+          `${message}\n${JSON.stringify(error, null, 2)}`
         : message,
       exitCode: 1,
       shouldExit: true,
@@ -261,16 +345,22 @@ export class ErrorHandler {
    * Format error with full details for verbose output
    */
   private static formatVerboseError(error: CliError): string {
+    // eslint-disable-next-line i18next/no-literal-string
     let output = `❌ ${error.name}: ${error.message}\n`;
+    // eslint-disable-next-line i18next/no-literal-string
     output += `   Code: ${error.code}\n`;
+    // eslint-disable-next-line i18next/no-literal-string
     output += `   Status: ${error.statusCode}\n`;
+    // eslint-disable-next-line i18next/no-literal-string
     output += `   Time: ${error.timestamp.toISOString()}\n`;
 
     if (error.context && Object.keys(error.context).length > 0) {
+      // eslint-disable-next-line i18next/no-literal-string
       output += `   Context: ${JSON.stringify(error.context, null, 4)}\n`;
     }
 
     if (error.stack) {
+      // eslint-disable-next-line i18next/no-literal-string
       output += `   Stack Trace:\n${error.stack}`;
     }
 
@@ -293,7 +383,7 @@ export class ErrorHandler {
   /**
    * Create error from unknown value
    */
-  static createError(error: unknown, context?: Record<string, any>): CliError {
+  static createError(error: UnknownError, context?: ErrorContext): CliError {
     if (error instanceof CliError) {
       return error;
     }
@@ -304,7 +394,7 @@ export class ErrorHandler {
 
     return new RouteExecutionError(
       "unknown",
-      new Error(String(error)),
+      new Error(this.errorToString(error)),
       context,
     );
   }
@@ -314,12 +404,13 @@ export class ErrorHandler {
    */
   static async withErrorHandling<T>(
     fn: () => Promise<T>,
-    context?: Record<string, any>,
+    context?: ErrorContext,
   ): Promise<T> {
     try {
       return await fn();
     } catch (error) {
-      throw this.createError(error, context);
+      // eslint-disable-next-line no-restricted-syntax
+      throw this.createError(error as UnknownError, context);
     }
   }
 

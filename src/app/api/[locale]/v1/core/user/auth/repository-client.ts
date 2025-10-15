@@ -129,13 +129,15 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
       }
 
       const status = getCookie(AUTH_STATUS_COOKIE_NAME);
+      const hasStatus = status !== null && status !== undefined;
+
       logger.debug("Checking auth status cookie", {
         cookieName: AUTH_STATUS_COOKIE_NAME,
         cookieValue: status,
-        hasStatus: !!status,
+        hasStatus,
       });
 
-      return createSuccessResponse(!!status);
+      return createSuccessResponse(hasStatus);
     } catch (error) {
       logger.error("Error in hasAuthStatus", error);
       return createErrorResponse(

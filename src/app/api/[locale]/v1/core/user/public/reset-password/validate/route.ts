@@ -9,6 +9,7 @@ import { createSuccessResponse } from "next-vibe/shared/types/response.schema";
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import { simpleT } from "@/i18n/core/shared";
 
 import { passwordRepository } from "../repository";
 import { resetPasswordValidateEndpoint } from "./definition";
@@ -17,7 +18,9 @@ export const { GET, tools } = endpointsHandler({
   endpoint: resetPasswordValidateEndpoint,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
+    handler: async ({ data, logger, locale }) => {
+      const { t } = simpleT(locale);
+
       const verifyResult = await passwordRepository.verifyResetToken(
         data.tokenInput.token,
         logger,
@@ -34,12 +37,18 @@ export const { GET, tools } = endpointsHandler({
       return createSuccessResponse({
         response: {
           valid: true,
-          message: "Reset token validation completed",
+          message: t(
+            "app.api.v1.core.user.public.resetPassword.validate.response.validationMessage",
+          ),
           userId: userId,
           expiresAt: undefined, // Not available from this method
           nextSteps: [
-            "Proceed to set your new password",
-            "Choose a strong, unique password",
+            t(
+              "app.api.v1.core.user.public.resetPassword.validate.response.nextSteps.steps.0",
+            ),
+            t(
+              "app.api.v1.core.user.public.resetPassword.validate.response.nextSteps.steps.1",
+            ),
           ],
         },
       });

@@ -15,7 +15,9 @@ export const translations: typeof enTranslations = {
     },
     search: {
       label: "Zapytanie wyszukiwania",
-      description: "Termin wyszukiwania do filtrowania leadów po e-mailu, nazwie firmy lub notatkach",
+      description:
+        "Termin wyszukiwania do filtrowania leadów po e-mailu, nazwie firmy lub notatkach",
+      placeholder: "Wprowadź termin wyszukiwania...",
     },
     limit: {
       label: "Limit wyników",
@@ -40,7 +42,8 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd serwera",
-        description: "Wystąpił wewnętrzny błąd serwera podczas wyszukiwania leadów",
+        description:
+          "Wystąpił wewnętrzny błąd serwera podczas wyszukiwania leadów",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -56,7 +59,8 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Brak wyników",
-        description: "Nie znaleziono leadów pasujących do kryteriów wyszukiwania",
+        description:
+          "Nie znaleziono leadów pasujących do kryteriów wyszukiwania",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",

@@ -41,13 +41,18 @@ const prompts = {
   ],
 };
 
-export function SuggestedPrompts({ onSelectPrompt }: SuggestedPromptsProps): JSX.Element {
-  const [activeCategory, setActiveCategory] = useState<keyof typeof prompts>("create");
+export function SuggestedPrompts({
+  onSelectPrompt,
+}: SuggestedPromptsProps): JSX.Element {
+  const [activeCategory, setActiveCategory] =
+    useState<keyof typeof prompts>("create");
 
   return (
     <div className="max-w-3xl w-full mx-auto space-y-8 px-4">
-      <h1 className="text-4xl font-semibold text-center">How can I help you?</h1>
-      
+      <h1 className="text-4xl font-semibold text-center">
+        How can I help you?
+      </h1>
+
       {/* Category Tabs */}
       <div className="flex gap-2 justify-center flex-wrap">
         {categories.map((category) => (
@@ -81,4 +86,3 @@ export function SuggestedPrompts({ onSelectPrompt }: SuggestedPromptsProps): JSX
     </div>
   );
 }
-

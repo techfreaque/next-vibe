@@ -29,7 +29,10 @@ export class PixelTrackingRepository {
    * Handle pixel tracking request
    * Returns a 1x1 transparent GIF and records engagement asynchronously
    */
-  static handlePixelRequest(request: NextRequest, logger: EndpointLogger): Response {
+  static handlePixelRequest(
+    request: NextRequest,
+    logger: EndpointLogger,
+  ): Response {
     try {
       const { searchParams } = new URL(request.url);
 

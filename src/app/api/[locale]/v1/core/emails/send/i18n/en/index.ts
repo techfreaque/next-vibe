@@ -13,6 +13,30 @@ export const translations = {
     description: "Configure email and optional SMS notification settings",
   },
 
+  // Field groups
+  recipient: {
+    title: "Recipient Information",
+    description: "Configure the email recipient details",
+  },
+  emailContent: {
+    title: "Email Content",
+    description: "Configure the email subject and body content",
+  },
+  senderSettings: {
+    title: "Sender Settings",
+    description: "Configure sender name and reply-to address",
+  },
+  groups: {
+    campaignTracking: {
+      title: "Campaign Tracking",
+      description: "Track this email as part of a campaign",
+    },
+    smsNotifications: {
+      title: "SMS Notifications",
+      description: "Send SMS notifications in addition to email",
+    },
+  },
+
   // Email fields
   to: {
     label: "Recipient Email",
@@ -52,6 +76,7 @@ export const translations = {
   campaignType: {
     label: "Campaign Type",
     description: "Type of email campaign",
+    placeholder: "Select campaign type...",
     options: {
       leadCampaign: "Lead Campaign",
       newsletter: "Newsletter",
@@ -84,6 +109,17 @@ export const translations = {
 
   // Response fields
   response: {
+    title: "Email Send Result",
+    description: "Result of the email sending operation",
+    deliveryStatus: {
+      title: "Delivery Status",
+    },
+    accountInfo: {
+      title: "Account Information",
+    },
+    deliveryResults: {
+      title: "Delivery Results",
+    },
     success: {
       label: "Success",
     },
@@ -112,11 +148,22 @@ export const translations = {
       title: "SMS Notification Result",
       description: "Result of SMS notification sending",
       success: "SMS Success",
-      messageId: "SMS Message ID",
+      messageId: {
+        label: "SMS Message ID",
+      },
       provider: "SMS Provider",
-      sentAt: "SMS Sent At",
-      error: "SMS Error",
+      sentAt: {
+        label: "SMS Sent At",
+      },
+      error: {
+        label: "SMS Error",
+      },
     },
+  },
+
+  // SMS template
+  sms: {
+    emailNotificationTemplate: "Email notification",
   },
 
   // Error messages
@@ -124,6 +171,12 @@ export const translations = {
     validation: {
       title: "Validation Error",
       description: "Please check your input and try again",
+      smsFields: "SMS notification fields",
+      smsRequired:
+        "SMS phone number and message are required when SMS notification is enabled",
+    },
+    sms: {
+      temporarilyUnavailable: "SMS service is temporarily unavailable",
     },
     unauthorized: {
       title: "Unauthorized",

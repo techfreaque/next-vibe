@@ -75,28 +75,50 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
     indent: string,
   ): string {
     if (!summary.hasIssues) {
+      // eslint-disable-next-line i18next/no-literal-string
       const icon = context.options.useEmojis ? "✨ " : "";
-      const text = "No issues found";
+      const text = context.translate(
+        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound",
+      );
       return `${indent}${icon}${this.styleText(text, "green", context)}`;
     }
 
     const parts: string[] = [];
 
     if (summary.errors > 0) {
+      // eslint-disable-next-line i18next/no-literal-string
       const icon = context.options.useEmojis ? "✖ " : "";
-      const text = `${summary.errors} error${summary.errors === 1 ? "" : "s"}`;
+      const errorWord =
+        summary.errors === 1
+          ? context.translate(
+              "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.error",
+            )
+          : context.translate(
+              "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.errors",
+            );
+      const text = `${summary.errors} ${errorWord}`;
       parts.push(`${indent}${icon}${this.styleText(text, "red", context)}`);
     }
 
     if (summary.warnings > 0) {
+      // eslint-disable-next-line i18next/no-literal-string
       const icon = context.options.useEmojis ? "⚠ " : "";
-      const text = `${summary.warnings} warning${summary.warnings === 1 ? "" : "s"}`;
+      const warningWord =
+        summary.warnings === 1
+          ? context.translate(
+              "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.warning",
+            )
+          : context.translate(
+              "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.warnings",
+            );
+      const text = `${summary.warnings} ${warningWord}`;
       parts.push(`${indent}${icon}${this.styleText(text, "yellow", context)}`);
     }
 
     if (summary.info > 0) {
+      // eslint-disable-next-line i18next/no-literal-string
       const icon = context.options.useEmojis ? "ℹ " : "";
-      const text = `${summary.info} info`;
+      const text = `${summary.info} ${context.translate("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.info")}`;
       parts.push(`${indent}${icon}${this.styleText(text, "blue", context)}`);
     }
 
@@ -131,6 +153,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
         formatted = `${(value * 100).toFixed(config.precision)}%`;
         break;
       case "currency":
+        // eslint-disable-next-line i18next/no-literal-string
         formatted = `$${value.toFixed(config.precision)}`;
         break;
       case "bytes":
@@ -178,14 +201,18 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
     // Default icons based on thresholds
     if (typeof value === "number" && config.threshold) {
       if (config.threshold.error && value >= config.threshold.error) {
+        // eslint-disable-next-line i18next/no-literal-string
         return "🔴 ";
       }
       if (config.threshold.warning && value >= config.threshold.warning) {
+        // eslint-disable-next-line i18next/no-literal-string
         return "🟡 ";
       }
+      // eslint-disable-next-line i18next/no-literal-string
       return "🟢 ";
     }
 
+    // eslint-disable-next-line i18next/no-literal-string
     return "📊 ";
   }
 

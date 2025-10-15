@@ -6,7 +6,17 @@ export const translations = {
     title: "Email List",
     description: "Configure email list parameters and view results",
   },
+  filters: {
+    title: "Filters",
+    description: "Filter and search emails",
+  },
+  displayOptions: {
+    title: "Display Options",
+  },
   fields: {
+    dateRange: {
+      title: "Date Range",
+    },
     page: {
       label: "Page",
       description: "Page number for pagination",
@@ -84,6 +94,27 @@ export const translations = {
         leadId: "Lead ID",
         createdAt: "Created At",
         updatedAt: "Updated At",
+        emailCore: {
+          title: "Core Information",
+        },
+        emailParties: {
+          title: "Sender & Recipient",
+        },
+        emailMetadata: {
+          title: "Metadata",
+        },
+        emailEngagement: {
+          title: "Engagement Tracking",
+        },
+        technicalDetails: {
+          title: "Technical Details",
+        },
+        associatedIds: {
+          title: "Associated IDs",
+        },
+        timestamps: {
+          title: "Timestamps",
+        },
       },
     },
     pagination: {

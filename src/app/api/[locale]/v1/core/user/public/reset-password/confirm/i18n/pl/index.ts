@@ -62,6 +62,13 @@ export const translations: typeof enTranslations = {
       label: "Wiadomość",
       description: "Wiadomość odpowiedzi",
     },
+    securityTip:
+      "Rozważ włączenie uwierzytelniania dwuskładnikowego dla lepszego bezpieczeństwa",
+    nextSteps: [
+      "Zaloguj się za pomocą nowego hasła",
+      "Zaktualizuj zapisane hasła w swojej przeglądarce",
+      "Rozważ włączenie 2FA dla dodatkowego bezpieczeństwa",
+    ],
   },
   errors: {
     validation: {

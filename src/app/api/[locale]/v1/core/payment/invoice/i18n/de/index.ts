@@ -9,6 +9,8 @@ export const translations: typeof enTranslations = {
       description: "Parameter konfigurieren",
     },
     response: {
+      success: "Rechnung erfolgreich erstellt",
+      message: "Statusmeldung",
       invoice: {
         title: "Rechnungsdetails",
         description: "Generierte Rechnungsinformationen",
@@ -69,5 +71,35 @@ export const translations: typeof enTranslations = {
       title: "Erfolg",
       description: "Vorgang erfolgreich abgeschlossen",
     },
+  },
+  customerId: {
+    label: "Kunden-ID",
+    description: "Stripe-Kundenkennung",
+    placeholder: "Kunden-ID eingeben",
+  },
+  amount: {
+    label: "Betrag",
+    description: "Rechnungsbetrag",
+    placeholder: "Betrag eingeben",
+  },
+  currency: {
+    label: "Währung",
+    description: "Währungscode",
+    placeholder: "Währung auswählen",
+  },
+  description: {
+    label: "Beschreibung",
+    description: "Rechnungsbeschreibung",
+    placeholder: "Beschreibung eingeben",
+  },
+  dueDate: {
+    label: "Fälligkeitsdatum",
+    description: "Zahlungsfrist",
+    placeholder: "Fälligkeitsdatum auswählen",
+  },
+  metadata: {
+    label: "Metadaten",
+    description: "Zusätzliche Metadaten",
+    placeholder: "Metadaten als JSON eingeben",
   },
 };

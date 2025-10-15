@@ -29,7 +29,7 @@ export function createCliHandler<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TFields,
 >(
   options: ApiHandlerOptions<
     TRequestOutput,

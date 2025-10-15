@@ -5,9 +5,6 @@
 
 "use client";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import { envClient } from "@/config/env-client";
 import type {
   ErrorResponseType,
   ResponseType,
@@ -17,6 +14,11 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import { envClient } from "@/config/env-client";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import {
   getStorageItem,
@@ -66,9 +68,9 @@ export class LeadTrackingClientRepository {
   /**
    * Create logger for client tracking operations
    */
-  static createLogger(locale: string): EndpointLogger {
+  static createLogger(locale: CountryLanguage): EndpointLogger {
     return createEndpointLogger(
-      envClient.NODE_ENV === "development",
+      String(envClient.NODE_ENV) === "development",
       Date.now(),
       locale,
     );
@@ -108,7 +110,7 @@ export class LeadTrackingClientRepository {
         trackingData,
       );
 
-      console.debug("lead.tracking.data.captured", {
+      logger.debug("leads.tracking.data.captured", {
         leadId,
         source: validatedSource,
         campaign: trackingData.campaign,
@@ -118,7 +120,7 @@ export class LeadTrackingClientRepository {
 
       return createSuccessResponse(trackingData);
     } catch (error) {
-      console.error("lead.tracking.data.capture.error", error);
+      logger.error("leads.tracking.data.capture.error", error);
       return createErrorResponse(
         "error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -129,9 +131,9 @@ export class LeadTrackingClientRepository {
   /**
    * Get stored lead tracking data
    */
-  static async getTrackingData(): Promise<
-    ResponseType<LeadTrackingData | null>
-  > {
+  static async getTrackingData(
+    logger: EndpointLogger,
+  ): Promise<ResponseType<LeadTrackingData | null>> {
     try {
       // Check if we're in a browser environment
       if (typeof window === "undefined") {
@@ -148,7 +150,7 @@ export class LeadTrackingClientRepository {
 
       return createSuccessResponse(data);
     } catch (error) {
-      console.error("Error retrieving lead tracking data", error);
+      logger.error("leads.tracking.data.retrieve.error", error);
       return createErrorResponse(
         "error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -159,11 +161,13 @@ export class LeadTrackingClientRepository {
   /**
    * Get leadId for signup form
    */
-  static async getLeadIdForSignup(): Promise<string | null> {
+  static async getLeadIdForSignup(
+    logger: EndpointLogger,
+  ): Promise<string | null> {
     try {
-      const result = await LeadTrackingClientRepository.getTrackingData();
+      const result = await LeadTrackingClientRepository.getTrackingData(logger);
       if (result.success && result.data) {
-        console.debug("Lead tracking data loaded for signup", {
+        logger.debug("leads.tracking.data.loaded.signup", {
           leadId: result.data.leadId,
           source: result.data.source,
           campaign: result.data.campaign,
@@ -173,7 +177,7 @@ export class LeadTrackingClientRepository {
       }
       return null;
     } catch (error) {
-      console.debug("Error loading lead tracking data (non-critical)", error);
+      logger.debug("leads.tracking.data.load.error.noncritical", error);
       return null;
     }
   }
@@ -183,6 +187,7 @@ export class LeadTrackingClientRepository {
    */
   static async storeTrackingData(
     trackingData: LeadTrackingData,
+    logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {
       if (typeof window === "undefined") {
@@ -194,7 +199,7 @@ export class LeadTrackingClientRepository {
         trackingData,
       );
 
-      console.debug("Lead tracking data stored", {
+      logger.debug("leads.tracking.data.stored", {
         leadId: trackingData.leadId,
         source: trackingData.source,
         campaign: trackingData.campaign,
@@ -203,7 +208,7 @@ export class LeadTrackingClientRepository {
 
       return createSuccessResponse(undefined);
     } catch (error) {
-      console.error("Error storing lead tracking data", error);
+      logger.error("leads.tracking.data.store.error", error);
       return createErrorResponse(
         "error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -214,7 +219,9 @@ export class LeadTrackingClientRepository {
   /**
    * Clear tracking data from storage
    */
-  static async clearTrackingData(): Promise<ResponseType<void>> {
+  static async clearTrackingData(
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
     try {
       // Check if we're in a browser environment
       if (typeof window === "undefined") {
@@ -222,10 +229,10 @@ export class LeadTrackingClientRepository {
       }
 
       await setStorageItem(LeadTrackingClientRepository.STORAGE_KEY, null);
-      console.debug("Lead tracking data cleared");
+      logger.debug("leads.tracking.data.cleared");
       return createSuccessResponse(undefined);
     } catch (error) {
-      console.error("Error clearing lead tracking data", error);
+      logger.error("leads.tracking.data.clear.error", error);
       return createErrorResponse(
         "error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -238,6 +245,7 @@ export class LeadTrackingClientRepository {
    */
   static validateTrackingParams(
     searchParams: URLSearchParams,
+    logger: EndpointLogger,
   ): ResponseType<TrackingValidationResult> {
     try {
       const errors: ErrorResponseType[] = [];
@@ -294,7 +302,7 @@ export class LeadTrackingClientRepository {
         errors: [],
       });
     } catch (error) {
-      console.error("Error validating tracking params", error);
+      logger.error("leads.tracking.params.validate.error", error);
       return createErrorResponse(
         "error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -307,6 +315,7 @@ export class LeadTrackingClientRepository {
    */
   static formatTrackingDataForStorage(
     params: TrackingParams,
+    logger: EndpointLogger,
   ): ResponseType<LeadTrackingData> {
     try {
       const trackingData: LeadTrackingData = {
@@ -322,7 +331,7 @@ export class LeadTrackingClientRepository {
 
       return createSuccessResponse(trackingData);
     } catch (error) {
-      console.error("Error formatting tracking data", error);
+      logger.error("leads.tracking.data.format.error", error);
       return createErrorResponse(
         "error.default",
         ErrorResponseTypes.INTERNAL_ERROR,

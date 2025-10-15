@@ -16,7 +16,7 @@ import type {
 import { Countries, type CountryLanguage } from "@/i18n/core/config";
 
 import { UserRoleFilter, UserStatusFilter } from "../enum";
-import type { UserStatsResponseTypeOutput as UsersStatsResponseType } from "./definition";
+import type { UserStatsResponseOutput as UsersStatsResponseType } from "./definition";
 import definitions from "./definition";
 
 /**

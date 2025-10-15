@@ -7,23 +7,16 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import type React from "react";
 
-import type {
-  EmailFunctionType,
-  EmailTemplateReturnType,
-} from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
+import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import {
-  BUSINESS_FORM_TIME,
-  CONSULTATION_DURATION,
-} from "../../../consultation/consultation-config/repository";
 import { contactClientRepository } from "../../../contact/repository-client";
 import {
   createTrackingContext,
   EmailTemplate,
 } from "../../../emails/smtp-client/components";
-import { PreferredContactMethod, UserDetailLevel } from "../../enum";
+import { UserDetailLevel } from "../../enum";
 import { userRepository } from "../../repository";
 import {
   type SignupPostRequestOutput,
@@ -31,10 +24,20 @@ import {
 } from "./definition";
 import { SignupType } from "./enum";
 
+// Constants for email templates
+const CONSULTATION_DURATION = {
+  minDurationMinutes: 30,
+  maxDurationMinutes: 60,
+};
+
+const BUSINESS_FORM_TIME = {
+  completionTimeMinutes: 10,
+};
+
 function renderWelcomeEmailContent(
   t: TFunction,
   locale: CountryLanguage,
-  user: { firstName: string; id: string },
+  user: { privateName: string; id: string },
   baseUrl: string,
   leadId: string,
 ): React.ReactElement {
@@ -53,7 +56,7 @@ function renderWelcomeEmailContent(
       locale={locale}
       title={t("auth.signup.email.title", {
         appName: t("common.appName"),
-        firstName: user.firstName,
+        privateName: user.privateName,
       })}
       previewText={t("auth.signup.email.previewText", {
         appName: t("common.appName"),
@@ -506,7 +509,7 @@ export const renderRegisterMail: EmailFunctionType<
 
   return createSuccessResponse({
     toEmail: user.email,
-    toName: user.firstName,
+    toName: user.privateName,
     subject: t("auth.signup.email.subject", {
       appName: t("common.appName"),
     }),
@@ -524,16 +527,13 @@ function renderAdminNotificationEmailContent(
   t: TFunction,
   locale: CountryLanguage,
   user: {
-    firstName: string;
-    lastName: string;
+    privateName: string;
+    publicName: string;
     email: string;
-    company?: string;
     id: string;
     createdAt: string | number | Date;
   },
   requestData: {
-    phone?: string;
-    preferredContactMethod: string[];
     signupType: string[];
     subscribeToNewsletter?: boolean | null;
   },
@@ -630,9 +630,29 @@ function renderAdminNotificationEmailContent(
               }}
             >
               <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                {t("auth.signup.admin_notification.name")}:
+                {t(
+                  "app.api.v1.core.user.public.signup.admin_notification.privateName",
+                )}
+                :
               </Text>{" "}
-              {user.firstName} {user.lastName}
+              {user.privateName}
+            </Text>
+
+            <Text
+              style={{
+                fontSize: "14px",
+                marginBottom: "6px",
+                color: "#4b5563",
+                lineHeight: "1.5",
+              }}
+            >
+              <Text style={{ fontWeight: "700", color: "#1f2937" }}>
+                {t(
+                  "app.api.v1.core.user.public.signup.admin_notification.publicName",
+                )}
+                :
+              </Text>{" "}
+              {user.publicName}
             </Text>
 
             <Text
@@ -653,47 +673,10 @@ function renderAdminNotificationEmailContent(
                 {user.email}
               </a>
             </Text>
-
-            {user.company && (
-              <Text
-                style={{
-                  fontSize: "14px",
-                  marginBottom: "6px",
-                  color: "#4b5563",
-                  lineHeight: "1.5",
-                }}
-              >
-                <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                  {t("auth.signup.admin_notification.company")}:
-                </Text>{" "}
-                {user.company}
-              </Text>
-            )}
-
-            {requestData.phone && (
-              <Text
-                style={{
-                  fontSize: "14px",
-                  marginBottom: "6px",
-                  color: "#4b5563",
-                  lineHeight: "1.5",
-                }}
-              >
-                <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                  {t("auth.signup.admin_notification.phone")}:
-                </Text>{" "}
-                <a
-                  href={`tel:${requestData.phone}`}
-                  style={{ color: "#3b82f6", textDecoration: "none" }}
-                >
-                  {requestData.phone}
-                </a>
-              </Text>
-            )}
           </div>
         </div>
 
-        {/* Contact Preferences */}
+        {/* Signup Preferences */}
         <div style={{ marginBottom: "16px" }}>
           <Text
             style={{
@@ -703,44 +686,12 @@ function renderAdminNotificationEmailContent(
               fontWeight: "600",
             }}
           >
-            {t("auth.signup.admin_notification.contact_preferences")}
+            {t(
+              "app.api.v1.core.user.public.signup.admin_notification.signup_preferences",
+            )}
           </Text>
 
           <div style={{ paddingLeft: "16px" }}>
-            <Text
-              style={{
-                fontSize: "14px",
-                marginBottom: "6px",
-                color: "#4b5563",
-                lineHeight: "1.5",
-              }}
-            >
-              <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                {t("auth.signup.admin_notification.preferred_method")}:
-              </Text>{" "}
-              <span
-                style={{
-                  backgroundColor: requestData.preferredContactMethod.includes(
-                    PreferredContactMethod.EMAIL,
-                  )
-                    ? "#dbeafe"
-                    : "#fef3c7",
-                  color: requestData.preferredContactMethod.includes(
-                    PreferredContactMethod.EMAIL,
-                  )
-                    ? "#1e40af"
-                    : "#92400e",
-                  padding: "2px 8px",
-                  borderRadius: "4px",
-                  fontSize: "12px",
-                  fontWeight: "600",
-                  textTransform: "capitalize",
-                }}
-              >
-                {requestData.preferredContactMethod.join(", ")}
-              </span>
-            </Text>
-
             {requestData.signupType.length > 0 && (
               <Text
                 style={{
@@ -916,42 +867,21 @@ function renderAdminNotificationEmailContent(
 
       {/* Action Buttons */}
       <Section style={{ textAlign: "center", marginBottom: "32px" }}>
-        <div style={{ marginBottom: "12px" }}>
-          <Button
-            href={`mailto:${user.email}?subject=Welcome to ${t("common.appName")} - Let's get started!`}
-            style={{
-              backgroundColor: "#3b82f6",
-              borderRadius: "8px",
-              color: "#ffffff",
-              fontSize: "14px",
-              fontWeight: "600",
-              padding: "12px 24px",
-              textDecoration: "none",
-              display: "inline-block",
-              marginRight: "12px",
-            }}
-          >
-            {t("auth.signup.admin_notification.contact_user")}
-          </Button>
-
-          {requestData.phone && (
-            <Button
-              href={`tel:${requestData.phone}`}
-              style={{
-                backgroundColor: "#10b981",
-                borderRadius: "8px",
-                color: "#ffffff",
-                fontSize: "14px",
-                fontWeight: "600",
-                padding: "12px 24px",
-                textDecoration: "none",
-                display: "inline-block",
-              }}
-            >
-              {t("auth.signup.admin_notification.call_user")}
-            </Button>
-          )}
-        </div>
+        <Button
+          href={`mailto:${user.email}?subject=Welcome to ${t("common.appName")} - Let's get started!`}
+          style={{
+            backgroundColor: "#3b82f6",
+            borderRadius: "8px",
+            color: "#ffffff",
+            fontSize: "14px",
+            fontWeight: "600",
+            padding: "12px 24px",
+            textDecoration: "none",
+            display: "inline-block",
+          }}
+        >
+          {t("auth.signup.admin_notification.contact_user")}
+        </Button>
       </Section>
 
       {/* Footer */}
@@ -1001,11 +931,9 @@ export const renderAdminSignupNotification: EmailFunctionType<
     toEmail: contactClientRepository.getSupportEmail(locale),
     toName: t("common.appName"),
     subject: t("auth.signup.admin_notification.subject", {
-      userName: user.firstName,
+      userName: user.privateName,
     }),
     jsx: renderAdminNotificationEmailContent(t, locale, user, {
-      phone: requestData.businessInfo?.phone,
-      preferredContactMethod: [requestData.preferences.preferredContactMethod],
       signupType: [requestData.preferences.signupType],
       subscribeToNewsletter: requestData.consent?.subscribeToNewsletter,
     }),

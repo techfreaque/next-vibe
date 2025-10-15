@@ -18,8 +18,8 @@ import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type React from "react";
 
+import { SignupType } from "@/app/api/[locale]/v1/core/user/public/signup/enum";
 import { useRegister } from "@/app/api/[locale]/v1/core/user/public/signup/hooks";
-import { SignupType } from "@/app/api/[locale]/v1/core/user/public/signup/schema";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction } from "@/i18n/core/static-types";
@@ -58,7 +58,7 @@ export default function SignUpForm({
 }: SignUpFormProps): React.ReactElement {
   const { t } = simpleT(locale);
   const { form, submitForm, isSubmitting, alert } = useRegister();
-  const signupType = form.watch("signupType");
+  const signupType = form.watch("preferences.signupType");
 
   return (
     <motion.div
@@ -72,7 +72,7 @@ export default function SignUpForm({
           <Form form={form} onSubmit={submitForm} className="space-y-6">
             <FormField
               control={form.control}
-              name="signupType"
+              name="preferences.signupType"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
@@ -81,13 +81,15 @@ export default function SignUpForm({
                       onValueChange={(value) => {
                         // Only set the value if it's one of the valid options
                         if (
-                          [SignupType.MEETING, SignupType.PRICING].includes(
-                            value as SignupType,
-                          )
+                          value === SignupType.MEETING ||
+                          value === SignupType.PRICING
                         ) {
-                          field.onChange(value as SignupType);
+                          field.onChange(value);
                         } else {
-                          errorLogger("Invalid signup type:", value);
+                          errorLogger(
+                            "app.api.v1.core.user.public.signup.errors.invalidSignupType",
+                            { value },
+                          );
                           // Shouldn't happen, but just in case
                           field.onChange(SignupType.PRICING);
                         }
@@ -143,11 +145,11 @@ export default function SignUpForm({
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <EndpointFormField
-                name="firstName"
+                name="personalInfo.privateName"
                 config={{
                   type: "text",
-                  label: "auth.signup.firstName",
-                  placeholder: "auth.signup.namePlaceholder",
+                  label: "auth.signup.privateName",
+                  placeholder: "auth.signup.privateNamePlaceholder",
                   disabled: isSubmitting,
                 }}
                 control={form.control}
@@ -158,11 +160,11 @@ export default function SignUpForm({
               />
 
               <EndpointFormField
-                name="lastName"
+                name="personalInfo.publicName"
                 config={{
                   type: "text",
-                  label: "auth.signup.lastName",
-                  placeholder: "auth.signup.lastNamePlaceholder",
+                  label: "auth.signup.publicName",
+                  placeholder: "auth.signup.publicNamePlaceholder",
                   disabled: isSubmitting,
                 }}
                 control={form.control}
@@ -174,7 +176,7 @@ export default function SignUpForm({
             </div>
 
             <EndpointFormField
-              name="email"
+              name="personalInfo.email"
               config={{
                 type: "email",
                 label: "auth.signup.emailLabel",
@@ -188,46 +190,14 @@ export default function SignUpForm({
               }}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <EndpointFormField
-                name="company"
-                config={{
-                  type: "text",
-                  label: "auth.signup.company",
-                  placeholder: "auth.signup.companyPlaceholder",
-                  disabled: isSubmitting,
-                }}
-                control={form.control}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-
-              <EndpointFormField
-                name="phone"
-                config={{
-                  type: "tel",
-                  label: "auth.signup.phone",
-                  placeholder: "auth.signup.phonePlaceholder",
-                  disabled: isSubmitting,
-                }}
-                control={form.control}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-            </div>
-
             <div className="space-y-4">
               <FormField
                 control={form.control}
-                name="password"
+                name="security.password"
                 render={({ field }) => (
                   <FormItem>
                     <EndpointFormField
-                      name="password"
+                      name="security.password"
                       config={{
                         type: "password",
                         label: "auth.signup.passwordLabel",
@@ -249,7 +219,7 @@ export default function SignUpForm({
               />
 
               <EndpointFormField
-                name="confirmPassword"
+                name="security.confirmPassword"
                 config={{
                   type: "password",
                   label: "auth.signup.confirmPasswordLabel",
@@ -264,34 +234,7 @@ export default function SignUpForm({
               />
 
               <EndpointFormField
-                name="preferredContactMethod"
-                config={{
-                  type: "radio",
-                  label: "auth.signup.preferredContactMethod",
-                  options: [
-                    {
-                      value: "email",
-                      label: "auth.signup.preferredContactOptions.email",
-                      disabled: isSubmitting,
-                    },
-                    {
-                      value: "phone",
-                      label: "auth.signup.preferredContactOptions.phone",
-                      disabled: isSubmitting,
-                    },
-                  ],
-                  orientation: "vertical",
-                  disabled: isSubmitting,
-                }}
-                control={form.control}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-
-              <EndpointFormField
-                name="subscribeToNewsletter"
+                name="consent.subscribeToNewsletter"
                 config={{
                   type: "checkbox",
                   label: undefined,
@@ -307,7 +250,7 @@ export default function SignUpForm({
 
               <div className="flex items-center">
                 <EndpointFormField
-                  name="acceptTerms"
+                  name="consent.acceptTerms"
                   config={{
                     type: "checkbox",
                     label: undefined,

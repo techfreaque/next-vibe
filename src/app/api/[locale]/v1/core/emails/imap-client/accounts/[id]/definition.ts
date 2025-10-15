@@ -867,23 +867,20 @@ const { DELETE } = createEndpoint({
 });
 
 // Export types
-export type ImapAccountGetRequestTypeInput = typeof GET.types.RequestInput;
-export type ImapAccountGetRequestTypeOutput = typeof GET.types.RequestOutput;
-export type ImapAccountGetResponseTypeInput = typeof GET.types.ResponseInput;
-export type ImapAccountGetResponseTypeOutput = typeof GET.types.ResponseOutput;
+export type ImapAccountGetRequestInput = typeof GET.types.RequestInput;
+export type ImapAccountGetRequestOutput = typeof GET.types.RequestOutput;
+export type ImapAccountGetResponseInput = typeof GET.types.ResponseInput;
+export type ImapAccountGetResponseOutput = typeof GET.types.ResponseOutput;
 
-export type ImapAccountPutRequestTypeInput = typeof PUT.types.RequestInput;
-export type ImapAccountPutRequestTypeOutput = typeof PUT.types.RequestOutput;
-export type ImapAccountPutResponseTypeInput = typeof PUT.types.ResponseInput;
-export type ImapAccountPutResponseTypeOutput = typeof PUT.types.ResponseOutput;
+export type ImapAccountPutRequestInput = typeof PUT.types.RequestInput;
+export type ImapAccountPutRequestOutput = typeof PUT.types.RequestOutput;
+export type ImapAccountPutResponseInput = typeof PUT.types.ResponseInput;
+export type ImapAccountPutResponseOutput = typeof PUT.types.ResponseOutput;
 
-export type ImapAccountDeleteRequestTypeInput =
-  typeof DELETE.types.RequestInput;
-export type ImapAccountDeleteRequestTypeOutput =
-  typeof DELETE.types.RequestOutput;
-export type ImapAccountDeleteResponseTypeInput =
-  typeof DELETE.types.ResponseInput;
-export type ImapAccountDeleteResponseTypeOutput =
+export type ImapAccountDeleteRequestInput = typeof DELETE.types.RequestInput;
+export type ImapAccountDeleteRequestOutput = typeof DELETE.types.RequestOutput;
+export type ImapAccountDeleteResponseInput = typeof DELETE.types.ResponseInput;
+export type ImapAccountDeleteResponseOutput =
   typeof DELETE.types.ResponseOutput;
 
 const imapAccountEndpoints = {

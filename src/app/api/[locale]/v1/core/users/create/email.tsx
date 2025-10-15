@@ -4,26 +4,25 @@
  */
 
 import { Button, Hr, Section, Text } from "@react-email/components";
-import type { JSX } from "react";
-
-import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
-import type { UndefinedType } from "next-vibe/shared/types/common.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import React, { type JSX } from "react";
 
 import {
   createTrackingContext,
   EmailTemplate,
-} from "../../emails/smtp-client/components";
-import type { EmailFunctionType } from "../../emails/smtp-client/email-handling/definition";
+} from "@/app/api/[locale]/v1/core/emails/smtp-client/components";
+import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
+import { env } from "@/config/env";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { TFunction } from "@/i18n/core/static-types";
+
 import type {
-  UserCreateRequestTypeOutput,
-  UserCreateResponseTypeOutput,
+  UserCreateRequestOutput,
+  UserCreateResponseOutput,
 } from "./definition";
 
 /**
@@ -35,14 +34,14 @@ function WelcomeEmailContent({
   t,
   locale,
 }: {
-  userData: UserCreateResponseTypeOutput;
+  userData: UserCreateResponseOutput;
   t: TFunction;
   locale: CountryLanguage;
 }): JSX.Element {
   // Create tracking context for user emails
   const tracking = createTrackingContext(
     locale,
-    userData.responseLeadId, // leadId if available
+    userData.responseLeadId ?? undefined, // leadId if available
     userData.responseId, // userId
     undefined, // no campaignId for transactional emails
   );
@@ -52,7 +51,7 @@ function WelcomeEmailContent({
       t={t}
       locale={locale}
       title={t("app.api.v1.core.users.create.email.users.welcome.greeting", {
-        name: userData.responseFirstName,
+        name: userData.responsePrivateName,
       })}
       previewText={t(
         "app.api.v1.core.users.create.email.users.welcome.preview",
@@ -68,7 +67,7 @@ function WelcomeEmailContent({
         }}
       >
         {t("app.api.v1.core.users.create.email.users.welcome.introduction", {
-          name: userData.responseFirstName,
+          name: userData.responsePrivateName,
           appName: t("common.appName"),
         })}
       </Text>
@@ -116,7 +115,7 @@ function WelcomeEmailContent({
           <Text style={{ fontWeight: "700" }}>
             {t("app.api.v1.core.users.create.email.users.welcome.name")}:
           </Text>{" "}
-          {userData.responseFirstName} {userData.responseLastName}
+          {userData.responsePrivateName}
         </Text>
 
         <Text
@@ -127,25 +126,10 @@ function WelcomeEmailContent({
           }}
         >
           <Text style={{ fontWeight: "700" }}>
-            {t("app.api.v1.core.users.create.email.users.welcome.company")}:
+            {t("app.api.v1.core.users.create.email.users.welcome.publicName")}:
           </Text>{" "}
-          {userData.responseCompany}
+          {userData.responsePublicName}
         </Text>
-
-        {userData.responsePhone && (
-          <Text
-            style={{
-              fontSize: "14px",
-              marginBottom: "4px",
-              color: "#4b5563",
-            }}
-          >
-            <Text style={{ fontWeight: "700" }}>
-              {t("app.api.v1.core.users.create.email.users.welcome.phone")}:
-            </Text>{" "}
-            {userData.responsePhone}
-          </Text>
-        )}
       </Section>
 
       <Hr style={{ borderColor: "#e5e7eb", margin: "24px 0" }} />
@@ -206,13 +190,13 @@ function AdminNotificationEmailContent({
   t,
   locale,
 }: {
-  userData: UserCreateResponseTypeOutput;
+  userData: UserCreateResponseOutput;
   t: TFunction;
   locale: CountryLanguage;
 }): JSX.Element {
   const tracking = createTrackingContext(
     locale,
-    userData.responseLeadId,
+    userData.responseLeadId ?? undefined,
     userData.responseId,
     undefined,
   );
@@ -223,7 +207,7 @@ function AdminNotificationEmailContent({
       locale={locale}
       title={t("app.api.v1.core.users.create.email.users.admin.newUser")}
       previewText={t("app.api.v1.core.users.create.email.users.admin.preview", {
-        name: `${userData.responseFirstName} ${userData.responseLastName}`,
+        name: userData.responsePrivateName,
       })}
       tracking={tracking}
     >
@@ -236,7 +220,7 @@ function AdminNotificationEmailContent({
         }}
       >
         {t("app.api.v1.core.users.create.email.users.admin.notification", {
-          name: `${userData.responseFirstName} ${userData.responseLastName}`,
+          name: userData.responsePrivateName,
           email: userData.responseEmail,
         })}
       </Text>
@@ -295,9 +279,9 @@ function AdminNotificationEmailContent({
           }}
         >
           <Text style={{ fontWeight: "700" }}>
-            {t("app.api.v1.core.users.create.email.users.labels.name")}
+            {t("app.api.v1.core.users.create.email.users.labels.privateName")}
           </Text>{" "}
-          {userData.responseFirstName} {userData.responseLastName}
+          {userData.responsePrivateName}
         </Text>
 
         <Text
@@ -308,9 +292,9 @@ function AdminNotificationEmailContent({
           }}
         >
           <Text style={{ fontWeight: "700" }}>
-            {t("app.api.v1.core.users.create.email.users.labels.company")}
+            {t("app.api.v1.core.users.create.email.users.labels.publicName")}
           </Text>{" "}
-          {userData.responseCompany}
+          {userData.responsePublicName}
         </Text>
 
         <Text
@@ -375,9 +359,9 @@ function AdminNotificationEmailContent({
  * Renders welcome email for newly created user
  */
 export const renderWelcomeEmail: EmailFunctionType<
-  UserCreateRequestTypeOutput,
-  UserCreateResponseTypeOutput,
-  UndefinedType
+  UserCreateRequestOutput,
+  UserCreateResponseOutput,
+  never
 > = ({ responseData, locale, t }) => {
   try {
     if (!responseData) {
@@ -389,7 +373,7 @@ export const renderWelcomeEmail: EmailFunctionType<
 
     return createSuccessResponse({
       toEmail: responseData.responseEmail,
-      toName: `${responseData.responseFirstName} ${responseData.responseLastName}`,
+      toName: responseData.responsePrivateName,
       subject: t("app.api.v1.core.users.create.email.users.welcome.subject", {
         appName: t("common.appName"),
       }),
@@ -412,9 +396,9 @@ export const renderWelcomeEmail: EmailFunctionType<
  * Renders admin notification email for new user creation
  */
 export const renderAdminNotificationEmail: EmailFunctionType<
-  UserCreateRequestTypeOutput,
-  UserCreateResponseTypeOutput,
-  UndefinedType
+  UserCreateRequestOutput,
+  UserCreateResponseOutput,
+  never
 > = ({ responseData, locale, t }) => {
   try {
     if (!responseData) {
@@ -428,7 +412,7 @@ export const renderAdminNotificationEmail: EmailFunctionType<
       toEmail: "admin@example.com", // Replace with actual admin email
       toName: t("common.appName"),
       subject: t("app.api.v1.core.users.create.email.users.admin.subject", {
-        name: `${responseData.responseFirstName} ${responseData.responseLastName}`,
+        name: responseData.responsePrivateName,
       }),
       jsx: AdminNotificationEmailContent({
         userData: responseData,

@@ -72,13 +72,8 @@ export class WidgetRegistry {
    * Get all registered widget types
    */
   getSupportedWidgetTypes(): WidgetType[] {
-    const types = new Set<WidgetType>();
-
-    for (const renderer of this.renderers) {
-      // This would need to be enhanced to get all supported types from each renderer
-      // For now, we'll return the known types
-    }
-
+    // TODO: Enhance to dynamically get all supported types from each renderer
+    // For now, return the known types
     return [
       WidgetType.TEXT,
       WidgetType.DATA_TABLE,

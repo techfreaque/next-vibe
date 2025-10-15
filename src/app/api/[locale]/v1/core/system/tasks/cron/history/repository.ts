@@ -13,12 +13,13 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
+import { z } from "zod";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "../../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import type { EndpointLogger } from "../../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { cronTaskExecutions, cronTasks } from "../../db";
 import { CronTaskPriority, CronTaskStatus } from "../../enum";
 import type {
@@ -64,13 +65,11 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
 
       if (data?.status) {
         // Handle string status filter
-        const statusFilter = data.status
-          .split(",")
-          .map((s) =>
-            s.trim(),
-          ) as (typeof CronTaskStatus)[keyof typeof CronTaskStatus][];
-        if (statusFilter.length > 0) {
-          conditions.push(inArray(cronTaskExecutions.status, statusFilter));
+        // Data is already validated through Zod schema, so strings are valid enum values
+        const statusStrings = data.status.split(",").map((s) => s.trim());
+        if (statusStrings.length > 0) {
+          // TypeScript can't infer enum types from string[], but Zod validation ensures correctness
+          conditions.push(inArray(cronTaskExecutions.status, statusStrings));
         }
       }
 
@@ -119,15 +118,15 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
       // Filter by priority if provided
       if (data?.priority) {
         // Handle string priority filter
-        const priorityFilter = data.priority
-          .split(",")
-          .map((p) =>
-            p.trim(),
-          ) as (typeof CronTaskPriority)[keyof typeof CronTaskPriority][];
-        if (priorityFilter.length > 0) {
-          executions = executions.filter(
-            (exec) => exec.priority && priorityFilter.includes(exec.priority),
-          );
+        // Data is already validated through Zod schema, so strings are valid enum values
+        const priorityStrings = data.priority.split(",").map((p) => p.trim());
+        if (priorityStrings.length > 0) {
+          executions = executions.filter((exec) => {
+            if (!exec.priority) {
+              return false;
+            }
+            return priorityStrings.includes(String(exec.priority));
+          });
         }
       }
 
@@ -169,26 +168,38 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
         }),
       );
 
-      return createSuccessResponse({
-        executions: executions.map((exec) => ({
-          id: exec.id,
-          taskId: exec.taskId,
-          taskName:
-            exec.taskName ??
-            t("app.api.v1.core.system.tasks.cron.history.get.unknownTask"),
-          status: exec.status,
-          priority: exec.priority ?? CronTaskPriority.MEDIUM,
-          startedAt: exec.startedAt.toISOString(),
-          completedAt: exec.completedAt?.toISOString() ?? null,
-          durationMs: exec.durationMs,
-          error: exec.error as {
-            message: string;
-            messageParams?: Record<string, string | number | boolean>;
-            errorType: string;
-          } | null,
-          environment: exec.environment,
-          createdAt: exec.createdAt.toISOString(),
-        })),
+      // Zod schemas for runtime validation and type narrowing
+      const statusSchema = z.nativeEnum(CronTaskStatus);
+      const prioritySchema = z.nativeEnum(CronTaskPriority);
+      const errorSchema = z
+        .object({
+          message: z.string(),
+          messageParams: z.record(z.string(), z.unknown()).optional(),
+          errorType: z.string(),
+        })
+        .nullable();
+
+      const response: CronHistoryResponseOutput = {
+        executions: executions.map((exec) => {
+          const execution: CronHistoryResponseOutput["executions"][number] = {
+            id: exec.id,
+            taskId: exec.taskId,
+            taskName:
+              exec.taskName ??
+              t("app.api.v1.core.system.tasks.cron.history.get.unknownTask"),
+            status: statusSchema.parse(exec.status),
+            priority: prioritySchema.parse(
+              exec.priority ?? CronTaskPriority.MEDIUM,
+            ),
+            startedAt: exec.startedAt.toISOString(),
+            completedAt: exec.completedAt?.toISOString() ?? null,
+            durationMs: exec.durationMs,
+            error: errorSchema.parse(exec.error),
+            environment: exec.environment,
+            createdAt: exec.createdAt.toISOString(),
+          };
+          return execution;
+        }),
         totalCount,
         hasMore: totalCount > offset + limit,
         summary: {
@@ -200,7 +211,9 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
             : null,
           successRate,
         },
-      });
+      };
+
+      return createSuccessResponse(response);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch cron task history", {

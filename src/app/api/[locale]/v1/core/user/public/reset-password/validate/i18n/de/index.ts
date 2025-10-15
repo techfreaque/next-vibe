@@ -23,10 +23,15 @@ export const translations: typeof enTranslations = {
     description: "Token-Validierungsantwort",
     valid: "Token gültig",
     message: "Validierungsnachricht",
+    validationMessage: "Reset-Token-Validierung abgeschlossen",
     userId: "Benutzer-ID",
     expiresAt: "Token läuft ab am",
     nextSteps: {
       item: "Nächste Schritte nach Validierung",
+      steps: [
+        "Fahren Sie fort, um Ihr neues Passwort festzulegen",
+        "Wählen Sie ein starkes, einzigartiges Passwort",
+      ],
     },
   },
   errors: {

@@ -202,6 +202,7 @@ const { GET } = createEndpoint({
       messages: responseArrayField(
         {
           type: WidgetType.DATA_TABLE,
+          columns: [],
         },
         objectField(
           {
@@ -382,9 +383,9 @@ const { GET } = createEndpoint({
         accountId: "123e4567-e89b-12d3-a456-426614174000",
         folderId: "456e7890-e89b-12d3-a456-426614174001",
         search: "",
-        status: "unread",
-        sortBy: "sentAt",
-        sortOrder: "desc",
+        status: ImapMessageStatusFilter.UNREAD,
+        sortBy: ImapMessageSortField.SENT_AT,
+        sortOrder: SortOrder.DESC,
       },
     },
     responses: {
@@ -402,8 +403,8 @@ const { GET } = createEndpoint({
           },
         ],
         total: 50,
-        page: 1,
-        limit: 20,
+        pageNumber: 1,
+        pageLimit: 20,
         totalPages: 3,
       },
     },

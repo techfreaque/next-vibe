@@ -24,7 +24,7 @@ import {
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
-import { CRON_SCHEDULES } from "@/app/api/[locale]/v1/core/system/tasks/cron/tasks/definition";
+import { CRON_SCHEDULES } from "@/app/api/[locale]/v1/core/system/tasks/constants";
 import { formatCronScheduleShort } from "@/app/api/[locale]/v1/core/system/tasks/cron-formatter";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";

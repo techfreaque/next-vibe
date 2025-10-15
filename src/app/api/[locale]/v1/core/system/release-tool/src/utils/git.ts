@@ -74,8 +74,7 @@ export function createGitTag(tag: string, mainPackagePath: string): void {
   } catch (error) {
     // For commit errors (not status check errors)
     loggerError("Failed to commit changes.", error);
-    // eslint-disable-next-line no-restricted-syntax
-    throw error;
+    throw new Error("Failed to commit changes");
   }
 
   // Continue with tagging and pushing
@@ -100,8 +99,7 @@ export function createGitTag(tag: string, mainPackagePath: string): void {
     }
   } catch (error) {
     loggerError("Failed during tag operations.", error);
-    // eslint-disable-next-line no-restricted-syntax
-    throw error;
+    throw new Error("Failed during tag operations");
   }
 }
 

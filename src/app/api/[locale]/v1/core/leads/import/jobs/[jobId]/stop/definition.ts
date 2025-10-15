@@ -1,85 +1,194 @@
 /**
  * Import Job Stop Action API Definition
+ * Stops a running import job
  */
 
 import { z } from "zod";
 
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import { undefinedSchema } from "next-vibe/shared/types/common.schema";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import {
+  objectField,
+  requestUrlParamsField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
+import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { UserRole } from "../../../../../user/user-roles/enum";
-
-// Stop job endpoint (POST)
-const stopJobEndpoint = createEndpoint({
-  description: "Stop a running import job",
+/**
+ * Stop Import Job Endpoint (POST)
+ * Stops a running import job
+ */
+const { POST } = createEndpoint({
   method: Methods.POST,
-  requestSchema: undefinedSchema,
-  responseSchema: z.object({
-    success: z.boolean(),
-    message: z.string() as z.ZodType<TranslationKey>,
-  }),
-  requestUrlSchema: z.object({
-    jobId: z.uuid(),
-  }),
-  apiQueryOptions: {
-    queryKey: ["import-jobs"],
-  },
-  fieldDescriptions: {
-    jobId: "ID of the import job to stop",
-  },
+  path: ["v1", "core", "leads", "import", "jobs", ":jobId", "stop"],
+  title: "app.api.v1.core.leads.import.jobs.jobId.stop.post.title",
+  description: "app.api.v1.core.leads.import.jobs.jobId.stop.post.description",
+  category: "app.api.v1.core.leads.category",
+  tags: [
+    "app.api.v1.core.leads.tags.leads",
+    "app.api.v1.core.leads.tags.management",
+  ],
   allowedRoles: [UserRole.ADMIN],
-  errorTypes: {
-    unauthorized: {
-      title: "leadsErrors.leadsImport.stop.error.unauthorized.title",
+
+  fields: objectField(
+    {
+      type: WidgetType.CONTAINER,
+      title: "app.api.v1.core.leads.import.jobs.jobId.stop.post.form.title",
       description:
-        "leadsErrors.leadsImport.stop.error.unauthorized.description",
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.form.description",
+      layout: { type: LayoutType.STACKED },
     },
-    forbidden: {
-      title: "leadsErrors.leadsImport.stop.error.forbidden.title",
-      description: "leadsErrors.leadsImport.stop.error.forbidden.description",
+    { request: "urlParams", response: true },
+    {
+      // === URL PARAMETERS ===
+      jobId: requestUrlParamsField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.UUID,
+          label:
+            "app.api.v1.core.leads.import.jobs.jobId.stop.post.jobId.label",
+          description:
+            "app.api.v1.core.leads.import.jobs.jobId.stop.post.jobId.description",
+          layout: { columns: 12 },
+          validation: { required: true },
+        },
+        z.string().uuid(),
+      ),
+
+      // === RESPONSE FIELDS ===
+      result: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          title:
+            "app.api.v1.core.leads.import.jobs.jobId.stop.post.response.title",
+          description:
+            "app.api.v1.core.leads.import.jobs.jobId.stop.post.response.description",
+          layout: { type: LayoutType.STACKED },
+        },
+        { response: true },
+        {
+          success: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.leads.import.jobs.jobId.stop.post.response.success.content",
+            },
+            z.boolean(),
+          ),
+          message: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.leads.import.jobs.jobId.stop.post.response.message.content",
+            },
+            z.string(),
+          ),
+        },
+      ),
     },
-    not_found: {
-      title: "leadsErrors.leadsImport.stop.error.not_found.title",
-      description: "leadsErrors.leadsImport.stop.error.not_found.description",
+  ),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.validation.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.validation.description",
     },
-    validation_failed: {
-      title: "leadsErrors.leadsImport.stop.error.validation.title",
-      description: "leadsErrors.leadsImport.stop.error.validation.description",
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.unauthorized.description",
     },
-    server_error: {
-      title: "leadsErrors.leadsImport.stop.error.server.title",
-      description: "leadsErrors.leadsImport.stop.error.server.description",
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.forbidden.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.notFound.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.notFound.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.server.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.unknown.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.network.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.network.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.unsavedChanges.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.conflict.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.stop.post.errors.conflict.description",
     },
   },
+
   successTypes: {
-    title: "leadsErrors.leadsImport.stop.success.title",
-    description: "leadsErrors.leadsImport.stop.success.description",
+    title: "app.api.v1.core.leads.import.jobs.jobId.stop.post.success.title",
+    description:
+      "app.api.v1.core.leads.import.jobs.jobId.stop.post.success.description",
   },
-  path: ["v1", "leads", "import", "jobs", "[jobId]", "stop"],
+
   examples: {
     urlPathVariables: {
-      default: {
-        jobId: "123e4567-e89b-12d3-a456-426614174000",
-      },
+      default: { jobId: "550e8400-e29b-41d4-a716-446655440000" },
     },
-    payloads: undefined,
+    requests: undefined,
     responses: {
       default: {
-        success: true,
-        message: "leadsErrors.leadsImport.stop.success.description",
+        result: { success: true, message: "Job stopped successfully" },
       },
     },
   },
 });
 
+// Export types following modern pattern
+export type ImportJobStopPostRequestInput = typeof POST.types.RequestInput;
+export type ImportJobStopPostRequestOutput = typeof POST.types.RequestOutput;
+export type ImportJobStopPostResponseInput = typeof POST.types.ResponseInput;
+export type ImportJobStopPostResponseOutput = typeof POST.types.ResponseOutput;
+
+// Repository types for standardized import patterns
+export type ImportJobStopRequestInput = ImportJobStopPostRequestInput;
+export type ImportJobStopRequestOutput = ImportJobStopPostRequestOutput;
+export type ImportJobStopResponseInput = ImportJobStopPostResponseInput;
+export type ImportJobStopResponseOutput = ImportJobStopPostResponseOutput;
+
+/**
+ * Export definitions
+ */
+export { POST };
+
 const definitions = {
-  POST: stopJobEndpoint.POST,
+  POST,
 } as const;
 
 export default definitions;
-
-export type ImportJobStopResponseType = z.infer<
-  typeof stopJobEndpoint.POST.responseSchema
->;

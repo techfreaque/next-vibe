@@ -10,6 +10,7 @@ import { type ChangeEvent, useCallback, useMemo } from "react";
 import { LeadTrackingClientRepository } from "@/app/api/[locale]/v1/core/leads/tracking/client-repository";
 import { useLeadId } from "@/app/api/[locale]/v1/core/leads/tracking/engagement/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EnhancedMutationResult } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation";
 import { useApiMutation } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation";
 import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation-form";
 import { useApiQuery } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/query";
@@ -18,16 +19,25 @@ import {
   useCustomState,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/store";
 import type {
-  InferApiFormReturn,
-  InferApiQueryReturn,
-  InferEnhancedMutationResult,
+  ApiFormReturn,
+  ApiQueryReturn,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/types";
 import { useUser } from "@/app/api/[locale]/v1/core/user/private/me/hooks";
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import statusEndpoints from "./status/definition";
+import statusEndpoints, {
+  type StatusGetResponseOutput,
+} from "./status/definition";
+import type {
+  SubscribePostRequestOutput,
+  SubscribePostResponseOutput,
+} from "./subscribe/definition";
 import subscribeEndpoints from "./subscribe/definition";
+import type {
+  UnsubscribePostRequestOutput,
+  UnsubscribePostResponseOutput,
+} from "./unsubscribe/definition";
 import unsubscribeEndpoints from "./unsubscribe/definition";
 
 /****************************
@@ -53,14 +63,17 @@ const showConfirmUnsubscribeKey = createCustomStateKey<boolean>(
 export function useNewsletterStatus(params: {
   email: string;
   enabled?: boolean;
-}): InferApiQueryReturn<typeof statusEndpoints.GET> {
+}): ApiQueryReturn<StatusGetResponseOutput> {
   const { locale } = useTranslation();
-  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
 
   return useApiQuery({
     endpoint: statusEndpoints.GET,
     requestData: { email: params.email },
-    urlParams: {},
+    urlParams: undefined,
     logger,
     options: {
       enabled: params.enabled !== false,
@@ -75,14 +88,24 @@ export function useNewsletterStatus(params: {
 /**
  * Hook for newsletter subscription with form validation
  */
-export function useNewsletterSubscription(): InferApiFormReturn<
-  typeof subscribeEndpoints.POST
+export function useNewsletterSubscription(): ApiFormReturn<
+  SubscribePostRequestOutput,
+  SubscribePostResponseOutput,
+  never
 > {
-  const formResult = useApiForm(subscribeEndpoints.POST, {
-    email: "",
-    name: "",
-    preferences: [],
-    inputLeadId: LeadTrackingClientRepository.LOADING_LEAD_ID, // Will be set by useEffect
+  const { locale } = useTranslation();
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
+
+  const formResult = useApiForm(subscribeEndpoints.POST, logger, {
+    defaultValues: {
+      email: "",
+      name: "",
+      preferences: [],
+      inputLeadId: LeadTrackingClientRepository.LOADING_LEAD_ID, // Will be set by useEffect
+    },
   });
 
   // Use lead ID hook with callback to set lead ID in form
@@ -96,11 +119,21 @@ export function useNewsletterSubscription(): InferApiFormReturn<
 /**
  * Hook for newsletter unsubscription
  */
-export function useNewsletterUnsubscription(): InferApiFormReturn<
-  typeof unsubscribeEndpoints.POST
+export function useNewsletterUnsubscription(): ApiFormReturn<
+  UnsubscribePostRequestOutput,
+  UnsubscribePostResponseOutput,
+  never
 > {
-  return useApiForm(unsubscribeEndpoints.POST, {
-    email: "",
+  const { locale } = useTranslation();
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
+
+  return useApiForm(unsubscribeEndpoints.POST, logger, {
+    defaultValues: {
+      email: "",
+    },
   });
 }
 
@@ -112,10 +145,18 @@ export function useNewsletterUnsubscription(): InferApiFormReturn<
  * Hook for subscription mutations
  * @deprecated Use useNewsletterManager instead for comprehensive newsletter management
  */
-export function useSubscriptionMutation(): InferEnhancedMutationResult<
-  typeof subscribeEndpoints.POST
+export function useSubscriptionMutation(): EnhancedMutationResult<
+  SubscribePostResponseOutput,
+  SubscribePostRequestOutput,
+  never
 > {
-  return useApiMutation(subscribeEndpoints.POST, {
+  const { locale } = useTranslation();
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
+
+  return useApiMutation(subscribeEndpoints.POST, logger, {
     onSuccess: () => {},
     onError: () => {},
   });
@@ -125,10 +166,18 @@ export function useSubscriptionMutation(): InferEnhancedMutationResult<
  * Hook for unsubscription mutations
  * @deprecated Use useNewsletterManager instead for comprehensive newsletter management
  */
-export function useUnsubscriptionMutation(): InferEnhancedMutationResult<
-  typeof unsubscribeEndpoints.POST
+export function useUnsubscriptionMutation(): EnhancedMutationResult<
+  UnsubscribePostResponseOutput,
+  UnsubscribePostRequestOutput,
+  never
 > {
-  return useApiMutation(unsubscribeEndpoints.POST, {
+  const { locale } = useTranslation();
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
+
+  return useApiMutation(unsubscribeEndpoints.POST, logger, {
     onSuccess: () => {},
     onError: () => {},
   });
@@ -166,7 +215,10 @@ interface NewsletterManagerResult {
  */
 export function useNewsletterManager(): NewsletterManagerResult {
   const { locale } = useTranslation();
-  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
   // Fetch current user data to get email
   const { user, isLoggedIn } = useUser(logger);
 
@@ -190,17 +242,21 @@ export function useNewsletterManager(): NewsletterManagerResult {
     return emailToValidate.length > 0 && emailRegex.test(emailToValidate);
   }, []);
 
-  const isCurrentEmailValid = isValidEmail(email);
+  const isCurrentEmailValid = email ? isValidEmail(email) : false;
 
   // Hooks for newsletter operations using mutations
-  const subscriptionMutation = useApiMutation(subscribeEndpoints.POST, {
+  const subscriptionMutation = useApiMutation(subscribeEndpoints.POST, logger, {
     onSuccess: () => {},
     onError: () => {},
   });
-  const unsubscribeMutation = useApiMutation(unsubscribeEndpoints.POST, {
-    onSuccess: () => {},
-    onError: () => {},
-  });
+  const unsubscribeMutation = useApiMutation(
+    unsubscribeEndpoints.POST,
+    logger,
+    {
+      onSuccess: () => {},
+      onError: () => {},
+    },
+  );
 
   // Handle email change - only allow changes when not logged in
   const handleEmailChange = useCallback(
@@ -219,7 +275,7 @@ export function useNewsletterManager(): NewsletterManagerResult {
 
   // Check status when we have a valid email but don't auto-trigger on typing
   const statusQuery = useNewsletterStatus({
-    email: email,
+    email: email || "",
     enabled:
       isCurrentEmailValid &&
       !subscriptionMutation.isPending &&
@@ -228,13 +284,14 @@ export function useNewsletterManager(): NewsletterManagerResult {
 
   // Type guard for newsletter status response
   const isNewsletterStatusResponse = (
-    data: any,
-  ): data is { subscribed: boolean } => {
+    data: StatusGetResponseOutput | undefined,
+  ): data is StatusGetResponseOutput => {
     return (
       data !== null &&
+      data !== undefined &&
       typeof data === "object" &&
       "subscribed" in data &&
-      typeof (data as { subscribed: any }).subscribed === "boolean"
+      typeof data.subscribed === "boolean"
     );
   };
 
@@ -314,11 +371,18 @@ export function useNewsletterManager(): NewsletterManagerResult {
 
         // Get leadId from client tracking if available, server will create anonymous lead if needed
         const handleSubscription = (): void => {
+          // Ensure we have valid leadId before proceeding
+          const finalLeadId = typeof leadId === "string" ? leadId : "";
+          if (!finalLeadId) {
+            logger.error("newsletter.hooks.errors.missing_lead_id");
+            return;
+          }
+
           try {
             subscriptionMutation.mutate({
               requestData: {
                 email: emailToUse,
-                inputLeadId: leadId, // Lead ID is always required now
+                inputLeadId: finalLeadId,
               },
               urlParams: undefined,
             });
@@ -327,7 +391,7 @@ export function useNewsletterManager(): NewsletterManagerResult {
             subscriptionMutation.mutate({
               requestData: {
                 email: emailToUse,
-                inputLeadId: leadId, // Use leadId from hook
+                inputLeadId: finalLeadId,
               },
               urlParams: undefined,
             });
@@ -345,6 +409,7 @@ export function useNewsletterManager(): NewsletterManagerResult {
       subscriptionMutation,
       setShowConfirmUnsubscribe,
       leadId,
+      logger,
     ],
   );
 
@@ -421,7 +486,7 @@ export function useNewsletterManager(): NewsletterManagerResult {
   );
 
   return {
-    email,
+    email: email || "",
     setEmail,
     isLoggedIn,
     isSubscribed: effectiveIsSubscribed,

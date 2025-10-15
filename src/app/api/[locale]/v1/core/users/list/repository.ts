@@ -6,47 +6,46 @@
 import "server-only";
 
 import { and, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
-import { users } from "@/app/api/[locale]/v1/core/user/db";
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+
+import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import { users } from "@/app/api/[locale]/v1/core/user/db";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { SortOrder, UserSortField, UserStatusFilter } from "../enum";
-import type { UserListRequestTypeOutput } from "./definition";
+import type { UserListRequestOutput } from "./definition";
 
 export interface UserListRepository {
   listUsers(
-    data: UserListRequestTypeOutput,
+    data: UserListRequestOutput,
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
-      totalCount: number;
-      pageCount: number;
-      page: number;
-      limit: number;
-      users: Array<{
-        id: string;
-        email: string;
-        firstName: string;
-        lastName: string;
-        company: string;
-        phone: string | null;
-        isActive: boolean;
-        emailVerified: boolean;
-        createdAt: string;
-        updatedAt: string;
-      }>;
+      response: {
+        totalCount: number;
+        pageCount: number;
+        page: number;
+        limit: number;
+        users: Array<{
+          id: string;
+          email: string;
+          privateName: string;
+          publicName: string;
+          isActive: boolean;
+          emailVerified: boolean;
+          createdAt: string;
+          updatedAt: string;
+        }>;
+      };
     }>
   >;
 }
@@ -93,9 +92,8 @@ export class UserListRepositoryImpl implements UserListRepository {
     | typeof users.createdAt
     | typeof users.updatedAt
     | typeof users.email
-    | typeof users.firstName
-    | typeof users.lastName
-    | typeof users.company {
+    | typeof users.privateName
+    | typeof users.publicName {
     switch (field) {
       case UserSortField.CREATED_AT:
         return users.createdAt;
@@ -103,40 +101,38 @@ export class UserListRepositoryImpl implements UserListRepository {
         return users.updatedAt;
       case UserSortField.EMAIL:
         return users.email;
-      case UserSortField.FIRST_NAME:
-        return users.firstName;
-      case UserSortField.LAST_NAME:
-        return users.lastName;
-      case UserSortField.COMPANY:
-        return users.company;
+      case UserSortField.PRIVATE_NAME:
+        return users.privateName;
+      case UserSortField.PUBLIC_NAME:
+        return users.publicName;
       default:
         return users.createdAt;
     }
   }
 
   async listUsers(
-    data: UserListRequestTypeOutput,
+    data: UserListRequestOutput,
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
-      totalCount: number;
-      pageCount: number;
-      page: number;
-      limit: number;
-      users: Array<{
-        id: string;
-        email: string;
-        firstName: string;
-        lastName: string;
-        company: string;
-        phone: string | null;
-        isActive: boolean;
-        emailVerified: boolean;
-        createdAt: string;
-        updatedAt: string;
-      }>;
+      response: {
+        totalCount: number;
+        pageCount: number;
+        page: number;
+        limit: number;
+        users: Array<{
+          id: string;
+          email: string;
+          privateName: string;
+          publicName: string;
+          isActive: boolean;
+          emailVerified: boolean;
+          createdAt: string;
+          updatedAt: string;
+        }>;
+      };
     }>
   > {
     try {
@@ -184,9 +180,14 @@ export class UserListRepositoryImpl implements UserListRepository {
       if (requestData.searchAndPagination?.search) {
         const searchCondition = or(
           ilike(users.email, `%${requestData.searchAndPagination.search}%`),
-          ilike(users.firstName, `%${requestData.searchAndPagination.search}%`),
-          ilike(users.lastName, `%${requestData.searchAndPagination.search}%`),
-          ilike(users.company, `%${requestData.searchAndPagination.search}%`),
+          ilike(
+            users.privateName,
+            `%${requestData.searchAndPagination.search}%`,
+          ),
+          ilike(
+            users.publicName,
+            `%${requestData.searchAndPagination.search}%`,
+          ),
         );
         if (searchCondition) {
           conditions.push(searchCondition);
@@ -225,30 +226,28 @@ export class UserListRepositoryImpl implements UserListRepository {
       });
 
       return createSuccessResponse({
-        totalCount: total,
-        pageCount: totalPages,
-        page,
-        limit,
-        users: usersList.map((user) => ({
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          company: user.company,
-          phone: user.phone,
-          isActive: user.isActive,
-          emailVerified: user.emailVerified,
-          createdAt: user.createdAt.toISOString(),
-          updatedAt: user.updatedAt.toISOString(),
-        })),
+        response: {
+          totalCount: total,
+          pageCount: totalPages,
+          page,
+          limit,
+          users: usersList.map((user) => ({
+            id: user.id,
+            email: user.email,
+            privateName: user.privateName,
+            publicName: user.publicName,
+            isActive: user.isActive,
+            emailVerified: user.emailVerified,
+            createdAt: user.createdAt.toISOString(),
+            updatedAt: user.updatedAt.toISOString(),
+          })),
+        },
       });
     } catch (error) {
       logger.error("Error listing users", error);
-      const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.users.list.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
       );
     }
   }

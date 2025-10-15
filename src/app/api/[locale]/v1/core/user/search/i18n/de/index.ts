@@ -106,6 +106,8 @@ export const translations: typeof enTranslations = {
       isPublic: "Öffentlich",
       firstName: "Vorname",
       lastName: "Nachname",
+      privateName: "Privater Name",
+      publicName: "Öffentlicher Name",
       company: "Unternehmen",
       email: "E-Mail",
       imageUrl: "Avatar",
@@ -128,6 +130,8 @@ export const translations: typeof enTranslations = {
   columns: {
     firstName: "Vorname",
     lastName: "Nachname",
+    privateName: "Privater Name",
+    publicName: "Öffentlicher Name",
     email: "E-Mail",
     company: "Unternehmen",
     userRoles: "Rollen",

@@ -12,7 +12,7 @@ import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
 
 import { useLeadId } from "../leads/tracking/engagement/hooks";
-import type { CompleteUserType } from "../user/definition";
+import type { StandardUserType } from "../user/definition";
 import definitions from "./definition";
 import { ContactSubject } from "./enum";
 
@@ -47,13 +47,17 @@ export function useContactEndpoint(
  */
 export function useContactWithEngagement(
   logger: EndpointLogger,
-  user?: CompleteUserType,
+  user: StandardUserType | undefined,
 ): EndpointReturn<typeof definitions> {
   // Get the base endpoint
   const formResult = useContactEndpoint(logger);
 
   // Use lead ID hook with callback to set lead ID in form
-  useLeadId(formResult.create?.form.setValue);
+  useLeadId((leadId: string) => {
+    if (formResult.create?.form) {
+      formResult.create.form.setValue("leadId", leadId);
+    }
+  });
 
   // Set default values based on user data
   useEffect(() => {
@@ -61,15 +65,15 @@ export function useContactWithEngagement(
       const form = formResult.create.form;
 
       // Set default values if they're not already set
-      if (!form.getValues("name") && user.firstName && user.lastName) {
-        form.setValue("name", `${user.firstName} ${user.lastName}`);
+      // Use privateName (user's private name) for the name field
+      if (!form.getValues("name") && user.privateName) {
+        form.setValue("name", user.privateName);
       }
       if (!form.getValues("email") && user.email) {
         form.setValue("email", user.email);
       }
-      if (!form.getValues("company") && user.company) {
-        form.setValue("company", user.company);
-      }
+      // Note: company field is optional in contact form and not part of user type
+      // If needed, this should be sourced from business data or lead information
       if (!form.getValues("subject")) {
         form.setValue("subject", ContactSubject.HELP_SUPPORT);
       }

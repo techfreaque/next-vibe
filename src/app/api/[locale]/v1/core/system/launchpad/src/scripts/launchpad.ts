@@ -22,7 +22,9 @@ const program = new Command();
 
 program
   .name("launchpad")
-  .description("Tool for managing and orchestrating multiple packages in a monorepo")
+  .description(
+    "Tool for managing and orchestrating multiple packages in a monorepo",
+  )
   .version("1.0.0");
 
 // Legacy interactive mode (default behavior)
@@ -38,7 +40,10 @@ program
   .command("ci-release")
   .description("CI release mode - release package based on git tag")
   .option("-t, --target <directory>", "Target directory to release")
-  .option("--tag <tag>", "Git tag to determine target (overrides auto-detection)")
+  .option(
+    "--tag <tag>",
+    "Git tag to determine target (overrides auto-detection)",
+  )
   .action(async (options) => {
     try {
       const rootDir = process.cwd();
@@ -78,11 +83,33 @@ program
 program
   .command("force-release")
   .description("Force release all packages with version bump")
-  .option("-v, --version-bump <type>", "Version bump type (patch|minor|major|init)")
-  .action(async (options) => {
+  .option(
+    "-v, --version-bump <type>",
+    "Version bump type (patch|minor|major|init)",
+  )
+  .action(async (options: { versionBump?: string }) => {
     try {
       const rootDir = process.cwd();
-      const versionBump = options.versionBump as VersionBumpType | undefined;
+
+      // Validate version bump type
+      let versionBump: VersionBumpType | undefined;
+      if (options.versionBump) {
+        const typedValue = options.versionBump;
+
+        if (
+          typedValue === "patch" ||
+          typedValue === "minor" ||
+          typedValue === "major" ||
+          typedValue === "init"
+        ) {
+          versionBump = typedValue;
+        } else {
+          throw new Error(
+            `Invalid version bump type: ${typedValue}. Must be one of: patch, minor, major, init`,
+          );
+        }
+      }
+
       await forceReleaseCommand(rootDir, versionBump);
     } catch (error) {
       loggerError("Force release failed:", error);

@@ -6,7 +6,7 @@
 import { z } from "zod";
 
 import { leadId } from "../../definition";
-import { EmailCampaignStage, EmailJourneyVariant } from "../../enum";
+import { EmailCampaignStage } from "../../enum";
 
 /**
  * Email Campaign Task Configuration Schema
@@ -15,7 +15,7 @@ export const emailCampaignConfigSchema = z.object({
   batchSize: z.number().min(1).max(100),
   maxEmailsPerRun: z.number().min(1).max(1000),
   dryRun: z.boolean(),
-  enabledStages: z.array(z.string()),
+  enabledStages: z.array(z.nativeEnum(EmailCampaignStage)),
   delayBetweenStages: z.object({
     [EmailCampaignStage.INITIAL]: z.number(),
     [EmailCampaignStage.FOLLOWUP_1]: z.number(),
@@ -146,6 +146,6 @@ export function createEmptyStageStats(): CampaignStageStatsType {
 export interface EmailCampaignError {
   leadId: string;
   email: string;
-  stage: EmailCampaignStage;
+  stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
   error: string;
 }

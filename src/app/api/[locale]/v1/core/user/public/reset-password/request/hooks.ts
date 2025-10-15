@@ -57,16 +57,16 @@ export function useResetPasswordRequest(logger: EndpointLogger): ApiFormReturn<
           email: "",
         },
       },
+      persistForm: false, // Disable persistence to avoid conflicts with old data structure
     },
     {
-      onSuccess: ({ responseData }) => {
+      onSuccess: () => {
         setIsSuccess(true);
 
         toast({
           title: t("auth.resetPassword.success.title"),
           description: t(
-            responseData.response
-              .message as "app.api.v1.core.user.public.resetPassword.request.response.success.message",
+            "app.api.v1.core.user.public.resetPassword.request.response.success.message",
           ),
           variant: "default",
         });

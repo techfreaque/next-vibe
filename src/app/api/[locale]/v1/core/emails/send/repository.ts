@@ -5,8 +5,6 @@
 
 import "server-only";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { Countries, Languages } from "@/i18n/core/config";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -15,27 +13,30 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { Countries, Languages } from "@/i18n/core/config";
 
-// Define the proper type for locale to match standardized patterns
-type CountryLanguage = `${Lowercase<Languages>}-${Countries}`;
 import { emailServiceRepository as emailService } from "../email-service/repository";
 import { smsServiceRepository as smsService } from "../sms-service/repository";
 import type {
-  EmailSendRequestTypeOutput,
-  EmailSendResponseTypeOutput,
+  EmailSendRequestOutput,
+  EmailSendResponseOutput,
 } from "./definition";
+
+// Define the proper type for locale to match standardized patterns
+type CountryLanguage = `${Lowercase<Languages>}-${Countries}`;
 
 /**
  * Email Send Repository Interface
  */
 export interface EmailSendRepository {
   sendEmail(
-    data: EmailSendRequestTypeOutput,
+    data: EmailSendRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<EmailSendResponseTypeOutput>>;
+  ): Promise<ResponseType<EmailSendResponseOutput>>;
 }
 
 /**
@@ -43,29 +44,32 @@ export interface EmailSendRepository {
  */
 export class EmailSendRepositoryImpl implements EmailSendRepository {
   async sendEmail(
-    data: EmailSendRequestTypeOutput,
+    data: EmailSendRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<EmailSendResponseTypeOutput>> {
+  ): Promise<ResponseType<EmailSendResponseOutput>> {
     try {
       logger.info("Email send repository: Processing email send request", {
-        to: data.to,
-        subject: data.subject,
-        hasSmsNotification: data.sendSmsNotification,
+        to: data.recipient.to,
+        subject: data.emailContent.subject,
+        hasSmsNotification: data.smsNotifications?.sendSmsNotification,
         userId: user.id,
       });
 
       // Validate SMS notification requirements
-      if (data.sendSmsNotification) {
-        if (!data.smsPhoneNumber || !data.smsMessage) {
+      if (data.smsNotifications?.sendSmsNotification) {
+        if (
+          !data.smsNotifications.smsPhoneNumber ||
+          !data.smsNotifications.smsMessage
+        ) {
           return createErrorResponse(
             "app.api.v1.core.emails.send.errors.validation.title",
             ErrorResponseTypes.VALIDATION_ERROR,
             {
-              field: "smsPhoneNumber|smsMessage",
+              field: "app.api.v1.core.emails.send.errors.validation.smsFields",
               message:
-                "SMS phone number and message are required when SMS notification is enabled",
+                "app.api.v1.core.emails.send.errors.validation.smsRequired",
             },
           );
         }
@@ -74,15 +78,24 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
       // Send email using email service
       const emailResult = await emailService.sendEmail(
         {
-          to: data.to,
-          toName: data.toName,
-          subject: data.subject,
-          html: data.html,
-          text: data.text,
-          replyTo: data.replyTo,
-          senderName: data.senderName,
-          campaignType: data.campaignType,
-          leadId: data.leadId,
+          recipientInfo: {
+            to: data.recipient.to,
+            toName: data.recipient.toName,
+          },
+          emailContent: {
+            subject: data.emailContent.subject,
+            html: data.emailContent.html,
+            text: data.emailContent.text,
+          },
+          senderSettings: {
+            senderName: data.senderSettings.senderName,
+            replyTo: data.senderSettings?.replyTo,
+          },
+          campaignSettings: {
+            campaignType: data.campaignTracking?.campaignType,
+            leadId: data.campaignTracking?.leadId,
+          },
+          advancedOptions: {},
         },
         user,
         locale,
@@ -92,39 +105,55 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
       if (!emailResult.success) {
         logger.error("Email send repository: Email sending failed", {
           error: emailResult.message,
-          to: data.to,
-          subject: data.subject,
+          to: data.recipient.to,
+          subject: data.emailContent.subject,
         });
         return emailResult;
       }
 
-      // Prepare response with email result
-      const response: EmailSendResponseTypeOutput = {
-        success: emailResult.data.success,
-        messageId: emailResult.data.messageId,
-        accountId: emailResult.data.accountId,
-        accountName: emailResult.data.accountName,
-        accepted: emailResult.data.accepted,
-        rejected: emailResult.data.rejected,
-        response: emailResult.data.response,
-        sentAt: emailResult.data.sentAt,
+      // Prepare response with email result (match nested endpoint structure)
+      const response: EmailSendResponseOutput = {
+        response: {
+          deliveryStatus: {
+            success: emailResult.data.result.success,
+            messageId: emailResult.data.result.messageId,
+            sentAt: emailResult.data.result.sentAt,
+            response: emailResult.data.result.response,
+          },
+          accountInfo: {
+            accountId: emailResult.data.result.accountId,
+            accountName: emailResult.data.result.accountName,
+          },
+          deliveryResults: {
+            accepted: emailResult.data.deliveryStatus.accepted,
+            rejected: emailResult.data.deliveryStatus.rejected,
+          },
+          smsResult: {
+            success: false,
+          },
+        },
       };
 
       // Send SMS notification if requested (optional, non-blocking)
-      if (data.sendSmsNotification && data.smsPhoneNumber && data.smsMessage) {
+      if (
+        data.smsNotifications?.sendSmsNotification &&
+        data.smsNotifications.smsPhoneNumber &&
+        data.smsNotifications.smsMessage
+      ) {
         logger.info("Email send repository: Sending SMS notification", {
-          phoneNumber: data.smsPhoneNumber,
-          emailMessageId: emailResult.data.messageId,
+          phoneNumber: data.smsNotifications.smsPhoneNumber,
+          emailMessageId: emailResult.data.result.messageId,
         });
 
         try {
           const smsResult = await smsService.sendSms(
             {
-              to: data.smsPhoneNumber,
-              message: data.smsMessage,
-              campaignType: data.campaignType,
-              leadId: data.leadId,
-              templateName: "email_notification",
+              to: data.smsNotifications.smsPhoneNumber,
+              message: data.smsNotifications.smsMessage,
+              campaignType: data.campaignTracking?.campaignType,
+              leadId: data.campaignTracking?.leadId,
+              templateName:
+                "app.api.v1.core.emails.send.sms.emailNotificationTemplate",
             },
             user,
             locale,
@@ -132,27 +161,27 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
           );
 
           if (smsResult.success) {
-            response.smsResult = {
+            response.response.smsResult = {
               success: true,
-              messageId: smsResult.data.messageId,
-              sentAt: smsResult.data.sentAt,
-              provider: smsResult.data.provider,
+              messageId: smsResult.data.result.messageId,
+              sentAt: smsResult.data.result.sentAt,
+              provider: smsResult.data.result.provider,
             };
             logger.info(
               "Email send repository: SMS notification sent successfully",
               {
-                smsMessageId: smsResult.data.messageId,
-                emailMessageId: emailResult.data.messageId,
+                smsMessageId: smsResult.data.result.messageId,
+                emailMessageId: emailResult.data.result.messageId,
               },
             );
           } else {
-            response.smsResult = {
+            response.response.smsResult = {
               success: false,
               error: smsResult.message,
             };
             logger.warn("Email send repository: SMS notification failed", {
               error: smsResult.message,
-              emailMessageId: emailResult.data.messageId,
+              emailMessageId: emailResult.data.result.messageId,
             });
           }
         } catch (smsError) {
@@ -160,29 +189,31 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
             "Email send repository: SMS notification error (non-blocking)",
             smsError,
           );
-          response.smsResult = {
+          response.response.smsResult = {
             success: false,
-            error: "SMS service temporarily unavailable",
+            error:
+              "app.api.v1.core.emails.send.errors.sms.temporarilyUnavailable",
           };
         }
       }
 
       logger.info("Email send repository: Email send completed successfully", {
-        emailMessageId: response.messageId,
-        accountUsed: response.accountName,
-        smsNotificationSent: response.smsResult?.success || false,
+        emailMessageId: response.response.deliveryStatus.messageId,
+        accountUsed: response.response.accountInfo.accountName,
+        smsNotificationSent: response.response.smsResult?.success || false,
       });
 
       return createSuccessResponse(response);
     } catch (error) {
+      const parsedError = parseError(error);
       logger.error(
         "Email send repository: Critical error in email send",
-        error,
+        parsedError,
       );
       return createErrorResponse(
         "app.api.v1.core.emails.send.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
-        parseError(error),
+        { error: parsedError.message },
       );
     }
   }

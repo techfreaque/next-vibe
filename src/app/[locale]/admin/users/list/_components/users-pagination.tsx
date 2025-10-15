@@ -47,12 +47,15 @@ export function UsersPagination({
   const { t } = simpleT(locale);
 
   const handlePageChange = (page: number): void => {
-    usersEndpoint.read.form.setValue("page", page);
+    usersEndpoint.read.form.setValue("searchAndPagination.page", page);
   };
 
   const handleLimitChange = (limit: string): void => {
-    usersEndpoint.read.form.setValue("limit", parseInt(limit, 10));
-    usersEndpoint.read.form.setValue("page", 1); // Reset to first page
+    usersEndpoint.read.form.setValue(
+      "searchAndPagination.limit",
+      parseInt(limit, 10),
+    );
+    usersEndpoint.read.form.setValue("searchAndPagination.page", 1); // Reset to first page
   };
 
   const startItem = (currentPage - 1) * currentLimit + 1;

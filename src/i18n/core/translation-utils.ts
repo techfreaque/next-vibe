@@ -225,7 +225,12 @@ export function translateKey<K extends TranslationKey>(
 ): string {
   // Use hardcoded fallback to avoid circular dependency during initialization
   const actualFallbackLanguage = fallbackLanguage ?? "en";
-  const value = getTranslationValue(key, language, actualFallbackLanguage, context);
+  const value = getTranslationValue(
+    key,
+    language,
+    actualFallbackLanguage,
+    context,
+  );
   return processTranslationValue(value, key, params, context);
 }
 

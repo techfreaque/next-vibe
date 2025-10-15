@@ -11,7 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import type React from "react";
 import { useState } from "react";
 
-import { useCronTasksListEndpoint } from "@/app/api/[locale]/v1/core/system/tasks/cron/tasks/hooks";
+import { useCronTasksList } from "@/app/api/[locale]/v1/core/system/tasks/cron/tasks/hooks";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -28,7 +29,8 @@ export function CronTasksClient({
   const { t } = simpleT(locale);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
-  const tasksEndpoint = useCronTasksListEndpoint();
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const tasksEndpoint = useCronTasksList(logger);
 
   return (
     <div className="space-y-6">

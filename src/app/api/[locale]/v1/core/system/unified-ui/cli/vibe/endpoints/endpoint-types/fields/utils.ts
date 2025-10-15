@@ -10,6 +10,7 @@ import { z } from "zod";
 import type { CacheStrategy } from "../core/enums";
 import { FieldUsage } from "../core/enums";
 import type {
+  ArrayField,
   FieldUsageConfig,
   InferSchemaFromField,
   ObjectField,
@@ -31,14 +32,14 @@ export function field<
 >(
   schema: TSchema,
   usage: TUsage,
-  ui: WidgetConfig,
+  ui: Partial<WidgetConfig>,
   cache?: CacheStrategy,
-): PrimitiveField<TSchema> & { usage: TUsage } {
+): PrimitiveField<TSchema, TUsage> {
   return {
     type: "primitive" as const,
     schema,
     usage,
-    ui,
+    ui: ui as WidgetConfig,
     cache,
   };
 }
@@ -47,44 +48,49 @@ export function field<
  * Create a field that can be both request and response
  */
 export function requestResponseField<TSchema extends z.ZodTypeAny>(
-  ui: WidgetConfig,
+  ui: Partial<WidgetConfig>,
   schema: TSchema,
   cache?: CacheStrategy,
   requestAsUrlParams?: false,
-): PrimitiveField<TSchema> & {
-  usage: {
+): PrimitiveField<
+  TSchema,
+  {
     request: "data";
     response: true;
-  };
-};
+  }
+>;
+// eslint-disable-next-line no-redeclare
 export function requestResponseField<TSchema extends z.ZodTypeAny>(
-  ui: WidgetConfig,
+  ui: Partial<WidgetConfig>,
   schema: TSchema,
   cache?: CacheStrategy,
   requestAsUrlParams?: true,
-): PrimitiveField<TSchema> & {
-  usage: {
+): PrimitiveField<
+  TSchema,
+  {
     request: "urlParams";
     response: true;
-  };
-};
+  }
+>;
+// eslint-disable-next-line no-redeclare
 export function requestResponseField<TSchema extends z.ZodTypeAny>(
-  ui: WidgetConfig,
+  ui: Partial<WidgetConfig>,
   schema: TSchema,
   cache?: CacheStrategy,
   requestAsUrlParams?: boolean,
-): PrimitiveField<TSchema> & {
-  usage: {
+): PrimitiveField<
+  TSchema,
+  {
     request: "data" | "urlParams";
     response: true;
-  };
-} {
+  }
+> {
   const requestType = requestAsUrlParams ? "urlParams" : "data";
   return {
     type: "primitive" as const,
     schema,
     usage: { request: requestType, response: true },
-    ui,
+    ui: ui as WidgetConfig,
     cache,
   };
 }
@@ -93,17 +99,15 @@ export function requestResponseField<TSchema extends z.ZodTypeAny>(
  * Create a request data field
  */
 export function requestDataField<TSchema extends z.ZodTypeAny>(
-  ui: WidgetConfig,
+  ui: Partial<WidgetConfig>,
   schema: TSchema,
   cache?: CacheStrategy,
-): PrimitiveField<TSchema> & {
-  usage: { request: "data" };
-} {
+): PrimitiveField<TSchema, { request: "data" }> {
   return {
     type: "primitive" as const,
     schema,
     usage: { request: "data" },
-    ui,
+    ui: ui as WidgetConfig,
     cache,
   };
 }
@@ -112,17 +116,15 @@ export function requestDataField<TSchema extends z.ZodTypeAny>(
  * Create a request URL params field
  */
 export function requestUrlParamsField<TSchema extends z.ZodTypeAny>(
-  ui: WidgetConfig,
+  ui: Partial<WidgetConfig>,
   schema: TSchema,
   cache?: CacheStrategy,
-): PrimitiveField<TSchema> & {
-  usage: { request: "urlParams"; response?: never };
-} {
+): PrimitiveField<TSchema, { request: "urlParams"; response?: never }> {
   return {
     type: "primitive" as const,
     schema,
     usage: { request: "urlParams" },
-    ui,
+    ui: ui as WidgetConfig,
     cache,
   };
 }
@@ -131,36 +133,41 @@ export function requestUrlParamsField<TSchema extends z.ZodTypeAny>(
  * Create a response field
  */
 export function responseField<TSchema extends z.ZodTypeAny>(
-  ui: WidgetConfig,
+  ui: Partial<WidgetConfig>,
   schema: TSchema,
   cache?: CacheStrategy,
-): PrimitiveField<TSchema> & { usage: { response: true } } {
+): PrimitiveField<TSchema, { response: true }> {
   return {
     type: "primitive" as const,
     schema,
     usage: { response: true },
-    ui,
+    ui: ui as WidgetConfig,
     cache,
   };
 }
 
 /**
  * Create an object field containing other fields
+ * Accepts any object-like structure where all values are UnifiedFields
+ *
+ * Note: We use a generic constraint to accept widget configs that may not have children specified,
+ * as children are provided separately. The ui parameter will be cast to WidgetConfig for storage.
  */
 export function objectField<
-  const C extends Record<string, UnifiedField<z.ZodTypeAny>>,
-  const U extends FieldUsageConfig,
+  C,
+  U extends FieldUsageConfig,
+  W extends Partial<WidgetConfig> = Partial<WidgetConfig>,
 >(
-  ui: WidgetConfig,
+  ui: W,
   usage: U,
   children: C,
   cache?: CacheStrategy,
-): ObjectField<C> & { usage: U } {
+): ObjectField<C, U> {
   return {
     type: "object" as const,
     children,
     usage,
-    ui,
+    ui: ui as WidgetConfig,
     cache,
   };
 }
@@ -168,9 +175,9 @@ export function objectField<
 /**
  * Create an array field containing repeated items
  */
-export function arrayField<Child extends UnifiedField<z.ZodTypeAny>>(
+export function arrayField<Child>(
   usage: FieldUsageConfig,
-  ui: WidgetConfig,
+  ui: Partial<WidgetConfig>,
   child: Child,
   cache?: CacheStrategy,
 ): {
@@ -184,7 +191,7 @@ export function arrayField<Child extends UnifiedField<z.ZodTypeAny>>(
     type: "array" as const,
     child,
     usage,
-    ui,
+    ui: ui as WidgetConfig,
     cache,
   };
 }
@@ -192,22 +199,16 @@ export function arrayField<Child extends UnifiedField<z.ZodTypeAny>>(
 /**
  * Create a request array field with specific request usage
  */
-export function requestDataArrayField<Child extends UnifiedField<z.ZodTypeAny>>(
-  ui: WidgetConfig,
+export function requestDataArrayField<Child>(
+  ui: Partial<WidgetConfig>,
   child: Child,
   cache?: CacheStrategy,
-): {
-  type: "array";
-  child: Child;
-  usage: { request: "data" };
-  ui: WidgetConfig;
-  cache?: CacheStrategy;
-} & { usage: { request: "data" } } {
+): ArrayField<Child, { request: "data" }> {
   return {
     type: "array" as const,
     child,
     usage: { request: "data" },
-    ui,
+    ui: ui as WidgetConfig,
     cache,
   };
 }
@@ -215,22 +216,16 @@ export function requestDataArrayField<Child extends UnifiedField<z.ZodTypeAny>>(
 /**
  * Create a response array field with specific response usage
  */
-export function responseArrayField<Child extends UnifiedField<z.ZodTypeAny>>(
-  ui: WidgetConfig,
+export function responseArrayField<Child>(
+  ui: Partial<WidgetConfig>,
   child: Child,
   cache?: CacheStrategy,
-): {
-  type: "array";
-  child: Child;
-  usage: { response: true };
-  ui: WidgetConfig;
-  cache?: CacheStrategy;
-} & { usage: { response: true } } {
+): ArrayField<Child, { response: true }> {
   return {
     type: "array" as const,
     child,
     usage: { response: true },
-    ui,
+    ui: ui as WidgetConfig,
     cache,
   };
 }
@@ -351,6 +346,7 @@ export type InferFieldType<F, Usage extends FieldUsage> =
 
 /**
  * Infer object type from children fields
+ * Uses flexible constraint that accepts both readonly and mutable properties
  */
 export type InferObjectType<C, Usage extends FieldUsage> =
   C extends Record<string, UnifiedField<z.ZodTypeAny>>
@@ -372,10 +368,10 @@ export type InferObjectType<C, Usage extends FieldUsage> =
  *
  * We return the actual inferred schema type to preserve input/output differentiation.
  */
-export function generateSchemaForUsage<
-  F extends UnifiedField<z.ZodTypeAny>,
-  Usage extends FieldUsage,
->(field: F, targetUsage: Usage): InferSchemaFromField<F, Usage> {
+export function generateSchemaForUsage<F, Usage extends FieldUsage>(
+  field: F,
+  targetUsage: Usage,
+): InferSchemaFromField<F, Usage> {
   // Defensive check: ensure field is defined
   if (!field || typeof field !== "object") {
     return z.never() as InferSchemaFromField<F, Usage>;
@@ -404,16 +400,26 @@ export function generateSchemaForUsage<
     }
   };
 
-  if (field.type === "primitive") {
-    if (hasUsage(field.usage)) {
-      return field.schema as InferSchemaFromField<F, Usage>;
+  interface FieldWithType {
+    type: "primitive" | "object" | "array";
+    usage?: FieldUsageConfig;
+    schema?: z.ZodTypeAny;
+    children?: Record<string, UnifiedField<z.ZodTypeAny>>;
+    child?: UnifiedField<z.ZodTypeAny>;
+  }
+
+  const typedField = field as F & FieldWithType;
+
+  if (typedField.type === "primitive") {
+    if (hasUsage(typedField.usage)) {
+      return typedField.schema as InferSchemaFromField<F, Usage>;
     }
     return z.never() as InferSchemaFromField<F, Usage>;
   }
 
-  if (field.type === "object") {
+  if (typedField.type === "object") {
     // Check if the object itself has the required usage
-    if (field.usage && !hasUsage(field.usage)) {
+    if (typedField.usage && !hasUsage(typedField.usage)) {
       return z.never() as InferSchemaFromField<F, Usage>;
     }
 
@@ -421,10 +427,12 @@ export function generateSchemaForUsage<
     // We need to avoid using Record<string, z.ZodTypeAny> which loses type information
     const shape: Record<string, z.ZodTypeAny> = {};
 
-    for (const [key, childField] of Object.entries(field.children)) {
-      const childSchema = generateSchemaForUsage(childField, targetUsage);
-      if (!(childSchema instanceof z.ZodNever)) {
-        shape[key] = childSchema;
+    if (typedField.children) {
+      for (const [key, childField] of Object.entries(typedField.children)) {
+        const childSchema = generateSchemaForUsage(childField, targetUsage);
+        if (!(childSchema instanceof z.ZodNever)) {
+          shape[key] = childSchema;
+        }
       }
     }
 
@@ -434,9 +442,9 @@ export function generateSchemaForUsage<
     return objectSchema as InferSchemaFromField<F, Usage>;
   }
 
-  if (field.type === "array") {
-    if (hasUsage(field.usage)) {
-      const childSchema = generateSchemaForUsage(field.child, targetUsage);
+  if (typedField.type === "array") {
+    if (hasUsage(typedField.usage)) {
+      const childSchema = generateSchemaForUsage(typedField.child, targetUsage);
       return (
         childSchema instanceof z.ZodNever ? z.never() : z.array(childSchema)
       ) as InferSchemaFromField<F, Usage>;
@@ -450,21 +458,19 @@ export function generateSchemaForUsage<
 // Utility types that work with z.ZodType<Output, ZodTypeDef, Input> to properly infer types
 // These preserve the input/output type differentiation from Zod schemas
 
-export type InferFieldSchemaInputType<
-  F extends UnifiedField<z.ZodTypeAny>,
-  Usage extends FieldUsage,
-> = z.input<ReturnType<typeof generateSchemaForUsage<F, Usage>>>;
+export type InferFieldSchemaInputType<F, Usage extends FieldUsage> = z.input<
+  ReturnType<typeof generateSchemaForUsage<F, Usage>>
+>;
 
-export type InferFieldSchemaOutputType<
-  F extends UnifiedField<z.ZodTypeAny>,
-  Usage extends FieldUsage,
-> = z.output<ReturnType<typeof generateSchemaForUsage<F, Usage>>>;
+export type InferFieldSchemaOutputType<F, Usage extends FieldUsage> = z.output<
+  ReturnType<typeof generateSchemaForUsage<F, Usage>>
+>;
 
 /**
  * Generate request data schema with proper input/output type differentiation
  * CRITICAL: This function must preserve the actual schema types for z.input<>/z.output<>
  */
-export function generateRequestDataSchema<F extends UnifiedField<z.ZodTypeAny>>(
+export function generateRequestDataSchema<F>(
   field: F,
 ): InferSchemaFromField<F, FieldUsage.RequestData> {
   // Generate the base schema - the runtime schema preserves its actual type
@@ -479,7 +485,7 @@ export function generateRequestDataSchema<F extends UnifiedField<z.ZodTypeAny>>(
  * Generate request URL params schema with proper input/output type differentiation
  * CRITICAL: This function must preserve the actual schema types for z.input<>/z.output<>
  */
-export function generateRequestUrlSchema<F extends UnifiedField<z.ZodTypeAny>>(
+export function generateRequestUrlSchema<F>(
   field: F,
 ): InferSchemaFromField<F, FieldUsage.RequestUrlParams> {
   // Generate the base schema - the runtime schema preserves its actual type
@@ -493,7 +499,7 @@ export function generateRequestUrlSchema<F extends UnifiedField<z.ZodTypeAny>>(
  * Generate response schema with proper input/output type differentiation
  * CRITICAL: This function must preserve the actual schema types for z.input<>/z.output<>
  */
-export function generateResponseSchema<F extends UnifiedField<z.ZodTypeAny>>(
+export function generateResponseSchema<F>(
   field: F,
 ): InferSchemaFromField<F, FieldUsage.Response> {
   // Generate the base schema - the runtime schema preserves its actual type

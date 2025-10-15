@@ -1,6 +1,7 @@
-import { cn } from "@/packages/next-vibe/shared/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import React from "react";
+
+import { cn } from "@/packages/next-vibe/shared/utils";
 
 export const textareaVariants = cva(
   "flex w-full rounded-md text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 transition-[color,box-shadow] outline-none resize-none overflow-hidden",
@@ -27,13 +28,19 @@ export interface TextareaProps
 }
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, variant, minRows = 2, maxRows = 10, onChange, ...props }, ref) => {
+  (
+    { className, variant, minRows = 2, maxRows = 10, onChange, ...props },
+    ref,
+  ) => {
     const internalRef = React.useRef<HTMLTextAreaElement>(null);
-    const textareaRef = (ref as React.RefObject<HTMLTextAreaElement>) || internalRef;
+    const textareaRef =
+      (ref as React.RefObject<HTMLTextAreaElement>) || internalRef;
 
     const adjustHeight = React.useCallback(() => {
       const textarea = textareaRef.current;
-      if (!textarea) return;
+      if (!textarea) {
+        return;
+      }
 
       // Reset height to get accurate scrollHeight
       textarea.style.height = "auto";
@@ -49,11 +56,15 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       const maxHeight = lineHeight * maxRows + paddingTop + paddingBottom;
 
       // Set new height within bounds
-      const newHeight = Math.min(Math.max(textarea.scrollHeight, minHeight), maxHeight);
+      const newHeight = Math.min(
+        Math.max(textarea.scrollHeight, minHeight),
+        maxHeight,
+      );
       textarea.style.height = `${newHeight}px`;
 
       // Enable scrolling if content exceeds maxHeight
-      textarea.style.overflowY = textarea.scrollHeight > maxHeight ? "auto" : "hidden";
+      textarea.style.overflowY =
+        textarea.scrollHeight > maxHeight ? "auto" : "hidden";
     }, [minRows, maxRows, textareaRef]);
 
     React.useEffect(() => {

@@ -175,9 +175,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.v1.core.emails.send.groups.campaignTracking.title",
-          description: "app.api.v1.core.emails.send.groups.campaignTracking.description",
+          description:
+            "app.api.v1.core.emails.send.groups.campaignTracking.description",
           layout: { type: LayoutType.GRID_2_COLUMNS },
-          collapsed: true,
         },
         { request: "data" },
         {
@@ -186,8 +186,10 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.v1.core.emails.send.campaignType.label",
-              description: "app.api.v1.core.emails.send.campaignType.description",
-              placeholder: "app.api.v1.core.emails.send.campaignType.placeholder",
+              description:
+                "app.api.v1.core.emails.send.campaignType.description",
+              placeholder:
+                "app.api.v1.core.emails.send.campaignType.placeholder",
               layout: { columns: 6 },
               options: CampaignTypeOptions,
             },
@@ -213,9 +215,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.v1.core.emails.send.groups.smsNotifications.title",
-          description: "app.api.v1.core.emails.send.groups.smsNotifications.description",
+          description:
+            "app.api.v1.core.emails.send.groups.smsNotifications.description",
           layout: { type: LayoutType.STACKED },
-          collapsed: true,
         },
         { request: "data" },
         {
@@ -224,7 +226,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label: "app.api.v1.core.emails.send.sendSmsNotification.label",
-              description: "app.api.v1.core.emails.send.sendSmsNotification.description",
+              description:
+                "app.api.v1.core.emails.send.sendSmsNotification.description",
               layout: { columns: 12 },
             },
             z.boolean().default(false),
@@ -235,8 +238,10 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.PHONE,
               label: "app.api.v1.core.emails.send.smsPhoneNumber.label",
-              description: "app.api.v1.core.emails.send.smsPhoneNumber.description",
-              placeholder: "app.api.v1.core.emails.send.smsPhoneNumber.placeholder",
+              description:
+                "app.api.v1.core.emails.send.smsPhoneNumber.description",
+              placeholder:
+                "app.api.v1.core.emails.send.smsPhoneNumber.placeholder",
               layout: { columns: 12 },
             },
             z.string().optional(),
@@ -271,7 +276,8 @@ const { POST } = createEndpoint({
           deliveryStatus: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.v1.core.emails.send.response.deliveryStatus.title",
+              title:
+                "app.api.v1.core.emails.send.response.deliveryStatus.title",
               layout: { type: LayoutType.GRID_2_COLUMNS },
             },
             { response: true },
@@ -286,7 +292,8 @@ const { POST } = createEndpoint({
               messageId: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.emails.send.response.messageId.label",
+                  content:
+                    "app.api.v1.core.emails.send.response.messageId.label",
                 },
                 z.string(),
               ),
@@ -300,7 +307,8 @@ const { POST } = createEndpoint({
               response: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.emails.send.response.response.label",
+                  content:
+                    "app.api.v1.core.emails.send.response.response.label",
                 },
                 z.string(),
               ),
@@ -319,14 +327,16 @@ const { POST } = createEndpoint({
               accountId: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.emails.send.response.accountId.label",
+                  content:
+                    "app.api.v1.core.emails.send.response.accountId.label",
                 },
                 z.string(),
               ),
               accountName: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.emails.send.response.accountName.label",
+                  content:
+                    "app.api.v1.core.emails.send.response.accountName.label",
                 },
                 z.string(),
               ),
@@ -337,7 +347,8 @@ const { POST } = createEndpoint({
           deliveryResults: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.v1.core.emails.send.response.deliveryResults.title",
+              title:
+                "app.api.v1.core.emails.send.response.deliveryResults.title",
               layout: { type: LayoutType.GRID_2_COLUMNS },
             },
             { response: true },
@@ -345,14 +356,16 @@ const { POST } = createEndpoint({
               accepted: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.emails.send.response.accepted.label",
+                  content:
+                    "app.api.v1.core.emails.send.response.accepted.label",
                 },
                 z.array(z.string()),
               ),
               rejected: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.emails.send.response.rejected.label",
+                  content:
+                    "app.api.v1.core.emails.send.response.rejected.label",
                 },
                 z.array(z.string()),
               ),
@@ -364,9 +377,9 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.v1.core.emails.send.response.smsResult.title",
-              description: "app.api.v1.core.emails.send.response.smsResult.description",
+              description:
+                "app.api.v1.core.emails.send.response.smsResult.description",
               layout: { type: LayoutType.GRID_2_COLUMNS },
-              collapsed: true,
             },
             { response: true },
             {
@@ -380,14 +393,16 @@ const { POST } = createEndpoint({
               messageId: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.emails.send.response.smsResult.messageId.label",
+                  content:
+                    "app.api.v1.core.emails.send.response.smsResult.messageId.label",
                 },
                 z.string().optional(),
               ),
               sentAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.emails.send.response.smsResult.sentAt.label",
+                  content:
+                    "app.api.v1.core.emails.send.response.smsResult.sentAt.label",
                 },
                 z.string().optional(),
               ),
@@ -401,7 +416,8 @@ const { POST } = createEndpoint({
               error: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.emails.send.response.smsResult.error.label",
+                  content:
+                    "app.api.v1.core.emails.send.response.smsResult.error.label",
                 },
                 z.string().optional(),
               ),
@@ -495,7 +511,7 @@ const { POST } = createEndpoint({
           senderName: "Test App",
         },
         campaignTracking: {
-          campaignType: CampaignType.MARKETING,
+          campaignType: CampaignType.NEWSLETTER,
           leadId: "lead_123456",
         },
         smsNotifications: {
@@ -594,10 +610,6 @@ export type EmailSendRequestInput = typeof POST.types.RequestInput;
 export type EmailSendRequestOutput = typeof POST.types.RequestOutput;
 export type EmailSendResponseInput = typeof POST.types.ResponseInput;
 export type EmailSendResponseOutput = typeof POST.types.ResponseOutput;
-
-// Export repository types for import standardization
-export type EmailSendRequestTypeOutput = EmailSendRequestOutput;
-export type EmailSendResponseTypeOutput = EmailSendResponseOutput;
 
 const definitions = { POST };
 export default definitions;

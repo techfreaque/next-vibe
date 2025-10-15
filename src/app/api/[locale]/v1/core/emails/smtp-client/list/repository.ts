@@ -14,23 +14,29 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { Countries, Languages } from "@/i18n/core/config";
 
 import { SortOrder } from "../../messages/enum";
-import { db, smtpAccounts } from "../db";
-import type { SmtpAccountResponseType } from "../definition";
-import type { SmtpAccountStatusFilter } from "../enum";
+import { smtpAccounts } from "../db";
 import { mapStatusFilter, SmtpAccountSortField } from "../enum";
 import type {
-  SmtpAccountsListRequestType,
-  SmtpAccountsListResponseType,
+  SmtpAccountsListGETRequestOutput,
+  SmtpAccountsListGETResponseOutput,
 } from "./definition";
+
+// Define the proper type for locale to match standardized patterns
+type CountryLanguage = `${Lowercase<Languages>}-${Countries}`;
 
 interface SmtpAccountsListRepository {
   listSmtpAccounts(
-    query: SmtpAccountsListRequestType,
+    data: SmtpAccountsListGETRequestOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpAccountsListResponseType>>;
+  ): Promise<ResponseType<SmtpAccountsListGETResponseOutput>>;
 }
 
 /**
@@ -42,45 +48,39 @@ class SmtpAccountsListRepositoryImpl implements SmtpAccountsListRepository {
    * Get list of SMTP accounts with filtering and pagination
    */
   async listSmtpAccounts(
-    query: SmtpAccountsListRequestType,
+    data: SmtpAccountsListGETRequestOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpAccountsListResponseType>> {
+  ): Promise<ResponseType<SmtpAccountsListGETResponseOutput>> {
     try {
-      logger.info("Getting SMTP accounts", { query });
+      logger.info("Getting SMTP accounts", { data, userId: user.id });
 
       // Build where conditions
       const whereConditions = [];
 
       // Status filter
-      const mappedStatus = mapStatusFilter(
-        query.status as SmtpAccountStatusFilter,
-      );
-      if (mappedStatus) {
-        whereConditions.push(eq(smtpAccounts.status, mappedStatus));
-      }
-
-      // Default account filter
-      if (
-        query.isDefault !== undefined &&
-        typeof query.isDefault === "boolean"
-      ) {
-        whereConditions.push(eq(smtpAccounts.isDefault, query.isDefault));
+      if (data.status) {
+        const mappedStatus = mapStatusFilter(data.status);
+        if (mappedStatus) {
+          whereConditions.push(eq(smtpAccounts.status, mappedStatus));
+        }
       }
 
       // Search filter
-      if (query.search && typeof query.search === "string") {
+      if (data.search) {
         whereConditions.push(
           or(
-            ilike(smtpAccounts.name, `%${query.search}%`),
-            ilike(smtpAccounts.description, `%${query.search}%`),
-            ilike(smtpAccounts.fromEmail, `%${query.search}%`),
+            ilike(smtpAccounts.name, `%${data.search}%`),
+            ilike(smtpAccounts.description, `%${data.search}%`),
+            ilike(smtpAccounts.fromEmail, `%${data.search}%`),
           ),
         );
       }
 
       // Build order by
-      const sortBy = query.sortBy || "createdAt";
-      const sortOrder = query.sortOrder || "desc";
+      const sortBy = data.sortBy || SmtpAccountSortField.CREATED_AT;
+      const sortOrder = data.sortOrder || SortOrder.DESC;
 
       // Get the sort column with proper type checking
       let sortColumn;
@@ -102,8 +102,8 @@ class SmtpAccountsListRepositoryImpl implements SmtpAccountsListRepository {
         sortOrder === SortOrder.ASC ? sortColumn : desc(sortColumn);
 
       // Pagination
-      const page = typeof query.page === "number" ? query.page : 1;
-      const limit = typeof query.limit === "number" ? query.limit : 20;
+      const page = data.page || 1;
+      const limit = data.limit || 20;
       const offset = (page - 1) * limit;
 
       // Get total count
@@ -126,50 +126,17 @@ class SmtpAccountsListRepositoryImpl implements SmtpAccountsListRepository {
         .limit(limit)
         .offset(offset);
 
-      // Transform to response format
-      const responseAccounts: SmtpAccountResponseType[] = accounts.map(
-        (account) => ({
-          id: account.id,
-          name: account.name,
-          description: account.description || undefined,
-          host: account.host,
-          port: account.port,
-          securityType: account.securityType,
-          username: account.username,
-
-          fromEmail: account.fromEmail,
-          connectionTimeout: account.connectionTimeout || undefined,
-          maxConnections: account.maxConnections || undefined,
-          rateLimitPerHour: account.rateLimitPerHour || undefined,
-          status: account.status,
-          isDefault: account.isDefault || undefined,
-          priority: account.priority || undefined,
-          healthCheckStatus: account.healthCheckStatus,
-          consecutiveFailures: account.consecutiveFailures || 0,
-          lastHealthCheck: account.lastHealthCheck?.toISOString() || null,
-          lastFailureAt: account.lastFailureAt?.toISOString() || null,
-          lastFailureReason: account.lastFailureReason,
-          emailsSentToday: account.emailsSentToday || 0,
-          emailsSentThisMonth: account.emailsSentThisMonth || 0,
-          totalEmailsSent: account.totalEmailsSent || 0,
-          lastUsedAt: account.lastUsedAt?.toISOString() || null,
-          metadata: account.metadata || undefined,
-          isExactMatch: false,
-          weight: 1,
-          isFailover: false,
-          failoverPriority: 0,
-          campaignTypes: account.campaignTypes || [],
-          emailJourneyVariants: account.emailJourneyVariants || [],
-          emailCampaignStages: account.emailCampaignStages || [],
-          countries: account.countries || [],
-          languages: account.languages || [],
-
-          createdBy: account.createdBy,
-          updatedBy: account.updatedBy,
-          createdAt: account.createdAt.toISOString(),
-          updatedAt: account.updatedAt.toISOString(),
-        }),
-      );
+      // Transform to response format - match endpoint definition exactly
+      const responseAccounts = accounts.map((account) => ({
+        id: account.id,
+        name: account.name,
+        status: account.status,
+        healthCheckStatus: account.healthCheckStatus,
+        priority: account.priority || 0,
+        totalEmailsSent: account.totalEmailsSent || 0,
+        lastUsedAt: account.lastUsedAt?.toISOString() || null,
+        createdAt: account.createdAt.toISOString(),
+      }));
 
       logger.info("SMTP accounts retrieved successfully", {
         count: accounts.length,
@@ -186,12 +153,11 @@ class SmtpAccountsListRepositoryImpl implements SmtpAccountsListRepository {
           total,
           totalPages,
         },
-        filters: query,
       });
     } catch (error) {
       logger.error("Error getting SMTP accounts", error);
       return createErrorResponse(
-        "leadsErrors.leads.get.error.server.title",
+        "app.api.v1.core.emails.smtpClient.list.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );

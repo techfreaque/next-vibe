@@ -13,7 +13,6 @@ import {
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { z } from "zod";
 
-import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import type {
   ExtractOutput,
   FieldUsage,
@@ -25,6 +24,7 @@ import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/e
 import { useTranslation } from "@/i18n/core/client";
 
 import type { EndpointLogger } from "../../../cli/vibe/endpoints/endpoint-handler/logger";
+import type { Methods } from "../../../cli/vibe/endpoints/endpoint-types/core/enums";
 import type { AnyData, ApiStore, QueryStoreType } from "../store";
 import { useApiStore } from "../store";
 import type { ApiQueryReturn } from "../types";
@@ -57,10 +57,7 @@ interface SerializableObject {
  * @returns Enhanced query result with extra loading state information
  */
 export function useApiQuery<
-  TExampleKey extends string,
-  TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TEndpoint extends CreateApiEndpoint<any, any, any, any>,
 >({
   endpoint,
   requestData,
@@ -68,25 +65,18 @@ export function useApiQuery<
   options,
   logger,
 }: {
-  endpoint: CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>;
+  endpoint: TEndpoint;
+
   logger: EndpointLogger;
-} & (ExtractOutput<
-  InferSchemaFromField<TFields, FieldUsage.RequestData>
-> extends never
+} & (TEndpoint["TRequestOutput"] extends never
   ? { requestData?: never }
   : {
-      requestData: ExtractOutput<
-        InferSchemaFromField<TFields, FieldUsage.RequestData>
-      >;
+      requestData: TEndpoint["TRequestOutput"];
     }) &
-  (ExtractOutput<
-    InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
-  > extends never
+  (TEndpoint["TUrlVariablesOutput"] extends never
     ? { urlParams?: never }
     : {
-        urlParams: ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
-        >;
+        urlParams: TEndpoint["TUrlVariablesOutput"];
       }) & {
     options: {
       queryKey?: QueryKey;
@@ -94,15 +84,9 @@ export function useApiQuery<
       staleTime?: number;
       cacheTime?: number;
       onSuccess?: (data: {
-        responseData: ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.Response>
-        >;
-        requestData: ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestData>
-        >;
-        urlParams: ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
-        >;
+        responseData: TEndpoint["TResponseOutput"];
+        requestData: TEndpoint["TRequestOutput"];
+        urlParams: TEndpoint["TUrlVariablesOutput"];
       }) => void;
       onError?: ({
         error,
@@ -110,12 +94,8 @@ export function useApiQuery<
         urlParams,
       }: {
         error: ErrorResponseType;
-        requestData: ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestData>
-        >;
-        urlParams: ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
-        >;
+        requestData: TEndpoint["TRequestOutput"];
+        urlParams: TEndpoint["TUrlVariablesOutput"];
       }) => void;
       disableLocalCache?: boolean;
       refreshDelay?: number;
@@ -131,13 +111,9 @@ export function useApiQuery<
       refetchOnWindowFocus?: boolean;
       retry?: number;
       refetchOnDependencyChange?: boolean;
-      initialData?: ExtractOutput<
-        InferSchemaFromField<TFields, FieldUsage.Response>
-      >;
+      initialData?: TEndpoint["TResponseOutput"];
     };
-  }): ApiQueryReturn<
-  ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
-> {
+  }): ApiQueryReturn<TEndpoint["TResponseOutput"]> {
   const {
     queryKey: customQueryKey,
     skipInitialFetch = false,
@@ -278,68 +254,59 @@ export function useApiQuery<
   const isInitialMount = useRef(true);
 
   // Create default state based on enabled option and existing store data
-  const defaultState: QueryStoreType<
-    ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
-  > = useMemo(() => {
-    if (options.enabled === false) {
+  const defaultState: QueryStoreType<TEndpoint["TResponseOutput"]> =
+    useMemo(() => {
+      if (options.enabled === false) {
+        return {
+          response: undefined,
+          data: undefined,
+          error: null,
+          isLoading: false,
+          isFetching: false,
+          isError: false,
+          isSuccess: false,
+          isLoadingFresh: false,
+          isCachedData: false,
+          statusMessage: "error.api.store.status.disabled" as const,
+          lastFetchTime: null,
+        };
+      }
+
+      // Check if we already have data in the store to avoid unnecessary loading states
+      const existingQuery = useApiStore.getState().queries[queryId];
+      if (existingQuery?.response?.success) {
+        // We have existing successful data, use it as the default state but not loading
+        return {
+          ...existingQuery,
+          isLoading: false,
+          isFetching: false,
+          isLoadingFresh: false,
+          isCachedData: true,
+        } as QueryStoreType<TEndpoint["TResponseOutput"]>;
+      }
+
+      // No existing data, start with loading state
       return {
         response: undefined,
-        data: undefined,
+        data: initialData,
         error: null,
-        isLoading: false,
-        isFetching: false,
+        isLoading: true,
+        isFetching: true,
         isError: false,
         isSuccess: false,
-        isLoadingFresh: false,
+        isLoadingFresh: true,
         isCachedData: false,
-        statusMessage: "error.api.store.status.disabled" as const,
+        statusMessage: "error.api.store.status.loading_data",
         lastFetchTime: null,
       };
-    }
-
-    // Check if we already have data in the store to avoid unnecessary loading states
-    const existingQuery = useApiStore.getState().queries[queryId];
-    if (existingQuery?.response?.success) {
-      // We have existing successful data, use it as the default state but not loading
-      return {
-        ...existingQuery,
-        isLoading: false,
-        isFetching: false,
-        isLoadingFresh: false,
-        isCachedData: true,
-      } as QueryStoreType<
-        ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
-      >;
-    }
-
-    // No existing data, start with loading state
-    return {
-      response: undefined,
-      data: initialData,
-      error: null,
-      isLoading: true,
-      isFetching: true,
-      isError: false,
-      isSuccess: false,
-      isLoadingFresh: true,
-      isCachedData: false,
-      statusMessage: "error.api.store.status.loading_data",
-      lastFetchTime: null,
-    };
-  }, [initialData, options.enabled, queryId]);
+    }, [initialData, options.enabled, queryId]);
 
   // Create a selector function for the store
   const selector = useCallback(
-    (
-      state: ApiStore,
-    ): QueryStoreType<
-      ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
-    > => {
+    (state: ApiStore): QueryStoreType<TEndpoint["TResponseOutput"]> => {
       const query = state.queries[queryId];
       return (
-        (query as QueryStoreType<
-          ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
-        >) ?? defaultState
+        (query as QueryStoreType<TEndpoint["TResponseOutput"]>) ?? defaultState
       );
     },
     [queryId, defaultState],
@@ -620,9 +587,7 @@ export function useApiQuery<
 
   // Refetch function
   const refetch = useCallback(async (): Promise<
-    ResponseType<
-      ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
-    >
+    ResponseType<TEndpoint["TResponseOutput"]>
   > => {
     try {
       const response = await executeQuery(
@@ -689,13 +654,7 @@ export function useApiQuery<
 
   // Helper function for updating query state
   const updateQueryState = useCallback(
-    (
-      updates: Partial<
-        QueryStoreType<
-          ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
-        >
-      >,
-    ) => {
+    (updates: Partial<QueryStoreType<TEndpoint["TResponseOutput"]>>) => {
       useApiStore.setState((state) => {
         const queries = { ...state.queries };
         const existingQuery = queries[queryId];
@@ -734,23 +693,14 @@ export function useApiQuery<
     };
 
     // Create the response object
-    const response:
-      | ResponseType<
-          ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
-        >
-      | undefined = queryState.isSuccess
-      ? createSuccessResponse(
-          queryState.data as ExtractOutput<
-            InferSchemaFromField<TFields, FieldUsage.Response>
-          >,
-        )
-      : queryState.isError && queryState.error
-        ? queryState.error
-        : undefined;
+    const response: ResponseType<TEndpoint["TResponseOutput"]> | undefined =
+      queryState.isSuccess
+        ? createSuccessResponse(queryState.data as TEndpoint["TResponseOutput"])
+        : queryState.isError && queryState.error
+          ? queryState.error
+          : undefined;
 
-    const result: ApiQueryReturn<
-      ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
-    > = {
+    const result: ApiQueryReturn<TEndpoint["TResponseOutput"]> = {
       response,
       // Backward compatibility properties
       data: queryState.data,

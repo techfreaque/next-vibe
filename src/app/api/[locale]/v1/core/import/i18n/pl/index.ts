@@ -8,93 +8,98 @@ export const translations: typeof enTranslations = {
   csv: {
     post: {
       title: "Importuj Dane CSV",
-      description: "Importuj dane z plików CSV z inteligentnym przetwarzaniem i walidacją",
-      
+      description:
+        "Importuj dane z plików CSV z inteligentnym przetwarzaniem i walidacją",
+
       form: {
         title: "Konfiguracja Importu CSV",
-        description: "Skonfiguruj ustawienia importu CSV dla optymalnych rezultatów",
+        description:
+          "Skonfiguruj ustawienia importu CSV dla optymalnych rezultatów",
       },
-      
+
       // === SEKCJA WGRYWANIA PLIKU ===
       fileSection: {
         title: "Wgrywanie Pliku",
         description: "Wybierz plik CSV i określ domenę docelową",
       },
-      
+
       file: {
         label: "Plik CSV",
         description: "Wybierz plik CSV do wgrania (max 10MB)",
         placeholder: "Wybierz plik CSV...",
-        helpText: "Obsługiwany format: CSV z wartościami oddzielonymi przecinkami. Pierwszy wiersz powinien zawierać nagłówki kolumn.",
+        helpText:
+          "Obsługiwany format: CSV z wartościami oddzielonymi przecinkami. Pierwszy wiersz powinien zawierać nagłówki kolumn.",
       },
-      
+
       fileName: {
         label: "Nazwa Pliku",
         description: "Nazwa tego importu (dla referencji)",
         placeholder: "np. Import Leadów Styczeń 2024",
       },
-      
+
       domain: {
         label: "Domena Importu",
         description: "Jaki typ danych importujesz?",
         placeholder: "Wybierz typ danych...",
       },
-      
+
       // === SEKCJA PRZETWARZANIA ===
       processingSection: {
         title: "Opcje Przetwarzania",
         description: "Skonfiguruj sposób przetwarzania twoich danych",
       },
-      
+
       skipDuplicates: {
         label: "Pomiń Duplikaty",
         description: "Pomiń rekordy z duplikowanymi adresami email",
-        helpText: "Zalecane: Zapobiega importowaniu tego samego kontaktu dwukrotnie",
+        helpText:
+          "Zalecane: Zapobiega importowaniu tego samego kontaktu dwukrotnie",
       },
-      
+
       updateExisting: {
         label: "Aktualizuj Istniejące",
         description: "Aktualizuj istniejące rekordy nowymi danymi z CSV",
-        helpText: "Jeśli niezaznaczone, istniejące rekordy pozostaną niezmienione",
+        helpText:
+          "Jeśli niezaznaczone, istniejące rekordy pozostaną niezmienione",
       },
-      
+
       useChunkedProcessing: {
         label: "Przetwarzanie w Tle",
         description: "Przetwarzaj duże pliki w tle",
         helpText: "Zalecane dla plików z więcej niż 500 rekordami",
       },
-      
+
       batchSize: {
         label: "Rozmiar Partii",
         description: "Liczba rekordów przetwarzanych jednocześnie",
         placeholder: "100",
         helpText: "Mniejsze partie są stabilniejsze, większe szybsze",
       },
-      
+
       // === SEKCJA WARTOŚCI DOMYŚLNYCH ===
       defaultsSection: {
         title: "Wartości Domyślne (Opcjonalne)",
         description: "Ustaw domyślne wartości dla rekordów bez tych informacji",
       },
-      
+
       defaultCountry: {
         label: "Domyślny Kraj",
         description: "Kraj dla rekordów bez lokalizacji",
         placeholder: "Wybierz kraj...",
       },
-      
+
       defaultLanguage: {
-        label: "Domyślny Język", 
+        label: "Domyślny Język",
         description: "Język dla rekordów bez preferencji językowych",
         placeholder: "Wybierz język...",
       },
-      
+
       // === ODPOWIEDŹ ===
       response: {
         title: "Wyniki Importu",
         description: "Podsumowanie operacji importu CSV",
       },
-      
+
       // === BŁĘDY ===
       errors: {
         validation: {
@@ -104,7 +109,8 @@ export const translations: typeof enTranslations = {
           emptyFileName: "Podaj nazwę tego importu",
           invalidDomain: "Wybierz prawidłową domenę importu",
           invalidBatchSize: "Rozmiar partii musi być między 10 a 1000",
-          fileTooLarge: "Rozmiar pliku przekracza limit 10MB. Rozważ przetwarzanie w tle.",
+          fileTooLarge:
+            "Rozmiar pliku przekracza limit 10MB. Rozważ przetwarzanie w tle.",
         },
         unauthorized: {
           title: "Dostęp Zabroniony",
@@ -116,51 +122,52 @@ export const translations: typeof enTranslations = {
         },
         server: {
           title: "Import Nieudany",
-          description: "Wystąpił błąd podczas przetwarzania importu. Spróbuj ponownie.",
+          description:
+            "Wystąpił błąd podczas przetwarzania importu. Spróbuj ponownie.",
         },
       },
-      
+
       success: {
         title: "Import Udany",
         description: "Twoje dane CSV zostały pomyślnie zaimportowane",
       },
     },
   },
-  
+
   // === ENDPOINT LISTY JOBÓW ===
   jobs: {
     get: {
       title: "Historia Jobów Importu",
       description: "Przeglądaj i zarządzaj swoimi jobami importu",
-      
+
       form: {
         title: "Filtruj Joby Importu",
         description: "Filtruj joby według statusu, daty lub innych kryteriów",
       },
-      
+
       status: {
         label: "Status Joba",
         description: "Filtruj według aktualnego statusu joba",
         placeholder: "Wszystkie statusy",
       },
-      
+
       limit: {
         label: "Wyników Na Stronę",
         description: "Liczba jobów do pokazania na stronę",
         placeholder: "20",
       },
-      
+
       offset: {
         label: "Przesunięcie Strony",
         description: "Pomiń tyle wyników (dla paginacji)",
         placeholder: "0",
       },
-      
+
       response: {
         title: "Joby Importu",
         description: "Historia twoich jobów importu i aktualny status",
       },
-      
+
       errors: {
         unauthorized: {
           title: "Dostęp Zabroniony",
@@ -171,14 +178,14 @@ export const translations: typeof enTranslations = {
           description: "Nie można pobrać historii jobów importu",
         },
       },
-      
+
       success: {
         title: "Joby Załadowane",
         description: "Pomyślnie pobrano historię jobów importu",
       },
     },
   },
-  
+
   // === TŁUMACZENIA ENUM ===
   enum: {
     // === STATUS JOBA ===
@@ -208,7 +215,7 @@ export const translations: typeof enTranslations = {
         description: "Przetwarzanie joba jest tymczasowo wstrzymane",
       },
     },
-    
+
     // === DOMENY IMPORTU ===
     domain: {
       leads: {
@@ -236,7 +243,7 @@ export const translations: typeof enTranslations = {
         description: "Szablony email i treści",
       },
     },
-    
+
     // === FORMATY PLIKÓW ===
     format: {
       csv: {
@@ -252,11 +259,11 @@ export const translations: typeof enTranslations = {
         description: "Dane JavaScript Object Notation",
       },
       tsv: {
-        label: "Plik TSV", 
+        label: "Plik TSV",
         description: "Wartości oddzielone tabulatorami",
       },
     },
-    
+
     // === TRYBY PRZETWARZANIA ===
     processing: {
       immediate: {
@@ -272,7 +279,7 @@ export const translations: typeof enTranslations = {
         description: "Zaplanuj przetwarzanie na określony czas",
       },
     },
-    
+
     // === TYPY BŁĘDÓW ===
     errorType: {
       validation: {
@@ -296,7 +303,7 @@ export const translations: typeof enTranslations = {
         description: "Wewnętrzny błąd systemu",
       },
     },
-    
+
     // === PRESETY ROZMIARU PARTII ===
     batchSize: {
       small: {
@@ -317,7 +324,7 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-  
+
   // === NASTĘPNE KROKI ===
   nextSteps: {
     reviewErrors: "Przejrzyj szczegóły błędów, aby zrozumieć co poszło nie tak",
@@ -330,14 +337,14 @@ export const translations: typeof enTranslations = {
     monitorProgress: "Monitoruj postęp w historii jobów",
     checkJobsList: "Sprawdź listę jobów dla szczegółowych aktualizacji statusu",
   },
-  
+
   // === KOMUNIKATY AKCJI ===
   errors: {
     cancel: {
       server: "Nie udało się anulować joba importu",
     },
     retry: {
-      server: "Nie udało się ponowić joba importu", 
+      server: "Nie udało się ponowić joba importu",
     },
     delete: {
       server: "Nie udało się usunąć joba importu",
@@ -346,11 +353,11 @@ export const translations: typeof enTranslations = {
       server: "Nie udało się pobrać statusu joba",
     },
   },
-  
+
   // === TAGI ===
   tags: {
     csv: "CSV",
-    upload: "Wgrywanie", 
+    upload: "Wgrywanie",
     batch: "Przetwarzanie Partiami",
     jobs: "Joby",
     status: "Status",

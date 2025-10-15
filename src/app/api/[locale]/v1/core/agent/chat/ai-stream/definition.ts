@@ -20,8 +20,6 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { ChatMessageRole } from "./enum";
-
 /**
  * Chat message schema
  */
@@ -117,6 +115,17 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.chat.aiStream.post.systemPrompt.placeholder",
         },
         z.string().max(2000).optional(),
+      ),
+      enableSearch: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.CHECKBOX,
+          label: "app.api.v1.core.agent.chat.aiStream.post.enableSearch.label",
+          description:
+            "app.api.v1.core.agent.chat.aiStream.post.enableSearch.description",
+          layout: { columns: 4 },
+        },
+        z.boolean().optional().default(false),
       ),
 
       // === RESPONSE FIELDS ===
@@ -300,10 +309,10 @@ const { POST } = createEndpoint({
 });
 
 // Extract types using the new enhanced system
-export type AiStreamPostRequestTypeInput = typeof POST.types.RequestInput;
-export type AiStreamPostRequestTypeOutput = typeof POST.types.RequestOutput;
-export type AiStreamPostResponseTypeInput = typeof POST.types.ResponseInput;
-export type AiStreamPostResponseTypeOutput = typeof POST.types.ResponseOutput;
+export type AiStreamPostRequestInput = typeof POST.types.RequestInput;
+export type AiStreamPostRequestOutput = typeof POST.types.RequestOutput;
+export type AiStreamPostResponseInput = typeof POST.types.ResponseInput;
+export type AiStreamPostResponseOutput = typeof POST.types.ResponseOutput;
 
 /**
  * Export definitions

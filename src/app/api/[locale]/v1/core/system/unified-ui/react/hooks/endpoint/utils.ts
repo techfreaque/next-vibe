@@ -14,9 +14,9 @@ interface EndpointLike {
 /**
  * Utility to detect available HTTP methods from endpoints object
  */
-export function useAvailableMethods<T extends Record<Methods, EndpointLike>>(
-  endpoints: T,
-): Methods[] {
+export function useAvailableMethods<
+  T extends Partial<Record<Methods, EndpointLike>>,
+>(endpoints: T): Methods[] {
   return useMemo(() => {
     return Object.keys(endpoints).filter((method) =>
       ["GET", "POST", "PUT", "PATCH", "DELETE"].includes(method),

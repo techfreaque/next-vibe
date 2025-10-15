@@ -65,7 +65,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.newsletter.unsubscribe.email.placeholder" as const,
           layout: { columns: 12 },
         },
-        z.email(),
+        z.string().email(),
       ),
 
       // === RESPONSE FIELDS ===

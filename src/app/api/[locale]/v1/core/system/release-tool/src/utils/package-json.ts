@@ -8,15 +8,29 @@ import type { PackageJson, ReleasePackage } from "../types/index.js";
 import { logger, loggerError } from "./logger.js";
 
 /**
+ * Type guard to validate if parsed JSON matches PackageJson structure
+ */
+function isPackageJson(value: unknown): value is PackageJson {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const obj = value as Record<string, unknown>;
+  return typeof obj.name === "string" && typeof obj.version === "string";
+}
+
+/**
  * Reads the package.json file for a package and returns its contents.
  */
 export function getPackageJson(cwd: string): PackageJson {
   const packageJsonPath = join(cwd, "package.json");
   if (!existsSync(packageJsonPath)) {
-    // eslint-disable-next-line no-restricted-syntax
     throw new Error(`No package.json found in ${packageJsonPath}`);
   }
-  return JSON.parse(readFileSync(packageJsonPath, "utf8")) as PackageJson;
+  const parsedJson: unknown = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+  if (!isPackageJson(parsedJson)) {
+    throw new Error(`Invalid package.json format in ${packageJsonPath}`);
+  }
+  return parsedJson;
 }
 
 /**
@@ -65,15 +79,13 @@ export async function updateDependencies(
     execSync(`${packageManager} install`, {
       cwd,
       stdio: "inherit",
-      // eslint-disable-next-line node/no-process-env
-      env: process.env,
+      env: { ...process.env },
     });
   } catch (error) {
     loggerError(
       `Error updating dependencies for ${pkg.directory}. Continuing with release process.`,
       error,
     );
-    // eslint-disable-next-line no-restricted-syntax
     throw error;
   }
 }

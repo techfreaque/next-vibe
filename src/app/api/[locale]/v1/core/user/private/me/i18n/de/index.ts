@@ -85,24 +85,25 @@ export const translations: typeof enTranslations = {
           invalid: "Bitte geben Sie eine gültige E-Mail-Adresse ein",
         },
       },
-      firstName: {
-        label: "Vorname",
-        description: "Ihr Vorname",
-        placeholder: "Geben Sie Ihren Vornamen ein",
-        help: "Ihr Vorname wird in Ihrem Profil angezeigt",
+      privateName: {
+        label: "Privater Name",
+        description: "Ihr interner/privater Name",
+        placeholder: "Geben Sie Ihren privaten Namen ein",
+        help: "Ihr privater Name wird intern und für private Kommunikation verwendet",
         validation: {
-          minLength: "Der Vorname muss mindestens 2 Zeichen lang sein",
-          maxLength: "Der Vorname darf nicht länger als 50 Zeichen sein",
+          minLength: "Der private Name muss mindestens 2 Zeichen lang sein",
+          maxLength: "Der private Name darf nicht länger als 50 Zeichen sein",
         },
       },
-      lastName: {
-        label: "Nachname",
-        description: "Ihr Nachname",
-        placeholder: "Geben Sie Ihren Nachnamen ein",
-        help: "Ihr Nachname wird in Ihrem Profil angezeigt",
+      publicName: {
+        label: "Öffentlicher Name",
+        description: "Ihr öffentlicher Anzeigename",
+        placeholder: "Geben Sie Ihren öffentlichen Namen ein",
+        help: "Ihr öffentlicher Name wird für andere Benutzer sichtbar sein",
         validation: {
-          minLength: "Der Nachname muss mindestens 2 Zeichen lang sein",
-          maxLength: "Der Nachname darf nicht länger als 50 Zeichen sein",
+          minLength: "Der öffentliche Name muss mindestens 2 Zeichen lang sein",
+          maxLength:
+            "Der öffentliche Name darf nicht länger als 50 Zeichen sein",
         },
       },
       imageUrl: {

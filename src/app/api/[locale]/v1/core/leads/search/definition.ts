@@ -19,18 +19,22 @@ import {
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { Countries, Languages } from "@/i18n/core/config";
 
-import { LeadSource, LeadStatus } from "../enum";
+import { EmailCampaignStage, LeadSource, LeadStatus } from "../enum";
 
 // Inline schema to avoid deprecated schema.ts imports
 const leadResponseSchema = z.object({
   id: z.uuid(),
   email: z.email(),
   businessName: z.string().min(1).max(255),
-  phone: z.string().regex(/^\+?[1-9]\d{1,14}$/).optional(),
+  phone: z
+    .string()
+    .regex(/^\+?[1-9]\d{1,14}$/)
+    .optional(),
   website: z.string().url().optional(),
-  country: z.string(),
-  language: z.string(),
+  country: z.nativeEnum(Countries),
+  language: z.nativeEnum(Languages),
   status: z.nativeEnum(LeadStatus),
   source: z.nativeEnum(LeadSource).optional(),
   notes: z.string().max(1000).optional(),
@@ -39,7 +43,7 @@ const leadResponseSchema = z.object({
   signedUpAt: z.string().datetime().nullable(),
   consultationBookedAt: z.string().datetime().nullable(),
   subscriptionConfirmedAt: z.string().datetime().nullable(),
-  currentCampaignStage: z.string().nullable(),
+  currentCampaignStage: z.nativeEnum(EmailCampaignStage).nullable(),
   emailsSent: z.number(),
   lastEmailSentAt: z.string().datetime().nullable(),
   unsubscribedAt: z.string().datetime().nullable(),
@@ -62,8 +66,11 @@ const { GET } = createEndpoint({
 
   title: "app.api.v1.core.leads.search.get.title" as const,
   description: "app.api.v1.core.leads.search.get.description" as const,
-  category: "app.api.v1.core.category" as const,
-  tags: ["app.api.v1.core.tags.leads" as const, "app.api.v1.core.tags.search" as const],
+  category: "app.api.v1.core.leads.category" as const,
+  tags: [
+    "app.api.v1.core.leads.tags.leads" as const,
+    "app.api.v1.core.leads.tags.search" as const,
+  ],
 
   fields: objectField(
     {
@@ -131,12 +138,14 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.v1.core.leads.search.get.errors.unauthorized.title" as const,
+      title:
+        "app.api.v1.core.leads.search.get.errors.unauthorized.title" as const,
       description:
         "app.api.v1.core.leads.search.get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.v1.core.leads.search.get.errors.validation.title" as const,
+      title:
+        "app.api.v1.core.leads.search.get.errors.validation.title" as const,
       description:
         "app.api.v1.core.leads.search.get.errors.validation.description" as const,
     },
@@ -180,59 +189,16 @@ const { GET } = createEndpoint({
 
   successTypes: {
     title: "app.api.v1.core.leads.search.get.success.title" as const,
-    description: "app.api.v1.core.leads.search.get.success.description" as const,
+    description:
+      "app.api.v1.core.leads.search.get.success.description" as const,
   },
 
   examples: {
-    requests: {
-      default: {
-        search: "acme",
-        limit: 10,
-        offset: 0,
-      },
-      withFilters: {
-        search: "corp",
-        limit: 20,
-        offset: 10,
-      },
+    urlPathVariables: {
+      success: {},
     },
     responses: {
-      default: {
-        response: {
-          leads: [
-            {
-              id: "123e4567-e89b-12d3-a456-426614174000",
-              email: "contact@acme.com",
-              businessName: "Acme Corp",
-              phone: "+1234567890",
-              website: "https://acme.com",
-              country: "GLOBAL",
-              language: "en",
-              status: "NEW",
-              source: "WEBSITE",
-              notes: "Interested in premium features",
-              convertedUserId: null,
-              convertedAt: null,
-              signedUpAt: null,
-              consultationBookedAt: null,
-              subscriptionConfirmedAt: null,
-              currentCampaignStage: null,
-              emailsSent: 0,
-              lastEmailSentAt: null,
-              unsubscribedAt: null,
-              emailsOpened: 0,
-              emailsClicked: 0,
-              lastEngagementAt: null,
-              metadata: {},
-              createdAt: "2023-01-01T00:00:00.000Z",
-              updatedAt: "2023-01-01T00:00:00.000Z",
-            },
-          ],
-          total: 1,
-          hasMore: false,
-        },
-      },
-      withFilters: {
+      success: {
         response: {
           leads: [],
           total: 0,
@@ -240,18 +206,65 @@ const { GET } = createEndpoint({
         },
       },
     },
-    urlPathVariables: {
-      default: {},
-      withFilters: {},
-    },
   },
+
+  /* examples: {
+    default: {
+      search: "acme",
+      limit: 10,
+      offset: 0,
+      response: {
+        leads: [
+          {
+            id: "123e4567-e89b-12d3-a456-426614174000",
+            email: "contact@acme.com",
+            businessName: "Acme Corp",
+            phone: "+1234567890",
+            website: "https://acme.com",
+            country: "GLOBAL",
+            language: "en",
+            status: "NEW",
+            source: "WEBSITE",
+            notes: "Interested in premium features",
+            convertedUserId: null,
+            convertedAt: null,
+            signedUpAt: null,
+            consultationBookedAt: null,
+            subscriptionConfirmedAt: null,
+            currentCampaignStage: null,
+            emailsSent: 0,
+            lastEmailSentAt: null,
+            unsubscribedAt: null,
+            emailsOpened: 0,
+            emailsClicked: 0,
+            lastEngagementAt: null,
+            metadata: {},
+            createdAt: "2023-01-01T00:00:00.000Z",
+            updatedAt: "2023-01-01T00:00:00.000Z",
+          },
+        ],
+        total: 1,
+        hasMore: false,
+      },
+    },
+    withFilters: {
+      search: "corp",
+      limit: 20,
+      offset: 10,
+      response: {
+        leads: [],
+        total: 0,
+        hasMore: false,
+      },
+    },
+  }, */
 });
 
 // Extract types using the new enhanced system
-export type LeadSearchGetRequestTypeInput = typeof GET.types.RequestInput;
-export type LeadSearchGetRequestTypeOutput = typeof GET.types.RequestOutput;
-export type LeadSearchGetResponseTypeInput = typeof GET.types.ResponseInput;
-export type LeadSearchGetResponseTypeOutput = typeof GET.types.ResponseOutput;
+export type LeadSearchGetRequestInput = typeof GET.types.RequestInput;
+export type LeadSearchGetRequestOutput = typeof GET.types.RequestOutput;
+export type LeadSearchGetResponseInput = typeof GET.types.ResponseInput;
+export type LeadSearchGetResponseOutput = typeof GET.types.ResponseOutput;
 
 /**
  * Export definitions

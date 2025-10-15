@@ -6,4 +6,4 @@ export const translations: typeof enTranslations = {
     pixel: "Pixel",
   },
   // Add endpoint-specific translations here
-} ;
+};

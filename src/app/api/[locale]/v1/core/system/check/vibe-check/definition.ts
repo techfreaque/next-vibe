@@ -93,7 +93,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.check.vibeCheck.fields.timeoutSeconds.description",
           layout: { columns: 4 },
         },
-        z.number().min(1).max(3600).default(360),
+        z.number().min(1).max(3600).default(3600),
       ),
 
       paths: requestDataField(

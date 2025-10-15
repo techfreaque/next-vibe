@@ -1,3 +1,5 @@
+import { translations as widgetsTranslations } from "../../widgets/i18n/en";
+
 export const translations = {
   post: {
     title: "Cli Ui",
@@ -49,4 +51,18 @@ export const translations = {
       description: "Operation completed successfully",
     },
   },
+  helpHandler: {
+    noDescription: "No description",
+    flagDataDesc: "JSON data payload for the request",
+    flagUserTypeDesc: "User type (ADMIN, CUSTOMER, PUBLIC)",
+    flagLocaleDesc: "Locale for the request",
+    flagOutputDesc: "Output format (json, pretty)",
+    flagVerboseDesc: "Show verbose output",
+    flagDryRunDesc: "Show what would be executed without running",
+    usageLabel: "Usage",
+    availableCommandsLabel: "Available Commands",
+    globalOptionsLabel: "Global Options",
+    examplesLabel: "Examples",
+  },
+  widgets: widgetsTranslations,
 };

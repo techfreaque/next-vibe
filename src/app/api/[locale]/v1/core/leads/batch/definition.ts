@@ -60,6 +60,7 @@ const { PATCH } = createEndpoint({
       description:
         "app.api.v1.core.leads.batch.patch.form.description" as const,
       layout: { type: LayoutType.STACKED },
+      children: [],
     },
     { request: "data", response: true },
     {
@@ -156,6 +157,7 @@ const { PATCH } = createEndpoint({
           description:
             "app.api.v1.core.leads.batch.patch.updates.description" as const,
           layout: { type: LayoutType.GRID_2_COLUMNS },
+          children: [],
         },
         { request: "data" },
         {
@@ -216,6 +218,7 @@ const { PATCH } = createEndpoint({
           description:
             "app.api.v1.core.leads.batch.patch.response.description" as const,
           layout: { type: LayoutType.STACKED },
+          children: [],
         },
         { response: true },
         {
@@ -263,11 +266,26 @@ const { PATCH } = createEndpoint({
                   id: z.string(),
                   email: z.string().nullable(),
                   businessName: z.string(),
-                  currentStatus: z.string(),
-                  currentCampaignStage: z.string().nullable(),
+                  currentStatus: z.nativeEnum(LeadStatus),
+                  currentCampaignStage: z
+                    .nativeEnum(EmailCampaignStage)
+                    .nullable(),
                 }),
               )
               .optional(),
+          ),
+          errors: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.leads.batch.patch.response.errors" as const,
+            },
+            z.array(
+              z.object({
+                leadId: z.string(),
+                error: z.string(),
+              }),
+            ),
           ),
         },
       ),
@@ -357,6 +375,7 @@ const { PATCH } = createEndpoint({
           totalMatched: 50,
           totalProcessed: 45,
           totalUpdated: 45,
+          errors: [],
         },
       },
     },
@@ -386,6 +405,7 @@ const { DELETE } = createEndpoint({
       description:
         "app.api.v1.core.leads.batch.delete.form.description" as const,
       layout: { type: LayoutType.STACKED },
+      children: [],
     },
     { request: "data", response: true },
     {
@@ -453,6 +473,7 @@ const { DELETE } = createEndpoint({
           description:
             "app.api.v1.core.leads.batch.delete.response.description" as const,
           layout: { type: LayoutType.STACKED },
+          children: [],
         },
         { response: true },
         {
@@ -500,11 +521,26 @@ const { DELETE } = createEndpoint({
                   id: z.string(),
                   email: z.string().nullable(),
                   businessName: z.string(),
-                  currentStatus: z.string(),
-                  currentCampaignStage: z.string().nullable(),
+                  currentStatus: z.nativeEnum(LeadStatus),
+                  currentCampaignStage: z
+                    .nativeEnum(EmailCampaignStage)
+                    .nullable(),
                 }),
               )
               .optional(),
+          ),
+          errors: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.leads.batch.delete.response.errors" as const,
+            },
+            z.array(
+              z.object({
+                leadId: z.string(),
+                error: z.string(),
+              }),
+            ),
           ),
         },
       ),
@@ -588,6 +624,7 @@ const { DELETE } = createEndpoint({
           totalMatched: 10,
           totalProcessed: 10,
           totalDeleted: 10,
+          errors: [],
         },
       },
     },
@@ -595,19 +632,19 @@ const { DELETE } = createEndpoint({
 });
 
 // Extract types using the new enhanced system
-export type BatchUpdateRequestTypeInput = typeof PATCH.types.RequestInput;
-export type BatchUpdateRequestTypeOutput = typeof PATCH.types.RequestOutput;
-export type BatchUpdateResponseTypeInput = typeof PATCH.types.ResponseInput;
-export type BatchUpdateResponseTypeOutput = typeof PATCH.types.ResponseOutput;
+export type BatchUpdateRequestInput = typeof PATCH.types.RequestInput;
+export type BatchUpdateRequestOutput = typeof PATCH.types.RequestOutput;
+export type BatchUpdateResponseInput = typeof PATCH.types.ResponseInput;
+export type BatchUpdateResponseOutput = typeof PATCH.types.ResponseOutput;
 
-export type BatchDeleteRequestTypeInput = typeof DELETE.types.RequestInput;
-export type BatchDeleteRequestTypeOutput = typeof DELETE.types.RequestOutput;
-export type BatchDeleteResponseTypeInput = typeof DELETE.types.ResponseInput;
-export type BatchDeleteResponseTypeOutput = typeof DELETE.types.ResponseOutput;
+export type BatchDeleteRequestInput = typeof DELETE.types.RequestInput;
+export type BatchDeleteRequestOutput = typeof DELETE.types.RequestOutput;
+export type BatchDeleteResponseInput = typeof DELETE.types.ResponseInput;
+export type BatchDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
 
 // Extract nested response types for repository use (unwrapped from endpoint response structure)
-export type BatchUpdateResponseData = BatchUpdateResponseTypeOutput["response"];
-export type BatchDeleteResponseData = BatchDeleteResponseTypeOutput["response"];
+export type BatchUpdateResponseData = BatchUpdateResponseOutput["response"];
+export type BatchDeleteResponseData = BatchDeleteResponseOutput["response"];
 
 /**
  * Export definitions

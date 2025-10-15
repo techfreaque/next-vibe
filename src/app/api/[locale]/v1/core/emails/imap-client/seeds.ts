@@ -4,13 +4,12 @@
  */
 
 import { eq } from "drizzle-orm";
-
-import { registerSeed } from "@/packages/next-vibe/server/db/seed-manager";
 import { env } from "next-vibe/server/env";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import { registerSeed } from "@/packages/next-vibe/server/db/seed-manager";
 
+import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { imapAccounts, type NewImapAccount } from "../messages/db";
 import { ImapAuthMethod, ImapSpecialUseType, ImapSyncStatus } from "./enum";
 
@@ -19,13 +18,14 @@ import { ImapAuthMethod, ImapSpecialUseType, ImapSyncStatus } from "./enum";
  */
 function getImapSeedConfig(): NewImapAccount {
   // Required account-specific environment variables
-  const name = env.IMAP_SEED_ACCOUNT_NAME;
-  const email = env.IMAP_SEED_EMAIL;
-  const host = env.IMAP_SEED_HOST;
-  const username = env.IMAP_SEED_USERNAME;
-  const password = env.IMAP_SEED_PASSWORD;
-  const port = env.IMAP_SEED_PORT;
-  const secure = env.IMAP_SEED_SECURE;
+  const name = env.IMAP_SEED_ACCOUNT_NAME || "Development IMAP Account";
+  const email = env.IMAP_SEED_EMAIL || "test@example.com";
+  const host = env.IMAP_SEED_HOST || "imap.gmail.com";
+  const username = env.IMAP_SEED_USERNAME || "";
+  const password = env.IMAP_SEED_PASSWORD || "";
+  const port = env.IMAP_SEED_PORT || 993;
+  const secure =
+    env.IMAP_SEED_SECURE !== undefined ? env.IMAP_SEED_SECURE : true;
 
   // Hardcoded settings for consistency
   const authMethod = ImapAuthMethod.PLAIN;

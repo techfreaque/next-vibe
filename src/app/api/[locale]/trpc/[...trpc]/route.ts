@@ -6,15 +6,13 @@
 
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import type { NextRequest } from "next/server";
-import {
-  type CountryLanguage,
-  CountryLanguageValues,
-  defaultLocale,
-} from "@/i18n/core/config";
-import { debugLogger } from "next-vibe/shared/utils";
 import { validateData } from "next-vibe/shared/utils";
 import { z } from "zod";
 
+import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
+import type { ResponseType } from "@/packages/next-vibe/shared";
+
+import { createEndpointLogger } from "../../v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { createTRPCContext } from "../../v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/trpc/trpc-context";
 import { appRouter } from "./router";
 
@@ -27,18 +25,20 @@ async function handler(
   { params }: { params: Promise<{ locale: CountryLanguage; trpc: string[] }> },
 ): Promise<Response> {
   const { locale: rawLocale } = await params;
+  const logger = createEndpointLogger(false, Date.now(), rawLocale);
 
   // Validate locale parameter
   const localeValidation = validateData(
     rawLocale,
     z.string(),
-  );
+    logger,
+  ) as ResponseType<CountryLanguage>;
   const locale = localeValidation.success
     ? localeValidation.data
     : defaultLocale;
 
   if (!localeValidation.success) {
-    debugLogger("Invalid locale in tRPC request, using default", {
+    logger.error("Invalid locale in tRPC request, using default", {
       requestedLocale: rawLocale,
       defaultLocale,
       url: req.url,
@@ -52,12 +52,13 @@ async function handler(
     createContext: async () => {
       return await createTRPCContext({
         req,
-        // Pass additional context for URL parameters if needed
         urlParams: { locale },
+        logger,
+        locale,
       });
     },
     onError: ({ error, path, type }) => {
-      debugLogger(`tRPC Error [${type}] on ${path}:`, {
+      logger.error(`tRPC Error [${type}] on ${path}:`, {
         error: error.message,
         code: error.code,
         cause: error.cause,

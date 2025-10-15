@@ -1,3 +1,7 @@
+import type { RefObject } from "react";
+
+import { TIMING } from "../config/constants";
+
 /**
  * Utility function to send a suggested prompt
  * Sets the input value and triggers form submission
@@ -5,7 +9,7 @@
 export function sendSuggestedPrompt(
   prompt: string,
   setInput: (value: string) => void,
-  inputRef: React.RefObject<HTMLTextAreaElement | null>
+  inputRef: RefObject<HTMLTextAreaElement | null>,
 ): void {
   setInput(prompt);
 
@@ -17,6 +21,5 @@ export function sendSuggestedPrompt(
         form.requestSubmit();
       }
     }
-  }, 100);
+  }, TIMING.SUGGESTED_PROMPT_SUBMIT_DELAY);
 }
-

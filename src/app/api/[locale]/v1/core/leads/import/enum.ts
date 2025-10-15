@@ -13,7 +13,6 @@ export const {
   enum: CsvImportJobStatus,
   options: CsvImportJobStatusOptions,
   Value: CsvImportJobStatusValue,
-  
 } = createEnumOptions({
   PENDING: "app.api.v1.core.leads.import.enums.csvImportJobStatus.pending",
   PROCESSING:

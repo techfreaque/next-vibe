@@ -2,53 +2,68 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
+    title: "Import-Job stoppen",
+    description: "Einen laufenden Import-Job stoppen",
+    jobId: {
+      label: "Job-ID",
+      description: "Eindeutige Kennung für den zu stoppenden Import-Job",
+    },
     form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
+      title: "Import-Job stoppen",
+      description: "Den laufenden Import-Job stoppen",
     },
     response: {
-      title: "Antwort",
-      description: "Antwortdaten",
+      title: "Stoppergebnis",
+      description: "Ergebnis der Stoppoperation",
+      success: {
+        content: "Erfolgsstatus",
+      },
+      message: {
+        content: "Stoppnachricht",
+      },
     },
     errors: {
-      unauthorized: {
-        title: "Nicht autorisiert",
-        description: "Authentifizierung erforderlich",
-      },
       validation: {
         title: "Validierungsfehler",
-        description: "Ungültige Anfrageparameter",
+        description: "Die angegebene Job-ID ist ungültig",
+      },
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Authentifizierung erforderlich, um Jobs zu stoppen",
+      },
+      forbidden: {
+        title: "Zugriff verweigert",
+        description: "Sie haben keine Berechtigung, diesen Job zu stoppen",
+      },
+      notFound: {
+        title: "Job nicht gefunden",
+        description: "Kein Import-Job mit der angegebenen ID gefunden",
       },
       server: {
         title: "Serverfehler",
-        description: "Interner Serverfehler",
+        description: "Beim Stoppen des Jobs ist ein Fehler aufgetreten",
       },
       unknown: {
         title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist aufgetreten",
+        description: "Ein unerwarteter Fehler ist aufgetreten",
       },
       network: {
         title: "Netzwerkfehler",
-        description: "Netzwerkfehler aufgetreten",
+        description: "Verbindung zum Server nicht möglich",
       },
-      forbidden: {
-        title: "Verboten",
-        description: "Zugriff verboten",
-      },
-      notFound: {
-        title: "Nicht gefunden",
-        description: "Ressource nicht gefunden",
+      unsavedChanges: {
+        title: "Nicht gespeicherte Änderungen",
+        description: "Sie haben nicht gespeicherte Änderungen",
       },
       conflict: {
-        title: "Konflikt",
-        description: "Datenkonflikt aufgetreten",
+        title: "Stoppkonflikt",
+        description:
+          "Job kann nicht gestoppt werden, wenn er nicht verarbeitet wird",
       },
     },
     success: {
       title: "Erfolg",
-      description: "Vorgang erfolgreich abgeschlossen",
+      description: "Import-Job erfolgreich gestoppt",
     },
   },
-} ;
+};

@@ -90,4 +90,32 @@ export const translations = {
       description: "You have been successfully subscribed to our newsletter",
     },
   },
+  repository: {
+    starting: "Starting newsletter subscription",
+    linking_to_lead: "Linking newsletter subscription to lead",
+    lead_found: "Lead found for newsletter subscription",
+    lead_updated: "Lead updated with newsletter subscription data",
+    lead_update_failed: "Failed to update lead with newsletter data",
+    lead_not_found: "Lead not found or not eligible for update",
+    lead_linking_error: "Error during lead linking from newsletter",
+    missing_lead_id: "Newsletter subscription attempted without leadId",
+    already_subscribed: "User already subscribed to newsletter",
+    reactivating: "Reactivating newsletter subscription",
+    creating_new: "Creating new newsletter subscription",
+    created_successfully: "Successfully created newsletter subscription",
+    subscription_failed: "Newsletter subscription failed",
+  },
+  sms: {
+    no_phone_number: "No phone number available for newsletter welcome SMS",
+    sending_welcome: "Sending welcome SMS to newsletter subscriber",
+    welcome_error: "Error sending newsletter welcome SMS",
+    no_admin_phone:
+      "No admin phone number configured, skipping SMS notification",
+    sending_admin_notification:
+      "Sending admin notification SMS for newsletter subscription",
+    admin_notification_error: "Error sending admin notification SMS",
+  },
+  route: {
+    sms_failed_continuing: "SMS notifications failed but continuing",
+  },
 };

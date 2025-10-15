@@ -85,24 +85,24 @@ export const translations: typeof enTranslations = {
           invalid: "Wprowadź prawidłowy adres e-mail",
         },
       },
-      firstName: {
-        label: "Imię",
-        description: "Twoje imię",
-        placeholder: "Wprowadź swoje imię",
-        help: "Twoje imię będzie wyświetlane w profilu",
+      privateName: {
+        label: "Nazwa prywatna",
+        description: "Twoja nazwa wewnętrzna/prywatna",
+        placeholder: "Wprowadź swoją nazwę prywatną",
+        help: "Twoja prywatna nazwa jest używana wewnętrznie i do prywatnej komunikacji",
         validation: {
-          minLength: "Imię musi mieć co najmniej 2 znaki",
-          maxLength: "Imię nie może przekraczać 50 znaków",
+          minLength: "Nazwa prywatna musi mieć co najmniej 2 znaki",
+          maxLength: "Nazwa prywatna nie może przekraczać 50 znaków",
         },
       },
-      lastName: {
-        label: "Nazwisko",
-        description: "Twoje nazwisko",
-        placeholder: "Wprowadź swoje nazwisko",
-        help: "Twoje nazwisko będzie wyświetlane w profilu",
+      publicName: {
+        label: "Nazwa publiczna",
+        description: "Twoja publiczna nazwa wyświetlana",
+        placeholder: "Wprowadź swoją nazwę publiczną",
+        help: "Twoja publiczna nazwa będzie widoczna dla innych użytkowników",
         validation: {
-          minLength: "Nazwisko musi mieć co najmniej 2 znaki",
-          maxLength: "Nazwisko nie może przekraczać 50 znaków",
+          minLength: "Nazwa publiczna musi mieć co najmniej 2 znaki",
+          maxLength: "Nazwa publiczna nie może przekraczać 50 znaków",
         },
       },
       imageUrl: {

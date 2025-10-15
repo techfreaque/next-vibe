@@ -1,4 +1,4 @@
-import type { JSX } from "react";
+import React, { type JSX } from "react";
 
 /**
  * Loading component displayed during initial page load and data fetching

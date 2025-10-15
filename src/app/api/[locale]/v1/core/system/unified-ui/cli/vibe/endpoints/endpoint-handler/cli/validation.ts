@@ -12,7 +12,7 @@ import type { z } from "zod";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { Methods } from "../../endpoint-types/core/enums";
+import type { Methods } from "../../endpoint-types/core/enums";
 import type { UnifiedField } from "../../endpoint-types/core/types";
 import type { CreateApiEndpoint } from "../../endpoint-types/endpoint/create";
 import {
@@ -51,7 +51,7 @@ export function validateCliRequestData<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TFields,
 >(
   endpoint: CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
   context: CliValidationContext<TRequestInput, TUrlVariablesInput>,

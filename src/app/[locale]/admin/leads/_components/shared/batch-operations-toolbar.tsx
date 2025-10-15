@@ -126,17 +126,17 @@ export function BatchOperationsToolbar({
       case "status":
         return Object.values(LeadStatus).map((status) => ({
           value: status,
-          label: t(status)
+          label: t(status),
         }));
       case "currentCampaignStage":
         return Object.values(EmailCampaignStage).map((stage) => ({
           value: stage,
-          label: t(stage)
+          label: t(stage),
         }));
       case "source":
         return Object.values(LeadSource).map((source) => ({
           value: source,
-          label: t(source)
+          label: t(source),
         }));
       default:
         return [];

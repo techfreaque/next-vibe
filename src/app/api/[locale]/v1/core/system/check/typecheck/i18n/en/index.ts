@@ -5,6 +5,24 @@ export const translations = {
   category: "System Checks",
   tag: "typecheck",
 
+  // Enum translations
+  status: {
+    passed: "Passed",
+    failed: "Failed",
+    running: "Running",
+    skipped: "Skipped",
+  },
+  severity: {
+    error: "Error",
+    warning: "Warning",
+    info: "Info",
+  },
+  mode: {
+    full: "Full",
+    incremental: "Incremental",
+    watch: "Watch",
+  },
+
   // Container
   container: {
     title: "TypeScript Type Check Configuration",
@@ -31,6 +49,7 @@ export const translations = {
 
   // Response fields
   response: {
+    successMessage: "TypeScript type check completed successfully",
     issue: {
       title: "TypeScript Issue",
       description: "Individual TypeScript type checking issue",
@@ -38,6 +57,8 @@ export const translations = {
       line: "Line number of the issue",
       column: "Column number of the issue",
       code: "TypeScript error code",
+      severity: "Issue severity level",
+      type: "Issue type",
       message: "Issue description message",
     },
   },
@@ -79,6 +100,14 @@ export const translations = {
     conflict: {
       title: "Conflict",
       description: "A data conflict occurred",
+    },
+    noTsFiles: {
+      title: "No TypeScript Files Found",
+      message: "No TypeScript files found in the specified path",
+    },
+    invalidCommand: {
+      title: "Invalid Command",
+      message: "The TypeScript check command is invalid or missing",
     },
   },
 

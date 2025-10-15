@@ -9,7 +9,12 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { Lead } from "../../../db";
-import type { EmailCampaignStage, EmailJourneyVariant } from "../../../enum";
+import type {
+  EmailCampaignStage,
+  EmailCampaignStageValues,
+  EmailJourneyVariant,
+  EmailJourneyVariantValues,
+} from "../../../enum";
 
 /**
  * Email Template Data Interface
@@ -23,8 +28,8 @@ export interface EmailTemplateData {
   companyEmail: string;
   campaign: {
     id: string;
-    stage: EmailCampaignStage;
-    journeyVariant: EmailJourneyVariant;
+    stage: typeof EmailCampaignStageValues;
+    journeyVariant: typeof EmailJourneyVariantValues;
   };
 }
 
@@ -106,8 +111,8 @@ export interface ABTestConfig {
  * Metrics tracked for email performance analysis
  */
 export interface EmailPerformanceMetrics {
-  journeyVariant: EmailJourneyVariant;
-  stage: EmailCampaignStage;
+  journeyVariant: typeof EmailJourneyVariantValues;
+  stage: typeof EmailCampaignStageValues;
   sent: number;
   delivered: number;
   opened: number;
@@ -128,8 +133,8 @@ export interface EmailPerformanceMetrics {
  */
 export interface CampaignSchedulingOptions {
   leadId: string;
-  journeyVariant: EmailJourneyVariant;
-  stage: EmailCampaignStage;
+  journeyVariant: typeof EmailJourneyVariantValues;
+  stage: typeof EmailCampaignStageValues;
   scheduledAt: Date;
   priority?: "low" | "normal" | "high";
   metadata?: Record<string, string | number | boolean>;

@@ -100,7 +100,11 @@ export interface ErrorMessage extends BaseMessage {
  * Discriminated union of all message types
  * Use this for type-safe message handling
  */
-export type ChatMessage = UserMessage | AssistantMessage | SystemMessage | ErrorMessage;
+export type ChatMessage =
+  | UserMessage
+  | AssistantMessage
+  | SystemMessage
+  | ErrorMessage;
 
 /**
  * Represents a path through the conversation tree
@@ -109,7 +113,7 @@ export type ChatMessage = UserMessage | AssistantMessage | SystemMessage | Error
 export interface ConversationPath {
   /** Array of message IDs representing the current path from root to leaf */
   messageIds: string[];
-  
+
   /** Index of the currently selected branch at each branching point */
   branchIndices: Record<string, number>;
 }
@@ -120,28 +124,28 @@ export interface ConversationPath {
 export interface ChatThread {
   /** Unique identifier for this thread */
   id: string;
-  
+
   /** Thread title (auto-generated or user-defined) */
   title: string;
-  
+
   /** Folder ID this thread belongs to */
   folderId: string | null;
-  
+
   /** Timestamp when thread was created */
   createdAt: number;
-  
+
   /** Timestamp when thread was last updated */
   updatedAt: number;
-  
+
   /** All messages in this thread (flat map for easy lookup) */
   messages: Record<string, ChatMessage>;
-  
+
   /** ID of the root message (null if no root/welcome message) */
   rootMessageId: string | null;
-  
+
   /** Current active conversation path */
   currentPath: ConversationPath;
-  
+
   /** Thread settings */
   settings?: {
     /** Default model for this thread */
@@ -151,7 +155,7 @@ export interface ChatThread {
     /** Custom system prompt for this thread */
     systemPrompt?: string;
   };
-  
+
   /** Thread metadata */
   metadata?: {
     /** Whether thread is pinned */
@@ -203,22 +207,22 @@ export interface ChatFolder {
 export interface ChatState {
   /** All threads indexed by ID */
   threads: Record<string, ChatThread>;
-  
+
   /** All folders indexed by ID */
   folders: Record<string, ChatFolder>;
-  
+
   /** ID of the currently active thread */
   activeThreadId: string | null;
-  
+
   /** Root folder IDs (top-level folders) */
   rootFolderIds: string[];
-  
+
   /** Threads not in any folder */
   unfiledThreadIds: string[];
-  
+
   /** Last updated timestamp */
   lastUpdated: number;
-  
+
   /** Version for migration purposes */
   version: number;
 }
@@ -227,7 +231,7 @@ export interface ChatState {
  * Helper type for creating new messages
  * More flexible than the discriminated union for message creation
  */
-export type NewMessageInput = {
+export interface NewMessageInput {
   id?: string;
   role: MessageRole;
   content: string;
@@ -250,14 +254,19 @@ export type NewMessageInput = {
     collapsed?: boolean;
     depth?: number;
   };
-};
+}
 
 /**
  * Helper type for creating new threads
  */
 export type NewThreadInput = Omit<
   ChatThread,
-  "id" | "createdAt" | "updatedAt" | "messages" | "rootMessageId" | "currentPath"
+  | "id"
+  | "createdAt"
+  | "updatedAt"
+  | "messages"
+  | "rootMessageId"
+  | "currentPath"
 > & {
   id?: string;
   createdAt?: number;
@@ -323,4 +332,3 @@ export interface ChatUIPreferences {
   /** Font size preference */
   fontSize?: "small" | "medium" | "large";
 }
-

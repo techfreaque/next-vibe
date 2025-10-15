@@ -1,7 +1,6 @@
 "use client";
 
 import { CheckIcon } from "lucide-react";
-import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { FC } from "react";
@@ -42,16 +41,15 @@ export const LocaleSelectorContent: FC = () => {
 
   const uniqueLanguages = getUniqueLanguages(countries);
   const currentLanguageFlag =
-    uniqueLanguages.find(([code]) => code === language)?.[1].countries[0]?.flag || currentCountry.flag;
+    uniqueLanguages.find(([code]) => code === language)?.[1].countries[0]
+      ?.flag || currentCountry.flag;
 
   return (
     <div className="w-72 p-2">
       <Tabs
         defaultValue="country"
         value={activeTab}
-        onValueChange={(value) =>
-          setActiveTab(value as "country" | "language")
-        }
+        onValueChange={(value) => setActiveTab(value as "country" | "language")}
         className="w-full"
       >
         <TabsList className="grid grid-cols-2 mb-2">
@@ -139,4 +137,3 @@ export const LocaleSelectorContent: FC = () => {
     </div>
   );
 };
-

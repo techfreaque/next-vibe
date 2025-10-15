@@ -11,10 +11,7 @@ import {
   createTrackingContext,
   EmailTemplate,
 } from "@/app/api/[locale]/v1/core/emails/smtp-client/components";
-import type {
-  EmailFunctionType,
-  EmailTemplateReturnType,
-} from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
+import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -60,7 +57,7 @@ function renderPasswordResetConfirmEmailContent(
         }}
       >
         {t("auth.resetPassword.confirmEmail.greeting", {
-          firstName: user.firstName,
+          name: user.publicName,
         })}
       </Text>
 
@@ -155,7 +152,7 @@ export const renderResetPasswordConfirmMail: EmailFunctionType<
   const appName = t("common.appName");
   return createSuccessResponse({
     toEmail: requestData.verification.email,
-    toName: user.firstName,
+    toName: user.publicName,
     subject: t("auth.resetPassword.confirmEmail.subject", {
       appName,
     }),

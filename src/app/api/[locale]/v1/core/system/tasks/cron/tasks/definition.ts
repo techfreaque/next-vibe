@@ -9,6 +9,7 @@ import { z } from "zod";
 import {
   EndpointErrorTypes,
   FieldDataType,
+  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
@@ -19,7 +20,6 @@ import {
   responseArrayField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
-import { LayoutType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import {
@@ -269,6 +269,30 @@ const { GET } = createEndpoint({
               },
               z.string().optional(),
             ),
+            version: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.tasks.cron.tasks.get.response.task.version",
+              },
+              z.number(),
+            ),
+            createdAt: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.tasks.cron.tasks.get.response.task.createdAt",
+              },
+              z.string(),
+            ),
+            updatedAt: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.tasks.cron.tasks.get.response.task.updatedAt",
+              },
+              z.string(),
+            ),
           },
         ),
       ),
@@ -342,6 +366,17 @@ const { GET } = createEndpoint({
     description:
       "app.api.v1.core.system.tasks.cron.tasks.get.success.retrieved.description",
   },
+  examples: {
+    requests: {
+      default: {},
+    },
+    responses: {
+      default: {
+        tasks: [],
+        totalTasks: 0,
+      },
+    },
+  },
 });
 
 // Export the endpoint following MIGRATION_GUIDE pattern
@@ -352,3 +387,8 @@ export type CronTaskListRequestInput = typeof GET.types.RequestInput;
 export type CronTaskListRequestOutput = typeof GET.types.RequestOutput;
 export type CronTaskListResponseInput = typeof GET.types.ResponseInput;
 export type CronTaskListResponseOutput = typeof GET.types.ResponseOutput;
+
+// Individual task type extracted from response
+export type CronTaskResponseType = CronTaskListResponseOutput["tasks"][number];
+
+export default endpoints;

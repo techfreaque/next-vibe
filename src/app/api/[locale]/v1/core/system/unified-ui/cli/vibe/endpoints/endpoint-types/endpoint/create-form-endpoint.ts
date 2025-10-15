@@ -22,7 +22,6 @@ import type {
   FieldUsageConfig,
   InferInputFromFieldForMethod,
   InferOutputFromFieldForMethod,
-  InferSchemaFromField,
   InferSchemaFromFieldForMethod,
   ObjectField,
   PrimitiveField,
@@ -231,11 +230,11 @@ type SupportsMethodAndUsage<
  * Filter schema for a specific method and usage type
  */
 export type FilterSchemaForMethod<
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TFields,
   TTargetUsage extends FieldUsage,
   TMethod extends Methods,
 > =
-  TFields extends PrimitiveField<infer TSchema>
+  TFields extends PrimitiveField<infer TSchema, FieldUsageConfig>
     ? SupportsMethodAndUsage<
         TFields["usage"],
         TMethod,
@@ -243,7 +242,7 @@ export type FilterSchemaForMethod<
       > extends true
       ? TSchema
       : z.ZodNever
-    : TFields extends ObjectField<infer TChildren>
+    : TFields extends ObjectField<infer TChildren, FieldUsageConfig>
       ? SupportsMethodAndUsage<
           TFields["usage"],
           TMethod,
@@ -262,112 +261,15 @@ export type FilterSchemaForMethod<
       : z.ZodNever;
 
 /**
- * Method-specific endpoint type that uses method-specific type inference
- * This ensures perfect type inference for each HTTP method
+ * Method-specific endpoint type that extends CreateApiEndpoint
+ * This ensures perfect type inference for each HTTP method and compatibility with hooks
  */
-export interface MethodSpecificEndpoint<
+export type MethodSpecificEndpoint<
   TFields extends UnifiedField<z.ZodTypeAny>,
   TMethod extends Methods,
   TExampleKey extends string,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-> {
-  readonly method: TMethod;
-  readonly path: readonly string[];
-  readonly title: TranslationKey;
-  readonly description: TranslationKey;
-  readonly category: TranslationKey;
-  readonly tags: readonly TranslationKey[];
-  readonly allowedRoles: TUserRoleValue;
-  readonly debug?: boolean;
-  readonly aliases?: readonly string[];
-  readonly fields: TFields;
-  readonly errorTypes: Record<
-    EndpointErrorTypes,
-    { title: TranslationKey; description: TranslationKey }
-  >;
-  readonly successTypes: { title: TranslationKey; description: TranslationKey };
-  readonly examples: {
-    requests?: InferInputFromFieldForMethod<
-      TFields,
-      TMethod,
-      FieldUsage.RequestData
-    > extends never
-      ? undefined
-      : ExamplesList<
-          InferInputFromFieldForMethod<
-            TFields,
-            TMethod,
-            FieldUsage.RequestData
-          >,
-          TExampleKey
-        >;
-    responses: ExamplesList<
-      InferOutputFromFieldForMethod<TFields, TMethod, FieldUsage.Response>,
-      TExampleKey
-    >;
-    urlPathVariables?: InferInputFromFieldForMethod<
-      TFields,
-      TMethod,
-      FieldUsage.RequestUrlParams
-    > extends never
-      ? undefined
-      : ExamplesList<
-          InferInputFromFieldForMethod<
-            TFields,
-            TMethod,
-            FieldUsage.RequestUrlParams
-          >,
-          TExampleKey
-        >;
-  };
-  readonly requestSchema: InferSchemaFromFieldForMethod<
-    TFields,
-    TMethod,
-    FieldUsage.RequestData
-  >;
-  readonly responseSchema: InferSchemaFromFieldForMethod<
-    TFields,
-    TMethod,
-    FieldUsage.Response
-  >;
-  readonly requestUrlParamsSchema: InferSchemaFromFieldForMethod<
-    TFields,
-    TMethod,
-    FieldUsage.RequestUrlParams
-  >;
-  readonly types: {
-    RequestInput: InferInputFromFieldForMethod<
-      TFields,
-      TMethod,
-      FieldUsage.RequestData
-    >;
-    RequestOutput: InferOutputFromFieldForMethod<
-      TFields,
-      TMethod,
-      FieldUsage.RequestData
-    >;
-    ResponseInput: InferInputFromFieldForMethod<
-      TFields,
-      TMethod,
-      FieldUsage.Response
-    >;
-    ResponseOutput: InferOutputFromFieldForMethod<
-      TFields,
-      TMethod,
-      FieldUsage.Response
-    >;
-    UrlVariablesInput: InferInputFromFieldForMethod<
-      TFields,
-      TMethod,
-      FieldUsage.RequestUrlParams
-    >;
-    UrlVariablesOutput: InferOutputFromFieldForMethod<
-      TFields,
-      TMethod,
-      FieldUsage.RequestUrlParams
-    >;
-  };
-}
+> = CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>;
 
 /**
  * Return type for createFormEndpoint - provides both GET and POST endpoints
@@ -400,15 +302,23 @@ export interface CreateFormEndpointReturn<
  * Transform method-specific field to simple field for a specific method
  * This converts fields with method-specific usage to simple usage patterns
  * @deprecated - Replaced by generateSchemaForMethodAndUsage
+ * Note: This function is used recursively within itself
  */
-function transformFieldForMethod<F extends UnifiedField<z.ZodTypeAny>>(
-  field: F,
-  method: Methods,
-): UnifiedField<z.ZodTypeAny> {
-  if (field.type === "primitive") {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function transformFieldForMethod<F>(field: F, method: Methods): F {
+  interface FieldWithType {
+    type: "primitive" | "object" | "array";
+    usage?: FieldUsageConfig;
+    children?: Record<string, UnifiedField<z.ZodTypeAny>>;
+    child?: UnifiedField<z.ZodTypeAny>;
+  }
+
+  const typedField = field as F & FieldWithType;
+
+  if (typedField.type === "primitive") {
     // Check if field has method-specific usage
-    if (field.usage && isMethodSpecificUsage(field.usage)) {
-      const methodSpecificUsage = field.usage as Record<
+    if (typedField.usage && isMethodSpecificUsage(typedField.usage)) {
+      const methodSpecificUsage = typedField.usage as Record<
         string,
         {
           request?: "data" | "urlParams" | "data&urlParams";
@@ -421,22 +331,22 @@ function transformFieldForMethod<F extends UnifiedField<z.ZodTypeAny>>(
         return {
           ...field,
           usage: {},
-        } as UnifiedField<z.ZodTypeAny>;
+        } as F;
       }
       return {
         ...field,
         usage: methodUsage,
-      } as UnifiedField<z.ZodTypeAny>;
+      } as F;
     }
     // Return field with original usage (might be simple usage)
     return field;
   }
 
-  if (field.type === "object") {
+  if (typedField.type === "object") {
     // Transform object field usage
-    let objectUsage = field.usage;
-    if (field.usage && isMethodSpecificUsage(field.usage)) {
-      const methodSpecificUsage = field.usage as Record<
+    let objectUsage = typedField.usage;
+    if (typedField.usage && isMethodSpecificUsage(typedField.usage)) {
+      const methodSpecificUsage = typedField.usage as Record<
         string,
         {
           request?: "data" | "urlParams" | "data&urlParams";
@@ -454,22 +364,24 @@ function transformFieldForMethod<F extends UnifiedField<z.ZodTypeAny>>(
 
     // Transform all children recursively
     const transformedChildren: Record<string, UnifiedField<z.ZodTypeAny>> = {};
-    for (const [key, childField] of Object.entries(field.children)) {
-      transformedChildren[key] = transformFieldForMethod(childField, method);
+    if (typedField.children) {
+      for (const [key, childField] of Object.entries(typedField.children)) {
+        transformedChildren[key] = transformFieldForMethod(childField, method);
+      }
     }
 
     return {
       ...field,
       usage: objectUsage,
       children: transformedChildren,
-    } as UnifiedField<z.ZodTypeAny>;
+    } as F;
   }
 
-  if (field.type === "array") {
+  if (typedField.type === "array") {
     // Transform array field usage
-    let arrayUsage = field.usage;
-    if (field.usage && isMethodSpecificUsage(field.usage)) {
-      const methodSpecificUsage = field.usage as Record<
+    let arrayUsage = typedField.usage;
+    if (typedField.usage && isMethodSpecificUsage(typedField.usage)) {
+      const methodSpecificUsage = typedField.usage as Record<
         string,
         {
           request?: "data" | "urlParams" | "data&urlParams";
@@ -486,13 +398,15 @@ function transformFieldForMethod<F extends UnifiedField<z.ZodTypeAny>>(
     }
 
     // Transform child field recursively
-    const transformedChild = transformFieldForMethod(field.child, method);
+    const transformedChild = typedField.child
+      ? transformFieldForMethod(typedField.child, method)
+      : undefined;
 
     return {
       ...field,
       usage: arrayUsage,
       child: transformedChild,
-    } as UnifiedField<z.ZodTypeAny>;
+    } as F;
   }
 
   return field;
@@ -505,10 +419,20 @@ function transformFieldForMethod<F extends UnifiedField<z.ZodTypeAny>>(
  *
  * FIXED VERSION: Handles all usage patterns correctly including computed property syntax
  */
-export function generateSchemaForMethodAndUsage<
-  F extends UnifiedField<z.ZodTypeAny>,
-  Usage extends FieldUsage,
->(field: F, method: Methods, targetUsage: Usage): z.ZodTypeAny {
+export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
+  field: F,
+  method: Methods,
+  targetUsage: Usage,
+): z.ZodTypeAny {
+  interface FieldWithType {
+    type: "primitive" | "object" | "array";
+    usage?: FieldUsageConfig;
+    schema?: z.ZodTypeAny;
+    children?: Record<string, UnifiedField<z.ZodTypeAny>>;
+    child?: UnifiedField<z.ZodTypeAny>;
+  }
+
+  const typedField = field as F & FieldWithType;
   const hasMethodSpecificUsage = (
     usage: FieldUsageConfig | undefined,
   ): boolean => {
@@ -534,9 +458,12 @@ export function generateSchemaForMethodAndUsage<
   };
 
   const getUsageForMethod = (
-    usage: FieldUsageConfig,
+    usage: FieldUsageConfig | undefined,
     method: Methods,
   ): FieldUsageConfig | undefined => {
+    if (!usage) {
+      return undefined;
+    }
     if (!hasMethodSpecificUsage(usage)) {
       return usage;
     }
@@ -607,17 +534,17 @@ export function generateSchemaForMethodAndUsage<
     }
   };
 
-  if (field.type === "primitive") {
-    const methodUsage = getUsageForMethod(field.usage, method);
+  if (typedField.type === "primitive") {
+    const methodUsage = getUsageForMethod(typedField.usage, method);
     if (methodUsage && hasTargetUsage(methodUsage)) {
-      return field.schema;
+      return typedField.schema ?? z.never();
     }
     return z.never();
   }
 
-  if (field.type === "object") {
+  if (typedField.type === "object") {
     // Check if the object itself should be included for this method and usage
-    const objectMethodUsage = getUsageForMethod(field.usage, method);
+    const objectMethodUsage = getUsageForMethod(typedField.usage, method);
     if (!objectMethodUsage || !hasTargetUsage(objectMethodUsage)) {
       return z.never();
     }
@@ -625,14 +552,16 @@ export function generateSchemaForMethodAndUsage<
     // Build shape object by recursively processing children
     const shape: Record<string, z.ZodTypeAny> = {};
 
-    for (const [key, childField] of Object.entries(field.children)) {
-      const childSchema = generateSchemaForMethodAndUsage(
-        childField,
-        method,
-        targetUsage,
-      );
-      if (!(childSchema instanceof z.ZodNever)) {
-        shape[key] = childSchema;
+    if (typedField.children) {
+      for (const [key, childField] of Object.entries(typedField.children)) {
+        const childSchema = generateSchemaForMethodAndUsage(
+          childField,
+          method,
+          targetUsage,
+        );
+        if (!(childSchema instanceof z.ZodNever)) {
+          shape[key] = childSchema;
+        }
       }
     }
 
@@ -644,11 +573,11 @@ export function generateSchemaForMethodAndUsage<
     return z.object(shape);
   }
 
-  if (field.type === "array") {
-    const methodUsage = getUsageForMethod(field.usage, method);
-    if (methodUsage && hasTargetUsage(methodUsage)) {
+  if (typedField.type === "array") {
+    const methodUsage = getUsageForMethod(typedField.usage, method);
+    if (methodUsage && hasTargetUsage(methodUsage) && typedField.child) {
       const childSchema = generateSchemaForMethodAndUsage(
-        field.child,
+        typedField.child,
         method,
         targetUsage,
       );
@@ -665,27 +594,30 @@ export function generateSchemaForMethodAndUsage<
 /**
  * Generate request data schema for a specific HTTP method using proper method-specific filtering
  */
-export function generateRequestDataSchemaForMethod<
-  F extends UnifiedField<z.ZodTypeAny>,
->(field: F, method: Methods): z.ZodTypeAny {
+export function generateRequestDataSchemaForMethod<F>(
+  field: F,
+  method: Methods,
+): z.ZodTypeAny {
   return generateSchemaForMethodAndUsage(field, method, FieldUsage.RequestData);
 }
 
 /**
  * Generate response schema for a specific HTTP method using proper method-specific filtering
  */
-export function generateResponseSchemaForMethod<
-  F extends UnifiedField<z.ZodTypeAny>,
->(field: F, method: Methods): z.ZodTypeAny {
+export function generateResponseSchemaForMethod<F>(
+  field: F,
+  method: Methods,
+): z.ZodTypeAny {
   return generateSchemaForMethodAndUsage(field, method, FieldUsage.Response);
 }
 
 /**
  * Generate request URL params schema for a specific HTTP method using proper method-specific filtering
  */
-export function generateRequestUrlSchemaForMethod<
-  F extends UnifiedField<z.ZodTypeAny>,
->(field: F, method: Methods): z.ZodTypeAny {
+export function generateRequestUrlSchemaForMethod<F>(
+  field: F,
+  method: Methods,
+): z.ZodTypeAny {
   return generateSchemaForMethodAndUsage(
     field,
     method,
@@ -727,12 +659,7 @@ export function createFormEndpoint<
   );
 
   // Create GET endpoint with method-specific type inference
-  const getEndpoint: MethodSpecificEndpoint<
-    TFields,
-    Methods.GET,
-    TExampleKey,
-    TUserRoleValue
-  > = {
+  const getEndpoint = {
     method: Methods.GET,
     path: config.path,
     title: config.methods.GET.title,
@@ -745,26 +672,14 @@ export function createFormEndpoint<
     fields: config.fields,
     errorTypes: config.errorTypes,
     successTypes: config.successTypes,
-    examples: (config.examples.GET || {
+    examples: config.examples.GET || {
       requests: undefined,
       responses: undefined,
       urlPathVariables: undefined,
-    }),
-    requestSchema: getRequestSchema as InferSchemaFromFieldForMethod<
-      TFields,
-      Methods.GET,
-      FieldUsage.RequestData
-    >,
-    responseSchema: getResponseSchema as InferSchemaFromFieldForMethod<
-      TFields,
-      Methods.GET,
-      FieldUsage.Response
-    >,
-    requestUrlParamsSchema: getUrlSchema as InferSchemaFromFieldForMethod<
-      TFields,
-      Methods.GET,
-      FieldUsage.RequestUrlParams
-    >,
+    },
+    requestSchema: getRequestSchema,
+    responseSchema: getResponseSchema,
+    requestUrlParamsSchema: getUrlSchema,
     types: {
       RequestInput: null as InferInputFromFieldForMethod<
         TFields,
@@ -814,12 +729,7 @@ export function createFormEndpoint<
   );
 
   // Create POST endpoint with method-specific type inference
-  const postEndpoint: MethodSpecificEndpoint<
-    TFields,
-    Methods.POST,
-    TExampleKey,
-    TUserRoleValue
-  > = {
+  const postEndpoint = {
     method: Methods.POST,
     path: config.path,
     title: config.methods.POST.title,
@@ -832,27 +742,14 @@ export function createFormEndpoint<
     fields: config.fields,
     errorTypes: config.errorTypes,
     successTypes: config.successTypes,
-    examples: (config.examples.POST || {
+    examples: config.examples.POST || {
       requests: {},
       responses: {},
       urlPathVariables: undefined,
-    }),
-    requestSchema: postRequestSchema as InferSchemaFromFieldForMethod<
-      TFields,
-      Methods.POST,
-      FieldUsage.RequestData
-    >,
-    responseSchema: postResponseSchema as InferSchemaFromFieldForMethod<
-      TFields,
-      Methods.POST,
-      FieldUsage.Response
-    >,
-    requestUrlParamsSchema:
-      postRequestUrlSchema as InferSchemaFromFieldForMethod<
-        TFields,
-        Methods.POST,
-        FieldUsage.RequestUrlParams
-      >,
+    },
+    requestSchema: postRequestSchema,
+    responseSchema: postResponseSchema,
+    requestUrlParamsSchema: postRequestUrlSchema,
     types: {
       RequestInput: null as InferInputFromFieldForMethod<
         TFields,
@@ -888,9 +785,22 @@ export function createFormEndpoint<
   };
 
   // Return the form endpoints
+  // Type assertion needed: method-specific types are structurally compatible but TypeScript can't verify
   return {
-    GET: getEndpoint,
-    POST: postEndpoint,
+    // eslint-disable-next-line no-restricted-syntax
+    GET: getEndpoint as unknown as MethodSpecificEndpoint<
+      TFields,
+      Methods.GET,
+      TExampleKey,
+      TUserRoleValue
+    >,
+    // eslint-disable-next-line no-restricted-syntax
+    POST: postEndpoint as unknown as MethodSpecificEndpoint<
+      TFields,
+      Methods.POST,
+      TExampleKey,
+      TUserRoleValue
+    >,
   };
 }
 

@@ -11,19 +11,15 @@ export const {
   CREATED_AT: "app.api.v1.core.users.list.enums.userSortField.createdAt",
   UPDATED_AT: "app.api.v1.core.users.list.enums.userSortField.updatedAt",
   EMAIL: "app.api.v1.core.users.list.enums.userSortField.email",
-  FIRST_NAME: "app.api.v1.core.users.list.enums.userSortField.firstName",
-  LAST_NAME: "app.api.v1.core.users.list.enums.userSortField.lastName",
-  COMPANY: "app.api.v1.core.users.list.enums.userSortField.company",
-  LAST_LOGIN: "app.api.v1.core.users.list.enums.userSortField.lastLogin",
+  PRIVATE_NAME: "app.api.v1.core.users.list.enums.userSortField.privateName",
+  PUBLIC_NAME: "app.api.v1.core.users.list.enums.userSortField.publicName",
 });
 export const UserSortFieldDB = [
   UserSortField.CREATED_AT,
   UserSortField.UPDATED_AT,
   UserSortField.EMAIL,
-  UserSortField.FIRST_NAME,
-  UserSortField.LAST_NAME,
-  UserSortField.COMPANY,
-  UserSortField.LAST_LOGIN,
+  UserSortField.PRIVATE_NAME,
+  UserSortField.PUBLIC_NAME,
 ] as const;
 
 /**

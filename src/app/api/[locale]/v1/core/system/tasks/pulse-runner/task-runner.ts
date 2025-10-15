@@ -11,6 +11,29 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { TaskRunner } from "../types/repository";
 
 /**
+ * Simple console logger for task runners
+ * Task runners don't have access to EndpointLogger, so we use console
+ */
+const logger = {
+  info: (message: string, meta?: unknown): void => {
+    // eslint-disable-next-line no-console, i18next/no-literal-string
+    console.log(`ℹ️ [PULSE-RUNNER] ${message}`, meta ? meta : "");
+  },
+  error: (message: string, error?: Error | unknown): void => {
+    // eslint-disable-next-line no-console, i18next/no-literal-string
+    console.error(`❌ [PULSE-RUNNER] ${message}`, error || "");
+  },
+  warn: (message: string, meta?: unknown): void => {
+    // eslint-disable-next-line no-console, i18next/no-literal-string
+    console.warn(`⚠️ [PULSE-RUNNER] ${message}`, meta ? meta : "");
+  },
+  debug: (message: string, meta?: unknown): void => {
+    // eslint-disable-next-line no-console, i18next/no-literal-string
+    console.debug(`🐛 [PULSE-RUNNER] ${message}`, meta ? meta : "");
+  },
+};
+
+/**
  * Pulse Task Runner Implementation
  * Calls the pulse repository every minute to trigger scheduled tasks
  */

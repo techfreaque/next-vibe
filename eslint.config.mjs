@@ -3,6 +3,21 @@ import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { FlatCompat } from '@eslint/eslintrc';
 import { i18nConfig } from "./eslint.i18n.config.mjs";
+import tsParser from "@typescript-eslint/parser";
+import globals from "globals";
+import js from "@eslint/js";
+import ts from "@typescript-eslint/eslint-plugin";
+import importPlugin from "eslint-plugin-import";
+import eslintPluginPrettier from "eslint-plugin-prettier";
+import reactCompiler from "eslint-plugin-react-compiler";
+import reactHooks from "eslint-plugin-react-hooks";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
+import unusedImports from "eslint-plugin-unused-imports";
+import nodePlugin from "eslint-plugin-node";
+import reactPlugin from "eslint-plugin-react";
+import jsxA11y from "eslint-plugin-jsx-a11y";
+import promisePlugin from "eslint-plugin-promise";
+import useServerPlugin from "@c-ehrlich/eslint-plugin-use-server";
 
 const enableI18n = true;
 // currently AI's don't like that, as it gets removed before they add the actual code
@@ -111,7 +126,8 @@ const config = [
       // TypeScript recommended rules
       ...ts.configs.recommended.rules,
       ...ts.configs["recommended-requiring-type-checking"].rules,
-
+      // TypeScript already checks for undefined variables
+      "no-undef": "off",
       // TypeScript custom rules
       "@typescript-eslint/no-unused-vars": [
         "error",
@@ -155,9 +171,6 @@ const config = [
       '@typescript-eslint/no-unsafe-function-type': 'error',
       '@typescript-eslint/no-wrapper-object-types': 'error',
 
-      // next
-      "@next/next/no-img-element": "error",
-
       // Node
       "node/no-process-env": "error",
 
@@ -177,7 +190,7 @@ const config = [
       "react/no-direct-mutation-state": "error",
       "react/no-unknown-property": "error",
       "react/self-closing-comp": "error",
-      "react/react-in-jsx-scope": "error", // Next.js doesn't require React import
+      "react/react-in-jsx-scope": "off", // Next.js doesn't require React import
 
       // Accessibility
       "jsx-a11y/alt-text": "error",
@@ -256,7 +269,6 @@ const config = [
   },
   ...compat.config({
     extends: [
-      "next/core-web-vitals",
       ...(enableI18n ? ["plugin:i18next/recommended"] : []),
     ],
   }),

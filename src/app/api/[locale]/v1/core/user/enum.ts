@@ -6,28 +6,6 @@
 import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/enum-helpers";
 
 /**
- * Preferred contact method enum
- */
-export const {
-  enum: PreferredContactMethod,
-  options: PreferredContactMethodOptions,
-  Value: PreferredContactMethodValue,
-} = createEnumOptions({
-  EMAIL: "app.api.v1.core.user.contactMethods.email",
-  PHONE: "app.api.v1.core.user.contactMethods.phone",
-  SMS: "app.api.v1.core.user.contactMethods.sms",
-  WHATSAPP: "app.api.v1.core.user.contactMethods.whatsapp",
-});
-
-// Create DB enum array for Drizzle
-export const PreferredContactMethodDB = [
-  PreferredContactMethod.EMAIL,
-  PreferredContactMethod.PHONE,
-  PreferredContactMethod.SMS,
-  PreferredContactMethod.WHATSAPP,
-] as const;
-
-/**
  * Theme enum using createEnumOptions pattern
  */
 export const {
@@ -79,49 +57,8 @@ export const {
   PL: "app.api.v1.core.user.language.pl",
 });
 
-// Create DB enum array for Drizzle
-export const LanguageDB = [Language.EN, Language.DE, Language.PL] as const;
-
-/**
- * Timezone enum for user timezone preferences
- */
-export const {
-  enum: Timezone,
-  options: TimezoneOptions,
-  Value: TimezoneValue,
-} = createEnumOptions({
-  UTC: "app.api.v1.core.user.timezone.utc",
-  AMERICA_NEW_YORK: "app.api.v1.core.user.timezone.america_new_york",
-  AMERICA_LOS_ANGELES: "app.api.v1.core.user.timezone.america_los_angeles",
-  EUROPE_LONDON: "app.api.v1.core.user.timezone.europe_london",
-  EUROPE_BERLIN: "app.api.v1.core.user.timezone.europe_berlin",
-  EUROPE_WARSAW: "app.api.v1.core.user.timezone.europe_warsaw",
-  ASIA_TOKYO: "app.api.v1.core.user.timezone.asia_tokyo",
-  AUSTRALIA_SYDNEY: "app.api.v1.core.user.timezone.australia_sydney",
-});
-
-// Create DB enum array for Drizzle
-export const ThemeDB = [Theme.LIGHT, Theme.DARK, Theme.SYSTEM] as const;
-
-export const ProfileVisibilityDB = [
-  ProfileVisibility.PUBLIC,
-  ProfileVisibility.PRIVATE,
-  ProfileVisibility.CONTACTS_ONLY,
-] as const;
-
 export const UserDetailLevelDB = [
   UserDetailLevel.MINIMAL,
   UserDetailLevel.STANDARD,
   UserDetailLevel.COMPLETE,
-] as const;
-
-export const TimezoneDB = [
-  Timezone.UTC,
-  Timezone.AMERICA_NEW_YORK,
-  Timezone.AMERICA_LOS_ANGELES,
-  Timezone.EUROPE_LONDON,
-  Timezone.EUROPE_BERLIN,
-  Timezone.EUROPE_WARSAW,
-  Timezone.ASIA_TOKYO,
-  Timezone.AUSTRALIA_SYDNEY,
 ] as const;

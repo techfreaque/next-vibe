@@ -1,14 +1,63 @@
 export const translations = {
-  post: {
+  get: {
     title: "Export Leads",
     description: "Export leads data to file",
     form: {
       title: "Export Configuration",
       description: "Configure lead export parameters and filters",
     },
+    format: {
+      label: "Export Format",
+      description: "File format for the export",
+    },
+    status: {
+      label: "Lead Status",
+      description: "Filter by lead status",
+    },
+    country: {
+      label: "Country",
+      description: "Filter by country",
+      placeholder: "Select country",
+    },
+    language: {
+      label: "Language",
+      description: "Filter by language",
+      placeholder: "Select language",
+    },
+    source: {
+      label: "Lead Source",
+      description: "Filter by lead source",
+      placeholder: "Select source",
+    },
+    search: {
+      label: "Search",
+      description: "Search leads by text",
+      placeholder: "Search leads...",
+    },
+    dateFrom: {
+      label: "Start Date",
+      description: "Export leads created from this date",
+    },
+    dateTo: {
+      label: "End Date",
+      description: "Export leads created until this date",
+    },
+    includeMetadata: {
+      label: "Include Metadata",
+      description: "Include creation and update timestamps",
+    },
+    includeEngagementData: {
+      label: "Include Engagement Data",
+      description: "Include email tracking and campaign data",
+    },
     response: {
       title: "Export File",
       description: "Generated export file with lead data",
+      fileName: "File Name",
+      fileContent: "File Content (Base64)",
+      mimeType: "MIME Type",
+      totalRecords: "Total Records",
+      exportedAt: "Exported At",
     },
     errors: {
       unauthorized: {
@@ -16,7 +65,7 @@ export const translations = {
         description: "Authentication required to export leads",
       },
       validation: {
-        title: "Validation Error", 
+        title: "Validation Error",
         description: "Invalid export parameters or filters",
       },
       server: {
@@ -53,4 +102,4 @@ export const translations = {
       description: "Lead export completed successfully",
     },
   },
-} ;
+};

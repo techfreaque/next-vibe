@@ -158,8 +158,7 @@ const { POST } = createEndpoint({
           ),
           cost: responseField(
             {
-              type: WidgetType.NUMBER,
-              format: "currency",
+              type: WidgetType.TEXT,
               content:
                 "app.api.v1.core.emails.smsService.send.response.result.cost",
             },
@@ -258,8 +257,8 @@ export type SmsSendPostResponseInput = typeof POST.types.ResponseInput;
 export type SmsSendPostResponseOutput = typeof POST.types.ResponseOutput;
 
 // Export repository types for import standardization
-export type SmsSendRequestTypeOutput = SmsSendPostRequestOutput;
-export type SmsSendResponseTypeOutput = SmsSendPostResponseOutput;
+export type SmsSendRequestOutput = SmsSendPostRequestOutput;
+export type SmsSendResponseOutput = SmsSendPostResponseOutput;
 
 const definitions = {
   POST,

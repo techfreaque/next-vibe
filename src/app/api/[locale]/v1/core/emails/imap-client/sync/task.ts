@@ -34,39 +34,41 @@ import { imapSyncTaskRepository } from "../sync-task/repository";
  * Task Configuration Schema
  */
 export const taskConfigSchema = z.object({
-  maxAccountsPerRun: z.number().min(1).max(50),
-  enableFolderSync: z.boolean(),
-  enableMessageSync: z.boolean(),
-  dryRun: z.boolean(),
+  maxAccountsPerRun: z.number().min(1).max(50).default(10),
+  enableFolderSync: z.boolean().default(true),
+  enableMessageSync: z.boolean().default(true),
+  dryRun: z.boolean().default(false),
 });
 
-export type TaskConfigType = z.infer<typeof taskConfigSchema>;
+export type TaskConfigType = z.output<typeof taskConfigSchema>;
 
 /**
  * Task Result Schema
  */
 export const taskResultSchema = z.object({
-  accountsProcessed: z.number(),
-  accountsSuccessful: z.number(),
-  accountsFailed: z.number(),
+  accountsProcessed: z.number().default(0),
+  accountsSuccessful: z.number().default(0),
+  accountsFailed: z.number().default(0),
   foldersProcessed: z.number().optional(),
   messagesProcessed: z.number().optional(),
-  errors: z.array(
-    z.object({
-      accountId: z.string(),
-      stage: z.string(),
-      error: z.string(),
-    }),
-  ),
+  errors: z
+    .array(
+      z.object({
+        accountId: z.string(),
+        stage: z.string(),
+        error: z.string(),
+      }),
+    )
+    .default([]),
   summary: z.object({
-    totalAccounts: z.number(),
-    activeAccounts: z.number(),
-    syncedAccounts: z.number(),
-    failedAccounts: z.number(),
+    totalAccounts: z.number().default(0),
+    activeAccounts: z.number().default(0),
+    syncedAccounts: z.number().default(0),
+    failedAccounts: z.number().default(0),
   }),
 });
 
-export type TaskResultType = z.infer<typeof taskResultSchema>;
+export type TaskResultType = z.output<typeof taskResultSchema>;
 
 /**
  * IMAP Sync Task Implementation
@@ -80,11 +82,17 @@ async function executeImapSync(
   logger.info("tasks.imap_sync.start", { config });
 
   try {
+    // System user context for CRON execution
+    const systemUser: JwtPrivatePayloadType = {
+      id: "system",
+      isPublic: false,
+    };
+
     // Use the repository to execute the IMAP sync task
     const syncResult = await imapSyncTaskRepository.executeImapSync(
       { config },
-      { id: "system", isPublic: false }, // System context for CRON
-      "en-US",
+      systemUser,
+      "en-US" as CountryLanguage,
       logger,
     );
 
@@ -118,16 +126,16 @@ async function executeImapSync(
 /**
  * Validate function for the task
  */
-async function validateImapSync(
+function validateImapSync(
   logger: EndpointLogger,
   locale: CountryLanguage,
   cronUser: JwtPrivatePayloadType,
-): Promise<ResponseType<boolean>> {
+): ResponseType<boolean> {
   try {
     // Use the repository to validate the IMAP sync task
-    const validationResult = await imapSyncTaskRepository.validateImapSync(
+    const validationResult = imapSyncTaskRepository.validateImapSync(
       {},
-      cronUser, // System context for CRON
+      cronUser,
       locale,
       logger,
     );
@@ -170,36 +178,34 @@ const imapSyncTask: Task = {
   timeout: TASK_TIMEOUTS.EXTENDED, // 30 minutes
 
   run: async ({ logger, locale, cronUser }) => {
-    logger.info("emails.imap.sync.task.start");
+    const context: TaskExecutionContext<TaskConfigType> = {
+      config: {
+        maxAccountsPerRun: 10,
+        enableFolderSync: true,
+        enableMessageSync: true,
+        dryRun: false,
+      },
+      logger,
+      taskName: "imap-sync",
+      signal: new AbortController().signal,
+      startTime: Date.now(),
+      locale,
+      cronUser,
+    };
 
-    try {
-      // Create a mock execution context for the task
-      const context: TaskExecutionContext<TaskConfigType> = {
-        config: {
-          maxAccountsPerRun: 10,
-          enableFolderSync: true,
-          enableMessageSync: true,
-          dryRun: false,
-        },
-        logger,
-      };
+    const result = await executeImapSync(context);
 
-      const result = await executeImapSync(context);
-
-      if (result.success) {
-        logger.info("emails.imap.sync.task.completed", result.data);
-      } else {
-        logger.error("emails.imap.sync.task.failed", result.error);
-        throw new Error(result.error?.message || "IMAP sync failed");
-      }
-    } catch (error) {
-      logger.error("emails.imap.sync.task.error", error);
-      throw error;
+    if (!result.success) {
+      return createErrorResponse(
+        "error.default",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
     }
+    // Returns void implicitly on success
   },
 
-  onError: async (props: { error: Error; logger: EndpointLogger }) => {
-    logger.error("emails.imap.sync.task.onError", error);
+  onError: ({ error, logger }) => {
+    logger.error("IMAP sync task error", error);
   },
 };
 

@@ -84,24 +84,24 @@ export const translations = {
           invalid: "Please enter a valid email address",
         },
       },
-      firstName: {
-        label: "First Name",
-        description: "Your first name",
-        placeholder: "Enter your first name",
-        help: "Your first name will be displayed on your profile",
+      privateName: {
+        label: "Private Name",
+        description: "Your internal/private name",
+        placeholder: "Enter your private name",
+        help: "Your private name is used internally and for private communications",
         validation: {
-          minLength: "First name must be at least 2 characters long",
-          maxLength: "First name cannot exceed 50 characters",
+          minLength: "Private name must be at least 2 characters long",
+          maxLength: "Private name cannot exceed 50 characters",
         },
       },
-      lastName: {
-        label: "Last Name",
-        description: "Your last name",
-        placeholder: "Enter your last name",
-        help: "Your last name will be displayed on your profile",
+      publicName: {
+        label: "Public Name",
+        description: "Your public display name",
+        placeholder: "Enter your public name",
+        help: "Your public name will be visible to other users",
         validation: {
-          minLength: "Last name must be at least 2 characters long",
-          maxLength: "Last name cannot exceed 50 characters",
+          minLength: "Public name must be at least 2 characters long",
+          maxLength: "Public name cannot exceed 50 characters",
         },
       },
       imageUrl: {

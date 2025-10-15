@@ -2,6 +2,7 @@ import { translations as authTranslations } from "../../auth/i18n/en";
 import { translations as privateTranslations } from "../../private/i18n/en";
 import { translations as publicTranslations } from "../../public/i18n/en";
 import { translations as searchTranslations } from "../../search/i18n/en";
+import { translations as sessionCleanupTranslations } from "../../session-cleanup/i18n/en";
 import { translations as userRolesTranslations } from "../../user-roles/i18n/en";
 
 export const translations = {
@@ -10,6 +11,7 @@ export const translations = {
   "private": privateTranslations,
   "public": publicTranslations,
   "search": searchTranslations,
+  "session-cleanup": sessionCleanupTranslations,
   "userRoles": userRolesTranslations,
   "profileVisibility": {
     public: "Public",
@@ -58,38 +60,6 @@ export const translations = {
     updateFailed: {
       title: "Update Failed",
       description: "Failed to update your profile. Please try again.",
-    },
-  },
-  "session-cleanup": {
-    errors: {
-      execution_failed: {
-        title: "Execution Failed",
-        description: "Session cleanup execution failed",
-      },
-      invalid_batch_size: {
-        title: "Invalid Batch Size",
-        description: "Batch size parameter is invalid",
-      },
-      invalid_session_retention: {
-        title: "Invalid Session Retention",
-        description: "Session retention parameter is invalid",
-      },
-      invalid_token_retention: {
-        title: "Invalid Token Retention",
-        description: "Token retention parameter is invalid",
-      },
-      partial_failure: {
-        title: "Partial Failure",
-        description: "Session cleanup partially failed",
-      },
-      validation_failed: {
-        title: "Validation Failed",
-        description: "Session cleanup validation failed",
-      },
-      unknown_error: {
-        title: "Unknown Error",
-        description: "An unknown error occurred during session cleanup",
-      },
     },
   },
 };

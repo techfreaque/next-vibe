@@ -5,5 +5,5 @@ import { translations as testMailTranslations } from "../../test-mail/i18n/en";
 export const translations = {
   journeys: journeysTranslations,
   services: servicesTranslations,
-  testMail: testMailTranslations
-} ;
+  testMail: testMailTranslations,
+};

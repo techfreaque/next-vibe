@@ -3,8 +3,6 @@
 import type { JSX } from "react";
 import React, { useState } from "react";
 
-import { ModelId, modelOptions } from "../../lib/config/models";
-import { SelectorBase, type SelectorOption } from "./selector-base";
 import {
   Button,
   Dialog,
@@ -14,6 +12,9 @@ import {
   Input,
   Label,
 } from "@/packages/next-vibe-ui/web/ui";
+
+import { ModelId, modelOptions } from "../../lib/config/models";
+import { SelectorBase, type SelectorOption } from "./selector-base";
 import { useFavorites } from "./use-favorites";
 
 interface ModelSelectorProps {
@@ -29,8 +30,14 @@ const DEFAULT_FAVORITES: ModelId[] = [
   ModelId.GEMINI_FLASH_2_0_LITE,
 ];
 
-export function ModelSelector({ value, onChange }: ModelSelectorProps): JSX.Element {
-  const [favorites, toggleFavorite] = useFavorites(STORAGE_KEY, DEFAULT_FAVORITES);
+export function ModelSelector({
+  value,
+  onChange,
+}: ModelSelectorProps): JSX.Element {
+  const [favorites, toggleFavorite] = useFavorites(
+    STORAGE_KEY,
+    DEFAULT_FAVORITES,
+  );
   const [addModelOpen, setAddModelOpen] = useState(false);
 
   // Convert models to selector options
@@ -89,9 +96,7 @@ export function ModelSelector({ value, onChange }: ModelSelectorProps): JSX.Elem
               <Button variant="outline" onClick={() => setAddModelOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={() => setAddModelOpen(false)}>
-                Add Model
-              </Button>
+              <Button onClick={() => setAddModelOpen(false)}>Add Model</Button>
             </div>
           </div>
         </DialogContent>
@@ -99,4 +104,3 @@ export function ModelSelector({ value, onChange }: ModelSelectorProps): JSX.Elem
     </>
   );
 }
-

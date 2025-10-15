@@ -164,6 +164,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.GROUPED_LIST,
           layout: { type: LayoutType.GRID, columns: 12 },
+          groupBy: "code",
         },
         objectField(
           {
@@ -296,9 +297,8 @@ export type ImapMessageSyncPostResponseOutput =
   typeof POST.types.ResponseOutput;
 
 // Export repository types for import standardization
-export type ImapMessageSyncRequestTypeOutput = ImapMessageSyncPostRequestOutput;
-export type ImapMessageSyncResponseTypeOutput =
-  ImapMessageSyncPostResponseOutput;
+export type ImapMessageSyncRequestOutput = ImapMessageSyncPostRequestOutput;
+export type ImapMessageSyncResponseOutput = ImapMessageSyncPostResponseOutput;
 
 const definitions = {
   POST,

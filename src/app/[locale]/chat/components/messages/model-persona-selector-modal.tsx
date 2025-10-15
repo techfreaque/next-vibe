@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { Send, X } from "lucide-react";
+import { cn } from "next-vibe/shared/utils";
+import { useState } from "react";
+
 import { Button, Textarea } from "@/packages/next-vibe-ui/web/ui";
+
+import type { ModelId } from "../../lib/config/models";
 import { ModelSelector } from "../input/model-selector";
 import { PersonaSelector } from "../input/persona-selector";
-import type { ModelId } from "../../lib/config/models";
-import { cn } from "next-vibe/shared/utils";
 
 interface ModelPersonaSelectorModalProps {
   title: string;
@@ -42,12 +44,12 @@ export function ModelPersonaSelectorModal({
   inputPlaceholder = "Type your response...",
 }: ModelPersonaSelectorModalProps) {
   return (
-    <div className="w-full">
+    <div className="w-full max-h-[80dvh] overflow-y-auto">
       <div
         className={cn(
           "p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
           "border border-border rounded-lg shadow-lg",
-          "w-full"
+          "w-full",
         )}
       >
         {/* Header */}
@@ -64,7 +66,7 @@ export function ModelPersonaSelectorModal({
               onChange={(e) => onInputChange?.(e.target.value)}
               placeholder={inputPlaceholder}
               rows={3}
-              className="w-full"
+              className="w-full min-h-[80px]"
               autoFocus
             />
           </div>
@@ -73,14 +75,8 @@ export function ModelPersonaSelectorModal({
         {/* Selectors */}
         <div className="space-y-3 mb-4">
           <div className="flex items-center gap-2 flex-wrap">
-            <ModelSelector
-              value={selectedModel}
-              onChange={onModelChange}
-            />
-            <PersonaSelector
-              value={selectedTone}
-              onChange={onToneChange}
-            />
+            <ModelSelector value={selectedModel} onChange={onModelChange} />
+            <PersonaSelector value={selectedTone} onChange={onToneChange} />
           </div>
         </div>
 
@@ -91,9 +87,9 @@ export function ModelPersonaSelectorModal({
             disabled={isLoading}
             size="sm"
             variant="ghost"
-            className="h-9"
+            className="h-10 min-h-[44px]"
           >
-            <X className="h-3.5 w-3.5 mr-2" />
+            <X className="h-4 w-4 mr-2" />
             Cancel
           </Button>
           <Button
@@ -101,9 +97,9 @@ export function ModelPersonaSelectorModal({
             disabled={isLoading || (showInput && !inputValue.trim())}
             size="sm"
             variant="default"
-            className="h-9"
+            className="h-10 min-h-[44px]"
           >
-            <Send className="h-3.5 w-3.5 mr-2" />
+            <Send className="h-4 w-4 mr-2" />
             {isLoading ? "Sending..." : confirmLabel}
           </Button>
         </div>
@@ -111,4 +107,3 @@ export function ModelPersonaSelectorModal({
     </div>
   );
 }
-

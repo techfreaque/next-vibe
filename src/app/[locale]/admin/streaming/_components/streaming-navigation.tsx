@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Bot, Zap } from "lucide-react";
+import { Bot } from "lucide-react";
 import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
@@ -15,7 +15,7 @@ import { simpleT } from "@/i18n/core/shared";
 
 interface StreamingNavigationProps {
   locale: CountryLanguage;
-  currentPage: "ai-stream" | "basic-stream";
+  currentPage: "ai-stream";
 }
 
 export function StreamingNavigation({
@@ -31,13 +31,6 @@ export function StreamingNavigation({
       icon: Bot,
       label: t("streamingApi.nav.aiStream"),
       description: t("streamingApi.nav.aiStreamDescription"),
-    },
-    {
-      key: "basic-stream",
-      href: `/${locale}/admin/streaming/basic-stream` as const,
-      icon: Zap,
-      label: t("streamingApi.nav.basicStream"),
-      description: t("streamingApi.nav.basicStreamDescription"),
     },
   ] as const;
 

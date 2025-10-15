@@ -8,8 +8,8 @@
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import type { JSX } from "react";
 
-import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/use-endpoint";
 import imapConfigDefinition from "@/app/api/[locale]/v1/core/emails/imap-client/config/definition";
+import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/use-endpoint";
 
 /**
  * IMAP Server Configuration Form Component

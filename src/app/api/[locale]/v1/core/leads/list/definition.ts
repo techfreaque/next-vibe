@@ -68,9 +68,11 @@ const { GET } = createEndpoint({
       searchPagination: objectField(
         {
           type: WidgetType.FORM_SECTION,
-          title: "app.api.v1.core.leads.list.get.searchPagination.title" as const,
-          description: "app.api.v1.core.leads.list.get.searchPagination.description" as const,
-          layout: { type: LayoutType.GRID_3_COLUMNS },
+          title:
+            "app.api.v1.core.leads.list.get.searchPagination.title" as const,
+          description:
+            "app.api.v1.core.leads.list.get.searchPagination.description" as const,
+          layout: { type: LayoutType.GRID, columns: 3 },
         },
         { request: "data" },
         {
@@ -79,8 +81,10 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.v1.core.leads.list.get.search.label" as const,
-              description: "app.api.v1.core.leads.list.get.search.description" as const,
-              placeholder: "app.api.v1.core.leads.list.get.search.placeholder" as const,
+              description:
+                "app.api.v1.core.leads.list.get.search.description" as const,
+              placeholder:
+                "app.api.v1.core.leads.list.get.search.placeholder" as const,
               layout: { columns: 8 },
             },
             z.string().optional(),
@@ -90,8 +94,10 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.NUMBER,
               label: "app.api.v1.core.leads.list.get.page.label" as const,
-              description: "app.api.v1.core.leads.list.get.page.description" as const,
-              placeholder: "app.api.v1.core.leads.list.get.page.placeholder" as const,
+              description:
+                "app.api.v1.core.leads.list.get.page.description" as const,
+              placeholder:
+                "app.api.v1.core.leads.list.get.page.placeholder" as const,
               layout: { columns: 2 },
               validation: { min: 1 },
             },
@@ -102,8 +108,10 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.NUMBER,
               label: "app.api.v1.core.leads.list.get.limit.label" as const,
-              description: "app.api.v1.core.leads.list.get.limit.description" as const,
-              placeholder: "app.api.v1.core.leads.list.get.limit.placeholder" as const,
+              description:
+                "app.api.v1.core.leads.list.get.limit.description" as const,
+              placeholder:
+                "app.api.v1.core.leads.list.get.limit.placeholder" as const,
               layout: { columns: 2 },
               validation: { min: 1, max: 100 },
             },
@@ -117,7 +125,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.FORM_SECTION,
           title: "app.api.v1.core.leads.list.get.statusFilters.title" as const,
-          description: "app.api.v1.core.leads.list.get.statusFilters.description" as const,
+          description:
+            "app.api.v1.core.leads.list.get.statusFilters.description" as const,
           layout: { type: LayoutType.GRID_2_COLUMNS },
         },
         { request: "data" },
@@ -127,8 +136,10 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
               label: "app.api.v1.core.leads.list.get.status.label" as const,
-              description: "app.api.v1.core.leads.list.get.status.description" as const,
-              placeholder: "app.api.v1.core.leads.list.get.status.placeholder" as const,
+              description:
+                "app.api.v1.core.leads.list.get.status.description" as const,
+              placeholder:
+                "app.api.v1.core.leads.list.get.status.placeholder" as const,
               options: LeadStatusFilterOptions,
               layout: { columns: 6 },
             },
@@ -138,9 +149,12 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.v1.core.leads.list.get.currentCampaignStage.label" as const,
-              description: "app.api.v1.core.leads.list.get.currentCampaignStage.description" as const,
-              placeholder: "app.api.v1.core.leads.list.get.currentCampaignStage.placeholder" as const,
+              label:
+                "app.api.v1.core.leads.list.get.currentCampaignStage.label" as const,
+              description:
+                "app.api.v1.core.leads.list.get.currentCampaignStage.description" as const,
+              placeholder:
+                "app.api.v1.core.leads.list.get.currentCampaignStage.placeholder" as const,
               options: EmailCampaignStageFilterOptions,
               layout: { columns: 6 },
             },
@@ -151,8 +165,10 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
               label: "app.api.v1.core.leads.list.get.source.label" as const,
-              description: "app.api.v1.core.leads.list.get.source.description" as const,
-              placeholder: "app.api.v1.core.leads.list.get.source.placeholder" as const,
+              description:
+                "app.api.v1.core.leads.list.get.source.description" as const,
+              placeholder:
+                "app.api.v1.core.leads.list.get.source.placeholder" as const,
               options: LeadSourceFilterOptions,
               layout: { columns: 12 },
             },
@@ -165,10 +181,11 @@ const { GET } = createEndpoint({
       locationFilters: objectField(
         {
           type: WidgetType.FORM_SECTION,
-          title: "app.api.v1.core.leads.list.get.locationFilters.title" as const,
-          description: "app.api.v1.core.leads.list.get.locationFilters.description" as const,
+          title:
+            "app.api.v1.core.leads.list.get.locationFilters.title" as const,
+          description:
+            "app.api.v1.core.leads.list.get.locationFilters.description" as const,
           layout: { type: LayoutType.GRID_2_COLUMNS },
-          collapsed: true,
         },
         { request: "data" },
         {
@@ -177,12 +194,17 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
               label: "app.api.v1.core.leads.list.get.country.label" as const,
-              description: "app.api.v1.core.leads.list.get.country.description" as const,
-              placeholder: "app.api.v1.core.leads.list.get.country.placeholder" as const,
-              options: Object.entries(Countries).map(([, value]) => ({
-                value: value,
-                label: `app.api.v1.core.leads.enums.country.${value.toLowerCase()}` as const,
-              })),
+              description:
+                "app.api.v1.core.leads.list.get.country.description" as const,
+              placeholder:
+                "app.api.v1.core.leads.list.get.country.placeholder" as const,
+              options: Object.entries(Countries).map(
+                ([, value]: [string, string]) => ({
+                  value: value,
+                  label:
+                    `app.api.v1.core.leads.enums.country.${value.toLowerCase()}` as const,
+                }),
+              ),
               layout: { columns: 6 },
             },
             z.array(z.string()).optional(),
@@ -192,12 +214,17 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
               label: "app.api.v1.core.leads.list.get.language.label" as const,
-              description: "app.api.v1.core.leads.list.get.language.description" as const,
-              placeholder: "app.api.v1.core.leads.list.get.language.placeholder" as const,
-              options: Object.entries(Languages).map(([, value]) => ({
-                value: value,
-                label: `app.api.v1.core.leads.enums.language.${value.toLowerCase()}` as const,
-              })),
+              description:
+                "app.api.v1.core.leads.list.get.language.description" as const,
+              placeholder:
+                "app.api.v1.core.leads.list.get.language.placeholder" as const,
+              options: Object.entries(Languages).map(
+                ([, value]: [string, string]) => ({
+                  value: value,
+                  label:
+                    `app.api.v1.core.leads.enums.language.${value.toLowerCase()}` as const,
+                }),
+              ),
               layout: { columns: 6 },
             },
             z.array(z.string()).optional(),
@@ -210,9 +237,9 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.FORM_SECTION,
           title: "app.api.v1.core.leads.list.get.sortingOptions.title" as const,
-          description: "app.api.v1.core.leads.list.get.sortingOptions.description" as const,
+          description:
+            "app.api.v1.core.leads.list.get.sortingOptions.description" as const,
           layout: { type: LayoutType.GRID_2_COLUMNS },
-          collapsed: true,
         },
         { request: "data" },
         {
@@ -221,20 +248,27 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.v1.core.leads.list.get.sortBy.label" as const,
-              description: "app.api.v1.core.leads.list.get.sortBy.description" as const,
-              placeholder: "app.api.v1.core.leads.list.get.sortBy.placeholder" as const,
+              description:
+                "app.api.v1.core.leads.list.get.sortBy.description" as const,
+              placeholder:
+                "app.api.v1.core.leads.list.get.sortBy.placeholder" as const,
               options: LeadSortFieldOptions,
               layout: { columns: 6 },
             },
-            z.nativeEnum(LeadSortField).optional().default(LeadSortField.CREATED_AT),
+            z
+              .nativeEnum(LeadSortField)
+              .optional()
+              .default(LeadSortField.CREATED_AT),
           ),
           sortOrder: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.v1.core.leads.list.get.sortOrder.label" as const,
-              description: "app.api.v1.core.leads.list.get.sortOrder.description" as const,
-              placeholder: "app.api.v1.core.leads.list.get.sortOrder.placeholder" as const,
+              description:
+                "app.api.v1.core.leads.list.get.sortOrder.description" as const,
+              placeholder:
+                "app.api.v1.core.leads.list.get.sortOrder.placeholder" as const,
               options: SortOrderOptions,
               layout: { columns: 6 },
             },
@@ -582,6 +616,14 @@ const { GET } = createEndpoint({
         statusFilters: {
           status: [LeadStatusFilter.ALL],
         },
+        locationFilters: {
+          country: [],
+          language: [],
+        },
+        sortingOptions: {
+          sortBy: LeadSortField.CREATED_AT,
+          sortOrder: SortOrder.DESC,
+        },
       },
       filtered: {
         searchPagination: {
@@ -592,11 +634,15 @@ const { GET } = createEndpoint({
         statusFilters: {
           status: [LeadStatusFilter.NEW, LeadStatusFilter.PENDING],
           source: [LeadSourceFilter.WEBSITE],
-          currentCampaignStage: [EmailCampaignStageFilter.INITIAL_CONTACT],
+          currentCampaignStage: [EmailCampaignStageFilter.INITIAL],
         },
         locationFilters: {
           country: ["US", "CA"],
           language: ["en"],
+        },
+        sortingOptions: {
+          sortBy: LeadSortField.CREATED_AT,
+          sortOrder: SortOrder.DESC,
         },
       },
       customSorting: {
@@ -605,10 +651,14 @@ const { GET } = createEndpoint({
           limit: 50,
         },
         statusFilters: {
-          status: [LeadStatusFilter.CONVERTED],
+          status: [LeadStatusFilter.SIGNED_UP],
+        },
+        locationFilters: {
+          country: [],
+          language: [],
         },
         sortingOptions: {
-          sortBy: LeadSortField.CONVERTED_AT,
+          sortBy: LeadSortField.UPDATED_AT,
           sortOrder: SortOrder.ASC,
         },
       },
@@ -659,6 +709,44 @@ const { GET } = createEndpoint({
           page: 1,
           limit: 10,
           totalPages: 0,
+        },
+      },
+      customSorting: {
+        response: {
+          leads: [
+            {
+              id: "123e4567-e89b-12d3-a456-426614174001",
+              email: "jane@startup.com",
+              businessName: "Startup Inc",
+              contactName: "Jane Smith",
+              phone: "+9876543210",
+              website: "https://startup.example.com",
+              country: "GLOBAL",
+              language: "EN",
+              status: LeadStatus.SIGNED_UP,
+              source: LeadSource.REFERRAL,
+              notes: null,
+              convertedUserId: "user-123",
+              convertedAt: new Date("2023-06-01T00:00:00.000Z"),
+              signedUpAt: new Date("2023-05-15T00:00:00.000Z"),
+              consultationBookedAt: null,
+              subscriptionConfirmedAt: null,
+              currentCampaignStage: EmailCampaignStage.FOLLOWUP_1,
+              emailsSent: 3,
+              lastEmailSentAt: new Date("2023-05-20T00:00:00.000Z"),
+              unsubscribedAt: null,
+              emailsOpened: 2,
+              emailsClicked: 1,
+              lastEngagementAt: new Date("2023-05-21T00:00:00.000Z"),
+              metadata: {},
+              createdAt: new Date("2023-05-01T00:00:00.000Z"),
+              updatedAt: new Date("2023-06-01T00:00:00.000Z"),
+            },
+          ],
+          total: 25,
+          page: 1,
+          limit: 50,
+          totalPages: 1,
         },
       },
     },

@@ -16,6 +16,58 @@ interface ReleaseConfig {
 }
 
 /**
+ * Type guard to check if an error has a code property
+ */
+function isErrorWithCode(error: unknown): error is Error & { code: string } {
+  return (
+    error instanceof Error &&
+    typeof (error as Error & { code?: string }).code === "string"
+  );
+}
+
+/**
+ * Type guard to check if an unknown value is an Error
+ */
+function isError(error: unknown): error is Error {
+  return error instanceof Error;
+}
+
+/**
+ * Type guard to check if module has a default export with ReleaseConfig
+ */
+function hasDefaultReleaseConfig(
+  module: unknown,
+): module is { default: ReleaseConfig } {
+  if (typeof module !== "object" || module === null) {
+    return false;
+  }
+  if (!("default" in module)) {
+    return false;
+  }
+  const defaultExport = (module as { default: unknown }).default;
+  if (typeof defaultExport !== "object" || defaultExport === null) {
+    return false;
+  }
+  return (
+    "packages" in defaultExport &&
+    Array.isArray((defaultExport as { packages: unknown }).packages)
+  );
+}
+
+/**
+ * Type guard to check if module is directly a ReleaseConfig
+ */
+function isDirectReleaseConfig(module: unknown): module is ReleaseConfig {
+  if (typeof module !== "object" || module === null) {
+    return false;
+  }
+  return (
+    "packages" in module &&
+    Array.isArray((module as { packages: unknown }).packages)
+  );
+}
+
+/**
  * Discovers all release.config.ts files in the monorepo
  */
 export function discoverReleaseTargets(rootDir: string): ReleaseTarget[] {
@@ -59,8 +111,11 @@ export function discoverReleaseTargets(rootDir: string): ReleaseTarget[] {
         } catch (statError) {
           // Skip files/directories we can't stat (like broken symlinks, sockets, etc.)
           // Only log if it's not a common issue
-          const error = statError as Error & { code?: string };
-          if (error.code !== "ENOENT" && !fullPath.includes("mysql")) {
+          if (
+            isErrorWithCode(statError) &&
+            statError.code !== "ENOENT" &&
+            !fullPath.includes("mysql")
+          ) {
             loggerError(`Failed to stat ${fullPath}:`, statError);
           }
         }
@@ -68,8 +123,9 @@ export function discoverReleaseTargets(rootDir: string): ReleaseTarget[] {
     } catch (error) {
       // Skip directories we can't read
       // Only log if it's not a permission issue
-      const fsError = error as Error & { code?: string };
-      if (fsError.code !== "EACCES") {
+      if (isErrorWithCode(error) && error.code !== "EACCES") {
+        loggerError(`Failed to read directory ${dir}:`, error);
+      } else if (!isErrorWithCode(error)) {
         loggerError(`Failed to read directory ${dir}:`, error);
       }
     }
@@ -156,10 +212,16 @@ export async function findTargetByGitTag(
 
       // Dynamically import the release config using dynamic import
       const configFileUrl = pathToFileURL(configPath).href;
-      const configModule = (await import(configFileUrl)) as {
-        default?: ReleaseConfig;
-      } & ReleaseConfig;
-      const config: ReleaseConfig = configModule.default || configModule;
+      const importedModule = await import(configFileUrl);
+
+      let config: ReleaseConfig;
+      if (hasDefaultReleaseConfig(importedModule)) {
+        config = importedModule.default;
+      } else if (isDirectReleaseConfig(importedModule)) {
+        config = importedModule;
+      } else {
+        continue;
+      }
 
       // Check each package in the config
       for (const pkg of config.packages || []) {
@@ -173,9 +235,8 @@ export async function findTargetByGitTag(
       }
     } catch (error) {
       // Skip targets with invalid configs
-      logger(
-        `Failed to load config for ${target.directory}: ${(error as Error).message}`,
-      );
+      const errorMessage = isError(error) ? error.message : String(error);
+      logger(`Failed to load config for ${target.directory}: ${errorMessage}`);
     }
   }
 
@@ -187,10 +248,17 @@ export async function findTargetByGitTag(
   for (const target of targets) {
     try {
       const configFileUrl = pathToFileURL(target.configPath).href;
-      const configModule = (await import(configFileUrl)) as {
-        default?: ReleaseConfig;
-      } & ReleaseConfig;
-      const config: ReleaseConfig = configModule.default || configModule;
+      const importedModule = await import(configFileUrl);
+
+      let config: ReleaseConfig;
+      if (hasDefaultReleaseConfig(importedModule)) {
+        config = importedModule.default;
+      } else if (isDirectReleaseConfig(importedModule)) {
+        config = importedModule;
+      } else {
+        continue;
+      }
+
       for (const pkg of config.packages || []) {
         if (pkg.release?.tagPrefix) {
           availablePrefixes.push(

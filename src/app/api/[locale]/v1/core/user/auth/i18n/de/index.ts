@@ -42,6 +42,11 @@ export const translations: typeof enTranslations = {
       title: "Cookie löschen fehlgeschlagen",
       description: "Authentifizierungs-Cookie konnte nicht gelöscht werden",
     },
+    publicPayloadNotSupported: {
+      title: "Öffentlicher Payload nicht unterstützt",
+      description:
+        "Öffentlicher JWT-Payload wird für CLI-Authentifizierung nicht unterstützt",
+    },
   },
   post: {
     title: "Titel",

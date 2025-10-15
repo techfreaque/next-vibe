@@ -62,6 +62,13 @@ export const translations: typeof enTranslations = {
       label: "Nachricht",
       description: "Antwortnachricht",
     },
+    securityTip:
+      "Erwägen Sie die Aktivierung der Zwei-Faktor-Authentifizierung für bessere Sicherheit",
+    nextSteps: [
+      "Melden Sie sich mit Ihrem neuen Passwort an",
+      "Aktualisieren Sie gespeicherte Passwörter in Ihrem Browser",
+      "Erwägen Sie die Aktivierung von 2FA für zusätzliche Sicherheit",
+    ],
   },
   errors: {
     validation: {

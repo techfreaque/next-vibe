@@ -106,6 +106,43 @@ export type ResponseType<TResponseData> =
   | SuccessResponseType<TResponseData>
   | ErrorResponseType;
 
+/**
+ * Streaming response marker
+ * When a handler returns this, the Next.js handler will return the Response directly
+ * without wrapping it in NextResponse.json()
+ *
+ * NOTE: This is NOT part of ResponseType - it's a separate return type for streaming handlers
+ */
+export interface StreamingResponse {
+  __isStreamingResponse: true;
+  response: Response;
+}
+
+/**
+ * Create a streaming response marker
+ * Use this in handlers that need to return streaming responses
+ */
+export function createStreamingResponse(response: Response): StreamingResponse {
+  return {
+    __isStreamingResponse: true,
+    response,
+  };
+}
+
+/**
+ * Type guard to check if a response is a streaming response
+ */
+export function isStreamingResponse(
+  value: unknown,
+): value is StreamingResponse {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "__isStreamingResponse" in value &&
+    value.__isStreamingResponse === true
+  );
+}
+
 export type MessageResponseType = z.infer<typeof messageResponseSchema>;
 
 export interface ErrorResponseType {

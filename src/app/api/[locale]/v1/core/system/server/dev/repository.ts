@@ -12,16 +12,16 @@ import { spawn } from "node:child_process";
 import { seedDatabase } from "next-vibe/server/db/seed-manager";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { EndpointLogger } from "../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { databaseMigrationRepository } from "../../db/migrate/repository";
 import { dockerOperationsRepository } from "../../db/utils/docker-operations/repository";
 import { dbUtilsRepository } from "../../db/utils/repository";
 import type { Task } from "../../tasks/types/repository";
 import { unifiedTaskRunnerRepository } from "../../tasks/unified-runner/repository";
+import type { EndpointLogger } from "../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type endpoints from "./definition";
 
 type RequestType = typeof endpoints.POST.types.RequestOutput;
@@ -152,19 +152,19 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   private async waitForDatabaseConnection(
     logger: EndpointLogger,
   ): Promise<void> {
-    const maxAttempts = 50; // Increased to match CLI reset script
-    const delayMs = 200; // Reduced delay to match CLI reset script
+    const maxAttempts = 60; // 60 attempts = 30 seconds
+    const delayMs = 500; // 500ms between attempts
 
     logger.debug("Waiting for database to be ready...");
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        // Wait a bit before checking (same as CLI reset script)
+        // Wait a bit before checking
         await new Promise<void>((resolve) => {
           setTimeout(resolve, delayMs);
         });
 
-        // Use proper database connection test (same as CLI reset script)
+        // Use proper database connection test
         const { Pool } = await import("pg");
 
         const pool = new Pool({
@@ -177,24 +177,34 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
           await pool.query(testQuery);
           await pool.end();
 
-          logger.debug(`Database connection ready after ${attempt} attempts`);
+          logger.debug(
+            `✅ Database connection ready after ${attempt} attempts (${(attempt * delayMs) / 1000}s)`,
+          );
           return;
         } catch (connError) {
           await pool.end().catch(() => {});
-          // Don't throw - continue with retry logic
-          logger.debug("Database connection attempt failed", {
-            error: connError,
-          });
+          // Log progress every 10 attempts
+          if (attempt % 10 === 0) {
+            logger.debug(
+              `⏳ Still waiting for database... (${attempt}/${maxAttempts})`,
+            );
+          }
         }
       } catch {
         if (attempt === maxAttempts) {
-          logger.warn("Database connection timeout - continuing anyway");
-          return;
+          logger.error(
+            "❌ Database connection timeout - this will cause errors",
+          );
+          throw new Error(
+            `Database connection timeout after ${maxAttempts} attempts (${(maxAttempts * delayMs) / 1000}s)`,
+          );
         }
 
-        logger.debug(
-          `Database not ready yet, retrying (${attempt}/${maxAttempts})...`,
-        );
+        if (attempt % 10 === 0) {
+          logger.debug(
+            `⏳ Database not ready yet, retrying (${attempt}/${maxAttempts})...`,
+          );
+        }
       }
     }
   }
@@ -276,9 +286,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
 
               logger.vibe("✅ Database started");
             } catch (error) {
-              const { parseError } = await import(
-                "next-vibe/shared/utils"
-              );
+              const { parseError } = await import("next-vibe/shared/utils");
               const parsedError = parseError(error);
               logger.vibe("❌ Failed to start database");
               logger.error("Database startup error details", parsedError);
@@ -302,16 +310,14 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
           );
 
           // Seed database
-          await seedDatabase("dev", logger);
+          await seedDatabase("dev", logger, locale);
           logger.vibe("✅ Database ready");
         } else {
           logger.vibe("⚠️ Docker unavailable (continuing anyway)");
           logger.vibe("🔧 Install Docker to enable database functionality");
         }
       } catch (error) {
-        const { parseError } = await import(
-          "next-vibe/shared/utils"
-        );
+        const { parseError } = await import("next-vibe/shared/utils");
         const parsedError = parseError(error);
         logger.vibe("❌ Database setup failed (continuing anyway)");
         logger.error("Database setup error details", parsedError);
@@ -328,9 +334,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         await this.startUnifiedTaskRunner(locale, logger, data);
         logger.vibe("✅ Task runner started in background");
       } catch (error) {
-        const { parseError } = await import(
-          "next-vibe/shared/utils"
-        );
+        const { parseError } = await import("next-vibe/shared/utils");
         const parsedError = parseError(error);
         logger.vibe("⚠️ Task runner startup failed (continuing anyway)");
         logger.error("Task runner startup error details", parsedError);

@@ -7,7 +7,10 @@
 import "server-only";
 
 import type { NextRequest } from "next/server";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type {
+  ResponseType,
+  StreamingResponse,
+} from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   ErrorResponseTypes,
@@ -24,7 +27,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { Methods } from "../../endpoint-types/core/enums";
-import type { UnifiedField } from "../../endpoint-types/core/types";
 import type { ApiEndpoint } from "../../endpoint-types/endpoint/create";
 import type { EndpointLogger } from "../logger";
 import type {
@@ -43,7 +45,7 @@ export interface HandlerContext<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TFields,
 > {
   endpoint: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>;
   handler: ApiHandlerFunction<
@@ -63,8 +65,11 @@ export interface HandlerContext<
 
 /**
  * Handler execution result - handlers return OUTPUT types
+ * Can be either a standard ResponseType or a StreamingResponse for streaming endpoints
  */
-export type HandlerResult<TResponse> = ResponseType<TResponse>;
+export type HandlerResult<TResponse> =
+  | ResponseType<TResponse>
+  | StreamingResponse;
 
 /**
  * Execute handler with unified authentication and error handling
@@ -78,7 +83,7 @@ export async function executeHandler<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TFields,
 >(
   context: HandlerContext<
     TRequestOutput,
@@ -143,7 +148,7 @@ export async function authenticateUser<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TFields,
 >(
   endpoint: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
   context: AuthContext,
@@ -193,7 +198,7 @@ export async function authenticateTypedUser<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TFields,
 >(
   endpoint: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
   context: AuthContext,

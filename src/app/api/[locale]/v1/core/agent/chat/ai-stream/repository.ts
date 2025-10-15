@@ -1,210 +1,136 @@
 /**
  * AI Stream Repository
- * Data access layer for AI streaming functionality using OpenAI GPT-4o
+ * Handles AI streaming chat functionality using OpenAI GPT-4o and Uncensored.ai
  */
 
 import "server-only";
 
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { streamText } from "ai";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  createErrorResponse,
-  createSuccessResponse,
+  createStreamingResponse,
   ErrorResponseTypes,
+  type ResponseType,
+  type StreamingResponse,
 } from "next-vibe/shared/types/response.schema";
-import { z } from "zod";
 
-import type { EndpointLogger } from "../../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import { braveSearch } from "@/app/api/[locale]/v1/core/agent/chat/tools/brave-search/repository";
+import { env } from "@/config/env";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { TFunction } from "@/i18n/core/static-types";
+
+import type { EndpointLogger } from "../../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type {
-  AiStreamPostRequestTypeOutput,
-  chatMessageSchema,
+  AiStreamPostRequestOutput,
+  AiStreamPostResponseOutput,
 } from "./definition";
-import { JwtPayloadType } from "../../../user/auth/definition";
-import { createUncensoredAI, isUncensoredAIModel } from "./providers/uncensored-ai";
-
-type ChatMessage = z.infer<typeof chatMessageSchema>;
+import { isUncensoredAIModel } from "./providers/uncensored-ai";
+import { handleUncensoredAI } from "./providers/uncensored-handler";
 
 /**
- * Environment validation schema
+ * Maximum duration for streaming responses (in seconds)
  */
-const envSchema = z.object({
-  OPENROUTER_API_KEY: z.string().min(1),
-});
+export const maxDuration = 30;
 
 /**
- * AI Stream Repository Interface
+ * Create AI streaming response
+ * Returns either a StreamingResponse for streaming endpoints or ResponseType for errors
  */
-export interface AiStreamRepository {
-  streamChat(
-    data: AiStreamPostRequestTypeOutput,
-    logger: EndpointLogger,
-    user: JwtPayloadType,
-  ): Response;
+export async function createAiStream({
+  data,
+  locale,
+  logger,
+}: {
+  data: AiStreamPostRequestOutput;
+  t: TFunction;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
+}): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse> {
+  logger.info("Creating AI stream", {
+    model: data.model,
+    messageCount: data.messages.length,
+    temperature: data.temperature,
+    maxTokens: data.maxTokens,
+  });
 
-  validateEnvironment(logger: EndpointLogger): ResponseType<boolean>;
-}
+  // Prepare messages with optional system prompt
+  const messages = data.systemPrompt
+    ? [
+        { role: "system" as const, content: data.systemPrompt },
+        ...data.messages.map((msg) => ({
+          role: msg.role,
+          content: msg.content,
+        })),
+      ]
+    : data.messages.map((msg) => ({
+        role: msg.role,
+        content: msg.content,
+      }));
 
-/**
- * AI Stream Repository Implementation
- */
-class AiStreamRepositoryImpl implements AiStreamRepository {
-  /**
-   * Validate environment variables
-   */
-  validateEnvironment(logger: EndpointLogger): ResponseType<boolean> {
-    try {
-      // eslint-disable-next-line node/no-process-env -- Required for environment validation
-      const env = envSchema.parse(process.env);
-
-      if (!env.OPENROUTER_API_KEY) {
-        return createErrorResponse(
-          "app.api.v1.core.agent.chat.aiStream.streamingErrors.aiStream.error.apiKey.missing",
-          ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        );
-      }
-
-      return createSuccessResponse(true);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(
-        error,
-      );
-      logger.error("Environment validation failed", { error: errorMessage });
-      return createErrorResponse(
-        "app.api.v1.core.agent.chat.aiStream.streamingErrors.aiStream.error.apiKey.invalid",
-        ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-      );
-    }
-  }
-
-  /**
-   * Stream chat responses using OpenAI GPT-4o
-   */
-  streamChat(
-    data: AiStreamPostRequestTypeOutput,
-    logger: EndpointLogger,
-    user: JwtPayloadType,
-  ): Response {
-    try {
-      logger.debug("Starting AI stream request", {
-        messageCount: data.messages.length,
-        model: data.model,
-        user,
-      });
-
-      // Validate environment
-      const envValidation = this.validateEnvironment(logger);
-      if (!envValidation.success) {
-        // Return a streaming error response
-        return new Response(
-          JSON.stringify({
-            error:
-              "app.api.v1.core.agent.chat.aiStream.streamingErrors.aiStream.error.configuration",
-            success: false,
-          }),
-          {
-            status: 500,
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        );
-      }
-
-      // Prepare messages for OpenAI - convert roles to lowercase
-      // Build ModelMessage[] with content parts expected by AI SDK
-      const messages = (
-        data.systemPrompt
-          ? [
-              {
-                role: "system" as const,
-                content: data.systemPrompt, // system expects plain string
-              },
-              ...data.messages.map((msg: ChatMessage) => ({
-                role: (msg.role as "user" | "assistant"),
-                content: [{ type: "text" as const, text: msg.content }],
-              })),
-            ]
-          : data.messages.map((msg: ChatMessage) => ({
-              role: (msg.role as "user" | "assistant"),
-              content: [{ type: "text" as const, text: msg.content }],
-            }))
-      );
-
-      logger.debug("Prepared messages for AI stream", {
-        messageCount: messages.length,
-        hasSystemPrompt: !!data.systemPrompt,
-      });
-
-      // Determine which provider to use based on model
-      // eslint-disable-next-line node/no-process-env -- Required for API key
-      let provider;
-      let modelId = data.model || "openai/gpt-5-nano";
-
-      if (isUncensoredAIModel(modelId)) {
-        // Use Uncensored.ai provider
-        if (!process.env.UNCENSORED_AI_API_KEY) {
-          logger.error("Uncensored.ai API key not configured");
-          return new Response(
-            JSON.stringify({
-              error: "Uncensored.ai API key not configured",
-            }),
-            {
-              status: 500,
-              headers: { "Content-Type": "application/json" },
-            }
-          );
-        }
-        provider = createUncensoredAI({
-          apiKey: process.env.UNCENSORED_AI_API_KEY,
-        });
-        modelId = "uncensored-lm"; // Normalize model ID for Uncensored.ai
-        logger.debug("Using Uncensored.ai provider");
-      } else {
-        // Use OpenRouter provider
-        provider = createOpenRouter({
-          apiKey: process.env.OPENROUTER_API_KEY,
-        });
-        logger.debug("Using OpenRouter provider", { model: modelId });
-      }
-
-      // Create streaming response
-      const result = streamText({
-        model: provider(modelId),
-        messages,
-        temperature: data.temperature,
-      });
-
-      logger.debug("AI stream setup successful");
-
-      // Return the streaming response
-      return result.toTextStreamResponse();
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(
-        error,
-      );
-      logger.error("AI stream processing failed", { error: errorMessage });
-
-      // Return error as streaming response
-      return new Response(
-        JSON.stringify({
-          error:
-            "app.api.v1.core.agent.chat.aiStream.streamingErrors.aiStream.error.processing",
+  try {
+    // Special handling for Uncensored.ai - doesn't support streaming
+    if (isUncensoredAIModel(data.model)) {
+      if (!env.UNCENSORED_AI_API_KEY) {
+        logger.error("Uncensored.ai API key not configured");
+        return {
           success: false,
-          message: error instanceof Error ? error.message : String(error),
-        }),
-        {
-          status: 500,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
+          message:
+            "app.api.v1.core.agent.chat.aiStream.route.errors.uncensoredApiKeyMissing",
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        };
+      }
+
+      const response = await handleUncensoredAI(
+        env.UNCENSORED_AI_API_KEY,
+        messages,
+        data.temperature,
+        data.maxTokens,
+        locale,
       );
+
+      return createStreamingResponse(response);
     }
+
+    const provider = createOpenRouter({
+      apiKey: env.OPENROUTER_API_KEY,
+    });
+
+    logger.info("Starting OpenRouter stream", {
+      model: data.model,
+      enableSearch: data.enableSearch,
+    });
+
+    // Build tools object conditionally
+    const tools = data.enableSearch ? { braveSearch } : undefined;
+
+    const result = streamText({
+      model: provider(data.model),
+      messages,
+      temperature: data.temperature,
+      abortSignal: AbortSignal.timeout(maxDuration * 1000),
+      ...(tools && { tools, maxSteps: 5 }),
+    });
+
+    const streamResponse = result.toTextStreamResponse();
+
+    logger.info("Stream created successfully");
+
+    return createStreamingResponse(streamResponse);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error("Failed to create AI stream", {
+      error: errorMessage,
+      model: data.model,
+    });
+
+    return {
+      success: false,
+      message:
+        "app.api.v1.core.agent.chat.aiStream.route.errors.streamCreationFailed",
+      errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      messageParams: {
+        error: errorMessage,
+      },
+    };
   }
 }
-
-/**
- * Repository instance
- */
-export const aiStreamRepository = new AiStreamRepositoryImpl();

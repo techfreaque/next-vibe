@@ -8,11 +8,16 @@ import type z from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import type { UnifiedField } from "../../endpoint-types/core/types";
-import type { Methods } from "../../endpoint-types/core/enums";
+import type { FieldUsage, Methods } from "../../endpoint-types/core/enums";
+import type {
+  ExtractInput,
+  InferSchemaFromField,
+  UnifiedField,
+} from "../../endpoint-types/core/types";
+import type { CreateApiEndpoint } from "../../endpoint-types/endpoint/create";
 import { authenticateUser, executeHandler } from "../core/handler-core";
 import { createEndpointLogger } from "../logger/endpoint-logger";
-import type { ApiHandlerOptions } from "../types";
+import type { ApiHandlerFunction, ApiHandlerOptions } from "../types";
 import { convertToTRPCError, handleNextVibeResponse } from "./trpc";
 import type { TRPCContext } from "./trpc-context";
 import type { TrpcHandlerReturnType as TrpcHandlerType } from "./types";
@@ -30,9 +35,36 @@ export function createTRPCHandler<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
->(
-  options: ApiHandlerOptions<
+  TFields,
+  TRequestInput = ExtractInput<
+    InferSchemaFromField<TFields, FieldUsage.RequestData>
+  >,
+  TResponseInput = ExtractInput<
+    InferSchemaFromField<TFields, FieldUsage.Response>
+  >,
+  TUrlVariablesInput = ExtractInput<
+    InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+  >,
+>(options: {
+  endpoint: CreateApiEndpoint<
+    TExampleKey,
+    TMethod,
+    TUserRoleValue,
+    TFields,
+    TRequestInput,
+    TRequestOutput,
+    TResponseInput,
+    TResponseOutput,
+    TUrlVariablesInput,
+    TUrlVariablesOutput
+  >;
+  handler: ApiHandlerFunction<
+    TRequestOutput,
+    TResponseOutput,
+    TUrlVariablesOutput,
+    TUserRoleValue
+  >;
+  email?: ApiHandlerOptions<
     TRequestOutput,
     TResponseOutput,
     TUrlVariablesOutput,
@@ -40,8 +72,17 @@ export function createTRPCHandler<
     TMethod,
     TUserRoleValue,
     TFields
-  >,
-): TrpcHandlerType<TRequestOutput, TResponseOutput, TUrlVariablesOutput> {
+  >["email"];
+  sms?: ApiHandlerOptions<
+    TRequestOutput,
+    TResponseOutput,
+    TUrlVariablesOutput,
+    TExampleKey,
+    TMethod,
+    TUserRoleValue,
+    TFields
+  >["sms"];
+}): TrpcHandlerType<TRequestOutput, TResponseOutput, TUrlVariablesOutput> {
   const { endpoint, handler } = options;
 
   return async (

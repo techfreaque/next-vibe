@@ -137,7 +137,8 @@ export const modelOptions: ModelOption[] = [
     id: ModelId.UNCENSORED_LM_V1_1,
     name: "UncensoredLM v1.1",
     provider: "Uncensored.ai",
-    description: "Uncensored language model without content filtering - $0.05 per inference",
+    description:
+      "Uncensored language model without content filtering - $0.05 per inference",
     parameterCount: undefined,
     contextWindow: 32768,
     icon: ShieldOffIcon,

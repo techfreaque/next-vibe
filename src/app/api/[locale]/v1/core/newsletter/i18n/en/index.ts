@@ -73,4 +73,9 @@ export const translations = {
       complained: "Complained",
     },
   },
+  hooks: {
+    errors: {
+      missing_lead_id: "Newsletter subscription: Missing leadId",
+    },
+  },
 };

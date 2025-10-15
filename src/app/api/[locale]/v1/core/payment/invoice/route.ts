@@ -16,14 +16,12 @@ export const { POST, tools } = endpointsHandler({
   endpoint: invoiceDefinitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
-      const userId = authRepository.requireUserId(user);
-      return await paymentRepository.createInvoice(
-        userId,
+    handler: ({ data, user, locale, logger }) =>
+      paymentRepository.createInvoice(
+        authRepository.requireUserId(user),
         data,
         locale,
         logger,
-      );
-    },
+      ),
   },
 });

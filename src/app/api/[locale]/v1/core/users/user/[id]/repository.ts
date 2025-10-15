@@ -6,12 +6,6 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
-import { users } from "@/app/api/[locale]/v1/core/user/db";
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -20,10 +14,17 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import { users } from "@/app/api/[locale]/v1/core/user/db";
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type {
-  UserDeleteResponseTypeOutput,
-  UserGetResponseTypeOutput,
-  UserPutRequestTypeOutput,
+  UserDeleteResponseOutput,
+  UserGetResponseOutput,
+  UserPutRequestOutput,
+  UserPutResponseOutput,
 } from "./definition";
 
 export interface UserByIdRepository {
@@ -32,21 +33,21 @@ export interface UserByIdRepository {
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<UserGetResponseTypeOutput>>;
+  ): Promise<ResponseType<UserGetResponseOutput>>;
 
   updateUser(
-    data: UserPutRequestTypeOutput,
+    data: UserPutRequestOutput,
     userId: string,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
-  ): Promise<ResponseType<UserGetResponseTypeOutput>>;
+  ): Promise<ResponseType<UserPutResponseOutput>>;
 
   deleteUser(
     data: { id: string },
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<UserDeleteResponseTypeOutput>>;
+  ): Promise<ResponseType<UserDeleteResponseOutput>>;
 }
 
 export class UserByIdRepositoryImpl implements UserByIdRepository {
@@ -55,7 +56,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<UserGetResponseTypeOutput>> {
+  ): Promise<ResponseType<UserGetResponseOutput>> {
     try {
       logger.debug("Getting user by ID", {
         id: data.id,
@@ -79,26 +80,13 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
       logger.debug("User found successfully", { userId: foundUser.id });
 
       return createSuccessResponse({
-        // Structured response format
         userProfile: {
           basicInfo: {
             id: foundUser.id,
             email: foundUser.email,
-            firstName: foundUser.firstName,
-            lastName: foundUser.lastName,
-            company: foundUser.company,
+            privateName: foundUser.privateName,
+            publicName: foundUser.publicName,
           },
-          contactDetails: {
-            phone: foundUser.phone,
-            preferredContactMethod: foundUser.preferredContactMethod,
-            website: foundUser.website,
-          },
-        },
-        profileDetails: {
-          imageUrl: foundUser.imageUrl,
-          bio: foundUser.bio,
-          jobTitle: foundUser.jobTitle,
-          leadId: foundUser.leadId,
         },
         accountStatus: {
           isActive: foundUser.isActive,
@@ -110,18 +98,10 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
           createdAt: foundUser.createdAt.toISOString(),
           updatedAt: foundUser.updatedAt.toISOString(),
         },
-        // Backward compatibility - flat fields
         leadId: foundUser.leadId,
         email: foundUser.email,
-        firstName: foundUser.firstName,
-        lastName: foundUser.lastName,
-        company: foundUser.company,
-        phone: foundUser.phone,
-        preferredContactMethod: foundUser.preferredContactMethod,
-        imageUrl: foundUser.imageUrl,
-        bio: foundUser.bio,
-        website: foundUser.website,
-        jobTitle: foundUser.jobTitle,
+        privateName: foundUser.privateName,
+        publicName: foundUser.publicName,
         emailVerified: foundUser.emailVerified,
         isActive: foundUser.isActive,
         stripeCustomerId: foundUser.stripeCustomerId,
@@ -141,11 +121,11 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
   }
 
   async updateUser(
-    data: UserPutRequestTypeOutput,
+    data: UserPutRequestOutput,
     userId: string,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
-  ): Promise<ResponseType<UserGetResponseTypeOutput>> {
+  ): Promise<ResponseType<UserPutResponseOutput>> {
     try {
       logger.debug("Updating user", { id: userId, requestingUser: user.id });
 
@@ -170,33 +150,14 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
       };
 
       // Handle nested basicInfo structure
-      if (data.basicInfo?.firstName !== undefined) {
-        updateData.firstName = data.basicInfo.firstName;
+      if (data.basicInfo?.privateName !== undefined) {
+        updateData.privateName = data.basicInfo.privateName;
       }
-      if (data.basicInfo?.lastName !== undefined) {
-        updateData.lastName = data.basicInfo.lastName;
-      }
-      if (data.basicInfo?.company !== undefined) {
-        updateData.company = data.basicInfo.company;
-      }
-      if (data.basicInfo?.jobTitle !== undefined) {
-        updateData.jobTitle = data.basicInfo.jobTitle;
+      if (data.basicInfo?.publicName !== undefined) {
+        updateData.publicName = data.basicInfo.publicName;
       }
       if (data.basicInfo?.email !== undefined) {
         updateData.email = data.basicInfo.email;
-      }
-
-      // Handle nested contactInfo structure
-      if (data.contactInfo?.phone !== undefined) {
-        updateData.phone = data.contactInfo.phone;
-      }
-      if (data.contactInfo?.website !== undefined) {
-        updateData.website = data.contactInfo.website;
-      }
-
-      // Handle nested profileDetails structure
-      if (data.profileDetails?.bio !== undefined) {
-        updateData.bio = data.profileDetails.bio;
       }
 
       // Handle nested adminSettings structure
@@ -227,49 +188,11 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
       logger.debug("User updated successfully", { userId });
 
       return createSuccessResponse({
-        // Structured response format (same as GET)
-        userProfile: {
-          basicInfo: {
-            id: updatedUser.id,
-            email: updatedUser.email,
-            firstName: updatedUser.firstName,
-            lastName: updatedUser.lastName,
-            company: updatedUser.company,
-          },
-          contactDetails: {
-            phone: updatedUser.phone,
-            preferredContactMethod: updatedUser.preferredContactMethod,
-            website: updatedUser.website,
-          },
-        },
-        profileDetails: {
-          imageUrl: updatedUser.imageUrl,
-          bio: updatedUser.bio,
-          jobTitle: updatedUser.jobTitle,
-          leadId: updatedUser.leadId,
-        },
-        accountStatus: {
-          isActive: updatedUser.isActive,
-          emailVerified: updatedUser.emailVerified,
-          stripeCustomerId: updatedUser.stripeCustomerId,
-          userRoles: [], // TODO: Fetch user roles from database
-        },
-        timestamps: {
-          createdAt: updatedUser.createdAt.toISOString(),
-          updatedAt: updatedUser.updatedAt.toISOString(),
-        },
-        // Backward compatibility - flat fields
+        id: updatedUser.id,
         leadId: updatedUser.leadId,
         email: updatedUser.email,
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
-        company: updatedUser.company,
-        phone: updatedUser.phone,
-        preferredContactMethod: updatedUser.preferredContactMethod,
-        imageUrl: updatedUser.imageUrl,
-        bio: updatedUser.bio,
-        website: updatedUser.website,
-        jobTitle: updatedUser.jobTitle,
+        privateName: updatedUser.privateName,
+        publicName: updatedUser.publicName,
         emailVerified: updatedUser.emailVerified,
         isActive: updatedUser.isActive,
         stripeCustomerId: updatedUser.stripeCustomerId,
@@ -293,7 +216,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<UserDeleteResponseTypeOutput>> {
+  ): Promise<ResponseType<UserDeleteResponseOutput>> {
     try {
       logger.debug("Deleting user", { id: data.id, requestingUser: user.id });
 

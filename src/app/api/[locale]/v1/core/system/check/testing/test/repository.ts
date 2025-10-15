@@ -3,16 +3,16 @@
  * Handles run tests operations
  */
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { ResponseType as ApiResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { TestRequestOutput, TestResponseOutput } from "./definition";
@@ -52,6 +52,7 @@ class TestRepositoryImpl implements TestRepositoryInterface {
       }
 
       // Build test command with optional path and flags
+      // eslint-disable-next-line i18next/no-literal-string
       let command = "npm test";
 
       // Add specific path if provided

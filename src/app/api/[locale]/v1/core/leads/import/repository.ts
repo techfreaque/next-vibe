@@ -6,10 +6,6 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { Countries, Languages } from "@/i18n/core/config";
 import type {
   ErrorResponseType,
   ResponseType,
@@ -20,11 +16,13 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
+import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { Countries, Languages } from "@/i18n/core/config";
+
 import { importRepository } from "../../import/repository";
 import type { DomainRecord } from "../../import/types";
-import type {
-  JwtPrivatePayloadType,
-} from "../../user/auth/definition";
+import type { JwtPrivatePayloadType } from "../../user/auth/definition";
 import { leads, type NewLead } from "../db";
 import type {
   EmailCampaignStageValues,
@@ -33,8 +31,8 @@ import type {
 } from "../enum";
 import { EmailCampaignStage, LeadSource, LeadStatus } from "../enum";
 import type {
-  LeadsImportRequestType,
-  LeadsImportResponseType,
+  LeadsImportRequestOutput,
+  LeadsImportResponseOutput,
 } from "./definition";
 
 /**
@@ -64,8 +62,7 @@ export interface DomainImportRepository<T extends DomainRecord> {
   /**
    * Check if a record exists by email
    */
-  recordExistsByEmail(email: string, logger: EndpointLogger,
-  ): Promise<boolean>;
+  recordExistsByEmail(email: string, logger: EndpointLogger): Promise<boolean>;
 
   /**
    * Get domain name for tracking
@@ -178,10 +175,10 @@ export interface CsvImportJobStatus {
 export interface ILeadsImportRepository
   extends DomainImportRepository<LeadRecord> {
   importLeadsFromCsv(
-    data: LeadsImportRequestType,
+    data: LeadsImportRequestOutput,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LeadsImportResponseType>>;
+  ): Promise<ResponseType<LeadsImportResponseOutput>>;
 }
 
 /**
@@ -203,7 +200,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
     config: CsvImportConfig,
   ): CsvRowValidationResult {
     const errors: ErrorResponseType[] = [];
-    const data: Partial<LeadRecord> = {};
+    const data: Record<string, string | number | boolean | null> = {};
 
     // Email is required
     if (row.email?.trim()) {
@@ -235,81 +232,24 @@ export class LeadsImportRepository implements ILeadsImportRepository {
     if (row.contactName || row.firstName || row.lastName) {
       const firstName = row.firstName || row.contactName || "";
       const lastName = row.lastName || "";
-      data.contactName = `${firstName} ${lastName}`.trim() || undefined;
+      data.contactName = `${firstName} ${lastName}`.trim() || null;
     }
 
     if (row.phone) {
       data.phone = row.phone.trim();
     }
 
-    // Country validation
-    if (row.country) {
-      const validCountries = ["DE", "PL", "GLOBAL"];
-      if (validCountries.includes(row.country.toUpperCase())) {
-        data.country = row.country.toUpperCase() as Countries;
-      } else {
-        data.country = config.defaultCountry;
-      }
-    } else {
-      data.country = config.defaultCountry;
-    }
-
-    // Language validation
-    if (row.language) {
-      const validLanguages = ["de", "pl", "en"];
-      if (validLanguages.includes(row.language.toLowerCase())) {
-        data.language = row.language.toLowerCase();
-      } else {
-        data.language = config.defaultLanguage;
-      }
-    } else {
-      data.language = config.defaultLanguage;
-    }
-
-    // Source validation
-    if (row.source) {
-      const validSources = Object.values(LeadSource);
-      if (validSources.includes(row.source as typeof LeadSourceValues)) {
-        data.source = row.source as typeof LeadSourceValues;
-      } else {
-        data.source = config.defaultSource;
-      }
-    } else {
-      data.source = config.defaultSource;
-    }
-
-    // Status validation
-    if (row.status) {
-      const validStatuses = Object.values(LeadStatus);
-      if (validStatuses.includes(row.status as typeof LeadStatusValues)) {
-        data.status = row.status as typeof LeadStatusValues;
-      } else {
-        data.status = config.defaultStatus;
-      }
-    } else {
-      data.status = config.defaultStatus;
-    }
-
-    // Campaign stage validation
-    if (row.currentCampaignStage || row.campaignStage) {
-      const campaignStage = row.currentCampaignStage || row.campaignStage;
-      const validStages = Object.values(EmailCampaignStage);
-      if (
-        validStages.includes(campaignStage as typeof EmailCampaignStageValues)
-      ) {
-        data.currentCampaignStage =
-          campaignStage as typeof EmailCampaignStageValues;
-      } else {
-        data.currentCampaignStage = config.defaultCampaignStage;
-      }
-    } else {
-      data.currentCampaignStage = config.defaultCampaignStage;
-    }
+    // Config has properly typed defaults from Zod validation
+    data.country = config.defaultCountry;
+    data.language = config.defaultLanguage;
+    data.source = config.defaultSource;
+    data.status = config.defaultStatus;
+    data.currentCampaignStage = config.defaultCampaignStage;
 
     return {
       isValid: errors.length === 0,
       errors,
-      data: data as Record<string, string | number | boolean | null>,
+      data,
     };
   }
 
@@ -454,10 +394,10 @@ export class LeadsImportRepository implements ILeadsImportRepository {
    * Uses the definition types and delegates to the generic import repository
    */
   async importLeadsFromCsv(
-    data: LeadsImportRequestType,
+    data: LeadsImportRequestOutput,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LeadsImportResponseType>> {
+  ): Promise<ResponseType<LeadsImportResponseOutput>> {
     try {
       // Convert the request data to the generic config format
       const config: CsvImportConfig = {
@@ -504,8 +444,8 @@ export class LeadsImportRepository implements ILeadsImportRepository {
           jobId: result.data.jobId,
         });
       } else {
-        logger.error("CSV import failed", result.error);
-        return result as ResponseType<LeadsImportResponseType>;
+        logger.error("CSV import failed", result.message);
+        return result;
       }
     } catch (error) {
       logger.error("Error importing leads from CSV", error);

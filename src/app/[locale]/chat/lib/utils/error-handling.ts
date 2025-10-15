@@ -1,6 +1,6 @@
 /**
  * Error Handling Utilities
- * 
+ *
  * Centralized error handling and user-friendly error messages.
  */
 
@@ -31,7 +31,7 @@ export interface ChatError {
 
 /**
  * Convert unknown error to ChatError
- * 
+ *
  * @param error - Error object
  * @param context - Context for the error
  * @returns Structured ChatError
@@ -110,7 +110,7 @@ export function toChatError(error: unknown, context?: string): ChatError {
 
 /**
  * Get user-friendly error message
- * 
+ *
  * @param error - Error object
  * @returns User-friendly message
  */
@@ -121,13 +121,13 @@ export function getUserErrorMessage(error: unknown): string {
 
 /**
  * Check if error should be retried
- * 
+ *
  * @param error - Error object
  * @returns true if error is retryable
  */
 export function isRetryableError(error: unknown): boolean {
   const chatError = toChatError(error);
-  
+
   // Don't retry aborts or validation errors
   if (
     chatError.type === ChatErrorType.ABORT_ERROR ||
@@ -147,23 +147,23 @@ export function isRetryableError(error: unknown): boolean {
 
 /**
  * Log error with context
- * 
+ *
  * @param error - Error object
  * @param context - Context for the error
  */
 export function logError(error: unknown, context?: string): void {
   const chatError = toChatError(error, context);
-  
+
   console.error(
     `[Chat Error] ${chatError.type}${context ? ` in ${context}` : ""}:`,
     chatError.message,
-    chatError.details
+    chatError.details,
   );
 }
 
 /**
  * Create error message for display
- * 
+ *
  * @param error - Error object
  * @param context - Context for the error
  * @returns Formatted error message
@@ -172,4 +172,3 @@ export function formatErrorMessage(error: unknown, context?: string): string {
   const chatError = toChatError(error, context);
   return chatError.userMessage;
 }
-

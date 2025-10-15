@@ -12,7 +12,7 @@ import { seedsGeneratorRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }: any) =>
+    handler: ({ data, user, locale, logger }) =>
       seedsGeneratorRepository.generateSeeds(data, user, locale, logger),
   },
 });

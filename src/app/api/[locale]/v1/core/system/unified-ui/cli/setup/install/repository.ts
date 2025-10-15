@@ -99,10 +99,6 @@ setlocal enabledelayedexpansion
 REM Vibe CLI Windows Binary
 REM Executes vibe.ts with Bun
 
-REM Set environment variables
-set "VIBE_START_TIME=%time%"
-set "VIBE_CLI_GLOBAL=true"
-
 REM Execute with Bun
 bun "${vibeTsPath}" %*
 
@@ -116,10 +112,6 @@ exit /b %errorlevel%
 
 # Vibe CLI Unix Binary
 # Executes vibe.ts with Bun
-
-# Set environment variables
-export VIBE_START_TIME=$(date +%s%3N)
-export VIBE_CLI_GLOBAL=true
 
 # Execute with Bun
 exec bun "${vibeTsPath}" "$@"

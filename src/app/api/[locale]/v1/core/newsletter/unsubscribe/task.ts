@@ -9,6 +9,12 @@
 import "server-only";
 
 import { and, eq, ne } from "drizzle-orm";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
 import { z } from "zod";
 
 import { leads } from "@/app/api/[locale]/v1/core/leads/db";
@@ -23,24 +29,19 @@ import type {
   Task,
   TaskExecutionContext,
 } from "@/app/api/[locale]/v1/core/system/tasks/types/repository";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  createErrorResponse,
-  createSuccessResponse,
-  ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
 
 import { newsletterSubscriptions } from "../db";
+import { NewsletterSubscriptionStatus } from "../enum";
 
 /**
  * Task Configuration Schema
  */
 export const taskConfigSchema = z.object({
-  batchSize: z.number().min(1).max(1000),
-  dryRun: z.boolean(),
+  batchSize: z.number().min(1).max(1000).default(500),
+  dryRun: z.boolean().default(false),
 });
 
-export type TaskConfigType = z.infer<typeof taskConfigSchema>;
+export type TaskConfigType = z.output<typeof taskConfigSchema>;
 
 /**
  * Task Result Schema
@@ -52,7 +53,7 @@ export const taskResultSchema = z.object({
   executionTimeMs: z.number(),
 });
 
-export type TaskResultType = z.infer<typeof taskResultSchema>;
+export type TaskResultType = z.output<typeof taskResultSchema>;
 
 /**
  * Newsletter Unsubscribe Sync Task Implementation
@@ -87,7 +88,10 @@ async function executeNewsletterUnsubscribeSync(
       )
       .where(
         and(
-          eq(newsletterSubscriptions.status, "unsubscribed"),
+          eq(
+            newsletterSubscriptions.status,
+            NewsletterSubscriptionStatus.UNSUBSCRIBED,
+          ),
           ne(leads.status, LeadStatus.UNSUBSCRIBED),
         ),
       )
@@ -158,7 +162,10 @@ async function executeNewsletterUnsubscribeSync(
       .where(
         and(
           eq(leads.status, LeadStatus.UNSUBSCRIBED),
-          eq(newsletterSubscriptions.status, "subscribed"),
+          eq(
+            newsletterSubscriptions.status,
+            NewsletterSubscriptionStatus.SUBSCRIBED,
+          ),
         ),
       )
       .limit(config.batchSize);
@@ -282,53 +289,32 @@ const newsletterUnsubscribeSyncTask: Task = {
   priority: CronTaskPriority.LOW,
   timeout: TASK_TIMEOUTS.MEDIUM, // 5 minutes
 
-  run: async () => {
-    // Running newsletter unsubscribe sync
+  run: async ({ logger, locale, cronUser }) => {
+    const context: TaskExecutionContext<TaskConfigType> = {
+      config: {
+        batchSize: 500,
+        dryRun: false,
+      },
+      logger,
+      taskName: "newsletter-unsubscribe-sync",
+      signal: new AbortController().signal,
+      startTime: Date.now(),
+      locale,
+      cronUser,
+    };
 
-    try {
-      // Create a mock execution context for the task
-      const context = {
-        config: {
-          batchSize: 500,
-          dryRun: false,
-        },
-        logger: {
-          info: () => {},
-          error: () => {},
-          debug: () => {},
-          warn: () => {},
-          vibe: () => {},
-          isDebugEnabled: false,
-        },
-        taskName: "newsletter-unsubscribe-sync",
-        signal: new AbortController().signal,
-        startTime: Date.now(),
-        locale: "en-US" as const,
-        cronUser: { id: "system", isPublic: false as const },
-      } as TaskExecutionContext<TaskConfigType>;
+    const result = await executeNewsletterUnsubscribeSync(context);
 
-      const result = await executeNewsletterUnsubscribeSync(context);
-
-      if (result.success) {
-        // Newsletter unsubscribe sync completed
-      } else {
-        // Newsletter unsubscribe sync failed
-        return createErrorResponse(
-          "app.api.v1.core.newsletter.unsubscribe.sync.failed",
-          ErrorResponseTypes.INTERNAL_ERROR,
-        );
-      }
-    } catch (error) {
-      // Newsletter unsubscribe sync error
+    if (!result.success) {
       return createErrorResponse(
-        "app.api.v1.core.newsletter.unsubscribe.sync.error",
+        "app.api.v1.core.newsletter.unsubscribe.sync.failed",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
   },
 
-  onError: async () => {
-    // Newsletter unsubscribe sync task error
+  onError: ({ error, logger }) => {
+    logger.error("Newsletter unsubscribe sync task error", error);
   },
 };
 

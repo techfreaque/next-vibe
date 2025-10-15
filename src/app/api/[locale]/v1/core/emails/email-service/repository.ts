@@ -17,10 +17,13 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { Countries, Languages } from "@/i18n/core/config";
 
-import type { CampaignTypeValue } from "../smtp-client/enum";
 import { CampaignType } from "../smtp-client/enum";
 import { smtpRepository } from "../smtp-client/repository";
-import type { SmtpSelectionCriteria } from "../smtp-client/sending/definition";
+import type {
+  SmtpSelectionCriteria,
+  SmtpSendParams,
+  SmtpSendResult,
+} from "../smtp-client/sending/definition";
 import type {
   EmailServiceSendPostRequestOutput,
   EmailServiceSendPostResponseOutput,
@@ -60,41 +63,40 @@ export class EmailServiceRepositoryImpl implements EmailServiceRepository {
         userId: user.isPublic ? "public" : user.id,
       });
 
-      // Prepare selection criteria for SMTP account selection
-      const localeString = String(locale);
-      const [langPart, countryPart] = localeString.split("-");
+      // Prepare selection criteria - data is already validated
+      const [langPart, countryPart] = locale.split("-") as [
+        Languages,
+        Countries,
+      ];
+
       const selectionCriteria: SmtpSelectionCriteria = {
         campaignType:
-          (data.campaignSettings.campaignType as CampaignTypeValue) ||
-          CampaignType.NOTIFICATION,
+          data.campaignSettings.campaignType || CampaignType.NOTIFICATION,
         emailJourneyVariant: data.campaignSettings.emailJourneyVariant || null,
         emailCampaignStage: data.campaignSettings.emailCampaignStage || null,
-        country: (countryPart?.toUpperCase() as Countries) || "GLOBAL",
-        language: (langPart?.toLowerCase() as Languages) || "en",
+        country: countryPart || "GLOBAL",
+        language: langPart || "en",
       };
 
-      // Use existing SMTP repository for email sending
-      const smtpSendData = {
-        params: {
-          to: data.recipientInfo.to,
-          toName: data.recipientInfo.toName,
-          subject: data.emailContent.subject,
-          html: data.emailContent.html,
-          text: data.emailContent.text,
-          replyTo: data.senderSettings.replyTo,
-          unsubscribeUrl: data.campaignSettings.unsubscribeUrl,
-          senderName: data.senderSettings.senderName,
-          selectionCriteria,
-          skipRateLimitCheck: data.advancedOptions.skipRateLimitCheck,
-          leadId: data.campaignSettings.leadId,
-          campaignId: data.campaignSettings.campaignId,
-        },
+      const smtpSendData: SmtpSendParams = {
+        to: data.recipientInfo.to,
+        toName: data.recipientInfo.toName,
+        subject: data.emailContent.subject,
+        html: data.emailContent.html,
+        text: data.emailContent.text,
+        replyTo: data.senderSettings.replyTo,
+        unsubscribeUrl: data.campaignSettings.unsubscribeUrl,
+        senderName: data.senderSettings.senderName,
+        selectionCriteria,
+        skipRateLimitCheck: data.advancedOptions.skipRateLimitCheck,
+        leadId: data.campaignSettings.leadId,
+        campaignId: data.campaignSettings.campaignId,
       };
 
       const result = await smtpRepository.sendEmail(
         smtpSendData,
         user,
-        (countryPart?.toUpperCase() as Countries) || "GLOBAL",
+        countryPart || "GLOBAL",
         logger,
       );
 
@@ -110,7 +112,7 @@ export class EmailServiceRepositoryImpl implements EmailServiceRepository {
       // Safe access to result data since we know result.success is true
       if (!result.data) {
         return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.send.errors.server.title",
+          "app.api.v1.core.emails.emailService.send.errors.server.title",
           ErrorResponseTypes.INTERNAL_ERROR,
           {
             error:
@@ -119,7 +121,7 @@ export class EmailServiceRepositoryImpl implements EmailServiceRepository {
         );
       }
 
-      const smtpResult = result.data.result;
+      const smtpResult: SmtpSendResult = result.data;
 
       logger.debug("Email service: Email sent successfully", {
         messageId: smtpResult.messageId,

@@ -6,29 +6,30 @@
 import "server-only";
 
 import { render } from "@react-email/render";
-
-import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
-import { CampaignType } from "@/app/api/[locale]/v1/core/emails/smtp-client/enum";
-import {
-  smtpClientService,
-  type SmtpSendResult,
-} from "@/app/api/[locale]/v1/core/emails/smtp-client/service";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
-import { env } from "@/config/env";
-import { parseError } from "next-vibe/shared/utils";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
+
+import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
+import { CampaignType } from "@/app/api/[locale]/v1/core/emails/smtp-client/enum";
+import { smtpSendingRepository } from "@/app/api/[locale]/v1/core/emails/smtp-client/sending/repository";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { Countries, Languages } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import type { LeadWithEmailType } from "../../../definition";
 import { emailService } from "../index";
-import type { TestEmailRequestType, TestEmailResponseType } from "./definition";
+import type {
+  TestEmailRequestOutput,
+  TestEmailResponseOutput,
+} from "./definition";
 
 /**
  * Test Email Repository Class
@@ -36,14 +37,55 @@ import type { TestEmailRequestType, TestEmailResponseType } from "./definition";
  */
 class TestEmailRepository {
   /**
+   * Create a mock lead object for test email rendering
+   * Centralized to ensure consistency across test email functionality
+   */
+  private createMockLead(
+    data: TestEmailRequestOutput,
+    testEmail: string,
+  ): LeadWithEmailType {
+    return {
+      id: "test-lead-id",
+      email: testEmail,
+      businessName: data.leadData.businessName,
+      contactName: data.leadData.contactName || null,
+      phone: null,
+      website: data.leadData.website || null,
+      country: data.leadData.country,
+      language: data.leadData.language,
+      status: data.leadData.status,
+      source: data.leadData.source || null,
+      notes: data.leadData.notes || null,
+      convertedUserId: null,
+      convertedAt: null,
+      signedUpAt: null,
+      consultationBookedAt: null,
+      subscriptionConfirmedAt: null,
+      currentCampaignStage: data.emailCampaignStage,
+      emailJourneyVariant: data.emailJourneyVariant,
+      emailsSent: 0,
+      lastEmailSentAt: null,
+      unsubscribedAt: null,
+      emailsOpened: 0,
+      emailsClicked: 0,
+      lastEngagementAt: null,
+      campaignStartedAt: null,
+      metadata: {},
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      bouncedAt: null,
+      invalidAt: null,
+    };
+  }
+  /**
    * Send a test email with custom lead data
    * Now uses the same email infrastructure as regular campaigns
    */
   async sendTestEmail(
-    data: TestEmailRequestType,
+    data: TestEmailRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-  ): Promise<ResponseType<TestEmailResponseType>> {
+  ): Promise<ResponseType<TestEmailResponseOutput>> {
     try {
       logger.info("test.email.send.start", {
         emailJourneyVariant: data.emailJourneyVariant,
@@ -90,38 +132,7 @@ class TestEmailRepository {
         );
       }
 
-      const mockLead = {
-        id: "test-lead-id",
-        email: data.testEmail, // Now guaranteed to be non-null
-        businessName: data.leadData.businessName,
-        contactName: data.leadData.contactName || null,
-        phone: null,
-        website: data.leadData.website || null,
-        country: data.leadData.country,
-        language: data.leadData.language,
-        status: data.leadData.status,
-        source: data.leadData.source || null,
-        notes: data.leadData.notes || null,
-        convertedUserId: null,
-        convertedAt: null,
-        signedUpAt: null,
-        consultationBookedAt: null,
-        subscriptionConfirmedAt: null,
-        currentCampaignStage: data.emailCampaignStage,
-        emailJourneyVariant: data.emailJourneyVariant,
-        emailsSent: 0,
-        lastEmailSentAt: null,
-        unsubscribedAt: null,
-        emailsOpened: 0,
-        emailsClicked: 0,
-        lastEngagementAt: null,
-        campaignStartedAt: null,
-        metadata: {},
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        bouncedAt: null,
-        invalidAt: null,
-      };
+      const mockLead = this.createMockLead(data, data.testEmail);
 
       // Generate the email content using the email service
       const emailContent = await emailService.renderEmail(
@@ -136,6 +147,7 @@ class TestEmailRepository {
           campaignId: "test-campaign-id",
           baseUrl: env.NEXT_PUBLIC_APP_URL,
         },
+        logger,
       );
 
       if (!emailContent) {
@@ -163,29 +175,35 @@ class TestEmailRepository {
         language: data.leadData.language || Languages.EN,
       };
 
-      // Use the new SMTP client service for test emails with selection criteria
-      let emailResponse: ResponseType<SmtpSendResult>;
+      // Use SMTP sending repository for test emails
       try {
         // Render JSX to HTML for SMTP service
         const html = await render(emailContent.jsx);
 
-        emailResponse = await smtpClientService.sendEmail({
-          to: data.testEmail,
-          toName: data.testEmail,
-          subject: emailContent.subject,
-          html,
-          replyTo: contactClientRepository.getSupportEmail(emailLocale),
-          unsubscribeUrl,
-          senderName: t("common.appName"),
-          selectionCriteria,
-        });
+        const emailResponse = await smtpSendingRepository.sendEmail(
+          {
+            params: {
+              to: data.testEmail,
+              toName: data.testEmail,
+              subject: emailContent.subject,
+              html,
+              replyTo: contactClientRepository.getSupportEmail(emailLocale),
+              unsubscribeUrl,
+              senderName: t("common.appName"),
+              selectionCriteria,
+            },
+          },
+          user,
+          emailLocale,
+          logger,
+        );
 
-        if (!emailResponse?.success) {
+        if (!emailResponse.success) {
           logger.error("test.email.send.smtp.error", {
             to: data.testEmail,
             subject: emailContent.subject,
-            error: emailResponse?.message,
-            errorParams: emailResponse?.messageParams,
+            error: emailResponse.message,
+            errorParams: emailResponse.messageParams,
           });
           return createErrorResponse(
             "leadsErrors.testEmail.error.sendingFailed.title",
@@ -194,11 +212,36 @@ class TestEmailRepository {
               recipient: data.testEmail,
               subject: emailContent.subject,
               error:
-                emailResponse?.message ||
+                emailResponse.message ||
                 "leadsErrors.testEmail.error.sendingFailed.description",
             },
           );
         }
+
+        // Email sent successfully - emailResponse.success is true
+        const sentAt = new Date();
+
+        // Extract messageId from SMTP response
+        // The response structure is: { success: true, data: { messageId, accountId, ... } }
+        const messageId: string =
+          emailResponse.data?.messageId || "unknown-message-id";
+
+        logger.info("test.email.send.success", {
+          messageId,
+          testEmail: data.testEmail,
+          subject: emailContent.subject,
+          sentAt,
+        });
+
+        return createSuccessResponse({
+          result: {
+            success: true,
+            messageId,
+            testEmail: data.testEmail,
+            subject: emailContent.subject,
+            sentAt,
+          },
+        });
       } catch (error) {
         logger.error("test.email.send.error", error);
         return createErrorResponse(
@@ -211,23 +254,6 @@ class TestEmailRepository {
           },
         );
       }
-
-      const sentAt = new Date();
-
-      logger.info("test.email.send.success", {
-        messageId: emailResponse?.data?.messageId || "unknown",
-        testEmail: data.testEmail,
-        subject: emailContent.subject,
-        sentAt,
-      });
-
-      return createSuccessResponse({
-        success: true,
-        messageId: emailResponse?.data?.messageId || "unknown",
-        testEmail: data.testEmail,
-        subject: emailContent.subject,
-        sentAt,
-      });
     } catch (error) {
       logger.error("test.email.send.server.error", error);
       return createErrorResponse(

@@ -8,4 +8,6 @@ export const sortTranslations: typeof EnglishSortTranslations = {
   first_name: "Vorname",
   last_name: "Nachname",
   company: "Unternehmen",
+  privateName: "Privater Name",
+  publicName: "Öffentlicher Name",
 };

@@ -3,16 +3,22 @@
  * Newsletter subscription management
  */
 
-import { boolean, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
+import { users } from "../user/db";
 import {
   NewsletterSubscriptionStatus,
   NewsletterSubscriptionStatusDB,
 } from "./enum";
-import { users } from "../user/db";
-
 
 /**
  * Newsletter subscriptions table schema

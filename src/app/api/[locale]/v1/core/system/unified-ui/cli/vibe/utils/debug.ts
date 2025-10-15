@@ -1,11 +1,35 @@
 /**
  * Production-ready debug utilities for CLI performance monitoring and resource cleanup
+ *
+ * Note: Triple-slash reference required for Node.js internal API types
+ * These are not available in standard @types/node and must be augmented locally
  */
 
+/* eslint-disable no-console */
+
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { EndpointLogger } from "../endpoints/endpoint-handler/logger";
+import { binaryStartTime } from "../vibe";
+
+/**
+ * Generic error type for cleanup operations
+ */
+interface CleanupError {
+  message?: string;
+  stack?: string;
+  [key: string]: string | number | boolean | undefined;
+}
+
+/**
+ * Safe handle types that should not be forcefully closed
+ */
+const WRITE_STREAM = "WriteStream";
+const READ_STREAM = "ReadStream";
+const TTY = "TTY";
+const SAFE_HANDLE_TYPES = [WRITE_STREAM, READ_STREAM, TTY] as const;
 
 /**
  * Timing data structure for performance monitoring
@@ -78,7 +102,7 @@ export class ResourceCleanupRegistry {
   /**
    * Execute all cleanup functions
    */
-  async cleanup(): Promise<void> {
+  async cleanup(logger: EndpointLogger): Promise<void> {
     // Clear all timers and intervals
     for (const timer of this.timers) {
       clearTimeout(timer);
@@ -91,8 +115,13 @@ export class ResourceCleanupRegistry {
     for (const cleanup of this.cleanupFunctions) {
       try {
         await cleanup();
-      } catch (error) {
-        console.warn("Cleanup function failed:", error);
+      } catch (cleanupError) {
+        logger.warn(
+          "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.cleanupFunctionFailed",
+          {
+            cleanupError: cleanupError as CleanupError,
+          },
+        );
       }
     }
 
@@ -113,10 +142,6 @@ export class CliPerformanceMonitor {
    * Initialize timing with binary start time from environment
    */
   initialize(): void {
-    const binaryStartTime = process.env.VIBE_START_TIME
-      ? parseInt(process.env.VIBE_START_TIME, 10)
-      : Date.now();
-
     this.timings = {
       binaryStart: binaryStartTime,
       tsStart: Date.now(),
@@ -195,7 +220,7 @@ export class ResourceMonitor {
           });
         }
       }
-    } catch (error) {
+    } catch {
       // Ignore errors accessing internal APIs
     }
 
@@ -210,7 +235,7 @@ export class ResourceMonitor {
       if (process._getActiveRequests) {
         return process._getActiveRequests().length;
       }
-    } catch (error) {
+    } catch {
       // Ignore errors accessing internal APIs
     }
     return 0;
@@ -221,10 +246,14 @@ export class ResourceMonitor {
    */
   hasProblematicHandles(): boolean {
     const handles = this.getActiveHandles();
-    const safeTypes = ["WriteStream", "ReadStream", "TTY"];
 
     // Any handle that's not in the safe list is potentially problematic
-    return handles.some((handle) => !safeTypes.includes(handle.type));
+    return handles.some(
+      (handle) =>
+        !SAFE_HANDLE_TYPES.includes(
+          handle.type as (typeof SAFE_HANDLE_TYPES)[number],
+        ),
+    );
   }
 
   /**
@@ -238,9 +267,9 @@ export class ResourceMonitor {
           try {
             // Skip stdio handles
             if (
-              handle.constructor.name === "WriteStream" ||
-              handle.constructor.name === "ReadStream" ||
-              handle.constructor.name === "TTY"
+              handle.constructor.name === WRITE_STREAM ||
+              handle.constructor.name === READ_STREAM ||
+              handle.constructor.name === TTY
             ) {
               continue;
             }
@@ -253,12 +282,12 @@ export class ResourceMonitor {
             } else if (typeof handle.end === "function") {
               handle.end();
             }
-          } catch (error) {
+          } catch {
             // Ignore errors when force closing handles
           }
         }
       }
-    } catch (error) {
+    } catch {
       // Ignore errors accessing internal APIs
     }
   }
@@ -271,11 +300,7 @@ export class DebugFormatter {
   /**
    * Format performance breakdown for verbose output
    */
-  static formatPerformanceBreakdown(
-    breakdown: PerformanceBreakdown,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    locale: CountryLanguage = "en-GLOBAL",
-  ): string {
+  static formatPerformanceBreakdown(breakdown: PerformanceBreakdown): string {
     return JSON.stringify(
       {
         binaryStartup: `${breakdown.binaryOverhead}ms`,
@@ -312,12 +337,28 @@ export class DebugFormatter {
   /**
    * Format simple execution summary for non-verbose output
    */
-  static formatExecutionSummary(breakdown: PerformanceBreakdown): string {
+  static formatExecutionSummary(
+    breakdown: PerformanceBreakdown,
+    locale: CountryLanguage,
+  ): string {
+    const { t } = simpleT(locale);
     const overhead = breakdown.totalDuration - breakdown.routeExecution;
     const executionSeconds = (breakdown.routeExecution / 1000).toFixed(2);
     const overheadSeconds = (overhead / 1000).toFixed(2);
     const totalSeconds = (breakdown.totalDuration / 1000).toFixed(2);
-    return `⏱️  Execution: ${executionSeconds}s (overhead: ${overheadSeconds}s, total: ${totalSeconds}s)`;
+
+    return (
+      // eslint-disable-next-line prefer-template
+      "\n" +
+      t(
+        "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.executionSummary",
+        {
+          executionSeconds,
+          overheadSeconds,
+          totalSeconds,
+        },
+      )
+    );
   }
 }
 
@@ -335,22 +376,12 @@ export class CliResourceManager {
   initialize(logger: EndpointLogger): void {
     this.performanceMonitor.initialize();
 
-    // Register cache cleanup
-    this.cleanupRegistry.register(async () => {
-      try {
-        const { routeCache } = await import("./cache");
-        routeCache.destroy();
-      } catch (error) {
-        // Cache might not be imported yet
-      }
-    });
-
     // Register performance monitor cleanup
     this.cleanupRegistry.register(async () => {
       try {
         const { performanceMonitor } = await import("./performance");
         performanceMonitor.setEnabled(false);
-      } catch (error) {
+      } catch {
         // Performance monitor might not be available
       }
     });
@@ -358,13 +389,8 @@ export class CliResourceManager {
     // Register database cleanup - this is critical for preventing hanging
     this.cleanupRegistry.register(async () => {
       try {
-        const { closeDatabase, rawPool } = await import("../../../../db");
+        const { closeDatabase } = await import("../../../../db");
         await closeDatabase(logger);
-
-        // Force close the raw pool if it still exists
-        if (rawPool && typeof rawPool.end === "function") {
-          await rawPool.end();
-        }
       } catch {
         // Database might not be imported yet
       }
@@ -399,24 +425,35 @@ export class CliResourceManager {
    * Setup signal handlers for graceful shutdown
    */
   private setupSignalHandlers(): void {
-    const handleShutdown = async (signal: string) => {
+    const handleShutdown = async (): Promise<void> => {
+      // Create a minimal logger for signal handler context
+      const logger: EndpointLogger = {
+        info: () => {},
+        warn: () => {},
+        error: () => {},
+        debug: () => {},
+        vibe: () => {},
+        isDebugEnabled: false,
+      };
+
       try {
-        await this.cleanupRegistry.cleanup();
+        await this.cleanupRegistry.cleanup(logger);
         process.exit(0);
-      } catch (error) {
+      } catch {
         process.exit(1);
       }
     };
 
-    process.on("SIGINT", () => handleShutdown("SIGINT"));
-    process.on("SIGTERM", () => handleShutdown("SIGTERM"));
-    process.on("SIGHUP", () => handleShutdown("SIGHUP"));
+    process.on("SIGINT", () => void handleShutdown());
+    process.on("SIGTERM", () => void handleShutdown());
+    process.on("SIGHUP", () => void handleShutdown());
   }
 
   /**
    * Perform comprehensive cleanup and exit gracefully
    */
   async cleanupAndExit(
+    logger: EndpointLogger,
     verbose = false,
     locale: CountryLanguage = "en-GLOBAL",
   ): Promise<void> {
@@ -428,38 +465,30 @@ export class CliResourceManager {
       const breakdown = this.performanceMonitor.calculateBreakdown();
       if (breakdown) {
         if (verbose) {
-          const { t } = simpleT(locale);
           const totalSeconds = (breakdown.totalDuration / 1000).toFixed(2);
-          console.log(
-            `\n${t("app.api.v1.core.system.cli.vibe.vibe.executionTime")}: ${totalSeconds}s`,
+          logger.info(
+            "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.executionTime",
+            { totalSeconds },
           );
-          console.log("Performance Breakdown:");
-          console.log(
-            DebugFormatter.formatPerformanceBreakdown(breakdown, locale),
+          logger.info(
+            "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.performanceBreakdown",
           );
+          console.log(DebugFormatter.formatPerformanceBreakdown(breakdown));
         } else {
-          console.log(`\n${DebugFormatter.formatExecutionSummary(breakdown)}`);
+          console.log(DebugFormatter.formatExecutionSummary(breakdown, locale));
         }
       }
 
       // Perform cleanup
-      await this.cleanupRegistry.cleanup();
-
-      // Additional aggressive database cleanup
-      try {
-        const { rawPool } = await import("../../../../db");
-        if (rawPool && typeof rawPool.end === "function") {
-          await rawPool.end();
-        }
-      } catch {
-        // Ignore if database module not available
-      }
+      await this.cleanupRegistry.cleanup(logger);
 
       // Force close any remaining problematic handles
       this.resourceMonitor.forceCloseHandles();
 
       // Give a moment for cleanup to complete
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 50);
+      });
 
       // Check for remaining problematic handles
       if (verbose) {
@@ -467,11 +496,21 @@ export class CliResourceManager {
         const requests = this.resourceMonitor.getActiveRequestsCount();
 
         if (handles.length > 0 || requests > 0) {
-          console.log("\n🔍 Remaining resources:");
-          console.log(
-            `  Active handles: ${DebugFormatter.formatActiveHandles(handles)}`,
+          logger.info(
+            "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.remainingResources",
           );
-          console.log(`  Active requests: ${requests}`);
+          logger.info(
+            "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.activeHandles",
+            {
+              handles: DebugFormatter.formatActiveHandles(handles),
+            },
+          );
+          logger.info(
+            "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.activeRequests",
+            {
+              requests: requests.toString(),
+            },
+          );
         }
       }
 
@@ -484,8 +523,8 @@ export class CliResourceManager {
       const hasProblematic = this.resourceMonitor.hasProblematicHandles();
       if (hasProblematic) {
         if (verbose) {
-          console.log(
-            "⚠️  Problematic handles detected, forcing exit in 100ms",
+          logger.warn(
+            "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.problematicHandlesDetected",
           );
         }
         setTimeout(() => process.exit(0), 100);
@@ -493,8 +532,11 @@ export class CliResourceManager {
         // Clean exit
         process.exit(0);
       }
-    } catch (error) {
-      console.warn("Cleanup error:", error);
+    } catch (cleanupError) {
+      logger.warn(
+        "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.cleanupError",
+        { cleanupError: cleanupError as CleanupError },
+      );
       process.exit(1);
     }
   }

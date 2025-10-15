@@ -1,17 +1,18 @@
 "use client";
 
 import type { JSX } from "react";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   Input,
   Label,
-  Button,
 } from "@/packages/next-vibe-ui/web/ui";
+
 import { FolderIconSelector } from "./folder-icon-selector";
 
 interface RenameFolderDialogProps {
@@ -83,4 +84,3 @@ export function RenameFolderDialog({
     </Dialog>
   );
 }
-

@@ -9,10 +9,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import type React from "react";
 
-import type {
-  EmailFunctionType,
-  EmailTemplateReturnType,
-} from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
+import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -31,7 +28,7 @@ import type {
 function renderPasswordResetRequestEmailContent(
   t: TFunction,
   locale: CountryLanguage,
-  user: { firstName: string; id: string },
+  user: { publicName: string; id: string },
   translatedAppName: string,
   passwordResetUrl: string,
 ): React.ReactElement {
@@ -64,7 +61,7 @@ function renderPasswordResetRequestEmailContent(
         }}
       >
         {t("auth.resetPassword.email.greeting", {
-          firstName: user.firstName,
+          name: user.publicName,
         })}
       </Text>
 
@@ -185,7 +182,7 @@ export const renderResetPasswordMail: EmailFunctionType<
 
     return createSuccessResponse({
       toEmail: requestData.emailInput.email,
-      toName: user.firstName,
+      toName: user.publicName,
       subject: t("auth.resetPassword.email.subject", {
         appName: translatedAppName,
       }),

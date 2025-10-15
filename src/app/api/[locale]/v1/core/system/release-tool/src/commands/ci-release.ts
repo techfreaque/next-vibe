@@ -122,7 +122,6 @@ function runCiReleaseCommand(
   packageName: string,
 ): void {
   if (!releaseConfig.ciReleaseCommand) {
-    // eslint-disable-next-line no-restricted-syntax
     throw new Error(
       `CI mode requires ciReleaseCommand to be configured for ${packageName}`,
     );
@@ -133,20 +132,17 @@ function runCiReleaseCommand(
   logger(`Running CI release command for ${packageName}: ${command.join(" ")}`);
 
   // Prepare environment variables
-  // eslint-disable-next-line node/no-process-env
-  const ciEnv = { ...process.env };
+  const processEnv = { ...process.env };
+  const ciEnv = { ...processEnv };
   if (env) {
     for (const [key, value] of Object.entries(env)) {
       if (typeof value !== "string") {
-        // eslint-disable-next-line no-restricted-syntax
         throw new Error(
           `Environment variable mapping value must be a string for ${packageName}`,
         );
       }
-      // eslint-disable-next-line node/no-process-env
-      const envValue = process.env[value];
+      const envValue = processEnv[value];
       if (!envValue) {
-        // eslint-disable-next-line no-restricted-syntax
         throw new Error(
           `Required environment variable ${value} is not set for ${packageName}`,
         );
@@ -162,7 +158,6 @@ function runCiReleaseCommand(
     });
     logger(`CI release command completed successfully for ${packageName}`);
   } catch (error) {
-    // eslint-disable-next-line no-restricted-syntax
     throw new Error(
       `CI release command failed for ${packageName}: ${error instanceof Error ? error.message : String(error)}`,
     );

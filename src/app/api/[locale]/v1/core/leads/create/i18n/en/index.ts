@@ -6,9 +6,87 @@ export const translations = {
       title: "New Lead Form",
       description: "Enter lead information to create a new lead",
     },
+    contactInfo: {
+      title: "Contact Information",
+      description: "Primary contact details for the lead",
+    },
+    email: {
+      label: "Email Address",
+      description: "Primary email address for communication",
+      placeholder: "john@example.com",
+    },
+    businessName: {
+      label: "Business Name",
+      description: "Name of the company or business",
+      placeholder: "Example Corp",
+    },
+    phone: {
+      label: "Phone Number",
+      description: "Contact phone number with country code",
+      placeholder: "+1234567890",
+    },
+    website: {
+      label: "Website",
+      description: "Company website URL",
+      placeholder: "https://example.com",
+    },
+    locationPreferences: {
+      title: "Location & Preferences",
+      description: "Geographic and language preferences",
+    },
+    country: {
+      label: "Country",
+      description: "Business location or target market",
+      placeholder: "Select a country",
+    },
+    language: {
+      label: "Language",
+      description: "Preferred communication language",
+      placeholder: "Select a language",
+    },
+    leadDetails: {
+      title: "Lead Details",
+      description: "Additional information about the lead",
+    },
+    source: {
+      label: "Lead Source",
+      description: "How the lead was acquired",
+      placeholder: "Select source",
+    },
+    notes: {
+      label: "Notes",
+      description: "Additional notes or comments",
+      placeholder: "Enter any additional information...",
+    },
     response: {
       title: "Created Lead",
       description: "Details of the newly created lead",
+      summary: {
+        title: "Lead Summary",
+        id: "Lead ID",
+        businessName: "Business Name",
+        email: "Email Address",
+        status: "Lead Status",
+      },
+      contactDetails: {
+        title: "Contact Details",
+        phone: "Phone Number",
+        website: "Website URL",
+        country: "Country",
+        language: "Language",
+      },
+      trackingInfo: {
+        title: "Tracking Information",
+        source: "Lead Source",
+        emailsSent: "Email Count",
+        currentCampaignStage: "Campaign Stage",
+      },
+      metadata: {
+        title: "Metadata",
+        notes: "Notes",
+        createdAt: "Creation Date",
+        updatedAt: "Last Updated",
+      },
     },
     errors: {
       unauthorized: {
@@ -66,8 +144,10 @@ export const translations = {
       nextSteps: {
         title: "What happens next?",
         step1: "Our team will review your business profile and goals",
-        step2: "You'll receive a personalized consultation proposal within 24 hours",
-        step3: "We'll schedule a call to discuss your specific needs and objectives",
+        step2:
+          "You'll receive a personalized consultation proposal within 24 hours",
+        step3:
+          "We'll schedule a call to discuss your specific needs and objectives",
       },
       cta: {
         getStarted: "Schedule Your Consultation",

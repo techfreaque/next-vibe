@@ -94,6 +94,19 @@ export const translations: typeof enTranslations = {
       description:
         "Ein interner Serverfehler ist beim Abrufen der E-Mail aufgetreten",
     },
+    conflict: {
+      title: "Konfliktfehler",
+      description:
+        "Ein Konflikt ist beim Verarbeiten der E-Mail-Anfrage aufgetreten",
+    },
+    network: {
+      title: "Netzwerkfehler",
+      description: "Ein Netzwerkfehler ist beim Abrufen der E-Mail aufgetreten",
+    },
+    unsavedChanges: {
+      title: "Ungespeicherte Änderungen",
+      description: "Es gibt ungespeicherte Änderungen",
+    },
     unknown: {
       title: "Unbekannter Fehler",
       description: "Ein unerwarteter Fehler ist aufgetreten",

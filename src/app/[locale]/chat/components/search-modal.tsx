@@ -1,19 +1,21 @@
 "use client";
 
-import { Search, MessageSquarePlus, X } from "lucide-react";
+import { MessageSquarePlus, Search, X } from "lucide-react";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
-import type { ChatThread } from "../lib/storage/types";
+import { useTranslation } from "@/i18n/core/client";
 import {
   Button,
-  Input,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  Input,
 } from "@/packages/next-vibe-ui/web/ui";
-import { cn } from "next-vibe/shared/utils";
+
+import type { ChatThread } from "../lib/storage/types";
 
 interface SearchModalProps {
   open: boolean;
@@ -30,9 +32,11 @@ export function SearchModal({
   onSelectThread,
   searchThreads,
 }: SearchModalProps): JSX.Element {
+  const { t } = useTranslation("chat");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const searchResults = searchQuery.length > 0 ? searchThreads(searchQuery) : [];
+  const searchResults =
+    searchQuery.length > 0 ? searchThreads(searchQuery) : [];
 
   const handleSelectThread = (threadId: string) => {
     onSelectThread(threadId);
@@ -47,27 +51,24 @@ export function SearchModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90dvh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Search & Create</DialogTitle>
+          <DialogTitle>{t("dialogs.searchAndCreate")}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 flex-1 overflow-hidden flex flex-col">
           {/* New Thread Button */}
-          <Button
-            onClick={handleCreateThread}
-            className="w-full"
-          >
+          <Button onClick={handleCreateThread} className="w-full flex-shrink-0">
             <MessageSquarePlus className="h-4 w-4 mr-2" />
-            New Chat
+            {t("common.newChat")}
           </Button>
 
           {/* Search Input */}
-          <div className="relative">
+          <div className="relative flex-shrink-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="Search threads..."
+              placeholder={t("common.searchThreadsPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
@@ -76,7 +77,7 @@ export function SearchModal({
 
           {/* Search Results */}
           {searchQuery.length > 0 && (
-            <div className="max-h-[300px] overflow-y-auto space-y-1">
+            <div className="flex-1 overflow-y-auto space-y-1 min-h-0">
               {searchResults.length > 0 ? (
                 searchResults.map((thread) => (
                   <button
@@ -84,7 +85,7 @@ export function SearchModal({
                     onClick={() => handleSelectThread(thread.id)}
                     className={cn(
                       "w-full text-left px-3 py-2 rounded-md hover:bg-accent transition-colors",
-                      "text-sm truncate"
+                      "text-sm truncate min-h-[44px] flex items-center",
                     )}
                   >
                     {thread.title}
@@ -92,7 +93,7 @@ export function SearchModal({
                 ))
               ) : (
                 <div className="text-center py-8 text-muted-foreground text-sm">
-                  No threads found
+                  {t("common.noThreadsFound")}
                 </div>
               )}
             </div>
@@ -102,4 +103,3 @@ export function SearchModal({
     </Dialog>
   );
 }
-

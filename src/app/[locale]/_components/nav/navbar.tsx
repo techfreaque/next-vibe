@@ -11,7 +11,7 @@ import { Button } from "next-vibe-ui/ui/button";
 import { TooltipProvider } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 
-import type { StandardUserType } from "@/app/api/[locale]/v1/core/user/schema";
+import type { StandardUserType } from "@/app/api/[locale]/v1/core/user/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

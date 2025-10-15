@@ -1,6 +1,7 @@
 import fs from "node:fs";
-import { parseError } from "next-vibe/shared/utils";
 import * as path from "node:path";
+
+import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "../../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { I18N_PATH, INDEX_FILE } from "../constants";

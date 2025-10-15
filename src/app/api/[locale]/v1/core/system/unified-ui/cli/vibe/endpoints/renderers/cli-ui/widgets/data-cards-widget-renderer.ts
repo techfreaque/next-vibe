@@ -8,6 +8,54 @@ import { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vib
 import { BaseWidgetRenderer } from "./base-widget-renderer";
 import type { ResponseFieldMetadata, WidgetRenderContext } from "./types";
 
+// Severity icon constants
+const SEVERITY_ICONS = {
+  ERROR: "✖ ",
+  WARNING: "⚠ ",
+  INFO: "ℹ ",
+  DEFAULT: "• ",
+  SUCCESS: "✨ ",
+} as const;
+
+/**
+ * Configuration for card rendering
+ */
+interface CardConfig {
+  layout: {
+    columns: number;
+    spacing: string;
+  };
+  groupBy?: string;
+  cardTemplate: string;
+  showSummary: boolean;
+  summaryTemplate?: string;
+  itemConfig: {
+    template: string;
+    size: string;
+    spacing: string;
+  };
+}
+
+/**
+ * Individual item in a card collection
+ */
+interface CardItem {
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | null
+    | undefined
+    | CardItem
+    | CardItem[];
+  line?: number;
+  column?: number;
+  severity?: string;
+  message?: string;
+  rule?: string;
+  file?: string;
+}
+
 /**
  * Data cards widget renderer with template-based formatting
  */
@@ -17,39 +65,98 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
   }
 
   render(field: ResponseFieldMetadata, context: WidgetRenderContext): string {
+    const t = context.translate;
     const data = field.value;
 
     if (!Array.isArray(data) || data.length === 0) {
-      return context.renderEmptyState("No data available");
+      return context.renderEmptyState(
+        t(
+          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.noDataAvailable",
+        ),
+      );
     }
+
+    // Type narrow the array items to CardItem
+    const typedData: CardItem[] = data.filter(
+      (item): item is CardItem => typeof item === "object" && item !== null,
+    );
 
     const config = this.getCardsConfig(field);
 
     // Handle different card templates
     switch (config.cardTemplate) {
       case "eslint-issue":
-        return this.renderESLintCards(data, config, context);
+        return this.renderESLintCards(typedData, config, context);
       case "code-issue":
-        return this.renderCodeIssueCards(data, config, context);
+        return this.renderCodeIssueCards(typedData, config, context);
       default:
-        return this.renderDefaultCards(data, config, context);
+        return this.renderDefaultCards(typedData, config, context);
     }
   }
 
-  private getCardsConfig(field: ResponseFieldMetadata) {
+  private getCardsConfig(field: ResponseFieldMetadata): CardConfig {
     const config = field.config || {};
 
+    // Handle layout config - ensure it's an object
+    let layout: { columns: number; spacing: string } = {
+      columns: 2,
+      spacing: "normal",
+    };
+    if (
+      config.layout &&
+      typeof config.layout === "object" &&
+      "columns" in config.layout &&
+      "spacing" in config.layout
+    ) {
+      layout = {
+        columns:
+          typeof config.layout.columns === "number" ? config.layout.columns : 2,
+        spacing:
+          typeof config.layout.spacing === "string"
+            ? config.layout.spacing
+            : "normal",
+      };
+    }
+
     return {
-      layout: config.layout || { columns: 2, spacing: "normal" },
-      groupBy: config.groupBy,
-      cardTemplate: config.cardTemplate || "default",
-      showSummary: config.showSummary ?? false,
-      summaryTemplate: config.summaryTemplate,
-      itemConfig: config.itemConfig || {
-        template: "default",
-        size: "medium",
-        spacing: "normal",
-      },
+      layout,
+      groupBy:
+        config.groupBy !== undefined ? String(config.groupBy) : undefined,
+      cardTemplate:
+        config.cardTemplate !== undefined
+          ? String(config.cardTemplate)
+          : "default",
+      showSummary:
+        config.showSummary !== undefined ? Boolean(config.showSummary) : false,
+      summaryTemplate:
+        config.summaryTemplate !== undefined
+          ? String(config.summaryTemplate)
+          : undefined,
+      itemConfig:
+        config.itemConfig &&
+        typeof config.itemConfig === "object" &&
+        "template" in config.itemConfig &&
+        "size" in config.itemConfig &&
+        "spacing" in config.itemConfig
+          ? {
+              template:
+                typeof config.itemConfig.template === "string"
+                  ? config.itemConfig.template
+                  : "default",
+              size:
+                typeof config.itemConfig.size === "string"
+                  ? config.itemConfig.size
+                  : "medium",
+              spacing:
+                typeof config.itemConfig.spacing === "string"
+                  ? config.itemConfig.spacing
+                  : "normal",
+            }
+          : {
+              template: "default",
+              size: "medium",
+              spacing: "normal",
+            },
     };
   }
 
@@ -57,8 +164,8 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
    * Render cards in ESLint-like format (grouped by file)
    */
   private renderESLintCards(
-    data: any[],
-    config: any,
+    data: CardItem[],
+    config: CardConfig,
     context: WidgetRenderContext,
   ): string {
     let output = "";
@@ -69,11 +176,13 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
       for (const [groupKey, items] of groups) {
         // File header
         const fileHeader = this.styleText(groupKey, "underline", context);
+        // eslint-disable-next-line i18next/no-literal-string
         output += `\n${fileHeader}\n`;
 
         // Issues for this file
         for (const item of items) {
           const line = this.renderESLintIssue(item, context);
+          // eslint-disable-next-line i18next/no-literal-string
           output += `  ${line}\n`;
         }
       }
@@ -81,12 +190,14 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
       // Flat list
       for (const item of data) {
         const line = this.renderESLintIssue(item, context);
+        // eslint-disable-next-line i18next/no-literal-string
         output += `${line}\n`;
       }
     }
 
     // Summary
     if (config.showSummary) {
+      // eslint-disable-next-line i18next/no-literal-string
       output += `\n${this.renderSummary(data, config, context)}`;
     }
 
@@ -96,7 +207,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
   /**
    * Render individual ESLint issue
    */
-  private renderESLintIssue(item: any, context: WidgetRenderContext): string {
+  private renderESLintIssue(
+    item: CardItem,
+    context: WidgetRenderContext,
+  ): string {
     const parts: string[] = [];
 
     // Location (line:column)
@@ -106,18 +220,18 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
     }
 
     // Severity with icon and color
-    if (item.severity) {
+    if (item.severity && typeof item.severity === "string") {
       const severity = this.formatSeverity(item.severity, context);
       parts.push(severity.padEnd(9));
     }
 
     // Message
-    if (item.message) {
+    if (item.message && typeof item.message === "string") {
       parts.push(item.message);
     }
 
     // Rule (if available)
-    if (item.rule) {
+    if (item.rule && typeof item.rule === "string") {
       parts.push(this.styleText(item.rule, "dim", context));
     }
 
@@ -128,8 +242,8 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
    * Render cards for code issues (more detailed format)
    */
   private renderCodeIssueCards(
-    data: any[],
-    config: any,
+    data: CardItem[],
+    config: CardConfig,
     context: WidgetRenderContext,
   ): string {
     const result: string[] = [];
@@ -151,7 +265,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
   /**
    * Render individual code issue card
    */
-  private renderCodeIssueCard(item: any, context: WidgetRenderContext): string {
+  private renderCodeIssueCard(
+    item: CardItem,
+    context: WidgetRenderContext,
+  ): string {
     const lines: string[] = [];
 
     // Header with file and location
@@ -159,12 +276,18 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
     lines.push(header);
 
     // Severity and message
-    const severity = this.formatSeverity(item.severity, context);
-    const message = item.message || "";
+    const severityStr =
+      item.severity && typeof item.severity === "string"
+        ? item.severity
+        : "info";
+    const severity = this.formatSeverity(severityStr, context);
+    const message =
+      item.message && typeof item.message === "string" ? item.message : "";
     lines.push(`${severity} ${message}`);
 
     // Rule if available
-    if (item.rule) {
+    if (item.rule && typeof item.rule === "string") {
+      // eslint-disable-next-line i18next/no-literal-string
       const rule = this.styleText(`Rule: ${item.rule}`, "dim", context);
       lines.push(rule);
     }
@@ -176,8 +299,8 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
    * Render default cards format
    */
   private renderDefaultCards(
-    data: any[],
-    config: any,
+    data: CardItem[],
+    config: CardConfig,
     context: WidgetRenderContext,
   ): string {
     const result: string[] = [];
@@ -194,12 +317,26 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
   /**
    * Render default card format
    */
-  private renderDefaultCard(item: any, context: WidgetRenderContext): string {
+  private renderDefaultCard(
+    item: CardItem,
+    context: WidgetRenderContext,
+  ): string {
     const lines: string[] = [];
 
     for (const [key, value] of Object.entries(item)) {
       const label = this.styleText(key, "bold", context);
-      const formattedValue = String(value);
+      let formattedValue = "";
+      if (typeof value === "string") {
+        formattedValue = value;
+      } else if (typeof value === "number") {
+        formattedValue = String(value);
+      } else if (typeof value === "boolean") {
+        formattedValue = value ? "true" : "false";
+      } else if (value === null) {
+        formattedValue = "null";
+      } else if (value === undefined) {
+        formattedValue = "undefined";
+      }
       lines.push(`${label}: ${formattedValue}`);
     }
 
@@ -209,15 +346,19 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
   /**
    * Build card header with file and location info
    */
-  private buildCardHeader(item: any, context: WidgetRenderContext): string {
+  private buildCardHeader(
+    item: CardItem,
+    context: WidgetRenderContext,
+  ): string {
     const parts: string[] = [];
 
-    if (item.file) {
+    if (item.file && typeof item.file === "string") {
       parts.push(this.styleText(item.file, "bold", context));
     }
 
     if (item.line || item.column) {
       const location = this.formatLocation(item.line, item.column);
+      // eslint-disable-next-line i18next/no-literal-string
       parts.push(this.styleText(`(${location})`, "dim", context));
     }
 
@@ -235,8 +376,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
       return `${line}:${column}`;
     }
     if (line) {
+      // eslint-disable-next-line i18next/no-literal-string
       return `${line}:0`;
     }
+
     return "";
   }
 
@@ -274,13 +417,13 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
   private getSeverityIcon(severity: string): string {
     switch (severity) {
       case "error":
-        return "✖ ";
+        return SEVERITY_ICONS.ERROR;
       case "warning":
-        return "⚠ ";
+        return SEVERITY_ICONS.WARNING;
       case "info":
-        return "ℹ ";
+        return SEVERITY_ICONS.INFO;
       default:
-        return "• ";
+        return SEVERITY_ICONS.DEFAULT;
     }
   }
 
@@ -288,8 +431,8 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
    * Render summary
    */
   private renderSummary(
-    data: any[],
-    config: any,
+    data: CardItem[],
+    config: CardConfig,
     context: WidgetRenderContext,
   ): string {
     const severityCounts = this.countBySeverity(data);
@@ -310,6 +453,7 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
   ): string {
     let summary = template;
     for (const [key, value] of Object.entries(counts)) {
+      // eslint-disable-next-line i18next/no-literal-string
       summary = summary.replace(new RegExp(`\\{${key}\\}`, "g"), String(value));
     }
     return summary;
@@ -322,19 +466,22 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
     counts: Record<string, number>,
     context: WidgetRenderContext,
   ): string {
+    const t = context.translate;
     const totalCount = Object.values(counts).reduce(
       (sum, count) => sum + count,
       0,
     );
 
     if (totalCount === 0) {
-      const icon = context.options.useEmojis ? "✨ " : "";
-      const text = "No issues found";
+      const icon = context.options.useEmojis ? SEVERITY_ICONS.SUCCESS : "";
+      const text = t(
+        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound",
+      );
       return this.styleText(`${icon}${text}`, "green", context);
     }
 
     const parts: string[] = [];
-    const icon = context.options.useEmojis ? "✖ " : "";
+    const icon = context.options.useEmojis ? SEVERITY_ICONS.ERROR : "";
 
     if (counts.error > 0) {
       const errorText = `${counts.error} error${counts.error === 1 ? "" : "s"}`;
@@ -350,6 +497,7 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
       return `${icon}${parts[0]}`;
     } else if (parts.length > 1) {
       const problemText = `${totalCount} problem${totalCount === 1 ? "" : "s"}`;
+      // eslint-disable-next-line i18next/no-literal-string
       return `${icon}${problemText} (${parts.join(", ")})`;
     }
 
@@ -359,11 +507,24 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
   /**
    * Group data by specified field
    */
-  private groupData(data: any[], groupBy: string): Map<string, any[]> {
-    const groups = new Map<string, any[]>();
+  private groupData(
+    data: CardItem[],
+    groupBy: string,
+  ): Map<string, CardItem[]> {
+    const groups = new Map<string, CardItem[]>();
 
     for (const item of data) {
-      const groupKey = item[groupBy] || "unknown";
+      const groupValue = item[groupBy];
+      let groupKey = "unknown";
+      if (typeof groupValue === "string") {
+        groupKey = groupValue;
+      } else if (typeof groupValue === "number") {
+        groupKey = String(groupValue);
+      } else if (typeof groupValue === "boolean") {
+        groupKey = groupValue ? "true" : "false";
+      } else if (groupValue !== null && groupValue !== undefined) {
+        groupKey = "unknown";
+      }
       if (!groups.has(groupKey)) {
         groups.set(groupKey, []);
       }
@@ -376,11 +537,15 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
   /**
    * Count items by severity
    */
-  private countBySeverity(data: any[]): Record<string, number> {
+  private countBySeverity(data: CardItem[]): Record<string, number> {
     const counts: Record<string, number> = { error: 0, warning: 0, info: 0 };
 
     for (const item of data) {
-      const severity = item.severity || "info";
+      const severityValue = item.severity;
+      let severity = "info";
+      if (typeof severityValue === "string") {
+        severity = severityValue;
+      }
       if (severity in counts) {
         counts[severity]++;
       } else {

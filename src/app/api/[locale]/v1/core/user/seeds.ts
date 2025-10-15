@@ -9,7 +9,7 @@ import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/end
 import { authRepository } from "./auth/repository";
 import type { NewUser } from "./db";
 import type { StandardUserType } from "./definition";
-import { PreferredContactMethod, UserDetailLevel } from "./enum";
+import { UserDetailLevel } from "./enum";
 import { sessionRepository } from "./private/session/repository";
 import { userRepository } from "./repository";
 import { UserRole } from "./user-roles/enum";
@@ -22,14 +22,11 @@ function createUserSeed(overrides?: Partial<NewUser>): NewUser {
   return {
     email: `user${Math.floor(Math.random() * 1000)}@example.com`,
     password: "password123", // Plain text password - will be hashed by createWithHashedPassword
-    firstName: `User${Math.floor(Math.random() * 1000)}`,
-    lastName: `LastName${Math.floor(Math.random() * 1000)}`,
-    imageUrl: `https://picsum.photos/seed/${Math.floor(Math.random() * 1000)}/200/200`,
-    preferredContactMethod: PreferredContactMethod.EMAIL, // Using enum value instead of string literal
+    privateName: `User${Math.floor(Math.random() * 1000)}`,
+    publicName: `Company${Math.floor(Math.random() * 1000)}`,
     emailVerified: true,
     isActive: true,
-    company: "User Company",
-    phone: "+1234567890",
+    marketingConsent: false,
 
     ...overrides,
   };
@@ -44,36 +41,35 @@ export async function dev(logger: EndpointLogger): Promise<void> {
   // Create CLI system user with all roles
   const cliUser = createUserSeed({
     email: "cli@system.local",
-    firstName: "CLI",
-    lastName: "System",
-    company: "System CLI",
+    privateName: "CLI System",
+    publicName: "System CLI",
   });
 
   // Create admin user
   const adminUser = createUserSeed({
     email: "admin@example.com",
-    firstName: "Admin",
-    lastName: "User",
+    privateName: "Admin User",
+    publicName: "Admin Corp",
   });
 
   // Create demo user
   const demoUser = createUserSeed({
     email: "demo@example.com",
-    firstName: "Demo",
-    lastName: "User",
+    privateName: "Demo User",
+    publicName: "Demo Company",
   });
 
   // Create regular users
   const regularUsers = [
     createUserSeed({
       email: "user1@example.com",
-      firstName: "Regular",
-      lastName: "User1",
+      privateName: "Regular User1",
+      publicName: "User1 Corp",
     }),
     createUserSeed({
       email: "user2@example.com",
-      firstName: "Regular",
-      lastName: "User2",
+      privateName: "Regular User2",
+      publicName: "User2 Corp",
     }),
   ];
 
@@ -266,13 +262,13 @@ export async function test(logger: EndpointLogger): Promise<void> {
   const testUsers = [
     createUserSeed({
       email: "test1@example.com",
-      firstName: "Test",
-      lastName: "User1",
+      privateName: "Test User1",
+      publicName: "Test1 Company",
     }),
     createUserSeed({
       email: "test2@example.com",
-      firstName: "Test",
-      lastName: "User2",
+      privateName: "Test User2",
+      publicName: "Test2 Company",
     }),
   ];
 
@@ -365,8 +361,8 @@ export async function prod(logger: EndpointLogger): Promise<void> {
   // Create admin user
   const adminUser = createUserSeed({
     email: "hi@socialmediaservice.center",
-    firstName: "Admin",
-    lastName: "User",
+    privateName: "Admin User",
+    publicName: "Social Media Service Center",
   });
 
   // Create admin user with hashed password using the repository

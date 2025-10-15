@@ -25,7 +25,9 @@ import { Progress } from "next-vibe-ui/ui/progress";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { JSX } from "react";
+import type { Control } from "react-hook-form";
 
+import type { LeadsStatsRequestType } from "@/app/api/[locale]/v1/core/leads/stats/definition";
 import { useLeadsStats } from "@/app/api/[locale]/v1/core/leads/stats/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

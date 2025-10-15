@@ -20,7 +20,6 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 
 import { completeUserSchema } from "../../definition";
-import { ProfileVisibility, ProfileVisibilityOptions } from "../../enum";
 import { UserRole } from "../../user-roles/enum";
 
 /**
@@ -29,21 +28,22 @@ import { UserRole } from "../../user-roles/enum";
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "user", "private", "me"],
-  title: "app.api.v1.core.user.private.me.get.title",
-  description: "app.api.v1.core.user.private.me.get.description",
-  category: "app.api.v1.core.user.category",
-  tags: ["app.api.v1.core.user.private.me.tag"],
+  title: "app.api.v1.core.user.private.me.get.title" as const,
+  description: "app.api.v1.core.user.private.me.get.description" as const,
+  category: "app.api.v1.core.user.category" as const,
+  tags: ["app.api.v1.core.user.private.me.tag" as const],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
-  ],
+  ] as const,
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.user.private.me.get.response.title",
-      description: "app.api.v1.core.user.private.me.get.response.description",
+      title: "app.api.v1.core.user.private.me.get.response.title" as const,
+      description:
+        "app.api.v1.core.user.private.me.get.response.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { response: true },
@@ -51,7 +51,8 @@ const { GET } = createEndpoint({
       user: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.user.private.me.get.response.user.title",
+          content:
+            "app.api.v1.core.user.private.me.get.response.user.title" as const,
         },
         completeUserSchema,
       ),
@@ -61,56 +62,66 @@ const { GET } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.v1.core.user.private.me.get.errors.validation.title",
+      title:
+        "app.api.v1.core.user.private.me.get.errors.validation.title" as const,
       description:
-        "app.api.v1.core.user.private.me.get.errors.validation.description",
+        "app.api.v1.core.user.private.me.get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.v1.core.user.private.me.get.errors.unauthorized.title",
+      title:
+        "app.api.v1.core.user.private.me.get.errors.unauthorized.title" as const,
       description:
-        "app.api.v1.core.user.private.me.get.errors.unauthorized.description",
+        "app.api.v1.core.user.private.me.get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.v1.core.user.private.me.get.errors.forbidden.title",
+      title:
+        "app.api.v1.core.user.private.me.get.errors.forbidden.title" as const,
       description:
-        "app.api.v1.core.user.private.me.get.errors.forbidden.description",
+        "app.api.v1.core.user.private.me.get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.v1.core.user.private.me.get.errors.notFound.title",
+      title:
+        "app.api.v1.core.user.private.me.get.errors.notFound.title" as const,
       description:
-        "app.api.v1.core.user.private.me.get.errors.notFound.description",
+        "app.api.v1.core.user.private.me.get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.v1.core.user.private.me.get.errors.conflict.title",
+      title:
+        "app.api.v1.core.user.private.me.get.errors.conflict.title" as const,
       description:
-        "app.api.v1.core.user.private.me.get.errors.conflict.description",
+        "app.api.v1.core.user.private.me.get.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.v1.core.user.private.me.get.errors.network.title",
+      title:
+        "app.api.v1.core.user.private.me.get.errors.network.title" as const,
       description:
-        "app.api.v1.core.user.private.me.get.errors.network.description",
+        "app.api.v1.core.user.private.me.get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.v1.core.user.private.me.get.errors.unsavedChanges.title",
+      title:
+        "app.api.v1.core.user.private.me.get.errors.unsavedChanges.title" as const,
       description:
-        "app.api.v1.core.user.private.me.get.errors.unsavedChanges.description",
+        "app.api.v1.core.user.private.me.get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.v1.core.user.private.me.get.errors.internal.title",
+      title:
+        "app.api.v1.core.user.private.me.get.errors.internal.title" as const,
       description:
-        "app.api.v1.core.user.private.me.get.errors.internal.description",
+        "app.api.v1.core.user.private.me.get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.v1.core.user.private.me.get.errors.unknown.title",
+      title:
+        "app.api.v1.core.user.private.me.get.errors.unknown.title" as const,
       description:
-        "app.api.v1.core.user.private.me.get.errors.unknown.description",
+        "app.api.v1.core.user.private.me.get.errors.unknown.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.user.private.me.get.success.title",
-    description: "app.api.v1.core.user.private.me.get.success.description",
+    title: "app.api.v1.core.user.private.me.get.success.title" as const,
+    description:
+      "app.api.v1.core.user.private.me.get.success.description" as const,
   },
 
   // === EXAMPLES ===
@@ -122,23 +133,21 @@ const { GET } = createEndpoint({
           leadId: null,
           isPublic: false as const,
           email: "user@example.com",
-          firstName: "John",
-          lastName: "Doe",
-          imageUrl: "https://example.com/avatar.jpg",
+          privateName: "John Doe",
+          publicName: "JD",
           userRoles: [
             {
               id: "role-id",
               role: UserRole.CUSTOMER,
             },
           ],
-          company: "Customer Company",
-          visibility: ProfileVisibility.PUBLIC,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           requireTwoFactor: false,
           marketingConsent: false,
           isActive: true,
           emailVerified: true,
+          stripeCustomerId: null,
         },
       },
     },
@@ -151,21 +160,22 @@ const { GET } = createEndpoint({
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "user", "private", "me"],
-  title: "app.api.v1.core.user.private.me.update.title",
-  description: "app.api.v1.core.user.private.me.update.description",
-  category: "app.api.v1.core.user.category",
-  tags: ["app.api.v1.core.user.private.me.tag"],
+  title: "app.api.v1.core.user.private.me.update.title" as const,
+  description: "app.api.v1.core.user.private.me.update.description" as const,
+  category: "app.api.v1.core.user.category" as const,
+  tags: ["app.api.v1.core.user.private.me.tag" as const],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
-  ],
+  ] as const,
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.user.private.me.update.title",
-      description: "app.api.v1.core.user.private.me.update.description",
+      title: "app.api.v1.core.user.private.me.update.title" as const,
+      description:
+        "app.api.v1.core.user.private.me.update.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -175,65 +185,65 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title:
-            "app.api.v1.core.user.private.me.update.groups.basicInfo.title",
+            "app.api.v1.core.user.private.me.update.groups.basicInfo.title" as const,
           description:
-            "app.api.v1.core.user.private.me.update.groups.basicInfo.description",
+            "app.api.v1.core.user.private.me.update.groups.basicInfo.description" as const,
           layout: { type: LayoutType.GRID, columns: 2 },
         },
         { request: "data" },
         {
-          firstName: requestDataField(
+          privateName: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label:
-                "app.api.v1.core.user.private.me.update.fields.firstName.label",
+                "app.api.v1.core.user.private.me.update.fields.privateName.label" as const,
               description:
-                "app.api.v1.core.user.private.me.update.fields.firstName.description",
+                "app.api.v1.core.user.private.me.update.fields.privateName.description" as const,
               placeholder:
-                "app.api.v1.core.user.private.me.update.fields.firstName.placeholder",
+                "app.api.v1.core.user.private.me.update.fields.privateName.placeholder" as const,
               required: false,
               layout: { columns: 6 },
               helpText:
-                "app.api.v1.core.user.private.me.update.fields.firstName.description",
+                "app.api.v1.core.user.private.me.update.fields.privateName.description" as const,
             },
             z
               .string()
               .min(2, {
                 message:
-                  "app.api.v1.core.user.private.me.update.fields.firstName.validation.minLength",
+                  "app.api.v1.core.user.private.me.update.fields.privateName.validation.minLength",
               })
               .max(50, {
                 message:
-                  "app.api.v1.core.user.private.me.update.fields.firstName.validation.maxLength",
+                  "app.api.v1.core.user.private.me.update.fields.privateName.validation.maxLength",
               })
               .optional(),
           ),
 
-          lastName: requestDataField(
+          publicName: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label:
-                "app.api.v1.core.user.private.me.update.fields.lastName.label",
+                "app.api.v1.core.user.private.me.update.fields.publicName.label" as const,
               description:
-                "app.api.v1.core.user.private.me.update.fields.lastName.description",
+                "app.api.v1.core.user.private.me.update.fields.publicName.description" as const,
               placeholder:
-                "app.api.v1.core.user.private.me.update.fields.lastName.placeholder",
+                "app.api.v1.core.user.private.me.update.fields.publicName.placeholder" as const,
               required: false,
               layout: { columns: 6 },
               helpText:
-                "app.api.v1.core.user.private.me.update.fields.lastName.description",
+                "app.api.v1.core.user.private.me.update.fields.publicName.description" as const,
             },
             z
               .string()
               .min(2, {
                 message:
-                  "app.api.v1.core.user.private.me.update.fields.lastName.validation.minLength",
+                  "app.api.v1.core.user.private.me.update.fields.publicName.validation.minLength",
               })
               .max(50, {
                 message:
-                  "app.api.v1.core.user.private.me.update.fields.lastName.validation.maxLength",
+                  "app.api.v1.core.user.private.me.update.fields.publicName.validation.maxLength",
               })
               .optional(),
           ),
@@ -243,15 +253,15 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.EMAIL,
               label:
-                "app.api.v1.core.user.private.me.update.fields.email.label",
+                "app.api.v1.core.user.private.me.update.fields.email.label" as const,
               description:
-                "app.api.v1.core.user.private.me.update.fields.email.description",
+                "app.api.v1.core.user.private.me.update.fields.email.description" as const,
               placeholder:
-                "app.api.v1.core.user.private.me.update.fields.email.placeholder",
+                "app.api.v1.core.user.private.me.update.fields.email.placeholder" as const,
               required: false,
               layout: { columns: 12 },
               helpText:
-                "app.api.v1.core.user.private.me.update.fields.email.description",
+                "app.api.v1.core.user.private.me.update.fields.email.description" as const,
             },
             z
               .string()
@@ -264,136 +274,32 @@ const { POST } = createEndpoint({
         },
       ),
 
-      // === PROFILE DETAILS ===
-      profileDetails: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.v1.core.user.private.me.update.groups.profileDetails.title",
-          description:
-            "app.api.v1.core.user.private.me.update.groups.profileDetails.description",
-          layout: { type: LayoutType.VERTICAL },
-        },
-        { request: "data" },
-        {
-          imageUrl: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.URL,
-              label:
-                "app.api.v1.core.user.private.me.update.fields.imageUrl.label",
-              description:
-                "app.api.v1.core.user.private.me.update.fields.imageUrl.description",
-              placeholder:
-                "app.api.v1.core.user.private.me.update.fields.imageUrl.placeholder",
-              required: false,
-              layout: { columns: 12 },
-              helpText:
-                "app.api.v1.core.user.private.me.update.fields.imageUrl.description",
-            },
-            z
-              .string()
-              .url({
-                message:
-                  "app.api.v1.core.user.private.me.update.fields.imageUrl.validation.invalid",
-              })
-              .optional(),
-          ),
-
-          company: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.v1.core.user.private.me.update.fields.company.label",
-              description:
-                "app.api.v1.core.user.private.me.update.fields.company.description",
-              placeholder:
-                "app.api.v1.core.user.private.me.update.fields.company.placeholder",
-              required: false,
-              layout: { columns: 12 },
-              helpText:
-                "app.api.v1.core.user.private.me.update.fields.company.description",
-            },
-            z
-              .string()
-              .max(100, {
-                message:
-                  "app.api.v1.core.user.private.me.update.fields.company.validation.maxLength",
-              })
-              .optional(),
-          ),
-
-          bio: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXTAREA,
-              label: "app.api.v1.core.user.private.me.update.fields.bio.label",
-              description:
-                "app.api.v1.core.user.private.me.update.fields.bio.description",
-              placeholder:
-                "app.api.v1.core.user.private.me.update.fields.bio.placeholder",
-              required: false,
-              layout: { columns: 12 },
-              helpText:
-                "app.api.v1.core.user.private.me.update.fields.bio.description",
-            },
-            z
-              .string()
-              .max(500, {
-                message:
-                  "app.api.v1.core.user.private.me.update.fields.bio.validation.maxLength",
-              })
-              .optional(),
-          ),
-        },
-      ),
-
       // === PRIVACY AND PREFERENCES ===
       privacySettings: objectField(
         {
           type: WidgetType.CONTAINER,
           title:
-            "app.api.v1.core.user.private.me.update.groups.privacySettings.title",
+            "app.api.v1.core.user.private.me.update.groups.privacySettings.title" as const,
           description:
-            "app.api.v1.core.user.private.me.update.groups.privacySettings.description",
+            "app.api.v1.core.user.private.me.update.groups.privacySettings.description" as const,
           layout: { type: LayoutType.VERTICAL },
         },
         { request: "data" },
         {
-          visibility: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label:
-                "app.api.v1.core.user.private.me.update.fields.visibility.label",
-              description:
-                "app.api.v1.core.user.private.me.update.fields.visibility.description",
-              placeholder:
-                "app.api.v1.core.user.private.me.update.fields.visibility.placeholder",
-              options: ProfileVisibilityOptions,
-              required: false,
-              layout: { columns: 12 },
-              helpText:
-                "app.api.v1.core.user.private.me.update.fields.visibility.description",
-            },
-            z.nativeEnum(ProfileVisibility).optional(),
-          ),
-
           marketingConsent: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label:
-                "app.api.v1.core.user.private.me.update.fields.marketingConsent.label",
+                "app.api.v1.core.user.private.me.update.fields.marketingConsent.label" as const,
               description:
-                "app.api.v1.core.user.private.me.update.fields.marketingConsent.description",
+                "app.api.v1.core.user.private.me.update.fields.marketingConsent.description" as const,
               placeholder:
-                "app.api.v1.core.user.private.me.update.fields.marketingConsent.placeholder",
+                "app.api.v1.core.user.private.me.update.fields.marketingConsent.placeholder" as const,
               required: false,
               layout: { columns: 12 },
               helpText:
-                "app.api.v1.core.user.private.me.update.fields.marketingConsent.description",
+                "app.api.v1.core.user.private.me.update.fields.marketingConsent.description" as const,
             },
             z.boolean().optional(),
           ),
@@ -404,9 +310,10 @@ const { POST } = createEndpoint({
       response: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.v1.core.user.private.me.update.response.title",
+          title:
+            "app.api.v1.core.user.private.me.update.response.title" as const,
           description:
-            "app.api.v1.core.user.private.me.update.response.description",
+            "app.api.v1.core.user.private.me.update.response.description" as const,
           layout: { type: LayoutType.VERTICAL },
         },
         { response: true },
@@ -414,7 +321,7 @@ const { POST } = createEndpoint({
           success: responseField(
             {
               type: WidgetType.BADGE,
-              text: "app.api.v1.core.user.private.me.update.response.success",
+              text: "app.api.v1.core.user.private.me.update.response.success" as const,
             },
             z.boolean().describe("Whether the profile update was successful"),
           ),
@@ -422,14 +329,15 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.private.me.update.response.message",
+                "app.api.v1.core.user.private.me.update.response.message" as const,
             },
             z.string().describe("Human-readable update status message"),
           ),
           user: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.v1.core.user.private.me.update.response.user",
+              content:
+                "app.api.v1.core.user.private.me.update.response.user" as const,
             },
             completeUserSchema.describe("Updated user profile information"),
           ),
@@ -437,9 +345,9 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title:
-                "app.api.v1.core.user.private.me.update.response.changesSummary.title",
+                "app.api.v1.core.user.private.me.update.response.changesSummary.title" as const,
               description:
-                "app.api.v1.core.user.private.me.update.response.changesSummary.description",
+                "app.api.v1.core.user.private.me.update.response.changesSummary.description" as const,
               layout: { type: LayoutType.GRID, columns: 12 },
             },
             { response: true },
@@ -448,7 +356,7 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.user.private.me.update.response.changesSummary.totalChanges",
+                    "app.api.v1.core.user.private.me.update.response.changesSummary.totalChanges" as const,
                 },
                 z.number().describe("Number of fields updated"),
               ),
@@ -456,14 +364,14 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.user.private.me.update.response.changesSummary.changedFields",
+                    "app.api.v1.core.user.private.me.update.response.changesSummary.changedFields" as const,
                 },
                 z.array(z.string()).describe("List of updated field names"),
               ),
               verificationRequired: responseField(
                 {
                   type: WidgetType.BADGE,
-                  text: "app.api.v1.core.user.private.me.update.response.changesSummary.verificationRequired",
+                  text: "app.api.v1.core.user.private.me.update.response.changesSummary.verificationRequired" as const,
                 },
                 z.boolean().describe("Whether email verification is needed"),
               ),
@@ -471,7 +379,7 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.user.private.me.update.response.changesSummary.lastUpdated",
+                    "app.api.v1.core.user.private.me.update.response.changesSummary.lastUpdated" as const,
                 },
                 z
                   .string()
@@ -485,7 +393,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.private.me.update.response.nextSteps",
+                "app.api.v1.core.user.private.me.update.response.nextSteps" as const,
             },
             z
               .array(z.string())
@@ -499,57 +407,66 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.v1.core.user.private.me.update.errors.validation.title",
+      title:
+        "app.api.v1.core.user.private.me.update.errors.validation.title" as const,
       description:
-        "app.api.v1.core.user.private.me.update.errors.validation.description",
+        "app.api.v1.core.user.private.me.update.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.v1.core.user.private.me.update.errors.unauthorized.title",
+      title:
+        "app.api.v1.core.user.private.me.update.errors.unauthorized.title" as const,
       description:
-        "app.api.v1.core.user.private.me.update.errors.unauthorized.description",
+        "app.api.v1.core.user.private.me.update.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.v1.core.user.private.me.update.errors.forbidden.title",
+      title:
+        "app.api.v1.core.user.private.me.update.errors.forbidden.title" as const,
       description:
-        "app.api.v1.core.user.private.me.update.errors.forbidden.description",
+        "app.api.v1.core.user.private.me.update.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.v1.core.user.private.me.update.errors.notFound.title",
+      title:
+        "app.api.v1.core.user.private.me.update.errors.notFound.title" as const,
       description:
-        "app.api.v1.core.user.private.me.update.errors.notFound.description",
+        "app.api.v1.core.user.private.me.update.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.v1.core.user.private.me.update.errors.conflict.title",
+      title:
+        "app.api.v1.core.user.private.me.update.errors.conflict.title" as const,
       description:
-        "app.api.v1.core.user.private.me.update.errors.conflict.description",
+        "app.api.v1.core.user.private.me.update.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.v1.core.user.private.me.update.errors.network.title",
+      title:
+        "app.api.v1.core.user.private.me.update.errors.network.title" as const,
       description:
-        "app.api.v1.core.user.private.me.update.errors.network.description",
+        "app.api.v1.core.user.private.me.update.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.user.private.me.update.errors.unsavedChanges.title",
+        "app.api.v1.core.user.private.me.update.errors.unsavedChanges.title" as const,
       description:
-        "app.api.v1.core.user.private.me.update.errors.unsavedChanges.description",
+        "app.api.v1.core.user.private.me.update.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.v1.core.user.private.me.update.errors.internal.title",
+      title:
+        "app.api.v1.core.user.private.me.update.errors.internal.title" as const,
       description:
-        "app.api.v1.core.user.private.me.update.errors.internal.description",
+        "app.api.v1.core.user.private.me.update.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.v1.core.user.private.me.update.errors.unknown.title",
+      title:
+        "app.api.v1.core.user.private.me.update.errors.unknown.title" as const,
       description:
-        "app.api.v1.core.user.private.me.update.errors.unknown.description",
+        "app.api.v1.core.user.private.me.update.errors.unknown.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.user.private.me.update.success.title",
-    description: "app.api.v1.core.user.private.me.update.success.description",
+    title: "app.api.v1.core.user.private.me.update.success.title" as const,
+    description:
+      "app.api.v1.core.user.private.me.update.success.description" as const,
   },
 
   // === EXAMPLES ===
@@ -557,33 +474,21 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         basicInfo: {
-          firstName: "John",
-          lastName: "Doe",
+          privateName: "John Doe",
+          publicName: "JD",
           email: "customer@example.com",
         },
-        profileDetails: {
-          imageUrl: "/placeholder.svg",
-          company: "Example Company",
-          bio: "Example bio text",
-        },
         privacySettings: {
-          visibility: ProfileVisibility.PUBLIC,
           marketingConsent: true,
         },
       },
       failed: {
         basicInfo: {
-          firstName: "",
-          lastName: "",
+          privateName: "",
+          publicName: "",
           email: "invalid-email",
         },
-        profileDetails: {
-          imageUrl: "not-a-valid-url",
-          company: "",
-          bio: "",
-        },
         privacySettings: {
-          visibility: ProfileVisibility.PRIVATE,
           marketingConsent: false,
         },
       },
@@ -598,27 +503,25 @@ const { POST } = createEndpoint({
             leadId: null,
             isPublic: false as const,
             email: "customer@example.com",
-            firstName: "John",
-            lastName: "Doe",
-            imageUrl: "/placeholder.svg",
+            privateName: "John Doe",
+            publicName: "JD",
             userRoles: [
               {
                 id: "role-id",
                 role: UserRole.CUSTOMER,
               },
             ],
-            company: "Example Company",
-            visibility: ProfileVisibility.PUBLIC,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             requireTwoFactor: false,
             marketingConsent: true,
             isActive: true,
             emailVerified: true,
+            stripeCustomerId: null,
           },
           changesSummary: {
             totalChanges: 3,
-            changedFields: ["firstName", "lastName", "company"],
+            changedFields: ["privateName", "publicName", "company"],
             verificationRequired: false,
             lastUpdated: "2 seconds ago",
           },
@@ -638,18 +541,16 @@ const { POST } = createEndpoint({
             leadId: null,
             isPublic: false as const,
             email: "",
-            firstName: "",
-            lastName: "",
-            imageUrl: null,
+            privateName: "",
+            publicName: "",
             userRoles: [],
-            company: "",
-            visibility: ProfileVisibility.PRIVATE,
             createdAt: "",
             updatedAt: "",
             requireTwoFactor: false,
             marketingConsent: false,
             isActive: false,
             emailVerified: false,
+            stripeCustomerId: null,
           },
           changesSummary: {
             totalChanges: 0,
@@ -673,22 +574,22 @@ const { POST } = createEndpoint({
 const { DELETE } = createEndpoint({
   method: Methods.DELETE,
   path: ["v1", "core", "user", "private", "me"],
-  title: "app.api.v1.core.user.private.me.delete.title",
-  description: "app.api.v1.core.user.private.me.delete.description",
-  category: "app.api.v1.core.user.category",
-  tags: ["app.api.v1.core.user.private.me.tag"],
+  title: "app.api.v1.core.user.private.me.delete.title" as const,
+  description: "app.api.v1.core.user.private.me.delete.description" as const,
+  category: "app.api.v1.core.user.category" as const,
+  tags: ["app.api.v1.core.user.private.me.tag" as const],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
-  ],
+  ] as const,
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.user.private.me.delete.response.title",
+      title: "app.api.v1.core.user.private.me.delete.response.title" as const,
       description:
-        "app.api.v1.core.user.private.me.delete.response.description",
+        "app.api.v1.core.user.private.me.delete.response.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { response: true },
@@ -696,7 +597,8 @@ const { DELETE } = createEndpoint({
       exists: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.user.private.me.delete.response.title",
+          content:
+            "app.api.v1.core.user.private.me.delete.response.title" as const,
         },
         z.boolean(),
       ),
@@ -706,57 +608,66 @@ const { DELETE } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.v1.core.user.private.me.delete.errors.validation.title",
+      title:
+        "app.api.v1.core.user.private.me.delete.errors.validation.title" as const,
       description:
-        "app.api.v1.core.user.private.me.delete.errors.validation.description",
+        "app.api.v1.core.user.private.me.delete.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.v1.core.user.private.me.delete.errors.unauthorized.title",
+      title:
+        "app.api.v1.core.user.private.me.delete.errors.unauthorized.title" as const,
       description:
-        "app.api.v1.core.user.private.me.delete.errors.unauthorized.description",
+        "app.api.v1.core.user.private.me.delete.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.v1.core.user.private.me.delete.errors.forbidden.title",
+      title:
+        "app.api.v1.core.user.private.me.delete.errors.forbidden.title" as const,
       description:
-        "app.api.v1.core.user.private.me.delete.errors.forbidden.description",
+        "app.api.v1.core.user.private.me.delete.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.v1.core.user.private.me.delete.errors.notFound.title",
+      title:
+        "app.api.v1.core.user.private.me.delete.errors.notFound.title" as const,
       description:
-        "app.api.v1.core.user.private.me.delete.errors.notFound.description",
+        "app.api.v1.core.user.private.me.delete.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.v1.core.user.private.me.delete.errors.conflict.title",
+      title:
+        "app.api.v1.core.user.private.me.delete.errors.conflict.title" as const,
       description:
-        "app.api.v1.core.user.private.me.delete.errors.conflict.description",
+        "app.api.v1.core.user.private.me.delete.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.v1.core.user.private.me.delete.errors.network.title",
+      title:
+        "app.api.v1.core.user.private.me.delete.errors.network.title" as const,
       description:
-        "app.api.v1.core.user.private.me.delete.errors.network.description",
+        "app.api.v1.core.user.private.me.delete.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.user.private.me.delete.errors.unsavedChanges.title",
+        "app.api.v1.core.user.private.me.delete.errors.unsavedChanges.title" as const,
       description:
-        "app.api.v1.core.user.private.me.delete.errors.unsavedChanges.description",
+        "app.api.v1.core.user.private.me.delete.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.v1.core.user.private.me.delete.errors.internal.title",
+      title:
+        "app.api.v1.core.user.private.me.delete.errors.internal.title" as const,
       description:
-        "app.api.v1.core.user.private.me.delete.errors.internal.description",
+        "app.api.v1.core.user.private.me.delete.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.v1.core.user.private.me.delete.errors.unknown.title",
+      title:
+        "app.api.v1.core.user.private.me.delete.errors.unknown.title" as const,
       description:
-        "app.api.v1.core.user.private.me.delete.errors.unknown.description",
+        "app.api.v1.core.user.private.me.delete.errors.unknown.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.user.private.me.delete.success.title",
-    description: "app.api.v1.core.user.private.me.delete.success.description",
+    title: "app.api.v1.core.user.private.me.delete.success.title" as const,
+    description:
+      "app.api.v1.core.user.private.me.delete.success.description" as const,
   },
 
   // === EXAMPLES ===

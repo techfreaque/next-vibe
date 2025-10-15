@@ -3,6 +3,7 @@
  * Handles GET requests for searching users
  */
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { createSuccessResponse } from "next-vibe/shared/types/response.schema";
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
@@ -14,7 +15,10 @@ import definitions, { type UserSearchGetResponseOutput } from "./definition";
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: async ({ data, logger }): Promise<ReturnType<typeof createSuccessResponse<UserSearchGetResponseOutput>>> => {
+    handler: async ({
+      data,
+      logger,
+    }): Promise<ResponseType<UserSearchGetResponseOutput>> => {
       const searchResult = await userRepository.searchUsers(
         data.searchCriteria?.search || "", // Empty string for all users
         {
@@ -46,33 +50,47 @@ export const { GET, tools } = endpointsHandler({
       const totalPages = Math.ceil(total / currentLimit);
       const currentPage = Math.floor(currentOffset / currentLimit) + 1;
 
-      return createSuccessResponse({
-        success: true,
-        message: "app.api.v1.core.user.search.response.message",
-        searchInfo: {
-          searchTerm: data.searchCriteria?.search,
-          appliedFilters: data.filters?.roles || [],
-          searchTime: "0.5s",
-          totalResults: total,
-        },
-        users: searchResult.data,
-        pagination: {
-          currentPage,
-          totalPages,
-          itemsPerPage: currentLimit,
-          totalItems: total,
-          hasMore,
-          hasPrevious: currentOffset > 0,
-        },
-        actions: [
-          {
-            action: "view-details",
-            label: "app.api.v1.core.user.search.actions.viewUser.label",
-            description:
-              "app.api.v1.core.user.search.actions.viewUser.description",
+      // Serialize dates to strings
+      const serializedUsers = searchResult.data.map((user) => ({
+        ...user,
+        createdAt:
+          user.createdAt instanceof Date
+            ? user.createdAt.toISOString()
+            : typeof user.createdAt === "string"
+              ? user.createdAt
+              : new Date(user.createdAt).toISOString(),
+        updatedAt:
+          user.updatedAt instanceof Date
+            ? user.updatedAt.toISOString()
+            : typeof user.updatedAt === "string"
+              ? user.updatedAt
+              : new Date(user.updatedAt).toISOString(),
+      }));
+
+      const responseData: UserSearchGetResponseOutput = {
+        response: {
+          success: Boolean(true),
+          message: "app.api.v1.core.user.search.response.message",
+          searchInfo: {
+            searchTerm: data.searchCriteria?.search,
+            appliedFilters: data.filters?.roles || [],
+            searchTime: "0.5s",
+            totalResults: total,
           },
-        ],
-      });
+          users: serializedUsers,
+          pagination: {
+            currentPage,
+            totalPages,
+            itemsPerPage: currentLimit,
+            totalItems: total,
+            hasMore,
+            hasPrevious: currentOffset > 0,
+          },
+          actions: undefined,
+        },
+      };
+
+      return createSuccessResponse(responseData);
     },
   },
 });

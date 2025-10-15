@@ -75,6 +75,32 @@ export const envSchema = envClientBaseSchema.extend({
   SMS_HTTP_CUSTOM_HEADERS: z.string().optional(),
   SMS_HTTP_AUTH_SCHEME: z.string().optional(),
   SMS_HTTP_CONTENT_TYPE: z.string().optional(),
+
+  // IMAP seed environment variables (optional, used for seeding development data)
+  IMAP_SEED_ACCOUNT_NAME: z.string().optional(),
+  IMAP_SEED_EMAIL: z.string().optional(),
+  IMAP_SEED_HOST: z.string().optional(),
+  IMAP_SEED_USERNAME: z.string().optional(),
+  IMAP_SEED_PASSWORD: z.string().optional(),
+  IMAP_SEED_PORT: stringToIntSchema(
+    "The env IMAP_SEED_PORT must be a number",
+  ).optional(),
+  IMAP_SEED_SECURE: z
+    .string()
+    .transform((val: string | undefined): boolean => {
+      if (val === undefined || val === "") {
+        return true; // default to secure
+      }
+      if (val === "true") {
+        return true;
+      }
+      if (val === "false") {
+        return false;
+      }
+      // eslint-disable-next-line no-restricted-syntax
+      throw new Error("The env IMAP_SEED_SECURE must be a boolean");
+    })
+    .optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

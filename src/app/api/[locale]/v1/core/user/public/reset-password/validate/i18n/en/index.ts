@@ -21,10 +21,15 @@ export const translations = {
     description: "Token validation response",
     valid: "Token Valid",
     message: "Validation Message",
+    validationMessage: "Reset token validation completed",
     userId: "User ID",
     expiresAt: "Token Expires At",
     nextSteps: {
       item: "Next Steps After Validation",
+      steps: [
+        "Proceed to set your new password",
+        "Choose a strong, unique password",
+      ],
     },
   },
   errors: {

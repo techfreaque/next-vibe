@@ -167,7 +167,7 @@ export const translations = {
   enums: {
     plan: {
       starter: "Starter",
-      professional: "Professional", 
+      professional: "Professional",
       premium: "Premium",
       enterprise: "Enterprise",
     },

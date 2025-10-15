@@ -15,20 +15,36 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { Countries, Languages } from "@/i18n/core/config";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 
-import type {
-  CountryLanguage,
-  JwtPayloadType,
-} from "../../../user/auth/definition";
 import { CampaignType } from "../enum";
 import type { SmtpSelectionCriteria } from "../sending/definition";
 import { smtpSendingRepository } from "../sending/repository";
 import type {
-  SendEmailParams,
   SendEmailRequestTypeOutput,
   SendEmailResponseTypeOutput,
 } from "./definition";
+
+// Type aliases for consistency
+type SendEmailRequestOutput = SendEmailRequestTypeOutput;
+type SendEmailResponseOutput = SendEmailResponseTypeOutput;
+
+/**
+ * Type guard to validate if a string is a valid Languages type
+ */
+function isLanguage(value: string): value is Languages {
+  const validLanguages: string[] = ["en", "de", "pl"];
+  return validLanguages.includes(value);
+}
+
+/**
+ * Type guard to validate if a string is a valid Countries type
+ */
+function isCountry(value: string): value is Countries {
+  const validCountries: string[] = ["GLOBAL", "US", "DE", "PL"];
+  return validCountries.includes(value);
+}
 
 /**
  * Utility function to map locale to country and language for SMTP selection
@@ -37,8 +53,23 @@ function mapLocaleToSelectionCriteria(locale: CountryLanguage): {
   country: Countries;
   language: Languages;
 } {
-  const [language, country] = locale.split("-") as [Languages, Countries];
-  return { country, language };
+  const parts: string[] = locale.split("-");
+  if (parts.length !== 2) {
+    throw new Error(`Invalid locale format: ${locale}`);
+  }
+
+  const languagePart = parts[0];
+  const countryPart = parts[1];
+
+  if (!isLanguage(languagePart)) {
+    throw new Error(`Invalid language in locale: ${languagePart}`);
+  }
+
+  if (!isCountry(countryPart)) {
+    throw new Error(`Invalid country in locale: ${countryPart}`);
+  }
+
+  return { country: countryPart, language: languagePart };
 }
 
 /**
@@ -46,11 +77,11 @@ function mapLocaleToSelectionCriteria(locale: CountryLanguage): {
  */
 export interface EmailSendingRepository {
   sendEmail(
-    data: SendEmailRequestTypeOutput,
+    data: SendEmailRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SendEmailResponseTypeOutput>>;
+  ): Promise<ResponseType<SendEmailResponseOutput>>;
 }
 
 /**
@@ -62,19 +93,19 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
    * This is the single place where all email rendering happens
    */
   async sendEmail(
-    data: SendEmailRequestTypeOutput,
+    data: SendEmailRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SendEmailResponseTypeOutput>> {
+  ): Promise<ResponseType<SendEmailResponseOutput>> {
     try {
       logger.debug("Enhanced email sending initiated", {
         toEmail: data.params.toEmail,
         subject: data.params.subject,
         locale: data.params.locale,
-        campaignType: data.params.campaignType,
-        emailJourneyVariant: data.params.emailJourneyVariant,
-        emailCampaignStage: data.params.emailCampaignStage,
+        campaignType: data.params.campaignType ?? undefined,
+        emailJourneyVariant: data.params.emailJourneyVariant ?? undefined,
+        emailCampaignStage: data.params.emailCampaignStage ?? undefined,
       });
 
       // 1) Render the React component to raw HTML
@@ -91,8 +122,8 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
       const selectionCriteria: SmtpSelectionCriteria = data.params
         .selectionCriteriaOverride || {
         campaignType: data.params.campaignType || CampaignType.SYSTEM,
-        emailJourneyVariant: data.params.emailJourneyVariant || null,
-        emailCampaignStage: data.params.emailCampaignStage || null,
+        emailJourneyVariant: data.params.emailJourneyVariant ?? null,
+        emailCampaignStage: data.params.emailCampaignStage ?? null,
         country,
         language,
       };
@@ -100,23 +131,20 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
       // 4) Send email using enhanced SMTP client service with selection criteria
       const emailResponse = await smtpSendingRepository.sendEmail(
         {
-          params: {
-            to: data.params.toEmail,
-            toName: data.params.toName,
-            subject: data.params.subject,
-            html: rawHtml,
-            replyTo:
-              data.params.replyToName && data.params.replyToEmail
-                ? `${data.params.replyToName} <${data.params.replyToEmail}>`
-                : undefined,
-            unsubscribeUrl: data.params.unsubscribeUrl,
-            senderName:
-              data.params.senderName || data.params.t("common.appName"), // Default to app name if not provided
-            selectionCriteria,
-            skipRateLimitCheck: data.params.skipRateLimitCheck,
-            leadId: data.params.leadId,
-            campaignId: data.params.campaignId,
-          },
+          to: data.params.toEmail,
+          toName: data.params.toName,
+          subject: data.params.subject,
+          html: rawHtml,
+          replyTo:
+            data.params.replyToName && data.params.replyToEmail
+              ? `${data.params.replyToName} <${data.params.replyToEmail}>`
+              : undefined,
+          unsubscribeUrl: data.params.unsubscribeUrl,
+          senderName: data.params.senderName || data.params.t("common.appName"), // Default to app name if not provided
+          selectionCriteria,
+          skipRateLimitCheck: data.params.skipRateLimitCheck,
+          leadId: data.params.leadId,
+          campaignId: data.params.campaignId,
         },
         user,
         locale,
@@ -140,19 +168,19 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
       logger.debug("Enhanced email sent successfully", {
         toEmail: data.params.toEmail,
         subject: data.params.subject,
-        messageId: emailResponse.data.result.messageId,
-        accountUsed: emailResponse.data.result.accountName,
+        messageId: emailResponse.data.messageId,
+        accountUsed: emailResponse.data.accountName,
       });
 
       // Return the SMTP result with account information
       return createSuccessResponse({
         result: {
-          messageId: emailResponse.data.result.messageId,
-          accountId: emailResponse.data.result.accountId,
-          accountName: emailResponse.data.result.accountName,
-          accepted: emailResponse.data.result.accepted,
-          rejected: emailResponse.data.result.rejected,
-          response: emailResponse.data.result.response,
+          messageId: emailResponse.data.messageId,
+          accountId: emailResponse.data.accountId,
+          accountName: emailResponse.data.accountName,
+          accepted: emailResponse.data.accepted,
+          rejected: emailResponse.data.rejected,
+          response: emailResponse.data.response,
         },
       });
     } catch (error) {

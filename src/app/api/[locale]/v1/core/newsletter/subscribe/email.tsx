@@ -4,24 +4,24 @@
  */
 
 import { Button, Hr, Link, Section, Text } from "@react-email/components";
-import type { JSX } from "react";
-
-import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
-import type { UndefinedType } from "next-vibe/shared/types/common.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import type { JSX } from "react";
+import React from "react";
 
-import { contactClientRepository } from "../../contact/repository-client";
+import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
 import {
   createTrackingContext,
   EmailTemplate,
-} from "../../emails/smtp-client/components";
-import type { EmailFunctionType } from "../../emails/smtp-client/email-handling/definition";
+} from "@/app/api/[locale]/v1/core/emails/smtp-client/components";
+import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
+import { env } from "@/config/env";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { TFunction } from "@/i18n/core/static-types";
+
 import type {
   SubscribePostRequestOutput as NewsletterSubscriptionType,
   SubscribePostResponseOutput as NewsletterSubscriptionResponseType,
@@ -289,7 +289,7 @@ function AdminNotificationEmailContent({
 export const renderWelcomeMail: EmailFunctionType<
   NewsletterSubscriptionType,
   NewsletterSubscriptionResponseType,
-  UndefinedType
+  never
 > = ({ requestData, responseData, locale, t }) => {
   try {
     return createSuccessResponse({
@@ -319,7 +319,7 @@ export const renderWelcomeMail: EmailFunctionType<
 export const renderAdminNotificationMail: EmailFunctionType<
   NewsletterSubscriptionType,
   NewsletterSubscriptionResponseType,
-  UndefinedType
+  never
 > = ({ requestData, locale, t }) => {
   try {
     return createSuccessResponse({

@@ -20,6 +20,7 @@ import { simpleT } from "@/i18n/core/shared";
 
 // import { newsletterSubscribeRepository } from "../../../../newsletter/subscribe/repository";
 import type { JwtPayloadType } from "../../auth/definition";
+import type { NewUser } from "../../db";
 import type { StandardUserType } from "../../definition";
 import { UserDetailLevel } from "../../enum";
 import { userRepository } from "../../repository";
@@ -150,9 +151,8 @@ export class SignupRepositoryImpl implements SignupRepository {
           user: {
             id: userData.id,
             email: userData.email,
-            firstName: userData.firstName,
-            lastName: userData.lastName,
-            imageUrl: userData.imageUrl || null,
+            privateName: userData.privateName,
+            publicName: userData.publicName,
             verificationRequired: false,
           },
           verificationInfo: {
@@ -244,15 +244,9 @@ export class SignupRepositoryImpl implements SignupRepository {
       // Extract data from nested structure
       const email = userInput.personalInfo.email;
       const password = userInput.security.password;
-      const firstName = userInput.personalInfo.firstName;
-      const lastName = userInput.personalInfo.lastName;
-      const imageUrl =
-        (userInput.personalInfo as { imageUrl?: string })?.imageUrl || null;
+      const privateName = userInput.personalInfo.privateName;
+      const publicName = userInput.personalInfo.publicName;
       const confirmPassword = userInput.security.confirmPassword;
-      const preferredContactMethod =
-        userInput.preferences?.preferredContactMethod || [];
-      const company = userInput.businessInfo?.company || null;
-      const phone = userInput.businessInfo?.phone || null;
       const subscribeToNewsletter =
         (userInput.preferences as { subscribeToNewsletter?: boolean })
           ?.subscribeToNewsletter || false;
@@ -288,25 +282,18 @@ export class SignupRepositoryImpl implements SignupRepository {
       }
 
       // Create user data object
-      const userData = {
+      const userData: NewUser = {
         email,
         password,
-        firstName,
-        lastName,
-        imageUrl: imageUrl ?? undefined,
-        preferredContactMethod,
-        company,
-        phone,
+        privateName,
+        publicName,
       };
 
       // Create new user with generated ID
       logger.debug("Creating new user", { email });
 
       const userResponse = await userRepository.createWithHashedPassword(
-        {
-          ...userData,
-          company: userData.company || "",
-        },
+        userData,
         logger,
       );
       if (!userResponse.success) {

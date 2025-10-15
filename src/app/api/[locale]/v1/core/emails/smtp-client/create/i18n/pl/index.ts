@@ -76,6 +76,18 @@ export const translations: typeof enTranslations = {
       createdAt: "Utworzono",
       updatedAt: "Zaktualizowano",
     },
+    accountSummary: {
+      title: "Podsumowanie konta",
+      description: "Podstawowe informacje o koncie",
+    },
+    connectionDetails: {
+      title: "Szczegóły połączenia",
+      description: "Konfiguracja połączenia z serwerem SMTP",
+    },
+    performanceMetrics: {
+      title: "Metryki wydajności",
+      description: "Wydajność konta i statystyki użytkowania",
+    },
   },
 
   errors: {

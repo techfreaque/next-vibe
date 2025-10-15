@@ -32,7 +32,7 @@ export interface ContactRepository {
    */
   submitContactForm(
     data: ContactRequestOutput,
-    user: JwtPayloadType,
+    user: JwtPayloadType | null,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ContactResponseOutput>>;
@@ -56,40 +56,46 @@ export class ContactRepositoryImpl implements ContactRepository {
    */
   async submitContactForm(
     data: ContactRequestOutput,
-    user: JwtPayloadType,
+    user: JwtPayloadType | null,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ContactResponseOutput>> {
     try {
-      logger.debug("contact.repository.create.start", {
+      logger.debug("app.api.v1.core.contact.repository.create.start", {
         email: data.email,
         subject: data.subject,
-        userId: !user.isPublic ? user.id : null,
+        userId: user && !user.isPublic ? user.id : null,
         leadId: data.leadId,
       });
 
       // Handle lead conversion if leadId provided
       if (data.leadId) {
         try {
-          logger.debug("contact.repository.lead.conversion.start", {
-            leadId: data.leadId,
-            email: data.email,
-            name: data.name,
-            company: data.company,
-          });
+          logger.debug(
+            "app.api.v1.core.contact.repository.lead.conversion.start",
+            {
+              leadId: data.leadId,
+              email: data.email,
+              name: data.name,
+              company: data.company,
+            },
+          );
 
           // Note: Lead conversion logic would go here if needed
           // For now, we'll just log that we have a lead ID
-          logger.debug("contact.repository.lead.provided", {
+          logger.debug("app.api.v1.core.contact.repository.lead.provided", {
             leadId: data.leadId,
           });
         } catch (error) {
           // Log error but don't fail the contact form submission
-          logger.error("contact.repository.lead.conversion.error", {
-            error,
-            leadId: data.leadId,
-            email: data.email,
-          });
+          logger.error(
+            "app.api.v1.core.contact.repository.lead.conversion.error",
+            {
+              error,
+              leadId: data.leadId,
+              email: data.email,
+            },
+          );
         }
       }
 
@@ -103,7 +109,7 @@ export class ContactRepositoryImpl implements ContactRepository {
           subject: data.subject,
           message: data.message,
           status: ContactStatus.NEW,
-          userId: !user.isPublic ? user.id : null,
+          userId: user && !user.isPublic ? user.id : null,
           createdAt: new Date(),
           updatedAt: new Date(),
         })
@@ -119,7 +125,7 @@ export class ContactRepositoryImpl implements ContactRepository {
         );
       }
 
-      logger.debug("contact.repository.create.success", {
+      logger.debug("app.api.v1.core.contact.repository.create.success", {
         contactId: contact.id,
         email: data.email,
         leadId: data.leadId,
@@ -131,7 +137,7 @@ export class ContactRepositoryImpl implements ContactRepository {
         status: [ContactStatus.NEW],
       });
     } catch (error) {
-      logger.error("contact.repository.create.error", error);
+      logger.error("app.api.v1.core.contact.repository.create.error", error);
       const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.contact.errors.repositoryCreateFailed",
@@ -153,7 +159,7 @@ export class ContactRepositoryImpl implements ContactRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ContactResponseOutput>> {
     try {
-      logger.debug("contact.repository.seed.create.start", {
+      logger.debug("app.api.v1.core.contact.repository.seed.create.start", {
         email: data.email,
       });
 
@@ -191,7 +197,10 @@ export class ContactRepositoryImpl implements ContactRepository {
         status: [data.status || ContactStatus.NEW],
       });
     } catch (error) {
-      logger.error("contact.repository.seed.create.error", error);
+      logger.error(
+        "app.api.v1.core.contact.repository.seed.create.error",
+        error,
+      );
       const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.contact.errors.repositoryCreateFailed",

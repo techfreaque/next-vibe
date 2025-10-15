@@ -336,19 +336,19 @@ const { GET, POST } = createFormEndpoint({
 });
 
 // Extract types using the new enhanced system
-export type PaymentGetRequestTypeInput = typeof GET.types.RequestInput;
-export type PaymentGetRequestTypeOutput = typeof GET.types.RequestOutput;
-export type PaymentGetResponseTypeInput = typeof GET.types.ResponseInput;
-export type PaymentGetResponseTypeOutput = typeof GET.types.ResponseOutput;
+export type PaymentGetRequestInput = typeof GET.types.RequestInput;
+export type PaymentGetRequestOutput = typeof GET.types.RequestOutput;
+export type PaymentGetResponseInput = typeof GET.types.ResponseInput;
+export type PaymentGetResponseOutput = typeof GET.types.ResponseOutput;
 
-export type PaymentPostRequestTypeInput = typeof POST.types.RequestInput;
-export type PaymentPostRequestTypeOutput = typeof POST.types.RequestOutput;
-export type PaymentPostResponseTypeInput = typeof POST.types.ResponseInput;
-export type PaymentPostResponseTypeOutput = typeof POST.types.ResponseOutput;
+export type PaymentPostRequestInput = typeof POST.types.RequestInput;
+export type PaymentPostRequestOutput = typeof POST.types.RequestOutput;
+export type PaymentPostResponseInput = typeof POST.types.ResponseInput;
+export type PaymentPostResponseOutput = typeof POST.types.ResponseOutput;
 
 // Additional type aliases for compatibility
-export type PaymentCreateRequestOutput = PaymentPostRequestTypeOutput;
-export type PaymentUpdateType = PaymentPostRequestTypeOutput;
+export type PaymentCreateRequestOutput = PaymentPostRequestOutput;
+export type PaymentUpdateType = PaymentPostRequestOutput;
 export interface PaymentDeleteType {
   paymentMethodId: string;
 }

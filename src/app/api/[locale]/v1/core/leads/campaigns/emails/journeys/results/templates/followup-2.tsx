@@ -1,8 +1,10 @@
 /**
+
  * Results Journey - Follow-up 2 Email Template
  */
 
 import { Text } from "@react-email/components";
+import React from "react";
 
 import {
   CTAButton,

@@ -2,18 +2,18 @@ import type {
   DefaultError,
   QueryKey,
   UseQueryOptions,
-} from "@tanstack/react-query";
-import type { FormEvent } from "react";
-import type { UseFormProps, UseFormReturn } from "react-hook-form";
-import type { ZodType } from "zod";
-
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
-import type { TranslationKey } from "@/i18n/core/static-types";
-
+} from "@tantml:react-query";
 import type {
   ErrorResponseType,
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
+import type { FormEvent } from "react";
+import type { UseFormProps, UseFormReturn } from "react-hook-form";
+import type { ZodType, ZodTypeDef } from "zod";
+
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
+import type { TranslationKey } from "@/i18n/core/static-types";
+
 import type { EnhancedMutationResult } from "./mutation";
 
 /**
@@ -23,111 +23,49 @@ import type { EnhancedMutationResult } from "./mutation";
 
 /**
  * Extract types from an CreateApiEndpoint for ApiFormReturn
+ * Uses direct property access instead of infer for better type inference
  */
 export type InferApiFormReturn<T> =
-  T extends CreateApiEndpoint<
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TRequestInput,
-    infer TRequestOutput,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TResponseInput,
-    infer TResponseOutput,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TUrlVariablesInput,
-    infer TUrlVariablesOutput,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TExampleKey,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TMethod,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TUserRoleValue,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TFields
-  >
-    ? ApiFormReturn<TRequestOutput, TResponseOutput, TUrlVariablesOutput>
+  T extends CreateApiEndpoint<any, any, any, any>
+    ? ApiFormReturn<
+        T["TRequestOutput"],
+        T["TResponseOutput"],
+        T["TUrlVariablesOutput"]
+      >
     : never;
 
 /**
  * Extract types from an CreateApiEndpoint for ApiQueryReturn
+ * Uses direct property access instead of infer for better type inference
  */
 export type InferApiQueryReturn<T> =
-  T extends CreateApiEndpoint<
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TRequestInput,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TRequestOutput,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TResponseInput,
-    infer TResponseOutput,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TUrlVariablesInput,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TUrlVariablesOutput,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TExampleKey,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TMethod,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TUserRoleValue,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TFields
-  >
-    ? ApiQueryReturn<TResponseOutput>
+  T extends CreateApiEndpoint<any, any, any, any>
+    ? ApiQueryReturn<T["TResponseOutput"]>
     : never;
 
 /**
  * Extract types from an CreateApiEndpoint for ApiQueryFormReturn
+ * Uses direct property access instead of infer for better type inference
  */
 export type InferApiQueryFormReturn<T> =
-  T extends CreateApiEndpoint<
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TRequestInput,
-    infer TRequestOutput,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TResponseInput,
-    infer TResponseOutput,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TUrlVariablesInput,
-    infer TUrlVariablesOutput,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TExampleKey,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TMethod,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TUserRoleValue,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TFields
-  >
-    ? ApiQueryFormReturn<TRequestOutput, TResponseOutput, TUrlVariablesOutput>
+  T extends CreateApiEndpoint<any, any, any, any>
+    ? ApiQueryFormReturn<
+        T["TRequestOutput"],
+        T["TResponseOutput"],
+        T["TUrlVariablesOutput"]
+      >
     : never;
 
 /**
  * Extract types from an CreateApiEndpoint for EnhancedMutationResult
+ * Uses direct property access instead of infer for better type inference
  */
 export type InferEnhancedMutationResult<T> =
-  T extends CreateApiEndpoint<
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TRequestInput,
-    infer TRequestOutput,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TResponseInput,
-    infer TResponseOutput,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TUrlVariablesInput,
-    infer TUrlVariablesOutput,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TExampleKey,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TMethod,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TUserRoleValue,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer TFields
-  >
+  T extends CreateApiEndpoint<any, any, any, any>
     ? EnhancedMutationResult<
-        TResponseOutput,
-        TRequestOutput,
-        TUrlVariablesOutput
+        T["TResponseOutput"],
+        T["TRequestOutput"],
+        T["TUrlVariablesOutput"]
       >
     : never;
 
@@ -269,7 +207,7 @@ export type ApiFormOptions<TRequest> = UseFormProps<TRequest> & {
 
 export interface ApiFormReturn<TRequest, TResponse, TUrlVariables> {
   // @ts-ignore - Intentionally ignoring FieldValues constraint requirement
-  form: UseFormReturn<TRequest, ZodType<TRequest, TRequest>>;
+  form: UseFormReturn<TRequest, ZodType<TRequest, ZodTypeDef, TRequest>>;
 
   /** The complete response including success/error state */
   response: ResponseType<TResponse> | undefined;

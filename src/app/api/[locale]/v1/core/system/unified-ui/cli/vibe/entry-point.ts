@@ -26,8 +26,6 @@ import type {
 } from "./utils/route-delegation-handler";
 import { routeDelegationHandler } from "./utils/route-delegation-handler";
 
-
-
 /**
  * Endpoint definition type for CLI
  */
@@ -127,7 +125,7 @@ export class CliEntryPoint {
 
       this.initialized = true;
     } catch (error) {
-     this.logger.error("Route discovery failed:", {
+      this.logger.error("Route discovery failed:", {
         baseDir: config.apiBaseDir,
         error: error instanceof Error ? error.message : String(error),
       });
@@ -182,12 +180,28 @@ export class CliEntryPoint {
     // Get CLI user for authentication if not provided
     let cliUser = options.user;
     if (!cliUser) {
-      // For seed commands, always use fallback authentication since we're creating the users
-      const isSeedCommand = command.includes("seed") || command.includes("db:seed");
+      // Commands that don't need database access should use fallback authentication
+      const noDbCommands = [
+        "seed",
+        "db:seed",
+        "typecheck",
+        "tc",
+        "lint",
+        "l",
+        "check",
+        "c",
+        "vibe-check",
+      ];
+      const needsFallbackAuth =
+        noDbCommands.some((cmd) => command.includes(cmd)) ||
+        command.includes("seed") ||
+        command.includes("db:");
 
-      if (isSeedCommand) {
-        // Use fallback authentication for seed commands
-        this.logger.debug("Using fallback CLI authentication for seed command");
+      if (needsFallbackAuth) {
+        // Use fallback authentication for commands that don't need DB
+        this.logger.debug("Using fallback CLI authentication for command", {
+          command,
+        });
         cliUser = {
           isPublic: false,
           id: "00000000-0000-0000-0000-000000000001",
@@ -197,7 +211,7 @@ export class CliEntryPoint {
           exp: Math.floor(Date.now() / 1000) + 3600,
         };
       } else {
-        // For non-seed commands, try to get the real user from database
+        // For other commands, try to get the real user from database
         cliUser = (await this.getCliUser(this.logger)) || undefined;
       }
     }
@@ -327,7 +341,15 @@ export class CliEntryPoint {
     const apiPath = `/${pathSegments.join("/")}`;
 
     // All possible HTTP methods - route-delegation-handler will check which ones exist
-    const allMethods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"];
+    const allMethods = [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "HEAD",
+      "OPTIONS",
+    ];
 
     // Register route with short alias
     for (const method of allMethods) {
@@ -336,7 +358,9 @@ export class CliEntryPoint {
         path: apiPath,
         method,
         routePath: routeFile,
-        description: this.t("app.api.v1.core.system.cli.vibe.vibe.executeCommand"),
+        description: this.t(
+          "app.api.v1.core.system.cli.vibe.vibe.executeCommand",
+        ),
       });
     }
 
@@ -348,7 +372,9 @@ export class CliEntryPoint {
           path: apiPath,
           method,
           routePath: routeFile,
-          description: this.t("app.api.v1.core.system.cli.vibe.vibe.executeCommand"),
+          description: this.t(
+            "app.api.v1.core.system.cli.vibe.vibe.executeCommand",
+          ),
         });
       }
     }
@@ -394,7 +420,7 @@ export class CliEntryPoint {
    */
   private findRouteByDefinitionAlias(command: string): CliRouteMetadata | null {
     // Get unique route files
-    const uniqueRouteFiles = [...new Set(this.routes.map(r => r.routePath))];
+    const uniqueRouteFiles = [...new Set(this.routes.map((r) => r.routePath))];
 
     for (const routeFile of uniqueRouteFiles) {
       const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
@@ -405,17 +431,26 @@ export class CliEntryPoint {
 
       try {
         // Use synchronous require for faster lookup
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
+
         const definitionModule = require(definitionPath);
 
         // Check default export
-        if (definitionModule.default && typeof definitionModule.default === "object") {
+        if (
+          definitionModule.default &&
+          typeof definitionModule.default === "object"
+        ) {
           for (const methodKey of Object.keys(definitionModule.default)) {
             const methodDef = definitionModule.default[methodKey];
-            if (methodDef && typeof methodDef === "object" && Array.isArray(methodDef.aliases)) {
+            if (
+              methodDef &&
+              typeof methodDef === "object" &&
+              Array.isArray(methodDef.aliases)
+            ) {
               if (methodDef.aliases.includes(command)) {
                 // Found it! Return a route with this alias
-                const existingRoute = this.routes.find(r => r.routePath === routeFile);
+                const existingRoute = this.routes.find(
+                  (r) => r.routePath === routeFile,
+                );
                 if (existingRoute) {
                   return {
                     ...existingRoute,

@@ -113,15 +113,14 @@ const { GET } = createEndpoint({
           type: responseField(
             {
               type: WidgetType.BADGE,
-              content: "app.api.v1.core.emails.messages.id.response.email.type",
+              text: "app.api.v1.core.emails.messages.id.response.email.type",
             },
             z.nativeEnum(EmailType),
           ),
           status: responseField(
             {
               type: WidgetType.BADGE,
-              content:
-                "app.api.v1.core.emails.messages.id.response.email.status",
+              text: "app.api.v1.core.emails.messages.id.response.email.status",
             },
             z.nativeEnum(EmailStatus),
           ),
@@ -261,6 +260,21 @@ const { GET } = createEndpoint({
       description:
         "app.api.v1.core.emails.messages.id.errors.server.description",
     },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "app.api.v1.core.emails.messages.id.errors.conflict.title",
+      description:
+        "app.api.v1.core.emails.messages.id.errors.conflict.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "app.api.v1.core.emails.messages.id.errors.network.title",
+      description:
+        "app.api.v1.core.emails.messages.id.errors.network.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "app.api.v1.core.emails.messages.id.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.emails.messages.id.errors.unsavedChanges.description",
+    },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.v1.core.emails.messages.id.errors.unknown.title",
       description:
@@ -276,7 +290,7 @@ const { GET } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    requests: {
+    urlPathVariables: {
       default: {
         id: "123e4567-e89b-12d3-a456-426614174000",
       },
@@ -311,10 +325,20 @@ const { GET } = createEndpoint({
   },
 });
 
+// Export types with consistent naming
+export type EmailGetRequestInput = typeof GET.types.RequestInput;
+export type EmailGetRequestOutput = typeof GET.types.RequestOutput;
+export type EmailGetResponseInput = typeof GET.types.ResponseInput;
+export type EmailGetResponseOutput = typeof GET.types.ResponseOutput;
+
+// Also export with legacy names for backward compatibility
 export type EmailGetGETRequestInput = typeof GET.types.RequestInput;
 export type EmailGetGETRequestOutput = typeof GET.types.RequestOutput;
 export type EmailGetGETResponseInput = typeof GET.types.ResponseInput;
 export type EmailGetGETResponseOutput = typeof GET.types.ResponseOutput;
+
+// Export commonly expected type name
+export type EmailGetResponseType = typeof GET.types.ResponseOutput;
 
 const emailGetEndpoints = { GET };
 export default emailGetEndpoints;

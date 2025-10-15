@@ -17,6 +17,18 @@ export const translations: typeof enTranslations = {
       placeholder: "Nachname eingeben",
       help: "Geben Sie Ihren Nachnamen ein, wie er in Ihrem Profil erscheinen soll",
     },
+    privateName: {
+      label: "Privater Name",
+      description: "Privater Name des Benutzers",
+      placeholder: "Privaten Namen eingeben",
+      help: "Geben Sie Ihren privaten Namen für interne Zwecke ein",
+    },
+    publicName: {
+      label: "Öffentlicher Name",
+      description: "Öffentlicher Name des Benutzers",
+      placeholder: "Öffentlichen Namen eingeben",
+      help: "Geben Sie Ihren öffentlichen Namen ein, wie er anderen angezeigt wird",
+    },
     email: {
       label: "E-Mail",
       description: "E-Mail-Adresse des Benutzers",
@@ -251,6 +263,7 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Erfolg",
       description: "Vorgang erfolgreich abgeschlossen",
+      processing: "Registrierung wird erfolgreich verarbeitet",
     },
   },
   response: {
@@ -263,6 +276,8 @@ export const translations: typeof enTranslations = {
       email: "E-Mail-Adresse",
       firstName: "Vorname",
       lastName: "Nachname",
+      privateName: "Privater Name",
+      publicName: "Öffentlicher Name",
       imageUrl: "Profilbild-URL",
       verificationRequired: "Verifizierung erforderlich",
     },
@@ -280,5 +295,10 @@ export const translations: typeof enTranslations = {
       meeting: "Meeting-Anmeldung",
       pricing: "Pricing-Anmeldung",
     },
+  },
+  admin_notification: {
+    privateName: "Privater Name",
+    publicName: "Öffentlicher Name",
+    signup_preferences: "Anmeldepräferenzen",
   },
 };

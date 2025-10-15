@@ -4,7 +4,7 @@
  * Following interface + implementation pattern
  */
 
-import { and, count, desc, eq, gte, lte, sql } from "drizzle-orm";
+import { count, desc, eq, sql } from "drizzle-orm";
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -123,10 +123,12 @@ export class PulseHealthRepository implements IPulseHealthRepository {
   ): Promise<ResponseType<PulseHealth>> {
     try {
       // Get the current health record
-      const currentHealthResponse = await this.getCurrentHealth();
+      const currentHealthResponse = await this.getCurrentHealth(logger);
       if (!currentHealthResponse.success || !currentHealthResponse.data) {
-        // Create new health record if none exists
-        return this.createHealthRecord(updates as NewPulseHealth);
+        // If no health record exists, cannot update - require a full create
+        return createErrorResponse(
+          "No health record found to update. Create one first.",
+        );
       }
 
       const [updatedHealth] = await db
@@ -486,7 +488,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         totalExecutions: health.totalExecutions,
         totalSuccesses: health.totalSuccesses,
         totalFailures: health.totalFailures,
-        metadata: health.metadata as Record<string, unknown> | null,
+        metadata: health.metadata || null,
         alertsSent: health.alertsSent,
         lastAlertAt: health.lastAlertAt?.toISOString() || null,
         isMaintenanceMode: health.isMaintenanceMode,

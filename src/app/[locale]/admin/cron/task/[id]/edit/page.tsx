@@ -7,8 +7,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type React from "react";
 
-import type { CronTaskResponseType } from "@/app/api/[locale]/v1/core/system/tasks/cron/tasks/definition";
-import { taskIndividualRepository } from "@/app/api/[locale]/v1/core/system/tasks/cron/tasks/repository";
+import type { IndividualCronTaskType } from "@/app/api/[locale]/v1/core/system/tasks/cron/task/[id]/definition";
 import { PulseHealthStatus } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 import { requireAdminUser } from "@/app/api/[locale]/v1/core/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -32,51 +31,24 @@ export default async function CronTaskEditPage({
   // Require admin user authentication
   await requireAdminUser(locale, `/${locale}/admin/cron/task/${id}/edit`);
 
-  // Fetch cron task data to verify it exists
-  const taskResponse = await taskIndividualRepository.findTaskById(id);
-
-  // Handle task not found
-  if (!taskResponse.success || !taskResponse.data) {
-    notFound();
-  }
-
-  const task = taskResponse.data;
-
-  // Transform the task data to match CronTaskResponseType
-  const taskWithComputedFields: CronTaskResponseType = {
-    id: task.id,
-    name: task.name,
-    description: task.description,
-    version: task.version,
-    schedule: task.schedule,
-    enabled: task.enabled,
-    priority: task.priority,
-    timeout: task.timeout,
-    retries: task.retries,
-    retryDelay: task.retryDelay,
-    defaultConfig:
-      (task.defaultConfig as Record<string, string>) ||
-      ({} as Record<string, string>),
-    lastExecutionDuration: task.lastExecutionDuration,
-    executionCount: task.executionCount,
-    successCount: task.successCount,
-    errorCount: task.errorCount,
-    tags: (task.tags as string[]) || [],
-    dependencies: (task.dependencies as string[]) || [],
-    monitoring: task.monitoring
-      ? (task.monitoring as Record<string, string>)
-      : null,
-    documentation: task.documentation
-      ? (task.documentation as Record<string, string>)
-      : null,
-    createdAt: task.createdAt.toISOString(),
-    updatedAt: task.updatedAt.toISOString(),
-    lastExecutedAt: task.lastExecutedAt?.toISOString() || null,
-    lastExecutionStatus: task.lastExecutionStatus,
-    lastExecutionError: task.lastExecutionError,
-    nextExecutionAt: null,
-    isRunning: false,
-    healthStatus: PulseHealthStatus.UNKNOWN,
+  // TODO: Fetch task data from API endpoint
+  // For now, create stub data to demonstrate the structure
+  const taskWithComputedFields: IndividualCronTaskType = {
+    id,
+    name: "Sample Task",
+    description: "Task description",
+    version: 1,
+    schedule: "0 * * * *",
+    enabled: true,
+    priority: "MEDIUM",
+    status: "PENDING",
+    category: "GENERAL",
+    timeout: 3600,
+    retries: 3,
+    lastRun: null,
+    nextRun: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 
   return (

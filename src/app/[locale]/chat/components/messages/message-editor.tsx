@@ -1,16 +1,20 @@
 "use client";
 
+import { GitBranch, RotateCcw, X } from "lucide-react";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React from "react";
-import { RotateCcw, GitBranch, X } from "lucide-react";
 
-import type { ChatMessage } from "../../lib/storage/types";
-import type { ModelId } from "../../lib/config/models";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { Button, Textarea } from "@/packages/next-vibe-ui/web/ui";
+
+import type { ModelId } from "../../lib/config/models";
+import type { ChatMessage } from "../../lib/storage/types";
+import { localeToSpeechLang } from "../../lib/utils/speech-utils";
 import { ModelSelector } from "../input/model-selector";
 import { PersonaSelector } from "../input/persona-selector";
+import { SpeechInputButton } from "../input/speech-input-button";
 import { useMessageEditor } from "./use-message-editor";
-import { cn } from "next-vibe/shared/utils";
 
 interface MessageEditorProps {
   message: ChatMessage;
@@ -21,6 +25,7 @@ interface MessageEditorProps {
   onModelChange?: (model: ModelId) => void;
   onToneChange?: (tone: string) => void;
   onBranch?: (messageId: string, content: string) => Promise<void>;
+  locale?: CountryLanguage;
 }
 
 export function MessageEditor({
@@ -32,7 +37,10 @@ export function MessageEditor({
   onModelChange,
   onToneChange,
   onBranch,
+  locale = "en",
 }: MessageEditorProps): JSX.Element {
+  const speechLang = localeToSpeechLang(locale);
+
   // Use custom hook for editor logic
   const editor = useMessageEditor({
     message,
@@ -51,7 +59,7 @@ export function MessageEditor({
         className={cn(
           "p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
           "border border-border rounded-lg shadow-lg",
-          "w-full"
+          "w-full",
         )}
       >
         {/* Textarea */}
@@ -71,8 +79,12 @@ export function MessageEditor({
           {/* Hint Text - Shows when textarea is empty */}
           {!editor.content && (
             <div className="absolute top-2 left-0 pointer-events-none text-sm text-muted-foreground">
-              <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">⌘/Ctrl+Enter</kbd> to overwrite,{" "}
-              <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Esc</kbd> to cancel
+              <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
+                ⌘/Ctrl+Enter
+              </kbd>{" "}
+              to overwrite,{" "}
+              <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Esc</kbd>{" "}
+              to cancel
             </div>
           )}
         </div>
@@ -82,21 +94,28 @@ export function MessageEditor({
           {/* Model and Tone Selectors */}
           <div className="flex items-center gap-2 flex-wrap">
             {onModelChange && (
-              <ModelSelector
-                value={selectedModel}
-                onChange={onModelChange}
-              />
+              <ModelSelector value={selectedModel} onChange={onModelChange} />
             )}
             {onToneChange && (
-              <PersonaSelector
-                value={selectedTone}
-                onChange={onToneChange}
-              />
+              <PersonaSelector value={selectedTone} onChange={onToneChange} />
             )}
           </div>
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 flex-wrap">
+            {/* Speech Input Button */}
+            <SpeechInputButton
+              onTranscript={(text) => {
+                // Append transcript to existing content
+                const newContent = editor.content
+                  ? `${editor.content} ${text}`.trim()
+                  : text;
+                editor.setContent(newContent);
+              }}
+              disabled={editor.isLoading}
+              lang={speechLang}
+            />
+
             {/* Overwrite Button */}
             <Button
               type="submit"
@@ -107,7 +126,9 @@ export function MessageEditor({
               title="Overwrite message and regenerate response"
             >
               <RotateCcw className="h-3.5 w-3.5 mr-2" />
-              {editor.isLoading && editor.actionType === "overwrite" ? "Overwriting..." : "Overwrite & Retry"}
+              {editor.isLoading && editor.actionType === "overwrite"
+                ? "Overwriting..."
+                : "Overwrite & Retry"}
             </Button>
 
             {/* Branch Button */}
@@ -122,7 +143,9 @@ export function MessageEditor({
                 title="Create a new branch from this message"
               >
                 <GitBranch className="h-3.5 w-3.5 mr-2" />
-                {editor.isLoading && editor.actionType === "branch" ? "Branching..." : "Branch"}
+                {editor.isLoading && editor.actionType === "branch"
+                  ? "Branching..."
+                  : "Branch"}
               </Button>
             )}
 
@@ -145,4 +168,3 @@ export function MessageEditor({
     </div>
   );
 }
-

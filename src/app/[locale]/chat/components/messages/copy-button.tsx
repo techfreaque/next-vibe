@@ -1,7 +1,8 @@
 "use client";
 
-import { Copy, Check } from "lucide-react";
+import { Check, Copy } from "lucide-react";
 import { useState } from "react";
+
 import { Button } from "@/packages/next-vibe-ui/web/ui";
 
 interface CopyButtonProps {
@@ -34,15 +35,14 @@ export function CopyButton({
       variant={variant}
       size={size}
       onClick={handleCopy}
-      className={className || "h-7 w-7"}
+      className={className || "h-8 w-8 md:h-7 md:w-7"}
       title={copied ? "Copied!" : "Copy to clipboard"}
     >
       {copied ? (
-        <Check className="h-3.5 w-3.5 text-green-500" />
+        <Check className="h-4 w-4 md:h-3.5 md:w-3.5 text-green-500" />
       ) : (
-        <Copy className="h-3.5 w-3.5" />
+        <Copy className="h-4 w-4 md:h-3.5 md:w-3.5" />
       )}
     </Button>
   );
 }
-

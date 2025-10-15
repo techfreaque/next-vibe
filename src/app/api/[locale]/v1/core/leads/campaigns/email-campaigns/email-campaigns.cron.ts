@@ -12,25 +12,19 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+
 import { EmailCampaignStage } from "../../enum";
 import { taskDefinition } from "./config";
 import { emailCampaignsRepository } from "./repository";
 import type { EmailCampaignConfigType, EmailCampaignResultType } from "./types";
 import { createEmptyEmailCampaignResult } from "./types";
 
-// Define task execution context inline
-interface TaskLogger {
-  info: (message: string, meta?: unknown) => void;
-  warn: (message: string, meta?: unknown) => void;
-  error: (message: string, meta?: unknown) => void;
-  debug: (message: string, meta?: unknown) => void;
-}
-
 interface CronTaskExecutionContext {
   taskId: string;
   taskName: string;
-  config: Record<string, unknown>;
-  logger: TaskLogger;
+  config: EmailCampaignConfigType;
+  logger: EndpointLogger;
   startTime: Date;
   isDryRun: boolean;
   isManual: boolean;
@@ -42,7 +36,10 @@ export { taskDefinition };
 /**
  * Stage priority mapping for processing order
  */
-const STAGE_PRIORITIES: Record<string, number> = {
+const STAGE_PRIORITIES: Record<
+  (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage],
+  number
+> = {
   [EmailCampaignStage.INITIAL]: 1,
   [EmailCampaignStage.FOLLOWUP_1]: 2,
   [EmailCampaignStage.FOLLOWUP_2]: 3,
@@ -54,7 +51,9 @@ const STAGE_PRIORITIES: Record<string, number> = {
 /**
  * Sort stages by priority for processing order
  */
-function sortStagesByPriority(stages: string[]): string[] {
+function sortStagesByPriority(
+  stages: Array<(typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]>,
+): Array<(typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]> {
   return stages.sort((a, b) => {
     const priorityA = STAGE_PRIORITIES[a] ?? 999;
     const priorityB = STAGE_PRIORITIES[b] ?? 999;
@@ -66,7 +65,7 @@ function sortStagesByPriority(stages: string[]): string[] {
  * Check if a stage should be processed based on configuration
  */
 function shouldProcessStage(
-  stage: string,
+  stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage],
   config: EmailCampaignConfigType,
 ): boolean {
   // Check if current time is within enabled hours
@@ -113,10 +112,10 @@ function mergeCampaignResults(
  * Process a single email campaign stage
  */
 async function processEmailCampaignStage(
-  stage: string,
+  stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage],
   config: EmailCampaignConfigType,
   globalResult: EmailCampaignResultType,
-  logger: TaskLogger,
+  logger: EndpointLogger,
 ): Promise<ResponseType<EmailCampaignResultType>> {
   try {
     logger.debug("Processing email campaign stage", { stage });
@@ -128,9 +127,8 @@ async function processEmailCampaignStage(
       return createSuccessResponse(createEmptyEmailCampaignResult());
     }
 
-    // Process the stage using the repository
     const stageResult = await emailCampaignsRepository.processStage(
-      stage as EmailCampaignStage,
+      stage,
       {
         batchSize: Math.min(config.batchSize, remainingEmailQuota),
         dryRun: config.dryRun,
@@ -166,9 +164,9 @@ async function processEmailCampaignStage(
 /**
  * Validate email campaign task execution
  */
-async function validateEmailCampaignTask(
-  context: CronTaskExecutionContext<EmailCampaignConfigType>,
-): Promise<ResponseType<boolean>> {
+function validateEmailCampaignTask(
+  context: CronTaskExecutionContext,
+): ResponseType<boolean> {
   const { config, logger } = context;
 
   try {
@@ -230,7 +228,7 @@ async function validateEmailCampaignTask(
  * Production-ready implementation with proper error handling and logging
  */
 export async function execute(
-  context: CronTaskExecutionContext<EmailCampaignConfigType>,
+  context: CronTaskExecutionContext,
 ): Promise<ResponseType<EmailCampaignResultType>> {
   const { config, logger, taskId } = context;
   const startTime = Date.now();
@@ -330,10 +328,10 @@ export async function execute(
  * Email Campaign Task Validation Function
  * Validates that the email campaign task can run safely
  */
-export async function validate(
-  context: CronTaskExecutionContext<EmailCampaignConfigType>,
-): Promise<ResponseType<boolean>> {
-  return await validateEmailCampaignTask(context);
+export function validate(
+  context: CronTaskExecutionContext,
+): ResponseType<boolean> {
+  return validateEmailCampaignTask(context);
 }
 
 /**
@@ -341,7 +339,7 @@ export async function validate(
  * Defines rollback behavior for email campaigns (not applicable)
  */
 export function rollback(
-  context: CronTaskExecutionContext<EmailCampaignConfigType>,
+  context: CronTaskExecutionContext,
 ): ResponseType<boolean> {
   const { logger } = context;
 

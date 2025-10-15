@@ -1,20 +1,38 @@
 /**
  * Users List API Route Handler
- * Handles POST requests for listing users with filtering and pagination
+ * Handles GET requests for listing users with filtering and pagination
  */
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
+import type { ApiHandlerProps } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/types";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 
+import type {
+  UserListRequestOutput,
+  UserListResponseOutput,
+} from "./definition";
 import definitions from "./definition";
 import { userListRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
-  [Methods.POST]: {
+  [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
-      return await userListRepository.listUsers(data, user, locale, logger);
+    handler: async (
+      props: ApiHandlerProps<
+        UserListRequestOutput,
+        Record<string, never>,
+        typeof definitions.GET.allowedRoles
+      >,
+    ): Promise<ResponseType<UserListResponseOutput>> => {
+      return await userListRepository.listUsers(
+        props.data,
+        props.user,
+        props.locale,
+        props.logger,
+      );
     },
   },
 });

@@ -18,7 +18,6 @@ export function runSnykTest(cwd: string, packageName: string): void {
       "Snyk CLI not found. Please install it with: npm install -g snyk",
       error,
     );
-    // eslint-disable-next-line no-restricted-syntax
     throw new Error("Snyk CLI is required for vulnerability testing");
   }
 
@@ -31,7 +30,6 @@ export function runSnykTest(cwd: string, packageName: string): void {
     logger(`Snyk vulnerability test passed for ${packageName}`);
   } catch (error) {
     loggerError(`Snyk vulnerability test failed for ${packageName}:`, error);
-    // eslint-disable-next-line no-restricted-syntax
     throw new Error(
       `Snyk vulnerability test failed for ${packageName}. Please fix vulnerabilities before proceeding.`,
     );
@@ -52,22 +50,18 @@ export function runSnykMonitor(cwd: string, packageName: string): void {
       "Snyk CLI not found. Please install it with: npm install -g snyk",
       error,
     );
-    // eslint-disable-next-line no-restricted-syntax
     throw new Error("Snyk CLI is required for vulnerability monitoring");
   }
 
   // Check if required environment variables are set
-  // eslint-disable-next-line node/no-process-env
-  if (!process.env["SNYK_TOKEN"]) {
-    // eslint-disable-next-line no-restricted-syntax
+  const env = { ...process.env };
+  if (!env["SNYK_TOKEN"]) {
     throw new Error(
       "SNYK_TOKEN environment variable is required for Snyk monitoring",
     );
   }
 
-  // eslint-disable-next-line node/no-process-env
-  if (!process.env["SNYK_ORG_KEY"]) {
-    // eslint-disable-next-line no-restricted-syntax
+  if (!env["SNYK_ORG_KEY"]) {
     throw new Error(
       "SNYK_ORG_KEY environment variable is required for Snyk monitoring",
     );
@@ -78,8 +72,7 @@ export function runSnykMonitor(cwd: string, packageName: string): void {
     const lockFile = getLockFile(cwd);
     const lockFileArg = lockFile ? `--file=${lockFile}` : "";
 
-    // eslint-disable-next-line node/no-process-env
-    const orgKey = process.env["SNYK_ORG_KEY"];
+    const orgKey = env["SNYK_ORG_KEY"];
     const projectName = `/github/repository/${packageName}`;
 
     // Run Snyk monitor to upload to dashboard
@@ -89,14 +82,12 @@ export function runSnykMonitor(cwd: string, packageName: string): void {
     execSync(command, {
       cwd,
       stdio: "inherit",
-      // eslint-disable-next-line node/no-process-env
-      env: process.env,
+      env,
     });
 
     logger(`Snyk monitor completed successfully for ${packageName}`);
   } catch (error) {
     loggerError(`Snyk monitor failed for ${packageName}:`, error);
-    // eslint-disable-next-line no-restricted-syntax
     throw new Error(
       `Snyk monitor failed for ${packageName}: ${error instanceof Error ? error.message : String(error)}`,
     );

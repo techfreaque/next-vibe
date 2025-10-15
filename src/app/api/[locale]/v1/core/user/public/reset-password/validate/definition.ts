@@ -27,17 +27,19 @@ import { UserRole } from "../../../user-roles/enum";
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "user", "public", "reset-password", "validate"],
-  title: "app.api.v1.core.user.public.resetPassword.validate.title",
-  description: "app.api.v1.core.user.public.resetPassword.validate.description",
-  category: "app.api.v1.core.user.category",
-  tags: ["app.api.v1.core.user.public.resetPassword.validate.tag"],
-  allowedRoles: [UserRole.PUBLIC],
+  title: "app.api.v1.core.user.public.resetPassword.validate.title" as const,
+  description:
+    "app.api.v1.core.user.public.resetPassword.validate.description" as const,
+  category: "app.api.v1.core.user.category" as const,
+  tags: ["app.api.v1.core.user.public.resetPassword.validate.tag" as const],
+  allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.user.public.resetPassword.validate.title",
+      title:
+        "app.api.v1.core.user.public.resetPassword.validate.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.validate.description",
+        "app.api.v1.core.user.public.resetPassword.validate.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -47,9 +49,9 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title:
-            "app.api.v1.core.user.public.resetPassword.validate.groups.tokenInput.title",
+            "app.api.v1.core.user.public.resetPassword.validate.groups.tokenInput.title" as const,
           description:
-            "app.api.v1.core.user.public.resetPassword.validate.groups.tokenInput.description",
+            "app.api.v1.core.user.public.resetPassword.validate.groups.tokenInput.description" as const,
           layout: { type: LayoutType.GRID, columns: 12 },
         },
         { request: "data" },
@@ -59,15 +61,15 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label:
-                "app.api.v1.core.user.public.resetPassword.validate.fields.token.label",
+                "app.api.v1.core.user.public.resetPassword.validate.fields.token.label" as const,
               description:
-                "app.api.v1.core.user.public.resetPassword.validate.fields.token.description",
+                "app.api.v1.core.user.public.resetPassword.validate.fields.token.description" as const,
               placeholder:
-                "app.api.v1.core.user.public.resetPassword.validate.fields.token.placeholder",
+                "app.api.v1.core.user.public.resetPassword.validate.fields.token.placeholder" as const,
               required: true,
               layout: { columns: 12 },
               helpText:
-                "app.api.v1.core.user.public.resetPassword.validate.fields.token.help",
+                "app.api.v1.core.user.public.resetPassword.validate.fields.token.help" as const,
             },
             z.string().min(1, {
               message:
@@ -82,9 +84,9 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title:
-            "app.api.v1.core.user.public.resetPassword.validate.response.title",
+            "app.api.v1.core.user.public.resetPassword.validate.response.title" as const,
           description:
-            "app.api.v1.core.user.public.resetPassword.validate.response.description",
+            "app.api.v1.core.user.public.resetPassword.validate.response.description" as const,
           layout: { type: LayoutType.GRID, columns: 12 },
         },
         { response: true },
@@ -93,7 +95,7 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.public.resetPassword.validate.response.valid",
+                "app.api.v1.core.user.public.resetPassword.validate.response.valid" as const,
             },
             z.boolean(),
           ),
@@ -101,7 +103,7 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.public.resetPassword.validate.response.message",
+                "app.api.v1.core.user.public.resetPassword.validate.response.message" as const,
             },
             z.string(),
           ),
@@ -109,7 +111,7 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.public.resetPassword.validate.response.userId",
+                "app.api.v1.core.user.public.resetPassword.validate.response.userId" as const,
             },
             z.uuid().optional(),
           ),
@@ -117,7 +119,7 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.public.resetPassword.validate.response.expiresAt",
+                "app.api.v1.core.user.public.resetPassword.validate.response.expiresAt" as const,
             },
             z.string().optional(),
           ),
@@ -125,7 +127,7 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.public.resetPassword.validate.response.nextSteps.item",
+                "app.api.v1.core.user.public.resetPassword.validate.response.nextSteps.item" as const,
             },
             z.array(z.string()),
           ),
@@ -138,65 +140,66 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.validation.title",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.validation.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.validation.description",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.unauthorized.title",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.unauthorized.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.unauthorized.description",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.internal.title",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.internal.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.internal.description",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.unknown.title",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.unknown.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.unknown.description",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.network.title",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.network.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.network.description",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.network.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.forbidden.title",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.forbidden.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.forbidden.description",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.notFound.title",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.notFound.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.notFound.description",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.unsaved.title",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.unsaved.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.unsaved.description",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.unsaved.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.conflict.title",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.conflict.title" as const,
       description:
-        "app.api.v1.core.user.public.resetPassword.validate.errors.conflict.description",
+        "app.api.v1.core.user.public.resetPassword.validate.errors.conflict.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.user.public.resetPassword.validate.success.title",
+    title:
+      "app.api.v1.core.user.public.resetPassword.validate.success.title" as const,
     description:
-      "app.api.v1.core.user.public.resetPassword.validate.success.description",
+      "app.api.v1.core.user.public.resetPassword.validate.success.description" as const,
   },
 
   // === EXAMPLES ===

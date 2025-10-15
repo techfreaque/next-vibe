@@ -278,12 +278,13 @@ export class PasswordRepositoryImpl implements PasswordRepository {
           })
           .where(eq(passwordResets.userId, userId));
       } else {
-        const validatedData = insertPasswordResetSchema.parse({
+        const resetData: NewPasswordReset = {
           userId,
           token,
           expiresAt: expiryDate,
-          createdAt: new Date(),
-        } as NewPasswordReset);
+        };
+
+        const validatedData = insertPasswordResetSchema.parse(resetData);
 
         const results = await db
           .insert(passwordResets)

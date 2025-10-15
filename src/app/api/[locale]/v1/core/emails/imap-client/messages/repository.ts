@@ -20,7 +20,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
-import type { Countries } from "@/i18n/core/config";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { type Email, emails, imapAccounts } from "../../messages/db";
 import {
@@ -30,9 +30,6 @@ import {
   ImapSyncStatus,
   SortOrder,
 } from "../enum";
-
-// Use proper type for CountryLanguage expected by IMAP repositories
-type CountryLanguage = Countries;
 
 // Local type definitions to replace problematic imports
 interface ImapMessageResponseType {
@@ -151,32 +148,16 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     return {
       id: message.id,
       subject: message.subject || "",
-      recipientEmail: message.recipientEmail,
-      recipientName: message.recipientName || null,
-      senderEmail: message.senderEmail,
       senderName: message.senderName || null,
-      imapUid: message.imapUid || null,
-      imapMessageId: message.imapMessageId || null,
-      imapFolderId: message.imapFolderId || null,
-      imapAccountId: message.imapAccountId || null,
-      bodyText: message.bodyText || null,
-      bodyHtml: message.bodyHtml || null,
-      headers: (message.headers as Record<string, string>) || {},
+      senderEmail: message.senderEmail,
+      recipientName: message.recipientName || null,
+      recipientEmail: message.recipientEmail,
       isRead: message.isRead || false,
       isFlagged: message.isFlagged || false,
-      isDeleted: message.isDeleted || false,
-      isDraft: message.isDraft || false,
-      isAnswered: message.isAnswered || false,
-      inReplyTo: message.inReplyTo || null,
-      references: message.references || null,
-      threadId: message.threadId || null,
       messageSize: message.messageSize || null,
-      hasAttachments: message.hasAttachments || false,
-      attachmentCount: message.attachmentCount || 0,
-      lastSyncAt: message.lastSyncAt?.toISOString() || null,
-      syncStatus: message.syncStatus || ImapSyncStatus.PENDING,
-      syncError: message.syncError || null,
       sentAt: message.sentAt?.toISOString() || null,
+      accountId: message.imapAccountId || "",
+      folderId: message.imapFolderId || null,
       createdAt: message.createdAt.toISOString(),
       updatedAt: message.updatedAt.toISOString(),
     };
@@ -392,14 +373,15 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         totalPages,
       });
     } catch (error) {
+      const parsedError = parseError(error);
       logger.error(
         "app.api.v1.core.emails.imapClient.messages.list.error.server",
-        error,
+        parsedError,
       );
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.messages.list.get.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
-        parseError(error),
+        { error: parsedError.message },
       );
     }
   }
@@ -540,16 +522,40 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
           );
         }
 
+        // Note: syncRepository methods expect full CountryLanguage format
+        // but this repository uses Countries type - map accordingly
+        // eslint-disable-next-line i18next/no-literal-string
+        const fullLocale = `en-${locale}` as CountryLanguage;
+
         // Sync the specific account
         const syncResult = await imapSyncRepository.syncAccount(
           { account: account[0] },
           user,
-          locale,
+          fullLocale,
           logger,
         );
 
         if (syncResult.success) {
-          return createSuccessResponse(syncResult.data);
+          const syncResults: SyncResults = {
+            accountsProcessed: 1,
+            foldersProcessed:
+              syncResult.data.result?.results?.foldersProcessed ?? 0,
+            messagesProcessed:
+              syncResult.data.result?.results?.messagesProcessed ?? 0,
+            foldersAdded: syncResult.data.result?.results?.foldersAdded ?? 0,
+            foldersUpdated:
+              syncResult.data.result?.results?.foldersUpdated ?? 0,
+            foldersDeleted:
+              syncResult.data.result?.results?.foldersDeleted ?? 0,
+            messagesAdded: syncResult.data.result?.results?.messagesAdded ?? 0,
+            messagesUpdated:
+              syncResult.data.result?.results?.messagesUpdated ?? 0,
+            messagesDeleted:
+              syncResult.data.result?.results?.messagesDeleted ?? 0,
+            duration: syncResult.data.result?.results?.duration ?? 0,
+            errors: syncResult.data.result?.results?.errors ?? [],
+          };
+          return createSuccessResponse(syncResults);
         } else {
           return createErrorResponse(
             "imapErrors.sync.message.failed",
@@ -558,15 +564,38 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         }
       } else {
         // Sync all accounts
+        // eslint-disable-next-line i18next/no-literal-string
+        const fullLocale = `en-${locale}` as CountryLanguage;
+
         const syncResult = await imapSyncRepository.syncAllAccounts(
           {},
           user,
-          locale,
+          fullLocale,
           logger,
         );
 
         if (syncResult.success) {
-          return createSuccessResponse(syncResult.data);
+          const syncResults: SyncResults = {
+            accountsProcessed:
+              syncResult.data.result?.results?.accountsProcessed ?? 0,
+            foldersProcessed:
+              syncResult.data.result?.results?.foldersProcessed ?? 0,
+            messagesProcessed:
+              syncResult.data.result?.results?.messagesProcessed ?? 0,
+            foldersAdded: syncResult.data.result?.results?.foldersAdded ?? 0,
+            foldersUpdated:
+              syncResult.data.result?.results?.foldersUpdated ?? 0,
+            foldersDeleted:
+              syncResult.data.result?.results?.foldersDeleted ?? 0,
+            messagesAdded: syncResult.data.result?.results?.messagesAdded ?? 0,
+            messagesUpdated:
+              syncResult.data.result?.results?.messagesUpdated ?? 0,
+            messagesDeleted:
+              syncResult.data.result?.results?.messagesDeleted ?? 0,
+            duration: syncResult.data.result?.results?.duration ?? 0,
+            errors: syncResult.data.result?.results?.errors ?? [],
+          };
+          return createSuccessResponse(syncResults);
         } else {
           return createErrorResponse(
             "imapErrors.sync.message.failed",
@@ -598,10 +627,28 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         syncStatus: data.syncStatus,
       });
 
+      // Validate sync status is a valid enum value
+      const validStatuses = [
+        ImapSyncStatus.PENDING,
+        ImapSyncStatus.SYNCING,
+        ImapSyncStatus.SYNCED,
+        ImapSyncStatus.ERROR,
+      ];
+
+      const syncStatus = validStatuses.includes(
+        data.syncStatus as typeof ImapSyncStatus.PENDING,
+      )
+        ? (data.syncStatus as
+            | typeof ImapSyncStatus.PENDING
+            | typeof ImapSyncStatus.SYNCING
+            | typeof ImapSyncStatus.SYNCED
+            | typeof ImapSyncStatus.ERROR)
+        : ImapSyncStatus.PENDING;
+
       const [updatedMessage] = await db
         .update(emails)
         .set({
-          syncStatus: data.syncStatus,
+          syncStatus,
           lastSyncAt: new Date(),
           updatedAt: new Date(),
         })

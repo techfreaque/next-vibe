@@ -37,7 +37,7 @@ interface LeadsStatsFiltersContainerProps {
 }
 
 interface LeadsStatsFiltersProps {
-  control: Control<Partial<LeadsStatsRequestType>>;
+  control: Control<LeadsStatsRequestType>;
 }
 
 export function LeadsStatsFilters({

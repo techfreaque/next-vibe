@@ -19,8 +19,6 @@ import type {
 export function determineFormDataPriority<T>(
   sources: FormDataSources<T>,
   config: AutoPrefillConfig,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  isDirty = false, // Ignored - local storage functionality removed
 ): FormDataPriority<T> {
   const { autoPrefill = true } = config;
   // autoPrefillFromLocalStorage is ignored - local storage functionality removed
@@ -35,8 +33,6 @@ export function determineFormDataPriority<T>(
     finalData = { ...finalData, ...sources.serverData };
     dataSource = "server";
   }
-
-  // Note: localStorageData is ignored - local storage functionality removed
 
   // Initial state always wins (explicit override)
   if (sources.initialState) {

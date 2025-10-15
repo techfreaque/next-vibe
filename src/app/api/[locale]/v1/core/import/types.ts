@@ -3,14 +3,15 @@
  * Generic types for CSV import operations that can be used by any domain
  */
 
-import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
+import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
+
 import type {
-  LeadsImportResponseType,
   CsvImportConfig,
   DomainImportRepository,
   ImportJobsListResponseType,
+  LeadsImportResponseType,
 } from "../leads/import/definition";
 
 /**

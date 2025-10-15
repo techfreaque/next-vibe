@@ -8,9 +8,6 @@
 
 import "server-only";
 
-import type { EndpointLogger } from "../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -19,6 +16,13 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import type {
+  JwtPayloadType,
+  JwtPrivatePayloadType,
+} from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import type { EndpointLogger } from "../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { CronTaskStatus } from "../enum";
 import type {
   CronTask,
@@ -32,6 +36,12 @@ import type {
   UnifiedRunnerRequestOutput,
   UnifiedRunnerResponseOutput,
 } from "./definition";
+
+// System user for cron task execution
+const CRON_SYSTEM_USER: JwtPrivatePayloadType = {
+  id: "system-cron",
+  isPublic: false,
+};
 
 /**
  * Unified Task Runner Repository Interface
@@ -67,6 +77,11 @@ export class UnifiedTaskRunnerRepositoryImpl
     error: string;
     timestamp: Date;
   }> = [];
+
+  // Execution context stored when runner starts
+  private locale: CountryLanguage = "en-GLOBAL";
+  private logger: EndpointLogger;
+  private cronUser: JwtPrivatePayloadType = CRON_SYSTEM_USER;
 
   async manageRunner(
     data: UnifiedRunnerRequestOutput,
@@ -167,8 +182,36 @@ export class UnifiedTaskRunnerRepositoryImpl
     this.markTaskAsRunning(taskName, "cron");
 
     try {
-      // Execute task
-      await task.run();
+      // Ensure execution context is available
+      if (!this.logger) {
+        const errorMsg = "Task runner not properly initialized with logger";
+        this.markTaskAsFailed(taskName, errorMsg);
+        return createErrorResponse(
+          "app.api.v1.core.system.tasks.unifiedRunner.post.errors.internal.title",
+          ErrorResponseTypes.INTERNAL_ERROR,
+          { error: errorMsg, taskName },
+        );
+      }
+
+      // Execute task with required props
+      const result = await task.run({
+        logger: this.logger,
+        locale: this.locale,
+        cronUser: this.cronUser,
+      });
+
+      // Check if task returned an error
+      if (result && typeof result === "object" && "error" in result) {
+        const errorMsg =
+          typeof result.error === "string" ? result.error : "Task failed";
+        this.markTaskAsFailed(taskName, errorMsg);
+        return createErrorResponse(
+          "app.api.v1.core.system.tasks.unifiedRunner.post.errors.internal.title",
+          ErrorResponseTypes.INTERNAL_ERROR,
+          { error: errorMsg, taskName },
+        );
+      }
+
       this.markTaskAsCompleted(taskName);
       return createSuccessResponse({
         status: CronTaskStatus.COMPLETED,
@@ -210,7 +253,9 @@ export class UnifiedTaskRunnerRepositoryImpl
       const errorMsg = parseError(error).message;
       this.markTaskAsFailed(taskName, errorMsg);
       if (task.onError) {
-        await task.onError(error as Error);
+        const errorInstance =
+          error instanceof Error ? error : new Error(errorMsg);
+        await task.onError(errorInstance);
       }
       return createErrorResponse(
         "app.api.v1.core.system.tasks.unifiedRunner.post.errors.internal.title",
@@ -257,6 +302,8 @@ export class UnifiedTaskRunnerRepositoryImpl
     tasks: Task[],
     signal: AbortSignal,
     locale: CountryLanguage,
+    logger: EndpointLogger,
+    cronUser?: JwtPrivatePayloadType,
   ): ResponseType<void> {
     try {
       // eslint-disable-next-line no-console
@@ -265,6 +312,13 @@ export class UnifiedTaskRunnerRepositoryImpl
         environment: this.environment,
         supportsSideTasks: this.supportsSideTasks,
       });
+
+      // Store execution context
+      this.locale = locale;
+      this.logger = logger;
+      if (cronUser) {
+        this.cronUser = cronUser;
+      }
 
       this.isRunning = true;
 
@@ -349,7 +403,9 @@ export class UnifiedTaskRunnerRepositoryImpl
           this.markTaskAsFailed(task.name, errorMsg);
 
           if (task.onError) {
-            await task.onError(error as Error);
+            const errorInstance =
+              error instanceof Error ? error : new Error(errorMsg);
+            await task.onError(errorInstance);
           }
         }
       });

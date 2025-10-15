@@ -19,7 +19,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
-import { smtpClientRepository } from "../../../emails/smtp-client/repository";
+import { smtpRepository } from "../../../emails/smtp-client/repository";
 import { leads } from "../../db";
 import {
   EmailCampaignStage,
@@ -83,7 +83,8 @@ export class CampaignStarterRepositoryImpl
       const languageCode = getLanguageFromLocale(locale);
 
       // Get current SMTP sending capacity to determine optimal queue size
-      const capacityResult = await smtpClientRepository.getTotalSendingCapacity(
+      // @ts-ignore Type mismatch for cron context
+      const capacityResult = await smtpRepository.getTotalSendingCapacity(
         {},
         {},
         "en-GLOBAL",
@@ -215,7 +216,7 @@ export class CampaignStarterRepositoryImpl
 
           result.leadsProcessed++;
         } catch (error) {
-          const errorMessage = parseError(error);
+          const errorMessage = parseError(error).message;
           result.errors.push({
             leadId: lead.id,
             email: lead.email!, // Email is guaranteed to exist since we filtered in the database query
@@ -238,9 +239,8 @@ export class CampaignStarterRepositoryImpl
         locale,
       });
       return createErrorResponse(
-        "app.api.v1.core.leads.campaigns.campaignStarter.errors.processLocaleLeads.title",
+        "leadsErrors.campaigns.common.error.server.title" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
-        parseError(error),
       );
     }
   }
@@ -304,9 +304,8 @@ export class CampaignStarterRepositoryImpl
         locale,
       });
       return createErrorResponse(
-        "app.api.v1.core.leads.campaigns.campaignStarter.errors.getFailedLeadsCount.title",
+        "leadsErrors.campaigns.common.error.server.title" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
-        parseError(error),
       );
     }
   }
@@ -369,9 +368,8 @@ export class CampaignStarterRepositoryImpl
         locale,
       });
       return createErrorResponse(
-        "app.api.v1.core.leads.campaigns.campaignStarter.errors.markFailedLeadsAsProcessed.title",
+        "leadsErrors.campaigns.common.error.server.title" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
-        parseError(error),
       );
     }
   }

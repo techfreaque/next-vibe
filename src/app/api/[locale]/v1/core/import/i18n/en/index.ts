@@ -6,93 +6,95 @@ export const translations = {
   csv: {
     post: {
       title: "Import CSV Data",
-      description: "Import data from CSV files with intelligent processing and validation",
-      
+      description:
+        "Import data from CSV files with intelligent processing and validation",
+
       form: {
         title: "CSV Import Configuration",
         description: "Configure your CSV import settings for optimal results",
       },
-      
+
       // === FILE UPLOAD SECTION ===
       fileSection: {
         title: "File Upload",
         description: "Select your CSV file and specify the target domain",
       },
-      
+
       file: {
         label: "CSV File",
         description: "Select a CSV file to upload (max 10MB)",
         placeholder: "Choose CSV file...",
-        helpText: "Supported format: CSV with comma-separated values. First row should contain column headers.",
+        helpText:
+          "Supported format: CSV with comma-separated values. First row should contain column headers.",
       },
-      
+
       fileName: {
         label: "File Name",
         description: "Name for this import (for your reference)",
         placeholder: "e.g., January 2024 Leads Import",
       },
-      
+
       domain: {
         label: "Import Domain",
         description: "What type of data are you importing?",
         placeholder: "Select data type...",
       },
-      
+
       // === PROCESSING SECTION ===
       processingSection: {
         title: "Processing Options",
         description: "Configure how your data should be processed",
       },
-      
+
       skipDuplicates: {
         label: "Skip Duplicates",
         description: "Skip records with duplicate email addresses",
         helpText: "Recommended: Prevents importing the same contact twice",
       },
-      
+
       updateExisting: {
         label: "Update Existing",
         description: "Update existing records with new data from CSV",
         helpText: "If unchecked, existing records will be left unchanged",
       },
-      
+
       useChunkedProcessing: {
         label: "Background Processing",
         description: "Process large files in the background",
         helpText: "Recommended for files with more than 500 records",
       },
-      
+
       batchSize: {
         label: "Batch Size",
         description: "Number of records to process at once",
         placeholder: "100",
         helpText: "Smaller batches are more stable, larger batches are faster",
       },
-      
+
       // === DEFAULTS SECTION ===
       defaultsSection: {
         title: "Default Values (Optional)",
         description: "Set default values for records missing this information",
       },
-      
+
       defaultCountry: {
         label: "Default Country",
         description: "Country for records without location",
         placeholder: "Select country...",
       },
-      
+
       defaultLanguage: {
-        label: "Default Language", 
+        label: "Default Language",
         description: "Language for records without language preference",
         placeholder: "Select language...",
       },
-      
+
       // === RESPONSE ===
       response: {
         title: "Import Results",
         description: "Summary of your CSV import operation",
       },
-      
+
       // === ERRORS ===
       errors: {
         validation: {
@@ -102,7 +104,8 @@ export const translations = {
           emptyFileName: "Please provide a name for this import",
           invalidDomain: "Please select a valid import domain",
           invalidBatchSize: "Batch size must be between 10 and 1000",
-          fileTooLarge: "File size exceeds 10MB limit. Consider using background processing.",
+          fileTooLarge:
+            "File size exceeds 10MB limit. Consider using background processing.",
         },
         unauthorized: {
           title: "Access Denied",
@@ -110,55 +113,57 @@ export const translations = {
         },
         fileTooLarge: {
           title: "File Too Large",
-          description: "The selected file exceeds the maximum size limit of 10MB",
+          description:
+            "The selected file exceeds the maximum size limit of 10MB",
         },
         server: {
           title: "Import Failed",
-          description: "An error occurred while processing your import. Please try again.",
+          description:
+            "An error occurred while processing your import. Please try again.",
         },
       },
-      
+
       success: {
         title: "Import Successful",
         description: "Your CSV data has been successfully imported",
       },
     },
   },
-  
+
   // === JOBS LIST ENDPOINT ===
   jobs: {
     get: {
       title: "Import Job History",
       description: "View and manage your import jobs",
-      
+
       form: {
         title: "Filter Import Jobs",
         description: "Filter jobs by status, date, or other criteria",
       },
-      
+
       status: {
         label: "Job Status",
         description: "Filter by current job status",
         placeholder: "All statuses",
       },
-      
+
       limit: {
         label: "Results Per Page",
         description: "Number of jobs to show per page",
         placeholder: "20",
       },
-      
+
       offset: {
         label: "Page Offset",
         description: "Skip this many results (for pagination)",
         placeholder: "0",
       },
-      
+
       response: {
         title: "Import Jobs",
         description: "Your import job history and current status",
       },
-      
+
       errors: {
         unauthorized: {
           title: "Access Denied",
@@ -169,14 +174,14 @@ export const translations = {
           description: "Unable to retrieve your import job history",
         },
       },
-      
+
       success: {
         title: "Jobs Loaded",
         description: "Successfully retrieved your import job history",
       },
     },
   },
-  
+
   // === ENUM TRANSLATIONS ===
   enum: {
     // === JOB STATUS ===
@@ -206,7 +211,7 @@ export const translations = {
         description: "Job processing is temporarily paused",
       },
     },
-    
+
     // === IMPORT DOMAINS ===
     domain: {
       leads: {
@@ -234,7 +239,7 @@ export const translations = {
         description: "Email templates and content",
       },
     },
-    
+
     // === FILE FORMATS ===
     format: {
       csv: {
@@ -250,11 +255,11 @@ export const translations = {
         description: "JavaScript Object Notation data",
       },
       tsv: {
-        label: "TSV File", 
+        label: "TSV File",
         description: "Tab-separated values",
       },
     },
-    
+
     // === PROCESSING MODES ===
     processing: {
       immediate: {
@@ -270,7 +275,7 @@ export const translations = {
         description: "Schedule processing for a specific time",
       },
     },
-    
+
     // === ERROR TYPES ===
     errorType: {
       validation: {
@@ -294,7 +299,7 @@ export const translations = {
         description: "Internal system error",
       },
     },
-    
+
     // === BATCH SIZE PRESETS ===
     batchSize: {
       small: {
@@ -315,7 +320,7 @@ export const translations = {
       },
     },
   },
-  
+
   // === NEXT STEPS ===
   nextSteps: {
     reviewErrors: "Review the error details to understand what went wrong",
@@ -328,14 +333,14 @@ export const translations = {
     monitorProgress: "Monitor the progress in the job history",
     checkJobsList: "Check the jobs list for detailed status updates",
   },
-  
+
   // === ACTION MESSAGES ===
   errors: {
     cancel: {
       server: "Failed to cancel import job",
     },
     retry: {
-      server: "Failed to retry import job", 
+      server: "Failed to retry import job",
     },
     delete: {
       server: "Failed to delete import job",
@@ -344,11 +349,11 @@ export const translations = {
       server: "Failed to get job status",
     },
   },
-  
+
   // === TAGS ===
   tags: {
     csv: "CSV",
-    upload: "Upload", 
+    upload: "Upload",
     batch: "Batch Processing",
     jobs: "Jobs",
     status: "Status",

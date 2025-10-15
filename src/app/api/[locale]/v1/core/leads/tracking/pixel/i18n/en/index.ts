@@ -4,4 +4,4 @@ export const translations = {
     pixel: "Pixel",
   },
   // Add endpoint-specific translations here
-} ;
+};

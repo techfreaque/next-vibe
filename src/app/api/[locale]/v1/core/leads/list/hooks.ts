@@ -3,9 +3,9 @@
  * React hook for interacting with the Leads List API
  */
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 import { LeadSortField, SortOrder } from "../enum";
 import definitions from "./definition";
@@ -28,12 +28,18 @@ export function useLeadsListEndpoint(
       },
       filterOptions: {
         initialFilters: {
-          page: 1,
-          limit: 20,
-          status: undefined,
-          currentCampaignStage: undefined,
-          sortBy: [LeadSortField.CREATED_AT],
-          sortOrder: [SortOrder.DESC],
+          searchPagination: {
+            page: 1,
+            limit: 20,
+          },
+          statusFilters: {
+            status: undefined,
+            currentCampaignStage: undefined,
+          },
+          sortingOptions: {
+            sortBy: LeadSortField.CREATED_AT,
+            sortOrder: SortOrder.DESC,
+          },
         },
       },
     },

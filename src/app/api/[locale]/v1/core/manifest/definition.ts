@@ -347,10 +347,10 @@ const { GET } = createEndpoint({
   },
 });
 
-export type ManifestRequestTypeInput = typeof GET.types.RequestInput;
-export type ManifestRequestTypeOutput = typeof GET.types.RequestOutput;
-export type ManifestResponseTypeInput = typeof GET.types.ResponseInput;
-export type ManifestResponseTypeOutput = typeof GET.types.ResponseOutput;
+export type ManifestRequestInput = typeof GET.types.RequestInput;
+export type ManifestRequestOutput = typeof GET.types.RequestOutput;
+export type ManifestResponseInput = typeof GET.types.ResponseInput;
+export type ManifestResponseOutput = typeof GET.types.ResponseOutput;
 
 /**
  * Export the endpoint definitions

@@ -13,16 +13,16 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-// Removed unused imports
+import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-
-import type { JwtPayloadType } from "../../../user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { db, smtpAccounts } from "../db";
+
+import { smtpAccounts } from "../db";
 // SmtpAccountResponseType doesn't exist - we'll create the response directly
 import type {
-  SmtpAccountCreateRequestTypeOutput,
-  SmtpAccountCreateResponseTypeOutput,
+  SmtpAccountCreateRequestOutput,
+  SmtpAccountCreateResponseOutput,
 } from "./definition";
 
 /**
@@ -30,11 +30,11 @@ import type {
  */
 interface SmtpAccountCreateRepository {
   createSmtpAccount(
-    data: SmtpAccountCreateRequestTypeOutput,
+    data: SmtpAccountCreateRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpAccountCreateResponseTypeOutput>>;
+  ): Promise<ResponseType<SmtpAccountCreateResponseOutput>>;
 }
 
 /**
@@ -46,14 +46,14 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
    * Create a new SMTP account
    */
   async createSmtpAccount(
-    data: SmtpAccountCreateRequestTypeOutput,
+    data: SmtpAccountCreateRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpAccountCreateResponseTypeOutput>> {
+  ): Promise<ResponseType<SmtpAccountCreateResponseOutput>> {
     try {
       logger.debug("Creating SMTP account", {
-        name: data.name,
+        name: data.accountInfo.name,
         userId: user.isPublic ? "public" : user.id,
       });
 
@@ -63,14 +63,14 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
       const [newAccount] = await db
         .insert(smtpAccounts)
         .values({
-          name: data.name,
-          description: data.description,
-          host: data.host,
-          port: data.port,
-          securityType: data.securityType,
-          username: data.username,
-          password: data.password,
-          fromEmail: data.fromEmail,
+          name: data.accountInfo.name,
+          description: data.accountInfo.description,
+          host: data.serverConfig.host,
+          port: data.serverConfig.port,
+          securityType: data.serverConfig.securityType,
+          username: data.authentication.username,
+          password: data.authentication.password,
+          fromEmail: data.emailConfig.fromEmail,
         })
         .returning();
 
@@ -85,23 +85,29 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
         );
       }
 
-      // Transform to response format
-      const responseAccount: SmtpAccountCreateResponseTypeOutput = {
+      // Transform to response format with proper nested structure
+      const responseAccount: SmtpAccountCreateResponseOutput = {
         account: {
-          id: newAccount.id,
-          name: newAccount.name,
-          description: newAccount.description || undefined,
-          host: newAccount.host,
-          port: newAccount.port,
-          securityType: newAccount.securityType,
-          username: newAccount.username,
-          fromEmail: newAccount.fromEmail,
-          status: newAccount.status,
-          healthCheckStatus: newAccount.healthCheckStatus,
-          priority: newAccount.priority || undefined,
-          totalEmailsSent: newAccount.totalEmailsSent || 0,
-          createdAt: newAccount.createdAt.toISOString(),
-          updatedAt: newAccount.updatedAt.toISOString(),
+          accountSummary: {
+            id: newAccount.id,
+            name: newAccount.name,
+            description: newAccount.description || undefined,
+            status: newAccount.status,
+          },
+          connectionDetails: {
+            host: newAccount.host,
+            port: newAccount.port,
+            securityType: newAccount.securityType,
+            username: newAccount.username,
+            fromEmail: newAccount.fromEmail,
+            healthCheckStatus: newAccount.healthCheckStatus,
+          },
+          performanceMetrics: {
+            priority: newAccount.priority || undefined,
+            totalEmailsSent: newAccount.totalEmailsSent || 0,
+            createdAt: newAccount.createdAt.toISOString(),
+            updatedAt: newAccount.updatedAt.toISOString(),
+          },
         },
       };
 

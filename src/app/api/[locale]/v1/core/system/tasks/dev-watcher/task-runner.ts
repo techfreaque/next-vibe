@@ -10,6 +10,29 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { TaskRunner } from "../types/repository";
 
 /**
+ * Simple console logger for task runners
+ * Task runners don't have access to EndpointLogger, so we use console
+ */
+const logger = {
+  info: (message: string, meta?: unknown): void => {
+    // eslint-disable-next-line no-console, i18next/no-literal-string
+    console.log(`ℹ️ [DEV-WATCHER] ${message}`, meta ? meta : "");
+  },
+  error: (message: string, error?: Error | unknown): void => {
+    // eslint-disable-next-line no-console, i18next/no-literal-string
+    console.error(`❌ [DEV-WATCHER] ${message}`, error || "");
+  },
+  warn: (message: string, meta?: unknown): void => {
+    // eslint-disable-next-line no-console, i18next/no-literal-string
+    console.warn(`⚠️ [DEV-WATCHER] ${message}`, meta ? meta : "");
+  },
+  debug: (message: string, meta?: unknown): void => {
+    // eslint-disable-next-line no-console, i18next/no-literal-string
+    console.debug(`🐛 [DEV-WATCHER] ${message}`, meta ? meta : "");
+  },
+};
+
+/**
  * Helper to safely access environment variables
  */
 const getEnvVar = (key: string): string | undefined => {
@@ -173,7 +196,6 @@ const startSmartFileWatcher = async (signal: AbortSignal): Promise<void> => {
     }, DEBOUNCE_MS);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const watchers: any[] = [];
 
   // Set up file watchers for each path

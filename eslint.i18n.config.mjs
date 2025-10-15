@@ -35,6 +35,9 @@ export const i18nConfig = [
       "src/packages/next-vibe/cli/**",
       "**/*schema.ts",
       "to_migrate",
+      "src/app/api/[locale]/v1/core/system/launchpad/**",
+      "src/app/api/[locale]/v1/core/system/release-tool/**",
+      "src/app/api/[locale]/v1/core/system/builder/**",
     ],
 
     plugins: { i18next },

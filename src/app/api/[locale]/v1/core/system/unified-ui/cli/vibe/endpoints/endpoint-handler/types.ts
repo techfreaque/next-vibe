@@ -35,7 +35,10 @@
 
 import type { NextRequest, NextResponse } from "next/server";
 import type { SmsFunctionType } from "next-vibe/server/sms/utils";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type {
+  ResponseType,
+  StreamingResponse,
+} from "next-vibe/shared/types/response.schema";
 import type { z } from "zod";
 
 import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
@@ -263,6 +266,10 @@ export interface ApiHandlerProps<
  * API handler function type - receives validated data and returns validated response
  * Note: In our schema system, TRequestInput is the validated data (what handlers should receive)
  * but the current interface uses TRequestOutput for backward compatibility
+ *
+ * Can return either:
+ * - ResponseType<TResponseOutput> for standard JSON responses
+ * - StreamingResponse for streaming endpoints (e.g., AI chat)
  */
 export type ApiHandlerFunction<
   TRequestOutput,
@@ -271,7 +278,10 @@ export type ApiHandlerFunction<
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
 > = (
   props: ApiHandlerProps<TRequestOutput, TUrlVariablesOutput, TUserRoleValue>,
-) => Promise<ResponseType<TResponseOutput>> | ResponseType<TResponseOutput>;
+) =>
+  | Promise<ResponseType<TResponseOutput> | StreamingResponse>
+  | ResponseType<TResponseOutput>
+  | StreamingResponse;
 
 /**
  * Email handler configuration
@@ -317,7 +327,7 @@ export interface ApiHandlerOptions<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TFields,
 > {
   /** API endpoint definition */
   endpoint: CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>;

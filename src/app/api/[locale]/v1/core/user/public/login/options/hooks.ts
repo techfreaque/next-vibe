@@ -11,6 +11,6 @@ import loginEndpoints from "./definition";
  */
 export function useLoginOptions(
   logger: EndpointLogger,
-): EndpointReturn<typeof loginEndpoints.GET> {
-  return useEndpoint(loginEndpoints.GET, {}, logger);
+): EndpointReturn<typeof loginEndpoints> {
+  return useEndpoint(loginEndpoints, {}, logger);
 }

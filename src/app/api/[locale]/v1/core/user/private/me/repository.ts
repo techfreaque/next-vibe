@@ -213,38 +213,20 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
 
       // Flatten basicInfo fields
       if (data.basicInfo) {
-        if (data.basicInfo.firstName !== undefined) {
-          updateData.firstName = data.basicInfo.firstName;
+        if (data.basicInfo.privateName !== undefined) {
+          updateData.privateName = data.basicInfo.privateName;
         }
-        if (data.basicInfo.lastName !== undefined) {
-          updateData.lastName = data.basicInfo.lastName;
+        if (data.basicInfo.publicName !== undefined) {
+          updateData.publicName = data.basicInfo.publicName;
         }
         if (data.basicInfo.email !== undefined) {
           updateData.email = data.basicInfo.email;
         }
       }
 
-      // Flatten profileDetails fields
-      if (data.profileDetails) {
-        if (data.profileDetails.imageUrl !== undefined) {
-          updateData.imageUrl = data.profileDetails.imageUrl;
-        }
-        if (data.profileDetails.company !== undefined) {
-          updateData.company = data.profileDetails.company;
-        }
-      }
-
-      // Handle visibility field from privacySettings
-      if (data.privacySettings?.visibility) {
-        // Handle both single value and array for visibility
-        if (Array.isArray(data.privacySettings.visibility)) {
-          updateData.visibility =
-            data.privacySettings.visibility.length > 0
-              ? String(data.privacySettings.visibility[0])
-              : undefined;
-        } else {
-          updateData.visibility = String(data.privacySettings.visibility);
-        }
+      // Handle marketingConsent from privacySettings
+      if (data.privacySettings?.marketingConsent !== undefined) {
+        updateData.marketingConsent = data.privacySettings.marketingConsent;
       }
 
       // Update user in database

@@ -5,9 +5,14 @@
  * Most of the implementation details are handled by the next-vibe package.
  */
 
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "next-vibe/shared/types/response.schema";
 import { useEffect } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EnhancedMutationResult } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation";
 import { useApiMutation } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation";
 import { useApiQuery } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/query";
 import {
@@ -18,7 +23,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/i18n/core/client";
 
 import { authClientRepository } from "../../auth/repository-client";
-import meEndpoints, { type MeGetResponseOutput } from "./definition";
+import meEndpoints, {
+  type MeDeleteRequestOutput,
+  type MeDeleteResponseOutput,
+  type MeGetResponseOutput,
+  type MePostRequestOutput,
+  type MePostResponseOutput,
+} from "./definition";
 
 /****************************
  * STATE KEYS
@@ -48,12 +59,15 @@ const authCheckedKey = createCustomStateKey<boolean>(USER_AUTH_CHECKED_KEY);
  *
  * @returns User data and loading state
  */
-export function useUser(logger: EndpointLogger): ReturnType<
-  typeof useApiQuery
-> & {
+export interface UseUserReturn {
   user: MeGetResponseOutput | undefined;
   isLoggedIn: boolean;
-} {
+  isLoading: boolean;
+  refetch: () => Promise<ResponseType<MeGetResponseOutput>>;
+  error: ErrorResponseType | undefined;
+}
+
+export function useUser(logger: EndpointLogger): UseUserReturn {
   const { toast } = useToast();
   const { t } = useTranslation();
 
@@ -135,10 +149,10 @@ export function useUser(logger: EndpointLogger): ReturnType<
   }, [authChecked, setQueryEnabled, setAuthChecked, logger]);
 
   return {
-    user: authUser as MeGetResponseOutput | undefined,
+    user: authUser,
     isLoggedIn: !!userResponse && !isError,
     isLoading: isLoading || !authChecked,
-    refetch: refetch as () => Promise<ReturnType<typeof useApiQuery>>,
+    refetch,
     error,
   };
 }
@@ -159,7 +173,7 @@ export function useUser(logger: EndpointLogger): ReturnType<
  */
 export function useUpdateProfile(
   logger: EndpointLogger,
-): ReturnType<typeof useApiMutation> {
+): EnhancedMutationResult<MePostResponseOutput, MePostRequestOutput, never> {
   const { toast } = useToast();
   const { refetch } = useUser(logger);
   const { t } = useTranslation();
@@ -197,7 +211,11 @@ export function useUpdateProfile(
  */
 export function useDeleteAccount(
   logger: EndpointLogger,
-): ReturnType<typeof useApiMutation> {
+): EnhancedMutationResult<
+  MeDeleteResponseOutput,
+  MeDeleteRequestOutput,
+  never
+> {
   const { toast } = useToast();
   const { t } = useTranslation();
 

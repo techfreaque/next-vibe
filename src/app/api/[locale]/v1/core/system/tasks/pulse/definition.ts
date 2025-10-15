@@ -8,7 +8,10 @@ import { z } from "zod";
 
 import {
   EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
   Methods,
+  WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import {
@@ -16,13 +19,8 @@ import {
   requestDataField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
-import {
-  FieldDataType,
-  LayoutType,
-  WidgetType,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
 
-import { UserRoleValue } from "../../../user/user-roles/enum";
+import { UserRole } from "../../../user/user-roles/enum";
 
 /**
  * POST endpoint definition - Execute pulse
@@ -76,15 +74,16 @@ const pulseExecuteEndpoint = createEndpoint({
     },
   },
   successTypes: {
-    title: "common.success",
-    description: "common.pulseExecuteDescription",
+    title: "app.api.v1.core.system.tasks.pulseSystem.success.title",
+    description: "app.api.v1.core.system.tasks.pulseSystem.success.description",
   },
 
   fields: objectField(
     {
-      type: WidgetType.CONTAINER,
-      title: "common.pulseContainerTitle",
-      description: "common.pulseContainerDescription",
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      label: "app.api.v1.core.system.tasks.pulseSystem.container.title",
+      layout: { columns: 12 },
     },
     { request: "data", response: true },
     {
@@ -126,7 +125,7 @@ const pulseExecuteEndpoint = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "common.success",
+          content: "app.api.v1.core.system.tasks.pulseSystem.success.content",
         },
         z.boolean(),
       ),
@@ -287,10 +286,25 @@ const pulseStatusEndpoint = createEndpoint({
   },
 
   successTypes: {
-    title: "common.success",
-    description: "common.pulseStatusDescription",
+    title: "app.api.v1.core.system.tasks.pulseSystem.success.title",
+    description: "app.api.v1.core.system.tasks.pulseSystem.success.description",
   },
 });
+
+// Export type definitions for both endpoints
+export type PulseExecuteRequestInput =
+  typeof pulseExecuteEndpoint.POST.types.RequestInput;
+export type PulseExecuteRequestOutput =
+  typeof pulseExecuteEndpoint.POST.types.RequestOutput;
+export type PulseExecuteResponseInput =
+  typeof pulseExecuteEndpoint.POST.types.ResponseInput;
+export type PulseExecuteResponseOutput =
+  typeof pulseExecuteEndpoint.POST.types.ResponseOutput;
+
+export type PulseStatusResponseInput =
+  typeof pulseStatusEndpoint.GET.types.ResponseInput;
+export type PulseStatusResponseOutput =
+  typeof pulseStatusEndpoint.GET.types.ResponseOutput;
 
 export { pulseStatusEndpoint as GET, pulseExecuteEndpoint as POST };
 export { pulseExecuteEndpoint, pulseStatusEndpoint };

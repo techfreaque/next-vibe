@@ -38,7 +38,7 @@ export const { POST, tools } = endpointsHandler({
         // Send admin notification SMS (non-blocking)
         sendAdminNotificationSms(data, user, locale, logger).catch(
           (smsError) => {
-            logger.warn("contact.route.sms.admin.failed", {
+            logger.warn("app.api.v1.core.contact.route.sms.admin.failed", {
               error:
                 smsError instanceof Error ? smsError.message : String(smsError),
               contactEmail: data.email,
@@ -48,7 +48,7 @@ export const { POST, tools } = endpointsHandler({
 
         // Send confirmation SMS to user (non-blocking)
         sendConfirmationSms(data, user, locale, logger).catch((smsError) => {
-          logger.warn("contact.route.sms.confirmation.failed", {
+          logger.warn("app.api.v1.core.contact.route.sms.confirmation.failed", {
             error:
               smsError instanceof Error ? smsError.message : String(smsError),
             contactEmail: data.email,

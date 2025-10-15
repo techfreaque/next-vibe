@@ -14,7 +14,8 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { z } from "zod";
+
+import { CountriesArr, LanguagesArr } from "@/i18n/core/config";
 
 import { users } from "../../user/db";
 import {
@@ -26,8 +27,6 @@ import {
   LeadStatusDB,
 } from "../enum";
 import { CsvImportJobStatus, CsvImportJobStatusDB } from "./enum";
-import { Countries, CountriesArr, LanguagesArr } from "@/i18n/core/config";
-
 
 /**
  * CSV Import Jobs Table
@@ -49,7 +48,9 @@ export const csvImportJobs = pgTable("csv_import_jobs", {
   defaultStatus: text("default_status", { enum: LeadStatusDB })
     .notNull()
     .default(LeadStatus.NEW),
-  defaultCampaignStage: text("default_campaign_stage", { enum: EmailCampaignStageDB })
+  defaultCampaignStage: text("default_campaign_stage", {
+    enum: EmailCampaignStageDB,
+  })
     .notNull()
     .default(EmailCampaignStage.NOT_STARTED),
   defaultSource: text("default_source", { enum: LeadSourceDB })

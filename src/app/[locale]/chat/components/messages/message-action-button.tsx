@@ -6,6 +6,8 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
+import type { JSX } from "react";
+
 import { Button } from "@/packages/next-vibe-ui/web/ui";
 
 interface MessageActionButtonProps {
@@ -22,17 +24,16 @@ export function MessageActionButton({
   title,
   variant = "default",
   className,
-}: MessageActionButtonProps) {
+}: MessageActionButtonProps): JSX.Element {
   return (
     <Button
       variant="ghost"
       size="icon"
       onClick={onClick}
-      className={`h-7 w-7 ${variant === "destructive" ? "hover:text-red-500" : ""} ${className || ""}`}
+      className={`h-8 w-8 md:h-7 md:w-7 ${variant === "destructive" ? "hover:text-red-500" : ""} ${className || ""}`}
       title={title}
     >
-      <Icon className="h-3.5 w-3.5" />
+      <Icon className="h-4 w-4 md:h-3.5 md:w-3.5" />
     </Button>
   );
 }
-

@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, CheckCircle, Loader2, Mail } from "lucide-react";
 import Link from "next/link";
+import { Environment } from "next-vibe/shared/utils/env-util";
 import {
   Button,
   Card,
@@ -16,7 +17,9 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import type { JSX } from "react";
 
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { useResetPasswordRequest } from "@/app/api/[locale]/v1/core/user/public/reset-password/request/hooks";
+import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -28,9 +31,17 @@ export default function ResetPasswordForm({
   locale,
 }: ResetPasswordFormProps): JSX.Element {
   const { t } = simpleT(locale);
+
+  // Initialize logger for client-side operations
+  const logger = createEndpointLogger(
+    envClient.NODE_ENV === Environment.DEVELOPMENT,
+    Date.now(),
+    locale,
+  );
+
   // Use the enhanced reset password request hook that includes all form logic
   const { form, submitForm, isSubmitting, isSuccess, alert } =
-    useResetPasswordRequest();
+    useResetPasswordRequest(logger);
 
   // Show success state when the form has been successfully submitted
   if (isSuccess) {
@@ -97,7 +108,7 @@ export default function ResetPasswordForm({
 
           <Form form={form} onSubmit={submitForm} className="space-y-6">
             <EndpointFormField
-              name="email"
+              name="emailInput.email"
               config={{
                 type: "email",
                 label: "auth.resetPassword.emailLabel",

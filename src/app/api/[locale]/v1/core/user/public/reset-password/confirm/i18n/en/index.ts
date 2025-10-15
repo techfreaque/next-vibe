@@ -60,6 +60,13 @@ export const translations = {
       label: "Message",
       description: "Response message",
     },
+    securityTip:
+      "Consider enabling two-factor authentication for better security",
+    nextSteps: [
+      "Log in with your new password",
+      "Update saved passwords in your browser",
+      "Consider enabling 2FA for added security",
+    ],
   },
   errors: {
     validation: {

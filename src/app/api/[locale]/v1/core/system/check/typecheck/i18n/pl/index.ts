@@ -8,6 +8,24 @@ export const translations: typeof enTranslations = {
   category: "Sprawdzenia systemowe",
   tag: "sprawdzanie-typów",
 
+  // Enum translations
+  status: {
+    passed: "Zaliczone",
+    failed: "Nieudane",
+    running: "W trakcie",
+    skipped: "Pominięte",
+  },
+  severity: {
+    error: "Błąd",
+    warning: "Ostrzeżenie",
+    info: "Info",
+  },
+  mode: {
+    full: "Pełny",
+    incremental: "Przyrostowy",
+    watch: "Obserwuj",
+  },
+
   // Container
   container: {
     title: "Konfiguracja sprawdzania typów TypeScript",
@@ -35,6 +53,7 @@ export const translations: typeof enTranslations = {
 
   // Response fields
   response: {
+    successMessage: "Sprawdzanie typów TypeScript zakończone pomyślnie",
     issue: {
       title: "Problem TypeScript",
       description: "Indywidualny problem sprawdzania typów TypeScript",
@@ -42,6 +61,8 @@ export const translations: typeof enTranslations = {
       line: "Numer linii problemu",
       column: "Numer kolumny problemu",
       code: "Kod błędu TypeScript",
+      severity: "Poziom ważności problemu",
+      type: "Typ problemu",
       message: "Komunikat opisu problemu",
     },
   },
@@ -83,6 +104,15 @@ export const translations: typeof enTranslations = {
     conflict: {
       title: "Konflikt",
       description: "Wystąpił konflikt danych",
+    },
+    noTsFiles: {
+      title: "Nie znaleziono plików TypeScript",
+      message: "Nie znaleziono plików TypeScript w określonej ścieżce",
+    },
+    invalidCommand: {
+      title: "Nieprawidłowe polecenie",
+      message:
+        "Polecenie sprawdzania TypeScript jest nieprawidłowe lub brakuje",
     },
   },
 

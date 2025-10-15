@@ -178,6 +178,10 @@ export const translations = {
         title: "Konflikt",
         description: "Wystąpił konflikt podczas przetwarzania żądania",
       },
+      noData: {
+        title: "Brak Danych",
+        description: "Usługa SMTP zwróciła sukces, ale nie dostarczyła danych",
+      },
       server: {
         title: "Błąd Serwera",
         description:

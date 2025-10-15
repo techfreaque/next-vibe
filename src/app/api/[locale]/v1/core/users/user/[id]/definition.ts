@@ -21,10 +21,6 @@ import {
   requestUrlParamsField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
-import {
-  PreferredContactMethod,
-  PreferredContactMethodOptions,
-} from "@/app/api/[locale]/v1/core/user/enum";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**
@@ -103,115 +99,23 @@ const { GET } = createEndpoint({
                 },
                 z.email().describe("User's email address"),
               ),
-              firstName: responseField(
+              privateName: responseField(
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.users.user.id.id.get.response.userProfile.basicInfo.firstName.content" as const,
+                    "app.api.v1.core.users.user.id.id.get.response.userProfile.basicInfo.privateName.content" as const,
                 },
-                z.string().describe("User's first name"),
+                z.string().describe("User's private name"),
               ),
-              lastName: responseField(
+              publicName: responseField(
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.users.user.id.id.get.response.userProfile.basicInfo.lastName.content" as const,
+                    "app.api.v1.core.users.user.id.id.get.response.userProfile.basicInfo.publicName.content" as const,
                 },
-                z.string().describe("User's last name"),
-              ),
-              company: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.users.user.id.id.get.response.userProfile.basicInfo.company.content" as const,
-                },
-                z.string().describe("User's company"),
+                z.string().describe("User's public name"),
               ),
             },
-          ),
-          contactDetails: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.v1.core.users.user.id.id.get.response.userProfile.contactDetails.title" as const,
-              description:
-                "app.api.v1.core.users.user.id.id.get.response.userProfile.contactDetails.description" as const,
-              layout: { type: LayoutType.VERTICAL },
-            },
-            { response: true },
-            {
-              phone: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.users.user.id.id.get.response.userProfile.contactDetails.phone.content" as const,
-                },
-                z.string().nullable().describe("Phone number"),
-              ),
-              preferredContactMethod: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.users.user.id.id.get.response.userProfile.contactDetails.preferredContactMethod.content" as const,
-                },
-                z.string().describe("Preferred contact method"),
-              ),
-              website: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.users.user.id.id.get.response.userProfile.contactDetails.website.content" as const,
-                },
-                z.string().nullable().describe("Website URL"),
-              ),
-            },
-          ),
-        },
-      ),
-
-      // === PROFILE DETAILS ===
-      profileDetails: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.v1.core.users.user.id.id.get.response.profileDetails.title" as const,
-          description:
-            "app.api.v1.core.users.user.id.id.get.response.profileDetails.description" as const,
-          layout: { type: LayoutType.STACKED },
-        },
-        { response: true },
-        {
-          imageUrl: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.users.user.id.id.get.response.profileDetails.imageUrl.content" as const,
-            },
-            z.string().nullable().describe("Profile image URL"),
-          ),
-          bio: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.users.user.id.id.get.response.profileDetails.bio.content" as const,
-            },
-            z.string().nullable().describe("User biography"),
-          ),
-          jobTitle: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.users.user.id.id.get.response.profileDetails.jobTitle.content" as const,
-            },
-            z.string().nullable().describe("Job title"),
-          ),
-          leadId: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.users.user.id.id.get.response.profileDetails.leadId.content" as const,
-            },
-            z.string().nullable().describe("Associated lead ID"),
           ),
         },
       ),
@@ -314,76 +218,21 @@ const { GET } = createEndpoint({
         },
         z.email(),
       ),
-      firstName: responseField(
+      privateName: responseField(
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.users.user.id.id.get.response.firstName.content" as const,
+            "app.api.v1.core.users.user.id.id.get.response.privateName.content" as const,
         },
         z.string(),
       ),
-      lastName: responseField(
+      publicName: responseField(
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.users.user.id.id.get.response.lastName.content" as const,
+            "app.api.v1.core.users.user.id.id.get.response.publicName.content" as const,
         },
         z.string(),
-      ),
-      company: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.user.id.id.get.response.company.content" as const,
-        },
-        z.string(),
-      ),
-      phone: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.user.id.id.get.response.phone.content" as const,
-        },
-        z.string().nullable(),
-      ),
-      preferredContactMethod: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.v1.core.users.user.id.id.get.response.preferredContactMethod.content" as const,
-        },
-        z.string(),
-      ),
-      imageUrl: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.user.id.id.get.response.imageUrl.content" as const,
-        },
-        z.string().nullable(),
-      ),
-      bio: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.user.id.id.get.response.bio.content" as const,
-        },
-        z.string().nullable(),
-      ),
-      website: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.user.id.id.get.response.website.content" as const,
-        },
-        z.string().nullable(),
-      ),
-      jobTitle: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.user.id.id.get.response.jobTitle.content" as const,
-        },
-        z.string().nullable(),
       ),
       emailVerified: responseField(
         {
@@ -512,21 +361,9 @@ const { GET } = createEndpoint({
           basicInfo: {
             id: "123e4567-e89b-12d3-a456-426614174000",
             email: "john.doe@example.com",
-            firstName: "John",
-            lastName: "Doe",
-            company: "Acme Corp",
+            privateName: "John Doe",
+            publicName: "John D.",
           },
-          contactDetails: {
-            phone: null,
-            preferredContactMethod: PreferredContactMethod.EMAIL,
-            website: null,
-          },
-        },
-        profileDetails: {
-          imageUrl: null,
-          bio: null,
-          jobTitle: null,
-          leadId: null,
         },
         accountStatus: {
           isActive: true,
@@ -546,15 +383,8 @@ const { GET } = createEndpoint({
         // Backward compatibility fields
         leadId: null,
         email: "john.doe@example.com",
-        firstName: "John",
-        lastName: "Doe",
-        company: "Acme Corp",
-        phone: null,
-        preferredContactMethod: PreferredContactMethod.EMAIL,
-        imageUrl: null,
-        bio: null,
-        website: null,
-        jobTitle: null,
+        privateName: "John Doe",
+        publicName: "John D.",
         emailVerified: true,
         isActive: true,
         stripeCustomerId: null,
@@ -640,174 +470,38 @@ const { PUT } = createEndpoint({
               .transform((val) => val.toLowerCase().trim())
               .optional(),
           ),
-          firstName: requestDataField(
+          privateName: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label:
-                "app.api.v1.core.users.user.id.id.put.firstName.label" as const,
+                "app.api.v1.core.users.user.id.id.put.privateName.label" as const,
               description:
-                "app.api.v1.core.users.user.id.id.put.firstName.description" as const,
+                "app.api.v1.core.users.user.id.id.put.privateName.description" as const,
               layout: { columns: 6 },
             },
             z
               .string()
-              .min(1, "usersErrors.validation.firstName.required")
-              .max(100, "usersErrors.validation.firstName.tooLong")
+              .min(1, "usersErrors.validation.privateName.required")
+              .max(255, "usersErrors.validation.privateName.tooLong")
               .transform((val) => val.trim())
               .optional(),
           ),
-          lastName: requestDataField(
+          publicName: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label:
-                "app.api.v1.core.users.user.id.id.put.lastName.label" as const,
+                "app.api.v1.core.users.user.id.id.put.publicName.label" as const,
               description:
-                "app.api.v1.core.users.user.id.id.put.lastName.description" as const,
+                "app.api.v1.core.users.user.id.id.put.publicName.description" as const,
               layout: { columns: 6 },
             },
             z
               .string()
-              .min(1, "usersErrors.validation.lastName.required")
-              .max(100, "usersErrors.validation.lastName.tooLong")
+              .min(1, "usersErrors.validation.publicName.required")
+              .max(255, "usersErrors.validation.publicName.tooLong")
               .transform((val) => val.trim())
-              .optional(),
-          ),
-          company: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.v1.core.users.user.id.id.put.company.label" as const,
-              description:
-                "app.api.v1.core.users.user.id.id.put.company.description" as const,
-              layout: { columns: 6 },
-            },
-            z
-              .string()
-              .min(1, "usersErrors.validation.company.required")
-              .max(255, "usersErrors.validation.company.tooLong")
-              .transform((val) => val.trim())
-              .optional(),
-          ),
-          jobTitle: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.v1.core.users.user.id.id.put.jobTitle.label" as const,
-              description:
-                "app.api.v1.core.users.user.id.id.put.jobTitle.description" as const,
-              layout: { columns: 6 },
-            },
-            z
-              .string()
-              .max(255, "usersErrors.validation.jobTitle.tooLong")
-              .transform((val) => val?.trim() || null)
-              .optional(),
-          ),
-        },
-      ),
-
-      // === CONTACT INFORMATION ===
-      contactInfo: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.v1.core.users.user.id.id.put.sections.contactInfo.title" as const,
-          description:
-            "app.api.v1.core.users.user.id.id.put.sections.contactInfo.description" as const,
-          layout: { type: LayoutType.GRID_2_COLUMNS },
-        },
-        { request: "data" },
-        {
-          phone: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.PHONE,
-              label:
-                "app.api.v1.core.users.user.id.id.put.phone.label" as const,
-              description:
-                "app.api.v1.core.users.user.id.id.put.phone.description" as const,
-              placeholder:
-                "app.api.v1.core.users.user.id.id.put.phone.placeholder" as const,
-              layout: { columns: 6 },
-            },
-            z
-              .string()
-              .regex(
-                /^\+?[1-9]\d{1,14}$/,
-                "usersErrors.validation.phone.invalid",
-              )
-              .transform((val) => val?.trim() || null)
-              .optional(),
-          ),
-          website: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.URL,
-              label:
-                "app.api.v1.core.users.user.id.id.put.website.label" as const,
-              description:
-                "app.api.v1.core.users.user.id.id.put.website.description" as const,
-              placeholder:
-                "app.api.v1.core.users.user.id.id.put.website.placeholder" as const,
-              layout: { columns: 6 },
-            },
-            z
-              .string()
-              .url("usersErrors.validation.website.invalid")
-              .transform((val) => val?.trim() || null)
-              .optional()
-              .or(z.literal("")),
-          ),
-          preferredContactMethod: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label:
-                "app.api.v1.core.users.user.id.id.put.preferredContactMethod.label" as const,
-              description:
-                "app.api.v1.core.users.user.id.id.put.preferredContactMethod.description" as const,
-              helpText:
-                "app.api.v1.core.users.user.id.id.put.preferredContactMethod.description" as const,
-              layout: { columns: 6 },
-              options: PreferredContactMethodOptions,
-            },
-            z.nativeEnum(PreferredContactMethod).optional(),
-          ),
-        },
-      ),
-
-      // === PROFILE DETAILS (OPTIONAL) ===
-      profileDetails: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.v1.core.users.user.id.id.put.sections.profileDetails.title" as const,
-          description:
-            "app.api.v1.core.users.user.id.id.put.sections.profileDetails.description" as const,
-          layout: { type: LayoutType.STACKED },
-          collapsed: true,
-        },
-        { request: "data" },
-        {
-          bio: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXTAREA,
-              label: "app.api.v1.core.users.user.id.id.put.bio.label" as const,
-              description:
-                "app.api.v1.core.users.user.id.id.put.bio.description" as const,
-              placeholder:
-                "app.api.v1.core.users.user.id.id.put.bio.placeholder" as const,
-              layout: { columns: 12 },
-            },
-            z
-              .string()
-              .max(1000, "usersErrors.validation.bio.tooLong")
-              .transform((val) => val?.trim() || null)
               .optional(),
           ),
         },
@@ -881,76 +575,21 @@ const { PUT } = createEndpoint({
         },
         z.email(),
       ),
-      firstName: responseField(
+      privateName: responseField(
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.users.user.id.id.put.response.firstName.content" as const,
+            "app.api.v1.core.users.user.id.id.put.response.privateName.content" as const,
         },
         z.string(),
       ),
-      lastName: responseField(
+      publicName: responseField(
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.users.user.id.id.put.response.lastName.content" as const,
+            "app.api.v1.core.users.user.id.id.put.response.publicName.content" as const,
         },
         z.string(),
-      ),
-      company: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.user.id.id.put.response.company.content" as const,
-        },
-        z.string(),
-      ),
-      phone: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.user.id.id.put.response.phone.content" as const,
-        },
-        z.string().nullable(),
-      ),
-      preferredContactMethod: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.v1.core.users.user.id.id.put.response.preferredContactMethod.content" as const,
-        },
-        z.string(),
-      ),
-      imageUrl: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.user.id.id.put.response.imageUrl.content" as const,
-        },
-        z.string().nullable(),
-      ),
-      bio: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.user.id.id.put.response.bio.content" as const,
-        },
-        z.string().nullable(),
-      ),
-      website: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.user.id.id.put.response.website.content" as const,
-        },
-        z.string().nullable(),
-      ),
-      jobTitle: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.user.id.id.put.response.jobTitle.content" as const,
-        },
-        z.string().nullable(),
       ),
       emailVerified: responseField(
         {
@@ -1071,20 +710,11 @@ const { PUT } = createEndpoint({
     requests: {
       default: {
         basicInfo: {
-          firstName: "John",
-          lastName: "Doe",
-          company: "Updated Company",
+          privateName: "John Doe",
+          publicName: "John D.",
         },
         adminSettings: {
           isActive: true,
-        },
-        contactInfo: {
-          phone: "+1234567890",
-          website: "https://example.com",
-          preferredContactMethod: PreferredContactMethod.EMAIL,
-        },
-        profileDetails: {
-          bio: "Updated bio",
         },
       },
     },
@@ -1093,15 +723,8 @@ const { PUT } = createEndpoint({
         id: "123e4567-e89b-12d3-a456-426614174000",
         leadId: null,
         email: "john.doe@example.com",
-        firstName: "John",
-        lastName: "Doe",
-        company: "Updated Company",
-        phone: null,
-        preferredContactMethod: PreferredContactMethod.EMAIL,
-        imageUrl: null,
-        bio: null,
-        website: null,
-        jobTitle: null,
+        privateName: "John Doe",
+        publicName: "John D.",
         emailVerified: true,
         isActive: true,
         stripeCustomerId: null,
@@ -1301,24 +924,24 @@ const { DELETE } = createEndpoint({
 
 // Extract types using the new enhanced system
 
-export type UserGetRequestTypeInput = typeof GET.types.RequestInput;
-export type UserGetRequestTypeOutput = typeof GET.types.RequestOutput;
-export type UserGetResponseTypeInput = typeof GET.types.ResponseInput;
-export type UserGetResponseTypeOutput = typeof GET.types.ResponseOutput;
+export type UserGetRequestInput = typeof GET.types.RequestInput;
+export type UserGetRequestOutput = typeof GET.types.RequestOutput;
+export type UserGetResponseInput = typeof GET.types.ResponseInput;
+export type UserGetResponseOutput = typeof GET.types.ResponseOutput;
 export type UserGetUrlParamsTypeInput = typeof GET.types.UrlVariablesInput;
 export type UserGetUrlParamsTypeOutput = typeof GET.types.UrlVariablesOutput;
 
-export type UserPutRequestTypeInput = typeof PUT.types.RequestInput;
-export type UserPutRequestTypeOutput = typeof PUT.types.RequestOutput;
-export type UserPutResponseTypeInput = typeof PUT.types.ResponseInput;
-export type UserPutResponseTypeOutput = typeof PUT.types.ResponseOutput;
+export type UserPutRequestInput = typeof PUT.types.RequestInput;
+export type UserPutRequestOutput = typeof PUT.types.RequestOutput;
+export type UserPutResponseInput = typeof PUT.types.ResponseInput;
+export type UserPutResponseOutput = typeof PUT.types.ResponseOutput;
 export type UserPutUrlParamsTypeInput = typeof PUT.types.UrlVariablesInput;
 export type UserPutUrlParamsTypeOutput = typeof PUT.types.UrlVariablesOutput;
 
-export type UserDeleteRequestTypeInput = typeof DELETE.types.RequestInput;
-export type UserDeleteRequestTypeOutput = typeof DELETE.types.RequestOutput;
-export type UserDeleteResponseTypeInput = typeof DELETE.types.ResponseInput;
-export type UserDeleteResponseTypeOutput = typeof DELETE.types.ResponseOutput;
+export type UserDeleteRequestInput = typeof DELETE.types.RequestInput;
+export type UserDeleteRequestOutput = typeof DELETE.types.RequestOutput;
+export type UserDeleteResponseInput = typeof DELETE.types.ResponseInput;
+export type UserDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
 export type UserDeleteUrlParamsTypeInput =
   typeof DELETE.types.UrlVariablesInput;
 export type UserDeleteUrlParamsTypeOutput =

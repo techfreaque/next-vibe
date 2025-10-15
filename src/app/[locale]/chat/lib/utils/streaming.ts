@@ -4,24 +4,41 @@
 
 /**
  * Parse a streaming chunk from the AI response
- * Handles Vercel AI SDK format: "0:"content"\n
+ * Handles multiple stream formats: Vercel AI SDK, SSE, and plain text
  */
 export function parseStreamChunk(line: string): string | null {
-  if (!line.trim()) return null;
+  if (!line.trim()) {
+    return null;
+  }
 
-  // Handle Vercel AI SDK format: "0:"content"\n
-  if (line.startsWith('0:"')) {
+  // Handle Vercel AI SDK format with prefix
+  if (line.startsWith("0:")) {
+    let content = line.slice(2);
+    // Remove quotes if present and unescape
+    if (content.startsWith('"') && content.endsWith('"')) {
+      content = content.slice(1, -1);
+      // Unescape JSON string escapes
+      content = content
+        .replace(/\\"/g, '"')
+        .replace(/\\\\/g, "\\")
+        .replace(/\\n/g, "\n");
+    }
+    return content;
+  }
+
+  // Handle SSE format
+  if (line.startsWith("data: ")) {
+    const data = line.slice(6);
     try {
-      // Extract the JSON string between 0:" and the closing "
-      const jsonStr = line.slice(2); // Remove '0:'
-      const parsed = JSON.parse(jsonStr);
-      return parsed || null;
+      const parsed = JSON.parse(data);
+      return parsed.choices?.[0]?.delta?.content || "";
     } catch {
-      return null;
+      return data;
     }
   }
 
-  return null;
+  // Plain text format
+  return line;
 }
 
 /**
@@ -32,7 +49,7 @@ export async function readStream(
   reader: ReadableStreamDefaultReader<Uint8Array>,
   decoder: TextDecoder,
   onChunk: (chunk: string) => void,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<string> {
   let fullContent = "";
   let buffer = "";
@@ -45,7 +62,9 @@ export async function readStream(
       }
 
       const { done, value } = await reader.read();
-      if (done) break;
+      if (done) {
+        break;
+      }
 
       // Decode the chunk
       const chunk = decoder.decode(value, { stream: true });
@@ -88,7 +107,7 @@ export async function readStream(
  */
 export function debounce<T extends (...args: never[]) => void>(
   func: T,
-  wait: number
+  wait: number,
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout | null = null;
 
@@ -111,7 +130,7 @@ export function debounce<T extends (...args: never[]) => void>(
  */
 export function createDebouncedStreamUpdate(
   updateFn: (content: string) => void,
-  interval: number = 100
+  interval = 100,
 ): {
   update: (content: string) => void;
   flush: () => void;
@@ -143,3 +162,48 @@ export function createDebouncedStreamUpdate(
   return { update, flush };
 }
 
+/**
+ * Process a stream reader and accumulate content
+ * Uses parseStreamChunk to handle various stream formats
+ * Calls onUpdate with accumulated content at regular intervals
+ */
+export async function processStreamReader(
+  reader: ReadableStreamDefaultReader<Uint8Array>,
+  decoder: TextDecoder,
+  onUpdate: (content: string) => void,
+  updateInterval: number,
+): Promise<string> {
+  let assistantContent = "";
+  let lastUpdateTime = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) {
+      break;
+    }
+
+    const chunk = decoder.decode(value, { stream: true });
+    const lines = chunk.split("\n");
+
+    for (const line of lines) {
+      if (!line.trim()) {
+        continue;
+      }
+
+      const content = parseStreamChunk(line);
+
+      if (content) {
+        assistantContent += content;
+
+        // Debounced update
+        const now = Date.now();
+        if (now - lastUpdateTime >= updateInterval) {
+          lastUpdateTime = now;
+          onUpdate(assistantContent);
+        }
+      }
+    }
+  }
+
+  return assistantContent;
+}

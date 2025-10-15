@@ -5,7 +5,6 @@
 
 "use client";
 
-import { usePathname } from "next/navigation";
 import type React from "react";
 import type { ReactNode } from "react";
 
@@ -19,24 +18,15 @@ interface AdminStreamingLayoutClientProps {
   locale: CountryLanguage;
 }
 
-type CurrentPageType = "ai-stream" | "basic-stream";
+type CurrentPageType = "ai-stream";
 
 export function AdminStreamingLayoutClient({
   children,
   locale,
 }: AdminStreamingLayoutClientProps): React.JSX.Element {
-  const pathname = usePathname();
   const { t } = simpleT(locale);
 
-  // Determine current page from pathname
-  const getCurrentPage = (): CurrentPageType => {
-    if (pathname.includes("/admin/streaming/basic-stream")) {
-      return "basic-stream";
-    }
-    return "ai-stream"; // Default to ai-stream
-  };
-
-  const currentPage = getCurrentPage();
+  const currentPage: CurrentPageType = "ai-stream";
 
   return (
     <div className="space-y-6">

@@ -3,25 +3,31 @@
  * React Email templates for batch update and delete operations
  */
 
-import { Button, Hr, Section, Text } from "@react-email/components";
-import type { UndefinedType } from "next-vibe/shared/types/common.schema";
+import { Button, Section, Text } from "@react-email/components";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import type { JSX } from "react";
+import React from "react";
 
+import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
+import {
+  createTrackingContext,
+  EmailTemplate,
+} from "@/app/api/[locale]/v1/core/emails/smtp-client/components";
+import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { contactClientRepository } from "../../contact/repository-client";
-import {
-  createTrackingContext,
-  EmailTemplate,
-} from "../../emails/smtp-client/components";
-import type { EmailFunctionType } from "../../emails/smtp-client/email-handling/definition";
+import type {
+  BatchDeleteRequestOutput,
+  BatchDeleteResponseData,
+  BatchUpdateRequestOutput,
+  BatchUpdateResponseData,
+} from "./definition";
 
 /**
  * Batch Update Completion Email Template Component
@@ -34,8 +40,8 @@ function BatchUpdateCompletionEmailContent({
   locale,
   userId,
 }: {
-  data: any;
-  responseData: any;
+  data: BatchUpdateRequestOutput;
+  responseData: BatchUpdateResponseData;
   t: TFunction;
   locale: CountryLanguage;
   userId?: string;
@@ -146,7 +152,7 @@ function BatchUpdateCompletionEmailContent({
           </Text>
         )}
 
-        {responseData?.errors?.length > 0 && (
+        {responseData.errors.length > 0 && (
           <>
             <Text
               style={{
@@ -215,8 +221,8 @@ function BatchDeleteCompletionEmailContent({
   locale,
   userId,
 }: {
-  data: any;
-  responseData: any;
+  data: BatchDeleteRequestOutput;
+  responseData: BatchDeleteResponseData;
   t: TFunction;
   locale: CountryLanguage;
   userId?: string;
@@ -327,7 +333,7 @@ function BatchDeleteCompletionEmailContent({
           </Text>
         )}
 
-        {responseData?.errors?.length > 0 && (
+        {responseData.errors.length > 0 && (
           <>
             <Text
               style={{
@@ -390,9 +396,9 @@ function BatchDeleteCompletionEmailContent({
  * Notifies admin team when a batch update operation is completed
  */
 export const renderBatchUpdateNotificationMail: EmailFunctionType<
-  any,
-  any,
-  UndefinedType
+  BatchUpdateRequestOutput,
+  BatchUpdateResponseData,
+  never
 > = ({ requestData, responseData, locale, t, user }) => {
   try {
     if (!responseData) {
@@ -435,9 +441,9 @@ export const renderBatchUpdateNotificationMail: EmailFunctionType<
  * Notifies admin team when a batch delete operation is completed
  */
 export const renderBatchDeleteNotificationMail: EmailFunctionType<
-  any,
-  any,
-  UndefinedType
+  BatchDeleteRequestOutput,
+  BatchDeleteResponseData,
+  never
 > = ({ requestData, responseData, locale, t, user }) => {
   try {
     if (!responseData) {

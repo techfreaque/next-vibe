@@ -6,10 +6,6 @@
 import "server-only";
 
 import { and, desc, eq, sql } from "drizzle-orm";
-
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -17,18 +13,22 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
+
+import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { csvImportJobs, importBatches } from "../leads/import/db";
 import type {
-  LeadsImportResponseType,
-  NewCsvImportJob,
-  NewImportBatch,
   CsvImportConfig,
   DomainImportRepository,
-  ImportJobUpdateResponseType,
   ImportJobsListRequestType,
   ImportJobsListResponseType,
+  ImportJobUpdateResponseType,
+  LeadsImportResponseOutput,
+  NewCsvImportJob,
+  NewImportBatch,
 } from "../leads/import/definition";
 import { CsvImportJobStatus } from "../leads/import/definition";
 import type { DomainRecord, ImportRepository } from "./types";
@@ -45,7 +45,7 @@ export class ImportRepositoryImpl implements ImportRepository {
     uploadedBy: DbId,
     domainRepository: DomainImportRepository<T>,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LeadsImportResponseType>> {
+  ): Promise<ResponseType<LeadsImportResponseOutput>> {
     try {
       logger.debug("Starting CSV import", {
         fileName: config.fileName,
@@ -108,7 +108,6 @@ export class ImportRepositoryImpl implements ImportRepository {
         rows,
         config,
         domainRepository,
-        logger,
       );
 
       // Update batch with final results
@@ -158,7 +157,7 @@ export class ImportRepositoryImpl implements ImportRepository {
     uploadedBy: DbId,
     domainName: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LeadsImportResponseType>> {
+  ): Promise<ResponseType<LeadsImportResponseOutput>> {
     try {
       // Decode CSV to get total rows
       const csvContent = Buffer.from(config.file, "base64").toString("utf-8");
@@ -267,7 +266,7 @@ export class ImportRepositoryImpl implements ImportRepository {
       return createSuccessResponse({
         id: jobData.id,
         fileName: jobData.fileName,
-        status: jobData.status as CsvImportJobStatus,
+        status: jobData.status,
         totalRows: jobData.totalRows,
         processedRows: jobData.processedRows,
         successfulImports: jobData.successfulImports,
@@ -374,7 +373,6 @@ export class ImportRepositoryImpl implements ImportRepository {
         batchRows,
         config,
         domainRepository,
-        logger,
       );
 
       // Update job progress
@@ -457,7 +455,6 @@ export class ImportRepositoryImpl implements ImportRepository {
     rows: Record<string, string>[],
     config: CsvImportConfig,
     domainRepository: DomainImportRepository<T>,
-    logger: EndpointLogger,
   ): Promise<{
     successfulImports: number;
     failedImports: number;
@@ -551,6 +548,17 @@ export class ImportRepositoryImpl implements ImportRepository {
   }
 
   /**
+   * Import CSV wrapper for route handlers
+   * NOTE: This is a placeholder. Domain-specific import should use importFromCsv with domain repository
+   */
+  importCsv(): ResponseType<LeadsImportResponseOutput> {
+    return createErrorResponse(
+      "leadsErrors.leadsImport.post.error.server.title",
+      ErrorResponseTypes.INTERNAL_ERROR,
+    );
+  }
+
+  /**
    * List import jobs for a user with filtering
    */
   async listImportJobs(
@@ -579,7 +587,7 @@ export class ImportRepositoryImpl implements ImportRepository {
       // Transform database results to match API response format
       const transformedJobs = jobs.map((job) => ({
         id: job.id,
-        status: job.status as CsvImportJobStatus,
+        status: job.status,
         createdAt: job.createdAt.toISOString(),
         updatedAt: job.updatedAt.toISOString(),
         error: job.error,
@@ -673,7 +681,7 @@ export class ImportRepositoryImpl implements ImportRepository {
       return createSuccessResponse({
         id: job.id,
         fileName: job.fileName,
-        status: job.status as CsvImportJobStatus,
+        status: job.status,
         totalRows: job.totalRows,
         processedRows: job.processedRows,
         successfulImports: job.successfulImports,

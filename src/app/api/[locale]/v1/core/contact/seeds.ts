@@ -30,7 +30,7 @@ function createContactSeed(overrides?: Partial<NewContact>): NewContact {
  * Development seed function for contact module
  */
 export async function dev(logger: EndpointLogger): Promise<void> {
-  logger.debug("contact.seeds.dev.start");
+  logger.debug("app.api.v1.core.contact.seeds.dev.start");
 
   try {
     // Create sample contact submissions for testing
@@ -68,25 +68,25 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       try {
         const result = await contactRepository.create(contact, logger);
         if (result.success) {
-          logger.debug("contact.seeds.dev.submission.created", {
+          logger.debug("app.api.v1.core.contact.seeds.dev.submission.created", {
             email: contact.email,
           });
         } else {
-          logger.error("contact.seeds.dev.submission.failed", {
+          logger.error("app.api.v1.core.contact.seeds.dev.submission.failed", {
             message: result.message,
           });
         }
       } catch (error) {
-        logger.error("contact.seeds.dev.submission.error", {
+        logger.error("app.api.v1.core.contact.seeds.dev.submission.error", {
           email: contact.email,
           error,
         });
       }
     }
 
-    logger.debug("contact.seeds.dev.complete");
+    logger.debug("app.api.v1.core.contact.seeds.dev.complete");
   } catch (error) {
-    logger.error("contact.seeds.dev.error", error);
+    logger.error("app.api.v1.core.contact.seeds.dev.error", error);
   }
 }
 
@@ -94,7 +94,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
  * Test seed function for contact module
  */
 export async function test(logger: EndpointLogger): Promise<void> {
-  logger.debug("contact.seeds.test.start");
+  logger.debug("app.api.v1.core.contact.seeds.test.start");
 
   try {
     // Create minimal test contact data
@@ -108,14 +108,14 @@ export async function test(logger: EndpointLogger): Promise<void> {
 
     const result = await contactRepository.create(testContact, logger);
     if (result.success) {
-      logger.debug("contact.seeds.test.submission.created");
+      logger.debug("app.api.v1.core.contact.seeds.test.submission.created");
     } else {
-      logger.error("contact.seeds.test.submission.failed", {
+      logger.error("app.api.v1.core.contact.seeds.test.submission.failed", {
         message: result.message,
       });
     }
   } catch (error) {
-    logger.error("contact.seeds.test.error", error);
+    logger.error("app.api.v1.core.contact.seeds.test.error", error);
   }
 }
 
@@ -123,15 +123,15 @@ export async function test(logger: EndpointLogger): Promise<void> {
  * Production seed function for contact module
  */
 export async function prod(logger: EndpointLogger): Promise<void> {
-  logger.debug("contact.seeds.prod.start");
+  logger.debug("app.api.v1.core.contact.seeds.prod.start");
 
   try {
     // Production doesn't need pre-seeded contact data
     // Contact submissions will be created by actual users
     await Promise.resolve(); // Ensure async behavior for consistency
-    logger.debug("contact.seeds.prod.ready");
+    logger.debug("app.api.v1.core.contact.seeds.prod.ready");
   } catch (error) {
-    logger.error("contact.seeds.prod.error", error);
+    logger.error("app.api.v1.core.contact.seeds.prod.error", error);
   }
 }
 

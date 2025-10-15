@@ -12,8 +12,8 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import type React from "react";
 
-import type { CronTaskResponseType } from "@/app/api/[locale]/v1/core/system/tasks/cron/tasks/definition";
-import type definitions from "@/app/api/[locale]/v1/core/system/tasks/cron/tasks/definition";
+import type definitions from "@/app/api/[locale]/v1/core/system/tasks/cron/task/[id]/definition";
+import type { IndividualCronTaskType } from "@/app/api/[locale]/v1/core/system/tasks/cron/task/[id]/definition";
 import { formatCronSchedule } from "@/app/api/[locale]/v1/core/system/tasks/cron-formatter";
 import {
   CronTaskPriority,
@@ -27,7 +27,7 @@ import { simpleT } from "@/i18n/core/shared";
 import { ScheduleAutocomplete } from "./schedule-autocomplete";
 
 interface CronTaskEditFormProps {
-  task: CronTaskResponseType;
+  task: IndividualCronTaskType;
   endpoint: EndpointReturn<typeof definitions>;
   locale: CountryLanguage;
 }
@@ -40,9 +40,9 @@ export function CronTaskEditForm({
   const { t } = simpleT(locale);
   const userTimezone = getDefaultTimezone(locale);
 
-  const handleSubmit = endpoint.create.onSubmit;
-  const isLoading = endpoint.read.isLoading;
-  const isSaving = endpoint.create.isSubmitting;
+  const handleSubmit = endpoint.create?.onSubmit;
+  const isLoading = endpoint.read?.isLoading;
+  const isSaving = endpoint.create?.isSubmitting;
 
   return (
     <div className="space-y-6">
@@ -101,7 +101,7 @@ export function CronTaskEditForm({
         </CardHeader>
         <CardContent>
           <Form
-            form={endpoint.create.form}
+            form={endpoint.create?.form}
             onSubmit={handleSubmit}
             className="space-y-6"
           >
@@ -120,7 +120,7 @@ export function CronTaskEditForm({
                     placeholder:
                       "admin.dashboard.cron.taskDetails.namePlaceholder",
                   }}
-                  control={endpoint.create.form.control}
+                  control={endpoint.create?.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -136,7 +136,7 @@ export function CronTaskEditForm({
                       "admin.dashboard.cron.taskDetails.descriptionPlaceholder",
                     rows: 3,
                   }}
-                  control={endpoint.create.form.control}
+                  control={endpoint.create?.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -152,11 +152,11 @@ export function CronTaskEditForm({
               }
             >
               <ScheduleAutocomplete
-                value={endpoint.create.form.watch("schedule")}
+                value={endpoint.create?.form.watch("schedule")}
                 onChange={(value) =>
-                  endpoint.create.form.setValue("schedule", value)
+                  endpoint.create?.form.setValue("schedule", value)
                 }
-                onBlur={() => endpoint.create.form.trigger("schedule")}
+                onBlur={() => endpoint.create?.form.trigger("schedule")}
                 placeholder={t(
                   "admin.dashboard.cron.taskDetails.schedulePlaceholder",
                 )}
@@ -183,7 +183,7 @@ export function CronTaskEditForm({
                     description:
                       "admin.dashboard.cron.taskDetails.enabledDescription",
                   }}
-                  control={endpoint.create.form.control}
+                  control={endpoint.create?.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -199,7 +199,7 @@ export function CronTaskEditForm({
                       "admin.dashboard.cron.taskDetails.priorityPlaceholder",
                     options: CronTaskPriorityOptions,
                   }}
-                  control={endpoint.create.form.control}
+                  control={endpoint.create?.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -214,7 +214,7 @@ export function CronTaskEditForm({
                     placeholder:
                       "admin.dashboard.cron.taskDetails.timeoutPlaceholder",
                   }}
-                  control={endpoint.create.form.control}
+                  control={endpoint.create?.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -229,7 +229,7 @@ export function CronTaskEditForm({
                     placeholder:
                       "admin.dashboard.cron.taskDetails.retriesPlaceholder",
                   }}
-                  control={endpoint.create.form.control}
+                  control={endpoint.create?.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,

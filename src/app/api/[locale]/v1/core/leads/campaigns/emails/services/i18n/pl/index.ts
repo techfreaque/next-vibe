@@ -51,4 +51,4 @@ export const translations: typeof enTranslations = {
       description: "Operacja zakończona pomyślnie",
     },
   },
-} ;
+};

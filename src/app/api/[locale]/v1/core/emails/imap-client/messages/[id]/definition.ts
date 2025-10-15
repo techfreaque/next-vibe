@@ -17,7 +17,6 @@ import {
   objectField,
   requestDataField,
   requestUrlParamsField,
-  responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 
 import { UserRole } from "../../../../user/user-roles/enum";
@@ -62,17 +61,7 @@ const { GET } = createEndpoint({
       ),
 
       // === RESPONSE FIELDS ===
-      message: responseField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.v1.core.emails.imapClient.messages.id.get.response.title",
-          description:
-            "app.api.v1.core.emails.imapClient.messages.id.get.response.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
-        },
-        imapMessageResponseSchema,
-      ),
+      message: imapMessageResponseSchema,
     },
   ),
 
@@ -181,8 +170,11 @@ const { GET } = createEndpoint({
           syncStatus: "SYNCED",
           syncError: null,
           sentAt: "2023-01-01T10:00:00.000Z",
+          receivedAt: "2023-01-01T10:05:00.000Z",
           createdAt: "2023-01-01T00:00:00.000Z",
           updatedAt: "2023-01-01T00:00:00.000Z",
+          folderName: "INBOX",
+          size: 2048,
         },
       },
     },
@@ -268,17 +260,7 @@ const { PATCH } = createEndpoint({
       ),
 
       // === RESPONSE FIELDS ===
-      message: responseField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.v1.core.emails.imapClient.messages.id.patch.response.title",
-          description:
-            "app.api.v1.core.emails.imapClient.messages.id.patch.response.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
-        },
-        imapMessageResponseSchema,
-      ),
+      message: imapMessageResponseSchema,
     },
   ),
 
@@ -388,8 +370,11 @@ const { PATCH } = createEndpoint({
           syncStatus: "SYNCED",
           syncError: null,
           sentAt: "2023-01-01T10:00:00.000Z",
+          receivedAt: "2023-01-01T10:05:00.000Z",
           createdAt: "2023-01-01T00:00:00.000Z",
           updatedAt: "2023-01-01T12:00:00.000Z",
+          folderName: "INBOX",
+          size: 2048,
         },
       },
     },

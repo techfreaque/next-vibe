@@ -18,12 +18,13 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { Countries, Languages } from "@/i18n/core/config";
 
+import { db } from "../../system/db";
 import { SortOrder } from "../imap-client/enum";
 import type {
   EmailGetGETRequestOutput,
   EmailGetGETResponseOutput,
 } from "./[id]/definition";
-import { emails } from "./db";
+import { emails, type NewEmail } from "./db";
 import {
   EmailSortField,
   EmailStatusFilter,
@@ -35,7 +36,6 @@ import type {
   EmailsListRequestOutput,
   EmailsListResponseOutput,
 } from "./list/definition";
-import { db } from "../../system/db";
 
 // Define the proper type for locale to match standardized patterns
 type CountryLanguage = `${Lowercase<Languages>}-${Countries}`;
@@ -57,6 +57,11 @@ export interface EmailsRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailGetGETResponseOutput>>;
+
+  create(
+    data: NewEmail,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ id: string }>>;
 }
 
 /**
@@ -117,7 +122,7 @@ class EmailsRepositoryImpl implements EmailsRepository {
           or(
             ilike(emails.subject, `%${search}%`),
             ilike(emails.recipientEmail, `%${search}%`),
-            ilike(emails.recipientName ?? "", `%${search}%`),
+            sql`${emails.recipientName} ilike ${`%${search}%`}`,
             ilike(emails.senderEmail, `%${search}%`),
           ),
         );
@@ -186,30 +191,45 @@ class EmailsRepositoryImpl implements EmailsRepository {
         .offset(offset);
 
       const emailsList = emailsResult.map((email) => ({
-        id: email.id,
-        subject: email.subject,
-        recipientEmail: email.recipientEmail,
-        recipientName: email.recipientName,
-        senderEmail: email.senderEmail,
-        senderName: email.senderName,
-        type: email.type,
-        templateName: email.templateName,
-        status: email.status,
-        emailProvider: email.emailProvider,
-        externalId: email.externalId,
-        sentAt: email.sentAt?.toISOString() || null,
-        deliveredAt: email.deliveredAt?.toISOString() || null,
-        openedAt: email.openedAt?.toISOString() || null,
-        clickedAt: email.clickedAt?.toISOString() || null,
-        bouncedAt: email.bouncedAt?.toISOString() || null,
-        unsubscribedAt: email.unsubscribedAt?.toISOString() || null,
-        error: email.error,
-        retryCount: Number(email.retryCount || 0),
-        userId: email.userId,
-        leadId: email.leadId,
-        metadata: email.metadata || {},
-        createdAt: email.createdAt.toISOString(),
-        updatedAt: email.updatedAt.toISOString(),
+        emailCore: {
+          id: email.id,
+          subject: email.subject,
+          status: email.status,
+        },
+        emailParties: {
+          recipient: {
+            recipientEmail: email.recipientEmail,
+            recipientName: email.recipientName,
+          },
+          sender: {
+            senderEmail: email.senderEmail,
+            senderName: email.senderName,
+          },
+        },
+        emailMetadata: {
+          type: email.type,
+          templateName: email.templateName,
+          emailProvider: email.emailProvider,
+          externalId: email.externalId,
+        },
+        emailEngagement: {
+          sentAt: email.sentAt?.toISOString() || null,
+          deliveredAt: email.deliveredAt?.toISOString() || null,
+          openedAt: email.openedAt?.toISOString() || null,
+          clickedAt: email.clickedAt?.toISOString() || null,
+        },
+        technicalDetails: {
+          retryCount: Number(email.retryCount || 0),
+          error: email.error,
+          associatedIds: {
+            userId: email.userId,
+            leadId: email.leadId,
+          },
+          timestamps: {
+            createdAt: email.createdAt.toISOString(),
+            updatedAt: email.updatedAt.toISOString(),
+          },
+        },
       }));
 
       const response = {
@@ -250,15 +270,16 @@ class EmailsRepositoryImpl implements EmailsRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailGetGETResponseOutput>> {
     try {
+      const emailId: string = "id" in data ? String(data.id) : "";
       logger.debug("Fetching email by ID", {
-        id: (data as { id: string }).id,
+        id: emailId,
         userId: user.id,
       });
 
       const [emailResult] = await db
         .select()
         .from(emails)
-        .where(eq(emails.id, (data as { id: string }).id));
+        .where(eq(emails.id, emailId));
 
       if (!emailResult) {
         return createErrorResponse(
@@ -304,6 +325,45 @@ class EmailsRepositoryImpl implements EmailsRepository {
       );
     }
   }
+
+  /**
+   * Create a new email record
+   */
+  async create(
+    data: NewEmail,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ id: string }>> {
+    try {
+      logger.debug("Creating email record", {
+        subject: data.subject,
+        recipientEmail: data.recipientEmail,
+      });
+
+      const [result] = await db
+        .insert(emails)
+        .values(data)
+        .returning({ id: emails.id });
+
+      if (!result) {
+        return createErrorResponse(
+          "app.api.v1.core.emails.messages.list.errors.server.title",
+          ErrorResponseTypes.INTERNAL_ERROR,
+        );
+      }
+
+      return createSuccessResponse({ id: result.id });
+    } catch (error) {
+      logger.error("Error creating email record", parseError(error));
+      return createErrorResponse(
+        "app.api.v1.core.emails.messages.list.errors.server.title",
+        ErrorResponseTypes.INTERNAL_ERROR,
+        { error: parseError(error).message },
+      );
+    }
+  }
 }
 
 export const emailsRepository = new EmailsRepositoryImpl();
+
+// Export as emailRepository for backwards compatibility with seeds
+export const emailRepository = emailsRepository;

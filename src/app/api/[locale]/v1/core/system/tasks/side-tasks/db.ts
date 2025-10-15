@@ -13,15 +13,10 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { z } from "zod";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
+import type { z } from "zod";
 
-import {
-  TaskPriority,
-  TaskPriorityDB,
-  TaskStatus,
-  TaskStatusDB,
-} from "../enum";
+import { TaskPriorityDB, TaskStatusDB } from "../enum";
 
 /**
  * Side Tasks Table
@@ -146,20 +141,32 @@ export const sideTaskHealthChecks = pgTable("side_task_health_checks", {
 export const insertSideTaskSchema = createInsertSchema(sideTasks);
 export const selectSideTaskSchema = createSelectSchema(sideTasks);
 
-export const insertSideTaskExecutionSchema = createInsertSchema(sideTaskExecutions);
-export const selectSideTaskExecutionSchema = createSelectSchema(sideTaskExecutions);
+export const insertSideTaskExecutionSchema =
+  createInsertSchema(sideTaskExecutions);
+export const selectSideTaskExecutionSchema =
+  createSelectSchema(sideTaskExecutions);
 
-export const insertSideTaskHealthCheckSchema = createInsertSchema(sideTaskHealthChecks);
-export const selectSideTaskHealthCheckSchema = createSelectSchema(sideTaskHealthChecks);
+export const insertSideTaskHealthCheckSchema =
+  createInsertSchema(sideTaskHealthChecks);
+export const selectSideTaskHealthCheckSchema =
+  createSelectSchema(sideTaskHealthChecks);
 
 /**
  * Type exports for side tasks
  */
-export type SideTaskRecord = z.infer<typeof selectSideTaskSchema>;
+export type SideTaskRecord = z.output<typeof selectSideTaskSchema>;
 export type NewSideTaskRecord = z.infer<typeof insertSideTaskSchema>;
 
-export type SideTaskExecutionRecord = z.infer<typeof selectSideTaskExecutionSchema>;
-export type NewSideTaskExecutionRecord = z.infer<typeof insertSideTaskExecutionSchema>;
+export type SideTaskExecutionRecord = z.output<
+  typeof selectSideTaskExecutionSchema
+>;
+export type NewSideTaskExecutionRecord = z.infer<
+  typeof insertSideTaskExecutionSchema
+>;
 
-export type SideTaskHealthCheckRecord = z.infer<typeof selectSideTaskHealthCheckSchema>;
-export type NewSideTaskHealthCheckRecord = z.infer<typeof insertSideTaskHealthCheckSchema>;
+export type SideTaskHealthCheckRecord = z.output<
+  typeof selectSideTaskHealthCheckSchema
+>;
+export type NewSideTaskHealthCheckRecord = z.infer<
+  typeof insertSideTaskHealthCheckSchema
+>;

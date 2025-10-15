@@ -7,6 +7,36 @@ export const translations: typeof enTranslations = {
   category: "Narzędzia Deweloperskie",
   tag: "jakość",
 
+  // Enum translations
+  checkType: {
+    lint: "Lint",
+    typecheck: "Sprawdzanie typów",
+    test: "Test",
+    structure: "Struktura",
+    migration: "Migracja",
+    all: "Wszystkie",
+  },
+  status: {
+    pending: "Oczekujące",
+    running: "W trakcie",
+    passed: "Zaliczone",
+    failed: "Nieudane",
+    warning: "Ostrzeżenie",
+    skipped: "Pominięte",
+  },
+  severity: {
+    error: "Błąd",
+    warning: "Ostrzeżenie",
+    info: "Info",
+    suggestion: "Sugestia",
+  },
+  fixAction: {
+    autoFix: "Automatyczna naprawa",
+    manualFix: "Ręczna naprawa",
+    ignore: "Ignoruj",
+    review: "Przejrzyj",
+  },
+
   container: {
     title: "Konfiguracja Vibe Check",
     description:

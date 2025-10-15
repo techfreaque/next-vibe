@@ -180,6 +180,11 @@ export const translations = {
         description:
           "Ein Konflikt ist bei der Verarbeitung der Anfrage aufgetreten",
       },
+      noData: {
+        title: "Keine Daten",
+        description:
+          "SMTP-Service meldete Erfolg, aber keine Daten wurden bereitgestellt",
+      },
       server: {
         title: "Serverfehler",
         description:

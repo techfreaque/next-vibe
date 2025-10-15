@@ -13,6 +13,7 @@ import {
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import { simpleT } from "@/i18n/core/shared";
 
 import { passwordRepository } from "../repository";
 import resetPasswordConfirmEndpoints from "./definition";
@@ -28,7 +29,9 @@ export const { POST, tools } = endpointsHandler({
         ignoreErrors: true,
       },
     ],
-    handler: async ({ data, logger }) => {
+    handler: async ({ data, logger, locale }) => {
+      const { t } = simpleT(locale);
+
       logger.debug("Password reset confirmation received", {
         email: data.verification.email,
       });
@@ -57,12 +60,19 @@ export const { POST, tools } = endpointsHandler({
         response: {
           success: true,
           message: "auth.resetPassword.success.password_reset",
-          securityTip:
-            "Consider enabling two-factor authentication for better security",
+          securityTip: t(
+            "app.api.v1.core.user.public.resetPassword.confirm.response.securityTip",
+          ),
           nextSteps: [
-            "Log in with your new password",
-            "Update saved passwords in your browser",
-            "Consider enabling 2FA for added security",
+            t(
+              "app.api.v1.core.user.public.resetPassword.confirm.response.nextSteps.0",
+            ),
+            t(
+              "app.api.v1.core.user.public.resetPassword.confirm.response.nextSteps.1",
+            ),
+            t(
+              "app.api.v1.core.user.public.resetPassword.confirm.response.nextSteps.2",
+            ),
           ],
         },
       });

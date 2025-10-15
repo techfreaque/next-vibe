@@ -4,6 +4,27 @@ import { join } from "node:path";
 import type { ReleaseState, ReleaseTarget } from "../types/types.js";
 import { logger, loggerError } from "./logger.js";
 
+/**
+ * Type guard to validate if parsed JSON matches ReleaseState structure
+ */
+function isReleaseState(value: unknown): value is ReleaseState {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const obj = value as Record<string, unknown>;
+
+  return (
+    Array.isArray(obj.targets) &&
+    Array.isArray(obj.completed) &&
+    Array.isArray(obj.failed) &&
+    Array.isArray(obj.skipped) &&
+    typeof obj.currentIndex === "number" &&
+    typeof obj.startTime === "string" &&
+    typeof obj.lastUpdated === "string"
+  );
+}
+
 export class StateManager {
   private stateFilePath: string;
 
@@ -42,9 +63,18 @@ export class StateManager {
 
     try {
       const stateData = readFileSync(this.stateFilePath, "utf-8");
-      const state = JSON.parse(stateData) as ReleaseState;
+      const parsedData: unknown = JSON.parse(stateData);
+
+      if (!isReleaseState(parsedData)) {
+        loggerError(
+          "Invalid state file format",
+          new Error("State file does not match expected structure"),
+        );
+        return null;
+      }
+
       logger(`Loaded existing state from ${this.stateFilePath}`);
-      return state;
+      return parsedData;
     } catch (error) {
       loggerError("Failed to load state file:", error);
       return null;

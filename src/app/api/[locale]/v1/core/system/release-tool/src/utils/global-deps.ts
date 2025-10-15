@@ -119,8 +119,7 @@ function updatePackageDependencies(
     execSync(`${packageManager} install`, {
       cwd,
       stdio: "inherit",
-      // eslint-disable-next-line node/no-process-env
-      env: process.env,
+      env: { ...process.env },
       timeout: 120000, // 2 minutes timeout
     });
 
@@ -130,7 +129,6 @@ function updatePackageDependencies(
       `Error updating dependencies for ${packageName}. Continuing with release process.`,
       error,
     );
-    // eslint-disable-next-line no-restricted-syntax
     throw error;
   }
 }

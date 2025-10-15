@@ -9,7 +9,17 @@ export const translations: typeof enTranslations = {
     description:
       "E-Mail-Listen-Parameter konfigurieren und Ergebnisse anzeigen",
   },
+  filters: {
+    title: "Filter",
+    description: "E-Mails filtern und suchen",
+  },
+  displayOptions: {
+    title: "Anzeigeoptionen",
+  },
   fields: {
+    dateRange: {
+      title: "Datumsbereich",
+    },
     page: {
       label: "Seite",
       description: "Seitenzahl für Paginierung",
@@ -87,6 +97,27 @@ export const translations: typeof enTranslations = {
         leadId: "Lead-ID",
         createdAt: "Erstellt am",
         updatedAt: "Aktualisiert am",
+        emailCore: {
+          title: "Kerninformationen",
+        },
+        emailParties: {
+          title: "Absender & Empfänger",
+        },
+        emailMetadata: {
+          title: "Metadaten",
+        },
+        emailEngagement: {
+          title: "Engagement-Tracking",
+        },
+        technicalDetails: {
+          title: "Technische Details",
+        },
+        associatedIds: {
+          title: "Zugehörige IDs",
+        },
+        timestamps: {
+          title: "Zeitstempel",
+        },
       },
     },
     pagination: {

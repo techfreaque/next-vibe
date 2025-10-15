@@ -8,9 +8,33 @@ import type { OutputOptions, RollupOptions } from "rollup";
 import type { BuildOptions, InlineConfig, PluginOption } from "vite";
 import { build } from "vite";
 
+import { simpleT } from "@/i18n/core/shared";
+
 import type { BuildConfig, FileToCompile, PackageConfig } from "./config.js";
 
+// CLI tool uses English translations by default
+const { t } = simpleT("en");
+
 const program = new Command();
+
+/**
+ * Type guard to validate if an imported module has the expected BuildConfig structure
+ */
+function isBuildConfigModule(
+  module: unknown,
+): module is { default: BuildConfig } {
+  if (typeof module !== "object" || module === null) {
+    return false;
+  }
+  if (!("default" in module)) {
+    return false;
+  }
+  const defaultExport = (module as { default: unknown }).default;
+  if (typeof defaultExport !== "object" || defaultExport === null) {
+    return false;
+  }
+  return true;
+}
 
 export interface CliOptions {
   config: string;
@@ -18,17 +42,19 @@ export interface CliOptions {
 
 program
   .command("build")
-  .description("buildType: build")
+  .description(t("app.api.v1.core.system.builder.cli.build.description"))
   .option(
+    // eslint-disable-next-line i18next/no-literal-string
     "-c, --config <path>",
-    "specify the config file path",
-    "build.config.ts",
+    t("app.api.v1.core.system.builder.cli.build.configOption"),
+    t("app.api.v1.core.system.builder.cli.build.defaultConfig"),
   )
   .action(async (options: CliOptions) => {
     await pweBuilder(options);
   });
 
 export async function pweBuilder(options: CliOptions): Promise<void> {
+  // eslint-disable-next-line i18next/no-literal-string
   logger("Building started");
   const buildConfig = await getConfigContent(options);
   cleanDistFolders(buildConfig);
@@ -46,6 +72,7 @@ export async function compileToJsFilesWithVite(
       }),
     );
   } else {
+    // eslint-disable-next-line i18next/no-literal-string
     logger("No files to compile in your config");
   }
 }
@@ -53,8 +80,11 @@ export async function compileToJsFilesWithVite(
 export async function pweBuild(fileConfig: FileToCompile): Promise<void> {
   const inputFilePath = resolve(process.cwd(), fileConfig.options.input);
   if (!existsSync(inputFilePath)) {
-    // eslint-disable-next-line no-restricted-syntax
-    throw new Error(`Input file ${inputFilePath} does not exist`);
+    throw new Error(
+      t("app.api.v1.core.system.builder.errors.inputFileNotFound", {
+        filePath: inputFilePath,
+      }),
+    );
   }
   const {
     plugins: pluginsOverride,
@@ -67,7 +97,9 @@ export async function pweBuild(fileConfig: FileToCompile): Promise<void> {
 
   const plugins: PluginOption[] = pluginsOverride || [];
   const buildOptions: BuildOptions = {
+    // eslint-disable-next-line i18next/no-literal-string
     target: "es6",
+    // eslint-disable-next-line i18next/no-literal-string
     outDir: resolve(fileConfig.options.output, ".."),
     minify: false,
     emptyOutDir: false,
@@ -92,7 +124,9 @@ export async function pweBuild(fileConfig: FileToCompile): Promise<void> {
   }
   if (fileConfig.options?.type?.includes("react")) {
     outputOptions.globals = {
+      // eslint-disable-next-line i18next/no-literal-string
       "react": "React",
+      // eslint-disable-next-line i18next/no-literal-string
       "react-dom": "ReactDOM",
     };
     const react = (await import("@vitejs/plugin-react")).default;
@@ -111,6 +145,7 @@ export async function pweBuild(fileConfig: FileToCompile): Promise<void> {
     });
   } else {
     outputOptions.entryFileNames = basename(fileConfig.options.output);
+    // eslint-disable-next-line i18next/no-literal-string
     outputOptions.assetFileNames = "[name][extname]";
     outputOptions.exports = "none";
     outputOptions.format = "iife";
@@ -164,8 +199,9 @@ async function setPackageBuildConfig({
     fileConfig.options.output,
   ).split(".")[0];
   if (!outPutFilesNameWithoutExtension) {
-    // eslint-disable-next-line no-restricted-syntax
-    throw new Error("Output file name is invalid");
+    throw new Error(
+      t("app.api.v1.core.system.builder.errors.invalidOutputFileName"),
+    );
   }
   buildOptions.lib = {
     entry: inputFilePath,
@@ -185,6 +221,7 @@ async function setPackageBuildConfig({
   );
 
   rollupOptions.external = (id): boolean => {
+    // eslint-disable-next-line i18next/no-literal-string
     return modulesToExternalize.includes(id) || id.startsWith("node:");
   };
 }
@@ -194,9 +231,15 @@ export async function getConfigContent(
 ): Promise<BuildConfig> {
   const configSourcePath = resolve(process.cwd(), options.config);
   // const compiledConfigPath = await getCompiledConfigPath(configSourcePath);
-  const buildConfig = (
-    (await import(configSourcePath)) as { default: BuildConfig }
-  ).default;
+  const importedModule = await import(configSourcePath);
+
+  if (!isBuildConfigModule(importedModule)) {
+    throw new Error(
+      t("app.api.v1.core.system.builder.errors.invalidBuildConfig"),
+    );
+  }
+
+  const buildConfig = importedModule.default;
   // cleanCompiledConfig(compiledConfigPath);
   return buildConfig;
 }
@@ -208,9 +251,11 @@ export async function getConfigContent(
 export async function getCompiledConfigPath(
   configPath: string,
 ): Promise<string> {
+  // eslint-disable-next-line i18next/no-literal-string
   const outputFileName = `build.config.tmp.${Math.round(Math.random() * 100000)}.cjs`;
   const outputDir = dirname(configPath);
   const outputFilePath = join(outputDir, outputFileName);
+
   const outputTmpDir = join(outputDir, "tmp");
   const outputFileTmpPath = join(outputTmpDir, outputFileName);
   try {
@@ -236,17 +281,14 @@ export async function getCompiledConfigPath(
     // Clean up in case of an error
     try {
       unlinkSync(outputFileTmpPath);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (_) {
+    } catch (_cleanupError) {
       /* empty */
     }
     try {
       unlinkSync(outputFilePath);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (_) {
+    } catch (_cleanupError) {
       /* empty */
     }
-    // eslint-disable-next-line no-restricted-syntax
     throw error;
   }
 }
@@ -260,8 +302,10 @@ export async function copyFiles(buildConfig: BuildConfig): Promise<void> {
       }
       await copy(fileOrFolderData.input, fileOrFolderData.output);
     }
+    // eslint-disable-next-line i18next/no-literal-string
     logger("Files copied successfully");
   } else {
+    // eslint-disable-next-line i18next/no-literal-string
     logger("No files to copy in your config");
   }
 }
@@ -271,24 +315,25 @@ export function cleanDistFolders(buildConfig: BuildConfig): void {
     buildConfig.foldersToClean.forEach((folder) => {
       try {
         rmSync(folder, { force: true, recursive: true });
+        // eslint-disable-next-line i18next/no-literal-string
         logger(`Done dist folder cleaning (${folder})`);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (_error) {
+      } catch (_cleanupError) {
         /* empty */
       }
     });
   } else {
+    // eslint-disable-next-line i18next/no-literal-string
     logger("No folders to clean in your config");
   }
 }
 
 function logger(message: string): void {
-  // eslint-disable-next-line no-console
+  // eslint-disable-next-line i18next/no-literal-string
   console.log(`[builder] ${message}`);
 }
 
-// eslint-disable-next-line node/no-process-env
-if (process.env["NODE_ENV"] !== "test") {
+const env = { ...process.env };
+if (env["NODE_ENV"] !== "test") {
   program.parse(process.argv);
 }
 

@@ -3,6 +3,7 @@
 import { MoveLeft } from "lucide-react";
 import { Button } from "next-vibe-ui/ui";
 import type { JSX } from "react";
+import React from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

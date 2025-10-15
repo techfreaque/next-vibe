@@ -14,15 +14,15 @@ import { isErrorResponseType } from "next-vibe/shared/utils/parse-error";
 import type { FormEvent } from "react";
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import type { z, ZodType } from "zod";
+import type { z } from "zod";
 
 import { useTranslation } from "@/i18n/core/client";
 
-import { UserRoleValue } from "../../../../../user/user-roles/enum";
+import type { UserRoleValue } from "../../../../../user/user-roles/enum";
 import type { EndpointLogger } from "../../../cli/vibe/endpoints/endpoint-handler/logger";
+import type { Methods } from "../../../cli/vibe/endpoints/endpoint-types/core/enums";
 import type { UnifiedField } from "../../../cli/vibe/endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "../../../cli/vibe/endpoints/endpoint-types/endpoint/create";
-import type { Methods } from "../../../cli/vibe/endpoints/endpoint-types/core/enums";
 import type { ApiStore, FormQueryParams } from "../store";
 import { useApiStore } from "../store";
 import type {
@@ -49,11 +49,16 @@ import type {
  * @returns Form and mutation for API interaction with enhanced error handling
  */
 export function useApiForm<
-  TEndpoint extends CreateApiEndpoint<any, any, any, any>,
+  TEndpoint extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    any
+  >,
 >(
   endpoint: TEndpoint,
   logger: EndpointLogger,
-  options: ApiFormOptions<TEndpoint["TRequestInput"]> = {},
+  options: ApiFormOptions<TEndpoint["TRequestOutput"]> = {},
   mutationOptions: ApiMutationOptions<
     TEndpoint["TRequestOutput"],
     TEndpoint["TResponseOutput"],
@@ -128,12 +133,10 @@ export function useApiForm<
   // Extract store methods for error handling
   const setFormErrorStore = useApiStore((state) => state.setFormError);
   const clearFormErrorStore = useApiStore((state) => state.clearFormError);
-  // Create base configuration without resolver
-  const formConfig: ApiFormOptions<ZodType<TEndpoint["TRequestInput"]>> = {
+  // Create base configuration with resolver
+  type FormData = TEndpoint["TRequestOutput"];
+  const formConfig = {
     ...options,
-    // We force our form types with this
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     resolver: zodResolver(endpoint.requestSchema),
   };
 
@@ -145,15 +148,8 @@ export function useApiForm<
     // eslint-disable-next-line i18next/no-literal-string
     persistenceKey || `form-${endpoint.path.join("-")}-${endpoint.method}`;
 
-  const formMethods = useForm<
-    // Initialize form with the proper configuration
-    // We force our form types with this
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    TEndpoint["TRequestInput"],
-    ZodType<TEndpoint["TRequestInput"]>,
-    TEndpoint["TRequestInput"]
-  >(formConfig);
+  // @ts-ignore - FormData is guaranteed to be an object type from Zod, satisfying FieldValues
+  const formMethods = useForm<FormData>(formConfig);
 
   // Implement form persistence directly
   const clearSavedForm = useCallback((): void => {
@@ -166,8 +162,8 @@ export function useApiForm<
       localStorage.removeItem(storageKey);
       // Reset the form to default values if available, otherwise empty
       const resetData =
-        (options.defaultValues as TEndpoint["TRequestInput"]) ||
-        ({} as TEndpoint["TRequestInput"]);
+        (options.defaultValues as TEndpoint["TRequestOutput"]) ||
+        ({} as TEndpoint["TRequestOutput"]);
       formMethods.reset(resetData);
     } catch (error) {
       logger.error("Error clearing form data from storage:", error);
@@ -185,7 +181,7 @@ export function useApiForm<
       if (savedFormData) {
         const parsedData = JSON.parse(
           savedFormData,
-        ) as TEndpoint["TRequestInput"];
+        ) as TEndpoint["TRequestOutput"];
         formMethods.reset(parsedData);
       }
     } catch (error) {
@@ -258,24 +254,21 @@ export function useApiForm<
           TEndpoint["TUrlVariablesOutput"]
         >,
   ): void => {
-    const _submitForm = async (): Promise<void> => {
-      try {
-        // Get form data
-        const formData = formMethods.getValues();
+    // Prevent default form submission behavior
+    if (event) {
+      event.preventDefault();
+    }
 
+    const _submitForm = async (validatedData: FormData): Promise<void> => {
+      try {
         // Clear any previous errors
         clearFormError();
 
-        // Call the API with the form data
+        // Call the API with the validated form data
         const result = await executeMutation(
-          endpoint as CreateApiEndpoint<
-            string,
-            Methods,
-            readonly (typeof UserRoleValue)[],
-            UnifiedField<z.ZodTypeAny>
-          >,
+          endpoint,
           logger,
-          formData as TEndpoint["TRequestOutput"],
+          validatedData,
           (options?.urlParamVariables as TEndpoint["TUrlVariablesOutput"]) ||
             ({} as TEndpoint["TUrlVariablesOutput"]),
           t,
@@ -296,7 +289,7 @@ export function useApiForm<
         const onSuccessResult = options?.onSuccess?.({
           responseData: result as TEndpoint["TResponseOutput"],
           pathParams: options?.urlParamVariables,
-          requestData: formData as TEndpoint["TRequestOutput"],
+          requestData: validatedData,
         });
 
         // If onSuccess returns an error, treat it as an error
@@ -304,7 +297,7 @@ export function useApiForm<
           setError(onSuccessResult);
           options?.onError?.({
             error: onSuccessResult,
-            requestData: formData as TEndpoint["TRequestOutput"],
+            requestData: validatedData,
             pathParams: options?.urlParamVariables,
           });
         }
@@ -327,11 +320,12 @@ export function useApiForm<
         const formData = formMethods.getValues();
         options?.onError?.({
           error: errorResponse,
-          requestData: formData as TEndpoint["TRequestOutput"],
+          requestData: formData,
           pathParams: options?.urlParamVariables,
         });
       }
     };
+    // @ts-ignore - FormData type is correct, type system can't infer the equivalence with TFieldValues
     void formMethods.handleSubmit(_submitForm, (errors) => {
       // Create an error response for form validation errors
       const errorResponse = createErrorResponse(
@@ -342,7 +336,7 @@ export function useApiForm<
 
       options?.onError?.({
         error: errorResponse,
-        requestData: formMethods.getValues() as TEndpoint["TRequestOutput"],
+        requestData: formMethods.getValues(),
         pathParams: options?.urlParamVariables,
       });
     })(event);
@@ -365,6 +359,7 @@ export function useApiForm<
           : undefined;
 
   return {
+    // @ts-ignore - FormData is TEndpoint["TRequestOutput"], type system can't infer the equivalence
     form: formMethods,
     response,
     // Backward compatibility properties

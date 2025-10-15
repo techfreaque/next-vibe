@@ -6,7 +6,7 @@
 import "server-only";
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 
 import { emailsRepository } from "../repository";
 import definitions from "./definition";
@@ -15,13 +15,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: async ({ urlVariables, user, locale, logger }) => {
-      return await emailsRepository.getEmailById(
-        urlVariables,
-        user,
-        locale,
-        logger,
-      );
-    },
+    handler: ({ urlVariables, user, locale, logger }) =>
+      emailsRepository.getEmailById(urlVariables, user, locale, logger),
   },
 });

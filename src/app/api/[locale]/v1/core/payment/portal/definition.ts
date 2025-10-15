@@ -180,10 +180,6 @@ const { POST } = createEndpoint({
         customerPortalUrl: "https://billing.stripe.com/session/xyz789",
       },
     },
-    urlPathVariables: {
-      default: {},
-      minimal: {},
-    },
   },
 });
 

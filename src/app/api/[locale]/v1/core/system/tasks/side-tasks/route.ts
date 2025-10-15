@@ -12,11 +12,11 @@ import { sideTasksRepository } from "./repository";
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ data, user, locale, logger }) =>
-      sideTasksRepository.getStatus(data, user, locale, logger),
+    handler: async ({ data, user, locale, logger }) =>
+      await sideTasksRepository.getStatus(data, user, locale, logger),
   },
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) =>
-      sideTasksRepository.handleAction(data, user, locale, logger),
+    handler: async ({ data, user, locale, logger }) =>
+      await sideTasksRepository.handleAction(data, user, locale, logger),
   },
 });

@@ -71,7 +71,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.newsletter.subscribe.email.helpText" as const,
           layout: { columns: 12 },
         },
-        z.email(),
+        z.string().email(),
       ),
       name: requestDataField(
         {

@@ -31,9 +31,14 @@ import type { CompleteUserType } from "../definition";
 import { UserDetailLevel } from "../enum";
 import { sessionRepository } from "../private/session/repository";
 import { userRepository } from "../repository";
-import { UserRole, type UserRoleValue } from "../user-roles/enum";
+import type { UserRoleValue } from "../user-roles/enum";
+import { UserRole } from "../user-roles/enum";
 import { userRolesRepository } from "../user-roles/repository";
-import type { JwtPrivatePayloadType, JWTPublicPayloadType } from "./definition";
+import type {
+  JwtPayloadType,
+  JwtPrivatePayloadType,
+  JWTPublicPayloadType,
+} from "./definition";
 
 /**
  * Platform context for authentication
@@ -42,21 +47,36 @@ export interface AuthContext {
   platform: "next" | "trpc" | "cli";
   request?: NextRequest; // Required for tRPC
   token?: string; // Required for CLI
-  jwtPayload?: JwtPrivatePayloadType; // Optional for CLI direct payload auth
+  jwtPayload?: JwtPayloadType; // Optional for CLI direct payload auth (can be public or private)
 }
 
 /**
  * Type helper to infer user type based on roles
+ * Returns union of possible user types
  */
 export type InferUserType<
   TRoles extends readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
-> = TRoles["length"] extends 1
-  ? TRoles[0] extends typeof UserRole.PUBLIC
-    ? JWTPublicPayloadType
-    : JwtPrivatePayloadType
-  : TRoles[number] extends typeof UserRole.PUBLIC
-    ? JwtPrivatePayloadType
-    : JwtPrivatePayloadType;
+> = TRoles[number] extends typeof UserRole.PUBLIC
+  ? JWTPublicPayloadType | JwtPrivatePayloadType
+  : JwtPrivatePayloadType;
+
+/**
+ * Helper to create public user payload
+ */
+function createPublicUser<
+  TRoles extends readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
+>(): InferUserType<TRoles> {
+  return { isPublic: true } as InferUserType<TRoles>;
+}
+
+/**
+ * Helper to create private user payload
+ */
+function createPrivateUser<
+  TRoles extends readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
+>(userId: string): InferUserType<TRoles> {
+  return { isPublic: false, id: userId } as InferUserType<TRoles>;
+}
 
 /**
  * Unified Auth Repository Interface with type-safe authentication
@@ -291,44 +311,42 @@ class AuthRepositoryImpl implements AuthRepository {
     requiredRoles: TRoles,
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
+    // Public role is always allowed
+    if (requiredRoles.includes(UserRole.PUBLIC)) {
+      return createPublicUser<TRoles>();
+    }
+
+    // Customer role is allowed for any authenticated user
+    if (requiredRoles.includes(UserRole.CUSTOMER)) {
+      return createPrivateUser<TRoles>(userId);
+    }
+
+    // For other roles, check the user's roles
     try {
-      // Public role is always allowed
-      if (requiredRoles.includes(UserRole.PUBLIC)) {
-        return { isPublic: true } as InferUserType<TRoles>;
-      }
-
-      // Customer role is allowed for any authenticated user
-      if (requiredRoles.includes(UserRole.CUSTOMER)) {
-        return { isPublic: false, id: userId } as InferUserType<TRoles>;
-      }
-
-      // For other roles, check the user's roles
       const userRolesResponse = await userRolesRepository.findByUserId(
         userId,
         logger,
       );
       if (!userRolesResponse.success) {
-        return { isPublic: true } as InferUserType<TRoles>;
+        return createPublicUser<TRoles>();
       }
 
       // Check for required roles
-      const hasRequiredRole = userRolesResponse.data.some((r) => {
-        const roleValue =
-          r.role as (typeof UserRoleValue)[keyof typeof UserRoleValue];
-        return requiredRoles.includes(roleValue);
-      });
+      const hasRequiredRole = userRolesResponse.data.some((r) =>
+        requiredRoles.some((requiredRole) => r.role === requiredRole),
+      );
 
       if (hasRequiredRole) {
-        return { isPublic: false, id: userId } as InferUserType<TRoles>;
+        return createPrivateUser<TRoles>(userId);
       }
 
-      return { isPublic: true } as InferUserType<TRoles>;
+      return createPublicUser<TRoles>();
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.auth.debug.errorCheckingUserAuth",
         error,
       );
-      return { isPublic: true } as InferUserType<TRoles>;
+      return createPublicUser<TRoles>();
     }
   }
 
@@ -758,11 +776,22 @@ class AuthRepositoryImpl implements AuthRepository {
         case "cli":
           if (context.jwtPayload) {
             // Direct payload authentication
-            return await this.authenticateWithPayload<TRoles>(
-              context.jwtPayload,
-              roles,
-              logger,
-            );
+            // Ensure payload is private (has id and isPublic: false)
+            if (!context.jwtPayload.isPublic && context.jwtPayload.id) {
+              return await this.authenticateWithPayload<TRoles>(
+                context.jwtPayload,
+                roles,
+                logger,
+              );
+            } else {
+              logger.error(
+                "app.api.v1.core.user.auth.debug.publicPayloadNotSupportedForCli",
+              );
+              return throwErrorResponse(
+                "app.api.v1.core.user.auth.errors.publicPayloadNotSupported.title",
+                ErrorResponseTypes.UNAUTHORIZED,
+              );
+            }
           } else if (context.token) {
             // Token-based authentication
             return await this.getAuthMinimalUserCli<TRoles>(

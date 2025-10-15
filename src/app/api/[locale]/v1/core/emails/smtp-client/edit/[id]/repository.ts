@@ -14,33 +14,47 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../../user/auth/definition";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { db, smtpAccounts } from "../../db";
-// SmtpAccountResponseType doesn't exist - we'll use the actual response types
+import { smtpAccounts } from "../../db";
+import type { CampaignType, SmtpSecurityType } from "../../enum";
 import type {
-  SmtpAccountEditGETRequestOutput,
   SmtpAccountEditGETResponseOutput,
-  SmtpAccountEditPUTRequestOutput,
   SmtpAccountEditPUTResponseOutput,
 } from "./definition";
+
+// Explicit interface for update data (bypassing broken PUT type from definition)
+interface SmtpAccountUpdateData {
+  id: string;
+  name?: string;
+  description?: string;
+  host?: string;
+  port?: number;
+  securityType?: (typeof SmtpSecurityType)[keyof typeof SmtpSecurityType];
+  username?: string;
+  password?: string;
+  fromEmail?: string;
+  priority?: number;
+  isDefault?: boolean;
+  campaignTypes?: Array<(typeof CampaignType)[keyof typeof CampaignType]>;
+}
 
 /**
  * SMTP Account Edit Repository Interface
  */
 export interface SmtpAccountEditRepository {
   getSmtpAccount(
-    accountId: string,
+    urlVariables: { id: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpAccountEditGETResponseOutput>>;
 
   updateSmtpAccount(
-    accountId: string,
-    data: SmtpAccountEditPUTRequestOutput,
+    data: SmtpAccountUpdateData,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -56,72 +70,50 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
    * Get SMTP account by ID
    */
   async getSmtpAccount(
-    accountId: string,
+    urlVariables: { id: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpAccountEditGETResponseOutput>> {
     try {
       logger.debug("Getting SMTP account", {
-        accountId,
+        accountId: urlVariables.id,
         userId: user.id,
       });
 
       const [account] = await db
         .select()
         .from(smtpAccounts)
-        .where(eq(smtpAccounts.id, accountId))
+        .where(eq(smtpAccounts.id, urlVariables.id))
         .limit(1);
 
       if (!account) {
         return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.edit.errors.not_found.title",
+          "app.api.v1.core.emails.smtpClient.edit.id.errors.notFound.title",
           ErrorResponseTypes.NOT_FOUND,
-          { accountId },
+          { accountId: urlVariables.id },
         );
       }
 
-      // Transform to response format
-      const responseAccount: SmtpAccountEditGETResponseOutput = {
-        id: account.id,
-        name: account.name,
-        description: account.description || undefined,
-        host: account.host,
-        port: account.port,
-        securityType: account.securityType,
-        username: account.username,
-        fromEmail: account.fromEmail,
-        connectionTimeout: account.connectionTimeout || undefined,
-        maxConnections: account.maxConnections || undefined,
-        rateLimitPerHour: account.rateLimitPerHour || undefined,
-        status: account.status,
-        isDefault: account.isDefault || undefined,
-        priority: account.priority || undefined,
-        healthCheckStatus: account.healthCheckStatus,
-        consecutiveFailures: account.consecutiveFailures || 0,
-        lastHealthCheck: account.lastHealthCheck?.toISOString() || null,
-        lastFailureAt: account.lastFailureAt?.toISOString() || null,
-        lastFailureReason: account.lastFailureReason,
-        emailsSentToday: account.emailsSentToday || 0,
-        emailsSentThisMonth: account.emailsSentThisMonth || 0,
-        totalEmailsSent: account.totalEmailsSent || 0,
-        lastUsedAt: account.lastUsedAt?.toISOString() || null,
-        metadata: account.metadata || undefined,
-        // Add new multi-select fields to response
-        campaignTypes: account.campaignTypes || [],
-        emailJourneyVariants: account.emailJourneyVariants || [],
-        emailCampaignStages: account.emailCampaignStages || [],
-        countries: account.countries || [],
-        languages: account.languages || [],
-        isExactMatch: false,
-        weight: 1,
-        isFailover: false,
-        failoverPriority: 0,
-
-        createdBy: account.createdBy,
-        updatedBy: account.updatedBy,
-        createdAt: account.createdAt.toISOString(),
-        updatedAt: account.updatedAt.toISOString(),
+      // Transform to response format - match endpoint definition exactly
+      const response: SmtpAccountEditGETResponseOutput = {
+        account: {
+          id: account.id,
+          name: account.name,
+          description: account.description || undefined,
+          host: account.host,
+          port: account.port,
+          securityType: account.securityType,
+          username: account.username,
+          fromEmail: account.fromEmail,
+          status: account.status,
+          healthCheckStatus: account.healthCheckStatus,
+          priority: account.priority || undefined,
+          totalEmailsSent: account.totalEmailsSent || 0,
+          lastUsedAt: account.lastUsedAt?.toISOString() || null,
+          createdAt: account.createdAt.toISOString(),
+          updatedAt: account.updatedAt.toISOString(),
+        },
       };
 
       logger.info("SMTP account retrieved successfully", {
@@ -130,11 +122,11 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
         userId: user.id,
       });
 
-      return createSuccessResponse(responseAccount);
+      return createSuccessResponse(response);
     } catch (error) {
       logger.error("Error getting SMTP account", error);
       return createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.edit.errors.server.title",
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -145,7 +137,7 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
    * Update SMTP account
    */
   async updateSmtpAccount(
-    data: SmtpAccountEditPUTRequestOutput,
+    data: SmtpAccountUpdateData,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -153,7 +145,7 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
     try {
       logger.info("Updating SMTP account", {
         accountId: data.id,
-        updates: Object.keys(data),
+        updates: Object.keys(data).filter((k) => k !== "id"),
         userId: user.id,
       });
 
@@ -166,7 +158,7 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
 
       if (!existingAccount) {
         return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.edit.errors.not_found.title",
+          "app.api.v1.core.emails.smtpClient.edit.id.errors.notFound.title",
           ErrorResponseTypes.NOT_FOUND,
           { accountId: data.id },
         );
@@ -200,68 +192,50 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
         }
       }
 
-      // Update the account
+      // Update the account - prepare update data excluding id field
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { id, ...updateFields } = data;
+      const updateData: Partial<typeof smtpAccounts.$inferInsert> = {
+        ...updateFields,
+        updatedAt: new Date(),
+      };
+
       const [updatedAccount] = await db
         .update(smtpAccounts)
-        .set({
-          ...data,
-          updatedAt: new Date(),
-        })
+        .set(updateData)
         .where(eq(smtpAccounts.id, data.id))
         .returning();
 
       if (!updatedAccount) {
         return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.edit.errors.server.title",
+          "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
           ErrorResponseTypes.INTERNAL_ERROR,
           {
             error:
-              "app.api.v1.core.emails.smtpClient.edit.errors.server.description",
+              "app.api.v1.core.emails.smtpClient.edit.id.errors.server.description",
           },
         );
       }
 
-      // Transform to response format
-      const responseAccount: SmtpAccountEditGETResponseOutput = {
-        id: updatedAccount.id,
-        name: updatedAccount.name,
-        description: updatedAccount.description || undefined,
-        host: updatedAccount.host,
-        port: updatedAccount.port,
-        securityType: updatedAccount.securityType,
-        username: updatedAccount.username,
-        fromEmail: updatedAccount.fromEmail,
-        connectionTimeout: updatedAccount.connectionTimeout || undefined,
-        maxConnections: updatedAccount.maxConnections || undefined,
-        rateLimitPerHour: updatedAccount.rateLimitPerHour || undefined,
-        status: updatedAccount.status,
-        isDefault: updatedAccount.isDefault || undefined,
-        priority: updatedAccount.priority || undefined,
-        healthCheckStatus: updatedAccount.healthCheckStatus,
-        consecutiveFailures: updatedAccount.consecutiveFailures || 0,
-        lastHealthCheck: updatedAccount.lastHealthCheck?.toISOString() || null,
-        lastFailureAt: updatedAccount.lastFailureAt?.toISOString() || null,
-        lastFailureReason: updatedAccount.lastFailureReason,
-        emailsSentToday: updatedAccount.emailsSentToday || 0,
-        emailsSentThisMonth: updatedAccount.emailsSentThisMonth || 0,
-        totalEmailsSent: updatedAccount.totalEmailsSent || 0,
-        lastUsedAt: updatedAccount.lastUsedAt?.toISOString() || null,
-        metadata: updatedAccount.metadata || undefined,
-        // Add new multi-select fields to response
-        campaignTypes: updatedAccount.campaignTypes || [],
-        emailJourneyVariants: updatedAccount.emailJourneyVariants || [],
-        emailCampaignStages: updatedAccount.emailCampaignStages || [],
-        countries: updatedAccount.countries || [],
-        languages: updatedAccount.languages || [],
-        isExactMatch: false,
-        weight: 1,
-        isFailover: false,
-        failoverPriority: 0,
-
-        createdBy: updatedAccount.createdBy,
-        updatedBy: updatedAccount.updatedBy,
-        createdAt: updatedAccount.createdAt.toISOString(),
-        updatedAt: updatedAccount.updatedAt.toISOString(),
+      // Transform to response format - match endpoint definition exactly
+      const response: SmtpAccountEditPUTResponseOutput = {
+        account: {
+          id: updatedAccount.id,
+          name: updatedAccount.name,
+          description: updatedAccount.description || undefined,
+          host: updatedAccount.host,
+          port: updatedAccount.port,
+          securityType: updatedAccount.securityType,
+          username: updatedAccount.username,
+          fromEmail: updatedAccount.fromEmail,
+          status: updatedAccount.status,
+          healthCheckStatus: updatedAccount.healthCheckStatus,
+          priority: updatedAccount.priority || undefined,
+          totalEmailsSent: updatedAccount.totalEmailsSent || 0,
+          lastUsedAt: updatedAccount.lastUsedAt?.toISOString() || null,
+          createdAt: updatedAccount.createdAt.toISOString(),
+          updatedAt: updatedAccount.updatedAt.toISOString(),
+        },
       };
 
       logger.info("SMTP account updated successfully", {
@@ -270,7 +244,7 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
         userId: user.id,
       });
 
-      return createSuccessResponse(responseAccount);
+      return createSuccessResponse(response);
     } catch (error) {
       logger.error("Error updating SMTP account", error);
 
@@ -281,17 +255,14 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
         errorMessage.includes("duplicate")
       ) {
         return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.edit.errors.conflict.title",
+          "app.api.v1.core.emails.smtpClient.edit.id.errors.conflict.title",
           ErrorResponseTypes.CONFLICT,
-          {
-            error:
-              "app.api.v1.core.emails.smtpClient.edit.errors.conflict.description",
-          },
+          { error: errorMessage },
         );
       }
 
       return createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.edit.errors.server.title",
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: errorMessage },
       );

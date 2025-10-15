@@ -26,6 +26,18 @@ type RequestType = typeof endpoints.POST.types.RequestOutput;
 type GenerateAllResponseType = typeof endpoints.POST.types.ResponseOutput;
 
 /**
+ * Type definitions for CLI generator modules
+ * These modules are from CLI-only paths and need explicit typing
+ */
+interface FunctionalGeneratorModule {
+  runFunctionalGenerators: (options: { rootDir: string }) => void;
+}
+
+interface SeedsGeneratorModule {
+  generateSeeds: (rootDir: string) => void;
+}
+
+/**
  * Generate All Repository Interface
  */
 interface GenerateAllRepository {
@@ -69,11 +81,14 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           (async (): Promise<string | null> => {
             try {
               outputLines.push("📝 Running functional generators...");
-              const functionalModule = await import(
+              // CLI-only module without type definitions - dynamic import required
+              /* eslint-disable @typescript-eslint/no-unsafe-assignment, import/no-unresolved */
+              const functionalModule: FunctionalGeneratorModule = await import(
+                // @ts-ignore - CLI module path not in tsconfig
                 "next-vibe/cli-do-not-import-from-here/scripts/generators/functional"
               );
-              const { runFunctionalGenerators } = functionalModule;
-              runFunctionalGenerators({
+              /* eslint-enable @typescript-eslint/no-unsafe-assignment, import/no-unresolved */
+              functionalModule.runFunctionalGenerators({
                 rootDir: "src",
               });
               outputLines.push(
@@ -99,11 +114,14 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           (async (): Promise<string | null> => {
             try {
               outputLines.push("🌱 Generating seeds...");
-              const seedsModule = await import(
+              // CLI-only module without type definitions - dynamic import required
+              /* eslint-disable @typescript-eslint/no-unsafe-assignment, import/no-unresolved */
+              const seedsModule: SeedsGeneratorModule = await import(
+                // @ts-ignore - CLI module path not in tsconfig
                 "next-vibe/cli-do-not-import-from-here/scripts/generators/functional/generate-seeds"
               );
-              const { generateSeeds } = seedsModule;
-              generateSeeds("src");
+              /* eslint-enable @typescript-eslint/no-unsafe-assignment, import/no-unresolved */
+              seedsModule.generateSeeds("src");
               outputLines.push("✅ Seeds generated successfully");
               generatorsRun++;
               return "seeds";
@@ -171,11 +189,13 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
 
       // Wait for all generators to complete
       const results = await Promise.allSettled(generatorPromises);
-      const completedGenerators = results
-        .filter(
-          (result) => result.status === "fulfilled" && result.value !== null,
-        )
-        .map((result) => (result as PromiseFulfilledResult<string>).value);
+      const completedGenerators: string[] = [];
+
+      for (const result of results) {
+        if (result.status === "fulfilled" && result.value !== null) {
+          completedGenerators.push(result.value);
+        }
+      }
 
       functionalGeneratorsCompleted = completedGenerators.length > 0;
 

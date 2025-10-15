@@ -1,3 +1,4 @@
+/// <reference types="node" />
 /* eslint-disable no-console */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable i18next/no-literal-string */

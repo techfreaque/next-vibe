@@ -10,14 +10,14 @@ export const chatColors = {
     to: "to-blue-600",
     gradient: "bg-gradient-to-br from-blue-500 to-blue-600",
   },
-  
+
   // Secondary blue gradients (lighter)
   secondary: {
     from: "from-blue-400",
     to: "to-indigo-500",
     gradient: "bg-gradient-to-br from-blue-400 to-indigo-500",
   },
-  
+
   // Accent blue gradients (for highlights)
   accent: {
     from: "from-blue-50",
@@ -25,7 +25,7 @@ export const chatColors = {
     gradient: "bg-gradient-to-br from-blue-50 to-indigo-50",
     dark: "dark:from-blue-950/30 dark:to-indigo-950/30",
   },
-  
+
   // Sidebar colors
   sidebar: {
     bg: "bg-slate-50 dark:bg-slate-950",
@@ -33,14 +33,14 @@ export const chatColors = {
     active: "bg-blue-100/70 dark:bg-blue-900/30",
     border: "border-slate-200 dark:border-slate-800",
   },
-  
+
   // Message bubbles
   message: {
     user: "bg-gradient-to-br from-blue-500 to-blue-600",
     assistant: "bg-white dark:bg-slate-900",
     error: "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900",
   },
-  
+
   // UI elements
   ui: {
     border: "border-slate-200 dark:border-slate-800",
@@ -79,4 +79,3 @@ export const chatProse = {
   links: "prose-a:text-blue-600 dark:prose-a:text-blue-400",
   all: "prose prose-sm dark:prose-invert max-w-none prose-headings:text-slate-900 dark:prose-headings:text-slate-100 prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-code:text-blue-600 dark:prose-code:text-blue-400",
 } as const;
-

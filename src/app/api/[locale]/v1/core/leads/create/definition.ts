@@ -33,25 +33,33 @@ const { POST } = createEndpoint({
   title: "app.api.v1.core.leads.create.post.title",
   description: "app.api.v1.core.leads.create.post.description",
   category: "app.api.v1.core.leads.category",
-  tags: ["app.api.v1.core.leads.tags.leads", "app.api.v1.core.leads.tags.create"],
+  tags: [
+    "app.api.v1.core.leads.tags.leads",
+    "app.api.v1.core.leads.tags.create",
+  ],
   allowedRoles: [UserRole.ADMIN],
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.leads.create.post.container.title",
-      description: "app.api.v1.core.leads.create.post.container.description",
+      title: "app.api.v1.core.leads.create.post.title",
+      description: "app.api.v1.core.leads.create.post.description",
       layout: { type: LayoutType.STACKED },
+      children: [],
     },
-    { request: "data", response: true },
+    {
+      [Methods.POST]: { request: "data", response: true },
+    },
     {
       // === CONTACT INFORMATION ===
       contactInfo: objectField(
         {
-          type: WidgetType.FORM_SECTION,
+          type: WidgetType.SECTION,
           title: "app.api.v1.core.leads.create.post.contactInfo.title",
-          description: "app.api.v1.core.leads.create.post.contactInfo.description",
+          description:
+            "app.api.v1.core.leads.create.post.contactInfo.description",
           layout: { type: LayoutType.GRID_2_COLUMNS },
+          children: [],
         },
         { request: "data" },
         {
@@ -60,8 +68,10 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.EMAIL,
               label: "app.api.v1.core.leads.create.post.email.label",
-              description: "app.api.v1.core.leads.create.post.email.description",
-              placeholder: "app.api.v1.core.leads.create.post.email.placeholder",
+              description:
+                "app.api.v1.core.leads.create.post.email.description",
+              placeholder:
+                "app.api.v1.core.leads.create.post.email.placeholder",
               layout: { columns: 12 },
               validation: { required: true },
             },
@@ -73,8 +83,10 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.v1.core.leads.create.post.businessName.label",
-              description: "app.api.v1.core.leads.create.post.businessName.description",
-              placeholder: "app.api.v1.core.leads.create.post.businessName.placeholder",
+              description:
+                "app.api.v1.core.leads.create.post.businessName.description",
+              placeholder:
+                "app.api.v1.core.leads.create.post.businessName.placeholder",
               layout: { columns: 12 },
               validation: { required: true, maxLength: 255 },
             },
@@ -86,12 +98,17 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.PHONE,
               label: "app.api.v1.core.leads.create.post.phone.label",
-              description: "app.api.v1.core.leads.create.post.phone.description",
-              placeholder: "app.api.v1.core.leads.create.post.phone.placeholder",
+              description:
+                "app.api.v1.core.leads.create.post.phone.description",
+              placeholder:
+                "app.api.v1.core.leads.create.post.phone.placeholder",
               layout: { columns: 6 },
-              validation: { pattern: /^\+?[1-9]\d{1,14}$/ },
+              validation: { pattern: /^\+?[1-9]\d{1,14}$/.source },
             },
-            z.string().regex(/^\+?[1-9]\d{1,14}$/).optional(),
+            z
+              .string()
+              .regex(/^\+?[1-9]\d{1,14}$/)
+              .optional(),
           ),
 
           website: requestDataField(
@@ -99,8 +116,10 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.URL,
               label: "app.api.v1.core.leads.create.post.website.label",
-              description: "app.api.v1.core.leads.create.post.website.description",
-              placeholder: "app.api.v1.core.leads.create.post.website.placeholder",
+              description:
+                "app.api.v1.core.leads.create.post.website.description",
+              placeholder:
+                "app.api.v1.core.leads.create.post.website.placeholder",
               layout: { columns: 6 },
             },
             z.string().url().optional(),
@@ -111,10 +130,12 @@ const { POST } = createEndpoint({
       // === LOCATION & PREFERENCES ===
       locationPreferences: objectField(
         {
-          type: WidgetType.FORM_SECTION,
+          type: WidgetType.SECTION,
           title: "app.api.v1.core.leads.create.post.locationPreferences.title",
-          description: "app.api.v1.core.leads.create.post.locationPreferences.description",
+          description:
+            "app.api.v1.core.leads.create.post.locationPreferences.description",
           layout: { type: LayoutType.GRID_2_COLUMNS },
+          children: [],
         },
         { request: "data" },
         {
@@ -123,13 +144,17 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.v1.core.leads.create.post.country.label",
-              description: "app.api.v1.core.leads.create.post.country.description",
-              placeholder: "app.api.v1.core.leads.create.post.country.placeholder",
+              description:
+                "app.api.v1.core.leads.create.post.country.description",
+              placeholder:
+                "app.api.v1.core.leads.create.post.country.placeholder",
               layout: { columns: 6 },
-              options: Object.entries(Countries).map(([, value]) => ({
-                value: value,
-                label: `app.api.v1.core.leads.enums.country.${value.toLowerCase()}`,
-              })),
+              options: Object.entries(Countries).map(
+                ([, value]: [string, string]) => ({
+                  value: value,
+                  label: `app.api.v1.core.leads.enums.country.${value.toLowerCase()}`,
+                }),
+              ),
               validation: { required: true },
             },
             z.string(),
@@ -140,13 +165,17 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.v1.core.leads.create.post.language.label",
-              description: "app.api.v1.core.leads.create.post.language.description",
-              placeholder: "app.api.v1.core.leads.create.post.language.placeholder",
+              description:
+                "app.api.v1.core.leads.create.post.language.description",
+              placeholder:
+                "app.api.v1.core.leads.create.post.language.placeholder",
               layout: { columns: 6 },
-              options: Object.entries(Languages).map(([, value]) => ({
-                value: value,
-                label: `app.api.v1.core.leads.enums.language.${value.toLowerCase()}`,
-              })),
+              options: Object.entries(Languages).map(
+                ([, value]: [string, string]) => ({
+                  value: value,
+                  label: `app.api.v1.core.leads.enums.language.${value.toLowerCase()}`,
+                }),
+              ),
               validation: { required: true },
             },
             z.string(),
@@ -157,11 +186,12 @@ const { POST } = createEndpoint({
       // === LEAD DETAILS ===
       leadDetails: objectField(
         {
-          type: WidgetType.FORM_SECTION,
+          type: WidgetType.SECTION,
           title: "app.api.v1.core.leads.create.post.leadDetails.title",
-          description: "app.api.v1.core.leads.create.post.leadDetails.description",
+          description:
+            "app.api.v1.core.leads.create.post.leadDetails.description",
           layout: { type: LayoutType.STACKED },
-          collapsed: true,
+          children: [],
         },
         { request: "data" },
         {
@@ -170,9 +200,11 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.v1.core.leads.create.post.source.label",
-              description: "app.api.v1.core.leads.create.post.source.description",
-              placeholder: "app.api.v1.core.leads.create.post.source.placeholder",
-              layout: { type: LayoutType.HORIZONTAL },
+              description:
+                "app.api.v1.core.leads.create.post.source.description",
+              placeholder:
+                "app.api.v1.core.leads.create.post.source.placeholder",
+              layout: { columns: 12 },
               options: LeadSourceOptions,
             },
             z.nativeEnum(LeadSource).optional(),
@@ -183,9 +215,11 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXTAREA,
               label: "app.api.v1.core.leads.create.post.notes.label",
-              description: "app.api.v1.core.leads.create.post.notes.description",
-              placeholder: "app.api.v1.core.leads.create.post.notes.placeholder",
-              layout: { type: LayoutType.FULL_WIDTH },
+              description:
+                "app.api.v1.core.leads.create.post.notes.description",
+              placeholder:
+                "app.api.v1.core.leads.create.post.notes.placeholder",
+              layout: { columns: 12 },
               validation: { maxLength: 1000 },
             },
             z.string().max(1000).optional(),
@@ -200,6 +234,7 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.leads.create.post.response.title",
           description: "app.api.v1.core.leads.create.post.response.description",
           layout: { type: LayoutType.STACKED },
+          children: [],
         },
         { response: true },
         {
@@ -209,38 +244,38 @@ const { POST } = createEndpoint({
               type: WidgetType.CONTAINER,
               title: "app.api.v1.core.leads.create.post.response.summary.title",
               layout: { type: LayoutType.GRID_2_COLUMNS },
+              children: [],
             },
             { response: true },
             {
               id: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.leads.create.post.response.id",
-                  label: "app.api.v1.core.leads.create.post.response.id.label",
+                  content:
+                    "app.api.v1.core.leads.create.post.response.summary.id",
                 },
                 z.string().uuid(),
               ),
               businessName: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.leads.create.post.response.businessName",
-                  label: "app.api.v1.core.leads.create.post.response.businessName.label",
+                  content:
+                    "app.api.v1.core.leads.create.post.response.summary.businessName",
                 },
                 z.string(),
               ),
               email: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.leads.create.post.response.email",
-                  label: "app.api.v1.core.leads.create.post.response.email.label",
+                  content:
+                    "app.api.v1.core.leads.create.post.response.summary.email",
                 },
                 z.email(),
               ),
               status: responseField(
                 {
-                  type: WidgetType.STATUS_BADGE,
-                  text: "app.api.v1.core.leads.create.post.response.status",
-                  label: "app.api.v1.core.leads.create.post.response.status.label",
+                  type: WidgetType.BADGE,
+                  text: "app.api.v1.core.leads.create.post.response.summary.status",
                 },
                 z.nativeEnum(LeadStatus),
               ),
@@ -251,40 +286,42 @@ const { POST } = createEndpoint({
           contactDetails: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.v1.core.leads.create.post.response.contactDetails.title",
+              title:
+                "app.api.v1.core.leads.create.post.response.contactDetails.title",
               layout: { type: LayoutType.GRID_2_COLUMNS },
+              children: [],
             },
             { response: true },
             {
               phone: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.leads.create.post.response.phone",
-                  label: "app.api.v1.core.leads.create.post.response.phone.label",
+                  content:
+                    "app.api.v1.core.leads.create.post.response.contactDetails.phone",
                 },
                 z.string().nullable(),
               ),
               website: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.leads.create.post.response.website",
-                  label: "app.api.v1.core.leads.create.post.response.website.label",
+                  content:
+                    "app.api.v1.core.leads.create.post.response.contactDetails.website",
                 },
                 z.string().nullable(),
               ),
               country: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.leads.create.post.response.country",
-                  label: "app.api.v1.core.leads.create.post.response.country.label",
+                  content:
+                    "app.api.v1.core.leads.create.post.response.contactDetails.country",
                 },
                 z.string(),
               ),
               language: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.leads.create.post.response.language",
-                  label: "app.api.v1.core.leads.create.post.response.language.label",
+                  content:
+                    "app.api.v1.core.leads.create.post.response.contactDetails.language",
                 },
                 z.string(),
               ),
@@ -295,33 +332,33 @@ const { POST } = createEndpoint({
           trackingInfo: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.v1.core.leads.create.post.response.trackingInfo.title",
-              layout: { type: LayoutType.GRID_3_COLUMNS },
-              collapsed: true,
+              title:
+                "app.api.v1.core.leads.create.post.response.trackingInfo.title",
+              layout: { type: LayoutType.GRID },
+              children: [],
             },
             { response: true },
             {
               source: responseField(
                 {
-                  type: WidgetType.SOURCE_BADGE,
-                  text: "app.api.v1.core.leads.create.post.response.source",
-                  label: "app.api.v1.core.leads.create.post.response.source.label",
+                  type: WidgetType.BADGE,
+                  text: "app.api.v1.core.leads.create.post.response.trackingInfo.source",
                 },
                 z.nativeEnum(LeadSource).nullable(),
               ),
               emailsSent: responseField(
                 {
-                  type: WidgetType.COUNT_BADGE,
-                  text: "app.api.v1.core.leads.create.post.response.emailsSent",
-                  label: "app.api.v1.core.leads.create.post.response.emailsSent.label",
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.create.post.response.trackingInfo.emailsSent",
                 },
                 z.number(),
               ),
               currentCampaignStage: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.leads.create.post.response.currentCampaignStage",
-                  label: "app.api.v1.core.leads.create.post.response.currentCampaignStage.label",
+                  content:
+                    "app.api.v1.core.leads.create.post.response.trackingInfo.currentCampaignStage",
                 },
                 z.string().nullable(),
               ),
@@ -332,33 +369,34 @@ const { POST } = createEndpoint({
           metadata: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.v1.core.leads.create.post.response.metadata.title",
+              title:
+                "app.api.v1.core.leads.create.post.response.metadata.title",
               layout: { type: LayoutType.GRID_2_COLUMNS },
-              collapsed: true,
+              children: [],
             },
             { response: true },
             {
               notes: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.v1.core.leads.create.post.response.notes",
-                  label: "app.api.v1.core.leads.create.post.response.notes.label",
+                  content:
+                    "app.api.v1.core.leads.create.post.response.metadata.notes",
                 },
                 z.string().nullable(),
               ),
               createdAt: responseField(
                 {
-                  type: WidgetType.DATETIME_TEXT,
-                  content: "app.api.v1.core.leads.create.post.response.createdAt",
-                  label: "app.api.v1.core.leads.create.post.response.createdAt.label",
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.create.post.response.metadata.createdAt",
                 },
                 z.string().datetime(),
               ),
               updatedAt: responseField(
                 {
-                  type: WidgetType.DATETIME_TEXT,
-                  content: "app.api.v1.core.leads.create.post.response.updatedAt",
-                  label: "app.api.v1.core.leads.create.post.response.updatedAt.label",
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.create.post.response.metadata.updatedAt",
                 },
                 z.string().datetime(),
               ),
@@ -373,39 +411,48 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.v1.core.leads.create.post.errors.validation.title",
-      description: "app.api.v1.core.leads.create.post.errors.validation.description",
+      description:
+        "app.api.v1.core.leads.create.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.v1.core.leads.create.post.errors.unauthorized.title",
-      description: "app.api.v1.core.leads.create.post.errors.unauthorized.description",
+      description:
+        "app.api.v1.core.leads.create.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.v1.core.leads.create.post.errors.forbidden.title",
-      description: "app.api.v1.core.leads.create.post.errors.forbidden.description",
+      description:
+        "app.api.v1.core.leads.create.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.v1.core.leads.create.post.errors.conflict.title",
-      description: "app.api.v1.core.leads.create.post.errors.conflict.description",
+      description:
+        "app.api.v1.core.leads.create.post.errors.conflict.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.v1.core.leads.create.post.errors.server.title",
-      description: "app.api.v1.core.leads.create.post.errors.server.description",
+      description:
+        "app.api.v1.core.leads.create.post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.v1.core.leads.create.post.errors.unknown.title",
-      description: "app.api.v1.core.leads.create.post.errors.unknown.description",
+      description:
+        "app.api.v1.core.leads.create.post.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.v1.core.leads.create.post.errors.network.title",
-      description: "app.api.v1.core.leads.create.post.errors.network.description",
+      description:
+        "app.api.v1.core.leads.create.post.errors.network.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.v1.core.leads.create.post.errors.notFound.title",
-      description: "app.api.v1.core.leads.create.post.errors.notFound.description",
+      description:
+        "app.api.v1.core.leads.create.post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.v1.core.leads.create.post.errors.unsavedChanges.title",
-      description: "app.api.v1.core.leads.create.post.errors.unsavedChanges.description",
+      description:
+        "app.api.v1.core.leads.create.post.errors.unsavedChanges.description",
     },
   },
 
@@ -443,6 +490,7 @@ const { POST } = createEndpoint({
           country: "US",
           language: "en",
         },
+        leadDetails: {},
       },
     },
     responses: {

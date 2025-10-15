@@ -16,6 +16,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import { smsServiceRepository } from "../emails/sms-service/repository";
 import { CampaignType } from "../emails/smtp-client/enum";
@@ -59,7 +60,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
       const adminPhone: string | undefined = undefined;
 
       if (!adminPhone) {
-        logger.debug("contact.sms.admin.phone.missing", {
+        logger.debug("app.api.v1.core.contact.sms.admin.phone.missing", {
           contactEmail: contactData.email,
         });
         return createSuccessResponse({
@@ -68,7 +69,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         });
       }
 
-      logger.debug("contact.sms.admin.send.start", {
+      logger.debug("app.api.v1.core.contact.sms.admin.send.start", {
         contactEmail: contactData.email,
         contactName: contactData.name,
         adminPhone,
@@ -103,7 +104,10 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         sent: true,
       });
     } catch (error) {
-      logger.error("contact.sms.admin.send.error", parseError(error));
+      logger.error(
+        "app.api.v1.core.contact.sms.admin.send.error",
+        parseError(error),
+      );
       return createErrorResponse(
         "error.general.internal_server_error",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -126,7 +130,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
       const userPhone = (user as { phone?: string } | null)?.phone;
 
       if (!userPhone) {
-        logger.debug("contact.sms.confirmation.phone.missing", {
+        logger.debug("app.api.v1.core.contact.sms.confirmation.phone.missing", {
           contactEmail: contactData.email,
           userId: user?.id,
         });
@@ -136,7 +140,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         });
       }
 
-      logger.debug("contact.sms.confirmation.send.start", {
+      logger.debug("app.api.v1.core.contact.sms.confirmation.send.start", {
         contactEmail: contactData.email,
         contactName: contactData.name,
         userPhone,
@@ -167,7 +171,10 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         sent: true,
       });
     } catch (error) {
-      logger.error("contact.sms.confirmation.send.error", parseError(error));
+      logger.error(
+        "app.api.v1.core.contact.sms.confirmation.send.error",
+        parseError(error),
+      );
       return createErrorResponse(
         "error.general.internal_server_error",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -183,19 +190,14 @@ export class ContactSmsServiceImpl implements ContactSmsService {
     locale: CountryLanguage,
   ): string {
     const { name, email, subject } = contactData;
+    const { t } = simpleT(locale);
 
-    // Translations available in i18n: app.api.v1.core.contact.sms.admin.notification
-    switch (locale.split("-")[0]) {
-      case "de":
-        // eslint-disable-next-line i18next/no-literal-string
-        return `Neue Kontaktanfrage: ${name} (${email}) - ${subject}`;
-      case "pl":
-        // eslint-disable-next-line i18next/no-literal-string
-        return `Nowe zapytanie kontaktowe: ${name} (${email}) - ${subject}`;
-      default: // English
-        // eslint-disable-next-line i18next/no-literal-string
-        return `New contact inquiry: ${name} (${email}) - ${subject}`;
-    }
+    // Use i18n translations: app.api.v1.core.contact.sms.admin.notification
+    return t("app.api.v1.core.contact.sms.admin.notification", {
+      name,
+      email,
+      subject,
+    });
   }
 
   /**
@@ -206,19 +208,12 @@ export class ContactSmsServiceImpl implements ContactSmsService {
     locale: CountryLanguage,
   ): string {
     const { name } = contactData;
+    const { t } = simpleT(locale);
 
-    // Translations available in i18n: app.api.v1.core.contact.sms.confirmation.message
-    switch (locale.split("-")[0]) {
-      case "de":
-        // eslint-disable-next-line i18next/no-literal-string
-        return `${name}, vielen Dank für Ihre Nachricht! Wir melden uns bald bei Ihnen.`;
-      case "pl":
-        // eslint-disable-next-line i18next/no-literal-string
-        return `${name}, dziękujemy za wiadomość! Skontaktujemy się wkrótce.`;
-      default: // English
-        // eslint-disable-next-line i18next/no-literal-string
-        return `${name}, thank you for your message! We'll get back to you soon.`;
-    }
+    // Use i18n translations: app.api.v1.core.contact.sms.confirmation.message
+    return t("app.api.v1.core.contact.sms.confirmation.message", {
+      name,
+    });
   }
 }
 

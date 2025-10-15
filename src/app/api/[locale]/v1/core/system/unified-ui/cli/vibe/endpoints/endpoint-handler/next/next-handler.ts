@@ -7,26 +7,25 @@ import type { NextRequest } from "next/server";
 import {
   createSuccessResponse,
   ErrorResponseTypes,
+  isStreamingResponse,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { z } from "zod";
 
 import type {
-  EmailHandleRequestTypeOutput,
-  EmailHandleResponseTypeOutput,
+  EmailHandleRequestOutput,
+  EmailHandleResponseOutput,
 } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
 import { EmailHandlingRepositoryImpl } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/repository";
-import type { InferUserType } from "@/app/api/[locale]/v1/core/user/auth/repository";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { Methods } from "../../endpoint-types/core/enums";
-import type { UnifiedField } from "../../endpoint-types/core/types";
 import { authenticateUser, executeHandler } from "../core/handler-core";
-import { createEndpointLogger } from "../logger/endpoint-logger";
 import type { EndpointLogger } from "../logger";
+import { createEndpointLogger } from "../logger/endpoint-logger";
 import type { ApiHandlerOptions } from "../types";
 import {
   createHTTPErrorResponse,
@@ -44,13 +43,13 @@ async function handleEmails<
   TResponseOutput,
   TUrlVariablesOutput,
 >(
-  data: EmailHandleRequestTypeOutput<
+  data: EmailHandleRequestOutput<
     TRequestOutput,
     TResponseOutput,
     TUrlVariablesOutput
   >,
   logger: EndpointLogger,
-): Promise<ResponseType<EmailHandleResponseTypeOutput>> {
+): Promise<ResponseType<EmailHandleResponseOutput>> {
   return await emailHandlingRepository.handleEmails(
     data,
     data.user,
@@ -73,7 +72,7 @@ export function createNextHandler<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TFields,
 >(
   options: ApiHandlerOptions<
     TRequestOutput,
@@ -97,7 +96,7 @@ export function createNextHandler<
   ) => {
     // Get locale and translation function
     const { locale, ...resolvedParams } = await params;
-    const urlParameters = (resolvedParams) as TUrlVariablesOutput;
+    const urlParameters = resolvedParams as TUrlVariablesOutput;
     const logger = createEndpointLogger(false, Date.now(), locale);
     const { t } = simpleT(locale);
     try {
@@ -154,12 +153,19 @@ export function createNextHandler<
         handler,
         validatedData: validationResult.data.requestData,
         urlVariables: validationResult.data.urlVariables,
-        user: authResult.data as InferUserType<TUserRoleValue>,
+        user: authResult.data,
         t,
         locale: validationResult.data.locale,
         request,
         logger,
       });
+
+      // Check if this is a streaming response
+      if (isStreamingResponse(result)) {
+        // Return the streaming response directly without wrapping
+        logger.info("Returning streaming response");
+        return result.response;
+      }
 
       if (!result.success) {
         return createHTTPErrorResponse({

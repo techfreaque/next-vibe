@@ -1,20 +1,28 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useEffect, useRef } from "react";
 
-import type { ChatMessage, ChatThread, ViewMode } from "../../lib/storage/types";
-import type { ModelId } from "../../lib/config/models";
-import { cn } from "next-vibe/shared/utils";
-import { SuggestedPrompts } from "./suggested-prompts";
-import { LoadingIndicator } from "./loading-indicator";
-import { ThreadedMessage } from "./threaded-message";
-import { LinearMessageView } from "./linear-message-view";
-import { FlatMessageView } from "./flat-message-view";
-import { useMessageActions } from "./use-message-actions";
-import { useChatContext } from "../../features/chat/context";
-import { getDirectReplies, getRootMessages } from "../../lib/utils/thread-builder";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+import { useChatContext } from "../../features/chat/context";
+import type { ModelId } from "../../lib/config/models";
+import type {
+  ChatMessage,
+  ChatThread,
+  ViewMode,
+} from "../../lib/storage/types";
+import {
+  getDirectReplies,
+  getRootMessages,
+} from "../../lib/utils/thread-builder";
+import { FlatMessageView } from "./flat-message-view";
+import { LinearMessageView } from "./linear-message-view";
+import { LoadingIndicator } from "./loading-indicator";
+import { SuggestedPrompts } from "./suggested-prompts";
+import { ThreadedMessage } from "./threaded-message";
+import { useMessageActions } from "./use-message-actions";
 
 interface ChatMessagesProps {
   thread: ChatThread;
@@ -73,17 +81,21 @@ export function ChatMessages({
   return (
     <div
       ref={messagesContainerRef}
+      id="chat-messages-container"
       className={cn(
         "h-full overflow-y-auto scroll-smooth",
-        "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-blue-400/30 hover:scrollbar-thumb-blue-500/50 scrollbar-thumb-rounded-full"
+        "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-blue-400/30 hover:scrollbar-thumb-blue-500/50 scrollbar-thumb-rounded-full",
       )}
     >
       {/* Inner container with consistent padding and dynamic bottom padding */}
       <div
-        className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-10 space-y-5"
+        id="chat-messages-content"
+        className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-15 space-y-5"
         style={{ paddingBottom: `${inputHeight + 16}px` }}
       >
-        {Object.keys(thread.messages).length === 0 && !isLoading && onSendMessage ? (
+        {Object.keys(thread.messages).length === 0 &&
+        !isLoading &&
+        onSendMessage ? (
           <div className="flex min-h-[60vh] items-center justify-center">
             <SuggestedPrompts onSelectPrompt={onSendMessage} />
           </div>
@@ -91,7 +103,9 @@ export function ChatMessages({
           // Flat view (4chan style) - ALL messages in chronological order
           (() => {
             // Get ALL messages from thread, sorted by timestamp
-            const allMessages = Object.values(thread.messages).sort((a, b) => a.timestamp - b.timestamp);
+            const allMessages = Object.values(thread.messages).sort(
+              (a, b) => a.timestamp - b.timestamp,
+            );
             return (
               <FlatMessageView
                 thread={thread}
@@ -101,7 +115,10 @@ export function ChatMessages({
                 onMessageClick={(messageId) => {
                   // Scroll to message when reference is clicked
                   const element = document.getElementById(`msg-${messageId}`);
-                  element?.scrollIntoView({ behavior: "smooth", block: "center" });
+                  element?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  });
                 }}
                 onBranchMessage={onBranchMessage}
                 onRetryMessage={onRetryMessage}
@@ -112,7 +129,7 @@ export function ChatMessages({
                 onToneChange={onToneChange}
                 onInsertQuote={() => {
                   // Only insert '>' character for quoting
-                  insertTextAtCursor('>');
+                  insertTextAtCursor(">");
                 }}
               />
             );
@@ -121,7 +138,10 @@ export function ChatMessages({
           // Threaded view (Reddit style) - Show ALL messages, not just current path
           (() => {
             const allMessages = Object.values(thread.messages);
-            const rootMessages = getRootMessages(allMessages, thread.rootMessageId);
+            const rootMessages = getRootMessages(
+              allMessages,
+              thread.rootMessageId,
+            );
             return rootMessages.map((rootMessage) => (
               <ThreadedMessage
                 key={rootMessage.id}
@@ -164,8 +184,12 @@ export function ChatMessages({
             onStartRetry={messageActions.startRetry}
             onStartAnswer={messageActions.startAnswer}
             onCancelAction={messageActions.cancelAction}
-            onSaveEdit={(id, content) => messageActions.handleSaveEdit(id, content, onEditMessage)}
-            onBranchEdit={(id, content) => messageActions.handleBranchEdit(id, content, onBranchMessage)}
+            onSaveEdit={(id, content) =>
+              messageActions.handleSaveEdit(id, content, onEditMessage)
+            }
+            onBranchEdit={(id, content) =>
+              messageActions.handleBranchEdit(id, content, onBranchMessage)
+            }
           />
         )}
 

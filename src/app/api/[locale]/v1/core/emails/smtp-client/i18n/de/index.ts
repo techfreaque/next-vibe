@@ -11,11 +11,28 @@ export const translations: typeof enTranslations = {
   create: createTranslations,
   edit: editTranslations,
   list: listTranslations,
-  send: {
+  sending: {
     errors: {
       server: {
         title: "Server-Fehler",
         description: "Ein Fehler ist auf dem SMTP-Server aufgetreten",
+      },
+      rejected: {
+        title: "E-Mail abgelehnt",
+        defaultReason: "E-Mail vom Server abgelehnt",
+      },
+      no_recipients: {
+        title: "Keine Empfänger akzeptiert",
+        defaultReason: "Keine Empfänger akzeptiert",
+      },
+      rate_limit: {
+        title: "Ratenlimit überschritten",
+      },
+      capacity: {
+        title: "Kapazitätsfehler",
+      },
+      no_account: {
+        title: "Kein SMTP-Konto verfügbar",
       },
     },
   },

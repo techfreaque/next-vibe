@@ -1,21 +1,25 @@
 "use client";
 
-import type { ChatMessage } from "../../lib/storage/types";
 import { cn } from "next-vibe/shared/utils";
+import type { JSX } from "react";
+
 import { chatColors } from "../../lib/design-tokens";
+import type { ChatMessage } from "../../lib/storage/types";
 
 interface ErrorMessageBubbleProps {
   message: ChatMessage;
 }
 
-export function ErrorMessageBubble({ message }: ErrorMessageBubbleProps) {
+export function ErrorMessageBubble({
+  message,
+}: ErrorMessageBubbleProps): JSX.Element {
   return (
     <div className="flex items-start gap-3">
       <div className="flex-1">
         <div
           className={cn(
             "rounded-2xl px-4 py-3 border",
-            chatColors.message.error
+            chatColors.message.error,
           )}
         >
           <div className="text-sm text-red-900 dark:text-red-100">
@@ -29,4 +33,3 @@ export function ErrorMessageBubble({ message }: ErrorMessageBubbleProps) {
     </div>
   );
 }
-

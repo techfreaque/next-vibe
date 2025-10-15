@@ -3,7 +3,8 @@
  * Handles content state, loading state, and action handlers
  */
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import type { ChatMessage } from "../../lib/storage/types";
 
 export type EditorActionType = "overwrite" | "branch" | null;
@@ -20,11 +21,11 @@ export interface UseMessageEditorReturn {
   content: string;
   isLoading: boolean;
   actionType: EditorActionType;
-  
+
   // Refs
   editorRef: React.RefObject<HTMLDivElement>;
   textareaRef: React.RefObject<HTMLTextAreaElement>;
-  
+
   // Handlers
   setContent: (content: string) => void;
   handleOverwrite: () => Promise<void>;
@@ -61,7 +62,7 @@ export function useMessageEditor({
         block: "center",
       });
     }
-    
+
     // Focus textarea after a short delay to ensure it's rendered
     const timeoutId = setTimeout(() => {
       textareaRef.current?.focus();
@@ -111,15 +112,18 @@ export function useMessageEditor({
     }
   }, [content, isLoading, message.id, onBranch]);
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent): void => {
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-      e.preventDefault();
-      void handleOverwrite();
-    } else if (e.key === "Escape") {
-      e.preventDefault();
-      onCancel();
-    }
-  }, [handleOverwrite, onCancel]);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent): void => {
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        void handleOverwrite();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        onCancel();
+      }
+    },
+    [handleOverwrite, onCancel],
+  );
 
   const handleCancel = useCallback(() => {
     if (!isLoading) {
@@ -140,4 +144,3 @@ export function useMessageEditor({
     handleCancel,
   };
 }
-

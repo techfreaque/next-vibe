@@ -106,6 +106,10 @@ export const translations: typeof enTranslations = {
       validation: {
         title: "Validierungsfehler",
         description: "Ungültige Checkout-Parameter",
+        reason: {
+          enterpriseCustomPricing:
+            "ENTERPRISE-Plan erfordert individuelle Preisgestaltung",
+        },
       },
       network: {
         title: "Netzwerkfehler",

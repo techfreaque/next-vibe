@@ -78,7 +78,8 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "TypeScript type check completed successfully",
+          content:
+            "app.api.v1.core.system.check.typecheck.response.successMessage",
         },
         z.boolean(),
       ),
@@ -227,7 +228,10 @@ const { POST } = createEndpoint({
       default: {},
     },
     responses: {
-      default: {},
+      default: {
+        success: true,
+        issues: [],
+      },
     },
   },
 });

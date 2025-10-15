@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 interface EslintPlugin {
   rules: Record<string, unknown>;
   configs?: Record<string, unknown>;

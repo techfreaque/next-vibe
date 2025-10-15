@@ -16,21 +16,21 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../user/auth/definition";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { imapAccounts } from "../../messages/db";
 import { imapAccountsRepository } from "../accounts/repository";
 import {
   ImapAccountSortField,
   ImapAccountStatusFilter,
-  ImapConnectionStatus,
+  ImapHealthStatus,
   ImapSyncStatus,
   SortOrder,
 } from "../enum";
 import type {
-  ImapHealthGetRequestTypeOutput,
-  ImapHealthGetResponseTypeOutput,
+  ImapHealthGetRequestOutput,
+  ImapHealthGetResponseOutput,
 } from "./definition";
 
 /**
@@ -38,11 +38,11 @@ import type {
  */
 export interface ImapHealthRepository {
   getHealthStatus(
-    data: ImapHealthGetRequestTypeOutput,
+    data: ImapHealthGetRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapHealthGetResponseTypeOutput>>;
+  ): Promise<ResponseType<ImapHealthGetResponseOutput>>;
 }
 
 /**
@@ -53,11 +53,11 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
    * Get current IMAP server health status
    */
   async getHealthStatus(
-    data: ImapHealthGetRequestTypeOutput,
+    data: ImapHealthGetRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapHealthGetResponseTypeOutput>> {
+  ): Promise<ResponseType<ImapHealthGetResponseOutput>> {
     try {
       logger.debug("Getting IMAP health status", { userId: user.id });
 
@@ -77,9 +77,9 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
 
       if (!accountsResponse.success) {
         return createErrorResponse(
-          "app.api.v1.core.emails.imapClient.health.get.errors.server.title",
+          "app.api.v1.core.emails.imapClient.health.health.get.errors.server.title",
           ErrorResponseTypes.INTERNAL_ERROR,
-          parseError(accountsResponse.error),
+          { error: accountsResponse.message },
         );
       }
 
@@ -96,7 +96,7 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
       const activeConnections = await this.getActiveConnections();
       const lastSyncTime = this.getLastSyncTime(accounts);
 
-      const healthData = {
+      return createSuccessResponse({
         success: true,
         data: {
           accountsHealthy: syncedAccounts,
@@ -107,16 +107,15 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
           status: this.determineHealthStatus(accounts),
         },
         message:
-          "app.api.v1.core.emails.imapClient.health.get.success.description",
-      };
-
-      return createSuccessResponse(healthData);
+          "app.api.v1.core.emails.imapClient.health.health.get.success.description",
+      });
     } catch (error) {
-      logger.error("Error getting IMAP health status", error);
+      const parsedError = parseError(error);
+      logger.error("Error getting IMAP health status", parsedError);
       return createErrorResponse(
-        "app.api.v1.core.emails.imapClient.health.get.errors.server.title",
+        "app.api.v1.core.emails.imapClient.health.health.get.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
-        parseError(error),
+        { error: parsedError.message },
       );
     }
   }
@@ -126,9 +125,13 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
    */
   private determineHealthStatus(
     accounts: Array<{ syncStatus: string; isConnected: boolean }>,
-  ): string {
+  ):
+    | typeof ImapHealthStatus.HEALTHY
+    | typeof ImapHealthStatus.WARNING
+    | typeof ImapHealthStatus.ERROR
+    | typeof ImapHealthStatus.MAINTENANCE {
     if (accounts.length === 0) {
-      return ImapConnectionStatus.DISCONNECTED;
+      return ImapHealthStatus.WARNING;
     }
 
     const connectedAccounts = accounts.filter((account) => account.isConnected);
@@ -137,14 +140,18 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
     );
 
     if (errorAccounts.length > accounts.length * 0.5) {
-      return ImapConnectionStatus.ERROR;
+      return ImapHealthStatus.ERROR;
+    }
+
+    if (connectedAccounts.length > accounts.length * 0.8) {
+      return ImapHealthStatus.HEALTHY;
     }
 
     if (connectedAccounts.length > 0) {
-      return ImapConnectionStatus.CONNECTED;
+      return ImapHealthStatus.WARNING;
     }
 
-    return ImapConnectionStatus.DISCONNECTED;
+    return ImapHealthStatus.ERROR;
   }
 
   /**

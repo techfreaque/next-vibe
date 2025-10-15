@@ -5,7 +5,7 @@ import type {
   ReleaseTarget,
   VersionBumpType,
 } from "../types/types.js";
-import { logger, loggerError } from "../utils/logger.js";
+import { logger } from "../utils/logger.js";
 import {
   discoverReleaseTargets,
   findTargetByGitTag,
@@ -30,13 +30,17 @@ export async function ciReleaseCommand(
 
   if (targetDirectory) {
     // Use explicitly provided target directory
-    targetToRelease = targets.find((t) => t.directory === targetDirectory) || null;
+    targetToRelease =
+      targets.find((t) => t.directory === targetDirectory) || null;
     if (!targetToRelease) {
       throw new Error(`Target directory not found: ${targetDirectory}`);
     }
   } else {
     // Determine target from git tag
-    const tagToUse = gitTag || getCurrentGitTag() || process.env.GITHUB_REF?.replace("refs/tags/", "");
+    const tagToUse =
+      gitTag ||
+      getCurrentGitTag() ||
+      process.env.GITHUB_REF?.replace("refs/tags/", "");
     if (!tagToUse) {
       throw new Error(
         "No git tag found. Provide --tag option, set GITHUB_REF environment variable, or use --target option.",
@@ -154,20 +158,25 @@ export async function forceReleaseCommand(
   // Prompt for version bump if not provided
   let selectedVersionBump = versionBump;
   if (!selectedVersionBump) {
+    const versionBumpChoices: Array<{
+      name: string;
+      value: VersionBumpType;
+    }> = [
+      { name: "Patch (1.0.0 -> 1.0.1)", value: "patch" },
+      { name: "Minor (1.0.0 -> 1.1.0)", value: "minor" },
+      { name: "Major (1.0.0 -> 2.0.0)", value: "major" },
+      { name: "Initialize (-> 1.0.0)", value: "init" },
+    ];
+
     const { versionBumpChoice } = await inquirer.prompt([
       {
         type: "list",
         name: "versionBumpChoice",
         message: "Select version bump type:",
-        choices: [
-          { name: "Patch (1.0.0 -> 1.0.1)", value: "patch" },
-          { name: "Minor (1.0.0 -> 1.1.0)", value: "minor" },
-          { name: "Major (1.0.0 -> 2.0.0)", value: "major" },
-          { name: "Initialize (-> 1.0.0)", value: "init" },
-        ],
+        choices: versionBumpChoices,
       },
     ]);
-    selectedVersionBump = versionBumpChoice as VersionBumpType;
+    selectedVersionBump = versionBumpChoice;
   }
 
   // Confirm the action
@@ -285,7 +294,7 @@ export async function showReleaseStatusCommand(rootDir: string): Promise<void> {
  */
 export async function weeklyUpdateCommand(
   rootDir: string,
-  branchName: string = "next_version_candidates",
+  branchName = "next_version_candidates",
 ): Promise<void> {
   logger("📅 Weekly Dependency Update");
 

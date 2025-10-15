@@ -1,8 +1,10 @@
 /**
+
  * Results Journey - Follow-up 3 Email Template (Final Opportunity)
  */
 
 import { Text } from "@react-email/components";
+import React from "react";
 
 import {
   CTAButton,

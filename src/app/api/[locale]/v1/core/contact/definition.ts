@@ -77,7 +77,7 @@ const { POST } = createEndpoint({
           layout: { columns: 6 },
           validation: { required: true },
         },
-        z.email(),
+        z.string().email(),
       ),
       company: requestDataField(
         {

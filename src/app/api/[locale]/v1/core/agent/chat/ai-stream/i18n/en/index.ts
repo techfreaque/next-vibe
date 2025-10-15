@@ -98,4 +98,21 @@ export const translations = {
       },
     },
   },
+  route: {
+    errors: {
+      invalidJson: "Invalid JSON in request body",
+      invalidRequestData: "Invalid request data",
+      uncensoredApiKeyMissing: "Uncensored.ai API key not configured",
+      openrouterApiKeyMissing: "OpenRouter API key not configured",
+      streamCreationFailed: "Failed to create stream",
+      unknownError: "An error occurred",
+    },
+  },
+  providers: {
+    uncensoredHandler: {
+      errors: {
+        apiError: "Uncensored.ai API error ({{status}}): {{errorText}}",
+      },
+    },
+  },
 };

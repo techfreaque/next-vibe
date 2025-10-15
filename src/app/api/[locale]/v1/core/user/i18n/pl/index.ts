@@ -2,6 +2,7 @@ import { translations as authTranslations } from "../../auth/i18n/pl";
 import { translations as privateTranslations } from "../../private/i18n/pl";
 import { translations as publicTranslations } from "../../public/i18n/pl";
 import { translations as searchTranslations } from "../../search/i18n/pl";
+import { translations as sessionCleanupTranslations } from "../../session-cleanup/i18n/pl";
 import { translations as userRolesTranslations } from "../../user-roles/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
@@ -11,6 +12,7 @@ export const translations: typeof enTranslations = {
   "private": privateTranslations,
   "public": publicTranslations,
   "search": searchTranslations,
+  "session-cleanup": sessionCleanupTranslations,
   "userRoles": userRolesTranslations,
   "profileVisibility": {
     public: "Publiczny",
@@ -59,38 +61,6 @@ export const translations: typeof enTranslations = {
     updateFailed: {
       title: "Aktualizacja nie powiodła się",
       description: "Nie udało się zaktualizować profilu. Spróbuj ponownie.",
-    },
-  },
-  "session-cleanup": {
-    errors: {
-      execution_failed: {
-        title: "Wykonanie nie powiodło się",
-        description: "Wykonanie czyszczenia sesji nie powiodło się",
-      },
-      invalid_batch_size: {
-        title: "Nieprawidłowy rozmiar partii",
-        description: "Parametr rozmiaru partii jest nieprawidłowy",
-      },
-      invalid_session_retention: {
-        title: "Nieprawidłowe przechowywanie sesji",
-        description: "Parametr przechowywania sesji jest nieprawidłowy",
-      },
-      invalid_token_retention: {
-        title: "Nieprawidłowe przechowywanie tokenów",
-        description: "Parametr przechowywania tokenów jest nieprawidłowy",
-      },
-      partial_failure: {
-        title: "Częściowa awaria",
-        description: "Czyszczenie sesji częściowo nie powiodło się",
-      },
-      validation_failed: {
-        title: "Walidacja nie powiodła się",
-        description: "Walidacja czyszczenia sesji nie powiodła się",
-      },
-      unknown_error: {
-        title: "Nieznany błąd",
-        description: "Wystąpił nieznany błąd podczas czyszczenia sesji",
-      },
     },
   },
 };

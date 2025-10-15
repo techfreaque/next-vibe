@@ -64,6 +64,7 @@ const { POST } = createEndpoint({
           description: "common.taskNamesDescription",
           placeholder: "common.selectTasks",
           layout: { columns: 6 },
+          options: [],
         },
         z.array(z.string()).optional(),
       ),
@@ -83,7 +84,8 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "common.success",
+          content:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.success",
         },
         z.boolean(),
       ),
@@ -111,11 +113,19 @@ const { POST } = createEndpoint({
       results: responseArrayField(
         {
           type: WidgetType.DATA_TABLE,
+          title:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.results",
+          description:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.resultsDescription",
         },
         objectField(
           {
             type: WidgetType.CONTAINER,
-            title: "tasks.runner.title",
+            title:
+              "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.resultItem",
+            description:
+              "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.resultItemDescription",
+            layout: { type: LayoutType.GRID, columns: 4 },
           },
           { response: true },
           {
@@ -129,7 +139,8 @@ const { POST } = createEndpoint({
             success: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "common.success",
+                content:
+                  "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.taskSuccess",
               },
               z.boolean(),
             ),
@@ -173,8 +184,10 @@ const { POST } = createEndpoint({
         "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "error.general.title",
-      description: "error.general.description",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.server.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
@@ -209,7 +222,6 @@ const { POST } = createEndpoint({
         taskNames: ["health-check", "database-sync"],
       },
     },
-    urlPathVariables: undefined,
     responses: {
       empty: {
         success: true,
@@ -261,10 +273,10 @@ const { POST } = createEndpoint({
   },
 });
 
-export type PulseExecuteRequestTypeInput = typeof POST.types.RequestInput;
-export type PulseExecuteRequestTypeOutput = typeof POST.types.RequestOutput;
-export type PulseExecuteResponseTypeInput = typeof POST.types.ResponseInput;
-export type PulseExecuteResponseTypeOutput = typeof POST.types.ResponseOutput;
+export type PulseExecuteRequestInput = typeof POST.types.RequestInput;
+export type PulseExecuteRequestOutput = typeof POST.types.RequestOutput;
+export type PulseExecuteResponseInput = typeof POST.types.ResponseInput;
+export type PulseExecuteResponseOutput = typeof POST.types.ResponseOutput;
 
 /**
  * Export the endpoint definitions

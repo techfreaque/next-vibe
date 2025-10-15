@@ -16,7 +16,7 @@ export const translations = {
         description: "Authentication required",
       },
       validation: {
-        title: "Validation Error", 
+        title: "Validation Error",
         description: "Invalid request parameters",
       },
       server: {
@@ -49,4 +49,4 @@ export const translations = {
       description: "Operation completed successfully",
     },
   },
-} ;
+};

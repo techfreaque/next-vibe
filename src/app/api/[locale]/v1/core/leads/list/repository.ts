@@ -3,13 +3,14 @@
  * Repository for listing leads with filtering and pagination
  */
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 
 import { leadsRepository } from "../repository";
 import type {
@@ -41,11 +42,11 @@ export class LeadsListRepositoryImpl implements LeadsListRepository {
     // Convert multi-select arrays to single values for the existing repository
     const queryData = {
       ...data,
-      status: data.status?.[0],
-      currentCampaignStage: data.currentCampaignStage?.[0],
-      country: data.country?.[0],
-      language: data.language?.[0],
-      source: data.source?.[0],
+      status: data.statusFilters?.status?.[0],
+      currentCampaignStage: data.statusFilters?.currentCampaignStage?.[0],
+      country: data.locationFilters?.country?.[0],
+      language: data.locationFilters?.language?.[0],
+      source: data.sourceFilters?.source?.[0],
     };
 
     // Create mock user and locale for the main repository
@@ -70,7 +71,6 @@ export class LeadsListRepositoryImpl implements LeadsListRepository {
         success: true as const,
         data: {
           response: {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
             leads: result.data.leads,
             total: result.data.total,
             page: result.data.page,

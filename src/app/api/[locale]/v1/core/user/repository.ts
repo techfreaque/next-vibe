@@ -31,7 +31,7 @@ import type {
   UserSearchOptions,
   UserType,
 } from "./definition";
-import { ProfileVisibility, UserDetailLevel } from "./enum";
+import { UserDetailLevel } from "./enum";
 import { UserRole, type UserRoleValue } from "./user-roles/enum";
 import { userRolesRepository } from "./user-roles/repository";
 
@@ -188,7 +188,9 @@ export class BaseUserRepositoryImpl implements UserRepository {
         !verifiedUser.id
       ) {
         // This is expected for public/unauthenticated users, log as debug
-        logger.debug("No user ID in JWT payload (public user)", { isPublic: verifiedUser.isPublic });
+        logger.debug("No user ID in JWT payload (public user)", {
+          isPublic: verifiedUser.isPublic,
+        });
         return createErrorResponse(
           "auth.errors.jwt_payload_missing_id",
           ErrorResponseTypes.INTERNAL_ERROR,
@@ -255,15 +257,13 @@ export class BaseUserRepositoryImpl implements UserRepository {
         id: user.id,
         leadId: user.leadId,
         isPublic: false,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        company: user.company,
+        privateName: user.privateName,
+        publicName: user.publicName,
         email: user.email,
-        imageUrl: user.imageUrl || undefined,
         emailVerified: user.emailVerified,
         isActive: user.isActive,
         requireTwoFactor: false,
-        marketingConsent: false,
+        marketingConsent: user.marketingConsent ?? false,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         userRoles: userRolesResponse.data,
@@ -278,15 +278,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       // For complete detail level, add additional profile data
       const completeUser: CompleteUserType = {
         ...standardUser,
-        phone: user.phone || undefined,
-        bio: undefined,
-        website: undefined,
-        location: undefined,
-        avatar: undefined,
-        coverImage: undefined,
-        socialLinks: undefined,
-        preferences: undefined,
-        visibility: ProfileVisibility.PRIVATE,
+        stripeCustomerId: user.stripeCustomerId,
       };
 
       return createSuccessResponse<ExtendedUserType<T>>(
@@ -315,18 +307,10 @@ export class BaseUserRepositoryImpl implements UserRepository {
     try {
       logger.debug("Getting user by email", { email, detailLevel });
 
-      // Use a safer query that doesn't directly reference the email_verified column
+      // Just get the ID and use getUserById for full details
       const results = await db
         .select({
           id: users.id,
-          email: users.email,
-          firstName: users.firstName,
-          lastName: users.lastName,
-          imageUrl: users.imageUrl,
-          emailVerified: users.emailVerified,
-          isActive: users.isActive,
-          createdAt: users.createdAt,
-          updatedAt: users.updatedAt,
         })
         .from(users)
         .where(eq(users.email, email));
@@ -343,12 +327,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       return await this.getUserById(results[0].id, detailLevel, logger);
     } catch (error) {
       const errorMessage = parseError(error).message;
-      // If the table doesn't exist yet (e.g., during initial setup), log as debug instead of error
-      if (errorMessage.includes("relation") && errorMessage.includes("does not exist")) {
-        logger.debug("Database table not ready yet", { email, error: errorMessage });
-      } else {
-        logger.error("Error getting user by email", error);
-      }
+      logger.error("Error getting user by email", error);
       return createErrorResponse(
         "user.errors.email_lookup_failed",
         ErrorResponseTypes.DATABASE_ERROR,
@@ -453,11 +432,11 @@ export class BaseUserRepositoryImpl implements UserRepository {
           .from(users)
           .limit(limit)
           .offset(offset)
-          .orderBy(users.firstName, users.lastName);
+          .orderBy(users.privateName, users.publicName);
       } else {
         // Search users with query
-        const firstNamePattern = `%${query}%`;
-        const lastNamePattern = `%${query}%`;
+        const privateNamePattern = `%${query}%`;
+        const publicNamePattern = `%${query}%`;
         const emailPattern = `%${query}%`;
 
         searchResults = await db
@@ -465,14 +444,14 @@ export class BaseUserRepositoryImpl implements UserRepository {
           .from(users)
           .where(
             or(
-              ilike(users.firstName, firstNamePattern),
-              ilike(users.lastName, lastNamePattern),
+              ilike(users.privateName, privateNamePattern),
+              ilike(users.publicName, publicNamePattern),
               ilike(users.email, emailPattern),
             ),
           )
           .limit(limit)
           .offset(offset)
-          .orderBy(users.firstName, users.lastName);
+          .orderBy(users.privateName, users.publicName);
       }
 
       // Map to StandardUserType with all required fields
@@ -493,15 +472,13 @@ export class BaseUserRepositoryImpl implements UserRepository {
           id: user.id,
           leadId: user.leadId,
           isPublic: false,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          company: user.company,
+          privateName: user.privateName,
+          publicName: user.publicName,
           email: user.email,
-          imageUrl: user.imageUrl || undefined,
           isActive: user.isActive,
           emailVerified: user.emailVerified,
           requireTwoFactor: false,
-          marketingConsent: false,
+          marketingConsent: user.marketingConsent ?? false,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
           userRoles: userRolesResponse.data,
@@ -538,7 +515,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         .from(users)
         .limit(limit)
         .offset(offset)
-        .orderBy(users.firstName, users.lastName);
+        .orderBy(users.privateName, users.publicName);
 
       // Map to StandardUserType with all required fields
       const mappedResults: StandardUserType[] = [];
@@ -557,17 +534,15 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
         const standardUser: StandardUserType = {
           id: user.id,
-          leadId: null, // Users don't have leadId
-          firstName: user.firstName,
-          lastName: user.lastName,
-          company: user.company,
+          leadId: user.leadId,
+          privateName: user.privateName,
+          publicName: user.publicName,
           email: user.email,
-          imageUrl: user.imageUrl || undefined,
           isActive: user.isActive,
           emailVerified: user.emailVerified,
-          isPublic: false, // Default to false for users
+          isPublic: false,
           requireTwoFactor: false,
-          marketingConsent: false,
+          marketingConsent: user.marketingConsent ?? false,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
           userRoles: userRolesResponse.data,
@@ -604,8 +579,8 @@ export class BaseUserRepositoryImpl implements UserRepository {
         countQuery = db.select({ count: count() }).from(users);
       } else {
         // Count users matching search criteria
-        const firstNamePattern = `%${query}%`;
-        const lastNamePattern = `%${query}%`;
+        const privateNamePattern = `%${query}%`;
+        const publicNamePattern = `%${query}%`;
         const emailPattern = `%${query}%`;
 
         countQuery = db
@@ -613,8 +588,8 @@ export class BaseUserRepositoryImpl implements UserRepository {
           .from(users)
           .where(
             or(
-              ilike(users.firstName, firstNamePattern),
-              ilike(users.lastName, lastNamePattern),
+              ilike(users.privateName, privateNamePattern),
+              ilike(users.publicName, publicNamePattern),
               ilike(users.email, emailPattern),
             ),
           );

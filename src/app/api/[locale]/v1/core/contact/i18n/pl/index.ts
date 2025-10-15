@@ -122,6 +122,7 @@ export const translations: typeof enTranslations = {
     repositoryCreateFailed: "Nie udało się utworzyć żądania kontaktu",
     repositoryCreateDetails:
       "Nie można obecnie przetworzyć Twojego formularza kontaktowego. Spróbuj ponownie później.",
+    noContactReturned: "Po utworzeniu nie zwrócono rekordu kontaktu",
     validation: {
       title: "Błąd walidacji",
       description: "Sprawdź swoje dane i spróbuj ponownie",
@@ -169,9 +170,89 @@ export const translations: typeof enTranslations = {
   sms: {
     admin: {
       notification: "Nowe zapytanie kontaktowe: {name} ({email}) - {subject}",
+      phone: {
+        missing:
+          "Brak skonfigurowanego numeru telefonu administratora dla powiadomień kontaktowych",
+      },
+      send: {
+        start:
+          "Wysyłanie SMS z powiadomieniem administratora o przesłaniu kontaktu",
+        error:
+          "Błąd wysyłania SMS z powiadomieniem administratora dla kontaktu",
+      },
     },
     confirmation: {
       message: "{name}, dziękujemy za wiadomość! Skontaktujemy się wkrótce.",
+      phone: {
+        missing:
+          "Brak numeru telefonu użytkownika dla SMS z potwierdzeniem kontaktu",
+      },
+      send: {
+        start:
+          "Wysyłanie SMS z potwierdzeniem do osoby przesyłającej formularz",
+        error: "Błąd wysyłania SMS z potwierdzeniem dla kontaktu",
+      },
+    },
+  },
+
+  repository: {
+    create: {
+      start: "Rozpoczynanie przesyłania formularza kontaktowego",
+      success: "Formularz kontaktowy przesłany pomyślnie",
+      error: "Błąd tworzenia przesłania formularza kontaktowego",
+    },
+    lead: {
+      conversion: {
+        start: "Rozpoczynanie konwersji leada dla kontaktu",
+        error: "Błąd podczas konwersji leada dla kontaktu",
+      },
+      provided: "ID leada dostarczone dla przesłania kontaktu",
+    },
+    seed: {
+      create: {
+        start: "Rozpoczynanie tworzenia seed-a kontaktu",
+        error: "Błąd tworzenia seed-a kontaktu",
+      },
+    },
+  },
+
+  route: {
+    sms: {
+      admin: {
+        failed:
+          "SMS z powiadomieniem administratora nie powiódł się dla przesłania kontaktu",
+      },
+      confirmation: {
+        failed: "SMS z potwierdzeniem nie powiódł się dla przesłania kontaktu",
+      },
+    },
+  },
+
+  seeds: {
+    dev: {
+      start: "Rozpoczynanie seed-ów kontaktu dla środowiska deweloperskiego",
+      submission: {
+        created: "Przesłanie kontaktu utworzone w seed-ach deweloperskich",
+        failed:
+          "Nie udało się utworzyć przesłania kontaktu w seed-ach deweloperskich",
+        error: "Błąd tworzenia przesłania kontaktu w seed-ach deweloperskich",
+      },
+      complete: "Seed-y deweloperskie kontaktu zakończone",
+      error: "Błąd seed-owania danych deweloperskich kontaktu",
+    },
+    test: {
+      start: "Rozpoczynanie seed-ów kontaktu dla środowiska testowego",
+      submission: {
+        created: "Przesłanie kontaktu utworzone w seed-ach testowych",
+        failed:
+          "Nie udało się utworzyć przesłania kontaktu w seed-ach testowych",
+      },
+      error: "Błąd seed-owania danych testowych kontaktu",
+    },
+    prod: {
+      start: "Rozpoczynanie seed-ów kontaktu dla środowiska produkcyjnego",
+      ready: "Środowisko produkcyjne kontaktu gotowe",
+      error: "Błąd seed-owania danych produkcyjnych kontaktu",
     },
   },
 

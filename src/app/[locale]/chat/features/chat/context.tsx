@@ -3,38 +3,54 @@
 import type { JSX, ReactNode } from "react";
 import React, {
   createContext,
-  useContext,
   useCallback,
-  useState,
-  useRef,
-  useMemo,
+  useContext,
   useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
 
-import type { ChatThread, ChatMessage, ChatFolder, ViewMode } from "../../lib/storage/types";
-import { useChatState } from "./hooks/use-chat-state";
+import { useTranslation } from "@/i18n/core/client";
+
+import { API_CONFIG, TIMING } from "../../lib/config/constants";
+import type { ModelId } from "../../lib/config/models";
+import { defaultModel } from "../../lib/config/models";
+import {
+  clearDraft,
+  getDraft,
+  getGlobalEnableSearch,
+  getGlobalModel,
+  getGlobalTone,
+  getGlobalTTSAutoplay,
+  saveDraft,
+  saveGlobalEnableSearch,
+  saveGlobalModel,
+  saveGlobalTone,
+  saveGlobalTTSAutoplay,
+} from "../../lib/storage/draft-storage";
 import {
   addMessageToThread,
   createBranchFromMessage,
-  switchBranch,
   deleteMessageBranch,
   getMessagesInPath,
+  switchBranch,
 } from "../../lib/storage/message-tree";
-import { ModelId, defaultModel } from "../../lib/config/models";
-import { useTranslation } from "@/i18n/core/client";
-import { logError, getUserErrorMessage } from "../../lib/utils/error-handling";
-import { buildChatCompletionRequest, handleAPIError, stripContextTags } from "../../lib/utils/api";
-import { TIMING, API_CONFIG } from "../../lib/config/constants";
-import { ValidationError } from "../../lib/utils/errors";
+import type {
+  ChatFolder,
+  ChatMessage,
+  ChatThread,
+  ViewMode,
+} from "../../lib/storage/types";
 import {
-  getDraft,
-  saveDraft,
-  clearDraft,
-  getGlobalModel,
-  saveGlobalModel,
-  getGlobalTone,
-  saveGlobalTone,
-} from "../../lib/storage/draft-storage";
+  buildChatCompletionRequest,
+  handleAPIError,
+  stripContextTags,
+} from "../../lib/utils/api";
+import { getUserErrorMessage, logError } from "../../lib/utils/error-handling";
+import { ValidationError } from "../../lib/utils/errors";
+import { processStreamReader } from "../../lib/utils/streaming";
+import { useChatState } from "./hooks/use-chat-state";
 
 interface ChatContextValue {
   // State
@@ -49,9 +65,13 @@ interface ChatContextValue {
   // Settings
   selectedTone: string;
   selectedModel: ModelId;
+  enableSearch: boolean;
+  ttsAutoplay: boolean;
   setSelectedTone: (tone: string) => void;
   setSelectedModel: (model: ModelId) => void;
-  
+  setEnableSearch: (enabled: boolean) => void;
+  setTTSAutoplay: (enabled: boolean) => void;
+
   // Actions
   sendMessage: (content: string) => Promise<void>;
   editMessage: (messageId: string, newContent: string) => Promise<void>;
@@ -61,7 +81,7 @@ interface ChatContextValue {
   retryMessage: (messageId: string) => Promise<void>;
   answerAsModel: (messageId: string) => Promise<void>;
   stopGeneration: () => void;
-  
+
   // Thread management (from useChatState)
   createNewThread: (folderId?: string | null) => string;
   deleteThread: (threadId: string) => void;
@@ -69,22 +89,22 @@ interface ChatContextValue {
   moveThread: (threadId: string, folderId: string | null) => void;
   updateThread: (
     threadId: string,
-    updates: Partial<ChatThread> | ((prev: ChatThread) => ChatThread)
+    updates: Partial<ChatThread> | ((prev: ChatThread) => ChatThread),
   ) => void;
   updateThreadTitle: (threadId: string) => void;
-  
+
   // Folder management
   createNewFolder: (name: string, parentId?: string | null) => string;
   updateFolder: (folderId: string, updates: Partial<ChatFolder>) => void;
   deleteFolder: (folderId: string, deleteThreads: boolean) => void;
   toggleFolderExpanded: (folderId: string) => void;
-  
+
   // UI
   uiPreferences: ReturnType<typeof useChatState>["uiPreferences"];
   toggleSidebar: () => void;
   setViewMode: (mode: ViewMode) => void;
   searchThreads: (query: string) => ChatThread[];
-  
+
   // Refs
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
 
@@ -109,8 +129,29 @@ interface ChatProviderProps {
   children: ReactNode;
 }
 
+/**
+ * Helper to validate thread update preconditions
+ * Reduces code duplication in state updaters
+ */
+function shouldSkipThreadUpdate(
+  mountedRef: React.RefObject<boolean>,
+  prevThread: ChatThread | null | undefined,
+  messageId?: string,
+): boolean {
+  if (!mountedRef.current) {
+    return true;
+  }
+  if (!prevThread) {
+    return true;
+  }
+  if (messageId && !prevThread.messages[messageId]) {
+    return true;
+  }
+  return false;
+}
+
 export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
-  const { locale } = useTranslation();
+  const { locale, t } = useTranslation("chat");
   const chatState = useChatState();
 
   // Initialize from localStorage
@@ -121,6 +162,12 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
   });
   const [selectedModel, setSelectedModel] = useState<ModelId>(() => {
     return getGlobalModel() || defaultModel;
+  });
+  const [enableSearch, setEnableSearch] = useState<boolean>(() => {
+    return getGlobalEnableSearch(); // defaults to false
+  });
+  const [ttsAutoplay, setTTSAutoplay] = useState<boolean>(() => {
+    return getGlobalTTSAutoplay(); // defaults to false
   });
 
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -136,7 +183,7 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
     return () => {
       mountedRef.current = false;
       // Abort all active streams
-      activeStreamsRef.current.forEach(controller => controller.abort());
+      activeStreamsRef.current.forEach((controller) => controller.abort());
       activeStreamsRef.current.clear();
     };
   }, []);
@@ -150,6 +197,16 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
   useEffect(() => {
     saveGlobalTone(selectedTone);
   }, [selectedTone]);
+
+  // Sync enable search to localStorage
+  useEffect(() => {
+    saveGlobalEnableSearch(enableSearch);
+  }, [enableSearch]);
+
+  // Sync TTS autoplay to localStorage
+  useEffect(() => {
+    saveGlobalTTSAutoplay(ttsAutoplay);
+  }, [ttsAutoplay]);
 
   // Restore draft when active thread changes
   useEffect(() => {
@@ -174,13 +231,21 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
 
   // Get AI response for a given parent message (internal helper)
   const getAIResponse = useCallback(
-    async (threadId: string, parentMessageId: string, threadOverride?: ChatThread) => {
+    async (
+      threadId: string,
+      parentMessageId: string,
+      threadOverride?: ChatThread,
+    ) => {
       // Check if component is still mounted
-      if (!mountedRef.current) return;
+      if (!mountedRef.current) {
+        return;
+      }
 
       // Use provided thread or get from state
       const thread = threadOverride || chatState.state.threads[threadId];
-      if (!thread) return;
+      if (!thread) {
+        return;
+      }
 
       // Generate unique stream ID for tracking
       const streamId = `stream-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
@@ -199,7 +264,8 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
           selectedTone,
           parentMessageId,
           API_CONFIG.DEFAULT_TEMPERATURE,
-          API_CONFIG.DEFAULT_MAX_TOKENS
+          API_CONFIG.DEFAULT_MAX_TOKENS,
+          enableSearch,
         );
 
         if (requestBody.messages.length === 0) {
@@ -241,82 +307,43 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
           // Update state immediately to show empty assistant message
           chatState.updateThread(threadId, () => threadWithAssistant);
 
-          // Debounce state updates to reduce overhead
-          let lastUpdateTime = 0;
-          const UPDATE_INTERVAL_MS = TIMING.STREAM_UPDATE_INTERVAL;
-          let chunkCount = 0;
-
           try {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-
-              const chunk = decoder.decode(value, { stream: true });
-              chunkCount++;
-
-              const lines = chunk.split("\n");
-
-              for (const line of lines) {
-                if (!line.trim()) continue;
-
-                // Handle Vercel AI SDK text stream format
-                // Format: "0:text content" or just plain text
-                let content = "";
-
-                if (line.startsWith("0:")) {
-                  // Vercel AI SDK format with prefix
-                  content = line.slice(2);
-                  // Remove quotes if present and unescape
-                  if (content.startsWith('"') && content.endsWith('"')) {
-                    content = content.slice(1, -1);
-                    // Unescape JSON string escapes
-                    content = content.replace(/\\"/g, '"').replace(/\\\\/g, '\\').replace(/\\n/g, '\n');
+            // Process stream using utility function
+            assistantContent = await processStreamReader(
+              reader,
+              decoder,
+              (content) => {
+                // Debounced update callback
+                chatState.updateThread(threadId, (prevThread) => {
+                  // Validate before updating
+                  if (
+                    shouldSkipThreadUpdate(
+                      mountedRef,
+                      prevThread,
+                      assistantMessageId,
+                    )
+                  ) {
+                    return prevThread;
                   }
-                } else if (line.startsWith("data: ")) {
-                  // SSE format
-                  const data = line.slice(6);
-                  try {
-                    const parsed = JSON.parse(data);
-                    content = parsed.choices?.[0]?.delta?.content || "";
-                  } catch {
-                    content = data;
+                  if (!activeStreamsRef.current.has(streamId)) {
+                    return prevThread;
                   }
-                } else {
-                  // Plain text format
-                  content = line;
-                }
 
-                if (content) {
-                  assistantContent += content;
-
-                  // Debounced update
-                  const now = Date.now();
-                  if (now - lastUpdateTime >= UPDATE_INTERVAL_MS) {
-                    lastUpdateTime = now;
-                    // Use functional update to avoid race conditions
-                    chatState.updateThread(threadId, (prevThread) => {
-                      // Validate before updating
-                      if (!mountedRef.current) return prevThread;
-                      if (!prevThread) return prevThread;
-                      if (!prevThread.messages[assistantMessageId]) return prevThread;
-                      if (!activeStreamsRef.current.has(streamId)) return prevThread;
-
-                      return {
-                        ...prevThread,
-                        messages: {
-                          ...prevThread.messages,
-                          [assistantMessageId]: {
-                            ...prevThread.messages[assistantMessageId],
-                            content: assistantContent,
-                          },
-                        },
-                        updatedAt: Date.now(),
-                      };
-                    });
-                  }
-                }
-              }
-            }
+                  return {
+                    ...prevThread,
+                    messages: {
+                      ...prevThread.messages,
+                      [assistantMessageId]: {
+                        ...prevThread.messages[assistantMessageId],
+                        content,
+                      },
+                    },
+                    updatedAt: Date.now(),
+                  };
+                });
+              },
+              TIMING.STREAM_UPDATE_INTERVAL,
+            );
 
             // Final update with complete content
             if (assistantContent && mountedRef.current) {
@@ -324,9 +351,15 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
               const cleanedContent = stripContextTags(assistantContent);
 
               chatState.updateThread(threadId, (prevThread) => {
-                if (!mountedRef.current) return prevThread;
-                if (!prevThread) return prevThread;
-                if (!prevThread.messages[assistantMessageId]) return prevThread;
+                if (
+                  shouldSkipThreadUpdate(
+                    mountedRef,
+                    prevThread,
+                    assistantMessageId,
+                  )
+                ) {
+                  return prevThread;
+                }
 
                 return {
                   ...prevThread,
@@ -340,8 +373,38 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
                   updatedAt: Date.now(),
                 };
               });
-            } else if (!assistantContent) {
-              console.warn("[AI Stream] No content received from stream!");
+            } else if (!assistantContent && mountedRef.current) {
+              // No content received - replace assistant message with error
+              chatState.updateThread(threadId, (prevThread) => {
+                if (
+                  shouldSkipThreadUpdate(
+                    mountedRef,
+                    prevThread,
+                    assistantMessageId,
+                  )
+                ) {
+                  return prevThread;
+                }
+
+                // Remove the empty assistant message and add error message instead
+                const messagesWithoutEmpty = { ...prevThread.messages };
+                delete messagesWithoutEmpty[assistantMessageId];
+
+                const currentMessages = getMessagesInPath({
+                  ...prevThread,
+                  messages: messagesWithoutEmpty,
+                });
+                const lastMsg = currentMessages[currentMessages.length - 1];
+
+                return addMessageToThread(
+                  { ...prevThread, messages: messagesWithoutEmpty },
+                  {
+                    role: "error",
+                    content: t("errors.noResponse"),
+                    parentId: lastMsg?.id || null,
+                  },
+                );
+              });
             }
           } finally {
             reader.releaseLock();
@@ -349,14 +412,16 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
         } else {
           // No reader available - add error message
           chatState.updateThread(threadId, (prevThread) => {
-            if (!prevThread) return prevThread;
+            if (!prevThread) {
+              return prevThread;
+            }
 
             const currentMessages = getMessagesInPath(prevThread);
             const lastMsg = currentMessages[currentMessages.length - 1];
 
             return addMessageToThread(prevThread, {
               role: "error",
-              content: "Failed to stream response: No reader available",
+              content: t("errors.noStream"),
               parentId: lastMsg?.id || null,
             });
           });
@@ -366,11 +431,16 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
         logError(error, "streamAIResponse");
 
         // Only show error if not aborted and component is still mounted
-        if (mountedRef.current && error instanceof Error && error.name !== "AbortError") {
+        if (
+          mountedRef.current &&
+          error instanceof Error &&
+          error.name !== "AbortError"
+        ) {
           // Use functional update to safely add error message
           chatState.updateThread(threadId, (prevThread) => {
-            if (!mountedRef.current) return prevThread;
-            if (!prevThread) return prevThread;
+            if (shouldSkipThreadUpdate(mountedRef, prevThread)) {
+              return prevThread;
+            }
 
             const currentMessages = getMessagesInPath(prevThread);
             const lastMsg = currentMessages[currentMessages.length - 1];
@@ -388,7 +458,7 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
         abortControllerRef.current = null;
       }
     },
-    [chatState, selectedModel, locale]
+    [chatState, selectedModel, enableSearch, locale, t],
   );
 
   // Send a new message
@@ -396,11 +466,15 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
     async (content: string) => {
       // Capture thread ID early - this is our stable reference
       const threadId = chatState.state.activeThreadId;
-      if (!threadId || !content.trim() || isLoading) return;
+      if (!threadId || !content.trim() || isLoading) {
+        return;
+      }
 
       // Get initial thread state - only used for local operations
       const initialThread = chatState.state.threads[threadId];
-      if (!initialThread) return;
+      if (!initialThread) {
+        return;
+      }
 
       const trimmedContent = content.trim();
       setInput("");
@@ -438,7 +512,7 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
 
         // Auto-update title if this is the first user message
         const userMessages = Object.values(
-          threadWithUserMessage.messages
+          threadWithUserMessage.messages,
         ).filter((m) => m.role === "user");
         if (userMessages.length === 1) {
           chatState.updateThreadTitle(threadId);
@@ -451,7 +525,7 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
         abortControllerRef.current = null;
       }
     },
-    [isLoading, selectedTone, chatState, getAIResponse]
+    [isLoading, selectedTone, chatState, getAIResponse, t],
   );
 
   // Branch from a message (create new conversation path)
@@ -459,53 +533,65 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
   const branchMessage = useCallback(
     async (messageId: string, newContent: string) => {
       const threadId = chatState.state.activeThreadId;
-      if (!threadId || !newContent.trim() || isLoading) return;
+      if (!threadId || !newContent.trim() || isLoading) {
+        return;
+      }
 
       const trimmedContent = newContent.trim();
-      let newUserMessageId: string | null = null;
-      let updatedThread: ChatThread | null = null;
+      setIsLoading(true);
 
-      // Update thread using functional update to avoid race conditions
-      chatState.updateThread(threadId, (currentThread) => {
-        if (!currentThread) return currentThread;
+      try {
+        let newUserMessageId: string | null = null;
+        let updatedThread: ChatThread | null = null;
 
-        const message = currentThread.messages[messageId];
-        if (!message) return currentThread;
-
-        // Can't branch from first message (no parent to branch from)
-        if (!message.parentId) {
-          console.warn("Cannot branch from first message - no parent");
-          return currentThread;
-        }
-
-        // Create a branch with the new message
-        const threadWithBranch = createBranchFromMessage(
-          currentThread,
-          message.parentId,
-          {
-            role: "user",
-            content: trimmedContent,
-            parentId: message.parentId,
-            tone: selectedTone,
+        // Update thread using functional update to avoid race conditions
+        chatState.updateThread(threadId, (currentThread) => {
+          if (!currentThread) {
+            return currentThread;
           }
-        );
 
-        // Capture the new user message ID
-        newUserMessageId =
-          threadWithBranch.currentPath.messageIds[
-            threadWithBranch.currentPath.messageIds.length - 1
-          ];
+          const message = currentThread.messages[messageId];
+          if (!message) {
+            return currentThread;
+          }
 
-        updatedThread = threadWithBranch;
-        return threadWithBranch;
-      });
+          // Can't branch from first message (no parent to branch from)
+          if (!message.parentId) {
+            console.warn("Cannot branch from first message - no parent");
+            return currentThread;
+          }
 
-      // Get AI response for the branched message
-      if (newUserMessageId && updatedThread) {
-        await getAIResponse(threadId, newUserMessageId, updatedThread);
+          // Create a branch with the new message
+          const threadWithBranch = createBranchFromMessage(
+            currentThread,
+            message.parentId,
+            {
+              role: "user",
+              content: trimmedContent,
+              parentId: message.parentId,
+              tone: selectedTone,
+            },
+          );
+
+          // Capture the new user message ID
+          newUserMessageId =
+            threadWithBranch.currentPath.messageIds[
+              threadWithBranch.currentPath.messageIds.length - 1
+            ];
+
+          updatedThread = threadWithBranch;
+          return threadWithBranch;
+        });
+
+        // Get AI response for the branched message
+        if (newUserMessageId && updatedThread) {
+          await getAIResponse(threadId, newUserMessageId, updatedThread);
+        }
+      } finally {
+        setIsLoading(false);
       }
     },
-    [selectedTone, chatState, getAIResponse, isLoading]
+    [selectedTone, chatState, getAIResponse, isLoading],
   );
 
   // Edit a message - same as branching (creates a new branch from the parent)
@@ -515,15 +601,19 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
   const deleteMessage = useCallback(
     (messageId: string) => {
       const threadId = chatState.state.activeThreadId;
-      if (!threadId) return;
+      if (!threadId) {
+        return;
+      }
 
       // Use functional update for consistency
       chatState.updateThread(threadId, (prevThread) => {
-        if (!prevThread) return prevThread;
+        if (!prevThread) {
+          return prevThread;
+        }
         return deleteMessageBranch(prevThread, messageId);
       });
     },
-    [chatState]
+    [chatState],
   );
 
   // Retry a message with different model/tone
@@ -531,34 +621,52 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
   const retryMessage = useCallback(
     async (messageId: string) => {
       const threadId = chatState.state.activeThreadId;
-      if (!threadId) return;
+      if (!threadId || isLoading) {
+        return;
+      }
 
       const thread = chatState.state.threads[threadId];
-      if (!thread) return;
+      if (!thread) {
+        return;
+      }
 
       const message = thread.messages[messageId];
-      if (!message || message.role !== "user") return;
+      if (!message || message.role !== "user") {
+        return;
+      }
 
-      // Simply generate a new AI response
-      // This will create a new branch if there are already responses
-      // The AI response will be added as a child of the user message
-      await getAIResponse(threadId, messageId, thread);
+      setIsLoading(true);
+
+      try {
+        // Simply generate a new AI response
+        // This will create a new branch if there are already responses
+        // The AI response will be added as a child of the user message
+        await getAIResponse(threadId, messageId, thread);
+      } finally {
+        setIsLoading(false);
+      }
     },
-    [chatState, getAIResponse]
+    [chatState, getAIResponse, isLoading],
   );
 
   // Answer as AI model (generate AI response to an AI message)
   const answerAsModel = useCallback(
     async (messageId: string) => {
       const threadId = chatState.state.activeThreadId;
-      if (!threadId || isLoading) return;
+      if (!threadId || isLoading) {
+        return;
+      }
 
       // Get current thread state
       const currentThread = chatState.state.threads[threadId];
-      if (!currentThread) return;
+      if (!currentThread) {
+        return;
+      }
 
       const message = currentThread.messages[messageId];
-      if (!message) return;
+      if (!message) {
+        return;
+      }
 
       setIsLoading(true);
 
@@ -569,22 +677,26 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
         setIsLoading(false);
       }
     },
-    [chatState, getAIResponse, isLoading]
+    [chatState, getAIResponse, isLoading],
   );
 
   // Switch to a different branch
   const switchMessageBranch = useCallback(
     (messageId: string, branchIndex: number) => {
       const threadId = chatState.state.activeThreadId;
-      if (!threadId) return;
+      if (!threadId) {
+        return;
+      }
 
       // Use functional update for consistency
       chatState.updateThread(threadId, (prevThread) => {
-        if (!prevThread) return prevThread;
+        if (!prevThread) {
+          return prevThread;
+        }
         return switchBranch(prevThread, messageId, branchIndex);
       });
     },
-    [chatState]
+    [chatState],
   );
 
   // Stop generation
@@ -597,25 +709,31 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
   }, []);
 
   // Insert text at cursor position in input
-  const insertTextAtCursor = useCallback((text: string) => {
-    const textarea = inputRef.current;
-    if (!textarea) return;
+  const insertTextAtCursor = useCallback(
+    (text: string) => {
+      const textarea = inputRef.current;
+      if (!textarea) {
+        return;
+      }
 
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const currentValue = input;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const currentValue = input;
 
-    // Insert text at cursor position
-    const newValue = currentValue.substring(0, start) + text + currentValue.substring(end);
-    setInput(newValue);
+      // Insert text at cursor position
+      const newValue =
+        currentValue.substring(0, start) + text + currentValue.substring(end);
+      setInput(newValue);
 
-    // Set cursor position after inserted text
-    setTimeout(() => {
-      textarea.focus();
-      const newCursorPos = start + text.length;
-      textarea.setSelectionRange(newCursorPos, newCursorPos);
-    }, 0);
-  }, [input]);
+      // Set cursor position after inserted text
+      setTimeout(() => {
+        textarea.focus();
+        const newCursorPos = start + text.length;
+        textarea.setSelectionRange(newCursorPos, newCursorPos);
+      }, TIMING.TEXT_INSERTION_FOCUS_DELAY);
+    },
+    [input],
+  );
 
   const contextValue: ChatContextValue = useMemo(
     () => ({
@@ -631,8 +749,12 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
       // Settings
       selectedTone,
       selectedModel,
+      enableSearch,
+      ttsAutoplay,
       setSelectedTone,
       setSelectedModel,
+      setEnableSearch,
+      setTTSAutoplay,
 
       // Actions
       sendMessage,
@@ -681,8 +803,12 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
       setInput,
       selectedTone,
       selectedModel,
+      enableSearch,
+      ttsAutoplay,
       setSelectedTone,
       setSelectedModel,
+      setEnableSearch,
+      setTTSAutoplay,
       sendMessage,
       editMessage,
       deleteMessage,
@@ -707,13 +833,10 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
       chatState.searchThreads,
       inputRef,
       chatState.state,
-    ]
+    ],
   );
 
   return (
-    <ChatContext.Provider value={contextValue}>
-      {children}
-    </ChatContext.Provider>
+    <ChatContext.Provider value={contextValue}>{children}</ChatContext.Provider>
   );
 }
-

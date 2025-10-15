@@ -19,7 +19,7 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { LayoutType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
 
-import { UserRoleValue } from "../../../user/user-roles/enum";
+import { UserRole } from "../../../user/user-roles/enum";
 
 const { POST } = createEndpoint({
   method: Methods.POST,
@@ -255,6 +255,12 @@ const { POST } = createEndpoint({
     },
   },
 });
+
+// Export types for repository usage
+export type GuardStartRequestInput = typeof POST.types.RequestInput;
+export type GuardStartRequestOutput = typeof POST.types.RequestOutput;
+export type GuardStartResponseInput = typeof POST.types.ResponseInput;
+export type GuardStartResponseOutput = typeof POST.types.ResponseOutput;
 
 const endpoints = { POST };
 export default endpoints;

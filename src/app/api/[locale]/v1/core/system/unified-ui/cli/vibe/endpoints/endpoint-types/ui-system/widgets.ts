@@ -322,13 +322,14 @@ export interface ChartWidgetConfig extends BaseWidgetConfig {
 
 /**
  * Container widget configuration
+ * Note: children is optional because it may be provided separately (e.g., in objectField)
  */
 export interface ContainerWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.CONTAINER;
   title?: TranslationKey;
   description?: TranslationKey;
   layout: LayoutConfig;
-  children: WidgetConfig[];
+  children?: WidgetConfig[];
   border?: boolean;
   shadow?: boolean;
   background?: ComponentVariant;
@@ -336,6 +337,7 @@ export interface ContainerWidgetConfig extends BaseWidgetConfig {
 
 /**
  * Section widget configuration
+ * Note: children is optional because it may be provided separately (e.g., in objectField)
  */
 export interface SectionWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.SECTION;
@@ -344,7 +346,7 @@ export interface SectionWidgetConfig extends BaseWidgetConfig {
   collapsible?: boolean;
   defaultExpanded?: boolean;
   layout: LayoutConfig;
-  children: WidgetConfig[];
+  children?: WidgetConfig[];
   actions?: ButtonAction[];
 }
 

@@ -21,14 +21,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import type React from "react";
 
-import type { CronExecutionType } from "@/app/api/[locale]/v1/core/system/tasks/cron/history/definition";
-import { cronExecutionHistoryRequestSchema } from "@/app/api/[locale]/v1/core/system/tasks/cron/history/definition";
+import type { CronHistoryResponseOutput } from "@/app/api/[locale]/v1/core/system/tasks/cron/history/definition";
 import type { CronHistoryEndpointReturn } from "@/app/api/[locale]/v1/core/system/tasks/cron/history/hooks";
-import {
-  CronTaskStatus,
-  CronTaskStatusFilter,
-  SortOrder,
-} from "@/app/api/[locale]/v1/core/system/tasks/enum";
+import { CronTaskStatus } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -45,67 +40,66 @@ export function ExecutionHistory({
 }: ExecutionHistoryProps): React.JSX.Element {
   const { t } = simpleT(locale);
 
+  type CronExecutionType = CronHistoryResponseOutput["executions"][number];
+
   const apiResponse = historyEndpoint.read.response;
   const history: CronExecutionType[] = apiResponse?.success
     ? apiResponse.data.executions
     : [];
-  const totalExecutions =
-    apiResponse && "totalExecutions" in apiResponse
-      ? (apiResponse.totalExecutions as number)
-      : 0;
-
-  const totalPages =
-    apiResponse && "totalPages" in apiResponse
-      ? (apiResponse.totalPages as number)
-      : 0;
+  const totalExecutions = apiResponse?.success
+    ? apiResponse.data.totalCount
+    : 0;
 
   const queryLoading = historyEndpoint.read.isLoading || false;
 
   // Get current form values for pagination display
   const currentPage = historyEndpoint.read.form?.getValues("page") || 1;
   const currentLimit = historyEndpoint.read.form?.getValues("limit") || 20;
+  type CronTaskStatusType = CronExecutionType["status"];
 
-  const getStatusIcon = (status: CronTaskStatus): React.ReactElement => {
+  const getStatusIcon = (status: CronTaskStatusType): React.ReactElement => {
     switch (status) {
-      case CronTaskStatus.COMPLETED:
+      case "COMPLETED":
         return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case CronTaskStatus.FAILED:
+      case "FAILED":
         return <XCircle className="h-4 w-4 text-red-600" />;
-      case CronTaskStatus.TIMEOUT:
+      case "TIMEOUT":
         return <XCircle className="h-4 w-4 text-red-600" />;
-      case CronTaskStatus.RUNNING:
+      case "RUNNING":
         return <Clock className="h-4 w-4 text-blue-600 animate-pulse" />;
-      case CronTaskStatus.PENDING:
+      case "PENDING":
         return <Clock className="h-4 w-4 text-yellow-600" />;
-      case CronTaskStatus.CANCELLED:
+      case "CANCELLED":
         return <XCircle className="h-4 w-4 text-gray-600" />;
-      case CronTaskStatus.SKIPPED:
+      case "SKIPPED":
         return <AlertCircle className="h-4 w-4 text-orange-600" />;
       default:
         return <AlertCircle className="h-4 w-4 text-yellow-600" />;
     }
   };
 
-  const STATUS_COLORS = {
-    [CronTaskStatus.COMPLETED]:
+  const STATUS_COLORS: Record<CronTaskStatusType, string> = {
+    COMPLETED:
       "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
-    [CronTaskStatus.FAILED]:
-      "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
-    [CronTaskStatus.TIMEOUT]:
-      "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
-    [CronTaskStatus.RUNNING]:
-      "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
-    [CronTaskStatus.PENDING]:
+    FAILED: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+    TIMEOUT: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+    RUNNING: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
+    PENDING:
       "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
-    [CronTaskStatus.CANCELLED]:
+    CANCELLED:
       "bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400",
-    [CronTaskStatus.SKIPPED]:
+    SKIPPED:
       "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400",
-    default: "bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400",
-  } as const;
+    STOPPED: "bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400",
+    ERROR: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+    BLOCKED:
+      "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400",
+    SCHEDULED:
+      "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
+  };
 
-  const getStatusColor = (status: CronTaskStatus): string => {
-    return STATUS_COLORS[status] || STATUS_COLORS.default;
+  const getStatusColor = (status: CronTaskStatusType): string => {
+    return STATUS_COLORS[status] || STATUS_COLORS.PENDING;
   };
 
   const getDuration = (execution: CronExecutionType): string => {
@@ -129,15 +123,12 @@ export function ExecutionHistory({
     historyEndpoint.read.form?.reset({
       taskId: undefined,
       taskName: undefined,
-      status: CronTaskStatusFilter.ALL,
-      isManual: undefined,
-      isDryRun: undefined,
+      status: undefined,
+      priority: undefined,
       startDate: undefined,
       endDate: undefined,
-      page: 1,
-      limit: 20,
-      sortBy: CronExecutionSortBy.STARTED_AT,
-      sortOrder: SortOrder.DESC,
+      limit: "20",
+      offset: "0",
     });
   };
 
@@ -192,7 +183,6 @@ export function ExecutionHistory({
                     "cronErrors.admin.interface.executionHistory.searchPlaceholder",
                 }}
                 control={historyEndpoint.read.form.control}
-                schema={cronExecutionHistoryRequestSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -203,47 +193,12 @@ export function ExecutionHistory({
               <EndpointFormField
                 name="status"
                 config={{
-                  type: "select",
+                  type: "text",
                   label: undefined,
                   placeholder:
                     "cronErrors.admin.interface.executionHistory.statusFilter",
-                  options: [
-                    {
-                      value: CronTaskStatusFilter.ALL,
-                      label: "cronErrors.admin.interface.all",
-                    },
-                    {
-                      value: CronTaskStatusFilter.PENDING,
-                      label: "cronErrors.admin.interface.pending",
-                    },
-                    {
-                      value: CronTaskStatusFilter.RUNNING,
-                      label: "cronErrors.admin.interface.running",
-                    },
-                    {
-                      value: CronTaskStatusFilter.COMPLETED,
-                      label: "cronErrors.admin.interface.completed",
-                    },
-                    {
-                      value: CronTaskStatusFilter.FAILED,
-                      label: "cronErrors.admin.interface.failed",
-                    },
-                    {
-                      value: CronTaskStatusFilter.TIMEOUT,
-                      label: "cronErrors.admin.interface.failed",
-                    },
-                    {
-                      value: CronTaskStatusFilter.CANCELLED,
-                      label: "cronErrors.admin.interface.cancelled",
-                    },
-                    {
-                      value: CronTaskStatusFilter.SKIPPED,
-                      label: "cronErrors.admin.interface.cancelled",
-                    },
-                  ],
                 }}
                 control={historyEndpoint.read.form.control}
-                schema={cronExecutionHistoryRequestSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -260,7 +215,6 @@ export function ExecutionHistory({
                     "cronErrors.admin.interface.executionHistory.startDate",
                 }}
                 control={historyEndpoint.read.form.control}
-                schema={cronExecutionHistoryRequestSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -277,7 +231,6 @@ export function ExecutionHistory({
                     "cronErrors.admin.interface.executionHistory.endDate",
                 }}
                 control={historyEndpoint.read.form.control}
-                schema={cronExecutionHistoryRequestSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -285,67 +238,7 @@ export function ExecutionHistory({
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                {/* Sort By */}
-                <EndpointFormField
-                  name="sortBy"
-                  config={{
-                    type: "select",
-                    label: undefined,
-                    placeholder: "cronErrors.admin.interface.filter",
-                    options: [
-                      {
-                        value: CronExecutionSortBy.STARTED_AT,
-                        label:
-                          "cronErrors.admin.interface.executionHistory.started",
-                      },
-                      {
-                        value: CronExecutionSortBy.COMPLETED_AT,
-                        label: "cronErrors.admin.interface.completed",
-                      },
-                      {
-                        value: CronExecutionSortBy.DURATION_MS,
-                        label:
-                          "cronErrors.admin.interface.executionHistory.duration",
-                      },
-                    ],
-                  }}
-                  control={historyEndpoint.read.form.control}
-                  schema={cronExecutionHistoryRequestSchema}
-                  theme={{
-                    style: "none",
-                    showAllRequired: false,
-                  }}
-                />
-
-                {/* Sort Order */}
-                <EndpointFormField
-                  name="sortOrder"
-                  config={{
-                    type: "select",
-                    label: undefined,
-                    placeholder: "cronErrors.admin.interface.filter",
-                    options: [
-                      {
-                        value: SortOrder.DESC,
-                        label: "cronErrors.admin.interface.next",
-                      },
-                      {
-                        value: SortOrder.ASC,
-                        label: "cronErrors.admin.interface.previous",
-                      },
-                    ],
-                  }}
-                  control={historyEndpoint.read.form.control}
-                  schema={cronExecutionHistoryRequestSchema}
-                  theme={{
-                    style: "none",
-                    showAllRequired: false,
-                  }}
-                />
-              </div>
-
+            <div className="flex items-center justify-end">
               <Button
                 type="button"
                 variant="outline"
@@ -410,15 +303,6 @@ export function ExecutionHistory({
                         : {getDuration(execution)}
                       </p>
                     </div>
-
-                    {execution.retryAttempt > 0 && (
-                      <Badge variant="outline" className="text-orange-600">
-                        {execution.retryAttempt}{" "}
-                        {t(
-                          "cronErrors.admin.interface.executionHistory.retries",
-                        )}
-                      </Badge>
-                    )}
                   </div>
                 </div>
 
@@ -433,21 +317,6 @@ export function ExecutionHistory({
                   </div>
                 )}
 
-                {execution.result && (
-                  <div className="mt-3">
-                    <details className="group">
-                      <summary className="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100">
-                        {t(
-                          "cronErrors.admin.interface.executionHistory.output",
-                        )}
-                      </summary>
-                      <pre className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-3 rounded border border-gray-200 dark:border-gray-700 mt-2 overflow-x-auto max-h-40">
-                        {JSON.stringify(execution.result, null, 2)}
-                      </pre>
-                    </details>
-                  </div>
-                )}
-
                 {execution.error && (
                   <div className="mt-3">
                     <details className="group">
@@ -458,11 +327,13 @@ export function ExecutionHistory({
                       </summary>
                       <div className="text-xs bg-red-50 dark:bg-red-900/20 p-3 rounded border border-red-200 dark:border-red-800 mt-2 overflow-x-auto max-h-40 text-red-800 dark:text-red-300">
                         <div className="mb-2 font-medium">
-                          {t(
-                            execution.error.message,
-                            execution.error.messageParams,
-                          )}
+                          {execution.error.message}
                         </div>
+                        {execution.error.errorType && (
+                          <div className="text-xs opacity-75">
+                            Type: {execution.error.errorType}
+                          </div>
+                        )}
                       </div>
                     </details>
                   </div>
@@ -476,19 +347,11 @@ export function ExecutionHistory({
         {totalExecutions > currentLimit && (
           <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {t("cronErrors.admin.interface.executionHistory.showingResults", {
-                from: (currentPage - 1) * currentLimit + 1,
-                to: Math.min(currentPage * currentLimit, totalExecutions),
-              })}
+              Showing {(currentPage - 1) * currentLimit + 1} to{" "}
+              {Math.min(currentPage * currentLimit, totalExecutions)} of{" "}
+              {totalExecutions} results
             </p>
             <div className="flex space-x-2">
-              <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
-                {t("leads.pagination.page_info_with_count", {
-                  current: currentPage,
-                  total: totalPages,
-                  count: totalExecutions,
-                })}
-              </span>
               <Button
                 variant="outline"
                 size="sm"
@@ -498,7 +361,7 @@ export function ExecutionHistory({
                 }}
                 disabled={currentPage === 1}
               >
-                {t("cronErrors.admin.interface.previous")}
+                Previous
               </Button>
               <Button
                 variant="outline"
@@ -507,9 +370,9 @@ export function ExecutionHistory({
                   const newPage = currentPage + 1;
                   historyEndpoint.read.form?.setValue("page", newPage);
                 }}
-                disabled={currentPage >= totalPages}
+                disabled={!apiResponse?.data.hasMore}
               >
-                {t("cronErrors.admin.interface.next")}
+                Next
               </Button>
             </div>
           </div>

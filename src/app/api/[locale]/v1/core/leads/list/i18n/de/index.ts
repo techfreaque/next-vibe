@@ -48,6 +48,22 @@ export const translations: typeof enTranslations = {
       description: "Leads nach Name, E-Mail oder Firma suchen",
       placeholder: "Suchbegriff eingeben",
     },
+    searchPagination: {
+      title: "Suche & Paginierung",
+      description: "Such- und Paginierungssteuerung",
+    },
+    statusFilters: {
+      title: "Status- & Kampagnenfilter",
+      description: "Nach Status, Kampagnenstufe und Quelle filtern",
+    },
+    locationFilters: {
+      title: "Standortfilter",
+      description: "Nach Land und Sprache filtern",
+    },
+    sortingOptions: {
+      title: "Sortieroptionen",
+      description: "Ergebnissortierung konfigurieren",
+    },
     sortBy: {
       label: "Sortieren nach",
       description: "Feld zum Sortieren der Ergebnisse",

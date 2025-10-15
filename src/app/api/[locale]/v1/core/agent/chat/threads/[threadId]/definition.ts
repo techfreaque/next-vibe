@@ -1,0 +1,845 @@
+/**
+ * Chat Thread by ID API Definition
+ * Defines endpoints for getting, updating, and deleting individual threads
+ */
+
+import { z } from "zod";
+
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
+import {
+  objectField,
+  requestDataField,
+  requestUrlParamsField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
+import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+
+import { ThreadStatus, ThreadStatusOptions } from "../../enum";
+
+/**
+ * Get Thread by ID Endpoint (GET)
+ * Retrieves a specific thread by ID
+ */
+const { GET } = createEndpoint({
+  method: Methods.GET,
+  path: ["v1", "core", "agent", "chat", "threads", "[threadId]"],
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+
+  title: "app.api.v1.core.agent.chat.threads.threadId.get.title" as const,
+  description:
+    "app.api.v1.core.agent.chat.threads.threadId.get.description" as const,
+  category: "app.api.v1.core.agent.chat.category" as const,
+  tags: ["app.api.v1.core.agent.chat.tags.threads" as const],
+
+  fields: objectField(
+    {
+      type: WidgetType.CONTAINER,
+      title:
+        "app.api.v1.core.agent.chat.threads.threadId.get.container.title" as const,
+      description:
+        "app.api.v1.core.agent.chat.threads.threadId.get.container.description" as const,
+      layout: { type: LayoutType.STACKED },
+    },
+    { request: "urlParams", response: true },
+    {
+      // === URL PARAMETERS ===
+      id: requestUrlParamsField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.UUID,
+          label: "app.api.v1.core.agent.chat.threads.id.get.id.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.id.get.id.description" as const,
+          layout: { columns: 12 },
+          validation: { required: true },
+        },
+        z.string().uuid(),
+      ),
+
+      // === RESPONSE ===
+      thread: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          title:
+            "app.api.v1.core.agent.chat.threads.id.get.response.thread.title" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.id.get.response.thread.description" as const,
+          layout: { type: LayoutType.GRID, columns: 2 },
+        },
+        { response: true },
+        {
+          id: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.get.response.thread.id.content" as const,
+            },
+            z.string().uuid(),
+          ),
+          userId: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.get.response.thread.userId.content" as const,
+            },
+            z.string().uuid(),
+          ),
+          title: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.get.response.thread.threadTitle.content" as const,
+            },
+            z.string(),
+          ),
+          folderId: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.get.response.thread.folderId.content" as const,
+            },
+            z.string().uuid().nullable(),
+          ),
+          status: responseField(
+            {
+              type: WidgetType.BADGE,
+              text: "app.api.v1.core.agent.chat.threads.id.get.response.thread.status.content" as const,
+            },
+            z.nativeEnum(ThreadStatus),
+          ),
+          defaultModel: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.get.response.thread.defaultModel.content" as const,
+            },
+            z.string().nullable(),
+          ),
+          defaultTone: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.get.response.thread.defaultTone.content" as const,
+            },
+            z.string().nullable(),
+          ),
+          systemPrompt: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.get.response.thread.systemPrompt.content" as const,
+            },
+            z.string().nullable(),
+          ),
+          pinned: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.get.response.thread.pinned.content" as const,
+            },
+            z.boolean(),
+          ),
+          archived: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.get.response.thread.archived.content" as const,
+            },
+            z.boolean(),
+          ),
+          tags: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.get.response.thread.tags.content" as const,
+            },
+            z.array(z.string()),
+          ),
+          preview: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.get.response.thread.preview.content" as const,
+            },
+            z.string().nullable(),
+          ),
+          metadata: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.get.response.thread.metadata.content" as const,
+            },
+            z.record(z.string(), z.any()),
+          ),
+          createdAt: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.get.response.thread.createdAt.content" as const,
+            },
+            z.date(),
+          ),
+          updatedAt: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.get.response.thread.updatedAt.content" as const,
+            },
+            z.date(),
+          ),
+        },
+      ),
+    },
+  ),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title:
+        "app.api.v1.core.agent.chat.threads.id.get.errors.validation.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.get.errors.validation.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title:
+        "app.api.v1.core.agent.chat.threads.id.get.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.get.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "app.api.v1.core.agent.chat.threads.id.get.errors.forbidden.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.get.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "app.api.v1.core.agent.chat.threads.id.get.errors.notFound.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.get.errors.notFound.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "app.api.v1.core.agent.chat.threads.id.get.errors.server.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.get.errors.server.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "app.api.v1.core.agent.chat.threads.id.get.errors.network.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.get.errors.network.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "app.api.v1.core.agent.chat.threads.id.get.errors.unknown.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.get.errors.unknown.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title:
+        "app.api.v1.core.agent.chat.threads.id.get.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.get.errors.unsavedChanges.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "app.api.v1.core.agent.chat.threads.id.get.errors.conflict.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.get.errors.conflict.description",
+    },
+  },
+
+  successTypes: {
+    title: "app.api.v1.core.agent.chat.threads.id.get.success.title",
+    description:
+      "app.api.v1.core.agent.chat.threads.id.get.success.description",
+  },
+
+  examples: {
+    urlPathVariables: {
+      default: { id: "550e8400-e29b-41d4-a716-446655440000" },
+    },
+    requests: undefined,
+    responses: {
+      default: {
+        thread: {
+          id: "550e8400-e29b-41d4-a716-446655440000",
+          userId: "660e8400-e29b-41d4-a716-446655440000",
+          title: "My Chat Thread",
+          folderId: null,
+          status: ThreadStatus.ACTIVE,
+          defaultModel: "gpt-4o",
+          defaultTone: "professional",
+          systemPrompt: null,
+          pinned: false,
+          archived: false,
+          tags: [],
+          preview: "Hello, how can I help you?",
+          metadata: {},
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      },
+    },
+  },
+});
+
+/**
+ * Update Thread Endpoint (PATCH)
+ * Updates an existing thread
+ */
+const { PATCH } = createEndpoint({
+  method: Methods.PATCH,
+  path: ["v1", "core", "agent", "chat", "threads", "[id]"],
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+
+  title: "app.api.v1.core.agent.chat.threads.id.patch.title" as const,
+  description:
+    "app.api.v1.core.agent.chat.threads.id.patch.description" as const,
+  category: "app.api.v1.core.agent.chat.category" as const,
+  tags: ["app.api.v1.core.agent.chat.tags.threads" as const],
+
+  fields: objectField(
+    {
+      type: WidgetType.CONTAINER,
+      title:
+        "app.api.v1.core.agent.chat.threads.id.patch.container.title" as const,
+      description:
+        "app.api.v1.core.agent.chat.threads.id.patch.container.description" as const,
+      layout: { type: LayoutType.STACKED },
+    },
+    { request: "data&urlParams", response: true },
+    {
+      // === URL PARAMETERS ===
+      id: requestUrlParamsField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.UUID,
+          label:
+            "app.api.v1.core.agent.chat.threads.id.patch.id.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.id.patch.id.description" as const,
+          layout: { columns: 12 },
+          validation: { required: true },
+        },
+        z.string().uuid(),
+      ),
+
+      // === UPDATE FIELDS ===
+      updates: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          title:
+            "app.api.v1.core.agent.chat.threads.id.patch.sections.updates.title" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.id.patch.sections.updates.description" as const,
+          layout: { type: LayoutType.GRID, columns: 2 },
+        },
+        { request: "data" },
+        {
+          title: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label:
+                "app.api.v1.core.agent.chat.threads.id.patch.threadTitle.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.id.patch.threadTitle.description" as const,
+              layout: { columns: 12 },
+            },
+            z.string().min(1).max(255).optional(),
+          ),
+          folderId: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.UUID,
+              label:
+                "app.api.v1.core.agent.chat.threads.id.patch.folderId.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.id.patch.folderId.description" as const,
+              layout: { columns: 6 },
+            },
+            z.string().uuid().optional().nullable(),
+          ),
+          status: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label:
+                "app.api.v1.core.agent.chat.threads.id.patch.status.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.id.patch.status.description" as const,
+              layout: { columns: 6 },
+              options: ThreadStatusOptions,
+            },
+            z.nativeEnum(ThreadStatus).optional(),
+          ),
+          defaultModel: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label:
+                "app.api.v1.core.agent.chat.threads.id.patch.defaultModel.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.id.patch.defaultModel.description" as const,
+              layout: { columns: 6 },
+            },
+            z.string().optional(),
+          ),
+          defaultTone: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label:
+                "app.api.v1.core.agent.chat.threads.id.patch.defaultTone.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.id.patch.defaultTone.description" as const,
+              layout: { columns: 6 },
+            },
+            z.string().optional(),
+          ),
+          systemPrompt: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXTAREA,
+              label:
+                "app.api.v1.core.agent.chat.threads.id.patch.systemPrompt.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.id.patch.systemPrompt.description" as const,
+              layout: { columns: 12 },
+            },
+            z.string().optional(),
+          ),
+          pinned: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.BOOLEAN,
+              label:
+                "app.api.v1.core.agent.chat.threads.id.patch.pinned.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.id.patch.pinned.description" as const,
+              layout: { columns: 6 },
+            },
+            z.boolean().optional(),
+          ),
+          archived: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.BOOLEAN,
+              label:
+                "app.api.v1.core.agent.chat.threads.id.patch.archived.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.id.patch.archived.description" as const,
+              layout: { columns: 6 },
+            },
+            z.boolean().optional(),
+          ),
+          tags: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label:
+                "app.api.v1.core.agent.chat.threads.id.patch.tags.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.id.patch.tags.description" as const,
+              layout: { columns: 12 },
+            },
+            z.array(z.string()).optional(),
+          ),
+        },
+      ),
+
+      // === RESPONSE (same as GET) ===
+      thread: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          title:
+            "app.api.v1.core.agent.chat.threads.id.patch.response.thread.title" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.id.patch.response.thread.description" as const,
+          layout: { type: LayoutType.GRID, columns: 2 },
+        },
+        { response: true },
+        {
+          id: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.patch.response.thread.id.content" as const,
+            },
+            z.string().uuid(),
+          ),
+          userId: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.patch.response.thread.userId.content" as const,
+            },
+            z.string().uuid(),
+          ),
+          title: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.patch.response.thread.threadTitle.content" as const,
+            },
+            z.string(),
+          ),
+          folderId: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.patch.response.thread.folderId.content" as const,
+            },
+            z.string().uuid().nullable(),
+          ),
+          status: responseField(
+            {
+              type: WidgetType.BADGE,
+              text: "app.api.v1.core.agent.chat.threads.id.patch.response.thread.status.content" as const,
+            },
+            z.nativeEnum(ThreadStatus),
+          ),
+          defaultModel: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.patch.response.thread.defaultModel.content" as const,
+            },
+            z.string().nullable(),
+          ),
+          defaultTone: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.patch.response.thread.defaultTone.content" as const,
+            },
+            z.string().nullable(),
+          ),
+          systemPrompt: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.patch.response.thread.systemPrompt.content" as const,
+            },
+            z.string().nullable(),
+          ),
+          pinned: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.patch.response.thread.pinned.content" as const,
+            },
+            z.boolean(),
+          ),
+          archived: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.patch.response.thread.archived.content" as const,
+            },
+            z.boolean(),
+          ),
+          tags: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.patch.response.thread.tags.content" as const,
+            },
+            z.array(z.string()),
+          ),
+          preview: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.patch.response.thread.preview.content" as const,
+            },
+            z.string().nullable(),
+          ),
+          metadata: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.patch.response.thread.metadata.content" as const,
+            },
+            z.record(z.string(), z.any()),
+          ),
+          createdAt: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.patch.response.thread.createdAt.content" as const,
+            },
+            z.date(),
+          ),
+          updatedAt: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.threads.id.patch.response.thread.updatedAt.content" as const,
+            },
+            z.date(),
+          ),
+        },
+      ),
+    },
+  ),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title:
+        "app.api.v1.core.agent.chat.threads.id.patch.errors.validation.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.patch.errors.validation.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title:
+        "app.api.v1.core.agent.chat.threads.id.patch.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.patch.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title:
+        "app.api.v1.core.agent.chat.threads.id.patch.errors.forbidden.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.patch.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title:
+        "app.api.v1.core.agent.chat.threads.id.patch.errors.notFound.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.patch.errors.notFound.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "app.api.v1.core.agent.chat.threads.id.patch.errors.server.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.patch.errors.server.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "app.api.v1.core.agent.chat.threads.id.patch.errors.network.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.patch.errors.network.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "app.api.v1.core.agent.chat.threads.id.patch.errors.unknown.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.patch.errors.unknown.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title:
+        "app.api.v1.core.agent.chat.threads.id.patch.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.patch.errors.unsavedChanges.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title:
+        "app.api.v1.core.agent.chat.threads.id.patch.errors.conflict.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.patch.errors.conflict.description",
+    },
+  },
+
+  successTypes: {
+    title: "app.api.v1.core.agent.chat.threads.id.patch.success.title",
+    description:
+      "app.api.v1.core.agent.chat.threads.id.patch.success.description",
+  },
+
+  examples: {
+    urlPathVariables: {
+      default: { id: "550e8400-e29b-41d4-a716-446655440000" },
+    },
+    requests: {
+      default: {
+        updates: {
+          title: "Updated Thread Title",
+          pinned: true,
+        },
+      },
+    },
+    responses: {
+      default: {
+        thread: {
+          id: "550e8400-e29b-41d4-a716-446655440000",
+          userId: "660e8400-e29b-41d4-a716-446655440000",
+          title: "Updated Thread Title",
+          folderId: null,
+          status: ThreadStatus.ACTIVE,
+          defaultModel: "gpt-4o",
+          defaultTone: "professional",
+          systemPrompt: null,
+          pinned: true,
+          archived: false,
+          tags: [],
+          preview: "Hello, how can I help you?",
+          metadata: {},
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      },
+    },
+  },
+});
+
+/**
+ * Delete Thread Endpoint (DELETE)
+ * Deletes a thread by ID
+ */
+const { DELETE } = createEndpoint({
+  method: Methods.DELETE,
+  path: ["v1", "core", "agent", "chat", "threads", "[id]"],
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+
+  title: "app.api.v1.core.agent.chat.threads.id.delete.title" as const,
+  description:
+    "app.api.v1.core.agent.chat.threads.id.delete.description" as const,
+  category: "app.api.v1.core.agent.chat.category" as const,
+  tags: ["app.api.v1.core.agent.chat.tags.threads" as const],
+
+  fields: objectField(
+    {
+      type: WidgetType.CONTAINER,
+      title:
+        "app.api.v1.core.agent.chat.threads.id.delete.container.title" as const,
+      description:
+        "app.api.v1.core.agent.chat.threads.id.delete.container.description" as const,
+      layout: { type: LayoutType.STACKED },
+    },
+    { request: "urlParams", response: true },
+    {
+      // === URL PARAMETERS ===
+      id: requestUrlParamsField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.UUID,
+          label:
+            "app.api.v1.core.agent.chat.threads.id.delete.id.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.id.delete.id.description" as const,
+          layout: { columns: 12 },
+          validation: { required: true },
+        },
+        z.string().uuid(),
+      ),
+
+      // === RESPONSE ===
+      success: responseField(
+        {
+          type: WidgetType.TEXT,
+          content:
+            "app.api.v1.core.agent.chat.threads.id.delete.response.success.content" as const,
+        },
+        z.boolean(),
+      ),
+      deletedId: responseField(
+        {
+          type: WidgetType.TEXT,
+          content:
+            "app.api.v1.core.agent.chat.threads.id.delete.response.deletedId.content" as const,
+        },
+        z.string().uuid(),
+      ),
+    },
+  ),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title:
+        "app.api.v1.core.agent.chat.threads.id.delete.errors.validation.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.delete.errors.validation.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title:
+        "app.api.v1.core.agent.chat.threads.id.delete.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.delete.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title:
+        "app.api.v1.core.agent.chat.threads.id.delete.errors.forbidden.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.delete.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title:
+        "app.api.v1.core.agent.chat.threads.id.delete.errors.notFound.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.delete.errors.notFound.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "app.api.v1.core.agent.chat.threads.id.delete.errors.server.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.delete.errors.server.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title:
+        "app.api.v1.core.agent.chat.threads.id.delete.errors.network.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.delete.errors.network.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title:
+        "app.api.v1.core.agent.chat.threads.id.delete.errors.unknown.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.delete.errors.unknown.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title:
+        "app.api.v1.core.agent.chat.threads.id.delete.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.delete.errors.unsavedChanges.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title:
+        "app.api.v1.core.agent.chat.threads.id.delete.errors.conflict.title",
+      description:
+        "app.api.v1.core.agent.chat.threads.id.delete.errors.conflict.description",
+    },
+  },
+
+  successTypes: {
+    title: "app.api.v1.core.agent.chat.threads.id.delete.success.title",
+    description:
+      "app.api.v1.core.agent.chat.threads.id.delete.success.description",
+  },
+
+  examples: {
+    urlPathVariables: {
+      default: { id: "550e8400-e29b-41d4-a716-446655440000" },
+    },
+    requests: undefined,
+    responses: {
+      default: {
+        success: true,
+        deletedId: "550e8400-e29b-41d4-a716-446655440000",
+      },
+    },
+  },
+});
+
+// Extract types
+export type ThreadGetRequestInput = typeof GET.types.RequestInput;
+export type ThreadGetRequestOutput = typeof GET.types.RequestOutput;
+export type ThreadGetResponseInput = typeof GET.types.ResponseInput;
+export type ThreadGetResponseOutput = typeof GET.types.ResponseOutput;
+export type ThreadGetUrlParamsTypeOutput = typeof GET.types.UrlVariablesOutput;
+
+export type ThreadPatchRequestInput = typeof PATCH.types.RequestInput;
+export type ThreadPatchRequestOutput = typeof PATCH.types.RequestOutput;
+export type ThreadPatchResponseInput = typeof PATCH.types.ResponseInput;
+export type ThreadPatchResponseOutput = typeof PATCH.types.ResponseOutput;
+export type ThreadPatchUrlParamsTypeOutput =
+  typeof PATCH.types.UrlVariablesOutput;
+
+export type ThreadDeleteRequestInput = typeof DELETE.types.RequestInput;
+export type ThreadDeleteRequestOutput = typeof DELETE.types.RequestOutput;
+export type ThreadDeleteResponseInput = typeof DELETE.types.ResponseInput;
+export type ThreadDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
+export type ThreadDeleteUrlParamsTypeOutput =
+  typeof DELETE.types.UrlVariablesOutput;
+
+const definitions = { GET, PATCH, DELETE };
+export { DELETE, GET, PATCH };
+export default definitions;

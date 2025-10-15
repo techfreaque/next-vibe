@@ -18,9 +18,12 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import type { JSX } from "react";
 
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { useResetPasswordConfirm } from "@/app/api/[locale]/v1/core/user/public/reset-password/confirm/hooks";
+import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { Environment } from "@/packages/next-vibe/shared";
 
 import { PasswordStrengthIndicator } from "../../../../_components/password-strength-indicator";
 
@@ -37,6 +40,13 @@ export default function ResetPasswordConfirmForm({
 }: ResetPasswordConfirmFormProps): JSX.Element {
   const { t } = simpleT(locale);
 
+  // Initialize logger for client-side operations
+  const logger = createEndpointLogger(
+    envClient.NODE_ENV === Environment.DEVELOPMENT,
+    Date.now(),
+    locale,
+  );
+
   const {
     form,
     submitForm,
@@ -45,7 +55,7 @@ export default function ResetPasswordConfirmForm({
     tokenValid,
     alert,
     isSuccess,
-  } = useResetPasswordConfirm(token, tokenValidationResponse);
+  } = useResetPasswordConfirm(token, tokenValidationResponse, logger);
 
   // If the token is invalid
   if (tokenValid === false) {
@@ -120,7 +130,7 @@ export default function ResetPasswordConfirmForm({
 
           <Form form={form} onSubmit={submitForm} className="space-y-6">
             <EndpointFormField
-              name="email"
+              name="verification.email"
               config={{
                 type: "email",
                 label: "auth.resetPassword.emailLabel",
@@ -136,7 +146,7 @@ export default function ResetPasswordConfirmForm({
 
             <FormItem>
               <EndpointFormField
-                name="password"
+                name="newPassword.password"
                 config={{
                   type: "password",
                   label: "auth.resetPassword.newPasswordLabel",
@@ -156,7 +166,7 @@ export default function ResetPasswordConfirmForm({
             </FormItem>
 
             <EndpointFormField
-              name="confirmPassword"
+              name="newPassword.confirmPassword"
               config={{
                 type: "password",
                 label: "auth.resetPasswordConfirm.confirmPassword",

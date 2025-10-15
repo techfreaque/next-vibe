@@ -124,6 +124,8 @@ export const translations: typeof enTranslations = {
     repositoryCreateFailed: "Kontaktanfrage konnte nicht erstellt werden",
     repositoryCreateDetails:
       "Ihr Kontaktformular kann derzeit nicht verarbeitet werden. Bitte versuchen Sie es später erneut.",
+    noContactReturned:
+      "Nach der Erstellung wurde kein Kontaktdatensatz zurückgegeben",
     validation: {
       title: "Validierungsfehler",
       description:
@@ -174,10 +176,88 @@ export const translations: typeof enTranslations = {
   sms: {
     admin: {
       notification: "Neue Kontaktanfrage: {name} ({email}) - {subject}",
+      phone: {
+        missing:
+          "Keine Admin-Telefonnummer für Kontakt-Benachrichtigungen konfiguriert",
+      },
+      send: {
+        start:
+          "Admin-Benachrichtigungs-SMS für Kontakt-Einreichung wird gesendet",
+        error: "Fehler beim Senden der Admin-Benachrichtigungs-SMS für Kontakt",
+      },
     },
     confirmation: {
       message:
         "{name}, vielen Dank für Ihre Nachricht! Wir melden uns bald bei Ihnen.",
+      phone: {
+        missing:
+          "Keine Benutzer-Telefonnummer für Kontakt-Bestätigungs-SMS verfügbar",
+      },
+      send: {
+        start: "Bestätigungs-SMS an Kontaktformular-Absender wird gesendet",
+        error: "Fehler beim Senden der Bestätigungs-SMS für Kontakt",
+      },
+    },
+  },
+
+  repository: {
+    create: {
+      start: "Kontaktformular-Einreichung wird gestartet",
+      success: "Kontaktformular erfolgreich eingereicht",
+      error: "Fehler beim Erstellen der Kontaktformular-Einreichung",
+    },
+    lead: {
+      conversion: {
+        start: "Lead-Konvertierung für Kontakt wird gestartet",
+        error: "Fehler bei der Lead-Konvertierung für Kontakt",
+      },
+      provided: "Lead-ID für Kontakt-Einreichung bereitgestellt",
+    },
+    seed: {
+      create: {
+        start: "Kontakt-Seed-Erstellung wird gestartet",
+        error: "Fehler beim Erstellen des Kontakt-Seeds",
+      },
+    },
+  },
+
+  route: {
+    sms: {
+      admin: {
+        failed:
+          "Admin-Benachrichtigungs-SMS für Kontakt-Einreichung fehlgeschlagen",
+      },
+      confirmation: {
+        failed: "Bestätigungs-SMS für Kontakt-Einreichung fehlgeschlagen",
+      },
+    },
+  },
+
+  seeds: {
+    dev: {
+      start: "Kontakt-Seeds für Entwicklungsumgebung werden gestartet",
+      submission: {
+        created: "Kontakt-Einreichung in Entwicklungs-Seeds erstellt",
+        failed:
+          "Fehler beim Erstellen der Kontakt-Einreichung in Entwicklungs-Seeds",
+        error:
+          "Fehler beim Erstellen der Kontakt-Einreichung in Entwicklungs-Seeds",
+      },
+      complete: "Kontakt-Entwicklungs-Seeds abgeschlossen",
+      error: "Fehler beim Seeden der Kontakt-Entwicklungsdaten",
+    },
+    test: {
+      start: "Kontakt-Seeds für Testumgebung werden gestartet",
+      submission: {
+        created: "Kontakt-Einreichung in Test-Seeds erstellt",
+        failed: "Fehler beim Erstellen der Kontakt-Einreichung in Test-Seeds",
+      },
+      error: "Fehler beim Seeden der Kontakt-Testdaten",
+    },
+    prod: {
+      start: "Kontakt-Seeds für Produktionsumgebung werden gestartet",
+      ready: "Kontakt-Produktionsumgebung bereit",
+      error: "Fehler beim Seeden der Kontakt-Produktionsdaten",
     },
   },
 

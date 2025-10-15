@@ -1,0 +1,21 @@
+export const translations = {
+  routeDelegationHandler: {
+    failedToGetCliUser: "Failed to get CLI user for authentication",
+    cliUserAuthFailed: "CLI user authentication failed",
+    couldNotRetrieveCli: "Could not retrieve CLI user from database",
+    executingRoute: "🎯 Executing route: {{route}}",
+    method: "Method: {{method}}",
+    data: "Data: {{data}}",
+    urlParams: "URL Params: {{urlParams}}",
+    dryRun: "🔍 Dry run - would execute with:",
+    requestData: "📝 Request Data:",
+    missingRequiredFields: "⚠️  Missing required fields: {{fields}}",
+    urlParameters: "🔗 URL Parameters:",
+    resultJson: "📊 Result (JSON):",
+    success: "✅ Success",
+    route: "🛣️  Route: {{method}} {{route}}",
+    result: "📊 Result:",
+    errorWithDetails: "❌ Error: {{error}}",
+    error: "❌ Error: {{error}}",
+  },
+};

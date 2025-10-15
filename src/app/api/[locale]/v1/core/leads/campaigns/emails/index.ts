@@ -3,20 +3,22 @@
  * Main entry point for the email system
  */
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { type CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import type {
-  EmailCampaignStage,
-  EmailCampaignStageValues,
-  EmailJourneyVariant,
-} from "../../enum";
+import type { LeadWithEmailType } from "../../definition";
+import type { EmailCampaignStage, EmailJourneyVariant } from "../../enum";
 import { leadTrackingRepository } from "../../tracking/repository";
 import { abTestingService } from "./services/ab-testing";
 import { emailRendererService } from "./services/renderer";
 import { campaignSchedulerService } from "./services/scheduler";
 import type { EmailTemplateResult } from "./types";
-import type { LeadWithEmailType } from "../../definition";
+
+type EmailJourneyVariantValues =
+  (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant];
+type EmailCampaignStageValues =
+  (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
 
 /**
  * Main Email Service Class
@@ -28,8 +30,8 @@ export class EmailService {
    */
   async renderEmail(
     lead: LeadWithEmailType,
-    journeyVariant: EmailJourneyVariant,
-    stage: EmailCampaignStage,
+    journeyVariant: EmailJourneyVariantValues,
+    stage: EmailCampaignStageValues,
     context: {
       t: TFunction;
       locale: CountryLanguage;
@@ -38,6 +40,7 @@ export class EmailService {
       campaignId: string;
       baseUrl: string;
     },
+    logger: EndpointLogger,
   ): Promise<EmailTemplateResult | null> {
     try {
       const trackingUrl = leadTrackingRepository.generateCampaignTrackingUrl(
@@ -65,13 +68,9 @@ export class EmailService {
           trackingUrl,
           unsubscribeUrl,
         },
+        logger,
       );
-    } catch (error) {
-      console.error("Error rendering email", error, {
-        leadId: lead.id,
-        journeyVariant,
-        stage,
-      });
+    } catch {
       return null;
     }
   }
@@ -81,19 +80,20 @@ export class EmailService {
    */
   assignJourneyVariant(
     leadId: string,
+    logger: EndpointLogger,
     leadData?: {
       country?: string;
       source?: string;
       businessType?: string;
     },
-  ): EmailJourneyVariant {
-    return abTestingService.assignJourneyVariant(leadId, leadData);
+  ): EmailJourneyVariantValues {
+    return abTestingService.assignJourneyVariant(leadId, logger, leadData);
   }
 
   /**
    * Get available journey variants
    */
-  getAvailableJourneys(): EmailJourneyVariant[] {
+  getAvailableJourneys(): EmailJourneyVariantValues[] {
     return emailRendererService.getAvailableJourneys();
   }
 
@@ -101,12 +101,12 @@ export class EmailService {
    * Get journey information
    */
   getJourneyInfo(
-    journeyVariant: EmailJourneyVariant,
+    journeyVariant: EmailJourneyVariantValues,
     t: TFunction,
   ): {
     name: string;
     description: string;
-    availableStages: EmailCampaignStage[];
+    availableStages: EmailCampaignStageValues[];
   } {
     return emailRendererService.getJourneyInfo(journeyVariant, t);
   }
@@ -115,8 +115,8 @@ export class EmailService {
    * Generate email preview
    */
   async generatePreview(
-    journeyVariant: EmailJourneyVariant,
-    stage: EmailCampaignStage,
+    journeyVariant: EmailJourneyVariantValues,
+    stage: EmailCampaignStageValues,
     context: {
       t: TFunction;
       locale: CountryLanguage;
@@ -155,8 +155,8 @@ export class EmailService {
    * Check if template exists for journey and stage
    */
   hasTemplate(
-    journeyVariant: EmailJourneyVariant,
-    stage: EmailCampaignStage,
+    journeyVariant: EmailJourneyVariantValues,
+    stage: EmailCampaignStageValues,
   ): boolean {
     return emailRendererService.hasTemplate(journeyVariant, stage);
   }
@@ -165,8 +165,8 @@ export class EmailService {
    * Get available stages for a journey
    */
   getAvailableStages(
-    journeyVariant: EmailJourneyVariant,
-  ): (typeof EmailCampaignStageValues)[] {
+    journeyVariant: EmailJourneyVariantValues,
+  ): EmailCampaignStageValues[] {
     return emailRendererService.getAvailableStages(journeyVariant);
   }
 }
@@ -177,11 +177,11 @@ export class EmailService {
 export const emailService = new EmailService();
 
 /**
- * Export all services for direct access if needed
- */
-export { abTestingService, campaignSchedulerService, emailRendererService };
-
-/**
  * Export types
  */
 export type * from "./types";
+
+/**
+ * Export all services for direct access if needed
+ */
+export { abTestingService, campaignSchedulerService, emailRendererService };

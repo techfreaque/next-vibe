@@ -10,10 +10,10 @@ import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-ui/
  */
 export const { enum: TypecheckStatus, options: TypecheckStatusOptions } =
   createEnumOptions({
-    PASSED: "core.system.dev.typecheck.status.passed" as const,
-    FAILED: "core.system.dev.typecheck.status.failed" as const,
-    RUNNING: "core.system.dev.typecheck.status.running" as const,
-    SKIPPED: "core.system.dev.typecheck.status.skipped" as const,
+    PASSED: "app.api.v1.core.system.check.typecheck.status.passed" as const,
+    FAILED: "app.api.v1.core.system.check.typecheck.status.failed" as const,
+    RUNNING: "app.api.v1.core.system.check.typecheck.status.running" as const,
+    SKIPPED: "app.api.v1.core.system.check.typecheck.status.skipped" as const,
   });
 
 /**
@@ -21,9 +21,9 @@ export const { enum: TypecheckStatus, options: TypecheckStatusOptions } =
  */
 export const { enum: TypecheckSeverity, options: TypecheckSeverityOptions } =
   createEnumOptions({
-    ERROR: "core.system.dev.typecheck.severity.error" as const,
-    WARNING: "core.system.dev.typecheck.severity.warning" as const,
-    INFO: "core.system.dev.typecheck.severity.info" as const,
+    ERROR: "app.api.v1.core.system.check.typecheck.severity.error" as const,
+    WARNING: "app.api.v1.core.system.check.typecheck.severity.warning" as const,
+    INFO: "app.api.v1.core.system.check.typecheck.severity.info" as const,
   });
 
 /**
@@ -31,7 +31,8 @@ export const { enum: TypecheckSeverity, options: TypecheckSeverityOptions } =
  */
 export const { enum: TypecheckMode, options: TypecheckModeOptions } =
   createEnumOptions({
-    FULL: "core.system.dev.typecheck.mode.full" as const,
-    INCREMENTAL: "core.system.dev.typecheck.mode.incremental" as const,
-    WATCH: "core.system.dev.typecheck.mode.watch" as const,
+    FULL: "app.api.v1.core.system.check.typecheck.mode.full" as const,
+    INCREMENTAL:
+      "app.api.v1.core.system.check.typecheck.mode.incremental" as const,
+    WATCH: "app.api.v1.core.system.check.typecheck.mode.watch" as const,
   });

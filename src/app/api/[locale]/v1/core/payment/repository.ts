@@ -5,7 +5,13 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorResponseTypes,
+  type ResponseType,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import Stripe from "stripe";
 
@@ -13,29 +19,18 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { users } from "@/app/api/[locale]/v1/core/user/db";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { env } from "next-vibe/server/env";
-import {
-  createErrorResponse,
-  createSuccessResponse,
-  ErrorResponseTypes,
-  type ResponseType,
-} from "next-vibe/shared/types/response.schema";
 
 import { paymentMethods, paymentTransactions } from "./db";
 import type {
-  PaymentGetRequestTypeOutput,
-  PaymentGetResponseTypeOutput,
-  PaymentPostRequestTypeOutput,
-  PaymentPostResponseTypeOutput,
+  PaymentGetRequestOutput,
+  PaymentGetResponseOutput,
+  PaymentPostRequestOutput,
+  PaymentPostResponseOutput,
 } from "./definition";
-import {
-  CheckoutMode,
-  PaymentMethodType,
-  PaymentProvider,
-  PaymentStatus,
-} from "./enum";
+import { CheckoutMode, PaymentProvider, PaymentStatus } from "./enum";
 import type {
   PaymentInvoiceRequestOutput,
   PaymentInvoiceResponseOutput,
@@ -54,7 +49,7 @@ let stripeInstance: Stripe | null = null;
 function getStripe(): Stripe {
   if (!stripeInstance) {
     stripeInstance = new Stripe(env.STRIPE_SECRET_KEY, {
-      apiVersion: "2025-07-30.basil",
+      apiVersion: "2025-09-30.clover",
     });
   }
   return stripeInstance;
@@ -62,18 +57,18 @@ function getStripe(): Stripe {
 
 export interface PaymentRepository {
   createPaymentSession(
-    data: PaymentPostRequestTypeOutput,
+    data: PaymentPostRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<PaymentPostResponseTypeOutput>>;
+  ): Promise<ResponseType<PaymentPostResponseOutput>>;
 
   getPaymentInfo(
-    data: PaymentGetRequestTypeOutput,
+    data: PaymentGetRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<PaymentGetResponseTypeOutput>>;
+  ): Promise<ResponseType<PaymentGetResponseOutput>>;
 
   createInvoice(
     userId: string,
@@ -105,11 +100,11 @@ export interface PaymentRepository {
 
 export class PaymentRepositoryImpl implements PaymentRepository {
   async createPaymentSession(
-    data: PaymentPostRequestTypeOutput,
+    data: PaymentPostRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<PaymentPostResponseTypeOutput>> {
+  ): Promise<ResponseType<PaymentPostResponseOutput>> {
     const { t } = simpleT(locale);
 
     try {
@@ -127,9 +122,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         .limit(1);
 
       if (!userRecord) {
-        logger.error("User not found for payment session", { userId: user.id });
+        logger.error("payment.create.error.userNotFound", { userId: user.id });
         return createErrorResponse(
-          t("app.api.v1.core.payment.create.errors.validation.title"),
+          "app.api.v1.core.payment.create.errors.notFound.title",
           ErrorResponseTypes.NOT_FOUND,
           { userId: user.id },
         );
@@ -150,24 +145,35 @@ export class PaymentRepositoryImpl implements PaymentRepository {
           logger,
         );
         if (!customerResult.success) {
+          logger.error("payment.create.error.stripeCustomerFailed");
           return createErrorResponse(
-            t("app.api.v1.core.payment.create.errors.internal.title"),
+            "app.api.v1.core.payment.create.errors.server.title",
             ErrorResponseTypes.INTERNAL_ERROR,
-            { error: "Failed to create Stripe customer" },
+            {
+              error: t("app.api.v1.core.payment.errors.customerCreationFailed"),
+            },
           );
         }
         stripeCustomerId = customerResult.data;
       }
 
       // Create Stripe checkout session
+      const paymentMethodTypes: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] =
+        (data.paymentMethodTypes?.map(
+          (type): Stripe.Checkout.SessionCreateParams.PaymentMethodType =>
+            type.toLowerCase() as Stripe.Checkout.SessionCreateParams.PaymentMethodType,
+        ) as Stripe.Checkout.SessionCreateParams.PaymentMethodType[]) || [
+          "card",
+        ];
+
       const sessionConfig: Stripe.Checkout.SessionCreateParams = {
         customer: stripeCustomerId,
-        payment_method_types: data.paymentMethodTypes || [
-          PaymentMethodType.CARD,
-        ],
-        mode: data.mode,
-        success_url: data.successUrl,
-        cancel_url: data.cancelUrl,
+        payment_method_types: paymentMethodTypes,
+        mode: data.mode.toLowerCase() as Stripe.Checkout.SessionCreateParams.Mode,
+        success_url:
+          data.successUrl || `${env.NEXT_PUBLIC_APP_URL}/payment/success`,
+        cancel_url:
+          data.cancelUrl || `${env.NEXT_PUBLIC_APP_URL}/payment/cancel`,
         line_items: [
           {
             price: data.priceId,
@@ -176,7 +182,6 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         ],
         metadata: {
           userId: user.id,
-          ...data.metadata,
         },
         allow_promotion_codes: true,
         billing_address_collection: "auto",
@@ -198,7 +203,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
           status: PaymentStatus.PENDING,
           provider: PaymentProvider.STRIPE,
           mode: data.mode,
-          metadata: data.metadata,
+          metadata: null,
         })
         .returning();
 
@@ -214,18 +219,18 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         mode: data.mode,
         sessionUrl: session.url || "",
         sessionId: session.id,
-        message: t("app.api.v1.core.payment.create.response.message"),
+        message: t("app.api.v1.core.payment.success.sessionCreated"),
       });
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error("Failed to create payment session", {
+      logger.error("payment.create.error.failed", {
         error: parsedError.message,
         userId: user.id,
         priceId: data.priceId,
       });
 
       return createErrorResponse(
-        t("app.api.v1.core.payment.create.errors.internal.title"),
+        "app.api.v1.core.payment.create.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message },
       );
@@ -233,11 +238,11 @@ export class PaymentRepositoryImpl implements PaymentRepository {
   }
 
   async getPaymentInfo(
-    data: PaymentGetRequestTypeOutput,
+    data: PaymentGetRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<PaymentGetResponseTypeOutput>> {
+  ): Promise<ResponseType<PaymentGetResponseOutput>> {
     const { t } = simpleT(locale);
 
     try {
@@ -250,7 +255,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         .select()
         .from(paymentTransactions)
         .where(eq(paymentTransactions.userId, user.id))
-        .orderBy(paymentTransactions.createdAt)
+        .orderBy(desc(paymentTransactions.createdAt))
         .limit(10);
 
       // Get user's payment methods
@@ -258,7 +263,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         .select()
         .from(paymentMethods)
         .where(eq(paymentMethods.userId, user.id))
-        .orderBy(paymentMethods.createdAt)
+        .orderBy(desc(paymentMethods.createdAt))
         .limit(10);
 
       logger.debug("Payment information retrieved", {
@@ -272,17 +277,17 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         mode: userTransactions[0]?.mode || CheckoutMode.PAYMENT,
         sessionUrl: "",
         sessionId: userTransactions[0]?.stripeSessionId || "",
-        message: t("app.api.v1.core.payment.get.response.message"),
+        message: t("app.api.v1.core.payment.success.infoRetrieved"),
       });
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error("Failed to get payment information", {
+      logger.error("payment.get.error.failed", {
         error: parsedError.message,
         userId: user.id,
       });
 
       return createErrorResponse(
-        t("app.api.v1.core.payment.get.errors.internal.title"),
+        "app.api.v1.core.payment.get.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message },
       );
@@ -373,13 +378,13 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       return createSuccessResponse(customer.id);
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error("Failed to create Stripe customer", {
+      logger.error("payment.stripe.customer.createFailed", {
         error: parsedError.message,
         userId: user.id,
       });
 
       return createErrorResponse(
-        "Failed to create customer",
+        "app.api.v1.core.payment.create.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message },
       );
@@ -407,10 +412,11 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         logger,
       );
       if (!stripeCustomerId) {
+        logger.error("payment.invoice.error.customerNotFound", { userId });
         return createErrorResponse(
-          t("app.api.v1.core.payment.invoice.post.errors.validation.title"),
+          "app.api.v1.core.payment.invoice.post.errors.notFound.title",
           ErrorResponseTypes.NOT_FOUND,
-          { error: "Customer not found" },
+          { error: t("app.api.v1.core.payment.errors.customerNotFound") },
         );
       }
 
@@ -432,7 +438,8 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         invoice: invoice.id,
         amount: Math.round(data.amount * 100),
         currency: data.currency.toLowerCase(),
-        description: data.description || "Invoice item",
+        description:
+          data.description || t("app.api.v1.core.payment.invoice.defaultItem"),
       });
 
       // Finalize and send invoice
@@ -450,7 +457,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
 
       return createSuccessResponse({
         success: true,
-        message: t("app.api.v1.core.payment.invoice.response.message"),
+        message: t("app.api.v1.core.payment.invoice.success.created"),
         invoice: {
           id: finalizedInvoice.id,
           userId,
@@ -458,24 +465,37 @@ export class PaymentRepositoryImpl implements PaymentRepository {
           invoiceNumber: finalizedInvoice.number || "N/A",
           amount: data.amount,
           currency: data.currency,
-          status: finalizedInvoice.status,
-          invoiceUrl: finalizedInvoice.invoice_pdf || "",
+          status:
+            finalizedInvoice.status === "open"
+              ? "OPEN"
+              : finalizedInvoice.status === "paid"
+                ? "PAID"
+                : finalizedInvoice.status === "void"
+                  ? "VOID"
+                  : finalizedInvoice.status === "uncollectible"
+                    ? "UNCOLLECTIBLE"
+                    : "DRAFT",
+          invoiceUrl: finalizedInvoice.hosted_invoice_url || "",
           invoicePdf: finalizedInvoice.invoice_pdf || "",
           dueDate: data.dueDate || new Date().toISOString(),
-          paidAt: null,
-          createdAt: new Date().toISOString(),
+          paidAt: finalizedInvoice.status_transitions?.paid_at
+            ? new Date(
+                finalizedInvoice.status_transitions.paid_at * 1000,
+              ).toISOString()
+            : undefined,
+          createdAt: new Date(finalizedInvoice.created * 1000).toISOString(),
           updatedAt: new Date().toISOString(),
         },
       });
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error("Failed to create invoice", {
+      logger.error("payment.invoice.error.failed", {
         error: parsedError.message,
         userId,
       });
 
       return createErrorResponse(
-        t("app.api.v1.core.payment.invoice.post.errors.server.title"),
+        "app.api.v1.core.payment.invoice.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message },
       );
@@ -499,17 +519,18 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         logger,
       );
       if (!stripeCustomerId) {
+        logger.error("payment.portal.error.customerNotFound", { userId });
         return createErrorResponse(
-          t("app.api.v1.core.payment.portal.post.errors.notFound.title"),
+          "app.api.v1.core.payment.portal.post.errors.notFound.title",
           ErrorResponseTypes.NOT_FOUND,
-          { error: "Customer not found" },
+          { error: t("app.api.v1.core.payment.errors.customerNotFound") },
         );
       }
 
       // Create portal session
       const session = await getStripe().billingPortal.sessions.create({
         customer: stripeCustomerId,
-        return_url: data.returnUrl,
+        return_url: data.returnUrl || `${env.NEXT_PUBLIC_APP_URL}/dashboard`,
       });
 
       logger.debug("Customer portal session created", {
@@ -519,18 +540,18 @@ export class PaymentRepositoryImpl implements PaymentRepository {
 
       return createSuccessResponse({
         success: true,
-        message: t("app.api.v1.core.payment.portal.response.message"),
+        message: t("app.api.v1.core.payment.portal.success.created"),
         customerPortalUrl: session.url,
       });
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error("Failed to create customer portal session", {
+      logger.error("payment.portal.error.failed", {
         error: parsedError.message,
         userId,
       });
 
       return createErrorResponse(
-        t("app.api.v1.core.payment.portal.post.errors.server.title"),
+        "app.api.v1.core.payment.portal.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message },
       );
@@ -565,8 +586,12 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         .limit(1);
 
       if (!transaction) {
+        logger.error("payment.refund.error.transactionNotFound", {
+          transactionId: data.transactionId,
+          userId,
+        });
         return createErrorResponse(
-          t("app.api.v1.core.payment.refund.post.errors.notFound.title"),
+          "app.api.v1.core.payment.refund.post.errors.notFound.title",
           ErrorResponseTypes.NOT_FOUND,
           { transactionId: data.transactionId },
         );
@@ -576,7 +601,11 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       const refund = await getStripe().refunds.create({
         payment_intent: transaction.stripeSessionId, // This should be payment intent ID
         amount: data.amount ? Math.round(data.amount * 100) : undefined,
-        reason: data.reason || "requested_by_customer",
+        reason:
+          (data.reason as
+            | "duplicate"
+            | "fraudulent"
+            | "requested_by_customer") || "requested_by_customer",
         metadata: {
           userId,
           transactionId: data.transactionId,
@@ -591,27 +620,32 @@ export class PaymentRepositoryImpl implements PaymentRepository {
 
       return createSuccessResponse({
         success: true,
-        message: t("app.api.v1.core.payment.refund.response.message"),
+        message: t("app.api.v1.core.payment.refund.success.created"),
         refund: {
           id: refund.id,
+          userId,
           transactionId: data.transactionId,
+          stripeRefundId: refund.id,
           amount: (refund.amount || 0) / 100,
           currency: refund.currency.toUpperCase(),
-          status: refund.status,
-          reason: refund.reason || "requested_by_customer",
+          status: refund.status || "pending",
+          reason:
+            data.reason ||
+            t("app.api.v1.core.payment.refund.reason.requestedByCustomer"),
           createdAt: new Date(refund.created * 1000).toISOString(),
+          updatedAt: new Date().toISOString(),
         },
       });
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error("Failed to create refund", {
+      logger.error("payment.refund.error.failed", {
         error: parsedError.message,
         userId,
         transactionId: data.transactionId,
       });
 
       return createErrorResponse(
-        t("app.api.v1.core.payment.refund.post.errors.server.title"),
+        "app.api.v1.core.payment.refund.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message },
       );
@@ -632,7 +666,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       const event = getStripe().webhooks.constructEvent(
         body,
         signature,
-        env.STRIPE_WEBHOOK_SECRET || "",
+        env.STRIPE_WEBHOOK_SECRET,
       );
 
       logger.debug("Webhook verified", {
@@ -649,10 +683,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
           await this.handlePaymentFailed(event.data.object, logger);
           break;
         case "invoice.payment_succeeded":
-          await this.handleInvoicePaymentSucceeded(
-            event.data.object,
-            logger,
-          );
+          this.handleInvoicePaymentSucceeded(event.data.object, logger);
           break;
         default:
           logger.debug("Unhandled webhook event type", {
@@ -663,12 +694,12 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       return createSuccessResponse({ received: true });
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error("Webhook processing failed", {
+      logger.error("payment.webhook.error.processingFailed", {
         error: parsedError.message,
       });
 
       return createErrorResponse(
-        "Webhook processing failed",
+        "app.api.v1.core.payment.errors.server.title",
         ErrorResponseTypes.BAD_REQUEST,
         { error: parsedError.message },
       );
@@ -676,7 +707,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
   }
 
   private async handlePaymentSucceeded(
-    paymentIntent: any,
+    paymentIntent: Stripe.PaymentIntent,
     logger: EndpointLogger,
   ): Promise<void> {
     try {
@@ -698,7 +729,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
   }
 
   private async handlePaymentFailed(
-    paymentIntent: any,
+    paymentIntent: Stripe.PaymentIntent,
     logger: EndpointLogger,
   ): Promise<void> {
     try {
@@ -719,18 +750,14 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     }
   }
 
-  private async handleInvoicePaymentSucceeded(
-    invoice: any,
+  private handleInvoicePaymentSucceeded(
+    invoice: Stripe.Invoice,
     logger: EndpointLogger,
-  ): Promise<void> {
-    try {
-      logger.debug("Invoice payment succeeded", {
-        invoiceId: invoice.id,
-      });
-      // Add invoice payment processing logic here if needed
-    } catch (error) {
-      logger.error("Failed to process invoice payment succeeded", { error });
-    }
+  ): void {
+    logger.debug("Invoice payment succeeded", {
+      invoiceId: invoice.id,
+    });
+    // Add invoice payment processing logic here if needed
   }
 }
 

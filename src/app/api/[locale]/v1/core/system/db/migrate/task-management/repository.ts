@@ -14,8 +14,6 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   MigrationTaskManagementRequestOutput,
@@ -206,7 +204,7 @@ export class MigrationTaskManagementRepositoryImpl
         taskExecuted: taskName || "all-migration-tasks",
       });
 
-      return createSuccessResponse({
+      const response: MigrationTaskManagementResponseOutput = {
         success: result.success,
         taskExecuted: taskName || "all-migration-tasks",
         status: result.success ? "completed" : "failed",
@@ -215,11 +213,13 @@ export class MigrationTaskManagementRepositoryImpl
         result: {
           success: result.success,
           message: result.message,
-          data: result.data as Record<string, string | number | boolean>,
+          data: result.data ? { ...result.data } : undefined,
           migrationsChecked: result.migrationsChecked,
           pendingMigrations: result.pendingMigrations,
         },
-      }) as ResponseType<MigrationTaskManagementResponseOutput>;
+      };
+
+      return createSuccessResponse(response);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Migration task operation execution failed", parsedError);

@@ -5,11 +5,11 @@
 "use client";
 
 import { Upload } from "lucide-react";
-import { useTranslation } from "next-vibe/core/client";
 import { Button } from "next-vibe-ui/ui/button";
 import type React from "react";
 import { useState } from "react";
 
+import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CsvImportDialog } from "./csv-import-dialog";

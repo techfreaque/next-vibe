@@ -4,7 +4,11 @@ import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import type { FormEvent } from "react";
 import { useMemo } from "react";
 
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+
 import type { EndpointLogger } from "../../../cli/vibe/endpoints/endpoint-handler/logger";
+import type { Methods } from "../../../cli/vibe/endpoints/endpoint-types/core/enums";
+import type { CreateApiEndpoint } from "../../../cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { AutoPrefillConfig } from "../form/types";
 import {
   type EndpointReturn,
@@ -16,9 +20,11 @@ import {
 } from "./types";
 import { useEndpointCreate } from "./use-endpoint-create";
 import { useEndpointDelete } from "./use-endpoint-delete";
-import { useEndpointFilter } from "./use-endpoint-filter";
 import { useEndpointRead } from "./use-endpoint-read";
 import { useAvailableMethods, usePrimaryMutationMethod } from "./utils";
+
+// Re-export EndpointReturn for external use
+export type { EndpointReturn } from "./types";
 
 /**
  * Utility function to normalize options with smart defaults and full type safety
@@ -38,11 +44,6 @@ function normalizeOptions<T>(options: UseEndpointOptions<T> = {}): {
   defaultValues?: PrimaryMutationTypes<T> extends never
     ? undefined
     : Partial<PrimaryMutationTypes<T>["request"]>;
-  filterOptions?: {
-    initialFilters?: GetEndpointTypes<T> extends never
-      ? undefined
-      : Partial<GetEndpointTypes<T>["request"]>;
-  };
   autoPrefill: boolean;
 } {
   // Merge top-level options with nested options, giving priority to top-level
@@ -65,7 +66,6 @@ function normalizeOptions<T>(options: UseEndpointOptions<T> = {}): {
   return {
     queryOptions,
     defaultValues,
-    filterOptions: options.filterOptions,
     autoPrefill: options.autoPrefill ?? true,
   };
 }
@@ -86,14 +86,22 @@ function normalizeOptions<T>(options: UseEndpointOptions<T> = {}): {
  * @param options - Configuration options for forms and queries
  * @returns Object with all available operations based on endpoint methods
  */
-export function useEndpoint<T extends Record<string, any>>(
+export function useEndpoint<
+  T extends Partial<
+    Record<
+      Methods,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
+    >
+  >,
+>(
   endpoints: T,
   options: UseEndpointOptions<T> = {},
   logger: EndpointLogger,
 ): EndpointReturn<T> {
-  const { t, locale } = useTranslation();
+  useTranslation();
   // Normalize options with smart defaults
-  const { queryOptions, defaultValues, filterOptions, autoPrefill } =
+  const { queryOptions, defaultValues, autoPrefill } =
     normalizeOptions(options);
 
   // Create autoPrefill configuration (simplified - no local storage)
@@ -109,56 +117,34 @@ export function useEndpoint<T extends Record<string, any>>(
   const primaryMutationMethod = usePrimaryMutationMethod(availableMethods);
 
   // Extract endpoints
+
   const readEndpoint = endpoints.GET || null;
+
   const primaryEndpoint = primaryMutationMethod
     ? endpoints[primaryMutationMethod]
     : null;
+
   const deleteEndpoint = endpoints.DELETE || null;
 
-  // Check if the GET endpoint is a LIST_FILTER type
-  const isListFilterEndpoint = false; // Simplified for now
-
-  // Use filtering hook for LIST_FILTER endpoints, regular read hook for others
-  const filterOperation = useEndpointFilter(
-    isListFilterEndpoint ? (readEndpoint as never) : null,
-    logger,
-    {
-      formOptions: {
-        persistForm: false, // No local storage
-        defaultValues: defaultValues as never,
-        persistenceKey: undefined,
-      },
-      queryOptions,
-      urlParams: queryOptions?.urlParams || ({} as never),
-      initialFilters: filterOptions?.initialFilters as never,
+  // Use read hook for GET endpoints (list filtering not implemented yet)
+  const read = useEndpointRead(readEndpoint, logger, {
+    formOptions: {
+      persistForm: false, // No local storage
+      defaultValues,
+      persistenceKey: undefined,
     },
-  );
-
-  const readOperation = useEndpointRead(
-    isListFilterEndpoint ? null : (readEndpoint as never),
-    logger,
-    {
-      formOptions: {
-        persistForm: false, // No local storage
-        defaultValues: defaultValues as never,
-        persistenceKey: undefined,
-      },
-      queryOptions,
-      urlParams: queryOptions?.urlParams || ({} as never),
-      autoPrefillConfig,
-    },
-  );
+    queryOptions,
+    urlParams: queryOptions?.urlParams,
+    autoPrefillConfig,
+  });
 
   // Use the appropriate operation based on endpoint type
-  const activeReadOperation = isListFilterEndpoint
-    ? filterOperation
-    : readOperation;
-
   const autoPrefillData = useMemo(() => {
-    return autoPrefill && activeReadOperation?.response?.success
-      ? activeReadOperation.response.data
-      : undefined;
-  }, [autoPrefill, activeReadOperation?.response]);
+    if (autoPrefill && read?.response?.success) {
+      return read.response.data;
+    }
+    return undefined;
+  }, [autoPrefill, read?.response]);
 
   // Calculate the appropriate reset data for form clearing
   // Priority: autoPrefillData (loaded data) > defaultValues
@@ -169,71 +155,47 @@ export function useEndpoint<T extends Record<string, any>>(
     return defaultValues;
   }, [autoPrefillData, defaultValues]);
 
-  const createOperation = useEndpointCreate(primaryEndpoint as never, logger, {
+  const createOperation = useEndpointCreate(primaryEndpoint, logger, {
     formOptions: {
       persistForm: false, // No local storage
-      defaultValues: defaultValues as never,
+      defaultValues,
       persistenceKey: undefined,
     },
     mutationOptions: {},
-    urlParams: queryOptions?.urlParams || ({} as never),
+    urlParams: queryOptions?.urlParams,
     autoPrefillData,
   });
 
-  const deleteOperation = useEndpointDelete(deleteEndpoint as never, logger, {
+  const deleteOperation = useEndpointDelete(deleteEndpoint, logger, {
     mutationOptions: {},
-    urlParams: queryOptions?.urlParams || ({} as never),
+    urlParams: queryOptions?.urlParams,
   });
 
   const isLoading =
-    activeReadOperation?.isLoading ||
+    read?.isLoading ||
     createOperation?.isSubmitting ||
     deleteOperation?.isSubmitting ||
     false;
 
   // Combined error state
   const error: ErrorResponseType | null =
-    activeReadOperation?.error ||
-    (createOperation?.submitError as ErrorResponseType) ||
+    read?.error ||
+    createOperation?.submitError ||
     deleteOperation?.error ||
     null;
 
-  // Create adapters to match the expected interface
-  const readAdapter = activeReadOperation
-    ? {
-        ...activeReadOperation,
-        values: activeReadOperation.form.watch(),
-        setValue: <K extends keyof typeof activeReadOperation.form.watch>(
-          key: K,
-          value: (typeof activeReadOperation.form.watch)[K],
-        ): void => {
-          activeReadOperation.form.setValue(key, value);
-        },
-        onSubmit: async (e: FormEvent | undefined): Promise<void> => {
-          e?.preventDefault();
-          await activeReadOperation.submitForm(e as never);
-        },
-        reset: (): void =>
-          activeReadOperation.form.reset((resetData || {}) as never),
-      }
-    : undefined;
-
-  const createAdapter = createOperation
+  // Return the appropriate create operation
+  const createValues = createOperation?.form.watch();
+  const create = createOperation
     ? {
         ...createOperation,
-        values: createOperation.form.watch(),
-        setValue: <K extends keyof typeof createOperation.form.watch>(
-          key: K,
-          value: (typeof createOperation.form.watch)[K],
-        ): void => {
-          createOperation.form.setValue(key, value);
-        },
+        values: createValues,
+        setValue: createOperation.form.setValue.bind(createOperation.form),
         onSubmit: async (e: FormEvent | undefined): Promise<void> => {
           e?.preventDefault();
-          await createOperation.submitForm(e as never);
+          await createOperation.submitForm(e);
         },
-        reset: (): void =>
-          createOperation.form.reset((resetData || {}) as never),
+        reset: (): void => createOperation.form.reset(resetData || {}),
         isSuccess: createOperation.isSubmitSuccessful,
         isDirty: createOperation.form.formState.isDirty,
         error:
@@ -245,9 +207,10 @@ export function useEndpoint<T extends Record<string, any>>(
     : undefined;
 
   // Generate alert state from success/error states and endpoint types
-  const alert: FormAlertState | null = useMemo(() => {
+  const alert = useMemo((): FormAlertState | null => {
     // Check for success state
-    if (createAdapter?.isSuccess && primaryEndpoint?.successTypes) {
+
+    if (create?.isSuccess && primaryEndpoint?.successTypes) {
       return {
         variant: "success",
         title: {
@@ -260,8 +223,10 @@ export function useEndpoint<T extends Record<string, any>>(
     }
 
     // Check for error state
+
     if (error && primaryEndpoint?.errorTypes) {
       // Try to find matching error type from endpoint by checking the errorKey
+
       const errorTypeEntries = Object.entries(primaryEndpoint.errorTypes);
       const matchingEntry = errorTypeEntries.find(([hookErrorType]) => {
         // Check if the error's errorKey matches any of the HookErrorTypes
@@ -273,10 +238,10 @@ export function useEndpoint<T extends Record<string, any>>(
         return {
           variant: "destructive",
           title: {
-            message: errorConfig?.title || "Error",
+            message: errorConfig.title,
           },
           message: {
-            message: errorConfig?.description || "An error occurred",
+            message: errorConfig.description,
           },
         };
       }
@@ -295,18 +260,13 @@ export function useEndpoint<T extends Record<string, any>>(
     }
 
     return null;
-  }, [createAdapter?.isSuccess, error, primaryEndpoint]);
+  }, [create?.isSuccess, error, primaryEndpoint]);
 
   return {
-    // Combined alert state
     alert,
-
-    // CRUD Operations
-    read: readAdapter,
-    create: createAdapter,
-    delete: deleteOperation,
-
-    // Combined state
+    read: read ?? undefined,
+    create: create ?? undefined,
+    delete: deleteOperation ?? undefined,
     isLoading,
     error,
   };

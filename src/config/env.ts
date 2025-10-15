@@ -11,35 +11,10 @@ import { envValidationLogger } from "@/packages/next-vibe/client/env-client";
 export const envSchema = vibeEnvSchema.extend({
   OPENROUTER_API_KEY: z.string().min(1),
   UNCENSORED_AI_API_KEY: z.string().optional(),
+  EDEN_AI_API_KEY: z.string().min(1),
+  BRAVE_SEARCH_API_KEY: z.string(),
   STRIPE_WEBHOOK_SECRET: z.string().min(1),
   STRIPE_SECRET_KEY: z.string().min(1),
-
-  // LLM Configuration
-  LLM_PROVIDER: z.enum(["openai", "anthropic", "local"]).default("openai"),
-  LLM_API_KEY: z.string().optional(),
-  LLM_MODEL: z.string().default("gpt-4-turbo-preview"),
-  LLM_MAX_TOKENS: stringToIntSchema(
-    "The env LLM_MAX_TOKENS must be a number",
-  ).default(2000),
-  LLM_TEMPERATURE: z
-    .string()
-    .transform((val: string): number => {
-      const parsed = parseFloat(val);
-      if (isNaN(parsed)) {
-        // eslint-disable-next-line no-restricted-syntax
-        throw new Error("The env LLM_TEMPERATURE must be a number");
-      }
-      return parsed;
-    })
-    .default(0.1),
-  LLM_TIMEOUT: stringToIntSchema(
-    "The env LLM_TIMEOUT must be a number",
-  ).default(30000),
-  LLM_RETRY_ATTEMPTS: stringToIntSchema(
-    "The env LLM_RETRY_ATTEMPTS must be a number",
-  ).default(3),
-  LLM_FALLBACK_MODEL: z.string().default("gpt-3.5-turbo"),
-
   // Lead campaigns email configuration
   LEADS_EMAIL_FROM_EMAIL: z.email(),
   LEADS_EMAIL_HOST: z.string(),

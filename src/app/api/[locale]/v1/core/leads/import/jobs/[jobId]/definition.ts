@@ -5,194 +5,590 @@
 
 import { z } from "zod";
 
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import {
+  objectField,
+  requestDataField,
+  requestUrlParamsField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
+import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { UserRole } from "../../../../user/user-roles/enum";
 import { CsvImportJobStatus } from "../../enum";
 
-// Job update schema (PATCH)
-const jobUpdateSchema = z.object({
-  batchSize: z.number().min(10).max(1000).optional(),
-  maxRetries: z.number().min(0).max(10).optional(),
-});
-
-// Job response schema
-const importJobSchema = z.object({
-  id: z.uuid(),
-  fileName: z.string(),
-  status: z.string(),
-  totalRows: z.number().nullable(),
-  processedRows: z.number(),
-  successfulImports: z.number(),
-  failedImports: z.number(),
-  duplicateEmails: z.number(),
-  currentBatchStart: z.number(),
-  batchSize: z.number(),
-  error: z.string().nullable(),
-  retryCount: z.number(),
-  maxRetries: z.number(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  startedAt: z.string().nullable(),
-  completedAt: z.string().nullable(),
-});
-
-// Update job endpoint (PATCH)
-const updateJobEndpoint = createEndpoint({
-  description: "Update import job settings",
+/**
+ * Update Import Job Endpoint (PATCH)
+ * Updates job configuration settings
+ */
+const { PATCH } = createEndpoint({
   method: Methods.PATCH,
-  requestSchema: jobUpdateSchema,
-  responseSchema: importJobSchema,
-  requestUrlSchema: z.object({
-    jobId: z.uuid(),
-  }),
-  apiQueryOptions: {
-    queryKey: ["import-jobs"],
-  },
-  fieldDescriptions: {
-    jobId: "ID of the import job to update",
-    batchSize: "Number of records to process in each batch",
-    maxRetries: "Maximum number of retry attempts for failed batches",
-  },
+  path: ["v1", "core", "leads", "import", "jobs", ":jobId"],
+  title: "app.api.v1.core.leads.import.jobs.jobId.patch.title",
+  description: "app.api.v1.core.leads.import.jobs.jobId.patch.description",
+  category: "app.api.v1.core.leads.category",
+  tags: [
+    "app.api.v1.core.leads.tags.leads",
+    "app.api.v1.core.leads.tags.management",
+  ],
   allowedRoles: [UserRole.ADMIN],
-  errorTypes: {
-    unauthorized: {
-      title: "leadsErrors.leadsImport.patch.error.unauthorized.title",
+
+  fields: objectField(
+    {
+      type: WidgetType.CONTAINER,
+      title: "app.api.v1.core.leads.import.jobs.jobId.patch.form.title",
       description:
-        "leadsErrors.leadsImport.patch.error.unauthorized.description",
+        "app.api.v1.core.leads.import.jobs.jobId.patch.form.description",
+      layout: { type: LayoutType.STACKED },
     },
-    forbidden: {
-      title: "leadsErrors.leadsImport.patch.error.forbidden.title",
-      description: "leadsErrors.leadsImport.patch.error.forbidden.description",
+    { request: "data", response: true },
+    {
+      // === URL PARAMETERS ===
+      jobId: requestUrlParamsField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.UUID,
+          label: "app.api.v1.core.leads.import.jobs.jobId.patch.jobId.label",
+          description:
+            "app.api.v1.core.leads.import.jobs.jobId.patch.jobId.description",
+          layout: { columns: 12 },
+          validation: { required: true },
+        },
+        z.string().uuid(),
+      ),
+
+      // === REQUEST FIELDS ===
+      settings: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          title: "app.api.v1.core.leads.import.jobs.jobId.patch.settings.title",
+          description:
+            "app.api.v1.core.leads.import.jobs.jobId.patch.settings.description",
+          layout: { type: LayoutType.GRID, columns: 2 },
+        },
+        { request: "data" },
+        {
+          batchSize: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.NUMBER,
+              label:
+                "app.api.v1.core.leads.import.jobs.jobId.patch.batchSize.label",
+              description:
+                "app.api.v1.core.leads.import.jobs.jobId.patch.batchSize.description",
+              placeholder:
+                "app.api.v1.core.leads.import.jobs.jobId.patch.batchSize.placeholder",
+              layout: { columns: 6 },
+              validation: { min: 10, max: 1000 },
+            },
+            z.number().min(10).max(1000).optional(),
+          ),
+          maxRetries: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.NUMBER,
+              label:
+                "app.api.v1.core.leads.import.jobs.jobId.patch.maxRetries.label",
+              description:
+                "app.api.v1.core.leads.import.jobs.jobId.patch.maxRetries.description",
+              placeholder:
+                "app.api.v1.core.leads.import.jobs.jobId.patch.maxRetries.placeholder",
+              layout: { columns: 6 },
+              validation: { min: 0, max: 10 },
+            },
+            z.number().min(0).max(10).optional(),
+          ),
+        },
+      ),
+
+      // === RESPONSE FIELDS ===
+      job: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          title: "app.api.v1.core.leads.import.jobs.jobId.patch.response.title",
+          description:
+            "app.api.v1.core.leads.import.jobs.jobId.patch.response.description",
+          layout: { type: LayoutType.STACKED },
+        },
+        { response: true },
+        {
+          info: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.import.jobs.jobId.patch.response.info.title",
+              description:
+                "app.api.v1.core.leads.import.jobs.jobId.patch.response.info.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+            },
+            { response: true },
+            {
+              id: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.import.jobs.jobId.patch.response.id.content",
+                },
+                z.string().uuid(),
+              ),
+              fileName: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.import.jobs.jobId.patch.response.fileName.content",
+                },
+                z.string(),
+              ),
+              status: responseField(
+                {
+                  type: WidgetType.BADGE,
+                  text: "app.api.v1.core.leads.import.jobs.jobId.patch.response.status.content",
+                },
+                z.nativeEnum(CsvImportJobStatus),
+              ),
+            },
+          ),
+
+          progress: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.import.jobs.jobId.patch.response.progress.title",
+              description:
+                "app.api.v1.core.leads.import.jobs.jobId.patch.response.progress.description",
+              layout: { type: LayoutType.GRID, columns: 3 },
+            },
+            { response: true },
+            {
+              totalRows: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.import.jobs.jobId.patch.response.totalRows.content",
+                },
+                z.number().nullable(),
+              ),
+              processedRows: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.import.jobs.jobId.patch.response.processedRows.content",
+                },
+                z.number(),
+              ),
+              successfulImports: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.import.jobs.jobId.patch.response.successfulImports.content",
+                },
+                z.number(),
+              ),
+              failedImports: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.import.jobs.jobId.patch.response.failedImports.content",
+                },
+                z.number(),
+              ),
+              duplicateEmails: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.import.jobs.jobId.patch.response.duplicateEmails.content",
+                },
+                z.number(),
+              ),
+            },
+          ),
+
+          configuration: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.import.jobs.jobId.patch.response.configuration.title",
+              description:
+                "app.api.v1.core.leads.import.jobs.jobId.patch.response.configuration.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+            },
+            { response: true },
+            {
+              currentBatchStart: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.import.jobs.jobId.patch.response.currentBatchStart.content",
+                },
+                z.number(),
+              ),
+              batchSize: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.import.jobs.jobId.patch.response.batchSize.content",
+                },
+                z.number(),
+              ),
+              retryCount: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.import.jobs.jobId.patch.response.retryCount.content",
+                },
+                z.number(),
+              ),
+              maxRetries: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.import.jobs.jobId.patch.response.maxRetries.content",
+                },
+                z.number(),
+              ),
+              error: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.import.jobs.jobId.patch.response.error.content",
+                },
+                z.string().nullable(),
+              ),
+            },
+          ),
+
+          timestamps: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.leads.import.jobs.jobId.patch.response.timestamps.title",
+              description:
+                "app.api.v1.core.leads.import.jobs.jobId.patch.response.timestamps.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+            },
+            { response: true },
+            {
+              createdAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.import.jobs.jobId.patch.response.createdAt.content",
+                },
+                z.string(),
+              ),
+              updatedAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.import.jobs.jobId.patch.response.updatedAt.content",
+                },
+                z.string(),
+              ),
+              startedAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.import.jobs.jobId.patch.response.startedAt.content",
+                },
+                z.string().nullable(),
+              ),
+              completedAt: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.import.jobs.jobId.patch.response.completedAt.content",
+                },
+                z.string().nullable(),
+              ),
+            },
+          ),
+        },
+      ),
     },
-    not_found: {
-      title: "leadsErrors.leadsImport.patch.error.not_found.title",
-      description: "leadsErrors.leadsImport.patch.error.not_found.description",
+  ),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.validation.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.validation.description",
     },
-    validation_failed: {
-      title: "leadsErrors.leadsImport.patch.error.validation.title",
-      description: "leadsErrors.leadsImport.patch.error.validation.description",
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.unauthorized.description",
     },
-    server_error: {
-      title: "leadsErrors.leadsImport.patch.error.server.title",
-      description: "leadsErrors.leadsImport.patch.error.server.description",
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.forbidden.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.notFound.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.notFound.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.server.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.unknown.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.unknown.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.network.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.network.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.unsavedChanges.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.conflict.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.patch.errors.conflict.description",
     },
   },
+
   successTypes: {
-    title: "leadsErrors.leadsImport.patch.success.title",
-    description: "leadsErrors.leadsImport.patch.success.description",
+    title: "app.api.v1.core.leads.import.jobs.jobId.patch.success.title",
+    description:
+      "app.api.v1.core.leads.import.jobs.jobId.patch.success.description",
   },
-  path: ["v1", "leads", "import", "jobs", "[jobId]"],
+
   examples: {
-    urlPathVariables: {
-      default: {
-        jobId: "123e4567-e89b-12d3-a456-426614174000",
-      },
+    urlPathVariables: undefined,
+    requests: {
+      default: { settings: { batchSize: 100, maxRetries: 3 } },
     },
     responses: {
       default: {
-        batchSize: 100,
-        maxRetries: 3,
-      },
-    },
-    responses: {
-      default: {
-        id: "123e4567-e89b-12d3-a456-426614174000",
-        fileName: "leads.csv",
-        status: CsvImportJobStatus.PROCESSING,
-        totalRows: 1000,
-        processedRows: 500,
-        successfulImports: 480,
-        failedImports: 20,
-        duplicateEmails: 0,
-        currentBatchStart: 500,
-        batchSize: 100,
-        error: null,
-        retryCount: 0,
-        maxRetries: 3,
-        createdAt: "2024-01-01T00:00:00Z",
-        updatedAt: "2024-01-01T00:30:00Z",
-        startedAt: "2024-01-01T00:00:00Z",
-        completedAt: null,
+        job: {
+          info: {
+            id: "550e8400-e29b-41d4-a716-446655440000",
+            fileName: "leads.csv",
+            status: "PROCESSING" as const,
+          },
+          progress: {
+            totalRows: 1000,
+            processedRows: 500,
+            successfulImports: 480,
+            failedImports: 20,
+            duplicateEmails: 5,
+          },
+          configuration: {
+            currentBatchStart: 500,
+            batchSize: 100,
+            retryCount: 0,
+            maxRetries: 3,
+            error: null,
+          },
+          timestamps: {
+            createdAt: "2024-01-01T00:00:00Z",
+            updatedAt: "2024-01-01T00:05:00Z",
+            startedAt: "2024-01-01T00:00:00Z",
+            completedAt: null,
+          },
+        },
       },
     },
   },
 });
 
-// Delete job endpoint (DELETE)
-const deleteJobEndpoint = createEndpoint({
-  description: "Delete import job",
+/**
+ * Delete Import Job Endpoint (DELETE)
+ * Deletes a specific import job
+ */
+const { DELETE } = createEndpoint({
   method: Methods.DELETE,
-  requestSchema: z.object({}),
-  responseSchema: z.object({
-    success: z.boolean(),
-    message: z.string() as z.ZodType<TranslationKey>,
-  }),
-  requestUrlSchema: z.object({
-    jobId: z.uuid(),
-  }),
-  apiQueryOptions: {
-    queryKey: ["import-jobs"],
-  },
-  fieldDescriptions: {
-    jobId: "ID of the import job to delete",
-  },
+  path: ["v1", "core", "leads", "import", "jobs", ":jobId"],
+  title: "app.api.v1.core.leads.import.jobs.jobId.delete.title",
+  description: "app.api.v1.core.leads.import.jobs.jobId.delete.description",
+  category: "app.api.v1.core.leads.category",
+  tags: [
+    "app.api.v1.core.leads.tags.leads",
+    "app.api.v1.core.leads.tags.management",
+  ],
   allowedRoles: [UserRole.ADMIN],
-  errorTypes: {
-    unauthorized: {
-      title: "leadsErrors.leadsImport.delete.error.unauthorized.title",
+
+  fields: objectField(
+    {
+      type: WidgetType.CONTAINER,
+      title: "app.api.v1.core.leads.import.jobs.jobId.delete.form.title",
       description:
-        "leadsErrors.leadsImport.delete.error.unauthorized.description",
+        "app.api.v1.core.leads.import.jobs.jobId.delete.form.description",
+      layout: { type: LayoutType.STACKED },
     },
-    forbidden: {
-      title: "leadsErrors.leadsImport.delete.error.forbidden.title",
-      description: "leadsErrors.leadsImport.delete.error.forbidden.description",
+    { request: "urlParams", response: true },
+    {
+      // === URL PARAMETERS ===
+      jobId: requestUrlParamsField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.UUID,
+          label: "app.api.v1.core.leads.import.jobs.jobId.delete.jobId.label",
+          description:
+            "app.api.v1.core.leads.import.jobs.jobId.delete.jobId.description",
+          layout: { columns: 12 },
+          validation: { required: true },
+        },
+        z.string().uuid(),
+      ),
+
+      // === RESPONSE FIELDS ===
+      result: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          title:
+            "app.api.v1.core.leads.import.jobs.jobId.delete.response.title",
+          description:
+            "app.api.v1.core.leads.import.jobs.jobId.delete.response.description",
+          layout: { type: LayoutType.STACKED },
+        },
+        { response: true },
+        {
+          success: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.leads.import.jobs.jobId.delete.response.success.content",
+            },
+            z.boolean(),
+          ),
+          message: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.leads.import.jobs.jobId.delete.response.message.content",
+            },
+            z.string(),
+          ),
+        },
+      ),
     },
-    not_found: {
-      title: "leadsErrors.leadsImport.delete.error.not_found.title",
-      description: "leadsErrors.leadsImport.delete.error.not_found.description",
+  ),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.validation.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.validation.description",
     },
-    server_error: {
-      title: "leadsErrors.leadsImport.delete.error.server.title",
-      description: "leadsErrors.leadsImport.delete.error.server.description",
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.forbidden.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.notFound.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.notFound.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.server.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.unknown.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.unknown.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.network.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.network.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.unsavedChanges.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.conflict.title",
+      description:
+        "app.api.v1.core.leads.import.jobs.jobId.delete.errors.conflict.description",
     },
   },
+
   successTypes: {
-    title: "leadsErrors.leadsImport.delete.success.title",
-    description: "leadsErrors.leadsImport.delete.success.description",
+    title: "app.api.v1.core.leads.import.jobs.jobId.delete.success.title",
+    description:
+      "app.api.v1.core.leads.import.jobs.jobId.delete.success.description",
   },
-  path: ["v1", "leads", "import", "jobs", "[jobId]"],
+
   examples: {
     urlPathVariables: {
-      default: {
-        jobId: "123e4567-e89b-12d3-a456-426614174000",
-      },
+      default: { jobId: "550e8400-e29b-41d4-a716-446655440000" },
     },
-    responses: {
-      default: {},
-    },
+    requests: undefined,
     responses: {
       default: {
-        success: true,
-        message: "leadsErrors.leadsImport.delete.success.description",
+        result: { success: true, message: "Job deleted successfully" },
       },
     },
   },
 });
+
+// Export types following modern pattern
+export type ImportJobPatchRequestInput = typeof PATCH.types.RequestInput;
+export type ImportJobPatchRequestOutput = typeof PATCH.types.RequestOutput;
+export type ImportJobPatchResponseInput = typeof PATCH.types.ResponseInput;
+export type ImportJobPatchResponseOutput = typeof PATCH.types.ResponseOutput;
+
+export type ImportJobDeleteRequestInput = typeof DELETE.types.RequestInput;
+export type ImportJobDeleteRequestOutput = typeof DELETE.types.RequestOutput;
+export type ImportJobDeleteResponseInput = typeof DELETE.types.ResponseInput;
+export type ImportJobDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
+
+// Repository types for standardized import patterns
+export type ImportJobUpdateRequestInput = ImportJobPatchRequestInput;
+export type ImportJobUpdateRequestOutput = ImportJobPatchRequestOutput;
+export type ImportJobUpdateResponseInput = ImportJobPatchResponseInput;
+export type ImportJobUpdateResponseOutput = ImportJobPatchResponseOutput;
+
+/**
+ * Export definitions
+ */
+export { DELETE, PATCH };
 
 const definitions = {
-  PATCH: updateJobEndpoint.PATCH,
-  DELETE: deleteJobEndpoint.DELETE,
+  PATCH,
+  DELETE,
 } as const;
 
 export default definitions;
-
-export type ImportJobUpdateResponseType = z.infer<
-  typeof updateJobEndpoint.PATCH.responseSchema
->;
-
-export type ImportJobDeleteResponseType = z.infer<
-  typeof deleteJobEndpoint.DELETE.responseSchema
->;

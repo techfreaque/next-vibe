@@ -9,6 +9,7 @@ import { headers } from "next/headers";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { parseError } from "next-vibe/shared/utils";
+import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { env } from "@/config/env";
@@ -27,9 +28,9 @@ const ERROR_METHOD_NOT_ALLOWED = "Method not allowed";
  */
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const logger = createEndpointLogger(
-    env.NODE_ENV === "development",
+    env.NODE_ENV === Environment.DEVELOPMENT,
     Date.now(),
-    "en", // Webhooks don't have locale context
+    "en-GLOBAL", // Webhooks don't have locale context - use default global locale
   );
 
   try {

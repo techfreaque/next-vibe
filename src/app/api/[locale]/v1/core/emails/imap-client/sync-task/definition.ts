@@ -40,21 +40,21 @@ export interface TaskResultType {
 /**
  * Execute IMAP Sync Request Type
  */
-export interface ExecuteImapSyncRequestTypeOutput {
+export interface ExecuteImapSyncRequestOutput {
   config: TaskConfigType;
 }
 
 /**
  * Execute IMAP Sync Response Type
  */
-export interface ExecuteImapSyncResponseTypeOutput {
+export interface ExecuteImapSyncResponseOutput {
   result: TaskResultType;
 }
 
 /**
  * Validate IMAP Sync Request Type
  */
-export interface ValidateImapSyncRequestTypeOutput {
+export interface ValidateImapSyncRequestOutput {
   // No specific parameters needed for validation
   [key: string]: never;
 }
@@ -62,6 +62,6 @@ export interface ValidateImapSyncRequestTypeOutput {
 /**
  * Validate IMAP Sync Response Type
  */
-export interface ValidateImapSyncResponseTypeOutput {
+export interface ValidateImapSyncResponseOutput {
   isValid: boolean;
 }

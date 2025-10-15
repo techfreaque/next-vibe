@@ -42,6 +42,11 @@ export const translations: typeof enTranslations = {
       title: "Usunięcie cookie nie powiodło się",
       description: "Nie udało się usunąć cookie uwierzytelniania",
     },
+    publicPayloadNotSupported: {
+      title: "Publiczny payload nie jest obsługiwany",
+      description:
+        "Publiczny payload JWT nie jest obsługiwany dla uwierzytelniania CLI",
+    },
   },
   post: {
     title: "Tytuł",

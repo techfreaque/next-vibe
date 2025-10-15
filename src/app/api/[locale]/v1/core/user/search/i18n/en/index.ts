@@ -104,6 +104,8 @@ export const translations = {
       isPublic: "Public",
       firstName: "First Name",
       lastName: "Last Name",
+      privateName: "Private Name",
+      publicName: "Public Name",
       company: "Company",
       email: "Email",
       imageUrl: "Avatar",
@@ -126,6 +128,8 @@ export const translations = {
   columns: {
     firstName: "First Name",
     lastName: "Last Name",
+    privateName: "Private Name",
+    publicName: "Public Name",
     email: "Email",
     company: "Company",
     userRoles: "Roles",

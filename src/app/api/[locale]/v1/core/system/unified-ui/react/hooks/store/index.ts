@@ -17,13 +17,8 @@ import type { z } from "zod";
 import { create } from "zustand";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import type {
-  ExtractOutput,
-  FieldUsage,
-  InferSchemaFromField,
-  UnifiedField,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import { callApi } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/api-utils";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -208,21 +203,24 @@ export interface ApiStore {
 
   // Methods
   executeQuery: <
-    TExampleKey extends string,
-    TMethod extends Methods,
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
-    TFields extends UnifiedField<z.ZodTypeAny>,
-    TEndpoint extends CreateApiEndpoint<
-      TExampleKey,
-      TMethod,
-      TUserRoleValue,
-      TFields
-    > = CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
+    TRequestOutput,
+    TResponseOutput,
+    TUrlVariablesOutput,
+    TEndpoint extends {
+      readonly TRequestOutput: TRequestOutput;
+      readonly TResponseOutput: TResponseOutput;
+      readonly TUrlVariablesOutput: TUrlVariablesOutput;
+      readonly requestSchema: z.ZodTypeAny;
+      readonly responseSchema: z.ZodTypeAny;
+      readonly method: Methods;
+      readonly path: readonly string[];
+      readonly requiresAuthentication: () => boolean;
+    },
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
-    requestData: TEndpoint["TRequestOutput"],
-    pathParams: TEndpoint["TUrlVariablesOutput"],
+    requestData: TRequestOutput,
+    pathParams: TUrlVariablesOutput,
     t: TFunction,
     locale: CountryLanguage,
     options?: Omit<
@@ -238,29 +236,32 @@ export interface ApiStore {
   ) => Promise<ResponseType<TEndpoint["TResponseOutput"]>>;
 
   executeMutation: <
-    TExampleKey extends string,
-    TMethod extends Methods,
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
-    TFields extends UnifiedField<z.ZodTypeAny>,
-    TEndpoint extends CreateApiEndpoint<
-      TExampleKey,
-      TMethod,
-      TUserRoleValue,
-      TFields
-    > = CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
+    TRequestOutput,
+    TResponseOutput,
+    TUrlVariablesOutput,
+    TEndpoint extends {
+      readonly TRequestOutput: TRequestOutput;
+      readonly TResponseOutput: TResponseOutput;
+      readonly TUrlVariablesOutput: TUrlVariablesOutput;
+      readonly requestSchema: z.ZodTypeAny;
+      readonly responseSchema: z.ZodTypeAny;
+      readonly method: Methods;
+      readonly path: readonly string[];
+      readonly requiresAuthentication: () => boolean;
+    },
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
-    requestData: TEndpoint["TRequestOutput"],
-    pathParams: TEndpoint["TUrlVariablesOutput"],
+    requestData: TRequestOutput,
+    pathParams: TUrlVariablesOutput,
     t: TFunction,
     locale: CountryLanguage,
     options?: ApiMutationOptions<
-      TEndpoint["TRequestOutput"],
-      TEndpoint["TResponseOutput"],
-      TEndpoint["TUrlVariablesOutput"]
+      TRequestOutput,
+      TResponseOutput,
+      TUrlVariablesOutput
     >,
-  ) => Promise<ResponseType<TEndpoint["TResponseOutput"]>>;
+  ) => Promise<ResponseType<TResponseOutput>>;
 
   invalidateQueries: (queryKey: QueryKey) => Promise<void>;
   refetchQuery: <TResponse>(
@@ -272,22 +273,14 @@ export interface ApiStore {
 
   // Helper to generate unique IDs
   getQueryId: (queryKey: QueryKey) => string;
-  getMutationId: <
-    TExampleKey extends string,
-    TMethod extends Methods,
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
-    TFields extends UnifiedField<z.ZodTypeAny>,
-  >(
-    endpoint: CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
-  ) => string;
-  getFormId: <
-    TExampleKey extends string,
-    TMethod extends Methods,
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
-    TFields extends UnifiedField<z.ZodTypeAny>,
-  >(
-    endpoint: CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
-  ) => string;
+  getMutationId: (endpoint: {
+    readonly method: Methods;
+    readonly path: readonly string[];
+  }) => string;
+  getFormId: (endpoint: {
+    readonly method: Methods;
+    readonly path: readonly string[];
+  }) => string;
 
   setFormQueryParams: (formId: string, params: FormQueryParams) => void;
   getFormQueryParams: <T>(formId: string) => T | undefined;
@@ -339,42 +332,37 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
   getQueryId: (queryKey: QueryKey): string => generateStorageKey(queryKey),
 
-  getMutationId: <
-    TExampleKey extends string,
-    TMethod extends Methods,
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
-    TFields extends UnifiedField<z.ZodTypeAny>,
-  >(
-    endpoint: CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
+  getMutationId: (endpoint: {
+    readonly method: Methods;
+    readonly path: readonly string[];
     // eslint-disable-next-line i18next/no-literal-string
-  ): string => `mutation-${endpoint.path.join("-")}-${endpoint.method}`,
+  }): string => `mutation-${endpoint.path.join("-")}-${endpoint.method}`,
 
-  getFormId: <
-    TExampleKey extends string,
-    TMethod extends Methods,
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
-    TFields extends UnifiedField<z.ZodTypeAny>,
-  >(
-    endpoint: CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
+  getFormId: (endpoint: {
+    readonly method: Methods;
+    readonly path: readonly string[];
     // eslint-disable-next-line i18next/no-literal-string
-  ): string => `form-${endpoint.path.join("-")}-${endpoint.method}`,
+  }): string => `form-${endpoint.path.join("-")}-${endpoint.method}`,
 
   executeQuery: async <
-    TExampleKey extends string,
-    TMethod extends Methods,
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
-    TFields extends UnifiedField<z.ZodTypeAny>,
-    TEndpoint extends CreateApiEndpoint<
-      TExampleKey,
-      TMethod,
-      TUserRoleValue,
-      TFields
-    > = CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
+    TRequestOutput,
+    TResponseOutput,
+    TUrlVariablesOutput,
+    TEndpoint extends {
+      readonly TRequestOutput: TRequestOutput;
+      readonly TResponseOutput: TResponseOutput;
+      readonly TUrlVariablesOutput: TUrlVariablesOutput;
+      readonly requestSchema: z.ZodTypeAny;
+      readonly responseSchema: z.ZodTypeAny;
+      readonly method: Methods;
+      readonly path: readonly string[];
+      readonly requiresAuthentication: () => boolean;
+    },
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
-    requestData: TEndpoint["TRequestOutput"],
-    pathParams: TEndpoint["TUrlVariablesOutput"],
+    requestData: TRequestOutput,
+    pathParams: TUrlVariablesOutput,
     t: TFunction,
     locale: CountryLanguage,
     options: Omit<
@@ -400,9 +388,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       typeof requestData === "object" &&
       requestData !== null
     ) {
-      requestData = undefined as ExtractOutput<
-        InferSchemaFromField<TFields, FieldUsage.RequestData>
-      >;
+      requestData = undefined as TRequestOutput;
     }
 
     const queryId = get().getQueryId(
@@ -424,11 +410,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       if (existingRequestEntry) {
         // If we have a request in flight, return the existing request
         const result = await existingRequestEntry.promise;
-        return createSuccessResponse(
-          result as ExtractOutput<
-            InferSchemaFromField<TFields, FieldUsage.Response>
-          >,
-        );
+        return createSuccessResponse(result as TResponseOutput);
       }
     }
 
@@ -451,11 +433,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     if (existingRequestEntry && options.refreshDelay) {
       // If we have a request in flight and a refresh delay is set, return the existing request
       const result = await existingRequestEntry.promise;
-      return createSuccessResponse(
-        result as ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.Response>
-        >,
-      );
+      return createSuccessResponse(result as TResponseOutput);
     }
 
     // Check if we have fresh data in the store
@@ -507,12 +485,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
           }
 
           void get().executeQuery(
-            endpoint as CreateApiEndpoint<
-              string,
-              Methods,
-              readonly (typeof UserRoleValue)[],
-              UnifiedField<z.ZodTypeAny>
-            >,
+            endpoint,
             logger,
             requestData,
             pathParams,
@@ -565,7 +538,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
       queries[queryId] = {
         response: undefined,
-        data: existingDataData,
+        data: existingData as AnyData,
         error: null,
         isError: false,
         isSuccess: false,
@@ -589,11 +562,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         const entry = inFlightRequests.get(requestKey);
         if (entry) {
           const result = await entry.promise;
-          return createSuccessResponse(
-            result as ExtractOutput<
-              InferSchemaFromField<TFields, FieldUsage.Response>
-            >,
-          );
+          return createSuccessResponse(result as TResponseOutput);
         }
       } catch (error) {
         // If the shared request fails, we'll continue and try again
@@ -721,14 +690,12 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             ...state.queries,
             [queryId]: {
               ...((state.queries[queryId] as
-                | QueryStoreType<TEndpoint["TResponseOutput"]>
+                | QueryStoreType<AnyData>
                 | undefined) ?? {}),
               response: errorResponse,
               data: (
-                state.queries[queryId] as
-                  | QueryStoreType<TEndpoint["TResponseOutput"]>
-                  | undefined
-              )?.dataData,
+                state.queries[queryId] as QueryStoreType<AnyData> | undefined
+              )?.data,
               error: errorResponse,
               isLoading: false,
               isFetching: false,
@@ -757,25 +724,16 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       }
 
       try {
-        // Build the endpoint URL
-        const endpointUrl = `/${endpoint.path.join("/")}`;
+        // Build the endpoint URL with locale
+        const endpointUrl = `/api/${locale}/${endpoint.path.join("/")}`;
 
         // Prepare the request body for non-GET requests
         const postBody =
-          endpoint.method !== "GET" ? JSON.stringify(requestData) : undefined;
+          endpoint.method !== Methods.GET
+            ? JSON.stringify(requestData)
+            : undefined;
 
-        const response = await callApi<
-          TEndpoint["TRequestInput"],
-          TEndpoint["TRequestOutput"],
-          TEndpoint["TResponseInput"],
-          TEndpoint["TResponseOutput"],
-          TEndpoint["TUrlVariablesInput"],
-          TEndpoint["TUrlVariablesOutput"],
-          TExampleKey,
-          TMethod,
-          TUserRoleValue,
-          TFields
-        >(endpoint, endpointUrl, postBody, logger);
+        const response = await callApi(endpoint, endpointUrl, postBody, logger);
 
         if (!response.success) {
           await removeStorageItem(queryId);
@@ -829,7 +787,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               ...state.queries,
               [queryId]: {
                 response: response as ResponseType<AnyData>,
-                data: response.dataData,
+                data: (response.success ? response.data : undefined) as AnyData,
                 error: null,
                 isLoading: false,
                 isFetching: false,
@@ -858,7 +816,9 @@ export const useApiStore = create<ApiStore>((set, get) => ({
           const onSuccessResult = options.onSuccess({
             requestData,
             urlParams: pathParams,
-            responseData: response.data,
+            responseData: (response.success
+              ? response.data
+              : undefined) as TResponseOutput,
           });
 
           // If onSuccess returns an error, treat it as an error
@@ -869,14 +829,14 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 ...state.queries,
                 [queryId]: {
                   ...((state.queries[queryId] as
-                    | QueryStoreType<TEndpoint["TResponseOutput"]>
+                    | QueryStoreType<AnyData>
                     | undefined) ?? {}),
                   response: onSuccessResult as ResponseType<AnyData>,
                   data: (
                     state.queries[queryId] as
-                      | QueryStoreType<TEndpoint["TResponseOutput"]>
+                      | QueryStoreType<AnyData>
                       | undefined
-                  )?.dataData,
+                  )?.data,
                   error: onSuccessResult,
                   isLoading: false,
                   isFetching: false,
@@ -901,11 +861,13 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             }
 
             // Return undefined since we can't throw - the error is already handled in state
-            return undefined as TEndpoint["TResponseOutput"];
+            return undefined as TResponseOutput;
           }
         }
 
-        return response.data;
+        return (
+          response.success ? response.data : undefined
+        ) as TResponseOutput;
       } catch (err) {
         // Create a properly typed error response with translation key
         const errorResponse = createErrorResponse(
@@ -923,14 +885,12 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             ...state.queries,
             [queryId]: {
               ...((state.queries[queryId] as
-                | QueryStoreType<TEndpoint["TResponseOutput"]>
+                | QueryStoreType<AnyData>
                 | undefined) ?? {}),
               response: errorResponse as ResponseType<AnyData>,
               data: (
-                state.queries[queryId] as
-                  | QueryStoreType<TEndpoint["TResponseOutput"]>
-                  | undefined
-              )?.dataData,
+                state.queries[queryId] as QueryStoreType<AnyData> | undefined
+              )?.data,
               error: errorResponse,
               isLoading: false,
               isFetching: false,
@@ -992,29 +952,32 @@ export const useApiStore = create<ApiStore>((set, get) => ({
   },
 
   executeMutation: async <
-    TExampleKey extends string,
-    TMethod extends Methods,
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
-    TFields extends UnifiedField<z.ZodTypeAny>,
-    TEndpoint extends CreateApiEndpoint<
-      TExampleKey,
-      TMethod,
-      TUserRoleValue,
-      TFields
-    > = CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
+    TRequestOutput,
+    TResponseOutput,
+    TUrlVariablesOutput,
+    TEndpoint extends {
+      readonly TRequestOutput: TRequestOutput;
+      readonly TResponseOutput: TResponseOutput;
+      readonly TUrlVariablesOutput: TUrlVariablesOutput;
+      readonly requestSchema: z.ZodTypeAny;
+      readonly responseSchema: z.ZodTypeAny;
+      readonly method: Methods;
+      readonly path: readonly string[];
+      readonly requiresAuthentication: () => boolean;
+    },
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
-    requestData: TEndpoint["TRequestOutput"],
-    pathParams: TEndpoint["TUrlVariablesOutput"],
+    requestData: TRequestOutput,
+    pathParams: TUrlVariablesOutput,
     t: TFunction,
     locale: CountryLanguage,
     options: ApiMutationOptions<
-      TEndpoint["TRequestOutput"],
-      TEndpoint["TResponseOutput"],
-      TEndpoint["TUrlVariablesOutput"]
+      TRequestOutput,
+      TResponseOutput,
+      TUrlVariablesOutput
     > = {},
-  ): Promise<ResponseType<TEndpoint["TResponseOutput"]>> => {
+  ): Promise<ResponseType<TResponseOutput>> => {
     // Check if the endpoint expects undefined for request data
     // This is determined by checking if the schema is undefinedSchema
     const isUndefinedSchema =
@@ -1092,25 +1055,16 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         return errorResponse;
       }
 
-      // Build the endpoint URL
-      const endpointUrl = `/${endpoint.path.join("/")}`;
+      // Build the endpoint URL with locale
+      const endpointUrl = `/api/${locale}/${endpoint.path.join("/")}`;
 
       // Prepare the request body for non-GET requests
       const postBody =
-        endpoint.method !== "GET" ? JSON.stringify(requestData) : undefined;
+        endpoint.method !== Methods.GET
+          ? JSON.stringify(requestData)
+          : undefined;
 
-      const response = await callApi<
-        TEndpoint["TRequestInput"],
-        TEndpoint["TRequestOutput"],
-        TEndpoint["TResponseInput"],
-        TEndpoint["TResponseOutput"],
-        TEndpoint["TUrlVariablesInput"],
-        TEndpoint["TUrlVariablesOutput"],
-        TExampleKey,
-        TMethod,
-        TUserRoleValue,
-        TFields
-      >(endpoint, endpointUrl, postBody, logger);
+      const response = await callApi(endpoint, endpointUrl, postBody, logger);
 
       if (!response.success) {
         // Update error state
@@ -1147,7 +1101,10 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       }
 
       // Update success state
-      const successResponse = createSuccessResponse(response.data);
+      const responseData = (
+        response.success ? response.data : undefined
+      ) as TResponseOutput;
+      const successResponse = createSuccessResponse(responseData);
       set((state) => ({
         mutations: {
           ...state.mutations,
@@ -1158,7 +1115,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             error: null,
             isSuccess: true,
             statusMessage: "error.api.store.status.mutation_success" as const,
-            data: response.dataData,
+            data: responseData as AnyData,
           },
         },
       }));
@@ -1171,7 +1128,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       // Call onSuccess handler if provided
       if (options.onSuccess) {
         const onSuccessResult = await options.onSuccess({
-          responseData: response.data,
+          responseData,
           pathParams,
           requestData,
         });
@@ -1208,7 +1165,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         }
       }
 
-      return createSuccessResponse(response.data);
+      return createSuccessResponse(responseData);
     } catch (error) {
       // If the error is already an ErrorResponseType, use it directly
       const errorResponse = isErrorResponseType(error)
@@ -1359,34 +1316,33 @@ export const apiClient = {
    * Fetch data from an API endpoint without using React hooks
    */
   fetch: async <
-    TExampleKey extends string,
-    TMethod extends Methods,
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
-    TFields extends UnifiedField<z.ZodTypeAny>,
-    TEndpoint extends CreateApiEndpoint<
-      TExampleKey,
-      TMethod,
-      TUserRoleValue,
-      TFields
-    > = CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
+    TRequestOutput,
+    TResponseOutput,
+    TUrlVariablesOutput,
+    TEndpoint extends {
+      readonly TRequestOutput: TRequestOutput;
+      readonly TResponseOutput: TResponseOutput;
+      readonly TUrlVariablesOutput: TUrlVariablesOutput;
+      readonly requestSchema: z.ZodTypeAny;
+      readonly responseSchema: z.ZodTypeAny;
+      readonly method: Methods;
+      readonly path: readonly string[];
+      readonly requiresAuthentication: () => boolean;
+    },
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
-    requestData: TEndpoint["TRequestOutput"],
-    pathParams: TEndpoint["TUrlVariablesOutput"],
+    requestData: TRequestOutput,
+    pathParams: TUrlVariablesOutput,
     t: TFunction,
     locale: CountryLanguage,
     options: Omit<
-      ApiQueryOptions<
-        TEndpoint["TRequestOutput"],
-        TEndpoint["TResponseOutput"],
-        TEndpoint["TUrlVariablesOutput"]
-      >,
+      ApiQueryOptions<TRequestOutput, TResponseOutput, TUrlVariablesOutput>,
       "queryKey"
     > & {
       queryKey?: QueryKey;
     } = {},
-  ): Promise<ResponseType<TEndpoint["TResponseOutput"]>> => {
+  ): Promise<ResponseType<TResponseOutput>> => {
     // Check if the endpoint expects undefined for request data
     const isUndefinedSchema =
       endpoint.requestSchema.safeParse(undefined).success &&
@@ -1436,16 +1392,12 @@ export const apiClient = {
    * Mutate data through an API endpoint without using React hooks
    */
   mutate: async <
-    TExampleKey extends string,
-    TMethod extends Methods,
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
-    TFields extends UnifiedField<z.ZodTypeAny>,
     TEndpoint extends CreateApiEndpoint<
-      TExampleKey,
-      TMethod,
-      TUserRoleValue,
-      TFields
-    > = CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
+      string,
+      Methods,
+      readonly (typeof UserRoleValue)[],
+      any
+    >,
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
@@ -1515,16 +1467,12 @@ export const apiClient = {
    * Get current mutation state without using React hooks
    */
   getMutationState: <
-    TExampleKey extends string,
-    TMethod extends Methods,
-    TUserRoleValue extends readonly (typeof UserRoleValue)[],
-    TFields extends UnifiedField<z.ZodTypeAny>,
     TEndpoint extends CreateApiEndpoint<
-      TExampleKey,
-      TMethod,
-      TUserRoleValue,
-      TFields
-    > = CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
+      string,
+      Methods,
+      readonly (typeof UserRoleValue)[],
+      any
+    >,
   >(
     endpoint: TEndpoint,
   ): MutationStoreType<TEndpoint["TResponseOutput"]> | undefined => {

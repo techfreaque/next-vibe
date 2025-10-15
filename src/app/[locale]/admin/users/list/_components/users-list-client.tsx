@@ -14,15 +14,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import React, { useState } from "react";
 
-import { userListRequestSchema } from "@/app/api/[locale]/v1/core/users/list/definition";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import {
   SortOrder,
   UserRoleFilter,
   UserSortField,
   UserStatusFilter,
 } from "@/app/api/[locale]/v1/core/users/enum";
+import type { UserListResponseOutput } from "@/app/api/[locale]/v1/core/users/list/definition";
+import type { UsersListEndpointReturn } from "@/app/api/[locale]/v1/core/users/list/hooks";
 import { useUsersListEndpoint } from "@/app/api/[locale]/v1/core/users/list/hooks";
-import type { UserResponseType } from "@/app/api/[locale]/v1/core/users/user/[id]/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -37,30 +38,45 @@ export function UsersListClient({
   locale,
 }: UsersListClientProps): React.JSX.Element {
   const { t } = simpleT(locale);
-  const usersEndpoint = useUsersListEndpoint();
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const usersEndpoint: UsersListEndpointReturn = useUsersListEndpoint(logger);
   const [viewMode, setViewMode] = useState<"list" | "table">("table");
 
+  type UserType = UserListResponseOutput["response"]["users"][number];
+
   const apiResponse = usersEndpoint.read.response;
-  const users: UserResponseType[] = apiResponse?.success
-    ? apiResponse.data.users
+  const users: UserType[] = apiResponse?.success
+    ? apiResponse.data.response.users
     : [];
-  const totalUsers = apiResponse?.success ? apiResponse.data.total : 0;
-  const totalPages = apiResponse?.success ? apiResponse.data.totalPages : 0;
+  const totalUsers = apiResponse?.success
+    ? apiResponse.data.response.totalCount
+    : 0;
+  const totalPages = apiResponse?.success
+    ? apiResponse.data.response.pageCount
+    : 0;
   const queryLoading = usersEndpoint.read.isLoading || false;
 
   // Get current form values for pagination display
-  const currentPage = usersEndpoint.read.form.getValues("page") || 1;
-  const currentLimit = usersEndpoint.read.form.getValues("limit") || 20;
+  const currentPage =
+    usersEndpoint.read.form.getValues("searchAndPagination.page") || 1;
+  const currentLimit =
+    usersEndpoint.read.form.getValues("searchAndPagination.limit") || 20;
 
   const handleClearFilters = (): void => {
     usersEndpoint.read.form.reset({
-      search: undefined,
-      status: UserStatusFilter.ALL,
-      role: UserRoleFilter.ALL,
-      page: 1,
-      limit: 20,
-      sortBy: UserSortField.CREATED_AT,
-      sortOrder: SortOrder.DESC,
+      searchAndPagination: {
+        search: undefined,
+        page: 1,
+        limit: 20,
+      },
+      filters: {
+        status: [UserStatusFilter.ALL],
+        role: [UserRoleFilter.ALL],
+      },
+      sorting: {
+        sortBy: UserSortField.CREATED_AT,
+        sortOrder: SortOrder.DESC,
+      },
     });
   };
 
@@ -135,14 +151,13 @@ export function UsersListClient({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {/* Search Field */}
               <EndpointFormField
-                name="search"
+                name="searchAndPagination.search"
                 config={{
                   type: "text",
                   label: undefined,
                   placeholder: "users.search.placeholder",
                 }}
                 control={usersEndpoint.read.form.control}
-                schema={userListRequestSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -151,7 +166,7 @@ export function UsersListClient({
 
               {/* Status Filter */}
               <EndpointFormField
-                name="status"
+                name="filters.status"
                 config={{
                   type: "select",
                   label: undefined,
@@ -180,7 +195,6 @@ export function UsersListClient({
                   ],
                 }}
                 control={usersEndpoint.read.form.control}
-                schema={userListRequestSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -189,7 +203,7 @@ export function UsersListClient({
 
               {/* Role Filter */}
               <EndpointFormField
-                name="role"
+                name="filters.role"
                 config={{
                   type: "select",
                   label: undefined,
@@ -222,7 +236,6 @@ export function UsersListClient({
                   ],
                 }}
                 control={usersEndpoint.read.form.control}
-                schema={userListRequestSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -231,7 +244,7 @@ export function UsersListClient({
 
               {/* Sort By */}
               <EndpointFormField
-                name="sortBy"
+                name="sorting.sortBy"
                 config={{
                   type: "select",
                   label: undefined,
@@ -250,21 +263,16 @@ export function UsersListClient({
                       label: "users.sort.email",
                     },
                     {
-                      value: UserSortField.FIRST_NAME,
-                      label: "users.sort.first_name",
+                      value: UserSortField.PRIVATE_NAME,
+                      label: "users.sort.privateName",
                     },
                     {
-                      value: UserSortField.LAST_NAME,
-                      label: "users.sort.last_name",
-                    },
-                    {
-                      value: UserSortField.COMPANY,
-                      label: "users.sort.company",
+                      value: UserSortField.PUBLIC_NAME,
+                      label: "users.sort.publicName",
                     },
                   ],
                 }}
                 control={usersEndpoint.read.form.control}
-                schema={userListRequestSchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -276,7 +284,7 @@ export function UsersListClient({
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <EndpointFormField
-                  name="sortOrder"
+                  name="sorting.sortOrder"
                   config={{
                     type: "select",
                     label: undefined,
@@ -293,7 +301,6 @@ export function UsersListClient({
                     ],
                   }}
                   control={usersEndpoint.read.form.control}
-                  schema={userListRequestSchema}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -350,7 +357,7 @@ export function UsersListClient({
           <UsersTable locale={locale} users={users} isLoading={queryLoading} />
         ) : (
           <div className="space-y-3">
-            {users.map((user) => (
+            {users.map((user: UserType) => (
               <div
                 key={user.id}
                 className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
@@ -362,7 +369,7 @@ export function UsersListClient({
                         href={`/${locale}/admin/users/${user.id}/edit`}
                         className="font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                       >
-                        {user.firstName} {user.lastName}
+                        {user.privateName || user.publicName}
                       </Link>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         {user.email}

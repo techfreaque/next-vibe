@@ -27,11 +27,134 @@ import {
   SmtpSecurityTypeOptions,
 } from "../../enum";
 
-const { GET, PUT } = createEndpoint({
-  method: Methods.GET, // Use single method for GET
+// Shared response schema for account
+const accountResponseFields = {
+  id: responseField(
+    {
+      type: WidgetType.TEXT,
+      content: "app.api.v1.core.emails.smtpClient.edit.id.response.account.id",
+    },
+    z.uuid(),
+  ),
+  name: responseField(
+    {
+      type: WidgetType.TEXT,
+      content:
+        "app.api.v1.core.emails.smtpClient.edit.id.response.account.name",
+    },
+    z.string(),
+  ),
+  description: responseField(
+    {
+      type: WidgetType.TEXT,
+      content:
+        "app.api.v1.core.emails.smtpClient.edit.id.response.account.fields.description",
+    },
+    z.string().optional(),
+  ),
+  host: responseField(
+    {
+      type: WidgetType.TEXT,
+      content:
+        "app.api.v1.core.emails.smtpClient.edit.id.response.account.host",
+    },
+    z.string(),
+  ),
+  port: responseField(
+    {
+      type: WidgetType.TEXT,
+      content:
+        "app.api.v1.core.emails.smtpClient.edit.id.response.account.port",
+    },
+    z.number().int(),
+  ),
+  securityType: responseField(
+    {
+      type: WidgetType.BADGE,
+      text: "app.api.v1.core.emails.smtpClient.edit.id.response.account.securityType",
+    },
+    z.nativeEnum(SmtpSecurityType),
+  ),
+  username: responseField(
+    {
+      type: WidgetType.TEXT,
+      content:
+        "app.api.v1.core.emails.smtpClient.edit.id.response.account.username",
+    },
+    z.string(),
+  ),
+  fromEmail: responseField(
+    {
+      type: WidgetType.TEXT,
+      content:
+        "app.api.v1.core.emails.smtpClient.edit.id.response.account.fromEmail",
+    },
+    z.email(),
+  ),
+  status: responseField(
+    {
+      type: WidgetType.BADGE,
+      text: "app.api.v1.core.emails.smtpClient.edit.id.response.account.status",
+    },
+    z.nativeEnum(SmtpAccountStatus),
+  ),
+  healthCheckStatus: responseField(
+    {
+      type: WidgetType.BADGE,
+      text: "app.api.v1.core.emails.smtpClient.edit.id.response.account.healthCheckStatus",
+    },
+    z.nativeEnum(SmtpHealthStatus).nullable(),
+  ),
+  priority: responseField(
+    {
+      type: WidgetType.TEXT,
+      content:
+        "app.api.v1.core.emails.smtpClient.edit.id.response.account.priority",
+    },
+    z.number().int().optional(),
+  ),
+  totalEmailsSent: responseField(
+    {
+      type: WidgetType.TEXT,
+      content:
+        "app.api.v1.core.emails.smtpClient.edit.id.response.account.totalEmailsSent",
+    },
+    z.number().int(),
+  ),
+  lastUsedAt: responseField(
+    {
+      type: WidgetType.TEXT,
+      content:
+        "app.api.v1.core.emails.smtpClient.edit.id.response.account.lastUsedAt",
+    },
+    z.string().datetime().nullable(),
+  ),
+  createdAt: responseField(
+    {
+      type: WidgetType.TEXT,
+      content:
+        "app.api.v1.core.emails.smtpClient.edit.id.response.account.createdAt",
+    },
+    z.string().datetime(),
+  ),
+  updatedAt: responseField(
+    {
+      type: WidgetType.TEXT,
+      content:
+        "app.api.v1.core.emails.smtpClient.edit.id.response.account.updatedAt",
+    },
+    z.string().datetime(),
+  ),
+};
+
+/**
+ * GET endpoint for retrieving SMTP account by ID
+ */
+const { GET } = createEndpoint({
+  method: Methods.GET,
   path: ["v1", "core", "emails", "smtp-client", "edit", "[id]"],
-  title: "app.api.v1.core.emails.smtpClient.edit.title",
-  description: "app.api.v1.core.emails.smtpClient.edit.description",
+  title: "app.api.v1.core.emails.smtpClient.edit.id.get.title",
+  description: "app.api.v1.core.emails.smtpClient.edit.id.get.description",
   category: "app.api.v1.core.emails.smtpClient.category",
   tags: ["app.api.v1.core.emails.smtpClient.tag"],
   allowedRoles: [UserRole.ADMIN],
@@ -39,9 +162,9 @@ const { GET, PUT } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.emails.smtpClient.edit.container.title",
+      title: "app.api.v1.core.emails.smtpClient.edit.id.get.container.title",
       description:
-        "app.api.v1.core.emails.smtpClient.edit.container.description",
+        "app.api.v1.core.emails.smtpClient.edit.id.get.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "urlParams", response: true },
@@ -51,145 +174,12 @@ const { GET, PUT } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.v1.core.emails.smtpClient.edit.fields.id.label",
+          label: "app.api.v1.core.emails.smtpClient.edit.id.fields.id.label",
           description:
-            "app.api.v1.core.emails.smtpClient.edit.fields.id.description",
+            "app.api.v1.core.emails.smtpClient.edit.id.fields.id.description",
           layout: { columns: 12 },
         },
         z.uuid(),
-      ),
-
-      // === REQUEST DATA FIELDS (for PUT) ===
-      name: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.v1.core.emails.smtpClient.edit.fields.name.label",
-          description:
-            "app.api.v1.core.emails.smtpClient.edit.fields.name.description",
-          placeholder:
-            "app.api.v1.core.emails.smtpClient.edit.fields.name.placeholder",
-          layout: { columns: 6 },
-          validation: { required: false },
-        },
-        z.string().min(1).optional(),
-      ),
-
-      description: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXTAREA,
-          label:
-            "app.api.v1.core.emails.smtpClient.edit.fields.description.label",
-          description:
-            "app.api.v1.core.emails.smtpClient.edit.fields.description.description",
-          placeholder:
-            "app.api.v1.core.emails.smtpClient.edit.fields.description.placeholder",
-          layout: { columns: 12 },
-          validation: { required: false },
-        },
-        z.string().optional(),
-      ),
-
-      host: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.v1.core.emails.smtpClient.edit.fields.host.label",
-          description:
-            "app.api.v1.core.emails.smtpClient.edit.fields.host.description",
-          placeholder:
-            "app.api.v1.core.emails.smtpClient.edit.fields.host.placeholder",
-          layout: { columns: 6 },
-        },
-        z.string().min(1).optional(),
-      ),
-
-      port: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.emails.smtpClient.edit.fields.port.label",
-          description:
-            "app.api.v1.core.emails.smtpClient.edit.fields.port.description",
-          placeholder:
-            "app.api.v1.core.emails.smtpClient.edit.fields.port.placeholder",
-          layout: { columns: 6 },
-        },
-        z.number().min(1).max(65535).optional(),
-      ),
-
-      securityType: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.v1.core.emails.smtpClient.edit.fields.securityType.label",
-          description:
-            "app.api.v1.core.emails.smtpClient.edit.fields.securityType.description",
-          placeholder:
-            "app.api.v1.core.emails.smtpClient.edit.fields.securityType.placeholder",
-          layout: { columns: 6 },
-          options: SmtpSecurityTypeOptions,
-        },
-        z.nativeEnum(SmtpSecurityType).optional(),
-      ),
-
-      username: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.v1.core.emails.smtpClient.edit.fields.username.label",
-          description:
-            "app.api.v1.core.emails.smtpClient.edit.fields.username.description",
-          placeholder:
-            "app.api.v1.core.emails.smtpClient.edit.fields.username.placeholder",
-          layout: { columns: 6 },
-        },
-        z.string().min(1).optional(),
-      ),
-
-      password: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.PASSWORD,
-          label: "app.api.v1.core.emails.smtpClient.edit.fields.password.label",
-          description:
-            "app.api.v1.core.emails.smtpClient.edit.fields.password.description",
-          placeholder:
-            "app.api.v1.core.emails.smtpClient.edit.fields.password.placeholder",
-          layout: { columns: 6 },
-        },
-        z.string().min(1).optional(),
-      ),
-
-      fromEmail: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.EMAIL,
-          label:
-            "app.api.v1.core.emails.smtpClient.edit.fields.fromEmail.label",
-          description:
-            "app.api.v1.core.emails.smtpClient.edit.fields.fromEmail.description",
-          placeholder:
-            "app.api.v1.core.emails.smtpClient.edit.fields.fromEmail.placeholder",
-          layout: { columns: 6 },
-        },
-        z.email().optional(),
-      ),
-
-      priority: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.emails.smtpClient.edit.fields.priority.label",
-          description:
-            "app.api.v1.core.emails.smtpClient.edit.fields.priority.description",
-          placeholder:
-            "app.api.v1.core.emails.smtpClient.edit.fields.priority.placeholder",
-          layout: { columns: 6 },
-        },
-        z.number().int().min(1).max(100).optional(),
       ),
 
       // === RESPONSE FIELDS ===
@@ -197,131 +187,13 @@ const { GET, PUT } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title:
-            "app.api.v1.core.emails.smtpClient.edit.response.account.title",
+            "app.api.v1.core.emails.smtpClient.edit.id.response.account.title",
           description:
-            "app.api.v1.core.emails.smtpClient.edit.response.account.description",
+            "app.api.v1.core.emails.smtpClient.edit.id.response.account.description",
           layout: { type: LayoutType.GRID, columns: 12 },
         },
         { response: true },
-        {
-          id: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.emails.smtpClient.edit.response.account.id",
-            },
-            z.uuid(),
-          ),
-          name: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.emails.smtpClient.edit.response.account.name",
-            },
-            z.string(),
-          ),
-          description: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.emails.smtpClient.edit.response.account.description",
-            },
-            z.string().optional(),
-          ),
-          host: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.emails.smtpClient.edit.response.account.host",
-            },
-            z.string(),
-          ),
-          port: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.emails.smtpClient.edit.response.account.port",
-            },
-            z.number().int(),
-          ),
-          securityType: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.v1.core.emails.smtpClient.edit.response.account.securityType",
-            },
-            z.nativeEnum(SmtpSecurityType),
-          ),
-          username: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.emails.smtpClient.edit.response.account.username",
-            },
-            z.string(),
-          ),
-          fromEmail: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.emails.smtpClient.edit.response.account.fromEmail",
-            },
-            z.email(),
-          ),
-          status: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.v1.core.emails.smtpClient.edit.response.account.status",
-            },
-            z.nativeEnum(SmtpAccountStatus),
-          ),
-          healthCheckStatus: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.v1.core.emails.smtpClient.edit.response.account.healthCheckStatus",
-            },
-            z.nativeEnum(SmtpHealthStatus).nullable(),
-          ),
-          priority: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.emails.smtpClient.edit.response.account.priority",
-            },
-            z.number().int().optional(),
-          ),
-          totalEmailsSent: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.emails.smtpClient.edit.response.account.totalEmailsSent",
-            },
-            z.number().int(),
-          ),
-          lastUsedAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.emails.smtpClient.edit.response.account.lastUsedAt",
-            },
-            z.string().datetime().nullable(),
-          ),
-          createdAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.emails.smtpClient.edit.response.account.createdAt",
-            },
-            z.string().datetime(),
-          ),
-          updatedAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.emails.smtpClient.edit.response.account.updatedAt",
-            },
-            z.string().datetime(),
-          ),
-        },
+        accountResponseFields,
       ),
     },
   ),
@@ -329,58 +201,73 @@ const { GET, PUT } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.v1.core.emails.smtpClient.edit.errors.validation.title",
+      title:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.validation.title",
       description:
-        "app.api.v1.core.emails.smtpClient.edit.errors.validation.description",
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.v1.core.emails.smtpClient.edit.errors.unauthorized.title",
+      title:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.unauthorized.title",
       description:
-        "app.api.v1.core.emails.smtpClient.edit.errors.unauthorized.description",
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "app.api.v1.core.emails.smtpClient.edit.id.errors.forbidden.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.v1.core.emails.smtpClient.edit.errors.notFound.title",
+      title: "app.api.v1.core.emails.smtpClient.edit.id.errors.notFound.title",
       description:
-        "app.api.v1.core.emails.smtpClient.edit.errors.notFound.description",
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.v1.core.emails.smtpClient.edit.errors.conflict.title",
+      title: "app.api.v1.core.emails.smtpClient.edit.id.errors.conflict.title",
       description:
-        "app.api.v1.core.emails.smtpClient.edit.errors.conflict.description",
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.conflict.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.v1.core.emails.smtpClient.edit.errors.server.title",
+      title: "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
       description:
-        "app.api.v1.core.emails.smtpClient.edit.errors.server.description",
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.server.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.networkError.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.networkError.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.v1.core.emails.smtpClient.edit.errors.unknown.title",
+      title: "app.api.v1.core.emails.smtpClient.edit.id.errors.unknown.title",
       description:
-        "app.api.v1.core.emails.smtpClient.edit.errors.unknown.description",
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.unknown.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.emails.smtpClient.edit.success.title",
-    description: "app.api.v1.core.emails.smtpClient.edit.success.description",
+    title: "app.api.v1.core.emails.smtpClient.edit.id.success.title",
+    description:
+      "app.api.v1.core.emails.smtpClient.edit.id.success.description",
   },
 
   // === EXAMPLES ===
   examples: {
-    requests: {
-      get: {
+    urlPathVariables: {
+      default: {
         id: "550e8400-e29b-41d4-a716-446655440001",
-      },
-      update: {
-        id: "550e8400-e29b-41d4-a716-446655440001",
-        name: "Updated Campaign SMTP",
-        description: "Updated SMTP account for marketing campaigns",
-        priority: 15,
       },
     },
+    requests: undefined,
     responses: {
-      get: {
+      default: {
         account: {
           id: "550e8400-e29b-41d4-a716-446655440001",
           name: "Campaign SMTP",
@@ -399,7 +286,290 @@ const { GET, PUT } = createEndpoint({
           updatedAt: "2024-01-07T10:00:00.000Z",
         },
       },
-      update: {
+    },
+  },
+});
+
+/**
+ * PUT endpoint for updating SMTP account
+ */
+const { PUT } = createEndpoint({
+  method: Methods.PUT,
+  path: ["v1", "core", "emails", "smtp-client", "edit", "[id]"],
+  title: "app.api.v1.core.emails.smtpClient.edit.id.put.title",
+  description: "app.api.v1.core.emails.smtpClient.edit.id.put.description",
+  category: "app.api.v1.core.emails.smtpClient.category",
+  tags: ["app.api.v1.core.emails.smtpClient.tag"],
+  allowedRoles: [UserRole.ADMIN],
+
+  fields: objectField(
+    {
+      type: WidgetType.CONTAINER,
+      title: "app.api.v1.core.emails.smtpClient.edit.id.put.container.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.edit.id.put.container.description",
+      layout: { type: LayoutType.GRID, columns: 12 },
+    },
+    { request: "data&urlParams", response: true },
+    {
+      // === URL PARAMETER ===
+      id: requestUrlParamsField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.v1.core.emails.smtpClient.edit.id.fields.id.label",
+          description:
+            "app.api.v1.core.emails.smtpClient.edit.id.fields.id.description",
+          layout: { columns: 12 },
+        },
+        z.uuid(),
+      ),
+
+      // === REQUEST DATA FIELDS ===
+      updates: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          title: "app.api.v1.core.emails.smtpClient.edit.id.put.updates.title",
+          description:
+            "app.api.v1.core.emails.smtpClient.edit.id.put.updates.description",
+          layout: { type: LayoutType.GRID, columns: 12 },
+        },
+        { request: "data" },
+        {
+          name: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.name.label",
+              description:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.name.description",
+              placeholder:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.name.placeholder",
+              layout: { columns: 6 },
+              validation: { required: false },
+            },
+            z.string().min(1).optional(),
+          ),
+
+          description: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXTAREA,
+              label:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.description.label",
+              description:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.description.description",
+              placeholder:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.description.placeholder",
+              layout: { columns: 12 },
+              validation: { required: false },
+            },
+            z.string().optional(),
+          ),
+
+          host: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.host.label",
+              description:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.host.description",
+              placeholder:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.host.placeholder",
+              layout: { columns: 6 },
+            },
+            z.string().min(1).optional(),
+          ),
+
+          port: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.NUMBER,
+              label:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.port.label",
+              description:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.port.description",
+              placeholder:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.port.placeholder",
+              layout: { columns: 6 },
+            },
+            z.number().min(1).max(65535).optional(),
+          ),
+
+          securityType: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.securityType.label",
+              description:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.securityType.description",
+              placeholder:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.securityType.placeholder",
+              layout: { columns: 6 },
+              options: SmtpSecurityTypeOptions,
+            },
+            z.nativeEnum(SmtpSecurityType).optional(),
+          ),
+
+          username: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.username.label",
+              description:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.username.description",
+              placeholder:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.username.placeholder",
+              layout: { columns: 6 },
+            },
+            z.string().min(1).optional(),
+          ),
+
+          password: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.PASSWORD,
+              label:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.password.label",
+              description:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.password.description",
+              placeholder:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.password.placeholder",
+              layout: { columns: 6 },
+            },
+            z.string().min(1).optional(),
+          ),
+
+          fromEmail: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.EMAIL,
+              label:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.fromEmail.label",
+              description:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.fromEmail.description",
+              placeholder:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.fromEmail.placeholder",
+              layout: { columns: 6 },
+            },
+            z.email().optional(),
+          ),
+
+          priority: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.NUMBER,
+              label:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.priority.label",
+              description:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.priority.description",
+              placeholder:
+                "app.api.v1.core.emails.smtpClient.edit.id.fields.priority.placeholder",
+              layout: { columns: 6 },
+            },
+            z.number().int().min(1).max(100).optional(),
+          ),
+        },
+      ),
+
+      // === RESPONSE FIELDS ===
+      account: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          title:
+            "app.api.v1.core.emails.smtpClient.edit.id.response.account.title",
+          description:
+            "app.api.v1.core.emails.smtpClient.edit.id.response.account.description",
+          layout: { type: LayoutType.GRID, columns: 12 },
+        },
+        { response: true },
+        accountResponseFields,
+      ),
+    },
+  ),
+
+  // === ERROR HANDLING ===
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.validation.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.validation.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "app.api.v1.core.emails.smtpClient.edit.id.errors.forbidden.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "app.api.v1.core.emails.smtpClient.edit.id.errors.notFound.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.notFound.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "app.api.v1.core.emails.smtpClient.edit.id.errors.conflict.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.conflict.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.server.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.networkError.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.networkError.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.unsavedChanges.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "app.api.v1.core.emails.smtpClient.edit.id.errors.unknown.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.edit.id.errors.unknown.description",
+    },
+  },
+
+  // === SUCCESS HANDLING ===
+  successTypes: {
+    title: "app.api.v1.core.emails.smtpClient.edit.id.success.title",
+    description:
+      "app.api.v1.core.emails.smtpClient.edit.id.success.description",
+  },
+
+  // === EXAMPLES ===
+  examples: {
+    urlPathVariables: {
+      default: {
+        id: "550e8400-e29b-41d4-a716-446655440001",
+      },
+    },
+    requests: {
+      default: {
+        updates: {
+          name: "Updated Campaign SMTP",
+          description: "Updated SMTP account for marketing campaigns",
+          priority: 15,
+        },
+      },
+    },
+    responses: {
+      default: {
         account: {
           id: "550e8400-e29b-41d4-a716-446655440001",
           name: "Updated Campaign SMTP",
@@ -440,14 +610,13 @@ export type SmtpAccountEditResponseInput = SmtpAccountEditPUTResponseInput;
 export type SmtpAccountEditResponseOutput = SmtpAccountEditPUTResponseOutput;
 
 // Export repository types for import standardization
-export type SmtpAccountEditGetRequestTypeOutput =
-  SmtpAccountEditGETRequestOutput;
-export type SmtpAccountEditGetResponseTypeOutput =
-  SmtpAccountEditGETResponseOutput;
-export type SmtpAccountEditPutRequestTypeOutput =
-  SmtpAccountEditPUTRequestOutput;
-export type SmtpAccountEditPutResponseTypeOutput =
-  SmtpAccountEditPUTResponseOutput;
+export type SmtpAccountEditGetRequestOutput = SmtpAccountEditGETRequestOutput;
+export type SmtpAccountEditGetResponseOutput = SmtpAccountEditGETResponseOutput;
+export type SmtpAccountEditPutRequestOutput = SmtpAccountEditPUTRequestOutput;
+export type SmtpAccountEditPutResponseOutput = SmtpAccountEditPUTResponseOutput;
 
 const smtpAccountEditEndpoints = { GET, PUT };
+
+export { GET, PUT };
+
 export default smtpAccountEditEndpoints;

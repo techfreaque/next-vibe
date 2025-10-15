@@ -89,6 +89,18 @@ export const translations = {
       description:
         "An internal server error occurred while retrieving the email",
     },
+    conflict: {
+      title: "Conflict Error",
+      description: "A conflict occurred while processing the email request",
+    },
+    network: {
+      title: "Network Error",
+      description: "A network error occurred while retrieving the email",
+    },
+    unsavedChanges: {
+      title: "Unsaved Changes",
+      description: "There are unsaved changes",
+    },
     unknown: {
       title: "Unknown Error",
       description: "An unexpected error occurred",

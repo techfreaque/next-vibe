@@ -1,10 +1,12 @@
 /**
+
  * Results Journey - Reactivation Email Template
  */
 
 import { Text } from "@react-email/components";
+import React from "react";
 
-import { getPricingPlansArray } from "@/app/[locale]/(site)/pricing/_components/pricing";
+import { getPricingPlansArray } from "@/app/[locale]/story/pricing/_components/pricing";
 import { SubscriptionPlan } from "@/app/api/[locale]/v1/core/subscription/enum";
 import { formatCurrencyNoDecimals } from "@/i18n/core/localization-utils";
 import { getCountryFromLocale } from "@/i18n/core/translation-utils";

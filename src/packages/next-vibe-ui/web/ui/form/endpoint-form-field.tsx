@@ -42,7 +42,6 @@ import type {
   FieldStyleClassName,
   FieldValidationState,
   RequiredFieldTheme,
-  TypeSafeFieldConfig,
 } from "./endpoint-form-field-types";
 import {
   FormControl,
@@ -68,16 +67,6 @@ const OPTION_KEY_PREFIX = "option-";
 interface FormFieldError {
   message?: string;
   type?: string;
-}
-
-// Type for form field object from react-hook-form
-interface FormField<
-  TValue = string | number | boolean | Date | string[] | null | undefined,
-> {
-  name: string;
-  value: TValue;
-  onChange: (value: TValue) => void;
-  onBlur: () => void;
 }
 
 /**
@@ -475,7 +464,7 @@ function renderFieldInput(
       );
 
     case "date": {
-      const dateValue = field.value as string | Date | undefined;
+      const dateValue = field.value;
       const parsedDate = dateValue
         ? typeof dateValue === "string"
           ? new Date(dateValue)
@@ -646,8 +635,8 @@ function renderFieldInput(
 
 // Generic field props interface
 export interface EndpointFormFieldProps<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends Path<TFieldValues> = Path<TFieldValues>,
+  TFieldValues extends FieldValues,
+  TName extends Path<TFieldValues>,
 > extends Omit<
     EndpointFormFieldPropsType<TFieldValues, TName>,
     "requiredFields"
@@ -660,8 +649,8 @@ export interface EndpointFormFieldProps<
  * Integrates with useEndpoint hook and provides comprehensive form field functionality
  */
 export function EndpointFormField<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends Path<TFieldValues> = Path<TFieldValues>,
+  TFieldValues extends FieldValues,
+  TName extends Path<TFieldValues>,
 >({
   name,
   config,
@@ -737,9 +726,7 @@ export function EndpointFormField<
 /**
  * Convenience component for creating multiple form fields
  */
-export interface EndpointFormFieldsProps<
-  TFieldValues extends FieldValues = FieldValues,
-> {
+export interface EndpointFormFieldsProps<TFieldValues extends FieldValues> {
   fields: Array<{
     name: Path<TFieldValues>;
     config: FieldConfig;
@@ -753,7 +740,8 @@ export interface EndpointFormFieldsProps<
 }
 
 export function EndpointFormFields<
-  TFieldValues extends FieldValues = FieldValues,
+  TFieldValues extends FieldValues,
+  TName extends Path<TFieldValues>,
 >({
   fields,
   control,
@@ -765,15 +753,10 @@ export function EndpointFormFields<
   return (
     <div className={cn("space-y-6", className)}>
       {fields.map((fieldDef) => (
-        <EndpointFormField<TFieldValues>
+        <EndpointFormField<TFieldValues, TName>
           key={fieldDef.name}
           name={fieldDef.name}
-          config={
-            fieldDef.config as TypeSafeFieldConfig<
-              TFieldValues,
-              Path<TFieldValues>
-            >
-          }
+          config={fieldDef.config}
           control={control}
           schema={schema}
           theme={theme}

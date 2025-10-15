@@ -14,41 +14,37 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
-import type {
-  JwtPayloadType,
-} from "../../../user/auth/definition";
+import type { JwtPayloadType } from "../../../user/auth/definition";
 import { emails } from "../../messages/db";
 import { EmailStatus } from "../../messages/enum";
 import type {
-  StoreEmailMetadataParams,
-  StoreEmailMetadataRequestTypeOutput,
-  StoreEmailMetadataResponseTypeOutput,
-  UpdateEmailEngagementParams,
-  UpdateEmailEngagementRequestTypeOutput,
-  UpdateEmailEngagementResponseTypeOutput,
+  StoreEmailMetadataRequestOutput,
+  StoreEmailMetadataResponseOutput,
+  UpdateEmailEngagementRequestOutput,
+  UpdateEmailEngagementResponseOutput,
 } from "./definition";
-import { CountryLanguage } from "@/i18n/core/config";
 
 /**
  * Email Metadata Repository Interface
  */
 export interface EmailMetadataRepository {
   storeEmailMetadata(
-    data: StoreEmailMetadataRequestTypeOutput,
+    data: StoreEmailMetadataRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<StoreEmailMetadataResponseTypeOutput>>;
+  ): Promise<ResponseType<StoreEmailMetadataResponseOutput>>;
 
   updateEmailEngagement(
-    data: UpdateEmailEngagementRequestTypeOutput,
+    data: UpdateEmailEngagementRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<UpdateEmailEngagementResponseTypeOutput>>;
+  ): Promise<ResponseType<UpdateEmailEngagementResponseOutput>>;
 }
 
 /**
@@ -59,11 +55,11 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
    * Store email metadata in the database
    */
   async storeEmailMetadata(
-    data: StoreEmailMetadataRequestTypeOutput,
+    data: StoreEmailMetadataRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<StoreEmailMetadataResponseTypeOutput>> {
+  ): Promise<ResponseType<StoreEmailMetadataResponseOutput>> {
     try {
       logger.debug("Storing email metadata", {
         recipient: data.params.recipientEmail,
@@ -73,14 +69,19 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
       });
 
       // Clean metadata to remove undefined values
-      const cleanMetadata: Record<string, string | number | boolean> = data
-        .params.metadata
-        ? (Object.fromEntries(
-            Object.entries(data.params.metadata).filter(
-              ([, value]) => value !== undefined,
-            ),
-          ) as Record<string, string | number | boolean>)
-        : {};
+      const cleanMetadata: Record<string, string | number | boolean> = {};
+      if (data.params.metadata) {
+        for (const [key, value] of Object.entries(data.params.metadata)) {
+          if (
+            value !== undefined &&
+            (typeof value === "string" ||
+              typeof value === "number" ||
+              typeof value === "boolean")
+          ) {
+            cleanMetadata[key] = value;
+          }
+        }
+      }
 
       await db.insert(emails).values({
         subject: data.params.subject,
@@ -123,7 +124,7 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
       });
 
       return createErrorResponse(
-        "email.metadata.store.failed",
+        "app.api.v1.core.emails.smtpClient.emailMetadata.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         {
           recipient: data.params.recipientEmail,
@@ -137,11 +138,11 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
    * Update email engagement status (opened, clicked, etc.)
    */
   async updateEmailEngagement(
-    data: UpdateEmailEngagementRequestTypeOutput,
+    data: UpdateEmailEngagementRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<UpdateEmailEngagementResponseTypeOutput>> {
+  ): Promise<ResponseType<UpdateEmailEngagementResponseOutput>> {
     try {
       logger.debug("Updating email engagement", {
         emailId: data.params.emailId,
@@ -154,7 +155,12 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
         clickedAt?: Date;
         bouncedAt?: Date;
         unsubscribedAt?: Date;
-        status?: EmailStatus;
+        status?:
+          | typeof EmailStatus.BOUNCED
+          | typeof EmailStatus.UNSUBSCRIBED
+          | typeof EmailStatus.FAILED
+          | typeof EmailStatus.SENT
+          | typeof EmailStatus.DELIVERED;
         updatedAt: Date;
       } = {
         updatedAt: new Date(),
@@ -215,7 +221,7 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
       });
 
       return createErrorResponse(
-        "email.engagement.update.failed",
+        "app.api.v1.core.emails.smtpClient.emailMetadata.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         {
           emailId: data.params.emailId,

@@ -6,39 +6,12 @@
 import {
   boolean,
   integer,
-  json,
   pgTable,
   text,
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { z } from "zod";
-
-import { ImapLoggingLevel, ImapLoggingLevelDB } from "./enum";
-
-/**
- * NOTE: Using text() with enum constraint instead of pgEnum() because translation keys
- * exceed PostgreSQL's 63-byte enum label limit. Type safety is maintained through
- * Drizzle's enum constraint and Zod validation.
- */
-
-/**
- * IMAP Client Configuration Database Schema
- * Database tables for IMAP configuration
- */
-
-import {
-  boolean,
-  integer,
-  json,
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { z } from "zod";
 
 import { ImapLoggingLevel, ImapLoggingLevelDB } from "./enum";
 

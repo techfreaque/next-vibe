@@ -7,10 +7,9 @@ import type { TFunction } from "@/i18n/core/static-types";
 import { registerSeed } from "@/packages/next-vibe/server/db/seed-manager";
 
 import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import { PreferredContactMethod } from "../user/enum";
 import { userRepository } from "../user/repository";
 import { UserRole } from "../user/user-roles/enum";
-import type { UserCreateRequestTypeOutput } from "./create/definition";
+import type { UserCreateRequestOutput } from "./create/definition";
 import { userCreateRepository } from "./create/repository";
 
 /**
@@ -22,33 +21,9 @@ const dummyT: TFunction = ((key: string) => key) as TFunction;
  * Helper function to create user management seed data
  */
 function createUserManagementSeed(
-  overrides: Partial<UserCreateRequestTypeOutput>,
-): UserCreateRequestTypeOutput {
-  return {
-    basicInfo: {
-      firstName: "Sample",
-      lastName: "User",
-      email: "sample.user@example.com",
-      password: "SamplePass123!",
-    },
-    organizationInfo: {
-      company: "Sample Company LLC",
-    },
-    contactInfo: {
-      phone: "+1-555-0199",
-      preferredContactMethod: PreferredContactMethod.EMAIL,
-    },
-    profileInfo: {
-      bio: "Sample user created through the users management system for testing and demonstration purposes.",
-      imageUrl: "https://picsum.photos/seed/sample/200/200",
-    },
-    adminSettings: {
-      isActive: true,
-      emailVerified: true,
-      roles: [UserRole.CUSTOMER],
-    },
-    ...overrides,
-  } as unknown as UserCreateRequestTypeOutput;
+  config: UserCreateRequestOutput,
+): UserCreateRequestOutput {
+  return config;
 }
 
 /**
@@ -79,21 +54,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     const sampleUsers = [
       createUserManagementSeed({
         basicInfo: {
-          firstName: "Sarah",
-          lastName: "Johnson",
           email: "sarah.johnson@example.com",
           password: "DevPass123!",
-        },
-        organizationInfo: {
-          company: "Johnson Marketing Agency",
-        },
-        contactInfo: {
-          phone: "+1-555-0101",
-          preferredContactMethod: PreferredContactMethod.EMAIL,
-        },
-        profileInfo: {
-          bio: "Digital marketing specialist with expertise in social media campaigns and content strategy.",
-          imageUrl: "https://picsum.photos/seed/sarah/200/200",
+          privateName: "Sarah Johnson",
+          publicName: "Sarah J.",
         },
         adminSettings: {
           isActive: true,
@@ -103,21 +67,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       }),
       createUserManagementSeed({
         basicInfo: {
-          firstName: "Michael",
-          lastName: "Chen",
           email: "michael.chen@example.com",
           password: "DevPass123!",
-        },
-        organizationInfo: {
-          company: "Chen Enterprises",
-        },
-        contactInfo: {
-          phone: "+1-555-0102",
-          preferredContactMethod: PreferredContactMethod.EMAIL,
-        },
-        profileInfo: {
-          bio: "Business consultant specializing in small business growth and operational efficiency.",
-          imageUrl: "https://picsum.photos/seed/michael/200/200",
+          privateName: "Michael Chen",
+          publicName: "Mike C.",
         },
         adminSettings: {
           isActive: true,
@@ -127,21 +80,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       }),
       createUserManagementSeed({
         basicInfo: {
-          firstName: "Emily",
-          lastName: "Rodriguez",
           email: "emily.rodriguez@example.com",
           password: "DevPass123!",
-        },
-        organizationInfo: {
-          company: "Rodriguez Design Studio",
-        },
-        contactInfo: {
-          phone: "+1-555-0103",
-          preferredContactMethod: PreferredContactMethod.EMAIL,
-        },
-        profileInfo: {
-          bio: "Creative director and brand strategist with a passion for visual storytelling.",
-          imageUrl: "https://picsum.photos/seed/emily/200/200",
+          privateName: "Emily Rodriguez",
+          publicName: "Emily R.",
         },
         adminSettings: {
           isActive: true,
@@ -228,21 +170,10 @@ export async function test(logger: EndpointLogger): Promise<void> {
     // Create minimal test user for user management testing
     const testUserData = createUserManagementSeed({
       basicInfo: {
-        firstName: "Test",
-        lastName: "Manager",
         email: "test.manager@example.com",
         password: "TestPass123!",
-      },
-      organizationInfo: {
-        company: "Test Management Corp",
-      },
-      contactInfo: {
-        phone: "+1-555-9999",
-        preferredContactMethod: PreferredContactMethod.EMAIL,
-      },
-      profileInfo: {
-        bio: "Test user for users management functionality validation.",
-        imageUrl: "https://picsum.photos/seed/testmanager/200/200",
+        privateName: "Test Manager",
+        publicName: "Test M.",
       },
       adminSettings: {
         isActive: true,

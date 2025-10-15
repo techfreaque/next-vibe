@@ -5,7 +5,6 @@
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint";
-import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
 
 import definitions from "./definition";
 
@@ -16,7 +15,7 @@ import definitions from "./definition";
  */
 export function useUsersListEndpoint(
   logger: EndpointLogger,
-): UsersListEndpointReturn {
+): ReturnType<typeof useEndpoint<typeof definitions>> {
   return useEndpoint(
     definitions,
     {
@@ -33,4 +32,4 @@ export function useUsersListEndpoint(
   );
 }
 
-export type UsersListEndpointReturn = EndpointReturn<typeof definitions>;
+export type UsersListEndpointReturn = ReturnType<typeof useUsersListEndpoint>;

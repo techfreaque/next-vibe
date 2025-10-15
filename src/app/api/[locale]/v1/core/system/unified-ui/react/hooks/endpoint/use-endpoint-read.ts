@@ -4,18 +4,12 @@
 "use client";
 
 import { useMemo } from "react";
-import type z from "zod";
+import type { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type {
-  ExtractInput,
-  ExtractOutput,
-  FieldUsage,
-  InferSchemaFromField,
-  UnifiedField,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { determineFormDataPriority } from "../form/data-priority";
@@ -44,19 +38,32 @@ import type {
  * @returns Query form for API interaction with enhanced error handling
  */
 export function useEndpointRead<
-  TEndpoint extends CreateApiEndpoint<any, any, any, any>,
+  TEndpoint extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    any
+  >,
 >(
   primaryEndpoint: TEndpoint | null,
   logger: EndpointLogger,
   options: {
-    formOptions?: ApiQueryFormOptions<any>;
-    queryOptions?: ApiQueryOptions<any, any, any>;
-    urlParams?: any;
-    autoPrefillData?: any;
-    initialState?: any;
+    formOptions?: ApiQueryFormOptions<TEndpoint["TRequestOutput"]>;
+    queryOptions?: ApiQueryOptions<
+      TEndpoint["TRequestOutput"],
+      TEndpoint["TResponseOutput"],
+      TEndpoint["TUrlVariablesOutput"]
+    >;
+    urlParams?: TEndpoint["TUrlVariablesOutput"];
+    autoPrefillData?: Partial<TEndpoint["TRequestOutput"]>;
+    initialState?: Partial<TEndpoint["TRequestOutput"]>;
     autoPrefillConfig?: AutoPrefillConfig;
   } = {},
-): any {
+): ApiQueryFormReturn<
+  TEndpoint["TRequestOutput"],
+  TEndpoint["TResponseOutput"],
+  TEndpoint["TUrlVariablesOutput"]
+> | null {
   // Return null if endpoint is not provided
   if (!primaryEndpoint) {
     return null;
@@ -64,9 +71,7 @@ export function useEndpointRead<
   const {
     formOptions = { persistForm: true, autoSubmit: true, debounceMs: 500 },
     queryOptions = {},
-    urlParams = {} as ExtractOutput<
-      InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
-    >,
+    urlParams = {} as TEndpoint["TUrlVariablesOutput"],
     autoPrefillData,
     initialState,
     autoPrefillConfig = {
@@ -79,19 +84,13 @@ export function useEndpointRead<
   // Merge all form data sources with proper priority handling
   const enhancedFormOptions = useMemo(() => {
     // Prepare data sources
-    const dataSources: FormDataSources<
-      ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>
-    > = {
+    const dataSources: FormDataSources<TEndpoint["TResponseOutput"]> = {
       defaultValues: formOptions.defaultValues as Partial<
-        ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>
+        TEndpoint["TResponseOutput"]
       >,
-      serverData: autoPrefillData as ExtractOutput<
-        InferSchemaFromField<TFields, FieldUsage.RequestData>
-      >,
+      serverData: autoPrefillData as TEndpoint["TResponseOutput"],
       localStorageData: undefined,
-      initialState: initialState as Partial<
-        ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>
-      >,
+      initialState: initialState as Partial<TEndpoint["TResponseOutput"]>,
     };
 
     // Determine final data with proper priority
@@ -107,12 +106,8 @@ export function useEndpointRead<
       // Store additional metadata for unsaved changes detection
       _dataSources: dataSources,
       _autoPrefillConfig: autoPrefillConfig,
-    } as ApiQueryFormOptions<
-      ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>
-    > & {
-      _dataSources: FormDataSources<
-        ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>
-      >;
+    } as ApiQueryFormOptions<TEndpoint["TRequestOutput"]> & {
+      _dataSources: FormDataSources<TEndpoint["TResponseOutput"]>;
       _autoPrefillConfig: AutoPrefillConfig;
     };
   }, [formOptions, autoPrefillData, initialState, autoPrefillConfig]);
@@ -138,11 +133,7 @@ export function useEndpointRead<
   // Use the existing query form hook with enhanced options
   const queryFormResult = useApiQueryForm({
     endpoint: primaryEndpoint,
-    urlVariables:
-      urlParams ||
-      ({} as ExtractOutput<
-        InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
-      >),
+    urlVariables: urlParams || ({} as TEndpoint["TUrlVariablesOutput"]),
     formOptions: enhancedFormOptions,
     queryOptions: enhancedQueryOptions,
     logger,

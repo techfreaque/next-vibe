@@ -7,13 +7,12 @@ import { existsSync, promises as fs } from "node:fs";
 import { cpus, freemem, totalmem } from "node:os";
 import { dirname, extname, join, relative, resolve } from "node:path";
 
-import type { ResponseType as ApiResponseType } from "next-vibe/shared/types/response.schema";
-import { createSuccessResponse } from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
-
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { ResponseType as ApiResponseType } from "../../../../../../../../packages/next-vibe/shared/types/response.schema";
+import { createSuccessResponse } from "../../../../../../../../packages/next-vibe/shared/types/response.schema";
+import { parseError } from "../../../../../../../../packages/next-vibe/shared/utils/parse-error";
 import type { LintRequestOutput, LintResponseOutput } from "./definition";
 
 /**
@@ -794,19 +793,22 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       return { issues, hasFixableIssues };
     }
 
-    try {
-      const results = JSON.parse(stdout) as Array<{
-        filePath: string;
-        messages: Array<{
-          line: number;
-          column: number;
-          ruleId: string | null;
-          severity: 1 | 2;
-          message: string;
-          fix?: { range: [number, number]; text: string }; // ESLint provides fix info for fixable issues
-        }>;
-        output?: string; // Fixed content when --fix is used
+    // Define ESLint result structure for type safety
+    type EslintResult = Array<{
+      filePath: string;
+      messages: Array<{
+        line: number;
+        column: number;
+        ruleId: string | null;
+        severity: 1 | 2;
+        message: string;
+        fix?: { range: [number, number]; text: string }; // ESLint provides fix info for fixable issues
       }>;
+      output?: string; // Fixed content when --fix is used
+    }>;
+
+    try {
+      const results: EslintResult = JSON.parse(stdout);
 
       // If --fix was used, write the fixed content back to files in parallel
       if (shouldFix) {

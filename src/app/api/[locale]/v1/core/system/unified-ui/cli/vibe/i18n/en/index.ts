@@ -1,7 +1,9 @@
 import { translations as endpointsTranslations } from "../../endpoints/i18n/en";
+import { translations as utilsTranslations } from "../../utils/i18n/en";
 
 export const translations = {
   endpoints: endpointsTranslations,
+  utils: utilsTranslations,
   vibe: {
     startingUp: "🚀 Starting Vibe CLI...",
     executionTime: "Execution Time",

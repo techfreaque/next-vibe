@@ -6,6 +6,12 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import Stripe from "stripe";
 
@@ -14,17 +20,12 @@ import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  createErrorResponse,
-  createSuccessResponse,
-  ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "../../user/auth/definition";
 import { users } from "../../user/db";
-import { BillingInterval, BillingIntervalValue, SubscriptionPlan, SubscriptionPlanValue } from "../enum";
+import type { BillingIntervalValue, SubscriptionPlanValue } from "../enum";
+import { BillingInterval, SubscriptionPlan } from "../enum";
 import type {
   CheckoutRequestOutput,
   CheckoutResponseOutput,
@@ -113,16 +114,8 @@ export const STRIPE_PRICE_IDS = {
 const getCountryFromLocale = (
   locale: CountryLanguage,
 ): keyof typeof STRIPE_PRICE_IDS => {
-  // Extract country part from locale (e.g., "en-GLOBAL" -> "GLOBAL", "de-DE" -> "DE")
   const countryPart = locale.split("-")[1];
-
-  // Validate that the country is supported
-  if (countryPart && countryPart in STRIPE_PRICE_IDS) {
-    return countryPart as keyof typeof STRIPE_PRICE_IDS;
-  }
-
-  // Default to GLOBAL if country is not found or not supported
-  return "GLOBAL";
+  return countryPart || "GLOBAL";
 };
 
 /**
@@ -132,10 +125,35 @@ const getStripePriceId = (
   planId: Exclude<SubscriptionPlanValue, typeof SubscriptionPlan.ENTERPRISE>,
   billingInterval: BillingIntervalValue,
   country: keyof typeof STRIPE_PRICE_IDS,
-): string => {
+): string | undefined => {
   const regionPrices = STRIPE_PRICE_IDS[country];
-  const intervalPrices = regionPrices[billingInterval];
-  return intervalPrices[planId];
+
+  // Type-safe access to nested record structure
+  if (billingInterval === BillingInterval.MONTHLY) {
+    const monthlyPrices = regionPrices[BillingInterval.MONTHLY];
+    if (planId === SubscriptionPlan.STARTER) {
+      return monthlyPrices[SubscriptionPlan.STARTER];
+    }
+    if (planId === SubscriptionPlan.PROFESSIONAL) {
+      return monthlyPrices[SubscriptionPlan.PROFESSIONAL];
+    }
+    if (planId === SubscriptionPlan.PREMIUM) {
+      return monthlyPrices[SubscriptionPlan.PREMIUM];
+    }
+  } else if (billingInterval === BillingInterval.YEARLY) {
+    const yearlyPrices = regionPrices[BillingInterval.YEARLY];
+    if (planId === SubscriptionPlan.STARTER) {
+      return yearlyPrices[SubscriptionPlan.STARTER];
+    }
+    if (planId === SubscriptionPlan.PROFESSIONAL) {
+      return yearlyPrices[SubscriptionPlan.PROFESSIONAL];
+    }
+    if (planId === SubscriptionPlan.PREMIUM) {
+      return yearlyPrices[SubscriptionPlan.PREMIUM];
+    }
+  }
+
+  return undefined;
 };
 
 /**
@@ -245,9 +263,31 @@ export class SubscriptionCheckoutRepositoryImpl
       // Get the country from locale for region-specific pricing
       country = getCountryFromLocale(locale);
 
+      // Validate that planId is not ENTERPRISE (ENTERPRISE requires custom pricing)
+      if (data.planId === SubscriptionPlan.ENTERPRISE) {
+        logger.error(
+          t(
+            "app.api.v1.core.subscription.checkout.post.errors.validation.reason.enterpriseCustomPricing",
+          ),
+          {
+            planId: data.planId,
+            userId: user.id,
+          },
+        );
+        return createErrorResponse(
+          "app.api.v1.core.subscription.checkout.post.errors.validation.title",
+          ErrorResponseTypes.BAD_REQUEST,
+          {
+            reason: t(
+              "app.api.v1.core.subscription.checkout.post.errors.validation.reason.enterpriseCustomPricing",
+            ),
+          },
+        );
+      }
+
       // Get the Stripe price ID for the plan, billing interval, and region
       stripePriceId = getStripePriceId(
-        data.planId as Exclude<SubscriptionPlanValue, typeof SubscriptionPlan.ENTERPRISE>,
+        data.planId,
         data.billingInterval,
         country,
       );
@@ -268,13 +308,8 @@ export class SubscriptionCheckoutRepositoryImpl
           locale,
         });
         return createErrorResponse(
-          t("app.api.v1.core.subscription.checkout.errors.validation.title"),
-          ErrorResponseTypes.VALIDATION_FAILED,
-          {
-            planId: data.planId,
-            billingInterval: data.billingInterval,
-            locale,
-          },
+          "app.api.v1.core.subscription.checkout.post.errors.validation.title",
+          ErrorResponseTypes.BAD_REQUEST,
         );
       }
 

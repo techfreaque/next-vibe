@@ -2,10 +2,8 @@
  * Hooks for password reset confirmation functionality
  */
 
-import type { UndefinedType } from "next-vibe/shared/types/common.schema";
 import type {
   ErrorResponseType,
-  MessageResponseType,
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { useToast } from "next-vibe-ui/ui";
@@ -16,13 +14,13 @@ import type {
   FormAlertState,
   SubmitFormFunction,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
-import type { ApiFormReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/types";
 import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation-form";
+import type { ApiFormReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/types";
 import { useTranslation } from "@/i18n/core/client";
 
-import type { 
+import type {
   ResetPasswordConfirmPostRequestOutput,
-  ResetPasswordConfirmPostResponseOutput 
+  ResetPasswordConfirmPostResponseOutput,
 } from "./definition";
 import resetPasswordConfirmEndpoints from "./definition";
 
@@ -84,6 +82,7 @@ export function useResetPasswordConfirm(
           confirmPassword: "",
         },
       },
+      persistForm: false, // Disable persistence to avoid conflicts with old data structure
     },
     {
       onSuccess: () => {
@@ -106,7 +105,7 @@ export function useResetPasswordConfirm(
   );
 
   // Generate alert state from error/success states
-  const alert: FormAlertState | null = useMemo(() => {
+  const alert = useMemo((): FormAlertState | null => {
     // Check for token error
     if (!tokenValidationResponse.success) {
       return {
@@ -152,6 +151,13 @@ export function useResetPasswordConfirm(
   }, [formResult.submitError, isSuccess, tokenValidationResponse]);
   const passwordValue = formResult.form.watch("newPassword.password");
 
+  // Extract token error to avoid complex union types
+  const tokenIsValid = tokenValidationResponse.success;
+  const tokenError = tokenIsValid
+    ? ""
+    : (tokenValidationResponse.message as string) ||
+      "auth.reset.errors.token_invalid";
+
   return {
     form: formResult.form,
     submitForm: formResult.submitForm,
@@ -159,10 +165,8 @@ export function useResetPasswordConfirm(
     isSuccess,
     submitError: formResult.submitError ?? null,
     passwordValue,
-    tokenError: tokenValidationResponse.success
-      ? ""
-      : tokenValidationResponse.message || "auth.reset.errors.token_invalid",
-    tokenValid: tokenValidationResponse.success,
+    tokenError,
+    tokenValid: tokenIsValid,
     alert,
   };
 }

@@ -11,19 +11,18 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../user/auth/definition";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { imapSyncRepository } from "../sync-service/repository";
 import type {
-  ExecuteImapSyncRequestTypeOutput,
-  ExecuteImapSyncResponseTypeOutput,
+  ExecuteImapSyncRequestOutput,
+  ExecuteImapSyncResponseOutput,
   TaskResultType,
-  ValidateImapSyncRequestTypeOutput,
-  ValidateImapSyncResponseTypeOutput,
+  ValidateImapSyncRequestOutput,
+  ValidateImapSyncResponseOutput,
 } from "./definition";
 
 /**
@@ -31,18 +30,18 @@ import type {
  */
 export interface ImapSyncTaskRepository {
   executeImapSync(
-    data: ExecuteImapSyncRequestTypeOutput,
+    data: ExecuteImapSyncRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ExecuteImapSyncResponseTypeOutput>>;
+  ): Promise<ResponseType<ExecuteImapSyncResponseOutput>>;
 
   validateImapSync(
-    data: ValidateImapSyncRequestTypeOutput,
+    data: ValidateImapSyncRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ValidateImapSyncResponseTypeOutput>>;
+  ): ResponseType<ValidateImapSyncResponseOutput>;
 }
 
 /**
@@ -53,21 +52,12 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
    * Execute IMAP sync task
    */
   async executeImapSync(
-    data: ExecuteImapSyncRequestTypeOutput,
+    data: ExecuteImapSyncRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ExecuteImapSyncResponseTypeOutput>> {
-    const config = data.config;
-
-    logger.info("tasks.imap_sync.start", { config });
-
-    let accountsProcessed = 0;
-    let accountsSuccessful = 0;
-    let accountsFailed = 0;
-    let foldersProcessed = 0;
-    let messagesProcessed = 0;
-    const errors: TaskResultType["errors"] = [];
+  ): Promise<ResponseType<ExecuteImapSyncResponseOutput>> {
+    logger.info("tasks.imap_sync.start", { config: data.config });
 
     try {
       // For now, we'll execute a simplified sync all accounts operation
@@ -84,10 +74,10 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
           accountsProcessed: syncResult.data.result.results.accountsProcessed,
           accountsSuccessful: syncResult.data.result.results.accountsProcessed,
           accountsFailed: 0,
-          foldersProcessed: config.enableFolderSync
+          foldersProcessed: data.config.enableFolderSync
             ? syncResult.data.result.results.foldersProcessed
             : undefined,
-          messagesProcessed: config.enableMessageSync
+          messagesProcessed: data.config.enableMessageSync
             ? syncResult.data.result.results.messagesProcessed
             : undefined,
           errors: syncResult.data.result.results.errors.map((error) => ({
@@ -132,12 +122,12 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
   /**
    * Validate IMAP sync task
    */
-  async validateImapSync(
-    data: ValidateImapSyncRequestTypeOutput,
+  validateImapSync(
+    data: ValidateImapSyncRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ValidateImapSyncResponseTypeOutput>> {
+  ): ResponseType<ValidateImapSyncResponseOutput> {
     try {
       // Basic validation - check if IMAP sync service is available
       // For now, we'll just return true since we don't have a health check method

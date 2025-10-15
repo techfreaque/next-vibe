@@ -16,12 +16,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import type { z } from "zod";
 
-import {
-  TaskPriority,
-  TaskPriorityDB,
-  TaskStatus,
-  TaskStatusDB,
-} from "../enum";
+import { CronTaskPriorityDB, CronTaskStatusDB } from "../enum";
 
 /**
  * Cron Tasks Table
@@ -36,7 +31,7 @@ export const cronTasks = pgTable("cron_tasks", {
   schedule: text("schedule").notNull(), // Cron expression
   timezone: text("timezone").default("UTC"),
   enabled: boolean("enabled").notNull().default(true),
-  priority: text("priority", { enum: TaskPriorityDB }).notNull(),
+  priority: text("priority", { enum: CronTaskPriorityDB }).notNull(),
   timeout: integer("timeout").default(300000), // 5 minutes default
   retries: integer("retries").default(3),
   retryDelay: integer("retry_delay").default(30000), // 30 seconds default
@@ -44,7 +39,9 @@ export const cronTasks = pgTable("cron_tasks", {
 
   // Execution tracking
   lastExecutedAt: timestamp("last_executed_at"),
-  lastExecutionStatus: text("last_execution_status", { enum: TaskStatusDB }),
+  lastExecutionStatus: text("last_execution_status", {
+    enum: CronTaskStatusDB,
+  }),
   lastExecutionError: text("last_execution_error"),
   lastExecutionDuration: integer("last_execution_duration"),
   nextExecutionAt: timestamp("next_execution_at"),
@@ -77,8 +74,8 @@ export const cronTaskExecutions = pgTable("cron_task_executions", {
     .references(() => cronTasks.id, { onDelete: "cascade" }),
   taskName: text("task_name").notNull(),
   executionId: text("execution_id").notNull().unique(),
-  status: text("status", { enum: TaskStatusDB }).notNull(),
-  priority: text("priority", { enum: TaskPriorityDB }).notNull(),
+  status: text("status", { enum: CronTaskStatusDB }).notNull(),
+  priority: text("priority", { enum: CronTaskPriorityDB }).notNull(),
 
   // Timing
   startedAt: timestamp("started_at").notNull(),

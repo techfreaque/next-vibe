@@ -19,6 +19,14 @@ export const translations = {
       label: "Password",
       description: "Secure password for the user account",
     },
+    privateName: {
+      label: "Private Name",
+      description: "User's full legal name (visible only to admins)",
+    },
+    publicName: {
+      label: "Public Name",
+      description: "User's display name (visible to all users)",
+    },
     firstName: {
       label: "First Name",
       description: "User's first name",
@@ -82,6 +90,12 @@ export const translations = {
       },
       email: {
         content: "Email Address",
+      },
+      privateName: {
+        content: "Private Name",
+      },
+      publicName: {
+        content: "Public Name",
       },
       firstName: {
         content: "First Name",
@@ -205,6 +219,7 @@ export const translations = {
         accountDetails: "Account Details",
         email: "Email",
         name: "Name",
+        publicName: "Display Name",
         company: "Company",
         phone: "Phone",
         nextSteps: "Next Steps",
@@ -228,6 +243,8 @@ export const translations = {
         id: "ID:",
         email: "Email:",
         name: "Name:",
+        privateName: "Full Name:",
+        publicName: "Display Name:",
         company: "Company:",
         created: "Created:",
         leadId: "Lead ID:",

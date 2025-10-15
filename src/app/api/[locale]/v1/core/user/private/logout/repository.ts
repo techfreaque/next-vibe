@@ -19,8 +19,8 @@ import type { JwtPrivatePayloadType } from "../../auth/definition";
 import { authRepository } from "../../auth/repository";
 import { sessionRepository } from "../session/repository";
 import type {
-  LogoutGetRequestOutput,
-  LogoutGetResponseOutput,
+  LogoutPostRequestOutput,
+  LogoutPostResponseOutput,
 } from "./definition";
 
 /**
@@ -36,10 +36,10 @@ export interface LogoutRepository {
    * @returns Success message
    */
   logout(
-    data: LogoutGetRequestOutput,
+    data: LogoutPostRequestOutput,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LogoutGetResponseOutput>>;
+  ): Promise<ResponseType<LogoutPostResponseOutput>>;
 }
 
 /**
@@ -55,10 +55,10 @@ export class LogoutRepositoryImpl implements LogoutRepository {
    * @returns Success message
    */
   async logout(
-    data: LogoutGetRequestOutput,
+    data: LogoutPostRequestOutput,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LogoutGetResponseOutput>> {
+  ): Promise<ResponseType<LogoutPostResponseOutput>> {
     // Removed locale parameter - translation keys handled by client
 
     try {

@@ -9,7 +9,7 @@ export const debugCli = _false;
 export const debugCron = _false;
 export const debugMiddleware = _false;
 export const debugApp = enableDebugLogger;
-export const debugLibrary = _false;
+export const debugLibrary = _true;
 export const translationsKeyMode = _false;
 
 // Form clearing behavior in development

@@ -64,6 +64,18 @@ export const translations = {
       createdAt: "Created At",
       updatedAt: "Updated At",
     },
+    accountSummary: {
+      title: "Account Summary",
+      description: "Basic account information",
+    },
+    connectionDetails: {
+      title: "Connection Details",
+      description: "SMTP server connection configuration",
+    },
+    performanceMetrics: {
+      title: "Performance Metrics",
+      description: "Account performance and usage statistics",
+    },
   },
   errors: {
     validation: {

@@ -18,8 +18,12 @@ import {
   type SQL,
   sql,
 } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
 import type { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
 import {
   DateRangePreset,
@@ -27,16 +31,10 @@ import {
   TimePeriod,
 } from "next-vibe/shared/types/stats-filtering.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
+
+import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-
-import type { JwtPayloadType } from "../../user/auth/definition";
-import {
-  createErrorResponse,
-  createSuccessResponse,
-  ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
 import {
   convertCountryFilter,
   convertLanguageFilter,
@@ -44,6 +42,7 @@ import {
   LanguageFilter,
 } from "@/i18n/core/config";
 
+import type { JwtPayloadType } from "../../user/auth/definition";
 import { emailCampaigns, leads } from "../db";
 import type { LeadSource } from "../enum";
 import {
@@ -58,8 +57,8 @@ import {
 } from "../enum";
 import type { EngagementLevel } from "../tracking/engagement/enum";
 import type {
-  LeadsStatsRequestType,
-  LeadsStatsResponseType,
+  LeadsStatsRequestOutput,
+  LeadsStatsResponseOutput,
 } from "./definition";
 
 // Constants for metric types to avoid literal strings
@@ -124,11 +123,11 @@ const mapLeadStatusToActivityType = (status: LeadStatus): ActivityType => {
 
 export interface LeadsStatsRepository {
   getLeadsStats(
-    data: LeadsStatsRequestType,
+    data: LeadsStatsRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LeadsStatsResponseType>>;
+  ): Promise<ResponseType<LeadsStatsResponseOutput>>;
 }
 
 export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
@@ -136,11 +135,11 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    * Get comprehensive leads statistics
    */
   async getLeadsStats(
-    data: LeadsStatsRequestType,
+    data: LeadsStatsRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LeadsStatsResponseType>> {
+  ): Promise<ResponseType<LeadsStatsResponseOutput>> {
     // Initialize date variables for error handling scope
     let dateFrom: Date | undefined;
     let dateTo: Date | undefined;
@@ -150,22 +149,21 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
 
       // Get date range
       const dateRange = getDateRangeFromPreset(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         data.dateRangePreset || DateRangePreset.LAST_30_DAYS,
       );
       dateFrom = dateRange.from;
       dateTo = dateRange.to;
 
       // Build where conditions
-      const whereConditions = this.buildWhereConditions(
-        data,
-        dateFrom,
-        dateTo,
-      );
+      const whereConditions = this.buildWhereConditions(data, dateFrom, dateTo);
 
       // Get all metrics in parallel
       const [
         currentMetrics,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         historicalData,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         groupedStats,
         recentActivity,
         topPerformingCampaigns,
@@ -176,19 +174,22 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           whereConditions,
           dateFrom,
           dateTo,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           data.timePeriod || TimePeriod.DAY,
           data,
           logger,
         ),
-        this.generateGroupedStats(whereConditions),
+        this.generateGroupedStats(whereConditions, logger),
         this.generateRecentActivity(whereConditions),
         this.generateTopPerformingCampaigns(whereConditions),
         this.generateTopPerformingSources(whereConditions),
       ]);
 
-      const response: LeadsStatsResponseType = {
+      const response: LeadsStatsResponseOutput = {
         ...currentMetrics,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         historicalData,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         groupedStats,
         generatedAt: new Date().toISOString(),
         dataRange: {
@@ -224,7 +225,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    * Build where conditions for database queries
    */
   private buildWhereConditions(
-    query: LeadsStatsRequestType,
+    query: LeadsStatsRequestOutput,
     dateFrom: Date,
     dateTo: Date,
   ): SQL | undefined {
@@ -236,6 +237,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
 
     // Status filter
     if (query.status !== LeadStatusFilter.ALL) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const status = mapStatusFilter(query.status);
       if (status) {
         conditions.push(eq(leads.status, status));
@@ -244,6 +246,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
 
     // Source filter
     if (query.source !== LeadSourceFilter.ALL) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const source = mapSourceFilter(query.source);
       if (source) {
         conditions.push(eq(leads.source, source));
@@ -253,6 +256,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     // Country filter
     if (query.country && query.country !== CountryFilter.ALL) {
       // Map filter to actual enum value
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const countryValue = convertCountryFilter(query.country);
       if (countryValue) {
         conditions.push(eq(leads.country, countryValue));
@@ -262,6 +266,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     // Language filter
     if (query.language && query.language !== LanguageFilter.ALL) {
       // Map filter to actual enum value
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const languageValue = convertLanguageFilter(query.language);
       if (languageValue) {
         conditions.push(eq(leads.language, languageValue));
@@ -273,6 +278,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       query.campaignStage &&
       query.campaignStage !== EmailCampaignStageFilter.ALL
     ) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const stage = mapCampaignStageFilter(query.campaignStage);
       if (stage) {
         conditions.push(eq(leads.currentCampaignStage, stage));
@@ -289,7 +295,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     whereConditions: SQL | undefined,
   ): Promise<
     Omit<
-      LeadsStatsResponseType,
+      LeadsStatsResponseOutput,
       | "historicalData"
       | "groupedStats"
       | "generatedAt"
@@ -599,8 +605,9 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     dateFrom: Date,
     dateTo: Date,
     timePeriod: TimePeriod,
-    filters: LeadsStatsRequestType,
-  ): Promise<LeadsStatsResponseType["historicalData"]> {
+    filters: LeadsStatsRequestOutput,
+    logger: EndpointLogger,
+  ): Promise<LeadsStatsResponseOutput["historicalData"]> {
     try {
       logger.debug("Generating historical data", {
         dateFrom: dateFrom.toISOString(),
@@ -650,6 +657,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           whereConditions,
           timePeriod,
           filters,
+          logger,
         ),
         this.getHistoricalMetric(
           intervals,
@@ -657,6 +665,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           METRIC_TYPES.NEW,
           timePeriod,
           filters,
+          logger,
         ),
         this.getHistoricalMetric(
           intervals,
@@ -664,6 +673,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           METRIC_TYPES.ACTIVE,
           timePeriod,
           filters,
+          logger,
         ),
         this.getHistoricalMetric(
           intervals,
@@ -671,6 +681,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           METRIC_TYPES.CAMPAIGN_RUNNING,
           timePeriod,
           filters,
+          logger,
         ),
         this.getHistoricalMetric(
           intervals,
@@ -678,6 +689,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           METRIC_TYPES.WEBSITE_USER,
           timePeriod,
           filters,
+          logger,
         ),
         this.getHistoricalMetric(
           intervals,
@@ -685,6 +697,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           METRIC_TYPES.NEWSLETTER_SUBSCRIBER,
           timePeriod,
           filters,
+          logger,
         ),
         this.getHistoricalMetric(
           intervals,
@@ -692,6 +705,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           METRIC_TYPES.CONVERTED,
           timePeriod,
           filters,
+          logger,
         ),
         this.getHistoricalMetric(
           intervals,
@@ -699,6 +713,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           METRIC_TYPES.SIGNED_UP,
           timePeriod,
           filters,
+          logger,
         ),
         this.getHistoricalMetric(
           intervals,
@@ -706,6 +721,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           METRIC_TYPES.CONSULTATION_BOOKED,
           timePeriod,
           filters,
+          logger,
         ),
         this.getHistoricalMetric(
           intervals,
@@ -713,6 +729,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           METRIC_TYPES.SUBSCRIPTION_CONFIRMED,
           timePeriod,
           filters,
+          logger,
         ),
         this.getHistoricalMetric(
           intervals,
@@ -720,6 +737,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           METRIC_TYPES.UNSUBSCRIBED,
           timePeriod,
           filters,
+          logger,
         ),
         this.getHistoricalMetric(
           intervals,
@@ -727,6 +745,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           METRIC_TYPES.BOUNCED,
           timePeriod,
           filters,
+          logger,
         ),
         this.getHistoricalMetric(
           intervals,
@@ -734,6 +753,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           METRIC_TYPES.INVALID,
           timePeriod,
           filters,
+          logger,
         ),
         this.getHistoricalMetric(
           intervals,
@@ -741,6 +761,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           METRIC_TYPES.EMAILS_SENT,
           timePeriod,
           filters,
+          logger,
         ),
         this.getHistoricalMetric(
           intervals,
@@ -748,6 +769,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           METRIC_TYPES.EMAILS_OPENED,
           timePeriod,
           filters,
+          logger,
         ),
         this.getHistoricalMetric(
           intervals,
@@ -755,6 +777,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           METRIC_TYPES.EMAILS_CLICKED,
           timePeriod,
           filters,
+          logger,
         ),
       ]).then((results) => {
         // Extract successful results and provide fallbacks for failed ones
@@ -802,26 +825,32 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       const openRateData = this.calculateRateData(
         emailsOpenedData,
         emailsSentData,
+        logger,
       );
       const clickRateData = this.calculateRateData(
         emailsClickedData,
         emailsSentData,
+        logger,
       );
       const conversionRateData = this.calculateRateData(
         convertedLeadsData,
         totalLeadsData,
+        logger,
       );
       const signupRateData = this.calculateRateData(
         signedUpLeadsData,
         totalLeadsData,
+        logger,
       );
       const consultationBookingRateData = this.calculateRateData(
         consultationBookedLeadsData,
         totalLeadsData,
+        logger,
       );
       const subscriptionConfirmationRateData = this.calculateRateData(
         subscriptionConfirmedLeadsData,
         totalLeadsData,
+        logger,
       );
 
       return {
@@ -965,6 +994,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
             whereConditions,
             timePeriod,
             filters,
+            logger,
           ),
           color: "#dc2626",
         },
@@ -976,6 +1006,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
             whereConditions,
             timePeriod,
             filters,
+            logger,
           ),
           color: "#3b82f6",
         },
@@ -987,6 +1018,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
             whereConditions,
             timePeriod,
             filters,
+            logger,
           ),
           color: "#10b981",
         },
@@ -1042,19 +1074,28 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   private async generateGroupedStats(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseType["groupedStats"]> {
+    logger: EndpointLogger,
+  ): Promise<LeadsStatsResponseOutput["groupedStats"]> {
     // Get grouped statistics from database
     const [
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byStatusData,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       bySourceData,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byCountryData,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byLanguageData,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byCampaignStageData,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byJourneyVariantData,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byEngagementLevelData,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byConversionFunnelData,
     ] = await Promise.all([
-      this.getGroupedByStatus(whereConditions),
+      this.getGroupedByStatus(whereConditions, logger),
       this.getGroupedBySource(whereConditions),
       this.getGroupedByCountry(whereConditions),
       this.getGroupedByLanguage(whereConditions),
@@ -1065,13 +1106,21 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     ]);
 
     return {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byStatus: byStatusData,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       bySource: bySourceData,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byCountry: byCountryData,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byLanguage: byLanguageData,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byCampaignStage: byCampaignStageData,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byJourneyVariant: byJourneyVariantData,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byEngagementLevel: byEngagementLevelData,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byConversionFunnel: byConversionFunnelData,
     };
   }
@@ -1081,7 +1130,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   private async generateRecentActivity(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseType["recentActivity"]> {
+  ): Promise<LeadsStatsResponseOutput["recentActivity"]> {
     // Get recent leads activity (last 10 activities)
     const recentLeads = await db
       .select({
@@ -1108,6 +1157,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       leadEmail: lead.email,
       leadBusinessName: lead.businessName || "",
       timestamp: lead.timestamp.toISOString(),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       type: mapLeadStatusToActivityType(lead.status),
       details: {
         status: lead.status,
@@ -1130,7 +1180,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   private async generateTopPerformingCampaigns(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseType["topPerformingCampaigns"]> {
+  ): Promise<LeadsStatsResponseOutput["topPerformingCampaigns"]> {
     // Get top performing campaigns based on conversion rates
     const campaignStats = await db
       .select({
@@ -1172,7 +1222,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   private async generateTopPerformingSources(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseType["topPerformingSources"]> {
+  ): Promise<LeadsStatsResponseOutput["topPerformingSources"]> {
     // Get top performing sources based on conversion rates
     const sourceStats = await db
       .select({
@@ -1196,6 +1246,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       const convertedLeads = Number(source.convertedLeads);
 
       return {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         source: (source.source as LeadSource) || ("website" as LeadSource),
         leadsGenerated: totalLeads,
         conversionRate: totalLeads > 0 ? convertedLeads / totalLeads : 0,
@@ -1212,6 +1263,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     dateFrom: Date,
     dateTo: Date,
     timePeriod: TimePeriod,
+    logger: EndpointLogger,
   ): Array<{ start: Date; end: Date; label: string }> {
     try {
       const intervals: Array<{ start: Date; end: Date; label: string }> = [];
@@ -1369,7 +1421,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     whereConditions: SQL | undefined,
     metricType: string,
     timePeriod: TimePeriod,
-    filters: LeadsStatsRequestType,
+    filters: LeadsStatsRequestOutput,
     logger: EndpointLogger,
   ): Promise<Array<{ date: string; value: number }>> {
     try {
@@ -1841,7 +1893,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     intervals: Array<{ start: Date; end: Date; label: string }>,
     whereConditions: SQL | undefined,
     timePeriod: TimePeriod,
-    filters: LeadsStatsRequestType,
+    filters: LeadsStatsRequestOutput,
+    logger: EndpointLogger,
   ): Promise<Array<{ date: string; value: number }>> {
     try {
       if (intervals.length === 0) {
@@ -1909,6 +1962,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
         METRIC_TYPES.NEW,
         timePeriod,
         filters,
+        logger,
       );
       return this.convertToCumulativeData(periodData);
     }
@@ -1919,11 +1973,12 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    * This is needed when we use different timestamp fields for filtering
    * We need to rebuild the conditions without the date range filters
    */
-  private buildNonDateConditions(filters: LeadsStatsRequestType): SQL[] {
+  private buildNonDateConditions(filters: LeadsStatsRequestOutput): SQL[] {
     const conditions: SQL[] = [];
 
     // Add status filter if specified (single value, not array)
     if (filters.status && filters.status !== LeadStatusFilter.ALL) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const mappedStatus = mapStatusFilter(filters.status);
       if (mappedStatus) {
         conditions.push(eq(leads.status, mappedStatus));
@@ -1932,6 +1987,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
 
     // Add source filter if specified (single value, not array)
     if (filters.source && filters.source !== LeadSourceFilter.ALL) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const mappedSource = mapSourceFilter(filters.source);
       if (mappedSource) {
         conditions.push(eq(leads.source, mappedSource));
@@ -2021,6 +2077,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   private calculateRateData(
     numeratorData: Array<{ date: string; value: number }>,
     denominatorData: Array<{ date: string; value: number }>,
+    logger: EndpointLogger,
   ): Array<{ date: string; value: number }> {
     try {
       // Validate input arrays
@@ -2120,6 +2177,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     const baseConditions: SQL[] = [
       gte(leads.createdAt, dateFrom),
       lte(leads.createdAt, dateTo),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       eq(leads.status, status),
     ];
 
@@ -2190,7 +2248,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   private async getGroupedByStatus(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseType["groupedStats"]["byStatus"]> {
+    logger: EndpointLogger,
+  ): Promise<LeadsStatsResponseOutput["groupedStats"]["byStatus"]> {
     // Get total count for percentage calculation
     const totalCountResult = await db
       .select({ count: count() })
@@ -2250,7 +2309,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   private async getGroupedBySource(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseType["groupedStats"]["bySource"]> {
+  ): Promise<LeadsStatsResponseOutput["groupedStats"]["bySource"]> {
     // Get total count for percentage calculation
     const totalCountResult = await db
       .select({ count: count() })
@@ -2288,7 +2347,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   private async getGroupedByCountry(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseType["groupedStats"]["byCountry"]> {
+  ): Promise<LeadsStatsResponseOutput["groupedStats"]["byCountry"]> {
     // Get total count for percentage calculation
     const totalCountResult = await db
       .select({ count: count() })
@@ -2326,7 +2385,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   private async getGroupedByLanguage(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseType["groupedStats"]["byLanguage"]> {
+  ): Promise<LeadsStatsResponseOutput["groupedStats"]["byLanguage"]> {
     // Get total count for percentage calculation
     const totalCountResult = await db
       .select({ count: count() })
@@ -2364,7 +2423,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   private async getGroupedByCampaignStage(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseType["groupedStats"]["byCampaignStage"]> {
+  ): Promise<LeadsStatsResponseOutput["groupedStats"]["byCampaignStage"]> {
     // Get total count for percentage calculation
     const totalCountResult = await db
       .select({ count: count() })
@@ -2405,7 +2464,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     intervals: Array<{ start: Date; end: Date; label: string }>,
     _whereConditions: SQL | undefined,
     timePeriod: TimePeriod,
-    filters: LeadsStatsRequestType,
+    filters: LeadsStatsRequestOutput,
+    logger: EndpointLogger,
   ): Promise<Array<{ date: string; value: number }>> {
     try {
       if (intervals.length === 0) {
@@ -2490,7 +2550,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     intervals: Array<{ start: Date; end: Date; label: string }>,
     _whereConditions: SQL | undefined,
     timePeriod: TimePeriod,
-    filters: LeadsStatsRequestType,
+    filters: LeadsStatsRequestOutput,
+    logger: EndpointLogger,
   ): Promise<Array<{ date: string; value: number }>> {
     try {
       if (intervals.length === 0) {
@@ -2591,7 +2652,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     intervals: Array<{ start: Date; end: Date; label: string }>,
     _whereConditions: SQL | undefined,
     timePeriod: TimePeriod,
-    filters: LeadsStatsRequestType,
+    filters: LeadsStatsRequestOutput,
+    logger: EndpointLogger,
   ): Promise<Array<{ date: string; value: number }>> {
     try {
       if (intervals.length === 0) {
@@ -3071,7 +3133,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   private async getGroupedByJourneyVariant(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseType["groupedStats"]["byJourneyVariant"]> {
+  ): Promise<LeadsStatsResponseOutput["groupedStats"]["byJourneyVariant"]> {
     // Get total count for percentage calculation
     const totalCountResult = await db
       .select({ count: count() })
@@ -3111,7 +3173,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   private async getGroupedByEngagementLevel(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseType["groupedStats"]["byEngagementLevel"]> {
+  ): Promise<LeadsStatsResponseOutput["groupedStats"]["byEngagementLevel"]> {
     // Get total count for percentage calculation
     const totalCountResult = await db
       .select({ count: count() })
@@ -3144,6 +3206,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       `);
 
     return engagementGroups.map((group) => ({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       level: group.level as EngagementLevel,
       count: Number(group.count),
       percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
@@ -3161,7 +3224,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   private async getGroupedByConversionFunnel(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseType["groupedStats"]["byConversionFunnel"]> {
+  ): Promise<LeadsStatsResponseOutput["groupedStats"]["byConversionFunnel"]> {
     // Get total count for percentage calculation
     const totalCountResult = await db
       .select({ count: count() })
@@ -3210,7 +3273,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Create an empty historical data structure for error fallback
    */
-  private createEmptyHistoricalDataStructure(): LeadsStatsResponseType["historicalData"] {
+  private createEmptyHistoricalDataStructure(): LeadsStatsResponseOutput["historicalData"] {
     const emptyData = {
       name: "leads.admin.stats.error" as const,
       type: "line" as ChartType,
@@ -3248,4 +3311,5 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   }
 }
 
-export const leadsStatsRepository: LeadsStatsRepository = new LeadsStatsRepositoryImpl();
+export const leadsStatsRepository: LeadsStatsRepository =
+  new LeadsStatsRepositoryImpl();

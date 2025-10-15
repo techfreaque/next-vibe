@@ -5,7 +5,6 @@
 
 import { z } from "zod";
 
-import { EmailCampaignStage, EmailJourneyVariant } from "../../../leads/enum";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -17,14 +16,12 @@ import { createEndpoint } from "../../../system/unified-ui/cli/vibe/endpoints/en
 import {
   objectField,
   requestDataField,
-  requestResponseField,
   responseArrayField,
   responseField,
 } from "../../../system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "../../../user/user-roles/enum";
 import { SortOrder, SortOrderOptions } from "../../messages/enum";
 import {
-  CampaignType,
   CampaignTypeFilter,
   CampaignTypeFilterOptions,
   SmtpAccountSortField,
@@ -35,7 +32,6 @@ import {
   SmtpHealthStatus,
   SmtpHealthStatusFilter,
   SmtpHealthStatusFilterOptions,
-  SmtpSecurityType,
 } from "../enum";
 
 const { GET } = createEndpoint({
@@ -55,7 +51,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.emails.smtpClient.list.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: true, response: true },
+    { request: "data", response: true },
     {
       // === REQUEST FIELDS (Filters) ===
       campaignType: requestDataField(
@@ -168,15 +164,15 @@ const { GET } = createEndpoint({
       accounts: responseArrayField(
         {
           type: WidgetType.DATA_TABLE,
-          title:
-            "app.api.v1.core.emails.smtpClient.list.response.accounts.title",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          columns: [],
         },
         objectField(
           {
             type: WidgetType.CONTAINER,
             title:
               "app.api.v1.core.emails.smtpClient.list.response.account.title",
+            description:
+              "app.api.v1.core.emails.smtpClient.list.response.account.description",
             layout: { type: LayoutType.GRID, columns: 12 },
           },
           { response: true },
@@ -200,16 +196,14 @@ const { GET } = createEndpoint({
             status: responseField(
               {
                 type: WidgetType.BADGE,
-                content:
-                  "app.api.v1.core.emails.smtpClient.list.response.account.status",
+                text: "app.api.v1.core.emails.smtpClient.list.response.account.status",
               },
               z.nativeEnum(SmtpAccountStatus),
             ),
             healthCheckStatus: responseField(
               {
                 type: WidgetType.BADGE,
-                content:
-                  "app.api.v1.core.emails.smtpClient.list.response.account.healthStatus",
+                text: "app.api.v1.core.emails.smtpClient.list.response.account.healthStatus",
               },
               z.nativeEnum(SmtpHealthStatus).nullable(),
             ),
@@ -254,6 +248,8 @@ const { GET } = createEndpoint({
           type: WidgetType.CONTAINER,
           title:
             "app.api.v1.core.emails.smtpClient.list.response.pagination.title",
+          description:
+            "app.api.v1.core.emails.smtpClient.list.response.pagination.description",
           layout: { type: LayoutType.GRID, columns: 12 },
         },
         { response: true },
@@ -307,10 +303,36 @@ const { GET } = createEndpoint({
       description:
         "app.api.v1.core.emails.smtpClient.list.errors.unauthorized.description",
     },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "app.api.v1.core.emails.smtpClient.list.errors.forbidden.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.list.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "app.api.v1.core.emails.smtpClient.list.errors.notFound.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.list.errors.notFound.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "app.api.v1.core.emails.smtpClient.list.errors.conflict.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.list.errors.conflict.description",
+    },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.v1.core.emails.smtpClient.list.errors.server.title",
       description:
         "app.api.v1.core.emails.smtpClient.list.errors.server.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "app.api.v1.core.emails.smtpClient.list.errors.networkError.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.list.errors.networkError.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title:
+        "app.api.v1.core.emails.smtpClient.list.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.emails.smtpClient.list.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.v1.core.emails.smtpClient.list.errors.unknown.title",
@@ -328,21 +350,7 @@ const { GET } = createEndpoint({
   // === EXAMPLES ===
   examples: {
     requests: {
-      default: {
-        campaignType: CampaignTypeFilter.ALL,
-        status: SmtpAccountStatusFilter.ACTIVE,
-        page: 1,
-        limit: 20,
-      },
-      filtered: {
-        campaignType: CampaignTypeFilter.LEAD_CAMPAIGN,
-        status: SmtpAccountStatusFilter.ACTIVE,
-        search: "campaign",
-        sortBy: SmtpAccountSortField.PRIORITY,
-        sortOrder: SortOrder.DESC,
-        page: 1,
-        limit: 10,
-      },
+      default: {},
     },
     responses: {
       default: {

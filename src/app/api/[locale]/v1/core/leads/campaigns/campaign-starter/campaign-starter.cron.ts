@@ -13,49 +13,66 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import {
+  type CronSettings,
   getDefaultConfig,
   getDefaultCronSettings,
 } from "./campaign-starter-config/default-config";
 import { campaignStarterConfigRepository } from "./campaign-starter-config/repository";
-import { distributionRepository } from "./distribution/repository";
 import { campaignStarterRepository } from "./repository";
 import {
   campaignStarterConfigSchema,
   type CampaignStarterConfigType,
-  campaignStarterResultSchema,
   type CampaignStarterResultType,
 } from "./types";
 
+// System user for cron tasks (public token without user ID)
+const SYSTEM_USER: JwtPayloadType = {
+  isPublic: true,
+};
+
 // Define task execution types inline
 interface TaskLogger {
-  info: (message: string, meta?: unknown) => void;
-  warn: (message: string, meta?: unknown) => void;
-  error: (message: string, meta?: unknown) => void;
-  debug: (message: string, meta?: unknown) => void;
+  info: (
+    message: string,
+    meta?: Record<string, string | number | boolean>,
+  ) => void;
+  warn: (
+    message: string,
+    meta?: Record<string, string | number | boolean>,
+  ) => void;
+  error: (
+    message: string,
+    meta?: Record<string, string | number | boolean>,
+  ) => void;
+  debug: (
+    message: string,
+    meta?: Record<string, string | number | boolean>,
+  ) => void;
+  vibe: (
+    message: string,
+    meta?: Record<string, string | number | boolean>,
+  ) => void;
+  isDebugEnabled: boolean;
 }
 
 interface CronTaskExecutionContext {
   taskId: string;
   taskName: string;
-  config: Record<string, unknown>;
+  config: CampaignStarterConfigType;
   logger: TaskLogger;
   startTime: Date;
   isDryRun: boolean;
   isManual: boolean;
 }
 
-interface CronTaskDefinition {
+interface CronTaskDefinition extends CronSettings {
   name: string;
   description: string;
-  schedule: string;
-  enabled: boolean;
-  priority: string;
-  timeout?: number;
-  retries?: number;
-  defaultConfig: Record<string, unknown>;
+  defaultConfig: CampaignStarterConfigType;
 }
 
 /**
@@ -66,56 +83,46 @@ interface CronTaskDefinition {
 /**
  * Campaign Starter Cron Task Definition
  */
-export const taskDefinition: CronTaskDefinition<
-  CampaignStarterConfigType,
-  CampaignStarterResultType
-> = {
+export const taskDefinition: CronTaskDefinition = {
   // Task metadata
   name: "lead-campaign-starter",
   description:
     "Start campaigns for new leads by transitioning them to PENDING status",
-  version: "1.0.0",
 
   // Scheduling and execution configuration - environment-specific
   ...getDefaultCronSettings(),
 
   // Task-specific configuration
   defaultConfig: getDefaultConfig(),
-
-  // Validation schemas
-  configSchema: campaignStarterConfigSchema,
-  resultSchema: campaignStarterResultSchema,
-
-  // Task categories and metadata
-  tags: ["campaigns", "leads", "automation"],
-  dependencies: [],
-  monitoring: {
-    alertOnFailure: true,
-    alertOnLongExecution: true,
-    maxExecutionTime: getDefaultCronSettings().timeout,
-  },
-
-  // Documentation
-  documentation: {
-    purpose: "Initiates email campaigns for new leads during business hours",
-    impact:
-      "Transitions leads from NEW to PENDING status for email campaign processing",
-    rollback: "No rollback needed - status changes are tracked in database",
-  },
 };
 
 /**
  * Campaign Starter Task Execution Function
  */
 export async function execute(
-  context: CronTaskExecutionContext<CampaignStarterConfigType>,
+  context: CronTaskExecutionContext,
 ): Promise<ResponseType<CampaignStarterResultType>> {
   const startTime = Date.now();
   const { logger, taskId } = context;
 
   try {
     // Ensure config exists in database and get current config
-    const config = await campaignStarterConfigRepository.ensureConfigExists();
+    const configResult =
+      await campaignStarterConfigRepository.ensureConfigExists(
+        SYSTEM_USER,
+        "en-GLOBAL",
+        logger,
+      );
+
+    if (!configResult.success || !configResult.data) {
+      return createErrorResponse(
+        "leadsErrors.campaigns.common.error.server.title",
+        ErrorResponseTypes.INTERNAL_ERROR,
+        { error: "Failed to load configuration" },
+      );
+    }
+
+    const config = configResult.data;
     const now = new Date();
 
     // Check if current time is within enabled hours and days
@@ -159,19 +166,21 @@ export async function execute(
 
     // TODO: Update distribution calculation to use repository
     // const distribution = calculateDistribution(config, taskDefinition.schedule);
-    const distribution = { runsPerWeek: 168, runsPerDay: 24 }; // Temporary placeholder
+    // const distribution = { runsPerWeek: 168, runsPerDay: 24 }; // Temporary placeholder - unused for now
 
     // Process each configured locale
     for (const [localeKey, weeklyQuota] of Object.entries(
       config.leadsPerWeek,
     )) {
       const locale = localeKey as CountryLanguage;
+      const weeklyQuotaNum = typeof weeklyQuota === "number" ? weeklyQuota : 0;
 
       // TODO: Update locale quota calculation to use repository
       // const localeInfo = await calculateLocaleQuota(locale, weeklyQuota, config, distribution, now);
       const localeInfo = {
-        baseLeadsPerRun: weeklyQuota / 7,
+        baseLeadsPerRun: weeklyQuotaNum / 7,
         adjustedLeadsPerRun: 0,
+        failedLeadsCount: 0,
       }; // Temporary placeholder
 
       // TODO: Update failed leads count to use repository
@@ -217,7 +226,7 @@ export async function execute(
     });
 
     return createErrorResponse(
-      "app.api.errors.campaign_starter_task_failed",
+      "leadsErrors.campaigns.common.error.server.title",
       ErrorResponseTypes.INTERNAL_ERROR,
       { error: errorMessage, executionTimeMs },
     );
@@ -228,7 +237,7 @@ export async function execute(
  * Campaign Starter Task Validation Function
  */
 export function validate(
-  context: CronTaskExecutionContext<CampaignStarterConfigType>,
+  context: CronTaskExecutionContext,
 ): ResponseType<boolean> {
   const { config, logger } = context;
 
@@ -236,34 +245,38 @@ export function validate(
     // Validate configuration
     const validation = campaignStarterConfigSchema.safeParse(config);
     if (!validation.success) {
-      const errorMessage = validation.error.errors
-        .map((err) => `${err.path.join(".")}: ${err.message}`)
-        .join(", ");
+      const errorDetails = validation.error.issues.map(
+        (issue) => `${issue.path.join(".")}: ${issue.message}`,
+      );
+      const errorMessage = errorDetails.join(", ");
 
       logger.error("Campaign starter configuration validation failed", {
-        errorCount: validation.error.errors.length,
+        errorCount: validation.error.issues.length,
         errorMessage: errorMessage,
       });
 
       return createErrorResponse(
-        "app.api.errors.task_validation_failed",
+        "leadsErrors.campaigns.common.error.validation.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: errorMessage },
       );
     }
 
+    // Get typed config after successful validation
+    const typedConfig = validation.data;
+
     // Validate business logic
-    if (config.enabledHours.start >= config.enabledHours.end) {
+    if (typedConfig.enabledHours.start >= typedConfig.enabledHours.end) {
       return createErrorResponse(
-        "app.api.errors.task_validation_failed",
+        "leadsErrors.campaigns.common.error.validation.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: "Start hour must be less than end hour" },
       );
     }
 
-    if (config.enabledDays.length === 0) {
+    if (typedConfig.enabledDays.length === 0) {
       return createErrorResponse(
-        "app.api.errors.task_validation_failed",
+        "leadsErrors.campaigns.common.error.validation.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: "At least one enabled day must be specified" },
       );
@@ -275,7 +288,7 @@ export function validate(
     logger.error("Campaign starter validation error", { error: errorMessage });
 
     return createErrorResponse(
-      "app.api.errors.task_validation_failed",
+      "leadsErrors.campaigns.common.error.validation.title",
       ErrorResponseTypes.INTERNAL_ERROR,
       { error: errorMessage },
     );
@@ -286,7 +299,7 @@ export function validate(
  * Campaign Starter Task Rollback Function
  */
 export function rollback(
-  context: CronTaskExecutionContext<CampaignStarterConfigType>,
+  context: CronTaskExecutionContext,
 ): ResponseType<boolean> {
   const { logger } = context;
 

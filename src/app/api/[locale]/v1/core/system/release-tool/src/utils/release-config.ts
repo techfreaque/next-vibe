@@ -6,6 +6,29 @@ import { logger, loggerError } from "./logger.js";
 
 export const DEFAULT_CONFIG_PATH = "release.config.ts";
 
+/**
+ * Type guard to validate if an imported module has the expected ReleaseConfig structure
+ */
+function isReleaseConfigModule(
+  module: unknown,
+): module is { default: ReleaseConfig } {
+  if (typeof module !== "object" || module === null) {
+    return false;
+  }
+  if (!("default" in module)) {
+    return false;
+  }
+  const defaultExport = (module as { default: unknown }).default;
+  if (typeof defaultExport !== "object" || defaultExport === null) {
+    return false;
+  }
+  if (!("packages" in defaultExport)) {
+    return false;
+  }
+  const packages = (defaultExport as { packages: unknown }).packages;
+  return Array.isArray(packages);
+}
+
 // async function getCompiledConfigPath(configPath: string): Promise<string> {
 //   const outputFileName = `release.config.tmp.${Math.round(Math.random() * 100000)}.cjs`;
 //   const outputDir = dirname(configPath);
@@ -69,28 +92,25 @@ export async function loadConfig(configPath: string): Promise<ReleaseConfig> {
   const resolvedConfigPath = resolve(process.cwd(), configPath);
 
   if (!existsSync(resolvedConfigPath)) {
-    // eslint-disable-next-line no-restricted-syntax
     throw new Error(`Config file not found: ${resolvedConfigPath}`);
   }
 
   try {
     // const compiledConfigPath = await getCompiledConfigPath(resolvedConfigPath);
-    const module = (await import(`file://${resolvedConfigPath}`)) as {
-      default: ReleaseConfig;
-    };
-    const config = module.default;
-    // cleanCompiledConfig(compiledConfigPath);
+    const importedModule = await import(`file://${resolvedConfigPath}`);
 
-    if (!config || !Array.isArray(config.packages)) {
-      // eslint-disable-next-line no-restricted-syntax
+    if (!isReleaseConfigModule(importedModule)) {
       throw new Error(
         "Invalid config format. Ensure the config exports a default object with a 'packages' array. Check the docs for more info.",
       );
     }
+
+    const config = importedModule.default;
+    // cleanCompiledConfig(compiledConfigPath);
+
     return config;
   } catch (error) {
     loggerError("Error loading config:", error);
-    // eslint-disable-next-line no-restricted-syntax
     throw error;
   }
 }

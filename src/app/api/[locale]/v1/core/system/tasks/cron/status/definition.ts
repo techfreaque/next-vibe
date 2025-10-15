@@ -5,7 +5,13 @@
 
 import { z } from "zod";
 
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import {
   objectField,
@@ -13,14 +19,8 @@ import {
   responseArrayField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  WidgetType,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
 
-import { UserRoleValue } from "../../../../user/user-roles/enum";
+import { UserRole } from "../../../../user/user-roles/enum";
 
 /**
  * GET endpoint definition - Get cron status
@@ -74,7 +74,7 @@ const cronStatusGetEndpoint = createEndpoint({
     },
   },
   successTypes: {
-    title: "common.success",
+    title: "app.api.v1.core.system.tasks.cron.status.success.title",
     description: "tasks.runner.description",
   },
 
@@ -114,7 +114,7 @@ const cronStatusGetEndpoint = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "common.success",
+          content: "app.api.v1.core.system.tasks.cron.status.success.content",
         },
         z.boolean(),
       ),
@@ -286,25 +286,12 @@ export { cronStatusGetEndpoint };
 const endpoints = { GET: cronStatusGetEndpoint };
 export default endpoints;
 
-// Export types for repository
-export interface CronStatusRequestInput {
-  taskId?: string;
-  detailed?: boolean;
-}
-export type CronStatusRequestOutput = CronStatusRequestInput;
-export interface CronStatusResponseInput {
-  success: boolean;
-  systemStatus: "healthy" | "warning" | "critical" | "unknown";
-  activeTasks: number;
-  totalTasks: number;
-  uptime: string;
-  tasks?: Array<{
-    id: string;
-    name: string;
-    status: string;
-    lastRun: string | null;
-    nextRun: string | null;
-    schedule: string;
-  }>;
-}
-export type CronStatusResponseOutput = CronStatusResponseInput;
+// Export types for repository using proper Output types from endpoint
+export type CronStatusRequestInput =
+  typeof cronStatusGetEndpoint.GET.types.RequestInput;
+export type CronStatusRequestOutput =
+  typeof cronStatusGetEndpoint.GET.types.RequestOutput;
+export type CronStatusResponseInput =
+  typeof cronStatusGetEndpoint.GET.types.ResponseInput;
+export type CronStatusResponseOutput =
+  typeof cronStatusGetEndpoint.GET.types.ResponseOutput;

@@ -141,7 +141,6 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
 
 /* eslint-disable prettier/prettier */
 /* eslint-disable simple-import-sort/imports */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import type { Task, TaskRegistry } from "../types/repository";
 import { UnifiedTaskRunnerRepositoryImpl } from "../unified-runner/repository";
@@ -157,19 +156,19 @@ const cronTasks = allTasks.filter((task): task is Task & { type: 'cron' } => tas
 const sideTasks = allTasks.filter((task): task is Task & { type: 'side' } => task.type === 'side');
 const taskRunners = allTasks.filter((task): task is Task & { type: 'task-runner' } => task.type === 'task-runner');
 
-const tasksByCategory = allTasks.reduce((acc, task) => {
-  const category = task.category as string;
+const tasksByCategory: Record<string, Task[]> = allTasks.reduce((acc, task) => {
+  const category = String(task.category);
   if (!acc[category]) {
     acc[category] = [];
   }
   acc[category].push(task);
   return acc;
-}, {} as Record<string, Task[]>);
+}, {});
 
-const tasksByName = allTasks.reduce((acc, task) => {
+const tasksByName: Record<string, Task> = allTasks.reduce((acc, task) => {
   acc[task.name] = task;
   return acc;
-}, {} as Record<string, Task>);
+}, {});
 
 // Create single unified task runner instance as per spec.md
 const taskRunner = new UnifiedTaskRunnerRepositoryImpl();

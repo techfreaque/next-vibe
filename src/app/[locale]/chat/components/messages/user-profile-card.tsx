@@ -5,8 +5,9 @@
 
 "use client";
 
-import type { ChatMessage } from "../../lib/storage/types";
 import { cn } from "next-vibe/shared/utils";
+
+import type { ChatMessage } from "../../lib/storage/types";
 import { formatRelativeTime } from "../../lib/utils/formatting";
 
 interface UserProfileCardProps {
@@ -25,9 +26,7 @@ export function UserProfileCard({
   onPostClick,
 }: UserProfileCardProps) {
   // Get all messages from this user
-  const userMessages = messages.filter(
-    (m) => m.author?.id === userId
-  );
+  const userMessages = messages.filter((m) => m.author?.id === userId);
 
   const postCount = userMessages.length;
   const recentPosts = userMessages.slice(-5).reverse(); // Last 5 posts, newest first
@@ -39,7 +38,7 @@ export function UserProfileCard({
         "w-80 p-4 rounded-lg",
         "bg-background/95 backdrop-blur-md",
         "border border-border shadow-2xl",
-        "animate-in fade-in-0 zoom-in-95 duration-150"
+        "animate-in fade-in-0 zoom-in-95 duration-150",
       )}
       style={{
         left: `${position.x}px`,
@@ -49,9 +48,7 @@ export function UserProfileCard({
       {/* Header */}
       <div className="flex items-center gap-3 mb-3 pb-3 border-b border-border/50">
         <div className="flex-1">
-          <div className="font-bold text-sm text-foreground">
-            {userName}
-          </div>
+          <div className="font-bold text-sm text-foreground">{userName}</div>
           <div className="text-xs text-muted-foreground">
             {postCount} {postCount === 1 ? "post" : "posts"}
           </div>
@@ -90,4 +87,3 @@ export function UserProfileCard({
     </div>
   );
 }
-

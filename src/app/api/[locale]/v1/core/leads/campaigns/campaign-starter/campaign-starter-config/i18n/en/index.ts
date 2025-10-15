@@ -21,6 +21,44 @@ export const translations = {
       retries: "Retries",
       retryDelay: "Retry Delay",
     },
+    errors: {
+      validation: {
+        title: "Validation Error",
+        description: "Invalid request parameters",
+      },
+      unauthorized: {
+        title: "Unauthorized",
+        description: "Authentication required",
+      },
+      server: {
+        title: "Server Error",
+        description: "Internal server error occurred",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unknown error occurred",
+      },
+      network: {
+        title: "Network Error",
+        description: "Network error occurred",
+      },
+      forbidden: {
+        title: "Forbidden",
+        description: "Access forbidden",
+      },
+      notFound: {
+        title: "Not Found",
+        description: "Resource not found",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
+      },
+      conflict: {
+        title: "Conflict",
+        description: "Data conflict occurred",
+      },
+    },
     success: {
       title: "Config Retrieved Successfully",
       description: "Campaign starter configuration retrieved successfully",
@@ -44,10 +82,25 @@ export const translations = {
     enabledDays: {
       label: "Enabled Days",
       description: "Days of the week when campaigns are enabled",
+      monday: "Monday",
+      tuesday: "Tuesday",
+      wednesday: "Wednesday",
+      thursday: "Thursday",
+      friday: "Friday",
+      saturday: "Saturday",
+      sunday: "Sunday",
     },
     enabledHours: {
       label: "Enabled Hours",
       description: "Hours of the day when campaigns are enabled",
+      start: {
+        label: "Start Hour",
+        description: "Hour of the day when campaigns start (0-23)",
+      },
+      end: {
+        label: "End Hour",
+        description: "Hour of the day when campaigns end (0-23)",
+      },
     },
     leadsPerWeek: {
       label: "Leads Per Week",
@@ -113,6 +166,10 @@ export const translations = {
       conflict: {
         title: "Conflict",
         description: "Data conflict occurred",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
       },
     },
     success: {

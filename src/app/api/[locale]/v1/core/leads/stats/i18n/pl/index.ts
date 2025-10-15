@@ -26,7 +26,8 @@ export const translations: typeof enTranslations = {
     },
     server: {
       title: "Błąd serwera",
-      description: "Wystąpił wewnętrzny błąd serwera podczas pobierania statystyk leadów",
+      description:
+        "Wystąpił wewnętrzny błąd serwera podczas pobierania statystyk leadów",
     },
     unknown: {
       title: "Nieznany błąd",
@@ -42,7 +43,8 @@ export const translations: typeof enTranslations = {
     },
     notFound: {
       title: "Brak danych",
-      description: "Nie znaleziono danych statystycznych dla określonych kryteriów",
+      description:
+        "Nie znaleziono danych statystycznych dla określonych kryteriów",
     },
     conflict: {
       title: "Konflikt",

@@ -19,14 +19,16 @@ import {
 import type React from "react";
 import { useCallback } from "react";
 
-import type { UserResponseType } from "@/app/api/[locale]/v1/core/users/user/[id]/definition";
+import type { UserListResponseOutput } from "@/app/api/[locale]/v1/core/users/list/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+type UserType = UserListResponseOutput["response"]["users"][number];
+
 interface UsersTableProps {
   locale: CountryLanguage;
-  users: UserResponseType[];
+  users: UserType[];
   isLoading: boolean;
 }
 
@@ -54,7 +56,7 @@ export function UsersTable({
 
   // Get status configuration
   const getStatusConfig = (
-    user: UserResponseType,
+    user: UserType,
   ): {
     variant: "default" | "destructive" | "secondary";
     label: TranslationKey;
@@ -86,8 +88,6 @@ export function UsersTable({
               <TableHead>{t("users.admin.table.name")}</TableHead>
               <TableHead>{t("users.admin.table.email")}</TableHead>
               <TableHead>{t("users.admin.table.status")}</TableHead>
-              <TableHead>{t("users.admin.table.roles")}</TableHead>
-              <TableHead>{t("users.admin.table.company")}</TableHead>
               <TableHead>{t("users.admin.table.created")}</TableHead>
               <TableHead className="text-right">
                 {t("users.admin.table.actions")}
@@ -97,12 +97,6 @@ export function UsersTable({
           <TableBody>
             {Array.from({ length: 5 }).map((_, index) => (
               <TableRow key={index}>
-                <TableCell>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                </TableCell>
-                <TableCell>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                </TableCell>
                 <TableCell>
                   <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                 </TableCell>
@@ -162,12 +156,6 @@ export function UsersTable({
             <TableHead className="min-w-[120px]">
               {t("users.admin.table.status")}
             </TableHead>
-            <TableHead className="min-w-[150px]">
-              {t("users.admin.table.roles")}
-            </TableHead>
-            <TableHead className="min-w-[150px]">
-              {t("users.admin.table.company")}
-            </TableHead>
             <TableHead className="min-w-[120px]">
               {t("users.admin.table.created")}
             </TableHead>
@@ -177,7 +165,7 @@ export function UsersTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map((user: UserResponseType) => {
+          {users.map((user: UserType) => {
             const statusConfig = getStatusConfig(user);
             return (
               <TableRow key={user.id}>
@@ -186,7 +174,7 @@ export function UsersTable({
                     href={`/${locale}/admin/users/${user.id}/edit`}
                     className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   >
-                    {user.firstName} {user.lastName}
+                    {user.privateName || user.publicName}
                   </Link>
                 </TableCell>
                 <TableCell>{user.email}</TableCell>
@@ -194,24 +182,6 @@ export function UsersTable({
                   <Badge variant={statusConfig.variant}>
                     {t(statusConfig.label)}
                   </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-wrap gap-1">
-                    {user.userRoles.map((role) => (
-                      <Badge
-                        key={role.id}
-                        variant="outline"
-                        className="text-xs"
-                      >
-                        {t(role.role)}
-                      </Badge>
-                    ))}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="max-w-[150px] truncate" title={user.company}>
-                    {user.company}
-                  </div>
                 </TableCell>
                 <TableCell>
                   <div className="text-sm text-gray-500 dark:text-gray-400">

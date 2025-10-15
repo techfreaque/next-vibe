@@ -6,12 +6,10 @@
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
-import { Currencies } from "@/i18n/core/config";
 import { registerSeed } from "@/packages/next-vibe/server/db/seed-manager";
 
 import type { PaymentCreateRequestOutput } from "./definition";
-import { CheckoutMode, PaymentMethodType, PaymentProvider } from "./enum";
-import { paymentRepository } from "./repository";
+import { CheckoutMode, PaymentMethodType } from "./enum";
 
 /**
  * Helper function to create payment seed data
@@ -20,17 +18,12 @@ function createPaymentSeed(
   overrides?: Partial<PaymentCreateRequestOutput>,
 ): PaymentCreateRequestOutput {
   return {
+    priceId: "price_test_default",
     mode: CheckoutMode.PAYMENT,
-    amount: 29.99,
-    currency: Currencies.USD,
     paymentMethodTypes: [PaymentMethodType.CARD],
     successUrl: "https://example.com/success",
     cancelUrl: "https://example.com/cancel",
     customerEmail: "test@example.com",
-    metadata: {
-      environment: "development",
-      module: "payment-seeds",
-    },
     ...overrides,
   };
 }
@@ -60,34 +53,19 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     // Create sample payment sessions for testing
     const paymentTestCases = [
       createPaymentSeed({
+        priceId: "price_premium_feature",
         mode: CheckoutMode.PAYMENT,
-        amount: 19.99,
-        currency: Currencies.USD,
         customerEmail: demoUser.email,
-        metadata: {
-          type: "one-time-payment",
-          product: "premium-feature",
-        },
       }),
       createPaymentSeed({
+        priceId: "price_monthly_professional",
         mode: CheckoutMode.SUBSCRIPTION,
-        amount: 29.99,
-        currency: Currencies.USD,
         customerEmail: demoUser.email,
-        metadata: {
-          type: "subscription",
-          plan: "monthly-professional",
-        },
       }),
       createPaymentSeed({
+        priceId: "price_setup",
         mode: CheckoutMode.SETUP,
-        amount: 0,
-        currency: Currencies.USD,
         customerEmail: demoUser.email,
-        metadata: {
-          type: "payment-method-setup",
-          purpose: "future-payments",
-        },
       }),
     ];
 
@@ -137,25 +115,15 @@ export async function test(logger: EndpointLogger): Promise<void> {
     const testPaymentCases = [
       // Successful payment test case
       createPaymentSeed({
+        priceId: "price_test_success",
         mode: CheckoutMode.PAYMENT,
-        amount: 9.99,
-        currency: Currencies.USD,
         customerEmail: testUser1.email,
-        metadata: {
-          testCase: "successful-payment",
-          userId: testUser1.id,
-        },
       }),
       // Failed payment test case
       createPaymentSeed({
+        priceId: "price_test_failed",
         mode: CheckoutMode.PAYMENT,
-        amount: 0.5, // Small amount that might trigger test failures
-        currency: Currencies.USD,
         customerEmail: testUser2.email,
-        metadata: {
-          testCase: "failed-payment",
-          userId: testUser2.id,
-        },
       }),
     ];
 
@@ -173,7 +141,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
 /**
  * Production seed function for payment module
  */
-export async function prod(logger: EndpointLogger): Promise<void> {
+export function prod(logger: EndpointLogger): void {
   logger.debug("🌱 Seeding payment data for production environment");
 
   try {

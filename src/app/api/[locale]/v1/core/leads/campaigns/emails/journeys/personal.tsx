@@ -3,6 +3,8 @@
  * Emphasizes personal connection, human expertise, and relationship building
  */
 
+import React from "react";
+
 import {
   HumanCTAButton,
   HumanEmailLayout,

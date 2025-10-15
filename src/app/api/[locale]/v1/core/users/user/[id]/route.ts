@@ -5,9 +5,23 @@
 
 import "server-only";
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
+import type { ApiHandlerProps } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/types";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 
+import type {
+  UserDeleteRequestOutput,
+  UserDeleteResponseOutput,
+  UserDeleteUrlParamsTypeOutput,
+  UserGetRequestOutput,
+  UserGetResponseOutput,
+  UserGetUrlParamsTypeOutput,
+  UserPutRequestOutput,
+  UserPutResponseOutput,
+  UserPutUrlParamsTypeOutput,
+} from "./definition";
 import definitions from "./definition";
 import { userByIdRepository } from "./repository";
 
@@ -15,34 +29,52 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: async ({ urlVariables, user, locale, logger }) => {
+    handler: async (
+      props: ApiHandlerProps<
+        UserGetRequestOutput,
+        UserGetUrlParamsTypeOutput,
+        typeof definitions.GET.allowedRoles
+      >,
+    ): Promise<ResponseType<UserGetResponseOutput>> => {
       return await userByIdRepository.getUserById(
-        { id: urlVariables.id },
-        user,
-        locale,
-        logger,
+        { id: props.urlVariables.id },
+        props.user,
+        props.locale,
+        props.logger,
       );
     },
   },
   [Methods.PUT]: {
     email: undefined,
-    handler: async ({ data, urlVariables, user, logger }) => {
+    handler: async (
+      props: ApiHandlerProps<
+        UserPutRequestOutput,
+        UserPutUrlParamsTypeOutput,
+        typeof definitions.PUT.allowedRoles
+      >,
+    ): Promise<ResponseType<UserPutResponseOutput>> => {
       return await userByIdRepository.updateUser(
-        data,
-        urlVariables.id,
-        user,
-        logger,
+        props.data,
+        props.urlVariables.id,
+        props.user,
+        props.logger,
       );
     },
   },
   [Methods.DELETE]: {
     email: undefined,
-    handler: async ({ urlVariables, user, locale, logger }) => {
+    handler: async (
+      props: ApiHandlerProps<
+        UserDeleteRequestOutput,
+        UserDeleteUrlParamsTypeOutput,
+        typeof definitions.DELETE.allowedRoles
+      >,
+    ): Promise<ResponseType<UserDeleteResponseOutput>> => {
       return await userByIdRepository.deleteUser(
-        { id: urlVariables.id },
-        user,
-        locale,
-        logger,
+        { id: props.urlVariables.id },
+        props.user,
+        props.locale,
+        props.logger,
       );
     },
   },

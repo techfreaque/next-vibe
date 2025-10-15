@@ -10,11 +10,8 @@ import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/e
 import { pulseStatusEndpoint } from "../definition";
 import { pulseHealthRepository } from "../repository";
 
-// Create endpoints object with just GET
-const endpoints = { GET: pulseStatusEndpoint };
-
 export const { GET, tools } = endpointsHandler({
-  endpoint: endpoints,
+  endpoint: pulseStatusEndpoint,
   [Methods.GET]: {
     handler: ({ user, locale, logger }) =>
       pulseHealthRepository.getPulseStatus(user, locale, logger),

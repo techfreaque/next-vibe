@@ -158,14 +158,15 @@ const { POST } = createEndpoint({
           layout: { columns: 12 },
           validation: { required: false },
         },
-        z.record(z.string()).optional(),
+        z.record(z.string(), z.string()).optional(),
       ),
 
       // RESPONSE FIELDS
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.payment.invoice.response.success" as const,
+          content:
+            "app.api.v1.core.payment.invoice.post.response.success" as const,
         },
         z.boolean(),
       ),
@@ -173,7 +174,8 @@ const { POST } = createEndpoint({
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.payment.invoice.response.message" as const,
+          content:
+            "app.api.v1.core.payment.invoice.post.response.message" as const,
         },
         z.string().nullable(),
       ),
@@ -383,9 +385,6 @@ const { POST } = createEndpoint({
           invoicePdf: "https://pay.stripe.com/invoice/acct_123/test_456/pdf",
           dueDate: "2024-02-01T00:00:00Z",
           paidAt: null,
-          metadata: {
-            project: "Website Development",
-          },
           createdAt: "2024-01-01T00:00:00Z",
           updatedAt: "2024-01-01T00:00:00Z",
         },

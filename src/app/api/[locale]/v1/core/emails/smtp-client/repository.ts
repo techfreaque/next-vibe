@@ -19,14 +19,15 @@ import { createTransport } from "nodemailer";
 import type { Address } from "nodemailer/lib/mailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
 
+import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
-import type { Countries, Languages } from "@/i18n/core/config";
+import type { Countries } from "@/i18n/core/config";
 
 import { emails } from "../messages/db";
 import { EmailStatus, EmailType } from "../messages/enum";
 import type { SmtpAccount } from "./db";
-import { db, smtpAccounts } from "./db";
+import { smtpAccounts } from "./db";
 import {
   CampaignType,
   SmtpAccountStatus,
@@ -35,11 +36,11 @@ import {
 } from "./enum";
 // Import types from definition.ts following standard pattern
 import type {
-  SmtpCapacityRequestTypeOutput,
-  SmtpCapacityResponseTypeOutput,
+  SmtpCapacityRequestOutput,
+  SmtpCapacityResponseOutput,
   SmtpSelectionCriteria,
-  SmtpSendRequestTypeOutput,
-  SmtpSendResponseTypeOutput,
+  SmtpSendRequestOutput,
+  SmtpSendResponseOutput,
 } from "./sending/definition";
 
 // Type alias for locale
@@ -53,18 +54,18 @@ export type { SmtpSelectionCriteria } from "./sending/definition";
  */
 export interface SmtpRepository {
   sendEmail(
-    data: SmtpSendRequestTypeOutput,
+    data: SmtpSendRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpSendResponseTypeOutput>>;
+  ): Promise<ResponseType<SmtpSendResponseOutput>>;
 
   getTotalSendingCapacity(
-    data: SmtpCapacityRequestTypeOutput,
+    data: SmtpCapacityRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpCapacityResponseTypeOutput>>;
+  ): Promise<ResponseType<SmtpCapacityResponseOutput>>;
 
   testConnection(
     data: { accountId: string },
@@ -88,11 +89,11 @@ class SmtpRepositoryImpl implements SmtpRepository {
    * Send email using database-configured SMTP account with retry and fallback support
    */
   async sendEmail(
-    data: SmtpSendRequestTypeOutput,
+    data: SmtpSendRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpSendResponseTypeOutput>> {
+  ): Promise<ResponseType<SmtpSendResponseOutput>> {
     try {
       logger.info("Sending email via SMTP service", {
         to: data.to,
@@ -112,7 +113,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
 
         if (isLeadCampaign) {
           return createErrorResponse(
-            "app.api.v1.core.emails.smtpClient.send.errors.no_account.title",
+            "app.api.v1.core.emails.smtpClient.sending.post.errors.noAccount.title",
             ErrorResponseTypes.NOT_FOUND,
             {
               campaignType: data.selectionCriteria.campaignType,
@@ -126,7 +127,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
           );
         } else {
           return createErrorResponse(
-            "app.api.v1.core.emails.smtpClient.send.errors.no_account.title",
+            "app.api.v1.core.emails.smtpClient.sending.post.errors.noAccount.title",
             ErrorResponseTypes.NOT_FOUND,
             {
               campaignType: data.selectionCriteria.campaignType,
@@ -185,9 +186,9 @@ class SmtpRepositoryImpl implements SmtpRepository {
     } catch (error) {
       logger.error("Critical error in email sending", error);
       return createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.send.errors.server.title",
+        "app.api.v1.core.emails.smtpClient.sending.post.errors.server.title",
         ErrorResponseTypes.EMAIL_ERROR,
-        parseError(error),
+        { error: parseError(error).message },
       );
     }
   }
@@ -196,11 +197,11 @@ class SmtpRepositoryImpl implements SmtpRepository {
    * Get total sending capacity across all active SMTP accounts
    */
   async getTotalSendingCapacity(
-    data: SmtpCapacityRequestTypeOutput,
+    data: SmtpCapacityRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpCapacityResponseTypeOutput>> {
+  ): Promise<ResponseType<SmtpCapacityResponseOutput>> {
     try {
       logger.info("Getting total sending capacity", { userId: user.id });
 
@@ -241,9 +242,9 @@ class SmtpRepositoryImpl implements SmtpRepository {
     } catch (error) {
       logger.error("Error getting total sending capacity", error);
       return createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.capacity.errors.server.title",
+        "app.api.v1.core.emails.smtpClient.capacity.post.errors.server.title",
         ErrorResponseTypes.EMAIL_ERROR,
-        parseError(error),
+        { error: parseError(error).message },
       );
     }
   }
@@ -271,7 +272,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
 
       if (!account) {
         return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.test.errors.not_found.title",
+          "app.api.v1.core.emails.smtpClient.test.post.errors.notFound.title",
           ErrorResponseTypes.NOT_FOUND,
           { accountId: data.accountId },
         );
@@ -295,9 +296,9 @@ class SmtpRepositoryImpl implements SmtpRepository {
       );
 
       return createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.test.errors.server.title",
+        "app.api.v1.core.emails.smtpClient.test.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
-        parseError(error),
+        { error: parseError(error).message },
       );
     }
   }
@@ -476,7 +477,10 @@ class SmtpRepositoryImpl implements SmtpRepository {
     const cacheKey = account.id;
 
     if (this.transportCache.has(cacheKey)) {
-      return this.transportCache.get(cacheKey)!;
+      const cachedTransport = this.transportCache.get(cacheKey);
+      if (cachedTransport) {
+        return cachedTransport;
+      }
     }
 
     try {
@@ -518,7 +522,11 @@ class SmtpRepositoryImpl implements SmtpRepository {
         parseError(error).message,
       );
 
-      throw new Error(parseError(error).message);
+      // Return error via exception - transport creation must succeed or fail
+      // Callers will handle the error and use fallback accounts if needed
+      throw new Error(
+        `SMTP transport creation failed: ${parseError(error).message}`,
+      );
     }
   }
 
@@ -526,13 +534,13 @@ class SmtpRepositoryImpl implements SmtpRepository {
    * Attempt to send email with retry logic for connection issues
    */
   private async attemptEmailSendWithRetry(
-    params: SmtpSendRequestTypeOutput,
+    params: SmtpSendRequestOutput,
     account: SmtpAccount,
     isFallback: boolean,
     logger: EndpointLogger,
     maxRetries = 2,
-  ): Promise<ResponseType<SmtpSendResponseTypeOutput>> {
-    let lastError: ResponseType<SmtpSendResponseTypeOutput> | null = null;
+  ): Promise<ResponseType<SmtpSendResponseOutput>> {
+    let lastError: ResponseType<SmtpSendResponseOutput> | null = null;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
@@ -594,7 +602,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
       } catch (error) {
         const errorMessage = parseError(error).message;
         lastError = createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.send.errors.server.title",
+          "app.api.v1.core.emails.smtpClient.sending.post.errors.server.title",
           ErrorResponseTypes.EMAIL_ERROR,
           {
             error: errorMessage,
@@ -619,7 +627,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
     return (
       lastError ||
       createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.send.errors.server.title",
+        "app.api.v1.core.emails.smtpClient.sending.post.errors.server.title",
         ErrorResponseTypes.EMAIL_ERROR,
         {
           accountId: account.id,
@@ -641,10 +649,10 @@ class SmtpRepositoryImpl implements SmtpRepository {
    * Perform the actual email sending with an account
    */
   private async performEmailSend(
-    params: SmtpSendRequestTypeOutput,
+    params: SmtpSendRequestOutput,
     account: SmtpAccount,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpSendResponseTypeOutput>> {
+  ): Promise<ResponseType<SmtpSendResponseOutput>> {
     try {
       // Check rate limits (skip if this is part of a pre-validated batch)
       if (!params.skipRateLimitCheck) {
@@ -696,7 +704,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
         const rejectedReason =
           typeof result.rejected[0] === "string"
             ? result.rejected[0]
-            : "Email rejected by server";
+            : "app.api.v1.core.emails.smtpClient.sending.post.errors.rejected.defaultReason";
 
         await this.updateAccountHealth(
           account.id,
@@ -706,7 +714,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
         );
 
         return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.send.errors.rejected.title",
+          "app.api.v1.core.emails.smtpClient.sending.post.errors.rejected.title",
           ErrorResponseTypes.EMAIL_ERROR,
           {
             recipient: params.to,
@@ -721,11 +729,11 @@ class SmtpRepositoryImpl implements SmtpRepository {
           account.id,
           false,
           logger,
-          "No recipients accepted",
+          "app.api.v1.core.emails.smtpClient.sending.post.errors.noRecipients.defaultReason",
         );
 
         return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.send.errors.no_recipients.title",
+          "app.api.v1.core.emails.smtpClient.sending.post.errors.noRecipients.title",
           ErrorResponseTypes.EMAIL_ERROR,
           {
             recipient: params.to,
@@ -794,7 +802,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
       }
 
       return createErrorResponse(
-        "app.api.v1.core.emails.smtpClient.send.errors.server.title",
+        "app.api.v1.core.emails.smtpClient.sending.post.errors.server.title",
         ErrorResponseTypes.EMAIL_ERROR,
         {
           error: parseError(error).message,
@@ -856,14 +864,14 @@ class SmtpRepositoryImpl implements SmtpRepository {
 
       if (!canSend) {
         return createErrorResponse(
-          "app.api.v1.core.emails.smtpClient.send.errors.rate_limit.title",
+          "app.api.v1.core.emails.smtpClient.sending.post.errors.rateLimit.title",
           ErrorResponseTypes.VALIDATION_ERROR,
           {
             accountName: account.name,
-            limit: account.rateLimitPerHour,
-            current: emailsSentThisHour,
+            limit: account.rateLimitPerHour.toString(),
+            current: emailsSentThisHour.toString(),
             timeWindow: "hour",
-            remainingCapacity: 0,
+            remainingCapacity: "0",
           },
         );
       }
@@ -896,7 +904,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
       senderName: string;
       smtpAccountId: string;
       messageId: string;
-      campaignType: CampaignType | null;
+      campaignType: (typeof CampaignType)[keyof typeof CampaignType] | null;
       emailJourneyVariant: string | null;
       emailCampaignStage: string | null;
       leadId?: string;
@@ -938,8 +946,8 @@ class SmtpRepositoryImpl implements SmtpRepository {
    * Get email type from campaign type
    */
   private getEmailTypeFromCampaign(
-    campaignType: CampaignType | null,
-  ): EmailType {
+    campaignType: (typeof CampaignType)[keyof typeof CampaignType] | null,
+  ): (typeof EmailType)[keyof typeof EmailType] {
     switch (campaignType) {
       case CampaignType.LEAD_CAMPAIGN:
         return EmailType.LEAD_CAMPAIGN;
@@ -1023,12 +1031,14 @@ class SmtpRepositoryImpl implements SmtpRepository {
    * Close all cached transports
    */
   async closeAllTransports(): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const [accountId, transport] of this.transportCache.entries()) {
       try {
         await new Promise<void>((resolve) => {
           transport.close();
           resolve();
         });
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         // Ignore transport close errors
       }

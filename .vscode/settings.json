@@ -1,5 +1,5 @@
 {
-  "typescript.experimental.useTsgo": false,
+  "typescript.experimental.useTsgo": true,
   "cSpell.words": [
     "openeats",
     "sovendus",

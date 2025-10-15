@@ -92,4 +92,34 @@ export const translations: typeof enTranslations = {
       description: "Zostałeś pomyślnie zapisany do naszego newslettera",
     },
   },
+  repository: {
+    starting: "Rozpoczynanie subskrypcji newslettera",
+    linking_to_lead: "Łączenie subskrypcji newslettera z leadem",
+    lead_found: "Znaleziono lead dla subskrypcji newslettera",
+    lead_updated: "Zaktualizowano lead z danymi subskrypcji newslettera",
+    lead_update_failed:
+      "Nie udało się zaktualizować leada z danymi newslettera",
+    lead_not_found:
+      "Lead nie znaleziony lub nie kwalifikuje się do aktualizacji",
+    lead_linking_error: "Błąd podczas łączenia leada z newsletterem",
+    missing_lead_id: "Próba subskrypcji newslettera bez leadId",
+    already_subscribed: "Użytkownik już zasubskrybował newsletter",
+    reactivating: "Reaktywacja subskrypcji newslettera",
+    creating_new: "Tworzenie nowej subskrypcji newslettera",
+    created_successfully: "Pomyślnie utworzono subskrypcję newslettera",
+    subscription_failed: "Subskrypcja newslettera nie powiodła się",
+  },
+  sms: {
+    no_phone_number: "Brak numeru telefonu dla powitalnego SMS newslettera",
+    sending_welcome: "Wysyłanie powitalnego SMS do subskrybenta newslettera",
+    welcome_error: "Błąd wysyłania powitalnego SMS newslettera",
+    no_admin_phone:
+      "Brak skonfigurowanego numeru telefonu administratora, pomijanie powiadomienia SMS",
+    sending_admin_notification:
+      "Wysyłanie powiadomienia SMS administratora dla subskrypcji newslettera",
+    admin_notification_error: "Błąd wysyłania powiadomienia SMS administratora",
+  },
+  route: {
+    sms_failed_continuing: "Powiadomienia SMS nie powiodły się, kontynuowanie",
+  },
 };

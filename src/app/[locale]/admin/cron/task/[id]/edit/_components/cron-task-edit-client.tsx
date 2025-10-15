@@ -9,8 +9,9 @@ import { useRouter } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";
 import type React from "react";
 
-import type { CronTaskResponseType } from "@/app/api/[locale]/v1/core/system/tasks/cron/tasks/definition";
+import type { IndividualCronTaskType } from "@/app/api/[locale]/v1/core/system/tasks/cron/task/[id]/definition";
 import { useCronTaskEndpoint } from "@/app/api/[locale]/v1/core/system/tasks/cron/tasks/hooks";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -19,7 +20,7 @@ import { CronTaskEditForm } from "./cron-task-edit-form";
 interface CronTaskEditClientProps {
   taskId: string;
   locale: CountryLanguage;
-  initialData: CronTaskResponseType;
+  initialData: IndividualCronTaskType;
 }
 
 export function CronTaskEditClient({
@@ -30,11 +31,15 @@ export function CronTaskEditClient({
   const { t } = simpleT(locale);
   const router = useRouter();
 
-  // Get endpoint for form handling
-  const endpoint = useCronTaskEndpoint({
-    taskId,
-    enabled: true,
-  });
+  // Create logger and get endpoint for form handling
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const endpoint = useCronTaskEndpoint(
+    {
+      taskId,
+      enabled: true,
+    },
+    logger,
+  );
 
   const handleBack = (): void => {
     router.push(`/${locale}/admin/cron/tasks`);

@@ -17,12 +17,6 @@ import {
   type SQL,
   sql,
 } from "drizzle-orm";
-
-import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
-import { userRoles, users } from "@/app/api/[locale]/v1/core/user/db";
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -34,6 +28,12 @@ import {
   getDateRangeFromPreset,
 } from "next-vibe/shared/types/stats-filtering.schema";
 import { parseError } from "next-vibe/shared/utils";
+
+import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import { userRoles, users } from "@/app/api/[locale]/v1/core/user/db";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { UserRoleFilter, UserStatusFilter } from "../enum";
 
@@ -71,24 +71,16 @@ interface UsersStatsResponse {
     emailUnverifiedUsers: number;
     verificationRate: number;
   };
-  profileStats: {
-    complete: {
-      usersWithPhone: number;
-      usersWithBio: number;
-      usersWithWebsite: number;
-      usersWithJobTitle: number;
-      usersWithImage: number;
-    };
-    integration: {
-      usersWithStripeId: number;
-      usersWithoutStripeId: number;
-      stripeIntegrationRate: number;
-      usersWithLeadId: number;
-      usersWithoutLeadId: number;
-      leadAssociationRate: number;
-    };
+  integrationStats: {
+    usersWithStripeId: number;
+    usersWithoutStripeId: number;
+    stripeIntegrationRate: number;
+    usersWithLeadId: number;
+    usersWithoutLeadId: number;
+    leadAssociationRate: number;
   };
   roleDistribution: {
+    usersByRole: { [key: string]: number };
     publicUsers: number;
     customerUsers: number;
     partnerAdminUsers: number;
@@ -109,7 +101,6 @@ interface UsersStatsResponse {
     };
   };
   businessInsights: {
-    uniqueCompanies: number;
     generatedAt: string;
   };
 
@@ -121,23 +112,18 @@ interface UsersStatsResponse {
   emailVerifiedUsers: number;
   emailUnverifiedUsers: number;
   verificationRate: number;
-  usersWithPhone: number;
-  usersWithBio: number;
-  usersWithWebsite: number;
-  usersWithJobTitle: number;
-  usersWithImage: number;
   usersWithStripeId: number;
   usersWithoutStripeId: number;
   stripeIntegrationRate: number;
   usersWithLeadId: number;
   usersWithoutLeadId: number;
   leadAssociationRate: number;
+  usersByRole: { [key: string]: number };
   publicUsers: number;
   customerUsers: number;
   partnerAdminUsers: number;
   partnerEmployeeUsers: number;
   adminUsers: number;
-  uniqueCompanies: number;
   usersCreatedToday: number;
   usersCreatedThisWeek: number;
   usersCreatedThisMonth: number;
@@ -223,10 +209,9 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
       if (query.search) {
         whereConditions.push(
           or(
-            ilike(users.firstName, `%${query.search}%`),
-            ilike(users.lastName, `%${query.search}%`),
+            ilike(users.privateName, `%${query.search}%`),
+            ilike(users.publicName, `%${query.search}%`),
             ilike(users.email, `%${query.search}%`),
-            ilike(users.company, `%${query.search}%`),
           ),
         );
       }
@@ -256,45 +241,6 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         }
       }
 
-      // Skip preferredContactMethod filtering for now due to enum type complexity
-      // if (query.preferredContactMethod) {
-      //   whereConditions.push(
-      //     eq(users.preferredContactMethod, query.preferredContactMethod),
-      //   );
-      // }
-
-      if (query.hasPhone !== undefined) {
-        if (query.hasPhone) {
-          whereConditions.push(isNotNull(users.phone));
-        } else {
-          whereConditions.push(isNull(users.phone));
-        }
-      }
-
-      if (query.hasBio !== undefined) {
-        if (query.hasBio) {
-          whereConditions.push(isNotNull(users.bio));
-        } else {
-          whereConditions.push(isNull(users.bio));
-        }
-      }
-
-      if (query.hasWebsite !== undefined) {
-        if (query.hasWebsite) {
-          whereConditions.push(isNotNull(users.website));
-        } else {
-          whereConditions.push(isNull(users.website));
-        }
-      }
-
-      if (query.hasJobTitle !== undefined) {
-        if (query.hasJobTitle) {
-          whereConditions.push(isNotNull(users.jobTitle));
-        } else {
-          whereConditions.push(isNull(users.jobTitle));
-        }
-      }
-
       const whereClause =
         whereConditions.length > 0 ? and(...whereConditions) : undefined;
 
@@ -321,27 +267,19 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
           verificationRate: currentPeriodStats.verificationRate,
         },
 
-        // Nested profile stats
-        profileStats: {
-          complete: {
-            usersWithPhone: currentPeriodStats.usersWithPhone,
-            usersWithBio: currentPeriodStats.usersWithBio,
-            usersWithWebsite: currentPeriodStats.usersWithWebsite,
-            usersWithJobTitle: currentPeriodStats.usersWithJobTitle,
-            usersWithImage: currentPeriodStats.usersWithImage,
-          },
-          integration: {
-            usersWithStripeId: currentPeriodStats.usersWithStripeId,
-            usersWithoutStripeId: currentPeriodStats.usersWithoutStripeId,
-            stripeIntegrationRate: currentPeriodStats.stripeIntegrationRate,
-            usersWithLeadId: currentPeriodStats.usersWithLeadId,
-            usersWithoutLeadId: currentPeriodStats.usersWithoutLeadId,
-            leadAssociationRate: currentPeriodStats.leadAssociationRate,
-          },
+        // Nested integration stats
+        integrationStats: {
+          usersWithStripeId: currentPeriodStats.usersWithStripeId,
+          usersWithoutStripeId: currentPeriodStats.usersWithoutStripeId,
+          stripeIntegrationRate: currentPeriodStats.stripeIntegrationRate,
+          usersWithLeadId: currentPeriodStats.usersWithLeadId,
+          usersWithoutLeadId: currentPeriodStats.usersWithoutLeadId,
+          leadAssociationRate: currentPeriodStats.leadAssociationRate,
         },
 
         // Nested role distribution
         roleDistribution: {
+          usersByRole: currentPeriodStats.usersByRole,
           publicUsers: currentPeriodStats.publicUsers,
           customerUsers: currentPeriodStats.customerUsers,
           partnerAdminUsers: currentPeriodStats.partnerAdminUsers,
@@ -367,7 +305,6 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
 
         // Nested business insights
         businessInsights: {
-          uniqueCompanies: currentPeriodStats.uniqueCompanies,
           generatedAt: new Date().toISOString(),
         },
 
@@ -379,23 +316,18 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         emailVerifiedUsers: currentPeriodStats.emailVerifiedUsers,
         emailUnverifiedUsers: currentPeriodStats.emailUnverifiedUsers,
         verificationRate: currentPeriodStats.verificationRate,
-        usersWithPhone: currentPeriodStats.usersWithPhone,
-        usersWithBio: currentPeriodStats.usersWithBio,
-        usersWithWebsite: currentPeriodStats.usersWithWebsite,
-        usersWithJobTitle: currentPeriodStats.usersWithJobTitle,
-        usersWithImage: currentPeriodStats.usersWithImage,
         usersWithStripeId: currentPeriodStats.usersWithStripeId,
         usersWithoutStripeId: currentPeriodStats.usersWithoutStripeId,
         stripeIntegrationRate: currentPeriodStats.stripeIntegrationRate,
         usersWithLeadId: currentPeriodStats.usersWithLeadId,
         usersWithoutLeadId: currentPeriodStats.usersWithoutLeadId,
         leadAssociationRate: currentPeriodStats.leadAssociationRate,
+        usersByRole: currentPeriodStats.usersByRole,
         publicUsers: currentPeriodStats.publicUsers,
         customerUsers: currentPeriodStats.customerUsers,
         partnerAdminUsers: currentPeriodStats.partnerAdminUsers,
         partnerEmployeeUsers: currentPeriodStats.partnerEmployeeUsers,
         adminUsers: currentPeriodStats.adminUsers,
-        uniqueCompanies: currentPeriodStats.uniqueCompanies,
         usersCreatedToday: currentPeriodStats.usersCreatedToday,
         usersCreatedThisWeek: currentPeriodStats.usersCreatedThisWeek,
         usersCreatedThisMonth: currentPeriodStats.usersCreatedThisMonth,
@@ -431,12 +363,6 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
     emailVerifiedUsers: number;
     emailUnverifiedUsers: number;
     verificationRate: number;
-    usersWithPhone: number;
-    usersWithBio: number;
-    usersWithWebsite: number;
-    usersWithJobTitle: number;
-    usersWithImage: number;
-    usersByContactMethod: { [key: string]: number };
     usersWithStripeId: number;
     usersWithoutStripeId: number;
     stripeIntegrationRate: number;
@@ -449,8 +375,6 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
     partnerAdminUsers: number;
     partnerEmployeeUsers: number;
     adminUsers: number;
-    usersByCompany: { [key: string]: number };
-    uniqueCompanies: number;
     usersCreatedToday: number;
     usersCreatedThisWeek: number;
     usersCreatedThisMonth: number;
@@ -467,11 +391,6 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         inactiveUsers: sql<number>`count(*) filter (where ${users.isActive} = false)::int`,
         emailVerifiedUsers: sql<number>`count(*) filter (where ${users.emailVerified} = true)::int`,
         emailUnverifiedUsers: sql<number>`count(*) filter (where ${users.emailVerified} = false)::int`,
-        usersWithPhone: sql<number>`count(*) filter (where ${users.phone} is not null)::int`,
-        usersWithBio: sql<number>`count(*) filter (where ${users.bio} is not null)::int`,
-        usersWithWebsite: sql<number>`count(*) filter (where ${users.website} is not null)::int`,
-        usersWithJobTitle: sql<number>`count(*) filter (where ${users.jobTitle} is not null)::int`,
-        usersWithImage: sql<number>`count(*) filter (where ${users.imageUrl} is not null)::int`,
         usersWithStripeId: sql<number>`count(*) filter (where ${users.stripeCustomerId} is not null)::int`,
         usersWithoutStripeId: sql<number>`count(*) filter (where ${users.stripeCustomerId} is null)::int`,
         usersWithLeadId: sql<number>`count(*) filter (where ${users.leadId} is not null)::int`,
@@ -485,11 +404,6 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
       inactiveUsers: 0,
       emailVerifiedUsers: 0,
       emailUnverifiedUsers: 0,
-      usersWithPhone: 0,
-      usersWithBio: 0,
-      usersWithWebsite: 0,
-      usersWithJobTitle: 0,
-      usersWithImage: 0,
       usersWithStripeId: 0,
       usersWithoutStripeId: 0,
       usersWithLeadId: 0,
@@ -521,36 +435,6 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         usersCreatedLastMonth: 0,
       },
     ];
-
-    // Get contact method distribution
-    const contactMethods = await db
-      .select({
-        method: users.preferredContactMethod,
-        count: sql<number>`count(*)::int`,
-      })
-      .from(users)
-      .where(whereClause)
-      .groupBy(users.preferredContactMethod);
-
-    const usersByContactMethod = Object.fromEntries(
-      contactMethods.map((item) => [item.method, item.count]),
-    );
-
-    // Get company distribution
-    const companies = await db
-      .select({
-        company: users.company,
-        count: sql<number>`count(*)::int`,
-      })
-      .from(users)
-      .where(whereClause)
-      .groupBy(users.company);
-
-    const usersByCompany = Object.fromEntries(
-      companies.map((item) => [item.company, item.count]),
-    );
-
-    const uniqueCompanies = companies.length;
 
     // Calculate rates
     const totalUsers = basicCounts.totalUsers;
@@ -606,12 +490,6 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
       emailVerifiedUsers: basicCounts.emailVerifiedUsers,
       emailUnverifiedUsers: basicCounts.emailUnverifiedUsers,
       verificationRate,
-      usersWithPhone: basicCounts.usersWithPhone,
-      usersWithBio: basicCounts.usersWithBio,
-      usersWithWebsite: basicCounts.usersWithWebsite,
-      usersWithJobTitle: basicCounts.usersWithJobTitle,
-      usersWithImage: basicCounts.usersWithImage,
-      usersByContactMethod,
       usersWithStripeId: basicCounts.usersWithStripeId,
       usersWithoutStripeId: basicCounts.usersWithoutStripeId,
       stripeIntegrationRate,
@@ -624,8 +502,6 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
       partnerAdminUsers,
       partnerEmployeeUsers,
       adminUsers,
-      usersByCompany,
-      uniqueCompanies,
       usersCreatedToday: timeBased.usersCreatedToday,
       usersCreatedThisWeek: timeBased.usersCreatedThisWeek,
       usersCreatedThisMonth: timeBased.usersCreatedThisMonth,

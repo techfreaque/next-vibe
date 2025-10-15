@@ -28,47 +28,35 @@ import type {
 } from "../types";
 
 // Type helpers for extracting endpoint types
-export type ExtractEndpointTypes<T> =
-  T extends CreateApiEndpoint<
-    infer TExampleKey,
-    infer TMethod,
-    infer TUserRoleValue,
-    infer TFields
-  >
-    ? {
-        request: ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestData>
-        >;
-        response: ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.Response>
-        >;
-        urlVariables: ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
-        >;
-        exampleKey: TExampleKey;
-        method: TMethod;
-        userRoleValue: TUserRoleValue;
-        fields: TFields;
-        requestInput: ExtractInput<
-          InferSchemaFromField<TFields, FieldUsage.RequestData>
-        >;
-        requestOutput: ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestData>
-        >;
-        responseInput: ExtractInput<
-          InferSchemaFromField<TFields, FieldUsage.Response>
-        >;
-        responseOutput: ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.Response>
-        >;
-        urlVariablesInput: ExtractInput<
-          InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
-        >;
-        urlVariablesOutput: ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
-        >;
-      }
-    : never;
+// Use the already-exposed type properties from CreateApiEndpoint instead of re-extracting
+export type ExtractEndpointTypes<T> = T extends CreateApiEndpoint<
+  infer TExampleKey,
+  infer TMethod,
+  infer TUserRoleValue,
+  infer TFields,
+  infer TRequestInput,
+  infer TRequestOutput,
+  infer TResponseInput,
+  infer TResponseOutput,
+  infer TUrlVariablesInput,
+  infer TUrlVariablesOutput
+>
+  ? {
+      request: TRequestOutput;
+      response: TResponseOutput;
+      urlVariables: TUrlVariablesOutput;
+      exampleKey: TExampleKey;
+      method: TMethod;
+      userRoleValue: TUserRoleValue;
+      fields: TFields;
+      requestInput: TRequestInput;
+      requestOutput: TRequestOutput;
+      responseInput: TResponseInput;
+      responseOutput: TResponseOutput;
+      urlVariablesInput: TUrlVariablesInput;
+      urlVariablesOutput: TUrlVariablesOutput;
+    }
+  : never;
 
 // Extract types from endpoints map
 export type GetEndpointTypes<T> = T extends { GET: infer TGet }

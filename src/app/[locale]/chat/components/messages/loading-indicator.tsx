@@ -1,10 +1,11 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+
 import {
+  chatAnimations,
   chatColors,
   chatShadows,
-  chatAnimations,
 } from "../../lib/design-tokens";
 
 export function LoadingIndicator() {
@@ -32,4 +33,3 @@ export function LoadingIndicator() {
     </div>
   );
 }
-

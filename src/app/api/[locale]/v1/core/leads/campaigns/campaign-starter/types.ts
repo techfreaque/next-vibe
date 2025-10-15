@@ -5,10 +5,7 @@
 
 import { z } from "zod";
 
-import {
-  type CountryLanguage,
-  CountryLanguageValues,
-} from "@/i18n/core/config";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
  * Campaign Starter Configuration Schema

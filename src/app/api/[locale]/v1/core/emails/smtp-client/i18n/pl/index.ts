@@ -11,11 +11,28 @@ export const translations: typeof enTranslations = {
   create: createTranslations,
   edit: editTranslations,
   list: listTranslations,
-  send: {
+  sending: {
     errors: {
       server: {
         title: "Błąd serwera",
         description: "Wystąpił błąd na serwerze SMTP",
+      },
+      rejected: {
+        title: "Email odrzucony",
+        defaultReason: "Email odrzucony przez serwer",
+      },
+      no_recipients: {
+        title: "Brak zaakceptowanych odbiorców",
+        defaultReason: "Brak zaakceptowanych odbiorców",
+      },
+      rate_limit: {
+        title: "Przekroczono limit szybkości",
+      },
+      capacity: {
+        title: "Błąd pojemności",
+      },
+      no_account: {
+        title: "Brak dostępnego konta SMTP",
       },
     },
   },

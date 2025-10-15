@@ -46,7 +46,9 @@ export async function localRelease(
 
   // If forceUpdate is true, only update dependencies and skip all other steps
   if (forceUpdate) {
-    logger("Force update completed - skipping quality checks and release steps");
+    logger(
+      "Force update completed - skipping quality checks and release steps",
+    );
     return;
   }
 

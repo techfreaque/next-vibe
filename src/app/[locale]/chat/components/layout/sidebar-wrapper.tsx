@@ -1,11 +1,15 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React from "react";
 
-import type { ChatState, ChatThread, ChatFolder } from "../../lib/storage/types";
+import type {
+  ChatFolder,
+  ChatState,
+  ChatThread,
+} from "../../lib/storage/types";
 import { ChatSidebar } from "../sidebar/chat-sidebar";
-import { cn } from "next-vibe/shared/utils";
 
 interface SidebarWrapperProps {
   state: ChatState;
@@ -45,12 +49,12 @@ export function SidebarWrapper({
       {/* Sidebar Container */}
       <div
         className={cn(
-          // Desktop: flexible width with smooth transition
+          // Desktop: flexible width with smooth transition, z-10 to stay below input (z-20)
           "hidden md:block transition-all duration-200 ease-in-out overflow-hidden border-r border-border flex-shrink-0",
           collapsed ? "w-0 border-r-0" : "w-64",
-          // Mobile: fixed overlay
-          "md:relative fixed inset-y-0 left-0 z-40 md:z-auto",
-          !collapsed && "block"
+          // Mobile: fixed overlay with z-50 (same as top bar, above input z-20, above backdrop z-30)
+          "md:relative md:z-10 fixed inset-y-0 left-0 z-50",
+          !collapsed && "block",
         )}
       >
         <div className="h-full w-64 bg-background">
@@ -82,4 +86,3 @@ export function SidebarWrapper({
     </>
   );
 }
-

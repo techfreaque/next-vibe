@@ -18,7 +18,7 @@ import { languageConfig } from "@/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { ManifestResponseTypeOutput } from "./definition";
+import type { ManifestResponseOutput } from "./definition";
 import {
   IconPurpose,
   WebAppCategory,
@@ -55,7 +55,7 @@ export interface ManifestRepository {
   generateManifest(
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ManifestResponseTypeOutput>>;
+  ): Promise<ResponseType<ManifestResponseOutput>>;
 }
 
 /**
@@ -68,7 +68,7 @@ export class ManifestRepositoryImpl implements ManifestRepository {
   async generateManifest(
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ManifestResponseTypeOutput>> {
+  ): Promise<ResponseType<ManifestResponseOutput>> {
     try {
       logger.debug("Generating manifest for locale", { locale });
 

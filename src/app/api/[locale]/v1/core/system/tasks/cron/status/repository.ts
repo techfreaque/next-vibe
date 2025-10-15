@@ -12,13 +12,13 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { CronTaskStatus } from "../../enum";
 import type {
-  CronStatusRequestInput,
-  CronStatusResponseInput,
+  CronStatusRequestOutput,
+  CronStatusResponseOutput,
 } from "./definition";
 
 /**
@@ -26,11 +26,11 @@ import type {
  */
 export interface ICronStatusRepository {
   getStatus(
-    data: CronStatusRequestInput,
+    data: CronStatusRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<CronStatusResponseInput>>;
+  ): Promise<ResponseType<CronStatusResponseOutput>>;
 }
 
 /**
@@ -38,11 +38,11 @@ export interface ICronStatusRepository {
  */
 class CronStatusRepositoryImpl implements ICronStatusRepository {
   async getStatus(
-    data: CronStatusRequestInput,
+    data: CronStatusRequestOutput,
     user: JwtPayloadType,
     _locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<CronStatusResponseInput>> {
+  ): Promise<ResponseType<CronStatusResponseOutput>> {
     try {
       // Add await to satisfy async requirement
       await Promise.resolve();
@@ -116,7 +116,7 @@ class CronStatusRepositoryImpl implements ICronStatusRepository {
       };
 
       logger.debug("Cron status retrieved successfully", {
-        systemStatus: response.systemStatus as string,
+        systemStatus: response.systemStatus,
         activeTasks: response.activeTasks,
         totalTasks: response.totalTasks,
       });

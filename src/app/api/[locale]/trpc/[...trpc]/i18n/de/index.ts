@@ -6,4 +6,4 @@ export const translations: typeof enTranslations = {
     endpoint: "Endpoint",
   },
   // Add endpoint-specific translations here
-} ;
+};

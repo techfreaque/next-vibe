@@ -13,9 +13,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { JwtPayloadType } from "../../user/auth/definition";
 import { leadsRepository } from "../repository";
 import type {
-  BatchDeleteRequestTypeOutput,
+  BatchDeleteRequestOutput,
   BatchDeleteResponseData,
-  BatchUpdateRequestTypeOutput,
+  BatchUpdateRequestOutput,
   BatchUpdateResponseData,
 } from "./definition";
 
@@ -24,14 +24,14 @@ import type {
  */
 export interface BatchRepository {
   batchUpdateLeads(
-    data: BatchUpdateRequestTypeOutput,
+    data: BatchUpdateRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<BatchUpdateResponseData>>;
 
   batchDeleteLeads(
-    data: BatchDeleteRequestTypeOutput,
+    data: BatchDeleteRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -46,7 +46,7 @@ class BatchRepositoryImpl implements BatchRepository {
    * Batch update leads - delegates to main leads repository
    */
   async batchUpdateLeads(
-    data: BatchUpdateRequestTypeOutput,
+    data: BatchUpdateRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -64,7 +64,7 @@ class BatchRepositoryImpl implements BatchRepository {
    * Batch delete leads - delegates to main leads repository
    */
   async batchDeleteLeads(
-    data: BatchDeleteRequestTypeOutput,
+    data: BatchDeleteRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,

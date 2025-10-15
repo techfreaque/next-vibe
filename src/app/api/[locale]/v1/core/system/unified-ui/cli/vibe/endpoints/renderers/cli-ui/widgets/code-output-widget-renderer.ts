@@ -7,9 +7,32 @@ import { WidgetType } from "../../../endpoint-types/core/enums";
 import { BaseWidgetRenderer } from "./base-widget-renderer";
 import type {
   CodeOutputConfig,
+  RenderableValue,
   ResponseFieldMetadata,
   WidgetRenderContext,
 } from "./types";
+
+// Default severity icon constants
+const DEFAULT_SEVERITY_ICONS = {
+  ERROR: "✖ ",
+  WARNING: "⚠ ",
+  INFO: "ℹ ",
+  SUCCESS: "✓ ",
+  SPARKLE: "✨ ",
+} as const;
+
+/**
+ * Code output item interface
+ */
+interface CodeOutputItem {
+  [key: string]: RenderableValue;
+  line?: number;
+  column?: number;
+  severity?: string;
+  message?: string;
+  rule?: string;
+  file?: string;
+}
 
 /**
  * Code output widget renderer with configurable building blocks
@@ -27,34 +50,90 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
       return this.renderEmptyState(config, context);
     }
 
+    const typedData: CodeOutputItem[] = data.filter(
+      (item): item is CodeOutputItem =>
+        typeof item === "object" && item !== null,
+    );
+
     switch (config.format) {
       case "eslint":
-        return this.renderESLintFormat(data, config, context);
+        return this.renderESLintFormat(typedData, config, context);
       case "json":
-        return this.renderJSONFormat(data, config, context);
+        return this.renderJSONFormat(typedData, config, context);
       case "table":
-        return this.renderTableFormat(data, config, context);
+        return this.renderTableFormat(typedData, config, context);
       default:
-        return this.renderGenericFormat(data, config, context);
+        return this.renderGenericFormat(typedData, config, context);
     }
   }
 
   private getCodeOutputConfig(field: ResponseFieldMetadata): CodeOutputConfig {
     const config = field.config || {};
 
+    const formatValue = config.outputFormat || config.format;
+    const format =
+      typeof formatValue === "string" &&
+      (formatValue === "eslint" ||
+        formatValue === "generic" ||
+        formatValue === "json" ||
+        formatValue === "table")
+        ? formatValue
+        : "generic";
+
+    const showSummaryValue = config.showSummary;
+    const showSummary =
+      typeof showSummaryValue === "boolean" ? showSummaryValue : true;
+
+    const colorSchemeValue = config.colorScheme;
+    const colorScheme =
+      typeof colorSchemeValue === "string" &&
+      (colorSchemeValue === "auto" ||
+        colorSchemeValue === "light" ||
+        colorSchemeValue === "dark")
+        ? colorSchemeValue
+        : "auto";
+
+    const severityIconsValue = config.severityIcons;
+    let severityIcons: Record<string, string> = {
+      error: DEFAULT_SEVERITY_ICONS.ERROR,
+      warning: DEFAULT_SEVERITY_ICONS.WARNING,
+      info: DEFAULT_SEVERITY_ICONS.INFO,
+      success: DEFAULT_SEVERITY_ICONS.SUCCESS,
+    };
+
+    if (
+      typeof severityIconsValue === "object" &&
+      severityIconsValue !== null &&
+      !Array.isArray(severityIconsValue)
+    ) {
+      const icons: Record<string, string> = {};
+      for (const [key, val] of Object.entries(severityIconsValue)) {
+        if (typeof val === "string") {
+          icons[key] = val;
+        }
+      }
+      if (Object.keys(icons).length > 0) {
+        severityIcons = icons;
+      }
+    }
+
+    const groupByValue = config.groupBy;
+    const groupBy = typeof groupByValue === "string" ? groupByValue : undefined;
+
+    const summaryTemplateValue = config.summaryTemplate;
+    const summaryTemplate =
+      typeof summaryTemplateValue === "string"
+        ? summaryTemplateValue
+        : undefined;
+
     return {
-      format: config.outputFormat || config.format || "generic",
-      groupBy: config.groupBy || config.groupByFile ? "file" : undefined,
-      showSummary: config.showSummary ?? true,
-      showLineNumbers: config.showLineNumbers ?? false,
-      colorScheme: config.colorScheme || "auto",
-      severityIcons: config.severityIcons || {
-        error: "✖ ",
-        warning: "⚠ ",
-        info: "ℹ ",
-        success: "✓ ",
-      },
-      summaryTemplate: config.summaryTemplate,
+      format,
+      groupBy,
+      showSummary,
+      showLineNumbers: false,
+      colorScheme,
+      severityIcons,
+      summaryTemplate,
     };
   }
 
@@ -62,13 +141,18 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
     config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
-    const icon = context.options.useEmojis ? "✨ " : "";
-    const text = "No issues found";
+    const t = context.translate;
+    const icon = context.options.useEmojis
+      ? DEFAULT_SEVERITY_ICONS.SPARKLE
+      : "";
+    const text = t(
+      "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound",
+    );
     return this.styleText(`${icon}${text}`, "green", context);
   }
 
   private renderESLintFormat(
-    data: any[],
+    data: CodeOutputItem[],
     config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
@@ -81,6 +165,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
     }
 
     if (config.showSummary) {
+      // eslint-disable-next-line i18next/no-literal-string
       output += `\n${this.renderSummary(data, config, context)}`;
     }
 
@@ -88,7 +173,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
   }
 
   private renderGroupedData(
-    data: any[],
+    data: CodeOutputItem[],
     config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
@@ -96,11 +181,10 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
     const result: string[] = [];
 
     for (const [groupKey, items] of groups) {
-      // Group header
       const groupHeader = this.styleText(groupKey, "underline", context);
+      // eslint-disable-next-line i18next/no-literal-string
       result.push(`\n${groupHeader}`);
 
-      // Group items
       for (const item of items) {
         const line = this.renderDataItem(item, config, context);
         result.push(`  ${line}`);
@@ -111,7 +195,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
   }
 
   private renderFlatData(
-    data: any[],
+    data: CodeOutputItem[],
     config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
@@ -121,31 +205,27 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
   }
 
   private renderDataItem(
-    item: any,
+    item: CodeOutputItem,
     config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
     const parts: string[] = [];
 
-    // Location (line:column)
     if (item.line || item.column) {
       const location = this.formatLocation(item.line, item.column);
       parts.push(location.padEnd(10));
     }
 
-    // Severity with icon and color
-    if (item.severity) {
+    if (item.severity && typeof item.severity === "string") {
       const severity = this.formatSeverity(item.severity, config, context);
       parts.push(severity.padEnd(9));
     }
 
-    // Message
-    if (item.message) {
+    if (item.message && typeof item.message === "string") {
       parts.push(item.message);
     }
 
-    // Rule (if available)
-    if (item.rule) {
+    if (item.rule && typeof item.rule === "string") {
       parts.push(this.styleText(item.rule, "dim", context));
     }
 
@@ -160,6 +240,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
       return `${line}:${column}`;
     }
     if (line) {
+      // eslint-disable-next-line i18next/no-literal-string
       return `${line}:0`;
     }
     return "";
@@ -170,9 +251,8 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
     config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
-    const icon = context.options.useEmojis
-      ? config.severityIcons[severity] || ""
-      : "";
+    const icons = config.severityIcons || {};
+    const icon = context.options.useEmojis ? icons[severity] || "" : "";
     const text = severity;
 
     if (!context.options.useColors) {
@@ -194,7 +274,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
   }
 
   private renderSummary(
-    data: any[],
+    data: CodeOutputItem[],
     config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
@@ -206,22 +286,28 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
   }
 
   private renderDefaultSummary(
-    data: any[],
+    data: CodeOutputItem[],
     config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
+    const t = context.translate;
     const severityCounts = this.countBySeverity(data);
     const totalCount = data.length;
 
     if (totalCount === 0) {
-      const icon = context.options.useEmojis ? "✨ " : "";
-      const text = "No issues found";
+      const icon = context.options.useEmojis
+        ? DEFAULT_SEVERITY_ICONS.SPARKLE
+        : "";
+      const text = t(
+        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound",
+      );
       return this.styleText(`${icon}${text}`, "green", context);
     }
 
     const parts: string[] = [];
+    const icons = config.severityIcons || {};
     const icon = context.options.useEmojis
-      ? config.severityIcons.error || "✖ "
+      ? icons.error || DEFAULT_SEVERITY_ICONS.ERROR
       : "";
 
     if (severityCounts.error > 0) {
@@ -238,6 +324,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
       return `${icon}${parts[0]}`;
     } else if (parts.length > 1) {
       const problemText = `${totalCount} problem${totalCount === 1 ? "" : "s"}`;
+      // eslint-disable-next-line i18next/no-literal-string
       return `${icon}${problemText} (${parts.join(", ")})`;
     }
 
@@ -245,9 +332,8 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
   }
 
   private renderCustomSummary(
-    data: any[],
+    data: CodeOutputItem[],
     config: CodeOutputConfig,
-    context: WidgetRenderContext,
   ): string {
     const severityCounts = this.countBySeverity(data);
     const variables = {
@@ -259,65 +345,73 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
 
     let summary = config.summaryTemplate!;
     for (const [key, value] of Object.entries(variables)) {
+      // eslint-disable-next-line i18next/no-literal-string
       summary = summary.replace(new RegExp(`\\{${key}\\}`, "g"), String(value));
     }
 
     return summary;
   }
 
-  private renderJSONFormat(
-    data: any[],
-    config: CodeOutputConfig,
-    context: WidgetRenderContext,
-  ): string {
+  private renderJSONFormat(data: CodeOutputItem[]): string {
     return JSON.stringify(data, null, 2);
   }
 
-  private renderTableFormat(
-    data: any[],
-    config: CodeOutputConfig,
-    context: WidgetRenderContext,
-  ): string {
-    // Delegate to table renderer
-    const tableField: ResponseFieldMetadata = {
-      ...({} as ResponseFieldMetadata),
-      value: data,
-      widgetType: WidgetType.DATA_TABLE,
-    };
-
-    // This would need to be injected or imported
-    // For now, return a simple table representation
-    return this.renderSimpleTable(data, context);
+  private renderTableFormat(data: CodeOutputItem[]): string {
+    return this.renderSimpleTable(data);
   }
 
-  private renderGenericFormat(
-    data: any[],
-    config: CodeOutputConfig,
-    context: WidgetRenderContext,
-  ): string {
+  private renderGenericFormat(data: CodeOutputItem[]): string {
     return data.map((item) => JSON.stringify(item)).join("\n");
   }
 
-  private renderSimpleTable(data: any[], context: WidgetRenderContext): string {
+  private renderSimpleTable(data: CodeOutputItem[]): string {
     if (data.length === 0) {
       return "";
     }
 
     const keys = Object.keys(data[0]);
+    // eslint-disable-next-line i18next/no-literal-string
     const header = keys.join(" | ");
+    // eslint-disable-next-line i18next/no-literal-string
     const separator = keys.map(() => "---").join(" | ");
-    const rows = data.map((item) =>
-      keys.map((key) => String(item[key] || "")).join(" | "),
-    );
+    const rows = data.map((item) => {
+      const row: string[] = [];
+      for (const key of keys) {
+        const val = item[key];
+        if (typeof val === "string") {
+          row.push(val);
+        } else if (typeof val === "number") {
+          row.push(String(val));
+        } else if (typeof val === "boolean") {
+          row.push(val ? "true" : "false");
+        } else {
+          row.push("");
+        }
+      }
+      // eslint-disable-next-line i18next/no-literal-string
+      return row.join(" | ");
+    });
 
     return [header, separator, ...rows].join("\n");
   }
 
-  private groupData(data: any[], groupBy: string): Map<string, any[]> {
-    const groups = new Map<string, any[]>();
+  private groupData(
+    data: CodeOutputItem[],
+    groupBy: string,
+  ): Map<string, CodeOutputItem[]> {
+    const groups = new Map<string, CodeOutputItem[]>();
 
     for (const item of data) {
-      const groupKey = item[groupBy] || "unknown";
+      const groupValue = item[groupBy];
+      let groupKey = "unknown";
+      if (typeof groupValue === "string") {
+        groupKey = groupValue;
+      } else if (typeof groupValue === "number") {
+        groupKey = String(groupValue);
+      } else if (typeof groupValue === "boolean") {
+        groupKey = groupValue ? "true" : "false";
+      }
+
       if (!groups.has(groupKey)) {
         groups.set(groupKey, []);
       }
@@ -327,11 +421,15 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
     return groups;
   }
 
-  private countBySeverity(data: any[]): Record<string, number> {
+  private countBySeverity(data: CodeOutputItem[]): Record<string, number> {
     const counts = { error: 0, warning: 0, info: 0, success: 0 };
 
     for (const item of data) {
-      const severity = item.severity || "info";
+      const severityValue = item.severity;
+      let severity = "info";
+      if (typeof severityValue === "string") {
+        severity = severityValue;
+      }
       if (severity in counts) {
         counts[severity as keyof typeof counts]++;
       }

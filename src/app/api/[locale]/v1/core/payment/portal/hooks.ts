@@ -3,6 +3,8 @@
  * Simplified hooks for interacting with the Payment Portal API
  */
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+
 import { useApiMutation } from "../../system/unified-ui/react/hooks/mutation";
 import { useApiForm } from "../../system/unified-ui/react/hooks/mutation-form";
 import type {
@@ -19,10 +21,13 @@ import definitions from "./definition";
 /**
  * Hook for creating customer portal sessions
  */
-export function useCreateCustomerPortal(
-  defaultValues?: Partial<PaymentPortalRequestOutput>,
-): InferApiFormReturn<typeof definitions.POST> {
-  return useApiForm(definitions.POST, { defaultValues });
+export function useCreateCustomerPortal(params: {
+  logger: EndpointLogger;
+  defaultValues?: Partial<PaymentPortalRequestOutput>;
+}): InferApiFormReturn<typeof definitions.POST> {
+  return useApiForm(definitions.POST, params.logger, {
+    defaultValues: params.defaultValues,
+  });
 }
 
 /****************************
@@ -32,10 +37,10 @@ export function useCreateCustomerPortal(
 /**
  * Hook for customer portal mutation
  */
-export function useCreateCustomerPortalMutation(): InferEnhancedMutationResult<
-  typeof definitions.POST
-> {
-  return useApiMutation(definitions.POST);
+export function useCreateCustomerPortalMutation(
+  logger: EndpointLogger,
+): InferEnhancedMutationResult<typeof definitions.POST> {
+  return useApiMutation(definitions.POST, logger);
 }
 
 /****************************
@@ -45,7 +50,7 @@ export function useCreateCustomerPortalMutation(): InferEnhancedMutationResult<
 /**
  * Hook for customer portal with simplified interface
  */
-export function useCustomerPortal(): {
+export function useCustomerPortal(logger: EndpointLogger): {
   createPortalSession: (
     returnUrl?: string,
   ) => Promise<
@@ -58,7 +63,7 @@ export function useCustomerPortal(): {
   isPending: boolean;
   error: InferEnhancedMutationResult<typeof definitions.POST>["error"];
 } {
-  const createMutation = useCreateCustomerPortalMutation();
+  const createMutation = useCreateCustomerPortalMutation(logger);
 
   const createPortalSession = async (
     returnUrl?: string,
@@ -73,7 +78,7 @@ export function useCustomerPortal(): {
       requestData: {
         returnUrl,
       },
-      urlParams: undefined,
+      urlParams: undefined as never,
     });
   };
 

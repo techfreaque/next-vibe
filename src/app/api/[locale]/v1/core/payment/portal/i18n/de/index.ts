@@ -51,6 +51,10 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Datenkonflikt aufgetreten",
       },
+      unsavedChanges: {
+        title: "Ungespeicherte Änderungen",
+        description: "Es gibt ungespeicherte Änderungen",
+      },
     },
     success: {
       title: "Erfolg",

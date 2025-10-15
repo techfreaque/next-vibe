@@ -1,7 +1,6 @@
 "use client";
 
 import { CheckIcon, Globe } from "lucide-react";
-import { cn } from "next-vibe/shared/utils";
 import {
   DropdownMenuItem,
   DropdownMenuSub,
@@ -52,4 +51,3 @@ const CountrySelectorMenu: FC = () => {
 };
 
 export default CountrySelectorMenu;
-

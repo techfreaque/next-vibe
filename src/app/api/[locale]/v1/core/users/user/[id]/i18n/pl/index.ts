@@ -30,6 +30,12 @@ export const translations: typeof enTranslations = {
             email: {
               content: "Adres e-mail",
             },
+            privateName: {
+              content: "Nazwa prywatna",
+            },
+            publicName: {
+              content: "Nazwa publiczna",
+            },
             firstName: {
               content: "Imię",
             },
@@ -101,6 +107,12 @@ export const translations: typeof enTranslations = {
         },
         email: {
           content: "Adres e-mail",
+        },
+        privateName: {
+          content: "Nazwa prywatna",
+        },
+        publicName: {
+          content: "Nazwa publiczna",
         },
         firstName: {
           content: "Imię",
@@ -229,6 +241,16 @@ export const translations: typeof enTranslations = {
         description: "Adres e-mail użytkownika do logowania i komunikacji",
         placeholder: "Wprowadź adres e-mail...",
       },
+      privateName: {
+        label: "Nazwa prywatna",
+        description:
+          "Pełne imię i nazwisko użytkownika (widoczne tylko dla administratorów)",
+      },
+      publicName: {
+        label: "Nazwa publiczna",
+        description:
+          "Nazwa wyświetlana użytkownika (widoczna dla wszystkich użytkowników)",
+      },
       firstName: {
         label: "Imię",
         description: "Imię użytkownika",
@@ -287,6 +309,12 @@ export const translations: typeof enTranslations = {
         },
         email: {
           content: "Adres e-mail",
+        },
+        privateName: {
+          content: "Nazwa prywatna",
+        },
+        publicName: {
+          content: "Nazwa publiczna",
         },
         firstName: {
           content: "Imię",

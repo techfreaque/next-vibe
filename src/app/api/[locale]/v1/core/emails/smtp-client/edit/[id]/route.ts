@@ -6,7 +6,7 @@
 import "server-only";
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 
 import definitions from "./definition";
 import { smtpAccountEditRepository } from "./repository";
@@ -15,16 +15,34 @@ export const { GET, PUT, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: async ({ data, urlVariables }) => {
-      return await smtpAccountEditRepository.getSmtpAccount(data, urlVariables);
-    },
+    handler: ({ urlVariables, user, locale, logger }) =>
+      smtpAccountEditRepository.getSmtpAccount(
+        urlVariables,
+        user,
+        locale,
+        logger,
+      ),
   },
   [Methods.PUT]: {
     email: undefined, // No emails for PUT requests
-    handler: async ({ data, urlVariables }) => {
-      return await smtpAccountEditRepository.updateSmtpAccount(
-        data,
-        urlVariables,
+    handler: ({ data, urlVariables, user, locale, logger }) => {
+      const updateData = {
+        id: urlVariables.id,
+        name: data.updates.name,
+        description: data.updates.description,
+        host: data.updates.host,
+        port: data.updates.port,
+        securityType: data.updates.securityType,
+        username: data.updates.username,
+        password: data.updates.password,
+        fromEmail: data.updates.fromEmail,
+        priority: data.updates.priority,
+      };
+      return smtpAccountEditRepository.updateSmtpAccount(
+        updateData,
+        user,
+        locale,
+        logger,
       );
     },
   },

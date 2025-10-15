@@ -5,7 +5,6 @@
 
 "use client";
 
-import { getLanguageFromLocale } from "next-vibe/core/translation-utils";
 import type { ChartDataType } from "next-vibe/shared/types/stats-filtering.schema";
 import { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
@@ -30,6 +29,7 @@ import { LeadSource } from "@/app/api/[locale]/v1/core/leads/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
+import { getLanguageFromLocale } from "@/i18n/core/translation-utils";
 
 import { LeadsSourceLegend } from "./leads-source-legend";
 

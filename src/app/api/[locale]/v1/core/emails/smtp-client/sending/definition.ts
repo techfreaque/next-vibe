@@ -14,7 +14,7 @@ import type { CampaignType } from "../enum";
  * Uses singular field names to match the selection logic
  */
 export interface SmtpSelectionCriteria {
-  campaignType: CampaignType;
+  campaignType: (typeof CampaignType)[keyof typeof CampaignType];
   emailJourneyVariant: string | null;
   emailCampaignStage: string | null;
   country: Countries;
@@ -52,30 +52,25 @@ export interface SmtpSendResult {
 }
 
 /**
- * SMTP Send Request Type
+ * SMTP Send Request Type (unwrapped for service layer)
  */
-export interface SmtpSendRequestTypeOutput {
-  params: SmtpSendParams;
-}
+export type SmtpSendRequestOutput = SmtpSendParams;
 
 /**
- * SMTP Send Response Type
+ * SMTP Send Response Type (unwrapped for service layer)
  */
-export interface SmtpSendResponseTypeOutput {
-  result: SmtpSendResult;
-}
+export type SmtpSendResponseOutput = SmtpSendResult;
 
 /**
  * SMTP Capacity Request Type
+ * No specific parameters needed
  */
-export interface SmtpCapacityRequestTypeOutput {
-  // No specific parameters needed
-}
+export type SmtpCapacityRequestOutput = Record<string, never>;
 
 /**
  * SMTP Capacity Response Type
  */
-export interface SmtpCapacityResponseTypeOutput {
+export interface SmtpCapacityResponseOutput {
   totalCapacity: number;
   remainingCapacity: number;
 }

@@ -6,7 +6,7 @@
 import "server-only";
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 
 import { imapAccountsRepository } from "../repository";
 import definitions from "./definition";
@@ -15,35 +15,22 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ urlVariables, user, locale, logger }) => {
-      return await imapAccountsRepository.getAccountById(
-        urlVariables,
-        user,
-        locale,
-        logger,
-      );
-    },
+    handler: ({ urlVariables, user, locale, logger }) =>
+      imapAccountsRepository.getAccountById(urlVariables, user, locale, logger),
   },
   [Methods.PUT]: {
     email: undefined,
-    handler: async ({ data, urlVariables, user, locale, logger }) => {
-      return await imapAccountsRepository.updateAccount(
+    handler: ({ data, urlVariables, user, locale, logger }) =>
+      imapAccountsRepository.updateAccount(
         { ...data, id: urlVariables.id },
         user,
         locale,
         logger,
-      );
-    },
+      ),
   },
   [Methods.DELETE]: {
     email: undefined,
-    handler: async ({ urlVariables, user, locale, logger }) => {
-      return await imapAccountsRepository.deleteAccount(
-        urlVariables,
-        user,
-        locale,
-        logger,
-      );
-    },
+    handler: ({ urlVariables, user, locale, logger }) =>
+      imapAccountsRepository.deleteAccount(urlVariables, user, locale, logger),
   },
 });

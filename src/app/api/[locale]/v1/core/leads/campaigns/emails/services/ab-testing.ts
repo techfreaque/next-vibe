@@ -3,13 +3,14 @@
  * Handles journey assignment and performance tracking for email campaigns
  */
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import { Countries } from "@/i18n/core/config";
 import {
   createErrorResponse,
   type ErrorResponseType,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import { Countries } from "@/i18n/core/config";
 
 import { EmailJourneyVariant } from "../../../enum";
 import type { ABTestConfig } from "../types";
@@ -130,12 +131,12 @@ export class ABTestingService {
    */
   assignJourneyVariant(
     leadId: string,
+    logger: EndpointLogger,
     leadData?: {
       country?: string;
       source?: string;
     },
-    logger?: EndpointLogger,
-  ): typeof EmailJourneyVariant {
+  ): (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant] {
     // Check if A/B test is active
     if (!this.config.isActive) {
       return EmailJourneyVariant.PERSONAL_APPROACH; // Default fallback
@@ -152,24 +153,29 @@ export class ABTestingService {
 
     // Calculate cumulative weights
     let cumulativeWeight = 0;
-    const variants = Object.entries(this.config.variants);
+    const variants = Object.entries(this.config.variants) as Array<
+      [
+        (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
+        { weight: number; description: string },
+      ]
+    >;
 
     for (const [variant, variantConfig] of variants) {
       cumulativeWeight += variantConfig.weight;
       if (percentage < cumulativeWeight) {
-        logger?.info("ab.test.assignment.success", {
+        logger.info("ab.test.assignment.success", {
           leadId,
           variant,
           percentage,
           cumulativeWeight,
           hash,
         });
-        return variant as EmailJourneyVariant;
+        return variant;
       }
     }
 
     // Fallback (should not reach here with proper weights)
-    logger?.warn("ab.test.assignment.fallback", {
+    logger.warn("ab.test.assignment.fallback", {
       leadId,
       percentage,
       totalWeight: cumulativeWeight,
@@ -292,14 +298,21 @@ export function getABTestSummary(
 } {
   const validation = validateABTestConfig(config);
 
+  const variants = Object.entries(config.variants) as Array<
+    [
+      (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
+      { weight: number; description: string },
+    ]
+  >;
+
   return {
     enabled: config.isActive,
     totalVariants: Object.keys(config.variants).length,
-    variants: Object.entries(config.variants).map(([key, variant]) => ({
+    variants: variants.map(([key, variant]) => ({
       id: key,
       name: variant.description,
       weight: variant.weight,
-      metadata: JOURNEY_VARIANT_METADATA[key as EmailJourneyVariant],
+      metadata: JOURNEY_VARIANT_METADATA[key],
     })),
     isValid: validation.isValid,
   };

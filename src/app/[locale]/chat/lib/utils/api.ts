@@ -2,12 +2,28 @@
  * API utilities for chat functionality
  */
 
-import type { ChatMessage, ChatThread } from "../storage/types";
+import { formattingInstructions } from "@/app/api/[locale]/v1/core/agent/chat/ai-stream/sytem-prompt";
+
 import type { ModelId } from "../config/models";
 import { getModelById } from "../config/models";
 import { getPersonaById } from "../config/personas";
-import { APIError } from "./errors";
 import { getMessagesInPath } from "../storage/message-tree";
+import type { ChatMessage, ChatThread } from "../storage/types";
+import { APIError } from "./errors";
+
+/**
+ * API constants
+ */
+const API_CONSTANTS = {
+  /** Length of message ID prefix for display */
+  ID_DISPLAY_LENGTH: 8,
+
+  /** Default locale for date formatting */
+  DEFAULT_LOCALE: "en-US",
+
+  /** Default persona name */
+  DEFAULT_PERSONA: "default",
+} as const;
 
 /**
  * Handle API response errors consistently
@@ -29,7 +45,7 @@ export async function handleAPIError(response: Response): Promise<never> {
     errorMessage,
     response.status,
     response.statusText,
-    errorData.details
+    errorData.details,
   );
 }
 
@@ -38,28 +54,31 @@ export async function handleAPIError(response: Response): Promise<never> {
  */
 function formatMessageTimestamp(timestamp: number): string {
   const date = new Date(timestamp);
-  return date.toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
+  return date.toLocaleString(API_CONSTANTS.DEFAULT_LOCALE, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
   });
 }
 
 /**
  * Get persona details from tone ID
  */
-function getPersonaDetails(tone?: string): { name: string; systemPrompt: string } {
+function getPersonaDetails(tone?: string): {
+  name: string;
+  systemPrompt: string;
+} {
   if (!tone) {
-    return { name: "default", systemPrompt: "" };
+    return { name: API_CONSTANTS.DEFAULT_PERSONA, systemPrompt: "" };
   }
 
   const persona = getPersonaById(tone);
   return {
     name: persona.name,
-    systemPrompt: persona.systemPrompt
+    systemPrompt: persona.systemPrompt,
   };
 }
 
@@ -74,7 +93,7 @@ function getPersonaDetails(tone?: string): { name: string; systemPrompt: string 
  */
 export function stripContextTags(content: string): string {
   // Remove <context>...</context> tags (case-insensitive, multiline)
-  return content.replace(/<context>[\s\S]*?<\/context>\s*/gi, '');
+  return content.replace(/<context>[\s\S]*?<\/context>\s*/gi, "");
 }
 
 /**
@@ -94,6 +113,7 @@ export interface ChatCompletionRequest {
   temperature: number;
   maxTokens: number;
   systemPrompt?: string;
+  enableSearch?: boolean;
 }
 
 /**
@@ -101,7 +121,9 @@ export interface ChatCompletionRequest {
  * Filters out error messages and formats for API
  * Wraps context information in <context> tags for easy parsing/removal
  */
-export function convertMessagesToAPIFormat(messages: ChatMessage[]): APIMessage[] {
+export function convertMessagesToAPIFormat(
+  messages: ChatMessage[],
+): APIMessage[] {
   return messages
     .filter((m) => m.role === "user" || m.role === "assistant")
     .map((m) => {
@@ -110,15 +132,18 @@ export function convertMessagesToAPIFormat(messages: ChatMessage[]): APIMessage[
 
       if (m.role === "user") {
         // User message context
-        const userName = m.author?.name || m.author?.id?.substring(0, 8) || "User";
+        const userName =
+          m.author?.name ||
+          m.author?.id?.substring(0, API_CONSTANTS.ID_DISPLAY_LENGTH) ||
+          "User";
         const timestamp = formatMessageTimestamp(m.timestamp);
-        contextMetadata = `<context>User: ${userName} | ID: ${m.id.substring(0, 8)} | ${timestamp}</context>\n`;
+        contextMetadata = `<context>User: ${userName} | ID: ${m.id.substring(0, API_CONSTANTS.ID_DISPLAY_LENGTH)} | ${timestamp}</context>\n`;
       } else if (m.role === "assistant") {
         // Assistant message context
         const modelName = m.model ? getModelById(m.model).name : "Assistant";
         const personaDetails = getPersonaDetails(m.tone);
         const timestamp = formatMessageTimestamp(m.timestamp);
-        contextMetadata = `<context>Assistant: ${modelName} (${personaDetails.name}) | ID: ${m.id.substring(0, 8)} | ${timestamp}</context>\n`;
+        contextMetadata = `<context>Assistant: ${modelName} (${personaDetails.name}) | ID: ${m.id.substring(0, API_CONSTANTS.ID_DISPLAY_LENGTH)} | ${timestamp}</context>\n`;
       }
 
       return {
@@ -135,28 +160,45 @@ function buildEnhancedSystemPrompt(
   thread: ChatThread,
   modelId: ModelId,
   tone: string,
-  parentMessageId: string | null
+  parentMessageId: string | null,
 ): string {
   const modelName = getModelById(modelId).name;
   const personaDetails = getPersonaDetails(tone);
   const threadName = thread.name || "Untitled Conversation";
 
   // Build context sections
-  const sections: string[] = [];
+  const sections: string[] = [formattingInstructions.join("; ")];
 
   // Important instruction about context tags
-  sections.push('IMPORTANT: Messages contain <context> tags with metadata. Do NOT include these tags in your response. Only respond with your actual message content.');
+  sections.push(
+    "IMPORTANT: Messages contain <context> tags with metadata. Do NOT include these tags in your response. Only respond with your actual message content.",
+  );
 
   // Thread context
   sections.push(`\nThread: "${threadName}"`);
 
+  // Check if parent message is an assistant message (Answer as AI scenario)
+  const parentMessage = parentMessageId
+    ? thread.messages[parentMessageId]
+    : null;
+  const isAnswerAsAI = parentMessage?.role === "assistant";
+
   // Parent message context (if responding to a specific message)
   if (parentMessageId) {
-    sections.push(`Responding to message ID: ${parentMessageId.substring(0, 8)}`);
+    sections.push(
+      `Responding to message ID: ${parentMessageId.substring(0, API_CONSTANTS.ID_DISPLAY_LENGTH)}`,
+    );
   }
 
   // Model and persona context
   sections.push(`You are: ${modelName} with ${personaDetails.name} persona`);
+
+  // Special instruction for Answer as AI feature
+  if (isAnswerAsAI) {
+    sections.push(
+      `\nIMPORTANT: You are generating a new AI response continuing from a previous assistant message. You MUST respond according to the ${personaDetails.name} persona specified above, not based on the style or persona of the previous assistant message. Follow the persona instructions strictly.`,
+    );
+  }
 
   // Persona system prompt
   if (personaDetails.systemPrompt) {
@@ -168,7 +210,7 @@ function buildEnhancedSystemPrompt(
     sections.push(`\nAdditional instructions: ${thread.settings.systemPrompt}`);
   }
 
-  return sections.join('\n');
+  return sections.join("\n");
 }
 
 /**
@@ -179,12 +221,18 @@ export function buildChatCompletionRequest(
   modelId: ModelId,
   tone: string,
   parentMessageId: string | null,
-  temperature: number = 0.7,
-  maxTokens: number = 2000
+  temperature = 0.7,
+  maxTokens = 2000,
+  enableSearch = false,
 ): ChatCompletionRequest {
   const messages = getMessagesInPath(thread);
   const modelConfig = getModelById(modelId);
-  const systemPrompt = buildEnhancedSystemPrompt(thread, modelId, tone, parentMessageId);
+  const systemPrompt = buildEnhancedSystemPrompt(
+    thread,
+    modelId,
+    tone,
+    parentMessageId,
+  );
 
   return {
     messages: convertMessagesToAPIFormat(messages),
@@ -192,78 +240,6 @@ export function buildChatCompletionRequest(
     temperature,
     maxTokens,
     systemPrompt,
+    enableSearch,
   };
 }
-
-/**
- * Build API path with locale
- */
-export function buildAPIPath(locale: string, endpoint: string): string {
-  return `/api/${locale}/v1/core/agent/chat/${endpoint}`;
-}
-
-/**
- * Fetch with error handling
- */
-export async function fetchWithErrorHandling(
-  url: string,
-  options: RequestInit
-): Promise<Response> {
-  try {
-    const response = await fetch(url, options);
-
-    if (!response.ok) {
-      await handleAPIError(response);
-    }
-
-    return response;
-  } catch (error: unknown) {
-    // If it's already an APIError, re-throw it
-    if (error instanceof APIError) {
-      throw error;
-    }
-
-    // Wrap other errors
-    if (error instanceof Error) {
-      throw new APIError(`Failed to fetch ${url}: ${error.message}`);
-    }
-
-    throw new APIError(`Failed to fetch ${url}: Unknown error`);
-  }
-}
-
-/**
- * Create abort controller with timeout
- */
-export function createAbortController(timeoutMs?: number): AbortController {
-  const controller = new AbortController();
-
-  if (timeoutMs) {
-    setTimeout(() => {
-      controller.abort();
-    }, timeoutMs);
-  }
-
-  return controller;
-}
-
-/**
- * Check if error is an abort error
- */
-export function isAbortError(error: unknown): boolean {
-  return error instanceof Error && error.name === "AbortError";
-}
-
-/**
- * Format error message for display
- */
-export function formatErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  if (typeof error === "string") {
-    return error;
-  }
-  return "An unknown error occurred";
-}
-

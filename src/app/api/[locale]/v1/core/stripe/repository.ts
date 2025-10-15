@@ -11,9 +11,6 @@ import { execSync, spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -21,6 +18,10 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import type { JwtPayloadType } from "../user/auth/definition";
 import type {
@@ -39,14 +40,14 @@ export interface CliStripeRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<CliStripeResponseOutput>>;
+  ): ResponseType<CliStripeResponseOutput>;
 
-  checkInstallation(logger: EndpointLogger): Promise<ResponseType<boolean>>;
+  checkInstallation(logger: EndpointLogger): ResponseType<boolean>;
   startListener(
     webhookUrl: string | undefined,
     logger: EndpointLogger,
-  ): Promise<ResponseType<string>>;
-  checkAuthentication(logger: EndpointLogger): Promise<ResponseType<boolean>>;
+  ): ResponseType<string>;
+  checkAuthentication(logger: EndpointLogger): ResponseType<boolean>;
 }
 
 /**
@@ -58,12 +59,12 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   /**
    * Process Stripe CLI operations
    */
-  async processStripe(
+  processStripe(
     data: CliStripeRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<CliStripeResponseOutput>> {
+  ): ResponseType<CliStripeResponseOutput> {
     const { t } = simpleT(locale);
 
     try {
@@ -85,12 +86,12 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
           if (installed) {
             response.version = this.getStripeVersion();
           } else {
-            response.instructions = this.getStripeCLIInstallInstructions(t);
+            response.instructions = this.getStripeCLIInstallInstructions();
           }
           break;
         }
         case "install": {
-          response.instructions = this.getStripeCLIInstallInstructions(t);
+          response.instructions = this.getStripeCLIInstallInstructions();
           response.success = false; // Cannot auto-install, only provide instructions
           break;
         }
@@ -133,7 +134,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
         }
         default: {
           return createErrorResponse(
-            t("app.api.v1.core.stripe.errors.validation.title"),
+            "app.api.v1.core.stripe.errors.validation.title",
             ErrorResponseTypes.VALIDATION_ERROR,
             { operation: data.operation },
           );
@@ -153,7 +154,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       logger.error("Error processing Stripe CLI operation:", error);
       const parsedError = parseError(error);
       return createErrorResponse(
-        t("app.api.v1.core.stripe.errors.serverError.title"),
+        "app.api.v1.core.stripe.errors.serverError.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         {
           operation: data.operation,
@@ -167,9 +168,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   /**
    * Check if Stripe CLI is installed
    */
-  async checkInstallation(
-    logger: EndpointLogger,
-  ): Promise<ResponseType<boolean>> {
+  checkInstallation(logger: EndpointLogger): ResponseType<boolean> {
     try {
       logger.debug("Checking Stripe CLI installation");
       const installed = this.isStripeCLIInstalled();
@@ -188,10 +187,10 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   /**
    * Start Stripe webhook listener
    */
-  async startListener(
+  startListener(
     webhookUrl: string | undefined,
     logger: EndpointLogger,
-  ): Promise<ResponseType<string>> {
+  ): ResponseType<string> {
     try {
       const url =
         webhookUrl ||
@@ -219,9 +218,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   /**
    * Check Stripe CLI authentication
    */
-  async checkAuthentication(
-    logger: EndpointLogger,
-  ): Promise<ResponseType<boolean>> {
+  checkAuthentication(logger: EndpointLogger): ResponseType<boolean> {
     try {
       const authenticated = this.checkStripeAuth(logger);
       return createSuccessResponse(authenticated);
@@ -241,6 +238,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
    */
   private isStripeCLIInstalled(): boolean {
     try {
+      // eslint-disable-next-line i18next/no-literal-string
       execSync("stripe --version", { stdio: "pipe" });
       return true;
     } catch {
@@ -253,6 +251,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
    */
   private getStripeVersion(): string {
     try {
+      // eslint-disable-next-line i18next/no-literal-string
       const version = execSync("stripe --version", {
         encoding: "utf-8",
       }).trim();
@@ -263,10 +262,11 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   }
 
   /**
-   * Get Stripe CLI installation instructions using translation function
+   * Get Stripe CLI installation instructions
    */
-  private getStripeCLIInstallInstructions(t: (key: string) => string): string {
-    // Fallback instructions with actual content for missing translation keys
+  /* eslint-disable i18next/no-literal-string */
+  private getStripeCLIInstallInstructions(): string {
+    // Hardcoded installation instructions
     const instructionsArray = [
       "Stripe CLI is not installed. Please install it following the official documentation:",
       "https://docs.stripe.com/stripe-cli",
@@ -302,6 +302,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
 
     return instructionsArray.join("\\n");
   }
+  /* eslint-enable i18next/no-literal-string */
 
   /**
    * Start Stripe webhook listener
@@ -314,8 +315,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   ): { success: boolean; process?: ChildProcess } {
     if (!this.isStripeCLIInstalled()) {
       logger.error("Stripe CLI is not installed");
-      const { t } = simpleT("en");
-      logger.debug(this.getStripeCLIInstallInstructions(t));
+      logger.debug(this.getStripeCLIInstallInstructions());
       return { success: false };
     }
 
@@ -406,6 +406,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
     }
 
     try {
+      // eslint-disable-next-line i18next/no-literal-string
       execSync("stripe config --list", { stdio: "pipe" });
       return true;
     } catch {
@@ -426,6 +427,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       logger.debug(`[Stripe] ${output}`);
 
       // Look for the webhook signing secret
+      // eslint-disable-next-line i18next/no-literal-string
       const whsecPattern = "whsec_";
       if (output.includes(whsecPattern)) {
         const secretMatch = output.match(/whsec_[a-zA-Z0-9]+/);
@@ -448,7 +450,9 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       }
 
       // Look for ready message
+      // eslint-disable-next-line i18next/no-literal-string
       const readyPattern = "Ready!";
+
       const listeningPattern = "listening";
       if (output.includes(readyPattern) || output.includes(listeningPattern)) {
         logger.debug("🎧 Stripe webhook listener is ready!");
@@ -463,6 +467,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
     try {
       // Determine the base directory for the project
       const projectRoot = process.cwd();
+      // eslint-disable-next-line i18next/no-literal-string
       const envFilename = ".env";
       const envPath = path.join(projectRoot, envFilename);
 
@@ -479,10 +484,12 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       const regex = /STRIPE_WEBHOOK_SECRET="[^"]*"/;
       if (regex.test(envContent)) {
         // Replace existing webhook secret
+        // eslint-disable-next-line i18next/no-literal-string
         const replacementText = `STRIPE_WEBHOOK_SECRET="${secret}"`;
         envContent = envContent.replace(regex, replacementText);
       } else {
         // Add new webhook secret at the end of the file
+        // eslint-disable-next-line i18next/no-literal-string
         const additionalContent = `\\nSTRIPE_WEBHOOK_SECRET="${secret}"\\n`;
         envContent += additionalContent;
       }
@@ -501,42 +508,25 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
 export const cliStripeRepository = new CliStripeRepositoryImpl();
 
 // Export individual functions for backward compatibility
-export const isStripeCLIInstalled = (): Promise<ResponseType<boolean>> => {
-  const logger = {
-    debug: () => {},
-    info: () => {},
-    error: () => {},
-    warn: () => {},
-    isDebugEnabled: false,
-  } as EndpointLogger;
+export const isStripeCLIInstalled = (
+  logger: EndpointLogger,
+): ResponseType<boolean> => {
   return new CliStripeRepositoryImpl().checkInstallation(logger);
 };
 
 export const getStripeCLIInstallInstructions = (): string => {
-  const { t } = simpleT("en");
-  return new CliStripeRepositoryImpl()["getStripeCLIInstallInstructions"](t);
+  return new CliStripeRepositoryImpl()["getStripeCLIInstallInstructions"]();
 };
 
 export const startStripeListener = (
+  logger: EndpointLogger,
   webhookUrl?: string,
-): Promise<ResponseType<string>> => {
-  const logger = {
-    debug: () => {},
-    info: () => {},
-    error: () => {},
-    warn: () => {},
-    isDebugEnabled: false,
-  } as EndpointLogger;
+): ResponseType<string> => {
   return new CliStripeRepositoryImpl().startListener(webhookUrl, logger);
 };
 
-export const checkStripeAuth = (): Promise<ResponseType<boolean>> => {
-  const logger = {
-    debug: () => {},
-    info: () => {},
-    error: () => {},
-    warn: () => {},
-    isDebugEnabled: false,
-  } as EndpointLogger;
+export const checkStripeAuth = (
+  logger: EndpointLogger,
+): ResponseType<boolean> => {
   return new CliStripeRepositoryImpl().checkAuthentication(logger);
 };

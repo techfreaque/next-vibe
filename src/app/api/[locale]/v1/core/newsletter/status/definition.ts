@@ -67,7 +67,7 @@ const { GET } = createEndpoint({
             order: 1,
           },
         },
-        z.email(),
+        z.string().email(),
       ),
       // RESPONSE FIELDS
       subscribed: responseField(

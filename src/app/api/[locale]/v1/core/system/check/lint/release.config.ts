@@ -10,6 +10,7 @@ const releaseConfig: ReleaseConfig = {
       build: true,
       test: false,
       release: {
+        // eslint-disable-next-line i18next/no-literal-string
         tagPrefix: "lint_",
       },
     },

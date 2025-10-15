@@ -1,45 +1,71 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  post: {
-    title: "Tytuł",
-    description: "Opis endpointu",
+  get: {
+    title: "Status Zadań Importu",
+    description: "Wyświetl i monitoruj zadania importu CSV",
     form: {
-      title: "Konfiguracja",
-      description: "Skonfiguruj parametry",
+      title: "Filtry Zadań",
+      description: "Filtruj zadania importu według statusu i paginacji",
+    },
+    filters: {
+      title: "Filtry",
+      description: "Opcje filtrowania dla zadań importu",
+    },
+    status: {
+      label: "Status Zadania",
+      description: "Filtruj według statusu zadania",
+      placeholder: "Wybierz status",
+    },
+    limit: {
+      label: "Wyników na Stronę",
+      description: "Liczba zadań do zwrócenia",
+      placeholder: "50",
+    },
+    offset: {
+      label: "Przesunięcie Strony",
+      description: "Liczba zadań do pominięcia",
+      placeholder: "0",
     },
     response: {
-      title: "Odpowiedź",
-      description: "Dane odpowiedzi",
+      title: "Zadania Importu",
+      description: "Lista zadań importu z ich aktualnym statusem",
+      items: {
+        title: "Lista Zadań",
+      },
     },
     errors: {
-      unauthorized: {
-        title: "Brak autoryzacji",
-        description: "Wymagana autoryzacja",
-      },
       validation: {
-        title: "Błąd walidacji",
-        description: "Nieprawidłowe parametry żądania",
+        title: "Błąd Walidacji",
+        description: "Nieprawidłowe parametry filtrowania",
       },
-      server: {
-        title: "Błąd serwera",
-        description: "Wystąpił wewnętrzny błąd serwera",
-      },
-      unknown: {
-        title: "Nieznany błąd",
-        description: "Wystąpił nieznany błąd",
-      },
-      network: {
-        title: "Błąd sieci",
-        description: "Wystąpił błąd sieci",
+      unauthorized: {
+        title: "Brak Autoryzacji",
+        description: "Wymagana autoryzacja do wyświetlania zadań importu",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Dostęp zabroniony",
+        description: "Dostęp zabroniony dla zadań importu",
       },
       notFound: {
-        title: "Nie znaleziono",
-        description: "Zasób nie został znaleziony",
+        title: "Nie Znaleziono",
+        description: "Nie znaleziono zadań importu",
+      },
+      server: {
+        title: "Błąd Serwera",
+        description: "Wewnętrzny błąd serwera podczas pobierania zadań",
+      },
+      unknown: {
+        title: "Nieznany Błąd",
+        description: "Wystąpił nieznany błąd",
+      },
+      network: {
+        title: "Błąd Sieci",
+        description: "Błąd sieci podczas pobierania zadań",
+      },
+      unsavedChanges: {
+        title: "Niezapisane Zmiany",
+        description: "Są niezapisane zmiany",
       },
       conflict: {
         title: "Konflikt",
@@ -47,8 +73,8 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Sukces",
-      description: "Operacja zakończona pomyślnie",
+      title: "Pobrano Zadania",
+      description: "Lista zadań importu została pobrana pomyślnie",
     },
   },
-} ;
+};

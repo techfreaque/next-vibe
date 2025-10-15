@@ -10,11 +10,28 @@ export const translations = {
   create: createTranslations,
   edit: editTranslations,
   list: listTranslations,
-  send: {
+  sending: {
     errors: {
       server: {
         title: "Server Error",
         description: "An error occurred on the SMTP server",
+      },
+      rejected: {
+        title: "Email Rejected",
+        defaultReason: "Email rejected by server",
+      },
+      no_recipients: {
+        title: "No Recipients Accepted",
+        defaultReason: "No recipients accepted",
+      },
+      rate_limit: {
+        title: "Rate Limit Exceeded",
+      },
+      capacity: {
+        title: "Capacity Error",
+      },
+      no_account: {
+        title: "No SMTP Account Available",
       },
     },
   },

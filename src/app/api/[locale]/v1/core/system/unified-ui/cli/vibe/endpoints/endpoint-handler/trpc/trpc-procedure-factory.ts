@@ -38,7 +38,7 @@ export function createTRPCProcedureFromEndpoint<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TFields,
   TRequestInput,
   TRequestOutput,
   TResponseInput,
@@ -60,7 +60,7 @@ export function createTRPCProcedureFromEndpoint<
   >,
   handler: ApiHandlerFunction<
     TRequestOutput,
-    TUrlVariablesInput,
+    TResponseOutput,
     TUrlVariablesOutput,
     TUserRoleValue
   >,
@@ -84,7 +84,6 @@ export function createTRPCProcedureFromEndpoint<
       TFields
     >["sms"];
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any {
   // Create enhanced handler to get the tRPC procedure
   const trpcHandler = createTRPCHandler({
@@ -215,12 +214,7 @@ function selectBaseProcedure<
 export function createTRPCProceduresFromEndpoints<
   T extends Record<
     string,
-    CreateApiEndpoint<
-      string,
-      Methods,
-      readonly (typeof UserRoleValue)[],
-      UnifiedField<z.ZodTypeAny>
-    >
+    CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
   >,
 >(
   endpoints: T,
@@ -243,7 +237,7 @@ export function createTRPCProceduresFromEndpoints<
         string,
         Methods,
         readonly (typeof UserRoleValue)[],
-        UnifiedField<z.ZodTypeAny>
+        any
       >["email"];
       sms?: ApiHandlerOptions<
         Record<string, string | number | boolean>,
@@ -252,7 +246,7 @@ export function createTRPCProceduresFromEndpoints<
         string,
         Methods,
         readonly (typeof UserRoleValue)[],
-        UnifiedField<z.ZodTypeAny>
+        any
       >["sms"];
     }
   >,
@@ -273,7 +267,6 @@ export function createTRPCProceduresFromEndpoints<
       const handler = handlers[method as keyof T];
       const procedureOptions = options?.[method as keyof T];
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       procedures[method as keyof T] = createTRPCProcedureFromEndpoint(
         endpoint,
         handler,
@@ -292,12 +285,7 @@ export function createTRPCProceduresFromEndpoints<
 export function createTRPCProceduresFromRouteExports(routeExports: {
   definitions?: Record<
     string,
-    CreateApiEndpoint<
-      string,
-      Methods,
-      readonly (typeof UserRoleValue)[],
-      UnifiedField<z.ZodTypeAny>
-    >
+    CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
   >;
   handlers?: Record<
     string,
@@ -320,7 +308,13 @@ export function createTRPCProceduresFromRouteExports(routeExports: {
     return {};
   }
 
-  const options: Record<string, Record<string, string | number | boolean>> = {};
+  const options: Record<
+    string,
+    {
+      email?: Record<string, string | number | boolean>;
+      sms?: Record<string, string | number | boolean>;
+    }
+  > = {};
 
   // Map email and sms configs to handlers
   if (email) {
@@ -349,7 +343,7 @@ export type ExtractTRPCProcedures<T> = {
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    UnifiedField<z.ZodTypeAny>
+    any
   >
     ? T[K]["method"] extends Methods.GET
       ? ReturnType<typeof publicProcedure.query>
@@ -363,12 +357,7 @@ export type ExtractTRPCProcedures<T> = {
 export interface RouteFileStructure {
   definitions?: Record<
     string,
-    CreateApiEndpoint<
-      string,
-      Methods,
-      readonly (typeof UserRoleValue)[],
-      UnifiedField<z.ZodTypeAny>
-    >
+    CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
   >;
   handlers?: Record<
     string,
@@ -381,8 +370,6 @@ export interface RouteFileStructure {
   >;
   email?: Record<string, Record<string, string | number | boolean>>;
   sms?: Record<string, Record<string, string | number | boolean>>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
 }
 
 /**
@@ -412,13 +399,12 @@ export function validateRouteFileForTRPC(routeFile: RouteFileStructure): {
 
   // For the new endpoint system, we don't require definitions or trpc exports
   // The route is valid if it has HTTP method handlers from endpointsHandler
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const hasEndpointsHandler =
-    routeFile.GET ||
-    routeFile.POST ||
-    routeFile.PUT ||
-    routeFile.PATCH ||
-    routeFile.DELETE;
+    "GET" in routeFile ||
+    "POST" in routeFile ||
+    "PUT" in routeFile ||
+    "PATCH" in routeFile ||
+    "DELETE" in routeFile;
 
   if (hasEndpointsHandler) {
     // This is a new-style endpoint, which is valid for tRPC generation
@@ -479,12 +465,13 @@ function createCombinedInputSchema<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TFields,
 >(
   endpoint: CreateApiEndpoint<
     TExampleKey,
     TMethod,
     TUserRoleValue,
-    UnifiedField<z.ZodTypeAny>,
+    TFields,
     TRequestInput,
     TRequestOutput,
     TResponseInput,
@@ -492,10 +479,7 @@ function createCombinedInputSchema<
     TUrlVariablesInput,
     TUrlVariablesOutput
   >,
-): z.ZodSchema<{
-  requestData: TRequestOutput;
-  urlVariables?: TUrlVariablesOutput;
-}> {
+): z.ZodTypeAny {
   // Check if endpoint has URL parameters
   if (endpoint.requestUrlParamsSchema) {
     // Create a combined schema that includes both request data and URL variables

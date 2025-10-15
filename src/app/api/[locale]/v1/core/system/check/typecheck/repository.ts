@@ -3,19 +3,21 @@
  * Handles run typescript type checking operations
  */
 
-import { exec } from "child_process";
 import { readFileSync, writeFileSync } from "node:fs";
-import type { ResponseType as ApiResponseType } from "next-vibe/shared/types/response.schema";
+import { promisify } from "node:util";
+
+import { exec } from "child_process";
+import { z } from "zod";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+
+import type { ResponseType as ApiResponseType } from "../../../../../../../../packages/next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
-import { promisify } from "node:util";
-
-import type { EndpointLogger } from "../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-
+} from "../../../../../../../../packages/next-vibe/shared/types/response.schema";
+import { parseError } from "../../../../../../../../packages/next-vibe/shared/utils/parse-error";
 import { TYPECHECK_PATTERNS } from "./constants";
 import type {
   TypecheckRequestOutput,
@@ -30,18 +32,22 @@ import {
   type TypecheckConfig,
 } from "./utils";
 
-// TypeScript configuration interfaces
-interface TsConfigCompilerOptions {
-  rootDir?: string;
-  paths?: Record<string, string[]>;
-  baseUrl?: string;
-}
+// TypeScript configuration Zod schema for runtime validation
+const TsConfigSchema = z.object({
+  compilerOptions: z
+    .object({
+      rootDir: z.string().optional(),
+      paths: z.record(z.string(), z.array(z.string())).optional(),
+      baseUrl: z.string().optional(),
+    })
+    .passthrough()
+    .optional(),
+  include: z.array(z.string()).optional(),
+  exclude: z.array(z.string()).optional(),
+});
 
-interface TsConfig {
-  compilerOptions?: TsConfigCompilerOptions;
-  include?: string[];
-  exclude?: string[];
-}
+// TypeScript configuration type inferred from Zod schema
+type TsConfig = z.infer<typeof TsConfigSchema>;
 
 const execAsync = promisify(exec);
 
@@ -51,10 +57,10 @@ const execAsync = promisify(exec);
  * but limits the files to be checked to improve performance
  */
 function createTempTsConfig(files: string[], tempConfigPath: string): void {
-  // Read the main tsconfig.json
-  const mainTsConfig = JSON.parse(
-    readFileSync("tsconfig.json", "utf8"),
-  ) as TsConfig;
+  // Read and validate the main tsconfig.json with Zod to avoid any type
+  const mainTsConfig = TsConfigSchema.parse(
+    JSON.parse(readFileSync("tsconfig.json", "utf8")),
+  );
 
   // Convert relative file paths to be relative to the temp config location
   // Since temp config is in .tmp/, we need to go up one level (../) to reach project root
@@ -184,7 +190,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         command = `${TYPECHECK_PATTERNS.TSGO_COMMAND} --noEmit --incremental --tsBuildInfoFile ${config.buildInfoFile} --skipLibCheck --project ${config.tempConfigFile}`;
       } else {
         // Folder - create temporary tsconfig that includes only files from this folder
-        const tsFiles = findTypeScriptFiles(config.targetPath);
+        const tsFiles = findTypeScriptFiles(config.targetPath || ".");
 
         if (tsFiles.length === 0) {
           return createSuccessResponse({
@@ -239,24 +245,33 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         stdout = result.stdout;
         stderr = result.stderr;
       } catch (execError) {
-        const error = execError as {
-          code?: number;
-          stdout?: string;
-          stderr?: string;
-        };
+        // TSC exit codes 1 and 2 mean TypeScript errors were found - check for them
+        const hasTypeErrors =
+          execError &&
+          typeof execError === "object" &&
+          "code" in execError &&
+          (execError.code === 1 || execError.code === 2);
 
-        // TSC exit codes 1 and 2 mean TypeScript errors were found - this is expected
-        if (error.code === 1 || error.code === 2) {
-          stdout = error.stdout;
-          stderr = error.stderr;
+        if (hasTypeErrors && "stdout" in execError && "stderr" in execError) {
+          stdout =
+            typeof execError.stdout === "string" ? execError.stdout : undefined;
+          stderr =
+            typeof execError.stderr === "string" ? execError.stderr : undefined;
           // TypeScript errors detected (exit codes 1 or 2)
         } else {
           // Other errors are unexpected
+          const parsedExecError = parseError(execError);
           logger.error(
             "Unexpected error executing TypeScript command",
-            execError as Error,
+            parsedExecError,
           );
-          throw execError;
+          return createErrorResponse(
+            "app.api.v1.core.system.check.typecheck.errors.internal.title",
+            ErrorResponseTypes.INTERNAL_ERROR,
+            {
+              error: parsedExecError.message,
+            },
+          );
         }
       }
 
@@ -316,12 +331,25 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
             continue;
           }
 
-          const errorObj = {
+          // Severity is already validated by regex to be "error" or "warning"
+          const errorObj: {
+            file: string;
+            line: number;
+            column: number;
+            code: string;
+            severity: "error" | "warning" | "info";
+            message: string;
+          } = {
             file: getDisplayPath(filePath),
             line: parseInt(lineNum, 10),
             column: parseInt(colNum, 10),
             code: code.trim(),
-            severity: severity as "error" | "warning" | "info",
+            severity:
+              severity === "error"
+                ? "error"
+                : severity === "warning"
+                  ? "warning"
+                  : "info",
             message: message.trim(),
           };
 
@@ -400,26 +428,24 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         message: string;
       }> = [];
 
-      // Handle exec error output
-      const execError = error as {
-        stderr?: string;
-        stdout?: string;
-        code?: number;
-      };
+      // Handle exec error output - check structure without assertions
+      const hasStderr = error && typeof error === "object" && "stderr" in error;
+      const hasStdout = error && typeof error === "object" && "stdout" in error;
+      const hasCode = error && typeof error === "object" && "code" in error;
 
-      if (execError.stderr && typeof execError.stderr === "string") {
-        output += execError.stderr;
+      if (hasStderr && typeof error.stderr === "string") {
+        output += error.stderr;
         errors.push({
           file: "unknown",
           severity: "error",
-          message: execError.stderr.trim(),
+          message: error.stderr.trim(),
         });
       }
-      if (execError.stdout && typeof execError.stdout === "string") {
-        output += execError.stdout;
+      if (hasStdout && typeof error.stdout === "string") {
+        output += error.stdout;
 
         // Parse TypeScript errors from stdout
-        const stdoutForSplit = execError.stdout || "";
+        const stdoutForSplit = error.stdout || "";
         const lines = stdoutForSplit.split("\n");
         for (const line of lines) {
           const match = line.match(TYPECHECK_PATTERNS.FULL_ERROR_PATTERN);
@@ -477,7 +503,9 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
 
       // For TypeScript errors (exit code 2) or when we have parsed errors, return success with error details
       // This allows the UI to display the actual TypeScript errors
-      if (execError.code === 2 || errors.length > 0) {
+      const errorCode =
+        hasCode && typeof error.code === "number" ? error.code : 0;
+      if (errorCode === 2 || errors.length > 0) {
         // TypeScript compilation errors - treat as successful response with issues
         return createSuccessResponse(response);
       }

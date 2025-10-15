@@ -83,14 +83,14 @@ export interface ImapMessageInfo {
 /**
  * IMAP Connection Test Request Type
  */
-export interface ImapConnectionTestRequestTypeOutput {
+export interface ImapConnectionTestRequestOutput {
   account: ImapAccount;
 }
 
 /**
  * IMAP Connection Test Response Type
  */
-export interface ImapConnectionTestResponseTypeOutput {
+export interface ImapConnectionTestResponseOutput {
   success: boolean;
   message: TranslationKey;
   connectionStatus: (typeof ImapConnectionStatus)[keyof typeof ImapConnectionStatus];
@@ -107,21 +107,21 @@ export interface ImapConnectionTestResponseTypeOutput {
 /**
  * IMAP Folder List Request Type
  */
-export interface ImapFolderListRequestTypeOutput {
+export interface ImapFolderListRequestOutput {
   account: ImapAccount;
 }
 
 /**
  * IMAP Folder List Response Type
  */
-export interface ImapFolderListResponseTypeOutput {
+export interface ImapFolderListResponseOutput {
   folders: ImapFolderInfo[];
 }
 
 /**
  * IMAP Message List Request Type
  */
-export interface ImapMessageListRequestTypeOutput {
+export interface ImapMessageListRequestOutput {
   account: ImapAccount;
   folderPath: string;
   options?: {
@@ -135,21 +135,21 @@ export interface ImapMessageListRequestTypeOutput {
 /**
  * IMAP Message List Response Type
  */
-export interface ImapMessageListResponseTypeOutput {
+export interface ImapMessageListResponseOutput {
   messages: ImapMessageInfo[];
 }
 
 /**
  * IMAP Connection Close Request Type
  */
-export interface ImapConnectionCloseRequestTypeOutput {
+export interface ImapConnectionCloseRequestOutput {
   account: ImapAccount;
 }
 
 /**
  * IMAP Connection Close Response Type
  */
-export interface ImapConnectionCloseResponseTypeOutput {
+export interface ImapConnectionCloseResponseOutput {
   success: boolean;
   message: TranslationKey;
 }

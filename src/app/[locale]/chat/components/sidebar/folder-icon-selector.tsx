@@ -1,34 +1,39 @@
 "use client";
 
 import {
-  Folder,
-  FolderOpen,
-  FolderHeart,
-  FolderClock,
-  FolderCode,
-  FolderGit,
-  Briefcase,
-  Home,
-  Star,
-  Heart,
-} from "lucide-react";
-import {
-  SiJavascript,
-  SiTypescript,
-  SiPython,
-  SiReact,
-  SiNextdotjs,
-  SiNodedotjs,
   SiDocker,
   SiGit,
   SiGithub,
   SiGoogle,
+  SiJavascript,
+  SiNextdotjs,
+  SiNodedotjs,
+  SiPython,
+  SiReact,
+  SiTypescript,
 } from "@icons-pack/react-simple-icons";
-import type { JSX } from "react";
+import {
+  Briefcase,
+  Folder,
+  FolderClock,
+  FolderCode,
+  FolderGit,
+  FolderHeart,
+  FolderOpen,
+  Heart,
+  Home,
+  Star,
+} from "lucide-react";
+import { cn } from "next-vibe/shared/utils";
+import type { ComponentType, JSX } from "react";
 import React from "react";
 
-import { Button, Popover, PopoverContent, PopoverTrigger } from "@/packages/next-vibe-ui/web/ui";
-import { cn } from "next-vibe/shared/utils";
+import {
+  Button,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/packages/next-vibe-ui/web/ui";
 
 interface FolderIconSelectorProps {
   value: string;
@@ -58,12 +63,17 @@ const ICON_OPTIONS = [
   { id: "si-google", label: "Google", Icon: SiGoogle },
 ];
 
-export function getIconComponent(iconId: string) {
+export function getIconComponent(
+  iconId: string,
+): ComponentType<{ className?: string }> {
   const option = ICON_OPTIONS.find((opt) => opt.id === iconId);
   return option?.Icon || Folder;
 }
 
-export function FolderIconSelector({ value, onChange }: FolderIconSelectorProps): JSX.Element {
+export function FolderIconSelector({
+  value,
+  onChange,
+}: FolderIconSelectorProps): JSX.Element {
   const [open, setOpen] = React.useState(false);
   const SelectedIcon = getIconComponent(value);
 
@@ -87,7 +97,7 @@ export function FolderIconSelector({ value, onChange }: FolderIconSelectorProps)
                 }}
                 className={cn(
                   "flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent transition-colors",
-                  value === option.id && "bg-accent border-2 border-primary"
+                  value === option.id && "bg-accent border-2 border-primary",
                 )}
                 title={option.label}
               >
@@ -100,4 +110,3 @@ export function FolderIconSelector({ value, onChange }: FolderIconSelectorProps)
     </Popover>
   );
 }
-

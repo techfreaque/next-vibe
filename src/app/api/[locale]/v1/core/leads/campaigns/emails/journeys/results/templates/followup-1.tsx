@@ -1,9 +1,11 @@
 /**
+
  * Results Journey - Follow-up 1 Email Template
  * COMPLETELY REDESIGNED: Focus on proven results, case studies, and ROI
  */
 
 import { Text } from "@react-email/components";
+import React from "react";
 
 import {
   CTAButton,

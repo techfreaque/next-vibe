@@ -1,10 +1,12 @@
 /**
+
  * Results Journey - Initial Contact Email Template
  */
 
 import { Text } from "@react-email/components";
+import React from "react";
 
-import { getPricingPlansArray } from "@/app/[locale]/(site)/pricing/_components/pricing";
+import { getPricingPlansArray } from "@/app/[locale]/story/pricing/_components/pricing";
 import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
 import { SubscriptionPlan } from "@/app/api/[locale]/v1/core/subscription/enum";
 import type { CountryLanguage } from "@/i18n/core/config";

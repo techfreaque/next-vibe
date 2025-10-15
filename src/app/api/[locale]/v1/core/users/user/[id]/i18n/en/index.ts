@@ -28,6 +28,12 @@ export const translations = {
             email: {
               content: "Email Address",
             },
+            privateName: {
+              content: "Private Name",
+            },
+            publicName: {
+              content: "Public Name",
+            },
             firstName: {
               content: "First Name",
             },
@@ -99,6 +105,12 @@ export const translations = {
         },
         email: {
           content: "Email Address",
+        },
+        privateName: {
+          content: "Private Name",
+        },
+        publicName: {
+          content: "Public Name",
         },
         firstName: {
           content: "First Name",
@@ -224,6 +236,14 @@ export const translations = {
         description: "User's email address for login and communication",
         placeholder: "Enter email address...",
       },
+      privateName: {
+        label: "Private Name",
+        description: "User's full legal name (visible only to admins)",
+      },
+      publicName: {
+        label: "Public Name",
+        description: "User's display name (visible to all users)",
+      },
       firstName: {
         label: "First Name",
         description: "User's first name",
@@ -282,6 +302,12 @@ export const translations = {
         },
         email: {
           content: "Email Address",
+        },
+        privateName: {
+          content: "Private Name",
+        },
+        publicName: {
+          content: "Public Name",
         },
         firstName: {
           content: "First Name",

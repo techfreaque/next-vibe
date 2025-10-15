@@ -15,16 +15,18 @@ import refundDefinitions from "./definition";
 export const { POST, tools } = endpointsHandler({
   endpoint: refundDefinitions,
   [Methods.POST]: {
-    handler: async ({ data, user, locale, logger }) => {
-      const userId = authRepository.requireUserId(user);
+    handler: ({ data, user, locale, logger }) => {
       logger.debug("Payment refund API POST request", {
-        userId: userId,
+        userId: authRepository.requireUserId(user),
         transactionId: data.transactionId,
         amount: data.amount,
       });
-
-      // Delegate to repository for business logic and data access
-      return await paymentRepository.createRefund(userId, data, locale, logger);
+      return paymentRepository.createRefund(
+        authRepository.requireUserId(user),
+        data,
+        locale,
+        logger,
+      );
     },
   },
 });

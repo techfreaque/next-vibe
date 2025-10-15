@@ -48,6 +48,22 @@ export const translations: typeof enTranslations = {
       description: "Szukaj leadów według nazwy, e-maila lub firmy",
       placeholder: "Wprowadź frazę wyszukiwania",
     },
+    searchPagination: {
+      title: "Wyszukiwanie i paginacja",
+      description: "Kontrolki wyszukiwania i paginacji",
+    },
+    statusFilters: {
+      title: "Filtry statusu i kampanii",
+      description: "Filtruj według statusu, etapu kampanii i źródła",
+    },
+    locationFilters: {
+      title: "Filtry lokalizacji",
+      description: "Filtruj według kraju i języka",
+    },
+    sortingOptions: {
+      title: "Opcje sortowania",
+      description: "Skonfiguruj sortowanie wyników",
+    },
     sortBy: {
       label: "Sortuj według",
       description: "Pole do sortowania wyników",

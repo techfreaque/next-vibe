@@ -67,6 +67,8 @@ export const translations = {
       email: "Email Address",
       firstName: "First Name",
       lastName: "Last Name",
+      privateName: "Private Name",
+      publicName: "Public Name",
       imageUrl: "Profile Image",
     },
     sessionInfo: {
@@ -121,6 +123,15 @@ export const translations = {
   success: {
     title: "Login Successful",
     description: "You have been logged in",
+  },
+  token: {
+    save: {
+      failed: "Failed to save authentication token",
+      success: "Authentication token saved successfully",
+    },
+  },
+  process: {
+    failed: "Login process failed",
   },
   enums: {
     socialProviders: {

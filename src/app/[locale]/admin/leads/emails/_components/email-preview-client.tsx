@@ -7,7 +7,6 @@
 
 import { render } from "@react-email/render";
 import { Mail, Send } from "lucide-react";
-import { errorLogger } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "next-vibe-ui/ui/dialog";
 import type React from "react";
@@ -15,19 +14,22 @@ import { useEffect, useState } from "react";
 
 import type { EmailTemplateResult } from "@/app/api/[locale]/v1/core/leads/campaigns/emails";
 import type {
-  EmailCampaignStage,
-  EmailJourneyVariant,
+  EmailCampaignStageValues,
+  EmailJourneyVariantValues,
 } from "@/app/api/[locale]/v1/core/leads/enum";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { useTranslation } from "@/i18n/core/client";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { TestEmailForm } from "./test-email-form";
 
 interface EmailPreviewClientProps {
-  journeyVariant: typeof EmailJourneyVariant;
-  stage: typeof EmailCampaignStage;
+  journeyVariant: typeof EmailJourneyVariantValues;
+  stage: typeof EmailCampaignStageValues;
   emailPreview: EmailTemplateResult;
   companyName: string;
   companyEmail: string;
+  locale: CountryLanguage;
 }
 
 export function EmailPreviewClient({
@@ -36,10 +38,12 @@ export function EmailPreviewClient({
   emailPreview,
   companyName,
   companyEmail,
+  locale,
 }: EmailPreviewClientProps): React.JSX.Element {
   const { t } = useTranslation();
   const [isTestEmailOpen, setIsTestEmailOpen] = useState(false);
   const [renderedHtml, setRenderedHtml] = useState<string>("");
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   useEffect(() => {
     // Render JSX to HTML for preview
@@ -48,13 +52,13 @@ export function EmailPreviewClient({
         const html = await render(emailPreview.jsx);
         setRenderedHtml(html);
       } catch (error) {
-        errorLogger("Failed to render email HTML:", error);
+        logger.error("Failed to render email HTML:", error);
         setRenderedHtml(t("leads.admin.emails.preview.error"));
       }
     };
 
     void renderEmailHtml();
-  }, [emailPreview.jsx, t]);
+  }, [emailPreview.jsx, logger, t]);
 
   return (
     <>

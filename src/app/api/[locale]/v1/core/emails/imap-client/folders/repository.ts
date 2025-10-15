@@ -26,11 +26,7 @@ import type { ImapFolder } from "../../messages/db";
 import { imapAccounts, imapFolders } from "../../messages/db";
 // Note: Removed problematic type imports from definition.ts
 // These types should be defined locally or imported from proper sources
-import {
-  ImapSyncStatus,
-  ImapSyncStatusFilter,
-  type ImapSyncStatusValue,
-} from "../enum";
+import { ImapSyncStatus, ImapSyncStatusFilter } from "../enum";
 
 /**
  * Local type definitions for folders repository
@@ -102,6 +98,17 @@ interface SyncResults {
   errors: ErrorResponseType[];
 }
 
+/**
+ * Sync Service Result Interface (partial result from sync service)
+ */
+interface SyncServiceResult {
+  foldersProcessed?: number;
+  foldersAdded?: number;
+  foldersUpdated?: number;
+  foldersDeleted?: number;
+  duration?: number;
+}
+
 export interface ImapFoldersRepository {
   listFolders(
     data: ImapFolderQueryType,
@@ -134,7 +141,7 @@ export interface ImapFoldersRepository {
   updateFolderSyncStatus(
     folderId: string,
     syncStatus: string,
-    syncError: string | null,
+    syncError: ErrorResponseType | null,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -175,7 +182,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
       accountId: folder.accountId,
       lastSyncAt: folder.lastSyncAt?.toISOString() || null,
       syncStatus: folder.syncStatus || ImapSyncStatus.PENDING,
-      syncError: folder.syncError || null,
+      syncError: folder.syncError ? JSON.stringify(folder.syncError) : null,
       createdAt: folder.createdAt.toISOString(),
       updatedAt: folder.updatedAt.toISOString(),
     };
@@ -204,7 +211,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
       const offset = (page - 1) * limit;
 
       // Build where conditions
-      const whereConditions = [];
+      const whereConditions: ReturnType<typeof eq>[] = [];
 
       // Account filter (required)
       if (data.accountId) {
@@ -220,23 +227,16 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
       // Sync status filter
       if (data.syncStatus && data.syncStatus !== ImapSyncStatusFilter.ALL) {
         // Convert filter to database enum value
-        let syncStatusValue: string;
-        switch (data.syncStatus) {
-          case ImapSyncStatusFilter.PENDING:
-            syncStatusValue = ImapSyncStatus.PENDING;
-            break;
-          case ImapSyncStatusFilter.SYNCING:
-            syncStatusValue = ImapSyncStatus.SYNCING;
-            break;
-          case ImapSyncStatusFilter.SYNCED:
-            syncStatusValue = ImapSyncStatus.SYNCED;
-            break;
-          case ImapSyncStatusFilter.ERROR:
-            syncStatusValue = ImapSyncStatus.ERROR;
-            break;
-          default:
-            syncStatusValue = ImapSyncStatus.PENDING;
-        }
+        const syncStatusValue =
+          data.syncStatus === ImapSyncStatusFilter.PENDING
+            ? ImapSyncStatus.PENDING
+            : data.syncStatus === ImapSyncStatusFilter.SYNCING
+              ? ImapSyncStatus.SYNCING
+              : data.syncStatus === ImapSyncStatusFilter.SYNCED
+                ? ImapSyncStatus.SYNCED
+                : data.syncStatus === ImapSyncStatusFilter.ERROR
+                  ? ImapSyncStatus.ERROR
+                  : ImapSyncStatus.PENDING;
         whereConditions.push(eq(imapFolders.syncStatus, syncStatusValue));
       }
 
@@ -367,32 +367,30 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         );
 
         if (syncResult.success && syncResult.data?.result) {
-          // Type guard for sync result
-          const result = syncResult.data.result;
-          const isValidResult = (
-            r: unknown,
-          ): r is {
-            foldersProcessed?: number;
-            foldersAdded?: number;
-            foldersUpdated?: number;
-            foldersDeleted?: number;
-            duration?: number;
-          } => {
-            return typeof r === "object" && r !== null;
-          };
+          // Extract sync result data - the sync service returns a SyncServiceResult type
+          const result = syncResult.data.result as SyncServiceResult;
 
-          const validResult = isValidResult(result) ? result : {};
           const syncResults: SyncResults = {
             accountsProcessed: 1,
-            foldersProcessed: validResult.foldersProcessed ?? 0,
+            foldersProcessed:
+              typeof result.foldersProcessed === "number"
+                ? result.foldersProcessed
+                : 0,
             messagesProcessed: 0,
-            foldersAdded: validResult.foldersAdded ?? 0,
-            foldersUpdated: validResult.foldersUpdated ?? 0,
-            foldersDeleted: validResult.foldersDeleted ?? 0,
+            foldersAdded:
+              typeof result.foldersAdded === "number" ? result.foldersAdded : 0,
+            foldersUpdated:
+              typeof result.foldersUpdated === "number"
+                ? result.foldersUpdated
+                : 0,
+            foldersDeleted:
+              typeof result.foldersDeleted === "number"
+                ? result.foldersDeleted
+                : 0,
             messagesAdded: 0,
             messagesUpdated: 0,
             messagesDeleted: 0,
-            duration: validResult.duration ?? 0,
+            duration: typeof result.duration === "number" ? result.duration : 0,
             errors: [],
           };
           return createSuccessResponse(syncResults);
@@ -471,7 +469,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
   async updateFolderSyncStatus(
     folderId: string,
     syncStatus: keyof typeof ImapSyncStatus,
-    syncError: string | null,
+    syncError: ErrorResponseType | null,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -490,7 +488,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         .update(imapFolders)
         .set({
           syncStatus: ImapSyncStatus[syncStatus],
-          syncError: syncError,
+          syncError,
           lastSyncAt: new Date(),
           updatedAt: new Date(),
         })

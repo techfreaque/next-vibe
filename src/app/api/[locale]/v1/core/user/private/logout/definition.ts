@@ -19,24 +19,25 @@ import {
 
 import { UserRole } from "../../user-roles/enum";
 
-const { GET } = createEndpoint({
-  method: Methods.GET,
+const { POST } = createEndpoint({
+  method: Methods.POST,
   path: ["v1", "core", "user", "private", "logout"],
-  title: "app.api.v1.core.user.private.logout.title",
-  description: "app.api.v1.core.user.private.logout.description",
-  category: "app.api.v1.core.user.category",
-  tags: ["app.api.v1.core.user.private.logout.tag"],
+  title: "app.api.v1.core.user.private.logout.title" as const,
+  description: "app.api.v1.core.user.private.logout.description" as const,
+  category: "app.api.v1.core.user.category" as const,
+  tags: ["app.api.v1.core.user.private.logout.tag" as const],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
-  ],
+  ] as const,
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.user.private.logout.response.title",
-      description: "app.api.v1.core.user.private.logout.response.description",
+      title: "app.api.v1.core.user.private.logout.response.title" as const,
+      description:
+        "app.api.v1.core.user.private.logout.response.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { response: true },
@@ -44,14 +45,16 @@ const { GET } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.user.private.logout.response.success",
+          content:
+            "app.api.v1.core.user.private.logout.response.success" as const,
         },
         z.boolean(),
       ),
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.user.private.logout.response.message",
+          content:
+            "app.api.v1.core.user.private.logout.response.message" as const,
         },
         z.string(),
       ),
@@ -59,14 +62,15 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.user.private.logout.response.sessionsCleaned",
+            "app.api.v1.core.user.private.logout.response.sessionsCleaned" as const,
         },
         z.number(),
       ),
       nextSteps: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.user.private.logout.response.nextSteps",
+          content:
+            "app.api.v1.core.user.private.logout.response.nextSteps" as const,
         },
         z.array(z.string()),
       ),
@@ -76,56 +80,66 @@ const { GET } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.v1.core.user.private.logout.errors.validation.title",
+      title:
+        "app.api.v1.core.user.private.logout.errors.validation.title" as const,
       description:
-        "app.api.v1.core.user.private.logout.errors.validation.description",
+        "app.api.v1.core.user.private.logout.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.v1.core.user.private.logout.errors.unauthorized.title",
+      title:
+        "app.api.v1.core.user.private.logout.errors.unauthorized.title" as const,
       description:
-        "app.api.v1.core.user.private.logout.errors.unauthorized.description",
+        "app.api.v1.core.user.private.logout.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.v1.core.user.private.logout.errors.internal.title",
+      title:
+        "app.api.v1.core.user.private.logout.errors.internal.title" as const,
       description:
-        "app.api.v1.core.user.private.logout.errors.internal.description",
+        "app.api.v1.core.user.private.logout.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.v1.core.user.private.logout.errors.unknown.title",
+      title:
+        "app.api.v1.core.user.private.logout.errors.unknown.title" as const,
       description:
-        "app.api.v1.core.user.private.logout.errors.unknown.description",
+        "app.api.v1.core.user.private.logout.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.v1.core.user.private.logout.errors.conflict.title",
+      title:
+        "app.api.v1.core.user.private.logout.errors.conflict.title" as const,
       description:
-        "app.api.v1.core.user.private.logout.errors.conflict.description",
+        "app.api.v1.core.user.private.logout.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.v1.core.user.private.logout.errors.forbidden.title",
+      title:
+        "app.api.v1.core.user.private.logout.errors.forbidden.title" as const,
       description:
-        "app.api.v1.core.user.private.logout.errors.forbidden.description",
+        "app.api.v1.core.user.private.logout.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.v1.core.user.private.logout.errors.network_error.title",
+      title:
+        "app.api.v1.core.user.private.logout.errors.network_error.title" as const,
       description:
-        "app.api.v1.core.user.private.logout.errors.network_error.description",
+        "app.api.v1.core.user.private.logout.errors.network_error.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.v1.core.user.private.logout.errors.not_found.title",
+      title:
+        "app.api.v1.core.user.private.logout.errors.not_found.title" as const,
       description:
-        "app.api.v1.core.user.private.logout.errors.not_found.description",
+        "app.api.v1.core.user.private.logout.errors.not_found.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.v1.core.user.private.logout.errors.unsaved_changes.title",
+      title:
+        "app.api.v1.core.user.private.logout.errors.unsaved_changes.title" as const,
       description:
-        "app.api.v1.core.user.private.logout.errors.unsaved_changes.description",
+        "app.api.v1.core.user.private.logout.errors.unsaved_changes.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.user.private.logout.success.title",
-    description: "app.api.v1.core.user.private.logout.success.description",
+    title: "app.api.v1.core.user.private.logout.success.title" as const,
+    description:
+      "app.api.v1.core.user.private.logout.success.description" as const,
   },
 
   // === EXAMPLES ===
@@ -155,14 +169,14 @@ const { GET } = createEndpoint({
   },
 });
 
-const logoutEndpoints = { GET };
+const logoutEndpoints = { POST };
 
-export { GET };
+export { POST };
 
 export default logoutEndpoints;
 
 // Export types as required by migration guide
-export type LogoutGetRequestInput = typeof GET.types.RequestInput;
-export type LogoutGetRequestOutput = typeof GET.types.RequestOutput;
-export type LogoutGetResponseInput = typeof GET.types.ResponseInput;
-export type LogoutGetResponseOutput = typeof GET.types.ResponseOutput;
+export type LogoutPostRequestInput = typeof POST.types.RequestInput;
+export type LogoutPostRequestOutput = typeof POST.types.RequestOutput;
+export type LogoutPostResponseInput = typeof POST.types.ResponseInput;
+export type LogoutPostResponseOutput = typeof POST.types.ResponseOutput;

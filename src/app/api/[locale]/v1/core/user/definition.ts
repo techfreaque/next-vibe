@@ -13,7 +13,6 @@ import type { JwtPayloadType } from "./auth/definition";
 import {
   Language,
   Theme,
-  Timezone,
   type UserDetailLevel,
   type UserDetailLevelValue,
 } from "./enum";
@@ -21,72 +20,17 @@ import { userRoleResponseSchema } from "./user-roles/definition";
 import type { UserRoleValue } from "./user-roles/enum";
 
 /**
- * Image URL Schema
- * Defines the schema for user image URLs
- */
-export const imageUrlSchema = z.string().nullable().optional();
-
-/**
  * User Preferences Schema
  * Defines user preferences
  */
 export const userPreferencesSchema = z
   .object({
-    emailNotifications: z.boolean().default(true),
-    smsNotifications: z.boolean().default(false),
     darkMode: z.boolean().default(false),
     language: z.string().default(Language.EN),
     theme: z.string().default(Theme.SYSTEM),
-    timezone: z.string().default(Timezone.UTC),
   })
   .partial();
 export type UserPreferencesType = z.infer<typeof userPreferencesSchema>;
-
-/**
- * Social Links Schema
- * Defines social media links structure with validation
- */
-export const socialLinksSchema = z
-  .object({
-    twitter: z
-      .string()
-      .url({
-        message: "validationErrors.user.profile.twitter_url_invalid",
-      })
-      .optional(),
-    facebook: z
-      .string()
-      .url({
-        message: "validationErrors.user.profile.facebook_url_invalid",
-      })
-      .optional(),
-    instagram: z
-      .string()
-      .url({
-        message: "validationErrors.user.profile.instagram_url_invalid",
-      })
-      .optional(),
-    linkedin: z
-      .string()
-      .url({
-        message: "validationErrors.user.profile.linkedin_url_invalid",
-      })
-      .optional(),
-    github: z
-      .string()
-      .url({
-        message: "validationErrors.user.profile.github_url_invalid",
-      })
-      .optional(),
-    website: z
-      .string()
-      .url({
-        message: "validationErrors.user.profile.website_url_invalid",
-      })
-      .optional(),
-  })
-  .partial();
-export type SocialLinksType = z.infer<typeof socialLinksSchema>;
 
 /**
  * Minimal User Schema
@@ -102,23 +46,13 @@ export const standardUserSchema = z.object({
   id: z.uuid(),
   leadId: leadId.nullable(),
   isPublic: z.literal(false),
-  firstName: z
-    .string()
-    .min(1, { message: "validationErrors.user.profile.first_name_required" }),
-  lastName: z
-    .string()
-    .min(1, { message: "validationErrors.user.profile.last_name_required" }),
-  company: z
-    .string()
-    .min(1, { message: "validationErrors.user.profile.company_required" }),
-  email: z
-    .string()
-    .email({ message: "validationErrors.user.profile.email_invalid" }),
-  imageUrl: imageUrlSchema,
+  email: z.email({ message: "validationErrors.user.profile.email_invalid" }),
+  privateName: z.string(),
+  publicName: z.string(),
   isActive: z.boolean().nullable(),
   emailVerified: z.boolean().nullable(),
-  requireTwoFactor: z.boolean().nullable(),
-  marketingConsent: z.boolean().nullable(),
+  requireTwoFactor: z.boolean().optional(),
+  marketingConsent: z.boolean().optional(),
   userRoles: z.array(userRoleResponseSchema),
   createdAt: dateSchema,
   updatedAt: dateSchema,
@@ -130,15 +64,7 @@ export type StandardUserType = z.infer<typeof standardUserSchema>;
  * Full user profile data
  */
 export const completeUserSchema = standardUserSchema.extend({
-  phone: z.string().optional(),
-  bio: z.string().optional(),
-  website: z.string().optional(),
-  location: z.string().optional(),
-  avatar: z.string().optional(),
-  coverImage: z.string().optional(),
-  socialLinks: socialLinksSchema.optional(),
-  preferences: userPreferencesSchema.optional(),
-  visibility: z.string(),
+  stripeCustomerId: z.string().nullable(),
 });
 export type CompleteUserType = z.infer<typeof completeUserSchema>;
 

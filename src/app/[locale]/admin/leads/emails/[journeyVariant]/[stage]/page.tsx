@@ -237,6 +237,7 @@ export default async function EmailPreviewPage({
         emailPreview={emailPreview}
         companyName={t("app.appName")}
         companyEmail={contactClientRepository.getSupportEmail(locale)}
+        locale={locale}
       />
     </div>
   );

@@ -3,11 +3,66 @@
  * Generates help content from endpoint definitions for both CLI and programmatic use
  */
 
+import type { z } from "zod";
+
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { DiscoveredRoute } from "../../../utils/route-delegation-handler";
-import type { EndpointLogger } from "../../endpoint-handler/logger";
+
+// CLI flag constants
+const CLI_FLAGS = {
+  DATA: "--data",
+  USER_TYPE: "--user-type",
+  LOCALE: "--locale",
+  OUTPUT: "--output",
+  VERBOSE: "--verbose",
+  DRY_RUN: "--dry-run",
+  PREFIX: "--",
+  OPTIONS: "[options]",
+} as const;
+
+// CLI example commands (technical documentation, not user-facing)
+const CLI_EXAMPLES = {
+  INTERACTIVE: "vibe                          # Start interactive mode",
+  LIST: "vibe list                     # List all available commands",
+  DB_PING: "vibe db:ping                  # Execute database ping",
+  USER_CREATE: 'vibe user:create --data \'{"email": "test@example.com"}\'',
+  HELP_DB: "vibe help db                  # Show help for database commands",
+  CHECK: "vibe check src/app/api        # Run vibe check on folder",
+} as const;
+
+// CLI flag strings (technical identifiers)
+const CLI_FLAG_STRINGS = {
+  DATA: "-d, --data <json>",
+  USER_TYPE: "-u, --user-type <type>",
+  LOCALE: "-l, --locale <locale>",
+  OUTPUT: "-o, --output <format>",
+  VERBOSE: "-v, --verbose",
+  DRY_RUN: "--dry-run",
+} as const;
+
+/**
+ * Endpoint definition structure (simplified for help generation)
+ */
+interface EndpointDefinition {
+  requestSchema?: z.ZodTypeAny;
+  requestUrlParamsSchema?: z.ZodTypeAny;
+}
+
+/**
+ * Zod type with internal _def property (for schema introspection)
+ */
+interface ZodWithDef {
+  _def?: {
+    typeName?: string;
+    innerType?: ZodWithDef;
+    defaultValue?: () => CountryLanguage;
+    values?: string[] | Record<string, string>;
+    description?: string;
+  };
+  shape?: Record<string, ZodWithDef>;
+}
 
 /**
  * Help content structure
@@ -76,8 +131,6 @@ export class HelpHandler {
   async generateHelp(
     routes: DiscoveredRoute[],
     options: HelpOptions = {},
-    locale: CountryLanguage,
-    logger: EndpointLogger,
   ): Promise<HelpContent> {
     const { t } = simpleT("en-GLOBAL");
 
@@ -130,17 +183,21 @@ export class HelpHandler {
     route: DiscoveredRoute,
     options: HelpOptions,
   ): Promise<CommandHelp> {
+    const { t } = simpleT("en-GLOBAL");
     const endpoint = await this.getEndpointDefinition(route);
 
     const commandHelp: CommandHelp = {
       name: route.alias,
       description:
-        route.description || "No description available".replace("No", "No"),
+        route.description ||
+        t(
+          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.noDescription",
+        ),
       usage: this.generateUsageString(route, endpoint),
     };
 
     if (options.includeParameters && endpoint) {
-      commandHelp.parameters = await this.generateParameterHelp(endpoint);
+      commandHelp.parameters = this.generateParameterHelp(endpoint);
     }
 
     if (options.includeExamples) {
@@ -153,7 +210,7 @@ export class HelpHandler {
   /**
    * Generate parameter help from endpoint schema
    */
-  private async generateParameterHelp(endpoint: any): Promise<ParameterHelp[]> {
+  private generateParameterHelp(endpoint: EndpointDefinition): ParameterHelp[] {
     const parameters: ParameterHelp[] = [];
 
     // Generate help for request data parameters
@@ -181,14 +238,15 @@ export class HelpHandler {
    * Extract parameters from Zod schema
    */
   private extractParametersFromSchema(
-    schema: any,
+    schema: z.ZodTypeAny,
     prefix: string,
   ): ParameterHelp[] {
     const parameters: ParameterHelp[] = [];
 
     try {
-      if (schema?.shape) {
-        for (const [key, fieldSchema] of Object.entries(schema.shape)) {
+      const zodWithDef = schema as ZodWithDef;
+      if (zodWithDef.shape) {
+        for (const [key, fieldSchema] of Object.entries(zodWithDef.shape)) {
           const param = this.extractParameterFromField(
             key,
             fieldSchema,
@@ -209,22 +267,24 @@ export class HelpHandler {
    */
   private extractParameterFromField(
     name: string,
-    schema: any,
+    schema: ZodWithDef,
     prefix: string,
   ): ParameterHelp {
     let required = true;
-    let defaultValue: any = undefined;
+    let defaultValue: CountryLanguage | undefined = undefined;
     let baseSchema = schema;
 
     // Unwrap optional and default schemas
     if (schema._def && schema._def.typeName === "ZodOptional") {
       required = false;
-      baseSchema = schema._def.innerType;
+      baseSchema = schema._def.innerType || schema;
     }
 
     if (schema._def && schema._def.typeName === "ZodDefault") {
-      defaultValue = schema._def.defaultValue();
-      baseSchema = schema._def.innerType;
+      if (schema._def.defaultValue) {
+        defaultValue = schema._def.defaultValue();
+      }
+      baseSchema = schema._def.innerType || schema;
       required = false;
     }
 
@@ -233,7 +293,7 @@ export class HelpHandler {
     const description = this.getSchemaDescription(baseSchema);
 
     return {
-      name: prefix === "url" ? `--${name}` : name,
+      name: prefix === "url" ? `${CLI_FLAGS.PREFIX}${name}` : name,
       type,
       required,
       description,
@@ -245,47 +305,54 @@ export class HelpHandler {
   /**
    * Get schema type string
    */
-  private getSchemaType(schema: any): string {
-    if (!schema._def) {
-      return "unknown".replace("n", "n");
+  private getSchemaType(schema: ZodWithDef): string {
+    if (!schema._def?.typeName) {
+      return "unknown";
     }
 
-    switch (schema._def.typeName) {
-      case "ZodString".replace("g", "g"):
-        return "string".replace("g", "g");
-      case "ZodNumber".replace("r", "r"):
-        return "number".replace("r", "r");
-      case "ZodBoolean".replace("n", "n"):
-        return "boolean".replace("n", "n");
-      case "ZodArray".replace("y", "y"):
-        return "array".replace("y", "y");
-      case "ZodObject".replace("t", "t"):
-        return "object".replace("t", "t");
-      case "ZodEnum".replace("m", "m"):
-        return "enum".replace("m", "m");
-      case "ZodNativeEnum".replace("m", "m"):
-        return "enum".replace("m", "m");
-      case "ZodDate".replace("e", "e"):
-        return "date".replace("e", "e");
+    const typeName = schema._def.typeName;
+    switch (typeName) {
+      case "ZodString":
+        return "string";
+      case "ZodNumber":
+        return "number";
+      case "ZodBoolean":
+        return "boolean";
+      case "ZodArray":
+        return "array";
+      case "ZodObject":
+        return "object";
+      case "ZodEnum":
+        return "enum";
+      case "ZodNativeEnum":
+        return "enum";
+      case "ZodDate":
+        return "date";
       default:
-        return "unknown".replace("n", "n");
+        return "unknown";
     }
   }
 
   /**
    * Get schema choices for enums
    */
-  private getSchemaChoices(schema: any): string[] | undefined {
-    if (!schema._def) {
+  private getSchemaChoices(schema: ZodWithDef): string[] | undefined {
+    if (!schema._def?.typeName) {
       return undefined;
     }
 
-    if (schema._def.typeName === "ZodEnum".replace("m", "m")) {
+    const typeName = schema._def.typeName;
+    if (typeName === "ZodEnum" && Array.isArray(schema._def.values)) {
       return schema._def.values;
     }
 
-    if (schema._def.typeName === "ZodNativeEnum".replace("m", "m")) {
-      return Object.values(schema._def.values);
+    if (typeName === "ZodNativeEnum" && schema._def.values) {
+      const values = schema._def.values;
+      if (typeof values === "object" && values !== null) {
+        return Object.values(values).filter(
+          (v): v is string => typeof v === "string",
+        );
+      }
     }
 
     return undefined;
@@ -294,35 +361,40 @@ export class HelpHandler {
   /**
    * Get schema description
    */
-  private getSchemaDescription(schema: any): string | undefined {
-    if (schema._def?.description) {
-      return schema._def.description;
-    }
-    return undefined;
+  private getSchemaDescription(schema: ZodWithDef): string | undefined {
+    return schema._def?.description;
   }
 
   /**
    * Generate usage string for command
    */
-  private generateUsageString(route: DiscoveredRoute, endpoint: any): string {
+  private generateUsageString(
+    route: DiscoveredRoute,
+    endpoint: EndpointDefinition | null,
+  ): string {
     let usage = `vibe ${route.alias}`;
 
     if (endpoint) {
       // Add data flag if request schema exists
       if (endpoint.requestSchema) {
-        usage += " [--data <json>]";
+        // eslint-disable-next-line i18next/no-literal-string
+        usage += ` [${CLI_FLAGS.DATA} <json>]`;
       }
 
       // Add URL parameter flags
-      if (endpoint.requestUrlParamsSchema?.shape) {
-        const urlParams = Object.keys(endpoint.requestUrlParamsSchema.shape);
+      const zodWithDef = endpoint.requestUrlParamsSchema as
+        | ZodWithDef
+        | undefined;
+      if (zodWithDef?.shape) {
+        const urlParams = Object.keys(zodWithDef.shape);
         for (const param of urlParams) {
-          usage += ` [--${param} <value>]`;
+          // eslint-disable-next-line i18next/no-literal-string
+          usage += ` [${CLI_FLAGS.PREFIX}${param} <value>]`;
         }
       }
     }
 
-    usage += " [options]";
+    usage += ` ${CLI_FLAGS.OPTIONS}`;
     return usage;
   }
 
@@ -331,7 +403,7 @@ export class HelpHandler {
    */
   private generateCommandExamples(
     route: DiscoveredRoute,
-    endpoint: any,
+    endpoint: EndpointDefinition | null,
   ): string[] {
     const examples: string[] = [];
 
@@ -340,11 +412,14 @@ export class HelpHandler {
 
     // Example with data if applicable
     if (endpoint?.requestSchema) {
-      examples.push(`vibe ${route.alias} --data '{"key": "value"}'`);
+      // eslint-disable-next-line i18next/no-literal-string
+      examples.push(`vibe ${route.alias} ${CLI_FLAGS.DATA} '{"key": "value"}'`);
     }
 
     // Example with verbose output
-    examples.push(`vibe ${route.alias} --verbose --output json`);
+    examples.push(
+      `vibe ${route.alias} ${CLI_FLAGS.VERBOSE} ${CLI_FLAGS.OUTPUT} json`,
+    );
 
     return examples;
   }
@@ -357,37 +432,49 @@ export class HelpHandler {
 
     return [
       {
-        flag: "-d, --data <json>",
-        description: t("app.api.v1.core.system.cli.vibe.help.usage"),
+        flag: CLI_FLAG_STRINGS.DATA,
+        description: t(
+          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagDataDesc",
+        ),
         type: "string",
       },
       {
-        flag: "-u, --user-type <type>",
-        description: "User type (ADMIN, CUSTOMER, PUBLIC)",
+        flag: CLI_FLAG_STRINGS.USER_TYPE,
+        description: t(
+          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagUserTypeDesc",
+        ),
         type: "string",
         defaultValue: undefined,
       },
       {
-        flag: "-l, --locale <locale>",
-        description: "Locale for the request",
+        flag: CLI_FLAG_STRINGS.LOCALE,
+        description: t(
+          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagLocaleDesc",
+        ),
         type: "string",
         defaultValue: "en-GLOBAL" as CountryLanguage,
       },
       {
-        flag: "-o, --output <format>",
-        description: "Output format (json, pretty)",
+        flag: CLI_FLAG_STRINGS.OUTPUT,
+        description: t(
+          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagOutputDesc",
+        ),
         type: "string",
         defaultValue: undefined,
       },
       {
-        flag: "-v, --verbose",
-        description: "Show verbose output",
+        flag: CLI_FLAG_STRINGS.VERBOSE,
+        description: t(
+          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagVerboseDesc",
+        ),
         type: "boolean",
         defaultValue: undefined,
       },
       {
-        flag: "--dry-run",
-        description: "Show what would be executed without running",
+        flag: CLI_FLAG_STRINGS.DRY_RUN,
+        description: t(
+          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.flagDryRunDesc",
+        ),
         type: "boolean",
         defaultValue: undefined,
       },
@@ -399,12 +486,12 @@ export class HelpHandler {
    */
   private generateExamples(): string[] {
     return [
-      "vibe                          # Start interactive mode",
-      "vibe list                     # List all available commands",
-      "vibe db:ping                  # Execute database ping",
-      'vibe user:create --data \'{"email": "test@example.com"}\'',
-      "vibe help db                  # Show help for database commands",
-      "vibe check src/app/api        # Run vibe check on folder",
+      CLI_EXAMPLES.INTERACTIVE,
+      CLI_EXAMPLES.LIST,
+      CLI_EXAMPLES.DB_PING,
+      CLI_EXAMPLES.USER_CREATE,
+      CLI_EXAMPLES.HELP_DB,
+      CLI_EXAMPLES.CHECK,
     ];
   }
 
@@ -412,19 +499,23 @@ export class HelpHandler {
    * Format help content as text
    */
   formatAsText(help: HelpContent): string {
+    const { t } = simpleT("en-GLOBAL");
     let output = "";
 
-    // Title and description
+    // eslint-disable-next-line i18next/no-literal-string
     output += `${help.title}\n`;
+    // eslint-disable-next-line i18next/no-literal-string
     output += `${help.description}\n\n`;
 
-    // Usage
-    output += `Usage: ${help.usage}\n\n`;
+    // eslint-disable-next-line i18next/no-literal-string
+    output += `${t("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.usageLabel")}: ${help.usage}\n\n`;
 
     // Commands
     if (help.commands && help.commands.length > 0) {
-      output += "Available Commands:\n";
+      // eslint-disable-next-line i18next/no-literal-string
+      output += `${t("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.availableCommandsLabel")}:\n`;
       for (const command of help.commands) {
+        // eslint-disable-next-line i18next/no-literal-string
         output += `  ${command.name.padEnd(20)} ${command.description}\n`;
       }
       output += "\n";
@@ -432,8 +523,10 @@ export class HelpHandler {
 
     // Options
     if (help.options && help.options.length > 0) {
-      output += "Global Options:\n";
+      // eslint-disable-next-line i18next/no-literal-string
+      output += `${t("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.globalOptionsLabel")}:\n`;
       for (const option of help.options) {
+        // eslint-disable-next-line i18next/no-literal-string
         output += `  ${option.flag.padEnd(25)} ${option.description}\n`;
       }
       output += "\n";
@@ -441,8 +534,10 @@ export class HelpHandler {
 
     // Examples
     if (help.examples && help.examples.length > 0) {
-      output += "Examples:\n";
+      // eslint-disable-next-line i18next/no-literal-string
+      output += `${t("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.helpHandler.examplesLabel")}:\n`;
       for (const example of help.examples) {
+        // eslint-disable-next-line i18next/no-literal-string
         output += `  ${example}\n`;
       }
       output += "\n";
@@ -461,17 +556,33 @@ export class HelpHandler {
   /**
    * Get endpoint definition from route
    */
-  private async getEndpointDefinition(route: DiscoveredRoute): Promise<any> {
+  private async getEndpointDefinition(
+    route: DiscoveredRoute,
+  ): Promise<EndpointDefinition | null> {
+    interface RouteModule {
+      tools?: {
+        definitions?: Record<string, EndpointDefinition>;
+      };
+    }
+
     try {
-      const routeModule = await import(route.routePath);
+      const moduleImport = (await import(route.routePath)) as RouteModule;
+      const routeModule = moduleImport;
 
       if (routeModule.tools?.definitions) {
         const definitions = routeModule.tools.definitions;
-        return definitions[route.method] || definitions.POST || definitions.GET;
+        const definition =
+          definitions[route.method] ||
+          definitions.POST ||
+          definitions.GET ||
+          null;
+        if (definition) {
+          return definition;
+        }
       }
 
       return null;
-    } catch (error) {
+    } catch {
       return null;
     }
   }

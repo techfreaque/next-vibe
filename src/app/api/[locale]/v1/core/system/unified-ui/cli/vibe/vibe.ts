@@ -5,8 +5,6 @@
  * Command line interface that can execute any route.ts from generated index files
  */
 
-// Load environment variables FIRST
-// Setup module aliases BEFORE any other imports
 import * as fs from "node:fs";
 import * as path from "node:path";
 
@@ -20,9 +18,9 @@ import type { EndpointLogger } from "./endpoints/endpoint-handler/logger";
 import { createEndpointLogger } from "./endpoints/endpoint-handler/logger";
 import { CliEntryPoint } from "./entry-point";
 import { ErrorHandler, setupGlobalErrorHandlers } from "./utils/errors";
-// import { logger } from "./utils/logger";
-// import { setupModuleAliases } from "./utils/module-resolver";
 import { memoryMonitor } from "./utils/performance";
+
+export const binaryStartTime = Date.now();
 
 /**
  * CLI Options interface for type safety
@@ -507,6 +505,7 @@ program
 
         // Use the new resource manager for cleanup and exit
         await cliResourceManager.cleanupAndExit(
+          logger,
           options.verbose ?? false,
           options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
         );
@@ -527,6 +526,7 @@ program
 
         // Cleanup and exit with error code
         await cliResourceManager.cleanupAndExit(
+          logger,
           options.verbose ?? false,
           options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
         );

@@ -20,9 +20,9 @@ import {
 } from "next-vibe-ui/ui/table";
 import type { JSX } from "react";
 
+import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/use-endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
-import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/use-endpoint";
 import imapAccountsListDefinition from "../../../../../api/[locale]/v1/core/emails/imap-client/accounts/list/definition";
 import imapAccountTestDefinition from "../../../../../api/[locale]/v1/core/emails/imap-client/accounts/test/definition";
 import { ImapSyncStatus } from "../../../../../api/[locale]/v1/core/emails/imap-client/enum";

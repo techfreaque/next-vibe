@@ -19,10 +19,6 @@ import {
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 
-import {
-  PreferredContactMethod,
-  PreferredContactMethodOptions,
-} from "../../enum";
 import { UserRole } from "../../user-roles/enum";
 import { SignupType, SignupTypeOptions } from "./enum";
 
@@ -32,16 +28,16 @@ import { SignupType, SignupTypeOptions } from "./enum";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "user", "public", "signup"],
-  title: "app.api.v1.core.user.public.signup.title",
-  description: "app.api.v1.core.user.public.signup.description",
-  category: "app.api.v1.core.user.category",
-  tags: ["app.api.v1.core.user.public.signup.tag"],
-  allowedRoles: [UserRole.PUBLIC],
+  title: "app.api.v1.core.user.public.signup.title" as const,
+  description: "app.api.v1.core.user.public.signup.description" as const,
+  category: "app.api.v1.core.user.category" as const,
+  tags: ["app.api.v1.core.user.public.signup.tag" as const],
+  allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.user.public.signup.title",
-      description: "app.api.v1.core.user.public.signup.description",
+      title: "app.api.v1.core.user.public.signup.title" as const,
+      description: "app.api.v1.core.user.public.signup.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -50,63 +46,65 @@ const { POST } = createEndpoint({
       personalInfo: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.v1.core.user.public.signup.groups.personalInfo.title",
+          title:
+            "app.api.v1.core.user.public.signup.groups.personalInfo.title" as const,
           description:
-            "app.api.v1.core.user.public.signup.groups.personalInfo.description",
+            "app.api.v1.core.user.public.signup.groups.personalInfo.description" as const,
           layout: { type: LayoutType.GRID, columns: 2 },
         },
         { request: "data" },
         {
-          firstName: requestDataField(
+          privateName: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label:
-                "app.api.v1.core.user.public.signup.fields.firstName.label",
+                "app.api.v1.core.user.public.signup.fields.privateName.label" as const,
               description:
-                "app.api.v1.core.user.public.signup.fields.firstName.description",
+                "app.api.v1.core.user.public.signup.fields.privateName.description" as const,
               placeholder:
-                "app.api.v1.core.user.public.signup.fields.firstName.placeholder",
+                "app.api.v1.core.user.public.signup.fields.privateName.placeholder" as const,
               required: true,
               layout: { columns: 6 },
               helpText:
-                "app.api.v1.core.user.public.signup.fields.firstName.description",
+                "app.api.v1.core.user.public.signup.fields.privateName.description" as const,
             },
             z
               .string()
               .min(2, {
                 message:
-                  "app.api.v1.core.user.public.signup.fields.firstName.validation.minLength",
+                  "app.api.v1.core.user.public.signup.fields.privateName.validation.minLength",
               })
-              .max(50, {
+              .max(100, {
                 message:
-                  "app.api.v1.core.user.public.signup.fields.firstName.validation.maxLength",
+                  "app.api.v1.core.user.public.signup.fields.privateName.validation.maxLength",
               }),
           ),
 
-          lastName: requestDataField(
+          publicName: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label: "app.api.v1.core.user.public.signup.fields.lastName.label",
+              label:
+                "app.api.v1.core.user.public.signup.fields.publicName.label" as const,
               description:
-                "app.api.v1.core.user.public.signup.fields.lastName.description",
+                "app.api.v1.core.user.public.signup.fields.publicName.description" as const,
               placeholder:
-                "app.api.v1.core.user.public.signup.fields.lastName.placeholder",
+                "app.api.v1.core.user.public.signup.fields.publicName.placeholder" as const,
               required: true,
               layout: { columns: 6 },
               helpText:
-                "app.api.v1.core.user.public.signup.fields.lastName.description",
+                "app.api.v1.core.user.public.signup.fields.publicName.description" as const,
             },
             z
               .string()
               .min(2, {
                 message:
-                  "app.api.v1.core.user.public.signup.fields.lastName.validation.minLength",
+                  "app.api.v1.core.user.public.signup.fields.publicName.validation.minLength",
               })
-              .max(50, {
+              .max(100, {
                 message:
-                  "app.api.v1.core.user.public.signup.fields.lastName.validation.maxLength",
+                  "app.api.v1.core.user.public.signup.fields.publicName.validation.maxLength",
               }),
           ),
 
@@ -114,15 +112,16 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.EMAIL,
-              label: "app.api.v1.core.user.public.signup.fields.email.label",
+              label:
+                "app.api.v1.core.user.public.signup.fields.email.label" as const,
               description:
-                "app.api.v1.core.user.public.signup.fields.email.description",
+                "app.api.v1.core.user.public.signup.fields.email.description" as const,
               placeholder:
-                "app.api.v1.core.user.public.signup.fields.email.placeholder",
+                "app.api.v1.core.user.public.signup.fields.email.placeholder" as const,
               required: true,
               layout: { columns: 12 },
               helpText:
-                "app.api.v1.core.user.public.signup.fields.email.description",
+                "app.api.v1.core.user.public.signup.fields.email.description" as const,
             },
             z
               .string()
@@ -139,9 +138,10 @@ const { POST } = createEndpoint({
       security: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.v1.core.user.public.signup.groups.security.title",
+          title:
+            "app.api.v1.core.user.public.signup.groups.security.title" as const,
           description:
-            "app.api.v1.core.user.public.signup.groups.security.description",
+            "app.api.v1.core.user.public.signup.groups.security.description" as const,
           layout: { type: LayoutType.VERTICAL },
         },
         { request: "data" },
@@ -150,15 +150,16 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.PASSWORD,
-              label: "app.api.v1.core.user.public.signup.fields.password.label",
+              label:
+                "app.api.v1.core.user.public.signup.fields.password.label" as const,
               description:
-                "app.api.v1.core.user.public.signup.fields.password.description",
+                "app.api.v1.core.user.public.signup.fields.password.description" as const,
               placeholder:
-                "app.api.v1.core.user.public.signup.fields.password.placeholder",
+                "app.api.v1.core.user.public.signup.fields.password.placeholder" as const,
               required: true,
               layout: { columns: 12 },
               helpText:
-                "app.api.v1.core.user.public.signup.fields.password.help",
+                "app.api.v1.core.user.public.signup.fields.password.help" as const,
             },
             z
               .string()
@@ -177,15 +178,15 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.PASSWORD,
               label:
-                "app.api.v1.core.user.public.signup.fields.confirmPassword.label",
+                "app.api.v1.core.user.public.signup.fields.confirmPassword.label" as const,
               description:
-                "app.api.v1.core.user.public.signup.fields.confirmPassword.description",
+                "app.api.v1.core.user.public.signup.fields.confirmPassword.description" as const,
               placeholder:
-                "app.api.v1.core.user.public.signup.fields.confirmPassword.placeholder",
+                "app.api.v1.core.user.public.signup.fields.confirmPassword.placeholder" as const,
               required: true,
               layout: { columns: 12 },
               helpText:
-                "app.api.v1.core.user.public.signup.fields.confirmPassword.description",
+                "app.api.v1.core.user.public.signup.fields.confirmPassword.description" as const,
             },
             z.string().min(8, {
               message:
@@ -195,110 +196,33 @@ const { POST } = createEndpoint({
         },
       ),
 
-      // === BUSINESS INFORMATION (OPTIONAL) ===
-      businessInfo: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.v1.core.user.public.signup.groups.businessInfo.title",
-          description:
-            "app.api.v1.core.user.public.signup.groups.businessInfo.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
-        },
-        { request: "data" },
-        {
-          company: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.v1.core.user.public.signup.fields.company.label",
-              description:
-                "app.api.v1.core.user.public.signup.fields.company.description",
-              placeholder:
-                "app.api.v1.core.user.public.signup.fields.company.placeholder",
-              required: false,
-              layout: { columns: 12 },
-              helpText:
-                "app.api.v1.core.user.public.signup.fields.company.description",
-            },
-            z
-              .string()
-              .max(100, {
-                message:
-                  "app.api.v1.core.user.public.signup.fields.company.validation.maxLength",
-              })
-              .optional(),
-          ),
-
-          phone: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.PHONE,
-              label: "app.api.v1.core.user.public.signup.fields.phone.label",
-              description:
-                "app.api.v1.core.user.public.signup.fields.phone.description",
-              placeholder:
-                "app.api.v1.core.user.public.signup.fields.phone.placeholder",
-              required: false,
-              layout: { columns: 12 },
-              helpText:
-                "app.api.v1.core.user.public.signup.fields.phone.description",
-            },
-            z
-              .string()
-              .regex(/^\+?[\d\s\-()]+$/, {
-                message:
-                  "app.api.v1.core.user.public.signup.fields.phone.validation.format",
-              })
-              .optional(),
-          ),
-        },
-      ),
-
       // === PREFERENCES ===
       preferences: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.v1.core.user.public.signup.groups.preferences.title",
+          title:
+            "app.api.v1.core.user.public.signup.groups.preferences.title" as const,
           description:
-            "app.api.v1.core.user.public.signup.groups.preferences.description",
+            "app.api.v1.core.user.public.signup.groups.preferences.description" as const,
           layout: { type: LayoutType.VERTICAL },
         },
         { request: "data" },
         {
-          preferredContactMethod: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label:
-                "app.api.v1.core.user.public.signup.fields.preferredContactMethod.label",
-              description:
-                "app.api.v1.core.user.public.signup.fields.preferredContactMethod.description",
-              placeholder:
-                "app.api.v1.core.user.public.signup.fields.preferredContactMethod.placeholder",
-              options: PreferredContactMethodOptions,
-              required: true,
-              layout: { columns: 12 },
-              helpText:
-                "app.api.v1.core.user.public.signup.fields.preferredContactMethod.help",
-            },
-            z.nativeEnum(PreferredContactMethod),
-          ),
-
           signupType: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label:
-                "app.api.v1.core.user.public.signup.fields.signupType.label",
+                "app.api.v1.core.user.public.signup.fields.signupType.label" as const,
               description:
-                "app.api.v1.core.user.public.signup.fields.signupType.description",
+                "app.api.v1.core.user.public.signup.fields.signupType.description" as const,
               placeholder:
-                "app.api.v1.core.user.public.signup.fields.signupType.placeholder",
+                "app.api.v1.core.user.public.signup.fields.signupType.placeholder" as const,
               options: SignupTypeOptions,
               required: true,
               layout: { columns: 12 },
               helpText:
-                "app.api.v1.core.user.public.signup.fields.signupType.help",
+                "app.api.v1.core.user.public.signup.fields.signupType.help" as const,
             },
             z.nativeEnum(SignupType),
           ),
@@ -309,9 +233,10 @@ const { POST } = createEndpoint({
       consent: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.v1.core.user.public.signup.groups.consent.title",
+          title:
+            "app.api.v1.core.user.public.signup.groups.consent.title" as const,
           description:
-            "app.api.v1.core.user.public.signup.groups.consent.description",
+            "app.api.v1.core.user.public.signup.groups.consent.description" as const,
           layout: { type: LayoutType.VERTICAL },
         },
         { request: "data" },
@@ -321,15 +246,15 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label:
-                "app.api.v1.core.user.public.signup.fields.acceptTerms.label",
+                "app.api.v1.core.user.public.signup.fields.acceptTerms.label" as const,
               description:
-                "app.api.v1.core.user.public.signup.fields.acceptTerms.description",
+                "app.api.v1.core.user.public.signup.fields.acceptTerms.description" as const,
               placeholder:
-                "app.api.v1.core.user.public.signup.fields.acceptTerms.placeholder",
+                "app.api.v1.core.user.public.signup.fields.acceptTerms.placeholder" as const,
               required: true,
               layout: { columns: 12 },
               helpText:
-                "app.api.v1.core.user.public.signup.fields.acceptTerms.help",
+                "app.api.v1.core.user.public.signup.fields.acceptTerms.help" as const,
             },
             z.boolean().refine((val) => val === true, {
               message:
@@ -342,15 +267,15 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label:
-                "app.api.v1.core.user.public.signup.fields.subscribeToNewsletter.label",
+                "app.api.v1.core.user.public.signup.fields.subscribeToNewsletter.label" as const,
               description:
-                "app.api.v1.core.user.public.signup.fields.subscribeToNewsletter.description",
+                "app.api.v1.core.user.public.signup.fields.subscribeToNewsletter.description" as const,
               placeholder:
-                "app.api.v1.core.user.public.signup.fields.subscribeToNewsletter.placeholder",
+                "app.api.v1.core.user.public.signup.fields.subscribeToNewsletter.placeholder" as const,
               required: false,
               layout: { columns: 12 },
               helpText:
-                "app.api.v1.core.user.public.signup.fields.subscribeToNewsletter.help",
+                "app.api.v1.core.user.public.signup.fields.subscribeToNewsletter.help" as const,
             },
             z.boolean().optional().default(false),
           ),
@@ -361,50 +286,28 @@ const { POST } = createEndpoint({
       advanced: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.v1.core.user.public.signup.groups.advanced.title",
+          title:
+            "app.api.v1.core.user.public.signup.groups.advanced.title" as const,
           description:
-            "app.api.v1.core.user.public.signup.groups.advanced.description",
+            "app.api.v1.core.user.public.signup.groups.advanced.description" as const,
           layout: { type: LayoutType.GRID, columns: 12 },
         },
         { request: "data" },
         {
-          imageUrl: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.URL,
-              label: "app.api.v1.core.user.public.signup.fields.imageUrl.label",
-              description:
-                "app.api.v1.core.user.public.signup.fields.imageUrl.description",
-              placeholder:
-                "app.api.v1.core.user.public.signup.fields.imageUrl.placeholder",
-              required: false,
-              layout: { columns: 12 },
-              helpText:
-                "app.api.v1.core.user.public.signup.fields.imageUrl.help",
-            },
-            z
-              .string()
-              .url({
-                message:
-                  "app.api.v1.core.user.public.signup.fields.imageUrl.validation.invalidUrl",
-              })
-              .optional()
-              .nullable(),
-          ),
-
           leadId: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.UUID,
-              label: "app.api.v1.core.user.public.signup.fields.leadId.label",
+              label:
+                "app.api.v1.core.user.public.signup.fields.leadId.label" as const,
               description:
-                "app.api.v1.core.user.public.signup.fields.leadId.description",
+                "app.api.v1.core.user.public.signup.fields.leadId.description" as const,
               placeholder:
-                "app.api.v1.core.user.public.signup.fields.leadId.placeholder",
+                "app.api.v1.core.user.public.signup.fields.leadId.placeholder" as const,
               required: false,
               layout: { columns: 12 },
               helpText:
-                "app.api.v1.core.user.public.signup.fields.leadId.description",
+                "app.api.v1.core.user.public.signup.fields.leadId.description" as const,
             },
             z
               .string()
@@ -421,9 +324,9 @@ const { POST } = createEndpoint({
       response: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.v1.core.user.public.signup.response.title",
+          title: "app.api.v1.core.user.public.signup.response.title" as const,
           description:
-            "app.api.v1.core.user.public.signup.response.description",
+            "app.api.v1.core.user.public.signup.response.description" as const,
           layout: { type: LayoutType.VERTICAL },
         },
         { response: true },
@@ -431,23 +334,25 @@ const { POST } = createEndpoint({
           success: responseField(
             {
               type: WidgetType.BADGE,
-              text: "app.api.v1.core.user.public.signup.response.success",
+              text: "app.api.v1.core.user.public.signup.response.success" as const,
             },
             z.boolean().describe("Whether the signup was successful"),
           ),
           message: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.v1.core.user.public.signup.response.message",
+              content:
+                "app.api.v1.core.user.public.signup.response.message" as const,
             },
             z.string().describe("Human-readable signup status message"),
           ),
           user: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.v1.core.user.public.signup.response.title",
+              title:
+                "app.api.v1.core.user.public.signup.response.title" as const,
               description:
-                "app.api.v1.core.user.public.signup.response.description",
+                "app.api.v1.core.user.public.signup.response.description" as const,
               layout: { type: LayoutType.GRID, columns: 12 },
             },
             { response: true },
@@ -456,7 +361,7 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.user.public.signup.response.user.id",
+                    "app.api.v1.core.user.public.signup.response.user.id" as const,
                 },
                 z.string().describe("Newly created user ID"),
               ),
@@ -464,38 +369,30 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.user.public.signup.response.user.email",
+                    "app.api.v1.core.user.public.signup.response.user.email" as const,
                 },
                 z.string().describe("User email address"),
               ),
-              firstName: responseField(
+              privateName: responseField(
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.user.public.signup.response.user.firstName",
+                    "app.api.v1.core.user.public.signup.response.user.privateName" as const,
                 },
-                z.string().describe("User first name"),
+                z.string().describe("User private name"),
               ),
-              lastName: responseField(
+              publicName: responseField(
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.user.public.signup.response.user.lastName",
+                    "app.api.v1.core.user.public.signup.response.user.publicName" as const,
                 },
-                z.string().describe("User last name"),
-              ),
-              imageUrl: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.user.public.signup.response.user.imageUrl",
-                },
-                z.string().nullable().describe("User profile image URL"),
+                z.string().describe("User public name"),
               ),
               verificationRequired: responseField(
                 {
                   type: WidgetType.BADGE,
-                  text: "app.api.v1.core.user.public.signup.response.user.verificationRequired",
+                  text: "app.api.v1.core.user.public.signup.response.user.verificationRequired" as const,
                 },
                 z.boolean().describe("Whether email verification is required"),
               ),
@@ -505,9 +402,9 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title:
-                "app.api.v1.core.user.public.signup.response.verificationInfo.title",
+                "app.api.v1.core.user.public.signup.response.verificationInfo.title" as const,
               description:
-                "app.api.v1.core.user.public.signup.response.verificationInfo.description",
+                "app.api.v1.core.user.public.signup.response.verificationInfo.description" as const,
               layout: { type: LayoutType.GRID, columns: 12 },
             },
             { response: true },
@@ -515,7 +412,7 @@ const { POST } = createEndpoint({
               emailSent: responseField(
                 {
                   type: WidgetType.BADGE,
-                  text: "app.api.v1.core.user.public.signup.response.verificationInfo.emailSent",
+                  text: "app.api.v1.core.user.public.signup.response.verificationInfo.emailSent" as const,
                 },
                 z.boolean().describe("Whether verification email was sent"),
               ),
@@ -523,7 +420,7 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.user.public.signup.response.verificationInfo.expiresAt",
+                    "app.api.v1.core.user.public.signup.response.verificationInfo.expiresAt" as const,
                 },
                 z
                   .string()
@@ -532,7 +429,7 @@ const { POST } = createEndpoint({
               checkSpamFolder: responseField(
                 {
                   type: WidgetType.BADGE,
-                  text: "app.api.v1.core.user.public.signup.response.verificationInfo.checkSpamFolder",
+                  text: "app.api.v1.core.user.public.signup.response.verificationInfo.checkSpamFolder" as const,
                 },
                 z.boolean().describe("Whether user should check spam folder"),
               ),
@@ -541,7 +438,8 @@ const { POST } = createEndpoint({
           nextSteps: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.v1.core.user.public.signup.response.nextSteps",
+              content:
+                "app.api.v1.core.user.public.signup.response.nextSteps" as const,
             },
             z
               .array(z.string())
@@ -555,57 +453,66 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.v1.core.user.public.signup.post.errors.validation.title",
+      title:
+        "app.api.v1.core.user.public.signup.post.errors.validation.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.post.errors.validation.description",
+        "app.api.v1.core.user.public.signup.post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.user.public.signup.post.errors.unauthorized.title",
+        "app.api.v1.core.user.public.signup.post.errors.unauthorized.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.post.errors.unauthorized.description",
+        "app.api.v1.core.user.public.signup.post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.v1.core.user.public.signup.errors.internal.title",
+      title:
+        "app.api.v1.core.user.public.signup.errors.internal.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.errors.internal.description",
+        "app.api.v1.core.user.public.signup.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.v1.core.user.public.signup.post.errors.unknown.title",
+      title:
+        "app.api.v1.core.user.public.signup.post.errors.unknown.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.post.errors.unknown.description",
+        "app.api.v1.core.user.public.signup.post.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.v1.core.user.public.signup.post.errors.conflict.title",
+      title:
+        "app.api.v1.core.user.public.signup.post.errors.conflict.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.post.errors.conflict.description",
+        "app.api.v1.core.user.public.signup.post.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.v1.core.user.public.signup.post.errors.forbidden.title",
+      title:
+        "app.api.v1.core.user.public.signup.post.errors.forbidden.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.post.errors.forbidden.description",
+        "app.api.v1.core.user.public.signup.post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.v1.core.user.public.signup.post.errors.network.title",
+      title:
+        "app.api.v1.core.user.public.signup.post.errors.network.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.post.errors.network.description",
+        "app.api.v1.core.user.public.signup.post.errors.network.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.v1.core.user.public.signup.post.errors.notFound.title",
+      title:
+        "app.api.v1.core.user.public.signup.post.errors.notFound.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.post.errors.notFound.description",
+        "app.api.v1.core.user.public.signup.post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.v1.core.user.public.signup.post.errors.unsaved.title",
+      title:
+        "app.api.v1.core.user.public.signup.post.errors.unsaved.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.post.errors.unsaved.description",
+        "app.api.v1.core.user.public.signup.post.errors.unsaved.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.user.public.signup.post.success.title",
-    description: "app.api.v1.core.user.public.signup.post.success.description",
+    title: "app.api.v1.core.user.public.signup.post.success.title" as const,
+    description:
+      "app.api.v1.core.user.public.signup.post.success.description" as const,
   },
 
   // === EXAMPLES ===
@@ -613,20 +520,15 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         personalInfo: {
-          firstName: "John",
-          lastName: "Doe",
+          privateName: "John Doe",
+          publicName: "John D.",
           email: "john.doe@example.com",
         },
         security: {
           password: "securepassword123",
           confirmPassword: "securepassword123",
         },
-        businessInfo: {
-          company: "Example Company",
-          phone: "+1234567890",
-        },
         preferences: {
-          preferredContactMethod: PreferredContactMethod.EMAIL,
           signupType: SignupType.MEETING,
         },
         consent: {
@@ -634,23 +536,20 @@ const { POST } = createEndpoint({
           subscribeToNewsletter: true,
         },
         advanced: {
-          imageUrl: "https://example.com/avatar.jpg",
           leadId: "550e8400-e29b-41d4-a716-446655440000",
         },
       },
       minimal: {
         personalInfo: {
-          firstName: "Jane",
-          lastName: "Smith",
+          privateName: "Jane Smith",
+          publicName: "Jane S.",
           email: "jane.smith@example.com",
         },
         security: {
           password: "securepassword123",
           confirmPassword: "securepassword123",
         },
-        businessInfo: {},
         preferences: {
-          preferredContactMethod: PreferredContactMethod.EMAIL,
           signupType: SignupType.PRICING,
         },
         consent: {
@@ -660,17 +559,15 @@ const { POST } = createEndpoint({
       },
       failed: {
         personalInfo: {
-          firstName: "Existing",
-          lastName: "User",
+          privateName: "Existing User",
+          publicName: "Existing U.",
           email: "existing.user@example.com",
         },
         security: {
           password: "securepassword123",
           confirmPassword: "securepassword123",
         },
-        businessInfo: {},
         preferences: {
-          preferredContactMethod: PreferredContactMethod.EMAIL,
           signupType: SignupType.MEETING,
         },
         consent: {
@@ -688,9 +585,8 @@ const { POST } = createEndpoint({
           user: {
             id: "123e4567-e89b-12d3-a456-426614174000",
             email: "john.doe@example.com",
-            firstName: "John",
-            lastName: "Doe",
-            imageUrl: "https://example.com/avatar.jpg",
+            privateName: "John Doe",
+            publicName: "John D.",
             verificationRequired: true,
           },
           verificationInfo: {
@@ -712,9 +608,8 @@ const { POST } = createEndpoint({
           user: {
             id: "123e4567-e89b-12d3-a456-426614174001",
             email: "jane.smith@example.com",
-            firstName: "Jane",
-            lastName: "Smith",
-            imageUrl: null,
+            privateName: "Jane Smith",
+            publicName: "Jane S.",
             verificationRequired: true,
           },
           verificationInfo: {
@@ -733,9 +628,8 @@ const { POST } = createEndpoint({
           user: {
             id: "",
             email: "",
-            firstName: "",
-            lastName: "",
-            imageUrl: null,
+            privateName: "",
+            publicName: "",
             verificationRequired: false,
           },
           verificationInfo: {
@@ -760,16 +654,18 @@ const { POST } = createEndpoint({
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "user", "public", "signup"],
-  title: "app.api.v1.core.user.public.signup.emailCheck.title",
-  description: "app.api.v1.core.user.public.signup.emailCheck.description",
-  category: "app.api.v1.core.user.category",
-  tags: ["app.api.v1.core.user.public.signup.emailCheck.tag"],
-  allowedRoles: [UserRole.PUBLIC],
+  title: "app.api.v1.core.user.public.signup.emailCheck.title" as const,
+  description:
+    "app.api.v1.core.user.public.signup.emailCheck.description" as const,
+  category: "app.api.v1.core.user.category" as const,
+  tags: ["app.api.v1.core.user.public.signup.emailCheck.tag" as const],
+  allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.user.public.signup.emailCheck.title",
-      description: "app.api.v1.core.user.public.signup.emailCheck.description",
+      title: "app.api.v1.core.user.public.signup.emailCheck.title" as const,
+      description:
+        "app.api.v1.core.user.public.signup.emailCheck.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -780,11 +676,11 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.EMAIL,
           label:
-            "app.api.v1.core.user.public.signup.emailCheck.fields.email.label",
+            "app.api.v1.core.user.public.signup.emailCheck.fields.email.label" as const,
           description:
-            "app.api.v1.core.user.public.signup.emailCheck.fields.email.description",
+            "app.api.v1.core.user.public.signup.emailCheck.fields.email.description" as const,
           placeholder:
-            "app.api.v1.core.user.public.signup.emailCheck.fields.email.placeholder",
+            "app.api.v1.core.user.public.signup.emailCheck.fields.email.placeholder" as const,
           required: true,
         },
         z.string().email({
@@ -797,9 +693,10 @@ const { GET } = createEndpoint({
       response: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.v1.core.user.public.signup.emailCheck.response.title",
+          title:
+            "app.api.v1.core.user.public.signup.emailCheck.response.title" as const,
           description:
-            "app.api.v1.core.user.public.signup.emailCheck.response.description",
+            "app.api.v1.core.user.public.signup.emailCheck.response.description" as const,
           layout: { type: LayoutType.GRID, columns: 12 },
         },
         { response: true },
@@ -808,7 +705,7 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.public.signup.emailCheck.response.available",
+                "app.api.v1.core.user.public.signup.emailCheck.response.available" as const,
             },
             z.boolean(),
           ),
@@ -816,7 +713,7 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.user.public.signup.emailCheck.response.message",
+                "app.api.v1.core.user.public.signup.emailCheck.response.message" as const,
             },
             z.string(),
           ),
@@ -829,65 +726,66 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.validation.title",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.validation.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.validation.description",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.validation.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.internal.title",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.internal.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.internal.description",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.unknown.title",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.unknown.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.unknown.description",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.conflict.title",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.conflict.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.conflict.description",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.forbidden.title",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.forbidden.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.forbidden.description",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.network.title",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.network.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.network.description",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.network.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.notFound.title",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.notFound.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.notFound.description",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.unsaved.title",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.unsaved.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.unsaved.description",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.unsaved.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.unauthorized.title",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.unauthorized.title" as const,
       description:
-        "app.api.v1.core.user.public.signup.emailCheck.errors.unauthorized.description",
+        "app.api.v1.core.user.public.signup.emailCheck.errors.unauthorized.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.user.public.signup.emailCheck.success.title",
+    title:
+      "app.api.v1.core.user.public.signup.emailCheck.success.title" as const,
     description:
-      "app.api.v1.core.user.public.signup.emailCheck.success.description",
+      "app.api.v1.core.user.public.signup.emailCheck.success.description" as const,
   },
 
   // === EXAMPLES ===

@@ -18,19 +18,18 @@ import { leadsRepository } from "@/app/api/[locale]/v1/core/leads/repository";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { JWTPublicPayloadType } from "../../auth/definition";
 import { authRepository } from "../../auth/repository";
 import { users } from "../../db";
 import { UserDetailLevel } from "../../enum";
+import type { NewSession } from "../../private/session/db";
 import { sessionRepository } from "../../private/session/repository";
 import { userRepository } from "../../repository";
 import type {
   LoginPostRequestOutput,
   LoginPostResponseOutput,
-  LoginResponseInputType,
 } from "./definition";
 import { SocialProviders } from "./options/enum";
 
@@ -273,7 +272,7 @@ export class LoginRepositoryImpl implements LoginRepository {
     userId: string,
     rememberMe = false,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LoginResponseInputType>> {
+  ): Promise<ResponseType<LoginPostResponseOutput>> {
     return await this.createOrRenewSession(userId, false, rememberMe, logger);
   }
 
@@ -288,7 +287,7 @@ export class LoginRepositoryImpl implements LoginRepository {
     userId: string,
     rememberMe = false,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LoginResponseInputType>> {
+  ): Promise<ResponseType<LoginPostResponseOutput>> {
     return await this.createOrRenewSession(
       userId,
       true, // isRenewal
@@ -310,7 +309,7 @@ export class LoginRepositoryImpl implements LoginRepository {
     isRenewal = false,
     rememberMe = false,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LoginResponseInputType>> {
+  ): Promise<ResponseType<LoginPostResponseOutput>> {
     try {
       // Create session and get user data
       logger.debug(
@@ -361,12 +360,12 @@ export class LoginRepositoryImpl implements LoginRepository {
       }
 
       // Create a session in the database
-      await sessionRepository.create({
+      const sessionData: NewSession = {
         userId,
         token: tokenResponse.data,
         expiresAt,
-        createdAt: new Date(),
-      });
+      };
+      await sessionRepository.create(sessionData);
 
       // Create the response data - LoginPostResponseOutput
       const responseData: LoginPostResponseOutput = {
@@ -375,9 +374,8 @@ export class LoginRepositoryImpl implements LoginRepository {
         user: {
           id: userResponse.data.id,
           email: userResponse.data.email,
-          firstName: userResponse.data.firstName,
-          lastName: userResponse.data.lastName,
-          imageUrl: userResponse.data.imageUrl || null,
+          privateName: userResponse.data.privateName,
+          publicName: userResponse.data.publicName,
         },
         sessionInfo: {
           expiresAt: expiresAt.toISOString(),
@@ -408,8 +406,15 @@ export class LoginRepositoryImpl implements LoginRepository {
       }
 
       // Return session data
-      return createSuccessResponse(responseData);
+      logger.debug("Login response data", { responseData });
+      const finalResponse = createSuccessResponse(responseData);
+      logger.debug("Login final response", { finalResponse });
+      return finalResponse;
     } catch (error) {
+      logger.error("Session creation failed", {
+        userId,
+        error: parseError(error).message,
+      });
       return createErrorResponse(
         "login.errors.session_creation_failed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -474,7 +479,7 @@ export class LoginRepositoryImpl implements LoginRepository {
           );
         }
         // Apply user-specific settings if they exist
-        options.requireTwoFactor = !!user.data.requireTwoFactor;
+        options.requireTwoFactor = user.data.requireTwoFactor === true;
 
         // Check if account is locked
         const isLocked = this.isAccountLocked(email);

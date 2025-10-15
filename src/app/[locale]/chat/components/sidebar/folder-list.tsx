@@ -1,10 +1,16 @@
 "use client";
 
-import { ChevronRight, ChevronDown, FolderPlus, MoreVertical, Trash2, Edit } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Edit,
+  FolderPlus,
+  MoreVertical,
+  Trash2,
+} from "lucide-react";
 import type { JSX } from "react";
 import React, { useMemo } from "react";
 
-import type { ChatState, ChatFolder, ChatThread } from "../../lib/storage/types";
 import {
   Button,
   DropdownMenu,
@@ -12,9 +18,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/packages/next-vibe-ui/web/ui";
-import { ThreadList } from "./thread-list";
+
+import type {
+  ChatFolder,
+  ChatState,
+  ChatThread,
+} from "../../lib/storage/types";
 import { getIconComponent } from "./folder-icon-selector";
 import { RenameFolderDialog } from "./rename-folder-dialog";
+import { ThreadList } from "./thread-list";
 
 // Time grouping helpers
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -76,7 +88,9 @@ export function FolderList({
     <div className="space-y-1 py-2">
       {state.rootFolderIds.map((folderId) => {
         const folder = state.folders[folderId];
-        if (!folder) return null;
+        if (!folder) {
+          return null;
+        }
 
         return (
           <FolderItem
@@ -152,7 +166,9 @@ function FolderItem({
       const confirmed = window.confirm(
         `Delete folder "${folder.name}" and move ${threadsInFolder.length} chat(s) to General?`,
       );
-      if (!confirmed) return;
+      if (!confirmed) {
+        return;
+      }
     }
     onDeleteFolder(folder.id, false);
   };
@@ -220,7 +236,15 @@ function FolderItem({
           </span>
         </div>
 
-        <div className="flex items-center gap-1 flex-shrink-0" style={{ width: isHovered ? 'auto' : '0px', opacity: isHovered ? 1 : 0, overflow: 'hidden' }} onClick={(e) => e.stopPropagation()}>
+        <div
+          className="flex items-center gap-1 flex-shrink-0"
+          style={{
+            width: isHovered ? "auto" : "0px",
+            opacity: isHovered ? 1 : 0,
+            overflow: "hidden",
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
           <Button
             variant="ghost"
             size="icon"
@@ -267,7 +291,10 @@ function FolderItem({
                 <FolderPlus className="h-4 w-4 mr-2" />
                 New Subfolder
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={handleDeleteFolder} className="text-destructive">
+              <DropdownMenuItem
+                onSelect={handleDeleteFolder}
+                className="text-destructive"
+              >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete Folder
               </DropdownMenuItem>
@@ -281,7 +308,9 @@ function FolderItem({
           {/* Child folders */}
           {folder.childrenIds.map((childId) => {
             const childFolder = state.folders[childId];
-            if (!childFolder) return null;
+            if (!childFolder) {
+              return null;
+            }
 
             return (
               <FolderItem
@@ -371,4 +400,3 @@ function FolderItem({
     </div>
   );
 }
-

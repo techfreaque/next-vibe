@@ -20,12 +20,9 @@ import {
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import {
-  PreferredContactMethod,
-  PreferredContactMethodOptions,
-} from "@/app/api/[locale]/v1/core/user/enum";
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
-
-import { UserRoleFilterOptions } from "../enum";
+  UserRole,
+  UserRoleOptions,
+} from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**
  * Users Create Endpoint Definition
@@ -33,7 +30,7 @@ import { UserRoleFilterOptions } from "../enum";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "users", "create"],
-  allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN],
+  allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
 
   title: "app.api.v1.core.users.create.post.title" as const,
   description: "app.api.v1.core.users.create.post.description" as const,
@@ -97,199 +94,37 @@ const { POST } = createEndpoint({
               .min(8, "usersErrors.validation.password.tooShort")
               .max(128, "usersErrors.validation.password.tooLong"),
           ),
-          firstName: requestDataField(
+          privateName: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label:
-                "app.api.v1.core.users.create.post.firstName.label" as const,
+                "app.api.v1.core.users.create.post.privateName.label" as const,
               description:
-                "app.api.v1.core.users.create.post.firstName.description" as const,
+                "app.api.v1.core.users.create.post.privateName.description" as const,
               layout: { columns: 6 },
             },
             z
               .string()
-              .min(1, "usersErrors.validation.firstName.required")
-              .max(100, "usersErrors.validation.firstName.tooLong")
+              .min(1, "usersErrors.validation.privateName.required")
+              .max(255, "usersErrors.validation.privateName.tooLong")
               .transform((val) => val.trim()),
           ),
-          lastName: requestDataField(
+          publicName: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label:
-                "app.api.v1.core.users.create.post.lastName.label" as const,
+                "app.api.v1.core.users.create.post.publicName.label" as const,
               description:
-                "app.api.v1.core.users.create.post.lastName.description" as const,
+                "app.api.v1.core.users.create.post.publicName.description" as const,
               layout: { columns: 6 },
             },
             z
               .string()
-              .min(1, "usersErrors.validation.lastName.required")
-              .max(100, "usersErrors.validation.lastName.tooLong")
+              .min(1, "usersErrors.validation.publicName.required")
+              .max(255, "usersErrors.validation.publicName.tooLong")
               .transform((val) => val.trim()),
-          ),
-        },
-      ),
-
-      // === ORGANIZATION INFORMATION ===
-      organizationInfo: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.v1.core.users.create.post.company.label" as const,
-          description:
-            "app.api.v1.core.users.create.post.company.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
-        },
-        { request: "data" },
-        {
-          company: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.v1.core.users.create.post.company.label" as const,
-              description:
-                "app.api.v1.core.users.create.post.company.description" as const,
-              layout: { columns: 6 },
-            },
-            z
-              .string()
-              .min(1, "usersErrors.validation.company.required")
-              .max(255, "usersErrors.validation.company.tooLong")
-              .transform((val) => val.trim()),
-          ),
-          jobTitle: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.v1.core.users.create.post.jobTitle.label" as const,
-              description:
-                "app.api.v1.core.users.create.post.jobTitle.description" as const,
-              layout: { columns: 6 },
-            },
-            z
-              .string()
-              .max(255, "usersErrors.validation.jobTitle.tooLong")
-              .transform((val) => val?.trim() || null)
-              .optional(),
-          ),
-        },
-      ),
-
-      // === CONTACT INFORMATION ===
-      contactInfo: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.v1.core.users.create.post.phone.label" as const,
-          description:
-            "app.api.v1.core.users.create.post.phone.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
-        },
-        { request: "data" },
-        {
-          phone: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.PHONE,
-              label: "app.api.v1.core.users.create.post.phone.label" as const,
-              description:
-                "app.api.v1.core.users.create.post.phone.description" as const,
-              placeholder:
-                "app.api.v1.core.users.create.post.phone.label" as const,
-              layout: { columns: 6 },
-            },
-            z
-              .string()
-              .regex(
-                /^\+?[1-9]\d{1,14}$/,
-                "usersErrors.validation.phone.invalid",
-              )
-              .transform((val) => val?.trim() || null)
-              .optional(),
-          ),
-          preferredContactMethod: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label:
-                "app.api.v1.core.users.create.post.preferredContactMethod.label" as const,
-              description:
-                "app.api.v1.core.users.create.post.preferredContactMethod.description" as const,
-              helpText:
-                "app.api.v1.core.users.create.post.preferredContactMethod.description" as const,
-              layout: { columns: 6 },
-              options: PreferredContactMethodOptions,
-            },
-            z.nativeEnum(PreferredContactMethod),
-          ),
-        },
-      ),
-
-      // === PROFILE INFORMATION (OPTIONAL) ===
-      profileInfo: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.v1.core.users.create.post.bio.label" as const,
-          description:
-            "app.api.v1.core.users.create.post.bio.description" as const,
-          layout: { type: LayoutType.VERTICAL },
-        },
-        { request: "data" },
-        {
-          imageUrl: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.URL,
-              label:
-                "app.api.v1.core.users.create.post.imageUrl.label" as const,
-              description:
-                "app.api.v1.core.users.create.post.imageUrl.description" as const,
-              placeholder:
-                "app.api.v1.core.users.create.post.imageUrl.label" as const,
-              layout: { columns: 12 },
-            },
-            z
-              .string()
-              .url("usersErrors.validation.imageUrl.invalid")
-              .transform((val) => val?.trim() || null)
-              .optional()
-              .or(z.literal("")),
-          ),
-          bio: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXTAREA,
-              label: "app.api.v1.core.users.create.post.bio.label" as const,
-              description:
-                "app.api.v1.core.users.create.post.bio.description" as const,
-              placeholder:
-                "app.api.v1.core.users.create.post.bio.label" as const,
-              layout: { columns: 12 },
-            },
-            z
-              .string()
-              .max(1000, "usersErrors.validation.bio.tooLong")
-              .transform((val) => val?.trim() || null)
-              .optional(),
-          ),
-          website: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.URL,
-              label: "app.api.v1.core.users.create.post.website.label" as const,
-              description:
-                "app.api.v1.core.users.create.post.website.description" as const,
-              placeholder:
-                "app.api.v1.core.users.create.post.website.label" as const,
-              layout: { columns: 12 },
-            },
-            z
-              .string()
-              .url("usersErrors.validation.website.invalid")
-              .transform((val) => val?.trim() || null)
-              .optional()
-              .or(z.literal("")),
           ),
         },
       ),
@@ -315,9 +150,9 @@ const { POST } = createEndpoint({
               helpText:
                 "app.api.v1.core.users.create.post.roles.description" as const,
               layout: { columns: 12 },
-              options: UserRoleFilterOptions,
+              options: UserRoleOptions,
             },
-            z.array(z.string()).optional(),
+            z.array(z.nativeEnum(UserRole)).optional(),
           ),
           emailVerified: requestDataField(
             {
@@ -413,29 +248,21 @@ const { POST } = createEndpoint({
             },
             z.email().describe("User's email address"),
           ),
-          firstName: responseField(
+          privateName: responseField(
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.users.create.post.response.firstName.content" as const,
+                "app.api.v1.core.users.create.post.response.privateName.content" as const,
             },
-            z.string().describe("User's first name"),
+            z.string().describe("User's private name"),
           ),
-          lastName: responseField(
+          publicName: responseField(
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.users.create.post.response.lastName.content" as const,
+                "app.api.v1.core.users.create.post.response.publicName.content" as const,
             },
-            z.string().describe("User's last name"),
-          ),
-          company: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.users.create.post.response.company.content" as const,
-            },
-            z.string().describe("User's company"),
+            z.string().describe("User's public name"),
           ),
           createdAt: responseField(
             {
@@ -471,76 +298,21 @@ const { POST } = createEndpoint({
         },
         z.email(),
       ),
-      responseFirstName: responseField(
+      responsePrivateName: responseField(
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.users.create.post.response.firstName.content" as const,
+            "app.api.v1.core.users.create.post.response.privateName.content" as const,
         },
         z.string(),
       ),
-      responseLastName: responseField(
+      responsePublicName: responseField(
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.users.create.post.response.lastName.content" as const,
+            "app.api.v1.core.users.create.post.response.publicName.content" as const,
         },
         z.string(),
-      ),
-      responseCompany: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.create.post.response.company.content" as const,
-        },
-        z.string(),
-      ),
-      responsePhone: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.create.post.response.phone.content" as const,
-        },
-        z.string().nullable(),
-      ),
-      responsePreferredContactMethod: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.v1.core.users.create.post.response.preferredContactMethod.content" as const,
-        },
-        z.nativeEnum(PreferredContactMethod),
-      ),
-      responseImageUrl: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.create.post.response.imageUrl.content" as const,
-        },
-        z.string().nullable(),
-      ),
-      responseBio: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.create.post.response.bio.content" as const,
-        },
-        z.string().nullable(),
-      ),
-      responseWebsite: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.create.post.response.website.content" as const,
-        },
-        z.string().nullable(),
-      ),
-      responseJobTitle: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.create.post.response.jobTitle.content" as const,
-        },
-        z.string().nullable(),
       ),
       responseEmailVerified: responseField(
         {
@@ -659,21 +431,8 @@ const { POST } = createEndpoint({
         basicInfo: {
           email: "customer@example.com",
           password: "password123",
-          firstName: "Customer",
-          lastName: "Name",
-        },
-        organizationInfo: {
-          company: "Customer Company",
-          jobTitle: "Customer Representative",
-        },
-        contactInfo: {
-          phone: "+1234567890",
-          preferredContactMethod: PreferredContactMethod.EMAIL,
-        },
-        profileInfo: {
-          imageUrl: "",
-          bio: "",
-          website: "",
+          privateName: "Customer Full Name",
+          publicName: "Customer",
         },
         adminSettings: {
           roles: [UserRole.CUSTOMER],
@@ -692,30 +451,22 @@ const { POST } = createEndpoint({
         userInfo: {
           id: "123e4567-e89b-12d3-a456-426614174000",
           email: "customer@example.com",
-          firstName: "Customer",
-          lastName: "Name",
-          company: "Customer Company",
+          privateName: "Customer Full Name",
+          publicName: "Customer",
           createdAt: "2023-01-01T00:00:00.000Z",
         },
         responseId: "123e4567-e89b-12d3-a456-426614174000",
         responseLeadId: null,
         responseEmail: "customer@example.com",
-        responseFirstName: "Customer",
-        responseLastName: "Name",
-        responseCompany: "Customer Company",
-        responsePhone: "+1234567890",
-        responsePreferredContactMethod: PreferredContactMethod.EMAIL,
-        responseImageUrl: null,
-        responseBio: null,
-        responseWebsite: null,
-        responseJobTitle: null,
+        responsePrivateName: "Customer Full Name",
+        responsePublicName: "Customer",
         responseEmailVerified: false,
         responseIsActive: true,
         responseStripeCustomerId: null,
         responseUserRoles: [
           {
             id: "role-id",
-            role: UserRole.CUSTOMER,
+            role: "app.api.v1.core.user.userRoles.enums.userRole.customer",
           },
         ],
         responseCreatedAt: "2023-01-01T00:00:00.000Z",
@@ -727,10 +478,10 @@ const { POST } = createEndpoint({
 });
 
 // Extract types using the new enhanced system
-export type UserCreateRequestTypeInput = typeof POST.types.RequestInput;
-export type UserCreateRequestTypeOutput = typeof POST.types.RequestOutput;
-export type UserCreateResponseTypeInput = typeof POST.types.ResponseInput;
-export type UserCreateResponseTypeOutput = typeof POST.types.ResponseOutput;
+export type UserCreateRequestInput = typeof POST.types.RequestInput;
+export type UserCreateRequestOutput = typeof POST.types.RequestOutput;
+export type UserCreateResponseInput = typeof POST.types.ResponseInput;
+export type UserCreateResponseOutput = typeof POST.types.ResponseOutput;
 
 /**
  * Export definitions

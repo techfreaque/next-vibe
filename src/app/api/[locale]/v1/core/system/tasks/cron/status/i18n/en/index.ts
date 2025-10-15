@@ -3,5 +3,8 @@ export const translations = {
   tags: {
     status: "Status",
   },
-  // Add endpoint-specific translations here
+  success: {
+    title: "Success",
+    content: "Success",
+  },
 };

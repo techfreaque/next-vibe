@@ -27,8 +27,8 @@ import { sessions } from "../private/session/db";
 import { passwordResets } from "../public/reset-password/db";
 import type {
   SessionCleanupConfigType,
-  SessionCleanupRequestTypeOutput,
-  SessionCleanupResponseTypeOutput,
+  SessionCleanupRequestOutput,
+  SessionCleanupResponseOutput,
 } from "./definition";
 
 /**
@@ -36,11 +36,11 @@ import type {
  */
 export interface SessionCleanupRepository {
   executeSessionCleanup(
-    data: SessionCleanupRequestTypeOutput,
+    data: SessionCleanupRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SessionCleanupResponseTypeOutput>>;
+  ): Promise<ResponseType<SessionCleanupResponseOutput>>;
 }
 
 /**
@@ -48,11 +48,11 @@ export interface SessionCleanupRepository {
  */
 export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
   async executeSessionCleanup(
-    data: SessionCleanupRequestTypeOutput,
+    data: SessionCleanupRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SessionCleanupResponseTypeOutput>> {
+  ): Promise<ResponseType<SessionCleanupResponseOutput>> {
     const startTime = Date.now();
 
     try {
@@ -142,12 +142,12 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
       totalProcessed = sessionsDeleted + tokensDeleted;
       const executionTimeMs = Date.now() - startTime;
 
-      const result: SessionCleanupResponseTypeOutput = {
+      const result: SessionCleanupResponseOutput = {
         sessionsDeleted,
         tokensDeleted,
         totalProcessed,
         executionTimeMs,
-        errors: errors.length > 0 ? errors : undefined,
+        errors,
       };
 
       logger.debug("Session cleanup task completed", {
@@ -157,12 +157,12 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
       // Return error if there were any errors, otherwise success
       if (errors.length > 0) {
         return createErrorResponse(
-          "user.errors.session_cleanup_partial_failure",
+          "app.api.v1.core.user.session-cleanup.errors.partial_failure.title",
           ErrorResponseTypes.INTERNAL_ERROR,
           {
             errors:
               result.errors?.join(", ") ||
-              "user.errors.session_cleanup_unknown_error",
+              "app.api.v1.core.user.session-cleanup.errors.unknown_error.title",
           },
         );
       }
@@ -178,7 +178,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
       });
 
       return createErrorResponse(
-        "user.errors.session_cleanup_execution_failed",
+        "app.api.v1.core.user.session-cleanup.errors.execution_failed.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: errorMessage },
       );
@@ -214,7 +214,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
         config.sessionRetentionDays > 365
       ) {
         return createErrorResponse(
-          "user.errors.invalid_session_retention",
+          "app.api.v1.core.user.session-cleanup.errors.invalid_session_retention.title",
           ErrorResponseTypes.VALIDATION_ERROR,
           { sessionRetentionDays: config.sessionRetentionDays },
         );
@@ -222,7 +222,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
 
       if (config.tokenRetentionDays < 1 || config.tokenRetentionDays > 365) {
         return createErrorResponse(
-          "user.errors.invalid_token_retention",
+          "app.api.v1.core.user.session-cleanup.errors.invalid_token_retention.title",
           ErrorResponseTypes.VALIDATION_ERROR,
           { tokenRetentionDays: config.tokenRetentionDays },
         );
@@ -230,7 +230,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
 
       if (config.batchSize < 1 || config.batchSize > 1000) {
         return createErrorResponse(
-          "user.errors.invalid_batch_size",
+          "app.api.v1.core.user.session-cleanup.errors.invalid_batch_size.title",
           ErrorResponseTypes.VALIDATION_ERROR,
           { batchSize: config.batchSize },
         );
@@ -243,7 +243,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
         error,
       });
       return createErrorResponse(
-        "user.errors.session_cleanup_validation_failed",
+        "app.api.v1.core.user.session-cleanup.errors.validation_failed.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );

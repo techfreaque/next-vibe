@@ -5,6 +5,7 @@
 
 "use client";
 
+import { Environment } from "next-vibe/shared/utils/env-util";
 import { useCallback, useEffect, useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
@@ -13,11 +14,7 @@ import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/
 import { envClient } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
 
-import type {
-  EmailCampaignStageValues,
-  LeadSourceValues,
-  LeadStatusValues,
-} from "../enum";
+import type { EmailCampaignStage, LeadSource, LeadStatus } from "../enum";
 import definitions from "./definition";
 
 /**
@@ -27,6 +24,10 @@ import definitions from "./definition";
 export function useBatchUpdateEndpoint(): EndpointReturn<{
   PATCH: typeof definitions.PATCH;
 }> {
+  const { locale } = useTranslation();
+  const isDevelopment = envClient.NODE_ENV === Environment.DEVELOPMENT;
+  const logger = createEndpointLogger(isDevelopment, Date.now(), locale);
+
   return useEndpoint(
     { PATCH: definitions.PATCH },
     {
@@ -39,6 +40,7 @@ export function useBatchUpdateEndpoint(): EndpointReturn<{
         persistForm: false,
       },
     },
+    logger,
   );
 }
 
@@ -49,6 +51,10 @@ export function useBatchUpdateEndpoint(): EndpointReturn<{
 export function useBatchDeleteEndpoint(): EndpointReturn<{
   DELETE: typeof definitions.DELETE;
 }> {
+  const { locale } = useTranslation();
+  const isDevelopment = envClient.NODE_ENV === Environment.DEVELOPMENT;
+  const logger = createEndpointLogger(isDevelopment, Date.now(), locale);
+
   return useEndpoint(
     {
       DELETE: definitions.DELETE,
@@ -63,11 +69,16 @@ export function useBatchDeleteEndpoint(): EndpointReturn<{
         persistForm: false,
       },
     },
+    logger,
   );
 }
 
-export type BatchUpdateEndpointReturn = EndpointReturn<typeof definitions>;
-export type BatchDeleteEndpointReturn = EndpointReturn<typeof definitions>;
+export type BatchUpdateEndpointReturn = EndpointReturn<{
+  PATCH: typeof definitions.PATCH;
+}>;
+export type BatchDeleteEndpointReturn = EndpointReturn<{
+  DELETE: typeof definitions.DELETE;
+}>;
 
 interface BatchOperationsReturn {
   // State
@@ -75,26 +86,26 @@ interface BatchOperationsReturn {
   batchDialogMode: "preview" | "confirm" | "result";
   operationType: "update" | "delete";
   pendingUpdates: {
-    status?: typeof LeadStatusValues;
-    currentCampaignStage?: typeof EmailCampaignStageValues;
-    source?: typeof LeadSourceValues;
+    status?: (typeof LeadStatus)[keyof typeof LeadStatus];
+    currentCampaignStage?: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
+    source?: (typeof LeadSource)[keyof typeof LeadSource];
     notes?: string;
   };
   previewLeads: Array<{
     id: string;
     email: string | null;
     businessName: string;
-    currentStatus: typeof LeadStatusValues;
-    currentCampaignStage: typeof EmailCampaignStageValues | null;
+    currentStatus: string;
+    currentCampaignStage: string | null;
   }>;
 
   // Handlers
   handlePreview: (
     currentFilters: Record<string, string | number | boolean | undefined>,
     updates: {
-      status?: typeof LeadStatusValues;
-      currentCampaignStage?: typeof EmailCampaignStageValues;
-      source?: typeof LeadSourceValues;
+      status?: (typeof LeadStatus)[keyof typeof LeadStatus];
+      currentCampaignStage?: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
+      source?: (typeof LeadSource)[keyof typeof LeadSource];
       notes?: string;
     },
   ) => Promise<void>;
@@ -103,9 +114,9 @@ interface BatchOperationsReturn {
   ) => Promise<void>;
   handleBatchUpdate: (
     updates: {
-      status?: typeof LeadStatusValues;
-      currentCampaignStage?: typeof EmailCampaignStageValues;
-      source?: typeof LeadSourceValues;
+      status?: (typeof LeadStatus)[keyof typeof LeadStatus];
+      currentCampaignStage?: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
+      source?: (typeof LeadSource)[keyof typeof LeadSource];
       notes?: string;
     },
     currentFilters: Record<string, string | number | boolean | undefined>,
@@ -129,9 +140,7 @@ interface BatchOperationsReturn {
 
   // Endpoints
   batchUpdateEndpoint: BatchUpdateEndpointReturn;
-  batchDeleteEndpoint: EndpointReturn<{
-    DELETE: typeof definitions.DELETE;
-  }>;
+  batchDeleteEndpoint: BatchDeleteEndpointReturn;
 
   // Operation completion callback
   onOperationComplete?: () => void;
@@ -146,11 +155,8 @@ export function useBatchOperations(
 ): BatchOperationsReturn {
   // Initialize client logger
   const { locale } = useTranslation();
-  const logger = createEndpointLogger(
-    envClient.NODE_ENV === "development",
-    Date.now(),
-    locale,
-  );
+  const isDevelopment = envClient.NODE_ENV === Environment.DEVELOPMENT;
+  const logger = createEndpointLogger(isDevelopment, Date.now(), locale);
 
   // Dialog state
   const [batchDialogOpen, setBatchDialogOpen] = useState(false);
@@ -161,9 +167,9 @@ export function useBatchOperations(
     "update",
   );
   const [pendingUpdates, setPendingUpdates] = useState<{
-    status?: typeof LeadStatusValues;
-    currentCampaignStage?: typeof EmailCampaignStageValues;
-    source?: typeof LeadSourceValues;
+    status?: (typeof LeadStatus)[keyof typeof LeadStatus];
+    currentCampaignStage?: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
+    source?: (typeof LeadSource)[keyof typeof LeadSource];
     notes?: string;
   }>({});
   const [previewLeads, setPreviewLeads] = useState<
@@ -171,8 +177,8 @@ export function useBatchOperations(
       id: string;
       email: string | null;
       businessName: string;
-      currentStatus: typeof LeadStatusValues;
-      currentCampaignStage: typeof EmailCampaignStageValues | null;
+      currentStatus: string;
+      currentCampaignStage: string | null;
     }>
   >([]);
 
@@ -184,20 +190,23 @@ export function useBatchOperations(
   useEffect(() => {
     if (
       operationType === "delete" &&
-      batchDeleteEndpoint.create.response?.success &&
-      batchDeleteEndpoint.create.response.data.preview &&
+      batchDeleteEndpoint.create?.response?.success &&
+      batchDeleteEndpoint.create?.response?.data?.response?.preview &&
       !batchDialogOpen
     ) {
       logger.debug("leads.batch.delete.preview.modal.auto.open", {
-        previewCount: batchDeleteEndpoint.create.response.data.preview.length,
+        previewCount:
+          batchDeleteEndpoint.create.response.data.response.preview.length,
       });
-      setPreviewLeads(batchDeleteEndpoint.create.response.data.preview);
+      setPreviewLeads(
+        batchDeleteEndpoint.create.response.data.response.preview,
+      );
       setBatchDialogMode("preview");
       setBatchDialogOpen(true);
     }
   }, [
     operationType,
-    batchDeleteEndpoint.create.response,
+    batchDeleteEndpoint.create?.response,
     batchDialogOpen,
     logger,
   ]);
@@ -205,20 +214,23 @@ export function useBatchOperations(
   useEffect(() => {
     if (
       operationType === "update" &&
-      batchUpdateEndpoint.create.response?.success &&
-      batchUpdateEndpoint.create.response.data.preview &&
+      batchUpdateEndpoint.create?.response?.success &&
+      batchUpdateEndpoint.create?.response?.data?.response?.preview &&
       !batchDialogOpen
     ) {
       logger.debug("leads.batch.update.preview.modal.auto.open", {
-        previewCount: batchUpdateEndpoint.create.response.data.preview.length,
+        previewCount:
+          batchUpdateEndpoint.create.response.data.response.preview.length,
       });
-      setPreviewLeads(batchUpdateEndpoint.create.response.data.preview);
+      setPreviewLeads(
+        batchUpdateEndpoint.create.response.data.response.preview,
+      );
       setBatchDialogMode("preview");
       setBatchDialogOpen(true);
     }
   }, [
     operationType,
-    batchUpdateEndpoint.create.response,
+    batchUpdateEndpoint.create?.response,
     batchDialogOpen,
     logger,
   ]);
@@ -230,9 +242,9 @@ export function useBatchOperations(
     async (
       currentFilters: Record<string, string | number | boolean | undefined>,
       updates: {
-        status?: typeof LeadStatusValues;
-        currentCampaignStage?: typeof EmailCampaignStageValues;
-        source?: typeof LeadSourceValues;
+        status?: (typeof LeadStatus)[keyof typeof LeadStatus];
+        currentCampaignStage?: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
+        source?: (typeof LeadSource)[keyof typeof LeadSource];
         notes?: string;
       },
     ) => {
@@ -262,9 +274,9 @@ export function useBatchOperations(
   const handleBatchUpdate = useCallback(
     async (
       updates: {
-        status?: typeof LeadStatusValues;
-        currentCampaignStage?: typeof EmailCampaignStageValues;
-        source?: typeof LeadSourceValues;
+        status?: (typeof LeadStatus)[keyof typeof LeadStatus];
+        currentCampaignStage?: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
+        source?: (typeof LeadSource)[keyof typeof LeadSource];
         notes?: string;
       },
       currentFilters: Record<string, string | number | boolean | undefined>,
@@ -292,10 +304,12 @@ export function useBatchOperations(
 
         // Check response
         if (
-          batchUpdateEndpoint.create.response?.success &&
-          batchUpdateEndpoint.create.response.data.preview
+          batchUpdateEndpoint.create?.response?.success &&
+          batchUpdateEndpoint.create?.response?.data?.response?.preview
         ) {
-          setPreviewLeads(batchUpdateEndpoint.create.response.data.preview);
+          setPreviewLeads(
+            batchUpdateEndpoint.create.response.data.response.preview,
+          );
           setBatchDialogMode("preview");
           setBatchDialogOpen(true);
         }
@@ -359,10 +373,12 @@ export function useBatchOperations(
 
         // Check response
         if (
-          batchDeleteEndpoint.create.response?.success &&
-          batchDeleteEndpoint.create.response.data.preview
+          batchDeleteEndpoint.create?.response?.success &&
+          batchDeleteEndpoint.create?.response?.data?.response?.preview
         ) {
-          setPreviewLeads(batchDeleteEndpoint.create.response.data.preview);
+          setPreviewLeads(
+            batchDeleteEndpoint.create.response.data.response.preview,
+          );
           setBatchDialogMode("preview");
           setBatchDialogOpen(true);
         }

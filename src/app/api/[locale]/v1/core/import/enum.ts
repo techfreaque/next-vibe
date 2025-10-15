@@ -105,42 +105,42 @@ export const ImportDomainOptions: SelectOption[] = [
     value: ImportDomain.LEADS,
     description: "app.api.v1.core.import.enum.domain.leads.description",
     icon: "users",
-    category: "Customer Data",
+    category: "app.api.v1.core.import.enum.category.customerData",
   },
   {
     label: "app.api.v1.core.import.enum.domain.contacts.label",
     value: ImportDomain.CONTACTS,
     description: "app.api.v1.core.import.enum.domain.contacts.description",
     icon: "contact",
-    category: "Customer Data",
+    category: "app.api.v1.core.import.enum.category.customerData",
   },
   {
     label: "app.api.v1.core.import.enum.domain.businessData.label",
     value: ImportDomain.BUSINESS_DATA,
     description: "app.api.v1.core.import.enum.domain.businessData.description",
     icon: "briefcase",
-    category: "Business Information",
+    category: "app.api.v1.core.import.enum.category.businessInformation",
   },
   {
     label: "app.api.v1.core.import.enum.domain.emails.label",
     value: ImportDomain.EMAILS,
     description: "app.api.v1.core.import.enum.domain.emails.description",
     icon: "mail",
-    category: "Communication",
+    category: "app.api.v1.core.import.enum.category.communication",
   },
   {
     label: "app.api.v1.core.import.enum.domain.users.label",
     value: ImportDomain.USERS,
     description: "app.api.v1.core.import.enum.domain.users.description",
     icon: "user",
-    category: "User Management",
+    category: "app.api.v1.core.import.enum.category.userManagement",
   },
   {
     label: "app.api.v1.core.import.enum.domain.templates.label",
     value: ImportDomain.TEMPLATES,
     description: "app.api.v1.core.import.enum.domain.templates.description",
     icon: "template",
-    category: "Content",
+    category: "app.api.v1.core.import.enum.category.content",
   },
 ];
 
@@ -210,7 +210,7 @@ export const ImportProcessingModeOptions: SelectOption[] = [
     description: "app.api.v1.core.import.enum.processing.immediate.description",
     icon: "zap",
     recommended: true,
-    limits: "Up to 1,000 records",
+    limits: "app.api.v1.core.import.enum.processing.immediate.limits",
   },
   {
     label: "app.api.v1.core.import.enum.processing.background.label",
@@ -218,14 +218,14 @@ export const ImportProcessingModeOptions: SelectOption[] = [
     description:
       "app.api.v1.core.import.enum.processing.background.description",
     icon: "background",
-    limits: "Up to 100,000 records",
+    limits: "app.api.v1.core.import.enum.processing.background.limits",
   },
   {
     label: "app.api.v1.core.import.enum.processing.scheduled.label",
     value: ImportProcessingMode.SCHEDULED,
     description: "app.api.v1.core.import.enum.processing.scheduled.description",
     icon: "calendar",
-    limits: "Unlimited records",
+    limits: "app.api.v1.core.import.enum.processing.scheduled.limits",
   },
 ];
 
@@ -291,25 +291,25 @@ export const BatchSizePresets: SelectOption[] = [
     label: "app.api.v1.core.import.enum.batchSize.small.label",
     value: "50",
     description: "app.api.v1.core.import.enum.batchSize.small.description",
-    recommended: "For testing or small imports",
+    recommended: "app.api.v1.core.import.enum.batchSize.small.recommended",
   },
   {
     label: "app.api.v1.core.import.enum.batchSize.medium.label",
     value: "100",
     description: "app.api.v1.core.import.enum.batchSize.medium.description",
-    recommended: "Recommended for most imports",
+    recommended: "app.api.v1.core.import.enum.batchSize.medium.recommended",
   },
   {
     label: "app.api.v1.core.import.enum.batchSize.large.label",
     value: "250",
     description: "app.api.v1.core.import.enum.batchSize.large.description",
-    recommended: "For large files with simple data",
+    recommended: "app.api.v1.core.import.enum.batchSize.large.recommended",
   },
   {
     label: "app.api.v1.core.import.enum.batchSize.xlarge.label",
     value: "500",
     description: "app.api.v1.core.import.enum.batchSize.xlarge.description",
-    recommended: "For very large files, advanced users",
+    recommended: "app.api.v1.core.import.enum.batchSize.xlarge.recommended",
   },
 ];
 
@@ -323,7 +323,9 @@ export const BatchSizePresets: SelectOption[] = [
 export const getCsvImportJobStatusLabel = (
   status: CsvImportJobStatus,
 ): string => {
-  const option = CsvImportJobStatusOptions.find((opt) => opt.value === status);
+  const option = CsvImportJobStatusOptions.find(
+    (opt) => opt.value === (status as string),
+  );
   return option?.label || status;
 };
 
@@ -331,7 +333,9 @@ export const getCsvImportJobStatusLabel = (
  * Get display label for Import Domain
  */
 export const getImportDomainLabel = (domain: ImportDomain): string => {
-  const option = ImportDomainOptions.find((opt) => opt.value === domain);
+  const option = ImportDomainOptions.find(
+    (opt) => opt.value === (domain as string),
+  );
   return option?.label || domain;
 };
 
@@ -341,7 +345,9 @@ export const getImportDomainLabel = (domain: ImportDomain): string => {
 export const getCsvImportJobStatusIcon = (
   status: CsvImportJobStatus,
 ): string => {
-  const option = CsvImportJobStatusOptions.find((opt) => opt.value === status);
+  const option = CsvImportJobStatusOptions.find(
+    (opt) => opt.value === (status as string),
+  );
   return option?.icon || "circle";
 };
 
@@ -351,7 +357,9 @@ export const getCsvImportJobStatusIcon = (
 export const getCsvImportJobStatusColor = (
   status: CsvImportJobStatus,
 ): string => {
-  const option = CsvImportJobStatusOptions.find((opt) => opt.value === status);
+  const option = CsvImportJobStatusOptions.find(
+    (opt) => opt.value === (status as string),
+  );
   return option?.color || "gray";
 };
 

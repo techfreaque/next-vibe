@@ -5,8 +5,7 @@
 
 import { Environment } from "next-vibe/shared/utils/env-util";
 
-import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/tasks/enum";
-import type { CronTaskDefinition } from "@/app/api/[locale]/v1/core/system/tasks/types/definition";
+import type { CronTaskDefinition } from "@/app/api/[locale]/v1/core/system/tasks/types/repository";
 import { env } from "@/config/env";
 
 import { EmailCampaignStage } from "../../enum";

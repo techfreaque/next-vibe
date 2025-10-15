@@ -9,8 +9,8 @@
 export class ChatError extends Error {
   constructor(
     message: string,
-    public readonly code?: string,
-    public readonly details?: unknown
+    readonly code?: string,
+    readonly details?: unknown,
   ) {
     super(message);
     this.name = this.constructor.name;
@@ -27,11 +27,11 @@ export class ChatError extends Error {
 export class APIError extends ChatError {
   constructor(
     message: string,
-    public readonly status?: number,
-    public readonly statusText?: string,
-    details?: unknown
+    readonly status?: number,
+    readonly statusText?: string,
+    details?: unknown,
   ) {
-    super(message, `API_ERROR_${status || 'UNKNOWN'}`, details);
+    super(message, `API_ERROR_${status || "UNKNOWN"}`, details);
   }
 }
 
@@ -41,10 +41,10 @@ export class APIError extends ChatError {
 export class ValidationError extends ChatError {
   constructor(
     message: string,
-    public readonly field?: string,
-    details?: unknown
+    readonly field?: string,
+    details?: unknown,
   ) {
-    super(message, 'VALIDATION_ERROR', details);
+    super(message, "VALIDATION_ERROR", details);
   }
 }
 
@@ -54,10 +54,10 @@ export class ValidationError extends ChatError {
 export class StreamError extends ChatError {
   constructor(
     message: string,
-    public readonly streamPhase?: 'init' | 'reading' | 'parsing' | 'complete',
-    details?: unknown
+    readonly streamPhase?: "init" | "reading" | "parsing" | "complete",
+    details?: unknown,
   ) {
-    super(message, 'STREAM_ERROR', details);
+    super(message, "STREAM_ERROR", details);
   }
 }
 
@@ -67,10 +67,10 @@ export class StreamError extends ChatError {
 export class StorageError extends ChatError {
   constructor(
     message: string,
-    public readonly operation?: 'read' | 'write' | 'delete',
-    details?: unknown
+    readonly operation?: "read" | "write" | "delete",
+    details?: unknown,
   ) {
-    super(message, 'STORAGE_ERROR', details);
+    super(message, "STORAGE_ERROR", details);
   }
 }
 
@@ -80,10 +80,10 @@ export class StorageError extends ChatError {
 export class MessageTreeError extends ChatError {
   constructor(
     message: string,
-    public readonly operation?: string,
-    details?: unknown
+    readonly operation?: string,
+    details?: unknown,
   ) {
-    super(message, 'MESSAGE_TREE_ERROR', details);
+    super(message, "MESSAGE_TREE_ERROR", details);
   }
 }
 
@@ -136,16 +136,16 @@ export function getErrorMessage(error: unknown): string {
   if (isChatError(error)) {
     return error.message;
   }
-  
+
   if (error instanceof Error) {
     return error.message;
   }
-  
-  if (typeof error === 'string') {
+
+  if (typeof error === "string") {
     return error;
   }
-  
-  return 'An unknown error occurred';
+
+  return "An unknown error occurred";
 }
 
 /**
@@ -165,16 +165,15 @@ export function getErrorDetails(error: unknown): {
       stack: error.stack,
     };
   }
-  
+
   if (error instanceof Error) {
     return {
       message: error.message,
       stack: error.stack,
     };
   }
-  
+
   return {
     message: String(error),
   };
 }
-

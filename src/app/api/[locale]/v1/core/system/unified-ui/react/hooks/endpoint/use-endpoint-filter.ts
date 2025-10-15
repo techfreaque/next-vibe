@@ -3,18 +3,12 @@
 "use client";
 
 import { useMemo } from "react";
-import type z from "zod";
+import type { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type {
-  ExtractInput,
-  ExtractOutput,
-  FieldUsage,
-  InferSchemaFromField,
-  UnifiedField,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
+import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
-import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { useApiQueryForm } from "../query-form";
@@ -41,17 +35,30 @@ import type {
  * @returns Filter form for API interaction with enhanced error handling
  */
 export function useEndpointFilter<
-  TEndpoint extends CreateApiEndpoint<any, any, any, any>,
+  TEndpoint extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    any
+  >,
 >(
   filterEndpoint: TEndpoint | null,
   logger: EndpointLogger,
   options: {
-    formOptions?: ApiQueryFormOptions<any>;
-    queryOptions?: ApiQueryOptions<any, any, any>;
-    urlParams?: any;
-    initialFilters?: any;
+    formOptions?: ApiQueryFormOptions<TEndpoint["TRequestOutput"]>;
+    queryOptions?: ApiQueryOptions<
+      TEndpoint["TRequestOutput"],
+      TEndpoint["TResponseOutput"],
+      TEndpoint["TUrlVariablesOutput"]
+    >;
+    urlParams?: TEndpoint["TUrlVariablesOutput"];
+    initialFilters?: Partial<TEndpoint["TRequestOutput"]>;
   } = {},
-): any {
+): ApiQueryFormReturn<
+  TEndpoint["TRequestOutput"],
+  TEndpoint["TResponseOutput"],
+  TEndpoint["TUrlVariablesOutput"]
+> | null {
   // Return null if endpoint is not provided
   if (!filterEndpoint) {
     return null;
@@ -59,9 +66,7 @@ export function useEndpointFilter<
   const {
     formOptions = { persistForm: true, autoSubmit: true, debounceMs: 300 },
     queryOptions = {},
-    urlParams = {} as ExtractOutput<
-      InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
-    >,
+    urlParams = {} as TEndpoint["TUrlVariablesOutput"],
     initialFilters,
   } = options;
 
@@ -76,9 +81,7 @@ export function useEndpointFilter<
       defaultValues: {
         ...formOptions.defaultValues,
         ...initialFilters,
-      } as Partial<
-        ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>
-      >, // Type assertion for form defaults
+      } as Partial<TEndpoint["TRequestInput"]>, // Type assertion for form defaults
       // Generate storage key for form persistence
       persistenceKey:
         formOptions.persistenceKey ||
@@ -99,17 +102,12 @@ export function useEndpointFilter<
 
   // Use the existing query form hook with enhanced options
   // Only call the hook if endpoint is provided to avoid conditional hook calls
-  const queryFormResult = useApiQueryForm<
-    TExampleKey,
-    TMethod,
-    TUserRoleValue,
-    TFields
-  >({
+  const queryFormResult = useApiQueryForm({
     endpoint: filterEndpoint,
     urlVariables: urlParams,
     queryOptions: enhancedQueryOptions,
     formOptions: enhancedFormOptions as ApiQueryFormOptions<
-      ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>
+      TEndpoint["TRequestOutput"]
     >,
     logger: logger,
   });

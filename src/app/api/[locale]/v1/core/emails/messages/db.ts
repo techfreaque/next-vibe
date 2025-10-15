@@ -9,7 +9,6 @@ import {
   index,
   integer,
   json,
-  pgEnum,
   pgTable,
   text,
   timestamp,
@@ -56,7 +55,9 @@ export const emails = pgTable(
     templateName: text("template_name"),
 
     // Status and tracking
-    status: text("status", { enum: EmailStatusDB }).notNull().default(EmailStatus.PENDING),
+    status: text("status", { enum: EmailStatusDB })
+      .notNull()
+      .default(EmailStatus.PENDING),
 
     // Provider information
     emailProvider: text("email_provider").default(EmailProvider.SMTP),
@@ -202,7 +203,9 @@ export const imapAccounts = pgTable(
     // Authentication
     username: text("username").notNull(),
     password: text("password").notNull(), // Should be encrypted in production
-    authMethod: text("auth_method", { enum: ImapAuthMethodDB }).default(ImapAuthMethod.PLAIN),
+    authMethod: text("auth_method", { enum: ImapAuthMethodDB }).default(
+      ImapAuthMethod.PLAIN,
+    ),
 
     // Connection settings
     connectionTimeout: integer("connection_timeout").default(30000),

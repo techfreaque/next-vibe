@@ -35,7 +35,7 @@ const { GET } = createEndpoint({
   description: "app.api.v1.core.users.stats.description" as const,
   category: "app.api.v1.core.users.stats.category" as const,
   tags: ["app.api.v1.core.users.stats.tag" as const],
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [UserRole.ADMIN] as const,
 
   fields: objectField(
     {
@@ -196,131 +196,65 @@ const { GET } = createEndpoint({
         },
       ),
 
-      // === PROFILE COMPLETION STATISTICS ===
-      profileStats: objectField(
+      // === INTEGRATION STATISTICS ===
+      integrationStats: objectField(
         {
           type: WidgetType.CONTAINER,
           title:
-            "app.api.v1.core.users.stats.response.profileStats.title" as const,
+            "app.api.v1.core.users.stats.response.integrationStats.title" as const,
           description:
-            "app.api.v1.core.users.stats.response.profileStats.description" as const,
-          layout: { type: LayoutType.GRID_2_COLUMNS },
+            "app.api.v1.core.users.stats.response.integrationStats.description" as const,
+          layout: { type: LayoutType.GRID, columns: 3 },
         },
         { response: true },
         {
-          complete: objectField(
+          usersWithStripeId: responseField(
             {
-              title:
-                "app.api.v1.core.users.stats.response.profileStats.complete.title" as const,
-              description:
-                "app.api.v1.core.users.stats.response.profileStats.complete.description" as const,
-              type: WidgetType.CONTAINER,
-              layout: { type: LayoutType.VERTICAL },
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.users.stats.response.integrationStats.usersWithStripeId.content" as const,
             },
-            { response: true },
-            {
-              usersWithPhone: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.users.stats.response.profileStats.complete.usersWithPhone.content" as const,
-                },
-                z.number().describe("Users with phone numbers"),
-              ),
-              usersWithBio: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.users.stats.response.profileStats.complete.usersWithBio.content" as const,
-                },
-                z.number().describe("Users with bio information"),
-              ),
-              usersWithWebsite: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.users.stats.response.profileStats.complete.usersWithWebsite.content" as const,
-                },
-                z.number().describe("Users with website URLs"),
-              ),
-              usersWithJobTitle: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.users.stats.response.profileStats.complete.usersWithJobTitle.content" as const,
-                },
-                z.number().describe("Users with job titles"),
-              ),
-              usersWithImage: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.users.stats.response.profileStats.complete.usersWithImage.content" as const,
-                },
-                z.number().describe("Users with profile images"),
-              ),
-            },
+            z.number().describe("Users with Stripe integration"),
           ),
-          integration: objectField(
+          usersWithoutStripeId: responseField(
             {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.v1.core.users.stats.response.integrationStats.title" as const,
-              description:
-                "app.api.v1.core.users.stats.response.integrationStats.description" as const,
-              layout: { type: LayoutType.VERTICAL },
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.users.stats.response.integrationStats.usersWithoutStripeId.content" as const,
             },
-            { response: true },
+            z.number().describe("Users without Stripe integration"),
+          ),
+          stripeIntegrationRate: responseField(
             {
-              usersWithStripeId: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.users.stats.response.integrationStats.usersWithStripeId.content" as const,
-                },
-                z.number().describe("Users with Stripe integration"),
-              ),
-              usersWithoutStripeId: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.users.stats.response.integrationStats.usersWithoutStripeId.content" as const,
-                },
-                z.number().describe("Users without Stripe integration"),
-              ),
-              stripeIntegrationRate: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.users.stats.response.integrationStats.stripeIntegrationRate.content" as const,
-                },
-                z.number().describe("Stripe integration percentage (0-1)"),
-              ),
-              usersWithLeadId: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.users.stats.response.integrationStats.usersWithLeadId.content" as const,
-                },
-                z.number().describe("Users linked to leads"),
-              ),
-              usersWithoutLeadId: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.users.stats.response.integrationStats.usersWithoutLeadId.content" as const,
-                },
-                z.number().describe("Users not linked to leads"),
-              ),
-              leadAssociationRate: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.users.stats.response.integrationStats.leadAssociationRate.content" as const,
-                },
-                z.number().describe("Lead association percentage (0-1)"),
-              ),
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.users.stats.response.integrationStats.stripeIntegrationRate.content" as const,
             },
+            z.number().describe("Stripe integration percentage (0-1)"),
+          ),
+          usersWithLeadId: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.users.stats.response.integrationStats.usersWithLeadId.content" as const,
+            },
+            z.number().describe("Users linked to leads"),
+          ),
+          usersWithoutLeadId: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.users.stats.response.integrationStats.usersWithoutLeadId.content" as const,
+            },
+            z.number().describe("Users not linked to leads"),
+          ),
+          leadAssociationRate: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.users.stats.response.integrationStats.leadAssociationRate.content" as const,
+            },
+            z.number().describe("Lead association percentage (0-1)"),
           ),
         },
       ),
@@ -489,14 +423,6 @@ const { GET } = createEndpoint({
         },
         { response: true },
         {
-          uniqueCompanies: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.users.stats.response.businessInsights.uniqueCompanies.content" as const,
-            },
-            z.number().describe("Number of unique companies represented"),
-          ),
           generatedAt: responseField(
             {
               type: WidgetType.TEXT,
@@ -566,46 +492,6 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.users.stats.response.verificationRate.content" as const,
-        },
-        z.number(),
-      ),
-      usersWithPhone: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.stats.response.usersWithPhone.content" as const,
-        },
-        z.number(),
-      ),
-      usersWithBio: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.stats.response.usersWithBio.content" as const,
-        },
-        z.number(),
-      ),
-      usersWithWebsite: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.stats.response.usersWithWebsite.content" as const,
-        },
-        z.number(),
-      ),
-      usersWithJobTitle: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.stats.response.usersWithJobTitle.content" as const,
-        },
-        z.number(),
-      ),
-      usersWithImage: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.stats.response.usersWithImage.content" as const,
         },
         z.number(),
       ),
@@ -694,14 +580,6 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.users.stats.response.adminUsers.content" as const,
-        },
-        z.number(),
-      ),
-      uniqueCompanies: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.users.stats.response.uniqueCompanies.content" as const,
         },
         z.number(),
       ),
@@ -843,11 +721,6 @@ const { GET } = createEndpoint({
         emailVerifiedUsers: 2200,
         emailUnverifiedUsers: 250,
         verificationRate: 0.898,
-        usersWithPhone: 1850,
-        usersWithBio: 1200,
-        usersWithWebsite: 800,
-        usersWithJobTitle: 1600,
-        usersWithImage: 1400,
         usersWithStripeId: 1800,
         usersWithoutStripeId: 650,
         stripeIntegrationRate: 0.735,
@@ -859,7 +732,6 @@ const { GET } = createEndpoint({
         partnerAdminUsers: 50,
         partnerEmployeeUsers: 80,
         adminUsers: 20,
-        uniqueCompanies: 45,
         usersCreatedToday: 12,
         usersCreatedThisWeek: 85,
         usersCreatedThisMonth: 320,
@@ -869,7 +741,6 @@ const { GET } = createEndpoint({
         retentionRate: 0.857,
         generatedAt: "2024-01-07T12:00:00.000Z",
         businessInsights: {
-          uniqueCompanies: 45,
           generatedAt: "2024-01-07T12:00:00.000Z",
         },
         growthMetrics: {
@@ -897,22 +768,13 @@ const { GET } = createEndpoint({
           emailUnverifiedUsers: 250,
           verificationRate: 0.898,
         },
-        profileStats: {
-          complete: {
-            usersWithPhone: 1850,
-            usersWithBio: 1200,
-            usersWithWebsite: 800,
-            usersWithJobTitle: 1600,
-            usersWithImage: 1400,
-          },
-          integration: {
-            usersWithStripeId: 1800,
-            usersWithoutStripeId: 650,
-            stripeIntegrationRate: 0.735,
-            usersWithLeadId: 1950,
-            usersWithoutLeadId: 500,
-            leadAssociationRate: 0.796,
-          },
+        integrationStats: {
+          usersWithStripeId: 1800,
+          usersWithoutStripeId: 650,
+          stripeIntegrationRate: 0.735,
+          usersWithLeadId: 1950,
+          usersWithoutLeadId: 500,
+          leadAssociationRate: 0.796,
         },
         overviewStats: {
           totalUsers: 2450,
@@ -926,14 +788,14 @@ const { GET } = createEndpoint({
 });
 
 // Extract types using the new enhanced system
-export type UserStatsRequestTypeInput = typeof GET.types.RequestInput;
-export type UserStatsRequestTypeOutput = typeof GET.types.RequestOutput;
-export type UserStatsResponseTypeInput = typeof GET.types.ResponseInput;
-export type UserStatsResponseTypeOutput = typeof GET.types.ResponseOutput;
+export type UserStatsRequestInput = typeof GET.types.RequestInput;
+export type UserStatsRequestOutput = typeof GET.types.RequestOutput;
+export type UserStatsResponseInput = typeof GET.types.ResponseInput;
+export type UserStatsResponseOutput = typeof GET.types.ResponseOutput;
 
 // Alias types for consistency with repository imports
-export type UsersStatsResponseType = UserStatsResponseTypeOutput;
-export type UserStatsRequestType = UserStatsRequestTypeOutput;
+export type UsersStatsResponseType = UserStatsResponseOutput;
+export type UserStatsRequestType = UserStatsRequestOutput;
 
 /**
  * Export definitions

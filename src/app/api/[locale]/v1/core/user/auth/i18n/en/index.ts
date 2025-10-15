@@ -40,6 +40,10 @@ export const translations = {
       title: "Cookie Clear Failed",
       description: "Failed to clear authentication cookie",
     },
+    publicPayloadNotSupported: {
+      title: "Public Payload Not Supported",
+      description: "Public JWT payload is not supported for CLI authentication",
+    },
   },
   post: {
     title: "Auth",

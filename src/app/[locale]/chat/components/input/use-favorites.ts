@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 /**
  * Hook for managing favorites in localStorage
@@ -8,7 +8,7 @@ import { useState, useEffect, useCallback } from "react";
  */
 export function useFavorites<T extends string>(
   storageKey: string,
-  defaultFavorites: T[]
+  defaultFavorites: T[],
 ): [T[], (id: T) => void, (favorites: T[]) => void] {
   const [favorites, setFavoritesState] = useState<T[]>(defaultFavorites);
   const [mounted, setMounted] = useState(false);
@@ -39,7 +39,7 @@ export function useFavorites<T extends string>(
         }
       }
     },
-    [storageKey, mounted]
+    [storageKey, mounted],
   );
 
   // Toggle a favorite
@@ -50,9 +50,8 @@ export function useFavorites<T extends string>(
         : [...favorites, id];
       setFavorites(newFavorites);
     },
-    [favorites, setFavorites]
+    [favorites, setFavorites],
   );
 
   return [favorites, toggleFavorite, setFavorites];
 }
-

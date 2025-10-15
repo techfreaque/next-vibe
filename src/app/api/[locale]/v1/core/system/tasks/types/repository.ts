@@ -6,10 +6,6 @@
 
 import "server-only";
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
-import type { z } from "zod";
-
-import type { CountryLanguage } from "@/i18n/core/config";
 import type {
   ErrorResponseType,
   ResponseType,
@@ -19,6 +15,10 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils/parse-error";
+import type { z } from "zod";
+
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPrivatePayloadType } from "../../../user/auth/definition";
 import type { EndpointLogger } from "../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";

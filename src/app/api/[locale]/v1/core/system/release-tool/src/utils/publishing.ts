@@ -104,7 +104,6 @@ export async function zipFolders({
       }
 
       if (!existsSync(inputPath)) {
-        // eslint-disable-next-line no-restricted-syntax
         throw new Error(`Input folder ${inputPath} does not exist, cannot zip`);
       }
 

@@ -14,6 +14,7 @@ import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { cronTasks } from "@/app/api/[locale]/v1/core/system/tasks/cron/db";
+import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -32,7 +33,7 @@ import type { CampaignStarterConfigType as CampaignStarterConfigWithCronType } f
  */
 export interface ICampaignStarterConfigRepository {
   getConfig(
-    data: {},
+    data: Record<string, never>,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -68,6 +69,21 @@ class CampaignStarterConfigRepositoryImpl
   }
 
   /**
+   * Validate and get priority value from database string
+   */
+  private isValidPriority(
+    value: string,
+  ): value is (typeof CronTaskPriority)[keyof typeof CronTaskPriority] {
+    return (
+      value === CronTaskPriority.CRITICAL ||
+      value === CronTaskPriority.HIGH ||
+      value === CronTaskPriority.MEDIUM ||
+      value === CronTaskPriority.LOW ||
+      value === CronTaskPriority.BACKGROUND
+    );
+  }
+
+  /**
    * Get cron task settings for campaign starter
    */
   private async getCronTaskSettings(): Promise<CronSettings> {
@@ -83,10 +99,19 @@ class CampaignStarterConfigRepositoryImpl
     }
 
     const defaults = getDefaultCronSettings();
+
+    // Validate priority is one of the valid CronTaskPriority values
+    // The database constraint ensures this, but TypeScript doesn't know that
+    const priorityValue = cronTask.priority;
+    const priority =
+      priorityValue && this.isValidPriority(priorityValue)
+        ? priorityValue
+        : defaults.priority;
+
     return {
       schedule: cronTask.schedule,
       enabled: cronTask.enabled,
-      priority: cronTask.priority,
+      priority,
       timeout: cronTask.timeout ?? defaults.timeout,
       retries: cronTask.retries ?? defaults.retries,
       retryDelay: cronTask.retryDelay ?? defaults.retryDelay,
@@ -186,7 +211,7 @@ class CampaignStarterConfigRepositoryImpl
    * Get campaign starter configuration
    */
   async getConfig(
-    data: {},
+    data: Record<string, never>,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,

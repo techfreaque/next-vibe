@@ -17,7 +17,6 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import type { JSX, ReactNode } from "react";
 import type { Control } from "react-hook-form";
 
-import type { CronStatsRequestType } from "@/app/api/[locale]/v1/core/system/tasks/cron/stats/definition";
 import type statsEndpoints from "@/app/api/[locale]/v1/core/system/tasks/cron/stats/definition";
 import {
   CronTaskPriorityFilter,
@@ -37,7 +36,7 @@ interface CronStatsFiltersContainerProps {
 }
 
 interface CronStatsFiltersProps {
-  control: Control<Partial<CronStatsRequestType>>;
+  control: EndpointReturn<typeof statsEndpoints>["read"]["form"]["control"];
 }
 
 /**
@@ -199,7 +198,7 @@ export function CronStatsFilters({
           type: "select",
           label: "admin.dashboard.cron.stats.filters.healthStatus",
           placeholder: "admin.dashboard.cron.stats.filters.selectHealthStatus",
-          options: Object.values(PulseHealthStatusFilter).map((status) => ({
+          options: Object.values(PulseHealthStatus).map((status) => ({
             value: status,
             label:
               `admin.dashboard.cron.stats.filters.health.${status}` as const,

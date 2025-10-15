@@ -14,10 +14,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { JwtPayloadType } from "../../../user/auth/definition";
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { ImapAccount } from "../../messages/db";
 import {
   ImapAuthMethod,
@@ -25,17 +25,17 @@ import {
   ImapSpecialUseType,
 } from "../enum";
 import type {
-  ImapConnectionCloseRequestTypeOutput,
-  ImapConnectionCloseResponseTypeOutput,
+  ImapConnectionCloseRequestOutput,
+  ImapConnectionCloseResponseOutput,
   ImapConnectionConfig,
-  ImapConnectionTestRequestTypeOutput,
-  ImapConnectionTestResponseTypeOutput,
+  ImapConnectionTestRequestOutput,
+  ImapConnectionTestResponseOutput,
   ImapFolderInfo,
-  ImapFolderListRequestTypeOutput,
-  ImapFolderListResponseTypeOutput,
+  ImapFolderListRequestOutput,
+  ImapFolderListResponseOutput,
   ImapMessageInfo,
-  ImapMessageListRequestTypeOutput,
-  ImapMessageListResponseTypeOutput,
+  ImapMessageListRequestOutput,
+  ImapMessageListResponseOutput,
 } from "./definition";
 
 /**
@@ -93,11 +93,11 @@ interface ImapConnectionImpl {
  */
 export interface ImapConnectionRepository {
   testConnection(
-    data: ImapConnectionTestRequestTypeOutput,
+    data: ImapConnectionTestRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapConnectionTestResponseTypeOutput>>;
+  ): Promise<ResponseType<ImapConnectionTestResponseOutput>>;
 
   connect(
     account: ImapAccount,
@@ -107,31 +107,31 @@ export interface ImapConnectionRepository {
   ): Promise<ResponseType<ImapConnectionImpl>>;
 
   disconnect(
-    data: ImapConnectionCloseRequestTypeOutput,
+    data: ImapConnectionCloseRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapConnectionCloseResponseTypeOutput>>;
+  ): Promise<ResponseType<ImapConnectionCloseResponseOutput>>;
 
   listFolders(
-    data: ImapFolderListRequestTypeOutput,
+    data: ImapFolderListRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapFolderListResponseTypeOutput>>;
+  ): Promise<ResponseType<ImapFolderListResponseOutput>>;
 
   listMessages(
-    data: ImapMessageListRequestTypeOutput,
+    data: ImapMessageListRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapMessageListResponseTypeOutput>>;
+  ): Promise<ResponseType<ImapMessageListResponseOutput>>;
 
   closeAllConnections(
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<{ success: boolean; message: TranslationKey }>>;
+  ): ResponseType<{ success: boolean; message: TranslationKey }>;
 }
 
 /**
@@ -191,11 +191,11 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
    * Test IMAP connection
    */
   async testConnection(
-    data: ImapConnectionTestRequestTypeOutput,
+    data: ImapConnectionTestRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapConnectionTestResponseTypeOutput>> {
+  ): Promise<ResponseType<ImapConnectionTestResponseOutput>> {
     const startTime = Date.now();
     const config = this.createConnectionConfig(data.account);
 
@@ -251,7 +251,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
 
         // Implement actual IMAP connection test using node-imap
         return await new Promise<
-          ResponseType<ImapConnectionTestResponseTypeOutput>
+          ResponseType<ImapConnectionTestResponseOutput>
         >((resolve) => {
           const imap = new Imap({
             user: config.username,
@@ -266,7 +266,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
           let resolved = false;
 
           const resolveOnce = (
-            result: ResponseType<ImapConnectionTestResponseTypeOutput>,
+            result: ResponseType<ImapConnectionTestResponseOutput>,
           ): void => {
             if (!resolved) {
               resolved = true;
@@ -445,11 +445,11 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
    * Disconnect from IMAP server
    */
   async disconnect(
-    data: ImapConnectionCloseRequestTypeOutput,
+    data: ImapConnectionCloseRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapConnectionCloseResponseTypeOutput>> {
+  ): Promise<ResponseType<ImapConnectionCloseResponseOutput>> {
     const config = this.createConnectionConfig(data.account);
     const connectionKey = `${config.host}:${config.port}:${config.username}`;
 
@@ -483,11 +483,11 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
    * List folders from IMAP server
    */
   async listFolders(
-    data: ImapFolderListRequestTypeOutput,
+    data: ImapFolderListRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapFolderListResponseTypeOutput>> {
+  ): Promise<ResponseType<ImapFolderListResponseOutput>> {
     try {
       logger.debug("Listing IMAP folders", { accountId: data.account.id });
 
@@ -575,11 +575,11 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
    * List messages from IMAP folder
    */
   async listMessages(
-    data: ImapMessageListRequestTypeOutput,
+    data: ImapMessageListRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapMessageListResponseTypeOutput>> {
+  ): Promise<ResponseType<ImapMessageListResponseOutput>> {
     try {
       logger.debug("Listing IMAP messages", {
         accountId: data.account.id,
@@ -795,19 +795,19 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
   /**
    * Close all connections
    */
-  async closeAllConnections(
+  closeAllConnections(
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<{ success: boolean; message: TranslationKey }>> {
+  ): ResponseType<{ success: boolean; message: TranslationKey }> {
     try {
       logger.debug("Closing all IMAP connections");
 
-      const closePromises = Array.from(this.connections.values()).map(
-        (connection) => connection.close(),
+      // Close all connections synchronously (close() returns void, not Promise)
+      Array.from(this.connections.values()).forEach((connection) =>
+        connection.close(),
       );
 
-      await Promise.allSettled(closePromises);
       this.connections.clear();
 
       logger.debug("All IMAP connections closed");

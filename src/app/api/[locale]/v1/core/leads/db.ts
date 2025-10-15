@@ -34,9 +34,14 @@ import {
 } from "./enum";
 
 // Create country and language enums from i18n config
-export const countryEnum = pgEnum("country", Object.values(Countries) as [string, ...string[]]);
-export const languageEnum = pgEnum("language", Object.values(Languages) as [string, ...string[]]);
-
+export const countryEnum = pgEnum(
+  "country",
+  Object.values(Countries) as [string, ...string[]],
+);
+export const languageEnum = pgEnum(
+  "language",
+  Object.values(Languages) as [string, ...string[]],
+);
 
 /**
  * Leads Table
@@ -55,7 +60,9 @@ export const leads = pgTable("leads", {
   language: languageEnum("language").notNull(),
 
   // Lead qualification
-  status: text("status", { enum: LeadStatusDB }).notNull().default(LeadStatus.NEW),
+  status: text("status", { enum: LeadStatusDB })
+    .notNull()
+    .default(LeadStatus.NEW),
   source: text("source", { enum: LeadSourceDB }),
   notes: text("notes"),
 
@@ -70,8 +77,12 @@ export const leads = pgTable("leads", {
   invalidAt: timestamp("invalid_at"), // When lead was marked as invalid
 
   // Email campaign tracking
-  currentCampaignStage: text("current_campaign_stage", { enum: EmailCampaignStageDB }).default(EmailCampaignStage.NOT_STARTED),
-  emailJourneyVariant: text("email_journey_variant", { enum: EmailJourneyVariantDB }),
+  currentCampaignStage: text("current_campaign_stage", {
+    enum: EmailCampaignStageDB,
+  }).default(EmailCampaignStage.NOT_STARTED),
+  emailJourneyVariant: text("email_journey_variant", {
+    enum: EmailJourneyVariantDB,
+  }),
   campaignStartedAt: timestamp("campaign_started_at"),
   emailsSent: integer("emails_sent").notNull().default(0),
   lastEmailSentAt: timestamp("last_email_sent_at"),
@@ -104,7 +115,9 @@ export const emailCampaigns = pgTable("email_campaigns", {
 
   // Campaign details
   stage: text("stage", { enum: EmailCampaignStageDB }).notNull(),
-  journeyVariant: text("journey_variant", { enum: EmailJourneyVariantDB }).notNull(),
+  journeyVariant: text("journey_variant", {
+    enum: EmailJourneyVariantDB,
+  }).notNull(),
   subject: text("subject").notNull(),
   templateName: text("template_name").notNull(),
 
@@ -113,7 +126,9 @@ export const emailCampaigns = pgTable("email_campaigns", {
   sentAt: timestamp("sent_at"),
 
   // Status and tracking
-  status: text("status", { enum: EmailStatusDB }).notNull().default(EmailStatus.PENDING),
+  status: text("status", { enum: EmailStatusDB })
+    .notNull()
+    .default(EmailStatus.PENDING),
   emailProvider: text("email_provider", { enum: EmailProviderDB }).default(
     EmailProvider.SMTP,
   ),
@@ -154,7 +169,9 @@ export const leadEngagements = pgTable("lead_engagements", {
   }),
 
   // Engagement details
-  engagementType: text("engagement_type", { enum: EngagementTypesDB }).notNull(),
+  engagementType: text("engagement_type", {
+    enum: EngagementTypesDB,
+  }).notNull(),
 
   // Tracking information
   ipAddress: text("ip_address"),

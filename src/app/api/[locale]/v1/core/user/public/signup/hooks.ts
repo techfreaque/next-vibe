@@ -2,8 +2,8 @@ import { useRouter } from "next/navigation";
 import { useToast } from "next-vibe-ui/ui";
 import { useMemo } from "react";
 
+import { useLeadId } from "@/app/api/[locale]/v1/core/leads/tracking/engagement/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type {
   FormAlertState,
   InferApiFormReturn,
@@ -11,13 +11,10 @@ import type {
 } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
 import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation-form";
 import { useApiQuery } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/query";
-import { useTranslation } from "@/i18n/core/client";
 import { envClient } from "@/config/env-client";
-import { LeadTrackingClientRepository } from "@/app/api/[locale]/v1/core/leads/tracking/client-repository";
-import { useLeadId } from "@/app/api/[locale]/v1/core/leads/tracking/engagement/hooks";
+import { useTranslation } from "@/i18n/core/client";
 
 import { authClientRepository } from "../../auth/repository-client";
-import { PreferredContactMethod } from "../../enum";
 import { useUser } from "../../private/me/hooks";
 import signupEndpoints from "./definition";
 import { SignupType } from "./enum";
@@ -34,15 +31,17 @@ export function useRegister(): InferApiFormReturn<
   const { toast } = useToast();
   const router = useRouter();
   const { t, locale } = useTranslation();
-  const { refetch } = useUser(createEndpointLogger(
-    envClient.NODE_ENV === "development",
-    Date.now(),
-    locale,
-  ));
-  
+  const { refetch } = useUser(
+    createEndpointLogger(
+      (envClient.NODE_ENV as string) === "development",
+      Date.now(),
+      locale,
+    ),
+  );
+
   // Initialize logger for client-side operations
   const logger = createEndpointLogger(
-    envClient.NODE_ENV === "development",
+    (envClient.NODE_ENV as string) === "development",
     Date.now(),
     locale,
   );
@@ -53,20 +52,15 @@ export function useRegister(): InferApiFormReturn<
     {
       defaultValues: {
         personalInfo: {
-          firstName: "",
-          lastName: "",
+          privateName: "",
+          publicName: "",
           email: "",
         },
         security: {
           password: "",
           confirmPassword: "",
         },
-        businessInfo: {
-          company: "",
-          phone: "",
-        },
         preferences: {
-          preferredContactMethod: PreferredContactMethod.EMAIL,
           signupType: SignupType.PRICING,
         },
         consent: {
@@ -74,10 +68,10 @@ export function useRegister(): InferApiFormReturn<
           subscribeToNewsletter: false,
         },
         advanced: {
-          imageUrl: "",
-          leadId: LeadTrackingClientRepository.LOADING_LEAD_ID,
+          leadId: undefined,
         },
       },
+      persistForm: false, // Disable persistence to avoid conflicts with old data structure
     },
     {
       onSuccess: async () => {
@@ -162,7 +156,14 @@ export function useRegister(): InferApiFormReturn<
   }, [formResult.response]);
 
   return {
-    ...formResult,
+    form: formResult.form,
+    response: formResult.response,
+    isSubmitSuccessful: formResult.isSubmitSuccessful,
+    submitError: formResult.submitError,
+    isSubmitting: formResult.isSubmitting,
+    submitForm: formResult.submitForm,
+    clearSavedForm: formResult.clearSavedForm,
+    setErrorType: formResult.setErrorType,
     alert,
   };
 }
@@ -180,23 +181,24 @@ export function useEmailCheck(
 
   // Initialize logger for client-side operations
   const logger = createEndpointLogger(
-    envClient.NODE_ENV === "development",
+    (envClient.NODE_ENV as string) === "development",
     Date.now(),
     locale,
   );
 
   return useApiQuery({
     endpoint: signupEndpoints.GET,
+    requestData: { email: email || "" },
     logger,
     options: {
       // Don't refetch unnecessarily
       refetchOnWindowFocus: false,
       staleTime: 1000 * 60 * 5, // 5 minutes
       enabled: !!email && email.includes("@") && email.includes("."),
-      onError: ({ error }: { error: { message: string } }) => {
+      onError: ({ error }) => {
         toast({
           title: t("auth.signup.errors.title"),
-          description: error.message,
+          description: t(error.message),
           variant: "destructive",
         });
       },

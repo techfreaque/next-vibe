@@ -174,20 +174,16 @@ type MatchesUsage<TUsage, TTargetUsage extends FieldUsage> =
  * COMPREHENSIVE SCHEMA INFERENCE: The complete type system
  * Back-propagates all 3 type parameters (Output, ZodType, Input) through the entire chain
  */
-export type InferSchemaFromField<
-  F extends UnifiedField<TSchema>,
-  Usage extends FieldUsage,
-  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
-> =
+export type InferSchemaFromField<F, Usage extends FieldUsage> =
   // Handle PrimitiveField
-  F extends PrimitiveField<infer TSchema>
+  F extends PrimitiveField<infer TSchemaInferred, FieldUsageConfig>
     ? F extends { usage: infer TUsage }
       ? MatchesUsage<TUsage, Usage> extends true
-        ? TSchema
+        ? TSchemaInferred
         : z.ZodNever
       : z.ZodNever
     : // Handle ObjectField
-      F extends ObjectField<infer TChildren>
+      F extends ObjectField<infer TChildren, FieldUsageConfig>
       ? F extends { usage: infer TUsage }
         ? MatchesUsage<TUsage, Usage> extends true
           ? z.ZodObject<{
@@ -201,7 +197,7 @@ export type InferSchemaFromField<
           : z.ZodNever
         : z.ZodNever
       : // Handle ArrayField
-        F extends ArrayField<infer TChild>
+        F extends ArrayField<infer TChild, FieldUsageConfig>
         ? F extends { usage: infer TUsage }
           ? MatchesUsage<TUsage, Usage> extends true
             ? z.ZodArray<
@@ -291,38 +287,49 @@ export type InferSchemaFromFieldForMethod<
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
 > =
   // Handle PrimitiveField
-  F extends PrimitiveField<infer TFieldSchema>
+  F extends PrimitiveField<infer TFieldSchema, FieldUsageConfig>
     ? F extends { usage: infer TUsage }
       ? MatchesUsageForMethod<TUsage, Method, Usage> extends true
         ? TFieldSchema
         : z.ZodNever
       : z.ZodNever
     : // Handle ObjectField
-      F extends ObjectField<infer TChildren>
+      F extends ObjectField<infer TChildren, FieldUsageConfig>
       ? F extends { usage: infer TUsage }
         ? MatchesUsageForMethod<TUsage, Method, Usage> extends true
           ? z.ZodObject<{
-              [K in keyof TChildren as InferSchemaFromFieldForMethod<
-                TChildren[K],
-                Method,
-                Usage
-              > extends z.ZodNever
-                ? never
-                : K]: InferSchemaFromFieldForMethod<
-                TChildren[K],
-                Method,
-                Usage
-              >;
+              [K in keyof TChildren as TChildren[K] extends UnifiedField<z.ZodTypeAny>
+                ? InferSchemaFromFieldForMethod<
+                    TChildren[K],
+                    Method,
+                    Usage,
+                    z.ZodTypeAny
+                  > extends z.ZodNever
+                  ? never
+                  : K
+                : never]: TChildren[K] extends UnifiedField<z.ZodTypeAny>
+                ? InferSchemaFromFieldForMethod<
+                    TChildren[K],
+                    Method,
+                    Usage,
+                    z.ZodTypeAny
+                  >
+                : never;
             }>
           : z.ZodNever
         : z.ZodNever
       : // Handle ArrayField
-        F extends ArrayField<infer TChild>
+        F extends ArrayField<infer TChild, FieldUsageConfig>
         ? F extends { usage: infer TUsage }
           ? MatchesUsageForMethod<TUsage, Method, Usage> extends true
             ? z.ZodArray<
                 TChild extends UnifiedField<z.ZodTypeAny>
-                  ? InferSchemaFromFieldForMethod<TChild, Method, Usage>
+                  ? InferSchemaFromFieldForMethod<
+                      TChild,
+                      Method,
+                      Usage,
+                      z.ZodTypeAny
+                    >
                   : TChild extends z.ZodTypeAny
                     ? TChild
                     : z.ZodNever
@@ -339,7 +346,7 @@ export type InferInputFromFieldForMethod<
   Method extends Methods,
   Usage extends FieldUsage,
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
-> = ExtractInput<InferSchemaFromFieldForMethod<F, Method, Usage>>;
+> = ExtractInput<InferSchemaFromFieldForMethod<F, Method, Usage, TSchema>>;
 
 /**
  * METHOD-SPECIFIC OUTPUT TYPE INFERENCE
@@ -349,70 +356,7 @@ export type InferOutputFromFieldForMethod<
   Method extends Methods,
   Usage extends FieldUsage,
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
-> = ExtractOutput<InferSchemaFromFieldForMethod<F, Method, Usage>>;
-
-// ============================================================================
-// DEBUG: Test method-specific usage detection
-// ============================================================================
-
-// Test if the type system correctly detects method-specific usage
-interface TestMethodSpecificUsage {
-  GET: {};
-  POST: { response: true };
-}
-
-type TestIsMethodSpecific = IsMethodSpecificUsage<TestMethodSpecificUsage>;
-type TestSupportsPostResponse = AnyMethodSupportsUsage<
-  TestMethodSpecificUsage,
-  FieldUsage.Response
->;
-type TestMatchesResponse = MatchesUsage<
-  TestMethodSpecificUsage,
-  FieldUsage.Response
->;
-
-// These should all be true
-type DebugTest1 = TestIsMethodSpecific extends true
-  ? "✅ Method-specific detected"
-  : "❌ Method-specific NOT detected";
-type DebugTest2 = TestSupportsPostResponse extends true
-  ? "✅ POST response supported"
-  : "❌ POST response NOT supported";
-type DebugTest3 = TestMatchesResponse extends true
-  ? "✅ Response usage matches"
-  : "❌ Response usage NOT matches";
-
-// Test assignments to see actual results
-const debugTest1: DebugTest1 = "✅ Method-specific detected";
-const debugTest2: DebugTest2 = "✅ POST response supported";
-const debugTest3: DebugTest3 = "✅ Response usage matches";
-
-// CRITICAL TEST: Check if the core InferSchemaFromField is working
-interface TestField {
-  schema: z.ZodString;
-  usage: {
-    GET: {};
-    POST: { response: true };
-  };
-}
-
-// This should be z.ZodNever for GET response (no response usage)
-type TestGetResponse = InferSchemaFromField<TestField, FieldUsage.Response>;
-// This should be z.ZodString for POST response (has response usage)
-type TestPostResponse = InferSchemaFromField<TestField, FieldUsage.Response>;
-
-// Test if the types are working correctly
-type TestGetResponseIsNever = TestGetResponse extends z.ZodNever
-  ? "✅ GET response is never"
-  : "❌ GET response is NOT never";
-type TestPostResponseIsString = TestPostResponse extends z.ZodString
-  ? "✅ POST response is string"
-  : "❌ POST response is NOT string";
-
-const testGetResponseIsNever: TestGetResponseIsNever =
-  "❌ GET response is NOT never";
-const testPostResponseIsString: TestPostResponseIsString =
-  "❌ POST response is NOT string";
+> = ExtractOutput<InferSchemaFromFieldForMethod<F, Method, Usage, TSchema>>;
 
 // ============================================================================
 // BASIC TYPE UTILITIES
@@ -739,10 +683,13 @@ export interface BulkAction {
  * Primitive field type with complete schema type preservation
  * Uses ExtractInputOutput to preserve Input, Output, and ZodType information
  */
-export interface PrimitiveField<TSchema extends z.ZodTypeAny> {
+export interface PrimitiveField<
+  TSchema extends z.ZodTypeAny,
+  TUsage extends FieldUsageConfig,
+> {
   type: "primitive";
   schema: TSchema;
-  usage: FieldUsageConfig;
+  usage: TUsage;
   cache?: CacheStrategy;
   ui: WidgetConfig;
   apiKey?: string;
@@ -751,16 +698,13 @@ export interface PrimitiveField<TSchema extends z.ZodTypeAny> {
 
 /**
  * Object field type with children preservation
+ * TChildren can be any object-like structure where all values are UnifiedFields
+ * The constraint is checked at the value level, not the type level
  */
-export interface ObjectField<
-  TChildren extends Record<string, UnifiedField<z.ZodTypeAny>> = Record<
-    string,
-    UnifiedField<z.ZodTypeAny>
-  >,
-> {
+export interface ObjectField<TChildren, TUsage extends FieldUsageConfig> {
   type: "object";
   schema?: z.ZodObject<Record<string, z.ZodTypeAny>>;
-  usage: FieldUsageConfig;
+  usage: TUsage;
   cache?: CacheStrategy;
   ui: WidgetConfig;
   children: TChildren;
@@ -769,12 +713,10 @@ export interface ObjectField<
 /**
  * Array field type with child preservation
  */
-export interface ArrayField<
-  TChild extends UnifiedField<z.ZodTypeAny> = UnifiedField<z.ZodTypeAny>,
-> {
+export interface ArrayField<TChild, TUsage extends FieldUsageConfig> {
   type: "array";
   schema?: z.ZodArray<z.ZodTypeAny>;
-  usage: FieldUsageConfig;
+  usage: TUsage;
   cache?: CacheStrategy;
   ui: WidgetConfig;
   child: TChild;
@@ -782,8 +724,10 @@ export interface ArrayField<
 
 /**
  * Unified field type that supports all field configurations with enhanced type preservation
+ * The union accepts any ObjectField or ArrayField regardless of their type parameters
+ * Type inference is preserved through the actual field definitions, not through constraints
  */
-export type UnifiedField<TSchema extends z.ZodTypeAny> =
-  | PrimitiveField<TSchema>
-  | ObjectField<Record<string, UnifiedField<z.ZodTypeAny>>>
-  | ArrayField<UnifiedField<z.ZodTypeAny>>;
+export type UnifiedField<TSchema extends z.ZodTypeAny = z.ZodTypeAny> =
+  | PrimitiveField<TSchema, FieldUsageConfig>
+  | ObjectField<Record<string, UnifiedField<z.ZodTypeAny>>, FieldUsageConfig>
+  | ArrayField<UnifiedField<z.ZodTypeAny> | z.ZodTypeAny, FieldUsageConfig>;

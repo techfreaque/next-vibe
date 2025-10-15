@@ -82,7 +82,6 @@ export const authenticatedProcedure = publicProcedure.use(isAuthenticated);
 export function requireRoles<TRoles extends readonly (typeof UserRoleValue)[]>(
   roles: TRoles,
   logger: EndpointLogger,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any {
   return middleware(async ({ ctx, next }) => {
     if (!ctx.user || ctx.user.isPublic) {

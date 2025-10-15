@@ -1,0 +1,188 @@
+import "server-only";
+
+import { and, eq } from "drizzle-orm";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
+
+import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
+import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+
+import type {
+  FolderDeleteResponseOutput,
+  FolderGetResponseOutput,
+  FolderUpdateRequestOutput,
+  FolderUpdateResponseOutput,
+} from "./definition";
+
+/**
+ * Get a single folder by ID
+ */
+export async function getFolder(
+  user: JwtPrivatePayloadType,
+  data: { id: string },
+): Promise<ResponseType<FolderGetResponseOutput>> {
+  if (!user.id) {
+    return createErrorResponse(
+      "app.api.v1.core.agent.chat.folders.id.get.errors.unauthorized.title",
+      ErrorResponseTypes.UNAUTHORIZED,
+    );
+  }
+
+  try {
+    const [folder] = await db
+      .select()
+      .from(chatFolders)
+      .where(and(eq(chatFolders.id, data.id), eq(chatFolders.userId, user.id)))
+      .limit(1);
+
+    if (!folder) {
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.folders.id.get.errors.notFound.title",
+        ErrorResponseTypes.NOT_FOUND,
+      );
+    }
+
+    return createSuccessResponse({
+      response: {
+        folder: {
+          ...folder,
+          createdAt: new Date(folder.createdAt),
+          updatedAt: new Date(folder.updatedAt),
+        },
+      },
+    }) as ResponseType<FolderGetResponseOutput>;
+  } catch {
+    return createErrorResponse(
+      "app.api.v1.core.agent.chat.folders.id.get.errors.server.title",
+      ErrorResponseTypes.INTERNAL_ERROR,
+    );
+  }
+}
+
+/**
+ * Update a folder
+ */
+export async function updateFolder(
+  user: JwtPrivatePayloadType,
+  data: FolderUpdateRequestOutput & { id: string },
+): Promise<ResponseType<FolderUpdateResponseOutput>> {
+  if (!user.id) {
+    return createErrorResponse(
+      "app.api.v1.core.agent.chat.folders.id.patch.errors.unauthorized.title",
+      ErrorResponseTypes.UNAUTHORIZED,
+    );
+  }
+
+  try {
+    const { id, updates } = data;
+
+    // Verify folder exists and belongs to user
+    const [existingFolder] = await db
+      .select()
+      .from(chatFolders)
+      .where(and(eq(chatFolders.id, id), eq(chatFolders.userId, user.id)))
+      .limit(1);
+
+    if (!existingFolder) {
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.folders.id.patch.errors.notFound.title",
+        ErrorResponseTypes.NOT_FOUND,
+      );
+    }
+
+    // Prevent circular parent references
+    if (updates.parentId === id) {
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.folders.id.patch.errors.validation.title",
+        ErrorResponseTypes.VALIDATION_ERROR,
+      );
+    }
+
+    // Update the folder
+    const [updatedFolder] = await db
+      .update(chatFolders)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(chatFolders.id, id), eq(chatFolders.userId, user.id)))
+      .returning();
+
+    if (!updatedFolder) {
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.folders.id.patch.errors.server.title",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
+
+    return createSuccessResponse({
+      response: {
+        folder: {
+          ...updatedFolder,
+          createdAt: new Date(updatedFolder.createdAt),
+          updatedAt: new Date(updatedFolder.updatedAt),
+        },
+      },
+    }) as ResponseType<FolderUpdateResponseOutput>;
+  } catch {
+    return createErrorResponse(
+      "app.api.v1.core.agent.chat.folders.id.patch.errors.server.title",
+      ErrorResponseTypes.INTERNAL_ERROR,
+    );
+  }
+}
+
+/**
+ * Delete a folder (cascade deletes handled by database)
+ */
+export async function deleteFolder(
+  user: JwtPrivatePayloadType,
+  data: { id: string },
+): Promise<ResponseType<FolderDeleteResponseOutput>> {
+  if (!user.id) {
+    return createErrorResponse(
+      "app.api.v1.core.agent.chat.folders.id.delete.errors.unauthorized.title",
+      ErrorResponseTypes.UNAUTHORIZED,
+    );
+  }
+
+  try {
+    const { id } = data;
+
+    // Verify folder exists and belongs to user
+    const [existingFolder] = await db
+      .select()
+      .from(chatFolders)
+      .where(and(eq(chatFolders.id, id), eq(chatFolders.userId, user.id)))
+      .limit(1);
+
+    if (!existingFolder) {
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.folders.id.delete.errors.notFound.title",
+        ErrorResponseTypes.NOT_FOUND,
+      );
+    }
+
+    // Delete the folder (cascade will handle child folders and threads)
+    await db
+      .delete(chatFolders)
+      .where(and(eq(chatFolders.id, id), eq(chatFolders.userId, user.id)));
+
+    return createSuccessResponse({
+      response: {
+        success: true,
+        deletedFolderId: id,
+      },
+    }) as ResponseType<FolderDeleteResponseOutput>;
+  } catch {
+    return createErrorResponse(
+      "app.api.v1.core.agent.chat.folders.id.delete.errors.server.title",
+      ErrorResponseTypes.INTERNAL_ERROR,
+    );
+  }
+}

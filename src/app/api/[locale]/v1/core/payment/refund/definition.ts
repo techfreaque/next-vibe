@@ -38,8 +38,8 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.payment.refund.description" as const,
   category: "app.api.v1.core.payment.category" as const,
   tags: [
-    "app.api.v1.core.payment.tags.refund" as const,
-    "app.api.v1.core.payment.tags.transaction" as const,
+    "app.api.v1.core.payment.refund.tags.refund" as const,
+    "app.api.v1.core.payment.refund.tags.transaction" as const,
   ],
 
   fields: objectField(
@@ -113,7 +113,7 @@ const { POST } = createEndpoint({
           layout: { columns: 12 },
           validation: { required: false },
         },
-        z.record(z.string()).optional(),
+        z.record(z.string(), z.string()).optional(),
       ),
 
       // RESPONSE FIELDS
@@ -227,7 +227,7 @@ const { POST } = createEndpoint({
             z.string(),
           ),
         },
-      ).nullable(),
+      ),
     },
   ),
 
@@ -272,6 +272,18 @@ const { POST } = createEndpoint({
         "app.api.v1.core.payment.refund.post.errors.unknown.title" as const,
       description:
         "app.api.v1.core.payment.refund.post.errors.unknown.description" as const,
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title:
+        "app.api.v1.core.payment.refund.post.errors.conflict.title" as const,
+      description:
+        "app.api.v1.core.payment.refund.post.errors.conflict.description" as const,
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title:
+        "app.api.v1.core.payment.refund.post.errors.unsavedChanges.title" as const,
+      description:
+        "app.api.v1.core.payment.refund.post.errors.unsavedChanges.description" as const,
     },
   },
 
@@ -350,11 +362,6 @@ const { POST } = createEndpoint({
           updatedAt: "2024-01-01T00:00:00Z",
         },
       },
-    },
-    urlPathVariables: {
-      default: {},
-      partial: {},
-      full: {},
     },
   },
 });

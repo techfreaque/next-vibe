@@ -16,12 +16,10 @@ export interface MessageWithReplies {
 export function buildMessageTree(
   messages: ChatMessage[],
   rootMessageId: string | null = null,
-  depth: number = 0
+  depth = 0,
 ): MessageWithReplies[] {
   // Find all messages that are direct children of the given parent
-  const children = messages.filter(
-    (msg) => msg.parentId === rootMessageId
-  );
+  const children = messages.filter((msg) => msg.parentId === rootMessageId);
 
   // Recursively build tree for each child
   return children.map((message) => ({
@@ -37,7 +35,7 @@ export function buildMessageTree(
 export function flattenMessageTree(tree: MessageWithReplies[]): ChatMessage[] {
   const result: ChatMessage[] = [];
 
-  function traverse(nodes: MessageWithReplies[]) {
+  function traverse(nodes: MessageWithReplies[]): void {
     for (const node of nodes) {
       result.push(node.message);
       if (node.replies.length > 0) {
@@ -55,7 +53,7 @@ export function flattenMessageTree(tree: MessageWithReplies[]): ChatMessage[] {
  */
 export function getDirectReplies(
   messages: ChatMessage[],
-  messageId: string
+  messageId: string,
 ): ChatMessage[] {
   return messages.filter((msg) => msg.parentId === messageId);
 }
@@ -65,7 +63,7 @@ export function getDirectReplies(
  */
 export function countTotalReplies(
   messages: ChatMessage[],
-  messageId: string
+  messageId: string,
 ): number {
   const directReplies = getDirectReplies(messages, messageId);
   let count = directReplies.length;
@@ -82,10 +80,12 @@ export function countTotalReplies(
  */
 export function getMessageDepth(
   messages: ChatMessage[],
-  messageId: string
+  messageId: string,
 ): number {
   const message = messages.find((m) => m.id === messageId);
-  if (!message || !message.parentId) return 0;
+  if (!message?.parentId) {
+    return 0;
+  }
 
   return 1 + getMessageDepth(messages, message.parentId);
 }
@@ -95,7 +95,7 @@ export function getMessageDepth(
  */
 export function getRootMessages(
   messages: ChatMessage[],
-  rootMessageId: string | null
+  rootMessageId: string | null,
 ): ChatMessage[] {
   return messages.filter((msg) => msg.parentId === rootMessageId);
 }
@@ -113,7 +113,7 @@ export function sortMessagesByTime(messages: ChatMessage[]): ChatMessage[] {
  */
 export function buildRedditStyleThreads(
   messages: ChatMessage[],
-  rootMessageId: string | null = null
+  rootMessageId: string | null = null,
 ): MessageWithReplies[] {
   // Sort messages by timestamp first
   const sortedMessages = sortMessagesByTime(messages);
@@ -121,4 +121,3 @@ export function buildRedditStyleThreads(
   // Build tree starting from root
   return buildMessageTree(sortedMessages, rootMessageId, 0);
 }
-

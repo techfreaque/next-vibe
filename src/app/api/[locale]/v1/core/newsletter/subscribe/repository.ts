@@ -6,18 +6,6 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-
-import type { Lead } from "@/app/api/[locale]/v1/core/leads/db";
-import {
-  getNewsletterSubscriptionStatus,
-  type LeadStatus,
-} from "@/app/api/[locale]/v1/core/leads/enum";
-import { leadsRepository } from "@/app/api/[locale]/v1/core/leads/repository";
-import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -25,6 +13,14 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
+
+import { getNewsletterSubscriptionStatus } from "@/app/api/[locale]/v1/core/leads/enum";
+import { leadsRepository } from "@/app/api/[locale]/v1/core/leads/repository";
+import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import { newsletterSubscriptions } from "../db";
 import { NewsletterSubscriptionStatus } from "../enum";
@@ -54,7 +50,7 @@ export class NewsletterSubscribeRepositoryImpl
     const { t } = simpleT(locale);
 
     try {
-      logger.debug("Starting newsletter subscription", {
+      logger.debug("app.api.v1.core.newsletter.subscribe.repository.starting", {
         email: data.email,
         hasName: !!data.name,
         hasPreferences: !!data.preferences?.length,
@@ -64,10 +60,13 @@ export class NewsletterSubscribeRepositoryImpl
       // Handle lead linking if leadId is provided
       if (data.inputLeadId) {
         try {
-          logger.debug("Linking newsletter subscription to lead", {
-            leadId: data.inputLeadId,
-            email: data.email,
-          });
+          logger.debug(
+            "app.api.v1.core.newsletter.subscribe.repository.linking_to_lead",
+            {
+              leadId: data.inputLeadId,
+              email: data.email,
+            },
+          );
 
           const leadResult = await leadsRepository.getLeadById(
             data.inputLeadId,
@@ -76,19 +75,39 @@ export class NewsletterSubscribeRepositoryImpl
             logger,
           );
           if (leadResult.success) {
-            logger.debug("Lead found for newsletter subscription", {
-              leadId: data.inputLeadId,
-              email: data.email,
-            });
+            logger.debug(
+              "app.api.v1.core.newsletter.subscribe.repository.lead_found",
+              {
+                leadId: data.inputLeadId,
+                email: data.email,
+              },
+            );
 
-            const currentStatus = leadResult.data
-              .status as (typeof LeadStatus)[keyof typeof LeadStatus];
+            // TypeScript narrowing doesn't work well in nested scopes, use type assertion
+            // We've already checked leadResult.success above
+            const lead = leadResult.data as {
+              status:
+                | "BOUNCED"
+                | "CAMPAIGN_RUNNING"
+                | "CONSULTATION_BOOKED"
+                | "INVALID"
+                | "IN_CONTACT"
+                | "NEW"
+                | "NEWSLETTER_SUBSCRIBER"
+                | "PENDING"
+                | "SIGNED_UP"
+                | "SUBSCRIPTION_CONFIRMED"
+                | "UNSUBSCRIBED"
+                | "WEBSITE_USER";
+              metadata?: Record<string, string | number | boolean>;
+            };
+            const currentStatus = lead.status;
             const newStatus = getNewsletterSubscriptionStatus(currentStatus);
 
-            const updateData: Partial<Lead> = {
+            const updateData = {
               status: newStatus,
               metadata: {
-                ...leadResult.data.metadata,
+                ...(lead.metadata || {}),
                 newsletterSubscribed: true,
                 newsletterSubscriptionDate: new Date().toISOString(),
                 subscribedEmail: data.email,
@@ -98,44 +117,59 @@ export class NewsletterSubscribeRepositoryImpl
 
             const updateResult = await leadsRepository.updateLead(
               data.inputLeadId,
-              updateData as Parameters<typeof leadsRepository.updateLead>[1],
+              updateData,
               user,
               locale,
               logger,
             );
 
             if (updateResult.success) {
-              logger.debug("Lead updated with newsletter subscription data", {
-                leadId: data.inputLeadId,
-                email: data.email,
-              });
+              logger.debug(
+                "app.api.v1.core.newsletter.subscribe.repository.lead_updated",
+                {
+                  leadId: data.inputLeadId,
+                  email: data.email,
+                },
+              );
             } else {
-              logger.error("Failed to update lead with newsletter data", {
-                leadId: data.inputLeadId,
-                email: data.email,
-                error: updateResult.message,
-              });
+              logger.error(
+                "app.api.v1.core.newsletter.subscribe.repository.lead_update_failed",
+                {
+                  leadId: data.inputLeadId,
+                  email: data.email,
+                  error: updateResult.message,
+                },
+              );
             }
           } else {
-            logger.debug("Lead not found or not eligible for update", {
-              leadId: data.inputLeadId,
-              email: data.email,
-            });
+            logger.debug(
+              "app.api.v1.core.newsletter.subscribe.repository.lead_not_found",
+              {
+                leadId: data.inputLeadId,
+                email: data.email,
+              },
+            );
           }
         } catch (error) {
-          logger.error("Error during lead linking from newsletter", {
-            error: parseError(error).message,
-            leadId: data.inputLeadId,
-            email: data.email,
-          });
+          logger.error(
+            "app.api.v1.core.newsletter.subscribe.repository.lead_linking_error",
+            {
+              error: parseError(error).message,
+              leadId: data.inputLeadId,
+              email: data.email,
+            },
+          );
         }
       }
 
       if (!data.inputLeadId) {
-        logger.error("Newsletter subscription attempted without leadId", {
-          email: data.email,
-          name: data.name,
-        });
+        logger.error(
+          "app.api.v1.core.newsletter.subscribe.repository.missing_lead_id",
+          {
+            email: data.email,
+            name: data.name,
+          },
+        );
         return createErrorResponse(
           "app.api.v1.core.newsletter.subscribe.errors.badRequest.title",
           ErrorResponseTypes.BAD_REQUEST,
@@ -154,10 +188,13 @@ export class NewsletterSubscribeRepositoryImpl
           existingSubscription.status ===
           NewsletterSubscriptionStatus.SUBSCRIBED
         ) {
-          logger.debug("User already subscribed to newsletter", {
-            email: data.email,
-            subscriptionId: existingSubscription.id,
-          });
+          logger.debug(
+            "app.api.v1.core.newsletter.subscribe.repository.already_subscribed",
+            {
+              email: data.email,
+              subscriptionId: existingSubscription.id,
+            },
+          );
           return createSuccessResponse({
             success: true,
             message: t(
@@ -170,10 +207,13 @@ export class NewsletterSubscribeRepositoryImpl
         }
 
         // Reactivate subscription
-        logger.debug("Reactivating newsletter subscription", {
-          email: data.email,
-          previousStatus: existingSubscription.status,
-        });
+        logger.debug(
+          "app.api.v1.core.newsletter.subscribe.repository.reactivating",
+          {
+            email: data.email,
+            previousStatus: existingSubscription.status,
+          },
+        );
 
         await db
           .update(newsletterSubscriptions)
@@ -195,11 +235,14 @@ export class NewsletterSubscribeRepositoryImpl
       }
 
       // Create new subscription
-      logger.debug("Creating new newsletter subscription", {
-        email: data.email,
-        hasName: !!data.name,
-        preferencesCount: data.preferences?.length || 0,
-      });
+      logger.debug(
+        "app.api.v1.core.newsletter.subscribe.repository.creating_new",
+        {
+          email: data.email,
+          hasName: !!data.name,
+          preferencesCount: data.preferences?.length || 0,
+        },
+      );
 
       const newSubscription = await db
         .insert(newsletterSubscriptions)
@@ -211,10 +254,13 @@ export class NewsletterSubscribeRepositoryImpl
         })
         .returning();
 
-      logger.debug("Successfully created newsletter subscription", {
-        email: data.email,
-        subscriptionId: newSubscription[0].id,
-      });
+      logger.debug(
+        "app.api.v1.core.newsletter.subscribe.repository.created_successfully",
+        {
+          email: data.email,
+          subscriptionId: newSubscription[0].id,
+        },
+      );
 
       return createSuccessResponse({
         success: true,
@@ -225,10 +271,13 @@ export class NewsletterSubscribeRepositoryImpl
       });
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error("Newsletter subscription failed", {
-        error: parsedError.message,
-        email: data.email,
-      });
+      logger.error(
+        "app.api.v1.core.newsletter.subscribe.repository.subscription_failed",
+        {
+          error: parsedError.message,
+          email: data.email,
+        },
+      );
 
       return createErrorResponse(
         "app.api.v1.core.newsletter.subscribe.errors.internal.title",

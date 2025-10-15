@@ -7,6 +7,30 @@ import { logger } from "./logger.js";
 import { runSnykMonitor, runSnykTest } from "./snyk.js";
 
 /**
+ * Type guard to validate if parsed JSON matches PackageJson structure
+ */
+function isPackageJson(value: unknown): value is PackageJson {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const obj = value as Record<string, unknown>;
+  return typeof obj.name === "string" && typeof obj.version === "string";
+}
+
+/**
+ * Type guard to check if error has stdout property
+ */
+function hasStdout(error: unknown): error is { stdout: string | Buffer } {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "stdout" in error &&
+    (typeof (error as { stdout: unknown }).stdout === "string" ||
+      Buffer.isBuffer((error as { stdout: unknown }).stdout))
+  );
+}
+
+/**
  * Runs tests for the given package path.
  */
 export function runTests(packagePath: string): void {
@@ -16,8 +40,12 @@ export function runTests(packagePath: string): void {
     return;
   }
 
-  const packageJson = JSON.parse(readFileSync(pkgPath, "utf8")) as PackageJson;
-  if (!packageJson.scripts?.["test"]) {
+  const parsedJson: unknown = JSON.parse(readFileSync(pkgPath, "utf8"));
+  if (!isPackageJson(parsedJson)) {
+    throw new Error(`Invalid package.json format in ${packagePath}`);
+  }
+
+  if (!parsedJson.scripts?.["test"]) {
     logger(
       `No test script found in package.json at ${pkgPath}, skipping tests.`,
     );
@@ -27,7 +55,6 @@ export function runTests(packagePath: string): void {
   try {
     execSync(`yarn test`, { stdio: "inherit", cwd: packagePath });
   } catch {
-    // eslint-disable-next-line no-restricted-syntax
     throw new Error(`Tests failed in ${packagePath}`);
   }
 }
@@ -42,7 +69,6 @@ export const lint = (cwd: string): void => {
     if (existsSync(eslintPath)) {
       lintOutput = execSync(`${eslintPath} --fix`, {
         encoding: "utf8",
-        // eslint-disable-next-line node/no-process-env
         env: { ...process.env, FORCE_COLOR: "1" },
         cwd: cwd,
       });
@@ -50,28 +76,19 @@ export const lint = (cwd: string): void => {
       // Fall back to yarn lint if eslint binary not found
       lintOutput = execSync(`yarn lint`, {
         encoding: "utf8",
-        // eslint-disable-next-line node/no-process-env
         env: { ...process.env, FORCE_COLOR: "1" },
         cwd: cwd,
       });
     }
   } catch (error) {
-    if (
-      typeof error === "object" &&
-      error !== null &&
-      "stdout" in error &&
-      error.stdout
-    ) {
-      lintOutput =
-        (error as { stdout?: string | Buffer }).stdout?.toString() ?? "";
+    if (hasStdout(error)) {
+      lintOutput = error.stdout.toString();
     } else if (error instanceof Error) {
       lintOutput = error.message;
     } else {
       lintOutput = "Unknown linting error.";
     }
-    // eslint-disable-next-line no-console
     console.error(`\n${lintOutput}`);
-    // eslint-disable-next-line no-console
     console.error(
       `%c[release-tool][ERROR] Linting errors detected in ${cwd}. Aborting release.`,
       "color: red; font-size: larger;",
@@ -101,34 +118,33 @@ export const typecheck = (cwd: string): void => {
       execSync(`${tscPath} --noEmit`, {
         stdio: "inherit",
         cwd,
-        // eslint-disable-next-line node/no-process-env
         env: { ...process.env, FORCE_COLOR: "1" },
       });
     } else {
       // Fall back to yarn/npm script if available
-      const packageJson = JSON.parse(
+      const parsedJson: unknown = JSON.parse(
         readFileSync(join(cwd, "package.json"), "utf8"),
-      ) as PackageJson;
-      if (packageJson.scripts?.["typecheck"]) {
+      );
+      if (!isPackageJson(parsedJson)) {
+        throw new Error(`Invalid package.json format in ${cwd}`);
+      }
+      if (parsedJson.scripts?.["typecheck"]) {
         execSync(`yarn typecheck`, { stdio: "inherit", cwd });
       } else {
         // Try global tsc as last resort
         execSync(`tsc --noEmit`, {
           stdio: "inherit",
           cwd,
-          // eslint-disable-next-line node/no-process-env
           env: { ...process.env, FORCE_COLOR: "1" },
         });
       }
     }
     logger(`TypeScript type checking passed for ${cwd}`);
   } catch {
-    // eslint-disable-next-line no-console
     console.error(
       `%c[release-tool][ERROR] TypeScript type checking failed in ${cwd}. Aborting release.`,
       "color: red; font-size: larger;",
     );
-    // eslint-disable-next-line no-restricted-syntax
     throw new Error(`TypeScript type checking failed in ${cwd}`);
   }
 };
@@ -159,8 +175,11 @@ export function snykMonitor(cwd: string): void {
 function getPackageJson(cwd: string): PackageJson {
   const pkgPath = join(cwd, "package.json");
   if (!existsSync(pkgPath)) {
-    // eslint-disable-next-line no-restricted-syntax
     throw new Error(`No package.json found in ${cwd}`);
   }
-  return JSON.parse(readFileSync(pkgPath, "utf8")) as PackageJson;
+  const parsedJson: unknown = JSON.parse(readFileSync(pkgPath, "utf8"));
+  if (!isPackageJson(parsedJson)) {
+    throw new Error(`Invalid package.json format in ${cwd}`);
+  }
+  return parsedJson;
 }

@@ -12,9 +12,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { EndpointLogger } from "../endpoints/endpoint-handler/logger";
+import type { Methods } from "../endpoints/endpoint-types/core/enums";
 import type { UnifiedField } from "../endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "../endpoints/endpoint-types/endpoint/create";
-import type { Methods } from "../endpoints/endpoint-types/core/enums";
 import { modularCLIResponseRenderer } from "../endpoints/renderers/cli-ui/modular-response-renderer";
 import { responseMetadataExtractor } from "../endpoints/renderers/cli-ui/response-metadata-extractor";
 import { schemaUIHandler } from "../endpoints/renderers/cli-ui/schema-ui-handler";
@@ -172,9 +172,19 @@ export class RouteDelegationHandler {
 
       // If handler not found for this method, try other methods
       if (!cliHandler) {
-        const allMethods = ["POST", "GET", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"];
+        const allMethods = [
+          "POST",
+          "GET",
+          "PUT",
+          "PATCH",
+          "DELETE",
+          "HEAD",
+          "OPTIONS",
+        ];
         for (const method of allMethods) {
-          if (method === route.method) continue; // Already tried this one
+          if (method === route.method) {
+            continue;
+          } // Already tried this one
           const altRoute = { ...route, method };
           cliHandler = await this.getCliHandler(altRoute, logger);
           if (cliHandler) {

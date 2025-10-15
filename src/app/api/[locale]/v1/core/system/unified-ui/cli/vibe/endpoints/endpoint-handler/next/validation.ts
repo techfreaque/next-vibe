@@ -53,7 +53,7 @@ export async function validateNextRequestData<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TFields,
 >(
   endpoint: CreateApiEndpoint<
     TExampleKey,

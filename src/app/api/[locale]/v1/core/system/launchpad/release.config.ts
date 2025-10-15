@@ -11,10 +11,6 @@ const releaseConfig: ReleaseConfig = {
       updateDeps: true,
       release: {
         tagPrefix: "launchpad_",
-        foldersToScanAndBumpThisPackage: [
-          // scan the whole dev env folder
-          { folder: "../../" },
-        ],
       },
     },
   ],

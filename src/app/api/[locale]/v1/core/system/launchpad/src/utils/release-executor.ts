@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process";
+import { execSync, spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
@@ -11,6 +11,7 @@ import type {
   VersionBumpType,
 } from "../types/types.js";
 import { logger, loggerError } from "./logger.js";
+import { discoverReleaseTargets } from "./release-discovery.js";
 import { StateManager } from "./state-manager.js";
 
 export class ReleaseExecutor {
@@ -41,8 +42,7 @@ export class ReleaseExecutor {
       execSync(command, {
         cwd: fullPath,
         stdio: "inherit",
-        // eslint-disable-next-line node/no-process-env
-        env: process.env,
+        env: { ...process.env },
       });
 
       logger(`✅ Successfully completed: ${target.directory}`);
@@ -226,7 +226,7 @@ export class ReleaseExecutor {
         execSync("bun pub release --force-update", {
           cwd: fullPath,
           stdio: "inherit",
-          env: process.env,
+          env: { ...process.env },
         });
 
         logger(`✅ Updated: ${target.directory}`);
@@ -316,9 +316,7 @@ export class ReleaseExecutor {
   }
 
   private discoverTargets(): ReleaseTarget[] {
-    // Import here to avoid circular dependency
-    const { discoverReleaseTargets } = require("./release-discovery.js");
-    return discoverReleaseTargets(this.rootDir) as ReleaseTarget[];
+    return discoverReleaseTargets(this.rootDir);
   }
 
   private async runSnykMonitoring(branchName: string): Promise<void> {
@@ -470,8 +468,6 @@ Check the [Snyk dashboard](https://app.snyk.io) for security vulnerabilities bef
     body: string,
     token: string,
   ): Promise<void> {
-    const { spawn } = require("child_process");
-
     const curlArgs = [
       "-X",
       "POST",

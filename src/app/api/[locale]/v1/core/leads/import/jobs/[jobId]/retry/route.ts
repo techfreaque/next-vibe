@@ -3,11 +3,10 @@
  */
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import { authRepository } from "@/app/api/[locale]/v1/core/user/auth/repository";
 
 import { importRepository } from "../../../../../import/repository";
-import { CsvImportJobAction } from "../../../enum";
 import definitions from "./definition";
 
 /**
@@ -16,15 +15,25 @@ import definitions from "./definition";
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: async ({ user, urlVariables }) => {
+    handler: async ({ user, urlVariables, logger }) => {
       const userId = authRepository.requireUserId(user);
       const { jobId } = urlVariables;
 
-      return await importRepository.performJobAction(
+      const response = await importRepository.performJobAction(
         userId,
         jobId,
-        CsvImportJobAction.RETRY,
+        "retry",
+        logger,
       );
+
+      // Wrap response in result object to match definition
+      if (response.success) {
+        return {
+          success: true,
+          data: { result: response.data },
+        };
+      }
+      return response;
     },
   },
 });

@@ -30,14 +30,23 @@ const prompt = (question: string): Promise<string> => {
   });
 };
 
+/**
+ * Type guard to check if an object is a LaunchpadPackage
+ */
+function isLaunchpadPackage(
+  obj: LaunchpadPackage | LaunchpadFolder,
+): obj is LaunchpadPackage {
+  return "branch" in obj && "repoUrl" in obj;
+}
+
 // Recursively process the config to extract all repository entries
 export function extractRepos(
   obj: LaunchpadPackage | LaunchpadFolder,
   currentPath: string[] = [],
 ): { path: string[]; config: LaunchpadPackage }[] {
-  if ("branch" in obj && "repoUrl" in obj) {
+  if (isLaunchpadPackage(obj)) {
     // This is a package
-    return [{ path: [...currentPath], config: obj as LaunchpadPackage }];
+    return [{ path: [...currentPath], config: obj }];
   } else {
     // This is a folder
     let results: { path: string[]; config: LaunchpadPackage }[] = [];
@@ -102,7 +111,6 @@ export async function cloneRepo(
     logger(`Repository cloned and checked out branch: ${branch}`);
   } catch (error) {
     loggerError(`Failed to clone repository:`, error);
-    // eslint-disable-next-line no-restricted-syntax
     throw error;
   }
 }

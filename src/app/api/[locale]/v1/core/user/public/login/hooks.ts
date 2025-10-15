@@ -7,30 +7,29 @@
 
 import type { Route } from "next";
 import { useRouter } from "next/navigation";
-import {
-  createErrorResponse,
-  ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
 import { useToast } from "next-vibe-ui/ui";
 import type { ChangeEvent } from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
-import { LeadTrackingClientRepository } from "@/app/api/[locale]/v1/core/leads/tracking/client-repository";
 import { useLeadId } from "@/app/api/[locale]/v1/core/leads/tracking/engagement/hooks";
 import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type {
-  FormAlertState,
-  InferApiFormReturn,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
+import type { FormAlertState } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
 import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation-form";
+import type { ApiFormReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/types";
 import { useTranslation } from "@/i18n/core/client";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
 import { authClientRepository } from "../../auth/repository-client";
 import { useUser } from "../../private/me/hooks";
 import loginEndpoints from "./definition";
 import { useLoginOptions } from "./options/hooks";
 import type { LoginOptions } from "./repository";
+
+// Get the exact types from the endpoint
+type LoginEndpoint = typeof loginEndpoints.POST;
+type LoginRequest = LoginEndpoint["TRequestOutput"];
+type LoginResponse = LoginEndpoint["TResponseOutput"];
+type LoginUrlVars = LoginEndpoint["TUrlVariablesOutput"];
 
 /****************************
  * FORM HOOKS
@@ -55,14 +54,14 @@ export function useLogin(
     allowSocialAuth: false,
   },
   logger: EndpointLogger,
-): InferApiFormReturn<typeof loginEndpoints.POST> & {
+): ApiFormReturn<LoginRequest, LoginResponse, LoginUrlVars> & {
   emailForOptions: string | null;
   handleEmailChange: (email: string | undefined) => void;
   handleEmailFieldChange: (
     e: ChangeEvent<HTMLInputElement>,
     field: { onChange: (e: ChangeEvent<HTMLInputElement>) => void },
   ) => void;
-  errorMessage: string | null;
+  errorMessage: TranslationKey | null;
   isAccountLocked: boolean;
   loginOptions: LoginOptions;
   alert: FormAlertState | null;
@@ -79,16 +78,21 @@ export function useLogin(
   // Get dynamic login options based on email
   const loginOptionsResult = useLoginOptions(logger);
   // Since loginOptionsResult may not have data initially, provide fallback
-  const dynamicLoginOptions = loginOptionsResult?.read?.data || null;
+  const dynamicLoginOptions =
+    (loginOptionsResult?.read?.response?.success &&
+      loginOptionsResult?.read?.response?.data?.response) ||
+    null;
 
   // Combine initial options with dynamic ones using useMemo to prevent unnecessary recalculations
-  const loginOptions = useMemo(
-    () => ({
+  const loginOptions = useMemo(() => {
+    const options: LoginOptions = {
       ...initialLoginOptions,
-      ...((dynamicLoginOptions || {}) as Partial<LoginOptions>),
-    }),
-    [dynamicLoginOptions, initialLoginOptions],
-  );
+    };
+    if (dynamicLoginOptions) {
+      Object.assign(options, dynamicLoginOptions);
+    }
+    return options;
+  }, [dynamicLoginOptions, initialLoginOptions]);
 
   // Check if account is locked - derived from loginOptions
   const isAccountLocked = useMemo(
@@ -144,32 +148,26 @@ export function useLogin(
         options: {
           rememberMe: false,
         },
-        leadId: LeadTrackingClientRepository.LOADING_LEAD_ID,
+        leadId: undefined,
       },
+      persistForm: false,
     },
     {
-      onSuccess: async ({ responseData }) => {
-        if (!responseData.exists) {
-          toast({
-            title: t("auth.login.errors.title"),
-            description: t("auth.login.errors.invalid_credentials"),
-            variant: "destructive",
-          });
-          setErrorMessage("auth.login.errors.invalid_credentials");
-          // Logger will be initialized below for actual error logging
-          return;
-        }
-
+      onSuccess: async (data) => {
         try {
+          logger.debug("auth.login.onSuccess.start", { data });
+
           // Set the auth status to indicate successful login
           // No need to clear first since the server has already set the httpOnly cookie
           const tokenResult = authClientRepository.setAuthStatus(logger);
           if (!tokenResult.success) {
             logger.error("auth.login.token.save.failed", tokenResult);
-            return createErrorResponse(
-              "auth.login.errors.token_save_failed",
-              ErrorResponseTypes.INTERNAL_ERROR,
-            );
+            toast({
+              title: t("auth.login.errors.title"),
+              description: t("auth.login.errors.token_save_failed"),
+              variant: "destructive",
+            });
+            return;
           }
           logger.debug("auth.login.token.save.success");
 
@@ -181,23 +179,28 @@ export function useLogin(
           });
 
           // Get redirect info from URL
-          const redirectTo = new URL(window.location.href).searchParams.get(
+          const redirectParam = new URL(window.location.href).searchParams.get(
             "redirectTo",
-          ) as Route;
+          );
+          const redirectTo: Route = (redirectParam ||
+            `/${locale}/app/onboarding`) satisfies Route;
 
+          logger.debug("auth.login.refetch.start");
           // Refetch user data after successful login
           await refetch();
+          logger.debug("auth.login.refetch.success");
 
           // Navigate immediately - the new page will handle user data fetching
           // Remove router.refresh() to prevent re-render loop
-          router.push(redirectTo || `/${locale}/app/onboarding`);
+          logger.debug("auth.login.redirect", { redirectTo });
+          router.push(redirectTo);
         } catch (error) {
+          logger.error("auth.login.process.failed", error);
           toast({
             title: t("auth.login.errors.title"),
             description: t("authErrors.login.form.error.unknown.description"),
             variant: "destructive",
           });
-          logger.error("auth.login.process.failed", error);
         }
       },
       onError: (data) => {
@@ -216,56 +219,44 @@ export function useLogin(
     formResult.form.setValue("leadId", leadId);
   });
 
-  // Hook up the email watcher to the form
-  useEffect(() => {
-    if (!formResult.form) {
-      return;
-    }
+  // Extract response values to avoid complex union types in useMemo
+  const responseSuccess = formResult.response?.success;
+  const hasError = responseSuccess === false;
 
-    formResult.form.watch(
-      (value: unknown, { name }: { name?: string }) => {
-        // Only process email changes to avoid unnecessary processing
-        if (
-          name === "credentials.email" &&
-          value &&
-          typeof value === "object" &&
-          "credentials" in value &&
-          value.credentials &&
-          typeof value.credentials === "object" &&
-          "email" in value.credentials &&
-          typeof value.credentials.email === "string"
-        ) {
-          handleEmailChange(value.credentials.email);
-        }
-      },
-    );
-  }, [formResult.form, handleEmailChange]);
+  // Use type narrowing to extract error details
+  let responseMessage: TranslationKey | null = null;
+  let responseMessageParams: TParams | undefined;
+  if (hasError && formResult.response) {
+    responseMessage = formResult.response.message as TranslationKey;
+    responseMessageParams = formResult.response.messageParams;
+  }
 
   // Generate alert state from error/success states
-  const alert: FormAlertState | null = useMemo(() => {
+  const alert = useMemo((): FormAlertState | null => {
     // Check for account locked state
     if (isAccountLocked) {
       return {
-        variant: "destructive",
+        variant: "destructive" as const,
         title: {
-          message: "auth.login.errors.accountLocked",
+          message: "auth.login.errors.accountLocked" as TranslationKey,
         },
         message: {
-          message: "auth.login.errors.accountLockedDescription",
+          message:
+            "auth.login.errors.accountLockedDescription" as TranslationKey,
         },
       };
     }
 
     // Check for form submission error (prioritize this over errorMessage)
-    if (formResult.response?.success === false) {
+    if (responseSuccess === false && responseMessage) {
       return {
-        variant: "destructive",
+        variant: "destructive" as const,
         title: {
-          message: "auth.login.errors.title",
+          message: "auth.login.errors.title" as TranslationKey,
         },
         message: {
-          message: formResult.response.message,
-          messageParams: formResult.response.messageParams,
+          message: responseMessage,
+          messageParams: responseMessageParams,
         },
       };
     }
@@ -273,9 +264,9 @@ export function useLogin(
     // Check for error message
     if (errorMessage) {
       return {
-        variant: "destructive",
+        variant: "destructive" as const,
         title: {
-          message: "auth.login.errors.title",
+          message: "auth.login.errors.title" as TranslationKey,
         },
         message: {
           message: errorMessage,
@@ -284,10 +275,23 @@ export function useLogin(
     }
 
     return null;
-  }, [isAccountLocked, errorMessage, formResult]);
+  }, [
+    isAccountLocked,
+    errorMessage,
+    responseMessage,
+    responseMessageParams,
+    responseSuccess,
+  ]);
 
   return {
-    ...formResult,
+    form: formResult.form,
+    response: formResult.response,
+    isSubmitSuccessful: formResult.isSubmitSuccessful,
+    submitError: formResult.submitError,
+    isSubmitting: formResult.isSubmitting,
+    submitForm: formResult.submitForm,
+    clearSavedForm: formResult.clearSavedForm,
+    setErrorType: formResult.setErrorType,
     emailForOptions,
     handleEmailChange,
     handleEmailFieldChange,

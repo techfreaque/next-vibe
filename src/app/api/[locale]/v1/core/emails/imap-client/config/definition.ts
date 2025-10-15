@@ -332,21 +332,21 @@ const { GET, POST } = createFormEndpoint({
 });
 
 // Extract types using the new enhanced system
-export type ImapConfigGetRequestTypeInput = typeof GET.types.RequestInput;
-export type ImapConfigGetRequestTypeOutput = typeof GET.types.RequestOutput;
-export type ImapConfigGetResponseTypeInput = typeof GET.types.ResponseInput;
-export type ImapConfigGetResponseTypeOutput = typeof GET.types.ResponseOutput;
+export type ImapConfigGetRequestInput = typeof GET.types.RequestInput;
+export type ImapConfigGetRequestOutput = typeof GET.types.RequestOutput;
+export type ImapConfigGetResponseInput = typeof GET.types.ResponseInput;
+export type ImapConfigGetResponseOutput = typeof GET.types.ResponseOutput;
 
-export type ImapConfigPostRequestTypeInput = typeof POST.types.RequestInput;
-export type ImapConfigPostRequestTypeOutput = typeof POST.types.RequestOutput;
-export type ImapConfigPostResponseTypeInput = typeof POST.types.ResponseInput;
-export type ImapConfigPostResponseTypeOutput = typeof POST.types.ResponseOutput;
+export type ImapConfigPostRequestInput = typeof POST.types.RequestInput;
+export type ImapConfigPostRequestOutput = typeof POST.types.RequestOutput;
+export type ImapConfigPostResponseInput = typeof POST.types.ResponseInput;
+export type ImapConfigPostResponseOutput = typeof POST.types.ResponseOutput;
 
 // Legacy type exports for repository compatibility
-export type ConfigGetRequestOutput = ImapConfigGetRequestTypeOutput;
-export type ConfigGetResponseOutput = ImapConfigGetResponseTypeOutput;
-export type ConfigUpdateRequestOutput = ImapConfigPostRequestTypeOutput;
-export type ConfigUpdateResponseOutput = ImapConfigPostResponseTypeOutput;
+export type ConfigGetRequestOutput = ImapConfigGetRequestOutput;
+export type ConfigGetResponseOutput = ImapConfigGetResponseOutput;
+export type ConfigUpdateRequestOutput = ImapConfigPostRequestOutput;
+export type ConfigUpdateResponseOutput = ImapConfigPostResponseOutput;
 
 /**
  * Export definitions

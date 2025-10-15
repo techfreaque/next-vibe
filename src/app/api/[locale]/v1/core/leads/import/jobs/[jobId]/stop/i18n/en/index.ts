@@ -1,52 +1,66 @@
 export const translations = {
   post: {
-    title: "Stop",
-    description: "Stop endpoint",
+    title: "Stop Import Job",
+    description: "Stop a running import job",
+    jobId: {
+      label: "Job ID",
+      description: "Unique identifier for the import job to stop",
+    },
     form: {
-      title: "Stop Configuration",
-      description: "Configure stop parameters",
+      title: "Stop Import Job",
+      description: "Stop the running import job",
     },
     response: {
-      title: "Response",
-      description: "Stop response data",
+      title: "Stop Result",
+      description: "Result of the stop operation",
+      success: {
+        content: "Success Status",
+      },
+      message: {
+        content: "Stop Message",
+      },
     },
     errors: {
+      validation: {
+        title: "Validation Error",
+        description: "The provided job ID is invalid",
+      },
       unauthorized: {
         title: "Unauthorized",
-        description: "Authentication required",
+        description: "Authentication required to stop jobs",
       },
-      validation: {
-        title: "Validation Error", 
-        description: "Invalid request parameters",
+      forbidden: {
+        title: "Access Denied",
+        description: "You don't have permission to stop this job",
+      },
+      notFound: {
+        title: "Job Not Found",
+        description: "No import job found with the provided ID",
       },
       server: {
         title: "Server Error",
-        description: "Internal server error occurred",
+        description: "An error occurred while stopping the job",
       },
       unknown: {
         title: "Unknown Error",
-        description: "An unknown error occurred",
+        description: "An unexpected error occurred",
       },
       network: {
         title: "Network Error",
-        description: "Network error occurred",
+        description: "Unable to connect to the server",
       },
-      forbidden: {
-        title: "Forbidden",
-        description: "Access forbidden",
-      },
-      notFound: {
-        title: "Not Found",
-        description: "Resource not found",
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
       },
       conflict: {
-        title: "Conflict",
-        description: "Data conflict occurred",
+        title: "Stop Conflict",
+        description: "Cannot stop job that is not currently processing",
       },
     },
     success: {
       title: "Success",
-      description: "Operation completed successfully",
+      description: "Import job stopped successfully",
     },
   },
-} ;
+};

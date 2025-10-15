@@ -6,29 +6,38 @@
 import "server-only";
 
 import { desc, eq } from "drizzle-orm";
-import { parseError } from "next-vibe/shared/utils";
-import type Stripe from "stripe";
-
-import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
+import type Stripe from "stripe";
+
+import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import { users } from "../user/db";
 import { stripe, STRIPE_PRICE_IDS } from "./checkout/repository";
 import type { NewSubscription } from "./db";
 import { subscriptions } from "./db";
 import type {
-  SubscriptionGetResponseTypeOutput,
-  SubscriptionPostRequestTypeOutput,
-  SubscriptionPostResponseTypeOutput,
+  SubscriptionDeleteRequestOutput,
+  SubscriptionGetResponseOutput,
+  SubscriptionPostRequestOutput,
+  SubscriptionPostResponseOutput,
+  SubscriptionPutRequestOutput,
+  SubscriptionPutResponseOutput,
 } from "./definition";
-import { BillingInterval, BillingIntervalValue, SubscriptionPlan, SubscriptionPlanValue, SubscriptionStatus, SubscriptionStatusValue } from "./enum";
+import type {
+  BillingIntervalValue,
+  SubscriptionPlanValue,
+  SubscriptionStatusValue,
+} from "./enum";
+import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "./enum";
 
 /**
  * Helper function to extract country from locale
@@ -55,10 +64,35 @@ const getStripePriceId = (
   planId: Exclude<SubscriptionPlanValue, typeof SubscriptionPlan.ENTERPRISE>,
   billingInterval: BillingIntervalValue,
   country: keyof typeof STRIPE_PRICE_IDS,
-): string => {
+): string | undefined => {
   const regionPrices = STRIPE_PRICE_IDS[country];
-  const intervalPrices = regionPrices[billingInterval];
-  return intervalPrices[planId];
+
+  // Type-safe access to nested record structure
+  if (billingInterval === BillingInterval.MONTHLY) {
+    const monthlyPrices = regionPrices[BillingInterval.MONTHLY];
+    if (planId === SubscriptionPlan.STARTER) {
+      return monthlyPrices[SubscriptionPlan.STARTER];
+    }
+    if (planId === SubscriptionPlan.PROFESSIONAL) {
+      return monthlyPrices[SubscriptionPlan.PROFESSIONAL];
+    }
+    if (planId === SubscriptionPlan.PREMIUM) {
+      return monthlyPrices[SubscriptionPlan.PREMIUM];
+    }
+  } else if (billingInterval === BillingInterval.YEARLY) {
+    const yearlyPrices = regionPrices[BillingInterval.YEARLY];
+    if (planId === SubscriptionPlan.STARTER) {
+      return yearlyPrices[SubscriptionPlan.STARTER];
+    }
+    if (planId === SubscriptionPlan.PROFESSIONAL) {
+      return yearlyPrices[SubscriptionPlan.PROFESSIONAL];
+    }
+    if (planId === SubscriptionPlan.PREMIUM) {
+      return yearlyPrices[SubscriptionPlan.PREMIUM];
+    }
+  }
+
+  return undefined;
 };
 
 /**
@@ -71,7 +105,7 @@ const ensureStripeCustomer = async (
 ): Promise<ResponseType<string>> => {
   try {
     // Get user from database
-    const user = await db
+    const user: (typeof users.$inferSelect)[] = await db
       .select()
       .from(users)
       .where(eq(users.id, userId))
@@ -127,17 +161,38 @@ const syncStripeSubscription = async (
   stripeSubscription: Stripe.Subscription,
   userId: string,
   logger: EndpointLogger,
-): Promise<ResponseType<SubscriptionPostResponseTypeOutput>> => {
+  locale: CountryLanguage,
+): Promise<ResponseType<SubscriptionPostResponseOutput>> => {
+  const { t } = simpleT(locale);
+
   try {
+    // Extract plan from metadata with proper type checking
+    const planFromMetadata = extractPlanFromMetadata(
+      stripeSubscription.metadata,
+    );
+    const validatedPlanId =
+      planFromMetadata &&
+      (planFromMetadata === SubscriptionPlan.STARTER ||
+        planFromMetadata === SubscriptionPlan.PROFESSIONAL ||
+        planFromMetadata === SubscriptionPlan.PREMIUM ||
+        planFromMetadata === SubscriptionPlan.ENTERPRISE)
+        ? planFromMetadata
+        : SubscriptionPlan.STARTER;
+
+    // Ensure stripeCustomerId is a string
+    const customerId =
+      typeof stripeSubscription.customer === "string"
+        ? stripeSubscription.customer
+        : stripeSubscription.customer.id;
+
     const subscriptionData: NewSubscription = {
       // Don't set id - let the database auto-generate a UUID
       userId: userId,
-      stripeCustomerId: stripeSubscription.customer as string,
+      stripeCustomerId: customerId,
       stripeSubscriptionId: stripeSubscription.id,
       stripePriceId: stripeSubscription.items.data[0]?.price.id || null,
       status: mapStripeStatusToLocal(stripeSubscription.status),
-      planId: (extractPlanFromMetadata(stripeSubscription.metadata) ||
-        SubscriptionPlan.STARTER) as SubscriptionPlanValue,
+      planId: validatedPlanId,
       billingInterval:
         stripeSubscription.items.data[0]?.price.recurring?.interval === "year"
           ? BillingInterval.YEARLY
@@ -166,7 +221,7 @@ const syncStripeSubscription = async (
     };
 
     // Upsert subscription in database
-    const result = await db
+    const result: (typeof subscriptions.$inferSelect)[] = await db
       .insert(subscriptions)
       .values(subscriptionData)
       .onConflictDoUpdate({
@@ -189,11 +244,11 @@ const syncStripeSubscription = async (
       })
       .returning();
 
-    const subscription = result[0];
+    const subscription: typeof subscriptions.$inferSelect = result[0];
     return createSuccessResponse({
       id: subscription.id,
       userId: subscription.userId,
-      plan: subscription.planId as SubscriptionPlanValue,
+      plan: subscription.planId,
       billingInterval: subscription.billingInterval,
       status: subscription.status,
       currentPeriodStart: subscription.currentPeriodStart.toISOString(),
@@ -201,7 +256,7 @@ const syncStripeSubscription = async (
       cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
       createdAt: subscription.createdAt.toISOString(),
       updatedAt: subscription.updatedAt.toISOString(),
-      message: "Subscription synced successfully",
+      message: t("app.api.v1.core.subscription.sync.success"),
     });
   } catch (error) {
     logger.error("Failed to sync Stripe subscription", {
@@ -263,36 +318,36 @@ export interface SubscriptionRepository {
   getSubscription(
     userId: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionGetResponseTypeOutput | null>>;
+  ): Promise<ResponseType<SubscriptionGetResponseOutput | null>>;
 
   /**
    * Create a new subscription with Stripe integration
    */
   createSubscription(
-    data: SubscriptionPostRequestTypeOutput,
+    data: SubscriptionPostRequestOutput,
     userId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionPostResponseTypeOutput>>;
+  ): Promise<ResponseType<SubscriptionPostResponseOutput>>;
 
   /**
    * Update a subscription with Stripe integration
    */
   updateSubscription(
-    data: SubscriptionPostRequestTypeOutput,
+    data: SubscriptionPutRequestOutput,
     userId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionPostResponseTypeOutput>>;
+  ): Promise<ResponseType<SubscriptionPutResponseOutput>>;
 
   /**
    * Cancel a subscription with Stripe integration
    */
   cancelSubscription(
-    data: { cancelAtPeriodEnd: boolean; reason?: string },
+    data: SubscriptionDeleteRequestOutput,
     userId: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionPostResponseTypeOutput>>;
+  ): Promise<ResponseType<{ success: boolean; message: string }>>;
 
   /**
    * Sync a Stripe subscription with the local database
@@ -302,7 +357,7 @@ export interface SubscriptionRepository {
     stripeSubscription: Stripe.Subscription,
     userId: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionPostResponseTypeOutput>>;
+  ): Promise<ResponseType<SubscriptionPostResponseOutput>>;
 
   /**
    * Ensure Stripe customer exists for user
@@ -324,9 +379,9 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
   async getSubscription(
     userId: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionGetResponseTypeOutput | null>> {
+  ): Promise<ResponseType<SubscriptionGetResponseOutput | null>> {
     try {
-      const results = await db
+      const results: (typeof subscriptions.$inferSelect)[] = await db
         .select()
         .from(subscriptions)
         .where(eq(subscriptions.userId, userId))
@@ -338,10 +393,10 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       }
 
       const subscription = results[0];
-      const subscriptionData: SubscriptionGetResponseTypeOutput = {
+      const subscriptionData: SubscriptionGetResponseOutput = {
         id: subscription.id,
         userId: subscription.userId,
-        plan: subscription.planId as SubscriptionPlanValue,
+        plan: subscription.planId,
         billingInterval: subscription.billingInterval,
         status: subscription.status,
         currentPeriodStart: subscription.currentPeriodStart.toISOString(),
@@ -368,11 +423,11 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
    * Create a new subscription with Stripe integration
    */
   async createSubscription(
-    data: SubscriptionPostRequestTypeOutput,
+    data: SubscriptionPostRequestOutput,
     userId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionPostResponseTypeOutput>> {
+  ): Promise<ResponseType<SubscriptionPostResponseOutput>> {
     try {
       // Ensure user has a Stripe customer
       const stripeCustomerResult = await ensureStripeCustomer(userId, logger);
@@ -404,6 +459,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         stripeSubscription,
         userId,
         logger,
+        locale,
       );
 
       if (!syncResult.success) {
@@ -426,18 +482,19 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
    * Update a subscription with Stripe integration
    */
   async updateSubscription(
-    data: SubscriptionPostRequestTypeOutput,
+    data: SubscriptionPutRequestOutput,
     userId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionPostResponseTypeOutput>> {
+  ): Promise<ResponseType<SubscriptionPutResponseOutput>> {
     try {
       // Get current subscription
-      const currentSubscription = await db
-        .select()
-        .from(subscriptions)
-        .where(eq(subscriptions.userId, userId))
-        .limit(1);
+      const currentSubscription: (typeof subscriptions.$inferSelect)[] =
+        await db
+          .select()
+          .from(subscriptions)
+          .where(eq(subscriptions.userId, userId))
+          .limit(1);
 
       if (!currentSubscription[0]) {
         return createErrorResponse(
@@ -485,14 +542,33 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
           stripeSubscription,
           userId,
           logger,
+          locale,
         );
         if (!syncResult.success) {
           return syncResult;
         }
-        return createSuccessResponse(syncResult.data);
+
+        // Transform POST response to PUT response format
+        const putResponse: SubscriptionPutResponseOutput = {
+          id: syncResult.data.id,
+          userId: syncResult.data.userId,
+          responsePlan: syncResult.data.plan,
+          responseBillingInterval: syncResult.data.billingInterval,
+          status: syncResult.data.status,
+          currentPeriodStart: syncResult.data.currentPeriodStart,
+          currentPeriodEnd: syncResult.data.currentPeriodEnd,
+          responseCancelAtPeriodEnd: syncResult.data.cancelAtPeriodEnd,
+          createdAt: syncResult.data.createdAt,
+          updatedAt: syncResult.data.updatedAt,
+          message: syncResult.data.message,
+        };
+
+        return createSuccessResponse(putResponse);
       }
 
       // Fallback to local update if no Stripe subscription
+      const { t } = simpleT(locale);
+
       const updateData: Partial<NewSubscription> = {
         updatedAt: new Date(),
       };
@@ -504,7 +580,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         updateData.billingInterval = data.billingInterval;
       }
 
-      const results = await db
+      const results: (typeof subscriptions.$inferSelect)[] = await db
         .update(subscriptions)
         .set(updateData)
         .where(eq(subscriptions.userId, userId))
@@ -518,18 +594,19 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       }
 
       const updatedSubscription = results[0];
-      const subscriptionData: SubscriptionPostResponseTypeOutput = {
+      const subscriptionData: SubscriptionPutResponseOutput = {
         id: updatedSubscription.id,
         userId: updatedSubscription.userId,
-        plan: updatedSubscription.planId as SubscriptionPlan,
-        billingInterval: updatedSubscription.billingInterval,
+        responsePlan: updatedSubscription.planId,
+        responseBillingInterval: updatedSubscription.billingInterval,
         status: updatedSubscription.status,
-        currentPeriodStart: updatedSubscription.currentPeriodStart.toISOString(),
+        currentPeriodStart:
+          updatedSubscription.currentPeriodStart.toISOString(),
         currentPeriodEnd: updatedSubscription.currentPeriodEnd.toISOString(),
-        cancelAtPeriodEnd: updatedSubscription.cancelAtPeriodEnd,
+        responseCancelAtPeriodEnd: updatedSubscription.cancelAtPeriodEnd,
         createdAt: updatedSubscription.createdAt.toISOString(),
         updatedAt: updatedSubscription.updatedAt.toISOString(),
-        message: "Subscription updated successfully",
+        message: t("app.api.v1.core.subscription.update.success"),
       };
 
       return createSuccessResponse(subscriptionData);
@@ -548,17 +625,18 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
    * Cancel a subscription with Stripe integration
    */
   async cancelSubscription(
-    data: { cancelAtPeriodEnd: boolean; reason?: string },
+    data: SubscriptionDeleteRequestOutput,
     userId: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionPostResponseTypeOutput>> {
+  ): Promise<ResponseType<{ success: boolean; message: string }>> {
     try {
       // Get current subscription
-      const currentSubscription = await db
-        .select()
-        .from(subscriptions)
-        .where(eq(subscriptions.userId, userId))
-        .limit(1);
+      const currentSubscription: (typeof subscriptions.$inferSelect)[] =
+        await db
+          .select()
+          .from(subscriptions)
+          .where(eq(subscriptions.userId, userId))
+          .limit(1);
 
       if (!currentSubscription[0]) {
         return createErrorResponse(
@@ -571,6 +649,9 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
       // If we have a Stripe subscription ID, cancel it in Stripe
       if (subscription.stripeSubscriptionId) {
+        // Note: Cancel operations don't have locale context, use default
+        const defaultLocale: CountryLanguage = "en-GLOBAL" as CountryLanguage;
+
         if (data.cancelAtPeriodEnd) {
           // Cancel at period end
           const stripeSubscription = await stripe.subscriptions.update(
@@ -585,11 +666,17 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
             stripeSubscription,
             userId,
             logger,
+            defaultLocale,
           );
           if (!syncResult.success) {
             return syncResult;
           }
-          return createSuccessResponse(syncResult.data);
+
+          const { t } = simpleT(defaultLocale);
+          return createSuccessResponse({
+            success: true,
+            message: t("app.api.v1.core.subscription.cancel.success"),
+          });
         } else {
           // Cancel immediately
           const stripeSubscription = await stripe.subscriptions.cancel(
@@ -601,11 +688,17 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
             stripeSubscription,
             userId,
             logger,
+            defaultLocale,
           );
           if (!syncResult.success) {
             return syncResult;
           }
-          return createSuccessResponse(syncResult.data);
+
+          const { t } = simpleT(defaultLocale);
+          return createSuccessResponse({
+            success: true,
+            message: t("app.api.v1.core.subscription.cancel.success"),
+          });
         }
       }
 
@@ -623,7 +716,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         updateData.endedAt = new Date();
       }
 
-      const results = await db
+      const results: (typeof subscriptions.$inferSelect)[] = await db
         .update(subscriptions)
         .set(updateData)
         .where(eq(subscriptions.userId, userId))
@@ -636,22 +729,14 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         );
       }
 
-      const canceledSubscription = results[0];
-      const subscriptionData: SubscriptionPostResponseTypeOutput = {
-        id: canceledSubscription.id,
-        userId: canceledSubscription.userId,
-        plan: canceledSubscription.planId as SubscriptionPlan,
-        billingInterval: canceledSubscription.billingInterval,
-        status: canceledSubscription.status,
-        currentPeriodStart: canceledSubscription.currentPeriodStart.toISOString(),
-        currentPeriodEnd: canceledSubscription.currentPeriodEnd.toISOString(),
-        cancelAtPeriodEnd: canceledSubscription.cancelAtPeriodEnd,
-        createdAt: canceledSubscription.createdAt.toISOString(),
-        updatedAt: canceledSubscription.updatedAt.toISOString(),
-        message: "Subscription canceled successfully",
-      };
+      // Use default locale for cancel operations since they don't have locale context
+      const defaultLocale: CountryLanguage = "en-GLOBAL" as CountryLanguage;
+      const { t } = simpleT(defaultLocale);
 
-      return createSuccessResponse(subscriptionData);
+      return createSuccessResponse({
+        success: true,
+        message: t("app.api.v1.core.subscription.cancel.success"),
+      });
     } catch (error) {
       logger.error("Error canceling subscription:", error);
       const parsedError = parseError(error);
@@ -671,8 +756,15 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
     stripeSubscription: Stripe.Subscription,
     userId: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionPostResponseTypeOutput>> {
-    return await syncStripeSubscription(stripeSubscription, userId, logger);
+  ): Promise<ResponseType<SubscriptionPostResponseOutput>> {
+    // Webhooks don't have locale context, use default
+    const defaultLocale: CountryLanguage = "en-GLOBAL" as CountryLanguage;
+    return await syncStripeSubscription(
+      stripeSubscription,
+      userId,
+      logger,
+      defaultLocale,
+    );
   }
 
   /**
@@ -684,7 +776,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
   ): Promise<ResponseType<string>> {
     try {
       // Get user from database
-      const user = await db
+      const user: (typeof users.$inferSelect)[] = await db
         .select()
         .from(users)
         .where(eq(users.id, userId))

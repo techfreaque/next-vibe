@@ -238,12 +238,10 @@ async function processRouteFile(
     const importPath = relativeToCurrentFile.startsWith(".")
       ? relativeToCurrentFile
       : `./${relativeToCurrentFile}`;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const routeModule = await import(importPath);
 
     // Extract available HTTP methods
     methods = ["GET", "POST", "PUT", "PATCH", "DELETE"].filter(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (method) => (routeModule as Record<string, any>)[method],
     );
 

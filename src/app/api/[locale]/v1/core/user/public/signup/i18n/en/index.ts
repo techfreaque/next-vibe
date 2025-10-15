@@ -15,6 +15,18 @@ export const translations = {
       placeholder: "Enter last name",
       help: "Enter your last name as it should appear on your profile",
     },
+    privateName: {
+      label: "Private Name",
+      description: "User's private name",
+      placeholder: "Enter private name",
+      help: "Enter your private name for internal use",
+    },
+    publicName: {
+      label: "Public Name",
+      description: "User's public name",
+      placeholder: "Enter public name",
+      help: "Enter your public name as it will be displayed to others",
+    },
     email: {
       label: "Email",
       description: "User's email address",
@@ -247,6 +259,7 @@ export const translations = {
     success: {
       title: "Success",
       description: "Operation completed successfully",
+      processing: "Processing signup successfully",
     },
   },
   response: {
@@ -259,6 +272,8 @@ export const translations = {
       email: "Email Address",
       firstName: "First Name",
       lastName: "Last Name",
+      privateName: "Private Name",
+      publicName: "Public Name",
       imageUrl: "Profile Image URL",
       verificationRequired: "Verification Required",
     },
@@ -276,5 +291,10 @@ export const translations = {
       meeting: "Meeting Signup",
       pricing: "Pricing Signup",
     },
+  },
+  admin_notification: {
+    privateName: "Private Name",
+    publicName: "Public Name",
+    signup_preferences: "Signup Preferences",
   },
 };

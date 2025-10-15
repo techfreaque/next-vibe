@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
 
@@ -37,4 +37,3 @@ export function useTheme(): [Theme, () => void] {
 
   return [theme, toggleTheme];
 }
-

@@ -5,5 +5,8 @@ export const translations: typeof enTranslations = {
   tags: {
     status: "Status",
   },
-  // Add endpoint-specific translations here
+  success: {
+    title: "Erfolg",
+    content: "Erfolg",
+  },
 };

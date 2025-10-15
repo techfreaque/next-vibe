@@ -8,4 +8,13 @@ export const translations = {
   status: {
     get: statusTranslations.get,
   },
+  success: {
+    title: "Success",
+    description: "Pulse executed successfully",
+    content: "Success",
+  },
+  container: {
+    title: "Pulse Container",
+    description: "Pulse container description",
+  },
 };

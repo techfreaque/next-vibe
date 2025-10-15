@@ -28,22 +28,17 @@ export const { POST, tools } = endpointsHandler({
     handler: async ({ data, user, locale, logger }) => {
       const result = await repository.subscribe(data, user, locale, logger);
 
-      // Send SMS notifications after successful subscription (optional, ignoring errors)
+      // Send SMS notifications after successful subscription (fire-and-forget)
       if (result.success) {
-        try {
-          await sendWelcomeSms(data, result.data, user, locale, logger);
-          await sendAdminNotificationSms(
-            data,
-            result.data,
-            user,
-            locale,
-            logger,
-          );
-        } catch (smsError) {
-          logger.debug("SMS notifications failed but continuing", { smsError });
-        }
+        sendWelcomeSms(data, result.data, user, locale, logger).catch(
+          (smsError: Error) =>
+            logger.debug("Welcome SMS failed but continuing", { smsError }),
+        );
+        sendAdminNotificationSms(data, result.data, user, locale, logger).catch(
+          (smsError: Error) =>
+            logger.debug("Admin SMS failed but continuing", { smsError }),
+        );
       }
-
       return result;
     },
   },

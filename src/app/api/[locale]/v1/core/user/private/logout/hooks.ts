@@ -38,7 +38,7 @@ export function useLogout(logger: EndpointLogger): () => void {
   const { refetch } = useUser(logger);
   const { t, locale } = useTranslation();
 
-  const logout = useApiMutation(logoutEndpoints.GET, logger, {
+  const logout = useApiMutation(logoutEndpoints.POST, logger, {
     onSuccess: async () => {
       toast({
         title: t("auth.logout.success.title"),
@@ -73,6 +73,6 @@ export function useLogout(logger: EndpointLogger): () => void {
   });
 
   return useCallback((): void => {
-    logout.mutate();
+    logout.mutate({});
   }, [logout]);
 }

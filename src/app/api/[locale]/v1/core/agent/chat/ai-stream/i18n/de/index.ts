@@ -101,4 +101,21 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  route: {
+    errors: {
+      invalidJson: "Ungültiges JSON im Anforderungstext",
+      invalidRequestData: "Ungültige Anforderungsdaten",
+      uncensoredApiKeyMissing: "Uncensored.ai API-Schlüssel nicht konfiguriert",
+      openrouterApiKeyMissing: "OpenRouter API-Schlüssel nicht konfiguriert",
+      streamCreationFailed: "Fehler beim Erstellen des Streams",
+      unknownError: "Ein Fehler ist aufgetreten",
+    },
+  },
+  providers: {
+    uncensoredHandler: {
+      errors: {
+        apiError: "Uncensored.ai API-Fehler ({{status}}): {{errorText}}",
+      },
+    },
+  },
 };

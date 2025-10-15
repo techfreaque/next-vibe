@@ -18,12 +18,12 @@ import { createTransport } from "nodemailer";
 import type { Address } from "nodemailer/lib/mailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
 
+import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { emailCampaigns } from "../../../leads/db";
-import type {
-  JwtPayloadType,
-} from "../../../user/auth/definition";
+import type { JwtPayloadType } from "../../../user/auth/definition";
 import { emails } from "../../messages/db";
 import { EmailStatus, EmailType } from "../../messages/enum";
 import type { SmtpAccount } from "../db";
@@ -35,33 +35,31 @@ import {
   SmtpSecurityType,
 } from "../enum";
 import type {
-  SmtpCapacityRequestTypeOutput,
-  SmtpCapacityResponseTypeOutput,
+  SmtpCapacityRequestOutput,
+  SmtpCapacityResponseOutput,
   SmtpSelectionCriteria,
   SmtpSendParams,
-  SmtpSendRequestTypeOutput,
-  SmtpSendResponseTypeOutput,
+  SmtpSendRequestOutput,
+  SmtpSendResponseOutput,
   SmtpSendResult,
 } from "./definition";
-import { CountryLanguage } from "@/i18n/core/config";
-import { db } from "@/app/api/[locale]/v1/core/system/db";
 /**
  * SMTP Sending Repository Interface
  */
 export interface SmtpSendingRepository {
   sendEmail(
-    data: SmtpSendRequestTypeOutput,
+    data: SmtpSendRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpSendResponseTypeOutput>>;
+  ): Promise<ResponseType<SmtpSendResponseOutput>>;
 
   getTotalSendingCapacity(
-    data: SmtpCapacityRequestTypeOutput,
+    data: SmtpCapacityRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpCapacityResponseTypeOutput>>;
+  ): Promise<ResponseType<SmtpCapacityResponseOutput>>;
 }
 
 /**
@@ -333,7 +331,8 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
   /**
    * Get any available SMTP account as fallback
    */
-  private async getFallbackSmtpAccount(logger: EndpointLogger,
+  private async getFallbackSmtpAccount(
+    logger: EndpointLogger,
   ): Promise<SmtpAccount | null> {
     try {
       const fallbackAccounts = await db
@@ -365,11 +364,15 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
    */
   private async getTransport(
     account: SmtpAccount,
+    logger: EndpointLogger,
   ): Promise<Transporter<SMTPTransport.SentMessageInfo>> {
     const cacheKey = account.id;
 
     if (this.transportCache.has(cacheKey)) {
-      return this.transportCache.get(cacheKey)!;
+      const cachedTransport = this.transportCache.get(cacheKey);
+      if (cachedTransport) {
+        return cachedTransport;
+      }
     }
 
     try {
@@ -407,6 +410,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
       await this.updateAccountHealth(
         account.id,
         false,
+        logger,
         parseError(error).message,
       );
 
@@ -418,39 +422,39 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
    * Send email using database-configured SMTP account with retry and fallback support
    */
   async sendEmail(
-    data: SmtpSendRequestTypeOutput,
+    data: SmtpSendRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpSendResponseTypeOutput>> {
+  ): Promise<ResponseType<SmtpSendResponseOutput>> {
     try {
       logger.debug("Sending email via SMTP service", {
-        to: data.params.to,
-        subject: data.params.subject,
-        selectionCriteria: data.params.selectionCriteria,
+        to: data.to,
+        subject: data.subject,
+        selectionCriteria: data.selectionCriteria,
       });
 
       // Get the primary account first
       const primaryAccount = await this.getSmtpAccountWithCriteria(
-        data.params.selectionCriteria,
+        data.selectionCriteria,
+        logger,
       );
       if (!primaryAccount) {
         const isLeadCampaign =
-          data.params.selectionCriteria.campaignType ===
-          CampaignType.LEAD_CAMPAIGN;
+          data.selectionCriteria.campaignType === CampaignType.LEAD_CAMPAIGN;
 
         if (isLeadCampaign) {
           return createErrorResponse(
             "app.api.v1.core.emails.smtpClient.sending.errors.no_account.title",
             ErrorResponseTypes.NOT_FOUND,
             {
-              campaignType: data.params.selectionCriteria.campaignType,
+              campaignType: data.selectionCriteria.campaignType,
               emailJourneyVariant:
-                data.params.selectionCriteria.emailJourneyVariant || "null",
+                data.selectionCriteria.emailJourneyVariant || "null",
               emailCampaignStage:
-                data.params.selectionCriteria.emailCampaignStage || "null",
-              country: data.params.selectionCriteria.country,
-              language: data.params.selectionCriteria.language,
+                data.selectionCriteria.emailCampaignStage || "null",
+              country: data.selectionCriteria.country,
+              language: data.selectionCriteria.language,
             },
           );
         } else {
@@ -458,7 +462,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
             "app.api.v1.core.emails.smtpClient.sending.errors.no_account.title",
             ErrorResponseTypes.NOT_FOUND,
             {
-              campaignType: data.params.selectionCriteria.campaignType,
+              campaignType: data.selectionCriteria.campaignType,
             },
           );
         }
@@ -466,20 +470,20 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
 
       // Try primary account with retry logic
       const primaryResult = await this.attemptEmailSendWithRetry(
-        data.params,
+        data,
         primaryAccount,
         false,
         logger,
       );
       if (primaryResult.success) {
-        return createSuccessResponse({ result: primaryResult.data });
+        return primaryResult;
       }
 
       // If primary failed after retries, try with fallback account
       logger.debug(
         "Primary SMTP account failed after retries, trying fallback",
         {
-          to: data.params.to,
+          to: data.to,
           primaryAccountId: primaryAccount.id,
           primaryError: primaryResult.message,
         },
@@ -492,18 +496,18 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
       }
 
       const fallbackResult = await this.attemptEmailSendWithRetry(
-        data.params,
+        data,
         fallbackAccount,
         true,
         logger,
       );
       if (fallbackResult.success) {
-        return createSuccessResponse({ result: fallbackResult.data });
+        return fallbackResult;
       }
 
       // Both attempts failed
       logger.error("All SMTP accounts failed", {
-        to: data.params.to,
+        to: data.to,
         primaryAccountId: primaryAccount.id,
         fallbackAccountId: fallbackAccount.id,
         primaryError: primaryResult.message,
@@ -530,8 +534,8 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
     params: SmtpSendParams,
     account: SmtpAccount,
     isFallback: boolean,
-    maxRetries = 2,
     logger: EndpointLogger,
+    maxRetries = 2,
   ): Promise<ResponseType<SmtpSendResult>> {
     let lastError: ResponseType<SmtpSendResult> | null = null;
 
@@ -677,7 +681,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
       }
 
       // Get transport
-      const transport = await this.getTransport(account);
+      const transport = await this.getTransport(account, logger);
 
       // Prepare email headers
       const headers: Record<string, string> = {};
@@ -702,9 +706,14 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
         const rejectedReason =
           typeof result.rejected[0] === "string"
             ? result.rejected[0]
-            : "Email rejected by server";
+            : "app.api.v1.core.emails.smtpClient.sending.errors.rejected.defaultReason";
 
-        await this.updateAccountHealth(account.id, false, rejectedReason);
+        await this.updateAccountHealth(
+          account.id,
+          false,
+          logger,
+          rejectedReason,
+        );
 
         return createErrorResponse(
           "app.api.v1.core.emails.smtpClient.sending.errors.rejected.title",
@@ -721,7 +730,8 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
         await this.updateAccountHealth(
           account.id,
           false,
-          "No recipients accepted",
+          logger,
+          "app.api.v1.core.emails.smtpClient.sending.errors.no_recipients.defaultReason",
         );
 
         return createErrorResponse(
@@ -737,30 +747,33 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
       // Skip storing campaign emails in emails table to avoid duplicate storage
       // Campaign emails are already stored in emailCampaigns table
       if (!params.campaignId) {
-        await this.recordEmailInDatabase({
-          subject: params.subject,
-          recipientEmail: params.to,
-          recipientName: params.toName,
-          senderEmail: account.fromEmail,
-          senderName: params.senderName,
-          smtpAccountId: account.id,
-          messageId: result.messageId,
-          campaignType: params.selectionCriteria?.campaignType,
-          emailJourneyVariant: params.selectionCriteria?.emailJourneyVariant,
-          emailCampaignStage: params.selectionCriteria?.emailCampaignStage,
-          leadId: params.leadId,
-          campaignId: params.campaignId,
-          templateName:
-            params.selectionCriteria?.emailJourneyVariant &&
-            params.selectionCriteria?.emailCampaignStage
-              ? `${params.selectionCriteria.emailJourneyVariant}_${params.selectionCriteria.emailCampaignStage}`
-              : undefined,
-        });
+        await this.recordEmailInDatabase(
+          {
+            subject: params.subject,
+            recipientEmail: params.to,
+            recipientName: params.toName,
+            senderEmail: account.fromEmail,
+            senderName: params.senderName,
+            smtpAccountId: account.id,
+            messageId: result.messageId,
+            campaignType: params.selectionCriteria?.campaignType,
+            emailJourneyVariant: params.selectionCriteria?.emailJourneyVariant,
+            emailCampaignStage: params.selectionCriteria?.emailCampaignStage,
+            leadId: params.leadId,
+            campaignId: params.campaignId,
+            templateName:
+              params.selectionCriteria?.emailJourneyVariant &&
+              params.selectionCriteria?.emailCampaignStage
+                ? `${params.selectionCriteria.emailJourneyVariant}_${params.selectionCriteria.emailCampaignStage}`
+                : undefined,
+          },
+          logger,
+        );
       }
 
       // Update account usage statistics
-      await this.updateAccountUsage(account.id);
-      await this.updateAccountHealth(account.id, true);
+      await this.updateAccountUsage(account.id, logger);
+      await this.updateAccountHealth(account.id, true, logger);
 
       // Note: Would use logger here if passed to private method
       logger.info("Email sent successfully", {
@@ -789,7 +802,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
       const isConnectionError =
         /greeting|timeout|connect|refused|unreachable/i.test(errorMessage);
       if (isConnectionError) {
-        await this.updateAccountHealth(account.id, false, errorMessage);
+        await this.updateAccountHealth(account.id, false, logger, errorMessage);
       }
 
       return createErrorResponse(
@@ -808,7 +821,9 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
    * Check rate limits for account with database validation
    * Returns remaining capacity for better queue management
    */
-  private async checkRateLimit(account: SmtpAccount, logger: EndpointLogger,
+  private async checkRateLimit(
+    account: SmtpAccount,
+    logger: EndpointLogger,
   ): Promise<
     ResponseType<{
       canSend: boolean;
@@ -897,21 +912,24 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
   /**
    * Record email in database for tracking and rate limiting
    */
-  private async recordEmailInDatabase(emailData: {
-    subject: string;
-    recipientEmail: string;
-    recipientName?: string;
-    senderEmail: string;
-    senderName: string;
-    smtpAccountId: string;
-    messageId: string;
-    campaignType: CampaignType | null;
-    emailJourneyVariant: EmailJourneyVariant | null;
-    emailCampaignStage: EmailCampaignStage | null;
-    leadId?: string;
-    campaignId?: string;
-    templateName?: string;
-  }): Promise<void> {
+  private async recordEmailInDatabase(
+    emailData: {
+      subject: string;
+      recipientEmail: string;
+      recipientName?: string;
+      senderEmail: string;
+      senderName: string;
+      smtpAccountId: string;
+      messageId: string;
+      campaignType: (typeof CampaignType)[keyof typeof CampaignType] | null;
+      emailJourneyVariant: string | null;
+      emailCampaignStage: string | null;
+      leadId?: string;
+      campaignId?: string;
+      templateName?: string;
+    },
+    logger: EndpointLogger,
+  ): Promise<void> {
     try {
       await db.insert(emails).values({
         subject: emailData.subject,
@@ -945,8 +963,8 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
    * Get email type from campaign type
    */
   private getEmailTypeFromCampaign(
-    campaignType: CampaignType | null,
-  ): EmailType {
+    campaignType: (typeof CampaignType)[keyof typeof CampaignType] | null,
+  ): (typeof EmailType)[keyof typeof EmailType] {
     switch (campaignType) {
       case CampaignType.LEAD_CAMPAIGN:
         return EmailType.LEAD_CAMPAIGN;
@@ -966,7 +984,10 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
   /**
    * Update account usage statistics
    */
-  private async updateAccountUsage(accountId: string): Promise<void> {
+  private async updateAccountUsage(
+    accountId: string,
+    logger: EndpointLogger,
+  ): Promise<void> {
     try {
       await db
         .update(smtpAccounts)
@@ -989,6 +1010,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
   private async updateAccountHealth(
     accountId: string,
     success: boolean,
+    logger: EndpointLogger,
     errorMessage?: string,
   ): Promise<void> {
     try {
@@ -1027,11 +1049,11 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
    * Used for intelligent queue management
    */
   async getTotalSendingCapacity(
-    data: SmtpCapacityRequestTypeOutput,
+    data: SmtpCapacityRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpCapacityResponseTypeOutput>> {
+  ): Promise<ResponseType<SmtpCapacityResponseOutput>> {
     try {
       // Get all active SMTP accounts
       const accounts = await db
@@ -1082,7 +1104,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
   /**
    * Close all cached transports
    */
-  async closeAllTransports(): Promise<void> {
+  async closeAllTransports(logger: EndpointLogger): Promise<void> {
     for (const [accountId, transport] of this.transportCache.entries()) {
       try {
         await new Promise<void>((resolve) => {

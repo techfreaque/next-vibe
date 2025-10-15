@@ -14,13 +14,12 @@ import {
 } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
-import type { StandardUserType } from "@/app/api/[locale]/v1/core/user/schema";
+import type { StandardUserType } from "@/app/api/[locale]/v1/core/user/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
 export function Notifications({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   user, // TODO: Use user for personalized notifications
   locale,
 }: {

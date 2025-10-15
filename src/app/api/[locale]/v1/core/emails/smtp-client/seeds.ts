@@ -8,9 +8,9 @@ import { eq } from "drizzle-orm";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { env } from "@/config/env";
 import { Countries, Languages } from "@/i18n/core/config";
-import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { registerSeed } from "@/packages/next-vibe/server/db/seed-manager";
 
+import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 // EmailJourneyVariant and EmailCampaignStage are defined as string arrays for seeding
 // to avoid cross-repository dependencies
 import { type NewSmtpAccount, smtpAccounts } from "./db";
@@ -32,15 +32,12 @@ function getSmtpAccount1Config(logger: EndpointLogger): NewSmtpAccount | null {
   const fromEmail = env.EMAIL_FROM_EMAIL;
 
   if (!host || !username || !password || !fromEmail) {
-    logger.error(
-      "❌ SMTP environment variables not configured for account 1",
-      {
-        host,
-        username,
-        password,
-        fromEmail,
-      },
-    );
+    logger.error("❌ SMTP environment variables not configured for account 1", {
+      host,
+      username,
+      password,
+      fromEmail,
+    });
     return null;
   }
 
@@ -136,7 +133,7 @@ function getSmtpAccount2Config(logger: EndpointLogger): NewSmtpAccount | null {
     campaignTypes: [CampaignType.LEAD_CAMPAIGN],
     emailJourneyVariants: [
       "PERSONAL_APPROACH",
-      "RESULTS_FOCUSED", 
+      "RESULTS_FOCUSED",
       "PERSONAL_RESULTS",
     ],
     emailCampaignStages: [
@@ -182,7 +179,9 @@ export async function dev(logger: EndpointLogger): Promise<void> {
   }
 
   try {
-    const accounts = [account1, account2].filter(Boolean) as NewSmtpAccount[];
+    const accounts = [account1, account2].filter(
+      (account): account is NewSmtpAccount => account !== null,
+    );
 
     for (const account of accounts) {
       // Check if account already exists by name (more specific than fromEmail)

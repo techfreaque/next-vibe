@@ -46,6 +46,22 @@ export const translations = {
       description: "Search leads by name, email, or business",
       placeholder: "Enter search term",
     },
+    searchPagination: {
+      title: "Search & Pagination",
+      description: "Search and pagination controls",
+    },
+    statusFilters: {
+      title: "Status & Campaign Filters",
+      description: "Filter by status, campaign stage, and source",
+    },
+    locationFilters: {
+      title: "Location Filters",
+      description: "Filter by country and language",
+    },
+    sortingOptions: {
+      title: "Sorting Options",
+      description: "Configure result sorting",
+    },
     sortBy: {
       label: "Sort By",
       description: "Field to sort results by",

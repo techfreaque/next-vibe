@@ -8,7 +8,6 @@ import {
   integer,
   jsonb,
   numeric,
-  pgEnum,
   pgTable,
   text,
   timestamp,
@@ -51,11 +50,15 @@ export const paymentTransactions = pgTable("payment_transactions", {
   stripePaymentIntentId: text("stripe_payment_intent_id"),
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
   currency: text("currency", { enum: CurrencyDB }).notNull(),
-  status: text("status", { enum: PaymentStatusDB }).notNull().default(PaymentStatus.PENDING),
+  status: text("status", { enum: PaymentStatusDB })
+    .notNull()
+    .default(PaymentStatus.PENDING),
   provider: text("provider", { enum: PaymentProviderDB })
     .notNull()
     .default(PaymentProvider.STRIPE),
-  mode: text("mode", { enum: CheckoutModeDB }).notNull().default(CheckoutMode.PAYMENT),
+  mode: text("mode", { enum: CheckoutModeDB })
+    .notNull()
+    .default(CheckoutMode.PAYMENT),
   metadata: jsonb("metadata"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -122,7 +125,9 @@ export const paymentRefunds = pgTable("payment_refunds", {
   stripeRefundId: text("stripe_refund_id").notNull(),
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
   currency: text("currency", { enum: CurrencyDB }).notNull(),
-  status: text("status", { enum: RefundStatusDB }).notNull().default(RefundStatus.PENDING),
+  status: text("status", { enum: RefundStatusDB })
+    .notNull()
+    .default(RefundStatus.PENDING),
   reason: text("reason"),
   metadata: jsonb("metadata"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -142,7 +147,9 @@ export const paymentInvoices = pgTable("payment_invoices", {
   invoiceNumber: text("invoice_number"),
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
   currency: text("currency", { enum: CurrencyDB }).notNull(),
-  status: text("status", { enum: InvoiceStatusDB }).notNull().default(InvoiceStatus.DRAFT),
+  status: text("status", { enum: InvoiceStatusDB })
+    .notNull()
+    .default(InvoiceStatus.DRAFT),
   invoiceUrl: text("invoice_url"),
   invoicePdf: text("invoice_pdf"),
   dueDate: timestamp("due_date"),
@@ -216,4 +223,3 @@ export type NewPaymentInvoice = z.infer<typeof insertPaymentInvoiceSchema>;
 
 export type PaymentDispute = z.infer<typeof selectPaymentDisputeSchema>;
 export type NewPaymentDispute = z.infer<typeof insertPaymentDisputeSchema>;
-

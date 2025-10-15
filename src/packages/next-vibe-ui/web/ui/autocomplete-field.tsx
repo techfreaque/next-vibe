@@ -10,10 +10,6 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
-import {
-  CATEGORY_TRANSLATION_KEYS,
-  FormFieldCategory,
-} from "@/app/[locale]/app/business-info/_constants/enums";
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -28,6 +24,10 @@ import {
   CommandList,
 } from "./command";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
+
+export enum FormFieldCategory {
+  // TODO
+}
 
 export interface AutocompleteOption {
   value: string;

@@ -116,7 +116,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.v1.core.system.db.sql.fields.results.title",
         },
-        z.array(z.record(z.any())).optional(),
+        z.array(z.record(z.string(), z.any())).optional(),
       ),
 
       rowCount: responseField(

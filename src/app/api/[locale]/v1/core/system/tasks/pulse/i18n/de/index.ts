@@ -5,4 +5,13 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   execute: executeTranslations,
   status: statusTranslations,
+  success: {
+    title: "Erfolg",
+    description: "Puls erfolgreich ausgeführt",
+    content: "Erfolg",
+  },
+  container: {
+    title: "Puls-Container",
+    description: "Puls-Container-Beschreibung",
+  },
 };

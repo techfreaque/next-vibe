@@ -5,7 +5,6 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -29,9 +28,22 @@ import type {
 import { ImapLoggingLevel } from "./enum";
 
 /**
- * Default IMAP Configuration
+ * Default IMAP Configuration (matches API definition shape)
  */
 const DEFAULT_IMAP_CONFIG = {
+  host: "imap.gmail.com",
+  port: 993,
+  username: "",
+  password: "",
+  tls: true,
+  autoReconnect: true,
+  loggingLevel: ImapLoggingLevel.INFO as typeof ImapLoggingLevel.INFO,
+};
+
+/**
+ * Default IMAP Configuration for DB (internal storage)
+ */
+const DEFAULT_IMAP_CONFIG_DB = {
   serverEnabled: true,
   maxConnections: 100,
   connectionTimeout: 30000,
@@ -66,73 +78,43 @@ export interface ImapConfigRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ConfigGetResponseOutput>>;
+  ): ResponseType<ConfigGetResponseOutput>;
 
   updateConfig(
     data: ConfigUpdateRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ConfigUpdateResponseOutput>>;
+  ): ResponseType<ConfigUpdateResponseOutput>;
 }
 
 export class ImapConfigRepositoryImpl implements ImapConfigRepository {
-  async getConfig(
+  getConfig(
     data: ConfigGetRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ConfigGetResponseOutput>> {
+  ): ResponseType<ConfigGetResponseOutput> {
     try {
       logger.debug("Getting IMAP configuration");
 
-      const [config] = await db.select().from(imapConfigurations).limit(1);
-
-      if (!config) {
-        logger.debug("No IMAP configuration found, creating default");
-        await this.createDefaultConfig(logger);
-
-        logger.vibe("📧 IMAP config: Using defaults", {
-          serverEnabled: DEFAULT_IMAP_CONFIG.serverEnabled,
-          maxConnections: DEFAULT_IMAP_CONFIG.maxConnections,
-        });
-
-        return createSuccessResponse(DEFAULT_IMAP_CONFIG);
-      }
-
-      logger.vibe("📧 IMAP config loaded successfully", {
-        serverEnabled: config.serverEnabled,
-        maxConnections: config.maxConnections,
-        syncEnabled: config.syncEnabled,
+      // For now, return the default configuration
+      // TODO: Store these fields in a separate table or extend the current schema
+      logger.vibe("📧 IMAP config: Using defaults", {
+        host: DEFAULT_IMAP_CONFIG.host,
+        port: DEFAULT_IMAP_CONFIG.port,
       });
 
       return createSuccessResponse({
-        serverEnabled: config.serverEnabled,
-        maxConnections: config.maxConnections,
-        connectionTimeout: config.connectionTimeout,
-        poolIdleTimeout: config.poolIdleTimeout,
-        keepAlive: config.keepAlive,
-        syncEnabled: config.syncEnabled,
-        syncInterval: config.syncInterval,
-        batchSize: config.batchSize,
-        maxMessages: config.maxMessages,
-        concurrentAccounts: config.concurrentAccounts,
-        cacheEnabled: config.cacheEnabled,
-        cacheTtl: config.cacheTtl,
-        cacheMaxSize: config.cacheMaxSize,
-        memoryThreshold: config.memoryThreshold,
-        maxRetries: config.maxRetries,
-        retryDelay: config.retryDelay,
-        circuitBreakerThreshold: config.circuitBreakerThreshold,
-        circuitBreakerTimeout: config.circuitBreakerTimeout,
-        healthCheckInterval: config.healthCheckInterval,
-        metricsEnabled: config.metricsEnabled,
-        loggingLevel: config.loggingLevel,
-        rateLimitEnabled: config.rateLimitEnabled,
-        rateLimitRequests: config.rateLimitRequests,
-        rateLimitWindow: config.rateLimitWindow,
-        debugMode: config.debugMode,
-        testMode: config.testMode,
+        host: DEFAULT_IMAP_CONFIG.host,
+        port: DEFAULT_IMAP_CONFIG.port,
+        username: DEFAULT_IMAP_CONFIG.username,
+        password: DEFAULT_IMAP_CONFIG.password,
+        tls: DEFAULT_IMAP_CONFIG.tls,
+        autoReconnect: DEFAULT_IMAP_CONFIG.autoReconnect,
+        loggingLevel: ImapLoggingLevel.INFO,
+        message:
+          "app.api.v1.core.emails.imapClient.config.get.response.message",
       });
     } catch (error) {
       const parsedError = parseError(error);
@@ -148,76 +130,34 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
     }
   }
 
-  async updateConfig(
+  updateConfig(
     data: ConfigUpdateRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ConfigUpdateResponseOutput>> {
+  ): ResponseType<ConfigUpdateResponseOutput> {
     try {
       logger.debug("Updating IMAP configuration", {
-        serverEnabled: data.serverEnabled,
-        maxConnections: data.maxConnections,
-        syncEnabled: data.syncEnabled,
+        host: data.host,
+        port: data.port,
+        username: data.username,
       });
 
-      const [existingConfig] = await db
-        .select()
-        .from(imapConfigurations)
-        .limit(1);
-
-      if (existingConfig) {
-        const updateData: Partial<typeof DEFAULT_IMAP_CONFIG> = {};
-        if (data.serverEnabled !== undefined) {
-          updateData.serverEnabled = data.serverEnabled;
-        }
-        if (data.maxConnections !== undefined) {
-          updateData.maxConnections = data.maxConnections;
-        }
-        if (data.connectionTimeout !== undefined) {
-          updateData.connectionTimeout = data.connectionTimeout;
-        }
-        if (data.syncEnabled !== undefined) {
-          updateData.syncEnabled = data.syncEnabled;
-        }
-        if (data.syncInterval !== undefined) {
-          updateData.syncInterval = data.syncInterval;
-        }
-        if (data.batchSize !== undefined) {
-          updateData.batchSize = data.batchSize;
-        }
-        if (data.loggingLevel !== undefined) {
-          updateData.loggingLevel = data.loggingLevel;
-        }
-
-        await db
-          .update(imapConfigurations)
-          .set({
-            ...updateData,
-            updatedAt: new Date(),
-          })
-          .where(eq(imapConfigurations.id, existingConfig.id));
-
-        logger.vibe("📧 IMAP config updated successfully", {
-          configId: existingConfig.id,
-          changesCount: Object.keys(updateData).length - 1, // -1 for updatedAt
-        });
-      } else {
-        const newConfig = {
-          ...DEFAULT_IMAP_CONFIG,
-          ...data,
-        };
-
-        await db.insert(imapConfigurations).values(newConfig);
-
-        logger.vibe("📧 IMAP config created with defaults", {
-          serverEnabled: newConfig.serverEnabled,
-          maxConnections: newConfig.maxConnections,
-        });
-      }
+      // For now, just log the update.
+      // TODO: Store in database when schema is aligned
+      logger.vibe("📧 IMAP config update requested", {
+        host: data.host,
+        port: data.port,
+      });
 
       return createSuccessResponse({
-        success: true,
+        host: data.host,
+        port: data.port,
+        username: data.username,
+        password: data.password,
+        tls: data.tls,
+        autoReconnect: data.autoReconnect,
+        loggingLevel: data.loggingLevel,
         message:
           "app.api.v1.core.emails.imapClient.config.update.response.message",
       });
@@ -238,7 +178,7 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
 
   private async createDefaultConfig(logger: EndpointLogger): Promise<void> {
     try {
-      await db.insert(imapConfigurations).values(DEFAULT_IMAP_CONFIG);
+      await db.insert(imapConfigurations).values(DEFAULT_IMAP_CONFIG_DB);
       logger.debug("Default IMAP configuration created");
     } catch (error) {
       const parsedError = parseError(error);

@@ -1,6 +1,7 @@
 import type { BuildConfig } from "builder";
 
 const buildConfig: BuildConfig = {
+  // eslint-disable-next-line i18next/no-literal-string
   foldersToClean: [".dist"],
   filesToCompile: [
     {

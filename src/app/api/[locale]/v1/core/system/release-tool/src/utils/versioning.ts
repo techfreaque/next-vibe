@@ -98,7 +98,6 @@ export function bumpVersion(
 ): string {
   const versionParts = currentVersion.split(".").map(Number);
   if (versionParts.length !== 3) {
-    // eslint-disable-next-line no-restricted-syntax
     throw new Error("Invalid version format");
   }
 
@@ -153,7 +152,6 @@ export function updateVariableStringValue(
         ? "define('CONSTANT_NAME', 'value')"
         : "const variableName = 'value'";
 
-      // eslint-disable-next-line no-restricted-syntax
       throw new Error(
         `Could not find a matching declaration for '${fileInfo.varName}' in '${fileInfo.filePath}' or the format is not supported. Only ${formatDescription} format is supported.`,
       );

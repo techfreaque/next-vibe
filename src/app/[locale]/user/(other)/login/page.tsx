@@ -4,7 +4,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { JSX } from "react";
 
-import { onboardingRepository } from "@/app/api/[locale]/v1/core/onboarding/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { loginRepository } from "@/app/api/[locale]/v1/core/user/public/login/repository";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
@@ -73,27 +72,12 @@ export default async function LoginPage({
   // Redirect if already authenticated
   if (verifiedUserResponse.success && verifiedUserResponse.data) {
     // If there's a callback URL, use it
-    if (callbackUrl) {
-      redirect(callbackUrl);
-    }
     const userId = verifiedUserResponse.data.id;
     if (userId) {
-      // Otherwise, check onboarding status to determine where to redirect
-      const onboardingResponse = await onboardingRepository.getOnboardingStatus(
-        userId,
-        logger,
-      );
-
-      const isOnboardingComplete = onboardingResponse.success
-        ? onboardingResponse.data.isCompleted
-        : false;
-
-      // Redirect based on onboarding status
-      if (isOnboardingComplete) {
-        redirect(`/${locale}/app/dashboard`);
-      } else {
-        redirect(`/${locale}/app/onboarding`);
+      if (callbackUrl) {
+        redirect(callbackUrl);
       }
+      redirect(`/${locale}/chat`);
     } else {
       logger.error("No user ID in JWT payload", {
         payload: verifiedUserResponse.data,
@@ -134,7 +118,7 @@ export default async function LoginPage({
             </p>
           </div>
         </div>
-        <LoginForm locale={locale} loginOptions={loginOptionsResponse.data}  />
+        <LoginForm locale={locale} loginOptions={loginOptionsResponse.data} />
       </div>
     </>
   );

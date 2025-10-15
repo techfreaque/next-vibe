@@ -3,62 +3,46 @@
  * React hook for CSV import with file handling logic
  */
 
-import React, { useMemo } from "react";
+import React from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint";
-import { envClient } from "@/config/env-client";
-import { useTranslation } from "@/i18n/core/client";
+import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
 
 import definitions from "./definition";
 
 /**
  * Hook for CSV import with file handling logic
  */
-export function useLeadsImportEndpoint(logger: EndpointLogger): EndpointReturn<
-  typeof definitions
-> & {
-  // File handling
+export function useLeadsImportEndpoint(
+  logger: EndpointLogger,
+  params?: { enabled?: boolean },
+): EndpointReturn<typeof definitions> & {
   selectedFile: File | null;
-  setSelectedFile: (file: File | null) => void;
+  setSelectedFile: React.Dispatch<React.SetStateAction<File | null>>;
   handleFileSelect: (file: File) => void;
   handleDrop: (e: React.DragEvent) => void;
   handleFileInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-
-  // Drag and drop
   dragOver: boolean;
-  setDragOver: (dragOver: boolean) => void;
-
-  // Template download
+  setDragOver: React.Dispatch<React.SetStateAction<boolean>>;
   downloadTemplate: () => void;
-
-  // Form helpers
   processAndSetFile: (file: File) => Promise<void>;
 } {
-  const { locale } = useTranslation();
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const [dragOver, setDragOver] = React.useState(false);
 
-  const queryOptions = useMemo(
-    () => ({
-      enabled: false, // Only run when manually triggered
-    }),
-    [],
-  );
-
-  const formOptions = useMemo(
-    () => ({
-      persistForm: false,
-    }),
-    [],
-  );
-
-  const baseEndpoint = useEndpoint(
+  const form = useEndpoint(
     definitions,
     {
-      queryOptions,
-      formOptions,
+      queryOptions: {
+        enabled: params?.enabled !== false,
+        refetchOnWindowFocus: false,
+        staleTime: 0,
+      },
+      formOptions: {
+        persistForm: false,
+        persistenceKey: "leads-import-form",
+      },
     },
     logger,
   );
@@ -66,6 +50,10 @@ export function useLeadsImportEndpoint(logger: EndpointLogger): EndpointReturn<
   // File processing function
   const processAndSetFile = React.useCallback(
     async (file: File): Promise<void> => {
+      if (!form.create) {
+        return;
+      }
+
       try {
         // Convert file to base64
         const fileContent = await new Promise<string>((resolve, reject) => {
@@ -81,16 +69,16 @@ export function useLeadsImportEndpoint(logger: EndpointLogger): EndpointReturn<
         });
 
         // Set form values
-        baseEndpoint.create.form.setValue("file", fileContent);
-        baseEndpoint.create.form.setValue("fileName", file.name);
+        form.create.form.setValue("file", fileContent);
+        form.create.form.setValue("fileName", file.name);
 
         // Trigger validation to ensure form is valid
-        await baseEndpoint.create.form.trigger(["file", "fileName"]);
+        await form.create.form.trigger(["file", "fileName"]);
       } catch (error) {
         logger.error("leads.import.file.processing.error", error);
       }
     },
-    [baseEndpoint.create.form],
+    [form.create, logger],
   );
 
   // File selection handler with validation
@@ -157,7 +145,7 @@ export function useLeadsImportEndpoint(logger: EndpointLogger): EndpointReturn<
   }, []);
 
   return {
-    ...baseEndpoint,
+    ...form,
     // File handling
     selectedFile,
     setSelectedFile,
@@ -177,4 +165,6 @@ export function useLeadsImportEndpoint(logger: EndpointLogger): EndpointReturn<
   };
 }
 
-export type LeadsImportEndpointReturn = EndpointReturn<typeof definitions>;
+export type LeadsImportEndpointReturn = ReturnType<
+  typeof useLeadsImportEndpoint
+>;

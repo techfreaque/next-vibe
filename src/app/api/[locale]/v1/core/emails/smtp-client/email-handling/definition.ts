@@ -11,12 +11,15 @@ import type {
 } from "next-vibe/shared/types/response.schema";
 import type { JSX } from "react";
 
+import type {
+  EmailCampaignStage,
+  EmailJourneyVariant,
+} from "@/app/api/[locale]/v1/core/leads/enum";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import type { EndpointLogger } from "../../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type { JwtPayloadType } from "../../../user/auth/definition";
-import type { EmailCampaignStage, EmailJourneyVariant } from "../../leads/enum";
 import type { EmailType } from "../../messages/enum";
 import type { CampaignType } from "../enum";
 import type { SmtpSelectionCriteria } from "../sending/definition";
@@ -34,12 +37,12 @@ export interface EmailTemplateReturnType {
   replyToEmail?: string;
   replyToName?: string;
   // Campaign context for proper SMTP selection and metadata
-  campaignType?: CampaignType;
-  emailJourneyVariant?: EmailJourneyVariant;
-  emailCampaignStage?: EmailCampaignStage;
+  campaignType?: (typeof CampaignType)[keyof typeof CampaignType];
+  emailJourneyVariant?: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant];
+  emailCampaignStage?: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
   // Email metadata
   templateName?: string;
-  emailType?: EmailType;
+  emailType?: (typeof EmailType)[keyof typeof EmailType];
   leadId?: string;
   unsubscribeUrl?: string;
   // SMTP selection criteria override
@@ -72,11 +75,7 @@ export type EmailFunctionType<TRequest, TResponse, TUrlVariables> = ({
 /**
  * Email Handle Request Type
  */
-export interface EmailHandleRequestTypeOutput<
-  TRequest,
-  TResponse,
-  TUrlVariables,
-> {
+export interface EmailHandleRequestOutput<TRequest, TResponse, TUrlVariables> {
   email:
     | {
         afterHandlerEmails?: {
@@ -96,6 +95,6 @@ export interface EmailHandleRequestTypeOutput<
 /**
  * Email Handle Response Type
  */
-export interface EmailHandleResponseTypeOutput {
+export interface EmailHandleResponseOutput {
   success: boolean;
 }

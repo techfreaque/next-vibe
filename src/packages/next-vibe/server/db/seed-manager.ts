@@ -84,7 +84,9 @@ async function discoverSeedFiles(logger: EndpointLogger): Promise<void> {
     }
   }
 
-  logger.info(`📦 Total modules registered: ${Object.keys(seedRegistry).length}`);
+  logger.info(
+    `📦 Total modules registered: ${Object.keys(seedRegistry).length}`,
+  );
 }
 
 // File patterns
@@ -132,7 +134,9 @@ export async function runSeeds(
   logger.info("🔍 Discovering seed files...");
   await discoverSeedFiles(logger);
 
-  logger.info(`📦 Seed registry has ${Object.keys(seedRegistry).length} modules`);
+  logger.info(
+    `📦 Seed registry has ${Object.keys(seedRegistry).length} modules`,
+  );
   logger.info(`🌱 Running ${environment} seeds...`);
 
   for (const [moduleId, seeds] of Object.entries(seedRegistry)) {
@@ -173,6 +177,7 @@ export async function seedDatabase(
   } catch (error) {
     logger.error("❌ Error seeding database:", error);
     // Don't call process.exit here - let the caller handle the error
+    // eslint-disable-next-line no-restricted-syntax
     throw error;
   } finally {
     await closeDatabase(logger);

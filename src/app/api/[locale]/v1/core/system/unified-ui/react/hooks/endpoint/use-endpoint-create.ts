@@ -4,18 +4,12 @@
 "use client";
 
 import { type FormEvent, useEffect, useMemo } from "react";
-import type z from "zod";
+import type { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type {
-  ExtractInput,
-  ExtractOutput,
-  FieldUsage,
-  InferSchemaFromField,
-  UnifiedField,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { useApiForm } from "../mutation-form";
@@ -43,18 +37,31 @@ import { mergeFormData } from "./utils";
  * @returns Form and mutation for API interaction with enhanced error handling
  */
 export function useEndpointCreate<
-  TEndpoint extends CreateApiEndpoint<any, any, any, any>,
+  TEndpoint extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    any
+  >,
 >(
   primaryEndpoint: TEndpoint | null,
   logger: EndpointLogger,
   options: {
-    formOptions?: ApiFormOptions<any>;
-    mutationOptions?: ApiMutationOptions<any, any, any>;
-    urlParams?: any;
-    autoPrefillData?: any;
-    initialState?: any;
+    formOptions?: ApiFormOptions<TEndpoint["TRequestOutput"]>;
+    mutationOptions?: ApiMutationOptions<
+      TEndpoint["TRequestOutput"],
+      TEndpoint["TResponseOutput"],
+      TEndpoint["TUrlVariablesOutput"]
+    >;
+    urlParams?: TEndpoint["TUrlVariablesOutput"];
+    autoPrefillData?: Partial<TEndpoint["TRequestOutput"]>;
+    initialState?: Partial<TEndpoint["TRequestOutput"]>;
   } = {},
-): any {
+): ApiFormReturn<
+  TEndpoint["TRequestOutput"],
+  TEndpoint["TResponseOutput"],
+  TEndpoint["TUrlVariablesOutput"]
+> | null {
   // Return null if endpoint is not provided
   if (!primaryEndpoint) {
     return null;
@@ -84,11 +91,12 @@ export function useEndpointCreate<
     return {
       ...formOptions,
       defaultValues: mergedDefaultValues,
-    } as ApiFormOptions<any>;
+    } as ApiFormOptions<TEndpoint["TRequestInput"]>;
   }, [formOptions, autoPrefillData, initialState, primaryEndpoint]);
 
   // Use the existing mutation form hook with enhanced options
   const formResult = useApiForm(
+    // @ts-ignore - Generic constraints are compatible, type system can't verify the complex relationship
     primaryEndpoint,
     logger,
     enhancedFormOptions,
@@ -108,7 +116,11 @@ export function useEndpointCreate<
 
   // If no URL parameters are needed, return the form result as-is
   if (!options.urlParams) {
-    return formResult;
+    return formResult as ApiFormReturn<
+  TEndpoint["TRequestOutput"],
+  TEndpoint["TResponseOutput"],
+  TEndpoint["TUrlVariablesOutput"]
+>;
   }
 
   // If URL parameters are provided, wrap the submitForm function to automatically include them

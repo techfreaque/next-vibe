@@ -66,7 +66,7 @@ export interface ApiEndpoint<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TFields,
 > {
   // Core endpoint metadata - all required for type safety
   readonly method: TMethod;
@@ -76,10 +76,10 @@ export interface ApiEndpoint<
   readonly title: TranslationKey;
   readonly description: TranslationKey;
   readonly category: TranslationKey;
-  readonly tags: TranslationKey[];
+  readonly tags: readonly TranslationKey[];
 
   readonly debug?: boolean;
-  readonly aliases?: string[];
+  readonly aliases?: readonly string[];
   readonly cli?: {
     // TODO: use keyof TRequestInput, TResponseInput, TUrlVariablesInput
     firstCliArgKey?: string;
@@ -227,6 +227,7 @@ export type InferFieldType<F, Usage extends FieldUsage> =
         : never;
 
 // Fixed object type inference - filter out never fields and remove readonly
+// Uses flexible constraint that accepts both readonly and mutable properties
 type InferObjectType<C, Usage extends FieldUsage> =
   C extends Record<string, UnifiedField<z.ZodTypeAny>>
     ? {
@@ -242,7 +243,7 @@ const generateSchemaForUsage = generateSchemaFromUtils;
 
 // Schema generation that preserves actual Zod types for proper input/output inference
 // CRITICAL: These functions must preserve the actual schema types for z.input<>/z.output<>
-function generateRequestDataSchema<F extends UnifiedField<z.ZodTypeAny>>(
+function generateRequestDataSchema<F>(
   field: F,
 ): InferSchemaFromField<F, FieldUsage.RequestData> {
   return generateSchemaForUsage(
@@ -251,7 +252,7 @@ function generateRequestDataSchema<F extends UnifiedField<z.ZodTypeAny>>(
   ) as InferSchemaFromField<F, FieldUsage.RequestData>;
 }
 
-function generateRequestUrlSchema<F extends UnifiedField<z.ZodTypeAny>>(
+function generateRequestUrlSchema<F>(
   field: F,
 ): InferSchemaFromField<F, FieldUsage.RequestUrlParams> {
   return generateSchemaForUsage(
@@ -260,7 +261,7 @@ function generateRequestUrlSchema<F extends UnifiedField<z.ZodTypeAny>>(
   ) as InferSchemaFromField<F, FieldUsage.RequestUrlParams>;
 }
 
-function generateResponseSchema<F extends UnifiedField<z.ZodTypeAny>>(
+function generateResponseSchema<F>(
   field: F,
 ): InferSchemaFromField<F, FieldUsage.Response> {
   return generateSchemaForUsage(
@@ -272,8 +273,8 @@ function generateResponseSchema<F extends UnifiedField<z.ZodTypeAny>>(
 export type CreateApiEndpoint<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends any,
-  TFields extends any,
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TFields,
   RequestInput = ExtractInput<
     InferSchemaFromField<TFields, FieldUsage.RequestData>
   >,
@@ -322,7 +323,7 @@ export type CreateApiEndpoint<
  * Return type for createEndpoint with full type inference from fields
  */
 export type CreateEndpointReturnInMethod<
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TFields,
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
@@ -340,7 +341,7 @@ export type CreateEndpointReturnInMethod<
  * Returns both legacy format and new destructured format for maximum compatibility
  */
 export function createEndpoint<
-  const TFields extends UnifiedField<z.ZodTypeAny>,
+  TFields,
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],

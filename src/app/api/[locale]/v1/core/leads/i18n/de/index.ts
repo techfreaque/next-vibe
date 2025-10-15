@@ -1,5 +1,3 @@
-import type { translations as enTranslations } from "../en";
-
 import { translations as batchTranslations } from "../../batch/i18n/de";
 import { translations as campaignsTranslations } from "../../campaigns/i18n/de";
 import { translations as createTranslations } from "../../create/i18n/de";
@@ -10,6 +8,7 @@ import { translations as listTranslations } from "../../list/i18n/de";
 import { translations as searchTranslations } from "../../search/i18n/de";
 import { translations as statsTranslations } from "../../stats/i18n/de";
 import { translations as trackingTranslations } from "../../tracking/i18n/de";
+import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Lead-Verwaltung",
@@ -18,6 +17,13 @@ export const translations: typeof enTranslations = {
     batch: "Stapel",
     campaigns: "Kampagnen",
     management: "Verwaltung",
+    create: "Erstellen",
+    search: "Suchen",
+    export: "Exportieren",
+    import: "Importieren",
+    csv: "CSV",
+    jobs: "Jobs",
+    list: "Liste",
   },
   batch: batchTranslations,
   campaigns: campaignsTranslations,

@@ -1,8 +1,10 @@
 import { translations as endpointsTranslations } from "../../endpoints/i18n/de";
+import { translations as utilsTranslations } from "../../utils/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   endpoints: endpointsTranslations,
+  utils: utilsTranslations,
   vibe: {
     startingUp: "🚀 Vibe CLI wird gestartet...",
     executionTime: "Ausführungszeit",

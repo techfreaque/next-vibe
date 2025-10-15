@@ -9,7 +9,6 @@ import { env } from "next-vibe/server/env";
 import type {
   ErrorResponseType,
   ResponseType,
-  SuccessResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -19,18 +18,15 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { CountryLanguage } from "@/i18n/core/config";
 
-import type {
-  CountryLanguage,
-  JwtPayloadType,
-} from "../../../user/auth/definition";
 import { EmailProvider, EmailStatus, EmailType } from "../../messages/enum";
 import { emailMetadataRepository } from "../email-metadata/repository";
 import { emailSendingRepository } from "../email-sending/repository";
 import type {
-  EmailHandleRequestTypeOutput,
-  EmailHandleResponseTypeOutput,
-  EmailTemplateReturnType,
+  EmailHandleRequestOutput,
+  EmailHandleResponseOutput,
 } from "./definition";
 
 /**
@@ -38,11 +34,11 @@ import type {
  */
 export interface EmailHandlingRepository {
   handleEmails<TRequest, TResponse, TUrlVariables>(
-    data: EmailHandleRequestTypeOutput<TRequest, TResponse, TUrlVariables>,
+    data: EmailHandleRequestOutput<TRequest, TResponse, TUrlVariables>,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<EmailHandleResponseTypeOutput>>;
+  ): Promise<ResponseType<EmailHandleResponseOutput>>;
 }
 
 /**
@@ -50,11 +46,11 @@ export interface EmailHandlingRepository {
  */
 export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
   async handleEmails<TRequest, TResponse, TUrlVariables>(
-    data: EmailHandleRequestTypeOutput<TRequest, TResponse, TUrlVariables>,
+    data: EmailHandleRequestOutput<TRequest, TResponse, TUrlVariables>,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<EmailHandleResponseTypeOutput>> {
+  ): Promise<ResponseType<EmailHandleResponseOutput>> {
     const errors: ErrorResponseType[] = [];
 
     if (data.email?.afterHandlerEmails) {
@@ -113,11 +109,11 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                 logger,
               );
 
-              if (emailSendResult.success) {
+              if (emailSendResult.success && emailSendResult.data) {
                 logger.debug("Email sent successfully", {
                   recipient: templateData.toEmail,
                   subject: templateData.subject,
-                  messageId: emailSendResult.data?.messageId,
+                  messageId: String(emailSendResult.data.messageId ?? ""),
                 });
               } else {
                 logger.error("Failed to send email", {

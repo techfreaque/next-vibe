@@ -16,9 +16,6 @@ import {
   requestDataField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
-import { LayoutType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
-
-import { UserRoleValue } from "../../user/user-roles/enum";
 
 /**
  * Seeds generation response schema
@@ -36,7 +33,7 @@ const seedsGenerationResponseSchema = z.object({
 /**
  * POST endpoint definition - Generate seeds
  */
-const POST = (createEndpoint)({
+const POST = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "generators", "seeds"],
   title: "core.system.db.seed.title",

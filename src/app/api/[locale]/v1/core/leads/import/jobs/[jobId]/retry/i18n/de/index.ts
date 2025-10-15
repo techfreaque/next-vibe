@@ -2,53 +2,68 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
+    title: "Import-Job wiederholen",
+    description: "Einen fehlgeschlagenen Import-Job wiederholen",
+    jobId: {
+      label: "Job-ID",
+      description: "Eindeutige Kennung für den zu wiederholenden Import-Job",
+    },
     form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
+      title: "Import-Job wiederholen",
+      description: "Den fehlgeschlagenen Import-Job wiederholen",
     },
     response: {
-      title: "Antwort",
-      description: "Antwortdaten",
+      title: "Wiederholungsergebnis",
+      description: "Ergebnis der Wiederholungsoperation",
+      success: {
+        content: "Erfolgsstatus",
+      },
+      message: {
+        content: "Wiederholungsnachricht",
+      },
     },
     errors: {
-      unauthorized: {
-        title: "Nicht autorisiert",
-        description: "Authentifizierung erforderlich",
-      },
       validation: {
         title: "Validierungsfehler",
-        description: "Ungültige Anfrageparameter",
+        description: "Die angegebene Job-ID ist ungültig",
+      },
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Authentifizierung erforderlich, um Jobs zu wiederholen",
+      },
+      forbidden: {
+        title: "Zugriff verweigert",
+        description: "Sie haben keine Berechtigung, diesen Job zu wiederholen",
+      },
+      notFound: {
+        title: "Job nicht gefunden",
+        description: "Kein Import-Job mit der angegebenen ID gefunden",
       },
       server: {
         title: "Serverfehler",
-        description: "Interner Serverfehler",
+        description: "Beim Wiederholen des Jobs ist ein Fehler aufgetreten",
       },
       unknown: {
         title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist aufgetreten",
+        description: "Ein unerwarteter Fehler ist aufgetreten",
       },
       network: {
         title: "Netzwerkfehler",
-        description: "Netzwerkfehler aufgetreten",
+        description: "Verbindung zum Server nicht möglich",
       },
-      forbidden: {
-        title: "Verboten",
-        description: "Zugriff verboten",
-      },
-      notFound: {
-        title: "Nicht gefunden",
-        description: "Ressource nicht gefunden",
+      unsavedChanges: {
+        title: "Nicht gespeicherte Änderungen",
+        description: "Sie haben nicht gespeicherte Änderungen",
       },
       conflict: {
-        title: "Konflikt",
-        description: "Datenkonflikt aufgetreten",
+        title: "Wiederholungskonflikt",
+        description:
+          "Job kann nicht wiederholt werden, während er verarbeitet wird",
       },
     },
     success: {
       title: "Erfolg",
-      description: "Vorgang erfolgreich abgeschlossen",
+      description: "Import-Job erfolgreich wiederholt",
     },
   },
-} ;
+};

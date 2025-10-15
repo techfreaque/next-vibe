@@ -17,6 +17,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli
 import {
   objectField,
   requestDataField,
+  requestUrlParamsField,
   responseArrayField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
@@ -61,7 +62,7 @@ const { POST: ImportCsvPost } = createEndpoint({
       // === FILE UPLOAD SECTION ===
       fileUploadSection: objectField(
         {
-          type: WidgetType.FORM_SECTION,
+          type: WidgetType.SECTION,
           title: "app.api.v1.core.import.csv.post.fileSection.title",
           description:
             "app.api.v1.core.import.csv.post.fileSection.description",
@@ -76,12 +77,8 @@ const { POST: ImportCsvPost } = createEndpoint({
               label: "app.api.v1.core.import.csv.post.file.label",
               description: "app.api.v1.core.import.csv.post.file.description",
               placeholder: "app.api.v1.core.import.csv.post.file.placeholder",
-              helpText: "app.api.v1.core.import.csv.post.file.helpText",
-              layout: { type: LayoutType.FULL_WIDTH },
               validation: {
                 required: true,
-                accept: ".csv,text/csv",
-                maxSize: "10MB",
               },
             },
             z.string().min(1),
@@ -96,7 +93,6 @@ const { POST: ImportCsvPost } = createEndpoint({
                 "app.api.v1.core.import.csv.post.fileName.description",
               placeholder:
                 "app.api.v1.core.import.csv.post.fileName.placeholder",
-              layout: { type: LayoutType.FULL_WIDTH },
               validation: { required: true },
             },
             z.string().min(1),
@@ -110,7 +106,6 @@ const { POST: ImportCsvPost } = createEndpoint({
               description: "app.api.v1.core.import.csv.post.domain.description",
               placeholder: "app.api.v1.core.import.csv.post.domain.placeholder",
               options: ImportDomainOptions,
-              layout: { type: LayoutType.FULL_WIDTH },
               validation: { required: true },
             },
             z.nativeEnum(ImportDomain),
@@ -121,11 +116,11 @@ const { POST: ImportCsvPost } = createEndpoint({
       // === PROCESSING OPTIONS SECTION ===
       processingSection: objectField(
         {
-          type: WidgetType.FORM_SECTION,
+          type: WidgetType.SECTION,
           title: "app.api.v1.core.import.csv.post.processingSection.title",
           description:
             "app.api.v1.core.import.csv.post.processingSection.description",
-          layout: { type: LayoutType.GRID_2_COLUMNS },
+          layout: { type: LayoutType.GRID, columns: 2 },
         },
         { request: "data" },
         {
@@ -136,9 +131,6 @@ const { POST: ImportCsvPost } = createEndpoint({
               label: "app.api.v1.core.import.csv.post.skipDuplicates.label",
               description:
                 "app.api.v1.core.import.csv.post.skipDuplicates.description",
-              helpText:
-                "app.api.v1.core.import.csv.post.skipDuplicates.helpText",
-              layout: { columns: 6 },
             },
             z.boolean().default(true),
           ),
@@ -150,9 +142,6 @@ const { POST: ImportCsvPost } = createEndpoint({
               label: "app.api.v1.core.import.csv.post.updateExisting.label",
               description:
                 "app.api.v1.core.import.csv.post.updateExisting.description",
-              helpText:
-                "app.api.v1.core.import.csv.post.updateExisting.helpText",
-              layout: { columns: 6 },
             },
             z.boolean().default(false),
           ),
@@ -165,9 +154,6 @@ const { POST: ImportCsvPost } = createEndpoint({
                 "app.api.v1.core.import.csv.post.useChunkedProcessing.label",
               description:
                 "app.api.v1.core.import.csv.post.useChunkedProcessing.description",
-              helpText:
-                "app.api.v1.core.import.csv.post.useChunkedProcessing.helpText",
-              layout: { columns: 6 },
             },
             z.boolean().default(false),
           ),
@@ -181,8 +167,6 @@ const { POST: ImportCsvPost } = createEndpoint({
                 "app.api.v1.core.import.csv.post.batchSize.description",
               placeholder:
                 "app.api.v1.core.import.csv.post.batchSize.placeholder",
-              helpText: "app.api.v1.core.import.csv.post.batchSize.helpText",
-              layout: { columns: 6 },
               validation: {
                 min: 10,
                 max: 1000,
@@ -196,12 +180,13 @@ const { POST: ImportCsvPost } = createEndpoint({
       // === DEFAULT VALUES SECTION ===
       defaultsSection: objectField(
         {
-          type: WidgetType.FORM_SECTION,
+          type: WidgetType.SECTION,
           title: "app.api.v1.core.import.csv.post.defaultsSection.title",
           description:
             "app.api.v1.core.import.csv.post.defaultsSection.description",
-          layout: { type: LayoutType.GRID_2_COLUMNS },
-          collapsed: true,
+          layout: { type: LayoutType.GRID, columns: 2 },
+          collapsible: true,
+          defaultExpanded: false,
         },
         { request: "data" },
         {
@@ -218,7 +203,6 @@ const { POST: ImportCsvPost } = createEndpoint({
                 label: key === "GLOBAL" ? "Global" : key,
                 value: code,
               })),
-              layout: { columns: 6 },
             },
             z.string().default("GLOBAL"),
           ),
@@ -236,7 +220,6 @@ const { POST: ImportCsvPost } = createEndpoint({
                 label: key,
                 value: code,
               })),
-              layout: { columns: 6 },
             },
             z.string().default("en"),
           ),
@@ -244,86 +227,208 @@ const { POST: ImportCsvPost } = createEndpoint({
       ),
 
       // === RESPONSE DATA ===
-      importResult: responseField(
+      importResult: objectField(
         {
-          type: WidgetType.RESULT_CONTAINER,
+          type: WidgetType.CONTAINER,
           title: "app.api.v1.core.import.csv.post.response.title",
           description: "app.api.v1.core.import.csv.post.response.description",
           layout: { type: LayoutType.STACKED },
         },
-        z.object({
+        { response: true },
+        {
           // === BASIC RESULTS ===
-          basicResults: z
-            .object({
-              batchId: z
-                .string()
-                .uuid()
-                .describe("Unique identifier for this import batch"),
-              totalRows: z.number().describe("Total number of rows processed"),
-              isChunkedProcessing: z
-                .boolean()
-                .describe("Whether processing was done in chunks"),
-              jobId: z
-                .string()
-                .uuid()
-                .optional()
-                .describe("Job ID for chunked processing"),
-            })
-            .describe("Basic import operation results"),
+          basicResults: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.import.csv.post.response.basicResults.title",
+              description:
+                "app.api.v1.core.import.csv.post.response.basicResults.description",
+              layout: { type: LayoutType.STACKED },
+            },
+            { response: true },
+            {
+              batchId: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.import.csv.post.response.batchId.label",
+                },
+                z.string().uuid(),
+              ),
+              totalRows: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.import.csv.post.response.totalRows.label",
+                },
+                z.number(),
+              ),
+              isChunkedProcessing: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.import.csv.post.response.isChunkedProcessing.label",
+                },
+                z.boolean(),
+              ),
+              jobId: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.import.csv.post.response.jobId.label",
+                },
+                z.string().uuid().optional(),
+              ),
+            },
+          ),
 
           // === STATISTICS ===
-          statistics: z
-            .object({
-              successfulImports: z
-                .number()
-                .describe("Number of successfully imported records"),
-              failedImports: z
-                .number()
-                .describe("Number of records that failed to import"),
-              duplicateEmails: z
-                .number()
-                .describe("Number of duplicate email addresses found"),
-              processingTimeMs: z
-                .number()
-                .optional()
-                .describe("Total processing time in milliseconds"),
-            })
-            .describe("Import processing statistics"),
+          statistics: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.import.csv.post.response.statistics.title",
+              description:
+                "app.api.v1.core.import.csv.post.response.statistics.description",
+              layout: { type: LayoutType.GRID, columns: 2 },
+            },
+            { response: true },
+            {
+              successfulImports: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.import.csv.post.response.successfulImports.label",
+                },
+                z.number(),
+              ),
+              failedImports: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.import.csv.post.response.failedImports.label",
+                },
+                z.number(),
+              ),
+              duplicateEmails: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.import.csv.post.response.duplicateEmails.label",
+                },
+                z.number(),
+              ),
+              processingTimeMs: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.import.csv.post.response.processingTimeMs.label",
+                },
+                z.number().optional(),
+              ),
+            },
+          ),
 
           // === DETAILED SUMMARY ===
-          summary: z
-            .object({
-              newRecords: z
-                .number()
-                .describe("Number of completely new records created"),
-              updatedRecords: z
-                .number()
-                .describe("Number of existing records updated"),
-              skippedDuplicates: z
-                .number()
-                .describe("Number of duplicates that were skipped"),
-            })
-            .describe("Detailed breakdown of import results"),
+          summary: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title: "app.api.v1.core.import.csv.post.response.summary.title",
+              description:
+                "app.api.v1.core.import.csv.post.response.summary.description",
+              layout: { type: LayoutType.GRID, columns: 3 },
+            },
+            { response: true },
+            {
+              newRecords: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.import.csv.post.response.newRecords.label",
+                },
+                z.number(),
+              ),
+              updatedRecords: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.import.csv.post.response.updatedRecords.label",
+                },
+                z.number(),
+              ),
+              skippedDuplicates: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.import.csv.post.response.skippedDuplicates.label",
+                },
+                z.number(),
+              ),
+            },
+          ),
 
           // === ERROR DETAILS ===
-          errors: z
-            .array(
-              z.object({
-                row: z.number().describe("Row number where error occurred"),
-                email: z
-                  .string()
-                  .optional()
-                  .describe("Email address associated with error"),
-                error: z.string().describe("Human-readable error message"),
-              }),
-            )
-            .describe("List of errors that occurred during import"),
+          errors: responseArrayField(
+            {
+              type: WidgetType.DATA_TABLE,
+              title: "app.api.v1.core.import.csv.post.response.errors.title",
+              description:
+                "app.api.v1.core.import.csv.post.response.errors.description",
+            },
+            objectField(
+              {
+                type: WidgetType.CONTAINER,
+                layout: { type: LayoutType.STACKED },
+              },
+              { response: true },
+              {
+                row: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.v1.core.import.csv.post.response.errors.row.label",
+                  },
+                  z.number(),
+                ),
+                email: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.v1.core.import.csv.post.response.errors.email.label",
+                  },
+                  z.string().optional(),
+                ),
+                error: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.v1.core.import.csv.post.response.errors.error.label",
+                  },
+                  z.string(),
+                ),
+              },
+            ),
+          ),
 
           // === NEXT STEPS ===
-          nextSteps: z
-            .array(z.string())
-            .describe("Recommended actions for the user"),
-        }),
+          nextSteps: responseArrayField(
+            {
+              type: WidgetType.DATA_LIST,
+              title: "app.api.v1.core.import.csv.post.response.nextSteps.title",
+              description:
+                "app.api.v1.core.import.csv.post.response.nextSteps.description",
+            },
+            responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.import.csv.post.response.nextSteps.item.label",
+              },
+              z.string(),
+            ),
+          ),
+        },
       ),
     },
   ),
@@ -334,19 +439,42 @@ const { POST: ImportCsvPost } = createEndpoint({
       description:
         "app.api.v1.core.import.csv.post.errors.validation.description",
     },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "app.api.v1.core.import.csv.post.errors.network.title",
+      description: "app.api.v1.core.import.csv.post.errors.network.description",
+    },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.v1.core.import.csv.post.errors.unauthorized.title",
       description:
         "app.api.v1.core.import.csv.post.errors.unauthorized.description",
     },
-    [EndpointErrorTypes.FILE_TOO_LARGE]: {
-      title: "app.api.v1.core.import.csv.post.errors.fileTooLarge.title",
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "app.api.v1.core.import.csv.post.errors.forbidden.title",
       description:
-        "app.api.v1.core.import.csv.post.errors.fileTooLarge.description",
+        "app.api.v1.core.import.csv.post.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "app.api.v1.core.import.csv.post.errors.notFound.title",
+      description:
+        "app.api.v1.core.import.csv.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.v1.core.import.csv.post.errors.server.title",
       description: "app.api.v1.core.import.csv.post.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "app.api.v1.core.import.csv.post.errors.unknown.title",
+      description: "app.api.v1.core.import.csv.post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "app.api.v1.core.import.csv.post.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.import.csv.post.errors.unsavedChanges.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "app.api.v1.core.import.csv.post.errors.conflict.title",
+      description:
+        "app.api.v1.core.import.csv.post.errors.conflict.description",
     },
   },
 
@@ -428,12 +556,12 @@ const { GET: ListImportJobsGet } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.import.jobs.get.form.title",
       description: "app.api.v1.core.import.jobs.get.form.description",
-      layout: { type: LayoutType.GRID_2_COLUMNS },
+      layout: { type: LayoutType.GRID, columns: 2 },
     },
-    { request: "query", response: true },
+    { request: "urlParams", response: true },
     {
       // === FILTER OPTIONS ===
-      status: requestDataField(
+      status: requestUrlParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
@@ -444,19 +572,17 @@ const { GET: ListImportJobsGet } = createEndpoint({
             { label: "All Statuses", value: "all" },
             ...CsvImportJobStatusOptions,
           ],
-          layout: { columns: 6 },
         },
         z.string().default("all"),
       ),
 
-      limit: requestDataField(
+      limit: requestUrlParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.v1.core.import.jobs.get.limit.label",
           description: "app.api.v1.core.import.jobs.get.limit.description",
           placeholder: "app.api.v1.core.import.jobs.get.limit.placeholder",
-          layout: { columns: 6 },
           validation: {
             min: 1,
             max: 100,
@@ -465,14 +591,13 @@ const { GET: ListImportJobsGet } = createEndpoint({
         z.number().min(1).max(100).default(20),
       ),
 
-      offset: requestDataField(
+      offset: requestUrlParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.v1.core.import.jobs.get.offset.label",
           description: "app.api.v1.core.import.jobs.get.offset.description",
           placeholder: "app.api.v1.core.import.jobs.get.offset.placeholder",
-          layout: { columns: 6 },
           validation: {
             min: 0,
           },
@@ -575,16 +700,20 @@ const { GET: ListImportJobsGet } = createEndpoint({
 });
 
 // === TYPE EXPORTS ===
-export type ImportCsvRequestType = z.infer<typeof ImportCsvPost.requestSchema>;
-export type ImportCsvResponseType = z.infer<
-  typeof ImportCsvPost.responseSchema
->;
-export type ListImportJobsRequestType = z.infer<
-  typeof ListImportJobsGet.requestSchema
->;
-export type ListImportJobsResponseType = z.infer<
-  typeof ListImportJobsGet.responseSchema
->;
+// Using .types accessor for field-based endpoints
+export type ImportCsvRequestInput = typeof ImportCsvPost.types.RequestInput;
+export type ImportCsvRequestOutput = typeof ImportCsvPost.types.RequestOutput;
+export type ImportCsvResponseInput = typeof ImportCsvPost.types.ResponseInput;
+export type ImportCsvResponseOutput = typeof ImportCsvPost.types.ResponseOutput;
+
+export type ListImportJobsRequestInput =
+  typeof ListImportJobsGet.types.RequestInput;
+export type ListImportJobsRequestOutput =
+  typeof ListImportJobsGet.types.RequestOutput;
+export type ListImportJobsResponseInput =
+  typeof ListImportJobsGet.types.ResponseInput;
+export type ListImportJobsResponseOutput =
+  typeof ListImportJobsGet.types.ResponseOutput;
 
 // === ENDPOINT EXPORTS ===
 const importEndpoints = {

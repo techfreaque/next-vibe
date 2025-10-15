@@ -16,10 +16,11 @@ import {
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { getCronFrequencyMinutes } from "@/app/api/[locale]/v1/core/system/tasks/cron-formatter";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
-import { leads } from "../../db";
+import { leads } from "../../../db";
 import type {
   DistributionCalculationInputType,
   DistributionCalculationOutputType,
@@ -33,14 +34,14 @@ import type {
 export interface DistributionRepository {
   calculateDistribution(
     data: DistributionCalculationInputType,
-    user: any,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<DistributionCalculationOutputType>>;
+  ): ResponseType<DistributionCalculationOutputType>;
 
   calculateLocaleQuota(
     data: LocaleQuotaCalculationInputType,
-    user: any,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LocaleProcessingInfoOutputType>>;
@@ -50,12 +51,12 @@ export interface DistributionRepository {
  * Distribution Repository Implementation
  */
 export class DistributionRepositoryImpl implements DistributionRepository {
-  async calculateDistribution(
+  calculateDistribution(
     data: DistributionCalculationInputType,
-    user: any,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<DistributionCalculationOutputType>> {
+  ): ResponseType<DistributionCalculationOutputType> {
     try {
       const { config, cronSchedule } = data;
 
@@ -64,7 +65,10 @@ export class DistributionRepositoryImpl implements DistributionRepository {
       const enabledDaysPerWeek = config.enabledDays.length;
 
       // Get cron frequency from schedule
-      const cronFrequencyMinutes = getCronFrequencyMinutes(cronSchedule);
+      const cronFrequencyMinutes = getCronFrequencyMinutes(
+        cronSchedule,
+        logger,
+      );
 
       // Calculate runs per day for the current enabled days
       const totalEnabledMinutesPerDay = totalEnabledHours * 60;
@@ -88,16 +92,15 @@ export class DistributionRepositoryImpl implements DistributionRepository {
     } catch (error) {
       logger.error("Distribution calculation failed", { error });
       return createErrorResponse(
-        "error.distribution.calculation_failed",
+        "leadsErrors.campaigns.common.error.server.title" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
-        error,
       );
     }
   }
 
   async calculateLocaleQuota(
     data: LocaleQuotaCalculationInputType,
-    user: any,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LocaleProcessingInfoOutputType>> {
@@ -174,9 +177,8 @@ export class DistributionRepositoryImpl implements DistributionRepository {
     } catch (error) {
       logger.error("Locale quota calculation failed", { error });
       return createErrorResponse(
-        "error.locale_quota.calculation_failed",
+        "leadsErrors.campaigns.common.error.server.title" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
-        error,
       );
     }
   }

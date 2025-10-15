@@ -14,6 +14,30 @@ export const translations = {
       "E-Mail- und optionale SMS-Benachrichtigungseinstellungen konfigurieren",
   },
 
+  // Field groups
+  recipient: {
+    title: "Empfängerinformationen",
+    description: "Empfängerdetails konfigurieren",
+  },
+  emailContent: {
+    title: "E-Mail-Inhalt",
+    description: "E-Mail-Betreff und Inhalt konfigurieren",
+  },
+  senderSettings: {
+    title: "Absendereinstellungen",
+    description: "Absendername und Antwort-Adresse konfigurieren",
+  },
+  groups: {
+    campaignTracking: {
+      title: "Kampagnen-Tracking",
+      description: "Diese E-Mail als Teil einer Kampagne verfolgen",
+    },
+    smsNotifications: {
+      title: "SMS-Benachrichtigungen",
+      description: "SMS-Benachrichtigungen zusätzlich zur E-Mail senden",
+    },
+  },
+
   // Email fields
   to: {
     label: "Empfänger-E-Mail",
@@ -70,6 +94,14 @@ export const translations = {
   campaignType: {
     label: "Kampagnentyp",
     description: "Art der E-Mail-Kampagne",
+    placeholder: "Kampagnentyp auswählen...",
+    options: {
+      leadCampaign: "Lead-Kampagne",
+      newsletter: "Newsletter",
+      transactional: "Transaktional",
+      notification: "Benachrichtigung",
+      system: "System",
+    },
   },
   leadId: {
     label: "Lead-ID",
@@ -79,6 +111,17 @@ export const translations = {
 
   // Response fields
   response: {
+    title: "E-Mail-Sendeergebnis",
+    description: "Ergebnis des E-Mail-Sendevorgangs",
+    deliveryStatus: {
+      title: "Zustellungsstatus",
+    },
+    accountInfo: {
+      title: "Kontoinformationen",
+    },
+    deliveryResults: {
+      title: "Zustellungsergebnisse",
+    },
     success: {
       label: "Erfolgreich",
     },
@@ -107,11 +150,22 @@ export const translations = {
       title: "SMS-Benachrichtigungsergebnis",
       description: "Ergebnis der SMS-Benachrichtigungssendung",
       success: "SMS-Erfolg",
-      messageId: "SMS-Nachrichten-ID",
+      messageId: {
+        label: "SMS-Nachrichten-ID",
+      },
       provider: "SMS-Anbieter",
-      sentAt: "SMS gesendet am",
-      error: "SMS-Fehler",
+      sentAt: {
+        label: "SMS gesendet am",
+      },
+      error: {
+        label: "SMS-Fehler",
+      },
     },
+  },
+
+  // SMS template
+  sms: {
+    emailNotificationTemplate: "E-Mail-Benachrichtigung",
   },
 
   // Error messages
@@ -120,6 +174,12 @@ export const translations = {
       title: "Validierungsfehler",
       description:
         "Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut",
+      smsFields: "SMS-Benachrichtigungsfelder",
+      smsRequired:
+        "Telefonnummer und Nachricht sind erforderlich, wenn SMS-Benachrichtigung aktiviert ist",
+    },
+    sms: {
+      temporarilyUnavailable: "SMS-Dienst ist vorübergehend nicht verfügbar",
     },
     unauthorized: {
       title: "Nicht autorisiert",

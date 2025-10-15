@@ -74,4 +74,9 @@ export const translations: typeof enTranslations = {
       complained: "Skarga",
     },
   },
+  hooks: {
+    errors: {
+      missing_lead_id: "Subskrypcja newslettera: Brak leadId",
+    },
+  },
 };

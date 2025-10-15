@@ -20,6 +20,15 @@ export const translations = {
       label: "Passwort",
       description: "Sicheres Passwort für das Benutzerkonto",
     },
+    privateName: {
+      label: "Privater Name",
+      description:
+        "Vollständiger rechtlicher Name des Benutzers (nur für Administratoren sichtbar)",
+    },
+    publicName: {
+      label: "Öffentlicher Name",
+      description: "Anzeigename des Benutzers (für alle Benutzer sichtbar)",
+    },
     firstName: {
       label: "Vorname",
       description: "Vorname des Benutzers",
@@ -83,6 +92,12 @@ export const translations = {
       },
       email: {
         content: "E-Mail-Adresse",
+      },
+      privateName: {
+        content: "Privater Name",
+      },
+      publicName: {
+        content: "Öffentlicher Name",
       },
       firstName: {
         content: "Vorname",
@@ -215,6 +230,7 @@ export const translations = {
         accountDetails: "Kontodetails",
         email: "E-Mail",
         name: "Name",
+        publicName: "Anzeigename",
         company: "Unternehmen",
         phone: "Telefon",
         nextSteps: "Nächste Schritte",
@@ -238,31 +254,33 @@ export const translations = {
         id: "ID:",
         email: "E-Mail:",
         name: "Name:",
+        privateName: "Vollständiger Name:",
+        publicName: "Anzeigename:",
         company: "Unternehmen:",
         created: "Erstellt:",
         leadId: "Lead-ID:",
       },
     },
-    sms: {
-      welcome: {
-        message:
-          "Willkommen {{firstName}}! Ihr Konto wurde erfolgreich erstellt. Besuchen Sie uns unter {{appUrl}}",
+  },
+  sms: {
+    welcome: {
+      message:
+        "Willkommen {{firstName}}! Ihr Konto wurde erfolgreich erstellt. Besuchen Sie uns unter {{appUrl}}",
+    },
+    verification: {
+      message:
+        "{{firstName}}, Ihr Verifizierungscode ist: {{code}}. Code innerhalb von 10 Minuten eingeben.",
+    },
+    errors: {
+      welcome_failed: {
+        title: "SMS-Willkommensnachricht fehlgeschlagen",
+        description:
+          "Willkommensnachricht per SMS konnte nicht gesendet werden",
       },
-      verification: {
-        message:
-          "{{firstName}}, Ihr Verifizierungscode ist: {{code}}. Code innerhalb von 10 Minuten eingeben.",
-      },
-      errors: {
-        welcome_failed: {
-          title: "SMS-Willkommensnachricht fehlgeschlagen",
-          description:
-            "Willkommensnachricht per SMS konnte nicht gesendet werden",
-        },
-        verification_failed: {
-          title: "SMS-Verifizierung fehlgeschlagen",
-          description:
-            "Verifizierungsnachricht per SMS konnte nicht gesendet werden",
-        },
+      verification_failed: {
+        title: "SMS-Verifizierung fehlgeschlagen",
+        description:
+          "Verifizierungsnachricht per SMS konnte nicht gesendet werden",
       },
     },
   },

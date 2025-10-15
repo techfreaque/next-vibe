@@ -75,7 +75,7 @@ export class DebouncedStorage {
   /**
    * Set an item with debouncing
    */
-  public setItem(key: string, value: string): void {
+  setItem(key: string, value: string): void {
     if (!this.isAvailable) {
       if (this.options.logErrors) {
         console.warn(`localStorage unavailable, skipping save for key: ${key}`);
@@ -108,7 +108,7 @@ export class DebouncedStorage {
   /**
    * Set an item as JSON with debouncing
    */
-  public setItemJSON<T>(key: string, value: T): void {
+  setItemJSON<T>(key: string, value: T): void {
     try {
       const jsonString = JSON.stringify(value);
       this.setItem(key, jsonString);
@@ -122,7 +122,7 @@ export class DebouncedStorage {
   /**
    * Get an item immediately (no debouncing)
    */
-  public getItem(key: string): string | null {
+  getItem(key: string): string | null {
     if (!this.isAvailable) {
       return null;
     }
@@ -140,7 +140,7 @@ export class DebouncedStorage {
   /**
    * Get an item as JSON immediately
    */
-  public getItemJSON<T>(key: string): T | null {
+  getItemJSON<T>(key: string): T | null {
     const value = this.getItem(key);
     if (!value) {
       return null;
@@ -159,7 +159,7 @@ export class DebouncedStorage {
   /**
    * Remove an item immediately
    */
-  public removeItem(key: string): void {
+  removeItem(key: string): void {
     if (!this.isAvailable) {
       return;
     }
@@ -210,7 +210,7 @@ export class DebouncedStorage {
 
         if (this.options.logErrors) {
           console.log(
-            `Retrying save for key ${key} (attempt ${item.retries}/${this.options.maxRetries}) in ${retryDelay}ms`
+            `Retrying save for key ${key} (attempt ${item.retries}/${this.options.maxRetries}) in ${retryDelay}ms`,
           );
         }
 
@@ -223,7 +223,7 @@ export class DebouncedStorage {
         // Max retries exceeded
         if (this.options.logErrors) {
           console.error(
-            `Max retries exceeded for key ${key}, giving up. Data may be lost.`
+            `Max retries exceeded for key ${key}, giving up. Data may be lost.`,
           );
         }
         this.queue.delete(key);
@@ -235,7 +235,7 @@ export class DebouncedStorage {
   /**
    * Flush all pending writes immediately
    */
-  public flushAll(): void {
+  flushAll(): void {
     // Clear all timers
     this.timers.forEach((timer) => clearTimeout(timer));
     this.timers.clear();
@@ -248,7 +248,7 @@ export class DebouncedStorage {
   /**
    * Clear all pending writes without saving
    */
-  public clearQueue(): void {
+  clearQueue(): void {
     this.timers.forEach((timer) => clearTimeout(timer));
     this.timers.clear();
     this.queue.clear();
@@ -257,14 +257,14 @@ export class DebouncedStorage {
   /**
    * Get the number of pending writes
    */
-  public getPendingCount(): number {
+  getPendingCount(): number {
     return this.queue.size;
   }
 
   /**
    * Check if a key has pending writes
    */
-  public hasPending(key: string): boolean {
+  hasPending(key: string): boolean {
     return this.queue.has(key);
   }
 }
@@ -302,4 +302,3 @@ if (typeof window !== "undefined") {
     }
   });
 }
-

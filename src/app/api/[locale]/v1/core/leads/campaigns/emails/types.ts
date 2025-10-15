@@ -9,7 +9,12 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { TrackingContext } from "../../../emails/smtp-client/components/tracking_context";
-import type { EmailCampaignStage, EmailJourneyVariant, LeadStatus, LeadSource } from "../../enum";
+import type {
+  EmailCampaignStage,
+  EmailJourneyVariant,
+  LeadSource,
+  LeadStatus,
+} from "../../enum";
 
 // Local type definition to avoid deprecated schema.ts imports
 interface LeadWithEmailType {
@@ -21,8 +26,8 @@ interface LeadWithEmailType {
   website?: string | null;
   country: string;
   language: string;
-  status: LeadStatus;
-  source: LeadSource | null;
+  status: (typeof LeadStatus)[keyof typeof LeadStatus];
+  source: (typeof LeadSource)[keyof typeof LeadSource] | null;
   notes?: string | null;
   convertedUserId?: string | null;
   convertedAt?: Date | null;
@@ -30,14 +35,16 @@ interface LeadWithEmailType {
   consultationBookedAt?: Date | null;
   subscriptionConfirmedAt?: Date | null;
   currentCampaignStage?: string | null;
-  emailJourneyVariant?: EmailJourneyVariant | null;
+  emailJourneyVariant?:
+    | (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant]
+    | null;
   emailsSent: number;
   lastEmailSentAt?: Date | null;
   unsubscribedAt?: Date | null;
   emailsOpened: number;
   emailsClicked: number;
   lastEngagementAt?: Date | null;
-  metadata?: Record<string, unknown>;
+  metadata?: Record<string, string | number | boolean | null>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -55,8 +62,8 @@ export interface EmailTemplateData {
   companyEmail: string;
   campaign: {
     id: string;
-    stage: EmailCampaignStage;
-    journeyVariant: EmailJourneyVariant;
+    stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
+    journeyVariant: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant];
   };
 }
 
@@ -91,14 +98,11 @@ export type EmailTemplateFunction = (
  * Journey Template Map
  * Maps campaign stages to template functions for each journey
  */
-export interface JourneyTemplateMap {
-  [EmailCampaignStage.INITIAL]: EmailTemplateFunction;
-  [EmailCampaignStage.FOLLOWUP_1]?: EmailTemplateFunction;
-  [EmailCampaignStage.FOLLOWUP_2]?: EmailTemplateFunction;
-  [EmailCampaignStage.FOLLOWUP_3]?: EmailTemplateFunction;
-  [EmailCampaignStage.NURTURE]?: EmailTemplateFunction;
-  [EmailCampaignStage.REACTIVATION]?: EmailTemplateFunction;
-}
+export type JourneyTemplateMap = {
+  [K in (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]]?: EmailTemplateFunction;
+} & {
+  [K in typeof EmailCampaignStage.INITIAL]: EmailTemplateFunction;
+};
 
 /**
  * A/B Test Configuration
@@ -132,8 +136,8 @@ export interface ABTestConfig {
  * Email Performance Metrics
  */
 export interface EmailPerformanceMetrics {
-  journeyVariant: EmailJourneyVariant;
-  stage: EmailCampaignStage;
+  journeyVariant: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant];
+  stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
   sent: number;
   delivered: number;
   opened: number;
@@ -153,8 +157,8 @@ export interface EmailPerformanceMetrics {
  */
 export interface CampaignSchedulingOptions {
   leadId: string;
-  journeyVariant: EmailJourneyVariant;
-  stage: EmailCampaignStage;
+  journeyVariant: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant];
+  stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
   scheduledAt: Date;
   metadata?: Record<string, string | number | boolean>;
 }

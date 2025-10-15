@@ -10,6 +10,7 @@ const releaseConfig: ReleaseConfig = {
       build: true,
       test: true,
       release: {
+        // eslint-disable-next-line i18next/no-literal-string
         tagPrefix: "builder_",
         foldersToScanAndBumpThisPackage: [
           // scan whole dev env

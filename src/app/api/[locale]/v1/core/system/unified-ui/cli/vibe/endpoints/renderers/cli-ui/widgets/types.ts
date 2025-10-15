@@ -3,7 +3,6 @@
  * Core types for the modular CLI widget rendering system
  */
 
-import chalk from "chalk";
 import type { z } from "zod";
 
 import type {
@@ -14,13 +13,56 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 /**
+ * Valid primitive values that can be rendered
+ */
+export type RenderableValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | RenderableValue[]
+  | { [key: string]: RenderableValue };
+
+/**
+ * Widget configuration interface
+ */
+export interface WidgetConfig {
+  layout?:
+    | {
+        columns: number;
+        spacing: string;
+      }
+    | string
+    | number;
+  groupBy?: string;
+  cardTemplate?: string;
+  showSummary?: boolean;
+  summaryTemplate?: string;
+  itemConfig?: {
+    template: string;
+    size: string;
+    spacing: string;
+  };
+  summaryTitle?: string;
+  summaryStats?: Array<{
+    field: string;
+    value: string;
+    label?: string;
+    icon?: string;
+    color?: string;
+  }>;
+  [key: string]: RenderableValue;
+}
+
+/**
  * Response field metadata extracted from endpoint definitions
  */
 export interface ResponseFieldMetadata {
   name: string;
   type: FieldDataType;
   widgetType: WidgetType;
-  value: any;
+  value: RenderableValue;
   label?: string;
   description?: string;
   required?: boolean;
@@ -45,13 +87,6 @@ export interface ResponseFieldMetadata {
   maxItemsPerGroup?: number;
   // Widget-specific configuration
   config?: WidgetConfig;
-}
-
-/**
- * Widget configuration interface
- */
-export interface WidgetConfig {
-  [key: string]: any;
 }
 
 /**
@@ -86,7 +121,7 @@ export interface WidgetRenderContext {
   options: CLIRenderingOptions;
   depth: number;
   translate: TFunction;
-  formatValue: (field: ResponseFieldMetadata, value: any) => string;
+  formatValue: (field: ResponseFieldMetadata, value: RenderableValue) => string;
   getFieldIcon: (type: FieldDataType) => string;
   renderEmptyState: (message: string) => string;
 }
@@ -118,7 +153,7 @@ export interface DataFormatter {
   formatBoolean(value: boolean): string;
   formatDate(value: Date | string): string;
   formatArray(
-    value: any[],
+    value: RenderableValue[],
     options?: { separator?: string; maxItems?: number },
   ): string;
   formatObject(value: object, options?: { maxDepth?: number }): string;
@@ -135,7 +170,7 @@ export interface TableRenderConfig {
     type: FieldDataType;
     width?: string;
     align?: "left" | "center" | "right";
-    formatter?: (value: any) => string;
+    formatter?: (value: RenderableValue) => string;
   }>;
   pagination?: {
     enabled: boolean;

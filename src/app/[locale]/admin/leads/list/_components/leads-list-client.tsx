@@ -28,9 +28,8 @@ import {
   LeadStatusFilter,
   SortOrder,
 } from "@/app/api/[locale]/v1/core/leads/enum";
+import type { LeadListGetResponseTypeOutput } from "@/app/api/[locale]/v1/core/leads/list/definition";
 import { useLeadsListEndpoint } from "@/app/api/[locale]/v1/core/leads/list/hooks";
-import type { LeadResponseType } from "@/app/api/[locale]/v1/core/leads/schema";
-import { leadQuerySchema } from "@/app/api/[locale]/v1/core/leads/schema";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import {
   CountryFilter,
@@ -57,10 +56,10 @@ export function LeadsListClient({
   const leadsEndpoint = useLeadsListEndpoint(logger);
   const [viewMode, setViewMode] = useState<"list" | "table">("list");
 
+  type LeadType = LeadListGetResponseTypeOutput["leads"][number];
+
   const apiResponse = leadsEndpoint.read.response;
-  const leads: LeadResponseType[] = apiResponse?.success
-    ? apiResponse.data.leads
-    : [];
+  const leads: LeadType[] = apiResponse?.success ? apiResponse.data.leads : [];
   const totalLeads = apiResponse?.success ? apiResponse.data.total : 0;
   const totalPages = apiResponse?.success ? apiResponse.data.totalPages : 0;
   const queryLoading = leadsEndpoint.read.isLoading || false;
@@ -229,7 +228,6 @@ export function LeadsListClient({
                   placeholder: "leads.search.placeholder",
                 }}
                 control={leadsEndpoint.read.form.control}
-                schema={leadQuerySchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -299,7 +297,6 @@ export function LeadsListClient({
                   ],
                 }}
                 control={leadsEndpoint.read.form.control}
-                schema={leadQuerySchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -341,7 +338,6 @@ export function LeadsListClient({
                   ],
                 }}
                 control={leadsEndpoint.read.form.control}
-                schema={leadQuerySchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -375,7 +371,6 @@ export function LeadsListClient({
                   ],
                 }}
                 control={leadsEndpoint.read.form.control}
-                schema={leadQuerySchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -412,7 +407,6 @@ export function LeadsListClient({
                   ],
                 }}
                 control={leadsEndpoint.read.form.control}
-                schema={leadQuerySchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -458,7 +452,6 @@ export function LeadsListClient({
                   ],
                 }}
                 control={leadsEndpoint.read.form.control}
-                schema={leadQuerySchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -496,7 +489,6 @@ export function LeadsListClient({
                   ],
                 }}
                 control={leadsEndpoint.read.form.control}
-                schema={leadQuerySchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -522,7 +514,6 @@ export function LeadsListClient({
                   ],
                 }}
                 control={leadsEndpoint.read.form.control}
-                schema={leadQuerySchema}
                 theme={{
                   style: "none",
                   showAllRequired: false,

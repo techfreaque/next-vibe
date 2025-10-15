@@ -4,24 +4,24 @@
  */
 
 import { Button, Hr, Section, Text } from "@react-email/components";
-import type { UndefinedType } from "next-vibe/shared/types/common.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import type { JSX } from "react";
+import React from "react";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
-
-import { env } from "@/config/env";
+import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
 import {
   createTrackingContext,
   EmailTemplate,
-} from "../../emails/smtp-client/components";
-import type { EmailFunctionType } from "../../emails/smtp-client/email-handling/definition";
-import { contactClientRepository } from "../../contact/repository-client";
+} from "@/app/api/[locale]/v1/core/emails/smtp-client/components";
+import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
+import { env } from "@/config/env";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { TFunction } from "@/i18n/core/static-types";
+
 import type { LeadCreateType, LeadResponseType } from "../definition";
 
 /**
@@ -66,7 +66,8 @@ function WelcomeEmailContent({
         }}
       >
         {t("leads.create.email.welcome.greeting", {
-          businessName: lead.businessName || t("leads.create.email.welcome.defaultName"),
+          businessName:
+            lead.businessName || t("leads.create.email.welcome.defaultName"),
         })}
       </Text>
 
@@ -108,7 +109,9 @@ function WelcomeEmailContent({
             marginBottom: "8px",
           }}
         >
-          <Text style={{ fontWeight: "700" }}>1.</Text>{"  "}
+          {/* eslint-disable-next-line i18next/no-literal-string */}
+          <Text style={{ fontWeight: "700" }}>1.</Text>
+          {"  "}
           {t("leads.create.email.welcome.nextSteps.step1")}
         </Text>
 
@@ -119,7 +122,9 @@ function WelcomeEmailContent({
             marginBottom: "8px",
           }}
         >
-          <Text style={{ fontWeight: "700" }}>2.</Text>{"  "}
+          {/* eslint-disable-next-line i18next/no-literal-string */}
+          <Text style={{ fontWeight: "700" }}>2.</Text>
+          {"  "}
           {t("leads.create.email.welcome.nextSteps.step2")}
         </Text>
 
@@ -130,7 +135,9 @@ function WelcomeEmailContent({
             marginBottom: "0",
           }}
         >
-          <Text style={{ fontWeight: "700" }}>3.</Text>{"  "}
+          {/* eslint-disable-next-line i18next/no-literal-string */}
+          <Text style={{ fontWeight: "700" }}>3.</Text>
+          {"  "}
           {t("leads.create.email.welcome.nextSteps.step3")}
         </Text>
       </Section>
@@ -248,7 +255,8 @@ function AdminNotificationEmailContent({
           <Text style={{ fontWeight: "700" }}>
             {t("leads.create.email.admin.newLead.businessName")}:
           </Text>{" "}
-          {lead.businessName || t("leads.create.email.admin.newLead.notProvided")}
+          {lead.businessName ||
+            t("leads.create.email.admin.newLead.notProvided")}
         </Text>
 
         <Text
@@ -396,7 +404,7 @@ function AdminNotificationEmailContent({
 export const renderWelcomeMail: EmailFunctionType<
   LeadCreateType,
   LeadResponseType,
-  UndefinedType
+  never
 > = ({ responseData, locale, t, user }) => {
   try {
     // Only send welcome email if lead has email and the creation was successful
@@ -438,7 +446,7 @@ export const renderWelcomeMail: EmailFunctionType<
 export const renderAdminNotificationMail: EmailFunctionType<
   LeadCreateType,
   LeadResponseType,
-  UndefinedType
+  never
 > = ({ responseData, locale, t, user }) => {
   try {
     if (!responseData) {
@@ -452,10 +460,16 @@ export const renderAdminNotificationMail: EmailFunctionType<
       toEmail: contactClientRepository.getSupportEmail(locale),
       toName: t("common.appName"),
       subject: t("leads.create.email.admin.newLead.subject", {
-        businessName: responseData.businessName || responseData.email || t("leads.create.email.admin.newLead.defaultName"),
+        businessName:
+          responseData.businessName ||
+          responseData.email ||
+          t("leads.create.email.admin.newLead.defaultName"),
       }),
-      replyToEmail: responseData.email || contactClientRepository.getSupportEmail(locale),
-      replyToName: responseData.businessName || t("leads.create.email.admin.newLead.defaultName"),
+      replyToEmail:
+        responseData.email || contactClientRepository.getSupportEmail(locale),
+      replyToName:
+        responseData.businessName ||
+        t("leads.create.email.admin.newLead.defaultName"),
 
       jsx: AdminNotificationEmailContent({
         lead: responseData,

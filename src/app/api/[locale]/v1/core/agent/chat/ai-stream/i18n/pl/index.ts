@@ -102,4 +102,22 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  route: {
+    errors: {
+      invalidJson: "Nieprawidłowy JSON w treści żądania",
+      invalidRequestData: "Nieprawidłowe dane żądania",
+      uncensoredApiKeyMissing:
+        "Klucz API Uncensored.ai nie został skonfigurowany",
+      openrouterApiKeyMissing: "Klucz API OpenRouter nie został skonfigurowany",
+      streamCreationFailed: "Nie udało się utworzyć strumienia",
+      unknownError: "Wystąpił błąd",
+    },
+  },
+  providers: {
+    uncensoredHandler: {
+      errors: {
+        apiError: "Błąd API Uncensored.ai ({{status}}): {{errorText}}",
+      },
+    },
+  },
 };

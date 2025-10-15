@@ -127,7 +127,7 @@ const { POST } = createEndpoint({
           layout: { columns: 12 },
           validation: { required: false },
         },
-        z.record(z.string()).optional(),
+        z.record(z.string(), z.string()).optional(),
       ),
 
       // RESPONSE FIELDS
@@ -205,11 +205,6 @@ const { POST } = createEndpoint({
         checkoutUrl: "https://checkout.stripe.com/pay/cs_test_456789123",
         message: "Starter plan checkout session created",
       },
-    },
-    urlPathVariables: {
-      default: {},
-      yearly: {},
-      starter: {},
     },
   },
 

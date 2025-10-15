@@ -4,13 +4,7 @@
  */
 
 import { relations } from "drizzle-orm";
-import {
-  boolean,
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
@@ -55,7 +49,9 @@ export const subscriptions = pgTable("subscriptions", {
   cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
   canceledAt: timestamp("canceled_at", { withTimezone: true }),
   endedAt: timestamp("ended_at", { withTimezone: true }),
-  cancellationReason: text("cancellation_reason", { enum: CancellationReasonDB }),
+  cancellationReason: text("cancellation_reason", {
+    enum: CancellationReasonDB,
+  }),
 
   // Trial information
   trialStart: timestamp("trial_start", { withTimezone: true }),

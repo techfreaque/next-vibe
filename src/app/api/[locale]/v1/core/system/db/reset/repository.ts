@@ -61,18 +61,24 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
       const truncateResult = await this.truncateTables(data.force, locale);
       tablesAffected = truncateResult.count;
 
+      const { t } = simpleT(locale);
+
       if (!data.force && !data.dryRun) {
         operations.push({
           type: "truncate",
           status: "skipped",
-          details: "Requires --force flag",
+          details: t(
+            "app.api.v1.core.system.db.reset.operations.truncate.requiresForce",
+          ),
           count: 0,
         });
       } else if (data.dryRun) {
         operations.push({
           type: "truncate",
           status: "skipped",
-          details: "Dry run mode",
+          details: t(
+            "app.api.v1.core.system.db.reset.operations.truncate.dryRun",
+          ),
           count: tablesAffected,
         });
       } else {
@@ -81,8 +87,10 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
           status: truncateResult.count > 0 ? "success" : "skipped",
           details:
             truncateResult.count > 0
-              ? "Truncated all tables"
-              : "No tables to truncate",
+              ? t("app.api.v1.core.system.db.reset.operations.truncate.success")
+              : t(
+                  "app.api.v1.core.system.db.reset.operations.truncate.noTables",
+                ),
           count: truncateResult.count,
         });
       }
@@ -94,28 +102,36 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
         operations.push({
           type: "migrate",
           status: "success",
-          details: "Applied migrations",
+          details: t(
+            "app.api.v1.core.system.db.reset.operations.migrate.success",
+          ),
           count: migrationResult.count,
         });
       } else if (data.dryRun) {
         operations.push({
           type: "migrate",
           status: "skipped",
-          details: "Dry run mode",
+          details: t(
+            "app.api.v1.core.system.db.reset.operations.migrate.dryRun",
+          ),
           count: 24, // Placeholder count
         });
       } else if (data.skipMigrations) {
         operations.push({
           type: "migrate",
           status: "skipped",
-          details: "Skipped by user",
+          details: t(
+            "app.api.v1.core.system.db.reset.operations.migrate.skippedByUser",
+          ),
           count: 0,
         });
       } else {
         operations.push({
           type: "migrate",
           status: "pending",
-          details: "Not executed",
+          details: t(
+            "app.api.v1.core.system.db.reset.operations.migrate.notExecuted",
+          ),
           count: 0,
         });
       }
@@ -127,28 +143,32 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
         operations.push({
           type: "seed",
           status: "success",
-          details: "Seeded data",
+          details: t("app.api.v1.core.system.db.reset.operations.seed.success"),
           count: seedResult.count,
         });
       } else if (data.dryRun) {
         operations.push({
           type: "seed",
           status: "skipped",
-          details: "Dry run mode",
+          details: t("app.api.v1.core.system.db.reset.operations.seed.dryRun"),
           count: 12, // Placeholder count
         });
       } else if (data.skipSeeds) {
         operations.push({
           type: "seed",
           status: "skipped",
-          details: "Skipped by user",
+          details: t(
+            "app.api.v1.core.system.db.reset.operations.seed.skippedByUser",
+          ),
           count: 0,
         });
       } else {
         operations.push({
           type: "seed",
           status: "pending",
-          details: "Not executed",
+          details: t(
+            "app.api.v1.core.system.db.reset.operations.seed.notExecuted",
+          ),
           count: 0,
         });
       }
@@ -325,10 +345,14 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
   private runMigrations(
     locale: CountryLanguage,
   ): Promise<{ output: string; count: number }> {
+    const { t } = simpleT(locale);
     // This would integrate with the migration repository
     // For now, returning realistic placeholder
     return Promise.resolve({
-      output: "✅ 24 migrations applied successfully",
+      output: t(
+        "app.api.v1.core.system.db.reset.operations.migrate.appliedSuccessfully",
+        { count: 24 },
+      ),
       count: 24,
     });
   }
@@ -339,10 +363,14 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
   private runSeeds(
     locale: CountryLanguage,
   ): Promise<{ output: string; count: number }> {
+    const { t } = simpleT(locale);
     // This would integrate with the seed system
     // For now, returning realistic placeholder
     return Promise.resolve({
-      output: "✅ 12 seed files executed successfully",
+      output: t(
+        "app.api.v1.core.system.db.reset.operations.seed.executedSuccessfully",
+        { count: 12 },
+      ),
       count: 12,
     });
   }

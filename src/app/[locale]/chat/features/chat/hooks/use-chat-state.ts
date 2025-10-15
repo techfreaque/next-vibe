@@ -1,34 +1,45 @@
 import { useCallback, useEffect, useState } from "react";
 
+import { debouncedStorage } from "../../../lib/storage/debounced-storage";
+import { quickSearchThreads } from "../../../lib/storage/search";
+import {
+  addFolderToState,
+  addThreadToState,
+  autoUpdateThreadTitle,
+  createFolder,
+  createInitialChatState,
+  createThread,
+  deleteFolderFromState,
+  deleteThreadFromState,
+  getThreadsInFolder,
+  moveThreadToFolder,
+  updateThreadInState,
+} from "../../../lib/storage/thread-manager";
 import type {
+  ChatFolder,
   ChatState,
   ChatThread,
-  ChatFolder,
   ChatUIPreferences,
   ViewMode,
 } from "../../../lib/storage/types";
 import { STORAGE_KEYS } from "../../../lib/storage/types";
-import {
-  createInitialChatState,
-  addThreadToState,
-  updateThreadInState,
-  deleteThreadFromState,
-  moveThreadToFolder,
-  addFolderToState,
-  deleteFolderFromState,
-  getThreadsInFolder,
-  autoUpdateThreadTitle,
-  createThread,
-  createFolder,
-} from "../../../lib/storage/thread-manager";
-import { quickSearchThreads } from "../../../lib/storage/search";
-import { debouncedStorage } from "../../../lib/storage/debounced-storage";
+
+/**
+ * Chat state constants
+ */
+const CHAT_STATE_CONSTANTS = {
+  /** Default name for the general folder */
+  GENERAL_FOLDER_NAME: "Private Chats",
+
+  /** Default icon for folders */
+  DEFAULT_FOLDER_ICON: "folder",
+} as const;
 
 /**
  * Default UI preferences
  */
 const DEFAULT_UI_PREFERENCES: ChatUIPreferences = {
-  sidebarCollapsed: false,
+  sidebarCollapsed: true,
   sidebarWidth: 280,
   showTimestamps: true,
   showBranchIndicators: true,
@@ -75,11 +86,15 @@ export function useChatState() {
 
   // Sync state across tabs using storage events
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined") {
+      return;
+    }
 
     const handleStorageChange = (e: StorageEvent) => {
       // Only handle changes from other tabs (e.storageArea will be null for same-tab changes)
-      if (!e.storageArea) return;
+      if (!e.storageArea) {
+        return;
+      }
 
       // Handle chat state changes
       if (e.key === STORAGE_KEYS.CHAT_STATE && e.newValue) {
@@ -100,10 +115,7 @@ export function useChatState() {
           const newPreferences = JSON.parse(e.newValue) as ChatUIPreferences;
           setUIPreferences((prev) => ({ ...prev, ...newPreferences }));
         } catch (error) {
-          console.error(
-            "Failed to sync UI preferences from other tab:",
-            error
-          );
+          console.error("Failed to sync UI preferences from other tab:", error);
         }
       }
     };
@@ -113,52 +125,49 @@ export function useChatState() {
   }, []);
 
   // Thread operations
-  const createNewThread = useCallback(
-    (folderId?: string | null): string => {
-      let newThreadId: string = "";
+  const createNewThread = useCallback((folderId?: string | null): string => {
+    let newThreadId = "";
 
-      setState((prev) => {
-        // Check if current active thread is empty (no messages at all)
-        const currentThread = prev.activeThreadId
-          ? prev.threads[prev.activeThreadId]
-          : null;
+    setState((prev) => {
+      // Check if current active thread is empty (no messages at all)
+      const currentThread = prev.activeThreadId
+        ? prev.threads[prev.activeThreadId]
+        : null;
 
-        let stateAfterCleanup = prev;
+      let stateAfterCleanup = prev;
 
-        if (currentThread) {
-          const messages = Object.values(currentThread.messages);
+      if (currentThread) {
+        const messages = Object.values(currentThread.messages);
 
-          // If current thread is completely empty, delete it
-          if (messages.length === 0) {
-            stateAfterCleanup = deleteThreadFromState(prev, currentThread.id);
-          }
+        // If current thread is completely empty, delete it
+        if (messages.length === 0) {
+          stateAfterCleanup = deleteThreadFromState(prev, currentThread.id);
         }
+      }
 
-        // Ensure thread always has a folder - use General if not specified
-        const generalFolder = Object.values(stateAfterCleanup.folders).find(
-          (f) => f.id === "folder-general"
-        );
-        const targetFolderId = folderId || generalFolder?.id || null;
+      // Ensure thread always has a folder - use General if not specified
+      const generalFolder = Object.values(stateAfterCleanup.folders).find(
+        (f) => f.id === "folder-general",
+      );
+      const targetFolderId = folderId || generalFolder?.id || null;
 
-        const newThread = createThread({ folderId: targetFolderId });
-        newThreadId = newThread.id;
+      const newThread = createThread({ folderId: targetFolderId });
+      newThreadId = newThread.id;
 
-        const updated = addThreadToState(stateAfterCleanup, newThread);
-        return {
-          ...updated,
-          activeThreadId: newThread.id,
-        };
-      });
+      const updated = addThreadToState(stateAfterCleanup, newThread);
+      return {
+        ...updated,
+        activeThreadId: newThread.id,
+      };
+    });
 
-      return newThreadId;
-    },
-    []
-  );
+    return newThreadId;
+  }, []);
 
   const updateThread = useCallback(
     (
       threadId: string,
-      updates: Partial<ChatThread> | ((prev: ChatThread) => ChatThread)
+      updates: Partial<ChatThread> | ((prev: ChatThread) => ChatThread),
     ) => {
       setState((prevState) => {
         const existingThread = prevState.threads[threadId];
@@ -176,7 +185,7 @@ export function useChatState() {
         return updateThreadInState(prevState, threadId, updatedThread);
       });
     },
-    []
+    [],
   );
 
   const deleteThread = useCallback((threadId: string) => {
@@ -233,7 +242,7 @@ export function useChatState() {
   );
 
   const deleteFolder = useCallback(
-    (folderId: string, deleteThreads: boolean = false) => {
+    (folderId: string, deleteThreads = false) => {
       setState((prev) => {
         const folder = prev.folders[folderId];
 
@@ -241,7 +250,7 @@ export function useChatState() {
         if (folder && folder.id === "folder-general") {
           // Move all threads out of General folder
           const threadsInFolder = Object.values(prev.threads).filter(
-            (t) => t.folderId === folderId
+            (t) => t.folderId === folderId,
           );
 
           let newState = { ...prev };
@@ -254,8 +263,9 @@ export function useChatState() {
           // Restore General folder to default
           newState.folders[folderId] = {
             ...newState.folders[folderId],
-            name: "Private Chats",
-            icon: "folder",
+            name: CHAT_STATE_CONSTANTS.GENERAL_FOLDER_NAME,
+            icon: CHAT_STATE_CONSTANTS.DEFAULT_FOLDER_ICON,
+            expanded: true,
           };
 
           return newState;
@@ -265,13 +275,15 @@ export function useChatState() {
         return deleteFolderFromState(prev, folderId, deleteThreads);
       });
     },
-    []
+    [],
   );
 
   const toggleFolderExpanded = useCallback((folderId: string) => {
     setState((prev) => {
       const folder = prev.folders[folderId];
-      if (!folder) return prev;
+      if (!folder) {
+        return prev;
+      }
 
       return {
         ...prev,
@@ -313,7 +325,9 @@ export function useChatState() {
 
   // Utility functions
   const getActiveThread = useCallback((): ChatThread | null => {
-    if (!state.activeThreadId) return null;
+    if (!state.activeThreadId) {
+      return null;
+    }
     return state.threads[state.activeThreadId] || null;
   }, [state]);
 
@@ -421,4 +435,3 @@ function loadUIPreferencesFromStorage(): ChatUIPreferences {
 function saveUIPreferencesToStorage(preferences: ChatUIPreferences): void {
   debouncedStorage.setItemJSON(STORAGE_KEYS.UI_PREFERENCES, preferences);
 }
-

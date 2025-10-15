@@ -1,17 +1,17 @@
 "use client";
 
 import type { JSX } from "react";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+
+import { useTranslation } from "@/i18n/core/client";
 
 import { useChatContext } from "../features/chat/context";
-import { SearchModal } from "./search-modal";
-import { useTranslation } from "@/i18n/core/client";
 import { useTheme } from "../hooks/use-theme";
 import { sendSuggestedPrompt } from "../lib/utils/send-prompt";
-import { TopBar } from "./layout/top-bar";
-import { SidebarWrapper } from "./layout/sidebar-wrapper";
 import { ChatArea } from "./layout/chat-area";
-
+import { SidebarWrapper } from "./layout/sidebar-wrapper";
+import { TopBar } from "./layout/top-bar";
+import { SearchModal } from "./search-modal";
 
 export function ChatInterface(): JSX.Element {
   const {
@@ -23,8 +23,12 @@ export function ChatInterface(): JSX.Element {
     setInput,
     selectedTone,
     selectedModel,
+    enableSearch,
+    ttsAutoplay,
     setSelectedTone,
     setSelectedModel,
+    setEnableSearch,
+    setTTSAutoplay,
     sendMessage,
     editMessage,
     deleteMessage,
@@ -49,7 +53,7 @@ export function ChatInterface(): JSX.Element {
     inputRef,
   } = useChatContext();
 
-  const { locale, currentCountry } = useTranslation();
+  const { locale, currentCountry, t } = useTranslation("chat");
   const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [theme, toggleTheme] = useTheme();
 
@@ -67,38 +71,84 @@ export function ChatInterface(): JSX.Element {
         await sendMessage(input);
       }
     },
-    [input, isLoading, sendMessage]
+    [input, isLoading, sendMessage],
   );
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
-        handleSubmit(e);
+        void handleSubmit(e);
       }
     },
-    [handleSubmit]
+    [handleSubmit],
   );
 
   const handleSendSuggestedPrompt = useCallback(
     (prompt: string) => {
       sendSuggestedPrompt(prompt, setInput, inputRef);
     },
-    [setInput, inputRef]
+    [setInput, inputRef],
   );
 
+  const handleScreenshot = useCallback(async () => {
+    try {
+      const { captureAndDownloadScreenshot } = await import(
+        "../lib/utils/screenshot"
+      );
+
+      // Generate filename based on thread title
+      const filename = activeThread?.title
+        ? `chat-${activeThread.title.replace(/[^a-z0-9]/gi, "-").toLowerCase()}`
+        : "chat-conversation";
+
+      await captureAndDownloadScreenshot(filename);
+    } catch (error) {
+      console.error("[Screenshot]", error);
+
+      // Show user-friendly error with specific translation keys
+      const errorMessage = (() => {
+        if (!(error instanceof Error)) {
+          return t("screenshot.tryAgain");
+        }
+
+        // Check for specific error messages and use appropriate translation keys
+        if (error.message.includes("Could not find chat messages area")) {
+          return t("screenshot.noMessages");
+        }
+
+        if (error.message.includes("Storage quota exceeded")) {
+          return t("screenshot.quotaExceeded");
+        }
+
+        if (error.message.includes("Failed to convert canvas to blob")) {
+          return t("screenshot.canvasError");
+        }
+
+        // Default: use generic error message
+        return t("screenshot.tryAgain");
+      })();
+
+      alert(errorMessage);
+    }
+  }, [activeThread, t]);
+
   // Get general folder for new threads
-  const generalFolder = Object.values(state.folders).find(f => f.id === "folder-general");
+  const generalFolder = Object.values(state.folders).find(
+    (f) => f.id === "folder-general",
+  );
 
   return (
     <>
-      <div className="flex h-screen overflow-hidden bg-background">
+      <div className="flex h-[100dvh] overflow-hidden bg-background">
         {/* Top Bar - Menu, Search, Settings */}
         <TopBar
           theme={theme}
           currentCountry={currentCountry}
           onToggleSidebar={toggleSidebar}
           onToggleTheme={toggleTheme}
+          onToggleTTSAutoplay={() => setTTSAutoplay(!ttsAutoplay)}
+          ttsAutoplay={ttsAutoplay}
           onOpenSearch={() => setSearchModalOpen(true)}
           sidebarCollapsed={uiPreferences.sidebarCollapsed}
           onNewChat={() => createNewThread(generalFolder?.id)}
@@ -131,6 +181,7 @@ export function ChatInterface(): JSX.Element {
           messages={messages}
           selectedModel={selectedModel}
           selectedTone={selectedTone}
+          enableSearch={enableSearch}
           input={input}
           isLoading={isLoading}
           inputRef={inputRef}
@@ -146,10 +197,12 @@ export function ChatInterface(): JSX.Element {
           onAnswerAsModel={answerAsModel}
           onModelChange={setSelectedModel}
           onToneChange={setSelectedTone}
+          onEnableSearchChange={setEnableSearch}
           onSendMessage={handleSendSuggestedPrompt}
           showBranchIndicators={uiPreferences.showBranchIndicators}
           viewMode={uiPreferences.viewMode}
           onViewModeChange={setViewMode}
+          onScreenshot={handleScreenshot}
         />
       </div>
 
@@ -164,4 +217,3 @@ export function ChatInterface(): JSX.Element {
     </>
   );
 }
-

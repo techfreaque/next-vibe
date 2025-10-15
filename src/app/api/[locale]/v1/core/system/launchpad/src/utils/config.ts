@@ -54,14 +54,12 @@ async function getCompiledConfigPath(configPath: string): Promise<string> {
     // // Clean up in case of an error
     try {
       unlinkSync(outputFileTmpPath);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (_) {
+    } catch (_cleanupError) {
       /* empty */
     }
     try {
       unlinkSync(outputFilePath);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (_) {
+    } catch (_cleanupError) {
       /* empty */
     }
     throw error;
@@ -109,6 +107,29 @@ function findConfigUp(configFileName: string): string | null {
  * Loads and returns the configuration.
  * @param explicitConfigPath Optional path to the config file
  */
+/**
+ * Type guard to validate that an imported module has the expected LaunchpadConfig structure
+ */
+function isLaunchpadConfigModule(
+  module: unknown,
+): module is { default: LaunchpadConfig } {
+  if (typeof module !== "object" || module === null) {
+    return false;
+  }
+  if (!("default" in module)) {
+    return false;
+  }
+  const defaultExport = (module as { default: unknown }).default;
+  if (typeof defaultExport !== "object" || defaultExport === null) {
+    return false;
+  }
+  if (!("packages" in defaultExport)) {
+    return false;
+  }
+  const packages = (defaultExport as { packages: unknown }).packages;
+  return typeof packages === "object" && packages !== null;
+}
+
 export async function loadConfig(
   explicitConfigPath?: string,
 ): Promise<LaunchpadConfig> {
@@ -139,17 +160,17 @@ export async function loadConfig(
 
   try {
     // const compiledConfigPath = await getCompiledConfigPath(resolvedConfigPath);
-    const module = (await import(`file://${resolvedConfigPath}`)) as {
-      default: LaunchpadConfig;
-    };
-    const config = module.default;
-    // cleanCompiledConfig(compiledConfigPath);
+    const importedModule = await import(`file://${resolvedConfigPath}`);
 
-    if (!config || typeof config.packages !== "object") {
+    if (!isLaunchpadConfigModule(importedModule)) {
       throw new Error(
         "Invalid config format. Ensure the config exports a default object with a 'packages' object. Check the docs for more info.",
       );
     }
+
+    const config = importedModule.default;
+    // cleanCompiledConfig(compiledConfigPath);
+
     return config;
   } catch (error) {
     loggerError("Error loading config:", error);

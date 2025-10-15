@@ -221,8 +221,8 @@ export type ImapHealthResponseInput = typeof GET.types.ResponseInput;
 export type ImapHealthResponseOutput = typeof GET.types.ResponseOutput;
 
 // Additional type exports for repository compatibility
-export type ImapHealthGetRequestTypeOutput = typeof GET.types.RequestOutput;
-export type ImapHealthGetResponseTypeOutput = typeof GET.types.ResponseOutput;
+export type ImapHealthGetRequestOutput = typeof GET.types.RequestOutput;
+export type ImapHealthGetResponseOutput = typeof GET.types.ResponseOutput;
 
 /**
  * Export definitions and types

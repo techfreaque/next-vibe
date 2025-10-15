@@ -4,15 +4,15 @@
  */
 
 import { useChat } from "@ai-sdk/react";
-import type React from "react";
-import { useMemo } from "react";
+import { DefaultChatTransport } from "ai";
+import { useCallback, useMemo } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
-import type { AiStreamPostRequestTypeOutput } from "./definition";
+import type { AiStreamPostRequestOutput } from "./definition";
 import definitions from "./definition";
 
 /**
@@ -54,7 +54,7 @@ export function useAiStreamEndpoint(params?: {
 
 /**
  * Hook for AI chat functionality with streaming support
- * Integrates useChat from @ai-sdk/react with our endpoint patterns
+ * Simplified version that returns only what's needed
  */
 export function useAiStreamChat(params?: {
   initialMessages?: Array<{
@@ -67,11 +67,11 @@ export function useAiStreamChat(params?: {
   maxTokens?: number;
   onFinish?: (message: { id: string; role: string; content: string }) => void;
   onError?: (error: Error) => void;
-}): ReturnType<typeof useChat> & {
+}): {
+  messages: Array<{ id: string; role: string; content: string }>;
   isStreaming: boolean;
-  streamingMessages: Array<{ id: string; role: string; content: string }>;
-  sendStreamingMessage: (e: React.FormEvent<HTMLFormElement>) => void;
-  clearStreamingChat: () => void;
+  sendMessage: () => Promise<void>;
+  clearChat: () => void;
   endpoint: EndpointReturn<typeof definitions>;
 } {
   const {
@@ -89,27 +89,55 @@ export function useAiStreamChat(params?: {
 
   // Construct the API path for useChat
   const apiPath = useMemo(() => {
-    // For streaming endpoints, we use a fixed path since useChat handles the API calls directly
-    return "/api/en/v1/template-api/ai-stream";
+    return "/api/en/v1/core/agent/chat/ai-stream";
   }, []);
+
+  // Convert initialMessages to UIMessage format with parts
+  const convertedMessages = useMemo(() => {
+    return initialMessages.map((msg, index) => ({
+      id: `msg-${index}`,
+      role: msg.role,
+      parts: [
+        {
+          type: "text" as const,
+          text: msg.content,
+        },
+      ],
+    }));
+  }, [initialMessages]);
+
+  // Create a transport with the necessary configuration
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: apiPath,
+        body: {
+          model,
+          temperature,
+          maxTokens,
+          systemPrompt,
+        },
+      }),
+    [apiPath, model, temperature, maxTokens, systemPrompt],
+  );
 
   // Use the useChat hook with our API endpoint
   const chatResult = useChat({
-    api: apiPath,
-    initialMessages: initialMessages.map((msg, index) => ({
-      id: `msg-${index}`,
-      role: msg.role,
-      content: msg.content,
-    })),
-    body: {
-      model,
-      temperature,
-      maxTokens,
-      systemPrompt,
-    },
-    onFinish: (message) => {
+    messages: convertedMessages,
+    transport,
+    onFinish: ({ message }) => {
       if (onFinish) {
-        onFinish(message);
+        // Extract text content from message parts
+        const textParts = message.parts.filter((part) => part.type === "text");
+        const content = textParts
+          .map((part) => (part.type === "text" ? part.text : ""))
+          .join("");
+
+        onFinish({
+          id: message.id,
+          role: message.role,
+          content,
+        });
       }
     },
     onError: (error) => {
@@ -119,14 +147,41 @@ export function useAiStreamChat(params?: {
     },
   });
 
+  // Convert messages to simple format
+  const simpleMessages = useMemo(() => {
+    const getMessageText = (
+      message: (typeof chatResult.messages)[0],
+    ): string => {
+      const textParts = message.parts.filter((part) => part.type === "text");
+      return textParts
+        .map((part) => (part.type === "text" ? part.text : ""))
+        .join("");
+    };
+
+    return chatResult.messages
+      .filter(
+        (msg) =>
+          msg.role === "user" ||
+          msg.role === "assistant" ||
+          msg.role === "system",
+      )
+      .map((msg) => ({
+        id: msg.id,
+        role: msg.role,
+        content: getMessageText(msg),
+      }));
+  }, [chatResult]);
+
+  const clearChat = useCallback(() => {
+    chatResult.setMessages([]);
+  }, [chatResult]);
+
   return {
-    ...chatResult,
-    // Additional properties for better integration
-    isStreaming: chatResult.isLoading || false,
-    streamingMessages: chatResult.messages.filter((msg) => msg.role !== "data"),
-    sendStreamingMessage: chatResult.handleSubmit,
-    clearStreamingChat: (): void => chatResult.setMessages([]),
-    // Expose endpoint for form operations if needed
+    messages: simpleMessages,
+    isStreaming:
+      chatResult.status === "streaming" || chatResult.status === "submitted",
+    sendMessage: chatResult.sendMessage,
+    clearChat,
     endpoint,
   };
 }
@@ -136,7 +191,7 @@ export function useAiStreamChat(params?: {
  * Provides form functionality for configuring AI stream parameters
  */
 export function useAiStreamForm(params?: {
-  defaultValues?: Partial<AiStreamPostRequestTypeOutput>;
+  defaultValues?: Partial<AiStreamPostRequestOutput>;
 }): EndpointReturn<typeof definitions> {
   const { locale } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);

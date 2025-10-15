@@ -4,24 +4,11 @@
  */
 
 import { relations } from "drizzle-orm";
-import {
-  boolean,
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import { PreferredContactMethod, PreferredContactMethodDB } from "./enum";
 import { UserRoleDB } from "./user-roles/enum";
-
-/**
- * NOTE: Using text() with enum constraint instead of pgEnum() because translation keys
- * exceed PostgreSQL's 63-byte enum label limit. Type safety is maintained through
- * Drizzle's enum constraint and Zod validation.
- */
 
 /**
  * Users table schema
@@ -31,21 +18,14 @@ export const users = pgTable("users", {
   leadId: uuid("lead_id").unique(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  firstName: text("first_name").notNull(),
-  lastName: text("last_name").notNull(),
-  company: text("company").notNull(),
-  phone: text("phone"),
-  preferredContactMethod: text("preferred_contact_method", { enum: PreferredContactMethodDB })
-    .notNull()
-    .default(PreferredContactMethod.EMAIL),
-  imageUrl: text("image_url"),
+  privateName: text("private_name").notNull(),
+  publicName: text("public_name").notNull(),
 
-  // Profile information
-  bio: text("bio"),
-  website: text("website"),
-  jobTitle: text("job_title"),
   emailVerified: boolean("email_verified").default(false).notNull(),
   isActive: boolean("is_active").default(true).notNull(),
+  marketingConsent: boolean("marketing_consent").default(false).notNull(),
+  isBanned: boolean("is_banned").default(false).notNull(),
+  bannedReason: text("banned_reason"),
 
   // Stripe integration
   stripeCustomerId: text("stripe_customer_id").unique(),

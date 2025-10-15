@@ -5,6 +5,11 @@
 
 "use client";
 
+import {
+  ChartType,
+  DateRangePreset,
+  TimePeriod,
+} from "next-vibe/shared/types/stats-filtering.schema";
 import { useCallback, useMemo } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
@@ -14,11 +19,6 @@ import type {
 } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint";
 import { useTranslation } from "@/i18n/core/client";
-import {
-  ChartType,
-  DateRangePreset,
-  TimePeriod,
-} from "@/lib/types/stats-filtering.schema";
 import {
   CountryFilter,
   type CountryLanguage,
@@ -32,7 +32,7 @@ import {
   LeadStatusFilter,
   SortOrder,
 } from "../enum";
-import type { LeadsStatsResponseType } from "./definition";
+import type { LeadsStatsResponseOutput } from "./definition";
 import definitions from "./definition";
 
 /**
@@ -176,7 +176,7 @@ export function useLeadsStats(locale: CountryLanguage): UseLeadsStatsReturn {
 }
 
 export interface UseLeadsStatsReturn {
-  stats: LeadsStatsResponseType | null;
+  stats: LeadsStatsResponseOutput | null;
   isLoading: boolean;
   hasError: boolean;
   hasData: boolean;

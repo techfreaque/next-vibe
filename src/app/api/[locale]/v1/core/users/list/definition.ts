@@ -33,11 +33,11 @@ import {
 } from "../enum";
 
 /**
- * Get Users List Endpoint (POST)
+ * Get Users List Endpoint (GET)
  * Retrieves a paginated list of users with filtering
  */
-const { POST } = createEndpoint({
-  method: Methods.POST,
+const { GET } = createEndpoint({
+  method: Methods.GET,
   path: ["v1", "core", "users", "list"],
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY] as const,
 
@@ -242,8 +242,8 @@ const { POST } = createEndpoint({
               layout: "grid",
               cardConfig: {
                 title: "email",
-                subtitle: "company",
-                content: ["firstName", "lastName"],
+                subtitle: "publicName",
+                content: ["privateName"],
                 metadata: ["isActive", "emailVerified"],
               },
             },
@@ -274,37 +274,21 @@ const { POST } = createEndpoint({
                   },
                   z.string(),
                 ),
-                firstName: responseField(
+                privateName: responseField(
                   {
                     type: WidgetType.TEXT,
                     content:
-                      "app.api.v1.core.users.list.response.user.firstName" as const,
+                      "app.api.v1.core.users.list.response.user.privateName" as const,
                   },
                   z.string(),
                 ),
-                lastName: responseField(
+                publicName: responseField(
                   {
                     type: WidgetType.TEXT,
                     content:
-                      "app.api.v1.core.users.list.response.user.lastName" as const,
+                      "app.api.v1.core.users.list.response.user.publicName" as const,
                   },
                   z.string(),
-                ),
-                company: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.v1.core.users.list.response.user.company" as const,
-                  },
-                  z.string(),
-                ),
-                phone: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content:
-                      "app.api.v1.core.users.list.response.user.phone" as const,
-                  },
-                  z.string().nullable(),
                 ),
                 isActive: responseField(
                   {
@@ -425,18 +409,39 @@ const { POST } = createEndpoint({
         },
       },
     },
+    responses: {
+      default: {
+        response: {
+          users: [],
+          totalCount: 0,
+          pageCount: 0,
+          page: 1,
+          limit: 20,
+        },
+      },
+      basicSearch: {
+        response: {
+          users: [],
+          totalCount: 0,
+          pageCount: 0,
+          page: 1,
+          limit: 10,
+        },
+      },
+    },
   },
 });
 
 // Extract types
-export type UserListRequestTypeInput = typeof POST.types.RequestInput;
-export type UserListRequestTypeOutput = typeof POST.types.RequestOutput;
-export type UserListResponseTypeInput = typeof POST.types.ResponseInput;
-export type UserListResponseTypeOutput = typeof POST.types.ResponseOutput;
+export type UserListRequestInput = typeof GET.types.RequestInput;
+export type UserListRequestOutput = typeof GET.types.RequestOutput;
+export type UserListResponseInput = typeof GET.types.ResponseInput;
+export type UserListResponseOutput = typeof GET.types.ResponseOutput;
 
 // Aliases for repository compatibility
-export type UsersQueryType = UserListRequestTypeOutput;
-export type UserListResponseType = UserListResponseTypeOutput;
+export type UsersQueryType = UserListRequestOutput;
+export type UserListResponseType = UserListResponseOutput;
 
-const definitions = { POST };
+const definitions = { GET };
+export { GET };
 export default definitions;

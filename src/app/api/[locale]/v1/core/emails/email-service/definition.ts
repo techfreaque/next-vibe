@@ -600,14 +600,12 @@ export type EmailServiceSendPostResponseOutput =
 
 // Export repository types for import standardization
 // Repository types for standardized import patterns
-export type EmailServiceSendRequestTypeOutput =
-  EmailServiceSendPostRequestOutput;
-export type EmailServiceSendResponseTypeOutput =
-  EmailServiceSendPostResponseOutput;
+export type EmailServiceSendRequestOutput = EmailServiceSendPostRequestOutput;
+export type EmailServiceSendResponseOutput = EmailServiceSendPostResponseOutput;
 
 // Legacy compatibility types
-export type EmailSendRequestTypeOutput = EmailServiceSendPostRequestOutput;
-export type EmailSendResponseTypeOutput = EmailServiceSendPostResponseOutput;
+export type EmailSendRequestOutput = EmailServiceSendPostRequestOutput;
+export type EmailSendResponseOutput = EmailServiceSendPostResponseOutput;
 
 const definitions = {
   POST,

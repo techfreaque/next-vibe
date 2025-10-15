@@ -3,7 +3,6 @@
  * Handles user avatar operations
  */
 
-import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import {
   createErrorResponse,
@@ -12,11 +11,9 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
-import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 
-import { users } from "../../../db";
 import { UserDetailLevel } from "../../../enum";
 import { BaseUserRepositoryImpl, userRepository } from "../../../repository";
 import type {
@@ -87,19 +84,19 @@ export class AvatarRepositoryImpl
         );
       }
 
-      // Implementation would handle file upload to storage service
-      // For now, simulate with a placeholder URL
       // TODO: Implement file upload to storage service
+      // TODO: Add avatar field to database schema
+      // Implementation would handle file upload to storage service
       const avatarUrl = `https://example.com/avatars/${userId}.jpg`;
 
-      // Update user with new avatar URL
-      await db
-        .update(users)
-        .set({
-          imageUrl: avatarUrl,
-          updatedAt: new Date(),
-        })
-        .where(eq(users.id, userId));
+      // TODO: Uncomment when avatar field is added to DB schema
+      // await db
+      //   .update(users)
+      //   .set({
+      //     avatarUrl: avatarUrl,
+      //     updatedAt: new Date(),
+      //   })
+      //   .where(eq(users.id, userId));
 
       // Revalidate relevant paths
       revalidatePath(`/dashboard/profile`);
@@ -160,16 +157,17 @@ export class AvatarRepositoryImpl
         );
       }
 
-      // Implementation would handle deleting from storage service
+      // TODO: Implement deletion from storage service
+      // TODO: Add avatar field to database schema
 
-      // Update user to remove avatar URL
-      await db
-        .update(users)
-        .set({
-          imageUrl: null,
-          updatedAt: new Date(),
-        })
-        .where(eq(users.id, userId));
+      // TODO: Uncomment when avatar field is added to DB schema
+      // await db
+      //   .update(users)
+      //   .set({
+      //     avatarUrl: null,
+      //     updatedAt: new Date(),
+      //   })
+      //   .where(eq(users.id, userId));
 
       // Revalidate relevant paths
       revalidatePath(`/dashboard/profile`);

@@ -1,6 +1,5 @@
-import type { translations as enTranslations } from "../en";
-
 import { translations as optionsTranslations } from "../../options/i18n/pl";
+import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Logowanie",
@@ -69,6 +68,8 @@ export const translations: typeof enTranslations = {
       email: "Adres e-mail",
       firstName: "Imię",
       lastName: "Nazwisko",
+      privateName: "Nazwa prywatna",
+      publicName: "Nazwa publiczna",
       imageUrl: "Zdjęcie profilowe",
     },
     sessionInfo: {
@@ -123,6 +124,15 @@ export const translations: typeof enTranslations = {
   success: {
     title: "Logowanie pomyślne",
     description: "Zostałeś zalogowany",
+  },
+  token: {
+    save: {
+      failed: "Nie udało się zapisać tokenu uwierzytelniania",
+      success: "Token uwierzytelniania został pomyślnie zapisany",
+    },
+  },
+  process: {
+    failed: "Proces logowania nie powiódł się",
   },
   enums: {
     socialProviders: {

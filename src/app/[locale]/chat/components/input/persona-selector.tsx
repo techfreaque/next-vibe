@@ -1,9 +1,8 @@
 "use client";
 
 import type { JSX } from "react";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-import { SelectorBase, type SelectorOption } from "./selector-base";
 import {
   Button,
   Dialog,
@@ -14,8 +13,10 @@ import {
   Label,
   Textarea,
 } from "@/packages/next-vibe-ui/web/ui";
-import { useFavorites } from "./use-favorites";
+
 import { DEFAULT_PERSONAS, type Persona } from "../../lib/config/personas";
+import { SelectorBase, type SelectorOption } from "./selector-base";
+import { useFavorites } from "./use-favorites";
 
 interface PersonaSelectorProps {
   value: string;
@@ -27,11 +28,14 @@ const STORAGE_KEY_FAVORITES = "chat-favorite-personas";
 
 const DEFAULT_FAVORITES = ["professional", "creative", "technical"];
 
-export function PersonaSelector({ value, onChange }: PersonaSelectorProps): JSX.Element {
+export function PersonaSelector({
+  value,
+  onChange,
+}: PersonaSelectorProps): JSX.Element {
   const [personas, setPersonas] = useState<Persona[]>(DEFAULT_PERSONAS);
   const [favorites, toggleFavorite, setFavorites] = useFavorites(
     STORAGE_KEY_FAVORITES,
-    DEFAULT_FAVORITES
+    DEFAULT_FAVORITES,
   );
   const [addPersonaOpen, setAddPersonaOpen] = useState(false);
   const [newPersona, setNewPersona] = useState({
@@ -57,14 +61,16 @@ export function PersonaSelector({ value, onChange }: PersonaSelectorProps): JSX.
   // Save custom personas to localStorage
   const savePersonas = (newPersonas: Persona[]) => {
     const customPersonas = newPersonas.filter(
-      (p) => !DEFAULT_PERSONAS.find((dp) => dp.id === p.id)
+      (p) => !DEFAULT_PERSONAS.find((dp) => dp.id === p.id),
     );
     localStorage.setItem(STORAGE_KEY_PERSONAS, JSON.stringify(customPersonas));
     setPersonas(newPersonas);
   };
 
   const handleAddPersona = () => {
-    if (!newPersona.name.trim()) return;
+    if (!newPersona.name.trim()) {
+      return;
+    }
 
     const persona: Persona = {
       id: `custom-${Date.now()}`,
@@ -116,7 +122,9 @@ export function PersonaSelector({ value, onChange }: PersonaSelectorProps): JSX.
                 id="persona-name"
                 placeholder="e.g., Code Reviewer"
                 value={newPersona.name}
-                onChange={(e) => setNewPersona({ ...newPersona, name: e.target.value })}
+                onChange={(e) =>
+                  setNewPersona({ ...newPersona, name: e.target.value })
+                }
               />
             </div>
             <div className="space-y-2">
@@ -125,7 +133,9 @@ export function PersonaSelector({ value, onChange }: PersonaSelectorProps): JSX.
                 id="persona-icon"
                 placeholder="✨"
                 value={newPersona.icon}
-                onChange={(e) => setNewPersona({ ...newPersona, icon: e.target.value })}
+                onChange={(e) =>
+                  setNewPersona({ ...newPersona, icon: e.target.value })
+                }
                 maxLength={2}
               />
             </div>
@@ -135,7 +145,9 @@ export function PersonaSelector({ value, onChange }: PersonaSelectorProps): JSX.
                 id="persona-description"
                 placeholder="Brief description of the persona"
                 value={newPersona.description}
-                onChange={(e) => setNewPersona({ ...newPersona, description: e.target.value })}
+                onChange={(e) =>
+                  setNewPersona({ ...newPersona, description: e.target.value })
+                }
               />
             </div>
             <div className="space-y-2">
@@ -144,15 +156,23 @@ export function PersonaSelector({ value, onChange }: PersonaSelectorProps): JSX.
                 id="persona-prompt"
                 placeholder="You are a..."
                 value={newPersona.systemPrompt}
-                onChange={(e) => setNewPersona({ ...newPersona, systemPrompt: e.target.value })}
+                onChange={(e) =>
+                  setNewPersona({ ...newPersona, systemPrompt: e.target.value })
+                }
                 rows={4}
               />
             </div>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setAddPersonaOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setAddPersonaOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button onClick={handleAddPersona} disabled={!newPersona.name.trim()}>
+              <Button
+                onClick={handleAddPersona}
+                disabled={!newPersona.name.trim()}
+              >
                 Create Persona
               </Button>
             </div>
@@ -162,4 +182,3 @@ export function PersonaSelector({ value, onChange }: PersonaSelectorProps): JSX.
     </>
   );
 }
-

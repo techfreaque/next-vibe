@@ -6,4 +6,6 @@ export const sortTranslations = {
   first_name: "First Name",
   last_name: "Last Name",
   company: "Company",
+  privateName: "Private Name",
+  publicName: "Public Name",
 };

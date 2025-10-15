@@ -1,8 +1,10 @@
 "use client";
 
-import type { MessageAuthor } from "../../lib/storage/types";
 import { Bot, User } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
+
+import { getPersonaName } from "../../lib/config/personas";
+import type { MessageAuthor } from "../../lib/storage/types";
 import { formatRelativeTime } from "../../lib/utils/formatting";
 
 interface MessageAuthorProps {
@@ -23,16 +25,23 @@ export function MessageAuthorInfo({
   className,
   tone,
 }: MessageAuthorProps) {
-
   const getAuthorColor = (author?: MessageAuthor): string => {
-    if (!author) return "text-foreground";
-    if (author.color) return author.color;
-    if (author.isAI) return "text-blue-500";
+    if (!author) {
+      return "text-foreground";
+    }
+    if (author.color) {
+      return author.color;
+    }
+    if (author.isAI) {
+      return "text-blue-500";
+    }
     return "text-foreground";
   };
 
   const getAuthorName = (author?: MessageAuthor): string => {
-    if (!author) return "You";
+    if (!author) {
+      return "You";
+    }
     return author.name;
   };
 
@@ -43,14 +52,14 @@ export function MessageAuthorInfo({
         className={cn(
           "rounded-full flex items-center justify-center flex-shrink-0",
           compact ? "h-6 w-6" : "h-8 w-8",
-          author?.isAI 
-            ? "bg-gradient-to-br from-blue-500 to-purple-600" 
-            : "bg-gradient-to-br from-gray-400 to-gray-600"
+          author?.isAI
+            ? "bg-gradient-to-br from-blue-500 to-purple-600"
+            : "bg-gradient-to-br from-gray-400 to-gray-600",
         )}
       >
         {author?.avatar ? (
-          <img 
-            src={author.avatar} 
+          <img
+            src={author.avatar}
             alt={author.name}
             className="w-full h-full rounded-full object-cover"
           />
@@ -67,22 +76,16 @@ export function MessageAuthorInfo({
           className={cn(
             "font-medium truncate",
             compact ? "text-xs" : "text-sm",
-            getAuthorColor(author)
+            getAuthorColor(author),
           )}
         >
           {getAuthorName(author)}
         </span>
 
-        {author?.isAI && author.modelId && (
+        {/* Show persona for both AI and user messages */}
+        {tone && (
           <span className="text-xs text-muted-foreground truncate">
-            ({author.modelId}
-            {tone && ` • ${tone}`})
-          </span>
-        )}
-
-        {!author?.isAI && tone && (
-          <span className="text-xs text-muted-foreground truncate">
-            ({tone})
+            ({getPersonaName(tone)})
           </span>
         )}
 
@@ -99,4 +102,3 @@ export function MessageAuthorInfo({
     </div>
   );
 }
-

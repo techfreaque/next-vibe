@@ -9,7 +9,6 @@ import {
   index,
   integer,
   jsonb,
-  pgEnum,
   pgTable,
   text,
   timestamp,
@@ -84,7 +83,9 @@ export const smtpAccounts = pgTable(
 
     // Health monitoring
     lastHealthCheck: timestamp("last_health_check"),
-    healthCheckStatus: text("health_check_status", { enum: SmtpHealthStatusDB }), // "healthy", "degraded", "unhealthy"
+    healthCheckStatus: text("health_check_status", {
+      enum: SmtpHealthStatusDB,
+    }), // "healthy", "degraded", "unhealthy"
     consecutiveFailures: integer("consecutive_failures").default(0),
     lastFailureAt: timestamp("last_failure_at"),
     lastFailureReason: text("last_failure_reason"),

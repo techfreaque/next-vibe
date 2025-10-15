@@ -23,10 +23,15 @@ export const translations: typeof enTranslations = {
     description: "Odpowiedź walidacji tokenu",
     valid: "Token Prawidłowy",
     message: "Wiadomość Walidacji",
+    validationMessage: "Walidacja tokenu resetowania zakończona",
     userId: "ID Użytkownika",
     expiresAt: "Token Wygasa",
     nextSteps: {
       item: "Kolejne Kroki Po Walidacji",
+      steps: [
+        "Przejdź do ustawienia nowego hasła",
+        "Wybierz silne, unikalne hasło",
+      ],
     },
   },
   errors: {

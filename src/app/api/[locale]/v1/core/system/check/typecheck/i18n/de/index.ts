@@ -8,6 +8,24 @@ export const translations: typeof enTranslations = {
   category: "Systemprüfungen",
   tag: "typprüfung",
 
+  // Enum translations
+  status: {
+    passed: "Bestanden",
+    failed: "Fehlgeschlagen",
+    running: "Läuft",
+    skipped: "Übersprungen",
+  },
+  severity: {
+    error: "Fehler",
+    warning: "Warnung",
+    info: "Info",
+  },
+  mode: {
+    full: "Vollständig",
+    incremental: "Inkrementell",
+    watch: "Überwachen",
+  },
+
   // Container
   container: {
     title: "TypeScript-Typprüfung Konfiguration",
@@ -37,6 +55,7 @@ export const translations: typeof enTranslations = {
 
   // Response fields
   response: {
+    successMessage: "TypeScript-Typprüfung erfolgreich abgeschlossen",
     issue: {
       title: "TypeScript-Problem",
       description: "Einzelnes TypeScript-Typprüfungsproblem",
@@ -44,6 +63,8 @@ export const translations: typeof enTranslations = {
       line: "Zeilennummer des Problems",
       column: "Spaltennummer des Problems",
       code: "TypeScript-Fehlercode",
+      severity: "Schweregrad des Problems",
+      type: "Problemtyp",
       message: "Problembeschreibung",
     },
   },
@@ -88,6 +109,14 @@ export const translations: typeof enTranslations = {
     conflict: {
       title: "Konflikt",
       description: "Ein Datenkonflikt ist aufgetreten",
+    },
+    noTsFiles: {
+      title: "Keine TypeScript-Dateien gefunden",
+      message: "Keine TypeScript-Dateien im angegebenen Pfad gefunden",
+    },
+    invalidCommand: {
+      title: "Ungültiger Befehl",
+      message: "Der TypeScript-Prüfbefehl ist ungültig oder fehlt",
     },
   },
 

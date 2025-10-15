@@ -1,35 +1,33 @@
 /**
- * Cron Task Stats Hooks
- * React hooks for cron statistics
+ * Cron Stats Hooks
+ * React hooks for cron statistics operations
  */
 
 "use client";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/use-endpoint";
+import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/use-endpoint";
+
+import definitions from "./definition";
+
 /**
  * Hook for fetching cron statistics
  */
-export const useCronStats = (): {
-  loading: boolean;
-  error: string | null;
-  data: {
-    success: boolean;
-    data: {
-      totalTasks: number;
-      executedTasks: number;
-      successfulTasks: number;
-      failedTasks: number;
-      averageExecutionTime: number;
-    };
-  } | null;
-  refetch: () => void;
-} => {
-  // Placeholder implementation - replace with actual hook logic
-  return {
-    loading: false,
-    error: null,
-    data: null,
-    refetch: (): void => {
-      // Implementation for refetching data
+export function useCronStats(
+  logger: EndpointLogger,
+): EndpointReturn<typeof definitions> {
+  return useEndpoint(
+    definitions,
+    {
+      queryOptions: {
+        enabled: true,
+        refetchOnWindowFocus: false,
+        staleTime: 30 * 1000, // 30 seconds
+      },
     },
-  };
-};
+    logger,
+  );
+}
+
+export type CronStatsEndpointReturn = EndpointReturn<typeof definitions>;

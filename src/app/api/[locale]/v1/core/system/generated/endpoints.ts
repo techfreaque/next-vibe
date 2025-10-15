@@ -157,7 +157,7 @@ import { default as endpointDefinition145 } from "@/app/api/[locale]/v1/core/tem
 import { default as endpointDefinition146 } from "@/app/api/[locale]/v1/core/template-api/stats/definition";
 
 // Type for endpoint definitions - using any here is necessary for dynamic endpoint structure
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type EndpointDefinition = any;
 
 export const endpoints: ApiSection = {};
