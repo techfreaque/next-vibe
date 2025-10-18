@@ -3,6 +3,8 @@
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 import {
   Button,
   Dialog,
@@ -19,13 +21,19 @@ interface NewFolderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (name: string, icon: string) => void;
+  locale: CountryLanguage;
+  /** Optional custom title translation key. If not provided, uses default "app.chat.newFolder.title" */
+  titleKey?: string;
 }
 
 export function NewFolderDialog({
   open,
   onOpenChange,
   onSave,
+  locale,
+  titleKey,
 }: NewFolderDialogProps): JSX.Element {
+  const { t } = simpleT(locale);
   const [name, setName] = useState("");
   const [icon, setIcon] = useState("folder");
 
@@ -37,7 +45,7 @@ export function NewFolderDialog({
     }
   }, [open]);
 
-  const handleSave = () => {
+  const handleSave = (): void => {
     if (name.trim()) {
       onSave(name.trim(), icon);
       onOpenChange(false);
@@ -48,16 +56,21 @@ export function NewFolderDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
-          <DialogTitle>Create New Folder</DialogTitle>
+          <DialogTitle>
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {t((titleKey || "app.chat.newFolder.title") as any)}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="folder-name">Folder Name</Label>
+            <Label htmlFor="folder-name">
+              {t("app.chat.newFolder.folderName")}
+            </Label>
             <Input
               id="folder-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter folder name"
+              placeholder={t("app.chat.newFolder.placeholder")}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   handleSave();
@@ -67,15 +80,15 @@ export function NewFolderDialog({
             />
           </div>
           <div className="space-y-2">
-            <Label>Folder Icon</Label>
+            <Label>{t("app.chat.newFolder.folderIcon")}</Label>
             <FolderIconSelector value={icon} onChange={setIcon} />
           </div>
           <div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {t("app.chat.newFolder.cancel")}
             </Button>
             <Button onClick={handleSave} disabled={!name.trim()}>
-              Create
+              {t("app.chat.newFolder.create")}
             </Button>
           </div>
         </div>

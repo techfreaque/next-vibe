@@ -312,9 +312,32 @@ export class CliEntryPoint {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
 
     for (const entry of entries) {
-      if (entry.isDirectory() && !entry.name.startsWith(".")) {
+      // Skip node_modules, .git, .next, and other common directories that should never contain route files
+      if (
+        entry.name === "node_modules" ||
+        entry.name === ".git" ||
+        entry.name === ".next" ||
+        entry.name === "dist" ||
+        entry.name === ".dist" ||
+        entry.name.startsWith(".")
+      ) {
+        continue;
+      }
+
+      if (entry.isDirectory()) {
         const fullPath = path.join(dir, entry.name);
         const newPath = [...currentPath, entry.name];
+
+        // Skip standalone package directories that have their own node_modules
+        // These are tools/packages that happen to be in the API directory but aren't API routes
+        const isStandalonePackage =
+          fullPath.includes("/system/builder") ||
+          fullPath.includes("/system/launchpad") ||
+          fullPath.includes("/system/release-tool");
+
+        if (isStandalonePackage) {
+          continue;
+        }
 
         // Check if this directory has a route.ts file
         const routeFile = path.join(fullPath, "route.ts");

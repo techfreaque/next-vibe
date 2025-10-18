@@ -9,7 +9,7 @@ import { Mail, Send } from "lucide-react";
 import {
   getCountryFromLocale,
   getLanguageFromLocale,
-} from "next-vibe/core/language-utils";
+} from "@/i18n/core/language-utils";
 import { FormAlert } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";

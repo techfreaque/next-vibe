@@ -1,4 +1,80 @@
 export const translations = {
+  // UI translations for list page
+  admin: {
+    title: "Email Management",
+    description: "Monitor email campaigns, track performance, and analyze engagement",
+    filters: {
+      title: "Filters",
+      search: "Search emails...",
+      status: "Filter by status",
+      type: "Filter by type",
+      clear: "Clear Filters",
+      quick_filters: "Quick Filters",
+      quick: {
+        sent: "Sent",
+        opened: "Opened",
+        bounced: "Bounced",
+        lead_campaigns: "Lead Campaigns",
+      },
+    },
+    status: {
+      all: "All Statuses",
+      pending: "Pending",
+      sent: "Sent",
+      delivered: "Delivered",
+      opened: "Opened",
+      clicked: "Clicked",
+      bounced: "Bounced",
+      failed: "Failed",
+      unsubscribed: "Unsubscribed",
+    },
+    type: {
+      all: "All Types",
+      transactional: "Transactional",
+      marketing: "Marketing",
+      notification: "Notification",
+      system: "System",
+      lead_campaign: "Lead Campaign",
+      user_communication: "User Communication",
+    },
+    sort: {
+      field: "Sort by",
+      created_at: "Created Date",
+      sent_at: "Sent Date",
+      subject: "Subject",
+      recipient_email: "Recipient",
+      status: "Status",
+      type: "Type",
+      order: "Sort order",
+      desc: "Descending",
+      asc: "Ascending",
+    },
+    table: {
+      subject: "Subject",
+      recipient: "Recipient",
+      status: "Status",
+      type: "Type",
+      sentAt: "Sent At",
+      actions: "Actions",
+    },
+    messages: {
+      noEmails: "No emails found",
+      noEmailsDescription: "Try adjusting your filters or create a new email campaign",
+    },
+  },
+
+  pagination: {
+    showing: "Showing {start} to {end} of {total} results",
+    previous: "Previous",
+    next: "Next",
+  },
+
+  // Navigation translations
+  nav: {
+    campaigns: "Email List",
+  },
+
+  // API endpoint translations
   post: {
     title: "List",
     description: "List endpoint",
@@ -49,4 +125,4 @@ export const translations = {
       description: "Operation completed successfully",
     },
   },
-};
+} as const;

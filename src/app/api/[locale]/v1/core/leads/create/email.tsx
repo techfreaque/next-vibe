@@ -20,21 +20,26 @@ import {
 import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
+import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
-import type { LeadCreateType, LeadResponseType } from "../definition";
+import type { LeadCreateType } from "../definition";
+import { LeadSource, LeadStatus } from "../enum";
+import type { LeadCreatePostResponseOutput } from "./definition";
 
 /**
  * Welcome Email Template Component for New Leads
  * Sends a welcome message to leads when they are created in the system
  */
+// Type for the lead data from create response
+type LeadData = LeadCreatePostResponseOutput["lead"];
+
 function WelcomeEmailContent({
   lead,
   t,
   locale,
   userId,
 }: {
-  lead: LeadResponseType;
+  lead: LeadData;
   t: TFunction;
   locale: CountryLanguage;
   userId?: string;
@@ -42,7 +47,7 @@ function WelcomeEmailContent({
   // Create tracking context for welcome emails with leadId
   const tracking = createTrackingContext(
     locale,
-    lead.id, // leadId for tracking engagement
+    lead.summary.id, // leadId for tracking engagement
     userId, // userId if lead is associated with a user
     undefined, // no campaignId for transactional emails
   );
@@ -51,10 +56,13 @@ function WelcomeEmailContent({
     <EmailTemplate
       t={t}
       locale={locale}
-      title={t("leads.create.email.welcome.title", {
-        businessName: lead.businessName || lead.email,
+      title={t("app.api.v1.core.leads.create.email.welcome.title", {
+        businessName:
+          lead.summary.businessName ||
+          lead.summary.email ||
+          t("app.api.v1.core.leads.create.email.welcome.defaultName"),
       })}
-      previewText={t("leads.create.email.welcome.preview")}
+      previewText={t("app.api.v1.core.leads.create.email.welcome.preview")}
       tracking={tracking}
     >
       <Text
@@ -65,9 +73,10 @@ function WelcomeEmailContent({
           marginBottom: "24px",
         }}
       >
-        {t("leads.create.email.welcome.greeting", {
+        {t("app.api.v1.core.leads.create.email.welcome.greeting", {
           businessName:
-            lead.businessName || t("leads.create.email.welcome.defaultName"),
+            lead.summary.businessName ||
+            t("app.api.v1.core.leads.create.email.welcome.defaultName"),
         })}
       </Text>
 
@@ -79,7 +88,7 @@ function WelcomeEmailContent({
           marginBottom: "24px",
         }}
       >
-        {t("leads.create.email.welcome.introduction")}
+        {t("app.api.v1.core.leads.create.email.welcome.introduction")}
       </Text>
 
       {/* Next Steps Section */}
@@ -99,7 +108,7 @@ function WelcomeEmailContent({
             marginBottom: "16px",
           }}
         >
-          {t("leads.create.email.welcome.nextSteps.title")}
+          {t("app.api.v1.core.leads.create.email.welcome.nextSteps.title")}
         </Text>
 
         <Text
@@ -112,7 +121,7 @@ function WelcomeEmailContent({
           {/* eslint-disable-next-line i18next/no-literal-string */}
           <Text style={{ fontWeight: "700" }}>1.</Text>
           {"  "}
-          {t("leads.create.email.welcome.nextSteps.step1")}
+          {t("app.api.v1.core.leads.create.email.welcome.nextSteps.step1")}
         </Text>
 
         <Text
@@ -125,7 +134,7 @@ function WelcomeEmailContent({
           {/* eslint-disable-next-line i18next/no-literal-string */}
           <Text style={{ fontWeight: "700" }}>2.</Text>
           {"  "}
-          {t("leads.create.email.welcome.nextSteps.step2")}
+          {t("app.api.v1.core.leads.create.email.welcome.nextSteps.step2")}
         </Text>
 
         <Text
@@ -138,7 +147,7 @@ function WelcomeEmailContent({
           {/* eslint-disable-next-line i18next/no-literal-string */}
           <Text style={{ fontWeight: "700" }}>3.</Text>
           {"  "}
-          {t("leads.create.email.welcome.nextSteps.step3")}
+          {t("app.api.v1.core.leads.create.email.welcome.nextSteps.step3")}
         </Text>
       </Section>
 
@@ -159,7 +168,7 @@ function WelcomeEmailContent({
             display: "inline-block",
           }}
         >
-          {t("leads.create.email.welcome.cta.getStarted")}
+          {t("app.api.v1.core.leads.create.email.welcome.cta.getStarted")}
         </Button>
       </Section>
 
@@ -171,7 +180,7 @@ function WelcomeEmailContent({
           marginBottom: "16px",
         }}
       >
-        {t("leads.create.email.welcome.support", {
+        {t("app.api.v1.core.leads.create.email.welcome.support", {
           supportEmail: contactClientRepository.getSupportEmail(locale),
         })}
       </Text>
@@ -189,7 +198,7 @@ function AdminNotificationEmailContent({
   locale,
   userId,
 }: {
-  lead: LeadResponseType;
+  lead: LeadData;
   t: TFunction;
   locale: CountryLanguage;
   userId?: string;
@@ -197,7 +206,7 @@ function AdminNotificationEmailContent({
   // Create tracking context for admin notification emails
   const tracking = createTrackingContext(
     locale,
-    lead.id, // leadId for tracking
+    lead.summary.id, // leadId for tracking
     userId, // userId if available
     undefined, // no campaignId for transactional emails
   );
@@ -206,10 +215,16 @@ function AdminNotificationEmailContent({
     <EmailTemplate
       t={t}
       locale={locale}
-      title={t("leads.create.email.admin.newLead.title")}
-      previewText={t("leads.create.email.admin.newLead.preview", {
-        businessName: lead.businessName || lead.email,
-      })}
+      title={t("app.api.v1.core.leads.create.email.admin.newLead.title")}
+      previewText={t(
+        "app.api.v1.core.leads.create.email.admin.newLead.preview",
+        {
+          businessName:
+            lead.summary.businessName ||
+            lead.summary.email ||
+            t("app.api.v1.core.leads.create.email.admin.newLead.defaultName"),
+        },
+      )}
       tracking={tracking}
     >
       <Text
@@ -220,8 +235,11 @@ function AdminNotificationEmailContent({
           marginBottom: "24px",
         }}
       >
-        {t("leads.create.email.admin.newLead.message", {
-          businessName: lead.businessName || lead.email,
+        {t("app.api.v1.core.leads.create.email.admin.newLead.message", {
+          businessName:
+            lead.summary.businessName ||
+            lead.summary.email ||
+            t("app.api.v1.core.leads.create.email.admin.newLead.defaultName"),
         })}
       </Text>
 
@@ -242,7 +260,7 @@ function AdminNotificationEmailContent({
             marginBottom: "16px",
           }}
         >
-          {t("leads.create.email.admin.newLead.leadDetails")}
+          {t("app.api.v1.core.leads.create.email.admin.newLead.leadDetails")}
         </Text>
 
         <Text
@@ -253,10 +271,11 @@ function AdminNotificationEmailContent({
           }}
         >
           <Text style={{ fontWeight: "700" }}>
-            {t("leads.create.email.admin.newLead.businessName")}:
+            {t("app.api.v1.core.leads.create.email.admin.newLead.businessName")}
+            :
           </Text>{" "}
-          {lead.businessName ||
-            t("leads.create.email.admin.newLead.notProvided")}
+          {lead.summary.businessName ||
+            t("app.api.v1.core.leads.create.email.admin.newLead.notProvided")}
         </Text>
 
         <Text
@@ -267,12 +286,13 @@ function AdminNotificationEmailContent({
           }}
         >
           <Text style={{ fontWeight: "700" }}>
-            {t("leads.create.email.admin.newLead.email")}:
+            {t("app.api.v1.core.leads.create.email.admin.newLead.email")}:
           </Text>{" "}
-          {lead.email || t("leads.create.email.admin.newLead.notProvided")}
+          {lead.summary.email ||
+            t("app.api.v1.core.leads.create.email.admin.newLead.notProvided")}
         </Text>
 
-        {lead.phone && (
+        {lead.contactDetails.phone && (
           <Text
             style={{
               fontSize: "14px",
@@ -281,13 +301,13 @@ function AdminNotificationEmailContent({
             }}
           >
             <Text style={{ fontWeight: "700" }}>
-              {t("leads.create.email.admin.newLead.phone")}:
+              {t("app.api.v1.core.leads.create.email.admin.newLead.phone")}:
             </Text>{" "}
-            {lead.phone}
+            {lead.contactDetails.phone}
           </Text>
         )}
 
-        {lead.website && (
+        {lead.contactDetails.website && (
           <Text
             style={{
               fontSize: "14px",
@@ -296,9 +316,9 @@ function AdminNotificationEmailContent({
             }}
           >
             <Text style={{ fontWeight: "700" }}>
-              {t("leads.create.email.admin.newLead.website")}:
+              {t("app.api.v1.core.leads.create.email.admin.newLead.website")}:
             </Text>{" "}
-            {lead.website}
+            {lead.contactDetails.website}
           </Text>
         )}
 
@@ -310,9 +330,11 @@ function AdminNotificationEmailContent({
           }}
         >
           <Text style={{ fontWeight: "700" }}>
-            {t("leads.create.email.admin.newLead.source")}:
+            {t("app.api.v1.core.leads.create.email.admin.newLead.source")}:
           </Text>{" "}
-          {t(`leads.enums.leadSource.${lead.source}`)}
+          {lead.trackingInfo.source
+            ? t(LeadSource[lead.trackingInfo.source] as TranslationKey)
+            : t("app.api.v1.core.leads.create.email.admin.newLead.notProvided")}
         </Text>
 
         <Text
@@ -323,12 +345,12 @@ function AdminNotificationEmailContent({
           }}
         >
           <Text style={{ fontWeight: "700" }}>
-            {t("leads.create.email.admin.newLead.status")}:
+            {t("app.api.v1.core.leads.create.email.admin.newLead.status")}:
           </Text>{" "}
-          {t(`leads.enums.leadStatus.${lead.status}`)}
+          {t(LeadStatus[lead.summary.status] as TranslationKey)}
         </Text>
 
-        {lead.notes && (
+        {lead.metadata.notes && (
           <>
             <Hr style={{ borderColor: "#e5e7eb", margin: "16px 0" }} />
             <Text
@@ -339,7 +361,7 @@ function AdminNotificationEmailContent({
                 marginBottom: "8px",
               }}
             >
-              {t("leads.create.email.admin.newLead.notes")}:
+              {t("app.api.v1.core.leads.create.email.admin.newLead.notes")}:
             </Text>
             <Text
               style={{
@@ -352,7 +374,7 @@ function AdminNotificationEmailContent({
                 border: "1px solid #e5e7eb",
               }}
             >
-              {lead.notes}
+              {lead.metadata.notes}
             </Text>
           </>
         )}
@@ -361,7 +383,7 @@ function AdminNotificationEmailContent({
       {/* Admin Actions */}
       <Section style={{ textAlign: "center", marginTop: "24px" }}>
         <Button
-          href={`${env.NEXT_PUBLIC_APP_URL}/admin/leads/lead/${lead.id}`}
+          href={`${env.NEXT_PUBLIC_APP_URL}/admin/leads/lead/${lead.summary.id}`}
           style={{
             backgroundColor: "#4f46e5",
             borderRadius: "6px",
@@ -374,7 +396,7 @@ function AdminNotificationEmailContent({
             marginRight: "12px",
           }}
         >
-          {t("leads.create.email.admin.newLead.viewLead")}
+          {t("app.api.v1.core.leads.create.email.admin.newLead.viewLead")}
         </Button>
 
         <Button
@@ -390,7 +412,7 @@ function AdminNotificationEmailContent({
             display: "inline-block",
           }}
         >
-          {t("leads.create.email.admin.newLead.viewAllLeads")}
+          {t("app.api.v1.core.leads.create.email.admin.newLead.viewAllLeads")}
         </Button>
       </Section>
     </EmailTemplate>
@@ -403,29 +425,31 @@ function AdminNotificationEmailContent({
  */
 export const renderWelcomeMail: EmailFunctionType<
   LeadCreateType,
-  LeadResponseType,
+  LeadCreatePostResponseOutput,
   never
 > = ({ responseData, locale, t, user }) => {
   try {
     // Only send welcome email if lead has email and the creation was successful
-    if (!responseData?.email) {
+    if (!responseData?.lead?.summary?.email) {
       return createErrorResponse(
-        "leads.create.email.welcome.error.noEmail",
+        "app.api.v1.core.leads.create.email.welcome.error.noEmail",
         ErrorResponseTypes.VALIDATION_ERROR,
       );
     }
 
     return createSuccessResponse({
-      toEmail: responseData.email,
-      toName: responseData.businessName || responseData.email,
-      subject: t("leads.create.email.welcome.subject", {
+      toEmail: responseData.lead.summary.email,
+      toName:
+        responseData.lead.summary.businessName ||
+        responseData.lead.summary.email,
+      subject: t("app.api.v1.core.leads.create.email.welcome.subject", {
         companyName: t("common.appName"),
       }),
       replyToEmail: contactClientRepository.getSupportEmail(locale),
       replyToName: t("common.appName"),
 
       jsx: WelcomeEmailContent({
-        lead: responseData,
+        lead: responseData.lead,
         t,
         locale,
         userId: user?.id,
@@ -445,13 +469,13 @@ export const renderWelcomeMail: EmailFunctionType<
  */
 export const renderAdminNotificationMail: EmailFunctionType<
   LeadCreateType,
-  LeadResponseType,
+  LeadCreatePostResponseOutput,
   never
 > = ({ responseData, locale, t, user }) => {
   try {
-    if (!responseData) {
+    if (!responseData?.lead) {
       return createErrorResponse(
-        "leads.create.email.admin.newLead.error.noData",
+        "app.api.v1.core.leads.create.email.admin.newLead.error.noData",
         ErrorResponseTypes.VALIDATION_ERROR,
       );
     }
@@ -459,20 +483,21 @@ export const renderAdminNotificationMail: EmailFunctionType<
     return createSuccessResponse({
       toEmail: contactClientRepository.getSupportEmail(locale),
       toName: t("common.appName"),
-      subject: t("leads.create.email.admin.newLead.subject", {
+      subject: t("app.api.v1.core.leads.create.email.admin.newLead.subject", {
         businessName:
-          responseData.businessName ||
-          responseData.email ||
-          t("leads.create.email.admin.newLead.defaultName"),
+          responseData.lead.summary.businessName ||
+          responseData.lead.summary.email ||
+          t("app.api.v1.core.leads.create.email.admin.newLead.defaultName"),
       }),
       replyToEmail:
-        responseData.email || contactClientRepository.getSupportEmail(locale),
+        responseData.lead.summary.email ||
+        contactClientRepository.getSupportEmail(locale),
       replyToName:
-        responseData.businessName ||
-        t("leads.create.email.admin.newLead.defaultName"),
+        responseData.lead.summary.businessName ||
+        t("app.api.v1.core.leads.create.email.admin.newLead.defaultName"),
 
       jsx: AdminNotificationEmailContent({
-        lead: responseData,
+        lead: responseData.lead,
         t,
         locale,
         userId: user?.id,

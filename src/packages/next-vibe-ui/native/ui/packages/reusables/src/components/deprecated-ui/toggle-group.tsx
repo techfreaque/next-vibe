@@ -1,16 +1,16 @@
-import * as React from "react";
-import type { GestureResponderEvent, ViewStyle } from "react-native";
-import { Pressable, View } from "react-native";
+import * as React from 'react';
+import type { GestureResponderEvent, ViewStyle } from 'react-native';
+import { Pressable, View } from 'react-native';
 
-import type { Button } from "../../components/deprecated-ui/button";
-import { buttonVariants } from "../../components/deprecated-ui/button";
-import { cn } from "../../lib/utils";
+import type { Button } from '../../components/deprecated-ui/button';
+import { buttonVariants } from '../../components/deprecated-ui/button';
+import { cn } from '../../lib/utils';
 
 interface ToggleGroupProps {
   defaultValue?: string | string[];
   onValueChange?: (value: string | string[]) => void;
   disabled?: boolean;
-  type?: "single" | "multiple";
+  type?: 'single' | 'multiple';
 }
 
 interface ToggleGroupContext {
@@ -27,22 +27,11 @@ const ToggleGroup = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof View> & ToggleGroupProps
 >(
   (
-    {
-      defaultValue = "",
-      onValueChange,
-      className,
-      disabled = false,
-      type = "single",
-      ...props
-    },
-    ref,
+    { defaultValue = '', onValueChange, className, disabled = false, type = 'single', ...props },
+    ref
   ) => {
     const [value, setValue] = React.useState(
-      type === "single"
-        ? defaultValue
-        : Array.isArray(defaultValue)
-          ? defaultValue
-          : [],
+      type === 'single' ? defaultValue : Array.isArray(defaultValue) ? defaultValue : []
     );
 
     return (
@@ -55,23 +44,23 @@ const ToggleGroup = React.forwardRef<
         }}
       >
         <View
-          role={type === "single" ? "radiogroup" : "group"}
+          role={type === 'single' ? 'radiogroup' : 'group'}
           ref={ref}
-          className={cn("flex-row gap-3", className)}
+          className={cn('flex-row gap-3', className)}
           {...props}
         />
       </ToggleGroupContext.Provider>
     );
-  },
+  }
 );
 
-ToggleGroup.displayName = "ToggleGroup";
+ToggleGroup.displayName = 'ToggleGroup';
 
 function useToggleGroupContext() {
   const context = React.useContext(ToggleGroupContext);
   if (!context) {
     throw new Error(
-      "ToggleGroup compound components cannot be rendered outside the ToggleGroup component",
+      'ToggleGroup compound components cannot be rendered outside the ToggleGroup component'
     );
   }
   return context;
@@ -79,7 +68,7 @@ function useToggleGroupContext() {
 
 const ToggleGroupItem = React.forwardRef<
   React.ElementRef<typeof Button>,
-  Omit<React.ComponentPropsWithoutRef<typeof Button>, "disabled" | "style"> & {
+  Omit<React.ComponentPropsWithoutRef<typeof Button>, 'disabled' | 'style'> & {
     name: string;
     buttonClass?: string;
     children?: React.ReactNode;
@@ -87,26 +76,15 @@ const ToggleGroupItem = React.forwardRef<
   }
 >(
   (
-    {
-      className,
-      name,
-      buttonClass,
-      onPress,
-      children,
-      variant = "default",
-      size,
-      style,
-      ...props
-    },
-    ref,
+    { className, name, buttonClass, onPress, children, variant = 'default', size, style, ...props },
+    ref
   ) => {
-    const { value, setValue, disabled, onValueChange } =
-      useToggleGroupContext();
+    const { value, setValue, disabled, onValueChange } = useToggleGroupContext();
 
     function handleOnPress(ev: GestureResponderEvent) {
       setValue((prev) => {
-        if (typeof prev === "string") {
-          const newVal = prev === name ? "" : name;
+        if (typeof prev === 'string') {
+          const newVal = prev === name ? '' : name;
           onValueChange?.(newVal);
           return newVal;
         }
@@ -122,36 +100,30 @@ const ToggleGroupItem = React.forwardRef<
       onPress?.(ev);
     }
 
-    const isSelected = Array.isArray(value)
-      ? value.includes(name)
-      : value === name;
+    const isSelected = Array.isArray(value) ? value.includes(name) : value === name;
 
     return (
       <Pressable
         disabled={disabled}
         onPress={handleOnPress}
         className={cn(
-          "border bg-background active:opacity-70",
-          isSelected ? "border-border" : "border-transparent",
+          'border bg-background active:opacity-70',
+          isSelected ? 'border-border' : 'border-transparent',
           buttonVariants({
-            variant: isSelected
-              ? "secondary"
-              : variant === "default"
-                ? "ghost"
-                : "outline",
+            variant: isSelected ? 'secondary' : variant === 'default' ? 'ghost' : 'outline',
             size,
           }),
-          className,
+          className
         )}
         accessibilityState={{ selected: value === name }}
-        role={typeof name === "string" ? "radio" : "switch"}
+        role={typeof name === 'string' ? 'radio' : 'switch'}
         ref={ref}
         {...props}
       >
         {children}
       </Pressable>
     );
-  },
+  }
 );
 
 export { ToggleGroup, ToggleGroupItem };

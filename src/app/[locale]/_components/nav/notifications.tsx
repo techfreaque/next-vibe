@@ -14,16 +14,13 @@ import {
 } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
-import type { StandardUserType } from "@/app/api/[locale]/v1/core/user/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
 export function Notifications({
-  user, // TODO: Use user for personalized notifications
   locale,
 }: {
-  user: StandardUserType;
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = simpleT(locale);
@@ -37,7 +34,7 @@ export function Notifications({
       title: "common.api.notifications.welcome.title",
       description: "common.api.notifications.welcome.description",
       level: "info",
-      href: "/app/onboarding",
+      href: "/",
     },
   ]; // TODO: create notifications repository in api folder
   const unreadNotificationCount = unreadNotifications?.length;
@@ -112,10 +109,7 @@ function NotificationButton({
                 variant="notification"
                 className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center font-medium border-2 border-white dark:border-gray-800"
               >
-                {notificationCount > 99
-                  ? // eslint-disable-next-line i18next/no-literal-string
-                    "99+"
-                  : String(notificationCount)}
+                {notificationCount > 99 ? 99 : notificationCount}
               </Badge>
             )}
           </Button>

@@ -130,7 +130,7 @@ export function ScheduleAutocomplete({
             <div className="flex items-center gap-2 flex-1 min-w-0">
               {isCustomValue && (
                 <Badge variant="secondary" className="text-xs">
-                  {t("admin.dashboard.cron.taskDetails.customBadge")}
+                  {t("app.admin.cron.taskDetails.customBadge")}
                 </Badge>
               )}
               <span className="truncate">
@@ -171,7 +171,7 @@ export function ScheduleAutocomplete({
               <CommandEmpty>
                 <div className="py-6 text-center text-sm">
                   <p className="text-muted-foreground">
-                    {t("admin.dashboard.cron.taskDetails.noSchedulesFound")}
+                    {t("app.admin.cron.taskDetails.noSchedulesFound")}
                   </p>
                   {allowCustom && searchValue && (
                     <Button
@@ -180,7 +180,7 @@ export function ScheduleAutocomplete({
                       className="mt-2"
                       onClick={() => handleCustomValue(searchValue)}
                     >
-                      {t("admin.dashboard.cron.taskDetails.useCustomSchedule", {
+                      {t("app.admin.cron.taskDetails.useCustomSchedule", {
                         searchValue,
                       })}
                     </Button>
@@ -191,7 +191,7 @@ export function ScheduleAutocomplete({
               {filteredOptions.length > 0 && (
                 <CommandGroup
                   heading={t(
-                    "admin.dashboard.cron.taskDetails.commonSchedules",
+                    "app.admin.cron.taskDetails.commonSchedules",
                   )}
                 >
                   {filteredOptions.map((option) => (
@@ -215,7 +215,7 @@ export function ScheduleAutocomplete({
                     className="flex items-center justify-between"
                   >
                     <span>
-                      {t("admin.dashboard.cron.taskDetails.useCustomSchedule", {
+                      {t("app.admin.cron.taskDetails.useCustomSchedule", {
                         searchValue,
                       })}
                     </span>

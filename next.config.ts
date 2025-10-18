@@ -30,6 +30,23 @@ const nextConfig: NextConfig = {
           "*.native.tsx": {
             loaders: ["ignore-loader"],
           },
+          // Ignore standalone package source files and routes in API routes
+          // These are tools/packages that happen to be in the API directory but aren't API routes
+          "src/app/api/**/builder/**": {
+            loaders: ["ignore-loader"],
+          },
+          "src/app/api/**/launchpad/**": {
+            loaders: ["ignore-loader"],
+          },
+          "src/app/api/**/release-tool/**": {
+            loaders: ["ignore-loader"],
+          },
+          "src/app/api/**/guard/**": {
+            loaders: ["ignore-loader"],
+          },
+          "src/app/api/**/check/**": {
+            loaders: ["ignore-loader"],
+          },
         },
       }
     : undefined,
@@ -109,6 +126,9 @@ const nextConfig: NextConfig = {
   },
 
   distDir: ".next",
+
+  // Enable standalone output for Docker production builds
+  output: "standalone",
 } as NextConfig;
 
 export default nextConfig;

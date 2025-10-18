@@ -1,8 +1,8 @@
-import { useNavigation } from "expo-router";
-import * as React from "react";
-import { Pressable, StyleSheet, View } from "react-native";
-import Animated, { FadeIn } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useNavigation } from 'expo-router';
+import * as React from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   Menubar,
@@ -18,8 +18,8 @@ import {
   MenubarSubContent,
   MenubarSubTrigger,
   MenubarTrigger,
-} from "~/components/ui/menubar";
-import { Text } from "~/components/ui/text";
+} from '~/components/ui/menubar';
+import { Text } from '~/components/ui/text';
 
 export default function MenubarScreen() {
   const insets = useSafeAreaInsets();
@@ -34,10 +34,10 @@ export default function MenubarScreen() {
   const [isSubOpen2, setIsSubOpen2] = React.useState(false);
   const [isChecked, setIsChecked] = React.useState(false);
   const [isChecked2, setIsChecked2] = React.useState(false);
-  const [radio, setRadio] = React.useState("michael");
+  const [radio, setRadio] = React.useState('michael');
   const navigation = useNavigation();
   React.useEffect(() => {
-    const sub = navigation.addListener("blur", () => {
+    const sub = navigation.addListener('blur', () => {
       onValueChange(undefined);
     });
 
@@ -50,7 +50,7 @@ export default function MenubarScreen() {
   }
 
   function onValueChange(val: string | undefined) {
-    if (typeof val === "string") {
+    if (typeof val === 'string') {
       setValue(val);
       return;
     }
@@ -59,7 +59,7 @@ export default function MenubarScreen() {
   }
 
   return (
-    <View className="flex-1 items-center p-4">
+    <View className='flex-1 items-center p-4'>
       {!!value && (
         <Pressable
           onPress={() => {
@@ -69,7 +69,7 @@ export default function MenubarScreen() {
         />
       )}
       <Menubar value={value} onValueChange={onValueChange}>
-        <MenubarMenu value="file">
+        <MenubarMenu value='file'>
           <MenubarTrigger onPress={closeSubs}>
             <Text>File</Text>
           </MenubarTrigger>
@@ -111,11 +111,11 @@ export default function MenubarScreen() {
             </MenubarItem>
           </MenubarContent>
         </MenubarMenu>
-        <MenubarMenu value="edit">
+        <MenubarMenu value='edit'>
           <MenubarTrigger onPress={closeSubs}>
             <Text>Edit</Text>
           </MenubarTrigger>
-          <MenubarContent insets={contentInsets} className="native:w-48">
+          <MenubarContent insets={contentInsets} className='native:w-48'>
             <MenubarItem>
               <Text>Undo</Text>
               <MenubarShortcut>⌘Z</MenubarShortcut>
@@ -159,7 +159,7 @@ export default function MenubarScreen() {
             </MenubarItem>
           </MenubarContent>
         </MenubarMenu>
-        <MenubarMenu value="view">
+        <MenubarMenu value='view'>
           <MenubarTrigger onPress={closeSubs}>
             <Text>View</Text>
           </MenubarTrigger>
@@ -197,19 +197,19 @@ export default function MenubarScreen() {
             </MenubarItem>
           </MenubarContent>
         </MenubarMenu>
-        <MenubarMenu value="profile">
+        <MenubarMenu value='profile'>
           <MenubarTrigger onPress={closeSubs}>
             <Text>Profiles</Text>
           </MenubarTrigger>
           <MenubarContent insets={contentInsets}>
             <MenubarRadioGroup value={radio} onValueChange={setRadio}>
-              <MenubarRadioItem closeOnPress={false} value="andy">
+              <MenubarRadioItem closeOnPress={false} value='andy'>
                 <Text>Andy</Text>
               </MenubarRadioItem>
-              <MenubarRadioItem closeOnPress={false} value="michael">
+              <MenubarRadioItem closeOnPress={false} value='michael'>
                 <Text>Michael</Text>
               </MenubarRadioItem>
-              <MenubarRadioItem closeOnPress={false} value="creed">
+              <MenubarRadioItem closeOnPress={false} value='creed'>
                 <Text>Creed</Text>
               </MenubarRadioItem>
             </MenubarRadioGroup>

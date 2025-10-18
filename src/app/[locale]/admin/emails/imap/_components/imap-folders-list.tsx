@@ -47,25 +47,25 @@ export function ImapFoldersList({
   const getSpecialUseBadge = (type: string): JSX.Element => {
     switch (type) {
       case "inbox":
-        return <Badge variant="default">{t("imap.folder.types.inbox")}</Badge>;
+        return <Badge variant="default">{t("app.admin.emails.imap.folder.types.inbox")}</Badge>;
       case "sent":
-        return <Badge variant="secondary">{t("imap.folder.types.sent")}</Badge>;
+        return <Badge variant="secondary">{t("app.admin.emails.imap.folder.types.sent")}</Badge>;
       case "drafts":
-        return <Badge variant="outline">{t("imap.folder.types.drafts")}</Badge>;
+        return <Badge variant="outline">{t("app.admin.emails.imap.folder.types.drafts")}</Badge>;
       case "trash":
         return (
-          <Badge variant="destructive">{t("imap.folder.types.trash")}</Badge>
+          <Badge variant="destructive">{t("app.admin.emails.imap.folder.types.trash")}</Badge>
         );
       case "junk":
         return (
-          <Badge variant="destructive">{t("imap.folder.types.junk")}</Badge>
+          <Badge variant="destructive">{t("app.admin.emails.imap.folder.types.junk")}</Badge>
         );
       case "archive":
         return (
-          <Badge variant="secondary">{t("imap.folder.types.archive")}</Badge>
+          <Badge variant="secondary">{t("app.admin.emails.imap.folder.types.archive")}</Badge>
         );
       default:
-        return <Badge variant="outline">{t("imap.folder.types.custom")}</Badge>;
+        return <Badge variant="outline">{t("app.admin.emails.imap.folder.types.custom")}</Badge>;
     }
   };
 
@@ -74,34 +74,34 @@ export function ImapFoldersList({
       case "synced":
         return (
           <Badge variant="default" className="bg-green-100 text-green-800">
-            {t("imap.sync.status.synced")}
+            {t("app.admin.emails.imap.sync.status.synced")}
           </Badge>
         );
       case "syncing":
         return (
           <Badge variant="default" className="bg-blue-100 text-blue-800">
-            {t("imap.sync.status.syncing")}
+            {t("app.admin.emails.imap.sync.status.syncing")}
           </Badge>
         );
       case "pending":
         return (
-          <Badge variant="secondary">{t("imap.sync.status.pending")}</Badge>
+          <Badge variant="secondary">{t("app.admin.emails.imap.sync.status.pending")}</Badge>
         );
       case "error":
         return (
-          <Badge variant="destructive">{t("imap.sync.status.error")}</Badge>
+          <Badge variant="destructive">{t("app.admin.emails.imap.sync.status.error")}</Badge>
         );
       default:
-        return <Badge variant="outline">{t("imap.sync.status.unknown")}</Badge>;
+        return <Badge variant="outline">{t("app.admin.emails.imap.sync.status.unknown")}</Badge>;
     }
   };
 
   if (isLoading) {
-    return <div className="p-4">{t("imap.common.loading")}</div>;
+    return <div className="p-4">{t("app.admin.emails.imap.common.loading")}</div>;
   }
 
   if (error) {
-    return <div className="p-4 text-red-600">{t("imap.common.error")}</div>;
+    return <div className="p-4 text-red-600">{t("app.admin.emails.imap.common.error")}</div>;
   }
 
   return (
@@ -109,21 +109,21 @@ export function ImapFoldersList({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t("imap.folder.name")}</TableHead>
-            <TableHead>{t("imap.folder.type")}</TableHead>
-            <TableHead>{t("imap.folder.messageCount")}</TableHead>
-            <TableHead>{t("imap.folder.unread")}</TableHead>
-            <TableHead>{t("imap.folder.recent")}</TableHead>
-            <TableHead>{t("imap.folder.syncStatus")}</TableHead>
-            <TableHead>{t("imap.folder.lastSync")}</TableHead>
-            <TableHead>{t("imap.common.actions")}</TableHead>
+            <TableHead>{t("app.admin.emails.imap.folder.name")}</TableHead>
+            <TableHead>{t("app.admin.emails.imap.folder.type")}</TableHead>
+            <TableHead>{t("app.admin.emails.imap.folder.messageCount")}</TableHead>
+            <TableHead>{t("app.admin.emails.imap.folder.unread")}</TableHead>
+            <TableHead>{t("app.admin.emails.imap.folder.recent")}</TableHead>
+            <TableHead>{t("app.admin.emails.imap.folder.syncStatus")}</TableHead>
+            <TableHead>{t("app.admin.emails.imap.folder.lastSync")}</TableHead>
+            <TableHead>{t("app.admin.emails.imap.common.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {folders.length === 0 ? (
             <TableRow>
               <TableCell colSpan={8} className="text-center py-8">
-                {t("imap.admin.folders.no_folders")}
+                {t("app.admin.emails.imap.admin.folders.no_folders")}
               </TableCell>
             </TableRow>
           ) : (
@@ -169,7 +169,7 @@ export function ImapFoldersList({
                         );
                       }}
                     >
-                      {t("imap.common.sync")}
+                      {t("app.admin.emails.imap.common.sync")}
                     </Button>
                     <Button
                       variant="outline"
@@ -180,7 +180,7 @@ export function ImapFoldersList({
                         );
                       }}
                     >
-                      {t("imap.common.view")}
+                      {t("app.admin.emails.imap.common.view")}
                     </Button>
                   </div>
                 </TableCell>
@@ -193,7 +193,7 @@ export function ImapFoldersList({
       {/* Footer with total count */}
       {totalFolders > 0 && (
         <div className="mt-4 text-sm text-gray-600">
-          {t("imap.folder.total", { count: totalFolders })}
+          {t("app.admin.emails.imap.folder.total", { count: totalFolders })}
         </div>
       )}
     </div>

@@ -1,3 +1,7 @@
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
+import { ID_GENERATION } from "../config/constants";
 import { defaultModel } from "../config/models";
 import { generateThreadTitle } from "./message-tree";
 import type {
@@ -7,13 +11,17 @@ import type {
   NewFolderInput,
   NewThreadInput,
 } from "./types";
-import { DEFAULT_FOLDERS } from "./types";
+import {
+  DEFAULT_FOLDER_CONFIGS,
+  DEFAULT_FOLDERS,
+  isDefaultFolder,
+} from "./types";
 
 /**
  * Generate a unique ID with a given prefix
  */
 function generateId(prefix: string): string {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  return `${prefix}-${Date.now()}-${Math.random().toString(ID_GENERATION.RANDOM_BASE).substring(ID_GENERATION.RANDOM_SUBSTRING_START, ID_GENERATION.RANDOM_SUBSTRING_END)}`;
 }
 
 /**
@@ -33,13 +41,17 @@ export function generateFolderId(): string {
 /**
  * Create a new thread without any initial messages
  */
-export function createThread(input?: Partial<NewThreadInput>): ChatThread {
+export function createThread(
+  locale: CountryLanguage,
+  input?: Partial<NewThreadInput>,
+): ChatThread {
   const threadId = input?.id || generateThreadId();
   const now = Date.now();
+  const { t } = simpleT(locale);
 
   const thread: ChatThread = {
     id: threadId,
-    title: input?.title || "New Chat",
+    title: input?.title || t("app.chat.common.newChat"),
     folderId: input?.folderId || null,
     createdAt: input?.createdAt || now,
     updatedAt: input?.updatedAt || now,
@@ -80,28 +92,38 @@ export function createFolder(input: NewFolderInput): ChatFolder {
 /**
  * Create initial chat state with default folders
  */
-export function createInitialChatState(): ChatState {
-  const generalFolder = createFolder({
-    id: DEFAULT_FOLDERS.GENERAL,
-    name: "Private Chats",
-    parentId: null,
-    icon: "folder",
-    expanded: true,
-  });
+export function createInitialChatState(locale: CountryLanguage): ChatState {
+  const { t } = simpleT(locale);
 
-  const initialThread = createThread({
-    folderId: DEFAULT_FOLDERS.GENERAL,
+  // Create default folders from centralized config
+  const folders: Record<string, ChatFolder> = {};
+  const rootFolderIds: string[] = [];
+
+  for (const config of DEFAULT_FOLDER_CONFIGS) {
+    const folder = createFolder({
+      id: config.id,
+      name: t(config.translationKey),
+      translationKey: config.translationKey,
+      isUserCustomized: false,
+      parentId: null,
+      icon: config.icon,
+      expanded: true,
+    });
+    folders[config.id] = folder;
+    rootFolderIds.push(config.id);
+  }
+
+  const initialThread = createThread(locale, {
+    folderId: DEFAULT_FOLDERS.PRIVATE,
   });
 
   return {
     threads: {
       [initialThread.id]: initialThread,
     },
-    folders: {
-      [generalFolder.id]: generalFolder,
-    },
+    folders,
     activeThreadId: initialThread.id,
-    rootFolderIds: [DEFAULT_FOLDERS.GENERAL],
+    rootFolderIds,
     unfiledThreadIds: [],
     lastUpdated: Date.now(),
     version: 2,
@@ -249,13 +271,24 @@ export function addFolderToState(
   state: ChatState,
   folder: ChatFolder,
 ): ChatState {
+  // Validate: Only default folders can be at root level (parentId === null)
+  if (!folder.parentId && !isDefaultFolder(folder.id)) {
+    // eslint-disable-next-line no-console -- Validation error
+    console.error(
+      // eslint-disable-next-line i18next/no-literal-string -- Error message
+      "Cannot add non-default folder at root level. Folder must have a parent.",
+      folder,
+    );
+    return state; // Return unchanged state
+  }
+
   const updatedState = { ...state };
   updatedState.folders = {
     ...state.folders,
     [folder.id]: folder,
   };
 
-  // Add to root folders if no parent
+  // Add to root folders if no parent (only for default folders)
   if (!folder.parentId && !updatedState.rootFolderIds.includes(folder.id)) {
     updatedState.rootFolderIds = [...state.rootFolderIds, folder.id];
   }
@@ -360,4 +393,85 @@ export function autoUpdateThreadTitle(
   return updateThreadInState(state, threadId, {
     title: newTitle,
   });
+}
+
+/**
+ * Ensure all default folders exist in the state
+ * This function guarantees that the 4 default folders are always present
+ */
+export function ensureDefaultFolders(
+  state: ChatState,
+  locale: CountryLanguage,
+): ChatState {
+  const { t } = simpleT(locale);
+  let updatedState = { ...state };
+  let needsUpdate = false;
+
+  // Check each default folder
+
+  // Use centralized default folder configs
+  for (const config of DEFAULT_FOLDER_CONFIGS) {
+    if (!updatedState.folders[config.id]) {
+      // Folder doesn't exist, create it
+      const newFolder = createFolder({
+        id: config.id,
+        name: t(config.translationKey),
+        translationKey: config.translationKey,
+        isUserCustomized: false,
+        parentId: null,
+        icon: config.icon,
+        expanded: true,
+      });
+
+      updatedState.folders[config.id] = newFolder;
+
+      // Add to root folders if not already there
+      if (!updatedState.rootFolderIds.includes(config.id)) {
+        updatedState.rootFolderIds = [...updatedState.rootFolderIds, config.id];
+      }
+
+      needsUpdate = true;
+    }
+  }
+
+  if (needsUpdate) {
+    updatedState.lastUpdated = Date.now();
+  }
+
+  return updatedState;
+}
+
+/**
+ * Get the display name for a folder
+ * For default folders, always use the translation key from DEFAULT_FOLDER_CONFIGS
+ * For custom folders, if user has customized the name, use stored name
+ * Otherwise, translate the translation key if available
+ */
+export function getFolderDisplayName(
+  folder: ChatFolder,
+  locale: CountryLanguage,
+): string {
+  const { t } = simpleT(locale);
+
+  // For default folders, always use the translation key from config
+  // This ensures names update when translations change
+  if (isDefaultFolder(folder.id)) {
+    const config = DEFAULT_FOLDER_CONFIGS.find((c) => c.id === folder.id);
+    if (config) {
+      return t(config.translationKey);
+    }
+  }
+
+  // If user has customized the name, always use the stored name
+  if (folder.isUserCustomized) {
+    return folder.name;
+  }
+
+  // If folder has a translation key, translate it
+  if (folder.translationKey) {
+    return t(folder.translationKey);
+  }
+
+  // Fallback to stored name
+  return folder.name;
 }

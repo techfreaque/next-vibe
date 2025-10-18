@@ -78,7 +78,7 @@ function TaskDeleteButton({
   const deleteHook = useDeleteCronTask(taskId);
 
   const handleDelete = async (): Promise<void> => {
-    if (!window.confirm(t("common.confirmDelete"))) {
+    if (!window.confirm(t("app.common.confirmDelete"))) {
       return;
     }
 
@@ -132,7 +132,7 @@ function InlineEditForm({
     <div className="bg-gray-50 dark:bg-gray-800 p-4 border-t">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-medium">
-          {t("admin.dashboard.cron.taskDetails.edit")}: {task.name}
+          {t("app.admin.cron.taskDetails.edit")}: {task.name}
         </h3>
         <Button variant="ghost" size="sm" onClick={onCancel}>
           <X className="h-4 w-4" />
@@ -164,7 +164,7 @@ export function CronTasksTable({
     if (!task.enabled) {
       return (
         <Badge variant="secondary">
-          {t("admin.dashboard.cron.taskStatus.disabled")}
+          {t("app.admin.cron.taskStatus.disabled")}
         </Badge>
       );
     }
@@ -172,7 +172,7 @@ export function CronTasksTable({
     if (task.isRunning) {
       return (
         <Badge variant="default" className="bg-blue-500">
-          {t("admin.dashboard.cron.taskStatus.running")}
+          {t("app.admin.cron.taskStatus.running")}
         </Badge>
       );
     }
@@ -180,7 +180,7 @@ export function CronTasksTable({
     if (task.lastExecutionStatus === "completed") {
       return (
         <Badge variant="default" className="bg-green-500">
-          {t("admin.dashboard.cron.taskStatus.completed")}
+          {t("app.admin.cron.taskStatus.completed")}
         </Badge>
       );
     }
@@ -188,14 +188,14 @@ export function CronTasksTable({
     if (task.lastExecutionStatus === "failed") {
       return (
         <Badge variant="destructive">
-          {t("admin.dashboard.cron.taskStatus.failed")}
+          {t("app.admin.cron.taskStatus.failed")}
         </Badge>
       );
     }
 
     return (
       <Badge variant="outline">
-        {t("admin.dashboard.cron.taskStatus.pending")}
+        {t("app.admin.cron.taskStatus.pending")}
       </Badge>
     );
   };
@@ -214,7 +214,7 @@ export function CronTasksTable({
     return (
       <div className="text-center py-8">
         <p className="text-gray-500 dark:text-gray-400">
-          {t("cronErrors.admin.interface.noResults")}
+          {t("app.admin.cron.cronErrors.admin.interface.noResults")}
         </p>
       </div>
     );
@@ -225,17 +225,17 @@ export function CronTasksTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t("admin.dashboard.cron.table.name")}</TableHead>
-            <TableHead>{t("admin.dashboard.cron.table.schedule")}</TableHead>
-            <TableHead>{t("admin.dashboard.cron.table.status")}</TableHead>
+            <TableHead>{t("app.admin.cron.table.name")}</TableHead>
+            <TableHead>{t("app.admin.cron.table.schedule")}</TableHead>
+            <TableHead>{t("app.admin.cron.table.status")}</TableHead>
             <TableHead>
-              {t("admin.dashboard.cron.table.lastExecuted")}
+              {t("app.admin.cron.table.lastExecuted")}
             </TableHead>
             <TableHead>
-              {t("admin.dashboard.cron.table.nextExecution")}
+              {t("app.admin.cron.table.nextExecution")}
             </TableHead>
-            <TableHead>{t("admin.dashboard.cron.table.enabled")}</TableHead>
-            <TableHead>{t("admin.dashboard.cron.table.actions")}</TableHead>
+            <TableHead>{t("app.admin.cron.table.enabled")}</TableHead>
+            <TableHead>{t("app.admin.cron.table.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -270,7 +270,7 @@ export function CronTasksTable({
                   <div className="text-sm">
                     {task.lastExecutedAt
                       ? new Date(task.lastExecutedAt).toLocaleString(locale)
-                      : t("admin.dashboard.cron.taskStatus.never")}
+                      : t("app.admin.cron.taskStatus.never")}
                   </div>
                 </TableCell>
                 <TableCell>
@@ -278,7 +278,7 @@ export function CronTasksTable({
                     {task.nextExecutionAt
                       ? new Date(task.nextExecutionAt).toLocaleString(locale)
                       : t(
-                          "admin.dashboard.cron.formatting.fallbacks.notScheduled",
+                          "app.admin.cron.formatting.fallbacks.notScheduled",
                         )}
                   </div>
                 </TableCell>

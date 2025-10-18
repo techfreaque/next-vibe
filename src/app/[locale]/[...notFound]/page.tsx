@@ -28,7 +28,7 @@ export async function generateMetadata({
     title: "meta.notFound.title",
     category: "meta.notFound.category",
     description: "meta.notFound.description",
-    image: "https://socialmediaservice.com/images/not-found.jpg",
+    image: "https://unbottled.ai/images/not-found.jpg",
     imageAlt: "meta.notFound.imageAlt",
     keywords: ["meta.notFound.keywords"],
   });

@@ -3,6 +3,8 @@
  * Cohesive blue gradient color system
  */
 
+/* eslint-disable i18next/no-literal-string -- All strings are CSS class names and technical identifiers */
+
 export const chatColors = {
   // Primary blue gradients
   primary: {
@@ -36,7 +38,7 @@ export const chatColors = {
 
   // Message bubbles
   message: {
-    user: "bg-gradient-to-br from-blue-500 to-blue-600",
+    user: "bg-blue-100 dark:bg-blue-950",
     assistant: "bg-white dark:bg-slate-900",
     error: "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900",
   },

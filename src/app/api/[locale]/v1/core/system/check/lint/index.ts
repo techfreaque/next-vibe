@@ -145,22 +145,22 @@ export function createEslintConfig(
             project: resolvedTsConfigPaths,
           },
         },
-        "react": { version: reactVersion },
+        react: { version: reactVersion },
       },
 
       plugins: {
         js,
         "@typescript-eslint": ts,
-        "import": importPlugin,
-        "prettier": eslintPluginPrettier,
+        import: importPlugin,
+        prettier: eslintPluginPrettier,
         // "react-compiler": reactCompiler,
         "react-hooks": reactHooks,
         "simple-import-sort": simpleImportSort,
         "unused-imports": unusedImports,
-        "node": nodePlugin,
-        "react": reactPlugin,
+        node: nodePlugin,
+        react: reactPlugin,
         "jsx-a11y": jsxA11y,
-        "promise": promisePlugin,
+        promise: promisePlugin,
         "@c-ehrlich/use-server": useServerPlugin,
       },
 
@@ -275,8 +275,8 @@ export function createEslintConfig(
         "import/no-restricted-paths": "error",
 
         // General code-quality rules
-        "curly": "error",
-        "eqeqeq": ["error", "always"],
+        curly: "error",
+        eqeqeq: ["error", "always"],
         "import/newline-after-import": "error",
         "prefer-template": "error",
         "no-console": "error",
@@ -290,7 +290,7 @@ export function createEslintConfig(
         "no-self-compare": "error",
         "no-unreachable-loop": "error",
         "no-unused-private-class-members": "error",
-        "camelcase": ["error", { properties: "never" }],
+        camelcase: ["error", { properties: "never" }],
 
         // force relative imports
         "no-restricted-imports": [

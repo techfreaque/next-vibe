@@ -24,8 +24,8 @@ export async function generateMetadata({
   const { t } = simpleT(locale);
 
   return {
-    title: t("emails.nav.campaigns"),
-    description: t("emails.admin.description"),
+    title: t("app.admin.emails.list.nav.campaigns"),
+    description: t("app.admin.emails.list.admin.description"),
   };
 }
 

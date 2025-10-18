@@ -31,6 +31,29 @@ export const Languages = languageConfig.languages;
 export const LanguagesArr = languageConfig.languagesArr;
 
 /**
+ * Countries Options for select fields
+ * Maps country codes to translation keys for UI display
+ */
+export const CountriesOptions = Object.keys(languageConfig.countries).map(
+  (key) => ({
+    value: key,
+    label: `i18n.countries.${key.toLowerCase()}` as const,
+  }),
+);
+
+/**
+ * Languages Options for select fields
+ * Maps language codes to translation keys for UI display
+ */
+export const LanguagesOptions = Object.keys(languageConfig.languages).map(
+  (key) => ({
+    value: key,
+    label:
+      `i18n.languages.${languageConfig.languages[key as keyof typeof languageConfig.languages].toLowerCase()}` as const,
+  }),
+);
+
+/**
  * Country Filter Enum
  * Includes all countries plus an "all" option for filtering
  */

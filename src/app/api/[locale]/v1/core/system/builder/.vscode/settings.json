@@ -1,8 +1,6 @@
 {
   "files.eol": "\n",
-  "cSpell.words": [
-    "profity"
-  ],
+  "cSpell.words": ["profity"],
   "editor.formatOnSave": true, // Format files on save
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",

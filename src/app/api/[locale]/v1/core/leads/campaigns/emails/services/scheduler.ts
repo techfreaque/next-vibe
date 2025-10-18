@@ -70,7 +70,9 @@ export class CampaignSchedulerService {
    * Leads are ineligible if they are converted, unsubscribed, or have invalid status
    */
   private isLeadEligibleForCampaign(lead: typeof leads.$inferSelect): boolean {
-    const ineligibleStatuses = [
+    const ineligibleStatuses: Array<
+      (typeof LeadStatus)[keyof typeof LeadStatus]
+    > = [
       LeadStatus.UNSUBSCRIBED,
       LeadStatus.SIGNED_UP,
       LeadStatus.CONSULTATION_BOOKED,

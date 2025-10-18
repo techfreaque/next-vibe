@@ -10,23 +10,23 @@ interface SpeechRecognition extends EventTarget {
   stop(): void;
   abort(): void;
 
-  onaudioend: ((this: SpeechRecognition, ev: Event) => unknown) | null;
-  onaudiostart: ((this: SpeechRecognition, ev: Event) => unknown) | null;
-  onend: ((this: SpeechRecognition, ev: Event) => unknown) | null;
+  onaudioend: ((this: SpeechRecognition, ev: Event) => void) | null;
+  onaudiostart: ((this: SpeechRecognition, ev: Event) => void) | null;
+  onend: ((this: SpeechRecognition, ev: Event) => void) | null;
   onerror:
-    | ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => unknown)
+    | ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => void)
     | null;
   onnomatch:
-    | ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => unknown)
+    | ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => void)
     | null;
   onresult:
-    | ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => unknown)
+    | ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => void)
     | null;
-  onsoundend: ((this: SpeechRecognition, ev: Event) => unknown) | null;
-  onsoundstart: ((this: SpeechRecognition, ev: Event) => unknown) | null;
-  onspeechend: ((this: SpeechRecognition, ev: Event) => unknown) | null;
-  onspeechstart: ((this: SpeechRecognition, ev: Event) => unknown) | null;
-  onstart: ((this: SpeechRecognition, ev: Event) => unknown) | null;
+  onsoundend: ((this: SpeechRecognition, ev: Event) => void) | null;
+  onsoundstart: ((this: SpeechRecognition, ev: Event) => void) | null;
+  onspeechend: ((this: SpeechRecognition, ev: Event) => void) | null;
+  onspeechstart: ((this: SpeechRecognition, ev: Event) => void) | null;
+  onstart: ((this: SpeechRecognition, ev: Event) => void) | null;
 }
 
 interface SpeechRecognitionEvent extends Event {
@@ -65,17 +65,12 @@ interface SpeechRecognitionErrorEvent extends Event {
   readonly message: string;
 }
 
-declare var SpeechRecognition: {
+interface SpeechRecognitionStatic {
   prototype: SpeechRecognition;
   new (): SpeechRecognition;
-};
-
-declare var webkitSpeechRecognition: {
-  prototype: SpeechRecognition;
-  new (): SpeechRecognition;
-};
+}
 
 interface Window {
-  SpeechRecognition: typeof SpeechRecognition;
-  webkitSpeechRecognition: typeof webkitSpeechRecognition;
+  SpeechRecognition: SpeechRecognitionStatic;
+  webkitSpeechRecognition: SpeechRecognitionStatic;
 }

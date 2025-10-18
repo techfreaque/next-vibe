@@ -53,7 +53,7 @@ export function EmailsListFilters({
           config={{
             type: "text",
             label: undefined,
-            placeholder: "emails.admin.filters.search",
+            placeholder: "app.admin.emails.list.admin.filters.search",
           }}
           control={form.control}
           schema={emailListEndpoint.GET.requestSchema}
@@ -69,43 +69,43 @@ export function EmailsListFilters({
           config={{
             type: "select",
             label: undefined,
-            placeholder: "emails.admin.filters.status",
+            placeholder: "app.admin.emails.list.admin.filters.status",
             options: [
               {
                 value: EmailStatusFilter.ALL,
-                label: "emails.admin.status.all",
+                label: "app.admin.emails.list.admin.status.all",
               },
               {
                 value: EmailStatusFilter.PENDING,
-                label: "emails.admin.status.pending",
+                label: "app.admin.emails.list.admin.status.pending",
               },
               {
                 value: EmailStatusFilter.SENT,
-                label: "emails.admin.status.sent",
+                label: "app.admin.emails.list.admin.status.sent",
               },
               {
                 value: EmailStatusFilter.DELIVERED,
-                label: "emails.admin.status.delivered",
+                label: "app.admin.emails.list.admin.status.delivered",
               },
               {
                 value: EmailStatusFilter.OPENED,
-                label: "emails.admin.status.opened",
+                label: "app.admin.emails.list.admin.status.opened",
               },
               {
                 value: EmailStatusFilter.CLICKED,
-                label: "emails.admin.status.clicked",
+                label: "app.admin.emails.list.admin.status.clicked",
               },
               {
                 value: EmailStatusFilter.BOUNCED,
-                label: "emails.admin.status.bounced",
+                label: "app.admin.emails.list.admin.status.bounced",
               },
               {
                 value: EmailStatusFilter.FAILED,
-                label: "emails.admin.status.failed",
+                label: "app.admin.emails.list.admin.status.failed",
               },
               {
                 value: EmailStatusFilter.UNSUBSCRIBED,
-                label: "emails.admin.status.unsubscribed",
+                label: "app.admin.emails.list.admin.status.unsubscribed",
               },
             ],
           }}
@@ -123,35 +123,35 @@ export function EmailsListFilters({
           config={{
             type: "select",
             label: undefined,
-            placeholder: "emails.admin.filters.type",
+            placeholder: "app.admin.emails.list.admin.filters.type",
             options: [
               {
                 value: EmailTypeFilter.ALL,
-                label: "emails.admin.type.all",
+                label: "app.admin.emails.list.admin.type.all",
               },
               {
                 value: EmailTypeFilter.TRANSACTIONAL,
-                label: "emails.admin.type.transactional",
+                label: "app.admin.emails.list.admin.type.transactional",
               },
               {
                 value: EmailTypeFilter.MARKETING,
-                label: "emails.admin.type.marketing",
+                label: "app.admin.emails.list.admin.type.marketing",
               },
               {
                 value: EmailTypeFilter.NOTIFICATION,
-                label: "emails.admin.type.notification",
+                label: "app.admin.emails.list.admin.type.notification",
               },
               {
                 value: EmailTypeFilter.SYSTEM,
-                label: "emails.admin.type.system",
+                label: "app.admin.emails.list.admin.type.system",
               },
               {
                 value: EmailTypeFilter.LEAD_CAMPAIGN,
-                label: "emails.admin.type.lead_campaign",
+                label: "app.admin.emails.list.admin.type.lead_campaign",
               },
               {
                 value: EmailTypeFilter.USER_COMMUNICATION,
-                label: "emails.admin.type.user_communication",
+                label: "app.admin.emails.list.admin.type.user_communication",
               },
             ],
           }}
@@ -169,31 +169,31 @@ export function EmailsListFilters({
           config={{
             type: "select",
             label: undefined,
-            placeholder: "emails.admin.sort.field",
+            placeholder: "app.admin.emails.list.admin.sort.field",
             options: [
               {
                 value: EmailSortField.CREATED_AT,
-                label: "emails.admin.sort.created_at",
+                label: "app.admin.emails.list.admin.sort.created_at",
               },
               {
                 value: EmailSortField.SENT_AT,
-                label: "emails.admin.sort.sent_at",
+                label: "app.admin.emails.list.admin.sort.sent_at",
               },
               {
                 value: EmailSortField.SUBJECT,
-                label: "emails.admin.sort.subject",
+                label: "app.admin.emails.list.admin.sort.subject",
               },
               {
                 value: EmailSortField.RECIPIENT_EMAIL,
-                label: "emails.admin.sort.recipient_email",
+                label: "app.admin.emails.list.admin.sort.recipient_email",
               },
               {
                 value: EmailSortField.STATUS,
-                label: "emails.admin.sort.status",
+                label: "app.admin.emails.list.admin.sort.status",
               },
               {
                 value: EmailSortField.TYPE,
-                label: "emails.admin.sort.type",
+                label: "app.admin.emails.list.admin.sort.type",
               },
             ],
           }}
@@ -214,15 +214,15 @@ export function EmailsListFilters({
           config={{
             type: "select",
             label: undefined,
-            placeholder: "emails.admin.sort.order",
+            placeholder: "app.admin.emails.list.admin.sort.order",
             options: [
               {
                 value: SortOrder.DESC,
-                label: "emails.admin.sort.desc",
+                label: "app.admin.emails.list.admin.sort.desc",
               },
               {
                 value: SortOrder.ASC,
-                label: "emails.admin.sort.asc",
+                label: "app.admin.emails.list.admin.sort.asc",
               },
             ],
           }}
@@ -242,7 +242,7 @@ export function EmailsListFilters({
             size="sm"
             onClick={handleClearFilters}
           >
-            {t("emails.admin.filters.clear")}
+            {t("app.admin.emails.list.admin.filters.clear")}
           </Button>
         </div>
       </div>
@@ -250,7 +250,7 @@ export function EmailsListFilters({
       {/* Quick filter buttons */}
       <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
         <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
-          {t("emails.admin.filters.quick_filters")}:
+          {t("app.admin.emails.list.admin.filters.quick_filters")}:
         </span>
         <Button
           type="button"
@@ -260,7 +260,7 @@ export function EmailsListFilters({
             form.setValue("status", EmailStatusFilter.SENT);
           }}
         >
-          {t("emails.admin.filters.quick.sent")}
+          {t("app.admin.emails.list.admin.filters.quick.sent")}
         </Button>
         <Button
           type="button"
@@ -270,7 +270,7 @@ export function EmailsListFilters({
             form.setValue("status", EmailStatusFilter.OPENED);
           }}
         >
-          {t("emails.admin.filters.quick.opened")}
+          {t("app.admin.emails.list.admin.filters.quick.opened")}
         </Button>
         <Button
           type="button"
@@ -280,7 +280,7 @@ export function EmailsListFilters({
             form.setValue("status", EmailStatusFilter.BOUNCED);
           }}
         >
-          {t("emails.admin.filters.quick.bounced")}
+          {t("app.admin.emails.list.admin.filters.quick.bounced")}
         </Button>
         <Button
           type="button"
@@ -290,7 +290,7 @@ export function EmailsListFilters({
             form.setValue("type", EmailTypeFilter.LEAD_CAMPAIGN);
           }}
         >
-          {t("emails.admin.filters.quick.lead_campaigns")}
+          {t("app.admin.emails.list.admin.filters.quick.lead_campaigns")}
         </Button>
       </div>
     </>

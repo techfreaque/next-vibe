@@ -2,11 +2,13 @@
 
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useChatContext } from "../../features/chat/context";
+import { DOM_IDS, LAYOUT, QUOTE_CHARACTER } from "../../lib/config/constants";
 import type { ModelId } from "../../lib/config/models";
 import type {
   ChatMessage,
@@ -29,6 +31,7 @@ interface ChatMessagesProps {
   messages: ChatMessage[];
   selectedModel: ModelId;
   selectedTone: string;
+  ttsAutoplay: boolean;
   onEditMessage: (messageId: string, newContent: string) => Promise<void>;
   onDeleteMessage: (messageId: string) => void;
   onSwitchBranch: (messageId: string, branchIndex: number) => void;
@@ -37,12 +40,19 @@ interface ChatMessagesProps {
   onBranchMessage?: (messageId: string, newContent: string) => Promise<void>;
   onRetryMessage?: (messageId: string) => Promise<void>;
   onAnswerAsModel?: (messageId: string) => Promise<void>;
+  onVoteMessage?: (messageId: string, vote: 1 | -1 | 0) => void;
   isLoading?: boolean;
   showBranchIndicators?: boolean;
-  onSendMessage?: (content: string) => void;
+  onSendMessage?: (
+    prompt: string,
+    personaId: string,
+    modelId?: ModelId,
+  ) => void;
   inputHeight?: number;
   viewMode?: ViewMode;
+  rootFolderId?: string;
   locale: CountryLanguage;
+  logger: EndpointLogger;
 }
 
 export function ChatMessages({
@@ -50,6 +60,7 @@ export function ChatMessages({
   messages,
   selectedModel,
   selectedTone,
+  ttsAutoplay,
   onEditMessage,
   onDeleteMessage,
   onSwitchBranch,
@@ -58,30 +69,86 @@ export function ChatMessages({
   onBranchMessage,
   onRetryMessage,
   onAnswerAsModel,
+  onVoteMessage,
   isLoading = false,
   showBranchIndicators = true,
   onSendMessage,
-  inputHeight = 120,
+  inputHeight = LAYOUT.DEFAULT_INPUT_HEIGHT,
   viewMode = "linear",
+  rootFolderId = "general",
+  locale,
+  logger,
 }: ChatMessagesProps): JSX.Element {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [userScrolledUp, setUserScrolledUp] = useState(false);
+  const lastMessageContentRef = useRef<string>("");
 
   // Use custom hook for message action state management
-  const messageActions = useMessageActions();
+  const messageActions = useMessageActions(logger);
 
   // Get context for inserting text into input
   const { insertTextAtCursor } = useChatContext();
 
-  // Auto-scroll to bottom when new messages arrive
+  // Check if user is at bottom of scroll
+  const isAtBottom = useCallback((): boolean => {
+    const container = messagesContainerRef.current;
+    if (!container) {
+      return true;
+    }
+
+    const threshold = 100; // pixels from bottom
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    return scrollHeight - scrollTop - clientHeight < threshold;
+  }, []);
+
+  // Handle scroll events to detect user scrolling up
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.length]);
+    const container = messagesContainerRef.current;
+    if (!container) {
+      return;
+    }
+
+    const handleScroll = (): void => {
+      const atBottom = isAtBottom();
+      setUserScrolledUp(!atBottom);
+    };
+
+    container.addEventListener("scroll", handleScroll);
+    return (): void => {
+      container.removeEventListener("scroll", handleScroll);
+    };
+  }, [isAtBottom]);
+
+  // Smart auto-scroll: only during streaming, respect user scroll position
+  useEffect(() => {
+    // Don't auto-scroll if user has scrolled up
+    if (userScrolledUp) {
+      return;
+    }
+
+    // Get the last message
+    const lastMessage = messages[messages.length - 1];
+    if (!lastMessage) {
+      return;
+    }
+
+    // Check if content is changing (streaming)
+    const isStreaming =
+      isLoading && lastMessage.content !== lastMessageContentRef.current;
+
+    lastMessageContentRef.current = lastMessage.content;
+
+    // Only auto-scroll during streaming or when new message arrives
+    if (isStreaming || messages.length > 0) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, isLoading, userScrolledUp]);
 
   return (
     <div
       ref={messagesContainerRef}
-      id="chat-messages-container"
+      id={DOM_IDS.MESSAGES_CONTAINER}
       className={cn(
         "h-full overflow-y-auto scroll-smooth",
         "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-blue-400/30 hover:scrollbar-thumb-blue-500/50 scrollbar-thumb-rounded-full",
@@ -89,19 +156,28 @@ export function ChatMessages({
     >
       {/* Inner container with consistent padding and dynamic bottom padding */}
       <div
-        id="chat-messages-content"
+        id={DOM_IDS.MESSAGES_CONTENT}
         className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-15 space-y-5"
-        style={{ paddingBottom: `${inputHeight + 16}px` }}
+        style={{
+          paddingBottom: `${inputHeight + LAYOUT.MESSAGES_BOTTOM_PADDING}px`,
+        }}
       >
         {Object.keys(thread.messages).length === 0 &&
         !isLoading &&
         onSendMessage ? (
-          <div className="flex min-h-[60vh] items-center justify-center">
-            <SuggestedPrompts onSelectPrompt={onSendMessage} />
+          <div
+            className="flex items-center justify-center"
+            style={{ minHeight: `${LAYOUT.SUGGESTIONS_MIN_HEIGHT}vh` }}
+          >
+            <SuggestedPrompts
+              onSelectPrompt={onSendMessage}
+              locale={locale}
+              rootFolderId={rootFolderId}
+            />
           </div>
         ) : viewMode === "flat" ? (
           // Flat view (4chan style) - ALL messages in chronological order
-          (() => {
+          ((): JSX.Element => {
             // Get ALL messages from thread, sorted by timestamp
             const allMessages = Object.values(thread.messages).sort(
               (a, b) => a.timestamp - b.timestamp,
@@ -112,9 +188,14 @@ export function ChatMessages({
                 messages={allMessages}
                 selectedModel={selectedModel}
                 selectedTone={selectedTone}
-                onMessageClick={(messageId) => {
+                ttsAutoplay={ttsAutoplay}
+                locale={locale}
+                logger={logger}
+                onMessageClick={(messageId): void => {
                   // Scroll to message when reference is clicked
-                  const element = document.getElementById(`msg-${messageId}`);
+                  const element = document.getElementById(
+                    `${DOM_IDS.MESSAGE_PREFIX}${messageId}`,
+                  );
                   element?.scrollIntoView({
                     behavior: "smooth",
                     block: "center",
@@ -128,15 +209,14 @@ export function ChatMessages({
                 onModelChange={onModelChange}
                 onToneChange={onToneChange}
                 onInsertQuote={() => {
-                  // Only insert '>' character for quoting
-                  insertTextAtCursor(">");
+                  insertTextAtCursor(QUOTE_CHARACTER);
                 }}
               />
             );
           })()
         ) : viewMode === "threaded" ? (
           // Threaded view (Reddit style) - Show ALL messages, not just current path
-          (() => {
+          ((): JSX.Element[] => {
             const allMessages = Object.values(thread.messages);
             const rootMessages = getRootMessages(
               allMessages,
@@ -151,11 +231,15 @@ export function ChatMessages({
                 depth={0}
                 selectedModel={selectedModel}
                 selectedTone={selectedTone}
+                ttsAutoplay={ttsAutoplay}
+                locale={locale}
+                logger={logger}
                 onEditMessage={onEditMessage}
                 onDeleteMessage={onDeleteMessage}
                 onBranchMessage={onBranchMessage}
                 onRetryMessage={onRetryMessage}
                 onAnswerAsModel={onAnswerAsModel}
+                onVoteMessage={onVoteMessage}
                 onModelChange={onModelChange}
                 onToneChange={onToneChange}
               />
@@ -169,6 +253,8 @@ export function ChatMessages({
             selectedModel={selectedModel}
             selectedTone={selectedTone}
             showBranchIndicators={showBranchIndicators}
+            ttsAutoplay={ttsAutoplay}
+            locale={locale}
             editingMessageId={messageActions.editingMessageId}
             retryingMessageId={messageActions.retryingMessageId}
             answeringMessageId={messageActions.answeringMessageId}
@@ -190,6 +276,7 @@ export function ChatMessages({
             onBranchEdit={(id, content) =>
               messageActions.handleBranchEdit(id, content, onBranchMessage)
             }
+            logger={logger}
           />
         )}
 

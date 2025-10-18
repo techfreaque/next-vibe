@@ -1,35 +1,80 @@
 "use client";
 
-import { FolderPlus, MessageSquarePlus, Search } from "lucide-react";
+import {
+  Coins,
+  FolderPlus,
+  HelpCircle,
+  Info,
+  MessageSquarePlus,
+  Search,
+  Settings,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { JSX } from "react";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-import { useTranslation } from "@/i18n/core/client";
-import { Button, Input, ScrollArea } from "@/packages/next-vibe-ui/web/ui";
+import { useCredits } from "@/app/api/[locale]/v1/core/agent/chat/credits/hooks";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Input,
+  ScrollArea,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/packages/next-vibe-ui/web/ui";
 
+import { UI_CONFIG } from "../../lib/config/constants";
 import type { ChatFolder, ChatState } from "../../lib/storage/types";
+import { DEFAULT_FOLDERS, getFolderColor } from "../../lib/storage/types";
+import {
+  buildFolderUrl,
+  getCreateFolderTranslationKey,
+  getNewChatTranslationKey,
+  getNewFolderTranslationKey,
+  getRootFolderId,
+} from "../../lib/utils/navigation";
 import { FolderList } from "./folder-list";
 import { NewFolderDialog } from "./new-folder-dialog";
+import { RootFolderBar } from "./root-folder-bar";
 import { ThreadList } from "./thread-list";
 
 interface ChatSidebarProps {
   state: ChatState;
   activeThreadId: string | null;
+  activeFolderId?: string;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
   onCreateThread: (folderId?: string | null) => void;
   onSelectThread: (threadId: string) => void;
   onDeleteThread: (threadId: string) => void;
   onMoveThread: (threadId: string, folderId: string | null) => void;
-  onCreateFolder: (name: string, parentId?: string | null) => void;
+  onCreateFolder: (name: string, parentId: string, icon?: string) => string;
   onUpdateFolder: (folderId: string, updates: Partial<ChatFolder>) => void;
   onDeleteFolder: (folderId: string, deleteThreads: boolean) => void;
   onToggleFolderExpanded: (folderId: string) => void;
+  onReorderFolder: (folderId: string, direction: "up" | "down") => void;
+  onMoveFolderToParent: (folderId: string, newParentId: string | null) => void;
   onUpdateThreadTitle: (threadId: string, title: string) => void;
   searchThreads: (query: string) => Array<{ id: string; title: string }>;
+  autoFocusSearch?: boolean;
 }
 
 export function ChatSidebar({
   state,
   activeThreadId,
+  activeFolderId,
+  locale,
+  logger,
   onCreateThread,
   onSelectThread,
   onDeleteThread,
@@ -38,65 +83,143 @@ export function ChatSidebar({
   onUpdateFolder,
   onDeleteFolder,
   onToggleFolderExpanded,
+  onReorderFolder,
+  onMoveFolderToParent,
   onUpdateThreadTitle,
   searchThreads,
+  autoFocusSearch = false,
 }: ChatSidebarProps): JSX.Element {
-  const { t } = useTranslation("chat");
+  const { t } = simpleT(locale);
+  const router = useRouter();
+  const endpoint = useCredits(logger);
+  const credits = endpoint.read?.response?.success
+    ? endpoint.read.response.data
+    : null;
   const [searchQuery, setSearchQuery] = useState("");
   const [newFolderDialogOpen, setNewFolderDialogOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSearch = (query: string) => {
+  // Get the root folder ID from the active folder (could be root or subfolder)
+  const activeRootFolderId = activeFolderId
+    ? getRootFolderId(state, activeFolderId)
+    : state.rootFolderIds[0] || DEFAULT_FOLDERS.PRIVATE;
+
+  // Get color for the active root folder
+  const rootFolderColor = getFolderColor(activeRootFolderId);
+
+  // Get button color classes based on root folder color
+  const getButtonColorClasses = (color: string | null): string => {
+    if (!color) {
+      return "";
+    }
+
+    /* eslint-disable i18next/no-literal-string */
+    const colorMap: Record<string, string> = {
+      sky: "bg-sky-500/15 text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 border-sky-500/30",
+      teal: "bg-teal-500/15 text-teal-700 dark:text-teal-300 hover:bg-teal-500/20 border-teal-500/30",
+      amber:
+        "bg-amber-500/15 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 border-amber-500/30",
+      zinc: "bg-zinc-500/15 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-500/20 border-zinc-500/30",
+    };
+    /* eslint-enable i18next/no-literal-string */
+
+    return colorMap[color] || "";
+  };
+
+  const handleSelectFolder = (folderId: string): void => {
+    const url = buildFolderUrl(locale, folderId, state);
+    router.push(url);
+  };
+
+  // Auto-focus search input when requested
+  useEffect(() => {
+    if (autoFocusSearch && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [autoFocusSearch]);
+
+  const handleSearch = (query: string): void => {
     setSearchQuery(query);
   };
 
-  const handleCreateFolder = (name: string) => {
-    onCreateFolder(name, null);
+  const handleCreateFolder = (name: string, icon: string): void => {
+    // Always create subfolders under the active folder (never at root level)
+    // If no active folder, use the active root folder as parent
+    const parentId: string = activeFolderId || activeRootFolderId;
+    onCreateFolder(name, parentId, icon);
   };
-
-  // Get General folder
-  const generalFolder = useMemo(() => {
-    return Object.values(state.folders).find((f) => f.id === "folder-general");
-  }, [state.folders]);
 
   const isSearching = searchQuery.length > 0;
   const searchResults = isSearching ? searchThreads(searchQuery) : [];
 
   return (
     <div className="flex flex-col h-full bg-background">
-      <div className="border-b border-border bg-background space-y-0 pt-15">
-        {/* New Chat Button */}
-        <div className="px-3 pb-2">
-          <Button
-            onClick={() => onCreateThread(generalFolder?.id)}
-            className="w-full h-10 sm:h-9"
-          >
-            <MessageSquarePlus className="h-4 w-4 mr-2" />
-            {t("common.newChat")}
-          </Button>
-        </div>
+      <div className="bg-background space-y-0 pt-15" />
 
-        {/* Search Bar + New Folder */}
-        <div className="px-3 pb-3 flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
-            <Input
-              type="text"
-              placeholder={t("common.searchPlaceholder")}
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="pl-8 h-10 sm:h-8 text-sm bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-500"
-            />
-          </div>
+      {/* Root Folder Navigation Bar */}
+      <RootFolderBar
+        state={state}
+        activeFolderId={activeRootFolderId}
+        locale={locale}
+        onSelectFolder={handleSelectFolder}
+      />
+      {/* New Chat Button */}
+      <div className="flex items-center gap-1 px-3 pb-2 min-w-max">
+        <Button
+          onClick={() => onCreateThread(activeRootFolderId)}
+          className={`w-full h-10 sm:h-9 ${getButtonColorClasses(rootFolderColor)}`}
+        >
+          <MessageSquarePlus className="h-4 w-4 mr-2" />
+          {t(getNewChatTranslationKey(activeRootFolderId))}
+        </Button>
+        {/* New Folder Button */}
+        <TooltipProvider delayDuration={300}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-11 w-11 hover:bg-accent"
+                onClick={() => {
+                  if (activeFolderId) {
+                    setNewFolderDialogOpen(true);
+                  }
+                }}
+                title={t(getNewFolderTranslationKey(activeRootFolderId))}
+              >
+                <FolderPlus className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p>{t(getNewFolderTranslationKey(activeRootFolderId))}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+      {/* Search Bar + Fullscreen Button */}
+      <div className="px-3 pb-3 flex gap-2  border-b border-border ">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+          <Input
+            ref={searchInputRef}
+            type="text"
+            placeholder={t("app.chat.common.searchPlaceholder")}
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="pl-8 h-10 sm:h-8 text-sm bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-500"
+          />
+        </div>
+        {/* {onNavigateToThreads && (
           <Button
             variant="outline"
             size="icon"
-            onClick={() => setNewFolderDialogOpen(true)}
+            onClick={onNavigateToThreads}
             className="h-10 w-10 sm:h-8 sm:w-8 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800"
-            title={t("actions.newFolder")}
+            title={t("app.chat.common.viewAllThreads")}
           >
-            <FolderPlus className="h-3.5 w-3.5" />
+            <Maximize2 className="h-3.5 w-3.5" />
           </Button>
-        </div>
+        )} */}
       </div>
 
       <div className="flex-1 overflow-hidden px-0">
@@ -105,7 +228,9 @@ export function ChatSidebar({
             {isSearching ? (
               <div>
                 <div className="px-2 py-1 text-xs font-medium text-slate-500 dark:text-slate-400">
-                  {t("common.searchResults")} ({searchResults.length})
+                  {t("app.chat.common.searchResults", {
+                    count: searchResults.length,
+                  })}
                 </div>
                 <ThreadList
                   threads={searchResults
@@ -117,11 +242,12 @@ export function ChatSidebar({
                   onUpdateTitle={onUpdateThreadTitle}
                   onMoveThread={onMoveThread}
                   state={state}
+                  locale={locale}
                   compact
                 />
                 {searchResults.length === 0 && (
                   <div className="px-4 py-8 text-center text-sm text-slate-500">
-                    {t("common.noChatsFound")}
+                    {t("app.chat.common.noChatsFound")}
                   </div>
                 )}
               </div>
@@ -129,6 +255,9 @@ export function ChatSidebar({
               <FolderList
                 state={state}
                 activeThreadId={activeThreadId}
+                activeRootFolderId={activeRootFolderId}
+                activeFolderId={activeFolderId}
+                locale={locale}
                 onCreateThread={onCreateThread}
                 onSelectThread={onSelectThread}
                 onDeleteThread={onDeleteThread}
@@ -137,6 +266,8 @@ export function ChatSidebar({
                 onUpdateFolder={onUpdateFolder}
                 onDeleteFolder={onDeleteFolder}
                 onToggleFolderExpanded={onToggleFolderExpanded}
+                onReorderFolder={onReorderFolder}
+                onMoveFolderToParent={onMoveFolderToParent}
                 onUpdateThreadTitle={onUpdateThreadTitle}
               />
             )}
@@ -144,10 +275,146 @@ export function ChatSidebar({
         </ScrollArea>
       </div>
 
+      {/* Credits Dropdown and Navigation Section */}
+      <div className="border-t border-border bg-background px-3 py-3 space-y-2">
+        {credits && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="w-full justify-between h-10">
+                <div className="flex items-center gap-2">
+                  <Coins className="h-4 w-4 text-blue-500" />
+                  <span className="text-sm font-medium">
+                    {t("app.chat.credits.total", { count: credits.total })}
+                  </span>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {t("app.chat.credits.viewDetails")}
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className={UI_CONFIG.SIDEBAR_WIDTH}
+            >
+              <div className="px-2 py-2 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">
+                    {t("app.chat.credits.breakdown")}
+                  </span>
+                </div>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      {t("app.chat.credits.total")}
+                    </span>
+                    <span className="font-medium">{credits.total}</span>
+                  </div>
+                  {credits.permanent > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">
+                        {t("app.chat.credits.permanent")}
+                      </span>
+                      <span>{credits.permanent}</span>
+                    </div>
+                  )}
+                  {credits.expiring > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">
+                        {t("app.chat.credits.expiring")}
+                      </span>
+                      <span>{credits.expiring}</span>
+                    </div>
+                  )}
+                  {credits.free > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">
+                        {t("app.chat.credits.free")}
+                      </span>
+                      <span>{credits.free}</span>
+                    </div>
+                  )}
+                  {credits.expiresAt && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-muted-foreground">
+                        {t("app.chat.credits.expiresAt")}
+                      </span>
+                      <span>
+                        {new Date(credits.expiresAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link
+                  href={`/${locale}/subscription`}
+                  className="w-full cursor-pointer"
+                >
+                  <Coins className="h-4 w-4 mr-2" />
+                  {t("app.chat.credits.buyMore")}
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
+        <div className="flex flex-col gap-1">
+          <Link href={`/${locale}/app/dashboard`}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start h-8 px-2"
+            >
+              <Settings className="h-3.5 w-3.5 mr-2" />
+              {t("app.chat.credits.navigation.profile")}
+            </Button>
+          </Link>
+          <Link href={`/${locale}/subscription`}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start h-8 px-2"
+            >
+              <Coins className="h-3.5 w-3.5 mr-2" />
+              {t("app.chat.credits.navigation.subscription")}
+            </Button>
+          </Link>
+          <Link href={`/${locale}/story/about-us`}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start h-8 px-2"
+            >
+              <Info className="h-3.5 w-3.5 mr-2" />
+              {t("app.chat.credits.navigation.about")}
+            </Button>
+          </Link>
+          <Link href={`/${locale}/help`}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start h-8 px-2"
+            >
+              <HelpCircle className="h-3.5 w-3.5 mr-2" />
+              {t("app.chat.credits.navigation.help")}
+            </Button>
+          </Link>
+        </div>
+      </div>
+
       <NewFolderDialog
         open={newFolderDialogOpen}
         onOpenChange={setNewFolderDialogOpen}
         onSave={handleCreateFolder}
+        locale={locale}
+        titleKey={
+          activeFolderId
+            ? getCreateFolderTranslationKey(
+                getRootFolderId(state, activeFolderId),
+              )
+            : undefined
+        }
       />
     </div>
   );

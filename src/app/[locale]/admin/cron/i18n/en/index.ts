@@ -1,52 +1,52 @@
+// Parent aggregator for cron translations
+// Imports from co-located child directory i18n folders
+import { translations as historyTranslations } from "../../history/i18n/en";
+import { translations as statsTranslations } from "../../stats/i18n/en";
+import { translations as taskTranslations } from "../../task/i18n/en";
+import { translations as tasksTranslations } from "../../tasks/i18n/en";
+
 export const translations = {
-  post: {
-    title: "Cron",
-    description: "Cron endpoint",
-    form: {
-      title: "Cron Configuration",
-      description: "Configure cron parameters",
-    },
-    response: {
-      title: "Response",
-      description: "Cron response data",
-    },
-    errors: {
-      unauthorized: {
-        title: "Unauthorized",
-        description: "Authentication required",
+  history: historyTranslations,
+  stats: statsTranslations,
+  task: taskTranslations,
+  tasks: tasksTranslations,
+  // Shared cron-level translations
+  nav: {
+    stats: "Statistics",
+    stats_description: "View cron task execution statistics and performance metrics",
+    tasks: "Tasks",
+    tasks_description: "Manage and configure cron tasks",
+    history: "History",
+    history_description: "View cron task execution history",
+  },
+  buttons: {
+    previous: "Previous",
+    next: "Next",
+  },
+  executionHistory: {
+    titleWithCount: "Execution History ({{count}})",
+    pagination: "Showing {{from}} to {{to}} of {{total}}",
+    errorType: "Error Type",
+  },
+  cronErrors: {
+    admin: {
+      interface: {
+        noResults: "No results",
+        filter: "Filter",
+        clear: "Clear",
+        executionHistory: {
+          searchPlaceholder: "Search by task name...",
+          statusFilter: "Filter by status",
+          startDate: "Start date",
+          endDate: "End date",
+          loadingHistory: "Loading execution history...",
+          noHistory: "No execution history found",
+          started: "Started",
+          duration: "Duration",
+          completed: "Completed",
+          errorDetails: "Error Details",
+        },
       },
-      validation: {
-        title: "Validation Error",
-        description: "Invalid request parameters",
-      },
-      server: {
-        title: "Server Error",
-        description: "Internal server error occurred",
-      },
-      unknown: {
-        title: "Unknown Error",
-        description: "An unknown error occurred",
-      },
-      network: {
-        title: "Network Error",
-        description: "Network error occurred",
-      },
-      forbidden: {
-        title: "Forbidden",
-        description: "Access forbidden",
-      },
-      notFound: {
-        title: "Not Found",
-        description: "Resource not found",
-      },
-      conflict: {
-        title: "Conflict",
-        description: "Data conflict occurred",
-      },
-    },
-    success: {
-      title: "Success",
-      description: "Operation completed successfully",
     },
   },
-};
+} as const;

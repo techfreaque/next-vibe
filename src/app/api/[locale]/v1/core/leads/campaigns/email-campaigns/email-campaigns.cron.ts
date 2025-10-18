@@ -40,6 +40,7 @@ const STAGE_PRIORITIES: Record<
   (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage],
   number
 > = {
+  [EmailCampaignStage.NOT_STARTED]: 0,
   [EmailCampaignStage.INITIAL]: 1,
   [EmailCampaignStage.FOLLOWUP_1]: 2,
   [EmailCampaignStage.FOLLOWUP_2]: 3,
@@ -142,7 +143,7 @@ async function processEmailCampaignStage(
         error: stageResult.message,
       });
       return createErrorResponse(
-        "app.api.errors.email_campaign_stage_failed",
+        "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { stage, error: stageResult.message },
       );
@@ -154,7 +155,7 @@ async function processEmailCampaignStage(
     logger.error("Error processing stage", { stage, error: errorMessage });
 
     return createErrorResponse(
-      "app.api.errors.email_campaign_stage_error",
+      "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
       ErrorResponseTypes.INTERNAL_ERROR,
       { stage, error: errorMessage },
     );
@@ -216,8 +217,8 @@ function validateEmailCampaignTask(
     });
 
     return createErrorResponse(
-      "app.api.errors.email_campaign_validation_failed",
-      ErrorResponseTypes.INTERNAL_ERROR,
+      "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.validation.title",
+      ErrorResponseTypes.VALIDATION_ERROR,
       { error: errorMessage },
     );
   }
@@ -317,7 +318,7 @@ export async function execute(
     });
 
     return createErrorResponse(
-      "app.api.errors.lead_email_campaigns_task_failed",
+      "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
       ErrorResponseTypes.INTERNAL_ERROR,
       { error: errorMessage, executionTimeMs },
     );

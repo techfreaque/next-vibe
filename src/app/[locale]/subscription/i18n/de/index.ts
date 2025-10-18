@@ -1,54 +1,22 @@
 import type { translations as enTranslations } from "../en";
+import { translations as billingTranslations } from "./billing";
+import { translations as checkoutTranslations } from "./checkout";
+import { translations as paymentTranslations } from "./payment";
+import { translations as premiumTranslations } from "./premium";
+import { translations as paymentErrorsTranslations } from "./paymentErrors";
+import { translations as subscriptionTranslations } from "./subscription";
+import { translations as subscriptionErrorsTranslations } from "./subscriptionErrors";
+import { translations as subscriptionsTranslations } from "./subscriptions";
+import { translations as subscriptionsErrorsTranslations } from "./subscriptionsErrors";
 
 export const translations: typeof enTranslations = {
-  post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
-    form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
-    },
-    response: {
-      title: "Antwort",
-      description: "Antwortdaten",
-    },
-    errors: {
-      unauthorized: {
-        title: "Nicht autorisiert",
-        description: "Authentifizierung erforderlich",
-      },
-      validation: {
-        title: "Validierungsfehler",
-        description: "Ungültige Anfrageparameter",
-      },
-      server: {
-        title: "Serverfehler",
-        description: "Interner Serverfehler",
-      },
-      unknown: {
-        title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist aufgetreten",
-      },
-      network: {
-        title: "Netzwerkfehler",
-        description: "Netzwerkfehler aufgetreten",
-      },
-      forbidden: {
-        title: "Verboten",
-        description: "Zugriff verboten",
-      },
-      notFound: {
-        title: "Nicht gefunden",
-        description: "Ressource nicht gefunden",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Datenkonflikt aufgetreten",
-      },
-    },
-    success: {
-      title: "Erfolg",
-      description: "Vorgang erfolgreich abgeschlossen",
-    },
-  },
+  billing: billingTranslations,
+  checkout: checkoutTranslations,
+  payment: paymentTranslations,
+  paymentErrors: paymentErrorsTranslations,
+  premium: premiumTranslations,
+  subscription: subscriptionTranslations,
+  subscriptionErrors: subscriptionErrorsTranslations,
+  subscriptions: subscriptionsTranslations,
+  subscriptionsErrors: subscriptionsErrorsTranslations,
 };

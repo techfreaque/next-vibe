@@ -101,7 +101,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.chat.aiStream.post.maxTokens.description",
           layout: { columns: 2 },
         },
-        z.coerce.number().min(1).max(4000).default(1000),
+        z.coerce.number().min(1).max(10000).default(1000),
       ),
       systemPrompt: requestDataField(
         {
@@ -114,12 +114,12 @@ const { POST } = createEndpoint({
           placeholder:
             "app.api.v1.core.agent.chat.aiStream.post.systemPrompt.placeholder",
         },
-        z.string().max(2000).optional(),
+        z.string().max(10000).optional(),
       ),
       enableSearch: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.CHECKBOX,
+          fieldType: FieldDataType.BOOLEAN,
           label: "app.api.v1.core.agent.chat.aiStream.post.enableSearch.label",
           description:
             "app.api.v1.core.agent.chat.aiStream.post.enableSearch.description",

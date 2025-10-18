@@ -52,23 +52,23 @@ export function ImapMessagesTable({
     if (!message.isRead) {
       return (
         <Badge variant="default" className="bg-blue-100 text-blue-800">
-          {t("imap.messages.unread")}
+          {t("app.admin.emails.imap.messages.unread")}
         </Badge>
       );
     }
-    return <Badge variant="outline">{t("imap.messages.read")}</Badge>;
+    return <Badge variant="outline">{t("app.admin.emails.imap.messages.read")}</Badge>;
   };
 
   const formatDate = (dateString: string | null): string => {
     if (!dateString) {
-      return t("imap.common.unknown");
+      return t("app.admin.emails.imap.common.unknown");
     }
 
     try {
       const date = new Date(dateString);
       return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
     } catch {
-      return t("imap.common.unknown");
+      return t("app.admin.emails.imap.common.unknown");
     }
   };
 
@@ -82,7 +82,7 @@ export function ImapMessagesTable({
   if (loading) {
     return (
       <div className="text-center py-8">
-        <p>{t("common.loading")}</p>
+        <p>{t("app.admin.emails.imap.common.loading")}</p>
       </div>
     );
   }
@@ -90,7 +90,7 @@ export function ImapMessagesTable({
   if (messages.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-muted-foreground">{t("imap.messages.noMessages")}</p>
+        <p className="text-muted-foreground">{t("app.admin.emails.imap.messages.noMessages")}</p>
       </div>
     );
   }
@@ -99,16 +99,16 @@ export function ImapMessagesTable({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-12">{t("imap.common.status")}</TableHead>
-          <TableHead>{t("imap.messages.subject")}</TableHead>
-          <TableHead>{t("imap.messages.sender")}</TableHead>
-          <TableHead>{t("imap.messages.recipient")}</TableHead>
-          <TableHead>{t("imap.messages.sentAt")}</TableHead>
+          <TableHead className="w-12">{t("app.admin.emails.imap.common.status")}</TableHead>
+          <TableHead>{t("app.admin.emails.imap.messages.subject")}</TableHead>
+          <TableHead>{t("app.admin.emails.imap.messages.sender")}</TableHead>
+          <TableHead>{t("app.admin.emails.imap.messages.recipient")}</TableHead>
+          <TableHead>{t("app.admin.emails.imap.messages.sentAt")}</TableHead>
           <TableHead className="w-12">
-            {t("imap.messages.attachments")}
+            {t("app.admin.emails.imap.messages.attachments")}
           </TableHead>
-          <TableHead className="w-12">{t("imap.messages.flagged")}</TableHead>
-          <TableHead className="w-32">{t("imap.common.actions")}</TableHead>
+          <TableHead className="w-12">{t("app.admin.emails.imap.messages.flagged")}</TableHead>
+          <TableHead className="w-32">{t("app.admin.emails.imap.common.actions")}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -128,7 +128,7 @@ export function ImapMessagesTable({
                   className={`font-medium ${!message.isRead ? "font-bold" : ""}`}
                 >
                   {truncateText(
-                    message.subject || t("imap.messages.noSubject"),
+                    message.subject || t("app.admin.emails.imap.messages.noSubject"),
                   )}
                 </div>
                 {getStatusBadge(message)}
@@ -182,7 +182,7 @@ export function ImapMessagesTable({
                   onClick={() => handleViewMessage(message.id)}
                 >
                   <Eye className="h-4 w-4 mr-1" />
-                  {t("imap.common.view")}
+                  {t("app.admin.emails.imap.common.view")}
                 </Button>
               </div>
             </TableCell>

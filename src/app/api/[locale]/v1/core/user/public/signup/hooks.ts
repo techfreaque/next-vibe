@@ -99,9 +99,9 @@ export function useRegister(): InferApiFormReturn<
           formResult.form.getValues("preferences.signupType") ===
           SignupType.MEETING
         ) {
-          router.push(`/${locale}/app/onboarding?step=consultation`);
+          router.push(`/${locale}/?step=consultation`);
         } else {
-          router.push(`/${locale}/app/onboarding?step=pricing`);
+          router.push(`/${locale}/?step=pricing`);
         }
 
         // Force a refresh to update the UI with the new auth state

@@ -5,7 +5,6 @@ import {
   createErrorResponse,
   ErrorResponseTypes,
 } from "../../../shared/types/response.schema";
-import { debugLogger } from "../../../shared/utils/logger";
 import { parseError } from "../../../shared/utils/parse-error";
 import { env } from "../../env";
 import type {
@@ -36,6 +35,17 @@ export enum AwsSnsAwsRegions {
   EU_NORTH_1 = "eu-north-1",
 }
 
+const AWS_SNS_CONSTANTS = {
+  DATA_TYPE_STRING: "String",
+  DATA_TYPE_NUMBER: "Number",
+  ACTION_PUBLISH: "Publish",
+  API_VERSION: "2010-03-31",
+  MESSAGE_ATTRIBUTES_FIELD: "MessageAttributes",
+  SENDER_ID_ATTRIBUTE: "AWS.SNS.SMS.SenderID",
+  SMS_TYPE_ATTRIBUTE: "AWS.SNS.SMS.SMSType",
+  MESSAGE_ID_PREFIX: "sns-",
+} as const;
+
 // Define specific interfaces
 interface AwsSnsMessageAttribute {
   DataType: string;
@@ -55,25 +65,32 @@ export function getAwsSnsProvider(): SmsProvider {
   const secretAccessKey = env.AWS_SECRET_ACCESS_KEY;
   const region = env.AWS_REGION;
 
-  // Validate credentials at initialization time
-  if (!accessKeyId) {
-    throw new Error("Missing AWS_ACCESS_KEY_ID environment variable");
-  }
-
-  if (!region) {
-    throw new Error("Missing AWS_REGION environment variable");
-  }
-
-  if (!secretAccessKey) {
-    throw new Error("Missing AWS_SECRET_ACCESS_KEY environment variable");
-  }
-
   return {
     name: SmsProviders.AWS_SNS,
 
     async sendSms(params: SendSmsParams): Promise<ResponseType<SmsResult>> {
       try {
-        debugLogger("Sending SMS via AWS SNS", { to: params.to });
+        // Validate credentials
+        if (!accessKeyId) {
+          return createErrorResponse(
+            "sms.errors.missing_aws_access_key",
+            ErrorResponseTypes.VALIDATION_ERROR,
+          );
+        }
+
+        if (!region) {
+          return createErrorResponse(
+            "sms.errors.missing_aws_region",
+            ErrorResponseTypes.VALIDATION_ERROR,
+          );
+        }
+
+        if (!secretAccessKey) {
+          return createErrorResponse(
+            "sms.errors.missing_aws_secret_key",
+            ErrorResponseTypes.VALIDATION_ERROR,
+          );
+        }
 
         // Validate required parameters
         if (!params.to) {
@@ -110,8 +127,8 @@ export function getAwsSnsProvider(): SmsProvider {
 
         // Add sender ID if provided
         if (params.from) {
-          messageAttributes["AWS.SNS.SMS.SenderID"] = {
-            DataType: "String",
+          messageAttributes[AWS_SNS_CONSTANTS.SENDER_ID_ATTRIBUTE] = {
+            DataType: AWS_SNS_CONSTANTS.DATA_TYPE_STRING,
             StringValue: params.from,
           };
         }
@@ -122,8 +139,8 @@ export function getAwsSnsProvider(): SmsProvider {
 
         // Additional SMS attributes
         if (options && typeof options === "object" && options.smsType) {
-          messageAttributes["AWS.SNS.SMS.SMSType"] = {
-            DataType: "String",
+          messageAttributes[AWS_SNS_CONSTANTS.SMS_TYPE_ATTRIBUTE] = {
+            DataType: AWS_SNS_CONSTANTS.DATA_TYPE_STRING,
             StringValue: options.smsType,
           };
         }
@@ -135,13 +152,13 @@ export function getAwsSnsProvider(): SmsProvider {
             let dataType: string;
 
             if (typeof value === "string") {
-              dataType = "String";
+              dataType = AWS_SNS_CONSTANTS.DATA_TYPE_STRING;
               stringValue = value;
             } else if (typeof value === "number") {
-              dataType = "Number";
+              dataType = AWS_SNS_CONSTANTS.DATA_TYPE_NUMBER;
               stringValue = value.toString();
             } else if (typeof value === "boolean") {
-              dataType = "String";
+              dataType = AWS_SNS_CONSTANTS.DATA_TYPE_STRING;
               stringValue = value.toString();
             } else {
               return; // Skip invalid types
@@ -156,8 +173,8 @@ export function getAwsSnsProvider(): SmsProvider {
 
         // Build query parameters
         const requestParams = new URLSearchParams({
-          Action: "Publish",
-          Version: "2010-03-31",
+          Action: AWS_SNS_CONSTANTS.ACTION_PUBLISH,
+          Version: AWS_SNS_CONSTANTS.API_VERSION,
           PhoneNumber: params.to,
           Message: params.message,
         });
@@ -165,7 +182,7 @@ export function getAwsSnsProvider(): SmsProvider {
         // Add message attributes if any
         if (Object.keys(messageAttributes).length > 0) {
           requestParams.append(
-            "MessageAttributes",
+            AWS_SNS_CONSTANTS.MESSAGE_ATTRIBUTES_FIELD,
             JSON.stringify(messageAttributes),
           );
         }
@@ -252,10 +269,10 @@ export function getAwsSnsProvider(): SmsProvider {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
-            "Host": host,
+            Host: host,
             "X-Amz-Date": amzDate,
             "X-Amz-Content-Sha256": contentHash,
-            "Authorization": authorizationHeader,
+            Authorization: authorizationHeader,
           },
           body: payload,
         });
@@ -265,15 +282,13 @@ export function getAwsSnsProvider(): SmsProvider {
 
           // Extract error message from XML response
           const errorMatch = errorText.match(/<Message>(.*?)<\/Message>/);
-          const errorMessage = errorMatch
-            ? errorMatch[1]
-            : "Unknown AWS SNS API error";
+          const errorMessage = errorMatch?.[1];
 
           return createErrorResponse(
             "sms.errors.aws_sns_api_error",
             ErrorResponseTypes.SMS_ERROR,
             {
-              error: errorMessage,
+              error: errorMessage ?? "error.sms.errors.unknown_aws_error",
               statusCode: response.status,
             },
           );
@@ -284,7 +299,9 @@ export function getAwsSnsProvider(): SmsProvider {
         const messageIdMatch = responseText.match(
           /<MessageId>(.*?)<\/MessageId>/,
         );
-        const messageId = messageIdMatch?.[1] ?? `sns-${Date.now()}`;
+        const timestamp = Date.now().toString();
+        const fallbackId = AWS_SNS_CONSTANTS.MESSAGE_ID_PREFIX + timestamp;
+        const messageId = messageIdMatch?.[1] ?? fallbackId;
 
         const requestIdMatch = responseText.match(
           /<RequestId>(.*?)<\/RequestId>/,

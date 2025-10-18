@@ -163,153 +163,820 @@ type EndpointDefinition = any;
 export const endpoints: ApiSection = {};
 
 export function setupEndpoints(): ApiSection {
-  setNestedPath(endpoints, ["_locale_", "v1", "agent", "chat", "basic-stream"], endpointDefinition0 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "agent", "chat", "ai-stream"], endpointDefinition1 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "agent", "confirmation", "_id_"], endpointDefinition2 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "agent", "process"], endpointDefinition3 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "agent", "classification"], endpointDefinition4 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "agent", "execution"], endpointDefinition5 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "agent", "status"], endpointDefinition6 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "server", "dev"], endpointDefinition7 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "server", "start"], endpointDefinition8 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "server", "start-next-server"], endpointDefinition9 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "server", "build"], endpointDefinition10 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "guard", "start"], endpointDefinition11 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "guard", "stop"], endpointDefinition12 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "guard", "status"], endpointDefinition13 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "guard", "destroy"], endpointDefinition14 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "tasks", "cron", "tasks"], endpointDefinition15 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "tasks", "cron", "history"], endpointDefinition16 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "tasks", "cron", "status"], endpointDefinition17 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "tasks", "cron", "stats"], endpointDefinition18 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "tasks", "side-tasks"], endpointDefinition19 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "tasks", "types"], endpointDefinition20 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "tasks", "pulse"], endpointDefinition21 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "tasks", "pulse", "execute"], endpointDefinition22 as EndpointDefinition);
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "agent", "chat", "basic-stream"],
+    endpointDefinition0 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "agent", "chat", "ai-stream"],
+    endpointDefinition1 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "agent", "confirmation", "_id_"],
+    endpointDefinition2 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "agent", "process"],
+    endpointDefinition3 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "agent", "classification"],
+    endpointDefinition4 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "agent", "execution"],
+    endpointDefinition5 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "agent", "status"],
+    endpointDefinition6 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "server", "dev"],
+    endpointDefinition7 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "server", "start"],
+    endpointDefinition8 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "server", "start-next-server"],
+    endpointDefinition9 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "server", "build"],
+    endpointDefinition10 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "guard", "start"],
+    endpointDefinition11 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "guard", "stop"],
+    endpointDefinition12 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "guard", "status"],
+    endpointDefinition13 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "guard", "destroy"],
+    endpointDefinition14 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "tasks", "cron", "tasks"],
+    endpointDefinition15 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "tasks", "cron", "history"],
+    endpointDefinition16 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "tasks", "cron", "status"],
+    endpointDefinition17 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "tasks", "cron", "stats"],
+    endpointDefinition18 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "tasks", "side-tasks"],
+    endpointDefinition19 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "tasks", "types"],
+    endpointDefinition20 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "tasks", "pulse"],
+    endpointDefinition21 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "tasks", "pulse", "execute"],
+    endpointDefinition22 as EndpointDefinition,
+  );
 
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "tasks", "unified-runner"], endpointDefinition24 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "db", "schema-verify"], endpointDefinition25 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "db", "utils"], endpointDefinition26 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "db", "utils", "docker-operations"], endpointDefinition27 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "db", "seed"], endpointDefinition28 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "db", "reset"], endpointDefinition29 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "db", "reset", "task-management"], endpointDefinition30 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "db", "migrate"], endpointDefinition31 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "db", "migrate", "task-management"], endpointDefinition32 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "db", "ping"], endpointDefinition33 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "db", "sql"], endpointDefinition34 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "db", "studio"], endpointDefinition35 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "check", "testing", "test"], endpointDefinition36 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "check", "vibe-check"], endpointDefinition37 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "check", "typecheck"], endpointDefinition38 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "check", "lint"], endpointDefinition39 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "check", "routes"], endpointDefinition40 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "release-tool", "config-management", "load"], endpointDefinition41 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "release-tool", "version-management", "update"], endpointDefinition42 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "release-tool", "version-management", "calculate"], endpointDefinition43 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "release-tool", "release-orchestration", "execute"], endpointDefinition44 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "unified-ui", "cli", "setup", "uninstall"], endpointDefinition45 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "unified-ui", "cli", "setup", "update"], endpointDefinition46 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "unified-ui", "cli", "setup", "status"], endpointDefinition47 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "unified-ui", "cli", "setup", "install"], endpointDefinition48 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "builder", "build-orchestration"], endpointDefinition49 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "builder", "bundle"], endpointDefinition50 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "builder"], endpointDefinition51 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "builder", "package"], endpointDefinition52 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "builder", "analyze"], endpointDefinition53 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "generators", "generate-all"], endpointDefinition54 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "generators", "endpoints"], endpointDefinition55 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "generators", "task-index"], endpointDefinition56 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "generators", "seeds"], endpointDefinition57 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "generators", "generate-trpc-router"], endpointDefinition58 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "system", "generators", "generate-trpc-router", "validation"], endpointDefinition59 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "manifest"], endpointDefinition60 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "leads", "lead", "_id_"], endpointDefinition61 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "leads", "tracking", "engagement"], endpointDefinition62 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "leads", "search"], endpointDefinition63 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "leads", "campaigns", "campaign-starter", "campaign-starter-config"], endpointDefinition64 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "leads", "campaigns", "emails", "test-mail"], endpointDefinition65 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "leads", "list"], endpointDefinition66 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "leads", "import"], endpointDefinition67 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "leads", "import", "jobs", "_jobId_"], endpointDefinition68 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "leads", "import", "jobs", "_jobId_", "stop"], endpointDefinition69 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "leads", "import", "jobs", "_jobId_", "retry"], endpointDefinition70 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "leads", "import", "status"], endpointDefinition71 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "leads", "export"], endpointDefinition72 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "leads", "stats"], endpointDefinition73 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "leads", "create"], endpointDefinition74 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "leads", "batch"], endpointDefinition75 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "users", "user", "_id_"], endpointDefinition76 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "users", "list"], endpointDefinition77 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "users", "stats"], endpointDefinition78 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "users", "create"], endpointDefinition79 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "user", "private", "logout"], endpointDefinition80 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "user", "private", "me"], endpointDefinition81 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "user", "private", "me", "password"], endpointDefinition82 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "user", "private", "me", "avatar"], endpointDefinition83);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "user", "public", "login"], endpointDefinition84 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "user", "public", "login", "options"], endpointDefinition85 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "user", "public", "signup"], endpointDefinition86 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "user", "public", "reset-password", "validate"], endpointDefinition87 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "user", "public", "reset-password", "request"], endpointDefinition88 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "user", "public", "reset-password", "confirm"], endpointDefinition89 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "user", "search"], endpointDefinition90 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "stripe"], endpointDefinition91 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "subscription"], endpointDefinition92 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "subscription", "checkout"], endpointDefinition93 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "payment"], endpointDefinition94 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "payment", "portal"], endpointDefinition95 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "payment", "invoice"], endpointDefinition96 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "payment", "refund"], endpointDefinition97 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "contact"], endpointDefinition98 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "smtp-client", "list"], endpointDefinition99 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "smtp-client", "edit", "_id_"], endpointDefinition100 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "smtp-client", "create"], endpointDefinition101 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "messages", "_id_"], endpointDefinition102 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "messages", "list"], endpointDefinition103 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "messages", "stats"], endpointDefinition104 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "imap-client", "messages", "_id_"], endpointDefinition105 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "imap-client", "messages", "list"], endpointDefinition106 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "imap-client", "messages", "sync"], endpointDefinition107 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "imap-client", "folders", "list"], endpointDefinition108 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "imap-client", "folders", "sync"], endpointDefinition109 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "imap-client", "config"], endpointDefinition110 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "imap-client", "health"], endpointDefinition111 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "imap-client", "sync"], endpointDefinition112 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "imap-client", "accounts", "_id_"], endpointDefinition113 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "imap-client", "accounts", "list"], endpointDefinition114 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "imap-client", "accounts", "create"], endpointDefinition115 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "emails", "imap-client", "accounts", "test"], endpointDefinition116 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "newsletter", "unsubscribe"], endpointDefinition117 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "newsletter", "subscribe"], endpointDefinition118 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "core", "newsletter", "status"], endpointDefinition119 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "onboarding"], endpointDefinition120 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "onboarding", "status"], endpointDefinition121 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "consultation", "schedule"], endpointDefinition122 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "consultation", "list"], endpointDefinition123 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "consultation", "admin", "consultation", "new"], endpointDefinition124 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "consultation", "admin", "consultation", "_id_"], endpointDefinition125 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "consultation", "admin", "list"], endpointDefinition126 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "consultation", "admin", "stats"], endpointDefinition127 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "consultation", "availability"], endpointDefinition128 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "consultation", "status"], endpointDefinition129 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "consultation", "create"], endpointDefinition130 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "business-data", "goals"], endpointDefinition131 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "business-data", "brand"], endpointDefinition132 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "business-data"], endpointDefinition133 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "business-data", "business-info"], endpointDefinition134 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "business-data", "social"], endpointDefinition135 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "business-data", "profile"], endpointDefinition136 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "business-data", "audience"], endpointDefinition137 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "business-data", "business-data"], endpointDefinition138 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "business-data", "challenges"], endpointDefinition139 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "business-data", "competitors"], endpointDefinition140 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "template-api", "enhanced-stats"], endpointDefinition141 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "template-api", "_id_"], endpointDefinition142 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "template-api", "notifications"], endpointDefinition143 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "template-api", "import"], endpointDefinition144 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "template-api", "export"], endpointDefinition145 as EndpointDefinition);
-  setNestedPath(endpoints, ["_locale_", "v1", "template-api", "stats"], endpointDefinition146 as EndpointDefinition);
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "tasks", "unified-runner"],
+    endpointDefinition24 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "db", "schema-verify"],
+    endpointDefinition25 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "db", "utils"],
+    endpointDefinition26 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "db", "utils", "docker-operations"],
+    endpointDefinition27 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "db", "seed"],
+    endpointDefinition28 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "db", "reset"],
+    endpointDefinition29 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "db", "reset", "task-management"],
+    endpointDefinition30 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "db", "migrate"],
+    endpointDefinition31 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "db", "migrate", "task-management"],
+    endpointDefinition32 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "db", "ping"],
+    endpointDefinition33 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "db", "sql"],
+    endpointDefinition34 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "db", "studio"],
+    endpointDefinition35 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "check", "testing", "test"],
+    endpointDefinition36 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "check", "vibe-check"],
+    endpointDefinition37 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "check", "typecheck"],
+    endpointDefinition38 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "check", "lint"],
+    endpointDefinition39 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "check", "routes"],
+    endpointDefinition40 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    [
+      "_locale_",
+      "v1",
+      "core",
+      "system",
+      "release-tool",
+      "config-management",
+      "load",
+    ],
+    endpointDefinition41 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    [
+      "_locale_",
+      "v1",
+      "core",
+      "system",
+      "release-tool",
+      "version-management",
+      "update",
+    ],
+    endpointDefinition42 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    [
+      "_locale_",
+      "v1",
+      "core",
+      "system",
+      "release-tool",
+      "version-management",
+      "calculate",
+    ],
+    endpointDefinition43 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    [
+      "_locale_",
+      "v1",
+      "core",
+      "system",
+      "release-tool",
+      "release-orchestration",
+      "execute",
+    ],
+    endpointDefinition44 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    [
+      "_locale_",
+      "v1",
+      "core",
+      "system",
+      "unified-ui",
+      "cli",
+      "setup",
+      "uninstall",
+    ],
+    endpointDefinition45 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    [
+      "_locale_",
+      "v1",
+      "core",
+      "system",
+      "unified-ui",
+      "cli",
+      "setup",
+      "update",
+    ],
+    endpointDefinition46 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    [
+      "_locale_",
+      "v1",
+      "core",
+      "system",
+      "unified-ui",
+      "cli",
+      "setup",
+      "status",
+    ],
+    endpointDefinition47 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    [
+      "_locale_",
+      "v1",
+      "core",
+      "system",
+      "unified-ui",
+      "cli",
+      "setup",
+      "install",
+    ],
+    endpointDefinition48 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "builder", "build-orchestration"],
+    endpointDefinition49 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "builder", "bundle"],
+    endpointDefinition50 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "builder"],
+    endpointDefinition51 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "builder", "package"],
+    endpointDefinition52 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "builder", "analyze"],
+    endpointDefinition53 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "generators", "generate-all"],
+    endpointDefinition54 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "generators", "endpoints"],
+    endpointDefinition55 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "generators", "task-index"],
+    endpointDefinition56 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "generators", "seeds"],
+    endpointDefinition57 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "system", "generators", "generate-trpc-router"],
+    endpointDefinition58 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    [
+      "_locale_",
+      "v1",
+      "core",
+      "system",
+      "generators",
+      "generate-trpc-router",
+      "validation",
+    ],
+    endpointDefinition59 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "manifest"],
+    endpointDefinition60 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "leads", "lead", "_id_"],
+    endpointDefinition61 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "leads", "tracking", "engagement"],
+    endpointDefinition62 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "leads", "search"],
+    endpointDefinition63 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    [
+      "_locale_",
+      "v1",
+      "core",
+      "leads",
+      "campaigns",
+      "campaign-starter",
+      "campaign-starter-config",
+    ],
+    endpointDefinition64 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "leads", "campaigns", "emails", "test-mail"],
+    endpointDefinition65 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "leads", "list"],
+    endpointDefinition66 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "leads", "import"],
+    endpointDefinition67 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "leads", "import", "jobs", "_jobId_"],
+    endpointDefinition68 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "leads", "import", "jobs", "_jobId_", "stop"],
+    endpointDefinition69 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "leads", "import", "jobs", "_jobId_", "retry"],
+    endpointDefinition70 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "leads", "import", "status"],
+    endpointDefinition71 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "leads", "export"],
+    endpointDefinition72 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "leads", "stats"],
+    endpointDefinition73 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "leads", "create"],
+    endpointDefinition74 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "leads", "batch"],
+    endpointDefinition75 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "users", "user", "_id_"],
+    endpointDefinition76 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "users", "list"],
+    endpointDefinition77 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "users", "stats"],
+    endpointDefinition78 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "users", "create"],
+    endpointDefinition79 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "user", "private", "logout"],
+    endpointDefinition80 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "user", "private", "me"],
+    endpointDefinition81 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "user", "private", "me", "password"],
+    endpointDefinition82 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "user", "private", "me", "avatar"],
+    endpointDefinition83,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "user", "public", "login"],
+    endpointDefinition84 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "user", "public", "login", "options"],
+    endpointDefinition85 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "user", "public", "signup"],
+    endpointDefinition86 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "user", "public", "reset-password", "validate"],
+    endpointDefinition87 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "user", "public", "reset-password", "request"],
+    endpointDefinition88 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "user", "public", "reset-password", "confirm"],
+    endpointDefinition89 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "user", "search"],
+    endpointDefinition90 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "stripe"],
+    endpointDefinition91 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "subscription"],
+    endpointDefinition92 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "subscription", "checkout"],
+    endpointDefinition93 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "payment"],
+    endpointDefinition94 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "payment", "portal"],
+    endpointDefinition95 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "payment", "invoice"],
+    endpointDefinition96 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "payment", "refund"],
+    endpointDefinition97 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "contact"],
+    endpointDefinition98 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "smtp-client", "list"],
+    endpointDefinition99 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "smtp-client", "edit", "_id_"],
+    endpointDefinition100 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "smtp-client", "create"],
+    endpointDefinition101 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "messages", "_id_"],
+    endpointDefinition102 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "messages", "list"],
+    endpointDefinition103 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "messages", "stats"],
+    endpointDefinition104 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "imap-client", "messages", "_id_"],
+    endpointDefinition105 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "imap-client", "messages", "list"],
+    endpointDefinition106 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "imap-client", "messages", "sync"],
+    endpointDefinition107 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "imap-client", "folders", "list"],
+    endpointDefinition108 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "imap-client", "folders", "sync"],
+    endpointDefinition109 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "imap-client", "config"],
+    endpointDefinition110 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "imap-client", "health"],
+    endpointDefinition111 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "imap-client", "sync"],
+    endpointDefinition112 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "imap-client", "accounts", "_id_"],
+    endpointDefinition113 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "imap-client", "accounts", "list"],
+    endpointDefinition114 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "imap-client", "accounts", "create"],
+    endpointDefinition115 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "emails", "imap-client", "accounts", "test"],
+    endpointDefinition116 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "newsletter", "unsubscribe"],
+    endpointDefinition117 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "newsletter", "subscribe"],
+    endpointDefinition118 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "core", "newsletter", "status"],
+    endpointDefinition119 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "onboarding"],
+    endpointDefinition120 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "onboarding", "status"],
+    endpointDefinition121 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "consultation", "schedule"],
+    endpointDefinition122 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "consultation", "list"],
+    endpointDefinition123 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "consultation", "admin", "consultation", "new"],
+    endpointDefinition124 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "consultation", "admin", "consultation", "_id_"],
+    endpointDefinition125 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "consultation", "admin", "list"],
+    endpointDefinition126 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "consultation", "admin", "stats"],
+    endpointDefinition127 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "consultation", "availability"],
+    endpointDefinition128 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "consultation", "status"],
+    endpointDefinition129 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "consultation", "create"],
+    endpointDefinition130 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "business-data", "goals"],
+    endpointDefinition131 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "business-data", "brand"],
+    endpointDefinition132 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "business-data"],
+    endpointDefinition133 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "business-data", "business-info"],
+    endpointDefinition134 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "business-data", "social"],
+    endpointDefinition135 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "business-data", "profile"],
+    endpointDefinition136 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "business-data", "audience"],
+    endpointDefinition137 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "business-data", "business-data"],
+    endpointDefinition138 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "business-data", "challenges"],
+    endpointDefinition139 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "business-data", "competitors"],
+    endpointDefinition140 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "template-api", "enhanced-stats"],
+    endpointDefinition141 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "template-api", "_id_"],
+    endpointDefinition142 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "template-api", "notifications"],
+    endpointDefinition143 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "template-api", "import"],
+    endpointDefinition144 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "template-api", "export"],
+    endpointDefinition145 as EndpointDefinition,
+  );
+  setNestedPath(
+    endpoints,
+    ["_locale_", "v1", "template-api", "stats"],
+    endpointDefinition146 as EndpointDefinition,
+  );
   return endpoints;
 }
-

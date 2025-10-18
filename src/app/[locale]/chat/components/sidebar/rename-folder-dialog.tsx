@@ -3,6 +3,8 @@
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 import {
   Button,
   Dialog,
@@ -13,14 +15,16 @@ import {
   Label,
 } from "@/packages/next-vibe-ui/web/ui";
 
-import { FolderIconSelector } from "./folder-icon-selector";
+import type { IconValue } from "../../lib/config/icons";
+import { IconSelector } from "../shared/icon-selector";
 
 interface RenameFolderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   folderName: string;
-  folderIcon: string;
-  onSave: (name: string, icon: string) => void;
+  folderIcon: IconValue;
+  onSave: (name: string, icon: IconValue) => void;
+  locale: CountryLanguage;
 }
 
 export function RenameFolderDialog({
@@ -29,9 +33,11 @@ export function RenameFolderDialog({
   folderName,
   folderIcon,
   onSave,
+  locale,
 }: RenameFolderDialogProps): JSX.Element {
+  const { t } = simpleT(locale);
   const [name, setName] = useState(folderName);
-  const [icon, setIcon] = useState(folderIcon);
+  const [icon, setIcon] = useState<IconValue>(folderIcon);
 
   // Update local state when props change
   useEffect(() => {
@@ -39,7 +45,7 @@ export function RenameFolderDialog({
     setIcon(folderIcon);
   }, [folderName, folderIcon, open]);
 
-  const handleSave = () => {
+  const handleSave = (): void => {
     if (name.trim()) {
       onSave(name.trim(), icon);
       onOpenChange(false);
@@ -50,16 +56,18 @@ export function RenameFolderDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
-          <DialogTitle>Rename Folder</DialogTitle>
+          <DialogTitle>{t("app.chat.renameFolder.title")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="folder-name">Folder Name</Label>
+            <Label htmlFor="folder-name">
+              {t("app.chat.renameFolder.folderName")}
+            </Label>
             <Input
               id="folder-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter folder name"
+              placeholder={t("app.chat.renameFolder.placeholder")}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   handleSave();
@@ -68,15 +76,15 @@ export function RenameFolderDialog({
             />
           </div>
           <div className="space-y-2">
-            <Label>Folder Icon</Label>
-            <FolderIconSelector value={icon} onChange={setIcon} />
+            <Label>{t("app.chat.renameFolder.folderIcon")}</Label>
+            <IconSelector value={icon} onChange={setIcon} locale={locale} />
           </div>
           <div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {t("app.chat.renameFolder.cancel")}
             </Button>
             <Button onClick={handleSave} disabled={!name.trim()}>
-              Save
+              {t("app.chat.renameFolder.save")}
             </Button>
           </div>
         </div>

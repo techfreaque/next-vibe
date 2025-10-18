@@ -6,6 +6,10 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import type { JSX } from "react";
+
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import type { ChatMessage } from "../../lib/storage/types";
 import { formatRelativeTime } from "../../lib/utils/formatting";
@@ -15,6 +19,7 @@ interface UserProfileCardProps {
   userName: string;
   messages: ChatMessage[];
   position: { x: number; y: number };
+  locale: CountryLanguage;
   onPostClick?: (messageId: string) => void;
 }
 
@@ -23,8 +28,11 @@ export function UserProfileCard({
   userName,
   messages,
   position,
+  locale,
   onPostClick,
-}: UserProfileCardProps) {
+}: UserProfileCardProps): JSX.Element {
+  const { t } = simpleT(locale);
+
   // Get all messages from this user
   const userMessages = messages.filter((m) => m.author?.id === userId);
 
@@ -50,7 +58,7 @@ export function UserProfileCard({
         <div className="flex-1">
           <div className="font-bold text-sm text-foreground">{userName}</div>
           <div className="text-xs text-muted-foreground">
-            {postCount} {postCount === 1 ? "post" : "posts"}
+            {t("app.chat.userProfile.postCount", { count: postCount })}
           </div>
         </div>
       </div>
@@ -59,9 +67,9 @@ export function UserProfileCard({
       {recentPosts.length > 0 && (
         <div className="space-y-2">
           <div className="text-xs font-semibold text-muted-foreground mb-2">
-            Recent Posts
+            {t("app.chat.userProfile.recentPosts")}
           </div>
-          {recentPosts.map((post, idx) => (
+          {recentPosts.map((post) => (
             <button
               key={post.id}
               onClick={() => onPostClick?.(post.id)}
@@ -81,7 +89,7 @@ export function UserProfileCard({
 
       {postCount === 0 && (
         <div className="text-xs text-muted-foreground text-center py-4">
-          No posts yet
+          {t("app.chat.userProfile.noPostsYet")}
         </div>
       )}
     </div>

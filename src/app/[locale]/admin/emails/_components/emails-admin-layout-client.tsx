@@ -42,32 +42,32 @@ export function EmailsAdminLayoutClient({
       key: "stats",
       href: `/${locale}/admin/emails/stats`,
       icon: BarChart3,
-      label: t("emails.nav.overview"),
-      description: t("emails.admin.stats.title"),
+      label: t("app.admin.emails.components.nav.overview"),
+      description: t("app.admin.emails.components.admin.stats.title"),
       pattern: new RegExp(`^/${locale}/admin/emails/stats`),
     },
     {
       key: "list",
       href: `/${locale}/admin/emails/list`,
       icon: List,
-      label: t("emails.nav.campaigns"),
-      description: t("emails.admin.title"),
+      label: t("app.admin.emails.components.nav.campaigns"),
+      description: t("app.admin.emails.components.admin.title"),
       pattern: new RegExp(`^/${locale}/admin/emails/list`),
     },
     {
       key: "imap",
       href: `/${locale}/admin/emails/imap`,
       icon: Database,
-      label: t("emails.nav.imap"),
-      description: t("imap.imapServer"),
+      label: t("app.admin.emails.components.nav.imap"),
+      description: t("app.admin.emails.imap.admin.overview.title"),
       pattern: new RegExp(`^/${locale}/admin/emails/imap`),
     },
     {
       key: "smtp",
       href: `/${locale}/admin/emails/smtp`,
       icon: Settings,
-      label: t("smtp.list.title"),
-      description: t("smtp.list.description"),
+      label: t("app.admin.emails.smtp.list.title"),
+      description: t("app.admin.emails.smtp.list.description"),
       pattern: new RegExp(`^/${locale}/admin/emails/smtp`),
     },
   ];
@@ -82,10 +82,10 @@ export function EmailsAdminLayoutClient({
       <div className="flex flex-col space-y-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {t("emails.admin.title")}
+            {t("app.admin.emails.components.admin.title")}
           </h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
-            {t("emails.admin.description")}
+            {t("app.admin.emails.components.admin.description")}
           </p>
         </div>
 

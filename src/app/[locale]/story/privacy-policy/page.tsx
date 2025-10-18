@@ -24,7 +24,7 @@ export async function generateMetadata(
     path: "privacy-policy",
     title: "meta.privacyPolicy.title",
     description: "meta.privacyPolicy.description",
-    image: "https://socialmediaservice.com/images/privacy-hero.jpg",
+    image: "https://unbottled.ai/images/privacy-hero.jpg",
     category: "meta.privacyPolicy.category",
     imageAlt: "meta.privacyPolicy.imageAlt",
     keywords: ["meta.privacyPolicy.keywords"],
@@ -32,7 +32,7 @@ export async function generateMetadata(
       openGraph: {
         title: "meta.privacyPolicy.ogTitle",
         description: "meta.privacyPolicy.ogDescription",
-        url: `https://socialmediaservice.com/${locale}/privacy-policy`,
+        url: `https://unbottled.ai/${locale}/privacy-policy`,
         type: "website",
         images: [...previousImages],
       },

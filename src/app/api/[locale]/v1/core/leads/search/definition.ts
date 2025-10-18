@@ -194,11 +194,55 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
-      success: {},
+    urlPathVariables: undefined,
+    requests: {
+      default: {
+        search: "acme",
+        limit: 10,
+        offset: 0,
+      },
+      empty: {
+        limit: 10,
+        offset: 0,
+      },
     },
     responses: {
-      success: {
+      default: {
+        response: {
+          leads: [
+            {
+              id: "123e4567-e89b-12d3-a456-426614174000",
+              email: "contact@acme.com",
+              businessName: "Acme Corp",
+              phone: "+1234567890",
+              website: "https://acme.com",
+              country: Countries.GLOBAL,
+              language: Languages.EN,
+              status: LeadStatus.NEW,
+              source: LeadSource.WEBSITE,
+              notes: "Interested in premium features",
+              convertedUserId: null,
+              convertedAt: null,
+              signedUpAt: null,
+              consultationBookedAt: null,
+              subscriptionConfirmedAt: null,
+              currentCampaignStage: null,
+              emailsSent: 0,
+              lastEmailSentAt: null,
+              unsubscribedAt: null,
+              emailsOpened: 0,
+              emailsClicked: 0,
+              lastEngagementAt: null,
+              metadata: {},
+              createdAt: "2023-01-01T00:00:00.000Z",
+              updatedAt: "2023-01-01T00:00:00.000Z",
+            },
+          ],
+          total: 1,
+          hasMore: false,
+        },
+      },
+      empty: {
         response: {
           leads: [],
           total: 0,
@@ -207,57 +251,6 @@ const { GET } = createEndpoint({
       },
     },
   },
-
-  /* examples: {
-    default: {
-      search: "acme",
-      limit: 10,
-      offset: 0,
-      response: {
-        leads: [
-          {
-            id: "123e4567-e89b-12d3-a456-426614174000",
-            email: "contact@acme.com",
-            businessName: "Acme Corp",
-            phone: "+1234567890",
-            website: "https://acme.com",
-            country: "GLOBAL",
-            language: "en",
-            status: "NEW",
-            source: "WEBSITE",
-            notes: "Interested in premium features",
-            convertedUserId: null,
-            convertedAt: null,
-            signedUpAt: null,
-            consultationBookedAt: null,
-            subscriptionConfirmedAt: null,
-            currentCampaignStage: null,
-            emailsSent: 0,
-            lastEmailSentAt: null,
-            unsubscribedAt: null,
-            emailsOpened: 0,
-            emailsClicked: 0,
-            lastEngagementAt: null,
-            metadata: {},
-            createdAt: "2023-01-01T00:00:00.000Z",
-            updatedAt: "2023-01-01T00:00:00.000Z",
-          },
-        ],
-        total: 1,
-        hasMore: false,
-      },
-    },
-    withFilters: {
-      search: "corp",
-      limit: 20,
-      offset: 10,
-      response: {
-        leads: [],
-        total: 0,
-        hasMore: false,
-      },
-    },
-  }, */
 });
 
 // Extract types using the new enhanced system

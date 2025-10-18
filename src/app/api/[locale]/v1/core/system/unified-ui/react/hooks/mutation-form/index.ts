@@ -148,7 +148,6 @@ export function useApiForm<
     // eslint-disable-next-line i18next/no-literal-string
     persistenceKey || `form-${endpoint.path.join("-")}-${endpoint.method}`;
 
-  // @ts-ignore - FormData is guaranteed to be an object type from Zod, satisfying FieldValues
   const formMethods = useForm<FormData>(formConfig);
 
   // Implement form persistence directly
@@ -325,7 +324,6 @@ export function useApiForm<
         });
       }
     };
-    // @ts-ignore - FormData type is correct, type system can't infer the equivalence with TFieldValues
     void formMethods.handleSubmit(_submitForm, (errors) => {
       // Create an error response for form validation errors
       const errorResponse = createErrorResponse(
@@ -359,7 +357,6 @@ export function useApiForm<
           : undefined;
 
   return {
-    // @ts-ignore - FormData is TEndpoint["TRequestOutput"], type system can't infer the equivalence
     form: formMethods,
     response,
     // Backward compatibility properties

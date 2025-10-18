@@ -31,6 +31,11 @@ export const translations: typeof enTranslations = {
       description: "Opcjonalne instrukcje systemowe",
       placeholder: "Wprowadź prompt systemowy...",
     },
+    enableSearch: {
+      label: "Włącz wyszukiwanie internetowe",
+      description:
+        "Zezwól AI na przeszukiwanie sieci w poszukiwaniu aktualnych informacji",
+    },
     response: {
       title: "Odpowiedź strumieniowa",
       description: "Odpowiedź strumieniowa wygenerowana przez AI",
@@ -111,6 +116,10 @@ export const translations: typeof enTranslations = {
       openrouterApiKeyMissing: "Klucz API OpenRouter nie został skonfigurowany",
       streamCreationFailed: "Nie udało się utworzyć strumienia",
       unknownError: "Wystąpił błąd",
+      creditValidationFailed: "Nie udało się zweryfikować salda kredytów",
+      noIdentifier: "Nie podano identyfikatora użytkownika lub leada",
+      insufficientCredits:
+        "Niewystarczająca liczba kredytów do wykonania żądania",
     },
   },
   providers: {

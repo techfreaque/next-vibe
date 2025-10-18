@@ -5,10 +5,8 @@
  * and help reduce code duplication across components.
  */
 
-import { useContext } from "react";
-
 import type { ChatMessage, ChatThread } from "../../../lib/storage/types";
-import { ChatContext } from "../context";
+import { useChatContext } from "../context";
 
 /**
  * Get the currently active thread
@@ -22,10 +20,7 @@ import { ChatContext } from "../context";
  * ```
  */
 export function useActiveThread(): ChatThread | null {
-  const context = useContext(ChatContext);
-  if (!context) {
-    throw new Error("useActiveThread must be used within ChatProvider");
-  }
+  const context = useChatContext();
   return context.activeThread;
 }
 
@@ -42,10 +37,7 @@ export function useActiveThread(): ChatThread | null {
  * ```
  */
 export function useThreadMessage(messageId: string): ChatMessage | undefined {
-  const context = useContext(ChatContext);
-  if (!context) {
-    throw new Error("useThreadMessage must be used within ChatProvider");
-  }
+  const context = useChatContext();
 
   const thread = context.activeThread;
   if (!thread) {
@@ -67,11 +59,7 @@ export function useThreadMessage(messageId: string): ChatMessage | undefined {
  * ```
  */
 export function useThreadMessages(): ChatMessage[] {
-  const context = useContext(ChatContext);
-  if (!context) {
-    throw new Error("useThreadMessages must be used within ChatProvider");
-  }
-
+  const context = useChatContext();
   return context.messages;
 }
 
@@ -88,10 +76,7 @@ export function useThreadMessages(): ChatMessage[] {
  * ```
  */
 export function useHasMessage(messageId: string): boolean {
-  const context = useContext(ChatContext);
-  if (!context) {
-    throw new Error("useHasMessage must be used within ChatProvider");
-  }
+  const context = useChatContext();
 
   const thread = context.activeThread;
   if (!thread) {
@@ -116,10 +101,7 @@ export function useHasMessage(messageId: string): boolean {
  * ```
  */
 export function useParentMessage(messageId: string): ChatMessage | undefined {
-  const context = useContext(ChatContext);
-  if (!context) {
-    throw new Error("useParentMessage must be used within ChatProvider");
-  }
+  const context = useChatContext();
 
   const thread = context.activeThread;
   if (!thread) {
@@ -149,10 +131,7 @@ export function useParentMessage(messageId: string): ChatMessage | undefined {
  * ```
  */
 export function useChildMessages(messageId: string): ChatMessage[] {
-  const context = useContext(ChatContext);
-  if (!context) {
-    throw new Error("useChildMessages must be used within ChatProvider");
-  }
+  const context = useChatContext();
 
   const thread = context.activeThread;
   if (!thread) {
@@ -160,7 +139,7 @@ export function useChildMessages(messageId: string): ChatMessage[] {
   }
 
   return Object.values(thread.messages).filter(
-    (msg) => msg.parentId === messageId,
+    (msg): msg is ChatMessage => msg.parentId === messageId,
   );
 }
 
@@ -176,11 +155,7 @@ export function useChildMessages(messageId: string): ChatMessage[] {
  * ```
  */
 export function useIsThreadEmpty(): boolean {
-  const context = useContext(ChatContext);
-  if (!context) {
-    throw new Error("useIsThreadEmpty must be used within ChatProvider");
-  }
-
+  const context = useChatContext();
   return context.messages.length === 0;
 }
 
@@ -196,10 +171,6 @@ export function useIsThreadEmpty(): boolean {
  * ```
  */
 export function useMessageCount(): number {
-  const context = useContext(ChatContext);
-  if (!context) {
-    throw new Error("useMessageCount must be used within ChatProvider");
-  }
-
+  const context = useChatContext();
   return context.messages.length;
 }

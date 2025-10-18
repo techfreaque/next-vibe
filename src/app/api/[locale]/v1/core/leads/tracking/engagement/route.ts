@@ -48,12 +48,12 @@ export const { GET, POST, tools } = endpointsHandler({
     handler: async ({ data, request, user, logger }) => {
       const startTime = Date.now();
 
-      // Extract data fields to properly typed variables
-      const leadId: string = data.id;
-      const campaignId: string | null | undefined = data.campaignId ?? null;
-      const stage = data.stage ?? null;
-      const source = data.source ?? null;
-      const targetUrl: string = data.url;
+      // Extract data fields with type assertions (validated by endpoint definition)
+      const leadId = data.id as string;
+      const campaignId = (data.campaignId ?? null) as string | null;
+      const stage = (data.stage ?? null) as string | null;
+      const source = (data.source ?? null) as string | null;
+      const targetUrl = data.url as string;
 
       logger.info("leads.tracking.click.start", {
         id: leadId,

@@ -123,7 +123,6 @@ export function requireRoles<TRoles extends readonly (typeof UserRoleValue)[]>(
  * Admin procedure - requires admin role
  */
 export const adminProcedure = authenticatedProcedure.use(
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   requireRoles(
     [UserRole.ADMIN],
     createEndpointLogger(false, Date.now(), "en-GLOBAL"),
@@ -134,7 +133,6 @@ export const adminProcedure = authenticatedProcedure.use(
  * Customer procedure - requires customer role or higher
  */
 export const customerProcedure = authenticatedProcedure.use(
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   requireRoles(
     [UserRole.CUSTOMER, UserRole.ADMIN],
     createEndpointLogger(false, Date.now(), "en-GLOBAL"),

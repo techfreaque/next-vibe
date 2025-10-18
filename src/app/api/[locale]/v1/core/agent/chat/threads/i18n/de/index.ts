@@ -1,8 +1,9 @@
-import { translations as threadsIdTranslations } from "../../[id]/i18n/de";
-import { translations as threadsThreadIdMessagesTranslations } from "../../[threadId]/messages/i18n/de";
+import { translations as threadsThreadIdTranslations } from "../../[threadId]/i18n/de";
+import { translations as searchTranslations } from "../../search/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  ...searchTranslations,
   get: {
     title: "Chat-Threads auflisten",
     description:
@@ -41,6 +42,18 @@ export const translations: typeof enTranslations = {
       label: "Suche",
       description: "Threads nach Titel oder Inhalt durchsuchen",
       placeholder: "Threads durchsuchen...",
+    },
+    isPinned: {
+      label: "Nur Angepinnte",
+      description: "Nur angepinnte Threads anzeigen",
+    },
+    dateFrom: {
+      label: "Datum Von",
+      description: "Threads nach diesem Datum filtern",
+    },
+    dateTo: {
+      label: "Datum Bis",
+      description: "Threads vor diesem Datum filtern",
     },
     response: {
       title: "Thread-Listen-Antwort",
@@ -234,8 +247,5 @@ export const translations: typeof enTranslations = {
       description: "Thread erfolgreich erstellt",
     },
   },
-  id: threadsIdTranslations,
-  threadId: {
-    messages: threadsThreadIdMessagesTranslations,
-  },
+  threadId: threadsThreadIdTranslations,
 };

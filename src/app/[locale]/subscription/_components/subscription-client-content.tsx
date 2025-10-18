@@ -3,25 +3,17 @@
 import { motion } from "framer-motion";
 import {
   AlertCircle,
-  ArrowRight,
   Calendar,
-  CheckCircle2,
+  Coins,
   CreditCard,
-  Download,
-  ExternalLink,
-  FileText,
-  RefreshCw,
-  Settings,
-  Shield,
-  Users,
-  X,
+  History,
+  Info,
+  Sparkles,
+  TrendingUp,
   Zap,
 } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 import { cn } from "next-vibe/shared/utils";
 import {
-  Alert,
-  AlertDescription,
   Badge,
   Button,
   Card,
@@ -29,193 +21,102 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "next-vibe-ui/ui";
 import { Container } from "next-vibe-ui/ui/container";
-import { useToast } from "next-vibe-ui/ui/use-toast";
 import type { JSX } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
-import PricingSection from "@/app/[locale]/story/pricing/_components/pricing-section";
-import type {
-  PaymentGetResponseTypeOutput,
-  PaymentResponseType,
-} from "@/app/api/[locale]/v1/core/payment/definition";
-import { InvoiceStatus } from "@/app/api/[locale]/v1/core/payment/enum";
-import { SubscriptionStatus } from "@/app/api/[locale]/v1/core/subscription/enum";
-import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/definition";
+import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
-import { simpleT } from "@/i18n/core/shared";
+
+/**
+ * Credit Balance Interface
+ */
+interface CreditBalance {
+  total: number;
+  expiring: number;
+  permanent: number;
+  free: number;
+  expiresAt: string | null;
+}
+
+/**
+ * Credit Transaction Interface
+ */
+interface CreditTransaction {
+  id: string;
+  amount: number;
+  balanceAfter: number;
+  type: string;
+  modelId: string | null;
+  messageId: string | null;
+  createdAt: string;
+}
 
 interface SubscriptionClientContentProps {
-  user: CompleteUserType;
-  initialSubscription: SubscriptionGetResponseType | null;
-  initialPaymentInfo?: PaymentResponseType | null;
-  initialBillingHistory?: PaymentGetResponseTypeOutput | null;
   locale: CountryLanguage;
+  initialCredits: CreditBalance | null;
+  initialHistory: {
+    transactions: CreditTransaction[];
+    totalCount: number;
+  } | null;
 }
 
 export function SubscriptionClientContent({
-  user,
-  initialSubscription,
-  initialPaymentInfo,
-  initialBillingHistory,
   locale,
+  initialCredits,
+  initialHistory,
 }: SubscriptionClientContentProps): JSX.Element {
-  const { t } = simpleT(locale);
-  const { toast } = useToast();
-  const searchParams = useSearchParams();
-
-  // Ref to prevent multiple URL parameter cleanups
-  const urlCleanupProcessedRef = useRef(false);
-
-  // State for tab navigation
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
+  const [packQuantity, setPackQuantity] = useState(1);
 
-  // State for dialogs
-  const [showCancelDialog, setShowCancelDialog] = useState(false);
-  const [showReactivateDialog, setShowReactivateDialog] = useState(false);
-
-  // Use the comprehensive subscription management hook
-  const {
-    subscription,
-    actions,
-    helpers,
-    currentPlan,
-    subscriptionState,
-    billingHistory,
-  } = useSubscriptionManagement(
-    locale,
-    initialSubscription,
-    initialPaymentInfo || null,
-    initialBillingHistory || null,
-  );
-
-  // Handle success/cancel messages from Stripe checkout
-  const handleStripeRedirectParams = useCallback(() => {
-    // Prevent multiple processing of the same URL parameters
-    if (urlCleanupProcessedRef.current) {
-      return;
+  // Helper to get transaction type translation key
+  const getTransactionTypeKey = (
+    type: string,
+  ):
+    | "subscription.history.types.purchase"
+    | "subscription.history.types.subscription"
+    | "subscription.history.types.usage"
+    | "subscription.history.types.expiry"
+    | "subscription.history.types.free_tier" => {
+    switch (type) {
+      case "purchase":
+        return "subscription.history.types.purchase";
+      case "subscription":
+        return "subscription.history.types.subscription";
+      case "usage":
+        return "subscription.history.types.usage";
+      case "expiry":
+        return "subscription.history.types.expiry";
+      case "free_tier":
+        return "subscription.history.types.free_tier";
+      default:
+        return "subscription.history.types.usage"; // fallback
     }
-
-    const success = searchParams.get("success");
-    const canceled = searchParams.get("canceled");
-    // eslint-disable-next-line i18next/no-literal-string
-    const sessionId = searchParams.get("session_id");
-
-    // Only process if we have relevant parameters
-    if (!success && !canceled) {
-      return;
-    }
-
-    urlCleanupProcessedRef.current = true;
-
-    if (success === "true" && sessionId) {
-      toast({
-        title: t("common.success.title"),
-        description: t("subscription.checkout.success"),
-        variant: "default",
-      });
-
-      // Clean up URL parameters
-      const url = new URL(window.location.href);
-      url.searchParams.delete("success");
-      // eslint-disable-next-line i18next/no-literal-string
-      url.searchParams.delete("session_id");
-      window.history.replaceState({}, "", url.toString());
-    } else if (canceled === "true") {
-      toast({
-        title: t("common.error.title"),
-        description: t("subscription.checkout.error"),
-        variant: "destructive",
-      });
-
-      // Clean up URL parameters
-      const url = new URL(window.location.href);
-      url.searchParams.delete("canceled");
-      window.history.replaceState({}, "", url.toString());
-    }
-  }, [searchParams, t, toast]);
-
-  useEffect(() => {
-    handleStripeRedirectParams();
-  }, [handleStripeRedirectParams]);
-
-  // Handle reactivation
-  const handleReactivateSubscription = async (): Promise<void> => {
-    await actions.handleReactivateSubscription();
-    setShowReactivateDialog(false);
-  };
-
-  // Handle cancellation
-  const handleCancelSubscription = async (): Promise<void> => {
-    await actions.handleCancelSubscription();
-    setShowCancelDialog(false);
   };
 
   // Format date with locale support
-  const formatDate = (date: string | Date | number): string => {
+  const formatDate = (date: string | Date): string => {
     try {
-      const dateObject =
-        typeof date === "number" ? new Date(date * 1000) : new Date(date);
+      const dateObject = new Date(date);
       return formatSimpleDate(dateObject, locale);
     } catch {
-      const fallback =
-        typeof date === "number" ? new Date(date * 1000) : new Date(date);
-      return fallback.toLocaleDateString();
+      return new Date(date).toLocaleDateString();
     }
   };
 
-  // Get status badge variant
-  const getStatusBadgeVariant = (
-    status: SubscriptionStatus,
-  ): "default" | "secondary" | "destructive" => {
-    switch (status) {
-      case SubscriptionStatus.ACTIVE:
-        return subscriptionState.isCancelledButActive ? "secondary" : "default";
-      case SubscriptionStatus.PAST_DUE:
-        return "secondary";
-      case SubscriptionStatus.CANCELED:
-        return "destructive";
-      default:
-        return "secondary";
-    }
-  };
-
-  // Get status display text
-  const getStatusText = (status: SubscriptionStatus): string => {
-    if (subscriptionState.isCancelledButActive) {
-      return t("subscription.messages.cancelledAtPeriodEnd");
-    }
-
-    switch (status) {
-      case SubscriptionStatus.ACTIVE:
-        return t("subscription.status.active");
-      case SubscriptionStatus.PAST_DUE:
-        return t("subscription.status.pastDue");
-      case SubscriptionStatus.CANCELED:
-        return t("subscription.status.canceled");
-      case SubscriptionStatus.TRIALING:
-        return t("subscription.status.trialing");
-      case SubscriptionStatus.INCOMPLETE:
-        return t("subscription.status.incomplete");
-      case SubscriptionStatus.INCOMPLETE_EXPIRED:
-        return t("subscription.status.incomplete_expired");
-      case SubscriptionStatus.UNPAID:
-        return t("subscription.status.unpaid");
-      default:
-        return status;
-    }
+  // Format currency
+  const formatPrice = (amount: number): string => {
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: "EUR",
+    }).format(amount);
   };
 
   return (
@@ -225,609 +126,527 @@ export function SubscriptionClientContent({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className={cn(
-          "text-center",
-          subscriptionState.hasSubscription ? "space-y-4" : "pt-8 pb-0 mb-0",
-        )}
+        className="text-center space-y-4"
       >
         <h1 className="text-4xl font-bold tracking-tight">
           {t("subscription.title")}
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          {subscriptionState.hasSubscription
-            ? t("billing.currentPlan.description")
-            : t("billing.noSubscription.description")}
+          {t("subscription.description")}
         </p>
       </motion.div>
 
-      {/* Main Content */}
-      {subscriptionState.hasSubscription && subscription ? (
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="space-y-8"
-        >
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              {t("subscription.tabs.overview")}
-            </TabsTrigger>
-            <TabsTrigger value="billing" className="flex items-center gap-2">
-              <CreditCard className="h-4 w-4" />
-              {t("subscription.tabs.billing")}
-            </TabsTrigger>
-            <TabsTrigger value="history" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              {t("subscription.tabs.history")}
-            </TabsTrigger>
-            <TabsTrigger value="plans" className="flex items-center gap-2">
-              <Zap className="h-4 w-4" />
-              {t("subscription.tabs.plans")}
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              {/* Current Plan Card */}
-              <Card className="relative overflow-hidden">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <CardTitle className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-primary/10">
-                          <Shield className="h-6 w-6 text-primary" />
-                        </div>
-                        {t("billing.currentPlan.title")}
-                      </CardTitle>
-                      <CardDescription>
-                        {helpers.getPlanNameTranslation(subscription.planId)}
-                      </CardDescription>
-                    </div>
-                    <Badge
-                      variant={getStatusBadgeVariant(subscription.status)}
-                      className="text-sm font-medium"
-                    >
-                      {getStatusText(subscription.status)}
-                    </Badge>
+      {/* Credit Balance Overview Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        <Card className="relative overflow-hidden">
+          <CardHeader>
+            <div className="flex items-start justify-between">
+              <div className="space-y-1">
+                <CardTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <Coins className="h-6 w-6 text-primary" />
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Plan Information Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Plan Details */}
-                    <div className="p-4 rounded-lg bg-muted/50 space-y-2">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Users className="h-4 w-4" />
-                        {t("subscription.current.title")}
+                  {t("subscription.balance.title")}
+                </CardTitle>
+                <CardDescription>
+                  {t("subscription.balance.description")}
+                </CardDescription>
+              </div>
+              <Badge className="text-lg font-bold px-4 py-2">
+                {initialCredits?.total ?? 0} {t("subscription.balance.total")}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {/* Expiring Credits */}
+              <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                <div className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300 mb-2">
+                  <Calendar className="h-4 w-4" />
+                  {t("subscription.balance.expiring.title")}
+                </div>
+                <div className="text-2xl font-bold text-amber-900 dark:text-amber-100">
+                  {initialCredits?.expiring ?? 0}
+                </div>
+                <div className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                  {t("subscription.balance.expiring.description")}
+                </div>
+              </div>
+
+              {/* Permanent Credits */}
+              <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-300 mb-2">
+                  <Sparkles className="h-4 w-4" />
+                  {t("subscription.balance.permanent.title")}
+                </div>
+                <div className="text-2xl font-bold text-green-900 dark:text-green-100">
+                  {initialCredits?.permanent ?? 0}
+                </div>
+                <div className="text-xs text-green-600 dark:text-green-400 mt-1">
+                  {t("subscription.balance.permanent.description")}
+                </div>
+              </div>
+
+              {/* Free Credits */}
+              <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300 mb-2">
+                  <Zap className="h-4 w-4" />
+                  {t("subscription.balance.free.title")}
+                </div>
+                <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                  {initialCredits?.free ?? 0}
+                </div>
+                <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                  {t("subscription.balance.free.description")}
+                </div>
+              </div>
+
+              {/* Expiration Notice */}
+              {initialCredits?.expiresAt && initialCredits.expiring > 0 && (
+                <div className="p-4 rounded-lg bg-muted/50 border">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                    <AlertCircle className="h-4 w-4" />
+                    {t("subscription.balance.nextExpiration")}
+                  </div>
+                  <div className="text-lg font-semibold">
+                    {formatDate(initialCredits.expiresAt)}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {initialCredits.expiring} {t("subscription.balance.total")}
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Tabs Section */}
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-6"
+      >
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="overview" className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4" />
+            {t("subscription.tabs.overview")}
+          </TabsTrigger>
+          <TabsTrigger value="buy" className="flex items-center gap-2">
+            <CreditCard className="h-4 w-4" />
+            {t("subscription.tabs.buy")}
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center gap-2">
+            <History className="h-4 w-4" />
+            {t("subscription.tabs.history")}
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Overview Tab */}
+        <TabsContent value="overview" className="space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Info className="h-5 w-5" />
+                  {t("subscription.overview.howItWorks.title")}
+                </CardTitle>
+                <CardDescription>
+                  {t("subscription.overview.howItWorks.description")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20">
+                    <Calendar className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-amber-900 dark:text-amber-100">
+                        {t("subscription.overview.howItWorks.expiring.title")}
+                      </p>
+                      <p className="text-sm text-amber-700 dark:text-amber-300">
+                        {t(
+                          "subscription.overview.howItWorks.expiring.description",
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20">
+                    <Sparkles className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-green-900 dark:text-green-100">
+                        {t("subscription.overview.howItWorks.permanent.title")}
+                      </p>
+                      <p className="text-sm text-green-700 dark:text-green-300">
+                        {t(
+                          "subscription.overview.howItWorks.permanent.description",
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+                    <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-blue-900 dark:text-blue-100">
+                        {t("subscription.overview.howItWorks.free.title")}
+                      </p>
+                      <p className="text-sm text-blue-700 dark:text-blue-300">
+                        {t("subscription.overview.howItWorks.free.description")}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Cost Reference */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Coins className="h-5 w-5" />
+                  {t("subscription.overview.costs.title")}
+                </CardTitle>
+                <CardDescription>
+                  {t("subscription.overview.costs.description")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold mb-2">
+                      {t("subscription.overview.costs.models.title")}
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="flex justify-between p-2 rounded bg-muted/50">
+                        <span>
+                          {t("subscription.overview.costs.models.gpt4")}
+                        </span>
+                        <span className="font-mono">
+                          {t("subscription.overview.costs.models.cost", {
+                            count: 5,
+                          })}
+                        </span>
                       </div>
-                      <div className="font-semibold text-lg">
-                        {currentPlan?.name
-                          ? t(currentPlan?.name)
-                          : subscription.planId}
+                      <div className="flex justify-between p-2 rounded bg-muted/50">
+                        <span>
+                          {t("subscription.overview.costs.models.claude")}
+                        </span>
+                        <span className="font-mono">
+                          {t("subscription.overview.costs.models.cost", {
+                            count: 4,
+                          })}
+                        </span>
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        {subscriptionState.currentSubscriptionIsAnnual
-                          ? t("pricing.plans.annually")
-                          : t("pricing.plans.monthly")}
+                      <div className="flex justify-between p-2 rounded bg-muted/50">
+                        <span>
+                          {t("subscription.overview.costs.models.gpt35")}
+                        </span>
+                        <span className="font-mono">
+                          {t("subscription.overview.costs.models.cost", {
+                            count: 2,
+                          })}
+                        </span>
+                      </div>
+                      <div className="flex justify-between p-2 rounded bg-muted/50">
+                        <span>
+                          {t("subscription.overview.costs.models.llama")}
+                        </span>
+                        <span className="font-mono">
+                          {t("subscription.overview.costs.models.cost", {
+                            count: 2,
+                          })}
+                        </span>
                       </div>
                     </div>
+                  </div>
 
-                    {/* Next Billing */}
-                    {!subscriptionState.isCancelledButActive &&
-                      subscription.currentPeriodEnd && (
-                        <div className="p-4 rounded-lg bg-muted/50 space-y-2">
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Calendar className="h-4 w-4" />
-                            {t("billing.subscription.nextBilling")}
-                          </div>
-                          <div className="font-semibold text-lg">
-                            {formatDate(subscription.currentPeriodEnd)}
+                  <div>
+                    <h4 className="font-semibold mb-2">
+                      {t("subscription.overview.costs.features.title")}
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="flex justify-between p-2 rounded bg-muted/50">
+                        <span>
+                          {t("subscription.overview.costs.features.search")}
+                        </span>
+                        <span className="font-mono">
+                          {t("subscription.overview.costs.features.searchCost")}
+                        </span>
+                      </div>
+                      <div className="flex justify-between p-2 rounded bg-muted/50">
+                        <span>
+                          {t("subscription.overview.costs.features.tts")}
+                        </span>
+                        <span className="font-mono">
+                          {t("subscription.overview.costs.features.audioCost")}
+                        </span>
+                      </div>
+                      <div className="flex justify-between p-2 rounded bg-muted/50">
+                        <span>
+                          {t("subscription.overview.costs.features.stt")}
+                        </span>
+                        <span className="font-mono">
+                          {t("subscription.overview.costs.features.audioCost")}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </TabsContent>
+
+        {/* Buy Credits Tab */}
+        <TabsContent value="buy" className="space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
+            {/* Subscription Option */}
+            <Card className="relative overflow-hidden border-2 border-primary">
+              <div className="absolute top-4 right-4">
+                <Badge className="bg-primary">
+                  {t("subscription.buy.subscription.badge")}
+                </Badge>
+              </div>
+              <CardHeader>
+                <CardTitle className="text-2xl">
+                  {t("subscription.buy.subscription.title")}
+                </CardTitle>
+                <CardDescription>
+                  {t("subscription.buy.subscription.description")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <div className="text-4xl font-bold">{formatPrice(10)}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("subscription.buy.subscription.perMonth")}
+                  </div>
+                </div>
+
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-primary" />
+                    <span>
+                      {t("subscription.buy.subscription.features.credits")}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-amber-600" />
+                    <span>
+                      {t("subscription.buy.subscription.features.expiry")}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-green-600" />
+                    <span>
+                      {t("subscription.buy.subscription.features.bestFor")}
+                    </span>
+                  </div>
+                </div>
+
+                <Button className="w-full" size="lg">
+                  {t("subscription.buy.subscription.button")}
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Credit Pack Option */}
+            <Card className="relative overflow-hidden">
+              <CardHeader>
+                <CardTitle className="text-2xl">
+                  {t("subscription.buy.pack.title")}
+                </CardTitle>
+                <CardDescription>
+                  {t("subscription.buy.pack.description")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <div className="text-4xl font-bold">{formatPrice(5)}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("subscription.buy.pack.perPack")}
+                  </div>
+                </div>
+
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-green-600" />
+                    <span>{t("subscription.buy.pack.features.credits")}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-green-600" />
+                    <span>{t("subscription.buy.pack.features.expiry")}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-blue-600" />
+                    <span>{t("subscription.buy.pack.features.bestFor")}</span>
+                  </div>
+                </div>
+
+                {/* Quantity Selector */}
+                <div className="space-y-3">
+                  <label className="text-sm font-medium">
+                    {t("subscription.buy.pack.quantity")}
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setPackQuantity(Math.max(1, packQuantity - 1))
+                      }
+                      disabled={packQuantity <= 1}
+                    >
+                      -
+                    </Button>
+                    <div className="flex-1 text-center">
+                      <div className="text-lg font-semibold">
+                        {packQuantity}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {t("subscription.buy.pack.total", {
+                          count: packQuantity * 500,
+                        })}
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setPackQuantity(Math.min(10, packQuantity + 1))
+                      }
+                      disabled={packQuantity >= 10}
+                    >
+                      +
+                    </Button>
+                  </div>
+                  <div className="text-center text-sm text-muted-foreground">
+                    {t("subscription.buy.pack.totalPrice", {
+                      price: formatPrice(5 * packQuantity),
+                    })}
+                  </div>
+                </div>
+
+                <Button className="w-full" size="lg" variant="outline">
+                  {t("subscription.buy.pack.button", {
+                    count: packQuantity,
+                    type:
+                      packQuantity === 1
+                        ? t("subscription.buy.pack.pack")
+                        : t("subscription.buy.pack.packs"),
+                  })}
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </TabsContent>
+
+        {/* Usage History Tab */}
+        <TabsContent value="history" className="space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <History className="h-5 w-5" />
+                  {t("subscription.history.title")}
+                </CardTitle>
+                <CardDescription>
+                  {t("subscription.history.description")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {!initialHistory || initialHistory.transactions.length === 0 ? (
+                  <div className="text-center py-12 space-y-4">
+                    <History className="h-12 w-12 text-muted-foreground mx-auto" />
+                    <div>
+                      <p className="text-lg font-medium">
+                        {t("subscription.history.empty.title")}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        {t("subscription.history.empty.description")}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {initialHistory.transactions.map((transaction) => (
+                      <div
+                        key={transaction.id}
+                        className={cn(
+                          "p-4 rounded-lg border flex items-center justify-between",
+                          transaction.amount > 0
+                            ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                            : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800",
+                        )}
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium capitalize">
+                              {t(getTransactionTypeKey(transaction.type))}
+                            </span>
+                            {transaction.modelId && (
+                              <Badge variant="outline" className="text-xs">
+                                {transaction.modelId}
+                              </Badge>
+                            )}
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            {t("subscription.billing.automatic")}
+                            {formatDate(transaction.createdAt)}
                           </div>
                         </div>
-                      )}
-
-                    {/* Access Until (for cancelled) */}
-                    {subscriptionState.isCancelledButActive &&
-                      subscription.currentPeriodEnd && (
-                        <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 space-y-2">
-                          <div className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300">
-                            <AlertCircle className="h-4 w-4" />
-                            {t("subscription.accessUntil")}
+                        <div className="text-right space-y-1">
+                          <div
+                            className={cn(
+                              "text-lg font-bold",
+                              transaction.amount > 0
+                                ? "text-green-700 dark:text-green-300"
+                                : "text-red-700 dark:text-red-300",
+                            )}
+                          >
+                            {transaction.amount > 0 ? "+" : ""}
+                            {transaction.amount}
                           </div>
-                          <div className="font-semibold text-lg text-amber-800 dark:text-amber-200">
-                            {formatDate(subscription.currentPeriodEnd)}
-                          </div>
-                          <div className="text-sm text-amber-600 dark:text-amber-400">
-                            {t("subscription.messages.cancellationWarning", {
-                              date: formatDate(subscription.currentPeriodEnd),
+                          <div className="text-xs text-muted-foreground">
+                            {t("subscription.history.balance", {
+                              count: transaction.balanceAfter,
                             })}
                           </div>
                         </div>
-                      )}
+                      </div>
+                    ))}
 
-                    {/* Billing Amount */}
-                    {currentPlan && (
-                      <div className="p-4 rounded-lg bg-muted/50 space-y-2">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <CreditCard className="h-4 w-4" />
-                          {t("subscription.billing.amount")}
-                        </div>
-                        <div className="font-semibold text-lg">
-                          {((): string => {
-                            const country = getCountryFromLocale(locale);
-                            const countryPricing =
-                              currentPlan.priceByCountry[country] ||
-                              currentPlan.priceByCountry.GLOBAL;
-                            const amount =
-                              subscriptionState.currentSubscriptionIsAnnual
-                                ? countryPricing.annual
-                                : countryPricing.monthly;
-                            return helpers.formatPrice(
-                              amount,
-                              countryPricing.currency,
-                            );
-                          })()}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {subscriptionState.currentSubscriptionIsAnnual
-                            ? t("pricing.plans.annually")
-                            : t("pricing.plans.monthly")}
-                        </div>
+                    {initialHistory.totalCount > 10 && (
+                      <div className="text-center pt-4">
+                        <Button variant="outline">
+                          {t("subscription.history.loadMore")}
+                        </Button>
                       </div>
                     )}
                   </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap gap-3 pt-4 border-t">
-                    {/* Update Payment Method */}
-                    <Button
-                      variant="outline"
-                      onClick={actions.handleUpdatePaymentMethod}
-                      disabled={actions.isUpdatingPaymentMethod}
-                      className="flex items-center gap-2"
-                    >
-                      {actions.isUpdatingPaymentMethod ? (
-                        <RefreshCw className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Settings className="h-4 w-4" />
-                      )}
-                      {t("subscription.actions.updatePayment")}
-                      <ExternalLink className="h-3 w-3" />
-                    </Button>
-
-                    {/* Cancel/Reactivate Subscription */}
-                    {subscriptionState.isCancelledButActive ? (
-                      <Button
-                        onClick={() => setShowReactivateDialog(true)}
-                        disabled={actions.isChangingPlan === "reactivate"}
-                        className="flex items-center gap-2"
-                      >
-                        {actions.isChangingPlan === "reactivate" ? (
-                          <RefreshCw className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <CheckCircle2 className="h-4 w-4" />
-                        )}
-                        {actions.isChangingPlan === "reactivate"
-                          ? t("subscription.actions.reactivating")
-                          : t("subscription.actions.reactivate")}
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowCancelDialog(true)}
-                        disabled={actions.isChangingPlan === "cancel"}
-                        className="flex items-center gap-2 text-destructive hover:text-destructive"
-                      >
-                        {actions.isChangingPlan === "cancel" ? (
-                          <RefreshCw className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <X className="h-4 w-4" />
-                        )}
-                        {actions.isChangingPlan === "cancel"
-                          ? t("subscription.actions.cancelling")
-                          : t("subscription.actions.cancel")}
-                      </Button>
-                    )}
-
-                    {/* View All Plans */}
-                    <Button
-                      variant="outline"
-                      onClick={() => setActiveTab("plans")}
-                      className="flex items-center gap-2"
-                    >
-                      <Zap className="h-4 w-4" />
-                      {t("billing.noSubscription.viewPlans")}
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Plan Features */}
-            {currentPlan && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <CheckCircle2 className="h-5 w-5 text-green-600" />
-                      {t("subscription.planFeatures")}
-                    </CardTitle>
-                    <CardDescription>
-                      {t("subscription.features.description", {
-                        plan: t(currentPlan.name),
-                      })}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {currentPlan.features?.map((feature, index) => (
-                        <div key={index} className="flex items-start gap-3">
-                          <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                          <span className="text-sm">{t(feature)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )}
-          </TabsContent>
-
-          {/* Billing Tab */}
-          <TabsContent value="billing" className="space-y-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="space-y-6"
-            >
-              {/* Payment Method Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <CreditCard className="h-5 w-5" />
-                    {t("billing.paymentMethod.title")}
-                  </CardTitle>
-                  <CardDescription>
-                    {t("billing.paymentMethod.description")}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="p-4 rounded-lg bg-muted/50 border border-dashed border-muted-foreground/25">
-                    <div className="text-center space-y-4">
-                      <CreditCard className="h-8 w-8 text-muted-foreground mx-auto" />
-                      <div>
-                        <p className="font-medium">
-                          {t("subscription.billing.paymentMethod")}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {t("subscription.billing.managePaymentMethod")}
-                        </p>
-                      </div>
-                      <Button
-                        onClick={actions.handleUpdatePaymentMethod}
-                        disabled={actions.isUpdatingPaymentMethod}
-                        className="flex items-center gap-2"
-                      >
-                        {actions.isUpdatingPaymentMethod ? (
-                          <RefreshCw className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Settings className="h-4 w-4" />
-                        )}
-                        {t("billing.paymentMethod.update")}
-                        <ExternalLink className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Billing Cycle Management */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5" />
-                    {t("subscription.billingCycle")}
-                  </CardTitle>
-                  <CardDescription>
-                    {t("subscription.billing.cycleDescription")}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="p-4 rounded-lg bg-muted/50">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">
-                            {t("subscription.billing.currentCycle")}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {subscriptionState.currentSubscriptionIsAnnual
-                              ? t("pricing.plans.annually")
-                              : t("pricing.plans.monthly")}
-                          </p>
-                        </div>
-                        <Badge variant="outline">
-                          {subscriptionState.currentSubscriptionIsAnnual
-                            ? t("subscription.billing.annual")
-                            : t("subscription.billing.monthly")}
-                        </Badge>
-                      </div>
-                    </div>
-
-                    {subscription.currentPeriodEnd && (
-                      <div className="p-4 rounded-lg border">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium">
-                              {subscriptionState.isCancelledButActive
-                                ? t("subscription.accessUntil")
-                                : t("billing.subscription.nextBilling")}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {formatDate(subscription.currentPeriodEnd)}
-                            </p>
-                          </div>
-                          <Calendar className="h-5 w-5 text-muted-foreground" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </TabsContent>
-
-          {/* Billing History Tab */}
-          <TabsContent value="history" className="space-y-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    {t("billing.history.title")}
-                  </CardTitle>
-                  <CardDescription>
-                    {t("billing.history.description")}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {billingHistory.length === 0 ? (
-                    <div className="text-center py-12 space-y-4">
-                      <FileText className="h-12 w-12 text-muted-foreground mx-auto" />
-                      <div>
-                        <p className="text-lg font-medium">
-                          {t("subscription.billing.empty")}
-                        </p>
-                        <p className="text-sm text-muted-foreground mt-2">
-                          {t("subscription.messages.billingHistoryEmpty")}
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {billingHistory.map((invoice) => (
-                        <motion.div
-                          key={invoice.id}
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          className="p-4 rounded-lg border hover:shadow-md transition-shadow"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              <div className="p-2 rounded-lg bg-muted">
-                                <FileText className="h-4 w-4" />
-                              </div>
-                              <div>
-                                <p className="font-medium">
-                                  {formatDate(invoice.createdAt)}
-                                </p>
-                                <p className="text-sm text-muted-foreground">
-                                  {t("subscription.billing.invoiceNumber", {
-                                    id:
-                                      invoice.invoiceNumber ||
-                                      invoice.id.slice(-8),
-                                  })}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                              <div className="text-right">
-                                <p className="font-semibold">
-                                  {helpers.formatPrice(
-                                    invoice.amount,
-                                    invoice.currency,
-                                  )}
-                                </p>
-                                <Badge
-                                  variant={
-                                    invoice.status === InvoiceStatus.PAID
-                                      ? "default"
-                                      : invoice.status === InvoiceStatus.OPEN
-                                        ? "secondary"
-                                        : "destructive"
-                                  }
-                                  className="text-xs"
-                                >
-                                  {helpers.getInvoiceStatusTranslation(
-                                    invoice.status,
-                                  )}
-                                </Badge>
-                              </div>
-                              {invoice.invoiceUrl && (
-                                <Button variant="outline" size="sm" asChild>
-                                  <a
-                                    href={invoice.invoiceUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-2"
-                                  >
-                                    <Download className="h-4 w-4" />
-                                    {t("subscription.billing.download")}
-                                  </a>
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          </TabsContent>
-
-          {/* Plans Tab */}
-          <TabsContent value="plans" id="plans" className="space-y-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              {/* Pricing Section */}
-              <PricingSection
-                locale={locale}
-                currentUser={user}
-                currentSubscription={subscription}
-                onPlanSelect={actions.handleSubscribe}
-                isProcessing={actions.isChangingPlan !== null}
-                onDowngrade={actions.handleDowngrade}
-                useHomePageLink={false}
-                hideFooterAndHeader={true}
-              />
-            </motion.div>
-          </TabsContent>
-        </Tabs>
-      ) : (
-        <PricingSection
-          locale={locale}
-          currentUser={user}
-          currentSubscription={subscription}
-          onPlanSelect={actions.handleSubscribe}
-          isProcessing={actions.isChangingPlan !== null}
-          onDowngrade={actions.handleDowngrade}
-          useHomePageLink={false}
-          hideFooterAndHeader={true}
-        />
-      )}
-
-      {/* Cancellation Confirmation Dialog */}
-      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-destructive" />
-              {t("subscription.cancellation.confirm.title")}
-            </DialogTitle>
-            <DialogDescription>
-              {t("subscription.cancellation.confirm.description")}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                {t("subscription.cancellation.confirm.warning", {
-                  date: subscription?.currentPeriodEnd
-                    ? formatDate(subscription.currentPeriodEnd)
-                    : t("subscription.billing.fallbackDate"),
-                })}
-              </AlertDescription>
-            </Alert>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowCancelDialog(false)}
-              disabled={actions.isChangingPlan === "cancel"}
-            >
-              {t("common.cancel")}
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleCancelSubscription}
-              disabled={actions.isChangingPlan === "cancel"}
-              className="flex items-center gap-2"
-            >
-              {actions.isChangingPlan === "cancel" ? (
-                <RefreshCw className="h-4 w-4 animate-spin" />
-              ) : (
-                <X className="h-4 w-4" />
-              )}
-              {actions.isChangingPlan === "cancel"
-                ? t("subscription.actions.cancelling")
-                : t("subscription.actions.cancel")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Reactivation Confirmation Dialog */}
-      <Dialog
-        open={showReactivateDialog}
-        onOpenChange={setShowReactivateDialog}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
-              {t("subscription.reactivation.confirm.title")}
-            </DialogTitle>
-            <DialogDescription>
-              {t("subscription.reactivation.confirm.description")}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Alert>
-              <CheckCircle2 className="h-4 w-4" />
-              <AlertDescription>
-                {t("subscription.reactivation.confirm.benefits")}
-              </AlertDescription>
-            </Alert>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowReactivateDialog(false)}
-              disabled={actions.isChangingPlan === "reactivate"}
-            >
-              {t("common.cancel")}
-            </Button>
-            <Button
-              onClick={handleReactivateSubscription}
-              disabled={actions.isChangingPlan === "reactivate"}
-              className="flex items-center gap-2"
-            >
-              {actions.isChangingPlan === "reactivate" ? (
-                <RefreshCw className="h-4 w-4 animate-spin" />
-              ) : (
-                <CheckCircle2 className="h-4 w-4" />
-              )}
-              {actions.isChangingPlan === "reactivate"
-                ? t("subscription.actions.reactivating")
-                : t("subscription.actions.reactivate")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        </TabsContent>
+      </Tabs>
     </Container>
   );
 }

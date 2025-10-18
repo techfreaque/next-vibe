@@ -1,54 +1,20 @@
+import { translations as componentsTranslations } from "../../_components/i18n/de";
+import { translations as aboutUsTranslations } from "../../about-us/i18n/de";
+import { translations as careersTranslations } from "../../careers/i18n/de";
+import { translations as imprintTranslations } from "../../imprint/i18n/de";
+import { translations as newsletterTranslations } from "../../newsletter/i18n/de";
+import { translations as pricingTranslations } from "../../pricing/i18n/de";
+import { translations as privacyPolicyTranslations } from "../../privacy-policy/i18n/de";
+import { translations as termsOfServiceTranslations } from "../../terms-of-service/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
-    form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
-    },
-    response: {
-      title: "Antwort",
-      description: "Antwortdaten",
-    },
-    errors: {
-      unauthorized: {
-        title: "Nicht autorisiert",
-        description: "Authentifizierung erforderlich",
-      },
-      validation: {
-        title: "Validierungsfehler",
-        description: "Ungültige Anfrageparameter",
-      },
-      server: {
-        title: "Serverfehler",
-        description: "Interner Serverfehler",
-      },
-      unknown: {
-        title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist aufgetreten",
-      },
-      network: {
-        title: "Netzwerkfehler",
-        description: "Netzwerkfehler aufgetreten",
-      },
-      forbidden: {
-        title: "Verboten",
-        description: "Zugriff verboten",
-      },
-      notFound: {
-        title: "Nicht gefunden",
-        description: "Ressource nicht gefunden",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Datenkonflikt aufgetreten",
-      },
-    },
-    success: {
-      title: "Erfolg",
-      description: "Vorgang erfolgreich abgeschlossen",
-    },
-  },
+  aboutUs: aboutUsTranslations,
+  careers: careersTranslations,
+  components: componentsTranslations,
+  imprint: imprintTranslations,
+  newsletter: newsletterTranslations,
+  pricing: pricingTranslations,
+  privacyPolicy: privacyPolicyTranslations,
+  termsOfService: termsOfServiceTranslations,
 };

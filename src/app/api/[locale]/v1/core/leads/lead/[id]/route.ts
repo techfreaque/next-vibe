@@ -25,8 +25,10 @@ export const { GET, PATCH, tools } = endpointsHandler({
   [Methods.PATCH]: {
     email: undefined,
     handler: async ({ urlVariables, data, user, locale, logger }) => {
+      // Type assertion: urlVariables.id is validated by endpoint definition as string UUID
+      const leadId = urlVariables.id as string;
       return await leadsRepository.updateLead(
-        urlVariables.id,
+        leadId,
         data,
         user,
         locale,

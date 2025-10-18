@@ -49,11 +49,11 @@ export function ImapAccountEditForm({
   const alert = endpoint.alert;
 
   if (endpoint.read?.isLoading) {
-    return <div>{t("imap.common.loading")}</div>;
+    return <div>{t("app.admin.emails.imap.common.loading")}</div>;
   }
 
   if (!form) {
-    return <div>{t("imap.common.loading")}</div>;
+    return <div>{t("app.admin.emails.imap.common.loading")}</div>;
   }
 
   return (
@@ -67,8 +67,8 @@ export function ImapAccountEditForm({
             name="name"
             config={{
               type: "text",
-              label: "imap.account.fields.name",
-              placeholder: "imap.account.fields.name",
+              label: "app.admin.emails.imap.account.fields.name",
+              placeholder: "app.admin.emails.imap.account.fields.name",
             }}
             control={form.control}
             theme={{
@@ -81,8 +81,8 @@ export function ImapAccountEditForm({
             name="email"
             config={{
               type: "email",
-              label: "imap.account.fields.email",
-              placeholder: "imap.account.fields.email",
+              label: "app.admin.emails.imap.account.fields.email",
+              placeholder: "app.admin.emails.imap.account.fields.email",
             }}
             control={form.control}
             theme={{
@@ -95,8 +95,8 @@ export function ImapAccountEditForm({
             name="host"
             config={{
               type: "text",
-              label: "imap.account.fields.host",
-              placeholder: "imap.account.fields.host",
+              label: "app.admin.emails.imap.account.fields.host",
+              placeholder: "app.admin.emails.imap.account.fields.host",
             }}
             control={form.control}
             theme={{
@@ -109,8 +109,8 @@ export function ImapAccountEditForm({
             name="port"
             config={{
               type: "number",
-              label: "imap.account.fields.port",
-              placeholder: "imap.account.fields.port",
+              label: "app.admin.emails.imap.account.fields.port",
+              placeholder: "app.admin.emails.imap.account.fields.port",
             }}
             control={form.control}
             theme={{
@@ -126,8 +126,8 @@ export function ImapAccountEditForm({
             name="username"
             config={{
               type: "text",
-              label: "imap.account.fields.username",
-              placeholder: "imap.account.fields.username",
+              label: "app.admin.emails.imap.account.fields.username",
+              placeholder: "app.admin.emails.imap.account.fields.username",
             }}
             control={form.control}
             theme={{
@@ -140,8 +140,8 @@ export function ImapAccountEditForm({
             name="password"
             config={{
               type: "password",
-              label: "imap.account.fields.password",
-              placeholder: "imap.account.placeholders.password_update",
+              label: "app.admin.emails.imap.account.fields.password",
+              placeholder: "app.admin.emails.imap.account.placeholders.password_update",
             }}
             control={form.control}
             theme={{
@@ -154,12 +154,12 @@ export function ImapAccountEditForm({
             name="authMethod"
             config={{
               type: "select",
-              label: "imap.account.fields.authMethod",
-              placeholder: "imap.account.fields.authMethod",
+              label: "app.admin.emails.imap.account.fields.authMethod",
+              placeholder: "app.admin.emails.imap.account.fields.authMethod",
               options: [
-                { value: ImapAuthMethod.PLAIN, label: "imap.auth.plain" },
-                { value: ImapAuthMethod.OAUTH2, label: "imap.auth.oauth2" },
-                { value: ImapAuthMethod.XOAUTH2, label: "imap.auth.xoauth2" },
+                { value: ImapAuthMethod.PLAIN, label: "app.admin.emails.imap.auth.plain" },
+                { value: ImapAuthMethod.OAUTH2, label: "app.admin.emails.imap.auth.oauth2" },
+                { value: ImapAuthMethod.XOAUTH2, label: "app.admin.emails.imap.auth.xoauth2" },
               ],
             }}
             control={form.control}
@@ -173,7 +173,7 @@ export function ImapAccountEditForm({
             name="secure"
             config={{
               type: "checkbox",
-              label: "imap.account.fields.secure",
+              label: "app.admin.emails.imap.account.fields.secure",
             }}
             control={form.control}
             theme={{
@@ -187,7 +187,7 @@ export function ImapAccountEditForm({
       {/* Advanced Settings */}
       <div className="space-y-4">
         <h3 className="text-lg font-medium">
-          {t("imap.account.sections.advanced")}
+          {t("app.admin.emails.imap.account.sections.advanced")}
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -195,8 +195,8 @@ export function ImapAccountEditForm({
             name="connectionTimeout"
             config={{
               type: "number",
-              label: "imap.account.fields.connectionTimeout",
-              placeholder: "imap.account.fields.connectionTimeout",
+              label: "app.admin.emails.imap.account.fields.connectionTimeout",
+              placeholder: "app.admin.emails.imap.account.fields.connectionTimeout",
             }}
             control={form.control}
             theme={{
@@ -209,8 +209,8 @@ export function ImapAccountEditForm({
             name="syncInterval"
             config={{
               type: "number",
-              label: "imap.account.fields.syncInterval",
-              placeholder: "imap.account.fields.syncInterval",
+              label: "app.admin.emails.imap.account.fields.syncInterval",
+              placeholder: "app.admin.emails.imap.account.fields.syncInterval",
             }}
             control={form.control}
             theme={{
@@ -223,8 +223,8 @@ export function ImapAccountEditForm({
             name="maxMessages"
             config={{
               type: "number",
-              label: "imap.account.fields.maxMessages",
-              placeholder: "imap.account.fields.maxMessages",
+              label: "app.admin.emails.imap.account.fields.maxMessages",
+              placeholder: "app.admin.emails.imap.account.fields.maxMessages",
             }}
             control={form.control}
             theme={{
@@ -238,7 +238,7 @@ export function ImapAccountEditForm({
           name="enabled"
           config={{
             type: "checkbox",
-            label: "imap.account.fields.enabled",
+            label: "app.admin.emails.imap.account.fields.enabled",
           }}
           control={form.control}
           theme={{
@@ -251,7 +251,7 @@ export function ImapAccountEditForm({
           name="keepAlive"
           config={{
             type: "checkbox",
-            label: "imap.account.fields.keepAlive",
+            label: "app.admin.emails.imap.account.fields.keepAlive",
           }}
           control={form.control}
           theme={{
@@ -264,12 +264,12 @@ export function ImapAccountEditForm({
       {/* Form Actions */}
       <div className="flex items-center justify-end space-x-4">
         <Button type="button" variant="outline" onClick={onCancel}>
-          {t("imap.common.cancel")}
+          {t("app.admin.emails.imap.common.cancel")}
         </Button>
         <Button type="submit" disabled={endpoint.create?.isSubmitting}>
           {endpoint.create?.isSubmitting
-            ? t("imap.common.saving")
-            : t("imap.account.update")}
+            ? t("app.admin.emails.imap.common.saving")
+            : t("app.admin.emails.imap.account.update")}
         </Button>
       </div>
     </Form>

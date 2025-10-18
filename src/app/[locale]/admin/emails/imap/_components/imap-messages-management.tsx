@@ -70,12 +70,12 @@ export function ImapMessagesManagement(): JSX.Element {
     <div>
       <div className="mb-6">
         <h1 className="text-3xl font-bold">
-          {t("imap.admin.messages.title", {
+          {t("app.admin.emails.imap.admin.messages.title", {
             count: totalMessages,
           })}
         </h1>
         <p className="text-muted-foreground">
-          {t("imap.admin.messages.description")}
+          {t("app.admin.emails.imap.admin.messages.description")}
         </p>
       </div>
       <div className="space-y-6">
@@ -84,7 +84,7 @@ export function ImapMessagesManagement(): JSX.Element {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center space-x-2">
                 <Filter className="h-5 w-5" />
-                <span>{t("imap.admin.messages.filters")}</span>
+                <span>{t("app.admin.emails.imap.admin.messages.filters")}</span>
               </CardTitle>
               <div className="flex items-center space-x-2">
                 <Button
@@ -93,7 +93,7 @@ export function ImapMessagesManagement(): JSX.Element {
                   size="sm"
                   onClick={handleClearFilters}
                 >
-                  {t("imap.common.clearFilters")}
+                  {t("app.admin.emails.imap.common.clearFilters")}
                 </Button>
                 <Button
                   type="button"
@@ -103,7 +103,7 @@ export function ImapMessagesManagement(): JSX.Element {
                   disabled={queryLoading}
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />
-                  {t("common.refresh")}
+                  {t("app.admin.emails.imap.common.refresh")}
                 </Button>
               </div>
             </div>
@@ -123,16 +123,16 @@ export function ImapMessagesManagement(): JSX.Element {
                   name="accountId"
                   config={{
                     type: "select",
-                    label: "imap.common.account",
-                    placeholder: "imap.common.selectAccount",
+                    label: "app.admin.emails.imap.common.account",
+                    placeholder: "app.admin.emails.imap.common.selectAccount",
                     options: [
                       {
                         value: ImapAccountFilter.ALL,
-                        label: "imap.forms.allAccounts",
+                        label: "app.admin.emails.imap.forms.allAccounts",
                       },
                       ...accounts.map((account) => ({
                         value: account.id,
-                        label: "imap.common.accountEmail" as const,
+                        label: "app.admin.emails.imap.common.accountEmail" as const,
                         labelParams: { email: account.email },
                       })),
                     ],
@@ -150,27 +150,27 @@ export function ImapMessagesManagement(): JSX.Element {
                   name="status"
                   config={{
                     type: "select",
-                    label: "imap.common.status",
+                    label: "app.admin.emails.imap.common.status",
                     options: [
                       {
                         value: ImapMessageStatusFilter.ALL,
-                        label: "imap.common.all",
+                        label: "app.admin.emails.imap.common.all",
                       },
                       {
                         value: ImapMessageStatusFilter.UNREAD,
-                        label: "imap.messages.unread",
+                        label: "app.admin.emails.imap.messages.unread",
                       },
                       {
                         value: ImapMessageStatusFilter.READ,
-                        label: "imap.messages.read",
+                        label: "app.admin.emails.imap.messages.read",
                       },
                       {
                         value: ImapMessageStatusFilter.FLAGGED,
-                        label: "imap.messages.flagged",
+                        label: "app.admin.emails.imap.messages.flagged",
                       },
                       {
                         value: ImapMessageStatusFilter.HAS_ATTACHMENTS,
-                        label: "imap.messages.withAttachments",
+                        label: "app.admin.emails.imap.messages.withAttachments",
                       },
                     ],
                   }}
@@ -187,23 +187,23 @@ export function ImapMessagesManagement(): JSX.Element {
                   name="sortBy"
                   config={{
                     type: "select",
-                    label: "imap.common.sortBy",
+                    label: "app.admin.emails.imap.common.sortBy",
                     options: [
                       {
                         value: ImapMessageSortField.SENT_AT,
-                        label: "imap.messages.sentAt",
+                        label: "app.admin.emails.imap.messages.sentAt",
                       },
                       {
                         value: ImapMessageSortField.SUBJECT,
-                        label: "imap.messages.subject",
+                        label: "app.admin.emails.imap.messages.subject",
                       },
                       {
                         value: ImapMessageSortField.SENDER_EMAIL,
-                        label: "imap.messages.sender",
+                        label: "app.admin.emails.imap.messages.sender",
                       },
                       {
                         value: ImapMessageSortField.CREATED_AT,
-                        label: "imap.common.createdAt",
+                        label: "app.admin.emails.imap.common.createdAt",
                       },
                     ],
                   }}
@@ -220,10 +220,10 @@ export function ImapMessagesManagement(): JSX.Element {
                   name="sortOrder"
                   config={{
                     type: "select",
-                    label: "imap.common.sortOrder",
+                    label: "app.admin.emails.imap.common.sortOrder",
                     options: [
-                      { value: SortOrder.DESC, label: "imap.common.newest" },
-                      { value: SortOrder.ASC, label: "imap.common.oldest" },
+                      { value: SortOrder.DESC, label: "app.admin.emails.imap.common.newest" },
+                      { value: SortOrder.ASC, label: "app.admin.emails.imap.common.oldest" },
                     ],
                   }}
                   control={messagesEndpoint.read?.form.control}
@@ -241,7 +241,7 @@ export function ImapMessagesManagement(): JSX.Element {
                   name="dateFrom"
                   config={{
                     type: "date",
-                    label: "imap.common.dateFrom",
+                    label: "app.admin.emails.imap.common.dateFrom",
                     placeholder: "common.selectDate",
                   }}
                   control={messagesEndpoint.read?.form.control}
@@ -256,7 +256,7 @@ export function ImapMessagesManagement(): JSX.Element {
                   name="dateTo"
                   config={{
                     type: "date",
-                    label: "imap.common.dateTo",
+                    label: "app.admin.emails.imap.common.dateTo",
                     placeholder: "common.selectDate",
                   }}
                   control={messagesEndpoint.read?.form.control}
@@ -276,7 +276,7 @@ export function ImapMessagesManagement(): JSX.Element {
                     config={{
                       type: "text",
                       label: undefined,
-                      placeholder: "imap.messages.searchPlaceholder",
+                      placeholder: "app.admin.emails.imap.messages.searchPlaceholder",
                     }}
                     control={messagesEndpoint.read?.form.control}
                     schema={imapMessageQuerySchema}
@@ -296,10 +296,10 @@ export function ImapMessagesManagement(): JSX.Element {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>
-                {t("imap.admin.messages.title", { count: totalMessages })}
+                {t("app.admin.emails.imap.admin.messages.title", { count: totalMessages })}
               </span>
               <div className="text-sm text-muted-foreground">
-                {t("imap.common.page")} {currentPage} {t("imap.common.of")}{" "}
+                {t("app.admin.emails.imap.common.page")} {currentPage} {t("app.admin.emails.imap.common.of")}{" "}
                 {totalPages}
               </div>
             </CardTitle>
@@ -318,11 +318,11 @@ export function ImapMessagesManagement(): JSX.Element {
               <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-muted-foreground">
-                    {t("imap.common.showing")}{" "}
-                    {(currentPage - 1) * currentLimit + 1} {t("imap.common.to")}{" "}
+                    {t("app.admin.emails.imap.common.showing")}{" "}
+                    {(currentPage - 1) * currentLimit + 1} {t("app.admin.emails.imap.common.to")}{" "}
                     {Math.min(currentPage * currentLimit, totalMessages)}{" "}
-                    {t("imap.common.of")} {totalMessages.toLocaleString()}{" "}
-                    {t("imap.admin.messages.title").toLowerCase()}
+                    {t("app.admin.emails.imap.common.of")} {totalMessages.toLocaleString()}{" "}
+                    {t("app.admin.emails.imap.admin.messages.title").toLowerCase()}
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button
@@ -336,7 +336,7 @@ export function ImapMessagesManagement(): JSX.Element {
                         );
                       }}
                     >
-                      {t("imap.common.previous")}
+                      {t("app.admin.emails.imap.common.previous")}
                     </Button>
                     <span className="text-sm">
                       {currentPage} / {totalPages}
@@ -352,7 +352,7 @@ export function ImapMessagesManagement(): JSX.Element {
                         );
                       }}
                     >
-                      {t("imap.common.next")}
+                      {t("app.admin.emails.imap.common.next")}
                     </Button>
                   </div>
                 </div>
@@ -364,7 +364,7 @@ export function ImapMessagesManagement(): JSX.Element {
         {/* Message Statistics */}
         <Card>
           <CardHeader>
-            <CardTitle>{t("imap.admin.messages.statistics")}</CardTitle>
+            <CardTitle>{t("app.admin.emails.imap.admin.messages.statistics")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -373,7 +373,7 @@ export function ImapMessagesManagement(): JSX.Element {
                   {totalMessages.toLocaleString()}
                 </div>
                 <div className="text-sm text-gray-600">
-                  {t("imap.dashboard.totalMessages")}
+                  {t("app.admin.emails.imap.dashboard.totalMessages")}
                 </div>
               </div>
               <div className="text-center">
@@ -383,7 +383,7 @@ export function ImapMessagesManagement(): JSX.Element {
                     .length.toLocaleString()}
                 </div>
                 <div className="text-sm text-gray-600">
-                  {t("imap.messages.unread")}
+                  {t("app.admin.emails.imap.messages.unread")}
                 </div>
               </div>
               <div className="text-center">
@@ -393,7 +393,7 @@ export function ImapMessagesManagement(): JSX.Element {
                     .length.toLocaleString()}
                 </div>
                 <div className="text-sm text-gray-600">
-                  {t("imap.messages.flagged")}
+                  {t("app.admin.emails.imap.messages.flagged")}
                 </div>
               </div>
               <div className="text-center">
@@ -403,7 +403,7 @@ export function ImapMessagesManagement(): JSX.Element {
                     .length.toLocaleString()}
                 </div>
                 <div className="text-sm text-gray-600">
-                  {t("imap.messages.withAttachments")}
+                  {t("app.admin.emails.imap.messages.withAttachments")}
                 </div>
               </div>
             </div>

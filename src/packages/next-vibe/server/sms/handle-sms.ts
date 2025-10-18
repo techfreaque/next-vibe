@@ -17,11 +17,7 @@ import {
 import { parseError } from "../../shared/utils";
 import { env } from "../env";
 import { batchSendSms, sendSms } from "./send-sms";
-import type {
-  SendSmsParams,
-  SmsFunctionType,
-  SmsHandlerOptions,
-} from "./utils";
+import type { SendSmsParams, SmsConfig, SmsHandlerOptions } from "./utils";
 
 /**
  * Processes and handles SMS messages triggered by API responses
@@ -37,14 +33,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
   locale,
   logger,
 }: {
-  sms:
-    | {
-        afterHandlerSms?: {
-          ignoreErrors?: boolean;
-          render: SmsFunctionType<TRequest, TResponse, TUrlVariables>;
-        }[];
-      }
-    | undefined;
+  sms: SmsConfig<TRequest, TResponse, TUrlVariables> | undefined;
   user: JwtPayloadType;
   responseData: TResponse;
   urlVariables: TUrlVariables;
@@ -76,22 +65,23 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
     await Promise.all(
       sms.afterHandlerSms.map(async (smsData) => {
         try {
-          const renderResult = await smsData.render({
+          const result = await smsData.render({
             user,
             urlVariables,
             requestData,
             responseData,
             t: tFunction,
             locale: currentLocale,
+            logger,
           });
 
-          if (!renderResult.success) {
+          if (!result.success) {
             if (!smsData.ignoreErrors) {
               errors.push(
                 createErrorResponse(
                   "sms.errors.rendering_failed",
                   ErrorResponseTypes.SMS_ERROR,
-                  { error: renderResult.message },
+                  { error: result.message },
                 ),
               );
             }
@@ -99,8 +89,8 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
           }
 
           // Handle both single messages and batch messages
-          if (Array.isArray(renderResult.data)) {
-            const messages: SendSmsParams[] = renderResult.data.map((msg) => {
+          if (Array.isArray(result.data)) {
+            const messages: SendSmsParams[] = result.data.map((msg) => {
               // Create a properly typed SMS params object with conditional properties
               const smsParams: SendSmsParams = {
                 to: msg.to,
@@ -116,7 +106,11 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
               // Only include options if there are any to include
               if (msg.options) {
                 // Build options object with only defined properties
-                const optionsObj: any = {};
+                const optionsObj: {
+                  provider?: string;
+                  type?: string;
+                  datacoding?: string;
+                } = {};
 
                 if (msg.options.provider) {
                   optionsObj.provider = msg.options.provider;
@@ -148,15 +142,12 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
             }
           } else {
             const _smsData: SendSmsParams = {
-              ...renderResult.data,
+              ...result.data,
               message:
                 options?.enableTruncation &&
-                renderResult.data.message.length > maxMessageLength
-                  ? `${renderResult.data.message.substring(
-                      0,
-                      maxMessageLength - 3,
-                    )}...`
-                  : renderResult.data.message,
+                result.data.message.length > maxMessageLength
+                  ? `${result.data.message.substring(0, maxMessageLength - 3)}...`
+                  : result.data.message,
             };
 
             const smsResponse = await sendSms(_smsData);
@@ -173,17 +164,15 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
             }
           }
         } catch (error) {
-          const errorMessage = `Error processing SMS renderer: ${
-            error instanceof Error ? error.message : "Unknown error"
-          }`;
-          logger.error(errorMessage, error);
+          const parsedError = parseError(error);
+          logger.error(parsedError.message, error);
 
           if (!smsData.ignoreErrors) {
             errors.push(
               createErrorResponse(
                 "sms.errors.rendering_failed",
                 ErrorResponseTypes.SMS_ERROR,
-                { error: errorMessage },
+                { error: parsedError.message },
               ),
             );
           }
@@ -213,7 +202,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
     return createErrorResponse(
       "sms.errors.delivery_failed",
       ErrorResponseTypes.SMS_ERROR,
-      { errorMessage: errors.join(", ") },
+      { errorCount: errors.length },
     );
   }
 

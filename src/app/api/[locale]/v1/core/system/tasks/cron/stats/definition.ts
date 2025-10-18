@@ -232,7 +232,7 @@ const { GET } = createEndpoint({
       includeDisabled: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.CHECKBOX,
+          fieldType: FieldDataType.BOOLEAN,
           label:
             "app.api.v1.core.system.tasks.cron.stats.get.fields.includeDisabled.title",
           layout: { columns: 3 },
@@ -243,7 +243,7 @@ const { GET } = createEndpoint({
       includeSystemTasks: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.CHECKBOX,
+          fieldType: FieldDataType.BOOLEAN,
           label:
             "app.api.v1.core.system.tasks.cron.stats.get.fields.includeSystemTasks.title",
           layout: { columns: 3 },
@@ -254,7 +254,7 @@ const { GET } = createEndpoint({
       hasRecentFailures: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.CHECKBOX,
+          fieldType: FieldDataType.BOOLEAN,
           label:
             "app.api.v1.core.system.tasks.cron.stats.get.fields.hasRecentFailures.title",
           layout: { columns: 3 },
@@ -265,7 +265,7 @@ const { GET } = createEndpoint({
       hasTimeout: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.CHECKBOX,
+          fieldType: FieldDataType.BOOLEAN,
           label:
             "app.api.v1.core.system.tasks.cron.stats.get.fields.hasTimeout.title",
           layout: { columns: 3 },

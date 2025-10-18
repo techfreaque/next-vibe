@@ -173,7 +173,7 @@ export function ImapMessagesList({
   };
 
   if (isLoading) {
-    return <div className="p-4">{t("imap.common.loading")}</div>;
+    return <div className="p-4">{t("app.admin.emails.imap.common.loading")}</div>;
   }
 
   return (
@@ -182,16 +182,16 @@ export function ImapMessagesList({
       {selectedMessages.length > 0 && (
         <div className="flex items-center space-x-2 p-3 bg-blue-50 rounded-lg">
           <span className="text-sm font-medium">
-            {t("imap.message.selected", { count: selectedMessages.length })}
+            {t("app.admin.emails.imap.message.selected", { count: selectedMessages.length })}
           </span>
           <Button size="sm" variant="outline" onClick={handleMarkAsRead}>
-            {t("imap.admin.messages.actions.markAsRead")}
+            {t("app.admin.emails.imap.admin.messages.actions.markAsRead")}
           </Button>
           <Button size="sm" variant="outline" onClick={handleMarkAsUnread}>
-            {t("imap.admin.messages.actions.markAsUnread")}
+            {t("app.admin.emails.imap.admin.messages.actions.markAsUnread")}
           </Button>
           <Button size="sm" variant="outline" onClick={handleToggleFlag}>
-            {t("imap.admin.messages.actions.toggleFlag")}
+            {t("app.admin.emails.imap.admin.messages.actions.toggleFlag")}
           </Button>
         </div>
       )}
@@ -208,19 +208,19 @@ export function ImapMessagesList({
                 />
               </TableHead>
               <TableHead className="w-12" />
-              <TableHead> {t("imap.common.subject")}</TableHead>
-              <TableHead> {t("imap.common.from")} </TableHead>
-              <TableHead> {t("imap.common.date")} </TableHead>
-              <TableHead> {t("imap.common.size")} </TableHead>
-              <TableHead> {t("imap.common.status")} </TableHead>
-              <TableHead> {t("imap.common.actions")} </TableHead>
+              <TableHead> {t("app.admin.emails.imap.common.subject")}</TableHead>
+              <TableHead> {t("app.admin.emails.imap.common.from")} </TableHead>
+              <TableHead> {t("app.admin.emails.imap.common.date")} </TableHead>
+              <TableHead> {t("app.admin.emails.imap.common.size")} </TableHead>
+              <TableHead> {t("app.admin.emails.imap.common.status")} </TableHead>
+              <TableHead> {t("app.admin.emails.imap.common.actions")} </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {messages.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={8} className="text-center py-8">
-                  {t("imap.admin.messages.no_messages")}
+                  {t("app.admin.emails.imap.admin.messages.no_messages")}
                 </TableCell>
               </TableRow>
             ) : (
@@ -319,7 +319,7 @@ export function ImapMessagesList({
       {messages.length > 0 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-600">
-            {t("imap.admin.messages.pagination.showing", {
+            {t("app.admin.emails.imap.admin.messages.pagination.showing", {
               start: (page - 1) * limit + 1,
               end: Math.min(page * limit, totalMessages),
               total: totalMessages,
@@ -332,14 +332,14 @@ export function ImapMessagesList({
               disabled={page === 1}
               onClick={() => setPage(page - 1)}
             >
-              {t("imap.common.previous")}
+              {t("app.admin.emails.imap.common.previous")}
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setPage(page + 1)}
             >
-              {t("imap.common.next")}
+              {t("app.admin.emails.imap.common.next")}
             </Button>
           </div>
         </div>

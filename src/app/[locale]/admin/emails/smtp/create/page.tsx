@@ -23,10 +23,10 @@ export default async function CreateSmtpAccountPage({
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">
-          {t("smtp.admin.create.title")}
+          {t("app.admin.emails.smtp.admin.create.title")}
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          {t("smtp.admin.create.description")}
+          {t("app.admin.emails.smtp.admin.create.description")}
         </p>
       </div>
 

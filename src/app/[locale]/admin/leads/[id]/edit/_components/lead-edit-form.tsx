@@ -7,7 +7,7 @@
 
 import { ArrowLeft, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTranslation } from "next-vibe/core/client";
+import { useTranslation } from "@/i18n/core/client";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
@@ -17,14 +17,13 @@ import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import type React from "react";
 import type { JSX } from "react";
 
-import { UserSelector } from "@/app/[locale]/admin/consultations/new/_components/user-selector";
 import {
   EmailCampaignStage,
   LeadStatus,
 } from "@/app/api/[locale]/v1/core/leads/enum";
 import { useLeadByIdEndpoint } from "@/app/api/[locale]/v1/core/leads/lead/[id]/hooks";
-import type { LeadResponseType } from "@/app/api/[locale]/v1/core/leads/lead/[id]/schema";
-import { leadUpdateSchema } from "@/app/api/[locale]/v1/core/leads/lead/[id]/schema";
+import type { LeadUpdateInput } from "@/app/api/[locale]/v1/core/leads/lead/[id]/definition";
+import { leadUpdateSchema } from "@/app/api/[locale]/v1/core/leads/lead/[id]/definition";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { Countries } from "@/i18n/core/config";

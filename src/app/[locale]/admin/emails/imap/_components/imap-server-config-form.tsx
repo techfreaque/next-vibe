@@ -33,7 +33,7 @@ export function ImapServerConfigForm(): JSX.Element {
         name="serverEnabled"
         config={{
           type: "switch",
-          label: "imap.config.server.enabled",
+          label: "app.admin.emails.imap.config.server.enabled",
         }}
         control={configEndpoint.create.form.control}
       />
@@ -42,7 +42,7 @@ export function ImapServerConfigForm(): JSX.Element {
         name="maxConnections"
         config={{
           type: "number",
-          label: "imap.config.server.maxConnections",
+          label: "app.admin.emails.imap.config.server.maxConnections",
           placeholder: undefined,
         }}
         control={configEndpoint.create.form.control}
@@ -52,7 +52,7 @@ export function ImapServerConfigForm(): JSX.Element {
         name="connectionTimeout"
         config={{
           type: "number",
-          label: "imap.config.server.connectionTimeout",
+          label: "app.admin.emails.imap.config.server.connectionTimeout",
           placeholder: undefined,
         }}
         control={configEndpoint.create.form.control}
@@ -62,7 +62,7 @@ export function ImapServerConfigForm(): JSX.Element {
         name="poolIdleTimeout"
         config={{
           type: "number",
-          label: "imap.config.server.poolIdleTimeout",
+          label: "app.admin.emails.imap.config.server.poolIdleTimeout",
           placeholder: undefined,
         }}
         control={configEndpoint.create.form.control}
@@ -72,7 +72,7 @@ export function ImapServerConfigForm(): JSX.Element {
         name="keepAlive"
         config={{
           type: "switch",
-          label: "imap.config.server.keepAlive",
+          label: "app.admin.emails.imap.config.server.keepAlive",
         }}
         control={configEndpoint.create.form.control}
       />

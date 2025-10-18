@@ -1,0 +1,15 @@
+export const translations = {
+  title: "Billing History",
+  empty: "No billing history found",
+  download: "Download Invoice",
+  invoiceNumber: "Invoice #{{id}}",
+  fallbackDate: "the billing date",
+  automatic: "Automatic",
+  amount: "Amount",
+  paymentMethod: "Payment Method",
+  managePaymentMethod: "Manage Payment Method",
+  cycleDescription: "Your billing cycle and next payment information",
+  currentCycle: "Current Cycle",
+  annual: "Annual",
+  monthly: "Monthly",
+};

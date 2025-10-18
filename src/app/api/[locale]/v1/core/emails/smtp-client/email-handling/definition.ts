@@ -11,10 +11,6 @@ import type {
 } from "next-vibe/shared/types/response.schema";
 import type { JSX } from "react";
 
-import type {
-  EmailCampaignStage,
-  EmailJourneyVariant,
-} from "@/app/api/[locale]/v1/core/leads/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -38,8 +34,9 @@ export interface EmailTemplateReturnType {
   replyToName?: string;
   // Campaign context for proper SMTP selection and metadata
   campaignType?: (typeof CampaignType)[keyof typeof CampaignType];
-  emailJourneyVariant?: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant];
-  emailCampaignStage?: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
+  // Using string instead of specific enum types to avoid circular dependency with leads module
+  emailJourneyVariant?: string;
+  emailCampaignStage?: string;
   // Email metadata
   templateName?: string;
   emailType?: (typeof EmailType)[keyof typeof EmailType];

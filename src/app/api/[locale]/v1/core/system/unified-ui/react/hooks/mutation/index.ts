@@ -324,7 +324,6 @@ export function useApiMutation<
     // Use local error state if it exists, otherwise fall back to store error
     const error = localError || mutationState.error;
 
-    // @ts-ignore - We're intentionally adding required properties that aren't in the store
     return {
       mutate,
       mutateAsync,

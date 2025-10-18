@@ -20,6 +20,11 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
+import type {
+  ExportFormatValues,
+  LeadStatusValues,
+  MimeTypeValues,
+} from "../enum";
 import {
   ExportFormat,
   ExportFormatOptions,
@@ -289,6 +294,28 @@ export type LeadExportRequestInput = typeof GET.types.RequestInput;
 export type LeadExportRequestOutput = typeof GET.types.RequestOutput;
 export type LeadExportResponseInput = typeof GET.types.ResponseInput;
 export type LeadExportResponseOutput = typeof GET.types.ResponseOutput;
+
+// Explicit types for repository compatibility (matches Zod schema above)
+export interface ExportQueryType {
+  format: typeof ExportFormatValues;
+  status?: typeof LeadStatusValues;
+  country?: string;
+  language?: string;
+  source?: string;
+  search?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+  includeMetadata: boolean;
+  includeEngagementData: boolean;
+}
+
+export interface ExportResponseType {
+  fileName: string;
+  fileContent: string;
+  mimeType: typeof MimeTypeValues;
+  totalRecords: number;
+  exportedAt: Date;
+}
 
 /**
  * Export definitions

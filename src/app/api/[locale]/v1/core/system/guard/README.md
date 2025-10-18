@@ -31,15 +31,17 @@ npx vibe-guard
 ## Quick Start
 
 1. **Navigate to your project directory**:
+
    ```bash
    cd /path/to/your/project
    ```
 
 2. **Start guard environment**:
+
    ```bash
    vibe-guard
    ```
-   
+
    This will automatically create the guard environment and start a secure shell.
 
 3. **Open VSCode** and the guard terminal will be available as the default profile.
@@ -47,23 +49,32 @@ npx vibe-guard
 ## Commands
 
 ### `vibe-guard` (default)
+
 Start the guard environment. Creates it if it doesn't exist.
 
 ### `vibe-guard create`
+
 Create a new guard environment.
+
 - `--project-path <path>`: Specify project path (default: current directory)
 - `--force`: Force recreation if environment already exists
 
 ### `vibe-guard start`
+
 Start an existing guard environment.
+
 - `--project-path <path>`: Specify project path (default: current directory)
 
 ### `vibe-guard status`
+
 Show the status of the guard environment.
+
 - `--project-path <path>`: Specify project path (default: current directory)
 
 ### `vibe-guard clean`
+
 Remove the guard environment.
+
 - `--project-path <path>`: Specify project path (default: current directory)
 
 ## How It Works
@@ -84,6 +95,7 @@ Vibe Guard creates a `.vibe-guard-instance` directory in your project with:
 ### VSCode Integration
 
 Automatically configures VSCode with:
+
 - Custom terminal profile "Vibe Guard"
 - Sets as default terminal profile
 - Preserves existing VSCode settings
@@ -113,6 +125,7 @@ your-project/
 ## Examples
 
 ### Basic Usage
+
 ```bash
 # Start guard in current directory
 vibe-guard
@@ -128,6 +141,7 @@ vibe-guard clean
 ```
 
 ### Development Workflow
+
 ```bash
 # 1. Navigate to project
 cd my-awesome-project

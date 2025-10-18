@@ -1,15 +1,11 @@
 import type {
   MaterialTopTabNavigationEventMap,
   MaterialTopTabNavigationOptions,
-} from "@react-navigation/material-top-tabs";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import {
-  type ParamListBase,
-  type TabNavigationState,
-  useTheme,
-} from "@react-navigation/native";
-import { Stack, withLayoutContext } from "expo-router";
-import { useWindowDimensions } from "react-native";
+} from '@react-navigation/material-top-tabs';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { type ParamListBase, type TabNavigationState, useTheme } from '@react-navigation/native';
+import { Stack, withLayoutContext } from 'expo-router';
+import { useWindowDimensions } from 'react-native';
 
 const { Navigator } = createMaterialTopTabNavigator();
 
@@ -27,14 +23,14 @@ export default function MaterialTopTabsLayout() {
     <>
       <Stack.Screen options={{ headerShadowVisible: false }} />
       <MaterialTopTabs
-        initialRouteName="index"
+        initialRouteName='index'
         screenOptions={{
           tabBarActiveTintColor: colors.text,
-          tabBarInactiveTintColor: "grey",
+          tabBarInactiveTintColor: 'grey',
           tabBarLabelStyle: {
             fontSize: 14,
-            textTransform: "none",
-            fontWeight: "bold",
+            textTransform: 'none',
+            fontWeight: 'bold',
           },
           tabBarIndicatorStyle: {
             backgroundColor: colors.text,
@@ -44,15 +40,15 @@ export default function MaterialTopTabsLayout() {
         }}
       >
         <MaterialTopTabs.Screen
-          name="index"
+          name='index'
           options={{
-            title: "UI",
+            title: 'UI',
           }}
         />
         <MaterialTopTabs.Screen
-          name="primitives"
+          name='primitives'
           options={{
-            title: "Primitives",
+            title: 'Primitives',
           }}
         />
       </MaterialTopTabs>

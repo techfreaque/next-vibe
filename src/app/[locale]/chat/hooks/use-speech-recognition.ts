@@ -2,10 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { TranslationKey } from "@/i18n/core/static-types";
+
 import {
   checkMicrophonePermission,
   checkSpeechRecognitionSupport,
   detectDevice,
+  getSpeechErrorTranslationKey,
 } from "../lib/utils/speech-utils";
 
 interface UseSpeechRecognitionOptions {
@@ -13,8 +17,9 @@ interface UseSpeechRecognitionOptions {
   interimResults?: boolean;
   lang?: string;
   onTranscript?: (transcript: string, isFinal: boolean) => void;
-  onError?: (error: string) => void;
+  onError?: (errorKey: TranslationKey) => void;
   maxRetries?: number;
+  logger: EndpointLogger;
 }
 
 interface UseSpeechRecognitionReturn {
@@ -26,8 +31,8 @@ interface UseSpeechRecognitionReturn {
   stopRecording: () => void;
   toggleRecording: () => Promise<void>;
   resetTranscript: () => void;
-  error: string | null;
-  supportReason?: string;
+  errorKey: TranslationKey | null;
+  supportReasonKey?: TranslationKey;
 }
 
 export function useSpeechRecognition({
@@ -37,13 +42,16 @@ export function useSpeechRecognition({
   onTranscript,
   onError,
   maxRetries = 3,
-}: UseSpeechRecognitionOptions = {}): UseSpeechRecognitionReturn {
+  logger,
+}: UseSpeechRecognitionOptions): UseSpeechRecognitionReturn {
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [interimTranscript, setInterimTranscript] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [errorKey, setErrorKey] = useState<TranslationKey | null>(null);
   const [isSupported, setIsSupported] = useState(false);
-  const [supportReason, setSupportReason] = useState<string | undefined>(undefined);
+  const [supportReasonKey, setSupportReasonKey] = useState<
+    TranslationKey | undefined
+  >(undefined);
 
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const shouldRestartRef = useRef(false);
@@ -51,44 +59,64 @@ export function useSpeechRecognition({
   const isStoppingRef = useRef(false);
   const isMountedRef = useRef(true);
   const retryCountRef = useRef(0);
-  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const retryTimeoutRef = useRef<number | null>(null);
   const deviceInfoRef = useRef(detectDevice());
 
   // Track mount state
   useEffect(() => {
     isMountedRef.current = true;
-    return () => {
+    return (): void => {
       isMountedRef.current = false;
     };
   }, []);
 
   // Initialize speech recognition with comprehensive checks
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined") {
+      return;
+    }
 
     // Comprehensive support check
     const supportCheck = checkSpeechRecognitionSupport();
 
     if (!supportCheck.supported) {
       setIsSupported(false);
-      setSupportReason(supportCheck.reason);
-      if (supportCheck.reason) {
-        console.info(`Speech recognition not available: ${supportCheck.reason}`);
+      setSupportReasonKey(supportCheck.reasonKey);
+      if (supportCheck.reasonKey) {
+        logger.info(
+          "Speech",
+          `Speech recognition not available: ${supportCheck.reasonKey}`,
+        );
       }
       return;
     }
 
     const SpeechRecognitionAPI =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+      (
+        window as Window & {
+          // eslint-disable-next-line no-restricted-syntax -- Browser API check requires unknown type
+          SpeechRecognition?: unknown;
+          // eslint-disable-next-line no-restricted-syntax -- Browser API check requires unknown type
+          webkitSpeechRecognition?: unknown;
+        }
+      ).SpeechRecognition ||
+      (
+        window as Window & {
+          // eslint-disable-next-line no-restricted-syntax -- Browser API check requires unknown type
+          SpeechRecognition?: unknown;
+          // eslint-disable-next-line no-restricted-syntax -- Browser API check requires unknown type
+          webkitSpeechRecognition?: unknown;
+        }
+      ).webkitSpeechRecognition;
 
     if (!SpeechRecognitionAPI) {
       setIsSupported(false);
-      setSupportReason("Speech recognition API not found");
+      setSupportReasonKey("app.chat.speechRecognition.errors.apiNotFound");
       return;
     }
 
     setIsSupported(true);
-    setSupportReason(undefined);
+    setSupportReasonKey(undefined);
 
     try {
       const recognition = new SpeechRecognitionAPI();
@@ -108,213 +136,230 @@ export function useSpeechRecognition({
       recognition.lang = lang;
       recognition.maxAlternatives = 1;
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      if (!isMountedRef.current) return;
-
-      console.log("[Speech] Result event received:", event.results.length);
-
-      let finalTranscript = "";
-      let interim = "";
-
-      try {
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const result = event.results[i];
-          if (!result || !result[0]) continue;
-
-          const transcriptPart = result[0].transcript;
-          console.log(`[Speech] Transcript part: "${transcriptPart}" (final: ${result.isFinal})`);
-
-          if (result.isFinal) {
-            finalTranscript += transcriptPart + " ";
-          } else {
-            interim += transcriptPart;
-          }
+      recognition.onresult = (event: SpeechRecognitionEvent): void => {
+        if (!isMountedRef.current) {
+          return;
         }
 
-        if (finalTranscript) {
-          console.log(`[Speech] Final transcript: "${finalTranscript}"`);
-          setTranscript((prev) => {
-            const newTranscript = (prev + finalTranscript).trim();
-            console.log(`[Speech] Setting transcript: "${newTranscript}"`);
-            if (isMountedRef.current) {
-              onTranscript?.(newTranscript, true);
+        logger.debug("Speech", "Result event received", {
+          resultCount: event.results.length,
+        });
+
+        let finalTranscript = "";
+        let interim = "";
+
+        try {
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const result = event.results[i];
+            if (!result?.[0]) {
+              continue;
             }
-            return newTranscript;
-          });
-          setInterimTranscript("");
-          // Reset retry count on successful recognition
-          retryCountRef.current = 0;
-        } else if (interim) {
-          console.log(`[Speech] Interim transcript: "${interim}"`);
-          setInterimTranscript(interim);
-          if (isMountedRef.current) {
-            setTranscript((prev) => {
-              onTranscript?.((prev + " " + interim).trim(), false);
-              return prev;
-            });
+
+            const transcriptPart = result[0].transcript;
+            logger.debug(
+              "Speech",
+              `Transcript part: "${transcriptPart}" (final: ${result.isFinal})`,
+            );
+
+            if (result.isFinal) {
+              finalTranscript += `${transcriptPart} `;
+            } else {
+              interim += transcriptPart;
+            }
           }
+
+          if (finalTranscript) {
+            logger.debug("Speech", `Final transcript: "${finalTranscript}"`);
+            setTranscript((prev) => {
+              const newTranscript = (prev + finalTranscript).trim();
+              logger.debug("Speech", `Setting transcript: "${newTranscript}"`);
+              if (isMountedRef.current) {
+                onTranscript?.(newTranscript, true);
+              }
+              return newTranscript;
+            });
+            setInterimTranscript("");
+            // Reset retry count on successful recognition
+            retryCountRef.current = 0;
+          } else if (interim) {
+            logger.debug("Speech", `Interim transcript: "${interim}"`);
+            setInterimTranscript(interim);
+            if (isMountedRef.current) {
+              setTranscript((prev) => {
+                onTranscript?.(`${prev} ${interim}`.trim(), false);
+                return prev;
+              });
+            }
+          }
+        } catch (err) {
+          logger.error("Speech", "Error processing speech result", err);
         }
-      } catch (err) {
-        console.error("[Speech] Error processing speech result:", err);
-      }
-    };
-
-    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      if (!isMountedRef.current) return;
-
-      console.log(`[Speech] Error event: ${event.error}`);
-
-      // Ignore aborted errors (they're expected during cleanup)
-      if (event.error === "aborted") {
-        console.log("[Speech] Aborted (expected during cleanup)");
-        if (isMountedRef.current) {
-          setIsRecording(false);
-        }
-        shouldRestartRef.current = false;
-        isStartingRef.current = false;
-        isStoppingRef.current = false;
-        return;
-      }
-
-      console.error("[Speech] Recognition error:", event.error);
-
-      const errorMessages: Record<string, string> = {
-        "no-speech": "No speech detected. Please try again.",
-        "audio-capture": "Microphone not available. Please check your settings.",
-        "not-allowed":
-          "Microphone permission denied. Please allow microphone access.",
-        network: "Network error. Please check your connection.",
-        "service-not-allowed": "Speech recognition service not allowed.",
-        "bad-grammar": "Speech recognition error. Please try again.",
-        "language-not-supported": "Language not supported.",
       };
 
-      const errorMessage =
-        errorMessages[event.error] ||
-        `Speech recognition error: ${event.error}`;
-
-      if (isMountedRef.current) {
-        setError(errorMessage);
-        onError?.(errorMessage);
-      }
-
-      // Don't restart on fatal errors
-      if (
-        event.error === "audio-capture" ||
-        event.error === "not-allowed" ||
-        event.error === "service-not-allowed" ||
-        event.error === "language-not-supported"
-      ) {
-        if (isMountedRef.current) {
-          setIsRecording(false);
-        }
-        shouldRestartRef.current = false;
-        isStartingRef.current = false;
-        retryCountRef.current = 0;
-      } else if (event.error === "no-speech" && retryCountRef.current < maxRetries) {
-        // Retry on no-speech if under retry limit
-        retryCountRef.current++;
-        shouldRestartRef.current = true;
-      } else {
-        // Stop after max retries
-        if (isMountedRef.current) {
-          setIsRecording(false);
-        }
-        shouldRestartRef.current = false;
-        isStartingRef.current = false;
-        retryCountRef.current = 0;
-      }
-    };
-
-    recognition.onend = () => {
-      if (!isMountedRef.current) return;
-
-      console.log("[Speech] Recognition ended. Should restart:", shouldRestartRef.current, "Retry count:", retryCountRef.current);
-
-      isStartingRef.current = false;
-      isStoppingRef.current = false;
-
-      // Auto-restart if continuous and still should be recording
-      if (shouldRestartRef.current && (continuous || retryCountRef.current > 0)) {
-        console.log("[Speech] Auto-restarting recognition...");
-        // Small delay before restart to avoid rapid cycling
-        if (retryTimeoutRef.current) {
-          clearTimeout(retryTimeoutRef.current);
+      recognition.onerror = (event: SpeechRecognitionErrorEvent): void => {
+        if (!isMountedRef.current) {
+          return;
         }
 
-        retryTimeoutRef.current = setTimeout(() => {
-          if (!isMountedRef.current || !shouldRestartRef.current) return;
+        logger.debug("Speech", `Error event: ${event.error}`);
 
-          try {
-            console.log("[Speech] Starting recognition again...");
-            recognition.start();
-          } catch (e) {
-            console.error("[Speech] Failed to restart recognition:", e);
-            if (isMountedRef.current) {
-              setIsRecording(false);
-            }
-            shouldRestartRef.current = false;
-            retryCountRef.current = 0;
+        // Ignore aborted errors (they're expected during cleanup)
+        if (event.error === "aborted") {
+          logger.debug("Speech", "Aborted (expected during cleanup)");
+          if (isMountedRef.current) {
+            setIsRecording(false);
           }
-        }, 200);
-      } else {
-        console.log("[Speech] Not restarting - stopping recording");
-        if (isMountedRef.current) {
-          setIsRecording(false);
+          shouldRestartRef.current = false;
+          isStartingRef.current = false;
+          isStoppingRef.current = false;
+          return;
         }
-        shouldRestartRef.current = false;
-        retryCountRef.current = 0;
-      }
-    };
 
-    recognition.onstart = () => {
-      if (!isMountedRef.current) return;
+        logger.error("Speech", "Recognition error", event.error);
 
-      console.log("[Speech] Recognition started");
-      isStartingRef.current = false;
-      if (isMountedRef.current) {
-        setIsRecording(true);
-        setError(null);
-      }
-    };
+        const errorTranslationKey = getSpeechErrorTranslationKey(event.error);
 
-    recognition.onaudiostart = () => {
-      if (!isMountedRef.current) return;
-      console.log("[Speech] Audio input started");
-      // Clear error when audio starts successfully
-      if (isMountedRef.current) {
-        setError(null);
-      }
-    };
+        if (isMountedRef.current) {
+          setErrorKey(errorTranslationKey);
+          onError?.(errorTranslationKey);
+        }
 
-    recognition.onaudioend = () => {
-      if (!isMountedRef.current) return;
-      console.log("[Speech] Audio input ended");
-    };
+        // Don't restart on fatal errors
+        if (
+          event.error === "audio-capture" ||
+          event.error === "not-allowed" ||
+          event.error === "service-not-allowed" ||
+          event.error === "language-not-supported"
+        ) {
+          if (isMountedRef.current) {
+            setIsRecording(false);
+          }
+          shouldRestartRef.current = false;
+          isStartingRef.current = false;
+          retryCountRef.current = 0;
+        } else if (
+          event.error === "no-speech" &&
+          retryCountRef.current < maxRetries
+        ) {
+          // Retry on no-speech if under retry limit
+          retryCountRef.current++;
+          shouldRestartRef.current = true;
+        } else {
+          // Stop after max retries
+          if (isMountedRef.current) {
+            setIsRecording(false);
+          }
+          shouldRestartRef.current = false;
+          isStartingRef.current = false;
+          retryCountRef.current = 0;
+        }
+      };
 
-    recognition.onsoundstart = () => {
-      console.log("[Speech] Sound detected");
-    };
+      recognition.onend = (): void => {
+        if (!isMountedRef.current) {
+          return;
+        }
 
-    recognition.onsoundend = () => {
-      console.log("[Speech] Sound ended");
-    };
+        logger.debug("Speech", "Recognition ended", {
+          shouldRestart: shouldRestartRef.current,
+          retryCount: retryCountRef.current,
+        });
 
-    recognition.onspeechstart = () => {
-      console.log("[Speech] Speech detected");
-    };
+        isStartingRef.current = false;
+        isStoppingRef.current = false;
 
-    recognition.onspeechend = () => {
-      console.log("[Speech] Speech ended");
-    };
+        // Auto-restart if continuous and still should be recording
+        if (
+          shouldRestartRef.current &&
+          (continuous || retryCountRef.current > 0)
+        ) {
+          logger.debug("Speech", "Auto-restarting recognition...");
+          // Small delay before restart to avoid rapid cycling
+          if (retryTimeoutRef.current) {
+            clearTimeout(retryTimeoutRef.current);
+          }
 
-    recognition.onnomatch = () => {
-      console.log("[Speech] No match found");
-    };
+          retryTimeoutRef.current = window.setTimeout(() => {
+            if (!isMountedRef.current || !shouldRestartRef.current) {
+              return;
+            }
+
+            try {
+              logger.debug("Speech", "Starting recognition again...");
+              recognition.start();
+            } catch (e) {
+              logger.error("Speech", "Failed to restart recognition", e);
+              if (isMountedRef.current) {
+                setIsRecording(false);
+              }
+              shouldRestartRef.current = false;
+              retryCountRef.current = 0;
+            }
+          }, 200);
+        } else {
+          logger.debug("Speech", "Not restarting - stopping recording");
+          if (isMountedRef.current) {
+            setIsRecording(false);
+          }
+          shouldRestartRef.current = false;
+          retryCountRef.current = 0;
+        }
+      };
+
+      recognition.onstart = (): void => {
+        if (!isMountedRef.current) {
+          return;
+        }
+
+        logger.debug("Speech", "Recognition started");
+        isStartingRef.current = false;
+        if (isMountedRef.current) {
+          setIsRecording(true);
+          setErrorKey(null);
+        }
+      };
+
+      recognition.onaudiostart = (): void => {
+        if (!isMountedRef.current) {
+          return;
+        }
+        logger.debug("Speech", "Audio input started");
+        // Clear error when audio starts successfully
+        if (isMountedRef.current) {
+          setErrorKey(null);
+        }
+      };
+
+      recognition.onaudioend = (): void => {
+        if (!isMountedRef.current) {
+          return;
+        }
+        logger.debug("Speech", "Audio input ended");
+      };
+
+      recognition.onsoundstart = (): void => {
+        logger.debug("Speech", "Sound detected");
+      };
+
+      recognition.onsoundend = (): void => {
+        logger.debug("Speech", "Sound ended");
+      };
+
+      recognition.onspeechstart = (): void => {
+        logger.debug("Speech", "Speech detected");
+      };
+
+      recognition.onspeechend = (): void => {
+        logger.debug("Speech", "Speech ended");
+      };
+
+      recognition.onnomatch = (): void => {
+        logger.debug("Speech", "No match found");
+      };
 
       recognitionRef.current = recognition;
 
-      return () => {
+      return (): void => {
         if (retryTimeoutRef.current) {
           clearTimeout(retryTimeoutRef.current);
         }
@@ -327,18 +372,28 @@ export function useSpeechRecognition({
           try {
             recognitionRef.current.abort();
           } catch (e) {
-            console.error("Error aborting recognition:", e);
+            logger.error("Speech", "Error aborting recognition", e);
           }
         }
       };
     } catch (err) {
-      console.error("Error initializing speech recognition:", err);
+      logger.error("Speech", "Error initializing speech recognition", err);
       setIsSupported(false);
-      setSupportReason("Failed to initialize speech recognition");
+      setSupportReasonKey(
+        "app.chat.speechRecognition.errors.initializationFailed",
+      );
     }
-  }, [continuous, interimResults, lang, onTranscript, onError, maxRetries]);
+  }, [
+    continuous,
+    interimResults,
+    lang,
+    onTranscript,
+    onError,
+    maxRetries,
+    logger,
+  ]);
 
-  const startRecording = useCallback(async () => {
+  const startRecording = useCallback(async (): Promise<void> => {
     if (!recognitionRef.current || !isSupported || isStartingRef.current) {
       return;
     }
@@ -354,20 +409,21 @@ export function useSpeechRecognition({
       retryCountRef.current = 0;
 
       // Check permission state first
-      const permissionState = await checkMicrophonePermission();
+      const permissionState = await checkMicrophonePermission(logger);
 
       if (permissionState === "denied") {
-        const errorMessage = "Microphone permission denied. Please allow microphone access in your browser settings.";
+        const errorTranslationKey: TranslationKey =
+          "app.chat.speechRecognition.errors.notAllowed";
         if (isMountedRef.current) {
-          setError(errorMessage);
-          onError?.(errorMessage);
+          setErrorKey(errorTranslationKey);
+          onError?.(errorTranslationKey);
         }
         isStartingRef.current = false;
         return;
       }
 
       // Request microphone permission if needed
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      if (navigator.mediaDevices?.getUserMedia) {
         try {
           // Request with specific constraints for better compatibility
           const stream = await navigator.mediaDevices.getUserMedia({
@@ -375,27 +431,31 @@ export function useSpeechRecognition({
               echoCancellation: true,
               noiseSuppression: true,
               autoGainControl: true,
-            }
+            },
           });
 
           // Stop the stream immediately - we just needed it for permission
-          stream.getTracks().forEach(track => track.stop());
+          stream.getTracks().forEach((track): void => track.stop());
         } catch (permErr) {
-          let errorMessage = "Microphone access denied";
+          let errorTranslationKey: TranslationKey =
+            "app.chat.speechRecognition.errors.microphoneAccessDenied";
 
           if (permErr instanceof Error) {
             if (permErr.name === "NotAllowedError") {
-              errorMessage = "Microphone permission denied. Please allow microphone access.";
+              errorTranslationKey =
+                "app.chat.speechRecognition.errors.microphonePermissionDenied";
             } else if (permErr.name === "NotFoundError") {
-              errorMessage = "No microphone found. Please connect a microphone.";
+              errorTranslationKey =
+                "app.chat.speechRecognition.errors.noMicrophoneFound";
             } else if (permErr.name === "NotReadableError") {
-              errorMessage = "Microphone is already in use by another application.";
+              errorTranslationKey =
+                "app.chat.speechRecognition.errors.microphoneInUse";
             }
           }
 
           if (isMountedRef.current) {
-            setError(errorMessage);
-            onError?.(errorMessage);
+            setErrorKey(errorTranslationKey);
+            onError?.(errorTranslationKey);
           }
           isStartingRef.current = false;
           return;
@@ -403,28 +463,32 @@ export function useSpeechRecognition({
       }
 
       // Start recognition
-      console.log("[Speech] Starting recognition with lang:", lang);
+      logger.debug("Speech", "Starting recognition with lang", { lang });
       recognitionRef.current.start();
     } catch (e) {
       isStartingRef.current = false;
 
+      // eslint-disable-next-line i18next/no-literal-string -- Checking error message from browser API
       if (e instanceof Error && e.message.includes("already started")) {
-        console.log("[Speech] Already started, ignoring");
+        logger.debug("Speech", "Already started, ignoring");
         // Already recording, ignore
         return;
       }
 
-      console.error("[Speech] Failed to start:", e);
-      const errorMessage = "Failed to start recording. Please try again.";
+      logger.error("Speech", "Failed to start recognition", e);
+      const errorTranslationKey: TranslationKey =
+        "app.chat.speechRecognition.errors.startFailed";
       if (isMountedRef.current) {
-        setError(errorMessage);
-        onError?.(errorMessage);
+        setErrorKey(errorTranslationKey);
+        onError?.(errorTranslationKey);
       }
     }
-  }, [isSupported, isRecording, onError, lang]);
+  }, [isSupported, isRecording, onError, lang, logger]);
 
-  const stopRecording = useCallback(() => {
-    if (!recognitionRef.current || isStoppingRef.current) return;
+  const stopRecording = useCallback((): void => {
+    if (!recognitionRef.current || isStoppingRef.current) {
+      return;
+    }
 
     try {
       isStoppingRef.current = true;
@@ -439,11 +503,11 @@ export function useSpeechRecognition({
       recognitionRef.current.stop();
     } catch (e) {
       isStoppingRef.current = false;
-      console.error("Error stopping recognition:", e);
+      logger.error("Speech", "Error stopping recognition", e);
     }
-  }, []);
+  }, [logger]);
 
-  const toggleRecording = useCallback(async () => {
+  const toggleRecording = useCallback(async (): Promise<void> => {
     if (isRecording || isStartingRef.current) {
       stopRecording();
     } else {
@@ -451,7 +515,7 @@ export function useSpeechRecognition({
     }
   }, [isRecording, startRecording, stopRecording]);
 
-  const resetTranscript = useCallback(() => {
+  const resetTranscript = useCallback((): void => {
     setTranscript("");
     setInterimTranscript("");
   }, []);
@@ -465,7 +529,7 @@ export function useSpeechRecognition({
     stopRecording,
     toggleRecording,
     resetTranscript,
-    error,
-    supportReason,
+    errorKey,
+    supportReasonKey,
   };
 }

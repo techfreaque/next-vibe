@@ -4,7 +4,5 @@
   "trailingSlash": true,
   "cleanUrls": true,
 
-  "redirects": [
-    { "source": "/", "destination": "/getting-started/introduction/" }
-  ]
+  "redirects": [{ "source": "/", "destination": "/getting-started/introduction/" }]
 }

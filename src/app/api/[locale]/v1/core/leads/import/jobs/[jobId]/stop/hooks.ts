@@ -22,8 +22,6 @@ export function useStopImportJobEndpoint(
   },
   logger: EndpointLogger,
 ): EndpointReturn<typeof definitions> {
-  // TODO: Fix URL parameter typing issue
-  // For now, return a simplified hook without URL parameters
   return useEndpoint(
     definitions,
     {
@@ -31,6 +29,9 @@ export function useStopImportJobEndpoint(
       staleTime: 0, // Always fresh for actions
       refetchOnWindowFocus: false,
       persistForm: false,
+      urlPathVariables: {
+        jobId: params.jobId,
+      },
     },
     logger,
   );

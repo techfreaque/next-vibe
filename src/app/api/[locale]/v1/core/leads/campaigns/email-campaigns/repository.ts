@@ -133,7 +133,7 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
         error: parseError(error).message,
       });
       return createErrorResponse(
-        "leadsErrors.campaigns.emailCampaigns.processStage.failed",
+        "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }

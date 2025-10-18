@@ -1031,15 +1031,13 @@ class SmtpRepositoryImpl implements SmtpRepository {
    * Close all cached transports
    */
   async closeAllTransports(): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    for (const [accountId, transport] of this.transportCache.entries()) {
+    for (const [_accountId, transport] of this.transportCache.entries()) {
       try {
         await new Promise<void>((resolve) => {
           transport.close();
           resolve();
         });
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (error) {
+      } catch (_error) {
         // Ignore transport close errors
       }
     }

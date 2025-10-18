@@ -1,4 +1,4 @@
-import { Ui } from "@rnr/reusables";
+import { Ui } from '@rnr/reusables';
 
 type BadgeProps = Ui.BadgeProps;
 export type { BadgeProps };

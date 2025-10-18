@@ -53,7 +53,7 @@ export function ImapFoldersManagement(): JSX.Element {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle> {t("imap.admin.folders.title")}</CardTitle>
+          <CardTitle> {t("app.admin.emails.imap.admin.folders.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <Form
@@ -68,7 +68,7 @@ export function ImapFoldersManagement(): JSX.Element {
               <div className="flex items-center space-x-4">
                 <div className="flex flex-col space-y-2">
                   <Label htmlFor="account-select">
-                    {t("imap.common.selectAccount")}
+                    {t("app.admin.emails.imap.common.selectAccount")}
                   </Label>
                   <Select
                     value={selectedAccountId}
@@ -79,7 +79,7 @@ export function ImapFoldersManagement(): JSX.Element {
                   >
                     <SelectTrigger className="w-[250px]">
                       <SelectValue
-                        placeholder={t("imap.common.selectAccount")}
+                        placeholder={t("app.admin.emails.imap.common.selectAccount")}
                       />
                     </SelectTrigger>
                     <SelectContent>
@@ -102,15 +102,15 @@ export function ImapFoldersManagement(): JSX.Element {
                   disabled={syncEndpoint.create.isSubmitting}
                 >
                   {syncEndpoint.create.isSubmitting
-                    ? t("imap.common.syncing")
-                    : t("imap.common.sync")}
+                    ? t("app.admin.emails.imap.common.syncing")
+                    : t("app.admin.emails.imap.common.sync")}
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={foldersEndpoint.read.refetch}
                 >
-                  {t("imap.common.refresh")}
+                  {t("app.admin.emails.imap.common.refresh")}
                 </Button>
               </div>
             </div>
@@ -126,7 +126,7 @@ export function ImapFoldersManagement(): JSX.Element {
       {/* Folder Statistics */}
       <Card>
         <CardHeader>
-          <CardTitle> {t("imap.admin.folders.stats.title")}</CardTitle>
+          <CardTitle> {t("app.admin.emails.imap.admin.folders.stats.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -137,7 +137,7 @@ export function ImapFoldersManagement(): JSX.Element {
                   : 0}
               </div>
               <div className="text-sm text-gray-600">
-                {t("imap.dashboard.totalFolders")}
+                {t("app.admin.emails.imap.dashboard.totalFolders")}
               </div>
             </div>
             <div className="text-center">
@@ -150,7 +150,7 @@ export function ImapFoldersManagement(): JSX.Element {
                   : 0}
               </div>
               <div className="text-sm text-gray-600">
-                {t("imap.dashboard.totalMessages")}
+                {t("app.admin.emails.imap.dashboard.totalMessages")}
               </div>
             </div>
             <div className="text-center">
@@ -163,17 +163,17 @@ export function ImapFoldersManagement(): JSX.Element {
                   : 0}
               </div>
               <div className="text-sm text-gray-600">
-                {t("imap.dashboard.unreadMessages")}
+                {t("app.admin.emails.imap.dashboard.unreadMessages")}
               </div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold">
                 {foldersEndpoint.read?.response?.success
-                  ? t("imap.dashboard.justNow")
-                  : t("imap.dashboard.never")}
+                  ? t("app.admin.emails.imap.dashboard.justNow")
+                  : t("app.admin.emails.imap.dashboard.never")}
               </div>
               <div className="text-sm text-gray-600">
-                {t("imap.dashboard.lastSync")}
+                {t("app.admin.emails.imap.dashboard.lastSync")}
               </div>
             </div>
           </div>

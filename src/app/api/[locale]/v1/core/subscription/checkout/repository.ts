@@ -324,8 +324,8 @@ export class SubscriptionCheckoutRepositoryImpl
             quantity: 1,
           },
         ],
-        success_url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/app/onboarding?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/app/subscription?canceled=true`,
+        success_url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription?canceled=true`,
         metadata: {
           userId: user.id,
           planId: data.planId,

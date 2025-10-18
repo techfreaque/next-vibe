@@ -1,0 +1,17 @@
+export const translations = {
+  userId: "User ID for the subscription",
+  planId: "Subscription plan type",
+  billingInterval: "How often the user is billed",
+  status: "Current subscription status",
+  currentPeriodStart: "Start date of current billing period",
+  currentPeriodEnd: "End date of current billing period",
+  cancelAtPeriodEnd: "Whether to cancel at the end of current period",
+  canceledAt: "Date when subscription was cancelled",
+  endedAt: "Date when subscription ended",
+  cancellationReason: "Reason for cancellation",
+  trialStart: "Trial period start date",
+  trialEnd: "Trial period end date",
+  stripeCustomerId: "Stripe customer identifier",
+  stripeSubscriptionId: "Stripe subscription identifier",
+  stripePriceId: "Stripe price identifier",
+};

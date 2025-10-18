@@ -11,11 +11,14 @@ import React, {
   useState,
 } from "react";
 
-import { useTranslation } from "@/i18n/core/client";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import { API_CONFIG, TIMING } from "../../lib/config/constants";
 import type { ModelId } from "../../lib/config/models";
 import { defaultModel } from "../../lib/config/models";
+import { getPersonaById } from "../../lib/config/personas";
 import {
   clearDraft,
   getDraft,
@@ -36,6 +39,7 @@ import {
   getMessagesInPath,
   switchBranch,
 } from "../../lib/storage/message-tree";
+import { createThread } from "../../lib/storage/thread-manager";
 import type {
   ChatFolder,
   ChatMessage,
@@ -47,8 +51,9 @@ import {
   handleAPIError,
   stripContextTags,
 } from "../../lib/utils/api";
-import { getUserErrorMessage, logError } from "../../lib/utils/error-handling";
+import { getUserErrorMessage } from "../../lib/utils/error-handling";
 import { ValidationError } from "../../lib/utils/errors";
+import { voteMessage as voteMessageUtil } from "../../lib/utils/message-votes";
 import { processStreamReader } from "../../lib/utils/streaming";
 import { useChatState } from "./hooks/use-chat-state";
 
@@ -61,6 +66,8 @@ interface ChatContextValue {
   // Input
   input: string;
   setInput: (input: string) => void;
+  currentFolderId: string | null;
+  setCurrentFolderId: (folderId: string | null) => void;
 
   // Settings
   selectedTone: string;
@@ -73,13 +80,18 @@ interface ChatContextValue {
   setTTSAutoplay: (enabled: boolean) => void;
 
   // Actions
-  sendMessage: (content: string) => Promise<void>;
+  sendMessage: (
+    content: string,
+    explicitFolderId?: string | null,
+  ) => Promise<string | null>;
   editMessage: (messageId: string, newContent: string) => Promise<void>;
   deleteMessage: (messageId: string) => void;
   switchMessageBranch: (messageId: string, branchIndex: number) => void;
   branchMessage: (messageId: string, newContent: string) => Promise<void>;
+  replyToMessage: (messageId: string, newContent: string) => Promise<void>;
   retryMessage: (messageId: string) => Promise<void>;
   answerAsModel: (messageId: string) => Promise<void>;
+  voteMessage: (messageId: string, vote: 1 | -1 | 0) => void;
   stopGeneration: () => void;
 
   // Thread management (from useChatState)
@@ -94,10 +106,12 @@ interface ChatContextValue {
   updateThreadTitle: (threadId: string) => void;
 
   // Folder management
-  createNewFolder: (name: string, parentId?: string | null) => string;
+  createNewFolder: (name: string, parentId: string, icon?: string) => string;
   updateFolder: (folderId: string, updates: Partial<ChatFolder>) => void;
   deleteFolder: (folderId: string, deleteThreads: boolean) => void;
   toggleFolderExpanded: (folderId: string) => void;
+  reorderFolder: (folderId: string, direction: "up" | "down") => void;
+  moveFolderToParent: (folderId: string, newParentId: string | null) => void;
 
   // UI
   uiPreferences: ReturnType<typeof useChatState>["uiPreferences"];
@@ -113,6 +127,9 @@ interface ChatContextValue {
 
   // State from useChatState
   state: ReturnType<typeof useChatState>["state"];
+
+  // Logger
+  logger: ReturnType<typeof createEndpointLogger>;
 }
 
 const ChatContext = createContext<ChatContextValue | undefined>(undefined);
@@ -120,6 +137,7 @@ const ChatContext = createContext<ChatContextValue | undefined>(undefined);
 export function useChatContext(): ChatContextValue {
   const context = useContext(ChatContext);
   if (!context) {
+    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- React context hook error, programming error not user-facing
     throw new Error("useChatContext must be used within ChatProvider");
   }
   return context;
@@ -127,6 +145,7 @@ export function useChatContext(): ChatContextValue {
 
 interface ChatProviderProps {
   children: ReactNode;
+  locale: CountryLanguage;
 }
 
 /**
@@ -150,24 +169,29 @@ function shouldSkipThreadUpdate(
   return false;
 }
 
-export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
-  const { locale, t } = useTranslation("chat");
-  const chatState = useChatState();
+export function ChatProvider({
+  children,
+  locale,
+}: ChatProviderProps): JSX.Element {
+  const { t } = simpleT(locale);
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const chatState = useChatState(locale, logger);
 
   // Initialize from localStorage
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [selectedTone, setSelectedTone] = useState<string>(() => {
-    return getGlobalTone() || "professional";
+    return getGlobalTone(logger) || getPersonaById("default").id;
   });
   const [selectedModel, setSelectedModel] = useState<ModelId>(() => {
-    return getGlobalModel() || defaultModel;
+    return getGlobalModel(logger) || defaultModel;
   });
   const [enableSearch, setEnableSearch] = useState<boolean>(() => {
-    return getGlobalEnableSearch(); // defaults to false
+    return getGlobalEnableSearch(logger); // defaults to false
   });
   const [ttsAutoplay, setTTSAutoplay] = useState<boolean>(() => {
-    return getGlobalTTSAutoplay(); // defaults to false
+    return getGlobalTTSAutoplay(logger); // defaults to false
   });
 
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -176,58 +200,77 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
   const activeStreamsRef = useRef<Map<string, AbortController>>(new Map());
 
   const activeThread = chatState.getActiveThread();
-  const messages = activeThread ? getMessagesInPath(activeThread) : [];
+  const messages = useMemo(
+    () => (activeThread ? getMessagesInPath(activeThread) : []),
+    [activeThread],
+  );
 
   // Cleanup on unmount
   useEffect(() => {
-    return () => {
+    // Capture ref value at effect creation time
+    const activeStreams = activeStreamsRef.current;
+    return (): void => {
       mountedRef.current = false;
       // Abort all active streams
-      activeStreamsRef.current.forEach((controller) => controller.abort());
-      activeStreamsRef.current.clear();
+      activeStreams.forEach((controller) => controller.abort());
+      activeStreams.clear();
     };
   }, []);
 
   // Sync model selection to localStorage
   useEffect(() => {
-    saveGlobalModel(selectedModel);
-  }, [selectedModel]);
+    saveGlobalModel(selectedModel, logger);
+  }, [selectedModel, logger]);
 
   // Sync tone selection to localStorage
   useEffect(() => {
-    saveGlobalTone(selectedTone);
-  }, [selectedTone]);
+    saveGlobalTone(selectedTone, logger);
+  }, [selectedTone, logger]);
 
   // Sync enable search to localStorage
   useEffect(() => {
-    saveGlobalEnableSearch(enableSearch);
-  }, [enableSearch]);
+    saveGlobalEnableSearch(enableSearch, logger);
+  }, [enableSearch, logger]);
 
   // Sync TTS autoplay to localStorage
   useEffect(() => {
-    saveGlobalTTSAutoplay(ttsAutoplay);
-  }, [ttsAutoplay]);
+    saveGlobalTTSAutoplay(ttsAutoplay, logger);
+  }, [ttsAutoplay, logger]);
 
-  // Restore draft when active thread changes
+  // Restore draft when folder changes
+  // Store previous folder ID to detect actual changes
+  const prevFolderIdRef = useRef<string | null>(null);
+
   useEffect(() => {
-    if (activeThread) {
-      const draft = getDraft(activeThread.id);
-      setInput(draft);
-    } else {
-      setInput("");
+    const folderId = currentFolderId;
+    const prevFolderId = prevFolderIdRef.current;
+
+    // Only restore if the folder ID actually changed
+    if (folderId !== prevFolderId) {
+      if (folderId) {
+        const draft = getDraft(folderId, logger);
+        setInput(draft);
+      } else if (prevFolderId !== null) {
+        // Only clear if we're transitioning from a real folder to no folder
+        // Don't clear on initial mount (prevFolderId === null)
+        setInput("");
+      }
+
+      prevFolderIdRef.current = folderId;
     }
-  }, [activeThread?.id]);
+  }, [currentFolderId, logger]);
 
   // Save draft when input changes (debounced via effect)
   useEffect(() => {
-    if (activeThread && input !== undefined) {
+    const folderId = currentFolderId;
+    if (folderId && input !== undefined) {
       const timeoutId = setTimeout(() => {
-        saveDraft(activeThread.id, input);
+        saveDraft(folderId, input, logger);
       }, TIMING.DRAFT_SAVE_DEBOUNCE);
 
-      return () => clearTimeout(timeoutId);
+      return (): void => clearTimeout(timeoutId);
     }
-  }, [activeThread?.id, input]);
+  }, [currentFolderId, input, logger]);
 
   // Get AI response for a given parent message (internal helper)
   const getAIResponse = useCallback(
@@ -236,18 +279,33 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
       parentMessageId: string,
       threadOverride?: ChatThread,
     ) => {
+      logger.debug("Chat", "getAIResponse called", {
+        threadId,
+        parentMessageId,
+        hasThreadOverride: Boolean(threadOverride),
+      });
+
       // Check if component is still mounted
       if (!mountedRef.current) {
+        logger.debug("Chat", "Component not mounted, aborting");
+        setIsLoading(false);
+        abortControllerRef.current = null;
         return;
       }
 
       // Use provided thread or get from state
       const thread = threadOverride || chatState.state.threads[threadId];
       if (!thread) {
+        logger.error("Chat", "Thread not found", { threadId });
+        setIsLoading(false);
+        abortControllerRef.current = null;
         return;
       }
 
+      logger.debug("Chat", "Thread found, initializing stream");
+
       // Generate unique stream ID for tracking
+      // eslint-disable-next-line i18next/no-literal-string -- Technical ID generation, not user-facing
       const streamId = `stream-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
       const controller = new AbortController();
       abortControllerRef.current = controller;
@@ -257,6 +315,7 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
         // Build the correct API path with locale
         const apiPath = `/api/${locale}/v1/core/agent/chat/ai-stream`;
 
+        logger.debug("Chat", "Building request");
         // Build request with enhanced context using utility function
         const requestBody = buildChatCompletionRequest(
           thread,
@@ -266,17 +325,31 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
           API_CONFIG.DEFAULT_TEMPERATURE,
           API_CONFIG.DEFAULT_MAX_TOKENS,
           enableSearch,
+          locale,
         );
 
+        logger.debug("Chat", "Request built", {
+          messageCount: requestBody.messages.length,
+          model: requestBody.model,
+        });
+
         if (requestBody.messages.length === 0) {
+          logger.error("Chat", "No valid messages to send");
+          // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Validation error for API, not user-facing
           throw new ValidationError("No valid messages to send to API");
         }
 
+        logger.debug("Chat", "Calling API", { apiPath });
         const response = await fetch(apiPath, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestBody),
           signal: controller.signal,
+        });
+
+        logger.debug("Chat", "API response received", {
+          ok: response.ok,
+          status: response.status,
         });
 
         if (!response.ok) {
@@ -289,14 +362,30 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
 
         if (reader) {
           let assistantContent = "";
+
+          // Check if parent message already has children (retry/branch case)
+          const parentMessage = thread.messages[parentMessageId];
+          const hasExistingResponses =
+            parentMessage && parentMessage.childrenIds.length > 0;
+
           // Create assistant message
-          const threadWithAssistant = addMessageToThread(thread, {
-            role: "assistant",
-            content: "",
-            parentId: parentMessageId,
-            model: selectedModel,
-            tone: selectedTone,
-          });
+          // Use createBranchFromMessage if there are already responses (retry/alternative)
+          // Use addMessageToThread for first response (normal flow)
+          const threadWithAssistant = hasExistingResponses
+            ? createBranchFromMessage(thread, parentMessageId, {
+                role: "assistant",
+                content: "",
+                parentId: parentMessageId,
+                model: selectedModel,
+                tone: selectedTone,
+              })
+            : addMessageToThread(thread, {
+                role: "assistant",
+                content: "",
+                parentId: parentMessageId,
+                model: selectedModel,
+                tone: selectedTone,
+              });
 
           // Get the assistant message ID from the path we just created
           const assistantMessageId =
@@ -374,7 +463,7 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
                 };
               });
             } else if (!assistantContent && mountedRef.current) {
-              // No content received - replace assistant message with error
+              // No content received - replace assistant message with error as a branch
               chatState.updateThread(threadId, (prevThread) => {
                 if (
                   shouldSkipThreadUpdate(
@@ -386,22 +475,21 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
                   return prevThread;
                 }
 
-                // Remove the empty assistant message and add error message instead
-                const messagesWithoutEmpty = { ...prevThread.messages };
-                delete messagesWithoutEmpty[assistantMessageId];
+                // Remove the empty assistant message properly (cleans up parent's childrenIds)
+                const threadWithoutEmpty = deleteMessageBranch(
+                  prevThread,
+                  assistantMessageId,
+                );
 
-                const currentMessages = getMessagesInPath({
-                  ...prevThread,
-                  messages: messagesWithoutEmpty,
-                });
-                const lastMsg = currentMessages[currentMessages.length - 1];
-
-                return addMessageToThread(
-                  { ...prevThread, messages: messagesWithoutEmpty },
+                // Create error message as a branch (sibling of the failed assistant message)
+                // This allows retrying to create a new branch
+                return createBranchFromMessage(
+                  threadWithoutEmpty,
+                  parentMessageId,
                   {
                     role: "error",
-                    content: t("errors.noResponse"),
-                    parentId: lastMsg?.id || null,
+                    content: t("app.chat.errors.noResponse"),
+                    parentId: parentMessageId,
                   },
                 );
               });
@@ -410,45 +498,42 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
             reader.releaseLock();
           }
         } else {
-          // No reader available - add error message
+          // No reader available - add error message as a branch
           chatState.updateThread(threadId, (prevThread) => {
             if (!prevThread) {
               return prevThread;
             }
 
-            const currentMessages = getMessagesInPath(prevThread);
-            const lastMsg = currentMessages[currentMessages.length - 1];
-
-            return addMessageToThread(prevThread, {
+            // Create error message as a branch (sibling of any existing responses)
+            return createBranchFromMessage(prevThread, parentMessageId, {
               role: "error",
-              content: t("errors.noStream"),
-              parentId: lastMsg?.id || null,
+              content: t("app.chat.errors.noStream"),
+              parentId: parentMessageId,
             });
           });
         }
+        // eslint-disable-next-line no-restricted-syntax -- Browser API catch requires unknown type
       } catch (error: unknown) {
+        const errorObj =
+          error instanceof Error ? error : new Error(String(error));
+
         // Log error for debugging
-        logError(error, "streamAIResponse");
+        logger.error("app.chat.errors.streamAIResponse", errorObj);
 
         // Only show error if not aborted and component is still mounted
-        if (
-          mountedRef.current &&
-          error instanceof Error &&
-          error.name !== "AbortError"
-        ) {
-          // Use functional update to safely add error message
+        if (mountedRef.current && errorObj.name !== "AbortError") {
+          // Use functional update to safely add error message as a branch
           chatState.updateThread(threadId, (prevThread) => {
             if (shouldSkipThreadUpdate(mountedRef, prevThread)) {
               return prevThread;
             }
 
-            const currentMessages = getMessagesInPath(prevThread);
-            const lastMsg = currentMessages[currentMessages.length - 1];
-
-            return addMessageToThread(prevThread, {
+            // Create error message as a branch (sibling of any existing responses)
+            // This allows retrying to create a new branch
+            return createBranchFromMessage(prevThread, parentMessageId, {
               role: "error",
-              content: getUserErrorMessage(error),
-              parentId: lastMsg?.id || null,
+              content: getUserErrorMessage(errorObj, locale),
+              parentId: parentMessageId,
             });
           });
         }
@@ -456,29 +541,80 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
         // Cleanup
         activeStreamsRef.current.delete(streamId);
         abortControllerRef.current = null;
+        setIsLoading(false);
       }
     },
-    [chatState, selectedModel, enableSearch, locale, t],
+    [
+      chatState,
+      locale,
+      selectedModel,
+      selectedTone,
+      enableSearch,
+      t,
+      logger,
+      setIsLoading,
+    ],
   );
 
   // Send a new message
+  // Returns the thread ID (useful for navigation after creating a new thread)
+  // folderId parameter allows caller to explicitly specify folder (overrides currentFolderId)
   const sendMessage = useCallback(
-    async (content: string) => {
-      // Capture thread ID early - this is our stable reference
-      const threadId = chatState.state.activeThreadId;
-      if (!threadId || !content.trim() || isLoading) {
-        return;
+    async (
+      content: string,
+      explicitFolderId?: string | null,
+    ): Promise<string | null> => {
+      logger.debug("Chat", "sendMessage called", {
+        contentLength: content.length,
+        isLoading,
+        explicitFolderId,
+        currentFolderId,
+      });
+
+      if (!content.trim() || isLoading) {
+        logger.debug("Chat", "sendMessage blocked", {
+          hasContent: Boolean(content.trim()),
+          isLoading,
+        });
+        return null;
       }
 
-      // Get initial thread state - only used for local operations
-      const initialThread = chatState.state.threads[threadId];
-      if (!initialThread) {
-        return;
-      }
+      // Use explicit folder ID if provided, otherwise use current folder ID
+      const targetFolderId = explicitFolderId ?? currentFolderId;
 
       const trimmedContent = content.trim();
+      logger.debug("Chat", "sendMessage starting", { targetFolderId });
+
+      // Get or create thread ID
+      let threadId = chatState.state.activeThreadId;
+      let initialThread: ChatThread | null = threadId
+        ? chatState.state.threads[threadId] || null
+        : null;
+
+      // If no active thread, create one
+      if (!threadId || !initialThread) {
+        logger.debug("Chat", "Creating new thread", { targetFolderId });
+        threadId = chatState.createNewThread(targetFolderId);
+        if (!threadId) {
+          logger.error("Chat", "Failed to create thread");
+          return null;
+        }
+        logger.debug("Chat", "Thread created", { threadId });
+
+        // Create the thread object directly since we just created it
+        // This avoids race conditions with state updates
+        initialThread = createThread(locale, {
+          id: threadId,
+          folderId: targetFolderId,
+        });
+      }
+
       setInput("");
-      clearDraft(threadId); // Clear draft from localStorage
+      // Clear draft from localStorage using folder ID
+      if (targetFolderId) {
+        clearDraft(targetFolderId, logger);
+      }
+      logger.debug("Chat", "Setting isLoading to true");
       setIsLoading(true);
 
       try {
@@ -519,13 +655,32 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
         }
 
         // Get AI response (pass the updated thread to avoid race condition)
+        logger.debug("Chat", "Calling getAIResponse", {
+          threadId,
+          userMessageId,
+        });
         await getAIResponse(threadId, userMessageId, threadWithUserMessage);
-      } finally {
+
+        logger.debug("Chat", "sendMessage completed successfully");
+        // Return thread ID (especially important for newly created threads)
+        return threadId;
+      } catch (error) {
+        // Only set loading to false on error - getAIResponse handles it on success
         setIsLoading(false);
         abortControllerRef.current = null;
+        logger.error("Chat", "Failed to send message", error);
+        return null;
       }
     },
-    [isLoading, selectedTone, chatState, getAIResponse, t],
+    [
+      chatState,
+      isLoading,
+      logger,
+      selectedTone,
+      getAIResponse,
+      currentFolderId,
+      locale,
+    ],
   );
 
   // Branch from a message (create new conversation path)
@@ -555,16 +710,11 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
             return currentThread;
           }
 
-          // Can't branch from first message (no parent to branch from)
-          if (!message.parentId) {
-            console.warn("Cannot branch from first message - no parent");
-            return currentThread;
-          }
-
-          // Create a branch with the new message
+          // Create a branch with the new message (sibling of the original)
+          // For root messages (no parent), pass null to create a root-level branch
           const threadWithBranch = createBranchFromMessage(
             currentThread,
-            message.parentId,
+            message.parentId, // null for root messages, parent ID otherwise
             {
               role: "user",
               content: trimmedContent,
@@ -586,16 +736,80 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
         // Get AI response for the branched message
         if (newUserMessageId && updatedThread) {
           await getAIResponse(threadId, newUserMessageId, updatedThread);
+        } else {
+          // No AI response needed, stop loading
+          setIsLoading(false);
         }
-      } finally {
+      } catch (error) {
         setIsLoading(false);
+        logger.error("Chat", "Failed to branch message", error);
       }
     },
-    [selectedTone, chatState, getAIResponse, isLoading],
+    [chatState, isLoading, selectedTone, logger, getAIResponse],
   );
 
   // Edit a message - same as branching (creates a new branch from the parent)
   const editMessage = branchMessage;
+
+  // Reply to a message (create a child message)
+  // This is different from branching - it creates a new message as a child of the target message
+  const replyToMessage = useCallback(
+    async (messageId: string, newContent: string) => {
+      const threadId = chatState.state.activeThreadId;
+      if (!threadId || !newContent.trim() || isLoading) {
+        return;
+      }
+
+      const trimmedContent = newContent.trim();
+      setIsLoading(true);
+
+      try {
+        let newUserMessageId: string | null = null;
+        let updatedThread: ChatThread | null = null;
+
+        // Update thread using functional update to avoid race conditions
+        chatState.updateThread(threadId, (currentThread) => {
+          if (!currentThread) {
+            return currentThread;
+          }
+
+          const message = currentThread.messages[messageId];
+          if (!message) {
+            return currentThread;
+          }
+
+          // Create a reply as a child of this message
+          const threadWithReply = addMessageToThread(currentThread, {
+            role: "user",
+            content: trimmedContent,
+            parentId: messageId, // This message is the parent
+            tone: selectedTone,
+          });
+
+          // Capture the new user message ID
+          newUserMessageId =
+            threadWithReply.currentPath.messageIds[
+              threadWithReply.currentPath.messageIds.length - 1
+            ];
+
+          updatedThread = threadWithReply;
+          return threadWithReply;
+        });
+
+        // Get AI response for the reply
+        if (newUserMessageId && updatedThread) {
+          await getAIResponse(threadId, newUserMessageId, updatedThread);
+        } else {
+          // No AI response needed, stop loading
+          setIsLoading(false);
+        }
+      } catch (error) {
+        setIsLoading(false);
+        logger.error("Chat", "Failed to reply to message", error);
+      }
+    },
+    [chatState, isLoading, selectedTone, logger, getAIResponse],
+  );
 
   // Delete a message and its descendants
   const deleteMessage = useCallback(
@@ -611,6 +825,25 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
           return prevThread;
         }
         return deleteMessageBranch(prevThread, messageId);
+      });
+    },
+    [chatState],
+  );
+
+  // Vote on a message (upvote, downvote, or remove vote)
+  const voteMessage = useCallback(
+    (messageId: string, vote: 1 | -1 | 0) => {
+      const threadId = chatState.state.activeThreadId;
+      if (!threadId) {
+        return;
+      }
+
+      // Use functional update for consistency
+      chatState.updateThread(threadId, (prevThread) => {
+        if (!prevThread) {
+          return prevThread;
+        }
+        return voteMessageUtil(prevThread, messageId, vote);
       });
     },
     [chatState],
@@ -642,11 +875,12 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
         // This will create a new branch if there are already responses
         // The AI response will be added as a child of the user message
         await getAIResponse(threadId, messageId, thread);
-      } finally {
+      } catch (error) {
         setIsLoading(false);
+        logger.error("Chat", "Failed to retry message", error);
       }
     },
-    [chatState, getAIResponse, isLoading],
+    [chatState, getAIResponse, isLoading, logger],
   );
 
   // Answer as AI model (generate AI response to an AI message)
@@ -673,11 +907,12 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
       try {
         // Call getAIResponse with the message as the parent
         await getAIResponse(threadId, messageId, currentThread);
-      } finally {
+      } catch (error) {
         setIsLoading(false);
+        logger.error("Chat", "Failed to answer as model", error);
       }
     },
-    [chatState, getAIResponse, isLoading],
+    [chatState, getAIResponse, isLoading, logger],
   );
 
   // Switch to a different branch
@@ -745,6 +980,8 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
       // Input
       input,
       setInput,
+      currentFolderId,
+      setCurrentFolderId,
 
       // Settings
       selectedTone,
@@ -762,8 +999,10 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
       deleteMessage,
       switchMessageBranch,
       branchMessage,
+      replyToMessage,
       retryMessage,
       answerAsModel,
+      voteMessage,
       stopGeneration,
 
       // Thread management
@@ -779,6 +1018,8 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
       updateFolder: chatState.updateFolder,
       deleteFolder: chatState.deleteFolder,
       toggleFolderExpanded: chatState.toggleFolderExpanded,
+      reorderFolder: chatState.reorderFolder,
+      moveFolderToParent: chatState.moveFolderToParent,
 
       // UI
       uiPreferences: chatState.uiPreferences,
@@ -794,28 +1035,29 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
 
       // State
       state: chatState.state,
+
+      // Logger
+      logger,
     }),
     [
       activeThread,
       messages,
       isLoading,
       input,
-      setInput,
+      currentFolderId,
       selectedTone,
       selectedModel,
       enableSearch,
       ttsAutoplay,
-      setSelectedTone,
-      setSelectedModel,
-      setEnableSearch,
-      setTTSAutoplay,
       sendMessage,
       editMessage,
       deleteMessage,
       switchMessageBranch,
       branchMessage,
+      replyToMessage,
       retryMessage,
       answerAsModel,
+      voteMessage,
       stopGeneration,
       chatState.createNewThread,
       chatState.deleteThread,
@@ -827,12 +1069,15 @@ export function ChatProvider({ children }: ChatProviderProps): JSX.Element {
       chatState.updateFolder,
       chatState.deleteFolder,
       chatState.toggleFolderExpanded,
+      chatState.reorderFolder,
+      chatState.moveFolderToParent,
       chatState.uiPreferences,
       chatState.toggleSidebar,
       chatState.setViewMode,
       chatState.searchThreads,
-      inputRef,
       chatState.state,
+      insertTextAtCursor,
+      logger,
     ],
   );
 

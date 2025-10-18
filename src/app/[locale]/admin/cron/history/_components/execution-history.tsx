@@ -23,7 +23,6 @@ import type React from "react";
 
 import type { CronHistoryResponseOutput } from "@/app/api/[locale]/v1/core/system/tasks/cron/history/definition";
 import type { CronHistoryEndpointReturn } from "@/app/api/[locale]/v1/core/system/tasks/cron/history/hooks";
-import { CronTaskStatus } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -53,8 +52,12 @@ export function ExecutionHistory({
   const queryLoading = historyEndpoint.read.isLoading || false;
 
   // Get current form values for pagination display
-  const currentPage = historyEndpoint.read.form?.getValues("page") || 1;
-  const currentLimit = historyEndpoint.read.form?.getValues("limit") || 20;
+  const currentOffset = parseInt(
+    historyEndpoint.read.form?.getValues("offset") || "0",
+  );
+  const currentLimit = parseInt(
+    historyEndpoint.read.form?.getValues("limit") || "20",
+  );
   type CronTaskStatusType = CronExecutionType["status"];
 
   const getStatusIcon = (status: CronTaskStatusType): React.ReactElement => {
@@ -111,7 +114,7 @@ export function ExecutionHistory({
       const end = new Date(execution.completedAt);
       return `${end.getTime() - start.getTime()}ms`;
     }
-    return t("cronErrors.admin.interface.noResults");
+    return t("app.admin.cron.cronErrors.admin.interface.noResults");
   };
 
   const formatDate = (dateString: string): string => {
@@ -138,7 +141,7 @@ export function ExecutionHistory({
         <div className="flex justify-between items-center">
           <CardTitle className="flex items-center">
             <Clock className="h-5 w-5 mr-2" />
-            {t("admin.dashboard.cron.executionHistory.titleWithCount", {
+            {t("app.admin.cron.executionHistory.titleWithCount", {
               count: history.length,
             })}
           </CardTitle>
@@ -163,7 +166,7 @@ export function ExecutionHistory({
           <div className="flex items-center space-x-2 mb-4">
             <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              {t("cronErrors.admin.interface.filter")}:
+              {t("app.admin.cron.cronErrors.admin.interface.filter")}:
             </span>
           </div>
 
@@ -180,7 +183,7 @@ export function ExecutionHistory({
                   type: "text",
                   label: undefined,
                   placeholder:
-                    "cronErrors.admin.interface.executionHistory.searchPlaceholder",
+                    "app.admin.cron.cronErrors.admin.interface.executionHistory.searchPlaceholder",
                 }}
                 control={historyEndpoint.read.form.control}
                 theme={{
@@ -196,7 +199,7 @@ export function ExecutionHistory({
                   type: "text",
                   label: undefined,
                   placeholder:
-                    "cronErrors.admin.interface.executionHistory.statusFilter",
+                    "app.admin.cron.cronErrors.admin.interface.executionHistory.statusFilter",
                 }}
                 control={historyEndpoint.read.form.control}
                 theme={{
@@ -212,7 +215,7 @@ export function ExecutionHistory({
                   type: "date",
                   label: undefined,
                   placeholder:
-                    "cronErrors.admin.interface.executionHistory.startDate",
+                    "app.admin.cron.cronErrors.admin.interface.executionHistory.startDate",
                 }}
                 control={historyEndpoint.read.form.control}
                 theme={{
@@ -228,7 +231,7 @@ export function ExecutionHistory({
                   type: "date",
                   label: undefined,
                   placeholder:
-                    "cronErrors.admin.interface.executionHistory.endDate",
+                    "app.admin.cron.cronErrors.admin.interface.executionHistory.endDate",
                 }}
                 control={historyEndpoint.read.form.control}
                 theme={{
@@ -245,7 +248,7 @@ export function ExecutionHistory({
                 size="sm"
                 onClick={handleClearFilters}
               >
-                {t("cronErrors.admin.interface.clear")}
+                {t("app.admin.cron.cronErrors.admin.interface.clear")}
               </Button>
             </div>
 
@@ -262,11 +265,11 @@ export function ExecutionHistory({
                 <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 dark:border-gray-100 mr-2" />
                   {t(
-                    "cronErrors.admin.interface.executionHistory.loadingHistory",
+                    "app.admin.cron.cronErrors.admin.interface.executionHistory.loadingHistory",
                   )}
                 </div>
               ) : (
-                t("cronErrors.admin.interface.executionHistory.noHistory")
+                t("app.admin.cron.cronErrors.admin.interface.executionHistory.noHistory")
               )}
             </div>
           ) : (
@@ -284,7 +287,7 @@ export function ExecutionHistory({
                       </h4>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         {t(
-                          "cronErrors.admin.interface.executionHistory.started",
+                          "app.admin.cron.cronErrors.admin.interface.executionHistory.started",
                         )}
                         : {formatDate(execution.startedAt)}
                       </p>
@@ -298,7 +301,7 @@ export function ExecutionHistory({
                       </Badge>
                       <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                         {t(
-                          "cronErrors.admin.interface.executionHistory.duration",
+                          "app.admin.cron.cronErrors.admin.interface.executionHistory.duration",
                         )}
                         : {getDuration(execution)}
                       </p>
@@ -310,7 +313,7 @@ export function ExecutionHistory({
                   <div className="mt-2">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                       {t(
-                        "cronErrors.admin.interface.executionHistory.completed",
+                        "app.admin.cron.cronErrors.admin.interface.executionHistory.completed",
                       )}
                       : {formatDate(execution.completedAt)}
                     </p>
@@ -322,7 +325,7 @@ export function ExecutionHistory({
                     <details className="group">
                       <summary className="cursor-pointer text-sm font-medium text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
                         {t(
-                          "cronErrors.admin.interface.executionHistory.errorDetails",
+                          "app.admin.cron.cronErrors.admin.interface.executionHistory.errorDetails",
                         )}
                       </summary>
                       <div className="text-xs bg-red-50 dark:bg-red-900/20 p-3 rounded border border-red-200 dark:border-red-800 mt-2 overflow-x-auto max-h-40 text-red-800 dark:text-red-300">
@@ -331,7 +334,10 @@ export function ExecutionHistory({
                         </div>
                         {execution.error.errorType && (
                           <div className="text-xs opacity-75">
-                            Type: {execution.error.errorType}
+                            {t(
+                              "app.admin.cron.executionHistory.errorType",
+                            )}
+                            : {execution.error.errorType}
                           </div>
                         )}
                       </div>
@@ -347,32 +353,40 @@ export function ExecutionHistory({
         {totalExecutions > currentLimit && (
           <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Showing {(currentPage - 1) * currentLimit + 1} to{" "}
-              {Math.min(currentPage * currentLimit, totalExecutions)} of{" "}
-              {totalExecutions} results
+              {t("app.admin.cron.executionHistory.pagination", {
+                from: currentOffset + 1,
+                to: Math.min(currentOffset + currentLimit, totalExecutions),
+                total: totalExecutions,
+              })}
             </p>
             <div className="flex space-x-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  const newPage = Math.max(1, currentPage - 1);
-                  historyEndpoint.read.form?.setValue("page", newPage);
+                  const newOffset = Math.max(0, currentOffset - currentLimit);
+                  historyEndpoint.read.form?.setValue(
+                    "offset",
+                    newOffset.toString(),
+                  );
                 }}
-                disabled={currentPage === 1}
+                disabled={currentOffset === 0}
               >
-                Previous
+                {t("app.admin.cron.buttons.previous")}
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  const newPage = currentPage + 1;
-                  historyEndpoint.read.form?.setValue("page", newPage);
+                  const newOffset = currentOffset + currentLimit;
+                  historyEndpoint.read.form?.setValue(
+                    "offset",
+                    newOffset.toString(),
+                  );
                 }}
-                disabled={!apiResponse?.data.hasMore}
+                disabled={!(apiResponse?.success && apiResponse.data.hasMore)}
               >
-                Next
+                {t("app.admin.cron.buttons.next")}
               </Button>
             </div>
           </div>

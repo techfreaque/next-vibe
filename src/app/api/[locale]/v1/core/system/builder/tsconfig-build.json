@@ -4,9 +4,7 @@
     "module": "NodeNext",
     "moduleResolution": "nodenext",
     "skipLibCheck": true,
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "outDir": ".dist",
     "noEmitOnError": true,
     "removeComments": true,
@@ -40,10 +38,6 @@
     "declaration": true,
     "declarationMap": true
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "src/build.test.ts"
-  ]
+  "include": ["src"],
+  "exclude": ["src/build.test.ts"]
 }

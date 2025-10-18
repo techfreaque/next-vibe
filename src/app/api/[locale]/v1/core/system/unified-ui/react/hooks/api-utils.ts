@@ -8,9 +8,87 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type z from "zod";
 
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { authClientRepository } from "../../../../user/auth/repository-client";
 import type { EndpointLogger } from "../../cli/vibe/endpoints/endpoint-handler/logger";
+
+// Type for values that can be in FormData
+type FormDataValue =
+  | string
+  | number
+  | boolean
+  | File
+  | Blob
+  | null
+  | undefined
+  | FormDataValue[]
+  | { [key: string]: FormDataValue };
+
+/**
+ * Check if an object contains File instances (recursively)
+ */
+export function containsFile(obj: FormDataValue): boolean {
+  if (obj instanceof File) {
+    return true;
+  }
+  if (obj instanceof Blob) {
+    return true;
+  }
+  if (Array.isArray(obj)) {
+    return obj.some((item) => containsFile(item));
+  }
+  if (obj && typeof obj === "object") {
+    return Object.values(obj).some((value) => containsFile(value));
+  }
+  return false;
+}
+
+/**
+ * Convert an object to FormData (recursively handles nested objects and arrays)
+ */
+export function objectToFormData(
+  obj: Record<string, FormDataValue>,
+  formData: FormData = new FormData(),
+  parentKey = "",
+): FormData {
+  for (const [key, value] of Object.entries(obj)) {
+    const formKey = parentKey ? `${parentKey}.${key}` : key;
+
+    if (value instanceof File || value instanceof Blob) {
+      // Append File/Blob directly
+      formData.append(formKey, value);
+    } else if (Array.isArray(value)) {
+      // Handle arrays
+      value.forEach((item, index) => {
+        const arrayKey = `${formKey}[${index}]`;
+        if (item instanceof File || item instanceof Blob) {
+          formData.append(arrayKey, item);
+        } else if (item && typeof item === "object") {
+          objectToFormData(
+            item as Record<string, FormDataValue>,
+            formData,
+            arrayKey,
+          );
+        } else if (item !== null && item !== undefined) {
+          // Primitives: string, number, boolean
+          formData.append(arrayKey, String(item));
+        }
+      });
+    } else if (value && typeof value === "object") {
+      // Handle nested objects
+      objectToFormData(
+        value as Record<string, FormDataValue>,
+        formData,
+        formKey,
+      );
+    } else if (value !== null && value !== undefined) {
+      // Handle primitives: string, number, boolean
+      formData.append(formKey, String(value));
+    }
+  }
+  return formData;
+}
 
 /**
  * Core function to call an API endpoint
@@ -30,21 +108,25 @@ export async function callApi<
 >(
   endpoint: TEndpoint,
   endpointUrl: string,
-  postBody: string | undefined,
+  postBody: string | FormData | undefined,
   logger: EndpointLogger,
 ): Promise<ResponseType<TResponseOutput>> {
   try {
-    // Prepare headers
-    const headers: HeadersInit = {
-      "Content-Type": "application/json",
-    };
+    // Prepare headers - don't set Content-Type for FormData (browser will set it with boundary)
+    const headers: HeadersInit =
+      postBody instanceof FormData
+        ? {}
+        : {
+            "Content-Type": "application/json",
+          };
 
     // Check authentication status if required
     if (endpoint.requiresAuthentication()) {
       const tokenResponse = authClientRepository.hasAuthStatus(logger);
       if (!tokenResponse.success || !tokenResponse.data) {
+        // Return error - server should provide proper translation key
         return createErrorResponse(
-          "error.errorTypes.unauthorized",
+          "app.user.auth.errors.auth_required" as TranslationKey,
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
@@ -77,8 +159,9 @@ export async function callApi<
         return json;
       }
 
+      // Fallback error when server doesn't return proper error format
       return createErrorResponse(
-        "error.errorTypes.http_error",
+        "error.api.http_error" as TranslationKey,
         ErrorResponseTypes.HTTP_ERROR,
         {
           statusCode: response.status,
@@ -96,8 +179,9 @@ export async function callApi<
       );
 
       if (!validationResponse.success) {
+        // Fallback error when response validation fails
         return createErrorResponse(
-          "error.errorTypes.validation_error",
+          "error.api.validation_error" as TranslationKey,
           ErrorResponseTypes.VALIDATION_ERROR,
           {
             message: validationResponse.message,
@@ -116,16 +200,18 @@ export async function callApi<
       return json;
     }
 
+    // Fallback error when server returns success but no data
     return createErrorResponse(
-      "error.errorTypes.internal_error",
+      "error.api.internal_error" as TranslationKey,
       ErrorResponseTypes.INTERNAL_ERROR,
       {
         url: endpointUrl,
       },
     );
   } catch (error) {
+    // Fallback error when request fails completely
     return createErrorResponse(
-      "error.errorTypes.internal_error",
+      "error.api.internal_error" as TranslationKey,
       ErrorResponseTypes.INTERNAL_ERROR,
       { error: parseError(error).message, endpoint: endpoint.path.join("/") },
     );

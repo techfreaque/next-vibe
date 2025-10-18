@@ -75,7 +75,7 @@ export function SmtpAccountsClient({
         <div className="flex justify-between items-center">
           <CardTitle className="flex items-center">
             <Users className="h-5 w-5 mr-2" />
-            {t("smtp.list.titleWithCount", { count: totalAccounts })}
+            {t("app.admin.emails.smtp.list.titleWithCount", { count: totalAccounts })}
           </CardTitle>
           <div className="flex items-center space-x-2">
             {/* View Mode Toggle */}
@@ -102,7 +102,7 @@ export function SmtpAccountsClient({
             <Button asChild>
               <Link href={`/${locale}/admin/emails/smtp/create`}>
                 <Plus className="h-4 w-4 mr-2" />
-                {t("smtp.list.actions.create")}
+                {t("app.admin.emails.smtp.list.actions.create")}
               </Link>
             </Button>
 
@@ -126,7 +126,7 @@ export function SmtpAccountsClient({
           <div className="flex items-center space-x-2 mb-4">
             <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              {t("smtp.list.filters.title")}:
+              {t("app.admin.emails.smtp.list.filters.title")}:
             </span>
           </div>
 
@@ -142,7 +142,7 @@ export function SmtpAccountsClient({
                 config={{
                   type: "text",
                   label: undefined,
-                  placeholder: "smtp.search.placeholder",
+                  placeholder: "app.admin.emails.smtp.search.placeholder",
                 }}
                 control={smtpAccountsEndpoint.read.form.control}
                 schema={smtpAccountListFilterSchema}
@@ -158,7 +158,7 @@ export function SmtpAccountsClient({
                 config={{
                   type: "select",
                   label: undefined,
-                  placeholder: "smtp.admin.fields.campaignTypes" as const,
+                  placeholder: "app.admin.emails.smtp.admin.fields.campaignTypes" as const,
                   options: [
                     {
                       value: CampaignTypeFilter.ALL,
@@ -166,23 +166,23 @@ export function SmtpAccountsClient({
                     },
                     {
                       value: CampaignTypeFilter.LEAD_CAMPAIGN,
-                      label: "smtp.admin.campaignTypes.leadCampaign" as const,
+                      label: "app.admin.emails.smtp.admin.campaignTypes.leadCampaign" as const,
                     },
                     {
                       value: CampaignTypeFilter.NEWSLETTER,
-                      label: "smtp.admin.campaignTypes.newsletter" as const,
+                      label: "app.admin.emails.smtp.admin.campaignTypes.newsletter" as const,
                     },
                     {
                       value: CampaignTypeFilter.TRANSACTIONAL,
-                      label: "smtp.admin.campaignTypes.transactional" as const,
+                      label: "app.admin.emails.smtp.admin.campaignTypes.transactional" as const,
                     },
                     {
                       value: CampaignTypeFilter.NOTIFICATION,
-                      label: "smtp.admin.campaignTypes.notification" as const,
+                      label: "app.admin.emails.smtp.admin.campaignTypes.notification" as const,
                     },
                     {
                       value: CampaignTypeFilter.SYSTEM,
-                      label: "smtp.admin.campaignTypes.system" as const,
+                      label: "app.admin.emails.smtp.admin.campaignTypes.system" as const,
                     },
                   ],
                 }}
@@ -200,27 +200,27 @@ export function SmtpAccountsClient({
                 config={{
                   type: "select",
                   label: undefined,
-                  placeholder: "smtp.filter.status.placeholder",
+                  placeholder: "app.admin.emails.smtp.filter.status.placeholder",
                   options: [
                     {
                       value: SmtpAccountStatusFilter.ALL,
-                      label: "smtp.filter.status.all",
+                      label: "app.admin.emails.smtp.filter.status.all",
                     },
                     {
                       value: SmtpAccountStatusFilter.ACTIVE,
-                      label: "smtp.filter.status.active",
+                      label: "app.admin.emails.smtp.filter.status.active",
                     },
                     {
                       value: SmtpAccountStatusFilter.INACTIVE,
-                      label: "smtp.filter.status.inactive",
+                      label: "app.admin.emails.smtp.filter.status.inactive",
                     },
                     {
                       value: SmtpAccountStatusFilter.ERROR,
-                      label: "smtp.filter.status.error",
+                      label: "app.admin.emails.smtp.filter.status.error",
                     },
                     {
                       value: SmtpAccountStatusFilter.TESTING,
-                      label: "smtp.filter.status.testing",
+                      label: "app.admin.emails.smtp.filter.status.testing",
                     },
                   ],
                 }}
@@ -238,27 +238,27 @@ export function SmtpAccountsClient({
                 config={{
                   type: "select",
                   label: undefined,
-                  placeholder: "smtp.filter.health.placeholder",
+                  placeholder: "app.admin.emails.smtp.filter.health.placeholder",
                   options: [
                     {
                       value: SmtpHealthStatusFilter.ALL,
-                      label: "smtp.filter.health.all",
+                      label: "app.admin.emails.smtp.filter.health.all",
                     },
                     {
                       value: SmtpHealthStatusFilter.HEALTHY,
-                      label: "smtp.filter.health.healthy",
+                      label: "app.admin.emails.smtp.filter.health.healthy",
                     },
                     {
                       value: SmtpHealthStatusFilter.DEGRADED,
-                      label: "smtp.filter.health.degraded",
+                      label: "app.admin.emails.smtp.filter.health.degraded",
                     },
                     {
                       value: SmtpHealthStatusFilter.UNHEALTHY,
-                      label: "smtp.filter.health.unhealthy",
+                      label: "app.admin.emails.smtp.filter.health.unhealthy",
                     },
                     {
                       value: SmtpHealthStatusFilter.UNKNOWN,
-                      label: "smtp.filter.health.unknown",
+                      label: "app.admin.emails.smtp.filter.health.unknown",
                     },
                   ],
                 }}
@@ -277,12 +277,12 @@ export function SmtpAccountsClient({
                 variant="outline"
                 onClick={handleClearFilters}
               >
-                {t("smtp.list.actions.clearFilters")}
+                {t("app.admin.emails.smtp.list.actions.clearFilters")}
               </Button>
 
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {t("smtp.list.results.showing", {
+                  {t("app.admin.emails.smtp.list.results.showing", {
                     start: (currentPage - 1) * currentLimit + 1,
                     end: Math.min(currentPage * currentLimit, totalAccounts),
                     total: totalAccounts,
@@ -299,15 +299,15 @@ export function SmtpAccountsClient({
             {queryLoading ? (
               <div className="flex items-center justify-center">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 dark:border-gray-100 mr-2" />
-                {t("smtp.list.loading")}
+                {t("app.admin.emails.smtp.list.loading")}
               </div>
             ) : (
               <div>
-                <p>{t("smtp.list.noResults")}</p>
+                <p>{t("app.admin.emails.smtp.list.noResults")}</p>
                 <Link href={`/${locale}/admin/emails/smtp/create`}>
                   <Button className="mt-4">
                     <Plus className="h-4 w-4 mr-2" />
-                    {t("smtp.list.actions.createFirst")}
+                    {t("app.admin.emails.smtp.list.actions.createFirst")}
                   </Button>
                 </Link>
               </div>
@@ -361,10 +361,10 @@ export function SmtpAccountsClient({
                   )
                 }
               >
-                {t("smtp.list.pagination.previous")}
+                {t("app.admin.emails.smtp.list.pagination.previous")}
               </Button>
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                {t("smtp.list.pagination.pageOf", {
+                {t("app.admin.emails.smtp.list.pagination.pageOf", {
                   current: currentPage,
                   total: totalPages,
                 })}
@@ -380,7 +380,7 @@ export function SmtpAccountsClient({
                   )
                 }
               >
-                {t("smtp.list.pagination.next")}
+                {t("app.admin.emails.smtp.list.pagination.next")}
               </Button>
             </div>
           </div>

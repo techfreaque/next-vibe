@@ -1,16 +1,24 @@
 "use client";
 
 import {
+  ArrowDown,
+  ArrowUp,
   ChevronDown,
   ChevronRight,
   Edit,
+  FolderInput,
   FolderPlus,
+  MessageSquarePlus,
   MoreVertical,
   Trash2,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useMemo } from "react";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 import {
   Button,
   DropdownMenu,
@@ -19,12 +27,22 @@ import {
   DropdownMenuTrigger,
 } from "@/packages/next-vibe-ui/web/ui";
 
+import { useTouchDevice } from "../../hooks/use-touch-device";
+import { getIconComponent, type IconValue } from "../../lib/config/icons";
+import { getFolderDisplayName } from "../../lib/storage/thread-manager";
 import type {
   ChatFolder,
   ChatState,
   ChatThread,
 } from "../../lib/storage/types";
-import { getIconComponent } from "./folder-icon-selector";
+import {
+  getDirectChildrenCount,
+  getFolderColor,
+  getFolderIcon,
+  isDefaultFolder,
+} from "../../lib/storage/types";
+import { buildFolderUrl, getRootFolderId } from "../../lib/utils/navigation";
+import { MoveFolderDialog } from "./move-folder-dialog";
 import { RenameFolderDialog } from "./rename-folder-dialog";
 import { ThreadList } from "./thread-list";
 
@@ -32,6 +50,48 @@ import { ThreadList } from "./thread-list";
 const DAY_MS = 24 * 60 * 60 * 1000;
 const WEEK_MS = 7 * DAY_MS;
 const MONTH_MS = 30 * DAY_MS;
+
+/**
+ * Get Tailwind color classes for folder hover effects based on root folder color
+ */
+function getFolderColorClasses(color: string | null): {
+  hover: string;
+  active: string;
+  border: string;
+} {
+  switch (color) {
+    case "sky":
+      return {
+        hover: "hover:bg-sky-500/8",
+        active: "bg-sky-500/12",
+        border: "border-sky-400",
+      };
+    case "teal":
+      return {
+        hover: "hover:bg-teal-500/8",
+        active: "bg-teal-500/12",
+        border: "border-teal-400",
+      };
+    case "amber":
+      return {
+        hover: "hover:bg-amber-500/8",
+        active: "bg-amber-500/12",
+        border: "border-amber-400",
+      };
+    case "zinc":
+      return {
+        hover: "hover:bg-zinc-500/8",
+        active: "bg-zinc-500/12",
+        border: "border-zinc-400",
+      };
+    default:
+      return {
+        hover: "hover:bg-accent/50",
+        active: "bg-accent",
+        border: "border-primary",
+      };
+  }
+}
 
 function groupThreadsByTime(threads: ChatThread[]): {
   today: ChatThread[];
@@ -60,20 +120,28 @@ function groupThreadsByTime(threads: ChatThread[]): {
 interface FolderListProps {
   state: ChatState;
   activeThreadId: string | null;
+  activeRootFolderId: string | null;
+  activeFolderId?: string;
+  locale: CountryLanguage;
   onCreateThread: (folderId?: string | null) => void;
   onSelectThread: (threadId: string) => void;
   onDeleteThread: (threadId: string) => void;
   onMoveThread: (threadId: string, folderId: string | null) => void;
-  onCreateFolder: (name: string, parentId?: string | null) => void;
+  onCreateFolder: (name: string, parentId: string, icon?: string) => void;
   onUpdateFolder: (folderId: string, updates: Partial<ChatFolder>) => void;
   onDeleteFolder: (folderId: string, deleteThreads: boolean) => void;
   onToggleFolderExpanded: (folderId: string) => void;
+  onReorderFolder: (folderId: string, direction: "up" | "down") => void;
+  onMoveFolderToParent: (folderId: string, newParentId: string | null) => void;
   onUpdateThreadTitle: (threadId: string, title: string) => void;
 }
 
 export function FolderList({
   state,
   activeThreadId,
+  activeRootFolderId,
+  activeFolderId,
+  locale,
   onCreateThread,
   onSelectThread,
   onDeleteThread,
@@ -82,34 +150,160 @@ export function FolderList({
   onUpdateFolder,
   onDeleteFolder,
   onToggleFolderExpanded,
+  onReorderFolder,
+  onMoveFolderToParent,
   onUpdateThreadTitle,
 }: FolderListProps): JSX.Element {
+  const { t } = simpleT(locale);
+
+  // If no active root folder, show all root folders (fallback)
+  if (!activeRootFolderId) {
+    return (
+      <div className="space-y-1 py-2">
+        {state.rootFolderIds.map((folderId) => {
+          const folder = state.folders[folderId];
+          if (!folder) {
+            return null;
+          }
+
+          return (
+            <FolderItem
+              key={folder.id}
+              folder={folder}
+              state={state}
+              activeThreadId={activeThreadId}
+              activeFolderId={activeFolderId}
+              locale={locale}
+              onCreateThread={onCreateThread}
+              onSelectThread={onSelectThread}
+              onDeleteThread={onDeleteThread}
+              onMoveThread={onMoveThread}
+              onCreateFolder={onCreateFolder}
+              onUpdateFolder={onUpdateFolder}
+              onDeleteFolder={onDeleteFolder}
+              onToggleFolderExpanded={onToggleFolderExpanded}
+              onReorderFolder={onReorderFolder}
+              onMoveFolderToParent={onMoveFolderToParent}
+              onUpdateThreadTitle={onUpdateThreadTitle}
+            />
+          );
+        })}
+      </div>
+    );
+  }
+
+  // Get the active root folder
+  const activeRootFolder = state.folders[activeRootFolderId];
+  if (!activeRootFolder) {
+    return (
+      <div className="px-4 py-8 text-center text-sm text-muted-foreground">
+        {t("app.chat.folderList.folderNotFound")}
+      </div>
+    );
+  }
+
+  // Get direct children (subfolders) of the active root folder in the correct order
+  const childFolders = activeRootFolder.childrenIds
+    .map((id) => state.folders[id])
+    .filter((folder): folder is ChatFolder => folder !== undefined);
+
+  const childThreads = Object.values(state.threads).filter(
+    (thread) => thread.folderId === activeRootFolderId,
+  );
+
+  // Group threads by time
+  const groupedThreads = groupThreadsByTime(childThreads);
+
   return (
     <div className="space-y-1 py-2">
-      {state.rootFolderIds.map((folderId) => {
-        const folder = state.folders[folderId];
-        if (!folder) {
-          return null;
-        }
+      {/* Render child folders */}
+      {childFolders.map((folder) => (
+        <FolderItem
+          key={folder.id}
+          folder={folder}
+          state={state}
+          activeThreadId={activeThreadId}
+          activeFolderId={activeFolderId}
+          locale={locale}
+          onCreateThread={onCreateThread}
+          onSelectThread={onSelectThread}
+          onDeleteThread={onDeleteThread}
+          onMoveThread={onMoveThread}
+          onCreateFolder={onCreateFolder}
+          onUpdateFolder={onUpdateFolder}
+          onDeleteFolder={onDeleteFolder}
+          onToggleFolderExpanded={onToggleFolderExpanded}
+          onReorderFolder={onReorderFolder}
+          onMoveFolderToParent={onMoveFolderToParent}
+          onUpdateThreadTitle={onUpdateThreadTitle}
+        />
+      ))}
 
-        return (
-          <FolderItem
-            key={folder.id}
-            folder={folder}
-            state={state}
-            activeThreadId={activeThreadId}
-            onCreateThread={onCreateThread}
-            onSelectThread={onSelectThread}
-            onDeleteThread={onDeleteThread}
-            onMoveThread={onMoveThread}
-            onCreateFolder={onCreateFolder}
-            onUpdateFolder={onUpdateFolder}
-            onDeleteFolder={onDeleteFolder}
-            onToggleFolderExpanded={onToggleFolderExpanded}
-            onUpdateThreadTitle={onUpdateThreadTitle}
-          />
-        );
-      })}
+      {/* Render threads directly in the active root folder */}
+      {childThreads.length > 0 && (
+        <>
+          {groupedThreads.today.length > 0 && (
+            <div className="mt-4">
+              <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
+                {t("app.chat.folderList.today")}
+              </div>
+              <ThreadList
+                threads={groupedThreads.today}
+                activeThreadId={activeThreadId}
+                onSelectThread={onSelectThread}
+                onDeleteThread={onDeleteThread}
+                onUpdateTitle={onUpdateThreadTitle}
+                onMoveThread={onMoveThread}
+                state={state}
+                locale={locale}
+              />
+            </div>
+          )}
+
+          {groupedThreads.lastWeek.length > 0 && (
+            <div className="mt-4">
+              <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
+                {t("app.chat.folderList.lastWeek")}
+              </div>
+              <ThreadList
+                threads={groupedThreads.lastWeek}
+                activeThreadId={activeThreadId}
+                onSelectThread={onSelectThread}
+                onDeleteThread={onDeleteThread}
+                onUpdateTitle={onUpdateThreadTitle}
+                onMoveThread={onMoveThread}
+                state={state}
+                locale={locale}
+              />
+            </div>
+          )}
+
+          {groupedThreads.lastMonth.length > 0 && (
+            <div className="mt-4">
+              <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
+                {t("app.chat.folderList.lastMonth")}
+              </div>
+              <ThreadList
+                threads={groupedThreads.lastMonth}
+                activeThreadId={activeThreadId}
+                onSelectThread={onSelectThread}
+                onDeleteThread={onDeleteThread}
+                onUpdateTitle={onUpdateThreadTitle}
+                onMoveThread={onMoveThread}
+                state={state}
+                locale={locale}
+              />
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Empty state */}
+      {childFolders.length === 0 && childThreads.length === 0 && (
+        <div className="px-4 py-8 text-center text-sm text-muted-foreground">
+          {t("app.chat.folderList.emptyFolder")}
+        </div>
+      )}
     </div>
   );
 }
@@ -118,14 +312,18 @@ interface FolderItemProps {
   folder: ChatFolder;
   state: ChatState;
   activeThreadId: string | null;
+  activeFolderId?: string;
+  locale: CountryLanguage;
   onCreateThread: (folderId?: string | null) => void;
   onSelectThread: (threadId: string) => void;
   onDeleteThread: (threadId: string) => void;
   onMoveThread: (threadId: string, folderId: string | null) => void;
-  onCreateFolder: (name: string, parentId?: string | null) => void;
+  onCreateFolder: (name: string, parentId: string, icon?: string) => void;
   onUpdateFolder: (folderId: string, updates: Partial<ChatFolder>) => void;
   onDeleteFolder: (folderId: string, deleteThreads: boolean) => void;
   onToggleFolderExpanded: (folderId: string) => void;
+  onReorderFolder: (folderId: string, direction: "up" | "down") => void;
+  onMoveFolderToParent: (folderId: string, newParentId: string | null) => void;
   onUpdateThreadTitle: (threadId: string, title: string) => void;
   depth?: number;
 }
@@ -134,6 +332,8 @@ function FolderItem({
   folder,
   state,
   activeThreadId,
+  activeFolderId,
+  locale,
   onCreateThread,
   onSelectThread,
   onDeleteThread,
@@ -142,12 +342,17 @@ function FolderItem({
   onUpdateFolder,
   onDeleteFolder,
   onToggleFolderExpanded,
+  onReorderFolder,
+  onMoveFolderToParent,
   onUpdateThreadTitle,
   depth = 0,
 }: FolderItemProps): JSX.Element {
+  const router = useRouter();
+  const isTouch = useTouchDevice();
   const [isHovered, setIsHovered] = React.useState(false);
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const [renameDialogOpen, setRenameDialogOpen] = React.useState(false);
+  const [moveDialogOpen, setMoveDialogOpen] = React.useState(false);
 
   const threadsInFolder = useMemo(() => {
     return Object.values(state.threads)
@@ -159,12 +364,30 @@ function FolderItem({
     return groupThreadsByTime(threadsInFolder);
   }, [threadsInFolder]);
 
-  const handleDeleteFolder = () => {
+  const { t } = simpleT(locale);
+  const folderDisplayName = getFolderDisplayName(folder, locale);
+  const isDefault = isDefaultFolder(folder.id);
+  const directChildrenCount = getDirectChildrenCount(state, folder.id);
+
+  // Get root folder ID and color for styling
+  const rootFolderId = getRootFolderId(state, folder.id);
+  const rootFolderColor = getFolderColor(rootFolderId);
+  const colorClasses = getFolderColorClasses(rootFolderColor);
+
+  const handleDeleteFolder = (): void => {
+    // Cannot delete default folders
+    if (isDefault) {
+      return;
+    }
+
     setDropdownOpen(false);
     const hasThreads = threadsInFolder.length > 0;
     if (hasThreads) {
       const confirmed = window.confirm(
-        `Delete folder "${folder.name}" and move ${threadsInFolder.length} chat(s) to General?`,
+        t("app.chat.folderList.confirmDelete", {
+          folderName: folderDisplayName,
+          count: threadsInFolder.length,
+        }),
       );
       if (!confirmed) {
         return;
@@ -173,135 +396,209 @@ function FolderItem({
     onDeleteFolder(folder.id, false);
   };
 
-  const handleCreateSubfolder = () => {
+  const handleCreateSubfolder = (): void => {
     setDropdownOpen(false);
-    const name = window.prompt("Enter folder name:");
+    const name = window.prompt(t("app.chat.folderList.enterFolderName"));
     if (name) {
       onCreateFolder(name, folder.id);
     }
   };
 
-  const handleToggleExpanded = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleToggleExpanded = (e: React.MouseEvent): void => {
+    e.stopPropagation(); // Prevent folder navigation when clicking chevron
     onToggleFolderExpanded(folder.id);
   };
 
-  const handleCreateThreadInFolder = (e: React.MouseEvent) => {
+  const handleCreateThreadInFolder = (e: React.MouseEvent): void => {
     e.stopPropagation();
     onCreateThread(folder.id);
   };
 
-  const handleRenameFolder = () => {
+  const handleRenameFolder = (): void => {
     setDropdownOpen(false);
     setRenameDialogOpen(true);
   };
 
-  const handleSaveRename = (name: string, icon: string) => {
+  const handleSaveRename = (name: string, icon: IconValue): void => {
     onUpdateFolder(folder.id, { name, icon });
   };
 
-  const FolderIcon = getIconComponent(folder.icon || "folder");
+  const handleMoveUp = (): void => {
+    setDropdownOpen(false);
+    onReorderFolder(folder.id, "up");
+  };
 
-  return (
-    <div>
+  const handleMoveDown = (): void => {
+    setDropdownOpen(false);
+    onReorderFolder(folder.id, "down");
+  };
+
+  const handleMoveToFolder = (): void => {
+    setDropdownOpen(false);
+    setMoveDialogOpen(true);
+  };
+
+  const handleSaveMove = (targetFolderId: string | null): void => {
+    onMoveFolderToParent(folder.id, targetFolderId);
+  };
+
+  // Determine if move up/down should be disabled
+  const isRoot = folder.parentId === null;
+  const folderList = isRoot
+    ? state.rootFolderIds
+    : (folder.parentId && state.folders[folder.parentId]?.childrenIds) || [];
+  const currentIndex = folderList.indexOf(folder.id);
+  const canMoveUp = currentIndex > 0;
+  const canMoveDown = currentIndex < folderList.length - 1;
+
+  const folderIcon = getFolderIcon(folder);
+  const FolderIcon = getIconComponent(folderIcon);
+  const isActive = activeFolderId === folder.id;
+
+  // Handle folder click to navigate
+  const handleFolderClick = (e: React.MouseEvent<HTMLDivElement>): void => {
+    // Don't navigate if clicking on buttons
+    const target = e.target as HTMLElement;
+    if (target.closest("button")) {
+      return;
+    }
+
+    const url = buildFolderUrl(locale, folder.id, state);
+    router.push(url);
+  };
+
+  const folderHeaderContent = (
+    <div
+      className={cn(
+        "flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors min-h-[36px] cursor-pointer",
+        colorClasses.hover,
+        isActive && `${colorClasses.active} border-l-2 ${colorClasses.border}`,
+      )}
+      style={{ paddingLeft: `${depth * 12 + 8}px` }}
+      onClick={handleFolderClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        // Don't remove hover state if dropdown is open
+        if (!dropdownOpen) {
+          setIsHovered(false);
+        }
+      }}
+    >
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={handleToggleExpanded}
+        className="h-5 w-5 p-0 hover:bg-transparent flex-shrink-0"
+      >
+        {folder.expanded ? (
+          <ChevronDown className="h-4 w-4" />
+        ) : (
+          <ChevronRight className="h-4 w-4" />
+        )}
+      </Button>
+
+      <div className="flex items-center gap-2 flex-1 min-w-0">
+        <FolderIcon className="h-4 w-4 flex-shrink-0" />
+        <span className="text-sm font-medium truncate">
+          {folderDisplayName}
+        </span>
+        {/* eslint-disable i18next/no-literal-string -- Formatting characters for count display */}
+        <span className="text-xs text-muted-foreground flex-shrink-0">
+          ({directChildrenCount})
+        </span>
+        {/* eslint-enable i18next/no-literal-string */}
+      </div>
+
       <div
-        className="flex items-center gap-1 px-2 py-1.5 rounded-md hover:bg-accent/50 transition-colors min-h-[36px]"
-        style={{ paddingLeft: `${depth * 12 + 8}px` }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => {
-          // Don't remove hover state if dropdown is open
-          if (!dropdownOpen) {
-            setIsHovered(false);
-          }
+        className="flex items-center gap-1 flex-shrink-0"
+        style={{
+          width: isHovered || isTouch ? "auto" : "0px",
+          opacity: isHovered || isTouch ? 1 : 0,
+          overflow: "hidden",
         }}
+        onClick={(e): void => e.stopPropagation()}
       >
         <Button
           variant="ghost"
           size="icon"
-          onClick={handleToggleExpanded}
-          className="h-5 w-5 p-0 hover:bg-transparent flex-shrink-0"
+          onClick={handleCreateThreadInFolder}
+          className="h-6 w-6"
+          title={t("app.chat.folderList.newChatInFolder")}
         >
-          {folder.expanded ? (
-            <ChevronDown className="h-4 w-4" />
-          ) : (
-            <ChevronRight className="h-4 w-4" />
-          )}
+          <MessageSquarePlus className="h-3.5 w-3.5" />
         </Button>
 
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <FolderIcon className="h-4 w-4 flex-shrink-0" />
-          <span className="text-sm font-medium truncate">{folder.name}</span>
-          <span className="text-xs text-muted-foreground flex-shrink-0">
-            ({threadsInFolder.length})
-          </span>
-        </div>
-
-        <div
-          className="flex items-center gap-1 flex-shrink-0"
-          style={{
-            width: isHovered ? "auto" : "0px",
-            opacity: isHovered ? 1 : 0,
-            overflow: "hidden",
+        <DropdownMenu
+          open={dropdownOpen}
+          onOpenChange={(open) => {
+            setDropdownOpen(open);
+            // Reset hover state when dropdown closes
+            if (!open) {
+              setIsHovered(false);
+            }
           }}
-          onClick={(e) => e.stopPropagation()}
         >
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleCreateThreadInFolder}
-            className="h-6 w-6"
-            title="New chat in folder"
-          >
-            <FolderPlus className="h-3.5 w-3.5" />
-          </Button>
-
-          <DropdownMenu
-            open={dropdownOpen}
-            onOpenChange={(open) => {
-              setDropdownOpen(open);
-              // Reset hover state when dropdown closes
-              if (!open) {
-                setIsHovered(false);
-              }
-            }}
-          >
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDropdownOpen(true);
-                }}
-              >
-                <MoreVertical className="h-3.5 w-3.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              onClick={(e) => e.stopPropagation()}
-              onCloseAutoFocus={(e) => e.preventDefault()}
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={(e) => {
+                e.stopPropagation();
+                setDropdownOpen(true);
+              }}
             >
-              <DropdownMenuItem onSelect={handleRenameFolder}>
-                <Edit className="h-4 w-4 mr-2" />
-                Rename Folder
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={handleCreateSubfolder}>
-                <FolderPlus className="h-4 w-4 mr-2" />
-                New Subfolder
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onSelect={handleDeleteFolder}
-                className="text-destructive"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Folder
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+              <MoreVertical className="h-3.5 w-3.5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            onClick={(e) => e.stopPropagation()}
+            onCloseAutoFocus={(e) => e.preventDefault()}
+          >
+            {/* All folders can be reordered and have subfolders */}
+            <DropdownMenuItem onSelect={handleMoveUp} disabled={!canMoveUp}>
+              <ArrowUp className="h-4 w-4 mr-2" />
+              {t("app.chat.folderList.moveUp")}
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={handleMoveDown} disabled={!canMoveDown}>
+              <ArrowDown className="h-4 w-4 mr-2" />
+              {t("app.chat.folderList.moveDown")}
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={handleCreateSubfolder}>
+              <FolderPlus className="h-4 w-4 mr-2" />
+              {t("app.chat.folderList.newSubfolder")}
+            </DropdownMenuItem>
+
+            {/* Only custom folders can be renamed, moved, and deleted */}
+            {!isDefault && (
+              <>
+                <DropdownMenuItem onSelect={handleRenameFolder}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  {t("app.chat.folderList.renameFolder")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={handleMoveToFolder}>
+                  <FolderInput className="h-4 w-4 mr-2" />
+                  {t("app.chat.folderList.moveToFolder")}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={handleDeleteFolder}
+                  className="text-destructive"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  {t("app.chat.folderList.deleteFolder")}
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
+    </div>
+  );
+
+  return (
+    <div>
+      {folderHeaderContent}
 
       {folder.expanded && (
         <div>
@@ -318,6 +615,8 @@ function FolderItem({
                 folder={childFolder}
                 state={state}
                 activeThreadId={activeThreadId}
+                activeFolderId={activeFolderId}
+                locale={locale}
                 onCreateThread={onCreateThread}
                 onSelectThread={onSelectThread}
                 onDeleteThread={onDeleteThread}
@@ -326,6 +625,8 @@ function FolderItem({
                 onUpdateFolder={onUpdateFolder}
                 onDeleteFolder={onDeleteFolder}
                 onToggleFolderExpanded={onToggleFolderExpanded}
+                onReorderFolder={onReorderFolder}
+                onMoveFolderToParent={onMoveFolderToParent}
                 onUpdateThreadTitle={onUpdateThreadTitle}
                 depth={depth + 1}
               />
@@ -338,7 +639,7 @@ function FolderItem({
               {groupedThreads.today.length > 0 && (
                 <div className="mb-2">
                   <div className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
-                    Today
+                    {t("app.chat.folderList.today")}
                   </div>
                   <ThreadList
                     threads={groupedThreads.today}
@@ -348,6 +649,7 @@ function FolderItem({
                     onUpdateTitle={onUpdateThreadTitle}
                     onMoveThread={onMoveThread}
                     state={state}
+                    locale={locale}
                   />
                 </div>
               )}
@@ -355,7 +657,7 @@ function FolderItem({
               {groupedThreads.lastWeek.length > 0 && (
                 <div className="mb-2">
                   <div className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
-                    Last 7 Days
+                    {t("app.chat.folderList.lastWeek")}
                   </div>
                   <ThreadList
                     threads={groupedThreads.lastWeek}
@@ -365,6 +667,7 @@ function FolderItem({
                     onUpdateTitle={onUpdateThreadTitle}
                     onMoveThread={onMoveThread}
                     state={state}
+                    locale={locale}
                   />
                 </div>
               )}
@@ -372,7 +675,7 @@ function FolderItem({
               {groupedThreads.lastMonth.length > 0 && (
                 <div className="mb-2">
                   <div className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
-                    Last 30 Days
+                    {t("app.chat.folderList.lastMonth")}
                   </div>
                   <ThreadList
                     threads={groupedThreads.lastMonth}
@@ -382,6 +685,7 @@ function FolderItem({
                     onUpdateTitle={onUpdateThreadTitle}
                     onMoveThread={onMoveThread}
                     state={state}
+                    locale={locale}
                   />
                 </div>
               )}
@@ -393,9 +697,19 @@ function FolderItem({
       <RenameFolderDialog
         open={renameDialogOpen}
         onOpenChange={setRenameDialogOpen}
-        folderName={folder.name}
+        folderName={folderDisplayName}
         folderIcon={folder.icon || "folder"}
         onSave={handleSaveRename}
+        locale={locale}
+      />
+
+      <MoveFolderDialog
+        open={moveDialogOpen}
+        onOpenChange={setMoveDialogOpen}
+        folder={folder}
+        state={state}
+        onMove={handleSaveMove}
+        locale={locale}
       />
     </div>
   );

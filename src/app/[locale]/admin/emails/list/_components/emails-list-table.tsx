@@ -93,10 +93,10 @@ export function EmailsListTable({
       <div className="text-center py-8">
         <Mail className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
         <h3 className="text-lg font-medium text-muted-foreground mb-2">
-          {t("emails.admin.messages.noEmails")}
+          {t("app.admin.emails.list.admin.messages.noEmails")}
         </h3>
         <p className="text-sm text-muted-foreground">
-          {t("emails.admin.messages.noEmailsDescription")}
+          {t("app.admin.emails.list.admin.messages.noEmailsDescription")}
         </p>
       </div>
     );
@@ -107,12 +107,12 @@ export function EmailsListTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t("emails.admin.table.subject")}</TableHead>
-            <TableHead>{t("emails.admin.table.recipient")}</TableHead>
-            <TableHead>{t("emails.admin.table.status")}</TableHead>
-            <TableHead>{t("emails.admin.table.type")}</TableHead>
-            <TableHead>{t("emails.admin.table.sentAt")}</TableHead>
-            <TableHead>{t("emails.admin.table.actions")}</TableHead>
+            <TableHead>{t("app.admin.emails.list.admin.table.subject")}</TableHead>
+            <TableHead>{t("app.admin.emails.list.admin.table.recipient")}</TableHead>
+            <TableHead>{t("app.admin.emails.list.admin.table.status")}</TableHead>
+            <TableHead>{t("app.admin.emails.list.admin.table.type")}</TableHead>
+            <TableHead>{t("app.admin.emails.list.admin.table.sentAt")}</TableHead>
+            <TableHead>{t("app.admin.emails.list.admin.table.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

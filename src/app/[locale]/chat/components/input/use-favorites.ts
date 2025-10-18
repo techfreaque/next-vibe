@@ -1,14 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+
 /**
  * Hook for managing favorites in localStorage
  * @param storageKey - The localStorage key to use
  * @param defaultFavorites - Default favorites to use if none are stored
+ * @param logger - Optional logger instance
  * @returns Tuple of [favorites, toggleFavorite, setFavorites]
  */
 export function useFavorites<T extends string>(
   storageKey: string,
   defaultFavorites: T[],
+  logger: EndpointLogger,
 ): [T[], (id: T) => void, (favorites: T[]) => void] {
   const [favorites, setFavoritesState] = useState<T[]>(defaultFavorites);
   const [mounted, setMounted] = useState(false);
@@ -22,10 +26,14 @@ export function useFavorites<T extends string>(
         const parsed = JSON.parse(stored) as T[];
         setFavoritesState(parsed);
       } catch (error) {
-        console.error(`Failed to load favorites from ${storageKey}:`, error);
+        logger.error(
+          "Storage",
+          `Failed to load favorites from ${storageKey}`,
+          error,
+        );
       }
     }
-  }, [storageKey]);
+  }, [storageKey, logger]);
 
   // Save favorites to localStorage
   const setFavorites = useCallback(
@@ -35,11 +43,15 @@ export function useFavorites<T extends string>(
         try {
           localStorage.setItem(storageKey, JSON.stringify(newFavorites));
         } catch (error) {
-          console.error(`Failed to save favorites to ${storageKey}:`, error);
+          logger.error(
+            "Storage",
+            `Failed to save favorites to ${storageKey}`,
+            error,
+          );
         }
       }
     },
-    [storageKey, mounted],
+    [storageKey, mounted, logger],
   );
 
   // Toggle a favorite

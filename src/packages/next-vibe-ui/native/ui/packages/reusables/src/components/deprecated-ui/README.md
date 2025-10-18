@@ -1,6 +1,6 @@
 # Deprecated UI
 
-The first draft of components with little to no focus on the web which are now deprecated. The code remains for those who may still want to use them. 
+The first draft of components with little to no focus on the web which are now deprecated. The code remains for those who may still want to use them.
 
 #### Accordion
 
@@ -55,13 +55,11 @@ https://github.com/mrzachnugent/rn-ui-inspired-by-shadcn/assets/63797719/a5bf066
 
 #### Collapsible
 
-
 https://github.com/mrzachnugent/rn-ui-inspired-by-shadcn/assets/63797719/5e6de7cc-81e4-48d6-9b5d-ce2251c91609
 
 #### Command
 
 https://github.com/mrzachnugent/rn-ui-inspired-by-shadcn/assets/63797719/eb366b71-e225-4828-be15-1fab9b76ae7f
-
 
 #### Data Table
 
@@ -72,7 +70,6 @@ https://github.com/mrzachnugent/react-native-reusables/assets/63797719/ed4b39db-
 https://github.com/mrzachnugent/rn-ui-inspired-by-shadcn/assets/63797719/1feb89ed-c598-4eb3-b56c-fa30d2b49cfd
 
 #### Dialog
-
 
 https://github.com/mrzachnugent/rn-ui-inspired-by-shadcn/assets/63797719/190a8a96-34ad-4f5f-bd19-250c2749932f
 

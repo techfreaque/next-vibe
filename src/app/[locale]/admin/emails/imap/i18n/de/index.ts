@@ -1,54 +1,19 @@
-import type { translations as enTranslations } from "../en";
+import { translations as uiTranslations } from "../../_components/i18n/de";
+import { translations as accountsApiTranslations } from "../../accounts/i18n/de";
+import { translations as configApiTranslations } from "../../config/i18n/de";
+import { translations as foldersApiTranslations } from "../../folders/i18n/de";
+import { translations as overviewApiTranslations } from "../../overview/i18n/de";
+import { translations as syncApiTranslations } from "../../sync/i18n/de";
 
-export const translations: typeof enTranslations = {
-  post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
-    form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
-    },
-    response: {
-      title: "Antwort",
-      description: "Antwortdaten",
-    },
-    errors: {
-      unauthorized: {
-        title: "Nicht autorisiert",
-        description: "Authentifizierung erforderlich",
-      },
-      validation: {
-        title: "Validierungsfehler",
-        description: "Ungültige Anfrageparameter",
-      },
-      server: {
-        title: "Serverfehler",
-        description: "Interner Serverfehler",
-      },
-      unknown: {
-        title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist aufgetreten",
-      },
-      network: {
-        title: "Netzwerkfehler",
-        description: "Netzwerkfehler aufgetreten",
-      },
-      forbidden: {
-        title: "Verboten",
-        description: "Zugriff verboten",
-      },
-      notFound: {
-        title: "Nicht gefunden",
-        description: "Ressource nicht gefunden",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Datenkonflikt aufgetreten",
-      },
-    },
-    success: {
-      title: "Erfolg",
-      description: "Vorgang erfolgreich abgeschlossen",
-    },
+// Spread UI translations at the top level for component access (e.g., "imap.account.fields.name")
+// Nest API translations under "api" namespace to avoid conflicts
+export const translations = {
+  ...uiTranslations,
+  api: {
+    accounts: accountsApiTranslations,
+    config: configApiTranslations,
+    folders: foldersApiTranslations,
+    overview: overviewApiTranslations,
+    sync: syncApiTranslations,
   },
-};
+} as const;

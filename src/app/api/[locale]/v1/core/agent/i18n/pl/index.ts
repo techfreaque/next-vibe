@@ -1,9 +1,8 @@
 import { translations as chatTranslations } from "../../chat/i18n/pl";
 import { translations as speechToTextTranslations } from "../../speech-to-text/i18n/pl";
 import { translations as textToSpeechTranslations } from "../../text-to-speech/i18n/pl";
-import type { translations as enTranslations } from "../en";
 
-export const translations: typeof enTranslations = {
+export const translations = {
   category: "Agent",
   tags: {
     streaming: "Strumieniowanie",

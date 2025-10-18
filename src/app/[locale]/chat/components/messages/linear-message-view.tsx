@@ -9,6 +9,9 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React from "react";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { ModelId } from "../../lib/config/models";
 import { chatAnimations } from "../../lib/design-tokens";
 import { getBranchInfo } from "../../lib/storage/message-tree";
@@ -26,6 +29,8 @@ interface LinearMessageViewProps {
   selectedModel: ModelId;
   selectedTone: string;
   showBranchIndicators: boolean;
+  ttsAutoplay: boolean;
+  locale: CountryLanguage;
 
   // Action states
   editingMessageId: string | null;
@@ -49,6 +54,8 @@ interface LinearMessageViewProps {
   onCancelAction: () => void;
   onSaveEdit: (messageId: string, content: string) => Promise<void>;
   onBranchEdit: (messageId: string, content: string) => Promise<void>;
+
+  logger: EndpointLogger;
 }
 
 export function LinearMessageView({
@@ -57,13 +64,13 @@ export function LinearMessageView({
   selectedModel,
   selectedTone,
   showBranchIndicators,
+  ttsAutoplay,
+  locale,
   editingMessageId,
   retryingMessageId,
   answeringMessageId,
-  onEditMessage,
   onDeleteMessage,
   onSwitchBranch,
-  onBranchMessage,
   onRetryMessage,
   onAnswerAsModel,
   onModelChange,
@@ -74,6 +81,7 @@ export function LinearMessageView({
   onCancelAction,
   onSaveEdit,
   onBranchEdit,
+  logger,
 }: LinearMessageViewProps): JSX.Element {
   return (
     <>
@@ -97,49 +105,77 @@ export function LinearMessageView({
                   onModelChange={onModelChange}
                   onToneChange={onToneChange}
                   onBranch={onBranchEdit}
+                  locale={locale}
+                  logger={logger}
                 />
               </div>
             ) : isRetrying ? (
               <div className="flex justify-end">
                 <ModelPersonaSelectorModal
-                  title="Retry with Different Settings"
-                  description="Choose a model and persona to regenerate the response"
+                  titleKey="app.chat.linearMessageView.retryModal.title"
+                  descriptionKey="app.chat.linearMessageView.retryModal.description"
                   selectedModel={selectedModel}
                   selectedTone={selectedTone}
-                  onModelChange={onModelChange || (() => {})}
-                  onToneChange={onToneChange || (() => {})}
-                  onConfirm={() => {
+                  onModelChange={
+                    onModelChange ||
+                    ((): void => {
+                      /* no-op */
+                    })
+                  }
+                  onToneChange={
+                    onToneChange ||
+                    ((): void => {
+                      /* no-op */
+                    })
+                  }
+                  onConfirm={(): void => {
                     if (onRetryMessage) {
-                      onRetryMessage(message.id);
+                      void onRetryMessage(message.id);
                     }
                     onCancelAction();
                   }}
                   onCancel={onCancelAction}
-                  confirmLabel="Retry"
+                  confirmLabelKey="app.chat.linearMessageView.retryModal.confirmLabel"
+                  locale={locale}
+                  logger={logger}
                 />
               </div>
             ) : isAnswering ? (
               <ModelPersonaSelectorModal
-                title="Answer as AI Model"
-                description="Choose a model and persona to generate an AI response"
+                titleKey="app.chat.linearMessageView.answerModal.title"
+                descriptionKey="app.chat.linearMessageView.answerModal.description"
                 selectedModel={selectedModel}
                 selectedTone={selectedTone}
-                onModelChange={onModelChange || (() => {})}
-                onToneChange={onToneChange || (() => {})}
-                onConfirm={() => {
+                onModelChange={
+                  onModelChange ||
+                  ((): void => {
+                    /* no-op */
+                  })
+                }
+                onToneChange={
+                  onToneChange ||
+                  ((): void => {
+                    /* no-op */
+                  })
+                }
+                onConfirm={(): void => {
                   if (onAnswerAsModel) {
-                    onAnswerAsModel(message.id);
+                    void onAnswerAsModel(message.id);
                   }
                   onCancelAction();
                 }}
                 onCancel={onCancelAction}
-                confirmLabel="Generate"
+                confirmLabelKey="app.chat.linearMessageView.answerModal.confirmLabel"
+                locale={locale}
+                logger={logger}
               />
             ) : (
               <>
                 {message.role === "user" && (
                   <UserMessageBubble
                     message={message}
+                    locale={locale}
+                    logger={logger}
                     onBranch={onStartEdit}
                     onRetry={onStartRetry}
                     onDelete={onDeleteMessage}
@@ -149,9 +185,12 @@ export function LinearMessageView({
                 {message.role === "assistant" && (
                   <AssistantMessageBubble
                     message={message}
+                    ttsAutoplay={ttsAutoplay}
+                    locale={locale}
                     onAnswerAsModel={onStartAnswer}
                     onDelete={onDeleteMessage}
                     showAuthor={true}
+                    logger={logger}
                   />
                 )}
                 {message.role === "error" && (
@@ -166,7 +205,10 @@ export function LinearMessageView({
                   currentBranchIndex={branchInfo.currentBranchIndex}
                   totalBranches={branchInfo.branchCount}
                   branches={branchInfo.branches}
-                  onSwitchBranch={(index) => onSwitchBranch(message.id, index)}
+                  onSwitchBranch={(index): void =>
+                    onSwitchBranch(message.id, index)
+                  }
+                  locale={locale}
                 />
               </div>
             )}

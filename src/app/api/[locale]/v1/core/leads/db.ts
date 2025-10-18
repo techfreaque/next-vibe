@@ -59,6 +59,9 @@ export const leads = pgTable("leads", {
   country: countryEnum("country").notNull(),
   language: languageEnum("language").notNull(),
 
+  // IP tracking for free tier credits
+  ipAddress: text("ip_address"),
+
   // Lead qualification
   status: text("status", { enum: LeadStatusDB })
     .notNull()
@@ -226,6 +229,20 @@ export const leadEngagementsRelations = relations(
 );
 
 /**
+ * Lead Credits Table
+ * Tracks free tier credits for leads (20 credits per IP)
+ */
+export const leadCredits = pgTable("lead_credits", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  leadId: uuid("lead_id")
+    .notNull()
+    .references(() => leads.id, { onDelete: "cascade" }),
+  amount: integer("amount").notNull().default(20), // Free tier starts with 20
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+/**
  * Zod Schemas
  */
 export const selectLeadSchema = createSelectSchema(leads);
@@ -234,6 +251,8 @@ export const selectEmailCampaignSchema = createSelectSchema(emailCampaigns);
 export const insertEmailCampaignSchema = createInsertSchema(emailCampaigns);
 export const selectLeadEngagementSchema = createSelectSchema(leadEngagements);
 export const insertLeadEngagementSchema = createInsertSchema(leadEngagements);
+export const selectLeadCreditSchema = createSelectSchema(leadCredits);
+export const insertLeadCreditSchema = createInsertSchema(leadCredits);
 
 /**
  * Types
@@ -244,3 +263,5 @@ export type EmailCampaign = z.infer<typeof selectEmailCampaignSchema>;
 export type NewEmailCampaign = z.infer<typeof insertEmailCampaignSchema>;
 export type LeadEngagement = z.infer<typeof selectLeadEngagementSchema>;
 export type NewLeadEngagement = z.infer<typeof insertLeadEngagementSchema>;
+export type LeadCredit = z.infer<typeof selectLeadCreditSchema>;
+export type NewLeadCredit = z.infer<typeof insertLeadCreditSchema>;

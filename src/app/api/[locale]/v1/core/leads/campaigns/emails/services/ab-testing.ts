@@ -93,14 +93,10 @@ const JOURNEY_VARIANT_METADATA = {
  */
 const DEFAULT_AB_TEST_CONFIG: ABTestConfig = {
   name: "Email Journey A/B Test",
-  description: "Testing three different email journey approaches",
+  description: "Testing two different email journey approaches",
   isActive: true,
   startDate: new Date("2024-01-01"),
   variants: {
-    // [EmailJourneyVariant.PERSONAL_APPROACH]: {
-    //   weight: 33.33,
-    //   description: "Personal touch with relationship building",
-    // },
     [EmailJourneyVariant.RESULTS_FOCUSED]: {
       weight: 50,
       description: "Data-driven with case studies and metrics",
@@ -248,7 +244,7 @@ export function validateABTestConfig(config: ABTestConfig): {
   if (Math.abs(totalWeight - 100) > 0.01) {
     errors.push(
       createErrorResponse(
-        "app.api.errors.ab_test_total_weight_invalid",
+        "error.errorTypes.validation_error",
         ErrorResponseTypes.VALIDATION_ERROR,
         { totalWeight },
       ),
@@ -260,7 +256,7 @@ export function validateABTestConfig(config: ABTestConfig): {
     if (variantConfig.weight <= 0) {
       errors.push(
         createErrorResponse(
-          "app.api.errors.ab_test_variant_weight_invalid",
+          "error.errorTypes.validation_error",
           ErrorResponseTypes.VALIDATION_ERROR,
           { variant, weight: variantConfig.weight },
         ),

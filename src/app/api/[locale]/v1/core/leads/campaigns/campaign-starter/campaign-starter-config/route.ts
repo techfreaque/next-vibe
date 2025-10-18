@@ -5,6 +5,12 @@
 
 import "server-only";
 
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
+
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 
@@ -27,14 +33,14 @@ export const { GET, PUT, tools } = endpointsHandler({
       );
       // Wrap the response data in the expected structure
       if (result.success && result.data) {
-        return {
-          ...result,
-          data: {
-            response: result.data,
-          },
-        };
+        return createSuccessResponse({
+          response: result.data,
+        });
       }
-      return result;
+      return createErrorResponse(
+        "error.general.internal_server_error",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
     },
   },
   [Methods.PUT]: {
@@ -48,14 +54,14 @@ export const { GET, PUT, tools } = endpointsHandler({
       );
       // Wrap the response data in the expected structure
       if (result.success && result.data) {
-        return {
-          ...result,
-          data: {
-            response: result.data,
-          },
-        };
+        return createSuccessResponse({
+          response: result.data,
+        });
       }
-      return result;
+      return createErrorResponse(
+        "error.general.internal_server_error",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
     },
   },
 });

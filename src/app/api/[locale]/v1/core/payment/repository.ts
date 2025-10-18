@@ -676,6 +676,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
 
       // Handle different event types
       switch (event.type) {
+        case "checkout.session.completed":
+          await this.handleCheckoutSessionCompleted(event.data.object, logger);
+          break;
         case "payment_intent.succeeded":
           await this.handlePaymentSucceeded(event.data.object, logger);
           break;
@@ -683,7 +686,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
           await this.handlePaymentFailed(event.data.object, logger);
           break;
         case "invoice.payment_succeeded":
-          this.handleInvoicePaymentSucceeded(event.data.object, logger);
+          await this.handleInvoicePaymentSucceeded(event.data.object, logger);
           break;
         default:
           logger.debug("Unhandled webhook event type", {
@@ -750,14 +753,136 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     }
   }
 
-  private handleInvoicePaymentSucceeded(
+  private async handleInvoicePaymentSucceeded(
     invoice: Stripe.Invoice,
     logger: EndpointLogger,
-  ): void {
-    logger.debug("Invoice payment succeeded", {
-      invoiceId: invoice.id,
-    });
-    // Add invoice payment processing logic here if needed
+  ): Promise<void> {
+    try {
+      logger.debug("Invoice payment succeeded", {
+        invoiceId: invoice.id,
+        subscriptionId: invoice.subscription,
+      });
+
+      // Check if this is a subscription invoice
+      if (!invoice.subscription) {
+        logger.debug(
+          "Invoice is not for a subscription, skipping credit addition",
+        );
+        return;
+      }
+
+      // Get the subscription to find the user
+      const subscription = await getStripe().subscriptions.retrieve(
+        invoice.subscription as string,
+      );
+
+      const userId = subscription.metadata?.userId;
+      if (!userId) {
+        logger.error("No userId found in subscription metadata", {
+          subscriptionId: subscription.id,
+        });
+        return;
+      }
+
+      // Calculate expiry date (end of current billing period)
+      const expiresAt = subscription.current_period_end
+        ? new Date(subscription.current_period_end * 1000)
+        : undefined;
+
+      // Import credit repository dynamically to avoid circular dependencies
+      const { creditRepository } = await import(
+        "../agent/chat/credits/repository"
+      );
+
+      // Add 1000 expiring credits for the subscription
+      const result = await creditRepository.addCredits(
+        userId,
+        1000,
+        "subscription",
+        expiresAt,
+      );
+
+      if (!result.success) {
+        logger.error("Failed to add subscription credits", {
+          invoiceId: invoice.id,
+          userId,
+          error: result.message,
+        });
+        return;
+      }
+
+      logger.info("Subscription credits added successfully", {
+        invoiceId: invoice.id,
+        userId,
+        credits: 1000,
+        expiresAt: expiresAt?.toISOString(),
+      });
+    } catch (error) {
+      logger.error("Failed to process invoice payment succeeded", {
+        error: parseError(error),
+        invoiceId: invoice.id,
+      });
+    }
+  }
+
+  private async handleCheckoutSessionCompleted(
+    session: Stripe.Checkout.Session,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      logger.debug("Checkout session completed", {
+        sessionId: session.id,
+        metadata: session.metadata,
+      });
+
+      // Check if this is a credit pack purchase
+      if (session.metadata?.type === "credit_pack") {
+        const userId = session.metadata.userId;
+        const totalCredits = parseInt(session.metadata.totalCredits || "0", 10);
+
+        if (!userId || !totalCredits) {
+          logger.error("Invalid credit pack metadata", {
+            sessionId: session.id,
+            metadata: session.metadata,
+          });
+          return;
+        }
+
+        // Import credit repository dynamically to avoid circular dependencies
+        const { creditRepository } = await import(
+          "../agent/chat/credits/repository"
+        );
+
+        // Add permanent credits to user account
+        const result = await creditRepository.addCredits(
+          userId,
+          totalCredits,
+          "permanent",
+          undefined, // No expiry for permanent credits
+        );
+
+        if (!result.success) {
+          logger.error("Failed to add credits after purchase", {
+            sessionId: session.id,
+            userId,
+            totalCredits,
+            error: result.message,
+          });
+          return;
+        }
+
+        logger.info("Credits added successfully after purchase", {
+          sessionId: session.id,
+          userId,
+          totalCredits,
+        });
+      }
+    } catch (error) {
+      logger.error("Failed to process checkout session completed", {
+        error: parseError(error),
+        sessionId: session.id,
+      });
+    }
   }
 }
 

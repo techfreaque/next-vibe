@@ -96,7 +96,6 @@ export function useEndpointCreate<
 
   // Use the existing mutation form hook with enhanced options
   const formResult = useApiForm(
-    // @ts-ignore - Generic constraints are compatible, type system can't verify the complex relationship
     primaryEndpoint,
     logger,
     enhancedFormOptions,
@@ -117,10 +116,10 @@ export function useEndpointCreate<
   // If no URL parameters are needed, return the form result as-is
   if (!options.urlParams) {
     return formResult as ApiFormReturn<
-  TEndpoint["TRequestOutput"],
-  TEndpoint["TResponseOutput"],
-  TEndpoint["TUrlVariablesOutput"]
->;
+      TEndpoint["TRequestOutput"],
+      TEndpoint["TResponseOutput"],
+      TEndpoint["TUrlVariablesOutput"]
+    >;
   }
 
   // If URL parameters are provided, wrap the submitForm function to automatically include them

@@ -28,7 +28,6 @@ interface NavbarProps {
   user: StandardUserType | undefined;
   locale: CountryLanguage;
   isOnboardingComplete: boolean;
-  homePathName: "" | "/app/onboarding" | "/app/dashboard";
   navigationItems: NavItemType[];
 }
 
@@ -36,7 +35,6 @@ export function Navbar({
   user,
   locale,
   isOnboardingComplete,
-  homePathName,
   navigationItems,
 }: NavbarProps): JSX.Element {
   const { t } = simpleT(locale);
@@ -50,7 +48,7 @@ export function Navbar({
     >
       <div className="container flex h-16 md:h-20 items-center justify-between px-4 lg:px-6">
         <div className="flex items-center gap-2">
-          <Logo locale={locale} pathName={homePathName} />
+          <Logo locale={locale} pathName="" />
         </div>
 
         {/* Desktop Navigation */}

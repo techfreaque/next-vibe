@@ -149,7 +149,7 @@ function FolderTreeNode({
           <div className="text-center">
             <div className="font-medium">{folder.messageCount}</div>
             <div className="text-xs text-gray-500">
-              {t("imap.common.total")}
+              {t("app.admin.emails.imap.common.total")}
             </div>
           </div>
           {folder.unseenCount > 0 && (
@@ -158,7 +158,7 @@ function FolderTreeNode({
                 {folder.unseenCount}
               </Badge>
               <div className="text-xs text-gray-500">
-                {t("imap.common.unread")}
+                {t("app.admin.emails.imap.common.unread")}
               </div>
             </div>
           )}
@@ -168,7 +168,7 @@ function FolderTreeNode({
                 {folder.recentCount}
               </div>
               <div className="text-xs text-gray-500">
-                {t("imap.common.recent")}
+                {t("app.admin.emails.imap.common.recent")}
               </div>
             </div>
           )}
@@ -187,10 +187,10 @@ function FolderTreeNode({
         {/* Actions */}
         <div className="ml-4 flex items-center space-x-2">
           <Button variant="outline" size="sm" onClick={() => onSync(folder.id)}>
-            {t("imap.folder.actions.sync")}
+            {t("app.admin.emails.imap.folder.actions.sync")}
           </Button>
           <Button variant="outline" size="sm" onClick={() => onView(folder.id)}>
-            {t("imap.common.view")}
+            {t("app.admin.emails.imap.common.view")}
           </Button>
         </div>
       </div>
@@ -259,7 +259,7 @@ export function ImapFolderTree({
       isSelectable: folder.isSelectable,
       hasChildren: folder.hasChildren,
       syncStatus: folder.syncStatus,
-      lastSyncAt: folder.lastSyncAt || t("imap.common.never"),
+      lastSyncAt: folder.lastSyncAt || t("app.admin.emails.imap.common.never"),
       children: [], // Hierarchical structure will be implemented when folder nesting is required
     }));
   };
@@ -270,10 +270,10 @@ export function ImapFolderTree({
     return (
       <div className="border rounded-lg">
         <div className="bg-gray-50 px-4 py-3 border-b">
-          <h3 className="font-medium">{t("imap.admin.folders.title")}</h3>
+          <h3 className="font-medium">{t("app.admin.emails.imap.admin.folders.title")}</h3>
         </div>
         <div className="p-4 text-center text-gray-500">
-          {t("imap.common.loading")}
+          {t("app.admin.emails.imap.common.loading")}
         </div>
       </div>
     );
@@ -282,12 +282,12 @@ export function ImapFolderTree({
   return (
     <div className="border rounded-lg">
       <div className="bg-gray-50 px-4 py-3 border-b">
-        <h3 className="font-medium">{t("imap.admin.folders.title")}</h3>
+        <h3 className="font-medium">{t("app.admin.emails.imap.admin.folders.title")}</h3>
       </div>
       <div className="max-h-96 overflow-y-auto">
         {folderTree.length === 0 ? (
           <div className="p-4 text-center text-gray-500">
-            {t("imap.admin.folders.no_folders")}
+            {t("app.admin.emails.imap.admin.folders.no_folders")}
           </div>
         ) : (
           folderTree.map((folder: FolderNode) => (

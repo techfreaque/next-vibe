@@ -5,16 +5,19 @@
 
 "use client";
 
-import Image from "next/image";
+import { Loader2, Square, Volume2 } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
-import { useTranslation } from "@/i18n/core/client";
+import { Logo } from "@/app/[locale]/_components/nav/logo";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 import { Markdown } from "@/packages/next-vibe-ui/web/ui/markdown";
 
-import logo from "../../../_components/nav/bottled.ai-logo.png";
 import { useTouchDevice } from "../../hooks/use-touch-device";
+import { useTTSAudio } from "../../hooks/use-tts-audio";
 import type { ModelId } from "../../lib/config/models";
 import { getModelById } from "../../lib/config/models";
 import { getPersonaName } from "../../lib/config/personas";
@@ -35,6 +38,9 @@ interface FlatMessageViewProps {
   messages: ChatMessage[];
   selectedModel: ModelId;
   selectedTone: string;
+  ttsAutoplay: boolean;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
   onMessageClick?: (messageId: string) => void;
   onBranchMessage?: (messageId: string, newContent: string) => Promise<void>;
   onRetryMessage?: (messageId: string) => Promise<void>;
@@ -136,13 +142,19 @@ function renderContentWithReferences(
     // Add the reference as a clickable link
     const postNumber = parseInt(match[1], 10);
     const messageId = postNumberToMessageId[postNumber];
+
     parts.push(
       <button
         key={`ref-${key++}`}
-        onClick={() => messageId && onMessageClick?.(messageId)}
+        onClick={(): void => {
+          if (messageId) {
+            onMessageClick?.(messageId);
+          }
+        }}
         className="text-blue-400 hover:text-blue-300 hover:underline cursor-pointer"
       >
-        &gt;&gt;{postNumber}
+        {/* eslint-disable-next-line i18next/no-literal-string -- Technical 4chan-style reference syntax */}
+        {`>>${postNumber}`}
       </button>,
     );
 
@@ -166,11 +178,14 @@ function MessagePreview({
   message,
   shortId,
   position,
+  locale,
 }: {
   message: ChatMessage;
   shortId: string;
   position: { x: number; y: number };
+  locale: CountryLanguage;
 }): JSX.Element {
+  const { t } = simpleT(locale);
   const idColor = getIdColor(shortId);
   const isUser = message.role === "user";
 
@@ -197,7 +212,9 @@ function MessagePreview({
             isUser ? "text-green-400" : "text-blue-400",
           )}
         >
-          {isUser ? "You" : message.author?.name || "Assistant"}
+          {isUser
+            ? t("app.chat.flatView.youLabel")
+            : message.author?.name || t("app.chat.flatView.assistantFallback")}
         </span>
         <span
           className="px-1.5 py-0.5 rounded text-xs font-mono"
@@ -228,12 +245,15 @@ function UserIdHoverCard({
   messages,
   position,
   onPostClick,
+  locale,
 }: {
   userId: string;
   messages: ChatMessage[];
   position: { x: number; y: number };
   onPostClick?: (messageId: string) => void;
+  locale: CountryLanguage;
 }): JSX.Element {
+  const { t } = simpleT(locale);
   const userPosts = getPostsByUserId(messages, userId);
   const postCount = userPosts.length;
   const idColor = getIdColor(userId);
@@ -260,13 +280,15 @@ function UserIdHoverCard({
             backgroundColor: `${idColor}20`,
             color: idColor,
             borderColor: idColor,
+
             borderWidth: "1px",
           }}
         >
-          ID: {userId}
+          {/* eslint-disable-next-line i18next/no-literal-string -- Technical ID label */}
+          {`ID: ${userId}`}
         </span>
         <span className="text-xs text-muted-foreground font-medium">
-          {postCount} {postCount === 1 ? "post" : "posts"}
+          {t("app.chat.flatView.postsById", { count: postCount })}
         </span>
       </div>
 
@@ -277,11 +299,14 @@ function UserIdHoverCard({
           return (
             <button
               key={post.id}
-              onClick={() => onPostClick?.(postShortId)}
+              onClick={(): void => {
+                onPostClick?.(postShortId);
+              }}
               className="w-full text-left p-2 rounded hover:bg-accent/50 transition-colors"
             >
               <div className="text-xs text-muted-foreground mb-1">
-                Post #{idx + 1} • {format4chanTimestamp(post.timestamp)}
+                {/* eslint-disable-next-line i18next/no-literal-string -- Technical post number and separator */}
+                {`Post #${idx + 1} • ${format4chanTimestamp(post.timestamp, t)}`}
               </div>
               <div className="text-sm text-foreground/90 line-clamp-2">
                 {post.content.substring(0, 100)}
@@ -295,12 +320,58 @@ function UserIdHoverCard({
   );
 }
 
-export function FlatMessageView({
-  thread: _thread,
+/**
+ * Individual Flat Message Component with TTS support
+ */
+interface FlatMessageProps {
+  message: ChatMessage;
+  index: number;
+  postNum: number;
+  postNumberMap: Record<string, number>;
+  postNumberToMessageId: Record<number, string>;
+  messages: ChatMessage[];
+  selectedModel: ModelId;
+  selectedTone: string;
+  ttsAutoplay: boolean;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
+  messageActions: ReturnType<typeof useMessageActions>;
+  isTouch: boolean;
+  hoveredRef: string | null;
+  onSetHoveredRef: (
+    ref: string | null,
+    position: { x: number; y: number } | null,
+  ) => void;
+  onSetHoveredUserId: (
+    userId: string | null,
+    position: { x: number; y: number } | null,
+  ) => void;
+  onBranchMessage?: (messageId: string, newContent: string) => Promise<void>;
+  onRetryMessage?: (messageId: string) => Promise<void>;
+  onAnswerAsModel?: (messageId: string) => Promise<void>;
+  onDeleteMessage?: (messageId: string) => void;
+  onEditMessage?: (messageId: string, newContent: string) => Promise<void>;
+  onModelChange?: (model: ModelId) => void;
+  onToneChange?: (tone: string) => void;
+  onInsertQuote?: () => void;
+}
+
+function FlatMessage({
+  message,
+  postNum,
+  postNumberMap,
+  postNumberToMessageId,
   messages,
   selectedModel,
   selectedTone,
-  onMessageClick: _onMessageClick,
+  ttsAutoplay,
+  locale,
+  logger,
+  messageActions,
+  isTouch,
+  hoveredRef,
+  onSetHoveredRef,
+  onSetHoveredUserId,
   onBranchMessage,
   onRetryMessage,
   onAnswerAsModel,
@@ -309,8 +380,538 @@ export function FlatMessageView({
   onModelChange,
   onToneChange,
   onInsertQuote,
+}: FlatMessageProps): JSX.Element {
+  const { t } = simpleT(locale);
+
+  // TTS support for assistant messages
+  const {
+    isLoading: isTTSLoading,
+    isPlaying,
+    playAudio,
+    stopAudio,
+  } = useTTSAudio({
+    text: message.content,
+    enabled: message.role === "assistant" && ttsAutoplay,
+    locale,
+    logger,
+  });
+
+  // User ID logic
+  const userId =
+    message.role === "user"
+      ? message.author?.id || "local-user"
+      : message.role === "assistant" && message.model
+        ? message.model
+        : "assistant";
+
+  const idColor = getIdColor(userId);
+  const isUser = message.role === "user";
+  const isAssistant = message.role === "assistant";
+
+  // Get display names
+  const modelData =
+    message.role === "assistant" && message.model
+      ? getModelById(message.model)
+      : null;
+  const modelDisplayName =
+    modelData?.name || t("app.chat.flatView.assistantFallback");
+  const personaDisplayName =
+    (message.role === "user" || message.role === "assistant") && message.tone
+      ? getPersonaName(message.tone)
+      : t("app.chat.flatView.anonymous");
+
+  const displayName = isUser
+    ? t("app.chat.flatView.anonymous")
+    : modelDisplayName;
+
+  const references = extractReferences(message.content);
+  const replyCount = countReplies(messages, postNum);
+  const backlinks = getBacklinks(messages, postNum, postNumberMap);
+  const isHighlighted = hoveredRef === postNum.toString();
+  const directReplies = getDirectReplies(messages, message.id);
+
+  return (
+    <div
+      key={message.id}
+      id={`${postNum}`}
+      className={cn(
+        "group/post relative",
+        "p-3 mb-2 rounded",
+        "transition-all duration-150",
+        isHighlighted && "bg-blue-500/5",
+      )}
+    >
+      {/* Logo watermark for first message */}
+      {postNum === 1 && (
+        <div className="absolute top-3 right-3 pointer-events-none bg-background/60 backdrop-blur-xl rounded-md p-1.5 shadow-sm border border-border/10">
+          <Logo
+            className="h-auto w-auto max-w-[100px] opacity-70"
+            locale={locale}
+            pathName="/"
+          />
+        </div>
+      )}
+
+      {/* Post Header */}
+      <div className="flex items-center gap-2.5 mb-3 flex-wrap">
+        {/* Author Name with Model Icon */}
+        <span
+          className={cn(
+            "font-bold text-sm flex items-center gap-1.5",
+            isUser ? "text-green-400" : "text-blue-400",
+          )}
+        >
+          {/* Show model icon for AI messages */}
+          {!isUser &&
+            modelData &&
+            ((): JSX.Element | null => {
+              const ModelIcon = modelData.icon;
+              return typeof ModelIcon === "string" ? (
+                <span className="text-base leading-none">{ModelIcon}</span>
+              ) : (
+                <ModelIcon className="h-3.5 w-3.5" />
+              );
+            })()}
+          {displayName}
+        </span>
+
+        {/* ID Badge - Hoverable */}
+        <button
+          className="px-2 py-0.5 rounded text-xs font-mono font-semibold shadow-sm cursor-pointer hover:opacity-80 transition-opacity"
+          style={{
+            backgroundColor: `${idColor}15`,
+            color: idColor,
+            borderColor: `${idColor}40`,
+            borderWidth: "1px",
+          }}
+          onMouseEnter={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            onSetHoveredUserId(userId, {
+              x: rect.left + rect.width / 2,
+              y: rect.bottom,
+            });
+          }}
+          onMouseLeave={() => {
+            onSetHoveredUserId(null, null);
+          }}
+          title={t("app.chat.flatView.postsById", {
+            count: countPostsByUserId(messages, userId),
+          })}
+        >
+          {isUser
+            ? t("app.chat.flatView.idLabel", { id: userId.substring(0, 8) })
+            : personaDisplayName}
+        </button>
+
+        {/* Timestamp */}
+        <span className="text-muted-foreground/80 text-xs font-medium">
+          {format4chanTimestamp(message.timestamp, t)}
+        </span>
+
+        {/* Post Number */}
+        <button
+          className="text-blue-400 hover:text-blue-300 text-xs font-semibold cursor-pointer hover:underline"
+          onClick={(): void => {
+            void navigator.clipboard.writeText(`>>${postNum}`);
+          }}
+          title={t("app.chat.flatView.clickToCopyRef")}
+        >
+          {formatPostNumber(postNum, locale)}
+        </button>
+
+        {/* Reply count badge */}
+        {replyCount > 0 && (
+          <span className="px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 text-xs font-bold border border-blue-500/30">
+            {replyCount} {replyCount === 1 ? "reply" : "replies"}
+          </span>
+        )}
+
+        {/* Reply indicator - Arrow symbol is technical, not user-facing text */}
+
+        {references.length > 0 && (
+          // eslint-disable-next-line i18next/no-literal-string -- Technical arrow symbol for reply indicator
+          <span className="text-blue-400/60 text-xs">▶</span>
+        )}
+      </div>
+
+      {/* Replying To */}
+      {message.parentId &&
+        ((): JSX.Element | null => {
+          const parentMsg = messages.find((m) => m.id === message.parentId);
+          if (!parentMsg) {
+            return null;
+          }
+          const parentPostNum = postNumberMap[parentMsg.id];
+          return (
+            <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
+              <span>{t("app.chat.flatView.replyingTo")}</span>
+              <button
+                onClick={() => {
+                  const element = document.getElementById(`${parentPostNum}`);
+                  element?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  });
+                }}
+                onMouseEnter={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  onSetHoveredRef(parentPostNum.toString(), {
+                    x: rect.left + rect.width / 2,
+                    y: rect.top,
+                  });
+                }}
+                onMouseLeave={(): void => {
+                  onSetHoveredRef(null, null);
+                }}
+                className="text-blue-400 hover:text-blue-300 hover:underline font-semibold"
+              >
+                {/* eslint-disable-next-line i18next/no-literal-string -- Technical 4chan-style reference syntax */}
+                {`>>${parentPostNum}`}
+              </button>
+            </div>
+          );
+        })()}
+
+      {/* Message Content */}
+      {messageActions.editingMessageId === message.id ? (
+        <div className="my-2">
+          <MessageEditor
+            message={message}
+            selectedModel={selectedModel}
+            selectedTone={selectedTone}
+            onSave={
+              onEditMessage
+                ? (id, content): Promise<void> =>
+                    messageActions.handleSaveEdit(id, content, onEditMessage)
+                : async (): Promise<void> => {}
+            }
+            onCancel={messageActions.cancelAction}
+            onModelChange={onModelChange}
+            onToneChange={onToneChange}
+            onBranch={
+              onBranchMessage
+                ? (id, content): Promise<void> =>
+                    messageActions.handleBranchEdit(
+                      id,
+                      content,
+                      onBranchMessage,
+                    )
+                : undefined
+            }
+            locale={locale}
+            logger={logger}
+          />
+        </div>
+      ) : messageActions.retryingMessageId === message.id ? (
+        <div className="my-2">
+          <ModelPersonaSelectorModal
+            titleKey="app.chat.flatView.retryModal.title"
+            descriptionKey="app.chat.flatView.retryModal.description"
+            selectedModel={selectedModel}
+            selectedTone={selectedTone}
+            onModelChange={onModelChange || ((): void => {})}
+            onToneChange={onToneChange || ((): void => {})}
+            onConfirm={(): Promise<void> =>
+              messageActions.handleConfirmRetry(message.id, onRetryMessage)
+            }
+            onCancel={messageActions.cancelAction}
+            confirmLabelKey="app.chat.flatView.retryModal.confirmLabel"
+            locale={locale}
+            logger={logger}
+          />
+        </div>
+      ) : messageActions.answeringMessageId === message.id ? (
+        <div className="my-2">
+          <ModelPersonaSelectorModal
+            titleKey="app.chat.flatView.answerModal.title"
+            descriptionKey="app.chat.flatView.answerModal.description"
+            selectedModel={selectedModel}
+            selectedTone={selectedTone}
+            onModelChange={onModelChange || ((): void => {})}
+            onToneChange={onToneChange || ((): void => {})}
+            onConfirm={(): Promise<void> =>
+              messageActions.handleConfirmAnswer(message.id, onAnswerAsModel)
+            }
+            onCancel={messageActions.cancelAction}
+            confirmLabelKey="app.chat.flatView.answerModal.confirmLabel"
+            locale={locale}
+            logger={logger}
+          />
+        </div>
+      ) : (
+        <div
+          className={cn(
+            "text-sm leading-relaxed",
+            "p-3",
+            "rounded border transition-all duration-150",
+            isHighlighted
+              ? "border-blue-500/60 bg-blue-500/5"
+              : "border-border/30 hover:border-border/50",
+          )}
+        >
+          {isAssistant ? (
+            <div
+              className={cn(
+                "prose prose-sm dark:prose-invert max-w-none",
+                "prose-p:my-2 prose-p:leading-relaxed",
+                "prose-code:text-blue-400 prose-code:bg-blue-950/40 prose-code:px-1 prose-code:rounded",
+                "prose-pre:bg-black/60 prose-pre:border prose-pre:border-border/40 prose-pre:rounded-md",
+                "prose-headings:text-foreground prose-headings:font-bold",
+                "prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline",
+              )}
+            >
+              <Markdown content={message.content} />
+            </div>
+          ) : (
+            <div className="whitespace-pre-wrap break-words text-foreground/95">
+              {renderContentWithReferences(
+                message.content,
+                postNumberToMessageId,
+                (msgId): void => {
+                  const targetPostNum = postNumberMap[msgId];
+
+                  const element = document.getElementById(`${targetPostNum}`);
+                  element?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  });
+                },
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Backlinks */}
+      {backlinks.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
+          <span>{t("app.chat.flatView.replies")}</span>
+          {backlinks.map((backlinkPostNum, idx) => (
+            <button
+              key={idx}
+              onClick={(): void => {
+                const element = document.getElementById(`${backlinkPostNum}`);
+                element?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "center",
+                });
+              }}
+              onMouseEnter={(e): void => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                onSetHoveredRef(backlinkPostNum.toString(), {
+                  x: rect.left + rect.width / 2,
+                  y: rect.top,
+                });
+              }}
+              onMouseLeave={(): void => {
+                onSetHoveredRef(null, null);
+              }}
+              className="text-blue-400 hover:text-blue-300 hover:underline"
+            >
+              {/* eslint-disable-next-line i18next/no-literal-string -- Technical 4chan-style reference syntax */}
+              {`>>${backlinkPostNum}`}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Direct Replies */}
+      {directReplies.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-2 text-xs">
+          <span className="text-muted-foreground">
+            {t("app.chat.flatView.replies")}
+          </span>
+          {directReplies.map((reply) => {
+            const replyPostNum = postNumberMap[reply.id];
+            return (
+              <button
+                key={reply.id}
+                onClick={(): void => {
+                  const element = document.getElementById(`${replyPostNum}`);
+                  element?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  });
+                }}
+                onMouseEnter={(e): void => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  onSetHoveredRef(replyPostNum.toString(), {
+                    x: rect.left + rect.width / 2,
+                    y: rect.top,
+                  });
+                }}
+                onMouseLeave={(): void => {
+                  onSetHoveredRef(null, null);
+                }}
+                className="text-blue-400 hover:text-blue-300 hover:underline font-semibold"
+              >
+                {/* eslint-disable-next-line i18next/no-literal-string -- Technical 4chan-style reference syntax */}
+                {`>>${replyPostNum}`}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Post Actions - 4chan-style text links */}
+      {!messageActions.editingMessageId &&
+        !messageActions.retryingMessageId &&
+        !messageActions.answeringMessageId && (
+          <div
+            className={cn(
+              "mt-3 flex items-center gap-3 text-xs flex-wrap",
+              "transition-opacity duration-200",
+              isTouch
+                ? "opacity-70 active:opacity-100"
+                : "opacity-0 group-hover/post:opacity-100 focus-within:opacity-100",
+            )}
+          >
+            {/* TTS Play/Stop - For assistant messages */}
+            {isAssistant && (
+              <button
+                onClick={isPlaying ? stopAudio : (): void => void playAudio()}
+                disabled={isTTSLoading}
+                className={cn(
+                  "text-blue-400 hover:text-blue-300 hover:underline transition-colors flex items-center gap-1",
+                  isTTSLoading && "opacity-50 cursor-not-allowed",
+                )}
+                title={
+                  isTTSLoading
+                    ? t("app.chat.flatView.actions.loadingAudio")
+                    : isPlaying
+                      ? t("app.chat.flatView.actions.stopAudio")
+                      : t("app.chat.flatView.actions.playAudio")
+                }
+              >
+                {isTTSLoading ? (
+                  <Loader2 className="h-3 w-3 animate-spin inline" />
+                ) : isPlaying ? (
+                  <Square className="h-3 w-3 inline" />
+                ) : (
+                  <Volume2 className="h-3 w-3 inline" />
+                )}
+                <span>
+                  [
+                  {isPlaying
+                    ? t("app.chat.flatView.actions.stop")
+                    : t("app.chat.flatView.actions.play")}
+                  ]
+                </span>
+              </button>
+            )}
+
+            {/* Reply */}
+            {onBranchMessage && (
+              <button
+                onClick={(): void => {
+                  void onBranchMessage(message.id, "");
+                }}
+                className="text-blue-400 hover:text-blue-300 hover:underline transition-colors"
+                title={t("app.chat.flatView.actions.replyToMessage")}
+              >
+                [{t("app.chat.flatView.actions.reply")}]
+              </button>
+            )}
+
+            {/* Edit/Branch */}
+            {isUser && onBranchMessage && (
+              <button
+                onClick={(): void => {
+                  messageActions.startEdit(message.id);
+                }}
+                className="text-green-400 hover:text-green-300 hover:underline transition-colors"
+                title={t("app.chat.flatView.actions.editMessage")}
+              >
+                [{t("app.chat.flatView.actions.edit")}]
+              </button>
+            )}
+
+            {/* Retry */}
+            {isUser && onRetryMessage && (
+              <button
+                onClick={(): void => {
+                  messageActions.startRetry(message.id);
+                }}
+                className="text-yellow-400 hover:text-yellow-300 hover:underline transition-colors"
+                title={t("app.chat.flatView.actions.retryWithDifferent")}
+              >
+                [{t("app.chat.flatView.actions.retry")}]
+              </button>
+            )}
+
+            {/* Answer as AI - For both user and assistant messages */}
+            {onAnswerAsModel && (
+              <button
+                onClick={(): void => {
+                  messageActions.startAnswer(message.id);
+                }}
+                className="text-purple-400 hover:text-purple-300 hover:underline transition-colors"
+                title={
+                  isAssistant
+                    ? t("app.chat.threadedView.actions.respondToAI")
+                    : t("app.chat.flatView.actions.generateAIResponse")
+                }
+              >
+                [{t("app.chat.flatView.actions.answerAsAI")}]
+              </button>
+            )}
+
+            {/* Quote */}
+            {onInsertQuote && (
+              <button
+                onClick={onInsertQuote}
+                className="text-blue-400 hover:text-blue-300 hover:underline transition-colors"
+                title={t("app.chat.flatView.actions.insertQuote")}
+              >
+                [{t("app.chat.flatView.actions.insertQuote")}]
+              </button>
+            )}
+
+            {/* Copy Link */}
+            <button
+              onClick={(): void => {
+                void navigator.clipboard.writeText(`>>${postNum}`);
+              }}
+              className="text-muted-foreground hover:text-foreground hover:underline transition-colors"
+              title={t("app.chat.flatView.actions.copyReference")}
+            >
+              [{t("app.chat.flatView.actions.copyReference")}]
+            </button>
+
+            {/* Delete */}
+            {onDeleteMessage && (
+              <button
+                onClick={(): void => {
+                  onDeleteMessage(message.id);
+                }}
+                className="px-2 py-1 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-all"
+                title={t("app.chat.flatView.actions.deleteMessage")}
+              >
+                [{t("app.chat.flatView.actions.delete")}]
+              </button>
+            )}
+          </div>
+        )}
+    </div>
+  );
+}
+
+export function FlatMessageView({
+  messages,
+  selectedModel,
+  selectedTone,
+  ttsAutoplay,
+  locale,
+  logger,
+  onBranchMessage,
+  onRetryMessage,
+  onAnswerAsModel,
+  onDeleteMessage,
+  onEditMessage,
+  onModelChange,
+  onToneChange,
+  onInsertQuote: _onInsertQuote,
 }: FlatMessageViewProps): JSX.Element {
-  const { t } = useTranslation("chat");
   const [hoveredRef, setHoveredRef] = useState<string | null>(null);
   const [previewPosition, setPreviewPosition] = useState<{
     x: number;
@@ -323,7 +924,7 @@ export function FlatMessageView({
   } | null>(null);
 
   // Use message actions hook for edit/retry/answer states
-  const messageActions = useMessageActions();
+  const messageActions = useMessageActions(logger);
 
   // Detect touch device for proper action visibility
   const isTouch = useTouchDevice();
@@ -334,7 +935,7 @@ export function FlatMessageView({
   const postNumberToMessageId: Record<number, string> = {};
 
   messageIds.forEach((id) => {
-    const postNum = getPostNumber(id);
+    const postNum = getPostNumber(id, logger);
     postNumberMap[id] = postNum;
     postNumberToMessageId[postNum] = id;
   });
@@ -352,6 +953,7 @@ export function FlatMessageView({
           message={previewMessage}
           shortId={hoveredRef}
           position={previewPosition}
+          locale={locale}
         />
       )}
 
@@ -361,478 +963,50 @@ export function FlatMessageView({
           userId={hoveredUserId}
           messages={messages}
           position={userIdPosition}
-          onPostClick={(postId) => {
-            const element = document.getElementById(`msg-${postId}`);
+          locale={locale}
+          onPostClick={(postId): void => {
+            const element = document.getElementById(`${postId}`);
             element?.scrollIntoView({ behavior: "smooth", block: "center" });
             setHoveredUserId(null);
           }}
         />
       )}
 
-      {messages.map((message, index) => {
-        const postNum = postNumberMap[message.id];
-
-        // User ID logic:
-        // For user messages: use author.id if available, otherwise "local-user"
-        // For AI messages: use model ID as the "user" ID
-        const userId =
-          message.role === "user"
-            ? message.author?.id || "local-user"
-            : message.role === "assistant" && message.model
-              ? message.model
-              : "assistant";
-
-        const idColor = getIdColor(userId);
-        const isUser = message.role === "user";
-        const isAssistant = message.role === "assistant";
-
-        // Get display names
-        const modelDisplayName =
-          message.role === "assistant" && message.model
-            ? getModelById(message.model).name
-            : "Assistant";
-        const personaDisplayName =
-          (message.role === "user" || message.role === "assistant") &&
-          message.tone
-            ? getPersonaName(message.tone)
-            : "default";
-
-        // Display name logic (4chan style):
-        // User: "Anonymous" (like 4chan)
-        // AI: "ModelName" only (persona shown separately)
-        const displayName = isUser ? "Anonymous" : modelDisplayName;
-
-        const references = extractReferences(message.content);
-        const replyCount = countReplies(messages, postNum);
-        const backlinks = getBacklinks(messages, postNum, postNumberMap);
-        const isHighlighted = hoveredRef === postNum.toString();
-        const directReplies = getDirectReplies(messages, message.id);
-
-        return (
-          <div
-            key={message.id}
-            id={`msg-${postNum}`}
-            className={cn(
-              "group/post relative",
-              "p-3 mb-2 rounded",
-              "transition-all duration-150",
-              isHighlighted && "bg-blue-500/5",
-            )}
-          >
-            {/* Logo Watermark - Only on first message */}
-            {index === 0 && (
-              <div className="absolute top-2 right-2 opacity-30 hover:opacity-50 transition-opacity pointer-events-none">
-                <Image
-                  src={logo}
-                  alt="Logo"
-                  width={120}
-                  height={40}
-                  className="h-auto w-auto max-w-[120px]"
-                  priority
-                />
-              </div>
-            )}
-
-            {/* Post Header */}
-            <div className="flex items-center gap-2.5 mb-3 flex-wrap">
-              {/* Author Name - 4chan style: "Anonymous" for user, "ModelName" for AI */}
-              <span
-                className={cn(
-                  "font-bold text-sm",
-                  isUser ? "text-green-400" : "text-blue-400",
-                )}
-              >
-                {displayName}
-              </span>
-
-              {/* ID Badge - Hoverable */}
-              {/* For user: show user ID, For AI: show persona */}
-              <button
-                className="px-2 py-0.5 rounded text-xs font-mono font-semibold shadow-sm cursor-pointer hover:opacity-80 transition-opacity"
-                style={{
-                  backgroundColor: `${idColor}15`,
-                  color: idColor,
-                  borderColor: `${idColor}40`,
-                  borderWidth: "1px",
-                }}
-                onMouseEnter={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  setHoveredUserId(userId);
-                  setUserIdPosition({
-                    x: rect.left + rect.width / 2,
-                    y: rect.bottom,
-                  });
-                }}
-                onMouseLeave={() => {
-                  setHoveredUserId(null);
-                  setUserIdPosition(null);
-                }}
-                title={`${countPostsByUserId(messages, userId)} posts by this ID`}
-              >
-                {isUser ? `ID: ${userId.substring(0, 8)}` : personaDisplayName}
-              </button>
-
-              {/* Timestamp */}
-              <span className="text-muted-foreground/80 text-xs font-medium">
-                {format4chanTimestamp(message.timestamp)}
-              </span>
-
-              {/* Post Number */}
-              <button
-                className="text-blue-400 hover:text-blue-300 text-xs font-semibold cursor-pointer hover:underline"
-                onClick={() => {
-                  // Copy >>postNum to clipboard
-                  navigator.clipboard.writeText(`>>${postNum}`);
-                }}
-                title="Click to copy reference"
-              >
-                {formatPostNumber(postNum)}
-              </button>
-
-              {/* Reply count badge */}
-              {replyCount > 0 && (
-                <span className="px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 text-xs font-bold border border-blue-500/30">
-                  {replyCount} {replyCount === 1 ? "reply" : "replies"}
-                </span>
-              )}
-
-              {/* Reply indicator (if has references) */}
-              {references.length > 0 && (
-                <span className="text-blue-400/60 text-xs">▶</span>
-              )}
-            </div>
-
-            {/* Replying To (parent message) */}
-            {message.parentId &&
-              (() => {
-                const parentMsg = messages.find(
-                  (m) => m.id === message.parentId,
-                );
-                if (!parentMsg) {
-                  return null;
-                }
-                const parentPostNum = postNumberMap[parentMsg.id];
-                return (
-                  <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>Replying to:</span>
-                    <button
-                      onClick={() => {
-                        const element = document.getElementById(
-                          `msg-${parentPostNum}`,
-                        );
-                        element?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "center",
-                        });
-                      }}
-                      onMouseEnter={(e) => {
-                        setHoveredRef(parentPostNum.toString());
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        setPreviewPosition({
-                          x: rect.left + rect.width / 2,
-                          y: rect.top,
-                        });
-                      }}
-                      onMouseLeave={() => {
-                        setHoveredRef(null);
-                        setPreviewPosition(null);
-                      }}
-                      className="text-blue-400 hover:text-blue-300 hover:underline font-semibold"
-                    >
-                      &gt;&gt;{parentPostNum}
-                    </button>
-                  </div>
-                );
-              })()}
-
-            {/* Message Content - with edit/retry/answer states */}
-            {messageActions.editingMessageId === message.id ? (
-              // Editing state
-              <div className="my-2">
-                <MessageEditor
-                  message={message}
-                  selectedModel={selectedModel}
-                  selectedTone={selectedTone}
-                  onSave={
-                    onEditMessage
-                      ? (id, content) =>
-                          messageActions.handleSaveEdit(
-                            id,
-                            content,
-                            onEditMessage,
-                          )
-                      : async () => {}
-                  }
-                  onCancel={messageActions.cancelAction}
-                  onModelChange={onModelChange}
-                  onToneChange={onToneChange}
-                  onBranch={
-                    onBranchMessage
-                      ? (id, content) =>
-                          messageActions.handleBranchEdit(
-                            id,
-                            content,
-                            onBranchMessage,
-                          )
-                      : undefined
-                  }
-                />
-              </div>
-            ) : messageActions.retryingMessageId === message.id ? (
-              // Retrying state
-              <div className="my-2">
-                <ModelPersonaSelectorModal
-                  title="Retry with Different Settings"
-                  description="Choose a model and persona to regenerate the response"
-                  selectedModel={selectedModel}
-                  selectedTone={selectedTone}
-                  onModelChange={onModelChange || (() => {})}
-                  onToneChange={onToneChange || (() => {})}
-                  onConfirm={() =>
-                    messageActions.handleConfirmRetry(
-                      message.id,
-                      onRetryMessage,
-                    )
-                  }
-                  onCancel={messageActions.cancelAction}
-                  confirmLabel="Retry"
-                />
-              </div>
-            ) : messageActions.answeringMessageId === message.id ? (
-              // Answering state
-              <div className="my-2">
-                <ModelPersonaSelectorModal
-                  title="Answer as AI Model"
-                  description="Choose a model and persona to generate an AI response"
-                  selectedModel={selectedModel}
-                  selectedTone={selectedTone}
-                  onModelChange={onModelChange || (() => {})}
-                  onToneChange={onToneChange || (() => {})}
-                  onConfirm={() =>
-                    messageActions.handleConfirmAnswer(
-                      message.id,
-                      onAnswerAsModel,
-                    )
-                  }
-                  onCancel={messageActions.cancelAction}
-                  confirmLabel="Generate"
-                />
-              </div>
-            ) : (
-              // Normal display - 4chan style with border around message
-              <div
-                className={cn(
-                  "text-sm leading-relaxed",
-                  "p-3",
-                  "rounded border transition-all duration-150",
-                  isHighlighted
-                    ? "border-blue-500/60 bg-blue-500/5"
-                    : "border-border/30 hover:border-border/50",
-                )}
-              >
-                {isAssistant ? (
-                  <div
-                    className={cn(
-                      "prose prose-sm dark:prose-invert max-w-none",
-                      "prose-p:my-2 prose-p:leading-relaxed",
-                      "prose-code:text-blue-400 prose-code:bg-blue-950/40 prose-code:px-1 prose-code:rounded",
-                      "prose-pre:bg-black/60 prose-pre:border prose-pre:border-border/40 prose-pre:rounded-md",
-                      "prose-headings:text-foreground prose-headings:font-bold",
-                      "prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline",
-                    )}
-                  >
-                    <Markdown content={message.content} />
-                  </div>
-                ) : (
-                  <div className="whitespace-pre-wrap break-words text-foreground/95">
-                    {renderContentWithReferences(
-                      message.content,
-                      postNumberToMessageId,
-                      (msgId) => {
-                        const targetPostNum = postNumberMap[msgId];
-                        const element = document.getElementById(
-                          `msg-${targetPostNum}`,
-                        );
-                        element?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "center",
-                        });
-                      },
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Backlinks (posts that reply to this one) */}
-            {backlinks.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                <span>Replies:</span>
-                {backlinks.map((backlinkPostNum, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => {
-                      const element = document.getElementById(
-                        `msg-${backlinkPostNum}`,
-                      );
-                      element?.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center",
-                      });
-                    }}
-                    onMouseEnter={(e) => {
-                      setHoveredRef(backlinkPostNum.toString());
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      setPreviewPosition({
-                        x: rect.left + rect.width / 2,
-                        y: rect.top,
-                      });
-                    }}
-                    onMouseLeave={() => {
-                      setHoveredRef(null);
-                      setPreviewPosition(null);
-                    }}
-                    className="text-blue-400 hover:text-blue-300 hover:underline"
-                  >
-                    &gt;&gt;{backlinkPostNum}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Direct Replies (children in tree) - 4chan style with post numbers */}
-            {directReplies.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                <span className="text-muted-foreground">Replies:</span>
-                {directReplies.map((reply) => {
-                  const replyPostNum = postNumberMap[reply.id];
-                  return (
-                    <button
-                      key={reply.id}
-                      onClick={() => {
-                        const element = document.getElementById(
-                          `msg-${replyPostNum}`,
-                        );
-                        element?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "center",
-                        });
-                      }}
-                      onMouseEnter={(e) => {
-                        setHoveredRef(replyPostNum.toString());
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        setPreviewPosition({
-                          x: rect.left + rect.width / 2,
-                          y: rect.top,
-                        });
-                      }}
-                      onMouseLeave={() => {
-                        setHoveredRef(null);
-                        setPreviewPosition(null);
-                      }}
-                      className="text-blue-400 hover:text-blue-300 hover:underline font-semibold"
-                    >
-                      &gt;&gt;{replyPostNum}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Post Actions (4chan-style) - Simple text links */}
-            {!messageActions.editingMessageId &&
-              !messageActions.retryingMessageId &&
-              !messageActions.answeringMessageId && (
-                <div
-                  className={cn(
-                    "mt-3 flex items-center gap-3 text-xs flex-wrap",
-                    "transition-opacity duration-200",
-                    // Touch devices: always visible but slightly transparent
-                    // Pointer devices: hidden until hover
-                    isTouch
-                      ? "opacity-70 active:opacity-100"
-                      : "opacity-0 group-hover/post:opacity-100 focus-within:opacity-100",
-                  )}
-                >
-                  {/* Reply - Creates a branch from this message */}
-                  {onBranchMessage && (
-                    <button
-                      onClick={() => onBranchMessage(message.id, "")}
-                      className="text-blue-400 hover:text-blue-300 hover:underline transition-colors"
-                      title="Reply to this message (creates a branch)"
-                    >
-                      [Reply]
-                    </button>
-                  )}
-
-                  {/* Edit/Branch - For user messages */}
-                  {isUser && onBranchMessage && (
-                    <button
-                      onClick={() => messageActions.startEdit(message.id)}
-                      className="text-green-400 hover:text-green-300 hover:underline transition-colors"
-                      title="Edit this message (creates a branch)"
-                    >
-                      [Edit]
-                    </button>
-                  )}
-
-                  {/* Retry - For user messages */}
-                  {isUser && onRetryMessage && (
-                    <button
-                      onClick={() => messageActions.startRetry(message.id)}
-                      className="text-yellow-400 hover:text-yellow-300 hover:underline transition-colors"
-                      title="Retry with different model/tone"
-                    >
-                      [Retry]
-                    </button>
-                  )}
-
-                  {/* Answer as Model - For user messages */}
-                  {isUser && onAnswerAsModel && (
-                    <button
-                      onClick={() => messageActions.startAnswer(message.id)}
-                      className="text-purple-400 hover:text-purple-300 hover:underline transition-colors"
-                      title="Generate AI response"
-                    >
-                      [Answer as AI]
-                    </button>
-                  )}
-
-                  {/* Quote - Only inserts '>' character */}
-                  {onInsertQuote && (
-                    <button
-                      onClick={onInsertQuote}
-                      className="text-blue-400 hover:text-blue-300 hover:underline transition-colors"
-                      title="Insert quote character '>'"
-                    >
-                      [Quote]
-                    </button>
-                  )}
-
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(`>>${postNum}`);
-                    }}
-                    className="text-muted-foreground hover:text-foreground hover:underline transition-colors"
-                    title="Copy reference link"
-                  >
-                    [Copy Link]
-                  </button>
-
-                  {onDeleteMessage && (
-                    <button
-                      onClick={() => onDeleteMessage(message.id)}
-                      className="px-2 py-1 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-all"
-                      title={t("actions.deleteThisMessage")}
-                    >
-                      [Delete]
-                    </button>
-                  )}
-                </div>
-              )}
-          </div>
-        );
-      })}
+      {messages.map((message, index) => (
+        <FlatMessage
+          key={message.id}
+          message={message}
+          index={index}
+          postNum={postNumberMap[message.id]}
+          postNumberMap={postNumberMap}
+          postNumberToMessageId={postNumberToMessageId}
+          messages={messages}
+          selectedModel={selectedModel}
+          selectedTone={selectedTone}
+          ttsAutoplay={ttsAutoplay}
+          locale={locale}
+          logger={logger}
+          messageActions={messageActions}
+          isTouch={isTouch}
+          hoveredRef={hoveredRef}
+          onSetHoveredRef={(ref, pos) => {
+            setHoveredRef(ref);
+            setPreviewPosition(pos);
+          }}
+          onSetHoveredUserId={(userId, pos) => {
+            setHoveredUserId(userId);
+            setUserIdPosition(pos);
+          }}
+          onBranchMessage={onBranchMessage}
+          onRetryMessage={onRetryMessage}
+          onAnswerAsModel={onAnswerAsModel}
+          onDeleteMessage={onDeleteMessage}
+          onEditMessage={onEditMessage}
+          onModelChange={onModelChange}
+          onToneChange={onToneChange}
+          onInsertQuote={_onInsertQuote}
+        />
+      ))}
     </div>
   );
 }

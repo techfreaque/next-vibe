@@ -1,7 +1,8 @@
-import { translations as threadsIdTranslations } from "../../[id]/i18n/en";
-import { translations as threadsThreadIdMessagesTranslations } from "../../[threadId]/messages/i18n/en";
+import { translations as threadsThreadIdTranslations } from "../../[threadId]/i18n/en";
+import { translations as searchTranslations } from "../../search/i18n/en";
 
 export const translations = {
+  ...searchTranslations,
   get: {
     title: "List Chat Threads",
     description:
@@ -40,6 +41,18 @@ export const translations = {
       label: "Search",
       description: "Search threads by title or content",
       placeholder: "Search threads...",
+    },
+    isPinned: {
+      label: "Pinned Only",
+      description: "Filter to show only pinned threads",
+    },
+    dateFrom: {
+      label: "Date From",
+      description: "Filter threads created after this date",
+    },
+    dateTo: {
+      label: "Date To",
+      description: "Filter threads created before this date",
     },
     response: {
       title: "Thread List Response",
@@ -233,8 +246,5 @@ export const translations = {
       description: "Thread created successfully",
     },
   },
-  id: threadsIdTranslations,
-  threadId: {
-    messages: threadsThreadIdMessagesTranslations,
-  },
+  threadId: threadsThreadIdTranslations,
 };

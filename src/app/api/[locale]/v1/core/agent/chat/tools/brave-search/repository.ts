@@ -6,7 +6,7 @@
 import "server-only";
 
 import { tool } from "ai";
-import z from "zod";
+import { z } from "zod";
 
 import { env } from "@/config/env";
 
@@ -377,6 +377,11 @@ function getBraveSearchService(): BraveSearchService {
 }
 
 /**
+ * Freshness options for Brave Search
+ */
+const FRESHNESS_OPTIONS = ["pd", "pw", "pm", "py"] as const;
+
+/**
  * AI SDK Tool for Brave Search
  * Provides web search capability to AI agents
  */
@@ -388,7 +393,7 @@ Use this when:
 - Information might have changed recently
 - You need to verify facts or get up-to-date data
 - User explicitly asks you to search`,
-  parameters: z.object({
+  inputSchema: z.object({
     query: z.string().min(1).max(400).describe(
       // eslint-disable-next-line i18next/no-literal-string
       "Clear and specific search query. Use keywords rather than questions.",
@@ -405,7 +410,7 @@ Use this when:
       .optional()
       // eslint-disable-next-line i18next/no-literal-string
       .describe("Include news results for current events (default: false)"),
-    freshness: z.enum(["pd", "pw", "pm", "py"]).optional().describe(
+    freshness: z.enum(FRESHNESS_OPTIONS).optional().describe(
       // eslint-disable-next-line i18next/no-literal-string
       "Filter by freshness: pd (day), pw (week), pm (month), py (year)",
     ),

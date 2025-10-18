@@ -1,32 +1,30 @@
-import { useScrollToTop } from "@react-navigation/native";
-import { FlashList } from "@shopify/flash-list";
-import { Link } from "expo-router";
-import * as React from "react";
-import { View } from "react-native";
+import { useScrollToTop } from '@react-navigation/native';
+import { FlashList } from '@shopify/flash-list';
+import { Link } from 'expo-router';
+import * as React from 'react';
+import { View } from 'react-native';
 
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { Text } from "~/components/ui/text";
-import { COMPONENTS } from "~/lib/constants";
-import { ChevronRight } from "~/lib/icons/ChevronRight";
-import { cn } from "~/lib/utils";
+import { Button } from '~/components/ui/button';
+import { Input } from '~/components/ui/input';
+import { Text } from '~/components/ui/text';
+import { COMPONENTS } from '~/lib/constants';
+import { ChevronRight } from '~/lib/icons/ChevronRight';
+import { cn } from '~/lib/utils';
 
 export default function ComponentsScreen() {
-  const [search, setSearch] = React.useState("");
+  const [search, setSearch] = React.useState('');
   const ref = React.useRef(null);
   useScrollToTop(ref);
 
   const data = search
-    ? COMPONENTS.filter((item) =>
-        item.toLowerCase().includes(search.toLowerCase()),
-      )
+    ? COMPONENTS.filter((item) => item.toLowerCase().includes(search.toLowerCase()))
     : COMPONENTS;
   return (
-    <View className="flex-1 px-4">
-      <View className="py-4">
+    <View className='flex-1 px-4'>
+      <View className='py-4'>
         <Input
-          placeholder="Search UI..."
-          clearButtonMode="always"
+          placeholder='Search UI...'
+          clearButtonMode='always'
           value={search}
           onChangeText={setSearch}
         />
@@ -34,26 +32,26 @@ export default function ComponentsScreen() {
       <FlashList
         ref={ref}
         data={data}
-        className="native:overflow-hidden rounded-t-lg"
+        className='native:overflow-hidden rounded-t-lg'
         estimatedItemSize={49}
         showsVerticalScrollIndicator={false}
         renderItem={({ item, index }) => (
           <Link href={`/${item}`} asChild>
             <Button
-              variant="secondary"
-              size="lg"
+              variant='secondary'
+              size='lg'
               className={cn(
-                "bg-secondary/40 pl-4 pr-1.5 border-x border-t border-foreground/5 rounded-none flex-row justify-between",
-                index === 0 && "rounded-t-lg",
-                index === data.length - 1 && "border-b rounded-b-lg",
+                'bg-secondary/40 pl-4 pr-1.5 border-x border-t border-foreground/5 rounded-none flex-row justify-between',
+                index === 0 && 'rounded-t-lg',
+                index === data.length - 1 && 'border-b rounded-b-lg'
               )}
             >
-              <Text className="text-xl">{toOptions(item)}</Text>
-              <ChevronRight className="text-foreground/50" />
+              <Text className='text-xl'>{toOptions(item)}</Text>
+              <ChevronRight className='text-foreground/50' />
             </Button>
           </Link>
         )}
-        ListFooterComponent={<View className="py-4" />}
+        ListFooterComponent={<View className='py-4' />}
       />
     </View>
   );
@@ -61,8 +59,8 @@ export default function ComponentsScreen() {
 
 function toOptions(name: string) {
   const title = name
-    .split("-")
+    .split('-')
     .map((str: string) => str.replace(/\b\w/g, (char) => char.toUpperCase()))
-    .join(" ");
+    .join(' ');
   return title;
 }

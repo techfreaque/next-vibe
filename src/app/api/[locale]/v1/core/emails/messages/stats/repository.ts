@@ -96,10 +96,8 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
     const timePeriod = (data.timePeriod ?? TimePeriod.DAY) as TimePeriod;
     const dateRangePreset = (data.dateRangePreset ??
       DateRangePreset.LAST_30_DAYS) as DateRangePreset;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const type: EmailTypeFilter = (data.type ??
       EmailTypeFilter.ALL) as EmailTypeFilter;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const status: EmailStatusFilter = (data.status ??
       EmailStatusFilter.ALL) as EmailStatusFilter;
     const search: string | undefined = data.search as string | undefined;
@@ -129,7 +127,6 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
 
       // Status filtering
       if (status && status !== EmailStatusFilter.ALL) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         const mappedStatus = mapEmailStatusFilter(status);
         if (mappedStatus) {
           whereConditions.push(eq(emails.status, mappedStatus));
@@ -138,7 +135,6 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
 
       // Type filtering
       if (type && type !== EmailTypeFilter.ALL) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         const mappedType = mapEmailTypeFilter(type);
         if (mappedType) {
           whereConditions.push(eq(emails.type, mappedType));
@@ -159,7 +155,6 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         whereConditions.length > 0 ? and(...whereConditions) : undefined;
 
       // Generate comprehensive email statistics
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const [
         currentPeriodStats,
         historicalData,
@@ -176,12 +171,9 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         this.generateTopPerformingProviders(whereClause),
       ]);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const statsResponse: EmailStatsResponseType = {
         ...currentPeriodStats,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         historicalData,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         groupedStats,
         generatedAt: new Date().toISOString(),
         dataRange: {
@@ -190,24 +182,17 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
             new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
           to: dateRange?.to?.toISOString() || new Date().toISOString(),
         },
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         recentActivity,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         topPerformingTemplates,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         topPerformingProviders,
       };
 
       logger.debug("Email stats generated successfully", {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         totalEmails: statsResponse.totalEmails,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         sentEmails: statsResponse.sentEmails,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         deliveredEmails: statsResponse.deliveredEmails,
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       return createSuccessResponse({ stats: statsResponse });
     } catch (error) {
       logger.error("Error generating email stats", error);
@@ -945,7 +930,6 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       }
 
       return {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         type: activityType,
         id: email.id,
         recipientEmail: email.recipientEmail,
@@ -1024,7 +1008,6 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       );
 
     return providerStats.map((item) => ({
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       provider: (item.provider as EmailProvider) || EmailProvider.OTHER,
       emailsSent: item.totalEmails,
       deliveryRate:

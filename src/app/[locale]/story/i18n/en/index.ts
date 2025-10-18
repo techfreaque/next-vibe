@@ -1,52 +1,19 @@
+import { translations as componentsTranslations } from "../../_components/i18n/en";
+import { translations as aboutUsTranslations } from "../../about-us/i18n/en";
+import { translations as careersTranslations } from "../../careers/i18n/en";
+import { translations as imprintTranslations } from "../../imprint/i18n/en";
+import { translations as newsletterTranslations } from "../../newsletter/i18n/en";
+import { translations as pricingTranslations } from "../../pricing/i18n/en";
+import { translations as privacyPolicyTranslations } from "../../privacy-policy/i18n/en";
+import { translations as termsOfServiceTranslations } from "../../terms-of-service/i18n/en";
+
 export const translations = {
-  post: {
-    title: "(site)",
-    description: "(site) endpoint",
-    form: {
-      title: "(site) Configuration",
-      description: "Configure (site) parameters",
-    },
-    response: {
-      title: "Response",
-      description: "(site) response data",
-    },
-    errors: {
-      unauthorized: {
-        title: "Unauthorized",
-        description: "Authentication required",
-      },
-      validation: {
-        title: "Validation Error",
-        description: "Invalid request parameters",
-      },
-      server: {
-        title: "Server Error",
-        description: "Internal server error occurred",
-      },
-      unknown: {
-        title: "Unknown Error",
-        description: "An unknown error occurred",
-      },
-      network: {
-        title: "Network Error",
-        description: "Network error occurred",
-      },
-      forbidden: {
-        title: "Forbidden",
-        description: "Access forbidden",
-      },
-      notFound: {
-        title: "Not Found",
-        description: "Resource not found",
-      },
-      conflict: {
-        title: "Conflict",
-        description: "Data conflict occurred",
-      },
-    },
-    success: {
-      title: "Success",
-      description: "Operation completed successfully",
-    },
-  },
-};
+  aboutUs: aboutUsTranslations,
+  careers: careersTranslations,
+  components: componentsTranslations,
+  imprint: imprintTranslations,
+  newsletter: newsletterTranslations,
+  pricing: pricingTranslations,
+  privacyPolicy: privacyPolicyTranslations,
+  termsOfService: termsOfServiceTranslations,
+} as const;

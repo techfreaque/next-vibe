@@ -196,8 +196,8 @@ export default function PricingSection({
     if (!currentUser) {
       if (useHomePageLink) {
         window.location.href = `/${locale}/user/signup?plan=${planId}`;
-      } else if (!window.location.pathname.includes("/app/subscription")) {
-        window.location.href = `/${locale}/app/subscription`;
+      } else if (!window.location.pathname.includes("/subscription")) {
+        window.location.href = `/${locale}/subscription`;
       }
       return;
     }
@@ -205,8 +205,8 @@ export default function PricingSection({
     // If logged in but no subscription, redirect to subscription page for management
     if (!currentSubscription && useHomePageLink) {
       // Don't redirect if we're already on the subscription page
-      if (!window.location.pathname.includes("/app/subscription")) {
-        window.location.href = `/${locale}/app/subscription`;
+      if (!window.location.pathname.includes("/subscription")) {
+        window.location.href = `/${locale}/subscription`;
       }
       return;
     }

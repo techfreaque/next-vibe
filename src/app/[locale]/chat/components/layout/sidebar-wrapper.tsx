@@ -4,6 +4,11 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React from "react";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
+import { UI_CONFIG } from "../../lib/config/constants";
 import type {
   ChatFolder,
   ChatState,
@@ -14,16 +19,21 @@ import { ChatSidebar } from "../sidebar/chat-sidebar";
 interface SidebarWrapperProps {
   state: ChatState;
   activeThreadId: string | null;
+  activeFolderId?: string;
   collapsed: boolean;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
   onToggle: () => void;
   onCreateThread: (folderId?: string | null) => void;
   onSelectThread: (threadId: string) => void;
   onDeleteThread: (threadId: string) => void;
   onMoveThread: (threadId: string, folderId: string | null) => void;
-  onCreateFolder: (name: string, parentId?: string | null) => void;
+  onCreateFolder: (name: string, parentId: string, icon?: string) => string;
   onUpdateFolder: (folderId: string, updates: Partial<ChatFolder>) => void;
   onDeleteFolder: (folderId: string, deleteThreads: boolean) => void;
   onToggleFolderExpanded: (folderId: string) => void;
+  onReorderFolder: (folderId: string, direction: "up" | "down") => void;
+  onMoveFolderToParent: (folderId: string, newParentId: string | null) => void;
   onUpdateThreadTitle: (threadId: string, title: string) => void;
   searchThreads: (query: string) => ChatThread[];
 }
@@ -31,7 +41,10 @@ interface SidebarWrapperProps {
 export function SidebarWrapper({
   state,
   activeThreadId,
+  activeFolderId,
   collapsed,
+  locale,
+  logger,
   onToggle,
   onCreateThread,
   onSelectThread,
@@ -41,34 +54,85 @@ export function SidebarWrapper({
   onUpdateFolder,
   onDeleteFolder,
   onToggleFolderExpanded,
+  onReorderFolder,
+  onMoveFolderToParent,
   onUpdateThreadTitle,
   searchThreads,
 }: SidebarWrapperProps): JSX.Element {
+  const { t } = simpleT(locale);
+
+  // Detect if we're on mobile (window width < 768px)
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = (): void => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Check on mount
+    checkMobile();
+
+    // Check on resize
+    window.addEventListener("resize", checkMobile);
+    return (): void => {
+      window.removeEventListener("resize", checkMobile);
+    };
+  }, []);
+
+  // Wrap handlers to auto-collapse sidebar on mobile
+  const handleCreateThread = React.useCallback(
+    (folderId?: string | null) => {
+      onCreateThread(folderId);
+      // Auto-collapse sidebar on mobile after creating thread
+      if (isMobile && !collapsed) {
+        onToggle();
+      }
+    },
+    [onCreateThread, isMobile, collapsed, onToggle],
+  );
+
+  const handleSelectThread = React.useCallback(
+    (threadId: string) => {
+      onSelectThread(threadId);
+      // Auto-collapse sidebar on mobile after selecting thread
+      if (isMobile && !collapsed) {
+        onToggle();
+      }
+    },
+    [onSelectThread, isMobile, collapsed, onToggle],
+  );
+
   return (
     <>
       {/* Sidebar Container */}
       <div
+        suppressHydrationWarning
         className={cn(
           // Desktop: flexible width with smooth transition, z-10 to stay below input (z-20)
           "hidden md:block transition-all duration-200 ease-in-out overflow-hidden border-r border-border flex-shrink-0",
-          collapsed ? "w-0 border-r-0" : "w-64",
+          collapsed ? "w-0 border-r-0" : UI_CONFIG.SIDEBAR_WIDTH,
           // Mobile: fixed overlay with z-50 (same as top bar, above input z-20, above backdrop z-30)
           "md:relative md:z-10 fixed inset-y-0 left-0 z-50",
           !collapsed && "block",
         )}
       >
-        <div className="h-full w-64 bg-background">
+        <div className={`h-full ${UI_CONFIG.SIDEBAR_WIDTH} bg-background`}>
           <ChatSidebar
             state={state}
             activeThreadId={activeThreadId}
-            onCreateThread={onCreateThread}
-            onSelectThread={onSelectThread}
+            activeFolderId={activeFolderId}
+            locale={locale}
+            logger={logger}
+            onCreateThread={handleCreateThread}
+            onSelectThread={handleSelectThread}
             onDeleteThread={onDeleteThread}
             onMoveThread={onMoveThread}
             onCreateFolder={onCreateFolder}
             onUpdateFolder={onUpdateFolder}
             onDeleteFolder={onDeleteFolder}
             onToggleFolderExpanded={onToggleFolderExpanded}
+            onReorderFolder={onReorderFolder}
+            onMoveFolderToParent={onMoveFolderToParent}
             onUpdateThreadTitle={onUpdateThreadTitle}
             searchThreads={searchThreads}
           />
@@ -80,7 +144,7 @@ export function SidebarWrapper({
         <div
           className="md:hidden fixed inset-0 bg-black/50 z-30"
           onClick={onToggle}
-          aria-label="Close sidebar"
+          aria-label={t("app.chat.common.closeSidebar")}
         />
       )}
     </>

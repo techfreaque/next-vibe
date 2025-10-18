@@ -1,10 +1,10 @@
-import * as Slot from "@rn-primitives/slot";
-import * as React from "react";
-import type { GestureResponderEvent } from "react-native";
-import { Modal, Pressable, Text, View } from "react-native";
+import * as Slot from '@rn-primitives/slot';
+import * as React from 'react';
+import type { GestureResponderEvent } from 'react-native';
+import { Modal, Pressable, Text, View } from 'react-native';
 
-import { Button } from "../../components/deprecated-ui/button";
-import { cn } from "../../lib/utils";
+import { Button } from '../../components/deprecated-ui/button';
+import { cn } from '../../lib/utils';
 
 interface AlertDialogProps {
   children: React.ReactNode;
@@ -19,46 +19,33 @@ interface AlertDialogContext {
   closeOnOverlayPress: boolean;
 }
 
-const AlertDialogContext = React.createContext<AlertDialogContext>(
-  {} as AlertDialogContext,
-);
+const AlertDialogContext = React.createContext<AlertDialogContext>({} as AlertDialogContext);
 
 const AlertDialog = React.forwardRef<
   React.ElementRef<typeof View>,
   React.ComponentPropsWithoutRef<typeof View> & AlertDialogProps
->(
-  (
-    {
-      open,
-      setOpen,
-      closeOnOverlayPress = false,
-      defaultOpen = false,
-      ...props
-    },
-    ref,
-  ) => {
-    const [visible, setVisible] = React.useState(defaultOpen ?? false);
-    return (
-      <AlertDialogContext.Provider
-        value={{
-          visible: open ?? visible,
-          setVisible: setOpen ?? setVisible,
-          closeOnOverlayPress,
-        }}
-      >
-        <View ref={ref} {...props} />
-      </AlertDialogContext.Provider>
-    );
-  },
-);
+>(({ open, setOpen, closeOnOverlayPress = false, defaultOpen = false, ...props }, ref) => {
+  const [visible, setVisible] = React.useState(defaultOpen ?? false);
+  return (
+    <AlertDialogContext.Provider
+      value={{
+        visible: open ?? visible,
+        setVisible: setOpen ?? setVisible,
+        closeOnOverlayPress,
+      }}
+    >
+      <View ref={ref} {...props} />
+    </AlertDialogContext.Provider>
+  );
+});
 
-AlertDialog.displayName = "AlertDialog";
+AlertDialog.displayName = 'AlertDialog';
 
 function useAlertDialogContext() {
   const context = React.useContext(AlertDialogContext);
   if (!context) {
     throw new Error(
-      "AlertDialog compound components cannot be rendered outside the AlertDialog component",
+      'AlertDialog compound components cannot be rendered outside the AlertDialog component'
     );
   }
   return context;
@@ -80,70 +67,64 @@ const AlertDialogTrigger = React.forwardRef<
   return <Trigger ref={ref} onPress={handleOnPress} {...props} />;
 });
 
-AlertDialogTrigger.displayName = "AlertDialogTrigger";
+AlertDialogTrigger.displayName = 'AlertDialogTrigger';
 
 const AlertDialogContent = React.forwardRef<
   React.ElementRef<typeof Modal>,
   React.ComponentPropsWithoutRef<typeof Modal> & { overlayClass?: string }
->(
-  (
-    { className, children, animationType = "fade", overlayClass, ...props },
-    ref,
-  ) => {
-    const { visible, setVisible, closeOnOverlayPress } =
-      useAlertDialogContext();
+>(({ className, children, animationType = 'fade', overlayClass, ...props }, ref) => {
+  const { visible, setVisible, closeOnOverlayPress } = useAlertDialogContext();
 
-    return (
-      <Modal
-        ref={ref}
-        animationType={animationType}
-        transparent={true}
-        visible={visible}
-        onRequestClose={() => {
-          setVisible((prev) => !prev);
-        }}
-        statusBarTranslucent
-        {...props}
+  return (
+    <Modal
+      ref={ref}
+      animationType={animationType}
+      transparent={true}
+      visible={visible}
+      onRequestClose={() => {
+        setVisible((prev) => !prev);
+      }}
+      statusBarTranslucent
+      {...props}
+    >
+      <Pressable
+        onPressOut={
+          closeOnOverlayPress
+            ? () => {
+                setVisible(false);
+              }
+            : undefined
+        }
+        className={cn(
+          'flex-1  justify-center items-center p-2',
+          animationType !== 'slide' && 'bg-zinc-50/80 dark:bg-zinc-900/80',
+          overlayClass
+        )}
       >
         <Pressable
-          onPressOut={
-            closeOnOverlayPress
-              ? () => {
-                  setVisible(false);
-                }
-              : undefined
-          }
           className={cn(
-            "flex-1  justify-center items-center p-2",
-            animationType !== "slide" && "bg-zinc-50/80 dark:bg-zinc-900/80",
-            overlayClass,
+            'bg-background rounded-2xl p-8 border border-border shadow-lg shadow-foreground/5',
+            className
           )}
+          role={'alertdialog'}
         >
-          <Pressable
-            className={cn(
-              "bg-background rounded-2xl p-8 border border-border shadow-lg shadow-foreground/5",
-              className,
-            )}
-            role={"alertdialog"}
-          >
-            {children}
-          </Pressable>
+          {children}
         </Pressable>
-      </Modal>
-    );
-  },
-);
+      </Pressable>
+    </Modal>
+  );
+});
 
-AlertDialogContent.displayName = "AlertDialogContent";
+AlertDialogContent.displayName = 'AlertDialogContent';
 
 const AlertDialogHeader = React.forwardRef<
   React.ElementRef<typeof View>,
   React.ComponentPropsWithoutRef<typeof View>
 >(({ className, ...props }, ref) => {
-  return <View className={cn("gap-2", className)} ref={ref} {...props} />;
+  return <View className={cn('gap-2', className)} ref={ref} {...props} />;
 });
 
-AlertDialogHeader.displayName = "AlertDialogHeader";
+AlertDialogHeader.displayName = 'AlertDialogHeader';
 
 const AlertDialogTitle = React.forwardRef<
   React.ElementRef<typeof Text>,
@@ -151,52 +132,40 @@ const AlertDialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => {
   return (
     <Text
-      className={cn("text-xl text-foreground font-semibold", className)}
+      className={cn('text-xl text-foreground font-semibold', className)}
       ref={ref}
-      role="heading"
+      role='heading'
       {...props}
     />
   );
 });
 
-AlertDialogTitle.displayName = "AlertDialogTitle";
+AlertDialogTitle.displayName = 'AlertDialogTitle';
 
 const AlertDialogDescription = React.forwardRef<
   React.ElementRef<typeof Text>,
   React.ComponentPropsWithoutRef<typeof Text>
 >(({ className, ...props }, ref) => {
-  return (
-    <Text
-      className={cn("text-lg text-muted-foreground", className)}
-      ref={ref}
-      {...props}
-    />
-  );
+  return <Text className={cn('text-lg text-muted-foreground', className)} ref={ref} {...props} />;
 });
 
-AlertDialogDescription.displayName = "AlertDialogDescription";
+AlertDialogDescription.displayName = 'AlertDialogDescription';
 
 const AlertDialogFooter = React.forwardRef<
   React.ElementRef<typeof View>,
   React.ComponentPropsWithoutRef<typeof View>
 >(({ className, ...props }, ref) => {
-  return (
-    <View
-      className={cn("flex-row justify-end gap-3 pt-8", className)}
-      ref={ref}
-      {...props}
-    />
-  );
+  return <View className={cn('flex-row justify-end gap-3 pt-8', className)} ref={ref} {...props} />;
 });
 
-AlertDialogFooter.displayName = "AlertDialogFooter";
+AlertDialogFooter.displayName = 'AlertDialogFooter';
 
 const AlertDialogCancel = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentPropsWithoutRef<typeof Button> & {
     asChild?: boolean;
   }
->(({ variant = "outline", asChild = false, ...props }, ref) => {
+>(({ variant = 'outline', asChild = false, ...props }, ref) => {
   const { setVisible } = useAlertDialogContext();
   const Trigger = asChild ? Slot.Pressable : Button;
   return (
@@ -211,13 +180,13 @@ const AlertDialogCancel = React.forwardRef<
   );
 });
 
-AlertDialogCancel.displayName = "AlertDialogCancel";
+AlertDialogCancel.displayName = 'AlertDialogCancel';
 
 type ButtonProps = React.ComponentPropsWithoutRef<typeof Button>;
 
 const AlertDialogAction = React.forwardRef<
   React.ElementRef<typeof Pressable>,
-  Omit<ButtonProps, "onPress"> & {
+  Omit<ButtonProps, 'onPress'> & {
     asChild?: boolean;
     onPress?:
       | ((event: GestureResponderEvent) => void)
@@ -234,7 +203,7 @@ const AlertDialogAction = React.forwardRef<
   return <Trigger onPress={onPressAction} ref={ref} {...props} />;
 });
 
-AlertDialogAction.displayName = "AlertDialogAction";
+AlertDialogAction.displayName = 'AlertDialogAction';
 
 export {
   AlertDialog,

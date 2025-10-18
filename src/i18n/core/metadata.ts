@@ -41,8 +41,8 @@ export interface MetadataConfig {
     index?: boolean;
     follow?: boolean;
     googleBot?: {
-      "index"?: boolean;
-      "follow"?: boolean;
+      index?: boolean;
+      follow?: boolean;
       "max-image-preview"?: "none" | "standard" | "large";
       "max-snippet"?: number;
     };

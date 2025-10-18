@@ -5,6 +5,9 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 import { Button } from "@/packages/next-vibe-ui/web/ui";
 
 import { useEdenAISpeech } from "../../hooks/use-eden-ai-speech";
@@ -13,51 +16,50 @@ interface SpeechInputButtonProps {
   onTranscript: (text: string) => void;
   disabled?: boolean;
   lang?: string;
-  locale?: string;
+  locale: CountryLanguage;
   className?: string;
+  logger: EndpointLogger;
 }
 
 export function SpeechInputButton({
   onTranscript,
   disabled = false,
   lang = "en-US",
-  locale = "en",
+  locale,
   className,
+  logger,
 }: SpeechInputButtonProps): JSX.Element {
+  const { t } = simpleT(locale);
   const [displayError, setDisplayError] = useState<string | null>(null);
 
-  const {
-    isRecording,
-    isProcessing,
-    toggleRecording,
-    error,
-    transcript,
-  } = useEdenAISpeech({
-    onTranscript,
-    onError: (err) => {
-      console.error("Speech recognition error:", err);
-    },
-    lang,
-    locale,
-  });
+  const { isRecording, isProcessing, toggleRecording, error, transcript } =
+    useEdenAISpeech({
+      onTranscript,
+      onError: (err) => {
+        logger.error("app.chat.speech.error", err);
+      },
+      lang,
+      locale,
+      logger,
+    });
 
   // Auto-clear error after 5 seconds
   useEffect(() => {
     if (error) {
       setDisplayError(error);
-      const timer = setTimeout(() => {
+      const timer = setTimeout((): void => {
         setDisplayError(null);
       }, 5000);
-      return () => clearTimeout(timer);
+      return (): void => clearTimeout(timer);
     }
   }, [error]);
 
   // Log transcript changes
   useEffect(() => {
     if (transcript) {
-      console.log(`[Speech Button] Received transcript: "${transcript}"`);
+      logger.debug("app.chat.speech.transcript", { transcript });
     }
-  }, [transcript]);
+  }, [transcript, logger]);
 
   const isActive = isRecording || isProcessing;
   const isDisabled = disabled || isProcessing;
@@ -77,10 +79,10 @@ export function SpeechInputButton({
         )}
         title={
           isRecording
-            ? "Stop recording"
+            ? t("app.chat.input.speechInput.stopRecording")
             : isProcessing
-              ? "Processing..."
-              : "Start voice input (Click to speak)"
+              ? t("app.chat.input.speechInput.processing")
+              : t("app.chat.input.speechInput.startVoiceInput")
         }
       >
         {isProcessing ? (
@@ -98,7 +100,7 @@ export function SpeechInputButton({
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-destructive rounded-full animate-pulse" />
             <span className="text-xs font-medium text-foreground">
-              Recording... Click to stop
+              {t("app.chat.input.speechInput.recordingClickToStop")}
             </span>
           </div>
         </div>
@@ -110,7 +112,7 @@ export function SpeechInputButton({
           <div className="flex items-center gap-2">
             <Loader2 className="w-3 h-3 animate-spin text-primary" />
             <span className="text-xs font-medium text-foreground">
-              Transcribing...
+              {t("app.chat.input.speechInput.transcribing")}
             </span>
           </div>
         </div>

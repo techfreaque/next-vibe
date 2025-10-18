@@ -1,27 +1,36 @@
 "use client";
 
 import {
+  ArrowBigDown,
   ArrowBigUp,
   ChevronDown,
   ChevronRight,
   CornerDownRight,
+  Loader2,
   MessageSquare,
   Share2,
+  Square,
+  Volume2,
 } from "lucide-react";
-import Image from "next/image";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
+import { Logo } from "@/app/[locale]/_components/nav/logo";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 import { Markdown } from "@/packages/next-vibe-ui/web/ui/markdown";
 
-import logo from "../../../_components/nav/bottled.ai-logo.png";
 import { useTouchDevice } from "../../hooks/use-touch-device";
+import { useTTSAudio } from "../../hooks/use-tts-audio";
+import { LAYOUT } from "../../lib/config/constants";
 import type { ModelId } from "../../lib/config/models";
 import { getModelById } from "../../lib/config/models";
 import { getPersonaName } from "../../lib/config/personas";
 import { chatAnimations } from "../../lib/design-tokens";
 import type { ChatMessage } from "../../lib/storage/types";
+import { getVoteStatus } from "../../lib/utils/message-votes";
 import { getDirectReplies } from "../../lib/utils/thread-builder";
 import { ErrorMessageBubble } from "./error-message-bubble";
 import { MessageEditor } from "./message-editor";
@@ -36,11 +45,15 @@ interface ThreadedMessageProps {
   depth: number;
   selectedModel: ModelId;
   selectedTone: string;
+  ttsAutoplay: boolean;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
   onEditMessage: (messageId: string, newContent: string) => Promise<void>;
   onDeleteMessage: (messageId: string) => void;
   onBranchMessage?: (messageId: string, newContent: string) => Promise<void>;
   onRetryMessage?: (messageId: string) => Promise<void>;
   onAnswerAsModel?: (messageId: string) => Promise<void>;
+  onVoteMessage?: (messageId: string, vote: 1 | -1 | 0) => void;
   onModelChange?: (model: ModelId) => void;
   onToneChange?: (tone: string) => void;
   maxDepth?: number;
@@ -53,15 +66,20 @@ export function ThreadedMessage({
   depth,
   selectedModel,
   selectedTone,
+  ttsAutoplay,
+  locale,
+  logger,
   onEditMessage,
   onDeleteMessage,
   onBranchMessage,
   onRetryMessage,
   onAnswerAsModel,
+  onVoteMessage,
   onModelChange,
   onToneChange,
-  maxDepth = 8,
+  maxDepth = LAYOUT.MAX_THREAD_DEPTH,
 }: ThreadedMessageProps): JSX.Element {
+  const { t } = simpleT(locale);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showDeepReplies, setShowDeepReplies] = useState(false);
   const [hoveredUserId, setHoveredUserId] = useState<string | null>(null);
@@ -71,26 +89,45 @@ export function ThreadedMessage({
   } | null>(null);
 
   // Use custom hook for message action state management
-  const messageActions = useMessageActions();
+  const messageActions = useMessageActions(logger);
 
   // Detect touch device for proper action visibility
   const isTouch = useTouchDevice();
+
+  // TTS support for assistant messages
+  const {
+    isLoading: isTTSLoading,
+    isPlaying,
+    playAudio,
+    stopAudio,
+  } = useTTSAudio({
+    text: message.content,
+    enabled: message.role === "assistant" && ttsAutoplay,
+    locale,
+    logger,
+  });
 
   const hasReplies = replies.length > 0;
   const isEditing = messageActions.isEditing(message.id);
   const isRetrying = messageActions.isRetrying(message.id);
   const isAnswering = messageActions.isAnswering(message.id);
 
-  // Minimal fixed indent - just 16px for any nested level (no increase with depth)
-  const indent = depth > 0 ? 16 : 0;
+  // Get vote status
+  const { userVote, voteScore } = getVoteStatus(message);
+
+  // Minimal fixed indent - just THREAD_INDENT for any nested level (no increase with depth)
+  const indent = depth > 0 ? LAYOUT.THREAD_INDENT * 2 : 0;
 
   return (
     <div className={cn(chatAnimations.slideIn, "relative")}>
       {/* Thread connector line - vertical line on the left */}
       {depth > 0 && (
         <div
-          className="absolute left-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-blue-500/30 via-blue-500/20 to-transparent"
-          style={{ marginLeft: `${indent - 8}px` }}
+          className="absolute left-0 top-0 bottom-0 bg-gradient-to-b from-blue-500/30 via-blue-500/20 to-transparent"
+          style={{
+            marginLeft: `${indent - LAYOUT.THREAD_LINE_MARGIN_OFFSET}px`,
+            width: `${LAYOUT.THREAD_LINE_WIDTH}px`,
+          }}
         />
       )}
 
@@ -102,7 +139,7 @@ export function ThreadedMessage({
         {/* Collapse/Expand button for messages with replies */}
         {hasReplies && (
           <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
+            onClick={(): void => setIsCollapsed(!isCollapsed)}
             className={cn(
               "absolute top-4 z-10",
               "h-5 w-5 rounded",
@@ -113,7 +150,11 @@ export function ThreadedMessage({
               "shadow-sm",
             )}
             style={{ left: depth > 0 ? `${indent - 26}px` : "-26px" }}
-            title={isCollapsed ? "Expand replies" : "Collapse replies"}
+            title={
+              isCollapsed
+                ? t("app.chat.threadedView.expandReplies")
+                : t("app.chat.threadedView.collapseReplies")
+            }
           >
             {isCollapsed ? (
               <ChevronRight className="h-3.5 w-3.5" />
@@ -155,37 +196,43 @@ export function ThreadedMessage({
                 onBranch={(id, content) =>
                   messageActions.handleBranchEdit(id, content, onBranchMessage)
                 }
+                locale={locale}
+                logger={logger}
               />
             </div>
           ) : isRetrying ? (
             <div className="flex justify-end">
               <ModelPersonaSelectorModal
-                title="Retry with Different Settings"
-                description="Choose a model and persona to regenerate the response"
+                titleKey="app.chat.threadedView.retryModal.title"
+                descriptionKey="app.chat.threadedView.retryModal.description"
                 selectedModel={selectedModel}
                 selectedTone={selectedTone}
-                onModelChange={onModelChange || (() => {})}
-                onToneChange={onToneChange || (() => {})}
-                onConfirm={() =>
+                onModelChange={onModelChange || ((): void => {})}
+                onToneChange={onToneChange || ((): void => {})}
+                onConfirm={(): Promise<void> =>
                   messageActions.handleConfirmRetry(message.id, onRetryMessage)
                 }
                 onCancel={messageActions.cancelAction}
-                confirmLabel="Retry"
+                confirmLabelKey="app.chat.threadedView.retryModal.confirmLabel"
+                locale={locale}
+                logger={logger}
               />
             </div>
           ) : isAnswering ? (
             <ModelPersonaSelectorModal
-              title="Answer as AI Model"
-              description="Choose a model and persona to generate an AI response"
+              titleKey="app.chat.threadedView.answerModal.title"
+              descriptionKey="app.chat.threadedView.answerModal.description"
               selectedModel={selectedModel}
               selectedTone={selectedTone}
-              onModelChange={onModelChange || (() => {})}
-              onToneChange={onToneChange || (() => {})}
-              onConfirm={() =>
+              onModelChange={onModelChange || ((): void => {})}
+              onToneChange={onToneChange || ((): void => {})}
+              onConfirm={(): Promise<void> =>
                 messageActions.handleConfirmAnswer(message.id, onAnswerAsModel)
               }
               onCancel={messageActions.cancelAction}
-              confirmLabel="Generate"
+              confirmLabelKey="app.chat.threadedView.answerModal.confirmLabel"
+              locale={locale}
+              logger={logger}
             />
           ) : (
             <>
@@ -201,14 +248,11 @@ export function ThreadedMessage({
               >
                 {/* Logo watermark for first message */}
                 {depth === 0 && !message.parentId && (
-                  <div className="absolute top-3 right-3 opacity-30 pointer-events-none">
-                    <Image
-                      src={logo}
-                      alt="Logo"
-                      width={60}
-                      height={20}
-                      className="h-auto w-auto max-w-[60px]"
-                      priority
+                  <div className="absolute top-3 right-3 pointer-events-none bg-background/60 backdrop-blur-xl rounded-md p-1.5 shadow-sm border border-border/10">
+                    <Logo
+                      className="h-auto w-auto max-w-[120px] opacity-70"
+                      locale={locale}
+                      pathName="/"
                     />
                   </div>
                 )}
@@ -217,12 +261,12 @@ export function ThreadedMessage({
                 <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground flex-wrap">
                   <button
                     className={cn(
-                      "font-semibold hover:underline cursor-pointer",
+                      "font-semibold hover:underline cursor-pointer flex items-center gap-1.5",
                       message.role === "user"
                         ? "text-green-400"
                         : "text-blue-400",
                     )}
-                    onMouseEnter={(e) => {
+                    onMouseEnter={(e): void => {
                       if (message.author?.id) {
                         const rect = e.currentTarget.getBoundingClientRect();
                         setHoveredUserId(message.author.id);
@@ -232,16 +276,30 @@ export function ThreadedMessage({
                         });
                       }
                     }}
-                    onMouseLeave={() => {
+                    onMouseLeave={(): void => {
                       setHoveredUserId(null);
                       setUserCardPosition(null);
                     }}
                   >
+                    {/* Show model icon for AI messages */}
+                    {message.role === "assistant" &&
+                      message.model &&
+                      ((): JSX.Element | null => {
+                        const modelData = getModelById(message.model);
+                        const ModelIcon = modelData.icon;
+                        return typeof ModelIcon === "string" ? (
+                          <span className="text-base leading-none">
+                            {ModelIcon}
+                          </span>
+                        ) : (
+                          <ModelIcon className="h-3 w-3" />
+                        );
+                      })()}
                     {message.role === "user"
-                      ? "You"
-                      : message.model
+                      ? t("app.chat.threadedView.youLabel")
+                      : message.role === "assistant" && message.model
                         ? getModelById(message.model).name
-                        : "Assistant"}
+                        : t("app.chat.threadedView.assistantFallback")}
                   </button>
 
                   {/* Persona/Tone - only for AI messages */}
@@ -299,63 +357,145 @@ export function ThreadedMessage({
                   : "opacity-0 group-hover/message:opacity-100 focus-within:opacity-100",
               )}
             >
-              {/* Upvote button (visual only for now) */}
-              <button
-                className="flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all"
-                title="Upvote"
-              >
-                <ArrowBigUp className="h-4 w-4" />
-                <span className="text-xs">Vote</span>
-              </button>
+              {/* Voting buttons */}
+              {onVoteMessage && (
+                <div className="flex items-center gap-0.5">
+                  <button
+                    onClick={() =>
+                      onVoteMessage(message.id, userVote === 1 ? 0 : 1)
+                    }
+                    className={cn(
+                      "flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 transition-all",
+                      userVote === 1
+                        ? "text-blue-400"
+                        : "text-muted-foreground hover:text-blue-400",
+                    )}
+                    title={t("app.chat.threadedView.actions.upvote")}
+                  >
+                    <ArrowBigUp
+                      className={cn(
+                        "h-4 w-4",
+                        userVote === 1 && "fill-current",
+                      )}
+                    />
+                  </button>
+                  {voteScore !== 0 && (
+                    <span
+                      className={cn(
+                        "text-xs font-medium min-w-[1.5rem] text-center",
+                        voteScore > 0 && "text-blue-400",
+                        voteScore < 0 && "text-red-400",
+                      )}
+                    >
+                      {voteScore > 0 ? `+${voteScore}` : voteScore}
+                    </span>
+                  )}
+                  <button
+                    onClick={() =>
+                      onVoteMessage(message.id, userVote === -1 ? 0 : -1)
+                    }
+                    className={cn(
+                      "flex items-center gap-1 px-2 py-1 rounded hover:bg-red-500/10 transition-all",
+                      userVote === -1
+                        ? "text-red-400"
+                        : "text-muted-foreground hover:text-red-400",
+                    )}
+                    title={t("app.chat.threadedView.actions.downvote")}
+                  >
+                    <ArrowBigDown
+                      className={cn(
+                        "h-4 w-4",
+                        userVote === -1 && "fill-current",
+                      )}
+                    />
+                  </button>
+                </div>
+              )}
+
+              {/* TTS Play/Stop button - For assistant messages */}
+              {message.role === "assistant" && (
+                <button
+                  onClick={isPlaying ? stopAudio : (): void => void playAudio()}
+                  disabled={isTTSLoading}
+                  className={cn(
+                    "flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all",
+                    isTTSLoading && "opacity-50 cursor-not-allowed",
+                  )}
+                  title={
+                    isTTSLoading
+                      ? t("app.chat.threadedView.actions.loadingAudio")
+                      : isPlaying
+                        ? t("app.chat.threadedView.actions.stopAudio")
+                        : t("app.chat.threadedView.actions.playAudio")
+                  }
+                >
+                  {isTTSLoading ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : isPlaying ? (
+                    <Square className="h-3.5 w-3.5" />
+                  ) : (
+                    <Volume2 className="h-3.5 w-3.5" />
+                  )}
+                  <span>
+                    {isPlaying
+                      ? t("app.chat.threadedView.actions.stop")
+                      : t("app.chat.threadedView.actions.play")}
+                  </span>
+                </button>
+              )}
 
               {/* Reply button - Creates a branch from this message */}
               {onBranchMessage && (
                 <button
-                  onClick={() => onBranchMessage(message.id, "")}
+                  onClick={(): void => void onBranchMessage(message.id, "")}
                   className="flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all"
-                  title="Reply to this message (creates a branch)"
+                  title={t("app.chat.threadedView.actions.replyToMessage")}
                 >
                   <MessageSquare className="h-3.5 w-3.5" />
-                  <span>Reply</span>
+                  <span>{t("app.chat.threadedView.actions.reply")}</span>
                 </button>
               )}
 
               {/* Edit - For user messages */}
               {message.role === "user" && onBranchMessage && (
                 <button
-                  onClick={() => messageActions.startEdit(message.id)}
+                  onClick={(): void => messageActions.startEdit(message.id)}
                   className="flex items-center gap-1 px-2 py-1 rounded hover:bg-green-500/10 text-muted-foreground hover:text-green-400 transition-all"
-                  title="Edit this message (creates a branch)"
+                  title={t("app.chat.threadedView.actions.editMessage")}
                 >
-                  <span>Edit</span>
+                  <span>{t("app.chat.threadedView.actions.edit")}</span>
                 </button>
               )}
 
               {/* Retry - For user messages */}
               {message.role === "user" && onRetryMessage && (
                 <button
-                  onClick={() => messageActions.startRetry(message.id)}
+                  onClick={(): void => messageActions.startRetry(message.id)}
                   className="flex items-center gap-1 px-2 py-1 rounded hover:bg-yellow-500/10 text-muted-foreground hover:text-yellow-400 transition-all"
-                  title="Retry with different model/tone"
+                  title={t("app.chat.threadedView.actions.retryWithDifferent")}
                 >
-                  <span>Retry</span>
+                  <span>{t("app.chat.threadedView.actions.retry")}</span>
                 </button>
               )}
 
-              {/* Answer as AI - For user messages */}
-              {message.role === "user" && onAnswerAsModel && (
+              {/* Answer as AI - For both user and assistant messages */}
+              {onAnswerAsModel && (
                 <button
-                  onClick={() => messageActions.startAnswer(message.id)}
+                  onClick={(): void => messageActions.startAnswer(message.id)}
                   className="flex items-center gap-1 px-2 py-1 rounded hover:bg-purple-500/10 text-muted-foreground hover:text-purple-400 transition-all"
-                  title="Generate AI response"
+                  title={
+                    message.role === "assistant"
+                      ? t("app.chat.threadedView.actions.respondToAI")
+                      : t("app.chat.threadedView.actions.generateAIResponse")
+                  }
                 >
-                  <span>Answer as AI</span>
+                  <span>{t("app.chat.threadedView.actions.answerAsAI")}</span>
                 </button>
               )}
 
               {/* Share/Permalink */}
               <button
-                onClick={() => {
+                onClick={(): void => {
                   const element = document.getElementById(
                     `thread-msg-${message.id}`,
                   );
@@ -363,32 +503,32 @@ export function ThreadedMessage({
                     behavior: "smooth",
                     block: "center",
                   });
-                  navigator.clipboard.writeText(
+                  void navigator.clipboard.writeText(
                     `${window.location.href}#thread-msg-${message.id}`,
                   );
                 }}
                 className="flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all"
-                title="Copy permalink"
+                title={t("app.chat.threadedView.actions.copyPermalink")}
               >
                 <Share2 className="h-3.5 w-3.5" />
-                <span>Share</span>
+                <span>{t("app.chat.threadedView.actions.share")}</span>
               </button>
 
               {/* Delete */}
               {onDeleteMessage && (
                 <button
-                  onClick={() => onDeleteMessage(message.id)}
+                  onClick={(): void => onDeleteMessage(message.id)}
                   className="flex items-center gap-1 px-2 py-1 rounded hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all"
-                  title="Delete this message"
+                  title={t("app.chat.threadedView.actions.deleteMessage")}
                 >
-                  <span>Delete</span>
+                  <span>{t("app.chat.threadedView.actions.delete")}</span>
                 </button>
               )}
 
               {/* Show parent (if not root) */}
               {message.parentId && (
                 <button
-                  onClick={() => {
+                  onClick={(): void => {
                     const element = document.getElementById(
                       `thread-msg-${message.parentId}`,
                     );
@@ -400,7 +540,7 @@ export function ThreadedMessage({
                   className="flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all"
                 >
                   <CornerDownRight className="h-3.5 w-3.5" />
-                  <span>Parent</span>
+                  <span>{t("app.chat.threadedView.actions.parent")}</span>
                 </button>
               )}
 
@@ -428,11 +568,15 @@ export function ThreadedMessage({
                   depth={depth + 1}
                   selectedModel={selectedModel}
                   selectedTone={selectedTone}
+                  ttsAutoplay={ttsAutoplay}
+                  locale={locale}
+                  logger={logger}
                   onEditMessage={onEditMessage}
                   onDeleteMessage={onDeleteMessage}
                   onBranchMessage={onBranchMessage}
                   onRetryMessage={onRetryMessage}
                   onAnswerAsModel={onAnswerAsModel}
+                  onVoteMessage={onVoteMessage}
                   onModelChange={onModelChange}
                   onToneChange={onToneChange}
                   maxDepth={maxDepth}
@@ -447,12 +591,17 @@ export function ThreadedMessage({
           depth >= maxDepth &&
           !showDeepReplies && (
             <button
-              onClick={() => setShowDeepReplies(true)}
+              onClick={(): void => setShowDeepReplies(true)}
               className="mt-3 text-sm text-blue-500 hover:text-blue-600 cursor-pointer hover:underline transition-all flex items-center gap-1"
             >
               <CornerDownRight className="h-3.5 w-3.5" />
-              Continue thread ({replies.length} more{" "}
-              {replies.length === 1 ? "reply" : "replies"})
+              {t("app.chat.threadedView.continueThread", {
+                count: replies.length,
+                replyText:
+                  replies.length === 1
+                    ? t("app.chat.threadedView.reply")
+                    : t("app.chat.threadedView.replies"),
+              })}
             </button>
           )}
       </div>
@@ -461,9 +610,12 @@ export function ThreadedMessage({
       {hoveredUserId && userCardPosition && (
         <UserProfileCard
           userId={hoveredUserId}
-          userName={message.author?.name || "User"}
+          userName={
+            message.author?.name || t("app.chat.threadedView.userFallback")
+          }
           messages={allMessages}
           position={userCardPosition}
+          locale={locale}
         />
       )}
     </div>

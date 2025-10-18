@@ -12,6 +12,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../user/auth/definition";
+import type { LeadResponseType } from "../definition";
 import { leadsRepository } from "../repository";
 
 /**
@@ -27,7 +28,7 @@ interface SearchRequestType {
  * Search response interface
  */
 interface SearchResponseType {
-  leads: any[];
+  leads: LeadResponseType[];
   total: number;
   hasMore: boolean;
 }
@@ -87,16 +88,19 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
       logger,
     );
 
-    if (!searchResult.success) {
+    if (!searchResult.success || !searchResult.data) {
       return searchResult;
     }
 
+    // Type-safe access to success response data
+    const responseData = searchResult.data.response;
+
     // Calculate if there are more results
-    const hasMore = searchResult.data.leads.length === limit;
+    const hasMore = responseData.leads.length === limit;
 
     return createSuccessResponse({
-      leads: searchResult.data.leads,
-      total: searchResult.data.total,
+      leads: responseData.leads,
+      total: responseData.total,
       hasMore,
     });
   }

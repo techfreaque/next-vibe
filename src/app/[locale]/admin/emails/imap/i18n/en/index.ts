@@ -1,52 +1,19 @@
+import { translations as uiTranslations } from "../../_components/i18n/en";
+import { translations as accountsApiTranslations } from "../../accounts/i18n/en";
+import { translations as configApiTranslations } from "../../config/i18n/en";
+import { translations as foldersApiTranslations } from "../../folders/i18n/en";
+import { translations as overviewApiTranslations } from "../../overview/i18n/en";
+import { translations as syncApiTranslations } from "../../sync/i18n/en";
+
+// Spread UI translations at the top level for component access (e.g., "imap.account.fields.name")
+// Nest API translations under "api" namespace to avoid conflicts
 export const translations = {
-  post: {
-    title: "Imap",
-    description: "Imap endpoint",
-    form: {
-      title: "Imap Configuration",
-      description: "Configure imap parameters",
-    },
-    response: {
-      title: "Response",
-      description: "Imap response data",
-    },
-    errors: {
-      unauthorized: {
-        title: "Unauthorized",
-        description: "Authentication required",
-      },
-      validation: {
-        title: "Validation Error",
-        description: "Invalid request parameters",
-      },
-      server: {
-        title: "Server Error",
-        description: "Internal server error occurred",
-      },
-      unknown: {
-        title: "Unknown Error",
-        description: "An unknown error occurred",
-      },
-      network: {
-        title: "Network Error",
-        description: "Network error occurred",
-      },
-      forbidden: {
-        title: "Forbidden",
-        description: "Access forbidden",
-      },
-      notFound: {
-        title: "Not Found",
-        description: "Resource not found",
-      },
-      conflict: {
-        title: "Conflict",
-        description: "Data conflict occurred",
-      },
-    },
-    success: {
-      title: "Success",
-      description: "Operation completed successfully",
-    },
+  ...uiTranslations,
+  api: {
+    accounts: accountsApiTranslations,
+    config: configApiTranslations,
+    folders: foldersApiTranslations,
+    overview: overviewApiTranslations,
+    sync: syncApiTranslations,
   },
-};
+} as const;

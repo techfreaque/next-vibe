@@ -1,0 +1,27 @@
+export const translations = {
+  labels: {
+    userId: "User",
+    planId: "Plan",
+    billingInterval: "Billing Interval",
+    status: "Status",
+    currentPeriodStart: "Period Start",
+    currentPeriodEnd: "Period End",
+    cancelAtPeriodEnd: "Cancel at Period End",
+    canceledAt: "Cancelled At",
+    endedAt: "Ended At",
+    cancellationReason: "Cancellation Reason",
+    trialStart: "Trial Start",
+    trialEnd: "Trial End",
+    stripeCustomerId: "Stripe Customer ID",
+    stripeSubscriptionId: "Stripe Subscription ID",
+    stripePriceId: "Stripe Price ID",
+  },
+  buttons: {
+    save: "Save Subscription",
+    cancel: "Cancel",
+    create: "Create Subscription",
+    update: "Update Subscription",
+    cancelSubscription: "Cancel Subscription",
+    reset: "Reset Form",
+  },
+};

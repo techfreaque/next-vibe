@@ -160,8 +160,17 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
       }
 
       const audioBuffer = await audioResponse.arrayBuffer();
-      const contentType =
+      let contentType =
         audioResponse.headers.get("content-type") || "audio/mpeg";
+
+      // Normalize content type - some providers return generic types
+      if (
+        contentType === "binary/octet-stream" ||
+        contentType === "application/octet-stream"
+      ) {
+        contentType = "audio/mpeg";
+        logger.debug("Normalized content type from octet-stream to audio/mpeg");
+      }
 
       // Convert to base64 data URL
       const base64Audio = Buffer.from(audioBuffer).toString("base64");

@@ -1,54 +1,22 @@
 import type { translations as enTranslations } from "../en";
+import { translations as billingTranslations } from "./billing";
+import { translations as checkoutTranslations } from "./checkout";
+import { translations as paymentTranslations } from "./payment";
+import { translations as premiumTranslations } from "./premium";
+import { translations as paymentErrorsTranslations } from "./paymentErrors";
+import { translations as subscriptionTranslations } from "./subscription";
+import { translations as subscriptionErrorsTranslations } from "./subscriptionErrors";
+import { translations as subscriptionsTranslations } from "./subscriptions";
+import { translations as subscriptionsErrorsTranslations } from "./subscriptionsErrors";
 
 export const translations: typeof enTranslations = {
-  post: {
-    title: "Tytuł",
-    description: "Opis endpointu",
-    form: {
-      title: "Konfiguracja",
-      description: "Skonfiguruj parametry",
-    },
-    response: {
-      title: "Odpowiedź",
-      description: "Dane odpowiedzi",
-    },
-    errors: {
-      unauthorized: {
-        title: "Brak autoryzacji",
-        description: "Wymagana autoryzacja",
-      },
-      validation: {
-        title: "Błąd walidacji",
-        description: "Nieprawidłowe parametry żądania",
-      },
-      server: {
-        title: "Błąd serwera",
-        description: "Wystąpił wewnętrzny błąd serwera",
-      },
-      unknown: {
-        title: "Nieznany błąd",
-        description: "Wystąpił nieznany błąd",
-      },
-      network: {
-        title: "Błąd sieci",
-        description: "Wystąpił błąd sieci",
-      },
-      forbidden: {
-        title: "Zabronione",
-        description: "Dostęp zabroniony",
-      },
-      notFound: {
-        title: "Nie znaleziono",
-        description: "Zasób nie został znaleziony",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Wystąpił konflikt danych",
-      },
-    },
-    success: {
-      title: "Sukces",
-      description: "Operacja zakończona pomyślnie",
-    },
-  },
+  billing: billingTranslations,
+  checkout: checkoutTranslations,
+  payment: paymentTranslations,
+  paymentErrors: paymentErrorsTranslations,
+  premium: premiumTranslations,
+  subscription: subscriptionTranslations,
+  subscriptionErrors: subscriptionErrorsTranslations,
+  subscriptions: subscriptionsTranslations,
+  subscriptionsErrors: subscriptionsErrorsTranslations,
 };

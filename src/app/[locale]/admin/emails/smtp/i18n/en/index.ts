@@ -1,52 +1,15 @@
+import { translations as uiTranslations } from "../../_components/i18n/en";
+import { translations as accountsTranslations } from "../../accounts/i18n/en";
+import { translations as createTranslations } from "../../create/i18n/en";
+import { translations as editTranslations } from "../../edit/i18n/en";
+
+// Spread UI translations at the top level for component access (e.g., "smtp.admin.fields.name")
+// Nest page-specific translations under "pages" namespace to avoid conflicts
 export const translations = {
-  post: {
-    title: "Smtp",
-    description: "Smtp endpoint",
-    form: {
-      title: "Smtp Configuration",
-      description: "Configure smtp parameters",
-    },
-    response: {
-      title: "Response",
-      description: "Smtp response data",
-    },
-    errors: {
-      unauthorized: {
-        title: "Unauthorized",
-        description: "Authentication required",
-      },
-      validation: {
-        title: "Validation Error",
-        description: "Invalid request parameters",
-      },
-      server: {
-        title: "Server Error",
-        description: "Internal server error occurred",
-      },
-      unknown: {
-        title: "Unknown Error",
-        description: "An unknown error occurred",
-      },
-      network: {
-        title: "Network Error",
-        description: "Network error occurred",
-      },
-      forbidden: {
-        title: "Forbidden",
-        description: "Access forbidden",
-      },
-      notFound: {
-        title: "Not Found",
-        description: "Resource not found",
-      },
-      conflict: {
-        title: "Conflict",
-        description: "Data conflict occurred",
-      },
-    },
-    success: {
-      title: "Success",
-      description: "Operation completed successfully",
-    },
+  ...uiTranslations,
+  pages: {
+    accounts: accountsTranslations,
+    create: createTranslations,
+    edit: editTranslations,
   },
-};
+} as const;

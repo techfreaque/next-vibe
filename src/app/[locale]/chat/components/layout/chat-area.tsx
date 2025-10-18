@@ -4,11 +4,13 @@ import { Camera, Loader2 } from "lucide-react";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { useTranslation } from "@/i18n/core/client";
+import { simpleT } from "@/i18n/core/shared";
 import { Button } from "@/packages/next-vibe-ui/web/ui";
 
 import { Logo } from "../../../_components/nav/logo";
+import { DOM_IDS, LAYOUT } from "../../lib/config/constants";
 import type { ModelId } from "../../lib/config/models";
 import type {
   ChatMessage,
@@ -17,6 +19,7 @@ import type {
 } from "../../lib/storage/types";
 import { ChatInput } from "../input/chat-input";
 import { ChatMessages } from "../messages/chat-messages";
+import { SuggestedPrompts } from "../messages/suggested-prompts";
 import { ViewModeToggle } from "../messages/view-mode-toggle";
 
 interface ChatAreaProps {
@@ -26,6 +29,7 @@ interface ChatAreaProps {
   selectedModel: ModelId;
   selectedTone: string;
   enableSearch: boolean;
+  ttsAutoplay: boolean;
   input: string;
   isLoading: boolean;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
@@ -39,14 +43,17 @@ interface ChatAreaProps {
   onModelChange: (model: ModelId) => void;
   onToneChange: (tone: string) => void;
   onEnableSearchChange: (enabled: boolean) => void;
-  onSendMessage: (prompt: string) => void;
+  onSendMessage: (prompt: string, personaId: string, modelId?: ModelId) => void;
   onBranchMessage?: (messageId: string, newContent: string) => Promise<void>;
   onRetryMessage?: (messageId: string) => Promise<void>;
   onAnswerAsModel?: (messageId: string) => Promise<void>;
+  onVoteMessage?: (messageId: string, vote: 1 | -1 | 0) => void;
   showBranchIndicators: boolean;
   viewMode?: ViewMode;
   onViewModeChange?: (mode: ViewMode) => void;
   onScreenshot?: () => Promise<void>;
+  rootFolderId?: string;
+  logger: EndpointLogger;
 }
 
 export function ChatArea({
@@ -56,6 +63,7 @@ export function ChatArea({
   selectedModel,
   selectedTone,
   enableSearch,
+  ttsAutoplay,
   input,
   isLoading,
   inputRef,
@@ -73,14 +81,41 @@ export function ChatArea({
   onBranchMessage,
   onRetryMessage,
   onAnswerAsModel,
+  onVoteMessage,
   showBranchIndicators,
   viewMode = "linear",
   onViewModeChange,
   onScreenshot,
+  rootFolderId = "general",
+  logger,
 }: ChatAreaProps): JSX.Element {
-  const { t } = useTranslation("chat");
+  const { t } = simpleT(locale);
   const inputContainerRef = useRef<HTMLDivElement>(null);
-  const [inputHeight, setInputHeight] = useState(120); // Sane default: ~120px
+  const [inputHeight, setInputHeight] = useState<number>(
+    LAYOUT.DEFAULT_INPUT_HEIGHT,
+  );
+
+  // Handle suggested prompt selection - insert into input and change persona/model
+  const handleSuggestedPromptSelect = useCallback(
+    (prompt: string, personaId: string, modelId?: ModelId): void => {
+      // Insert prompt into input
+      onInputChange(prompt);
+
+      // Change persona
+      onToneChange(personaId);
+
+      // Change model if persona has preferred model
+      if (modelId) {
+        onModelChange(modelId);
+      }
+
+      // Focus input
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    },
+    [onInputChange, onToneChange, onModelChange, inputRef],
+  );
   const [isCapturingScreenshot, setIsCapturingScreenshot] = useState(false);
 
   // Measure input height dynamically
@@ -97,13 +132,13 @@ export function ChatArea({
 
     resizeObserver.observe(inputContainerRef.current);
 
-    return () => {
+    return (): void => {
       resizeObserver.disconnect();
     };
   }, []);
 
   // Handle screenshot with loading state
-  const handleScreenshotClick = useCallback(async () => {
+  const handleScreenshotClick = useCallback(async (): Promise<void> => {
     if (!onScreenshot || isCapturingScreenshot) {
       return;
     }
@@ -124,7 +159,11 @@ export function ChatArea({
       {messages.length > 0 && (onViewModeChange || onScreenshot) && (
         <div className="absolute top-4 right-4 z-40 flex gap-1">
           {onViewModeChange && (
-            <ViewModeToggle mode={viewMode} onChange={onViewModeChange} />
+            <ViewModeToggle
+              mode={viewMode}
+              onChange={onViewModeChange}
+              locale={locale}
+            />
           )}
           {onScreenshot && (
             <Button
@@ -132,11 +171,11 @@ export function ChatArea({
               size="icon"
               onClick={handleScreenshotClick}
               disabled={isCapturingScreenshot}
-              className="bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-10 w-10 sm:h-9 sm:w-9 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-9 w-9 disabled:opacity-50 disabled:cursor-not-allowed"
               title={
                 isCapturingScreenshot
-                  ? t("screenshot.capturing")
-                  : t("screenshot.capture")
+                  ? t("app.chat.screenshot.capturing")
+                  : t("app.chat.screenshot.capture")
               }
             >
               {isCapturingScreenshot ? (
@@ -150,22 +189,30 @@ export function ChatArea({
       )}
 
       {/* Logo - Only show in linear view (ChatGPT style) */}
-      {viewMode === "linear" && (
+      {viewMode === "linear" && messages.length > 0 && (
         <div className="w-full h-0">
-          <div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10">
-            <Logo locale={locale} pathName="/chat" className="mt-[50px]" />
+          <div className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-15 space-y-5">
+            <div className="max-w-[30%] h-[50px] flex bg-background/80 backdrop-blur-xl rounded-lg p-2 shadow-sm border border-border/20">
+              <Logo
+                locale={locale}
+                pathName=""
+                className="w-full h-auto"
+                linkClassName="my-auto"
+              />
+            </div>
           </div>
         </div>
       )}
 
       {/* Messages Area - Full height, scrollable inside */}
       <div className="flex-1 overflow-hidden min-h-0">
-        {thread && (
+        {thread ? (
           <ChatMessages
             thread={thread}
             messages={messages}
             selectedModel={selectedModel}
             selectedTone={selectedTone}
+            ttsAutoplay={ttsAutoplay}
             onEditMessage={onEditMessage}
             onDeleteMessage={onDeleteMessage}
             onSwitchBranch={onSwitchBranch}
@@ -174,43 +221,70 @@ export function ChatArea({
             onBranchMessage={onBranchMessage}
             onRetryMessage={onRetryMessage}
             onAnswerAsModel={onAnswerAsModel}
+            onVoteMessage={onVoteMessage}
             isLoading={isLoading}
             showBranchIndicators={showBranchIndicators}
             onSendMessage={onSendMessage}
             inputHeight={inputHeight}
             viewMode={viewMode}
+            rootFolderId={rootFolderId}
             locale={locale}
+            logger={logger}
           />
+        ) : (
+          // Empty state for new threads - show suggestions
+          <div
+            className="h-full overflow-y-auto scroll-smooth scrollbar-thin scrollbar-track-transparent scrollbar-thumb-blue-400/30 hover:scrollbar-thumb-blue-500/50 scrollbar-thumb-rounded-full"
+            id={DOM_IDS.MESSAGES_CONTAINER}
+          >
+            <div
+              className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pt-15 space-y-5"
+              style={{
+                paddingBottom: `${inputHeight + LAYOUT.MESSAGES_BOTTOM_PADDING}px`,
+              }}
+            >
+              <div
+                className="flex items-center justify-center"
+                style={{ minHeight: `${LAYOUT.SUGGESTIONS_MIN_HEIGHT}vh` }}
+              >
+                <SuggestedPrompts
+                  onSelectPrompt={handleSuggestedPromptSelect}
+                  locale={locale}
+                  rootFolderId={rootFolderId}
+                />
+              </div>
+            </div>
+          </div>
         )}
       </div>
 
       {/* Input Area - Positioned absolutely at bottom with max-width */}
       {/* z-20: Above messages, below sidebar on mobile (z-50), below top bar (z-50) */}
-      {thread && (
-        <div
-          ref={inputContainerRef}
-          className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none"
-        >
-          <div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pointer-events-auto">
-            <ChatInput
-              ref={inputRef}
-              value={input}
-              onChange={onInputChange}
-              onSubmit={onSubmit}
-              onKeyDown={onKeyDown}
-              isLoading={isLoading}
-              onStop={onStop}
-              selectedTone={selectedTone}
-              selectedModel={selectedModel}
-              enableSearch={enableSearch}
-              onToneChange={onToneChange}
-              onModelChange={onModelChange}
-              onEnableSearchChange={onEnableSearchChange}
-              locale={locale}
-            />
-          </div>
+      {/* Always show input, even for new threads */}
+      <div
+        ref={inputContainerRef}
+        className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none"
+      >
+        <div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pointer-events-auto">
+          <ChatInput
+            ref={inputRef}
+            value={input}
+            onChange={onInputChange}
+            onSubmit={onSubmit}
+            onKeyDown={onKeyDown}
+            isLoading={isLoading}
+            onStop={onStop}
+            selectedTone={selectedTone}
+            selectedModel={selectedModel}
+            enableSearch={enableSearch}
+            onToneChange={onToneChange}
+            onModelChange={onModelChange}
+            onEnableSearchChange={onEnableSearchChange}
+            locale={locale}
+            logger={logger}
+          />
         </div>
-      )}
+      </div>
     </div>
   );
 }

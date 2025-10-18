@@ -1,9 +1,9 @@
-import * as React from "react";
-import type { GestureResponderEvent } from "react-native";
-import { Pressable, View } from "react-native";
+import * as React from 'react';
+import type { GestureResponderEvent } from 'react-native';
+import { Pressable, View } from 'react-native';
 
-import { cn } from "../../lib/utils";
-import { Label } from "./label";
+import { cn } from '../../lib/utils';
+import { Label } from './label';
 
 interface RadioGroupProps {
   defaultValue?: string;
@@ -23,40 +23,30 @@ const RadioGroupContext = React.createContext({} as RadioGroupContext);
 const RadioGroup = React.forwardRef<
   React.ElementRef<typeof View>,
   React.ComponentPropsWithoutRef<typeof View> & RadioGroupProps
->(
-  (
-    { defaultValue = "", onValueChange, className, disabled = false, ...props },
-    ref,
-  ) => {
-    const [value, setValue] = React.useState(defaultValue);
+>(({ defaultValue = '', onValueChange, className, disabled = false, ...props }, ref) => {
+  const [value, setValue] = React.useState(defaultValue);
 
-    return (
-      <RadioGroupContext.Provider
-        value={{
-          value,
-          setValue,
-          disabled,
-          onValueChange,
-        }}
-      >
-        <View
-          role="radiogroup"
-          ref={ref}
-          className={cn("gap-2", className)}
-          {...props}
-        />
-      </RadioGroupContext.Provider>
-    );
-  },
-);
+  return (
+    <RadioGroupContext.Provider
+      value={{
+        value,
+        setValue,
+        disabled,
+        onValueChange,
+      }}
+    >
+      <View role='radiogroup' ref={ref} className={cn('gap-2', className)} {...props} />
+    </RadioGroupContext.Provider>
+  );
+});
 
-RadioGroup.displayName = "RadioGroup";
+RadioGroup.displayName = 'RadioGroup';
 
 function useRadioGroupContext() {
   const context = React.useContext(RadioGroupContext);
   if (!context) {
     throw new Error(
-      "RadioGroup compound components cannot be rendered outside the RadioGroup component",
+      'RadioGroup compound components cannot be rendered outside the RadioGroup component'
     );
   }
   return context;
@@ -64,7 +54,7 @@ function useRadioGroupContext() {
 
 const RadioGroupItem = React.forwardRef<
   React.ElementRef<typeof Pressable>,
-  Omit<React.ComponentPropsWithoutRef<typeof Pressable>, "disabled"> & {
+  Omit<React.ComponentPropsWithoutRef<typeof Pressable>, 'disabled'> & {
     name: string;
     labelClass?: string;
     buttonClass?: string;
@@ -73,17 +63,8 @@ const RadioGroupItem = React.forwardRef<
   }
 >(
   (
-    {
-      className,
-      name,
-      labelClass,
-      buttonClass,
-      innerButtonClass,
-      onPress,
-      children,
-      ...props
-    },
-    ref,
+    { className, name, labelClass, buttonClass, innerButtonClass, onPress, children, ...props },
+    ref
   ) => {
     const { value, setValue, disabled, onValueChange } = useRadioGroupContext();
 
@@ -94,39 +75,29 @@ const RadioGroupItem = React.forwardRef<
     }
 
     return (
-      <View className={cn("flex-row gap-3 items-center", className)}>
+      <View className={cn('flex-row gap-3 items-center', className)}>
         <Pressable
           disabled={disabled}
           onPress={handleOnPress}
           className={cn(
-            "h-6 w-6 border-primary native:[borderWidth:1.5] web:border rounded-full items-center justify-center",
-            buttonClass,
+            'h-6 w-6 border-primary native:[borderWidth:1.5] web:border rounded-full items-center justify-center',
+            buttonClass
           )}
           aria-labelledby={name}
           accessibilityState={{ selected: value === name }}
-          role="radio"
+          role='radio'
           {...props}
         >
           {value === name && (
-            <View
-              ref={ref}
-              className={cn(
-                "h-3 w-3 bg-primary rounded-full",
-                innerButtonClass,
-              )}
-            />
+            <View ref={ref} className={cn('h-3 w-3 bg-primary rounded-full', innerButtonClass)} />
           )}
         </Pressable>
-        <Label
-          onPress={handleOnPress}
-          className={cn("text-xl", labelClass)}
-          nativeID={name}
-        >
+        <Label onPress={handleOnPress} className={cn('text-xl', labelClass)} nativeID={name}>
           {children}
         </Label>
       </View>
     );
-  },
+  }
 );
 
 export { RadioGroup, RadioGroupItem };

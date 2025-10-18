@@ -162,6 +162,7 @@ class CampaignStarterConfigRepositoryImpl
       name: "campaign-starter" as const,
 
       version: "1.0.0", // Required field
+      category: "LEAD_MANAGEMENT",
       // eslint-disable-next-line i18next/no-literal-string
       description: "Campaign starter cron task",
       schedule: cronSettings.schedule,
@@ -171,6 +172,7 @@ class CampaignStarterConfigRepositoryImpl
       retries: cronSettings.retries,
       retryDelay: cronSettings.retryDelay,
       defaultConfig: {},
+      createdAt: new Date(),
       updatedAt: new Date(),
     };
 

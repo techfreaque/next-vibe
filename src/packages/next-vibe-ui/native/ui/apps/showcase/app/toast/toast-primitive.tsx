@@ -1,8 +1,8 @@
-import { Portal } from "@rn-primitives/portal";
-import * as Toast from "@rn-primitives/toast";
-import React, { useEffect } from "react";
-import { Pressable, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Portal } from '@rn-primitives/portal';
+import * as Toast from '@rn-primitives/toast';
+import React, { useEffect } from 'react';
+import { Pressable, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ToastScreen() {
   const [open, setOpen] = React.useState(false);
@@ -46,40 +46,35 @@ export default function ToastScreen() {
   return (
     <>
       {open && (
-        <Portal name="toast-example">
-          <View
-            style={{ top: insets.top + 4 }}
-            className="px-4 absolute w-full"
-          >
+        <Portal name='toast-example'>
+          <View style={{ top: insets.top + 4 }} className='px-4 absolute w-full'>
             <Toast.Root
-              type="foreground"
+              type='foreground'
               open={open}
               onOpenChange={setOpen}
-              className="opacity-95 bg-secondary border-border flex-row justify-between items-center p-4 rounded-xl"
+              className='opacity-95 bg-secondary border-border flex-row justify-between items-center p-4 rounded-xl'
             >
-              <View className="gap-1.5">
-                <Toast.Title className="text-foreground text-3xl">
-                  Here is a toast
-                </Toast.Title>
-                <Toast.Description className="text-foreground text-lg">
+              <View className='gap-1.5'>
+                <Toast.Title className='text-foreground text-3xl'>Here is a toast</Toast.Title>
+                <Toast.Description className='text-foreground text-lg'>
                   It will disappear in {seconds} seconds
                 </Toast.Description>
               </View>
-              <View className="gap-2">
-                <Toast.Action className="border border-primary px-4 py-2">
-                  <Text className="text-foreground">Action</Text>
+              <View className='gap-2'>
+                <Toast.Action className='border border-primary px-4 py-2'>
+                  <Text className='text-foreground'>Action</Text>
                 </Toast.Action>
-                <Toast.Close className="border border-primary px-4 py-2">
-                  <Text className="text-foreground">Close</Text>
+                <Toast.Close className='border border-primary px-4 py-2'>
+                  <Text className='text-foreground'>Close</Text>
                 </Toast.Close>
               </View>
             </Toast.Root>
           </View>
         </Portal>
       )}
-      <View className="flex-1 justify-center items-center p-6 gap-12">
+      <View className='flex-1 justify-center items-center p-6 gap-12'>
         <Pressable onPress={() => setOpen((prev) => !prev)}>
-          <Text className="text-foreground text-xl">Show Toast</Text>
+          <Text className='text-foreground text-xl'>Show Toast</Text>
         </Pressable>
       </View>
     </>

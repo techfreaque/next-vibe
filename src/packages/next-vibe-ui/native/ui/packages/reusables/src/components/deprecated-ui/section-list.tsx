@@ -1,22 +1,22 @@
-import type { FlashListProps as ShopifyFlashListProps } from "@shopify/flash-list";
-import { FlashList as ShopifyFlashList } from "@shopify/flash-list";
-import * as React from "react";
+import type { FlashListProps as ShopifyFlashListProps } from '@shopify/flash-list';
+import { FlashList as ShopifyFlashList } from '@shopify/flash-list';
+import * as React from 'react';
 
 interface IdItem {
   id?: string;
 }
 
 interface SectionListProps<TItem> extends ShopifyFlashListProps<TItem> {
-  renderSectionHeader: ShopifyFlashListProps<string>["renderItem"];
+  renderSectionHeader: ShopifyFlashListProps<string>['renderItem'];
 }
 
 function FlashList<TItem>(
   props: SectionListProps<TItem | string>,
-  ref: React.ForwardedRef<ShopifyFlashList<TItem | string>>,
+  ref: React.ForwardedRef<ShopifyFlashList<TItem | string>>
 ) {
   const {
     keyExtractor = (item, index) =>
-      typeof item === "string"
+      typeof item === 'string'
         ? item
         : (item as IdItem)?.id
           ? ((item as IdItem).id ?? String(index))
@@ -29,16 +29,12 @@ function FlashList<TItem>(
 
   const stickyHeaderIndices = useStickyHeaderIndices<TItem>(
     [...(props.data ?? [])],
-    props.extraData,
+    props.extraData
   );
 
   const renderItems = React.useCallback(
-    (
-      info: Parameters<
-        NonNullable<ShopifyFlashListProps<TItem | string>["renderItem"]>
-      >[0],
-    ) => {
-      if (typeof info.item === "string" && renderSectionHeader) {
+    (info: Parameters<NonNullable<ShopifyFlashListProps<TItem | string>['renderItem']>>[0]) => {
+      if (typeof info.item === 'string' && renderSectionHeader) {
         // Rendering header
         return renderSectionHeader?.(info);
       } else {
@@ -46,7 +42,7 @@ function FlashList<TItem>(
         return renderItem?.(info) ?? null;
       }
     },
-    [renderItem, renderSectionHeader],
+    [renderItem, renderSectionHeader]
   );
 
   return (
@@ -63,7 +59,7 @@ function FlashList<TItem>(
 }
 
 function getItemType<TItem>(item: TItem) {
-  return typeof item === "string" ? "sectionHeader" : "row";
+  return typeof item === 'string' ? 'sectionHeader' : 'row';
 }
 
 function getStickyHeaderIndices<TItem>(data: (string | TItem)[]) {
@@ -72,7 +68,7 @@ function getStickyHeaderIndices<TItem>(data: (string | TItem)[]) {
   }
   return data
     .map((item, index) => {
-      if (typeof item === "string") {
+      if (typeof item === 'string') {
         return index;
       } else {
         return null;
@@ -86,12 +82,8 @@ function getStickyHeaderIndices<TItem>(data: (string | TItem)[]) {
  * @info "Hacky" way to update stickyHeaderIndices when data changes while 👇 issue is being fixed
  * @issue https://github.com/Shopify/flash-list/issues/615
  */
-function useStickyHeaderIndices<TItem>(
-  data: (string | TItem)[],
-  _extraData?: unknown,
-) {
-  const [_stickyHeadersUpdate, triggerStickyHeadersUpdate] =
-    React.useState<boolean>(false);
+function useStickyHeaderIndices<TItem>(data: (string | TItem)[], _extraData?: unknown) {
+  const [_stickyHeadersUpdate, triggerStickyHeadersUpdate] = React.useState<boolean>(false);
   const [, triggerRerender] = React.useState<boolean>(false);
   const stickyHeaderIndices = React.useRef<number[]>([]);
   const actualStickyHeaderIndices = React.useRef<number[]>([]);
@@ -113,7 +105,7 @@ function useStickyHeaderIndices<TItem>(
 const SectionList = React.forwardRef(FlashList) as <TItem>(
   props: SectionListProps<TItem | string> & {
     ref?: React.ForwardedRef<ShopifyFlashList<TItem | string>>;
-  },
+  }
 ) => ReturnType<typeof FlashList>;
 
 export { SectionList, type SectionListProps };

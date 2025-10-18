@@ -820,8 +820,8 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         );
       }
 
-      const lead = leadResult.data;
-      const currentStatus = lead.status;
+      const leadDetail = leadResult.data.lead;
+      const currentStatus = leadDetail.basicInfo.status;
       let newStatus = currentStatus;
       let statusChanged = false;
 
@@ -872,16 +872,18 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
             // Build properly typed metadata - filter existing metadata to only include valid types
             const filteredMetadata: Record<string, string | number | boolean> =
               {};
-            if (lead.metadata) {
-              Object.entries(lead.metadata).forEach(([key, value]) => {
-                if (
-                  typeof value === "string" ||
-                  typeof value === "number" ||
-                  typeof value === "boolean"
-                ) {
-                  filteredMetadata[key] = value;
-                }
-              });
+            if (leadDetail.metadata.metadata) {
+              Object.entries(leadDetail.metadata.metadata).forEach(
+                ([key, value]) => {
+                  if (
+                    typeof value === "string" ||
+                    typeof value === "number" ||
+                    typeof value === "boolean"
+                  ) {
+                    filteredMetadata[key] = value;
+                  }
+                },
+              );
             }
 
             const updatedMetadata: Record<string, string | number | boolean> = {

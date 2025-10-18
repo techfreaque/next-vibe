@@ -21,7 +21,7 @@ export function translateFolderName(
 ): string {
   // Check if it's the default "Private Chats" folder
   if (name === "Private Chats") {
-    return t("common.privateChats");
+    return t("app.chat.common.privateChats");
   }
 
   // Return original name for custom folders
@@ -44,7 +44,7 @@ export function translateThreadTitle(
 ): string {
   // Check if it's the default "New Chat" title
   if (title === "New Chat") {
-    return t("common.newChat");
+    return t("app.chat.common.newChat");
   }
 
   // Return original title for custom titles

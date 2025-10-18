@@ -1,5 +1,5 @@
-import { existsSync, promises as fs } from "node:fs";
-import path from "node:path";
+import { existsSync, promises as fs } from 'node:fs';
+import path from 'node:path';
 
 export async function copyFolder(
   src: string,
@@ -7,7 +7,7 @@ export async function copyFolder(
   options: { ignore: string[]; renameTemplateFiles: boolean } = {
     ignore: [],
     renameTemplateFiles: false,
-  },
+  }
 ) {
   if (!existsSync(src)) {
     throw new Error(`Source folder does not exist: ${src}`);
@@ -30,13 +30,10 @@ export async function copyFolder(
     if (entry.isDirectory()) {
       await copyFolder(srcPath, destPath, options);
     } else if (entry.isFile()) {
-      if (options.renameTemplateFiles && entry.name === "gitignore-template") {
-        await fs.copyFile(srcPath, path.join(dest, ".gitignore"));
-      } else if (
-        options.renameTemplateFiles &&
-        entry.name === "npmrc-template"
-      ) {
-        await fs.copyFile(srcPath, path.join(dest, ".npmrc"));
+      if (options.renameTemplateFiles && entry.name === 'gitignore-template') {
+        await fs.copyFile(srcPath, path.join(dest, '.gitignore'));
+      } else if (options.renameTemplateFiles && entry.name === 'npmrc-template') {
+        await fs.copyFile(srcPath, path.join(dest, '.npmrc'));
       } else {
         await fs.copyFile(srcPath, destPath);
       }

@@ -1,0 +1,16 @@
+export const translations = {
+  refresh: "Refresh",
+  export: "Export",
+  exportCsv: "Export as CSV",
+  exportExcel: "Export as Excel",
+  add: "Add User",
+  addUser: "Add User",
+  edit: "Edit",
+  editUser: "Edit User",
+  deleteUser: "Delete User",
+  viewUser: "View User",
+  activateUser: "Activate User",
+  deactivateUser: "Deactivate User",
+  verifyEmail: "Verify Email",
+  resetPassword: "Reset Password",
+};

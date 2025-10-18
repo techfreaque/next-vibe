@@ -96,7 +96,9 @@
   }
 
   .text-shadow-lg {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 8px rgba(0, 0, 0, 0.25);
+    text-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.5),
+      0 0 8px rgba(0, 0, 0, 0.25);
   }
 
   /* Fallback for gradient text when bg-clip-text fails */
@@ -259,13 +261,13 @@
 @layer base {
   :root {
     /* Fallbacks for older browsers */
-    --background: #ffffff;
+    --background: #dbeafe;
     --foreground: #0f172a;
-    --card: #ffffff;
+    --card: #dbeafe;
     --card-foreground: #0f172a;
-    --popover: #ffffff;
+    --popover: #dbeafe;
     --popover-foreground: #0f172a;
-    --primary: #1e293b;
+    --primary: #3b82f6;
     --primary-foreground: #f8fafc;
     --secondary: #f1f5f9;
     --secondary-foreground: #1e293b;
@@ -275,18 +277,18 @@
     --accent-foreground: #1e293b;
     --destructive: #ef4444;
     --destructive-foreground: #f8fafc;
-    --border: #e2e8f0;
-    --input: #e2e8f0;
-    --ring: #0f172a;
+    --border: #bfdbfe;
+    --input: #bfdbfe;
+    --ring: #3b82f6;
 
     /* Modern HSL values for newer browsers */
-    --background: 0 0% 100%;
+    --background: 214 100% 97%;
     --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
+    --card: 214 100% 97%;
     --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
+    --popover: 214 100% 97%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 98%;
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
@@ -296,9 +298,9 @@
     --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 10% 3.9%;
+    --border: 214 95% 87%;
+    --input: 214 95% 87%;
+    --ring: 217 91% 60%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -317,14 +319,14 @@
 
   .dark {
     /* Fallbacks for older browsers */
-    --background: #0f172a;
+    --background: #0a0d12;
     --foreground: #f8fafc;
-    --card: #0f172a;
+    --card: #0a0d12;
     --card-foreground: #f8fafc;
-    --popover: #0f172a;
+    --popover: #0a0d12;
     --popover-foreground: #f8fafc;
-    --primary: #f8fafc;
-    --primary-foreground: #1e293b;
+    --primary: #3b82f6;
+    --primary-foreground: #f8fafc;
     --secondary: #1e293b;
     --secondary-foreground: #f8fafc;
     --muted: #1e293b;
@@ -335,17 +337,17 @@
     --destructive-foreground: #f8fafc;
     --border: #1e293b;
     --input: #1e293b;
-    --ring: #cbd5e1;
+    --ring: #3b82f6;
 
     /* Modern HSL values for newer browsers */
-    --background: 240 10% 3.9%;
+    --background: 220 15% 5%;
     --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
+    --card: 220 15% 5%;
     --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
+    --popover: 220 15% 5%;
     --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 98%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
@@ -356,7 +358,7 @@
     --destructive-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    --ring: 217 91% 60%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -373,8 +375,6 @@
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border;
@@ -385,7 +385,7 @@
   }
 
   .container {
-    @apply mx-auto px-4 md:px-6
+    @apply mx-auto px-4 md:px-6;
   }
 
   /* Fix for cut-off bottoms of letters */

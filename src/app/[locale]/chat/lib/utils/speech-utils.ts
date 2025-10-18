@@ -2,6 +2,9 @@
  * Speech recognition utility functions
  */
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { TranslationKey } from "@/i18n/core/static-types";
+
 /**
  * Device and browser detection
  */
@@ -37,15 +40,13 @@ export function detectDevice(): DeviceInfo {
   const ua = navigator.userAgent.toLowerCase();
 
   const isIOS = /iphone|ipad|ipod/.test(ua);
-  const isAndroid = /android/.test(ua);
+  const isAndroid = ua.includes("android");
   const isMobile =
-    isIOS ||
-    isAndroid ||
-    /mobile|tablet|ip(ad|hone|od)|android|silk/i.test(ua);
+    isIOS || isAndroid || /mobile|tablet|ip(ad|hone|od)|android|silk/i.test(ua);
 
-  const isChrome = /chrome/.test(ua) && !/edge|edg/.test(ua);
-  const isSafari = /safari/.test(ua) && !/chrome/.test(ua);
-  const isFirefox = /firefox/.test(ua);
+  const isChrome = ua.includes("chrome") && !/edge|edg/.test(ua);
+  const isSafari = ua.includes("safari") && !ua.includes("chrome");
+  const isFirefox = ua.includes("firefox");
   const isEdge = /edge|edg/.test(ua);
 
   // Extract browser version
@@ -82,7 +83,9 @@ export function detectDevice(): DeviceInfo {
  * @returns true if in a secure context
  */
 export function isSecureContext(): boolean {
-  if (typeof window === "undefined") return false;
+  if (typeof window === "undefined") {
+    return false;
+  }
 
   // Check if window.isSecureContext is available
   if (typeof window.isSecureContext === "boolean") {
@@ -103,33 +106,51 @@ export function isSecureContext(): boolean {
 
 /**
  * Check if speech recognition is supported and available
- * @returns Object with support status and reason if not supported
+ * @returns Object with support status and translation key for reason if not supported
  */
 export function checkSpeechRecognitionSupport(): {
   supported: boolean;
-  reason?: string;
+  reasonKey?: TranslationKey;
 } {
   if (typeof window === "undefined") {
-    return { supported: false, reason: "Not in browser environment" };
+    return {
+      supported: false,
+      reasonKey: "app.chat.speechRecognition.errors.notInBrowser",
+    };
   }
 
   // Check for secure context first
   if (!isSecureContext()) {
     return {
       supported: false,
-      reason: "Speech recognition requires HTTPS or localhost",
+      reasonKey: "app.chat.speechRecognition.errors.requiresHttps",
     };
   }
 
   // Check for API availability
   const hasSpeechRecognition = !!(
-    window.SpeechRecognition || window.webkitSpeechRecognition
+    (
+      window as Window & {
+        // eslint-disable-next-line no-restricted-syntax -- Browser API check requires unknown type
+        SpeechRecognition?: unknown;
+        // eslint-disable-next-line no-restricted-syntax -- Browser API check requires unknown type
+        webkitSpeechRecognition?: unknown;
+      }
+    ).SpeechRecognition ||
+    (
+      window as Window & {
+        // eslint-disable-next-line no-restricted-syntax -- Browser API check requires unknown type
+        SpeechRecognition?: unknown;
+        // eslint-disable-next-line no-restricted-syntax -- Browser API check requires unknown type
+        webkitSpeechRecognition?: unknown;
+      }
+    ).webkitSpeechRecognition
   );
 
   if (!hasSpeechRecognition) {
     return {
       supported: false,
-      reason: "Speech recognition not available in this browser",
+      reasonKey: "app.chat.speechRecognition.errors.notAvailable",
     };
   }
 
@@ -140,7 +161,7 @@ export function checkSpeechRecognitionSupport(): {
   if (device.isFirefox) {
     return {
       supported: false,
-      reason: "Speech recognition not supported in Firefox",
+      reasonKey: "app.chat.speechRecognition.errors.firefoxNotSupported",
     };
   }
 
@@ -150,16 +171,16 @@ export function checkSpeechRecognitionSupport(): {
     if (version && version < 14.5) {
       return {
         supported: false,
-        reason: "Please update Safari to version 14.5 or later",
+        reasonKey: "app.chat.speechRecognition.errors.safariVersionTooOld",
       };
     }
   }
 
   // Check if MediaDevices API is available (required for permissions)
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+  if (!navigator.mediaDevices?.getUserMedia) {
     return {
       supported: false,
-      reason: "Microphone access not available",
+      reasonKey: "app.chat.speechRecognition.errors.microphoneNotAvailable",
     };
   }
 
@@ -202,33 +223,36 @@ export function localeToSpeechLang(locale: string): string {
 }
 
 /**
- * Get user-friendly name for a speech recognition error
+ * Get translation key for a speech recognition error
  * @param errorCode - The error code from SpeechRecognitionErrorEvent
- * @returns User-friendly error message
+ * @returns Translation key for the error message
  */
-export function getSpeechErrorMessage(errorCode: string): string {
-  const errorMessages: Record<string, string> = {
-    "no-speech": "No speech detected. Please try again.",
-    "audio-capture": "Microphone not available. Please check your settings.",
-    "not-allowed":
-      "Microphone permission denied. Please allow microphone access in your browser settings.",
-    network: "Network error. Please check your connection.",
-    "service-not-allowed": "Speech recognition service not allowed.",
-    "bad-grammar": "Speech recognition error. Please try again.",
-    "language-not-supported": "This language is not supported for speech recognition.",
-    aborted: "Recording cancelled.",
+export function getSpeechErrorTranslationKey(
+  errorCode: string,
+): TranslationKey {
+  const errorKeyMap: Record<string, TranslationKey> = {
+    "no-speech": "app.chat.speechRecognition.errors.noSpeech",
+    "audio-capture": "app.chat.speechRecognition.errors.audioCapture",
+    "not-allowed": "app.chat.speechRecognition.errors.notAllowed",
+    "network": "app.chat.speechRecognition.errors.network",
+    "service-not-allowed":
+      "app.chat.speechRecognition.errors.serviceNotAllowed",
+    "bad-grammar": "app.chat.speechRecognition.errors.badGrammar",
+    "language-not-supported":
+      "app.chat.speechRecognition.errors.languageNotSupported",
+    "aborted": "app.chat.speechRecognition.errors.aborted",
   };
 
-  return errorMessages[errorCode] || `Speech recognition error: ${errorCode}`;
+  return errorKeyMap[errorCode] || "app.chat.speechRecognition.errors.unknown";
 }
 
 /**
  * Check microphone permission state
  * @returns Permission state: 'granted', 'denied', 'prompt', or 'unknown'
  */
-export async function checkMicrophonePermission(): Promise<
-  "granted" | "denied" | "prompt" | "unknown"
-> {
+export async function checkMicrophonePermission(
+  logger: EndpointLogger,
+): Promise<"granted" | "denied" | "prompt" | "unknown"> {
   if (typeof navigator === "undefined" || !navigator.permissions) {
     return "unknown";
   }
@@ -239,7 +263,7 @@ export async function checkMicrophonePermission(): Promise<
     });
     return result.state as "granted" | "denied" | "prompt";
   } catch (error) {
-    console.warn("Could not check microphone permission:", error);
+    logger.warn("Speech", "Could not check microphone permission", error);
     return "unknown";
   }
 }

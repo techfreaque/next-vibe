@@ -1,0 +1,38 @@
+export const translations = {
+  status: "Filter by status",
+  campaign_stage: "Filter by campaign stage",
+  country: "Filter by country",
+  language: "Filter by language",
+  source: "Filter by source",
+  all_statuses: "All Statuses",
+  all_countries: "All Countries",
+  all_languages: "All Languages",
+  all_sources: "All Sources",
+  sort: "Sort by",
+  page_size: "Page size",
+  quick_filters: "Quick Filters",
+  quick: {
+    new_leads: "New Leads",
+    campaign_running: "Campaign Running",
+    imported: "Imported",
+    not_started: "Not Started",
+  },
+  countries: {
+    global: "Global",
+    de: "Germany",
+    pl: "Poland",
+  },
+  languages: {
+    en: "English",
+    de: "German",
+    pl: "Polish",
+  },
+  sources: {
+    website: "Website",
+    social_media: "Social Media",
+    email_campaign: "Email Campaign",
+    referral: "Referral",
+    csv_import: "CSV Import",
+    api: "API",
+  },
+};

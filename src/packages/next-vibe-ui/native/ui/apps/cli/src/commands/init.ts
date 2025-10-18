@@ -1,61 +1,61 @@
-import { execSync } from "node:child_process";
-import { existsSync, promises as fs } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { Command } from "commander";
-import { execa } from "execa";
-import ora from "ora";
-import prompts from "prompts";
+import { execSync } from 'node:child_process';
+import { existsSync, promises as fs } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { Command } from 'commander';
+import { execa } from 'execa';
+import ora from 'ora';
+import prompts from 'prompts';
 
-import { copyFolder } from "@/src/utils/copy-folder";
-import { handleError } from "@/src/utils/handle-error";
-import { logger } from "@/src/utils/logger";
+import { copyFolder } from '@/src/utils/copy-folder';
+import { handleError } from '@/src/utils/handle-error';
+import { logger } from '@/src/utils/logger';
 
 const filePath = fileURLToPath(import.meta.url);
 const fileDir = path.dirname(filePath);
 
 export const init = new Command()
-  .name("init")
-  .description("Initialize a new React Native Reusables project")
+  .name('init')
+  .description('Initialize a new React Native Reusables project')
   .action(async () => {
     try {
       const cwd = process.cwd();
 
-      if (existsSync(cwd) && existsSync(path.join(cwd, "package.json"))) {
+      if (existsSync(cwd) && existsSync(path.join(cwd, 'package.json'))) {
         const { option } = await prompts({
-          type: "select",
-          name: "option",
-          message: "Package.json found. How would you like to proceed?",
+          type: 'select',
+          name: 'option',
+          message: 'Package.json found. How would you like to proceed?',
           choices: [
-            { title: "Initialize a new project", value: "new-project" },
-            { title: "Cancel", value: "cancel" },
+            { title: 'Initialize a new project', value: 'new-project' },
+            { title: 'Cancel', value: 'cancel' },
           ],
           initial: false,
         });
 
-        if (option === "cancel") {
-          logger.info("Installation cancelled.");
+        if (option === 'cancel') {
+          logger.info('Installation cancelled.');
           process.exit(0);
         }
       }
 
       const { projectPath } = await prompts({
-        type: "text",
-        name: "projectPath",
+        type: 'text',
+        name: 'projectPath',
         message: `Enter the project name or relative path (e.g., 'my-app' or './apps/my-app'):`,
-        initial: "./my-app",
+        initial: './my-app',
       });
 
       const { packageManager } = await prompts({
-        type: "select",
-        name: "packageManager",
-        message: "Which package manager would you like the CLI to use?",
+        type: 'select',
+        name: 'packageManager',
+        message: 'Which package manager would you like the CLI to use?',
         choices: [
-          { title: "npm", value: "npm" },
-          { title: "yarn", value: "yarn" },
-          { title: "pnpm", value: "pnpm" },
-          { title: "bun", value: "bun" },
-          { title: "None.", value: "none" },
+          { title: 'npm', value: 'npm' },
+          { title: 'yarn', value: 'yarn' },
+          { title: 'pnpm', value: 'pnpm' },
+          { title: 'bun', value: 'bun' },
+          { title: 'None.', value: 'none' },
         ],
       });
 
@@ -70,76 +70,65 @@ export const init = new Command()
 
       const filesToIgnore = [];
 
-      if (packageManager !== "pnpm") {
-        filesToIgnore.push("npmrc-template");
+      if (packageManager !== 'pnpm') {
+        filesToIgnore.push('npmrc-template');
       }
 
-      await copyFolder(
-        path.join(fileDir, "../__generated/starter-base"),
-        fullProjectPath,
-        {
-          ignore: filesToIgnore,
-          renameTemplateFiles: true,
-        },
-      );
+      await copyFolder(path.join(fileDir, '../__generated/starter-base'), fullProjectPath, {
+        ignore: filesToIgnore,
+        renameTemplateFiles: true,
+      });
 
       await Promise.all([
+        replaceAllInJsonFile(path.join(fullProjectPath, 'app.json'), 'starter-base', projectName),
         replaceAllInJsonFile(
-          path.join(fullProjectPath, "app.json"),
-          "starter-base",
-          projectName,
-        ),
-        replaceAllInJsonFile(
-          path.join(fullProjectPath, "package.json"),
-          "@rnr/starter-base",
-          projectName,
+          path.join(fullProjectPath, 'package.json'),
+          '@rnr/starter-base',
+          projectName
         ),
       ]);
 
-      if (packageManager !== "none") {
+      if (packageManager !== 'none') {
         spinner.start(
-          `Installing dependencies using ${packageManager} (this may take a few minutes)...`,
+          `Installing dependencies using ${packageManager} (this may take a few minutes)...`
         );
-        await execa(packageManager, ["install"], {
+        await execa(packageManager, ['install'], {
           cwd: fullProjectPath,
         });
-        spinner.text = "Running expo doctor to ensure package compatibility...";
-        await execa("npx", ["expo", "install", "--fix"], {
+        spinner.text = 'Running expo doctor to ensure package compatibility...';
+        await execa('npx', ['expo', 'install', '--fix'], {
           cwd: fullProjectPath,
         });
       }
 
       spinner.stop();
       const { gitInit } = await prompts({
-        type: "confirm",
-        name: "gitInit",
-        message: "Would you like to initialize a Git repository?",
+        type: 'confirm',
+        name: 'gitInit',
+        message: 'Would you like to initialize a Git repository?',
       });
 
       if (gitInit) {
-        spinner.start("Initializing Git repository...");
+        spinner.start('Initializing Git repository...');
         try {
-          execSync("git init", { stdio: "inherit", cwd: fullProjectPath });
+          execSync('git init', { stdio: 'inherit', cwd: fullProjectPath });
 
-          execSync("git add -A", { stdio: "inherit", cwd: fullProjectPath });
-          execSync(
-            'git commit -m "initialize project with @react-native-reusables/cli"',
-            {
-              stdio: "inherit",
-              cwd: fullProjectPath,
-            },
-          );
+          execSync('git add -A', { stdio: 'inherit', cwd: fullProjectPath });
+          execSync('git commit -m "initialize project with @react-native-reusables/cli"', {
+            stdio: 'inherit',
+            cwd: fullProjectPath,
+          });
 
-          spinner.succeed("Git repository initialized successfully.");
+          spinner.succeed('Git repository initialized successfully.');
         } catch (error) {
-          logger.error("Failed to initialize Git repository:", error);
+          logger.error('Failed to initialize Git repository:', error);
         }
       }
 
-      spinner.succeed("New project initialized successfully!");
-      if (packageManager !== "none") {
+      spinner.succeed('New project initialized successfully!');
+      if (packageManager !== 'none') {
       }
-      if (packageManager === "none") {
+      if (packageManager === 'none') {
       }
       process.exit(0);
     } catch (error) {
@@ -147,18 +136,14 @@ export const init = new Command()
     }
   });
 
-async function replaceAllInJsonFile(
-  path: string,
-  searchValue: string,
-  replaceValue: string,
-) {
+async function replaceAllInJsonFile(path: string, searchValue: string, replaceValue: string) {
   try {
     if (!existsSync(path)) {
       logger.error(`The path ${path} does not exist.`);
       process.exit(1);
     }
 
-    const jsonValue = await fs.readFile(path, "utf8");
+    const jsonValue = await fs.readFile(path, 'utf8');
     const replacedValue = jsonValue.replaceAll(searchValue, replaceValue);
 
     await fs.writeFile(path, replacedValue);

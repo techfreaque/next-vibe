@@ -59,7 +59,7 @@ export function EmailStatsFiltersContainer({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-lg font-semibold">
-            {title || t("common.filter")}
+            {title || t("app.admin.emails.stats.common.filter")}
           </CardTitle>
           {onRefresh && (
             <Button
@@ -69,7 +69,7 @@ export function EmailStatsFiltersContainer({
               className="flex items-center gap-2"
             >
               <RefreshCw className="h-4 w-4" />
-              {t("common.refresh")}
+              {t("app.admin.emails.stats.common.refresh")}
             </Button>
           )}
         </CardHeader>
@@ -95,31 +95,37 @@ export function EmailStatsFilters({
           name="timePeriod"
           config={{
             type: "select",
-            label: "emails.admin.stats.filters.timePeriod",
+            label: "app.admin.emails.stats.admin.stats.filters.timePeriod",
             options: [
               {
                 value: TimePeriod.HOUR,
-                label: "emails.admin.stats.filters.timePeriods.hour",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.timePeriods.hour",
               },
               {
                 value: TimePeriod.DAY,
-                label: "emails.admin.stats.filters.timePeriods.day",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.timePeriods.day",
               },
               {
                 value: TimePeriod.WEEK,
-                label: "emails.admin.stats.filters.timePeriods.week",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.timePeriods.week",
               },
               {
                 value: TimePeriod.MONTH,
-                label: "emails.admin.stats.filters.timePeriods.month",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.timePeriods.month",
               },
               {
                 value: TimePeriod.QUARTER,
-                label: "emails.admin.stats.filters.timePeriods.quarter",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.timePeriods.quarter",
               },
               {
                 value: TimePeriod.YEAR,
-                label: "emails.admin.stats.filters.timePeriods.year",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.timePeriods.year",
               },
             ],
           }}
@@ -131,51 +137,62 @@ export function EmailStatsFilters({
           name="dateRangePreset"
           config={{
             type: "select",
-            label: "emails.admin.stats.filters.dateRange",
+            label: "app.admin.emails.stats.admin.stats.filters.dateRange",
             options: [
               {
                 value: DateRangePreset.TODAY,
-                label: "emails.admin.stats.filters.dateRanges.today",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.dateRanges.today",
               },
               {
                 value: DateRangePreset.YESTERDAY,
-                label: "emails.admin.stats.filters.dateRanges.yesterday",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.dateRanges.yesterday",
               },
               {
                 value: DateRangePreset.LAST_7_DAYS,
-                label: "emails.admin.stats.filters.dateRanges.last7Days",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.dateRanges.last7Days",
               },
               {
                 value: DateRangePreset.LAST_30_DAYS,
-                label: "emails.admin.stats.filters.dateRanges.last30Days",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.dateRanges.last30Days",
               },
               {
                 value: DateRangePreset.LAST_90_DAYS,
-                label: "emails.admin.stats.filters.dateRanges.last90Days",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.dateRanges.last90Days",
               },
               {
                 value: DateRangePreset.THIS_MONTH,
-                label: "emails.admin.stats.filters.dateRanges.thisMonth",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.dateRanges.thisMonth",
               },
               {
                 value: DateRangePreset.LAST_MONTH,
-                label: "emails.admin.stats.filters.dateRanges.lastMonth",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.dateRanges.lastMonth",
               },
               {
                 value: DateRangePreset.THIS_QUARTER,
-                label: "emails.admin.stats.filters.dateRanges.thisQuarter",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.dateRanges.thisQuarter",
               },
               {
                 value: DateRangePreset.LAST_QUARTER,
-                label: "emails.admin.stats.filters.dateRanges.lastQuarter",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.dateRanges.lastQuarter",
               },
               {
                 value: DateRangePreset.THIS_YEAR,
-                label: "emails.admin.stats.filters.dateRanges.thisYear",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.dateRanges.thisYear",
               },
               {
                 value: DateRangePreset.LAST_YEAR,
-                label: "emails.admin.stats.filters.dateRanges.lastYear",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.dateRanges.lastYear",
               },
             ],
           }}
@@ -187,19 +204,22 @@ export function EmailStatsFilters({
           name="chartType"
           config={{
             type: "select",
-            label: "emails.admin.stats.filters.chartType",
+            label: "app.admin.emails.stats.admin.stats.filters.chartType",
             options: [
               {
                 value: ChartType.LINE,
-                label: "emails.admin.stats.filters.chartTypes.line",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.chartTypes.line",
               },
               {
                 value: ChartType.BAR,
-                label: "emails.admin.stats.filters.chartTypes.bar",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.chartTypes.bar",
               },
               {
                 value: ChartType.AREA,
-                label: "emails.admin.stats.filters.chartTypes.area",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.chartTypes.area",
               },
             ],
           }}
@@ -214,39 +234,47 @@ export function EmailStatsFilters({
           name="status"
           config={{
             type: "select",
-            label: "emails.admin.stats.filters.statuses.title",
+            label: "app.admin.emails.stats.admin.stats.filters.statuses.title",
             options: [
               {
                 value: EmailStatusFilter.ALL,
-                label: "emails.admin.stats.filters.statuses.all",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.statuses.all",
               },
               {
                 value: EmailStatusFilter.SENT,
-                label: "emails.admin.stats.filters.statuses.sent",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.statuses.sent",
               },
               {
                 value: EmailStatusFilter.DELIVERED,
-                label: "emails.admin.stats.filters.statuses.delivered",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.statuses.delivered",
               },
               {
                 value: EmailStatusFilter.OPENED,
-                label: "emails.admin.stats.filters.statuses.opened",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.statuses.opened",
               },
               {
                 value: EmailStatusFilter.CLICKED,
-                label: "emails.admin.stats.filters.statuses.clicked",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.statuses.clicked",
               },
               {
                 value: EmailStatusFilter.BOUNCED,
-                label: "emails.admin.stats.filters.statuses.bounced",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.statuses.bounced",
               },
               {
                 value: EmailStatusFilter.FAILED,
-                label: "emails.admin.stats.filters.statuses.failed",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.statuses.failed",
               },
               {
                 value: EmailStatusFilter.UNSUBSCRIBED,
-                label: "emails.admin.stats.filters.statuses.unsubscribed",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.statuses.unsubscribed",
               },
             ],
           }}
@@ -258,31 +286,36 @@ export function EmailStatsFilters({
           name="type"
           config={{
             type: "select",
-            label: "emails.admin.stats.filters.types.title",
+            label: "app.admin.emails.stats.admin.stats.filters.types.title",
             options: [
               {
                 value: EmailTypeFilter.ALL,
-                label: "emails.admin.stats.filters.types.all",
+                label: "app.admin.emails.stats.admin.stats.filters.types.all",
               },
               {
                 value: EmailTypeFilter.LEAD_CAMPAIGN,
-                label: "emails.admin.stats.filters.types.leadCampaign",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.types.leadCampaign",
               },
               {
                 value: EmailTypeFilter.TRANSACTIONAL,
-                label: "emails.admin.stats.filters.types.transactional",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.types.transactional",
               },
               {
                 value: EmailTypeFilter.MARKETING,
-                label: "emails.admin.stats.filters.types.marketing",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.types.marketing",
               },
               {
                 value: EmailTypeFilter.NOTIFICATION,
-                label: "emails.admin.stats.filters.types.notification",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.types.notification",
               },
               {
                 value: EmailTypeFilter.SYSTEM,
-                label: "emails.admin.stats.filters.types.system",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.types.system",
               },
             ],
           }}
@@ -294,23 +327,26 @@ export function EmailStatsFilters({
           name="sortBy"
           config={{
             type: "select",
-            label: "emails.admin.stats.filters.sortBy.title",
+            label: "app.admin.emails.stats.admin.stats.filters.sortBy.title",
             options: [
               {
                 value: EmailSortField.CREATED_AT,
-                label: "emails.admin.stats.filters.sortBy.createdAt",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.sortBy.createdAt",
               },
               {
                 value: EmailSortField.SENT_AT,
-                label: "emails.admin.stats.filters.sortBy.sentAt",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.sortBy.sentAt",
               },
               {
                 value: EmailSortField.STATUS,
-                label: "emails.admin.stats.filters.sortBy.status",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.sortBy.status",
               },
               {
                 value: EmailSortField.TYPE,
-                label: "emails.admin.stats.filters.sortBy.type",
+                label: "app.admin.emails.stats.admin.stats.filters.sortBy.type",
               },
             ],
           }}
@@ -325,15 +361,17 @@ export function EmailStatsFilters({
           name="sortOrder"
           config={{
             type: "select",
-            label: "emails.admin.stats.filters.sortOrder.title",
+            label: "app.admin.emails.stats.admin.stats.filters.sortOrder.title",
             options: [
               {
                 value: SortOrder.DESC,
-                label: "emails.admin.stats.filters.sortOrder.desc",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.sortOrder.desc",
               },
               {
                 value: SortOrder.ASC,
-                label: "emails.admin.stats.filters.sortOrder.asc",
+                label:
+                  "app.admin.emails.stats.admin.stats.filters.sortOrder.asc",
               },
             ],
           }}
@@ -345,9 +383,10 @@ export function EmailStatsFilters({
           name="includeComparison"
           config={{
             type: "checkbox",
-            label: "emails.admin.stats.filters.includeComparison",
+            label:
+              "app.admin.emails.stats.admin.stats.filters.includeComparison",
             description:
-              "emails.admin.stats.filters.includeComparisonDescription",
+              "app.admin.emails.stats.admin.stats.filters.includeComparisonDescription",
           }}
         />
       </div>
@@ -358,8 +397,9 @@ export function EmailStatsFilters({
         name="search"
         config={{
           type: "text",
-          label: "emails.admin.stats.filters.search",
-          placeholder: "emails.admin.stats.filters.searchPlaceholder",
+          label: "app.admin.emails.stats.admin.stats.filters.search",
+          placeholder:
+            "app.admin.emails.stats.admin.stats.filters.searchPlaceholder",
         }}
       />
     </div>

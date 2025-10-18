@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, desc, eq, ilike, isNull, or } from "drizzle-orm";
+import { and, count, desc, eq, gte, ilike, isNull, lte, or } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -66,6 +66,9 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       const search = data.filters?.search;
       const folderId = data.filters?.folderId;
       const status = data.filters?.status;
+      const isPinned = data.filters?.isPinned;
+      const dateFrom = data.filters?.dateFrom;
+      const dateTo = data.filters?.dateTo;
 
       logger.debug("Listing threads", {
         userId: user.id,
@@ -74,6 +77,9 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         search,
         folderId,
         status,
+        isPinned,
+        dateFrom,
+        dateTo,
       });
 
       // Type guard to ensure user has id
@@ -100,6 +106,19 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       // Filter by status
       if (status) {
         conditions.push(eq(chatThreads.status, status));
+      }
+
+      // Filter by pinned status
+      if (isPinned !== undefined) {
+        conditions.push(eq(chatThreads.pinned, isPinned));
+      }
+
+      // Filter by date range
+      if (dateFrom) {
+        conditions.push(gte(chatThreads.createdAt, new Date(dateFrom)));
+      }
+      if (dateTo) {
+        conditions.push(lte(chatThreads.createdAt, new Date(dateTo)));
       }
 
       // Search in title and preview

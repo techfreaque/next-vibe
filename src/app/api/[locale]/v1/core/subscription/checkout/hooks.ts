@@ -23,11 +23,8 @@ import type {
 import { useApiMutation } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation";
 import { useTranslation } from "@/i18n/core/client";
 
-import type {
-  type BillingIntervalValue,
-  SubscriptionPlan,
-  type SubscriptionPlanValue,
-} from "../enum";
+import type { BillingIntervalValue, SubscriptionPlanValue } from "../enum";
+import { SubscriptionPlan } from "../enum";
 import type {
   CheckoutRequestInput,
   CheckoutResponseOutput,

@@ -19,7 +19,12 @@ import {
   responseArrayField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
-import { Countries, Languages } from "@/i18n/core/config";
+import {
+  Countries,
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "@/i18n/core/config";
 
 import { UserRole } from "../../user/user-roles/enum";
 import {
@@ -198,16 +203,10 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.leads.list.get.country.description" as const,
               placeholder:
                 "app.api.v1.core.leads.list.get.country.placeholder" as const,
-              options: Object.entries(Countries).map(
-                ([, value]: [string, string]) => ({
-                  value: value,
-                  label:
-                    `app.api.v1.core.leads.enums.country.${value.toLowerCase()}` as const,
-                }),
-              ),
+              options: CountriesOptions,
               layout: { columns: 6 },
             },
-            z.array(z.string()).optional(),
+            z.array(z.nativeEnum(Countries)).optional(),
           ),
           language: requestDataField(
             {
@@ -218,16 +217,10 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.leads.list.get.language.description" as const,
               placeholder:
                 "app.api.v1.core.leads.list.get.language.placeholder" as const,
-              options: Object.entries(Languages).map(
-                ([, value]: [string, string]) => ({
-                  value: value,
-                  label:
-                    `app.api.v1.core.leads.enums.language.${value.toLowerCase()}` as const,
-                }),
-              ),
+              options: LanguagesOptions,
               layout: { columns: 6 },
             },
-            z.array(z.string()).optional(),
+            z.array(z.nativeEnum(Languages)).optional(),
           ),
         },
       ),
@@ -361,7 +354,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.v1.core.leads.list.get.response.leads.country" as const,
                   },
-                  z.string(),
+                  z.nativeEnum(Countries),
                 ),
                 language: responseField(
                   {
@@ -369,7 +362,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.v1.core.leads.list.get.response.leads.language" as const,
                   },
-                  z.string(),
+                  z.nativeEnum(Languages),
                 ),
                 status: responseField(
                   {
@@ -637,8 +630,8 @@ const { GET } = createEndpoint({
           currentCampaignStage: [EmailCampaignStageFilter.INITIAL],
         },
         locationFilters: {
-          country: ["US", "CA"],
-          language: ["en"],
+          country: [Countries.US, Countries.CA],
+          language: [Languages.EN],
         },
         sortingOptions: {
           sortBy: LeadSortField.CREATED_AT,
@@ -674,8 +667,8 @@ const { GET } = createEndpoint({
               contactName: "John Doe",
               phone: "+1234567890",
               website: "https://example.com",
-              country: "GLOBAL",
-              language: "EN",
+              country: Countries.GLOBAL,
+              language: Languages.EN,
               status: LeadStatus.NEW,
               source: LeadSource.WEBSITE,
               notes: "Interested in premium features",
@@ -721,8 +714,8 @@ const { GET } = createEndpoint({
               contactName: "Jane Smith",
               phone: "+9876543210",
               website: "https://startup.example.com",
-              country: "GLOBAL",
-              language: "EN",
+              country: Countries.GLOBAL,
+              language: Languages.EN,
               status: LeadStatus.SIGNED_UP,
               source: LeadSource.REFERRAL,
               notes: null,

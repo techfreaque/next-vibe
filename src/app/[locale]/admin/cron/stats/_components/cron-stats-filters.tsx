@@ -32,11 +32,11 @@ interface CronStatsFiltersContainerProps {
   children: ReactNode;
   onRefresh?: () => void;
   title?: string;
-  form: EndpointReturn<typeof statsEndpoints>["read"]["form"];
+  form: EndpointReturn<typeof statsEndpoints.GET>["read"]["form"];
 }
 
 interface CronStatsFiltersProps {
-  control: EndpointReturn<typeof statsEndpoints>["read"]["form"]["control"];
+  control: EndpointReturn<typeof statsEndpoints.GET>["read"]["form"]["control"];
 }
 
 /**
@@ -56,7 +56,7 @@ export function CronStatsFiltersContainer({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-lg font-semibold">
-            {title || t("common.filter")}
+            {title || t("app.common.filter")}
           </CardTitle>
           {onRefresh && (
             <Button
@@ -66,7 +66,7 @@ export function CronStatsFiltersContainer({
               className="flex items-center gap-2"
             >
               <RefreshCw className="h-4 w-4" />
-              {t("common.refresh")}
+              {t("app.common.refresh")}
             </Button>
           )}
         </CardHeader>
@@ -87,24 +87,24 @@ export function CronStatsFilters({
         control={control}
         config={{
           type: "select",
-          label: "admin.dashboard.cron.stats.filters.timePeriod",
-          placeholder: "admin.dashboard.cron.stats.filters.selectTimePeriod",
+          label: "app.admin.cron.stats.filters.timePeriod",
+          placeholder: "app.admin.cron.stats.filters.selectTimePeriod",
           options: [
             {
               value: TimePeriod.HOUR,
-              label: "admin.dashboard.cron.stats.filters.timePeriods.hour",
+              label: "app.admin.cron.stats.filters.timePeriods.hour",
             },
             {
               value: TimePeriod.DAY,
-              label: "admin.dashboard.cron.stats.filters.timePeriods.day",
+              label: "app.admin.cron.stats.filters.timePeriods.day",
             },
             {
               value: TimePeriod.WEEK,
-              label: "admin.dashboard.cron.stats.filters.timePeriods.week",
+              label: "app.admin.cron.stats.filters.timePeriods.week",
             },
             {
               value: TimePeriod.MONTH,
-              label: "admin.dashboard.cron.stats.filters.timePeriods.month",
+              label: "app.admin.cron.stats.filters.timePeriods.month",
             },
           ],
         }}
@@ -115,36 +115,36 @@ export function CronStatsFilters({
         control={control}
         config={{
           type: "select",
-          label: "admin.dashboard.cron.stats.filters.dateRange",
-          placeholder: "admin.dashboard.cron.stats.filters.selectDateRange",
+          label: "app.admin.cron.stats.filters.dateRange",
+          placeholder: "app.admin.cron.stats.filters.selectDateRange",
           options: [
             {
               value: DateRangePreset.TODAY,
-              label: "admin.dashboard.cron.stats.filters.dateRanges.today",
+              label: "app.admin.cron.stats.filters.dateRanges.today",
             },
             {
               value: DateRangePreset.YESTERDAY,
-              label: "admin.dashboard.cron.stats.filters.dateRanges.yesterday",
+              label: "app.admin.cron.stats.filters.dateRanges.yesterday",
             },
             {
               value: DateRangePreset.LAST_7_DAYS,
-              label: "admin.dashboard.cron.stats.filters.dateRanges.last7Days",
+              label: "app.admin.cron.stats.filters.dateRanges.last7Days",
             },
             {
               value: DateRangePreset.LAST_30_DAYS,
-              label: "admin.dashboard.cron.stats.filters.dateRanges.last30Days",
+              label: "app.admin.cron.stats.filters.dateRanges.last30Days",
             },
             {
               value: DateRangePreset.LAST_90_DAYS,
-              label: "admin.dashboard.cron.stats.filters.dateRanges.last90Days",
+              label: "app.admin.cron.stats.filters.dateRanges.last90Days",
             },
             {
               value: DateRangePreset.THIS_MONTH,
-              label: "admin.dashboard.cron.stats.filters.dateRanges.thisMonth",
+              label: "app.admin.cron.stats.filters.dateRanges.thisMonth",
             },
             {
               value: DateRangePreset.LAST_MONTH,
-              label: "admin.dashboard.cron.stats.filters.dateRanges.lastMonth",
+              label: "app.admin.cron.stats.filters.dateRanges.lastMonth",
             },
           ],
         }}
@@ -156,8 +156,8 @@ export function CronStatsFilters({
         control={control}
         config={{
           type: "text",
-          label: "admin.dashboard.cron.stats.filters.taskName",
-          placeholder: "admin.dashboard.cron.stats.filters.enterTaskName",
+          label: "app.admin.cron.stats.filters.taskName",
+          placeholder: "app.admin.cron.stats.filters.enterTaskName",
         }}
       />
 
@@ -166,8 +166,8 @@ export function CronStatsFilters({
         control={control}
         config={{
           type: "select",
-          label: "admin.dashboard.cron.stats.filters.taskStatus",
-          placeholder: "admin.dashboard.cron.stats.filters.selectTaskStatus",
+          label: "app.admin.cron.stats.filters.taskStatus",
+          placeholder: "app.admin.cron.stats.filters.selectTaskStatus",
           options: Object.values(CronTaskStatusFilter).map((status) => ({
             value: status,
             label:
@@ -181,8 +181,8 @@ export function CronStatsFilters({
         control={control}
         config={{
           type: "select",
-          label: "admin.dashboard.cron.stats.filters.taskPriority",
-          placeholder: "admin.dashboard.cron.stats.filters.selectTaskPriority",
+          label: "app.admin.cron.stats.filters.taskPriority",
+          placeholder: "app.admin.cron.stats.filters.selectTaskPriority",
           options: Object.values(CronTaskPriorityFilter).map((priority) => ({
             value: priority,
             label:
@@ -196,8 +196,8 @@ export function CronStatsFilters({
         control={control}
         config={{
           type: "select",
-          label: "admin.dashboard.cron.stats.filters.healthStatus",
-          placeholder: "admin.dashboard.cron.stats.filters.selectHealthStatus",
+          label: "app.admin.cron.stats.filters.healthStatus",
+          placeholder: "app.admin.cron.stats.filters.selectHealthStatus",
           options: Object.values(PulseHealthStatus).map((status) => ({
             value: status,
             label:
@@ -212,8 +212,8 @@ export function CronStatsFilters({
         control={control}
         config={{
           type: "number",
-          label: "admin.dashboard.cron.stats.filters.minDuration",
-          placeholder: "admin.dashboard.cron.stats.filters.enterMinDuration",
+          label: "app.admin.cron.stats.filters.minDuration",
+          placeholder: "app.admin.cron.stats.filters.enterMinDuration",
         }}
       />
 
@@ -222,8 +222,8 @@ export function CronStatsFilters({
         control={control}
         config={{
           type: "number",
-          label: "admin.dashboard.cron.stats.filters.maxDuration",
-          placeholder: "admin.dashboard.cron.stats.filters.enterMaxDuration",
+          label: "app.admin.cron.stats.filters.maxDuration",
+          placeholder: "app.admin.cron.stats.filters.enterMaxDuration",
         }}
       />
 
@@ -233,7 +233,7 @@ export function CronStatsFilters({
         control={control}
         config={{
           type: "checkbox",
-          label: "admin.dashboard.cron.stats.filters.includeDisabled",
+          label: "app.admin.cron.stats.filters.includeDisabled",
         }}
       />
 
@@ -242,7 +242,7 @@ export function CronStatsFilters({
         control={control}
         config={{
           type: "checkbox",
-          label: "admin.dashboard.cron.stats.filters.includeSystemTasks",
+          label: "app.admin.cron.stats.filters.includeSystemTasks",
         }}
       />
 
@@ -251,7 +251,7 @@ export function CronStatsFilters({
         control={control}
         config={{
           type: "checkbox",
-          label: "admin.dashboard.cron.stats.filters.hasRecentFailures",
+          label: "app.admin.cron.stats.filters.hasRecentFailures",
         }}
       />
 
@@ -260,7 +260,7 @@ export function CronStatsFilters({
         control={control}
         config={{
           type: "checkbox",
-          label: "admin.dashboard.cron.stats.filters.hasTimeout",
+          label: "app.admin.cron.stats.filters.hasTimeout",
         }}
       />
 
@@ -271,8 +271,8 @@ export function CronStatsFilters({
           control={control}
           config={{
             type: "text",
-            label: "admin.dashboard.cron.stats.filters.search",
-            placeholder: "admin.dashboard.cron.stats.filters.searchPlaceholder",
+            label: "app.admin.cron.stats.filters.search",
+            placeholder: "app.admin.cron.stats.filters.searchPlaceholder",
           }}
         />
       </div>

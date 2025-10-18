@@ -1,6 +1,8 @@
+import { translations as messagesTranslations } from "../../messages/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  messages: messagesTranslations,
   get: {
     title: "Chat-Thread abrufen",
     description: "Einen bestimmten Chat-Thread nach ID abrufen",

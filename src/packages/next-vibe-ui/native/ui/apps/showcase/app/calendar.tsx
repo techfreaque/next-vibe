@@ -1,18 +1,18 @@
-import { DeprecatedUi } from "@rnr/reusables";
-import * as React from "react";
-import { ScrollView } from "react-native";
+import { DeprecatedUi } from '@rnr/reusables';
+import * as React from 'react';
+import { ScrollView } from 'react-native';
 
-import { useColorScheme } from "~/lib/useColorScheme";
+import { useColorScheme } from '~/lib/useColorScheme';
 
 const { Calendar, LocaleConfig } = DeprecatedUi;
 
 // TODO: refactor to use UI components
 
-LocaleConfig.defaultLocale = "en";
+LocaleConfig.defaultLocale = 'en';
 
 export default function CalendarScreen() {
   const { isDarkColorScheme } = useColorScheme();
-  const [selectedDate, setSelectedDate] = React.useState("");
+  const [selectedDate, setSelectedDate] = React.useState('');
   const [selectedDates, setSelectedDates] = React.useState<string[]>([]);
 
   return (
@@ -25,7 +25,7 @@ export default function CalendarScreen() {
           [selectedDate]: {
             selected: true,
             disableTouchEvent: true,
-            selectedColor: isDarkColorScheme ? "#0ea5e9" : "#0284c7",
+            selectedColor: isDarkColorScheme ? '#0ea5e9' : '#0284c7',
           },
         }}
       />
@@ -40,8 +40,8 @@ export default function CalendarScreen() {
         }}
         markedDates={getMarkedDates(selectedDates)}
         theme={{
-          todayTextColor: "orange",
-          arrowColor: "orange",
+          todayTextColor: 'orange',
+          arrowColor: 'orange',
         }}
       />
     </ScrollView>
@@ -53,10 +53,10 @@ function getMarkedDates(dates: string[]) {
     (acc, date) => {
       acc[date] = {
         selected: true,
-        selectedColor: "orange",
+        selectedColor: 'orange',
       };
       return acc;
     },
-    {} as Record<string, { selected: boolean; selectedColor: string }>,
+    {} as Record<string, { selected: boolean; selectedColor: string }>
   );
 }

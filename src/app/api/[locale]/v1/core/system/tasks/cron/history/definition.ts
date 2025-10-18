@@ -6,6 +6,7 @@
 import { z } from "zod";
 
 import {
+  EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
@@ -19,7 +20,6 @@ import {
 import { LayoutType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { EndpointErrorTypes } from "../../../../../../../../../../to_migrate/to_delete/endpoint-types-old";
 import { CronTaskPriority, CronTaskStatus } from "../../enum";
 
 /**

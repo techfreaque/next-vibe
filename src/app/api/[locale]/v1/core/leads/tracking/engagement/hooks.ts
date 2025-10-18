@@ -5,15 +5,12 @@
 
 "use client";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { useTranslation } from "@/i18n/core/client";
 
-import { EngagementTypes } from "../../enum";
 import { LeadTrackingClientRepository } from "../client-repository";
-import type { LeadEngagementResponseOutput } from "./definition";
 
 /**
  * Simple Lead ID Hook
@@ -50,7 +47,11 @@ export function useLeadId(setValueCallback?: (value: string) => void): {
           });
         } else {
           // If no lead ID in storage, wait a bit and retry (LeadTrackingProvider might still be initializing)
-          await new Promise((resolve) => setTimeout(resolve, 500));
+          await new Promise<void>((resolve) => {
+            setTimeout(() => {
+              resolve();
+            }, 500);
+          });
           const retryResult =
             await LeadTrackingClientRepository.getTrackingData(logger);
           const retryLeadId = retryResult.success

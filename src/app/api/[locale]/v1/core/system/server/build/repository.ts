@@ -58,7 +58,6 @@ const MESSAGES = {
     "Database connection failed. Please ensure the database is running and accessible.",
   DB_START_SUGGESTION:
     "Try running 'docker compose -f docker-compose-dev.yml up -d' to start the database",
-  NEXT_BUILD_HANDLED: "✅ Next.js build will be handled by yarn build command",
   FAILED_PROD_MIGRATIONS: "Failed to run production migrations",
 } as const;
 
@@ -153,19 +152,25 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
         // Build Next.js application with proper NODE_ENV
         output.push(MESSAGES.BUILDING_NEXTJS);
 
-        // Set NODE_ENV to production for build
-        // eslint-disable-next-line node/no-process-env
-        const originalEnv = process.env.NODE_ENV;
+        // Run Next.js build command
+        const { execSync } = await import("child_process");
         try {
-          // Note: In practice, NODE_ENV should be set externally by yarn build
-          output.push(MESSAGES.NEXT_BUILD_HANDLED);
-          output.push(`Target: ${data.target || "default"}`); // eslint-disable-line i18next/no-literal-string
+          execSync("NODE_ENV=production bun run next build", {
+            stdio: "inherit",
+            cwd: process.cwd(),
+            shell: true,
+          });
           output.push(MESSAGES.NEXTJS_BUILD_SUCCESS);
-        } finally {
-          // Restore original NODE_ENV if it was changed
-          if (originalEnv !== undefined) {
-            // eslint-disable-next-line node/no-process-env
-            Object.assign(process.env, { NODE_ENV: originalEnv });
+        } catch (buildError) {
+          errors.push(MESSAGES.NEXTJS_BUILD_FAILED);
+          if (!data.force) {
+            const response: BuildResponseType = {
+              success: false,
+              output: output.join("\n"),
+              duration: Date.now() - startTime,
+              errors,
+            };
+            return createSuccessResponse(response);
           }
         }
       }

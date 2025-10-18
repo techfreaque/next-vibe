@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
-import { existsSync, promises as fs } from "node:fs";
-import path from "node:path";
+import { existsSync, promises as fs } from 'node:fs';
+import path from 'node:path';
 
-import { COMPONENTS } from "../src/items/components";
-import { TEMPLATES } from "../src/items/templates";
-import { copyFolder } from "../src/utils/copy-folder";
+import { COMPONENTS } from '../src/items/components';
+import { TEMPLATES } from '../src/items/templates';
+import { copyFolder } from '../src/utils/copy-folder';
 
 async function main() {
   for (const template of TEMPLATES) {
-    await copyFolder(template.path, path.join("__generated", template.name), {
-      ignore: [".expo", "node_modules"],
+    await copyFolder(template.path, path.join('__generated', template.name), {
+      ignore: ['.expo', 'node_modules'],
       renameTemplateFiles: false,
     });
   }
@@ -25,16 +25,14 @@ async function main() {
 
 main();
 
-async function writeFiles(
-  paths: Array<{ from: string; to: { folder: string; file: string } }>,
-) {
+async function writeFiles(paths: Array<{ from: string; to: { folder: string; file: string } }>) {
   for (const compPath of paths) {
-    const targetDir = path.join("__generated/components", compPath.to.folder);
+    const targetDir = path.join('__generated/components', compPath.to.folder);
     if (!existsSync(targetDir)) {
       await fs.mkdir(targetDir, { recursive: true });
     }
     try {
-      const content = await fs.readFile(path.resolve(compPath.from), "utf8");
+      const content = await fs.readFile(path.resolve(compPath.from), 'utf8');
       await fs.writeFile(path.join(targetDir, compPath.to.file), content);
     } catch (_error) {}
   }

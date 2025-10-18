@@ -14,6 +14,11 @@
  * - branchIndices stores which branch was selected at each branching point
  */
 
+import {
+  ErrorResponseTypes,
+  throwErrorResponse,
+} from "next-vibe/shared/types/response.schema";
+
 import type {
   ChatMessage,
   ChatThread,
@@ -54,6 +59,7 @@ const MESSAGE_TREE_CONSTANTS = {
  * const id = generateMessageId(); // "msg-1234567890-abc123d"
  */
 export function generateMessageId(): string {
+  // eslint-disable-next-line i18next/no-literal-string -- Technical ID generation, not user-facing
   return `msg-${Date.now()}-${Math.random().toString(36).substring(MESSAGE_TREE_CONSTANTS.RANDOM_ID_START, MESSAGE_TREE_CONSTANTS.RANDOM_ID_END)}`;
 }
 
@@ -206,7 +212,7 @@ export function addMessageToThread(
  * This preserves the original message and allows switching between branches.
  *
  * @param thread - The chat thread
- * @param parentMessageId - ID of the message to branch from
+ * @param parentMessageId - ID of the message to branch from (null for root-level branches)
  * @param newMessage - The new message data for the branch
  * @returns A new thread object with the branch created
  * @throws Error if parent message not found or not in current path
@@ -217,10 +223,17 @@ export function addMessageToThread(
  *   role: "assistant",
  *   content: "Alternative response"
  * });
+ *
+ * @example
+ * // Create a root-level branch (editing first message)
+ * const branched = createBranchFromMessage(thread, null, {
+ *   role: "user",
+ *   content: "Alternative first message"
+ * });
  */
 export function createBranchFromMessage(
   thread: ChatThread,
-  parentMessageId: string,
+  parentMessageId: string | null,
   newMessage: NewMessageInput,
 ): ChatThread {
   const newMsg = createMessage({
@@ -228,11 +241,34 @@ export function createBranchFromMessage(
     parentId: parentMessageId,
   });
 
-  // Update parent's children list
   const updatedMessages = { ...thread.messages };
+
+  // Handle root-level branching (parentMessageId is null)
+  if (parentMessageId === null) {
+    // Add new root message
+    updatedMessages[newMsg.id] = newMsg;
+
+    // Update path to use this new root message
+    const newPath: ConversationPath = {
+      messageIds: [newMsg.id],
+      branchIndices: {},
+    };
+
+    return {
+      ...thread,
+      messages: updatedMessages,
+      currentPath: newPath,
+      updatedAt: Date.now(),
+    };
+  }
+
+  // Handle normal branching (parentMessageId is not null)
   const parent = updatedMessages[parentMessageId];
   if (!parent) {
-    throw new Error(`Parent message ${parentMessageId} not found`);
+    throwErrorResponse(
+      "app.chat.errors.parentMessageNotFound",
+      ErrorResponseTypes.NOT_FOUND,
+    );
   }
 
   updatedMessages[parentMessageId] = {
@@ -246,7 +282,10 @@ export function createBranchFromMessage(
   // Update path to use this new branch
   const parentIndex = thread.currentPath.messageIds.indexOf(parentMessageId);
   if (parentIndex === -1) {
-    throw new Error(`Parent message ${parentMessageId} not in current path`);
+    throwErrorResponse(
+      "app.chat.errors.parentMessageNotInPath",
+      ErrorResponseTypes.BAD_REQUEST,
+    );
   }
 
   const newPath: ConversationPath = {
@@ -299,16 +338,25 @@ export function switchBranch(
 ): ChatThread {
   const message = thread.messages[messageId];
   if (!message) {
-    throw new Error(`Message ${messageId} not found`);
+    throwErrorResponse(
+      "app.chat.errors.messageNotFound",
+      ErrorResponseTypes.NOT_FOUND,
+    );
   }
 
   if (branchIndex < 0 || branchIndex >= message.childrenIds.length) {
-    throw new Error(`Invalid branch index ${branchIndex}`);
+    throwErrorResponse(
+      "app.chat.errors.invalidBranchIndex",
+      ErrorResponseTypes.BAD_REQUEST,
+    );
   }
 
   const messageIndex = thread.currentPath.messageIds.indexOf(messageId);
   if (messageIndex === -1) {
-    throw new Error(`Message ${messageId} not in current path`);
+    throwErrorResponse(
+      "app.chat.errors.messageNotInPath",
+      ErrorResponseTypes.BAD_REQUEST,
+    );
   }
 
   // Build new path up to this message, then follow the selected branch
@@ -388,16 +436,22 @@ export function getBranchInfo(
     };
   }
 
-  const branchCount = message.childrenIds.length;
+  // Filter out deleted messages (childrenIds that don't exist in messages)
+  const validChildrenIds = message.childrenIds.filter(
+    (childId) => thread.messages[childId],
+  );
+
+  const branchCount = validChildrenIds.length;
   const currentBranchIndex = thread.currentPath.branchIndices[messageId] || 0;
 
-  const branches = message.childrenIds.map((childId) => {
+  const branches = validChildrenIds.map((childId) => {
     const child = thread.messages[childId];
     return {
       id: childId,
-      preview: child
-        ? child.content.substring(0, MESSAGE_TREE_CONSTANTS.PREVIEW_LENGTH)
-        : "",
+      preview: child.content.substring(
+        0,
+        MESSAGE_TREE_CONSTANTS.PREVIEW_LENGTH,
+      ),
     };
   });
 

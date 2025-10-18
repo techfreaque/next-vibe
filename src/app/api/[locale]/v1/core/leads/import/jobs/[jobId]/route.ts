@@ -51,8 +51,9 @@ export const { PATCH, DELETE, tools } = endpointsHandler({
               configuration: {
                 currentBatchStart: response.data.currentBatchStart,
                 batchSize: response.data.batchSize,
-                maxRetries: response.data.maxRetries,
                 retryCount: response.data.retryCount,
+                maxRetries: response.data.maxRetries,
+                error: response.data.error || null,
               },
               timestamps: {
                 createdAt: response.data.createdAt,

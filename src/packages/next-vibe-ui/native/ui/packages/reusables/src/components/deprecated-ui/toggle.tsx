@@ -1,23 +1,20 @@
-import * as React from "react";
-import { Pressable, View } from "react-native";
+import * as React from 'react';
+import { Pressable, View } from 'react-native';
 
-import type { Button } from "../../components/deprecated-ui/button";
-import { buttonVariants } from "../../components/deprecated-ui/button";
-import { cn } from "../../lib/utils";
+import type { Button } from '../../components/deprecated-ui/button';
+import { buttonVariants } from '../../components/deprecated-ui/button';
+import { cn } from '../../lib/utils';
 
 interface ToggleProps {
   defaultValue?: boolean;
   value?: boolean;
   onChange?: React.Dispatch<React.SetStateAction<boolean>>;
-  variant?: "default" | "outline";
+  variant?: 'default' | 'outline';
 }
 
 const Toggle = React.forwardRef<
   React.ElementRef<typeof Button>,
-  Omit<
-    React.ComponentPropsWithoutRef<typeof Button>,
-    "variant" | "onPress" | "children"
-  > &
+  Omit<React.ComponentPropsWithoutRef<typeof Button>, 'variant' | 'onPress' | 'children'> &
     ToggleProps & {
       children?: React.ReactNode;
     }
@@ -31,10 +28,10 @@ const Toggle = React.forwardRef<
       size,
       textClass,
       children,
-      variant = "default",
+      variant = 'default',
       ...props
     },
-    ref,
+    ref
   ) => {
     const [isChecked, setChecked] = React.useState(false);
     return (
@@ -47,26 +44,22 @@ const Toggle = React.forwardRef<
           }
           setChecked((prev) => !prev);
         }}
-        role="switch"
+        role='switch'
         accessibilityState={{ selected: value || isChecked }}
         {...props}
       >
         {({ pressed }) => (
           <View
             className={cn(
-              "border bg-background",
-              pressed ? "opacity-70" : "",
-              value || isChecked ? "border-border" : "border-transparent",
+              'border bg-background',
+              pressed ? 'opacity-70' : '',
+              value || isChecked ? 'border-border' : 'border-transparent',
               buttonVariants({
                 variant:
-                  value || isChecked
-                    ? "secondary"
-                    : variant === "default"
-                      ? "ghost"
-                      : "outline",
+                  value || isChecked ? 'secondary' : variant === 'default' ? 'ghost' : 'outline',
                 size,
                 className,
-              }),
+              })
             )}
           >
             {children}
@@ -74,7 +67,7 @@ const Toggle = React.forwardRef<
         )}
       </Pressable>
     );
-  },
+  }
 );
 
 export { Toggle };

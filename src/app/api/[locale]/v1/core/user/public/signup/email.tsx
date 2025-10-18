@@ -136,7 +136,7 @@ function renderWelcomeEmailContent(
 
         <div style={{ textAlign: "center", marginBottom: "16px" }}>
           <Button
-            href={`${baseUrl}/${locale}/app/onboarding`}
+            href={`${baseUrl}/${locale}/`}
             style={{
               backgroundColor: "#2563eb",
               borderRadius: "8px",
@@ -228,7 +228,7 @@ function renderWelcomeEmailContent(
           })}
         </Text>
         <Button
-          href={`${baseUrl}/${locale}/app/onboarding`}
+          href={`${baseUrl}/${locale}/`}
           style={{
             backgroundColor: "transparent",
             border: "2px solid #64748b",
@@ -365,7 +365,7 @@ function renderWelcomeEmailContent(
         </ul>
         <Section style={{ textAlign: "center", marginTop: "16px" }}>
           <Button
-            href={`${baseUrl}/${locale}/app/onboarding`}
+            href={`${baseUrl}/${locale}/`}
             style={{
               backgroundColor: "transparent",
               border: "2px solid #64748b",

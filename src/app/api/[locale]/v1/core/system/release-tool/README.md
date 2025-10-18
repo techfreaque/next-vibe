@@ -58,7 +58,6 @@ const releaseConfig: ReleaseConfig = {
 };
 
 export default releaseConfig;
-
 ```
 
 ## Usage

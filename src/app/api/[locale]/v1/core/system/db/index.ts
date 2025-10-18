@@ -2,6 +2,10 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { env } from "next-vibe/server/env";
 import pg from "pg";
 
+import * as agentChatSchema from "../../agent/chat/db";
+import * as creditSchema from "../../agent/chat/credits/db";
+import * as leadsSchema from "../../leads/db";
+import * as userSchema from "../../user/db";
 import type { EndpointLogger } from "../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 const { Pool } = pg;
@@ -22,9 +26,16 @@ const poolConfig = {
 const pool = new Pool(poolConfig);
 
 /**
- * Drizzle ORM database client
+ * Drizzle ORM database client with schema registration
  */
-export const db = drizzle(pool);
+export const db = drizzle(pool, {
+  schema: {
+    ...userSchema,
+    ...agentChatSchema,
+    ...creditSchema,
+    ...leadsSchema,
+  },
+});
 
 /**
  * Raw PostgreSQL pool for direct queries when needed

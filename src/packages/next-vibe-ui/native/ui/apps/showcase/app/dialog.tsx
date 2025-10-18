@@ -1,6 +1,6 @@
-import { ScrollView } from "react-native";
+import { ScrollView } from 'react-native';
 
-import { Button } from "~/components/ui/button";
+import { Button } from '~/components/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -10,19 +10,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "~/components/ui/dialog";
-import { Text } from "~/components/ui/text";
+} from '~/components/ui/dialog';
+import { Text } from '~/components/ui/text';
 
 export default function DialogScreen() {
   return (
-    <ScrollView contentContainerClassName="flex-1 justify-center items-center p-6">
+    <ScrollView contentContainerClassName='flex-1 justify-center items-center p-6'>
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="outline">
+          <Button variant='outline'>
             <Text>Edit Profile</Text>
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className='sm:max-w-[425px]'>
           <DialogHeader>
             <DialogTitle>Edit profile</DialogTitle>
             <DialogDescription>

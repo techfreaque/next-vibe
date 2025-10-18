@@ -35,6 +35,6 @@ bun test
 4. Create a pull request to the main repository.
 5. If you have access to the repository, you can publish a new version by running:
 
-    ```bash
-    bun pub
-    ```
+   ```bash
+   bun pub
+   ```

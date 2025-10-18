@@ -122,13 +122,11 @@ export const taskDefinition: CronTaskDefinition<
 
   // Scheduling configuration
   schedule: getSchedule(),
-  timezone: "UTC",
   enabled: true,
 
   // Execution configuration
   timeout: 600000, // 10 minutes
   retries: 3,
-  retryDelay: 5000,
 
   // Task-specific configuration
   defaultConfig: getDefaultConfig(),
@@ -138,21 +136,24 @@ export const taskDefinition: CronTaskDefinition<
   resultSchema: emailCampaignResultSchema,
 
   // Task categories and metadata
+  category: "LEAD_MANAGEMENT",
   tags: ["email", "marketing", "leads", "automation"],
   dependencies: [],
   monitoring: {
+    enabled: true,
     alertOnFailure: true,
-    alertOnLongExecution: true,
-    maxExecutionTime: 600000, // 10 minutes
+    alertOnTimeout: true,
+    maxFailures: 3,
   },
 
   // Documentation
   documentation: {
-    // eslint-disable-next-line i18next/no-literal-string
-    purpose: "Automates lead nurturing through staged email campaigns",
-    // eslint-disable-next-line i18next/no-literal-string
-    impact: "Improves lead conversion and engagement rates",
-    // eslint-disable-next-line i18next/no-literal-string
-    rollback: "No rollback needed - emails are tracked in database",
+    description:
+      // eslint-disable-next-line i18next/no-literal-string
+      "Automates lead nurturing through staged email campaigns to improve lead conversion and engagement rates",
+    troubleshooting: [
+      // eslint-disable-next-line i18next/no-literal-string
+      "No rollback needed - emails are tracked in database",
+    ],
   },
 };

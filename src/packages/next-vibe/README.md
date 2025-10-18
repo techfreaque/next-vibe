@@ -37,12 +37,12 @@ Initialize the API library in your application:
 
 ```typescript
 
-
 ```
 
 ### Implement the API Route Handler
 
 ```typescript
+
 ```
 
 ### Use the API Client in Your Components
@@ -111,17 +111,10 @@ next-vibe includes several performance optimizations:
 
 ### Server-Side APIs
 
-
-
 ### Client-Side Hooks
 
-
-
 ### Testing Utilities
-
-
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-

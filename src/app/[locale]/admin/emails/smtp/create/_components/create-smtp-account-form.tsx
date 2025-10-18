@@ -51,22 +51,22 @@ export function CreateSmtpAccountForm({
     {
       value: SmtpSecurityType.NONE,
       label:
-        "admin.dashboard.smtp.securityType.none" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.securityType.none" as const satisfies TranslationKey,
     },
     {
       value: SmtpSecurityType.TLS,
       label:
-        "admin.dashboard.smtp.securityType.tls" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.securityType.tls" as const satisfies TranslationKey,
     },
     {
       value: SmtpSecurityType.SSL,
       label:
-        "admin.dashboard.smtp.securityType.ssl" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.securityType.ssl" as const satisfies TranslationKey,
     },
     {
       value: SmtpSecurityType.STARTTLS,
       label:
-        "admin.dashboard.smtp.securityType.starttls" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.securityType.starttls" as const satisfies TranslationKey,
     },
   ];
 
@@ -75,27 +75,27 @@ export function CreateSmtpAccountForm({
     {
       value: CampaignType.LEAD_CAMPAIGN,
       label:
-        "smtp.admin.campaignTypes.leadCampaign" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.campaignTypes.leadCampaign" as const satisfies TranslationKey,
     },
     {
       value: CampaignType.NEWSLETTER,
       label:
-        "smtp.admin.campaignTypes.newsletter" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.campaignTypes.newsletter" as const satisfies TranslationKey,
     },
     {
       value: CampaignType.TRANSACTIONAL,
       label:
-        "smtp.admin.campaignTypes.transactional" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.campaignTypes.transactional" as const satisfies TranslationKey,
     },
     {
       value: CampaignType.NOTIFICATION,
       label:
-        "smtp.admin.campaignTypes.notification" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.campaignTypes.notification" as const satisfies TranslationKey,
     },
     {
       value: CampaignType.SYSTEM,
       label:
-        "smtp.admin.campaignTypes.system" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.campaignTypes.system" as const satisfies TranslationKey,
     },
   ];
 
@@ -104,17 +104,17 @@ export function CreateSmtpAccountForm({
     {
       value: EmailJourneyVariant.PERSONAL_APPROACH,
       label:
-        "smtp.admin.emailJourneyVariants.personalApproach" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailJourneyVariants.personalApproach" as const satisfies TranslationKey,
     },
     {
       value: EmailJourneyVariant.RESULTS_FOCUSED,
       label:
-        "smtp.admin.emailJourneyVariants.resultsFocused" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailJourneyVariants.resultsFocused" as const satisfies TranslationKey,
     },
     {
       value: EmailJourneyVariant.PERSONAL_RESULTS,
       label:
-        "smtp.admin.emailJourneyVariants.personalResults" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailJourneyVariants.personalResults" as const satisfies TranslationKey,
     },
   ];
 
@@ -123,37 +123,37 @@ export function CreateSmtpAccountForm({
     {
       value: EmailCampaignStage.NOT_STARTED,
       label:
-        "smtp.admin.emailCampaignStages.notStarted" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailCampaignStages.notStarted" as const satisfies TranslationKey,
     },
     {
       value: EmailCampaignStage.INITIAL,
       label:
-        "smtp.admin.emailCampaignStages.initial" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailCampaignStages.initial" as const satisfies TranslationKey,
     },
     {
       value: EmailCampaignStage.FOLLOWUP_1,
       label:
-        "smtp.admin.emailCampaignStages.followup1" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailCampaignStages.followup1" as const satisfies TranslationKey,
     },
     {
       value: EmailCampaignStage.FOLLOWUP_2,
       label:
-        "smtp.admin.emailCampaignStages.followup2" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailCampaignStages.followup2" as const satisfies TranslationKey,
     },
     {
       value: EmailCampaignStage.FOLLOWUP_3,
       label:
-        "smtp.admin.emailCampaignStages.followup3" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailCampaignStages.followup3" as const satisfies TranslationKey,
     },
     {
       value: EmailCampaignStage.NURTURE,
       label:
-        "smtp.admin.emailCampaignStages.nurture" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailCampaignStages.nurture" as const satisfies TranslationKey,
     },
     {
       value: EmailCampaignStage.REACTIVATION,
       label:
-        "smtp.admin.emailCampaignStages.reactivation" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailCampaignStages.reactivation" as const satisfies TranslationKey,
     },
   ];
 
@@ -208,31 +208,31 @@ export function CreateSmtpAccountForm({
         <Button variant="outline" asChild>
           <Link href={`/${locale}/admin/emails/smtp`}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            {"admin.dashboard.smtp.actions.back"}
+            {"app.admin.emails.smtp.actions.back"}
           </Link>
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>{"admin.dashboard.smtp.pages.create"}</CardTitle>
+          <CardTitle>{"app.admin.emails.smtp.pages.create"}</CardTitle>
         </CardHeader>
         <CardContent>
           <Form form={endpoint.create.form} onSubmit={handleSubmit}>
             <div className="space-y-6">
               {/* Basic Information */}
               <FormFieldGroup
-                title={"admin.dashboard.smtp.form.basicInformation"}
+                title={"app.admin.emails.smtp.form.basicInformation"}
                 description={
-                  "admin.dashboard.smtp.form.basicInformationDescription"
+                  "app.admin.emails.smtp.form.basicInformationDescription"
                 }
               >
                 <EndpointFormField
                   name="name"
                   config={{
                     type: "text",
-                    label: "admin.dashboard.smtp.fields.name",
-                    placeholder: "admin.dashboard.smtp.fields.namePlaceholder",
+                    label: "app.admin.emails.smtp.fields.name",
+                    placeholder: "app.admin.emails.smtp.fields.namePlaceholder",
                   }}
                   control={endpoint.create.form.control}
                   schema={createSmtpAccountSchema}
@@ -247,9 +247,9 @@ export function CreateSmtpAccountForm({
                   name="description"
                   config={{
                     type: "textarea",
-                    label: "admin.dashboard.smtp.fields.description",
+                    label: "app.admin.emails.smtp.fields.description",
                     placeholder:
-                      "admin.dashboard.smtp.fields.descriptionPlaceholder",
+                      "app.admin.emails.smtp.fields.descriptionPlaceholder",
 
                     rows: 2,
                   }}
@@ -264,16 +264,16 @@ export function CreateSmtpAccountForm({
 
               {/* Selection Criteria */}
               <FormFieldGroup
-                title={"smtp.admin.form.selectionCriteria"}
-                description={"smtp.admin.form.selectionCriteriaDescription"}
+                title={"app.admin.emails.smtp.admin.form.selectionCriteria"}
+                description={"app.admin.emails.smtp.admin.form.selectionCriteriaDescription"}
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <EndpointFormField
                     name="campaignTypes"
                     config={{
                       type: "multiselect",
-                      label: "smtp.admin.fields.campaignTypes",
-                      placeholder: "smtp.admin.fields.campaignTypesPlaceholder",
+                      label: "app.admin.emails.smtp.admin.fields.campaignTypes",
+                      placeholder: "app.admin.emails.smtp.admin.fields.campaignTypesPlaceholder",
                       options: campaignTypeOptions,
                       maxSelections: 5,
                       searchable: true,
@@ -290,9 +290,9 @@ export function CreateSmtpAccountForm({
                     name="emailJourneyVariants"
                     config={{
                       type: "multiselect",
-                      label: "smtp.admin.fields.emailJourneyVariants",
+                      label: "app.admin.emails.smtp.admin.fields.emailJourneyVariants",
                       placeholder:
-                        "smtp.admin.fields.emailJourneyVariantsPlaceholder",
+                        "app.admin.emails.smtp.admin.fields.emailJourneyVariantsPlaceholder",
                       options: emailJourneyVariantOptions,
                       maxSelections: 3,
                       searchable: true,
@@ -309,9 +309,9 @@ export function CreateSmtpAccountForm({
                     name="emailCampaignStages"
                     config={{
                       type: "multiselect",
-                      label: "smtp.admin.fields.emailCampaignStages",
+                      label: "app.admin.emails.smtp.admin.fields.emailCampaignStages",
                       placeholder:
-                        "smtp.admin.fields.emailCampaignStagesPlaceholder",
+                        "app.admin.emails.smtp.admin.fields.emailCampaignStagesPlaceholder",
                       options: emailCampaignStageOptions,
                       maxSelections: 7,
                       searchable: true,
@@ -328,8 +328,8 @@ export function CreateSmtpAccountForm({
                     name="countries"
                     config={{
                       type: "multiselect",
-                      label: "smtp.admin.fields.countries",
-                      placeholder: "smtp.admin.fields.countriesPlaceholder",
+                      label: "app.admin.emails.smtp.admin.fields.countries",
+                      placeholder: "app.admin.emails.smtp.admin.fields.countriesPlaceholder",
                       options: countryOptions,
                       maxSelections: 3,
                       searchable: true,
@@ -346,8 +346,8 @@ export function CreateSmtpAccountForm({
                     name="languages"
                     config={{
                       type: "multiselect",
-                      label: "smtp.admin.fields.languages",
-                      placeholder: "smtp.admin.fields.languagesPlaceholder",
+                      label: "app.admin.emails.smtp.admin.fields.languages",
+                      placeholder: "app.admin.emails.smtp.admin.fields.languagesPlaceholder",
                       options: languageOptions,
                       maxSelections: 3,
                       searchable: true,
@@ -364,9 +364,9 @@ export function CreateSmtpAccountForm({
 
               {/* Server Configuration */}
               <FormFieldGroup
-                title={"admin.dashboard.smtp.form.serverConfiguration"}
+                title={"app.admin.emails.smtp.form.serverConfiguration"}
                 description={
-                  "admin.dashboard.smtp.form.serverConfigurationDescription"
+                  "app.admin.emails.smtp.form.serverConfigurationDescription"
                 }
               >
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -374,9 +374,9 @@ export function CreateSmtpAccountForm({
                     name="host"
                     config={{
                       type: "text",
-                      label: "admin.dashboard.smtp.fields.host",
+                      label: "app.admin.emails.smtp.fields.host",
                       placeholder:
-                        "admin.dashboard.smtp.fields.hostPlaceholder",
+                        "app.admin.emails.smtp.fields.hostPlaceholder",
                     }}
                     control={endpoint.create.form.control}
                     schema={createSmtpAccountSchema}
@@ -391,9 +391,9 @@ export function CreateSmtpAccountForm({
                     name="port"
                     config={{
                       type: "number",
-                      label: "admin.dashboard.smtp.fields.port",
+                      label: "app.admin.emails.smtp.fields.port",
                       placeholder:
-                        "admin.dashboard.smtp.fields.portPlaceholder",
+                        "app.admin.emails.smtp.fields.portPlaceholder",
                     }}
                     control={endpoint.create.form.control}
                     schema={createSmtpAccountSchema}
@@ -408,9 +408,9 @@ export function CreateSmtpAccountForm({
                     name="securityType"
                     config={{
                       type: "select",
-                      label: "admin.dashboard.smtp.fields.securityType",
+                      label: "app.admin.emails.smtp.fields.securityType",
                       placeholder:
-                        "admin.dashboard.smtp.fields.securityTypePlaceholder",
+                        "app.admin.emails.smtp.fields.securityTypePlaceholder",
                       options: securityTypeOptions,
                     }}
                     control={endpoint.create.form.control}
@@ -426,9 +426,9 @@ export function CreateSmtpAccountForm({
 
               {/* Authentication */}
               <FormFieldGroup
-                title={"admin.dashboard.smtp.form.authentication"}
+                title={"app.admin.emails.smtp.form.authentication"}
                 description={
-                  "admin.dashboard.smtp.form.authenticationDescription"
+                  "app.admin.emails.smtp.form.authenticationDescription"
                 }
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -436,9 +436,9 @@ export function CreateSmtpAccountForm({
                     name="username"
                     config={{
                       type: "text",
-                      label: "admin.dashboard.smtp.fields.username",
+                      label: "app.admin.emails.smtp.fields.username",
                       placeholder:
-                        "admin.dashboard.smtp.fields.usernamePlaceholder",
+                        "app.admin.emails.smtp.fields.usernamePlaceholder",
                     }}
                     control={endpoint.create.form.control}
                     schema={createSmtpAccountSchema}
@@ -453,9 +453,9 @@ export function CreateSmtpAccountForm({
                     name="password"
                     config={{
                       type: "password",
-                      label: "admin.dashboard.smtp.fields.password",
+                      label: "app.admin.emails.smtp.fields.password",
                       placeholder:
-                        "admin.dashboard.smtp.fields.passwordPlaceholder",
+                        "app.admin.emails.smtp.fields.passwordPlaceholder",
                     }}
                     control={endpoint.create.form.control}
                     schema={createSmtpAccountSchema}
@@ -470,18 +470,18 @@ export function CreateSmtpAccountForm({
 
               {/* Email Settings */}
               <FormFieldGroup
-                title={"admin.dashboard.smtp.form.emailSettings"}
+                title={"app.admin.emails.smtp.form.emailSettings"}
                 description={
-                  "admin.dashboard.smtp.form.emailSettingsDescription"
+                  "app.admin.emails.smtp.form.emailSettingsDescription"
                 }
               >
                 <EndpointFormField
                   name="fromEmail"
                   config={{
                     type: "email",
-                    label: "admin.dashboard.smtp.fields.fromEmail",
+                    label: "app.admin.emails.smtp.fields.fromEmail",
                     placeholder:
-                      "admin.dashboard.smtp.fields.fromEmailPlaceholder",
+                      "app.admin.emails.smtp.fields.fromEmailPlaceholder",
                   }}
                   control={endpoint.create.form.control}
                   schema={createSmtpAccountSchema}
@@ -495,9 +495,9 @@ export function CreateSmtpAccountForm({
 
               {/* Advanced Settings */}
               <FormFieldGroup
-                title={"admin.dashboard.smtp.form.advancedSettings"}
+                title={"app.admin.emails.smtp.form.advancedSettings"}
                 description={
-                  "admin.dashboard.smtp.form.advancedSettingsDescription"
+                  "app.admin.emails.smtp.form.advancedSettingsDescription"
                 }
               >
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -505,9 +505,9 @@ export function CreateSmtpAccountForm({
                     name="connectionTimeout"
                     config={{
                       type: "number",
-                      label: "admin.dashboard.smtp.fields.connectionTimeout",
+                      label: "app.admin.emails.smtp.fields.connectionTimeout",
                       placeholder:
-                        "admin.dashboard.smtp.fields.connectionTimeoutPlaceholder",
+                        "app.admin.emails.smtp.fields.connectionTimeoutPlaceholder",
                     }}
                     control={endpoint.create.form.control}
                     schema={createSmtpAccountSchema}
@@ -521,9 +521,9 @@ export function CreateSmtpAccountForm({
                     name="maxConnections"
                     config={{
                       type: "number",
-                      label: "admin.dashboard.smtp.fields.maxConnections",
+                      label: "app.admin.emails.smtp.fields.maxConnections",
                       placeholder:
-                        "admin.dashboard.smtp.fields.maxConnectionsPlaceholder",
+                        "app.admin.emails.smtp.fields.maxConnectionsPlaceholder",
                     }}
                     control={endpoint.create.form.control}
                     schema={createSmtpAccountSchema}
@@ -537,9 +537,9 @@ export function CreateSmtpAccountForm({
                     name="rateLimitPerHour"
                     config={{
                       type: "number",
-                      label: "admin.dashboard.smtp.fields.rateLimitPerHour",
+                      label: "app.admin.emails.smtp.fields.rateLimitPerHour",
                       placeholder:
-                        "admin.dashboard.smtp.fields.rateLimitPerHourPlaceholder",
+                        "app.admin.emails.smtp.fields.rateLimitPerHourPlaceholder",
                       min: 1,
                       max: 36000,
                     }}
@@ -557,9 +557,9 @@ export function CreateSmtpAccountForm({
                     name="isDefault"
                     config={{
                       type: "switch",
-                      label: "admin.dashboard.smtp.fields.isDefault",
+                      label: "app.admin.emails.smtp.fields.isDefault",
                       description:
-                        "admin.dashboard.smtp.fields.isDefaultDescription",
+                        "app.admin.emails.smtp.fields.isDefaultDescription",
                     }}
                     control={endpoint.create.form.control}
                     schema={createSmtpAccountSchema}
@@ -573,9 +573,9 @@ export function CreateSmtpAccountForm({
                     name="priority"
                     config={{
                       type: "number",
-                      label: "admin.dashboard.smtp.fields.priority",
+                      label: "app.admin.emails.smtp.fields.priority",
                       placeholder:
-                        "admin.dashboard.smtp.fields.priorityPlaceholder",
+                        "app.admin.emails.smtp.fields.priorityPlaceholder",
                     }}
                     control={endpoint.create.form.control}
                     schema={createSmtpAccountSchema}
@@ -589,9 +589,9 @@ export function CreateSmtpAccountForm({
 
               {/* Selection Criteria */}
               <FormFieldGroup
-                title={"admin.dashboard.smtp.form.advancedSettings" as const}
+                title={"app.admin.emails.smtp.form.advancedSettings" as const}
                 description={
-                  "admin.dashboard.smtp.form.advancedSettingsDescription" as const
+                  "app.admin.emails.smtp.form.advancedSettingsDescription" as const
                 }
               >
                 <div className="space-y-4">
@@ -600,9 +600,9 @@ export function CreateSmtpAccountForm({
                       name="weight"
                       config={{
                         type: "number",
-                        label: "smtp.admin.fields.weight" as const,
+                        label: "app.admin.emails.smtp.admin.fields.weight" as const,
                         placeholder:
-                          "smtp.admin.fields.weightPlaceholder" as const,
+                          "app.admin.emails.smtp.admin.fields.weightPlaceholder" as const,
                         min: 1,
                         max: 100,
                       }}
@@ -618,9 +618,9 @@ export function CreateSmtpAccountForm({
                       name="failoverPriority"
                       config={{
                         type: "number",
-                        label: "smtp.admin.fields.failoverPriority" as const,
+                        label: "app.admin.emails.smtp.admin.fields.failoverPriority" as const,
                         placeholder:
-                          "smtp.admin.fields.failoverPriorityPlaceholder" as const,
+                          "app.admin.emails.smtp.admin.fields.failoverPriorityPlaceholder" as const,
                         min: 0,
                         max: 100,
                       }}
@@ -638,9 +638,9 @@ export function CreateSmtpAccountForm({
                       name="isExactMatch"
                       config={{
                         type: "switch",
-                        label: "smtp.admin.fields.isExactMatch" as const,
+                        label: "app.admin.emails.smtp.admin.fields.isExactMatch" as const,
                         description:
-                          "smtp.admin.fields.isExactMatchDescription" as const,
+                          "app.admin.emails.smtp.admin.fields.isExactMatchDescription" as const,
                       }}
                       control={endpoint.create.form.control}
                       schema={createSmtpAccountSchema}
@@ -654,9 +654,9 @@ export function CreateSmtpAccountForm({
                       name="isFailover"
                       config={{
                         type: "switch",
-                        label: "smtp.admin.fields.isFailover" as const,
+                        label: "app.admin.emails.smtp.admin.fields.isFailover" as const,
                         description:
-                          "smtp.admin.fields.isFailoverDescription" as const,
+                          "app.admin.emails.smtp.admin.fields.isFailoverDescription" as const,
                       }}
                       control={endpoint.create.form.control}
                       schema={createSmtpAccountSchema}
@@ -680,13 +680,13 @@ export function CreateSmtpAccountForm({
                   onClick={() => router.push(`/${locale}/admin/emails/smtp`)}
                   disabled={isLoading}
                 >
-                  {t("admin.dashboard.smtp.actions.cancel")}
+                  {t("app.admin.emails.smtp.actions.cancel")}
                 </Button>
                 <Button type="submit" disabled={isLoading}>
                   <Save className="h-4 w-4 mr-2" />
                   {isLoading
-                    ? t("admin.dashboard.smtp.actions.creating")
-                    : t("admin.dashboard.smtp.actions.create")}
+                    ? t("app.admin.emails.smtp.actions.creating")
+                    : t("app.admin.emails.smtp.actions.create")}
                 </Button>
               </div>
             </div>

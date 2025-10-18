@@ -1,24 +1,24 @@
-import { existsSync, promises as fs } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import chalk from "chalk";
-import { Command } from "commander";
-import { execa } from "execa";
-import type { Ora } from "ora";
-import ora from "ora";
-import prompts from "prompts";
-import { z } from "zod";
+import { existsSync, promises as fs } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import chalk from 'chalk';
+import { Command } from 'commander';
+import { execa } from 'execa';
+import type { Ora } from 'ora';
+import ora from 'ora';
+import prompts from 'prompts';
+import { z } from 'zod';
 
-import type { Config } from "@/src/utils/get-config";
-import { getConfig } from "@/src/utils/get-config";
-import { getPackageManager } from "@/src/utils/get-package-manager";
-import { handleError } from "@/src/utils/handle-error";
-import { logger } from "@/src/utils/logger";
-import { promptForConfig } from "@/src/utils/prompt-for-config";
+import type { Config } from '@/src/utils/get-config';
+import { getConfig } from '@/src/utils/get-config';
+import { getPackageManager } from '@/src/utils/get-package-manager';
+import { handleError } from '@/src/utils/handle-error';
+import { logger } from '@/src/utils/logger';
+import { promptForConfig } from '@/src/utils/prompt-for-config';
 
-import type { Component } from "../items";
-import { getAllComponentsToWrite, INVALID_COMPONENT_ERROR } from "../items";
-import { COMPONENTS } from "../items/components";
+import type { Component } from '../items';
+import { getAllComponentsToWrite, INVALID_COMPONENT_ERROR } from '../items';
+import { COMPONENTS } from '../items/components';
 
 const filePath = fileURLToPath(import.meta.url);
 const fileDir = path.dirname(filePath);
@@ -31,14 +31,14 @@ const addOptionsSchema = z.object({
 });
 
 export const add = new Command()
-  .name("add")
-  .description("add components to your project")
-  .argument("[components...]", "the components to add")
-  .option("-o, --overwrite", "overwrite existing files.", false)
+  .name('add')
+  .description('add components to your project')
+  .argument('[components...]', 'the components to add')
+  .option('-o, --overwrite', 'overwrite existing files.', false)
   .option(
-    "-c, --cwd <cwd>",
-    "the working directory. defaults to the current directory.",
-    process.cwd(),
+    '-c, --cwd <cwd>',
+    'the working directory. defaults to the current directory.',
+    process.cwd()
   )
   .action(async (components, opts) => {
     try {
@@ -63,10 +63,10 @@ export const add = new Command()
       let selectedComponents: string[] = options.components ?? [];
       if (!selectedComponents?.length) {
         const { components } = await prompts({
-          type: "multiselect",
-          name: "components",
-          message: "Which components would you like to add?",
-          hint: "Space to select. A to toggle all. Enter to submit.",
+          type: 'multiselect',
+          name: 'components',
+          message: 'Which components would you like to add?',
+          hint: 'Space to select. A to toggle all. Enter to submit.',
           instructions: false,
           choices: COMPONENTS.map((entry) => ({
             title: entry.name,
@@ -78,7 +78,7 @@ export const add = new Command()
       }
 
       if (!selectedComponents?.length) {
-        logger.warn("No components selected. Exiting.");
+        logger.warn('No components selected. Exiting.');
         process.exit(0);
       }
 
@@ -91,11 +91,8 @@ export const add = new Command()
         if (err instanceof Error && err.message === INVALID_COMPONENT_ERROR) {
           logger.error(
             `Invalid component(s): ${selectedComponents
-              .filter(
-                (component) =>
-                  !COMPONENTS.find((entry) => entry.name === component),
-              )
-              .join(", ")}`,
+              .filter((component) => !COMPONENTS.find((entry) => entry.name === component))
+              .join(', ')}`
           );
           process.exit(1);
         }
@@ -117,13 +114,13 @@ export const add = new Command()
       const uniqueNpmPackages = Array.from(new Set(npmPackages));
 
       if (uniqueNpmPackages.length) {
-        spinner.text = `Installing ${uniqueNpmPackages.join(", ")}...`;
+        spinner.text = `Installing ${uniqueNpmPackages.join(', ')}...`;
         await execa(
           packageManager,
-          [packageManager === "npm" ? "install" : "add", ...uniqueNpmPackages],
+          [packageManager === 'npm' ? 'install' : 'add', ...uniqueNpmPackages],
           {
             cwd,
-          },
+          }
         );
       }
       spinner.succeed(`Done.`);
@@ -141,13 +138,10 @@ async function writeFiles(
   }>,
   config: Config,
   spinner: Ora,
-  overwriteFlag: boolean,
+  overwriteFlag: boolean
 ) {
   for (const compPath of paths) {
-    const targetDir = path.join(
-      config.resolvedPaths.components,
-      compPath.to.folder,
-    );
+    const targetDir = path.join(config.resolvedPaths.components, compPath.to.folder);
     if (!existsSync(targetDir)) {
       await fs.mkdir(targetDir, { recursive: true });
     }
@@ -155,19 +149,19 @@ async function writeFiles(
     spinner.stop();
 
     if (existsSync(path.join(targetDir, compPath.to.file))) {
-      const filePath = [compPath.to.folder, compPath.to.file].join("/");
+      const filePath = [compPath.to.folder, compPath.to.file].join('/');
       if (!overwriteFlag) {
         logger.info(
           `File already exists: ${chalk.bgCyan(
-            filePath,
-          )} was skipped. To overwrite, run with the ${chalk.green("--overwrite")} flag.`,
+            filePath
+          )} was skipped. To overwrite, run with the ${chalk.green('--overwrite')} flag.`
         );
         continue;
       }
 
       const { overwrite } = await prompts({
-        type: "confirm",
-        name: "overwrite",
+        type: 'confirm',
+        name: 'overwrite',
         message: `File already exists: ${chalk.yellow(filePath)}. Would you like to overwrite?`,
         initial: false,
       });
@@ -180,18 +174,13 @@ async function writeFiles(
 
     spinner.start(`Installing ${comp.name}...`);
     const readFromPath = compPath.distFrom
-      ? path.join(fileDir, "../__generated/components", compPath.distFrom)
-      : path.join(
-          fileDir,
-          "../__generated/components",
-          compPath.to.folder,
-          compPath.to.file,
-        );
+      ? path.join(fileDir, '../__generated/components', compPath.distFrom)
+      : path.join(fileDir, '../__generated/components', compPath.to.folder, compPath.to.file);
     try {
-      const content = await fs.readFile(path.resolve(readFromPath), "utf8");
+      const content = await fs.readFile(path.resolve(readFromPath), 'utf8');
       await fs.writeFile(
         path.join(targetDir, compPath.to.file),
-        fixImports(content, config.aliases.components, config.aliases.lib),
+        fixImports(content, config.aliases.components, config.aliases.lib)
       );
     } catch (error) {
       handleError(error);
@@ -199,13 +188,13 @@ async function writeFiles(
   }
 
   for (const icon of comp.icons ?? []) {
-    const targetDir = path.resolve(config.resolvedPaths.lib, "icons");
+    const targetDir = path.resolve(config.resolvedPaths.lib, 'icons');
     if (!existsSync(targetDir)) {
       await fs.mkdir(targetDir, { recursive: true });
       try {
         await fs.writeFile(
           path.join(targetDir, `iconWithClassName.ts`),
-          `import type { LucideIcon } from 'lucide-react-native';\nimport { cssInterop } from 'nativewind';\n\nexport function iconWithClassName(icon: LucideIcon) {\ncssInterop(icon, {\n  className: {\n    target: 'style',\n    nativeStyleToProp: {\n      color: true,\n      opacity: true,\n    },\n  },\n});\n}`,
+          `import type { LucideIcon } from 'lucide-react-native';\nimport { cssInterop } from 'nativewind';\n\nexport function iconWithClassName(icon: LucideIcon) {\ncssInterop(icon, {\n  className: {\n    target: 'style',\n    nativeStyleToProp: {\n      color: true,\n      opacity: true,\n    },\n  },\n});\n}`
         );
       } catch (error) {
         handleError(error);
@@ -217,15 +206,15 @@ async function writeFiles(
       if (!overwriteFlag) {
         logger.info(
           `File already exists: ${chalk.bgCyan(
-            `${icon}.tsx`,
-          )} was skipped. To overwrite, run with the ${chalk.green("--overwrite")} flag.`,
+            `${icon}.tsx`
+          )} was skipped. To overwrite, run with the ${chalk.green('--overwrite')} flag.`
         );
         continue;
       }
 
       const { overwrite } = await prompts({
-        type: "confirm",
-        name: "overwrite",
+        type: 'confirm',
+        name: 'overwrite',
         message: `File already exists: ${chalk.yellow(filePath)}. Would you like to overwrite?`,
         initial: false,
       });
@@ -241,7 +230,7 @@ async function writeFiles(
     try {
       await fs.writeFile(
         path.join(targetDir, `${icon}.tsx`),
-        `import { ${icon} } from 'lucide-react-native';\nimport { iconWithClassName } from './iconWithClassName';\niconWithClassName(${icon});\nexport { ${icon} };`,
+        `import { ${icon} } from 'lucide-react-native';\nimport { iconWithClassName } from './iconWithClassName';\niconWithClassName(${icon});\nexport { ${icon} };`
       );
     } catch (error) {
       handleError(error);
@@ -249,14 +238,10 @@ async function writeFiles(
   }
 }
 
-function fixImports(
-  rawfile: string,
-  componentsAlias: string,
-  libAlias: string,
-) {
+function fixImports(rawfile: string, componentsAlias: string, libAlias: string) {
   return rawfile
-    .replace("./typography", `${componentsAlias}/ui/typography`)
-    .replace("./text", `${componentsAlias}/ui/text`)
-    .replaceAll("../../components", componentsAlias)
-    .replaceAll("../../lib", libAlias);
+    .replace('./typography', `${componentsAlias}/ui/typography`)
+    .replace('./text', `${componentsAlias}/ui/text`)
+    .replaceAll('../../components', componentsAlias)
+    .replaceAll('../../lib', libAlias);
 }

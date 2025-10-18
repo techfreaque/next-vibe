@@ -6,7 +6,6 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "../../shared/types/response.schema";
-import { debugLogger, errorLogger } from "../../shared/utils/logger";
 import { env } from "../env";
 import { getAwsSnsProvider } from "./providers/aws-sns";
 import { getHttpProvider } from "./providers/http";
@@ -50,8 +49,9 @@ export function getSmsProvider(providerName?: SmsProviders): SmsProvider {
       provider = getHttpProvider();
       break;
     default:
-      // Using error code instead of string literal
-      throw new Error(`error.general.unsupported_provider`);
+      // Fallback to Twilio for unsupported providers
+      provider = getTwilioProvider();
+      break;
   }
 
   // Cache the provider
@@ -105,7 +105,6 @@ export async function sendSms(
 
   try {
     const provider = getSmsProvider(params.options?.provider);
-    debugLogger(`Sending SMS to ${params.to} using ${provider.name} provider`);
 
     // Use default from number if not provided
     const smsParams: SendSmsParams = {
@@ -114,16 +113,14 @@ export async function sendSms(
       from: params.from || env.SMS_FROM_NUMBER,
     };
 
-    let lastError: any;
+    let lastError: Error | undefined;
 
     // Implement retry logic
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        debugLogger(`SMS attempt ${attempt}/${maxAttempts} to ${params.to}`);
         const result = await provider.sendSms(smsParams);
 
         if (result.success) {
-          debugLogger(`SMS sent successfully to ${params.to}`, result.data);
           return result;
         }
 
@@ -136,7 +133,8 @@ export async function sendSms(
           });
         }
       } catch (error) {
-        lastError = error;
+        lastError =
+          error instanceof Error ? error : new Error("error.general.unknown");
         if (attempt < maxAttempts) {
           // Wait before retry - fix promise executor issue
           await new Promise<void>((resolve) => {
@@ -147,19 +145,14 @@ export async function sendSms(
     }
 
     // If we get here, all attempts failed
-    errorLogger(
-      `Failed to send SMS to ${params.to} after ${maxAttempts} attempts:`,
-      lastError,
-    );
     return createErrorResponse(
       "sms.error.delivery_failed",
       ErrorResponseTypes.SMS_ERROR,
       {
-        errorMessage: lastError instanceof Error ? lastError.message : "",
+        errorMessage: lastError?.message ?? "",
       },
     );
   } catch (error) {
-    errorLogger("Unexpected error sending SMS:", error);
     return createErrorResponse(
       "sms.error.unexpected_error",
       ErrorResponseTypes.SMS_ERROR,

@@ -15,9 +15,8 @@ interface ImportStatusAlertProps {
 }
 
 export function ImportStatusAlert({
-  locale: _locale, // eslint-disable-line @typescript-eslint/no-unused-vars -- Will be used when import functionality is implemented
+  locale,
 }: ImportStatusAlertProps): React.JSX.Element | null {
-  // TODO: Implement import status monitoring when import hooks are available
-  // For now, return null to avoid TypeScript errors
+  // TODO: Implement import status monitoring
   return null;
 }

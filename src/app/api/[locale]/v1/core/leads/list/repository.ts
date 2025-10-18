@@ -24,6 +24,7 @@ import type {
 export interface LeadsListRepository {
   listLeads(
     data: LeadListGetRequestTypeOutput,
+    user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadListGetResponseTypeOutput>>;
 }
@@ -34,6 +35,7 @@ export interface LeadsListRepository {
 export class LeadsListRepositoryImpl implements LeadsListRepository {
   async listLeads(
     data: LeadListGetRequestTypeOutput,
+    user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadListGetResponseTypeOutput>> {
     logger.info("Listing leads with filters");
@@ -46,36 +48,34 @@ export class LeadsListRepositoryImpl implements LeadsListRepository {
       currentCampaignStage: data.statusFilters?.currentCampaignStage?.[0],
       country: data.locationFilters?.country?.[0],
       language: data.locationFilters?.language?.[0],
-      source: data.sourceFilters?.source?.[0],
+      source: data.statusFilters?.source?.[0],
     };
 
-    // Create mock user and locale for the main repository
-    const mockUser: JwtPayloadType = {
-      id: "system",
-      isPublic: false,
-    };
     const mockLocale = "en-GLOBAL" as const;
 
     const result = await leadsRepository.listLeads(
       queryData,
-      mockUser,
+      user,
       mockLocale,
       logger,
     );
 
-    if (result.success) {
-      logger.vibe(`🎯 Successfully listed ${result.data.leads.length} leads`);
+    if (result.success && result.data) {
+      // Type-safe access to success response data
+      const responseData = result.data.response;
+      logger.vibe(`🎯 Successfully listed ${responseData.leads.length} leads`);
+
       // The definition expects a response wrapper
       // We'll create a properly typed response
       return {
         success: true as const,
         data: {
           response: {
-            leads: result.data.leads,
-            total: result.data.total,
-            page: result.data.page,
-            limit: result.data.limit,
-            totalPages: result.data.totalPages,
+            leads: responseData.leads,
+            total: responseData.total,
+            page: responseData.page,
+            limit: responseData.limit,
+            totalPages: responseData.totalPages,
           },
         },
       } satisfies ResponseType<LeadListGetResponseTypeOutput>;

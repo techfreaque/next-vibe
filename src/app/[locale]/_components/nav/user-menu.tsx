@@ -62,9 +62,7 @@ export function UserMenu({
         <DropdownMenuItem asChild>
           <Link
             href={
-              isOnboardingComplete
-                ? `/${locale}/app/dashboard`
-                : `/${locale}/app/onboarding`
+              isOnboardingComplete ? `/${locale}/app/dashboard` : `/${locale}/`
             }
           >
             {isOnboardingComplete ? (

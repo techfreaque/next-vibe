@@ -46,22 +46,27 @@ src/app/api/[locale]/v1/core/system/generators/
 export const taskDefinition: CronTaskDefinition<ConfigType, ResultType> = {
   name: "task-name",
   description: "Task description",
-  schedule: "*/5 * * * *",        // Cron expression string
+  schedule: "*/5 * * * *", // Cron expression string
   // OR
-  schedule: async () => {         // Function returning ResponseType<boolean>
+  schedule: async () => {
+    // Function returning ResponseType<boolean>
     return createSuccessResponse(shouldRunNow);
   },
   enabled: true,
-  timeout: 300000,                // 5 minutes
+  timeout: 300000, // 5 minutes
   priority: CronTaskPriority.MEDIUM,
-  defaultConfig: { /* config */ },
+  defaultConfig: {
+    /* config */
+  },
   configSchema: taskConfigSchema,
   resultSchema: taskResultSchema,
   tags: ["category"],
-  dependencies: ["other-task"]
+  dependencies: ["other-task"],
 };
 
-export async function execute(context: TaskExecutionContext<ConfigType>): Promise<ResponseType<ResultType>> {
+export async function execute(
+  context: TaskExecutionContext<ConfigType>,
+): Promise<ResponseType<ResultType>> {
   // Task implementation
 }
 ```
@@ -96,13 +101,13 @@ export const sideTaskConfigs: SideTask[] = [
     run: async (signal: AbortSignal) => {
       while (!signal.aborted) {
         // File watching logic
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     },
     onShutdown: async () => {
       // Cleanup file watchers
-    }
-  }
+    },
+  },
 ];
 ```
 
@@ -135,7 +140,7 @@ export const { enum: CronTaskPriority, options: CronTaskPriorityOptions } =
     HIGH: "tasks.priority.high" as const,
     MEDIUM: "tasks.priority.medium" as const,
     LOW: "tasks.priority.low" as const,
-    BACKGROUND: "tasks.priority.background" as const
+    BACKGROUND: "tasks.priority.background" as const,
   });
 
 export const { enum: CronTaskStatus, options: CronTaskStatusOptions } =
@@ -146,8 +151,8 @@ export const { enum: CronTaskStatus, options: CronTaskStatusOptions } =
     FAILED: "tasks.status.failed" as const,
     TIMEOUT: "tasks.status.timeout" as const,
     CANCELLED: "tasks.status.cancelled" as const,
-    SKIPPED: "tasks.status.skipped" as const,      // Skipped due to overlap
-    BLOCKED: "tasks.status.blocked" as const       // Blocked by running instance
+    SKIPPED: "tasks.status.skipped" as const, // Skipped due to overlap
+    BLOCKED: "tasks.status.blocked" as const, // Blocked by running instance
     // ... other statuses
   });
 ```
@@ -309,13 +314,13 @@ CREATE TABLE task_runner_state (
 ```typescript
 // Task system configuration
 interface TaskSystemConfig {
-  TASK_RUNNER_ENABLED: boolean;           // Enable/disable task runner
+  TASK_RUNNER_ENABLED: boolean; // Enable/disable task runner
   TASK_RUNNER_ENVIRONMENT: "development" | "production" | "serverless";
-  TASK_DEFAULT_TIMEOUT: number;           // Default task timeout (ms)
-  TASK_DEFAULT_RETRIES: number;           // Default retry attempts
-  TASK_OVERLAP_PREVENTION: boolean;       // Enable overlap prevention
-  PULSE_INTERVAL: number;                 // Pulse execution interval (ms)
-  SIDE_TASKS_ENABLED: boolean;            // Enable side tasks (false for serverless)
+  TASK_DEFAULT_TIMEOUT: number; // Default task timeout (ms)
+  TASK_DEFAULT_RETRIES: number; // Default retry attempts
+  TASK_OVERLAP_PREVENTION: boolean; // Enable overlap prevention
+  PULSE_INTERVAL: number; // Pulse execution interval (ms)
+  SIDE_TASKS_ENABLED: boolean; // Enable side tasks (false for serverless)
 }
 ```
 
@@ -333,7 +338,7 @@ interface TaskSystemConfig {
 ```typescript
 export const taskDefinition: CronTaskDefinition<ConfigType, ResultType> = {
   name: "task-name",
-  schedule: "*/5 * * * *",        // Cron expression string
+  schedule: "*/5 * * * *", // Cron expression string
   // OR
   schedule: async (): Promise<ResponseType<boolean>> => {
     // Dynamic scheduling logic
@@ -344,7 +349,9 @@ export const taskDefinition: CronTaskDefinition<ConfigType, ResultType> = {
   // ... other properties (all type-safe)
 };
 
-export async function execute(context: TaskExecutionContext<ConfigType>): Promise<ResponseType<ResultType>> {
+export async function execute(
+  context: TaskExecutionContext<ConfigType>,
+): Promise<ResponseType<ResultType>> {
   // Type-safe implementation
 }
 ```
@@ -389,7 +396,7 @@ async function executeCronTask(task: CronTask): Promise<ResponseType<any>> {
     return createSuccessResponse({
       status: "SKIPPED",
       reason: "previous_instance_running",
-      message: `Task ${taskName} skipped - previous instance still running`
+      message: `Task ${taskName} skipped - previous instance still running`,
     });
   }
 

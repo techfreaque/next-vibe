@@ -64,4 +64,3 @@ export const ViewModeDB = [
   ViewMode.THREADED,
   ViewMode.FLAT,
 ] as const;
-

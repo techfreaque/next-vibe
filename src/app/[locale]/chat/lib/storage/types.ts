@@ -1,3 +1,6 @@
+import type { TranslationKey } from "@/i18n/core/static-types";
+
+import type { IconKey, IconValue } from "../config/icons";
 import type { ModelId } from "../config/models";
 
 /**
@@ -53,6 +56,10 @@ interface BaseMessage {
     collapsed?: boolean;
     /** Depth in thread (0 = root, 1 = first reply, etc.) */
     depth?: number;
+    /** User vote on this message (1 = upvote, -1 = downvote, 0 or undefined = no vote) */
+    userVote?: number;
+    /** Total vote score (sum of all votes) */
+    voteScore?: number;
   };
 }
 
@@ -176,11 +183,20 @@ export interface ChatFolder {
   /** Unique identifier for this folder */
   id: string;
 
-  /** Folder name */
+  /** Folder name (can be user-customized or translation key) */
   name: string;
 
-  /** Folder icon (lucide icon name or si icon name) */
-  icon?: string;
+  /** Translation key for default folders (e.g., "app.chat.common.privateChats") */
+  translationKey?: TranslationKey;
+
+  /** Whether the user has customized the folder name (overrides translation) */
+  isUserCustomized?: boolean;
+
+  /** Folder icon (emoji, icon key, or React component) */
+  icon?: IconValue;
+
+  /** URL path segment for this folder (e.g., "private", "shared", "public", "incognito") */
+  urlPath?: string;
 
   /** Parent folder ID (null for root folders) */
   parentId: string | null;
@@ -253,6 +269,8 @@ export interface NewMessageInput {
     replyCount?: number;
     collapsed?: boolean;
     depth?: number;
+    userVote?: number;
+    voteScore?: number;
   };
 }
 
@@ -299,8 +317,112 @@ export const STORAGE_KEYS = {
  * Default folder IDs
  */
 export const DEFAULT_FOLDERS = {
-  GENERAL: "folder-general",
+  PRIVATE: "general",
+  SHARED: "shared",
+  PUBLIC: "public",
+  INCOGNITO: "incognito",
 } as const;
+
+/**
+ * Default folder configuration with all metadata
+ */
+export const DEFAULT_FOLDER_CONFIGS: {
+  id: (typeof DEFAULT_FOLDERS)[keyof typeof DEFAULT_FOLDERS];
+  translationKey: TranslationKey;
+  icon: IconKey;
+  descriptionKey: TranslationKey;
+  order: number;
+  color: string;
+}[] = [
+  {
+    id: DEFAULT_FOLDERS.PRIVATE,
+    translationKey: "app.chat.common.privateChats" as const,
+    icon: "lock" as const,
+    descriptionKey: "app.chat.folders.privateDescription" as const,
+    order: 0,
+    color: "sky", // Softer blue for private/secure
+  },
+  {
+    id: DEFAULT_FOLDERS.INCOGNITO,
+    translationKey: "app.chat.common.incognitoChats" as const,
+    icon: "shield-plus" as const,
+    descriptionKey: "app.chat.folders.incognitoDescription" as const,
+    order: 1,
+    color: "zinc", // Neutral gray for incognito/hidden
+  },
+  {
+    id: DEFAULT_FOLDERS.SHARED,
+    translationKey: "app.chat.common.sharedChats" as const,
+    icon: "users" as const,
+    descriptionKey: "app.chat.folders.sharedDescription" as const,
+    order: 2,
+    color: "teal", // Collaborative teal for shared
+  },
+  {
+    id: DEFAULT_FOLDERS.PUBLIC,
+    translationKey: "app.chat.common.publicChats" as const,
+    icon: "1a" as const,
+    descriptionKey: "app.chat.folders.publicDescription" as const,
+    order: 3,
+    color: "amber", // Premium gold/amber for public 1A
+  },
+] as const;
+
+/**
+ * Check if a folder is a default folder (cannot be deleted or moved)
+ */
+export function isDefaultFolder(folderId: string): boolean {
+  return Object.values(DEFAULT_FOLDERS).includes(
+    folderId as (typeof DEFAULT_FOLDERS)[keyof typeof DEFAULT_FOLDERS],
+  );
+}
+
+/**
+ * Get the icon for a folder
+ * For default folders, always use the icon from DEFAULT_FOLDER_CONFIGS
+ * For custom folders, use the stored icon or fallback to "folder"
+ */
+export function getFolderIcon(folder: ChatFolder): IconValue {
+  if (isDefaultFolder(folder.id)) {
+    const config = DEFAULT_FOLDER_CONFIGS.find((c) => c.id === folder.id);
+    return config?.icon || "folder";
+  }
+  return folder.icon || "folder";
+}
+
+/**
+ * Get the color for a folder
+ * For default folders, always use the color from DEFAULT_FOLDER_CONFIGS
+ * For custom folders, return null (no special color)
+ */
+export function getFolderColor(folderId: string): string | null {
+  if (isDefaultFolder(folderId)) {
+    const config = DEFAULT_FOLDER_CONFIGS.find((c) => c.id === folderId);
+    return config?.color || null;
+  }
+  return null;
+}
+
+/**
+ * Get the count of direct children (threads + subfolders) in a folder
+ * Does NOT count nested items recursively
+ */
+export function getDirectChildrenCount(
+  state: ChatState,
+  folderId: string,
+): number {
+  // Count direct threads
+  const directThreads = Object.values(state.threads).filter(
+    (thread) => thread.folderId === folderId,
+  ).length;
+
+  // Count direct subfolders
+  const directSubfolders = Object.values(state.folders).filter(
+    (folder) => folder.parentId === folderId,
+  ).length;
+
+  return directThreads + directSubfolders;
+}
 
 /**
  * View mode for messages

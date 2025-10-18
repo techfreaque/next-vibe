@@ -23,7 +23,7 @@ export default async function SmtpAccountsPage({
       {/* Page Description */}
       <div>
         <p className="text-gray-600 dark:text-gray-400">
-          {t("admin.dashboard.smtp.description")}
+          {t("app.admin.emails.smtp.list.description")}
         </p>
       </div>
 

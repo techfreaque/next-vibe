@@ -379,14 +379,274 @@ const { GET } = createEndpoint({
   },
 });
 
-// Export the endpoint following MIGRATION_GUIDE pattern
-export const endpoints = { GET };
+/**
+ * POST /cron/tasks - Create a new cron task
+ */
+const { POST } = createEndpoint({
+  method: Methods.POST,
+  path: ["v1", "core", "system", "tasks", "cron", "tasks"],
+  title: "app.api.v1.core.system.tasks.cron.tasks.post.title",
+  description: "app.api.v1.core.system.tasks.cron.tasks.post.description",
+  category: "app.api.v1.core.system.tasks.category",
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  tags: ["app.api.v1.core.system.tasks.cron.tasks.post.title"],
+  fields: objectField(
+    {
+      type: WidgetType.CONTAINER,
+      title: "app.api.v1.core.system.tasks.cron.tasks.post.container.title",
+      description:
+        "app.api.v1.core.system.tasks.cron.tasks.post.container.description",
+      layout: { type: LayoutType.GRID, columns: 12 },
+    },
+    { request: "data", response: true },
+    {
+      // Request fields
+      name: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.name.label",
+          description:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.name.description",
+          placeholder:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.name.placeholder",
+          layout: { columns: 12 },
+        },
+        z.string().min(1),
+      ),
+      description: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXTAREA,
+          label:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.description.label",
+          description:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.description.description",
+          placeholder:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.description.placeholder",
+          layout: { columns: 12 },
+        },
+        z.string().optional(),
+      ),
+      schedule: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.schedule.label",
+          description:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.schedule.description",
+          placeholder:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.schedule.placeholder",
+          layout: { columns: 6 },
+        },
+        z.string().min(1),
+      ),
+      priority: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.priority.label",
+          description:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.priority.description",
+          options: CronTaskPriorityOptions,
+          layout: { columns: 6 },
+        },
+        z.nativeEnum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
+      ),
+      category: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.category.label",
+          description:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.category.description",
+          options: TaskCategoryOptions,
+          layout: { columns: 6 },
+        },
+        z.nativeEnum(TaskCategory).default(TaskCategory.SYSTEM),
+      ),
+      enabled: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.enabled.label",
+          description:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.enabled.description",
+          layout: { columns: 6 },
+        },
+        z.boolean().default(true),
+      ),
+      timeout: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.timeout.label",
+          description:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.timeout.description",
+          layout: { columns: 4 },
+        },
+        z.number().default(300000),
+      ),
+      retries: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.retries.label",
+          description:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.retries.description",
+          layout: { columns: 4 },
+        },
+        z.number().default(3),
+      ),
+      retryDelay: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.retryDelay.label",
+          description:
+            "app.api.v1.core.system.tasks.cron.tasks.post.fields.retryDelay.description",
+          layout: { columns: 4 },
+        },
+        z.number().default(5000),
+      ),
 
-// Type exports for use in repository and route
+      // Response - return the created task
+      task: responseField(
+        {
+          type: WidgetType.CONTAINER,
+          title:
+            "app.api.v1.core.system.tasks.cron.tasks.post.response.task.title",
+          content:
+            "app.api.v1.core.system.tasks.cron.tasks.post.response.task.description",
+        },
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          description: z.string().optional(),
+          schedule: z.string(),
+          enabled: z.boolean(),
+          priority: z.nativeEnum(CronTaskPriority),
+          status: z.nativeEnum(CronTaskStatus),
+          category: z.nativeEnum(TaskCategory),
+          timeout: z.number(),
+          retries: z.number(),
+          retryDelay: z.number(),
+          version: z.number(),
+          createdAt: z.string(),
+          updatedAt: z.string(),
+        }),
+      ),
+    },
+  ),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title:
+        "app.api.v1.core.system.tasks.cron.tasks.post.errors.validation.title",
+      description:
+        "app.api.v1.core.system.tasks.cron.tasks.post.errors.validation.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title:
+        "app.api.v1.core.system.tasks.cron.tasks.post.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.system.tasks.cron.tasks.post.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title:
+        "app.api.v1.core.system.tasks.cron.tasks.post.errors.internal.title",
+      description:
+        "app.api.v1.core.system.tasks.cron.tasks.post.errors.internal.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title:
+        "app.api.v1.core.system.tasks.cron.tasks.post.errors.forbidden.title",
+      description:
+        "app.api.v1.core.system.tasks.cron.tasks.post.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title:
+        "app.api.v1.core.system.tasks.cron.tasks.post.errors.conflict.title",
+      description:
+        "app.api.v1.core.system.tasks.cron.tasks.post.errors.conflict.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title:
+        "app.api.v1.core.system.tasks.cron.tasks.post.errors.network.title",
+      description:
+        "app.api.v1.core.system.tasks.cron.tasks.post.errors.network.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title:
+        "app.api.v1.core.system.tasks.cron.tasks.post.errors.unknown.title",
+      description:
+        "app.api.v1.core.system.tasks.cron.tasks.post.errors.unknown.description",
+    },
+  },
+  successTypes: {
+    title: "app.api.v1.core.system.tasks.cron.tasks.post.success.created.title",
+    description:
+      "app.api.v1.core.system.tasks.cron.tasks.post.success.created.description",
+  },
+  examples: {
+    requests: {
+      default: {
+        name: "Daily Cleanup Task",
+        description: "Cleans up old data",
+        schedule: "0 0 * * *",
+        priority: CronTaskPriority.MEDIUM,
+        category: TaskCategory.MAINTENANCE,
+        enabled: true,
+        timeout: 300000,
+        retries: 3,
+        retryDelay: 5000,
+      },
+    },
+    responses: {
+      default: {
+        task: {
+          id: "task-123",
+          name: "Daily Cleanup Task",
+          description: "Cleans up old data",
+          schedule: "0 0 * * *",
+          enabled: true,
+          priority: CronTaskPriority.MEDIUM,
+          status: CronTaskStatus.PENDING,
+          category: TaskCategory.MAINTENANCE,
+          timeout: 300000,
+          retries: 3,
+          retryDelay: 5000,
+          version: 1,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      },
+    },
+  },
+});
+
+// Export the endpoint following MIGRATION_GUIDE pattern
+export const endpoints = { GET, POST };
+
+// Type exports for GET endpoint
 export type CronTaskListRequestInput = typeof GET.types.RequestInput;
 export type CronTaskListRequestOutput = typeof GET.types.RequestOutput;
 export type CronTaskListResponseInput = typeof GET.types.ResponseInput;
 export type CronTaskListResponseOutput = typeof GET.types.ResponseOutput;
+
+// Type exports for POST endpoint
+export type CronTaskCreateRequestInput = typeof POST.types.RequestInput;
+export type CronTaskCreateRequestOutput = typeof POST.types.RequestOutput;
+export type CronTaskCreateResponseInput = typeof POST.types.ResponseInput;
+export type CronTaskCreateResponseOutput = typeof POST.types.ResponseOutput;
 
 // Individual task type extracted from response
 export type CronTaskResponseType = CronTaskListResponseOutput["tasks"][number];

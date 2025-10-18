@@ -39,7 +39,7 @@ export const LocaleSelectorContent: FC = () => {
     [changeLocale],
   );
 
-  const uniqueLanguages = getUniqueLanguages(countries);
+  const uniqueLanguages = getUniqueLanguages();
   const currentLanguageFlag =
     uniqueLanguages.find(([code]) => code === language)?.[1].countries[0]
       ?.flag || currentCountry.flag;
@@ -60,7 +60,7 @@ export const LocaleSelectorContent: FC = () => {
             onMouseLeave={() => setTabHover(null)}
           >
             <span className="text-sm">{currentCountry.flag}</span>
-            {t("common.selector.country")}
+            {t("app.chat.common.selector.country")}
           </TabsTrigger>
           <TabsTrigger
             value="language"
@@ -69,7 +69,7 @@ export const LocaleSelectorContent: FC = () => {
             onMouseLeave={() => setTabHover(null)}
           >
             <span className="text-sm">{currentLanguageFlag}</span>
-            {t("common.selector.language")}
+            {t("app.chat.common.selector.language")}
           </TabsTrigger>
         </TabsList>
 

@@ -82,7 +82,7 @@ export function EmailsListPagination({
     return (
       <div className="flex justify-between items-center mt-4">
         <div className="text-sm text-muted-foreground">
-          {t("emails.pagination.showing", {
+          {t("app.admin.emails.list.pagination.showing", {
             start: startItem,
             end: endItem,
             total: totalEmails,
@@ -96,7 +96,7 @@ export function EmailsListPagination({
     <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-4">
       {/* Results info */}
       <div className="text-sm text-muted-foreground">
-        {t("emails.pagination.showing", {
+        {t("app.admin.emails.list.pagination.showing", {
           start: startItem,
           end: endItem,
           total: totalEmails,
@@ -113,7 +113,7 @@ export function EmailsListPagination({
           disabled={currentPage <= 1}
         >
           <ChevronLeft className="h-4 w-4" />
-          {t("emails.pagination.previous")}
+          {t("app.admin.emails.list.pagination.previous")}
         </Button>
 
         {/* Page numbers */}
@@ -170,7 +170,7 @@ export function EmailsListPagination({
           onClick={handleNextPage}
           disabled={currentPage >= totalPages}
         >
-          {t("emails.pagination.next")}
+          {t("app.admin.emails.list.pagination.next")}
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>

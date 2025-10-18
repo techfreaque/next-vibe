@@ -1,87 +1,165 @@
 "use client";
 
+import { MoreHorizontal } from "lucide-react";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  ScrollArea,
+} from "@/packages/next-vibe-ui/web/ui";
+
+import { getIconComponent } from "../../lib/config/icons";
+import type { ModelId } from "../../lib/config/models";
+import { DEFAULT_PERSONAS, type Persona } from "../../lib/config/personas";
+
 interface SuggestedPromptsProps {
-  onSelectPrompt: (prompt: string) => void;
+  onSelectPrompt: (
+    prompt: string,
+    personaId: string,
+    modelId?: ModelId,
+  ) => void;
+  locale: CountryLanguage;
+  rootFolderId?: string;
 }
 
-const categories = [
-  { id: "create", label: "Create", icon: "✨" },
-  { id: "explore", label: "Explore", icon: "📄" },
-  { id: "code", label: "Code", icon: "💻" },
-  { id: "learn", label: "Learn", icon: "🎓" },
-] as const;
-
-const prompts = {
-  create: [
-    "Write a short story about a robot discovering emotions",
-    "Help me outline a sci-fi novel set in a post-apocalyptic world",
-    "Create a character profile for a complex villain with sympathetic motives",
-    "Give me 5 creative writing prompts for flash fiction",
-  ],
-  explore: [
-    "Explain quantum computing in simple terms",
-    "What are the latest developments in renewable energy?",
-    "Compare different philosophies of consciousness",
-    "Summarize the history of the internet",
-  ],
-  code: [
-    "Help me debug this React component",
-    "Explain the difference between async/await and promises",
-    "Write a Python script to analyze CSV data",
-    "Review my code for best practices",
-  ],
-  learn: [
-    "Teach me the basics of machine learning",
-    "How does photosynthesis work?",
-    "Explain the theory of relativity",
-    "What are the key principles of economics?",
-  ],
-};
+// Get first 5 personas for tabs
+const FEATURED_PERSONAS = DEFAULT_PERSONAS.slice(0, 5);
 
 export function SuggestedPrompts({
   onSelectPrompt,
+  locale,
+  rootFolderId = "general",
 }: SuggestedPromptsProps): JSX.Element {
-  const [activeCategory, setActiveCategory] =
-    useState<keyof typeof prompts>("create");
+  const { t } = simpleT(locale);
+  const [selectedPersona, setSelectedPersona] = useState<Persona>(
+    FEATURED_PERSONAS[0],
+  );
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handlePersonaSelect = (persona: Persona): void => {
+    setSelectedPersona(persona);
+    setModalOpen(false);
+  };
+
+  const handlePromptClick = (prompt: string): void => {
+    onSelectPrompt(prompt, selectedPersona.id, selectedPersona.preferredModel);
+  };
+
+  const prompts = selectedPersona.suggestedPrompts || [];
+
+  // Get title based on root folder
+  const getTitleKey = (): TranslationKey => {
+    switch (rootFolderId) {
+      case "general":
+        return "app.chat.suggestedPrompts.privateTitle";
+      case "shared":
+        return "app.chat.suggestedPrompts.sharedTitle";
+      case "public":
+        return "app.chat.suggestedPrompts.publicTitle";
+      case "incognito":
+        return "app.chat.suggestedPrompts.incognitoTitle";
+      default:
+        return "app.chat.suggestedPrompts.title";
+    }
+  };
 
   return (
-    <div className="max-w-3xl w-full mx-auto space-y-8 px-4">
-      <h1 className="text-4xl font-semibold text-center">
-        How can I help you?
+    <div className="w-full space-y-6 sm:space-y-8">
+      <h1 className="text-3xl sm:text-4xl font-semibold text-center">
+        {t(getTitleKey())}
       </h1>
 
-      {/* Category Tabs */}
+      {/* Persona Tabs */}
       <div className="flex gap-2 justify-center flex-wrap">
-        {categories.map((category) => (
+        {FEATURED_PERSONAS.map((persona) => (
           <button
-            key={category.id}
-            onClick={() => setActiveCategory(category.id)}
-            className={`px-4 py-2 rounded-full transition-all flex items-center gap-2 ${
-              activeCategory === category.id
+            key={persona.id}
+            onClick={(): void => handlePersonaSelect(persona)}
+            className={`px-3 sm:px-4 py-2 rounded-full transition-all flex items-center gap-2 text-sm sm:text-base ${
+              selectedPersona.id === persona.id
                 ? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30"
                 : "hover:bg-accent border border-transparent"
             }`}
           >
-            <span>{category.icon}</span>
-            <span className="font-medium">{category.label}</span>
+            {React.createElement(getIconComponent(persona.icon), {
+              className: "text-base sm:text-lg",
+            })}
+            <span className="font-medium hidden sm:inline">{persona.name}</span>
           </button>
         ))}
+
+        {/* More button - opens modal */}
+        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+          <DialogTrigger asChild>
+            <button className="px-3 sm:px-4 py-2 rounded-full transition-all flex items-center gap-2 hover:bg-accent border border-transparent text-sm sm:text-base">
+              <MoreHorizontal className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="font-medium hidden sm:inline">
+                {t("app.chat.suggestedPrompts.more")}
+              </span>
+            </button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[80vh]">
+            <DialogHeader>
+              <DialogTitle>
+                {t("app.chat.suggestedPrompts.selectPersona")}
+              </DialogTitle>
+            </DialogHeader>
+            <ScrollArea className="h-[60vh] pr-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {DEFAULT_PERSONAS.map((persona) => (
+                  <button
+                    key={persona.id}
+                    onClick={(): void => handlePersonaSelect(persona)}
+                    className={`p-4 rounded-lg border transition-all text-left ${
+                      selectedPersona.id === persona.id
+                        ? "border-purple-500 bg-purple-500/10"
+                        : "border-border hover:border-purple-500/50 hover:bg-accent"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      {React.createElement(getIconComponent(persona.icon), {
+                        className: "text-2xl",
+                      })}
+                      <span className="font-semibold">{persona.name}</span>
+                    </div>
+                    {persona.description && (
+                      <p className="text-sm text-muted-foreground">
+                        {persona.description}
+                      </p>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
       </div>
 
-      {/* Suggested Prompts */}
+      {/* Suggested Prompts for selected persona */}
       <div className="space-y-3">
-        {prompts[activeCategory].map((prompt, index) => (
-          <button
-            key={index}
-            onClick={() => onSelectPrompt(prompt)}
-            className="w-full text-left p-4 rounded-lg hover:bg-accent transition-all border border-border"
-          >
-            {prompt}
-          </button>
-        ))}
+        {prompts.length > 0 ? (
+          prompts.map((prompt, index) => (
+            <button
+              key={index}
+              onClick={(): void => handlePromptClick(prompt)}
+              className="w-full text-left p-3 sm:p-4 rounded-lg hover:bg-accent transition-all border border-border cursor-pointer text-sm sm:text-base"
+            >
+              {prompt}
+            </button>
+          ))
+        ) : (
+          <p className="text-center text-muted-foreground py-8">
+            {t("app.chat.suggestedPrompts.noPrompts")}
+          </p>
+        )}
       </div>
     </div>
   );

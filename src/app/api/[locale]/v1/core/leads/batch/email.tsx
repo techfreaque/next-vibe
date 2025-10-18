@@ -25,8 +25,10 @@ import type { TFunction } from "@/i18n/core/static-types";
 import type {
   BatchDeleteRequestOutput,
   BatchDeleteResponseData,
+  BatchDeleteResponseOutput,
   BatchUpdateRequestOutput,
   BatchUpdateResponseData,
+  BatchUpdateResponseOutput,
 } from "./definition";
 
 /**
@@ -397,11 +399,11 @@ function BatchDeleteCompletionEmailContent({
  */
 export const renderBatchUpdateNotificationMail: EmailFunctionType<
   BatchUpdateRequestOutput,
-  BatchUpdateResponseData,
+  BatchUpdateResponseOutput,
   never
 > = ({ requestData, responseData, locale, t, user }) => {
   try {
-    if (!responseData) {
+    if (!responseData?.response) {
       return createErrorResponse(
         "app.api.v1.core.leads.batch.email.admin.batchUpdate.error.noData",
         ErrorResponseTypes.VALIDATION_ERROR,
@@ -414,7 +416,7 @@ export const renderBatchUpdateNotificationMail: EmailFunctionType<
       subject: t(
         "app.api.v1.core.leads.batch.email.admin.batchUpdate.subject",
         {
-          totalProcessed: responseData.totalProcessed || 0,
+          totalProcessed: responseData.response.totalProcessed || 0,
         },
       ),
       replyToEmail: contactClientRepository.getSupportEmail(locale),
@@ -422,7 +424,7 @@ export const renderBatchUpdateNotificationMail: EmailFunctionType<
 
       jsx: BatchUpdateCompletionEmailContent({
         data: requestData,
-        responseData,
+        responseData: responseData.response,
         t,
         locale,
         userId: user?.id,
@@ -442,11 +444,11 @@ export const renderBatchUpdateNotificationMail: EmailFunctionType<
  */
 export const renderBatchDeleteNotificationMail: EmailFunctionType<
   BatchDeleteRequestOutput,
-  BatchDeleteResponseData,
+  BatchDeleteResponseOutput,
   never
 > = ({ requestData, responseData, locale, t, user }) => {
   try {
-    if (!responseData) {
+    if (!responseData?.response) {
       return createErrorResponse(
         "app.api.v1.core.leads.batch.email.admin.batchDelete.error.noData",
         ErrorResponseTypes.VALIDATION_ERROR,
@@ -459,7 +461,7 @@ export const renderBatchDeleteNotificationMail: EmailFunctionType<
       subject: t(
         "app.api.v1.core.leads.batch.email.admin.batchDelete.subject",
         {
-          totalProcessed: responseData.totalProcessed || 0,
+          totalProcessed: responseData.response.totalProcessed || 0,
         },
       ),
       replyToEmail: contactClientRepository.getSupportEmail(locale),
@@ -467,7 +469,7 @@ export const renderBatchDeleteNotificationMail: EmailFunctionType<
 
       jsx: BatchDeleteCompletionEmailContent({
         data: requestData,
-        responseData,
+        responseData: responseData.response,
         t,
         locale,
         userId: user?.id,

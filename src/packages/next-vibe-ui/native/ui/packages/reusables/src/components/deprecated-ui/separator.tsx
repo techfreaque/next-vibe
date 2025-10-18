@@ -1,7 +1,7 @@
-import * as React from "react";
-import { View } from "react-native";
+import * as React from 'react';
+import { View } from 'react-native';
 
-import { cn } from "../../lib/utils";
+import { cn } from '../../lib/utils';
 
 const Separator = React.forwardRef<
   React.ElementRef<typeof View>,
@@ -10,13 +10,13 @@ const Separator = React.forwardRef<
   return (
     <View
       ref={ref}
-      className={cn("native:h-[1] web:h-[1px] bg-border", className)}
-      role="separator"
+      className={cn('native:h-[1] web:h-[1px] bg-border', className)}
+      role='separator'
       {...props}
     />
   );
 });
 
-Separator.displayName = "Separator";
+Separator.displayName = 'Separator';
 
 export { Separator };

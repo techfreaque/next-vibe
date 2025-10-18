@@ -306,35 +306,36 @@ export class UnifiedTaskRunnerRepositoryImpl
     cronUser?: JwtPrivatePayloadType,
   ): ResponseType<void> {
     try {
-      // eslint-disable-next-line no-console
-      console.log("🚀 [TASK-RUNNER] Starting unified task runner", {
-        taskCount: tasks.length,
-        environment: this.environment,
-        supportsSideTasks: this.supportsSideTasks,
-      });
-
-      // Store execution context
+      // Store execution context first so logger is available
       this.locale = locale;
       this.logger = logger;
       if (cronUser) {
         this.cronUser = cronUser;
       }
 
+      this.logger.info("Starting unified task runner", {
+        taskCount: tasks.length,
+        environment: this.environment,
+        supportsSideTasks: this.supportsSideTasks,
+      });
+
       this.isRunning = true;
 
       // Start all side tasks and task runners in background
       void this.startTasksInBackground(tasks, signal, locale);
 
-      // eslint-disable-next-line no-console
-      console.log("✅ [TASK-RUNNER] Task runner startup initiated");
+      this.logger.info("Task runner startup initiated");
 
       return createSuccessResponse(undefined);
     } catch (error) {
       const errorMsg = parseError(error).message;
-      // eslint-disable-next-line no-console
-      console.error("❌ [TASK-RUNNER] Failed to start task runner", {
-        error: errorMsg,
-      });
+
+      // Use logger if available, otherwise fall back to console (during initialization)
+      if (this.logger) {
+        this.logger.error("Failed to start task runner", {
+          error: errorMsg,
+        });
+      }
 
       return createErrorResponse(
         "app.api.v1.core.system.tasks.unifiedRunner.post.errors.internal.title",
@@ -360,8 +361,7 @@ export class UnifiedTaskRunnerRepositoryImpl
           task.type === "side" || task.type === "task-runner",
       );
 
-      // eslint-disable-next-line no-console
-      console.log("🔄 [TASK-RUNNER] Starting side tasks and task runners", {
+      this.logger.info("Starting side tasks and task runners", {
         sideTaskCount: sideTasks.length,
         taskNames: sideTasks.map((t) => t.name),
       });
@@ -369,13 +369,11 @@ export class UnifiedTaskRunnerRepositoryImpl
       // Start each side task in parallel
       const sideTaskPromises = sideTasks.map(async (task) => {
         if (!task.enabled) {
-          // eslint-disable-next-line no-console
-          console.log(`⏭️ [TASK-RUNNER] Skipping disabled task: ${task.name}`);
+          this.logger.info(`Skipping disabled task: ${task.name}`);
           return;
         }
 
-        // eslint-disable-next-line no-console
-        console.log(`🚀 [TASK-RUNNER] Starting side task: ${task.name}`);
+        this.logger.info(`Starting side task: ${task.name}`);
 
         try {
           // Create abort controller for this specific task
@@ -391,13 +389,11 @@ export class UnifiedTaskRunnerRepositoryImpl
           // Start the task
           await task.run(taskController.signal);
 
-          // eslint-disable-next-line no-console
-          console.log(`✅ [TASK-RUNNER] Side task completed: ${task.name}`);
+          this.logger.info(`Side task completed: ${task.name}`);
           this.markTaskAsCompleted(task.name);
         } catch (error) {
           const errorMsg = parseError(error).message;
-          // eslint-disable-next-line no-console
-          console.error(`❌ [TASK-RUNNER] Side task failed: ${task.name}`, {
+          this.logger.error(`Side task failed: ${task.name}`, {
             error: errorMsg,
           });
           this.markTaskAsFailed(task.name, errorMsg);
@@ -413,15 +409,11 @@ export class UnifiedTaskRunnerRepositoryImpl
       // Don't await all promises - let them run in background
       void Promise.allSettled(sideTaskPromises)
         .then(() => {
-          // eslint-disable-next-line no-console
-          console.log(
-            "🏁 [TASK-RUNNER] All side tasks have completed or failed",
-          );
+          this.logger.info("All side tasks have completed or failed");
           return;
         })
         .catch((error) => {
-          // eslint-disable-next-line no-console
-          console.error("Error in side task promises", error);
+          this.logger.error("Error in side task promises", error);
         });
 
       // Set up cron task scheduler for cron tasks
@@ -429,8 +421,7 @@ export class UnifiedTaskRunnerRepositoryImpl
         (task): task is CronTask => task.type === "cron",
       );
       if (cronTasks.length > 0) {
-        // eslint-disable-next-line no-console
-        console.log("⏰ [TASK-RUNNER] Setting up cron task scheduler", {
+        this.logger.info("Setting up cron task scheduler", {
           cronTaskCount: cronTasks.length,
           taskNames: cronTasks.map((t) => t.name),
         });
@@ -439,21 +430,16 @@ export class UnifiedTaskRunnerRepositoryImpl
         // In a real implementation, you'd use a cron scheduler here
         cronTasks.forEach((task) => {
           if (task.enabled) {
-            // eslint-disable-next-line no-console
-            console.log(
-              `📅 [TASK-RUNNER] Would schedule cron task: ${task.name} with schedule: ${task.schedule}`,
+            this.logger.info(
+              `Would schedule cron task: ${task.name} with schedule: ${task.schedule}`,
             );
           } else {
-            // eslint-disable-next-line no-console
-            console.log(
-              `⏭️ [TASK-RUNNER] Skipping disabled cron task: ${task.name}`,
-            );
+            this.logger.info(`Skipping disabled cron task: ${task.name}`);
           }
         });
       }
 
-      // eslint-disable-next-line no-console
-      console.log("🎉 [TASK-RUNNER] Task runner startup completed", {
+      this.logger.info("Task runner startup completed", {
         totalTasks: tasks.length,
         sideTasksStarted: sideTasks.filter((t) => t.enabled).length,
         cronTasksScheduled: cronTasks.filter((t) => t.enabled).length,
@@ -462,8 +448,7 @@ export class UnifiedTaskRunnerRepositoryImpl
       });
     } catch (error) {
       const errorMsg = parseError(error).message;
-      // eslint-disable-next-line no-console
-      console.error("💥 [TASK-RUNNER] Background task startup failed", {
+      this.logger.error("Background task startup failed", {
         error: errorMsg,
       });
     }

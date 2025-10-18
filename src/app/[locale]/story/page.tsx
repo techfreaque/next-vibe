@@ -34,18 +34,18 @@ export async function generateMetadata({
     title: "meta.home.title",
     category: "meta.home.category",
     description: "meta.home.description",
-    image: "https://socialmediaservice.com/images/home-hero.jpg",
+    image: "https://unbottled.ai/images/home-hero.jpg",
     imageAlt: "meta.home.imageAlt",
     keywords: ["meta.home.keywords"],
     additionalMetadata: {
       openGraph: {
         title: "meta.home.ogTitle",
         description: "meta.home.ogDescription",
-        url: `https://socialmediaservice.com/${locale}`,
+        url: `https://unbottled.ai/${locale}`,
         type: "website",
         images: [
           {
-            url: "https://socialmediaservice.com/images/home-hero.jpg",
+            url: "https://unbottled.ai/images/home-hero.jpg",
             width: 1200,
             height: 630,
             alt: "meta.home.imageAlt",
@@ -56,7 +56,7 @@ export async function generateMetadata({
         card: "summary_large_image",
         title: "meta.home.twitterTitle",
         description: "meta.home.twitterDescription",
-        images: ["https://socialmediaservice.com/images/home-hero.jpg"],
+        images: ["https://unbottled.ai/images/home-hero.jpg"],
       },
     },
   });

@@ -183,7 +183,7 @@ export function useLogin(
             "redirectTo",
           );
           const redirectTo: Route = (redirectParam ||
-            `/${locale}/app/onboarding`) satisfies Route;
+            `/${locale}/`) satisfies Route;
 
           logger.debug("auth.login.refetch.start");
           // Refetch user data after successful login
@@ -232,6 +232,11 @@ export function useLogin(
   }
 
   // Generate alert state from error/success states
+  // Use JSON.stringify for complex objects to avoid union type complexity issues
+  const responseMessageParamsKey = responseMessageParams
+    ? JSON.stringify(responseMessageParams)
+    : null;
+
   const alert = useMemo((): FormAlertState | null => {
     // Check for account locked state
     if (isAccountLocked) {
@@ -279,7 +284,7 @@ export function useLogin(
     isAccountLocked,
     errorMessage,
     responseMessage,
-    responseMessageParams,
+    responseMessageParamsKey,
     responseSuccess,
   ]);
 

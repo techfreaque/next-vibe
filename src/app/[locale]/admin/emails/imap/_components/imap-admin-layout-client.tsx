@@ -41,40 +41,40 @@ export function ImapAdminLayoutClient({
       key: "overview",
       href: `/${locale}/admin/emails/imap/overview`,
       icon: BarChart3,
-      label: t("imap.nav.overview"),
-      description: t("imap.nav.overview_description"),
+      label: t("app.admin.emails.imap.nav.overview"),
+      description: t("app.admin.emails.imap.nav.overview_description"),
       pattern: new RegExp(`^/${locale}/admin/emails/imap/overview`),
     },
     {
       key: "accounts",
       href: `/${locale}/admin/emails/imap/accounts`,
       icon: Users,
-      label: t("imap.nav.accounts"),
-      description: t("imap.nav.accounts_description"),
+      label: t("app.admin.emails.imap.nav.accounts"),
+      description: t("app.admin.emails.imap.nav.accounts_description"),
       pattern: new RegExp(`^/${locale}/admin/emails/imap/accounts`),
     },
     {
       key: "messages",
       href: `/${locale}/admin/emails/imap/messages`,
       icon: Mail,
-      label: t("imap.nav.messages"),
-      description: t("imap.nav.messages_description"),
+      label: t("app.admin.emails.imap.nav.messages"),
+      description: t("app.admin.emails.imap.nav.messages_description"),
       pattern: new RegExp(`^/${locale}/admin/emails/imap/messages`),
     },
     {
       key: "config",
       href: `/${locale}/admin/emails/imap/config`,
       icon: Settings,
-      label: t("imap.nav.config"),
-      description: t("imap.nav.config_description"),
+      label: t("app.admin.emails.imap.nav.config"),
+      description: t("app.admin.emails.imap.nav.config_description"),
       pattern: new RegExp(`^/${locale}/admin/emails/imap/config`),
     },
     {
       key: "sync",
       href: `/${locale}/admin/emails/imap/sync`,
       icon: RefreshCw,
-      label: t("imap.nav.sync"),
-      description: t("imap.nav.sync_description"),
+      label: t("app.admin.emails.imap.nav.sync"),
+      description: t("app.admin.emails.imap.nav.sync_description"),
       pattern: new RegExp(`^/${locale}/admin/emails/imap/sync`),
     },
   ];
@@ -91,16 +91,16 @@ export function ImapAdminLayoutClient({
           <div className="flex flex-col space-y-4">
             <div>
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {t("imap.title")}
+                {t("app.admin.emails.imap.title")}
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {t("imap.nav.overview_description")}
+                {t("app.admin.emails.imap.nav.overview_description")}
               </p>
             </div>
 
             {/* Sub Navigation Tabs */}
             <div className="border-b border-gray-200 dark:border-gray-700">
-              <nav className="flex space-x-8" aria-label={t("imap.title")}>
+              <nav className="flex space-x-8" aria-label={t("app.admin.emails.imap.title")}>
                 {subNavigationItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = currentSubSection?.key === item.key;

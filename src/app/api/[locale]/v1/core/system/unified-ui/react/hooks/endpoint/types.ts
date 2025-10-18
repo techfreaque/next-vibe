@@ -10,7 +10,6 @@ import type { ZodType } from "zod";
 import type { ZodTypeDef } from "zod/v3";
 
 import type {
-  ExtractInput,
   ExtractOutput,
   FieldUsage,
   InferSchemaFromField,
@@ -29,34 +28,35 @@ import type {
 
 // Type helpers for extracting endpoint types
 // Use the already-exposed type properties from CreateApiEndpoint instead of re-extracting
-export type ExtractEndpointTypes<T> = T extends CreateApiEndpoint<
-  infer TExampleKey,
-  infer TMethod,
-  infer TUserRoleValue,
-  infer TFields,
-  infer TRequestInput,
-  infer TRequestOutput,
-  infer TResponseInput,
-  infer TResponseOutput,
-  infer TUrlVariablesInput,
-  infer TUrlVariablesOutput
->
-  ? {
-      request: TRequestOutput;
-      response: TResponseOutput;
-      urlVariables: TUrlVariablesOutput;
-      exampleKey: TExampleKey;
-      method: TMethod;
-      userRoleValue: TUserRoleValue;
-      fields: TFields;
-      requestInput: TRequestInput;
-      requestOutput: TRequestOutput;
-      responseInput: TResponseInput;
-      responseOutput: TResponseOutput;
-      urlVariablesInput: TUrlVariablesInput;
-      urlVariablesOutput: TUrlVariablesOutput;
-    }
-  : never;
+export type ExtractEndpointTypes<T> =
+  T extends CreateApiEndpoint<
+    infer TExampleKey,
+    infer TMethod,
+    infer TUserRoleValue,
+    infer TFields,
+    infer TRequestInput,
+    infer TRequestOutput,
+    infer TResponseInput,
+    infer TResponseOutput,
+    infer TUrlVariablesInput,
+    infer TUrlVariablesOutput
+  >
+    ? {
+        request: TRequestOutput;
+        response: TResponseOutput;
+        urlVariables: TUrlVariablesOutput;
+        exampleKey: TExampleKey;
+        method: TMethod;
+        userRoleValue: TUserRoleValue;
+        fields: TFields;
+        requestInput: TRequestInput;
+        requestOutput: TRequestOutput;
+        responseInput: TResponseInput;
+        responseOutput: TResponseOutput;
+        urlVariablesInput: TUrlVariablesInput;
+        urlVariablesOutput: TUrlVariablesOutput;
+      }
+    : never;
 
 // Extract types from endpoints map
 export type GetEndpointTypes<T> = T extends { GET: infer TGet }
@@ -91,12 +91,19 @@ export type PrimaryMutationTypes<T> =
       : PutEndpointTypes<T>
     : PostEndpointTypes<T>;
 
+// Combined URL variables type - supports both GET and mutation endpoints
+// If GET exists, use its urlVariables; otherwise use primary mutation's urlVariables
+export type EndpointUrlVariables<T> =
+  GetEndpointTypes<T> extends never
+    ? PrimaryMutationTypes<T> extends never
+      ? undefined
+      : PrimaryMutationTypes<T>["urlVariables"]
+    : GetEndpointTypes<T>["urlVariables"];
+
 // Hook options interface with smart defaults and simple configuration
 export interface UseEndpointOptions<T> {
-  // URL parameters for endpoints that require them
-  urlParams?: GetEndpointTypes<T> extends never
-    ? undefined
-    : GetEndpointTypes<T>["urlVariables"];
+  // URL parameters for endpoints that require them (supports both GET and mutation endpoints)
+  urlParams?: EndpointUrlVariables<T>;
 
   // Query configuration
   enabled?: boolean;
@@ -128,9 +135,7 @@ export interface UseEndpointOptions<T> {
     requestData?: GetEndpointTypes<T> extends never
       ? undefined
       : GetEndpointTypes<T>["request"];
-    urlParams?: GetEndpointTypes<T> extends never
-      ? undefined
-      : GetEndpointTypes<T>["urlVariables"];
+    urlParams?: EndpointUrlVariables<T>;
     staleTime?: number;
     refetchOnWindowFocus?: boolean;
   };

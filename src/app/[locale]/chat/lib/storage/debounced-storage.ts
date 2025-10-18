@@ -11,6 +11,8 @@
  * - Graceful degradation if localStorage unavailable
  */
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+
 import { TIMING } from "../config/constants";
 
 interface StorageQueueItem {
@@ -25,27 +27,48 @@ interface DebouncedStorageOptions {
   debounceMs?: number;
   /** Maximum number of retry attempts (default: 3) */
   maxRetries?: number;
-  /** Whether to log errors to console (default: true) */
-  logErrors?: boolean;
+  /** Logger instance for error reporting */
+  logger?: EndpointLogger;
 }
+
+// Simple console logger for when no logger is provided
+/* eslint-disable no-console, i18next/no-literal-string, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument */
+const consoleLogger: EndpointLogger = {
+  info: (message: string, ...args: any[]) =>
+    console.log(`[Storage] ${message}`, ...args),
+  error: (message: string, error?: any, ...args: any[]) =>
+    console.error(`[Storage] ${message}`, error, ...args),
+  warn: (message: string, ...args: any[]) =>
+    console.warn(`[Storage] ${message}`, ...args),
+  debug: (message: string, ...args: any[]) =>
+    console.log(`[Storage] ${message}`, ...args),
+  vibe: (message: string, ...args: any[]) =>
+    console.log(`[Storage] ${message}`, ...args),
+  isDebugEnabled: false,
+};
+/* eslint-enable no-console, i18next/no-literal-string, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument */
 
 const DEFAULT_OPTIONS: Required<DebouncedStorageOptions> = {
   debounceMs: TIMING.STORAGE_DEBOUNCE,
   maxRetries: 3,
-  logErrors: true,
+  logger: consoleLogger,
 };
 
 /**
  * Debounced localStorage manager
  */
 export class DebouncedStorage {
-  private options: Required<DebouncedStorageOptions>;
-  private timers: Map<string, NodeJS.Timeout>;
+  private debounceMs: number;
+  private maxRetries: number;
+  private logger: EndpointLogger;
+  private timers: Map<string, ReturnType<typeof setTimeout>>;
   private queue: Map<string, StorageQueueItem>;
   private isAvailable: boolean;
 
   constructor(options: DebouncedStorageOptions = {}) {
-    this.options = { ...DEFAULT_OPTIONS, ...options };
+    this.debounceMs = options.debounceMs ?? DEFAULT_OPTIONS.debounceMs;
+    this.maxRetries = options.maxRetries ?? DEFAULT_OPTIONS.maxRetries;
+    this.logger = options.logger ?? DEFAULT_OPTIONS.logger;
     this.timers = new Map();
     this.queue = new Map();
     this.isAvailable = this.checkAvailability();
@@ -60,14 +83,13 @@ export class DebouncedStorage {
     }
 
     try {
+      // eslint-disable-next-line i18next/no-literal-string -- Technical test key, not user-facing
       const testKey = "__storage_test__";
       localStorage.setItem(testKey, "test");
       localStorage.removeItem(testKey);
       return true;
     } catch (e) {
-      if (this.options.logErrors) {
-        console.warn("localStorage is not available:", e);
-      }
+      this.logger.warn("Storage", "localStorage is not available", e);
       return false;
     }
   }
@@ -77,9 +99,10 @@ export class DebouncedStorage {
    */
   setItem(key: string, value: string): void {
     if (!this.isAvailable) {
-      if (this.options.logErrors) {
-        console.warn(`localStorage unavailable, skipping save for key: ${key}`);
-      }
+      this.logger.warn(
+        "Storage",
+        `localStorage unavailable, skipping save for key: ${key}`,
+      );
       return;
     }
 
@@ -100,7 +123,7 @@ export class DebouncedStorage {
     // Set new debounced timer
     const timer = setTimeout(() => {
       this.flush(key);
-    }, this.options.debounceMs);
+    }, this.debounceMs);
 
     this.timers.set(key, timer);
   }
@@ -113,9 +136,11 @@ export class DebouncedStorage {
       const jsonString = JSON.stringify(value);
       this.setItem(key, jsonString);
     } catch (error) {
-      if (this.options.logErrors) {
-        console.error(`Failed to stringify value for key ${key}:`, error);
-      }
+      this.logger.error(
+        "Storage",
+        `Failed to stringify value for key ${key}`,
+        error,
+      );
     }
   }
 
@@ -130,9 +155,7 @@ export class DebouncedStorage {
     try {
       return localStorage.getItem(key);
     } catch (error) {
-      if (this.options.logErrors) {
-        console.error(`Failed to get item for key ${key}:`, error);
-      }
+      this.logger.error("Storage", `Failed to get item for key ${key}`, error);
       return null;
     }
   }
@@ -149,9 +172,11 @@ export class DebouncedStorage {
     try {
       return JSON.parse(value) as T;
     } catch (error) {
-      if (this.options.logErrors) {
-        console.error(`Failed to parse JSON for key ${key}:`, error);
-      }
+      this.logger.error(
+        "Storage",
+        `Failed to parse JSON for key ${key}`,
+        error,
+      );
       return null;
     }
   }
@@ -175,9 +200,11 @@ export class DebouncedStorage {
     try {
       localStorage.removeItem(key);
     } catch (error) {
-      if (this.options.logErrors) {
-        console.error(`Failed to remove item for key ${key}:`, error);
-      }
+      this.logger.error(
+        "Storage",
+        `Failed to remove item for key ${key}`,
+        error,
+      );
     }
   }
 
@@ -197,22 +224,23 @@ export class DebouncedStorage {
       this.queue.delete(key);
       this.timers.delete(key);
     } catch (error) {
-      if (this.options.logErrors) {
-        console.error(`Failed to save to localStorage for key ${key}:`, error);
-      }
+      this.logger.error(
+        "Storage",
+        `Failed to save to localStorage for key ${key}`,
+        error,
+      );
 
       // Retry logic
-      if (item.retries < this.options.maxRetries) {
+      if (item.retries < this.maxRetries) {
         item.retries++;
 
         // Exponential backoff: 1s, 2s, 4s
         const retryDelay = 1000 * Math.pow(2, item.retries - 1);
 
-        if (this.options.logErrors) {
-          console.log(
-            `Retrying save for key ${key} (attempt ${item.retries}/${this.options.maxRetries}) in ${retryDelay}ms`,
-          );
-        }
+        this.logger.info(
+          "Storage",
+          `Retrying save for key ${key} (attempt ${item.retries}/${this.maxRetries}) in ${retryDelay}ms`,
+        );
 
         const timer = setTimeout(() => {
           this.flush(key);
@@ -221,11 +249,10 @@ export class DebouncedStorage {
         this.timers.set(key, timer);
       } else {
         // Max retries exceeded
-        if (this.options.logErrors) {
-          console.error(
-            `Max retries exceeded for key ${key}, giving up. Data may be lost.`,
-          );
-        }
+        this.logger.error(
+          "Storage",
+          `Max retries exceeded for key ${key}, giving up. Data may be lost.`,
+        );
         this.queue.delete(key);
         this.timers.delete(key);
       }
@@ -271,17 +298,17 @@ export class DebouncedStorage {
 
 /**
  * Singleton instance for app-wide use
+ * Note: For proper logging, create a new instance with a logger
  */
 export const debouncedStorage = new DebouncedStorage({
   debounceMs: 500,
   maxRetries: 3,
-  logErrors: true,
 });
 
 /**
  * Hook for using debounced storage in React components
  */
-export function useDebouncedStorage(options?: DebouncedStorageOptions) {
+export function useDebouncedStorage(): DebouncedStorage {
   // For now, return the singleton
   // In the future, could create per-component instances if needed
   return debouncedStorage;

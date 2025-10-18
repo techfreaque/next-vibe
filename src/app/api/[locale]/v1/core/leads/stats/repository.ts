@@ -148,10 +148,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       logger.debug("Getting leads stats", { data, userId: user.id });
 
       // Get date range
-      const dateRange = getDateRangeFromPreset(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        data.dateRangePreset || DateRangePreset.LAST_30_DAYS,
-      );
+      const dateRange = getDateRangeFromPreset(data.dateRangePreset);
       dateFrom = dateRange.from;
       dateTo = dateRange.to;
 
@@ -161,9 +158,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       // Get all metrics in parallel
       const [
         currentMetrics,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         historicalData,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         groupedStats,
         recentActivity,
         topPerformingCampaigns,
@@ -174,8 +169,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           whereConditions,
           dateFrom,
           dateTo,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-          data.timePeriod || TimePeriod.DAY,
+          data.timePeriod,
           data,
           logger,
         ),
@@ -187,9 +181,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
 
       const response: LeadsStatsResponseOutput = {
         ...currentMetrics,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         historicalData,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         groupedStats,
         generatedAt: new Date().toISOString(),
         dataRange: {
@@ -237,7 +229,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
 
     // Status filter
     if (query.status !== LeadStatusFilter.ALL) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const status = mapStatusFilter(query.status);
       if (status) {
         conditions.push(eq(leads.status, status));
@@ -246,7 +237,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
 
     // Source filter
     if (query.source !== LeadSourceFilter.ALL) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const source = mapSourceFilter(query.source);
       if (source) {
         conditions.push(eq(leads.source, source));
@@ -254,9 +244,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     }
 
     // Country filter
-    if (query.country && query.country !== CountryFilter.ALL) {
+    if (query.country !== CountryFilter.ALL) {
       // Map filter to actual enum value
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const countryValue = convertCountryFilter(query.country);
       if (countryValue) {
         conditions.push(eq(leads.country, countryValue));
@@ -264,9 +253,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     }
 
     // Language filter
-    if (query.language && query.language !== LanguageFilter.ALL) {
+    if (query.language !== LanguageFilter.ALL) {
       // Map filter to actual enum value
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const languageValue = convertLanguageFilter(query.language);
       if (languageValue) {
         conditions.push(eq(leads.language, languageValue));
@@ -274,11 +262,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     }
 
     // Campaign stage filter
-    if (
-      query.campaignStage &&
-      query.campaignStage !== EmailCampaignStageFilter.ALL
-    ) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    if (query.campaignStage !== EmailCampaignStageFilter.ALL) {
       const stage = mapCampaignStageFilter(query.campaignStage);
       if (stage) {
         conditions.push(eq(leads.currentCampaignStage, stage));
@@ -1078,21 +1062,13 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   ): Promise<LeadsStatsResponseOutput["groupedStats"]> {
     // Get grouped statistics from database
     const [
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byStatusData,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       bySourceData,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byCountryData,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byLanguageData,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byCampaignStageData,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byJourneyVariantData,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byEngagementLevelData,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byConversionFunnelData,
     ] = await Promise.all([
       this.getGroupedByStatus(whereConditions, logger),
@@ -1106,21 +1082,13 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     ]);
 
     return {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byStatus: byStatusData,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       bySource: bySourceData,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byCountry: byCountryData,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byLanguage: byLanguageData,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byCampaignStage: byCampaignStageData,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byJourneyVariant: byJourneyVariantData,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byEngagementLevel: byEngagementLevelData,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       byConversionFunnel: byConversionFunnelData,
     };
   }
@@ -1157,7 +1125,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       leadEmail: lead.email,
       leadBusinessName: lead.businessName || "",
       timestamp: lead.timestamp.toISOString(),
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       type: mapLeadStatusToActivityType(lead.status),
       details: {
         status: lead.status,
@@ -1246,7 +1213,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       const convertedLeads = Number(source.convertedLeads);
 
       return {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         source: (source.source as LeadSource) || ("website" as LeadSource),
         leadsGenerated: totalLeads,
         conversionRate: totalLeads > 0 ? convertedLeads / totalLeads : 0,
@@ -1978,7 +1944,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
 
     // Add status filter if specified (single value, not array)
     if (filters.status && filters.status !== LeadStatusFilter.ALL) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const mappedStatus = mapStatusFilter(filters.status);
       if (mappedStatus) {
         conditions.push(eq(leads.status, mappedStatus));
@@ -1987,7 +1952,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
 
     // Add source filter if specified (single value, not array)
     if (filters.source && filters.source !== LeadSourceFilter.ALL) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const mappedSource = mapSourceFilter(filters.source);
       if (mappedSource) {
         conditions.push(eq(leads.source, mappedSource));
@@ -2177,7 +2141,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     const baseConditions: SQL[] = [
       gte(leads.createdAt, dateFrom),
       lte(leads.createdAt, dateTo),
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
       eq(leads.status, status),
     ];
 
@@ -3206,7 +3170,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       `);
 
     return engagementGroups.map((group) => ({
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       level: group.level as EngagementLevel,
       count: Number(group.count),
       percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,

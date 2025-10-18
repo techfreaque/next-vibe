@@ -35,18 +35,17 @@
   ],
   "author": "Marcus Brandstaetter - Anywhere Widgets",
   "dependencies": {
+    "@inquirer/prompts": "7.8.6",
     "chalk": "5.6.2",
     "commander": "14.0.1",
-    "inquirer": "12.9.6",
     "simple-git": "3.28.0",
+    "typescript": "5.9.2",
     "vite": "7.1.6"
   },
   "devDependencies": {
-    "@types/inquirer": "9.0.9",
     "@types/node": "24.5.2",
     "lint": "workspace:*",
     "builder": "workspace:*",
-    "release-tool": "workspace:*",
-    "typescript": "5.9.2"
+    "release-tool": "workspace:*"
   }
 }

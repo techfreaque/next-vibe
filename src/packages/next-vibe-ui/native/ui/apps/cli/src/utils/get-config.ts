@@ -1,14 +1,14 @@
-import { cosmiconfig } from "cosmiconfig";
-import { loadConfig } from "tsconfig-paths";
-import { z } from "zod";
+import { cosmiconfig } from 'cosmiconfig';
+import { loadConfig } from 'tsconfig-paths';
+import { z } from 'zod';
 
-import { resolveImport } from "@/src/utils/resolve-import";
+import { resolveImport } from '@/src/utils/resolve-import';
 
-export const DEFAULT_COMPONENTS = "~/components";
-export const DEFAULT_LIB = "~/lib";
+export const DEFAULT_COMPONENTS = '~/components';
+export const DEFAULT_LIB = '~/lib';
 
-const explorer = cosmiconfig("components", {
-  searchPlaces: ["components.json"],
+const explorer = cosmiconfig('components', {
+  searchPlaces: ['components.json'],
 });
 
 export const rawConfigSchema = z.object({
@@ -43,10 +43,8 @@ export async function resolveConfigPaths(cwd: string, config: RawConfig) {
   // Read tsconfig.json.
   const tsConfig = await loadConfig(cwd);
 
-  if (tsConfig.resultType === "failed") {
-    throw new Error(
-      `Failed to load tsconfig.json. ${tsConfig.message ?? ""}`.trim(),
-    );
+  if (tsConfig.resultType === 'failed') {
+    throw new Error(`Failed to load tsconfig.json. ${tsConfig.message ?? ''}`.trim());
   }
 
   return configSchema.parse({

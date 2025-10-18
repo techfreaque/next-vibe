@@ -2,6 +2,10 @@
  * Message helper utilities
  */
 
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
+import { TEXT_FORMAT } from "../config/constants";
 import { getMessagesInPath } from "../storage/message-tree";
 import type { ChatMessage, ChatThread } from "../storage/types";
 
@@ -161,31 +165,37 @@ export function getBranchMessages(
  * Generate a title from the first user message
  */
 export function generateTitleFromMessage(content: string): string {
-  const maxLength = 50;
   const trimmed = content.trim();
 
-  if (trimmed.length <= maxLength) {
+  if (trimmed.length <= TEXT_FORMAT.TITLE_MAX_LENGTH) {
     return trimmed;
   }
 
   // Try to cut at a word boundary
-  const truncated = trimmed.slice(0, maxLength);
+  const truncated = trimmed.slice(0, TEXT_FORMAT.TITLE_MAX_LENGTH);
   const lastSpace = truncated.lastIndexOf(" ");
 
-  if (lastSpace > maxLength * 0.7) {
-    return `${truncated.slice(0, lastSpace)}...`;
+  if (
+    lastSpace >
+    TEXT_FORMAT.TITLE_MAX_LENGTH * TEXT_FORMAT.WORD_BOUNDARY_RATIO
+  ) {
+    return `${truncated.slice(0, lastSpace)}${TEXT_FORMAT.ELLIPSIS}`;
   }
 
-  return `${truncated}...`;
+  return `${truncated}${TEXT_FORMAT.ELLIPSIS}`;
 }
 
 /**
  * Check if thread needs a title update
  */
-export function needsTitleUpdate(thread: ChatThread): boolean {
+export function needsTitleUpdate(
+  thread: ChatThread,
+  locale: CountryLanguage,
+): boolean {
   const userMessages = getUserMessages(thread);
-  return (
-    userMessages.length === 1 &&
-    (thread.title === "New Chat" || thread.title.startsWith("Chat "))
-  );
+  const { t } = simpleT(locale);
+  const defaultTitle = t("app.chat.common.newChat");
+
+  // Check if title is still the default "New Chat" title
+  return userMessages.length === 1 && thread.title === defaultTitle;
 }

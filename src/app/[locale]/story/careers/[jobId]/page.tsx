@@ -64,14 +64,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: "meta.careers.title",
     description: "meta.careers.description",
     category: "meta.careers.category",
-    image: "https://socialmediaservice.com/images/careers-hero.jpg",
+    image: "https://unbottled.ai/images/careers-hero.jpg",
     imageAlt: "meta.careers.imageAlt",
     keywords: ["meta.careers.keywords"],
     additionalMetadata: {
       openGraph: {
         title: "meta.careers.ogTitle",
         description: "meta.careers.ogDescription",
-        url: `https://socialmediaservice.com/${locale}/careers/${jobId}`,
+        url: `https://unbottled.ai/${locale}/careers/${jobId}`,
         type: "website",
       },
       twitter: {

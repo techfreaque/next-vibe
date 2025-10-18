@@ -1,6 +1,6 @@
-import { LayoutPanelLeft } from "lucide-react-native";
+import { LayoutPanelLeft } from 'lucide-react-native';
 
-import { iconWithClassName } from "./iconWithClassName";
+import { iconWithClassName } from './iconWithClassName';
 
 iconWithClassName(LayoutPanelLeft);
 export { LayoutPanelLeft };

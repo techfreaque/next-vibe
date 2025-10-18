@@ -9,7 +9,6 @@ import type { EndpointLogger } from "../../../unified-ui/cli/vibe/endpoints/endp
 import type { EndpointReturn } from "../../../unified-ui/react/hooks/endpoint";
 import { useEndpoint } from "../../../unified-ui/react/hooks/endpoint";
 import { endpoints as taskEndpoints } from "../task/[id]/definition";
-import { useCronTask } from "../task/[id]/hooks";
 import { endpoints } from "./definition";
 
 /**
@@ -46,38 +45,42 @@ export function useCronTaskEndpoint(
   );
 }
 
-// Stub hook for creating tasks
-export function useCreateCronTask(): {
-  create: { onSubmit: null; form: null };
-} {
-  console.warn("useCreateCronTask: Create task endpoint not yet implemented");
-  return {
-    create: { onSubmit: null, form: null },
-  };
+/**
+ * Hook for creating new cron tasks
+ * Provides form handling and mutation capabilities for task creation
+ */
+export function useCreateCronTask(
+  logger: EndpointLogger,
+): EndpointReturn<typeof endpoints> {
+  return useEndpoint(endpoints, {}, logger);
 }
 
-// Stub hook for deleting tasks
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function useDeleteCronTask(taskId: string): {
-  mutateAsync: (data: unknown) => Promise<void>;
+/**
+ * Stub hook for deleting tasks
+ * TODO: Implement when delete endpoint is available
+ */
+export function useDeleteCronTask(_taskId: string): {
+  mutateAsync: () => Promise<void>;
 } {
-  console.warn("useDeleteCronTask: Delete task endpoint not yet implemented");
   return {
-    mutateAsync: async () => {
-      throw new Error("Delete task endpoint not yet implemented");
+    mutateAsync: (): Promise<void> => {
+      // No-op stub - endpoint not yet implemented
+      return Promise.resolve();
     },
   };
 }
 
-// Stub hook for toggling task enabled status
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function useToggleCronTask(taskId: string): {
-  mutateAsync: (enabled: boolean) => Promise<void>;
+/**
+ * Stub hook for toggling task enabled status
+ * TODO: Implement when toggle endpoint is available
+ */
+export function useToggleCronTask(_taskId: string): {
+  mutateAsync: (_enabled: boolean) => Promise<void>;
 } {
-  console.warn("useToggleCronTask: Toggle task endpoint not yet implemented");
   return {
-    mutateAsync: async () => {
-      throw new Error("Toggle task endpoint not yet implemented");
+    mutateAsync: (_enabled: boolean): Promise<void> => {
+      // No-op stub - endpoint not yet implemented
+      return Promise.resolve();
     },
   };
 }

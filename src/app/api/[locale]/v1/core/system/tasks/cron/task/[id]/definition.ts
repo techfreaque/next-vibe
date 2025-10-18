@@ -15,7 +15,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli
 import {
   objectField,
   requestDataField,
-  requestUrlField,
+  requestUrlParamsField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { LayoutType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
@@ -50,8 +50,7 @@ const { GET } = createEndpoint({
     { request: "url", response: true },
     {
       // URL parameter
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-      id: requestUrlField(
+      id: requestUrlParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -169,8 +168,7 @@ const { PUT } = createEndpoint({
     { request: "both", response: true },
     {
       // URL parameter
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-      id: requestUrlField(
+      id: requestUrlParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -401,8 +399,7 @@ const { DELETE } = createEndpoint({
     { request: "url", response: true },
     {
       // URL parameter
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-      id: requestUrlField(
+      id: requestUrlParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,

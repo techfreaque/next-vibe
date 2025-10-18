@@ -1,54 +1,24 @@
 import type { translations as enTranslations } from "../en";
+import { translations as authClientTranslations } from "./authClient";
+import { translations as loginTranslations } from "./login";
+import { translations as resetPasswordTranslations } from "./resetPassword";
+import { translations as sessionTranslations } from "./session";
+import { translations as userAvatarTranslations } from "./userAvatar";
+import { translations as userMeTranslations } from "./userMe";
+import { translations as userPasswordTranslations } from "./userPassword";
+import { translations as authTranslations } from "./auth";
+import { translations as authErrorsTranslations } from "./authErrors";
+import { translations as userTranslations } from "./user";
 
 export const translations: typeof enTranslations = {
-  post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
-    form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
-    },
-    response: {
-      title: "Antwort",
-      description: "Antwortdaten",
-    },
-    errors: {
-      unauthorized: {
-        title: "Nicht autorisiert",
-        description: "Authentifizierung erforderlich",
-      },
-      validation: {
-        title: "Validierungsfehler",
-        description: "Ungültige Anfrageparameter",
-      },
-      server: {
-        title: "Serverfehler",
-        description: "Interner Serverfehler",
-      },
-      unknown: {
-        title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist aufgetreten",
-      },
-      network: {
-        title: "Netzwerkfehler",
-        description: "Netzwerkfehler aufgetreten",
-      },
-      forbidden: {
-        title: "Verboten",
-        description: "Zugriff verboten",
-      },
-      notFound: {
-        title: "Nicht gefunden",
-        description: "Ressource nicht gefunden",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Datenkonflikt aufgetreten",
-      },
-    },
-    success: {
-      title: "Erfolg",
-      description: "Vorgang erfolgreich abgeschlossen",
-    },
-  },
+  auth: authTranslations,
+  authClient: authClientTranslations,
+  authErrors: authErrorsTranslations,
+  login: loginTranslations,
+  resetPassword: resetPasswordTranslations,
+  session: sessionTranslations,
+  user: userTranslations,
+  userAvatar: userAvatarTranslations,
+  userMe: userMeTranslations,
+  userPassword: userPasswordTranslations,
 };

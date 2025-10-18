@@ -24,6 +24,8 @@ import type { EndpointLogger } from "../../../unified-ui/cli/vibe/endpoints/endp
 import { cronTasks } from "../../db";
 import { CronTaskPriority, CronTaskStatus, TaskCategory } from "../../enum";
 import type {
+  CronTaskCreateRequestOutput,
+  CronTaskCreateResponseOutput,
   CronTaskListRequestOutput,
   CronTaskListResponseOutput,
   CronTaskResponseType,
@@ -33,6 +35,11 @@ import type {
  * Default cron schedule for tasks without a specific schedule
  */
 const DEFAULT_CRON_SCHEDULE = "0 0 * * *";
+
+/**
+ * Database error message pattern for unique constraint violations
+ */
+const UNIQUE_CONSTRAINT_ERROR = "unique constraint";
 
 /**
  * Calculate next execution time for a cron schedule
@@ -172,6 +179,13 @@ export interface ICronTasksListRepository {
     _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskListResponseOutput>>;
+
+  createTask(
+    data: CronTaskCreateRequestOutput,
+    _user: JwtPayloadType,
+    _locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CronTaskCreateResponseOutput>>;
 }
 
 /**
@@ -266,6 +280,122 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
 
       return createErrorResponse(
         "app.api.v1.core.system.tasks.cron.tasks.get.errors.internal.title",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
+  }
+
+  async createTask(
+    data: CronTaskCreateRequestOutput,
+    _user: JwtPayloadType,
+    _locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CronTaskCreateResponseOutput>> {
+    try {
+      logger.info("Starting cron task creation");
+      logger.debug("Request data", data);
+
+      // Check if task with same name already exists
+      const existingTask = await db
+        .select()
+        .from(cronTasks)
+        .where(eq(cronTasks.name, data.name))
+        .limit(1);
+
+      if (existingTask.length > 0) {
+        logger.warn("Task with same name already exists", {
+          name: data.name,
+        });
+        return createErrorResponse(
+          "app.api.v1.core.system.tasks.cron.tasks.post.errors.conflict.title",
+          ErrorResponseTypes.CONFLICT,
+        );
+      }
+
+      // Calculate next execution time
+      const nextRun = calculateNextExecutionTime(data.schedule);
+
+      // Prepare task data for insertion
+      const taskData = {
+        name: data.name,
+        description: data.description || null,
+        schedule: data.schedule,
+        enabled: data.enabled ?? true,
+        priority: data.priority ?? CronTaskPriority.MEDIUM,
+        category: data.category ?? TaskCategory.SYSTEM,
+        timeout: data.timeout ?? 300000,
+        retries: data.retries ?? 3,
+        version: "1",
+        defaultConfig: {
+          retryDelay: data.retryDelay ?? 5000,
+        },
+        nextRun: nextRun || undefined,
+        runCount: 0,
+        successCount: 0,
+        errorCount: 0,
+      };
+
+      logger.debug("Inserting task into database", taskData);
+
+      // Insert the task into the database
+      const [createdTask] = await db
+        .insert(cronTasks)
+        .values(taskData)
+        .returning();
+
+      if (!createdTask) {
+        logger.error("Failed to create task - no task returned");
+        return createErrorResponse(
+          "app.api.v1.core.system.tasks.cron.tasks.post.errors.internal.title",
+          ErrorResponseTypes.INTERNAL_ERROR,
+        );
+      }
+
+      logger.info("Task created successfully", {
+        id: createdTask.id,
+        name: createdTask.name,
+      });
+
+      // Format the response
+      const response: CronTaskCreateResponseOutput = {
+        task: {
+          id: createdTask.id,
+          name: createdTask.name,
+          description: createdTask.description || undefined,
+          schedule: createdTask.schedule || DEFAULT_CRON_SCHEDULE,
+          enabled: createdTask.enabled,
+          priority: z.nativeEnum(CronTaskPriority).parse(createdTask.priority),
+          status: CronTaskStatus.PENDING, // New tasks are always pending
+          category: z.nativeEnum(TaskCategory).parse(createdTask.category),
+          timeout: createdTask.timeout || 300000,
+          retries: createdTask.retries || 3,
+          retryDelay:
+            (createdTask.defaultConfig as { retryDelay?: number })
+              ?.retryDelay || 5000,
+          version: parseInt(createdTask.version, 10) || 1,
+          createdAt: createdTask.createdAt.toISOString(),
+          updatedAt: createdTask.updatedAt.toISOString(),
+        },
+      };
+
+      logger.vibe("🚀 Successfully created cron task");
+      logger.debug("Created task response", response);
+
+      return createSuccessResponse(response);
+    } catch (error) {
+      const parsedError = parseError(error);
+      logger.error("Failed to create cron task", parsedError);
+
+      // Check for unique constraint violation
+      if (parsedError.message?.includes(UNIQUE_CONSTRAINT_ERROR)) {
+        return createErrorResponse(
+          "app.api.v1.core.system.tasks.cron.tasks.post.errors.conflict.title",
+          ErrorResponseTypes.CONFLICT,
+        );
+      }
+
+      return createErrorResponse(
+        "app.api.v1.core.system.tasks.cron.tasks.post.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }

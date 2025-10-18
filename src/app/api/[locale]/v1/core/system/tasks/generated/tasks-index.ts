@@ -4,10 +4,10 @@
  * Implements spec.md unified task registry requirements
  *
  * Generation Info:
- * - Task files: 4
+ * - Task files: 5
  * - Task runner files: 2
  * - Side task config files: 0
- * - Generated at: 2025-10-15T21:34:13.139Z
+ * - Generated at: 2025-10-16T21:08:48.953Z
  */
 
 /* eslint-disable prettier/prettier */
@@ -16,20 +16,22 @@
 import type { Task, TaskRegistry } from "../types/repository";
 import { UnifiedTaskRunnerRepositoryImpl } from "../unified-runner/repository";
 
-import { tasks as taskModule0 } from "../../../newsletter/unsubscribe/task";
-import { tasks as taskModule1 } from "../../../user/session-cleanup/task";
-import { tasks as taskModule2 } from "../../../leads/import/task";
+import { tasks as taskModule0 } from "../../../user/session-cleanup/task";
+import { tasks as taskModule1 } from "../../../leads/import/task";
+import { tasks as taskModule2 } from "../../../newsletter/unsubscribe/task";
 import { tasks as taskModule3 } from "../../../emails/imap-client/sync/task";
-import { taskRunners as runnerModule4 } from "../pulse-runner/task-runner";
-import { taskRunners as runnerModule5 } from "../dev-watcher/task-runner";
+import { tasks as taskModule4 } from "../../../agent/chat/credits/expire/task";
+import { taskRunners as runnerModule5 } from "../pulse-runner/task-runner";
+import { taskRunners as runnerModule6 } from "../dev-watcher/task-runner";
 
 const allTasks: Task[] = [
   ...taskModule0,
   ...taskModule1,
   ...taskModule2,
   ...taskModule3,
-  ...runnerModule4,
+  ...taskModule4,
   ...runnerModule5,
+  ...runnerModule6,
 ];
 
 const cronTasks = allTasks.filter((task): task is Task & { type: 'cron' } => task.type === 'cron');

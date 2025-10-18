@@ -5,6 +5,78 @@
  */
 
 import html2canvas from "html2canvas";
+import {
+  ErrorResponseTypes,
+  throwErrorResponse,
+} from "next-vibe/shared/types/response.schema";
+
+/**
+ * Generate a sanitized filename for screenshots
+ * Technical function - filenames are not user-facing strings
+ */
+export function generateScreenshotFilename(threadTitle?: string): string {
+  if (!threadTitle) {
+    return "chat-conversation";
+  }
+  // eslint-disable-next-line i18next/no-literal-string
+  return `chat-${threadTitle.replace(/[^a-z0-9]/gi, "-").toLowerCase()}`;
+}
+
+export type ScreenshotErrorTranslationKey =
+  | "app.chat.screenshot.noMessages"
+  | "app.chat.screenshot.quotaExceeded"
+  | "app.chat.screenshot.canvasError"
+  | "app.chat.screenshot.tryAgain";
+
+/**
+ * Get the appropriate translation key for a screenshot error
+ * @param error - The error that occurred
+ * @returns Translation key for the error message
+ */
+export function getScreenshotErrorKey(
+  error: Error | ScreenshotError,
+): ScreenshotErrorTranslationKey {
+  if (!(error instanceof ScreenshotError)) {
+    return "app.chat.screenshot.tryAgain";
+  }
+
+  switch (error.code) {
+    case SCREENSHOT_ERROR_CODES.NO_MESSAGES_AREA:
+      return "app.chat.screenshot.noMessages";
+    case SCREENSHOT_ERROR_CODES.QUOTA_EXCEEDED:
+      return "app.chat.screenshot.quotaExceeded";
+    case SCREENSHOT_ERROR_CODES.CANVAS_CONVERSION_FAILED:
+      return "app.chat.screenshot.canvasError";
+    default:
+      return "app.chat.screenshot.tryAgain";
+  }
+}
+
+/**
+ * Screenshot error codes for proper error handling
+ */
+export const SCREENSHOT_ERROR_CODES = {
+  NO_MESSAGES_AREA: "NO_MESSAGES_AREA",
+  QUOTA_EXCEEDED: "QUOTA_EXCEEDED",
+  CANVAS_CONVERSION_FAILED: "CANVAS_CONVERSION_FAILED",
+} as const;
+
+export type ScreenshotErrorCode =
+  (typeof SCREENSHOT_ERROR_CODES)[keyof typeof SCREENSHOT_ERROR_CODES];
+
+/**
+ * Custom error class for screenshot operations
+ */
+export class ScreenshotError extends Error {
+  constructor(
+    message: string,
+    public code: ScreenshotErrorCode,
+  ) {
+    super(message);
+    // eslint-disable-next-line i18next/no-literal-string -- Error class name, not user-facing
+    this.name = "ScreenshotError";
+  }
+}
 
 /**
  * Screenshot configuration constants
@@ -40,13 +112,16 @@ const SCREENSHOT_CONFIG = {
 async function captureElementAsBlob(element: HTMLElement): Promise<Blob> {
   const canvas = await html2canvas(element, SCREENSHOT_CONFIG.CANVAS_OPTIONS);
 
-  return await new Promise((resolve, reject) => {
+  return await new Promise((resolve) => {
     canvas.toBlob(
       (blob) => {
         if (blob) {
           resolve(blob);
         } else {
-          reject(new Error("Failed to convert canvas to blob"));
+          throwErrorResponse(
+            "app.chat.screenshot.canvasError",
+            ErrorResponseTypes.INTERNAL_ERROR,
+          );
         }
       },
       SCREENSHOT_CONFIG.IMAGE_FORMAT,
@@ -102,8 +177,9 @@ export async function captureAndDownloadScreenshot(
     const chatContainer = document.getElementById("chat-messages-container");
 
     if (!chatContainer) {
-      throw new Error(
-        "Could not find chat messages area. Please ensure you have messages in the chat.",
+      throwErrorResponse(
+        "app.chat.screenshot.noMessages",
+        ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
 
@@ -141,9 +217,15 @@ export async function captureAndSaveToStorage(
   } catch (error) {
     // Handle quota exceeded error
     if (error instanceof Error && error.name === "QuotaExceededError") {
-      throw new Error("Storage quota exceeded. Screenshot is too large.");
+      throwErrorResponse(
+        "app.chat.screenshot.quotaExceeded",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
     }
-    throw error;
+    throwErrorResponse(
+      "app.chat.screenshot.failed",
+      ErrorResponseTypes.INTERNAL_ERROR,
+    );
   }
 
   return dataUrl;

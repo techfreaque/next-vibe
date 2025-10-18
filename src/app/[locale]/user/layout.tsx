@@ -18,14 +18,14 @@ export async function generateMetadata({
     title: "meta.profile.title",
     description: "meta.profile.description",
     category: "meta.profile.category",
-    image: "https://socialmediaservice.com/images/user-hero.jpg",
+    image: "https://unbottled.ai/images/user-hero.jpg",
     imageAlt: "meta.profile.imageAlt",
     keywords: ["meta.profile.keywords"],
     additionalMetadata: {
       openGraph: {
         title: "meta.profile.ogTitle",
         description: "meta.profile.ogDescription",
-        url: `https://socialmediaservice.com/${locale}/user`,
+        url: `https://unbottled.ai/${locale}/user`,
         type: "website",
       },
       twitter: {

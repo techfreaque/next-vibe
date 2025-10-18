@@ -23,10 +23,10 @@ export default async function EditSmtpAccountPage({
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">
-          {t("admin.dashboard.smtp.pages.edit")}
+          {t("app.admin.emails.smtp.pages.edit.edit")}
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          {t("admin.dashboard.smtp.pages.editDescription")}
+          {t("app.admin.emails.smtp.pages.edit.editDescription")}
         </p>
       </div>
 

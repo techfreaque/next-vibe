@@ -3,16 +3,36 @@
  * API routes for cron task statistics
  */
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
+import type { ApiHandlerProps } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/types";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 
-import { GET as cronStatsEndpoint } from "./definition";
+import type {
+  CronStatsGetRequestOutput,
+  CronStatsGetResponseOutput,
+} from "./definition";
+import definitions from "./definition";
 import { cronStatsRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
-  endpoint: cronStatsEndpoint,
+  endpoint: definitions,
   [Methods.GET]: {
-    handler: ({ data, user, locale, logger }) =>
-      cronStatsRepository.getStats(data, user, locale, logger),
+    email: undefined,
+    handler: async (
+      props: ApiHandlerProps<
+        CronStatsGetRequestOutput,
+        Record<string, never>,
+        typeof definitions.GET.allowedRoles
+      >,
+    ): Promise<ResponseType<CronStatsGetResponseOutput>> => {
+      return await cronStatsRepository.getStats(
+        props.data,
+        props.user,
+        props.locale,
+        props.logger,
+      );
+    },
   },
 });

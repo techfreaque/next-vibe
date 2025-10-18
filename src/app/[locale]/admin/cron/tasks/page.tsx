@@ -24,8 +24,8 @@ export async function generateMetadata({
   const { t } = simpleT(locale);
 
   return {
-    title: t("admin.dashboard.cron.nav.tasks"),
-    description: t("admin.dashboard.cron.nav.tasks_description"),
+    title: t("app.admin.cron.nav.tasks"),
+    description: t("app.admin.cron.nav.tasks_description"),
   };
 }
 

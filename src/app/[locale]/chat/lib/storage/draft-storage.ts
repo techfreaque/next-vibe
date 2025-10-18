@@ -3,41 +3,49 @@
  * Manages localStorage for input drafts and global settings
  */
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+
 import type { ModelId } from "../config/models";
 
-const DRAFT_KEY_PREFIX = "chat-draft-";
+const DRAFT_KEY_PREFIX = "chat-draft-folder-";
 const GLOBAL_MODEL_KEY = "chat-global-model";
 const GLOBAL_TONE_KEY = "chat-global-tone";
 const GLOBAL_ENABLE_SEARCH_KEY = "chat-enable-search";
 const GLOBAL_TTS_AUTOPLAY_KEY = "chat-tts-autoplay";
 
 /**
- * Get draft for a specific thread
+ * Get draft for a specific folder
+ * Drafts are now stored per folder, not per thread
  */
-export function getDraft(threadId: string): string {
+export function getDraft(folderId: string, logger: EndpointLogger): string {
   if (typeof window === "undefined") {
     return "";
   }
 
   try {
-    const key = `${DRAFT_KEY_PREFIX}${threadId}`;
+    const key = `${DRAFT_KEY_PREFIX}${folderId}`;
     return localStorage.getItem(key) || "";
   } catch (error) {
-    console.error("[Draft Storage] Error getting draft:", error);
+    logger.error("Storage", "Error getting draft", error);
     return "";
   }
 }
 
 /**
- * Save draft for a specific thread
+ * Save draft for a specific folder
+ * Drafts are now stored per folder, not per thread
  */
-export function saveDraft(threadId: string, content: string): void {
+export function saveDraft(
+  folderId: string,
+  content: string,
+  logger: EndpointLogger,
+): void {
   if (typeof window === "undefined") {
     return;
   }
 
   try {
-    const key = `${DRAFT_KEY_PREFIX}${threadId}`;
+    const key = `${DRAFT_KEY_PREFIX}${folderId}`;
     if (content.trim()) {
       localStorage.setItem(key, content);
     } else {
@@ -45,30 +53,32 @@ export function saveDraft(threadId: string, content: string): void {
       localStorage.removeItem(key);
     }
   } catch (error) {
-    console.error("[Draft Storage] Error saving draft:", error);
+    logger.error("Storage", "Error saving draft", error);
   }
 }
 
 /**
- * Clear draft for a specific thread
+ * Clear draft for a specific folder
+ * Drafts are now stored per folder, not per thread
+ * This should only be called when a message is sent
  */
-export function clearDraft(threadId: string): void {
+export function clearDraft(folderId: string, logger: EndpointLogger): void {
   if (typeof window === "undefined") {
     return;
   }
 
   try {
-    const key = `${DRAFT_KEY_PREFIX}${threadId}`;
+    const key = `${DRAFT_KEY_PREFIX}${folderId}`;
     localStorage.removeItem(key);
   } catch (error) {
-    console.error("[Draft Storage] Error clearing draft:", error);
+    logger.error("Storage", "Error clearing draft", error);
   }
 }
 
 /**
  * Get global model selection
  */
-export function getGlobalModel(): ModelId | null {
+export function getGlobalModel(logger: EndpointLogger): ModelId | null {
   if (typeof window === "undefined") {
     return null;
   }
@@ -77,7 +87,7 @@ export function getGlobalModel(): ModelId | null {
     const stored = localStorage.getItem(GLOBAL_MODEL_KEY);
     return stored as ModelId | null;
   } catch (error) {
-    console.error("[Draft Storage] Error getting global model:", error);
+    logger.error("Storage", "Error getting global model", error);
     return null;
   }
 }
@@ -85,7 +95,7 @@ export function getGlobalModel(): ModelId | null {
 /**
  * Save global model selection
  */
-export function saveGlobalModel(model: ModelId): void {
+export function saveGlobalModel(model: ModelId, logger: EndpointLogger): void {
   if (typeof window === "undefined") {
     return;
   }
@@ -93,14 +103,14 @@ export function saveGlobalModel(model: ModelId): void {
   try {
     localStorage.setItem(GLOBAL_MODEL_KEY, model);
   } catch (error) {
-    console.error("[Draft Storage] Error saving global model:", error);
+    logger.error("Storage", "Error saving global model", error);
   }
 }
 
 /**
  * Get global tone selection
  */
-export function getGlobalTone(): string | null {
+export function getGlobalTone(logger: EndpointLogger): string | null {
   if (typeof window === "undefined") {
     return null;
   }
@@ -108,7 +118,7 @@ export function getGlobalTone(): string | null {
   try {
     return localStorage.getItem(GLOBAL_TONE_KEY);
   } catch (error) {
-    console.error("[Draft Storage] Error getting global tone:", error);
+    logger.error("Storage", "Error getting global tone", error);
     return null;
   }
 }
@@ -116,7 +126,7 @@ export function getGlobalTone(): string | null {
 /**
  * Save global tone selection
  */
-export function saveGlobalTone(tone: string): void {
+export function saveGlobalTone(tone: string, logger: EndpointLogger): void {
   if (typeof window === "undefined") {
     return;
   }
@@ -124,14 +134,14 @@ export function saveGlobalTone(tone: string): void {
   try {
     localStorage.setItem(GLOBAL_TONE_KEY, tone);
   } catch (error) {
-    console.error("[Draft Storage] Error saving global tone:", error);
+    logger.error("Storage", "Error saving global tone", error);
   }
 }
 
 /**
  * Get global enable search setting (defaults to false)
  */
-export function getGlobalEnableSearch(): boolean {
+export function getGlobalEnableSearch(logger: EndpointLogger): boolean {
   if (typeof window === "undefined") {
     return false;
   }
@@ -140,8 +150,7 @@ export function getGlobalEnableSearch(): boolean {
     const stored = localStorage.getItem(GLOBAL_ENABLE_SEARCH_KEY);
     return stored === "true";
   } catch (error) {
-    // eslint-disable-next-line no-console, i18next/no-literal-string
-    console.error("[Draft Storage] Error getting enable search:", error);
+    logger.error("Storage", "Error getting enable search setting", error);
     return false;
   }
 }
@@ -149,7 +158,10 @@ export function getGlobalEnableSearch(): boolean {
 /**
  * Save global enable search setting
  */
-export function saveGlobalEnableSearch(enabled: boolean): void {
+export function saveGlobalEnableSearch(
+  enabled: boolean,
+  logger: EndpointLogger,
+): void {
   if (typeof window === "undefined") {
     return;
   }
@@ -157,15 +169,14 @@ export function saveGlobalEnableSearch(enabled: boolean): void {
   try {
     localStorage.setItem(GLOBAL_ENABLE_SEARCH_KEY, enabled.toString());
   } catch (error) {
-    // eslint-disable-next-line no-console, i18next/no-literal-string
-    console.error("[Draft Storage] Error saving enable search:", error);
+    logger.error("Storage", "Error saving enable search setting", error);
   }
 }
 
 /**
  * Get global TTS autoplay setting (defaults to false)
  */
-export function getGlobalTTSAutoplay(): boolean {
+export function getGlobalTTSAutoplay(logger: EndpointLogger): boolean {
   if (typeof window === "undefined") {
     return false;
   }
@@ -174,8 +185,7 @@ export function getGlobalTTSAutoplay(): boolean {
     const stored = localStorage.getItem(GLOBAL_TTS_AUTOPLAY_KEY);
     return stored === "true";
   } catch (error) {
-    // eslint-disable-next-line no-console, i18next/no-literal-string
-    console.error("[Draft Storage] Error getting TTS autoplay:", error);
+    logger.error("Storage", "Error getting TTS autoplay setting", error);
     return false;
   }
 }
@@ -183,7 +193,10 @@ export function getGlobalTTSAutoplay(): boolean {
 /**
  * Save global TTS autoplay setting
  */
-export function saveGlobalTTSAutoplay(enabled: boolean): void {
+export function saveGlobalTTSAutoplay(
+  enabled: boolean,
+  logger: EndpointLogger,
+): void {
   if (typeof window === "undefined") {
     return;
   }
@@ -191,7 +204,6 @@ export function saveGlobalTTSAutoplay(enabled: boolean): void {
   try {
     localStorage.setItem(GLOBAL_TTS_AUTOPLAY_KEY, enabled.toString());
   } catch (error) {
-    // eslint-disable-next-line no-console, i18next/no-literal-string
-    console.error("[Draft Storage] Error saving TTS autoplay:", error);
+    logger.error("Storage", "Error saving TTS autoplay setting", error);
   }
 }

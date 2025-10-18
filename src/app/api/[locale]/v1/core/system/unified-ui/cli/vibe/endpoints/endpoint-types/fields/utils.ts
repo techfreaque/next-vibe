@@ -157,12 +157,7 @@ export function objectField<
   C,
   U extends FieldUsageConfig,
   W extends Partial<WidgetConfig> = Partial<WidgetConfig>,
->(
-  ui: W,
-  usage: U,
-  children: C,
-  cache?: CacheStrategy,
-): ObjectField<C, U> {
+>(ui: W, usage: U, children: C, cache?: CacheStrategy): ObjectField<C, U> {
   return {
     type: "object" as const,
     children,

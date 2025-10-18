@@ -1,0 +1,217 @@
+import { translations as messageIdTranslations } from "../../[messageId]/i18n/pl";
+import pathTranslations from "../../path/i18n/pl";
+import { translations as searchTranslations } from "../../search/i18n/pl";
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  ...searchTranslations,
+  get: {
+    title: "List Thread Messages",
+    description: "Retrieve all messages in a chat thread",
+    container: {
+      title: "Messages",
+      description: "Thread message list",
+    },
+    threadId: {
+      label: "Thread ID",
+      description: "ID of the thread to retrieve messages from",
+    },
+    response: {
+      title: "Messages Response",
+      description: "List of messages in the thread",
+      messages: {
+        message: {
+          title: "Message",
+          id: {
+            content: "Message ID",
+          },
+          threadId: {
+            content: "Thread ID",
+          },
+          role: {
+            content: "Role",
+          },
+          content: {
+            content: "Content",
+          },
+          parentId: {
+            content: "Parent Message ID",
+          },
+          depth: {
+            content: "Depth",
+          },
+          authorId: {
+            content: "Author ID",
+          },
+          isAI: {
+            content: "Is AI",
+          },
+          model: {
+            content: "Model",
+          },
+          tokens: {
+            content: "Tokens",
+          },
+          createdAt: {
+            content: "Created At",
+          },
+          updatedAt: {
+            content: "Updated At",
+          },
+        },
+      },
+    },
+    errors: {
+      validation: {
+        title: "Validation Error",
+        description: "Invalid request parameters",
+      },
+      network: {
+        title: "Network Error",
+        description: "Unable to connect to the server",
+      },
+      unauthorized: {
+        title: "Unauthorized",
+        description: "You must be logged in to view messages",
+      },
+      forbidden: {
+        title: "Forbidden",
+        description: "You don't have permission to view these messages",
+      },
+      notFound: {
+        title: "Not Found",
+        description: "Thread not found",
+      },
+      server: {
+        title: "Server Error",
+        description: "An internal server error occurred",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unexpected error occurred",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
+      },
+      conflict: {
+        title: "Conflict",
+        description: "A conflict occurred",
+      },
+    },
+    success: {
+      title: "Success",
+      description: "Messages retrieved successfully",
+    },
+  },
+  post: {
+    title: "Create Message",
+    description: "Create a new message in a chat thread",
+    form: {
+      title: "New Message",
+      description: "Create a message in the thread",
+    },
+    sections: {
+      message: {
+        title: "Message Details",
+        description: "Message content and settings",
+      },
+    },
+    threadId: {
+      label: "Thread ID",
+      description: "ID of the thread to add message to",
+    },
+    content: {
+      label: "Content",
+      description: "Message content",
+      placeholder: "Enter message content...",
+    },
+    role: {
+      label: "Role",
+      description: "Message role (user, assistant, system)",
+    },
+    parentId: {
+      label: "Parent Message",
+      description: "Parent message ID for branching",
+    },
+    model: {
+      label: "Model",
+      description: "AI model to use for response",
+    },
+    response: {
+      title: "Created Message",
+      description: "Newly created message details",
+      message: {
+        title: "Message",
+        id: {
+          content: "Message ID",
+        },
+        threadId: {
+          content: "Thread ID",
+        },
+        role: {
+          content: "Role",
+        },
+        content: {
+          content: "Content",
+        },
+        parentId: {
+          content: "Parent Message ID",
+        },
+        depth: {
+          content: "Depth",
+        },
+        createdAt: {
+          content: "Created At",
+        },
+        updatedAt: {
+          content: "Updated At",
+        },
+      },
+    },
+    errors: {
+      validation: {
+        title: "Validation Error",
+        description: "Invalid message data provided",
+      },
+      network: {
+        title: "Network Error",
+        description: "Unable to connect to the server",
+      },
+      unauthorized: {
+        title: "Unauthorized",
+        description: "You must be logged in to create messages",
+      },
+      forbidden: {
+        title: "Forbidden",
+        description: "You don't have permission to create messages",
+      },
+      notFound: {
+        title: "Not Found",
+        description: "Thread not found",
+      },
+      server: {
+        title: "Server Error",
+        description: "An internal server error occurred",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unexpected error occurred",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
+      },
+      conflict: {
+        title: "Conflict",
+        description: "A conflict occurred",
+      },
+    },
+    success: {
+      title: "Success",
+      description: "Message created successfully",
+    },
+  },
+  messageId: messageIdTranslations,
+  path: pathTranslations,
+};

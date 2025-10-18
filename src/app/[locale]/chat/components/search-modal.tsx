@@ -1,11 +1,12 @@
 "use client";
 
-import { MessageSquarePlus, Search, X } from "lucide-react";
+import { MessageSquarePlus, Search } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
-import { useTranslation } from "@/i18n/core/client";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 import {
   Button,
   Dialog,
@@ -23,6 +24,7 @@ interface SearchModalProps {
   onCreateThread: () => void;
   onSelectThread: (threadId: string) => void;
   searchThreads: (query: string) => ChatThread[];
+  locale: CountryLanguage;
 }
 
 export function SearchModal({
@@ -31,20 +33,21 @@ export function SearchModal({
   onCreateThread,
   onSelectThread,
   searchThreads,
+  locale,
 }: SearchModalProps): JSX.Element {
-  const { t } = useTranslation("chat");
+  const { t } = simpleT(locale);
   const [searchQuery, setSearchQuery] = useState("");
 
   const searchResults =
     searchQuery.length > 0 ? searchThreads(searchQuery) : [];
 
-  const handleSelectThread = (threadId: string) => {
+  const handleSelectThread = (threadId: string): void => {
     onSelectThread(threadId);
     onOpenChange(false);
     setSearchQuery("");
   };
 
-  const handleCreateThread = () => {
+  const handleCreateThread = (): void => {
     onCreateThread();
     onOpenChange(false);
   };
@@ -53,14 +56,16 @@ export function SearchModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] max-h-[90dvh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>{t("dialogs.searchAndCreate")}</DialogTitle>
+          <DialogTitle>
+            {t("app.chat.common.searchModal.searchAndCreate")}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 flex-1 overflow-hidden flex flex-col">
           {/* New Thread Button */}
           <Button onClick={handleCreateThread} className="w-full flex-shrink-0">
             <MessageSquarePlus className="h-4 w-4 mr-2" />
-            {t("common.newChat")}
+            {t("app.chat.common.searchModal.newChat")}
           </Button>
 
           {/* Search Input */}
@@ -68,7 +73,9 @@ export function SearchModal({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
-              placeholder={t("common.searchThreadsPlaceholder")}
+              placeholder={t(
+                "app.chat.common.searchModal.searchThreadsPlaceholder",
+              )}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
@@ -93,7 +100,7 @@ export function SearchModal({
                 ))
               ) : (
                 <div className="text-center py-8 text-muted-foreground text-sm">
-                  {t("common.noThreadsFound")}
+                  {t("app.chat.common.searchModal.noThreadsFound")}
                 </div>
               )}
             </div>

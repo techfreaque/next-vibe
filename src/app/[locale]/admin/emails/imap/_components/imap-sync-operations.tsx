@@ -64,14 +64,14 @@ export function ImapSyncOperations(): JSX.Element {
     isRunning: syncingAccounts.length > 0 || isSyncing,
     currentOperation:
       syncingAccounts.length > 0
-        ? t("imap.sync.status.syncing")
-        : t("imap.sync.idle"),
+        ? t("app.admin.emails.imap.sync.status.syncing")
+        : t("app.admin.emails.imap.sync.idle"),
     progress: isSyncing ? 50 : 0, // Progress will be calculated from actual sync data
     startTime: null,
     estimatedCompletion: null,
     lastSync:
-      lastSyncTimes.length > 0 ? lastSyncTimes[0] : t("imap.common.never"),
-    nextSync: t("imap.sync.nextSync"),
+      lastSyncTimes.length > 0 ? lastSyncTimes[0] : t("app.admin.emails.imap.common.never"),
+    nextSync: t("app.admin.emails.imap.sync.nextSync"),
   };
 
   const syncHistory = [
@@ -79,7 +79,7 @@ export function ImapSyncOperations(): JSX.Element {
       id: "1",
       startTime: "2023-12-01T10:30:00Z",
       endTime: "2023-12-01T10:32:15Z",
-      status: t("imap.sync.status.synced"),
+      status: t("app.admin.emails.imap.sync.status.synced"),
       accountsProcessed: 3,
       foldersProcessed: 12,
       messagesProcessed: 145,
@@ -90,7 +90,7 @@ export function ImapSyncOperations(): JSX.Element {
       id: "2",
       startTime: "2023-12-01T10:25:00Z",
       endTime: "2023-12-01T10:27:30Z",
-      status: t("imap.sync.status.synced"),
+      status: t("app.admin.emails.imap.sync.status.synced"),
       accountsProcessed: 3,
       foldersProcessed: 12,
       messagesProcessed: 89,
@@ -101,7 +101,7 @@ export function ImapSyncOperations(): JSX.Element {
       id: "3",
       startTime: "2023-12-01T10:20:00Z",
       endTime: "2023-12-01T10:20:45Z",
-      status: t("imap.sync.status.error"),
+      status: t("app.admin.emails.imap.sync.status.error"),
       accountsProcessed: 1,
       foldersProcessed: 4,
       messagesProcessed: 0,
@@ -112,13 +112,13 @@ export function ImapSyncOperations(): JSX.Element {
 
   const getStatusIcon = (status: string): JSX.Element => {
     switch (status) {
-      case t("imap.sync.status.synced"):
+      case t("app.admin.emails.imap.sync.status.synced"):
         return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case t("imap.sync.status.syncing"):
+      case t("app.admin.emails.imap.sync.status.syncing"):
         return <RefreshCw className="h-4 w-4 text-blue-600 animate-spin" />;
-      case t("imap.sync.status.error"):
+      case t("app.admin.emails.imap.sync.status.error"):
         return <AlertCircle className="h-4 w-4 text-red-600" />;
-      case t("imap.sync.status.pending"):
+      case t("app.admin.emails.imap.sync.status.pending"):
         return <Pause className="h-4 w-4 text-yellow-600" />;
       default:
         return <Clock className="h-4 w-4 text-gray-600" />;
@@ -127,21 +127,21 @@ export function ImapSyncOperations(): JSX.Element {
 
   const getStatusBadge = (status: string): JSX.Element => {
     switch (status) {
-      case t("imap.sync.status.synced"):
+      case t("app.admin.emails.imap.sync.status.synced"):
         return (
           <Badge variant="default" className="bg-green-100 text-green-800">
             {status}
           </Badge>
         );
-      case t("imap.sync.status.syncing"):
+      case t("app.admin.emails.imap.sync.status.syncing"):
         return (
           <Badge variant="default" className="bg-blue-100 text-blue-800">
             {status}
           </Badge>
         );
-      case t("imap.sync.status.error"):
+      case t("app.admin.emails.imap.sync.status.error"):
         return <Badge variant="destructive">{status}</Badge>;
-      case t("imap.sync.status.pending"):
+      case t("app.admin.emails.imap.sync.status.pending"):
         return <Badge variant="secondary">{status}</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
@@ -181,7 +181,7 @@ export function ImapSyncOperations(): JSX.Element {
       {/* Sync Control Panel */}
       <Card>
         <CardHeader>
-          <CardTitle> {t("imap.sync.controlPanel")}</CardTitle>
+          <CardTitle> {t("app.admin.emails.imap.sync.controlPanel")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
@@ -190,23 +190,23 @@ export function ImapSyncOperations(): JSX.Element {
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">
                   {syncStatus.isRunning
-                    ? t("imap.sync.status.syncing")
-                    : t("imap.sync.idle")}
+                    ? t("app.admin.emails.imap.sync.status.syncing")
+                    : t("app.admin.emails.imap.sync.idle")}
                 </div>
                 <div className="text-sm text-gray-600">
-                  {t("imap.sync.currentStatus")}
+                  {t("app.admin.emails.imap.sync.currentStatus")}
                 </div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold">{syncStatus.lastSync}</div>
                 <div className="text-sm text-gray-600">
-                  {t("imap.sync.lastSync")}
+                  {t("app.admin.emails.imap.sync.lastSync")}
                 </div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold">{syncStatus.nextSync}</div>
                 <div className="text-sm text-gray-600">
-                  {t("imap.sync.nextSync")}
+                  {t("app.admin.emails.imap.sync.nextSync")}
                 </div>
               </div>
               <div className="text-center">
@@ -214,7 +214,7 @@ export function ImapSyncOperations(): JSX.Element {
                   {syncStatus.currentOperation}
                 </div>
                 <div className="text-sm text-gray-600">
-                  {t("imap.sync.currentOperation")}
+                  {t("app.admin.emails.imap.sync.currentOperation")}
                 </div>
               </div>
             </div>
@@ -223,7 +223,7 @@ export function ImapSyncOperations(): JSX.Element {
             {syncStatus.isRunning && (
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>{t("imap.sync.progress")}</span>
+                  <span>{t("app.admin.emails.imap.sync.progress")}</span>
                   <span>{syncStatus.progress}%</span>
                 </div>
                 <Progress value={syncStatus.progress} className="w-full" />
@@ -238,7 +238,7 @@ export function ImapSyncOperations(): JSX.Element {
                 className="flex items-center space-x-2"
               >
                 <Play className="h-4 w-4" />
-                <span>{t("imap.sync.start")}</span>
+                <span>{t("app.admin.emails.imap.sync.start")}</span>
               </Button>
               <Button
                 variant="outline"
@@ -247,7 +247,7 @@ export function ImapSyncOperations(): JSX.Element {
                 className="flex items-center space-x-2"
               >
                 <Pause className="h-4 w-4" />
-                <span>{t("imap.sync.pause")}</span>
+                <span>{t("app.admin.emails.imap.sync.pause")}</span>
               </Button>
               <Button
                 variant="outline"
@@ -256,9 +256,9 @@ export function ImapSyncOperations(): JSX.Element {
                 className="flex items-center space-x-2"
               >
                 <Square className="h-4 w-4" />
-                <span>{t("imap.sync.stop")}</span>
+                <span>{t("app.admin.emails.imap.sync.stop")}</span>
               </Button>
-              <Button variant="outline">{t("imap.sync.manual")}</Button>
+              <Button variant="outline">{t("app.admin.emails.imap.sync.manual")}</Button>
             </div>
           </div>
         </CardContent>
@@ -271,7 +271,7 @@ export function ImapSyncOperations(): JSX.Element {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">
-                  {t("imap.sync.statistics.totalSyncsToday")}
+                  {t("app.admin.emails.imap.sync.statistics.totalSyncsToday")}
                 </p>
                 <p className="text-2xl font-bold">24</p>
               </div>
@@ -285,7 +285,7 @@ export function ImapSyncOperations(): JSX.Element {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">
-                  {t("imap.sync.statistics.successfulSyncs")}
+                  {t("app.admin.emails.imap.sync.statistics.successfulSyncs")}
                 </p>
                 <p className="text-2xl font-bold text-green-600">22</p>
               </div>
@@ -299,7 +299,7 @@ export function ImapSyncOperations(): JSX.Element {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">
-                  {t("imap.sync.statistics.failedSyncs")}
+                  {t("app.admin.emails.imap.sync.statistics.failedSyncs")}
                 </p>
                 <p className="text-2xl font-bold text-red-600">2</p>
               </div>
@@ -313,9 +313,9 @@ export function ImapSyncOperations(): JSX.Element {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">
-                  {t("imap.sync.statistics.avgDuration")}
+                  {t("app.admin.emails.imap.sync.statistics.avgDuration")}
                 </p>
-                <p className="text-2xl font-bold">{t("imap.common.never")}</p>
+                <p className="text-2xl font-bold">{t("app.admin.emails.imap.common.never")}</p>
               </div>
               <Clock className="h-8 w-8 text-gray-600" />
             </div>
@@ -326,19 +326,19 @@ export function ImapSyncOperations(): JSX.Element {
       {/* Sync History */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("imap.sync.history.title")}</CardTitle>
+          <CardTitle>{t("app.admin.emails.imap.sync.history.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t("imap.sync.history.startTime")}</TableHead>
-                <TableHead>{t("imap.sync.history.status")}</TableHead>
-                <TableHead>{t("imap.sync.history.duration")}</TableHead>
-                <TableHead>{t("imap.sync.history.accounts")}</TableHead>
-                <TableHead>{t("imap.sync.history.folders")}</TableHead>
-                <TableHead>{t("imap.sync.history.messages")}</TableHead>
-                <TableHead>{t("imap.sync.history.errors")}</TableHead>
+                <TableHead>{t("app.admin.emails.imap.sync.history.startTime")}</TableHead>
+                <TableHead>{t("app.admin.emails.imap.sync.history.status")}</TableHead>
+                <TableHead>{t("app.admin.emails.imap.sync.history.duration")}</TableHead>
+                <TableHead>{t("app.admin.emails.imap.sync.history.accounts")}</TableHead>
+                <TableHead>{t("app.admin.emails.imap.sync.history.folders")}</TableHead>
+                <TableHead>{t("app.admin.emails.imap.sync.history.messages")}</TableHead>
+                <TableHead>{t("app.admin.emails.imap.sync.history.errors")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

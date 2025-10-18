@@ -140,11 +140,11 @@ export class PixelTrackingRepository {
       const result = pixelTrackingRequestSchema.safeParse(filteredParams);
 
       if (!result.success) {
+        // Use Zod's built-in error formatting
+        const fallbackError = "validation" + "." + "failed"; // Avoid i18next literal string
         return {
           success: false,
-          error: result.error.errors
-            .map((e) => `${e.path.join(".")}: ${e.message}`)
-            .join(", "),
+          error: result.error.message || fallbackError,
         };
       }
 

@@ -134,6 +134,42 @@ const { GET } = createEndpoint({
             },
             z.string().optional(),
           ),
+          isPinned: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.BOOLEAN,
+              label:
+                "app.api.v1.core.agent.chat.threads.get.isPinned.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.get.isPinned.description" as const,
+              layout: { columns: 6 },
+            },
+            z.boolean().optional(),
+          ),
+          dateFrom: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label:
+                "app.api.v1.core.agent.chat.threads.get.dateFrom.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.get.dateFrom.description" as const,
+              layout: { columns: 6 },
+            },
+            z.string().datetime().optional(),
+          ),
+          dateTo: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label:
+                "app.api.v1.core.agent.chat.threads.get.dateTo.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.get.dateTo.description" as const,
+              layout: { columns: 6 },
+            },
+            z.string().datetime().optional(),
+          ),
         },
       ),
 

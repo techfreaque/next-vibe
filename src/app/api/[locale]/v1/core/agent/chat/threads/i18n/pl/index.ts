@@ -1,8 +1,9 @@
-import { translations as threadsIdTranslations } from "../../[id]/i18n/pl";
-import { translations as threadsThreadIdMessagesTranslations } from "../../[threadId]/messages/i18n/pl";
+import { translations as threadsThreadIdTranslations } from "../../[threadId]/i18n/pl";
+import { translations as searchTranslations } from "../../search/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  ...searchTranslations,
   get: {
     title: "Lista wątków czatu",
     description:
@@ -41,6 +42,18 @@ export const translations: typeof enTranslations = {
       label: "Szukaj",
       description: "Szukaj wątków według tytułu lub treści",
       placeholder: "Szukaj wątków...",
+    },
+    isPinned: {
+      label: "Tylko Przypięte",
+      description: "Pokaż tylko przypięte wątki",
+    },
+    dateFrom: {
+      label: "Data Od",
+      description: "Filtruj wątki utworzone po tej dacie",
+    },
+    dateTo: {
+      label: "Data Do",
+      description: "Filtruj wątki utworzone przed tą datą",
     },
     response: {
       title: "Odpowiedź listy wątków",
@@ -234,8 +247,5 @@ export const translations: typeof enTranslations = {
       description: "Wątek został pomyślnie utworzony",
     },
   },
-  id: threadsIdTranslations,
-  threadId: {
-    messages: threadsThreadIdMessagesTranslations,
-  },
+  threadId: threadsThreadIdTranslations,
 };

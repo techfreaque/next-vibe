@@ -68,7 +68,7 @@ export default async function SignUpPage({
   const logger = createEndpointLogger(false, Date.now(), locale);
   const user = await userRepository.getUserByAuth({}, logger);
   if (user.success) {
-    redirect(`/${locale}/app/onboarding`);
+    redirect(`/${locale}/`);
   }
 
   return (

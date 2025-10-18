@@ -1,7 +1,7 @@
-import * as React from "react";
-import { View } from "react-native";
+import * as React from 'react';
+import { View } from 'react-native';
 
-import { Button } from "~/components/ui/button";
+import { Button } from '~/components/ui/button';
 import {
   Card,
   CardContent,
@@ -9,30 +9,30 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "~/components/ui/card";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { Text } from "~/components/ui/text";
+} from '~/components/ui/card';
+import { Input } from '~/components/ui/input';
+import { Label } from '~/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { Text } from '~/components/ui/text';
 
 export default function TabsScreen() {
-  const [value, setValue] = React.useState("account");
+  const [value, setValue] = React.useState('account');
   return (
-    <View className="flex-1 justify-center p-6">
+    <View className='flex-1 justify-center p-6'>
       <Tabs
         value={value}
         onValueChange={setValue}
-        className="w-full max-w-[400px] mx-auto flex-col gap-1.5"
+        className='w-full max-w-[400px] mx-auto flex-col gap-1.5'
       >
-        <TabsList className="flex-row w-full">
-          <TabsTrigger value="account" className="flex-1">
+        <TabsList className='flex-row w-full'>
+          <TabsTrigger value='account' className='flex-1'>
             <Text>Account</Text>
           </TabsTrigger>
-          <TabsTrigger value="password" className="flex-1">
+          <TabsTrigger value='password' className='flex-1'>
             <Text>Password</Text>
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="account">
+        <TabsContent value='account'>
           <Card>
             <CardHeader>
               <CardTitle>Account</CardTitle>
@@ -40,17 +40,14 @@ export default function TabsScreen() {
                 Make changes to your account here. Click save when you're done.
               </CardDescription>
             </CardHeader>
-            <CardContent className="gap-4 native:gap-2">
-              <View className="gap-1">
-                <Label nativeID="name">Name</Label>
-                <Input
-                  aria-aria-labelledby="name"
-                  defaultValue="Pedro Duarte"
-                />
+            <CardContent className='gap-4 native:gap-2'>
+              <View className='gap-1'>
+                <Label nativeID='name'>Name</Label>
+                <Input aria-aria-labelledby='name' defaultValue='Pedro Duarte' />
               </View>
-              <View className="gap-1">
-                <Label nativeID="username">Username</Label>
-                <Input id="username" defaultValue="@peduarte" />
+              <View className='gap-1'>
+                <Label nativeID='username'>Username</Label>
+                <Input id='username' defaultValue='@peduarte' />
               </View>
             </CardContent>
             <CardFooter>
@@ -60,7 +57,7 @@ export default function TabsScreen() {
             </CardFooter>
           </Card>
         </TabsContent>
-        <TabsContent value="password">
+        <TabsContent value='password'>
           <Card>
             <CardHeader>
               <CardTitle>Password</CardTitle>
@@ -68,22 +65,14 @@ export default function TabsScreen() {
                 Change your password here. After saving, you'll be logged out.
               </CardDescription>
             </CardHeader>
-            <CardContent className="gap-4 native:gap-2">
-              <View className="gap-1">
-                <Label nativeID="current">Current password</Label>
-                <Input
-                  placeholder="********"
-                  aria-labelledby="current"
-                  secureTextEntry
-                />
+            <CardContent className='gap-4 native:gap-2'>
+              <View className='gap-1'>
+                <Label nativeID='current'>Current password</Label>
+                <Input placeholder='********' aria-labelledby='current' secureTextEntry />
               </View>
-              <View className="gap-1">
-                <Label nativeID="new">New password</Label>
-                <Input
-                  placeholder="********"
-                  aria-labelledby="new"
-                  secureTextEntry
-                />
+              <View className='gap-1'>
+                <Label nativeID='new'>New password</Label>
+                <Input placeholder='********' aria-labelledby='new' secureTextEntry />
               </View>
             </CardContent>
             <CardFooter>

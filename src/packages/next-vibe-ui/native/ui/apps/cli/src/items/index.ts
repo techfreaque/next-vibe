@@ -1,11 +1,11 @@
-import { COMPONENTS } from "./components";
+import { COMPONENTS } from './components';
 
 export type Component = (typeof COMPONENTS)[number] & { icons?: string[] };
-type ComponentName = (typeof COMPONENTS)[number]["name"];
+type ComponentName = (typeof COMPONENTS)[number]['name'];
 
 function getComponentDependencies(
   componentName: ComponentName,
-  visited = new Set<ComponentName>(),
+  visited = new Set<ComponentName>()
 ) {
   const component = COMPONENTS.find((comp) => comp.name === componentName);
   if (!component) {
@@ -26,16 +26,13 @@ function getComponentDependencies(
   return dependencies;
 }
 
-export const INVALID_COMPONENT_ERROR = "invalid component";
+export const INVALID_COMPONENT_ERROR = 'invalid component';
 
 export function getAllComponentsToWrite(componentNames: string[]): Component[] {
   const uniqueComponents = new Set<ComponentName>();
 
   if (
-    componentNames.some(
-      (componentName) =>
-        !COMPONENTS.find((comp) => comp.name === componentName),
-    )
+    componentNames.some((componentName) => !COMPONENTS.find((comp) => comp.name === componentName))
   ) {
     throw new Error(INVALID_COMPONENT_ERROR);
   }

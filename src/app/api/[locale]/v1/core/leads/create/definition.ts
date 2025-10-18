@@ -270,7 +270,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.v1.core.leads.create.post.response.summary.email",
                 },
-                z.email(),
+                z.string().email().nullable(),
               ),
               status: responseField(
                 {

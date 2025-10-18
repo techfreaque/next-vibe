@@ -1,6 +1,10 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import type { JSX } from "react";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import {
   chatColors,
@@ -13,6 +17,8 @@ import { UserMessageActions } from "./user-message-actions";
 
 interface UserMessageBubbleProps {
   message: ChatMessage;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
   onBranch?: (messageId: string) => void;
   onRetry?: (messageId: string) => void;
   onDelete?: (messageId: string) => void;
@@ -21,11 +27,18 @@ interface UserMessageBubbleProps {
 
 export function UserMessageBubble({
   message,
+  locale,
+  logger,
   onBranch,
   onRetry,
   onDelete,
   showAuthor = false,
-}: UserMessageBubbleProps) {
+}: UserMessageBubbleProps): JSX.Element {
+  const tone =
+    message.role === "user" || message.role === "assistant"
+      ? message.tone
+      : undefined;
+
   return (
     <div className="flex justify-end">
       <div className="max-w-[90%] sm:max-w-[85%] group/message">
@@ -36,7 +49,8 @@ export function UserMessageBubble({
               author={message.author}
               timestamp={message.timestamp}
               edited={message.metadata?.edited}
-              tone={message.tone}
+              tone={tone}
+              locale={locale}
               compact
             />
           </div>
@@ -44,9 +58,9 @@ export function UserMessageBubble({
 
         <div
           className={cn(
-            "text-white rounded-2xl px-3 py-2.5 sm:px-4 sm:py-3",
-            chatColors.primary.gradient,
-            chatShadows.lg,
+            "text-foreground rounded-2xl px-3 py-2.5 sm:px-4 sm:py-3",
+            chatColors.message.user,
+            chatShadows.sm,
             chatTransitions.default,
           )}
         >
@@ -60,6 +74,8 @@ export function UserMessageBubble({
           <UserMessageActions
             messageId={message.id}
             content={message.content}
+            locale={locale}
+            logger={logger}
             onBranch={onBranch}
             onRetry={onRetry}
             onDelete={onDelete}

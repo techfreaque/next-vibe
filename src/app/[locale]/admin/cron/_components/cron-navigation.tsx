@@ -34,22 +34,22 @@ export function CronNavigation({
       key: "stats",
       href: `/${locale}/admin/stats` as const,
       icon: TrendingUp,
-      label: t("admin.dashboard.cron.nav.stats"),
-      description: t("admin.dashboard.cron.nav.stats_description"),
+      label: t("app.admin.cron.nav.stats"),
+      description: t("app.admin.cron.nav.stats_description"),
     },
     {
       key: "tasks",
       href: `/${locale}/admin/cron/tasks` as const,
       icon: List,
-      label: t("admin.dashboard.cron.nav.tasks"),
-      description: t("admin.dashboard.cron.nav.tasks_description"),
+      label: t("app.admin.cron.nav.tasks"),
+      description: t("app.admin.cron.nav.tasks_description"),
     },
     {
       key: "history",
       href: `/${locale}/admin/cron/history` as const,
       icon: History,
-      label: t("admin.dashboard.cron.nav.history"),
-      description: t("admin.dashboard.cron.nav.history_description"),
+      label: t("app.admin.cron.nav.history"),
+      description: t("app.admin.cron.nav.history_description"),
     },
   ] as const;
 
@@ -78,7 +78,7 @@ export function CronNavigation({
                       <span className="font-medium">{item.label}</span>
                       {isActive && (
                         <Badge variant="secondary" className="ml-auto">
-                          {t("common.active")}
+                          {t("app.common.active")}
                         </Badge>
                       )}
                     </div>

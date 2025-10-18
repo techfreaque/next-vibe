@@ -158,7 +158,7 @@ registerSeed(
     test,
     prod,
   },
-  50 // Priority value - determines execution order
+  50, // Priority value - determines execution order
 );
 ```
 

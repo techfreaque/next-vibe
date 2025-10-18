@@ -53,7 +53,7 @@ export function EmailsListClient({
         <div className="flex justify-between items-center">
           <CardTitle className="flex items-center">
             <Mail className="h-5 w-5 mr-2" />
-            {t("emails.admin.title")} {totalEmails}
+            {t("app.admin.emails.list.admin.title")} {totalEmails}
           </CardTitle>
 
           <div className="flex items-center space-x-2">
@@ -77,7 +77,7 @@ export function EmailsListClient({
           <div className="flex items-center space-x-2 mb-4">
             <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              {t("emails.admin.filters.title")}:
+              {t("app.admin.emails.list.admin.filters.title")}:
             </span>
           </div>
 

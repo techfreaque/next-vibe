@@ -1,37 +1,48 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+import { cn } from "@/packages/next-vibe/shared";
 
-export function Logo({}: {
+import logoBlack from "./uai-logo-black.png";
+import logoWhite from "./uai-logo-white.png";
+
+export function Logo({
+  locale,
+  pathName,
+  className,
+  linkClassName,
+}: {
   locale: CountryLanguage;
-  pathName?: "" | "/app/onboarding" | "/app/dashboard" | "/chat";
+  pathName: string;
   className?: string;
+  linkClassName?: string;
 }): JSX.Element {
+  const { t } = simpleT(locale);
   return (
-    <>
-      {/* Desktop logo */}
-      {/* <Link
-        href={`/${locale}${pathName}`}
-      >
-          <Image
-            src={logo}
-            alt={t("common.appName")}
-            width={250}
-            height={80}
-            className={cn("hidden dark:block h-18 w-auto", className)}
-            priority
-          />
-          <Image
-            src={logoBlack}
-            alt={t("common.appName")}
-            width={250}
-            height={80}
-            className={cn("hidden light:block h-18 w-auto", className)}
-            priority
-          />
-      </Link> */}
-    </>
+    <Link href={`/${locale}${pathName}`} className={linkClassName}>
+      <Image
+        fetchPriority="high"
+        src={logoWhite}
+        alt={t("common.appName")}
+        width={250}
+        height={80}
+        className={cn("hidden dark:block h-18 w-auto", className)}
+        priority
+      />
+      <Image
+        fetchPriority="high"
+        src={logoBlack}
+        alt={t("common.appName")}
+        width={250}
+        height={80}
+        className={cn("hidden light:block h-18 w-auto", className)}
+        priority
+      />
+    </Link>
   );
 }

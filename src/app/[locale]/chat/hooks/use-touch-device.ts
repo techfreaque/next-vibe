@@ -13,12 +13,12 @@ export function useTouchDevice(): boolean {
 
   useEffect(() => {
     // Check if touch is supported
-    const checkTouch = () => {
+    const checkTouch = (): void => {
       // Multiple checks for better compatibility
       const hasTouch =
         "ontouchstart" in window ||
         navigator.maxTouchPoints > 0 ||
-        // @ts-ignore - for older browsers
+        // @ts-ignore - msMaxTouchPoints is a legacy IE property not in TypeScript types
         navigator.msMaxTouchPoints > 0;
 
       setIsTouch(hasTouch);
@@ -28,7 +28,7 @@ export function useTouchDevice(): boolean {
 
     // Re-check on resize (for 2-in-1 devices that can switch modes)
     window.addEventListener("resize", checkTouch);
-    return () => window.removeEventListener("resize", checkTouch);
+    return (): void => window.removeEventListener("resize", checkTouch);
   }, []);
 
   return isTouch;
@@ -49,14 +49,16 @@ export function getTouchAwareClasses(alwaysVisibleOnTouch = true): string {
   const isTouch =
     "ontouchstart" in window ||
     navigator.maxTouchPoints > 0 ||
-    // @ts-ignore
+    // @ts-ignore - msMaxTouchPoints is a legacy IE property not in TypeScript types
     navigator.msMaxTouchPoints > 0;
 
   if (isTouch && alwaysVisibleOnTouch) {
     // On touch devices: always visible but slightly transparent for better UX
+    // eslint-disable-next-line i18next/no-literal-string -- CSS class names, not user-facing text
     return "opacity-70 active:opacity-100";
   } else {
     // On pointer devices: hidden until hover
+    // eslint-disable-next-line i18next/no-literal-string -- CSS class names, not user-facing text
     return "opacity-0 group-hover:opacity-100 focus-within:opacity-100";
   }
 }

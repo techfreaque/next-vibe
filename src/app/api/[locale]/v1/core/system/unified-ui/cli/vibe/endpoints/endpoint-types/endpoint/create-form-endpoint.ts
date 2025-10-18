@@ -537,16 +537,19 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
   if (typedField.type === "primitive") {
     const methodUsage = getUsageForMethod(typedField.usage, method);
     if (methodUsage && hasTargetUsage(methodUsage)) {
-      return typedField.schema ?? z.never();
+      return (
+        typedField.schema ??
+        (targetUsage === FieldUsage.RequestData ? z.undefined() : z.never())
+      );
     }
-    return z.never();
+    return targetUsage === FieldUsage.RequestData ? z.undefined() : z.never();
   }
 
   if (typedField.type === "object") {
     // Check if the object itself should be included for this method and usage
     const objectMethodUsage = getUsageForMethod(typedField.usage, method);
     if (!objectMethodUsage || !hasTargetUsage(objectMethodUsage)) {
-      return z.never();
+      return targetUsage === FieldUsage.RequestData ? z.undefined() : z.never();
     }
 
     // Build shape object by recursively processing children
@@ -565,9 +568,9 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
       }
     }
 
-    // If no children match this usage, return z.never()
+    // If no children match this usage, return z.undefined() for request data, z.never() for others
     if (Object.keys(shape).length === 0) {
-      return z.never();
+      return targetUsage === FieldUsage.RequestData ? z.undefined() : z.never();
     }
 
     return z.object(shape);
@@ -582,13 +585,15 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
         targetUsage,
       );
       return childSchema instanceof z.ZodNever
-        ? z.never()
+        ? targetUsage === FieldUsage.RequestData
+          ? z.undefined()
+          : z.never()
         : z.array(childSchema);
     }
-    return z.never();
+    return targetUsage === FieldUsage.RequestData ? z.undefined() : z.never();
   }
 
-  return z.never();
+  return targetUsage === FieldUsage.RequestData ? z.undefined() : z.never();
 }
 
 /**

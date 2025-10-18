@@ -60,7 +60,7 @@ export function ImapMessageDetail({
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
-          <p className="text-gray-600">{t("imap.common.loading")}</p>
+          <p className="text-gray-600">{t("app.admin.emails.imap.common.loading")}</p>
         </div>
       </div>
     );
@@ -72,11 +72,11 @@ export function ImapMessageDetail({
         <div className="text-center">
           <p className="text-red-600 mb-4">
             {readError?.message ||
-              t("imapErrors.messages.get.error.not_found.description")}
+              t("app.admin.emails.imap.admin.messages.error.title", { error: "" })}
           </p>
           <Button variant="outline" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            {t("imap.forms.back")}
+            {t("app.admin.emails.imap.forms.back")}
           </Button>
         </div>
       </div>
@@ -115,13 +115,13 @@ export function ImapMessageDetail({
 
   const formatSize = (bytes: number): string => {
     const sizes = [
-      t("imap.common.bytes"),
-      t("imap.common.kilobytes"),
-      t("imap.common.megabytes"),
-      t("imap.common.gigabytes"),
+      t("app.admin.emails.imap.common.bytes"),
+      t("app.admin.emails.imap.common.kilobytes"),
+      t("app.admin.emails.imap.common.megabytes"),
+      t("app.admin.emails.imap.common.gigabytes"),
     ];
     if (bytes === 0) {
-      return `0 ${t("imap.common.bytes")}`;
+      return `0 ${t("app.admin.emails.imap.common.bytes")}`;
     }
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     return `${Math.round((bytes / Math.pow(1024, i)) * 100) / 100} ${sizes[i]}`;
@@ -133,13 +133,13 @@ export function ImapMessageDetail({
       <div className="flex items-center justify-between">
         <Button variant="outline" onClick={handleBack}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          {t("imap.forms.back")}
+          {t("app.admin.emails.imap.forms.back")}
         </Button>
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             {!messageData.isRead && (
               <Badge variant="default" className="bg-blue-100 text-blue-800">
-                {t("imap.messages.unread")}
+                {t("app.admin.emails.imap.messages.unread")}
               </Badge>
             )}
             {messageData.isFlagged && (
@@ -150,12 +150,12 @@ export function ImapMessageDetail({
             {isEditMode ? (
               <>
                 <Eye className="h-4 w-4 mr-1" />
-                {t("imap.common.view")}
+                {t("app.admin.emails.imap.common.view")}
               </>
             ) : (
               <>
                 <Edit className="h-4 w-4 mr-1" />
-                {t("imap.common.edit")}
+                {t("app.admin.emails.imap.common.edit")}
               </>
             )}
           </Button>
@@ -165,8 +165,8 @@ export function ImapMessageDetail({
               disabled={messageEndpoint.create?.isSubmitting}
             >
               {messageEndpoint.create?.isSubmitting
-                ? t("imap.common.saving")
-                : t("imap.common.save")}
+                ? t("app.admin.emails.imap.common.saving")
+                : t("app.admin.emails.imap.common.save")}
             </Button>
           )}
         </div>
@@ -176,7 +176,7 @@ export function ImapMessageDetail({
       {isEditMode ? (
         <Card>
           <CardHeader>
-            <CardTitle>{t("imap.messages.edit.title")}</CardTitle>
+            <CardTitle>{t("app.admin.emails.imap.messages.edit.title")}</CardTitle>
           </CardHeader>
           <CardContent>
             <Form
@@ -191,8 +191,8 @@ export function ImapMessageDetail({
                 name="subject"
                 config={{
                   type: "text",
-                  label: "imap.messages.subject",
-                  placeholder: "imap.messages.subject",
+                  label: "app.admin.emails.imap.messages.subject",
+                  placeholder: "app.admin.emails.imap.messages.subject",
                 }}
                 theme={{
                   style: "none",
@@ -205,7 +205,7 @@ export function ImapMessageDetail({
                 name="isRead"
                 config={{
                   type: "checkbox",
-                  label: "imap.messages.markAsRead",
+                  label: "app.admin.emails.imap.messages.markAsRead",
                 }}
                 theme={{
                   style: "none",
@@ -218,7 +218,7 @@ export function ImapMessageDetail({
                 name="isFlagged"
                 config={{
                   type: "checkbox",
-                  label: "imap.messages.flagged",
+                  label: "app.admin.emails.imap.messages.flagged",
                 }}
                 theme={{
                   style: "none",
@@ -231,8 +231,8 @@ export function ImapMessageDetail({
                 disabled={messageEndpoint.create?.isSubmitting}
               >
                 {messageEndpoint.create?.isSubmitting
-                  ? t("imap.common.saving")
-                  : t("imap.common.save")}
+                  ? t("app.admin.emails.imap.common.saving")
+                  : t("app.admin.emails.imap.common.save")}
               </Button>
             </Form>
           </CardContent>
@@ -260,7 +260,7 @@ export function ImapMessageDetail({
                 <div className="flex items-center space-x-3">
                   <User className="h-5 w-5 text-gray-500" />
                   <div>
-                    <div className="font-medium">{t("imap.messages.from")}</div>
+                    <div className="font-medium">{t("app.admin.emails.imap.messages.from")}</div>
                     <div className="text-sm text-gray-600">
                       {messageData.senderName ? (
                         <>
@@ -276,7 +276,7 @@ export function ImapMessageDetail({
                 <div className="flex items-center space-x-3">
                   <Mail className="h-5 w-5 text-gray-500" />
                   <div>
-                    <div className="font-medium">{t("imap.messages.to")}</div>
+                    <div className="font-medium">{t("app.admin.emails.imap.messages.to")}</div>
                     <div className="text-sm text-gray-600">
                       {messageData.recipientName ? (
                         <>
@@ -295,21 +295,21 @@ export function ImapMessageDetail({
               <div className="flex items-center space-x-3">
                 <Calendar className="h-5 w-5 text-gray-500" />
                 <div>
-                  <div className="font-medium">{t("imap.messages.sentAt")}</div>
+                  <div className="font-medium">{t("app.admin.emails.imap.messages.sentAt")}</div>
                   <div className="text-sm text-gray-600">
                     {messageData.sentAt
                       ? formatDate(messageData.sentAt)
-                      : t("imap.common.unknown")}
+                      : t("app.admin.emails.imap.common.unknown")}
                   </div>
                 </div>
               </div>
 
               {/* Message Size */}
               <div className="text-sm text-gray-600">
-                {t("imap.messages.size")}:{" "}
+                {t("app.admin.emails.imap.messages.size")}:{" "}
                 {messageData.messageSize
                   ? formatSize(messageData.messageSize)
-                  : t("imap.common.unknown")}
+                  : t("app.admin.emails.imap.common.unknown")}
               </div>
             </CardContent>
           </Card>
@@ -317,7 +317,7 @@ export function ImapMessageDetail({
           {/* Message Content */}
           <Card>
             <CardHeader>
-              <CardTitle>{t("imap.messages.content")}</CardTitle>
+              <CardTitle>{t("app.admin.emails.imap.messages.content")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="prose max-w-none">
@@ -328,7 +328,7 @@ export function ImapMessageDetail({
                   />
                 ) : (
                   <div className="whitespace-pre-wrap">
-                    {messageData.bodyText || t("imap.messages.noContent")}
+                    {messageData.bodyText || t("app.admin.emails.imap.messages.noContent")}
                   </div>
                 )}
               </div>
@@ -338,14 +338,14 @@ export function ImapMessageDetail({
           {/* Technical Details */}
           <Card>
             <CardHeader>
-              <CardTitle>{t("imap.messages.technicalDetails")}</CardTitle>
+              <CardTitle>{t("app.admin.emails.imap.messages.technicalDetails")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="font-medium">
-                      {t("imap.messages.messageId")}:
+                      {t("app.admin.emails.imap.messages.messageId")}:
                     </span>
                     <div className="text-gray-600 font-mono break-all">
                       {messageData.headers?.["Message-ID"] ||
@@ -355,7 +355,7 @@ export function ImapMessageDetail({
                   </div>
                   <div>
                     <span className="font-medium">
-                      {t("imap.messages.returnPath")}:
+                      {t("app.admin.emails.imap.messages.returnPath")}:
                     </span>
                     <div className="text-gray-600">
                       {messageData.headers?.["Return-Path"] ||
@@ -366,7 +366,7 @@ export function ImapMessageDetail({
                 <Separator />
                 <div className="text-sm">
                   <span className="font-medium">
-                    {t("imap.messages.createdAt")}:
+                    {t("app.admin.emails.imap.messages.createdAt")}:
                   </span>
                   <span className="text-gray-600 ml-2">
                     {formatDate(messageData.createdAt)}
@@ -374,12 +374,12 @@ export function ImapMessageDetail({
                 </div>
                 <div className="text-sm">
                   <span className="font-medium">
-                    {t("imap.messages.lastSync")}:
+                    {t("app.admin.emails.imap.messages.lastSync")}:
                   </span>
                   <span className="text-gray-600 ml-2">
                     {messageData.lastSyncAt
                       ? formatDate(messageData.lastSyncAt)
-                      : t("imap.common.never")}
+                      : t("app.admin.emails.imap.common.never")}
                   </span>
                 </div>
               </div>

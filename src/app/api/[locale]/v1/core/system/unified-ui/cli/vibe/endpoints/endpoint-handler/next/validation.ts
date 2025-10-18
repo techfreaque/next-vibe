@@ -9,7 +9,7 @@ import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { validateData } from "next-vibe/shared/utils/validation";
-import type { z } from "zod";
+import { z } from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -163,6 +163,16 @@ function validateGetRequestData<TRequestInput, TRequestOutput>(
   request: NextRequest,
   logger: EndpointLogger,
 ): ResponseType<TRequestOutput> {
+  // Check if the schema is z.undefined() or z.never() (no request data expected)
+  // This happens when an endpoint has no request fields
+  if (endpoint.requestSchema instanceof z.ZodUndefined || endpoint.requestSchema instanceof z.ZodNever) {
+    // Return success with undefined as the data (will be cast to TRequestOutput)
+    return {
+      success: true,
+      data: undefined as TRequestOutput,
+    };
+  }
+
   // Extract from URL search parameters (raw data)
   const { searchParams } = new URL(request.url);
   const queryData: Record<string, string> = {};
@@ -180,8 +190,41 @@ function validateGetRequestData<TRequestInput, TRequestOutput>(
 }
 
 /**
+ * Parse FormData into a nested object structure
+ * Handles dot notation (e.g., "fileUpload.file") and array notation (e.g., "items[0]")
+ */
+function parseFormDataToObject(formData: FormData): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+
+  for (const [key, value] of formData.entries()) {
+    // Split by dots to handle nested objects (e.g., "fileUpload.file")
+    const keys = key.split(".");
+    let current: Record<string, unknown> = result;
+
+    for (let i = 0; i < keys.length; i++) {
+      const k = keys[i];
+      const isLast = i === keys.length - 1;
+
+      if (isLast) {
+        // Last key - set the value
+        current[k] = value;
+      } else {
+        // Intermediate key - create nested object if it doesn't exist
+        if (!current[k] || typeof current[k] !== "object") {
+          current[k] = {};
+        }
+        current = current[k] as Record<string, unknown>;
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
  * Validate POST/PUT/PATCH/DELETE request data from body
  * Extracts raw request body and validates using schema
+ * Handles both JSON and FormData (multipart/form-data)
  */
 async function validatePostRequestData<TRequestInput, TRequestOutput>(
   endpoint: {
@@ -190,9 +233,31 @@ async function validatePostRequestData<TRequestInput, TRequestOutput>(
   request: NextRequest,
   logger: EndpointLogger,
 ): Promise<ResponseType<TRequestOutput>> {
+  // Check if the schema is z.undefined() or z.never() (no request data expected)
+  // This happens when an endpoint has no request fields
+  if (endpoint.requestSchema instanceof z.ZodUndefined || endpoint.requestSchema instanceof z.ZodNever) {
+    // Return success with undefined as the data (will be cast to TRequestOutput)
+    return {
+      success: true,
+      data: undefined as TRequestOutput,
+    };
+  }
+
   // Extract from request body (raw data)
   try {
-    const body = (await request.json()) as TRequestInput;
+    const contentType = request.headers.get("content-type") || "";
+
+    let body: TRequestInput;
+
+    if (contentType.includes("multipart/form-data")) {
+      // Parse FormData
+      const formData = await request.formData();
+      body = parseFormDataToObject(formData) as TRequestInput;
+    } else {
+      // Parse JSON
+      body = (await request.json()) as TRequestInput;
+    }
+
     // Validate using schema - schema takes raw input and produces validated output
     return validateEndpointRequestData(body, endpoint.requestSchema, logger);
   } catch (error) {

@@ -3,7 +3,7 @@
  * Provides file explorer-like navigation and form-based interface that respects data-driven UI
  */
 
-import inquirer from "inquirer";
+import { input, select, confirm } from "@inquirer/prompts";
 import type { z } from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -359,17 +359,13 @@ export class InteractiveModeHandler {
       },
     );
 
-    const choice = await inquirer.prompt([
-      {
-        type: "list",
-        name: "action",
-        message: navigateMessage,
-        choices,
-        pageSize: 15,
-      },
-    ]);
+    const action = await select({
+      message: navigateMessage,
+      choices,
+      pageSize: 15,
+    });
 
-    return choice.action as string;
+    return action as string;
   }
 
   /**
@@ -515,16 +511,12 @@ export class InteractiveModeHandler {
     const executeAnotherText = t(
       "app.api.v1.core.system.cli.vibe.interactive.navigation.executeAnother",
     );
-    const continueChoice = await inquirer.prompt([
-      {
-        type: "confirm",
-        name: "continue",
-        message: executeAnotherText,
-        default: true,
-      },
-    ]);
+    const shouldContinue = await confirm({
+      message: executeAnotherText,
+      default: true,
+    });
 
-    if (!continueChoice.continue) {
+    if (!shouldContinue) {
       return;
     }
   }
@@ -552,17 +544,13 @@ export class InteractiveModeHandler {
       { name: "Polish (Poland)", value: "pl-PL" },
     ] satisfies Array<{ name: string; value: CountryLanguage }>;
 
-    const localeChoice = await inquirer.prompt([
-      {
-        type: "list",
-        name: "locale",
-        message: selectLocaleText,
-        choices: localeOptions,
-        default: this.session.locale || "en-GLOBAL",
-      },
-    ]);
+    const locale = await select({
+      message: selectLocaleText,
+      choices: localeOptions,
+      default: this.session.locale || "en-GLOBAL",
+    });
 
-    return localeChoice.locale as CountryLanguage;
+    return locale as CountryLanguage;
   }
 
   /**
@@ -652,16 +640,12 @@ export class InteractiveModeHandler {
         );
       }
 
-      const confirmExecution = await inquirer.prompt([
-        {
-          type: "confirm",
-          name: "execute",
-          message: executeWithParamsText,
-          default: true,
-        },
-      ]);
+      const shouldExecute = await confirm({
+        message: executeWithParamsText,
+        default: true,
+      });
 
-      if (!confirmExecution.execute) {
+      if (!shouldExecute) {
         return;
       }
     }
@@ -955,43 +939,39 @@ export class InteractiveModeHandler {
       "app.api.v1.core.system.cli.vibe.interactive.navigation.backToMainMenu",
     );
 
-    const settingsChoice = await inquirer.prompt([
-      {
-        type: "list",
-        name: "setting",
-        message: chooseSettingText,
-        choices: [
-          {
-            name: outputFormatText.replace(
-              InteractiveModeHandler.CURRENT_PLACEHOLDER,
-              this.session.options?.output || "",
-            ),
-            value: "output",
-          },
-          {
-            name: verboseModeText.replace(
-              InteractiveModeHandler.CURRENT_PLACEHOLDER,
-              String(this.session.options?.verbose || false),
-            ),
-            value: "verbose",
-          },
-          {
-            name: localeText.replace(
-              InteractiveModeHandler.CURRENT_PLACEHOLDER,
-              this.session.locale || "",
-            ),
-            value: "locale",
-          },
-          { name: backToMainMenuText, value: "back" },
-        ],
-      },
-    ]);
+    const setting = await select({
+      message: chooseSettingText,
+      choices: [
+        {
+          name: outputFormatText.replace(
+            InteractiveModeHandler.CURRENT_PLACEHOLDER,
+            this.session.options?.output || "",
+          ),
+          value: "output",
+        },
+        {
+          name: verboseModeText.replace(
+            InteractiveModeHandler.CURRENT_PLACEHOLDER,
+            String(this.session.options?.verbose || false),
+          ),
+          value: "verbose",
+        },
+        {
+          name: localeText.replace(
+            InteractiveModeHandler.CURRENT_PLACEHOLDER,
+            this.session.locale || "",
+          ),
+          value: "locale",
+        },
+        { name: backToMainMenuText, value: "back" },
+      ],
+    });
 
-    if (settingsChoice.setting === "back") {
+    if (setting === "back") {
       return;
     }
 
-    await this.updateSetting(settingsChoice.setting as string);
+    await this.updateSetting(setting as string);
   }
 
   /**
@@ -1011,21 +991,17 @@ export class InteractiveModeHandler {
           "app.api.v1.core.system.cli.vibe.interactive.navigation.jsonRaw",
         );
 
-        const outputChoice = await inquirer.prompt([
-          {
-            type: "list",
-            name: "output",
-            message: chooseOutputFormatText,
-            choices: [
-              { name: prettyFormattedText, value: "pretty" },
-              { name: jsonRawText, value: "json" },
-            ],
-            default: this.session.options?.output,
-          },
-        ]);
+        const output = await select({
+          message: chooseOutputFormatText,
+          choices: [
+            { name: prettyFormattedText, value: "pretty" },
+            { name: jsonRawText, value: "json" },
+          ],
+          default: this.session.options?.output,
+        });
         this.session.options = {
           ...this.session.options,
-          output: outputChoice.output as "json" | "pretty",
+          output: output as "json" | "pretty",
         };
         break;
       }
@@ -1036,17 +1012,13 @@ export class InteractiveModeHandler {
           "app.api.v1.core.system.cli.vibe.interactive.navigation.enableVerboseOutput",
         );
 
-        const verboseChoice = await inquirer.prompt([
-          {
-            type: "confirm",
-            name: "verbose",
-            message: enableVerboseOutputText,
-            default: this.session.options?.verbose,
-          },
-        ]);
+        const verbose = await confirm({
+          message: enableVerboseOutputText,
+          default: this.session.options?.verbose,
+        });
         this.session.options = {
           ...this.session.options,
-          verbose: verboseChoice.verbose as boolean,
+          verbose: verbose as boolean,
         };
         break;
       }
@@ -1066,20 +1038,16 @@ export class InteractiveModeHandler {
           "app.api.v1.core.system.cli.vibe.interactive.navigation.polish",
         );
 
-        const localeChoice = await inquirer.prompt([
-          {
-            type: "list",
-            name: "locale",
-            message: chooseLocaleText,
-            choices: [
-              { name: englishGlobalText, value: "en-GLOBAL" },
-              { name: germanText, value: "de-DE" },
-              { name: polishText, value: "pl-PL" },
-            ] satisfies Array<{ name: string; value: CountryLanguage }>,
-            default: this.session.locale,
-          },
-        ]);
-        this.session.locale = localeChoice.locale as CountryLanguage;
+        const locale = await select({
+          message: chooseLocaleText,
+          choices: [
+            { name: englishGlobalText, value: "en-GLOBAL" },
+            { name: germanText, value: "de-DE" },
+            { name: polishText, value: "pl-PL" },
+          ] satisfies Array<{ name: string; value: CountryLanguage }>,
+          default: this.session.locale,
+        });
+        this.session.locale = locale as CountryLanguage;
         break;
       }
     }

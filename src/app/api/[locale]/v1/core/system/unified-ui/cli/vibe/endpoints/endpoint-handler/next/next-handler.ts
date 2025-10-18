@@ -137,6 +137,13 @@ export function createNextHandler<
       );
 
       if (!validationResult.success) {
+        logger.error(
+          `Validation error: ${validationResult.message} (${
+            validationResult.messageParams
+              ? JSON.stringify(validationResult.messageParams)
+              : "No params"
+          })`,
+        );
         return createHTTPErrorResponse({
           message: "error.errors.invalid_request_data",
           errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,

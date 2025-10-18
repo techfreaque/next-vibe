@@ -27,18 +27,132 @@ import { CountryFilter, LanguageFilter } from "@/i18n/core/config";
 
 import { UserRole } from "../../user/user-roles/enum";
 import {
+  ActivityType,
   EmailCampaignStageFilter,
   EmailCampaignStageFilterOptions,
   EmailJourneyVariant,
   LeadSortField,
   LeadSortFieldOptions,
+  LeadSource,
   LeadSourceFilter,
   LeadSourceFilterOptions,
+  LeadStatus,
   LeadStatusFilter,
   LeadStatusFilterOptions,
   SortOrder,
   SortOrderOptions,
 } from "../enum";
+
+// ========== Zod Schemas for Complex Response Types ==========
+
+// Historical data point schema
+const historicalDataPointSchema = z.object({
+  date: z.string(),
+  value: z.number(),
+});
+
+// Chart data schema for a single metric
+const chartDataSchema = z.object({
+  name: z.string(),
+  type: z.nativeEnum(ChartType),
+  data: z.array(historicalDataPointSchema),
+  color: z.string(),
+});
+
+// Complete historical data schema
+const historicalDataSchema = z.object({
+  totalLeads: chartDataSchema,
+  newLeads: chartDataSchema,
+  activeLeads: chartDataSchema,
+  campaignRunningLeads: chartDataSchema,
+  websiteUserLeads: chartDataSchema,
+  newsletterSubscriberLeads: chartDataSchema,
+  convertedLeads: chartDataSchema,
+  signedUpLeads: chartDataSchema,
+  consultationBookedLeads: chartDataSchema,
+  subscriptionConfirmedLeads: chartDataSchema,
+  unsubscribedLeads: chartDataSchema,
+  bouncedLeads: chartDataSchema,
+  invalidLeads: chartDataSchema,
+  emailsSent: chartDataSchema,
+  emailsOpened: chartDataSchema,
+  emailsClicked: chartDataSchema,
+  openRate: chartDataSchema,
+  clickRate: chartDataSchema,
+  conversionRate: chartDataSchema,
+  signupRate: chartDataSchema,
+  consultationBookingRate: chartDataSchema,
+  subscriptionConfirmationRate: chartDataSchema,
+  averageEmailEngagementScore: chartDataSchema,
+  leadVelocity: chartDataSchema,
+  dataCompletenessRate: chartDataSchema,
+});
+
+// Grouped stats item schema
+const groupedStatsItemSchema = z.object({
+  label: z.string(),
+  value: z.number(),
+  percentage: z.number(),
+  color: z.string(),
+});
+
+// Grouped stats schema
+const groupedStatsSchema = z.object({
+  byStatus: z.array(groupedStatsItemSchema),
+  bySource: z.array(groupedStatsItemSchema),
+  byCountry: z.array(groupedStatsItemSchema),
+  byLanguage: z.array(groupedStatsItemSchema),
+  byCampaignStage: z.array(groupedStatsItemSchema),
+  byJourneyVariant: z.array(groupedStatsItemSchema),
+  byEngagementLevel: z.array(groupedStatsItemSchema),
+  byConversionFunnel: z.array(groupedStatsItemSchema),
+});
+
+// Top performing campaign schema
+const topPerformingCampaignSchema = z.object({
+  campaignId: z.string(),
+  campaignName: z.string(),
+  leadsGenerated: z.number(),
+  conversionRate: z.number(),
+  openRate: z.number(),
+  clickRate: z.number(),
+});
+
+// Top performing source schema
+const topPerformingSourceSchema = z.object({
+  source: z.nativeEnum(LeadSource),
+  leadsGenerated: z.number(),
+  conversionRate: z.number(),
+  qualityScore: z.number(),
+});
+
+// Recent activity details schema
+const recentActivityDetailsSchema = z.object({
+  status: z.nativeEnum(LeadStatus),
+  source: z.string(),
+  country: z.string(),
+  emailsSent: z.number(),
+  emailsOpened: z.number(),
+  emailsClicked: z.number(),
+  daysSinceCreated: z.number(),
+  isConverted: z.boolean(),
+});
+
+// Recent activity item schema
+const recentActivitySchema = z.object({
+  id: z.string(),
+  leadEmail: z.string(),
+  leadBusinessName: z.string(),
+  timestamp: z.string(),
+  type: z.nativeEnum(ActivityType),
+  details: recentActivityDetailsSchema,
+});
+
+// Data range schema
+const dataRangeSchema = z.object({
+  from: z.string(),
+  to: z.string(),
+});
 
 // Create options arrays for enums that don't have them
 const TimePeriodOptions = [
@@ -1042,22 +1156,22 @@ const { GET } = createEndpoint({
         z.number(),
       ),
 
-      // Historical data - using z.any() for the complex nested structure
+      // Historical data with proper Zod schema
       historicalData: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.v1.core.leads.stats.response.historicalData",
         },
-        z.any(),
+        historicalDataSchema,
       ),
 
-      // Grouped stats - using z.any() for the complex nested structure
+      // Grouped stats with proper Zod schema
       groupedStats: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.v1.core.leads.stats.response.groupedStats",
         },
-        z.any(),
+        groupedStatsSchema,
       ),
 
       // Performance metrics - time-based
@@ -1087,14 +1201,14 @@ const { GET } = createEndpoint({
         z.number(),
       ),
 
-      // Top performers
+      // Top performers with proper Zod schemas
       topPerformingCampaigns: responseField(
         {
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.leads.stats.response.topPerformingCampaigns",
         },
-        z.array(z.any()),
+        z.array(topPerformingCampaignSchema),
       ),
 
       topPerformingSources: responseField(
@@ -1102,16 +1216,16 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.v1.core.leads.stats.response.topPerformingSources",
         },
-        z.array(z.any()),
+        z.array(topPerformingSourceSchema),
       ),
 
-      // Recent activity
+      // Recent activity with proper Zod schema
       recentActivity: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.v1.core.leads.stats.response.recentActivity",
         },
-        z.array(z.any()),
+        z.array(recentActivitySchema),
       ),
 
       // Metadata
@@ -1120,7 +1234,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.v1.core.leads.stats.response.generatedAt",
         },
-        z.coerce.date(),
+        z.string(),
       ),
 
       dataRange: responseField(
@@ -1128,16 +1242,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.v1.core.leads.stats.response.dataRange",
         },
-        z.any(),
-      ),
-
-      // Add a catch-all field for any remaining data
-      data: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.v1.core.leads.stats.response.data",
-        },
-        z.any(),
+        dataRangeSchema,
       ),
     },
   ),

@@ -18,23 +18,13 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
-// TODO: Replace with proper enum imports from core config
-// TODO: Replace with proper filter utilities
-// Temporarily comment out for CLI compatibility
-// import { convertCountryFilter, convertLanguageFilter } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import { newsletterSubscriptions } from "../newsletter/db";
 import { NewsletterSubscriptionStatus } from "../newsletter/enum";
 import type { JwtPayloadType } from "../user/auth/definition";
 import { users } from "../user/db";
-import {
-  emailCampaigns,
-  type Lead,
-  leadEngagements,
-  leads,
-  type NewLead,
-} from "./db";
+import { emailCampaigns, type Lead, leadEngagements, leads } from "./db";
 import type {
   LeadCreateType,
   LeadDetailResponse,
@@ -95,7 +85,7 @@ const INVALID_STATUS_TRANSITION_ERROR = "Invalid status transition";
  */
 export interface LeadsRepository {
   createLead(
-    data: Omit<LeadCreateType, "email"> & { email: string | undefined },
+    data: LeadCreateType,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -254,11 +244,13 @@ export interface LeadsRepository {
   batchUpdateLeads(
     data: {
       search?: string;
-      status?: LeadStatusFilterType;
-      currentCampaignStage?: EmailCampaignStageFilterType;
-      country?: CountryFilter;
-      language?: LanguageFilter;
-      source?: LeadSourceFilterType;
+      status?: LeadStatusFilterType | LeadStatusFilterType[];
+      currentCampaignStage?:
+        | EmailCampaignStageFilterType
+        | EmailCampaignStageFilterType[];
+      country?: CountryFilter | CountryFilter[];
+      language?: LanguageFilter | LanguageFilter[];
+      source?: LeadSourceFilterType | LeadSourceFilterType[];
       sortBy?: LeadSortFieldType[];
       sortOrder?: SortOrderType[];
       scope?: BatchOperationScopeType;
@@ -296,11 +288,13 @@ export interface LeadsRepository {
   batchDeleteLeads(
     data: {
       search?: string;
-      status?: LeadStatusFilterType;
-      currentCampaignStage?: EmailCampaignStageFilterType;
-      country?: CountryFilter;
-      language?: LanguageFilter;
-      source?: LeadSourceFilterType;
+      status?: LeadStatusFilterType | LeadStatusFilterType[];
+      currentCampaignStage?:
+        | EmailCampaignStageFilterType
+        | EmailCampaignStageFilterType[];
+      country?: CountryFilter | CountryFilter[];
+      language?: LanguageFilter | LanguageFilter[];
+      source?: LeadSourceFilterType | LeadSourceFilterType[];
       sortBy?: LeadSortFieldType[];
       sortOrder?: SortOrderType[];
       scope?: BatchOperationScopeType;
@@ -370,7 +364,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
    * Create a new lead with business logic
    */
   async createLead(
-    data: Omit<LeadCreateType, "email"> & { email: string | undefined },
+    data: LeadCreateType,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -598,7 +592,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
           );
         }
 
-        const currentStatus = currentLeadResult.data.status;
+        const currentStatus = currentLeadResult.data.lead.basicInfo.status;
         const newStatus = data.status;
 
         // Validate status transition
@@ -1528,7 +1522,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
       logger.debug("Exporting leads", { query });
 
       // Build where conditions (similar to listLeads)
-      const conditions = [];
+      const conditions: SQL[] = [];
 
       if (query.status) {
         conditions.push(eq(leads.status, query.status));
@@ -1543,10 +1537,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
       }
 
       if (query.source) {
-        const convertedSource = mapSourceFilter(query.source);
-        if (convertedSource) {
-          conditions.push(eq(leads.source, convertedSource));
-        }
+        conditions.push(eq(leads.source, query.source));
       }
 
       if (query.search) {
@@ -1597,7 +1588,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       logger.debug("Leads exported successfully", {
         totalRecords: leadsData.length,
-        format: query.format,
+        format: String(query.format),
         fileName,
       });
 
@@ -1802,8 +1793,11 @@ class LeadsRepositoryImpl implements LeadsRepository {
       // Handle status filters (can be array)
       if (status && Array.isArray(status) && status.length > 0) {
         const mappedStatuses = status
-          .map((filter) => mapStatusFilter(filter))
-          .filter((s) => s !== null);
+          .map((filter: LeadStatusFilterType) => mapStatusFilter(filter))
+          .filter(
+            (s): s is NonNullable<ReturnType<typeof mapStatusFilter>> =>
+              s !== null,
+          );
         if (mappedStatuses.length > 0) {
           conditions.push(
             or(...mappedStatuses.map((s) => eq(leads.status, s)))!,
@@ -1823,8 +1817,13 @@ class LeadsRepositoryImpl implements LeadsRepository {
         currentCampaignStage.length > 0
       ) {
         const mappedStages = currentCampaignStage
-          .map((filter) => mapCampaignStageFilter(filter))
-          .filter((s) => s !== null);
+          .map((filter: EmailCampaignStageFilterType) =>
+            mapCampaignStageFilter(filter),
+          )
+          .filter(
+            (s): s is NonNullable<ReturnType<typeof mapCampaignStageFilter>> =>
+              s !== null,
+          );
         if (mappedStages.length > 0) {
           conditions.push(
             or(...mappedStages.map((s) => eq(leads.currentCampaignStage, s)))!,
@@ -1840,8 +1839,11 @@ class LeadsRepositoryImpl implements LeadsRepository {
       // Handle source filters (can be array)
       if (source && Array.isArray(source) && source.length > 0) {
         const mappedSources = source
-          .map((filter) => mapSourceFilter(filter))
-          .filter((s) => s !== null);
+          .map((filter: LeadSourceFilterType) => mapSourceFilter(filter))
+          .filter(
+            (s): s is NonNullable<ReturnType<typeof mapSourceFilter>> =>
+              s !== null,
+          );
         if (mappedSources.length > 0) {
           conditions.push(
             or(...mappedSources.map((s) => eq(leads.source, s)))!,
@@ -1856,14 +1858,18 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       // Handle country filters (can be array)
       if (country && Array.isArray(country) && country.length > 0) {
-        conditions.push(or(...country.map((c) => eq(leads.country, c)))!);
+        conditions.push(
+          or(...country.map((c: CountryFilter) => eq(leads.country, c)))!,
+        );
       } else if (country && !Array.isArray(country)) {
         conditions.push(eq(leads.country, country));
       }
 
       // Handle language filters (can be array)
       if (language && Array.isArray(language) && language.length > 0) {
-        conditions.push(or(...language.map((l) => eq(leads.language, l)))!);
+        conditions.push(
+          or(...language.map((l: LanguageFilter) => eq(leads.language, l)))!,
+        );
       } else if (language && !Array.isArray(language)) {
         conditions.push(eq(leads.language, language));
       }
@@ -2142,8 +2148,11 @@ class LeadsRepositoryImpl implements LeadsRepository {
       // Handle status filters (can be array)
       if (status && Array.isArray(status) && status.length > 0) {
         const mappedStatuses = status
-          .map((filter) => mapStatusFilter(filter))
-          .filter((s) => s !== null);
+          .map((filter: LeadStatusFilterType) => mapStatusFilter(filter))
+          .filter(
+            (s): s is NonNullable<ReturnType<typeof mapStatusFilter>> =>
+              s !== null,
+          );
         if (mappedStatuses.length > 0) {
           conditions.push(
             or(...mappedStatuses.map((s) => eq(leads.status, s)))!,
@@ -2163,8 +2172,13 @@ class LeadsRepositoryImpl implements LeadsRepository {
         currentCampaignStage.length > 0
       ) {
         const mappedStages = currentCampaignStage
-          .map((filter) => mapCampaignStageFilter(filter))
-          .filter((s) => s !== null);
+          .map((filter: EmailCampaignStageFilterType) =>
+            mapCampaignStageFilter(filter),
+          )
+          .filter(
+            (s): s is NonNullable<ReturnType<typeof mapCampaignStageFilter>> =>
+              s !== null,
+          );
         if (mappedStages.length > 0) {
           conditions.push(
             or(...mappedStages.map((s) => eq(leads.currentCampaignStage, s)))!,
@@ -2180,8 +2194,11 @@ class LeadsRepositoryImpl implements LeadsRepository {
       // Handle source filters (can be array)
       if (source && Array.isArray(source) && source.length > 0) {
         const mappedSources = source
-          .map((filter) => mapSourceFilter(filter))
-          .filter((s) => s !== null);
+          .map((filter: LeadSourceFilterType) => mapSourceFilter(filter))
+          .filter(
+            (s): s is NonNullable<ReturnType<typeof mapSourceFilter>> =>
+              s !== null,
+          );
         if (mappedSources.length > 0) {
           conditions.push(
             or(...mappedSources.map((s) => eq(leads.source, s)))!,
@@ -2196,14 +2213,18 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       // Handle country filters (can be array)
       if (country && Array.isArray(country) && country.length > 0) {
-        conditions.push(or(...country.map((c) => eq(leads.country, c)))!);
+        conditions.push(
+          or(...country.map((c: CountryFilter) => eq(leads.country, c)))!,
+        );
       } else if (country && !Array.isArray(country)) {
         conditions.push(eq(leads.country, country));
       }
 
       // Handle language filters (can be array)
       if (language && Array.isArray(language) && language.length > 0) {
-        conditions.push(or(...language.map((l) => eq(leads.language, l)))!);
+        conditions.push(
+          or(...language.map((l: LanguageFilter) => eq(leads.language, l)))!,
+        );
       } else if (language && !Array.isArray(language)) {
         conditions.push(eq(leads.language, language));
       }

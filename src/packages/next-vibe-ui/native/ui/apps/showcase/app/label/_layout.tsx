@@ -1,22 +1,22 @@
-import { Tabs } from "expo-router";
-import { Copy, ToyBrick } from "lucide-react-native";
+import { Tabs } from 'expo-router';
+import { Copy, ToyBrick } from 'lucide-react-native';
 
 export default function LabelTabsLayout() {
   return (
     <Tabs screenOptions={screenOptions}>
       <Tabs.Screen
-        name="index"
+        name='index'
         options={{
-          title: "Reusable",
+          title: 'Reusable',
           tabBarIcon({ color, size }) {
             return <Copy color={color} size={size} />;
           },
         }}
       />
       <Tabs.Screen
-        name="label-primitive"
+        name='label-primitive'
         options={{
-          title: "Primitive",
+          title: 'Primitive',
           tabBarIcon({ color, size }) {
             return <ToyBrick color={color} size={size} />;
           },
@@ -27,7 +27,7 @@ export default function LabelTabsLayout() {
 }
 
 type RootTabs = React.ComponentProps<typeof Tabs>;
-type ScreenOptions = RootTabs["screenOptions"];
+type ScreenOptions = RootTabs['screenOptions'];
 
 const screenOptions: ScreenOptions = {
   headerShown: false,

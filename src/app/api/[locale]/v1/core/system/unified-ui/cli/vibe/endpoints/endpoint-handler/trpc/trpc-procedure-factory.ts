@@ -197,10 +197,7 @@ function selectBaseProcedure<
   // For specific roles, create a custom procedure with role requirements
   if (allowedRoles.length > 0) {
     const logger = createEndpointLogger(false, Date.now(), "en-GLOBAL");
-    return authenticatedProcedure.use(
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      requireRoles(allowedRoles, logger),
-    );
+    return authenticatedProcedure.use(requireRoles(allowedRoles, logger));
   }
 
   // Default to authenticated procedure

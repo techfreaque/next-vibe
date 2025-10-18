@@ -126,11 +126,11 @@ export function getTwilioProvider(): SmsProvider {
         // Type-safe headers handling
         const headers: {
           "Content-Type": string;
-          "Authorization": string;
+          Authorization: string;
           [key: string]: string;
         } = {
           "Content-Type": "application/x-www-form-urlencoded",
-          "Authorization": authHeader,
+          Authorization: authHeader,
         };
 
         // Type-safe header merging

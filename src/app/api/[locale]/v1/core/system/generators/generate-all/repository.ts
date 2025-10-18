@@ -26,18 +26,6 @@ type RequestType = typeof endpoints.POST.types.RequestOutput;
 type GenerateAllResponseType = typeof endpoints.POST.types.ResponseOutput;
 
 /**
- * Type definitions for CLI generator modules
- * These modules are from CLI-only paths and need explicit typing
- */
-interface FunctionalGeneratorModule {
-  runFunctionalGenerators: (options: { rootDir: string }) => void;
-}
-
-interface SeedsGeneratorModule {
-  generateSeeds: (rootDir: string) => void;
-}
-
-/**
  * Generate All Repository Interface
  */
 interface GenerateAllRepository {
@@ -75,30 +63,45 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       // Run all generators in parallel
       const generatorPromises = [];
 
-      // 1. Functional Generators - Call the full functional generator system
+      // 1. Endpoints Generator - Generate endpoints and tRPC routers
       if (!data.skipEndpoints) {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              outputLines.push("📝 Running functional generators...");
-              // CLI-only module without type definitions - dynamic import required
-              /* eslint-disable @typescript-eslint/no-unsafe-assignment, import/no-unresolved */
-              const functionalModule: FunctionalGeneratorModule = await import(
-                // @ts-ignore - CLI module path not in tsconfig
-                "next-vibe/cli-do-not-import-from-here/scripts/generators/functional"
+              outputLines.push("📝 Running endpoints generator...");
+              const { functionalGeneratorsRepository } = await import(
+                "../endpoints/repository"
               );
-              /* eslint-enable @typescript-eslint/no-unsafe-assignment, import/no-unresolved */
-              functionalModule.runFunctionalGenerators({
-                rootDir: "src",
-              });
-              outputLines.push(
-                "✅ Functional generators completed successfully",
+
+              const result = await functionalGeneratorsRepository.runGenerators(
+                {
+                  skipEndpoints: false,
+                  skipSeeds: true,
+                  skipCronTasks: true,
+                  skipTRPCRouter: false,
+                  rootDir: "src",
+                  verbose: false,
+                },
+                user,
+                locale,
+                logger,
               );
-              generatorsRun++;
-              return "functional-generators";
+
+              if (result.success) {
+                outputLines.push(
+                  "✅ Endpoints generator completed successfully",
+                );
+                generatorsRun++;
+                return "endpoints";
+              } else {
+                outputLines.push(
+                  `❌ Endpoints generator failed: ${result.message || "Unknown error"}`,
+                );
+                return null;
+              }
             } catch (error) {
               outputLines.push(
-                `❌ Functional generators failed: ${parseError(error)}`,
+                `❌ Endpoints generator failed: ${parseError(error).message}`,
               );
               return null;
             }
@@ -108,26 +111,42 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorsSkipped++;
       }
 
-      // 2. Seeds Generator - Call the actual generator function directly
+      // 2. Seeds Generator - Generate seed index
       if (!data.skipSeeds) {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
               outputLines.push("🌱 Generating seeds...");
-              // CLI-only module without type definitions - dynamic import required
-              /* eslint-disable @typescript-eslint/no-unsafe-assignment, import/no-unresolved */
-              const seedsModule: SeedsGeneratorModule = await import(
-                // @ts-ignore - CLI module path not in tsconfig
-                "next-vibe/cli-do-not-import-from-here/scripts/generators/functional/generate-seeds"
+              const { seedsGeneratorRepository } = await import(
+                "../seeds/repository"
               );
-              /* eslint-enable @typescript-eslint/no-unsafe-assignment, import/no-unresolved */
-              seedsModule.generateSeeds("src");
-              outputLines.push("✅ Seeds generated successfully");
-              generatorsRun++;
-              return "seeds";
+
+              const result = await seedsGeneratorRepository.generateSeeds(
+                {
+                  outputDir: "src/app/api/[locale]/v1/core/system/generated",
+                  includeTestData: true,
+                  includeProdData: true,
+                  verbose: false,
+                  dryRun: false,
+                },
+                user,
+                locale,
+                logger,
+              );
+
+              if (result.success) {
+                outputLines.push("✅ Seeds generated successfully");
+                generatorsRun++;
+                return "seeds";
+              } else {
+                outputLines.push(
+                  `❌ Seeds generator failed: ${result.message || "Unknown error"}`,
+                );
+                return null;
+              }
             } catch (error) {
               outputLines.push(
-                `❌ Seeds generator failed: ${parseError(error)}`,
+                `❌ Seeds generator failed: ${parseError(error).message}`,
               );
               return null;
             }

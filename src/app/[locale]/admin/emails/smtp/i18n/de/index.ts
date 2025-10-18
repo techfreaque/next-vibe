@@ -1,54 +1,15 @@
-import type { translations as enTranslations } from "../en";
+import { translations as uiTranslations } from "../../_components/i18n/de";
+import { translations as accountsTranslations } from "../../accounts/i18n/de";
+import { translations as createTranslations } from "../../create/i18n/de";
+import { translations as editTranslations } from "../../edit/i18n/de";
 
-export const translations: typeof enTranslations = {
-  post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
-    form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
-    },
-    response: {
-      title: "Antwort",
-      description: "Antwortdaten",
-    },
-    errors: {
-      unauthorized: {
-        title: "Nicht autorisiert",
-        description: "Authentifizierung erforderlich",
-      },
-      validation: {
-        title: "Validierungsfehler",
-        description: "Ungültige Anfrageparameter",
-      },
-      server: {
-        title: "Serverfehler",
-        description: "Interner Serverfehler",
-      },
-      unknown: {
-        title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist aufgetreten",
-      },
-      network: {
-        title: "Netzwerkfehler",
-        description: "Netzwerkfehler aufgetreten",
-      },
-      forbidden: {
-        title: "Verboten",
-        description: "Zugriff verboten",
-      },
-      notFound: {
-        title: "Nicht gefunden",
-        description: "Ressource nicht gefunden",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Datenkonflikt aufgetreten",
-      },
-    },
-    success: {
-      title: "Erfolg",
-      description: "Vorgang erfolgreich abgeschlossen",
-    },
+// Spread UI translations at the top level for component access (e.g., "smtp.admin.fields.name")
+// Nest page-specific translations under "pages" namespace to avoid conflicts
+export const translations = {
+  ...uiTranslations,
+  pages: {
+    accounts: accountsTranslations,
+    create: createTranslations,
+    edit: editTranslations,
   },
-};
+} as const;

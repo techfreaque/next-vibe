@@ -75,7 +75,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
       // Type guard to ensure user has id
       if (!user.id) {
         return createErrorResponse(
-          "app.api.v1.core.agent.chat.threads.id.get.errors.unauthorized.title",
+          "app.api.v1.core.agent.chat.threads.threadId.get.errors.unauthorized.title",
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
@@ -90,7 +90,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
 
       if (!thread) {
         return createErrorResponse(
-          "app.api.v1.core.agent.chat.threads.id.get.errors.notFound.title",
+          "app.api.v1.core.agent.chat.threads.threadId.get.errors.notFound.title",
           ErrorResponseTypes.NOT_FOUND,
           { threadId: data.id },
         );
@@ -104,7 +104,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
     } catch (error) {
       logger.error("Error getting thread by ID", error);
       return createErrorResponse(
-        "app.api.v1.core.agent.chat.threads.id.get.errors.server.title",
+        "app.api.v1.core.agent.chat.threads.threadId.get.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -130,7 +130,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
       // Type guard to ensure user has id
       if (!user.id) {
         return createErrorResponse(
-          "app.api.v1.core.agent.chat.threads.id.patch.errors.unauthorized.title",
+          "app.api.v1.core.agent.chat.threads.threadId.patch.errors.unauthorized.title",
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
@@ -146,7 +146,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
 
       if (!existingThread) {
         return createErrorResponse(
-          "app.api.v1.core.agent.chat.threads.id.patch.errors.notFound.title",
+          "app.api.v1.core.agent.chat.threads.threadId.patch.errors.notFound.title",
           ErrorResponseTypes.NOT_FOUND,
           { threadId: data.id },
         );
@@ -212,7 +212,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
     } catch (error) {
       logger.error("Error updating thread", error);
       return createErrorResponse(
-        "app.api.v1.core.agent.chat.threads.id.patch.errors.server.title",
+        "app.api.v1.core.agent.chat.threads.threadId.patch.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -237,7 +237,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
       // Type guard to ensure user has id
       if (!user.id) {
         return createErrorResponse(
-          "app.api.v1.core.agent.chat.threads.id.delete.errors.unauthorized.title",
+          "app.api.v1.core.agent.chat.threads.threadId.delete.errors.unauthorized.title",
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
@@ -253,7 +253,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
 
       if (!existingThread) {
         return createErrorResponse(
-          "app.api.v1.core.agent.chat.threads.id.delete.errors.notFound.title",
+          "app.api.v1.core.agent.chat.threads.threadId.delete.errors.notFound.title",
           ErrorResponseTypes.NOT_FOUND,
           { threadId: data.id },
         );
@@ -275,7 +275,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
     } catch (error) {
       logger.error("Error deleting thread", error);
       return createErrorResponse(
-        "app.api.v1.core.agent.chat.threads.id.delete.errors.server.title",
+        "app.api.v1.core.agent.chat.threads.threadId.delete.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );

@@ -220,7 +220,6 @@ export function useApiQueryForm<
   type FormData = ExtractOutput<
     InferSchemaFromField<TFields, FieldUsage.RequestData>
   >;
-  // @ts-ignore - FormData is guaranteed to be an object type from Zod, satisfying FieldValues
   const formMethods = useForm<FormData>(formConfig);
   const { watch } = formMethods;
 
@@ -335,11 +334,8 @@ export function useApiQueryForm<
   const finalEnabled = queryOptions.enabled !== false;
 
   const query = useApiQuery({
-    // @ts-ignore - Generic constraints are compatible, type system can't verify the complex relationship
     endpoint,
-    // @ts-ignore - Generic constraints are compatible
     requestData: queryParams,
-    // @ts-ignore - Generic constraints are compatible
     urlParams: urlVariables,
     logger,
     options: {
@@ -351,7 +347,6 @@ export function useApiQueryForm<
       onError: ({ error }): void => {
         if (queryOptions.onError) {
           // Call the user's onError handler with the error
-          // @ts-ignore - We know this is the correct structure expected by the consumer
           queryOptions.onError({
             error,
             requestData: queryParams,
@@ -658,7 +653,6 @@ export function useApiQueryForm<
 
   // Create a result object that combines form and query functionality
   return {
-    // @ts-ignore - FormData type is correct, type system can't infer the complex generic relationship
     form: formMethods,
 
     // Use the query response as the primary response

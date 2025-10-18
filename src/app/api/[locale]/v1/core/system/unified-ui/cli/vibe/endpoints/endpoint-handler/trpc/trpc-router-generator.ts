@@ -81,11 +81,22 @@ export async function generateTRPCRouter(
   const warnings: string[] = [];
   const routeFiles: RouteFileInfo[] = [];
 
+  // Add default exclude patterns for standalone packages
+  // These packages have their own node_modules and shouldn't be processed as API routes
+  const defaultExcludePatterns = [
+    "system/builder",
+    "system/launchpad",
+    "system/release-tool",
+    "system/guard",
+    "system/check",
+  ];
+  const allExcludePatterns = [...defaultExcludePatterns, ...excludePatterns];
+
   try {
     // Debug: Starting tRPC router generation
 
     // Scan for route files
-    const discoveredFiles = scanForRouteFiles(apiDir, excludePatterns);
+    const discoveredFiles = scanForRouteFiles(apiDir, allExcludePatterns);
     // Debug: Found route files
 
     // Validate and process each route file
@@ -182,6 +193,17 @@ function scanForRouteFiles(
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
       const relativePath = path.relative(apiDir, fullPath);
+
+      // Skip node_modules, .git, .next, and other common directories that should never contain route files
+      if (
+        entry.name === "node_modules" ||
+        entry.name === ".git" ||
+        entry.name === ".next" ||
+        entry.name === "dist" ||
+        entry.name === ".dist"
+      ) {
+        continue;
+      }
 
       // Check exclude patterns
       if (excludePatterns.some((pattern) => relativePath.includes(pattern))) {

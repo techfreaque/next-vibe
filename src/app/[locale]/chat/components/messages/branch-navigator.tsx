@@ -5,6 +5,8 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React from "react";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 import { Button } from "@/packages/next-vibe-ui/web/ui";
 
 interface BranchNavigatorProps {
@@ -12,6 +14,7 @@ interface BranchNavigatorProps {
   totalBranches: number;
   branches: Array<{ id: string; preview: string }>;
   onSwitchBranch: (index: number) => void;
+  locale: CountryLanguage;
   className?: string;
 }
 
@@ -20,19 +23,22 @@ export function BranchNavigator({
   totalBranches,
   branches,
   onSwitchBranch,
+  locale,
   className,
 }: BranchNavigatorProps): JSX.Element {
+  const { t } = simpleT(locale);
+
   if (totalBranches <= 1) {
     return <></>;
   }
 
-  const handlePrevious = () => {
+  const handlePrevious = (): void => {
     const newIndex =
       currentBranchIndex > 0 ? currentBranchIndex - 1 : totalBranches - 1;
     onSwitchBranch(newIndex);
   };
 
-  const handleNext = () => {
+  const handleNext = (): void => {
     const newIndex =
       currentBranchIndex < totalBranches - 1 ? currentBranchIndex + 1 : 0;
     onSwitchBranch(newIndex);
@@ -53,7 +59,7 @@ export function BranchNavigator({
           size="icon"
           onClick={handlePrevious}
           className="h-6 w-6"
-          title="Previous branch"
+          title={t("app.chat.messages.branch.previous")}
         >
           <ChevronLeft className="h-3.5 w-3.5" />
         </Button>
@@ -69,7 +75,7 @@ export function BranchNavigator({
           size="icon"
           onClick={handleNext}
           className="h-6 w-6"
-          title="Next branch"
+          title={t("app.chat.messages.branch.next")}
         >
           <ChevronRight className="h-3.5 w-3.5" />
         </Button>

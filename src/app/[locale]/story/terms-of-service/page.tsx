@@ -24,7 +24,7 @@ export async function generateMetadata(
     path: "terms-of-service",
     title: "meta.termsOfService.title",
     description: "meta.termsOfService.description",
-    image: "https://socialmediaservice.com/images/terms-hero.jpg",
+    image: "https://unbottled.ai/images/terms-hero.jpg",
     imageAlt: "meta.termsOfService.imageAlt",
     keywords: ["meta.termsOfService.keywords"],
     category: "meta.termsOfService.category",
@@ -32,7 +32,7 @@ export async function generateMetadata(
       openGraph: {
         title: "meta.termsOfService.ogTitle",
         description: "meta.termsOfService.ogDescription",
-        url: `https://socialmediaservice.com/${locale}/terms-of-service`,
+        url: `https://unbottled.ai/${locale}/terms-of-service`,
         type: "website",
         images: [...previousImages],
       },

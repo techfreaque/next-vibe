@@ -1,6 +1,6 @@
-import { ExternalLink, Moon, Sun } from "lucide-react";
-import { cn } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui/ui/button";
+import { ExternalLink, Moon, Sun } from 'lucide-react';
+import { cn } from 'next-vibe/shared/utils';
+import { Button } from 'next-vibe-ui/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,22 +9,21 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "next-vibe-ui/ui/dropdown-menu";
-import * as React from "react";
+} from 'next-vibe-ui/ui/dropdown-menu';
+import * as React from 'react';
 
-const LOCAL_STORAGE_KEY = "starlight-theme";
+const LOCAL_STORAGE_KEY = 'starlight-theme';
 
 function getPreferredTheme() {
-  return matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  return matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
 }
 
 function getTheme() {
   let localStorageTheme =
-    typeof localStorage !== "undefined" &&
-    localStorage.getItem(LOCAL_STORAGE_KEY);
+    typeof localStorage !== 'undefined' && localStorage.getItem(LOCAL_STORAGE_KEY);
   if (
-    localStorageTheme === "auto" ||
-    (localStorageTheme !== "dark" && localStorageTheme !== "light")
+    localStorageTheme === 'auto' ||
+    (localStorageTheme !== 'dark' && localStorageTheme !== 'light')
   ) {
     localStorageTheme = getPreferredTheme();
   }
@@ -32,7 +31,7 @@ function getTheme() {
 }
 
 export function ThemeSelector() {
-  const [theme, setTheme] = React.useState("dark");
+  const [theme, setTheme] = React.useState('dark');
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
@@ -42,27 +41,24 @@ export function ThemeSelector() {
 
   function handleThemeChange(radioValue: string) {
     setTheme(radioValue);
-    const newTheme = radioValue === "auto" ? getPreferredTheme() : radioValue;
+    const newTheme = radioValue === 'auto' ? getPreferredTheme() : radioValue;
     document.documentElement.dataset.theme = newTheme;
     localStorage.setItem(LOCAL_STORAGE_KEY, newTheme);
   }
 
   return (
-    <div className="flex items-center space-x-2">
+    <div className='flex items-center space-x-2'>
       <Button
-        size="sm"
-        variant="ghost"
-        className={cn(
-          !mounted && "opacity-0",
-          "bg-secondary hover:bg-background gap-1.5",
-        )}
+        size='sm'
+        variant='ghost'
+        className={cn(!mounted && 'opacity-0', 'bg-secondary hover:bg-background gap-1.5')}
         asChild
       >
         <a
-          href="https://rnr-showcase.vercel.app/"
-          target="_blank"
-          className="text-foreground no-underline"
-          rel="noopener"
+          href='https://rnr-showcase.vercel.app/'
+          target='_blank'
+          className='text-foreground no-underline'
+          rel='noopener'
         >
           Demo <ExternalLink size={15} />
         </a>
@@ -70,26 +66,23 @@ export function ThemeSelector() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            size="sm"
-            variant="ghost"
+            size='sm'
+            variant='ghost'
             className={cn(
-              !mounted && "opacity-0",
-              "text-foreground bg-secondary hover:bg-background",
+              !mounted && 'opacity-0',
+              'text-foreground bg-secondary hover:bg-background'
             )}
           >
-            {theme === "light" ? <Sun size={18} /> : <Moon size={18} />}
+            {theme === 'light' ? <Sun size={18} /> : <Moon size={18} />}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56" align="end">
+        <DropdownMenuContent className='w-56' align='end'>
           <DropdownMenuLabel>Appearance</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuRadioGroup
-            value={theme}
-            onValueChange={handleThemeChange}
-          >
-            <DropdownMenuRadioItem value="auto">Auto</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
+          <DropdownMenuRadioGroup value={theme} onValueChange={handleThemeChange}>
+            <DropdownMenuRadioItem value='auto'>Auto</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value='light'>Light</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value='dark'>Dark</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>

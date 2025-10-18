@@ -13,14 +13,18 @@ import {
   isErrorResponseType,
   parseError,
 } from "next-vibe/shared/utils/parse-error";
-import type { z } from "zod";
+import { z } from "zod";
 import { create } from "zustand";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
-import { callApi } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/api-utils";
+import {
+  callApi,
+  containsFile,
+  objectToFormData,
+} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/api-utils";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
@@ -667,8 +671,22 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
     // Create the fetch promise
     const fetchPromise = (async (): Promise<TEndpoint["TResponseOutput"]> => {
+      // For endpoints with no request body, ensure requestData is undefined
+      // The schema will be z.undefined() for these endpoints
+      let validatedRequestData = requestData;
+
+      // Check if the schema expects undefined (no request fields)
+      const hasNoRequestFields = !endpoint.requestSchema ||
+        endpoint.requestSchema instanceof z.ZodUndefined;
+
+      if (hasNoRequestFields) {
+        // For endpoints with no request body, always use undefined
+        validatedRequestData = undefined as TRequestOutput;
+      }
+
       // Validate request data using the endpoint's schema
-      const requestValidation = endpoint.requestSchema.safeParse(requestData);
+      const requestValidation =
+        endpoint.requestSchema.safeParse(validatedRequestData);
 
       if (!requestValidation.success) {
         logger.error("executeQuery: request validation failed", {
@@ -728,10 +746,17 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         const endpointUrl = `/api/${locale}/${endpoint.path.join("/")}`;
 
         // Prepare the request body for non-GET requests
-        const postBody =
-          endpoint.method !== Methods.GET
-            ? JSON.stringify(requestData)
-            : undefined;
+        // Check if requestData contains File objects - if so, use FormData
+        let postBody: string | FormData | undefined;
+        if (endpoint.method !== Methods.GET) {
+          if (containsFile(requestData)) {
+            // Convert to FormData
+            postBody = objectToFormData(requestData as Record<string, unknown>);
+          } else {
+            // Use JSON
+            postBody = JSON.stringify(requestData);
+          }
+        }
 
         const response = await callApi(endpoint, endpointUrl, postBody, logger);
 
@@ -1059,10 +1084,17 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       const endpointUrl = `/api/${locale}/${endpoint.path.join("/")}`;
 
       // Prepare the request body for non-GET requests
-      const postBody =
-        endpoint.method !== Methods.GET
-          ? JSON.stringify(requestData)
-          : undefined;
+      // Check if requestData contains File objects - if so, use FormData
+      let postBody: string | FormData | undefined;
+      if (endpoint.method !== Methods.GET) {
+        if (containsFile(requestData)) {
+          // Convert to FormData
+          postBody = objectToFormData(requestData as Record<string, unknown>);
+        } else {
+          // Use JSON
+          postBody = JSON.stringify(requestData);
+        }
+      }
 
       const response = await callApi(endpoint, endpointUrl, postBody, logger);
 

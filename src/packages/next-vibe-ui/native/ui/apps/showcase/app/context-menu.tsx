@@ -1,7 +1,7 @@
-import * as React from "react";
-import { Platform, Pressable, View } from "react-native";
-import Animated, { FadeIn } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as React from 'react';
+import { Platform, Pressable, View } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   ContextMenu,
@@ -17,12 +17,11 @@ import {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
   ContextMenuTrigger,
-} from "~/components/ui/context-menu";
-import { Text } from "~/components/ui/text";
+} from '~/components/ui/context-menu';
+import { Text } from '~/components/ui/text';
 
 export default function ContextScreen() {
-  const triggerRef =
-    React.useRef<React.ElementRef<typeof ContextMenuTrigger>>(null);
+  const triggerRef = React.useRef<React.ElementRef<typeof ContextMenuTrigger>>(null);
   const insets = useSafeAreaInsets();
   const contentInsets = {
     top: insets.top,
@@ -32,12 +31,12 @@ export default function ContextScreen() {
   };
   const [checkboxValue, setCheckboxValue] = React.useState(false);
   const [subCheckboxValue, setSubCheckboxValue] = React.useState(false);
-  const [radioValue, setRadioValue] = React.useState("pedro");
+  const [radioValue, setRadioValue] = React.useState('pedro');
 
   return (
-    <View className="flex-1 justify-center p-6 gap-12">
+    <View className='flex-1 justify-center p-6 gap-12'>
       <Pressable
-        className="absolute top-0 right-0 w-16 h-16 active:bg-primary/5"
+        className='absolute top-0 right-0 w-16 h-16 active:bg-primary/5'
         onPress={() => {
           // Only for Native platforms: open menu programmatically
           triggerRef.current?.open();
@@ -46,18 +45,14 @@ export default function ContextScreen() {
       <ContextMenu>
         <ContextMenuTrigger
           ref={triggerRef}
-          className="flex h-[150px] w-full max-w-[300px] mx-auto web:cursor-default items-center justify-center rounded-md border border-foreground border-dashed"
+          className='flex h-[150px] w-full max-w-[300px] mx-auto web:cursor-default items-center justify-center rounded-md border border-foreground border-dashed'
         >
-          <Text className="text-foreground text-sm native:text-lg">
-            {Platform.OS === "web" ? "Right click here" : "Long press here"}
+          <Text className='text-foreground text-sm native:text-lg'>
+            {Platform.OS === 'web' ? 'Right click here' : 'Long press here'}
           </Text>
         </ContextMenuTrigger>
 
-        <ContextMenuContent
-          align="start"
-          insets={contentInsets}
-          className="w-64 native:w-72"
-        >
+        <ContextMenuContent align='start' insets={contentInsets} className='w-64 native:w-72'>
           <ContextMenuItem inset>
             <Text>Back</Text>
             <ContextMenuShortcut>⌘[</ContextMenuShortcut>
@@ -75,7 +70,7 @@ export default function ContextScreen() {
             <ContextMenuSubTrigger inset>
               <Text>More Tools</Text>
             </ContextMenuSubTrigger>
-            <ContextMenuSubContent className="web:w-48 native:mt-1">
+            <ContextMenuSubContent className='web:w-48 native:mt-1'>
               <Animated.View entering={FadeIn.duration(200)}>
                 <ContextMenuItem>
                   <Text>Save Page As...</Text>
@@ -110,16 +105,13 @@ export default function ContextScreen() {
             <Text>Show Full URLs</Text>
           </ContextMenuCheckboxItem>
           <ContextMenuSeparator />
-          <ContextMenuRadioGroup
-            value={radioValue}
-            onValueChange={setRadioValue}
-          >
+          <ContextMenuRadioGroup value={radioValue} onValueChange={setRadioValue}>
             <ContextMenuLabel inset>People</ContextMenuLabel>
             <ContextMenuSeparator />
-            <ContextMenuRadioItem value="pedro" closeOnPress={false}>
+            <ContextMenuRadioItem value='pedro' closeOnPress={false}>
               <Text>Elmer Fudd</Text>
             </ContextMenuRadioItem>
-            <ContextMenuRadioItem value="colm" closeOnPress={false}>
+            <ContextMenuRadioItem value='colm' closeOnPress={false}>
               <Text>Foghorn Leghorn</Text>
             </ContextMenuRadioItem>
           </ContextMenuRadioGroup>

@@ -22,7 +22,7 @@ export function ImapPerformanceConfigForm(): JSX.Element {
         name="cacheEnabled"
         config={{
           type: "switch",
-          label: "imap.config.performance.cacheEnabled",
+          label: "app.admin.emails.imap.config.performance.cacheEnabled",
         }}
         control={configEndpoint.create.form.control}
       />
@@ -31,7 +31,7 @@ export function ImapPerformanceConfigForm(): JSX.Element {
         name="cacheTtl"
         config={{
           type: "number",
-          label: "imap.config.performance.cacheTtl",
+          label: "app.admin.emails.imap.config.performance.cacheTtl",
           placeholder: undefined,
         }}
         control={configEndpoint.create.form.control}
@@ -41,7 +41,7 @@ export function ImapPerformanceConfigForm(): JSX.Element {
         name="cacheMaxSize"
         config={{
           type: "number",
-          label: "imap.config.performance.cacheMaxSize",
+          label: "app.admin.emails.imap.config.performance.cacheMaxSize",
           placeholder: undefined,
         }}
         control={configEndpoint.create.form.control}
@@ -51,7 +51,7 @@ export function ImapPerformanceConfigForm(): JSX.Element {
         name="memoryThreshold"
         config={{
           type: "number",
-          label: "imap.config.performance.memoryThreshold",
+          label: "app.admin.emails.imap.config.performance.memoryThreshold",
           placeholder: undefined,
         }}
         control={configEndpoint.create.form.control}
@@ -61,7 +61,7 @@ export function ImapPerformanceConfigForm(): JSX.Element {
         name="maxRetries"
         config={{
           type: "number",
-          label: "imap.config.resilience.maxRetries",
+          label: "app.admin.emails.imap.config.resilience.maxRetries",
           placeholder: undefined,
         }}
         control={configEndpoint.create.form.control}
@@ -71,7 +71,7 @@ export function ImapPerformanceConfigForm(): JSX.Element {
         name="retryDelay"
         config={{
           type: "number",
-          label: "imap.config.resilience.retryDelay",
+          label: "app.admin.emails.imap.config.resilience.retryDelay",
           placeholder: undefined,
         }}
         control={configEndpoint.create.form.control}
@@ -81,7 +81,7 @@ export function ImapPerformanceConfigForm(): JSX.Element {
         name="circuitBreakerThreshold"
         config={{
           type: "number",
-          label: "imap.config.resilience.circuitBreakerThreshold",
+          label: "app.admin.emails.imap.config.resilience.circuitBreakerThreshold",
           placeholder: undefined,
         }}
         control={configEndpoint.create.form.control}
@@ -91,7 +91,7 @@ export function ImapPerformanceConfigForm(): JSX.Element {
         name="circuitBreakerTimeout"
         config={{
           type: "number",
-          label: "imap.config.resilience.circuitBreakerTimeout",
+          label: "app.admin.emails.imap.config.resilience.circuitBreakerTimeout",
           placeholder: undefined,
         }}
         control={configEndpoint.create.form.control}

@@ -1,0 +1,20 @@
+export const translations = {
+  fields: {
+    id: "Subscription ID",
+    userId: "User ID",
+    planId: "Plan ID",
+    billingInterval: "Billing interval",
+    status: "Subscription status",
+    currentPeriodStart: "Current period start",
+    currentPeriodEnd: "Current period end",
+    cancelAtPeriodEnd: "Cancel at period end",
+    canceledAt: "Cancelled at",
+    endedAt: "Ended at",
+    cancellationReason: "Cancellation reason",
+    trialStart: "Trial start",
+    trialEnd: "Trial end",
+    stripeCustomerId: "Stripe customer ID",
+    stripeSubscriptionId: "Stripe subscription ID",
+    stripePriceId: "Stripe price ID",
+  },
+};

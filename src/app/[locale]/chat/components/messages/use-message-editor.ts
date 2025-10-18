@@ -5,6 +5,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+
+import { TIMING } from "../../lib/config/constants";
 import type { ChatMessage } from "../../lib/storage/types";
 
 export type EditorActionType = "overwrite" | "branch" | null;
@@ -14,6 +17,7 @@ export interface UseMessageEditorOptions {
   onSave: (messageId: string, content: string) => Promise<void>;
   onBranch?: (messageId: string, content: string) => Promise<void>;
   onCancel: () => void;
+  logger: EndpointLogger;
 }
 
 export interface UseMessageEditorReturn {
@@ -23,8 +27,8 @@ export interface UseMessageEditorReturn {
   actionType: EditorActionType;
 
   // Refs
-  editorRef: React.RefObject<HTMLDivElement>;
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
+  editorRef: React.RefObject<HTMLDivElement | null>;
+  textareaRef: React.RefObject<HTMLTextAreaElement | null>;
 
   // Handlers
   setContent: (content: string) => void;
@@ -42,6 +46,7 @@ export function useMessageEditor({
   onSave,
   onBranch,
   onCancel,
+  logger,
 }: UseMessageEditorOptions): UseMessageEditorReturn {
   const [content, setContent] = useState(message.content);
   const [isLoading, setIsLoading] = useState(false);
@@ -52,7 +57,7 @@ export function useMessageEditor({
   // Initialize content when message changes
   useEffect(() => {
     setContent(message.content);
-  }, [message.id]);
+  }, [message.id, message.content]);
 
   // Scroll into view and focus when editor mounts
   useEffect(() => {
@@ -68,9 +73,9 @@ export function useMessageEditor({
       textareaRef.current?.focus();
       // Select all text for easy editing
       textareaRef.current?.select();
-    }, 100);
+    }, TIMING.MESSAGE_EDITOR_FOCUS_DELAY);
 
-    return () => clearTimeout(timeoutId);
+    return (): void => clearTimeout(timeoutId);
   }, []);
 
   const handleOverwrite = useCallback(async (): Promise<void> => {
@@ -84,14 +89,14 @@ export function useMessageEditor({
     try {
       await onSave(message.id, trimmedContent);
     } catch (error) {
-      console.error("Failed to overwrite message:", error);
+      logger.error("Failed to overwrite message", error);
       // Don't clear loading state on error so user can retry
-      throw error;
+      // Error is logged, no need to throw
     } finally {
       setIsLoading(false);
       setActionType(null);
     }
-  }, [content, isLoading, message.id, onSave]);
+  }, [content, isLoading, message.id, onSave, logger]);
 
   const handleBranch = useCallback(async (): Promise<void> => {
     const trimmedContent = content.trim();
@@ -104,13 +109,13 @@ export function useMessageEditor({
     try {
       await onBranch(message.id, trimmedContent);
     } catch (error) {
-      console.error("Failed to branch message:", error);
-      throw error;
+      logger.error("Failed to branch message", error);
+      // Error is logged, no need to throw
     } finally {
       setIsLoading(false);
       setActionType(null);
     }
-  }, [content, isLoading, message.id, onBranch]);
+  }, [content, isLoading, message.id, onBranch, logger]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent): void => {

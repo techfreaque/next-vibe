@@ -18,7 +18,7 @@ import { createEslintConfig } from "lint";
 export default createEslintConfig({
   projectRoot: import.meta.dirname,
   enableNext: false, // Set to true for Next.js projects
-  tsConfigPaths: ['./tsconfig.json'],
+  tsConfigPaths: ["./tsconfig.json"],
   additionalIgnores: [],
   customRules: {},
 });

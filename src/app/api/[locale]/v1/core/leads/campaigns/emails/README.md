@@ -7,7 +7,7 @@ A comprehensive, production-ready email system with A/B testing and multiple jou
 The email system automatically sends personalized email sequences to leads using three different journey approaches:
 
 1. **Personal Approach** - Relationship-focused, authentic messaging
-2. **Results Focused** - Data-driven with case studies and metrics  
+2. **Results Focused** - Data-driven with case studies and metrics
 3. **Urgency & Scarcity** - Time-sensitive offers and competitive pressure
 
 ## 🏗️ Architecture
@@ -32,23 +32,27 @@ emails/
 ## 🚀 Features
 
 ### ✅ Complete Email Journeys
+
 - **6 stages per journey**: Initial, Follow-up 1-3, Nurture, Reactivation
 - **18 total templates**: 3 journeys × 6 stages each
 - **Production-ready content**: Professional, engaging copy
 
 ### ✅ A/B Testing System
+
 - **Automatic assignment**: Deterministic lead assignment to journey variants
 - **Performance tracking**: Open rates, click rates, conversion metrics
 - **Statistical analysis**: Confidence intervals and significance testing
 - **Dynamic optimization**: Ability to adjust weights based on performance
 
 ### ✅ Smart Scheduling
+
 - **Automated timing**: Intelligent delays between email stages
 - **Priority handling**: Support for low/normal/high priority campaigns
 - **Failure handling**: Retry logic and error management
 - **Scalable processing**: Batch processing for high volume
 
 ### ✅ Professional Templates
+
 - **Responsive design**: Mobile-optimized email layouts
 - **Brand consistency**: Customizable company branding
 - **Rich components**: CTAs, social proof, statistics grids
@@ -57,6 +61,7 @@ emails/
 ## 📧 Journey Details
 
 ### Journey A: Personal Approach
+
 **Philosophy**: Build authentic relationships and trust
 
 - **Initial**: Personal introduction with genuine interest
@@ -66,7 +71,8 @@ emails/
 - **Nurture**: Valuable tips and continued support
 - **Reactivation**: Friendly check-in and reconnection
 
-### Journey B: Results Focused  
+### Journey B: Results Focused
+
 **Philosophy**: Demonstrate value through data and proof
 
 - **Initial**: Lead with impressive statistics and results
@@ -77,6 +83,7 @@ emails/
 - **Reactivation**: New case study results and achievements
 
 ### Journey C: Urgency & Scarcity
+
 **Philosophy**: Create urgency and fear of missing out
 
 - **Initial**: Limited spots available with countdown
@@ -89,22 +96,24 @@ emails/
 ## 🔧 Usage
 
 ### Initialize Campaign for New Lead
+
 ```typescript
-import { emailService } from './emails';
+import { emailService } from "./emails";
 
 // Automatically called when lead is created
 const campaignId = await emailService.initializeCampaign(leadId, {
-  priority: 'normal',
+  priority: "normal",
   metadata: {
-    source: 'website',
-    campaign: 'spring_2024'
-  }
+    source: "website",
+    campaign: "spring_2024",
+  },
 });
 ```
 
 ### Process Pending Emails (Cron Job)
+
 ```typescript
-import { processEmailCampaigns } from './cron/email-campaigns';
+import { processEmailCampaigns } from "./cron/email-campaigns";
 
 // Run every 15 minutes
 const results = await processEmailCampaigns();
@@ -112,20 +121,22 @@ console.log(`Sent ${results.sent} emails, ${results.failed} failed`);
 ```
 
 ### Generate Email Preview
+
 ```typescript
 const preview = await emailService.generatePreview(
   EmailJourneyVariant.PERSONAL_APPROACH,
   EmailCampaignStage.INITIAL,
   {
     t: translationFunction,
-    locale: 'en',
-    companyName: 'Your Company',
-    companyEmail: 'support@yourcompany.com'
-  }
+    locale: "en",
+    companyName: "Your Company",
+    companyEmail: "support@yourcompany.com",
+  },
 );
 ```
 
 ### Get A/B Test Performance
+
 ```typescript
 const config = emailService.getABTestConfig();
 const stats = await emailService.getCampaignStats();
@@ -134,17 +145,20 @@ const stats = await emailService.getCampaignStats();
 ## 📊 A/B Testing
 
 ### Default Configuration
+
 - **Personal Approach**: 33% weight
-- **Results Focused**: 33% weight  
+- **Results Focused**: 33% weight
 - **Urgency & Scarcity**: 34% weight
 
 ### Performance Metrics
+
 - Open rates, click rates, conversion rates
 - Unsubscribe rates, bounce rates
 - Statistical significance testing
 - Automatic winner detection
 
 ### Optimization
+
 - Adjust weights based on performance
 - Stop tests when significance reached
 - Implement winning variants automatically
@@ -152,6 +166,7 @@ const stats = await emailService.getCampaignStats();
 ## 🔄 Automation
 
 ### Email Scheduling
+
 - **Initial**: Sent immediately upon lead creation
 - **Follow-up 1**: 3 days after initial
 - **Follow-up 2**: 5 days after follow-up 1
@@ -160,6 +175,7 @@ const stats = await emailService.getCampaignStats();
 - **Reactivation**: 30 days after nurture
 
 ### Cron Jobs
+
 - **Email processing**: Every 15 minutes
 - **Analytics**: Daily performance reports
 - **Cleanup**: Weekly old campaign removal
@@ -174,11 +190,13 @@ const stats = await emailService.getCampaignStats();
 ## 🎨 Customization
 
 ### Brand Styling
+
 - Company name and email in all templates
 - Consistent color scheme and typography
 - Customizable CTA buttons and layouts
 
 ### Content Personalization
+
 - Lead name and business name in all emails
 - Dynamic content based on lead data
 - Localization support for multiple languages
@@ -186,12 +204,14 @@ const stats = await emailService.getCampaignStats();
 ## 📈 Analytics & Reporting
 
 ### Campaign Performance
+
 - Total emails sent, delivered, opened, clicked
 - Journey-specific performance metrics
 - A/B test winner identification
 - ROI and conversion tracking
 
 ### Lead Engagement
+
 - Individual lead email history
 - Engagement scoring and segmentation
 - Unsubscribe and bounce tracking
@@ -207,6 +227,7 @@ const stats = await emailService.getCampaignStats();
 ## 🚀 Production Deployment
 
 ### Environment Variables
+
 ```env
 NEXT_PUBLIC_COMPANY_NAME="Your Company Name"
 NEXT_PUBLIC_SUPPORT_EMAIL="support@yourcompany.com"
@@ -214,6 +235,7 @@ NEXT_PUBLIC_APP_URL="https://yourapp.com"
 ```
 
 ### Cron Setup (Vercel)
+
 ```json
 {
   "crons": [
@@ -226,6 +248,7 @@ NEXT_PUBLIC_APP_URL="https://yourapp.com"
 ```
 
 ### Database Migrations
+
 Ensure all email campaign tables are created and indexed properly.
 
 ## 📝 Next Steps

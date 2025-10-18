@@ -1,10 +1,13 @@
 "use client";
 
 import { Edit2, FolderInput, MoreVertical, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 import {
   Button,
   DropdownMenu,
@@ -21,13 +24,10 @@ import {
   TooltipTrigger,
 } from "@/packages/next-vibe-ui/web/ui";
 
+import { useTouchDevice } from "../../hooks/use-touch-device";
+import { getIconComponent } from "../../lib/config/icons";
 import { chatColors, chatTransitions } from "../../lib/design-tokens";
-import type {
-  ChatFolder,
-  ChatState,
-  ChatThread,
-} from "../../lib/storage/types";
-import { formatRelativeTime } from "../../lib/utils/formatting";
+import type { ChatState, ChatThread } from "../../lib/storage/types";
 
 interface ThreadListProps {
   threads: ChatThread[];
@@ -38,6 +38,7 @@ interface ThreadListProps {
   onMoveThread?: (threadId: string, folderId: string | null) => void;
   state?: ChatState;
   compact?: boolean;
+  locale: CountryLanguage;
 }
 
 export function ThreadList({
@@ -49,6 +50,7 @@ export function ThreadList({
   onMoveThread,
   state,
   compact = false,
+  locale,
 }: ThreadListProps): JSX.Element {
   return (
     <div className="space-y-0.5">
@@ -63,6 +65,7 @@ export function ThreadList({
           onMoveThread={onMoveThread}
           state={state}
           compact={compact}
+          locale={locale}
         />
       ))}
     </div>
@@ -78,18 +81,22 @@ interface ThreadItemProps {
   onMoveThread?: (threadId: string, folderId: string | null) => void;
   state?: ChatState;
   compact?: boolean;
+  locale: CountryLanguage;
 }
 
 function ThreadItem({
   thread,
   isActive,
-  onSelect,
   onDelete,
   onUpdateTitle,
   onMoveThread,
   state,
   compact = false,
+  locale,
 }: ThreadItemProps): JSX.Element {
+  const router = useRouter();
+  const isTouch = useTouchDevice();
+  const { t } = simpleT(locale);
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(thread.title);
   const [isHovered, setIsHovered] = useState(false);
@@ -99,32 +106,33 @@ function ThreadItem({
   // Get model icon (fallback to default model if not set)
   // Model config removed - icons no longer shown in thread list for clean design
 
-  const handleDelete = () => {
+  const handleDelete = (): void => {
     setDropdownOpen(false);
+    // eslint-disable-next-line i18next/no-literal-string -- Browser confirm dialog, will be replaced with custom modal
     const confirmed = window.confirm(`Delete chat "${thread.title}"?`);
     if (confirmed) {
       onDelete(thread.id);
     }
   };
 
-  const handleEdit = () => {
+  const handleEdit = (): void => {
     setDropdownOpen(false);
     setIsEditing(true);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = (): void => {
     if (editTitle.trim()) {
       onUpdateTitle(thread.id, editTitle.trim());
     }
     setIsEditing(false);
   };
 
-  const handleCancelEdit = () => {
+  const handleCancelEdit = (): void => {
     setEditTitle(thread.title);
     setIsEditing(false);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent): void => {
     if (e.key === "Enter") {
       handleSaveEdit();
     } else if (e.key === "Escape") {
@@ -132,7 +140,7 @@ function ThreadItem({
     }
   };
 
-  const handleMoveToFolder = (folderId: string | null) => {
+  const handleMoveToFolder = (folderId: string | null): void => {
     setDropdownOpen(false);
     if (onMoveThread) {
       onMoveThread(thread.id, folderId);
@@ -142,6 +150,24 @@ function ThreadItem({
   // Get all folders for the move menu
   const allFolders = state ? Object.values(state.folders) : [];
   const currentFolderId = thread.folderId;
+
+  // Handle thread click to navigate
+  const handleThreadClick = (e: React.MouseEvent<HTMLDivElement>): void => {
+    // Don't navigate if editing or clicking on buttons
+    if (isEditing) {
+      return;
+    }
+
+    const target = e.target as HTMLElement;
+    if (target.closest("button") || target.closest("input")) {
+      return;
+    }
+
+    // Navigate to thread using folder ID and thread ID
+    if (thread.folderId) {
+      router.push(`/${locale}/threads/${thread.folderId}/${thread.id}`);
+    }
+  };
 
   return (
     <div
@@ -153,7 +179,7 @@ function ThreadItem({
           : chatColors.sidebar.hover,
         compact && "py-1.5",
       )}
-      onClick={() => !isEditing && onSelect(thread.id)}
+      onClick={handleThreadClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         // Don't remove hover state if dropdown is open
@@ -167,9 +193,8 @@ function ThreadItem({
         setTimeout(() => setIsTouched(false), 3000);
       }}
     >
-      {/* Removed AI provider icon for clean design */}
-      <div className="flex-1 min-w-0">
-        {isEditing ? (
+      {isEditing ? (
+        <div className="flex-1 min-w-0">
           <input
             type="text"
             value={editTitle}
@@ -180,7 +205,9 @@ function ThreadItem({
             autoFocus
             onClick={(e) => e.stopPropagation()}
           />
-        ) : (
+        </div>
+      ) : (
+        <div className="flex-1 min-w-0">
           <TooltipProvider delayDuration={500}>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -198,11 +225,6 @@ function ThreadItem({
                       {thread.metadata.preview}
                     </div>
                   )}
-                  {!compact && (
-                    <div className="text-xs text-muted-foreground">
-                      {formatRelativeTime(thread.updatedAt)}
-                    </div>
-                  )}
                 </div>
               </TooltipTrigger>
               <TooltipContent side="right" className="max-w-xs">
@@ -215,10 +237,10 @@ function ThreadItem({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        )}
-      </div>
+        </div>
+      )}
 
-      {!isEditing && (isHovered || isTouched || isActive) && (
+      {!isEditing && (isHovered || isTouched || isActive || isTouch) && (
         <div
           className="flex items-center gap-1"
           onClick={(e) => e.stopPropagation()}
@@ -238,7 +260,7 @@ function ThreadItem({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6"
+                className="h-5 w-6"
                 onClick={(e) => {
                   e.stopPropagation();
                   setDropdownOpen(true);
@@ -254,7 +276,7 @@ function ThreadItem({
             >
               <DropdownMenuItem onSelect={handleEdit}>
                 <Edit2 className="h-4 w-4 mr-2" />
-                Rename
+                {t("app.chat.actions.rename")}
               </DropdownMenuItem>
 
               {onMoveThread && state && (
@@ -263,7 +285,7 @@ function ThreadItem({
                   <DropdownMenuSub>
                     <DropdownMenuSubTrigger>
                       <FolderInput className="h-4 w-4 mr-2" />
-                      Move to Folder
+                      {t("app.chat.actions.moveToFolder")}
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent>
                       {/* Option to move to root (no folder) */}
@@ -271,27 +293,39 @@ function ThreadItem({
                         <DropdownMenuItem
                           onSelect={() => handleMoveToFolder(null)}
                         >
-                          <span className="text-sm">📁 Unfiled</span>
+                          {((): JSX.Element => {
+                            const UnfiledIcon = getIconComponent("folder");
+                            return (
+                              <>
+                                <UnfiledIcon className="h-4 w-4 mr-2" />
+                                {t("app.chat.actions.unfiled")}
+                              </>
+                            );
+                          })()}
                         </DropdownMenuItem>
                       )}
 
                       {/* List all folders */}
                       {allFolders.length > 0 ? (
-                        allFolders.map((folder) => (
-                          <DropdownMenuItem
-                            key={folder.id}
-                            onSelect={() => handleMoveToFolder(folder.id)}
-                            disabled={currentFolderId === folder.id}
-                          >
-                            <span className="text-sm">
-                              {folder.icon || "📁"} {folder.name}
-                            </span>
-                          </DropdownMenuItem>
-                        ))
+                        allFolders.map((folder) => {
+                          const FolderIcon = getIconComponent(
+                            folder.icon || "folder",
+                          );
+                          return (
+                            <DropdownMenuItem
+                              key={folder.id}
+                              onSelect={() => handleMoveToFolder(folder.id)}
+                              disabled={currentFolderId === folder.id}
+                            >
+                              <FolderIcon className="h-4 w-4 mr-2" />
+                              {folder.name}
+                            </DropdownMenuItem>
+                          );
+                        })
                       ) : (
                         <DropdownMenuItem disabled>
                           <span className="text-sm text-muted-foreground">
-                            No folders available
+                            {t("app.chat.actions.noFoldersAvailable")}
                           </span>
                         </DropdownMenuItem>
                       )}
@@ -306,7 +340,7 @@ function ThreadItem({
                 className="text-destructive"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
-                Delete
+                {t("app.chat.common.delete")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

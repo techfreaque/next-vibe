@@ -4,6 +4,10 @@
  * Common formatting functions used across the chat application.
  */
 
+import type { TFunction } from "@/i18n/core/static-types";
+
+import { TEXT_FORMAT } from "../config/constants";
+
 /**
  * Format timestamp as relative time (e.g., "5m ago", "2h ago")
  *
@@ -18,14 +22,18 @@ export function formatRelativeTime(timestamp: number): string {
   const days = Math.floor(diff / 86400000);
 
   if (days > 0) {
+    // eslint-disable-next-line i18next/no-literal-string -- Technical time format, not user-facing
     return `${days}d ago`;
   }
   if (hours > 0) {
+    // eslint-disable-next-line i18next/no-literal-string -- Technical time format, not user-facing
     return `${hours}h ago`;
   }
   if (minutes > 0) {
+    // eslint-disable-next-line i18next/no-literal-string -- Technical time format, not user-facing
     return `${minutes}m ago`;
   }
+  // eslint-disable-next-line i18next/no-literal-string -- Technical time format, not user-facing
   return "just now";
 }
 
@@ -35,19 +43,35 @@ export function formatRelativeTime(timestamp: number): string {
  * @param timestamp - Unix timestamp in milliseconds
  * @returns Formatted timestamp string
  */
-export function format4chanTimestamp(timestamp: number): string {
+export function format4chanTimestamp(timestamp: number, t: TFunction): string {
   const date = new Date(timestamp);
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
-  const year = String(date.getFullYear()).substring(2);
-  const dayName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
-    date.getDay()
-  ];
+  const year = String(date.getFullYear()).substring(
+    TEXT_FORMAT.YEAR_SUBSTRING_LENGTH,
+  );
+  const dayName = [
+    t("app.chat.flatView.timestamp.sun"),
+    t("app.chat.flatView.timestamp.mon"),
+    t("app.chat.flatView.timestamp.tue"),
+    t("app.chat.flatView.timestamp.wed"),
+    t("app.chat.flatView.timestamp.thu"),
+    t("app.chat.flatView.timestamp.fri"),
+    t("app.chat.flatView.timestamp.sat"),
+  ][date.getDay()];
   const hours = String(date.getHours()).padStart(2, "0");
   const mins = String(date.getMinutes()).padStart(2, "0");
   const secs = String(date.getSeconds()).padStart(2, "0");
-
-  return `${month}/${day}/${year}(${dayName})${hours}:${mins}:${secs}`;
+  // 4chan-style timestamp format, user-facing
+  return t("app.chat.flatView.timestamp.format", {
+    month,
+    day,
+    year,
+    dayName,
+    hours,
+    mins,
+    secs,
+  });
 }
 
 /**
@@ -57,7 +81,7 @@ export function format4chanTimestamp(timestamp: number): string {
  * @returns Short ID (8 characters)
  */
 export function getShortId(messageId: string): string {
-  return messageId.substring(0, 8);
+  return messageId.substring(0, TEXT_FORMAT.SHORT_ID_LENGTH);
 }
 
 /**
@@ -76,6 +100,7 @@ export function getIdColor(id: string): string {
   const saturation = 60 + (Math.abs(hash) % 20); // 60-80%
   const lightness = 45 + (Math.abs(hash >> 8) % 15); // 45-60%
 
+  // eslint-disable-next-line i18next/no-literal-string -- HSL color format, not user-facing
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 

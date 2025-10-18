@@ -127,7 +127,7 @@ export function EmailsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("emails.admin.stats.totalEmails")}
+              {t("app.admin.emails.stats.admin.stats.totalEmails")}
             </CardTitle>
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -137,7 +137,7 @@ export function EmailsStatsClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {formatNumber(stats?.sentEmails || 0)}{" "}
-              {t("emails.admin.stats.metrics.sent")}
+              {t("app.admin.emails.stats.admin.stats.metrics.sent")}
             </p>
           </CardContent>
         </Card>
@@ -146,7 +146,7 @@ export function EmailsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("emails.admin.stats.metrics.deliveredEmails")}
+              {t("app.admin.emails.stats.admin.stats.metrics.deliveredEmails")}
             </CardTitle>
             <Send className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -156,7 +156,7 @@ export function EmailsStatsClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {formatPercentage(stats?.deliveryRate || 0)}{" "}
-              {t("emails.admin.stats.metrics.deliveryRate")}
+              {t("app.admin.emails.stats.admin.stats.metrics.deliveryRate")}
             </p>
           </CardContent>
         </Card>
@@ -165,7 +165,7 @@ export function EmailsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("emails.admin.stats.openedEmails")}
+              {t("app.admin.emails.stats.admin.stats.openedEmails")}
             </CardTitle>
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -175,7 +175,7 @@ export function EmailsStatsClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {formatPercentage(stats?.openRate || 0)}{" "}
-              {t("emails.admin.stats.openRate")}
+              {t("app.admin.emails.stats.admin.stats.openRate")}
             </p>
           </CardContent>
         </Card>
@@ -184,7 +184,7 @@ export function EmailsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("emails.admin.stats.clickedEmails")}
+              {t("app.admin.emails.stats.admin.stats.clickedEmails")}
             </CardTitle>
             <MousePointer className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -194,7 +194,7 @@ export function EmailsStatsClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {formatPercentage(stats?.clickRate || 0)}{" "}
-              {t("emails.admin.stats.clickRate")}
+              {t("app.admin.emails.stats.admin.stats.clickRate")}
             </p>
           </CardContent>
         </Card>
@@ -203,7 +203,7 @@ export function EmailsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("emails.admin.stats.bouncedEmails")}
+              {t("app.admin.emails.stats.admin.stats.bouncedEmails")}
             </CardTitle>
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -213,7 +213,7 @@ export function EmailsStatsClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {formatPercentage(stats?.bounceRate || 0)}{" "}
-              {t("emails.admin.stats.bounceRate")}
+              {t("app.admin.emails.stats.admin.stats.bounceRate")}
             </p>
           </CardContent>
         </Card>
@@ -222,7 +222,7 @@ export function EmailsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("emails.admin.stats.failedEmails")}
+              {t("app.admin.emails.stats.admin.stats.failedEmails")}
             </CardTitle>
             <UserX className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -232,7 +232,7 @@ export function EmailsStatsClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {formatPercentage(stats?.failureRate || 0)}{" "}
-              {t("emails.admin.stats.failureRate")}
+              {t("app.admin.emails.stats.admin.stats.failureRate")}
             </p>
           </CardContent>
         </Card>
@@ -241,7 +241,7 @@ export function EmailsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("emails.admin.stats.draftEmails")}
+              {t("app.admin.emails.stats.admin.stats.draftEmails")}
             </CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -250,7 +250,7 @@ export function EmailsStatsClient({
               {formatNumber(stats?.draftEmails || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
-              {t("emails.admin.stats.pendingToSend")}
+              {t("app.admin.emails.stats.admin.stats.pendingToSend")}
             </p>
           </CardContent>
         </Card>
@@ -262,7 +262,7 @@ export function EmailsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("emails.admin.stats.metrics.emailsWithUserId")}
+              {t("app.admin.emails.stats.admin.stats.metrics.emailsWithUserId")}
             </CardTitle>
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -272,7 +272,9 @@ export function EmailsStatsClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {formatNumber(stats?.emailsWithoutUserId || 0)}{" "}
-              {t("emails.admin.stats.metrics.emailsWithoutUserId")}
+              {t(
+                "app.admin.emails.stats.admin.stats.metrics.emailsWithoutUserId",
+              )}
             </p>
           </CardContent>
         </Card>
@@ -281,7 +283,7 @@ export function EmailsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("emails.admin.stats.metrics.emailsWithLeadId")}
+              {t("app.admin.emails.stats.admin.stats.metrics.emailsWithLeadId")}
             </CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -291,7 +293,9 @@ export function EmailsStatsClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {formatNumber(stats?.emailsWithoutLeadId || 0)}{" "}
-              {t("emails.admin.stats.metrics.emailsWithoutLeadId")}
+              {t(
+                "app.admin.emails.stats.admin.stats.metrics.emailsWithoutLeadId",
+              )}
             </p>
           </CardContent>
         </Card>
@@ -300,7 +304,7 @@ export function EmailsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("emails.admin.stats.metrics.emailsWithErrors")}
+              {t("app.admin.emails.stats.admin.stats.metrics.emailsWithErrors")}
             </CardTitle>
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -310,7 +314,9 @@ export function EmailsStatsClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {formatNumber(stats?.emailsWithoutErrors || 0)}{" "}
-              {t("emails.admin.stats.metrics.emailsWithoutErrors")}
+              {t(
+                "app.admin.emails.stats.admin.stats.metrics.emailsWithoutErrors",
+              )}
             </p>
           </CardContent>
         </Card>
@@ -319,7 +325,9 @@ export function EmailsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("emails.admin.stats.metrics.averageRetryCount")}
+              {t(
+                "app.admin.emails.stats.admin.stats.metrics.averageRetryCount",
+              )}
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -328,7 +336,7 @@ export function EmailsStatsClient({
               {(stats?.averageRetryCount || 0).toFixed(1)}
             </div>
             <p className="text-xs text-muted-foreground">
-              {t("emails.admin.stats.metrics.maxRetryCount")}:{" "}
+              {t("app.admin.emails.stats.admin.stats.metrics.maxRetryCount")}:{" "}
               {stats?.maxRetryCount || 0}
             </p>
           </CardContent>
@@ -341,7 +349,9 @@ export function EmailsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("emails.admin.stats.metrics.averageProcessingTime")}
+              {t(
+                "app.admin.emails.stats.admin.stats.metrics.averageProcessingTime",
+              )}
             </CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -350,7 +360,9 @@ export function EmailsStatsClient({
               {(stats?.averageProcessingTime || 0).toFixed(2)}ms
             </div>
             <p className="text-xs text-muted-foreground">
-              {t("emails.admin.stats.metrics.processingTimeDescription")}
+              {t(
+                "app.admin.emails.stats.admin.stats.metrics.processingTimeDescription",
+              )}
             </p>
           </CardContent>
         </Card>
@@ -359,7 +371,9 @@ export function EmailsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("emails.admin.stats.metrics.averageDeliveryTime")}
+              {t(
+                "app.admin.emails.stats.admin.stats.metrics.averageDeliveryTime",
+              )}
             </CardTitle>
             <Send className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -368,7 +382,9 @@ export function EmailsStatsClient({
               {(stats?.averageDeliveryTime || 0).toFixed(2)}ms
             </div>
             <p className="text-xs text-muted-foreground">
-              {t("emails.admin.stats.metrics.deliveryTimeDescription")}
+              {t(
+                "app.admin.emails.stats.admin.stats.metrics.deliveryTimeDescription",
+              )}
             </p>
           </CardContent>
         </Card>
@@ -378,16 +394,16 @@ export function EmailsStatsClient({
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">
-            {t("emails.admin.stats.tabs.overview")}
+            {t("app.admin.emails.stats.admin.stats.tabs.overview")}
           </TabsTrigger>
           <TabsTrigger value="performance">
-            {t("emails.admin.stats.tabs.performance")}
+            {t("app.admin.emails.stats.admin.stats.tabs.performance")}
           </TabsTrigger>
           <TabsTrigger value="distribution">
-            {t("emails.admin.stats.tabs.distribution")}
+            {t("app.admin.emails.stats.admin.stats.tabs.distribution")}
           </TabsTrigger>
           <TabsTrigger value="providers">
-            {t("emails.admin.stats.tabs.providers")}
+            {t("app.admin.emails.stats.admin.stats.tabs.providers")}
           </TabsTrigger>
         </TabsList>
 
@@ -405,8 +421,10 @@ export function EmailsStatsClient({
                     color: value?.color,
                   }),
                 ),
-                title: t("emails.admin.stats.chart.title"),
-                subtitle: t("emails.admin.stats.chart.subtitle"),
+                title: t("app.admin.emails.stats.admin.stats.chart.title"),
+                subtitle: t(
+                  "app.admin.emails.stats.admin.stats.chart.subtitle",
+                ),
               }}
               isLoading={isLoading}
               height={400}
@@ -421,14 +439,16 @@ export function EmailsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-4 w-4" />
-                  {t("emails.admin.stats.performance.title")}
+                  {t("app.admin.emails.stats.admin.stats.performance.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">
-                      {t("emails.admin.stats.performance.deliveryRate")}
+                      {t(
+                        "app.admin.emails.stats.admin.stats.performance.deliveryRate",
+                      )}
                     </span>
                     <span className="text-sm text-muted-foreground">
                       {formatPercentage(stats?.deliveryRate || 0)}
@@ -436,7 +456,9 @@ export function EmailsStatsClient({
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">
-                      {t("emails.admin.stats.performance.openRate")}
+                      {t(
+                        "app.admin.emails.stats.admin.stats.performance.openRate",
+                      )}
                     </span>
                     <span className="text-sm text-muted-foreground">
                       {formatPercentage(stats?.openRate || 0)}
@@ -444,7 +466,9 @@ export function EmailsStatsClient({
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">
-                      {t("emails.admin.stats.performance.clickRate")}
+                      {t(
+                        "app.admin.emails.stats.admin.stats.performance.clickRate",
+                      )}
                     </span>
                     <span className="text-sm text-muted-foreground">
                       {formatPercentage(stats?.clickRate || 0)}
@@ -452,7 +476,9 @@ export function EmailsStatsClient({
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">
-                      {t("emails.admin.stats.performance.bounceRate")}
+                      {t(
+                        "app.admin.emails.stats.admin.stats.performance.bounceRate",
+                      )}
                     </span>
                     <span className="text-sm text-muted-foreground">
                       {formatPercentage(stats?.bounceRate || 0)}
@@ -467,7 +493,9 @@ export function EmailsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
-                  {t("emails.admin.stats.topPerformingTemplates")}
+                  {t(
+                    "app.admin.emails.stats.admin.stats.topPerformingTemplates",
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -480,16 +508,16 @@ export function EmailsStatsClient({
                         </span>
                         <Badge variant="secondary">
                           {formatNumber(template.emailsSent)}{" "}
-                          {t("emails.admin.stats.sent")}
+                          {t("app.admin.emails.stats.admin.stats.sent")}
                         </Badge>
                       </div>
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
                         <span>
-                          {t("emails.admin.stats.openRate")}:{" "}
+                          {t("app.admin.emails.stats.admin.stats.openRate")}:{" "}
                           {formatPercentage(template.openRate)}
                         </span>
                         <span>
-                          {t("emails.admin.stats.clickRate")}:{" "}
+                          {t("app.admin.emails.stats.admin.stats.clickRate")}:{" "}
                           {formatPercentage(template.clickRate)}
                         </span>
                       </div>
@@ -500,7 +528,7 @@ export function EmailsStatsClient({
                     </div>
                   )) || (
                     <p className="text-sm text-muted-foreground">
-                      {t("emails.admin.stats.noTemplateData")}
+                      {t("app.admin.emails.stats.admin.stats.noTemplateData")}
                     </p>
                   )}
                 </div>
@@ -516,7 +544,7 @@ export function EmailsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <PieChart className="h-4 w-4" />
-                  {t("emails.admin.stats.statusDistribution")}
+                  {t("app.admin.emails.stats.admin.stats.statusDistribution")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -530,38 +558,42 @@ export function EmailsStatsClient({
                               {((): string => {
                                 const statusKey = status.toLowerCase();
                                 const statusTranslations = {
-                                  sent: t("emails.admin.stats.statuses.sent"),
+                                  sent: t(
+                                    "app.admin.emails.stats.admin.stats.statuses.sent",
+                                  ),
                                   delivered: t(
-                                    "emails.admin.stats.statuses.delivered",
+                                    "app.admin.emails.stats.admin.stats.statuses.delivered",
                                   ),
                                   opened: t(
-                                    "emails.admin.stats.statuses.opened",
+                                    "app.admin.emails.stats.admin.stats.statuses.opened",
                                   ),
                                   clicked: t(
-                                    "emails.admin.stats.statuses.clicked",
+                                    "app.admin.emails.stats.admin.stats.statuses.clicked",
                                   ),
                                   bounced: t(
-                                    "emails.admin.stats.statuses.bounced",
+                                    "app.admin.emails.stats.admin.stats.statuses.bounced",
                                   ),
                                   failed: t(
-                                    "emails.admin.stats.statuses.failed",
+                                    "app.admin.emails.stats.admin.stats.statuses.failed",
                                   ),
                                   queued: t(
-                                    "emails.admin.stats.statuses.queued",
+                                    "app.admin.emails.stats.admin.stats.statuses.queued",
                                   ),
                                   processing: t(
-                                    "emails.admin.stats.statuses.processing",
+                                    "app.admin.emails.stats.admin.stats.statuses.processing",
                                   ),
                                   scheduled: t(
-                                    "emails.admin.stats.statuses.scheduled",
+                                    "app.admin.emails.stats.admin.stats.statuses.scheduled",
                                   ),
                                   pending: t(
-                                    "emails.admin.stats.statuses.pending",
+                                    "app.admin.emails.stats.admin.stats.statuses.pending",
                                   ),
                                   unsubscribed: t(
-                                    "emails.admin.stats.statuses.unsubscribed",
+                                    "app.admin.emails.stats.admin.stats.statuses.unsubscribed",
                                   ),
-                                  draft: t("emails.admin.stats.statuses.draft"),
+                                  draft: t(
+                                    "app.admin.emails.stats.admin.stats.statuses.draft",
+                                  ),
                                 };
                                 return (
                                   statusTranslations[
@@ -586,7 +618,7 @@ export function EmailsStatsClient({
                       ),
                     )) || (
                     <p className="text-sm text-muted-foreground">
-                      {t("emails.admin.stats.noStatusData")}
+                      {t("app.admin.emails.stats.admin.stats.noStatusData")}
                     </p>
                   )}
                 </div>
@@ -598,7 +630,7 @@ export function EmailsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
-                  {t("emails.admin.stats.typeDistribution")}
+                  {t("app.admin.emails.stats.admin.stats.typeDistribution")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -613,20 +645,22 @@ export function EmailsStatsClient({
                                 const typeKey = type.toLowerCase();
                                 const typeTranslations = {
                                   transactional: t(
-                                    "emails.admin.stats.types.transactional",
+                                    "app.admin.emails.stats.admin.stats.types.transactional",
                                   ),
                                   marketing: t(
-                                    "emails.admin.stats.types.marketing",
+                                    "app.admin.emails.stats.admin.stats.types.marketing",
                                   ),
                                   notification: t(
-                                    "emails.admin.stats.types.notification",
+                                    "app.admin.emails.stats.admin.stats.types.notification",
                                   ),
-                                  system: t("emails.admin.stats.types.system"),
+                                  system: t(
+                                    "app.admin.emails.stats.admin.stats.types.system",
+                                  ),
                                   lead_campaign: t(
-                                    "emails.admin.stats.types.lead_campaign",
+                                    "app.admin.emails.stats.admin.stats.types.lead_campaign",
                                   ),
                                   user_communication: t(
-                                    "emails.admin.stats.types.user_communication",
+                                    "app.admin.emails.stats.admin.stats.types.user_communication",
                                   ),
                                 };
                                 return (
@@ -652,7 +686,7 @@ export function EmailsStatsClient({
                       ),
                     )) || (
                     <p className="text-sm text-muted-foreground">
-                      {t("emails.admin.stats.noTypeData")}
+                      {t("app.admin.emails.stats.admin.stats.noTypeData")}
                     </p>
                   )}
                 </div>
@@ -668,7 +702,7 @@ export function EmailsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Globe className="h-4 w-4" />
-                  {t("emails.admin.stats.providerPerformance")}
+                  {t("app.admin.emails.stats.admin.stats.providerPerformance")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -681,20 +715,20 @@ export function EmailsStatsClient({
                         </span>
                         <Badge variant="outline">
                           {formatNumber(provider.emailsSent)}{" "}
-                          {t("emails.admin.stats.sent")}
+                          {t("app.admin.emails.stats.admin.stats.sent")}
                         </Badge>
                       </div>
                       <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
                         <span>
-                          {t("emails.admin.stats.delivery")}:{" "}
+                          {t("app.admin.emails.stats.admin.stats.delivery")}:{" "}
                           {formatPercentage(provider.deliveryRate)}
                         </span>
                         <span>
-                          {t("emails.admin.stats.open")}:{" "}
+                          {t("app.admin.emails.stats.admin.stats.open")}:{" "}
                           {formatPercentage(provider.openRate)}
                         </span>
                         <span>
-                          {t("emails.admin.stats.click")}:{" "}
+                          {t("app.admin.emails.stats.admin.stats.click")}:{" "}
                           {formatPercentage(provider.clickRate)}
                         </span>
                       </div>
@@ -705,7 +739,7 @@ export function EmailsStatsClient({
                     </div>
                   )) || (
                     <p className="text-sm text-muted-foreground">
-                      {t("emails.admin.stats.noProviderData")}
+                      {t("app.admin.emails.stats.admin.stats.noProviderData")}
                     </p>
                   )}
                 </div>
@@ -717,7 +751,7 @@ export function EmailsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <UserCheck className="h-4 w-4" />
-                  {t("emails.admin.stats.recentActivity")}
+                  {t("app.admin.emails.stats.admin.stats.recentActivity")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -731,7 +765,7 @@ export function EmailsStatsClient({
                         <p className="text-sm font-medium">
                           {(activity.details?.subject as string) ||
                             activity.templateName ||
-                            t("emails.admin.stats.noSubject")}
+                            t("app.admin.emails.stats.admin.stats.noSubject")}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {activity.recipientEmail} • {activity.type}
@@ -750,23 +784,25 @@ export function EmailsStatsClient({
                           const typeKey = activity.type.toLowerCase();
                           const activityTranslations = {
                             lead_created: t(
-                              "emails.admin.stats.statuses.pending",
+                              "app.admin.emails.stats.admin.stats.statuses.pending",
                             ),
                             lead_updated: t(
-                              "emails.admin.stats.statuses.pending",
+                              "app.admin.emails.stats.admin.stats.statuses.pending",
                             ),
-                            email_sent: t("emails.admin.stats.statuses.sent"),
+                            email_sent: t(
+                              "app.admin.emails.stats.admin.stats.statuses.sent",
+                            ),
                             email_opened: t(
-                              "emails.admin.stats.statuses.opened",
+                              "app.admin.emails.stats.admin.stats.statuses.opened",
                             ),
                             email_clicked: t(
-                              "emails.admin.stats.statuses.clicked",
+                              "app.admin.emails.stats.admin.stats.statuses.clicked",
                             ),
                             lead_converted: t(
-                              "emails.admin.stats.statuses.delivered",
+                              "app.admin.emails.stats.admin.stats.statuses.delivered",
                             ),
                             lead_unsubscribed: t(
-                              "emails.admin.stats.statuses.unsubscribed",
+                              "app.admin.emails.stats.admin.stats.statuses.unsubscribed",
                             ),
                           };
                           return (
@@ -779,7 +815,7 @@ export function EmailsStatsClient({
                     </div>
                   )) || (
                     <p className="text-sm text-muted-foreground">
-                      {t("emails.admin.stats.noRecentActivity")}
+                      {t("app.admin.emails.stats.admin.stats.noRecentActivity")}
                     </p>
                   )}
                 </div>

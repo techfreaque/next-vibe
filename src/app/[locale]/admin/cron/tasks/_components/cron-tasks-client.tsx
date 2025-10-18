@@ -39,10 +39,10 @@ export function CronTasksClient({
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle>{t("admin.dashboard.cron.taskManagement")}</CardTitle>
+              <CardTitle>{t("app.admin.cron.taskManagement")}</CardTitle>
 
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {t("admin.dashboard.cron.nav.tasks_description")}
+                {t("app.admin.cron.nav.tasks_description")}
               </p>
             </div>
             <div className="flex space-x-2">
@@ -53,11 +53,11 @@ export function CronTasksClient({
                 disabled={tasksEndpoint.read.isLoading}
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
-                {t("common.refresh")}
+                {t("app.common.refresh")}
               </Button>
               <Button size="sm" onClick={() => setCreateDialogOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
-                {t("admin.dashboard.cron.buttons.createTask")}
+                {t("app.admin.cron.buttons.createTask")}
               </Button>
             </div>
           </div>

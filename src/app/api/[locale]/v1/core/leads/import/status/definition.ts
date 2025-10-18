@@ -215,7 +215,8 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
+    urlPathVariables: undefined,
+    requests: {
       default: {
         filters: {
           status: CsvImportJobStatus.PROCESSING,

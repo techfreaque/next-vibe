@@ -22,14 +22,12 @@ import { Label } from "../label";
 function Form<TRequest>(props: {
   className?: string;
   children: React.ReactNode;
-  // @ts-ignore - Intentionally ignoring FieldValues constraint requirement
   form: UseFormReturn<TRequest, ZodType<TRequest, ZodTypeDef, TRequest>>;
   onSubmit:
     | ((e: React.FormEvent<HTMLFormElement>) => void | Promise<void>)
     | undefined;
 }): React.JSX.Element {
   return (
-    // @ts-ignore - Intentionally ignoring FieldValues constraint requirement
     <FormProvider {...props.form}>
       <form className={cn(props.className)} onSubmit={props.onSubmit}>
         {props.children}

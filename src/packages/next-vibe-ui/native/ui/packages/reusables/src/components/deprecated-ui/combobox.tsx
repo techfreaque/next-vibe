@@ -1,7 +1,7 @@
-import * as React from "react";
-import type { ListRenderItemInfo } from "react-native";
-import { Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as React from 'react';
+import type { ListRenderItemInfo } from 'react-native';
+import { Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   BottomSheet,
@@ -11,16 +11,12 @@ import {
   BottomSheetOpenTrigger,
   BottomSheetTextInput,
   useBottomSheet,
-} from "../../components/deprecated-ui/bottom-sheet";
-import {
-  Button,
-  buttonTextVariants,
-  buttonVariants,
-} from "../../components/deprecated-ui/button";
-import { Check } from "../../lib/icons/Check";
-import { ChevronsUpDown } from "../../lib/icons/ChevronsUpDown";
-import { Search } from "../../lib/icons/Search";
-import { cn } from "../../lib/utils";
+} from '../../components/deprecated-ui/bottom-sheet';
+import { Button, buttonTextVariants, buttonVariants } from '../../components/deprecated-ui/button';
+import { Check } from '../../lib/icons/Check';
+import { ChevronsUpDown } from '../../lib/icons/ChevronsUpDown';
+import { Search } from '../../lib/icons/Search';
+import { cn } from '../../lib/utils';
 
 // TODO: refactor and move to UI
 // TODO: create web component, use https://ui.shadcn.com/docs/components/combobox
@@ -34,7 +30,7 @@ interface ComboboxOption {
 
 const Combobox = React.forwardRef<
   React.ElementRef<typeof Button>,
-  Omit<React.ComponentPropsWithoutRef<typeof Button>, "children"> & {
+  Omit<React.ComponentPropsWithoutRef<typeof Button>, 'children'> & {
     items: ComboboxOption[];
     placeholder?: string;
     inputProps?: React.ComponentPropsWithoutRef<typeof BottomSheetTextInput>;
@@ -48,33 +44,31 @@ const Combobox = React.forwardRef<
     {
       className,
       textClass,
-      variant = "outline",
-      size = "sm",
+      variant = 'outline',
+      size = 'sm',
       inputProps,
       placeholder,
       items,
-      emptyText = "Nothing found...",
+      emptyText = 'Nothing found...',
       defaultSelectedItem = null,
       selectedItem: selectedItemProp,
       onSelectedItemChange,
       ...props
     },
-    ref,
+    ref
   ) => {
     const insets = useSafeAreaInsets();
-    const [search, setSearch] = React.useState("");
-    const [selectedItem, setSelectedItem] =
-      React.useState<ComboboxOption | null>(defaultSelectedItem);
+    const [search, setSearch] = React.useState('');
+    const [selectedItem, setSelectedItem] = React.useState<ComboboxOption | null>(
+      defaultSelectedItem
+    );
     const bottomSheet = useBottomSheet();
-    const inputRef =
-      React.useRef<React.ComponentRef<typeof BottomSheetTextInput>>(null);
+    const inputRef = React.useRef<React.ComponentRef<typeof BottomSheetTextInput>>(null);
 
     const listItems = React.useMemo(() => {
       return search
         ? items.filter((item) => {
-            return item.label
-              ?.toLocaleLowerCase()
-              .includes(search.toLocaleLowerCase());
+            return item.label?.toLocaleLowerCase().includes(search.toLocaleLowerCase());
           })
         : items;
     }, [items, search]);
@@ -83,7 +77,7 @@ const Combobox = React.forwardRef<
       if (selectedItemProp?.value === listItem.value) {
         return null;
       }
-      setSearch("");
+      setSearch('');
       bottomSheet.close();
       return listItem;
     }
@@ -96,8 +90,8 @@ const Combobox = React.forwardRef<
           : selectedItem?.value === listItem.value;
         return (
           <Button
-            variant="ghost"
-            className="items-center flex-row android:flex-1 justify-between px-3 py-4"
+            variant='ghost'
+            className='items-center flex-row android:flex-1 justify-between px-3 py-4'
             style={{ minHeight: 70 }}
             onPress={() => {
               if (onSelectedItemChange) {
@@ -107,18 +101,14 @@ const Combobox = React.forwardRef<
               setSelectedItem(onItemChange(listItem));
             }}
           >
-            <View className="flex-row flex-1">
-              <Text className={"text-foreground text-xl"}>
-                {listItem.label}
-              </Text>
+            <View className='flex-row flex-1'>
+              <Text className={'text-foreground text-xl'}>{listItem.label}</Text>
             </View>
-            {isSelected && (
-              <Check size={24} className={"text-foreground px-6 mt-1.5"} />
-            )}
+            {isSelected && <Check size={24} className={'text-foreground px-6 mt-1.5'} />}
           </Button>
         );
       },
-      [selectedItem, selectedItemProp, onItemChange, onSelectedItemChange],
+      [selectedItem, selectedItemProp, onItemChange, onSelectedItemChange]
     );
 
     function onSubmitEditing() {
@@ -139,7 +129,7 @@ const Combobox = React.forwardRef<
         return;
       }
       const input = inputRef.current;
-      if (input && "focus" in input && typeof input.focus === "function") {
+      if (input && 'focus' in input && typeof input.focus === 'function') {
         input.focus();
       }
     }
@@ -153,56 +143,56 @@ const Combobox = React.forwardRef<
           className={buttonVariants({
             variant,
             size,
-            className: cn("flex-row w-full", className),
+            className: cn('flex-row w-full', className),
           })}
-          role="combobox"
+          role='combobox'
           {...props}
         >
-          <View className="flex-1 flex-row justify-between ">
+          <View className='flex-1 flex-row justify-between '>
             <Text
               className={buttonTextVariants({
                 variant,
                 size,
-                className: cn(!itemSelected && "opacity-50", textClass),
+                className: cn(!itemSelected && 'opacity-50', textClass),
               })}
               numberOfLines={1}
             >
-              {itemSelected ? itemSelected.label : (placeholder ?? "")}
+              {itemSelected ? itemSelected.label : (placeholder ?? '')}
             </Text>
-            <ChevronsUpDown className="text-foreground ml-2 opacity-50" />
+            <ChevronsUpDown className='text-foreground ml-2 opacity-50' />
           </View>
         </BottomSheetOpenTrigger>
         <BottomSheetContent
           ref={bottomSheet.ref}
           onDismiss={() => {
-            setSearch("");
+            setSearch('');
           }}
         >
-          <BottomSheetHeader className="border-b-0">
-            <Text className="text-foreground text-xl font-bold text-center px-0.5">
+          <BottomSheetHeader className='border-b-0'>
+            <Text className='text-foreground text-xl font-bold text-center px-0.5'>
               {placeholder}
             </Text>
           </BottomSheetHeader>
-          <View className="relative px-4 border-b border-border pb-4">
+          <View className='relative px-4 border-b border-border pb-4'>
             <BottomSheetTextInput
-              role="searchbox"
+              role='searchbox'
               ref={inputRef}
-              className="pl-12"
+              className='pl-12'
               value={search}
               onChangeText={setSearch}
               onSubmitEditing={onSubmitEditing}
-              returnKeyType="next"
-              clearButtonMode="while-editing"
-              placeholder="Search..."
+              returnKeyType='next'
+              clearButtonMode='while-editing'
+              placeholder='Search...'
               {...inputProps}
             />
             <Button
-              variant={"ghost"}
-              size="sm"
-              className="absolute left-4 top-2.5"
+              variant={'ghost'}
+              size='sm'
+              className='absolute left-4 top-2.5'
               onPress={onSearchIconPress}
             >
-              <Search size={18} className="text-foreground opacity-50" />
+              <Search size={18} className='text-foreground opacity-50' />
             </Button>
           </View>
           <BottomSheetFlatList
@@ -211,11 +201,9 @@ const Combobox = React.forwardRef<
               paddingBottom: insets.bottom + HEADER_HEIGHT,
             }}
             renderItem={renderItem}
-            keyExtractor={(item, index) =>
-              (item as ComboboxOption)?.value ?? index.toString()
-            }
-            className={"px-4"}
-            keyboardShouldPersistTaps="handled"
+            keyExtractor={(item, index) => (item as ComboboxOption)?.value ?? index.toString()}
+            className={'px-4'}
+            keyboardShouldPersistTaps='handled'
             // ListEmptyComponent={() => {
             //   return (
             //     <View
@@ -230,9 +218,9 @@ const Combobox = React.forwardRef<
         </BottomSheetContent>
       </BottomSheet>
     );
-  },
+  }
 );
 
-Combobox.displayName = "Combobox";
+Combobox.displayName = 'Combobox';
 
 export { Combobox, type ComboboxOption };

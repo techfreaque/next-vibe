@@ -5,8 +5,11 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/schema
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import type { ResponseType } from "../../shared/types/response.schema";
-import { errorLogger } from "../../shared/utils/logger";
+import type {
+  ErrorResponseType,
+  ResponseType,
+  SuccessResponseType,
+} from "../../shared/types/response.schema";
 import { env } from "../env";
 
 /**
@@ -118,14 +121,12 @@ export enum SmsProviders {
   HTTP = "http",
 }
 
-export type SmsFunctionType<TRequest, TResponse, TUrlVariables> = ({
-  requestData,
-  responseData,
-  urlVariables,
-  user,
-}: SmsRenderProps<TRequest, TResponse, TUrlVariables>) =>
-  | Promise<ResponseType<SmsTemplateReturnType | SmsTemplateReturnType[]>>
-  | ResponseType<SmsTemplateReturnType | SmsTemplateReturnType[]>;
+/**
+ * Return type for SMS render functions
+ */
+export type SmsRenderReturnType = ResponseType<
+  SmsTemplateReturnType | SmsTemplateReturnType[]
+>;
 
 export interface SmsRenderProps<TRequest, TResponse, TUrlVariables> {
   requestData: TRequest;
@@ -136,6 +137,16 @@ export interface SmsRenderProps<TRequest, TResponse, TUrlVariables> {
   locale: CountryLanguage;
   logger: EndpointLogger;
 }
+
+export type SmsFunctionType<TRequest, TResponse, TUrlVariables> = (
+  props: SmsRenderProps<TRequest, TResponse, TUrlVariables>,
+) =>
+  | Promise<
+      | SuccessResponseType<SmsTemplateReturnType | SmsTemplateReturnType[]>
+      | ErrorResponseType
+    >
+  | SuccessResponseType<SmsTemplateReturnType | SmsTemplateReturnType[]>
+  | ErrorResponseType;
 
 export interface SmsTemplateReturnType {
   to: string;
@@ -178,6 +189,23 @@ export interface SmsHandlerOptions {
 }
 
 /**
+ * Explicit interface for SMS handler configuration
+ */
+export interface SmsHandler<TRequest, TResponse, TUrlVariables> {
+  readonly ignoreErrors?: boolean;
+  readonly render: SmsFunctionType<TRequest, TResponse, TUrlVariables>;
+}
+
+/**
+ * Explicit interface for SMS configuration
+ */
+export interface SmsConfig<TRequest, TResponse, TUrlVariables> {
+  afterHandlerSms?: ReadonlyArray<
+    SmsHandler<TRequest, TResponse, TUrlVariables>
+  >;
+}
+
+/**
  * Zod schema for E.164 phone number validation
  * Shared across all SMS providers for consistency
  */
@@ -208,11 +236,7 @@ export function validateE164PhoneNumber(
         }
         return { valid: true };
       }
-    } catch (error) {
-      errorLogger(
-        "Invalid SMS_HTTP_PHONE_REGEX, falling back to default",
-        error,
-      );
+    } catch {
       // Fall back to standard validation if regex is invalid
     }
   }

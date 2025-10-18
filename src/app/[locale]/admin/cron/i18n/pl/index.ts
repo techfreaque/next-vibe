@@ -1,54 +1,52 @@
-import type { translations as enTranslations } from "../en";
+// Parent aggregator for cron translations
+// Imports from co-located child directory i18n folders
+import { translations as historyTranslations } from "../../history/i18n/pl";
+import { translations as statsTranslations } from "../../stats/i18n/pl";
+import { translations as taskTranslations } from "../../task/i18n/pl";
+import { translations as tasksTranslations } from "../../tasks/i18n/pl";
 
-export const translations: typeof enTranslations = {
-  post: {
-    title: "Tytuł",
-    description: "Opis endpointu",
-    form: {
-      title: "Konfiguracja",
-      description: "Skonfiguruj parametry",
-    },
-    response: {
-      title: "Odpowiedź",
-      description: "Dane odpowiedzi",
-    },
-    errors: {
-      unauthorized: {
-        title: "Brak autoryzacji",
-        description: "Wymagana autoryzacja",
+export const translations = {
+  history: historyTranslations,
+  stats: statsTranslations,
+  task: taskTranslations,
+  tasks: tasksTranslations,
+  // Shared cron-level translations (Polish)
+  nav: {
+    stats: "Statystyki",
+    stats_description: "Zobacz statystyki i metryki wydajności zadań cron",
+    tasks: "Zadania",
+    tasks_description: "Zarządzaj i konfiguruj zadania cron",
+    history: "Historia",
+    history_description: "Zobacz historię wykonywania zadań cron",
+  },
+  buttons: {
+    previous: "Poprzedni",
+    next: "Następny",
+  },
+  executionHistory: {
+    titleWithCount: "Historia wykonań ({{count}})",
+    pagination: "Pokazuje {{from}} do {{to}} z {{total}}",
+    errorType: "Typ błędu",
+  },
+  cronErrors: {
+    admin: {
+      interface: {
+        noResults: "Brak wyników",
+        filter: "Filtruj",
+        clear: "Wyczyść",
+        executionHistory: {
+          searchPlaceholder: "Szukaj według nazwy zadania...",
+          statusFilter: "Filtruj według statusu",
+          startDate: "Data rozpoczęcia",
+          endDate: "Data zakończenia",
+          loadingHistory: "Ładowanie historii wykonań...",
+          noHistory: "Nie znaleziono historii wykonań",
+          started: "Rozpoczęto",
+          duration: "Czas trwania",
+          completed: "Zakończono",
+          errorDetails: "Szczegóły błędu",
+        },
       },
-      validation: {
-        title: "Błąd walidacji",
-        description: "Nieprawidłowe parametry żądania",
-      },
-      server: {
-        title: "Błąd serwera",
-        description: "Wystąpił wewnętrzny błąd serwera",
-      },
-      unknown: {
-        title: "Nieznany błąd",
-        description: "Wystąpił nieznany błąd",
-      },
-      network: {
-        title: "Błąd sieci",
-        description: "Wystąpił błąd sieci",
-      },
-      forbidden: {
-        title: "Zabronione",
-        description: "Dostęp zabroniony",
-      },
-      notFound: {
-        title: "Nie znaleziono",
-        description: "Zasób nie został znaleziony",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Wystąpił konflikt danych",
-      },
-    },
-    success: {
-      title: "Sukces",
-      description: "Operacja zakończona pomyślnie",
     },
   },
-};
+} as const;

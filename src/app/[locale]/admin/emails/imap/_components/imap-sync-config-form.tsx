@@ -22,7 +22,7 @@ export function ImapSyncConfigForm(): JSX.Element {
         name="syncEnabled"
         config={{
           type: "switch",
-          label: "imap.config.sync.enabled",
+          label: "app.admin.emails.imap.config.sync.enabled",
         }}
         control={configEndpoint.create.form.control}
       />
@@ -31,7 +31,7 @@ export function ImapSyncConfigForm(): JSX.Element {
         name="syncInterval"
         config={{
           type: "number",
-          label: "imap.config.sync.interval",
+          label: "app.admin.emails.imap.config.sync.interval",
           placeholder: undefined,
         }}
         control={configEndpoint.create.form.control}
@@ -41,7 +41,7 @@ export function ImapSyncConfigForm(): JSX.Element {
         name="batchSize"
         config={{
           type: "number",
-          label: "imap.config.sync.batchSize",
+          label: "app.admin.emails.imap.config.sync.batchSize",
           placeholder: undefined,
         }}
         control={configEndpoint.create.form.control}
@@ -51,7 +51,7 @@ export function ImapSyncConfigForm(): JSX.Element {
         name="maxMessages"
         config={{
           type: "number",
-          label: "imap.config.sync.maxMessages",
+          label: "app.admin.emails.imap.config.sync.maxMessages",
           placeholder: undefined,
         }}
         control={configEndpoint.create.form.control}
@@ -61,7 +61,7 @@ export function ImapSyncConfigForm(): JSX.Element {
         name="concurrentAccounts"
         config={{
           type: "number",
-          label: "imap.config.sync.concurrentAccounts",
+          label: "app.admin.emails.imap.config.sync.concurrentAccounts",
           placeholder: undefined,
         }}
         control={configEndpoint.create.form.control}

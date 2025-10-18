@@ -9,9 +9,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
 import CallToAction from "../_components/call-to-action";
-import Testimonials from "../testimonials/_components/testimonials";
-import PricingComparisonTable from "./_components/pricing-comparison-table";
-import PricingSection from "./_components/pricing-section";
+// import Testimonials from "../testimonials/_components/testimonials"; // Removed - testimonials component deleted
+import CreditPricingSection from "./_components/credit-pricing";
 import SubscriptionBanner from "./_components/subscription-banner";
 
 interface Props {
@@ -30,14 +29,14 @@ export const generateMetadata = async ({
     title: "meta.pricing.title",
     category: "meta.billing.category",
     description: "meta.pricing.description",
-    image: "https://socialmediaservice.com/images/pricing-hero.jpg",
+    image: "https://unbottled.ai/images/pricing-hero.jpg",
     imageAlt: "meta.pricing.imageAlt",
     keywords: ["meta.pricing.keywords"],
     additionalMetadata: {
       openGraph: {
         title: "meta.pricing.ogTitle",
         description: "meta.pricing.ogDescription",
-        url: "https://socialmediaservice.com/pricing",
+        url: "https://unbottled.ai/pricing",
         type: "website",
       },
       twitter: {
@@ -77,17 +76,13 @@ export default async function PricingPage({
       {user && subscription && (
         <SubscriptionBanner locale={locale} subscription={subscription} />
       )}
-      <PricingSection
+      <CreditPricingSection
         locale={locale}
         currentUser={user}
-        currentSubscription={subscription}
         useHomePageLink
-        hideFooterAndHeader={false}
-        isProcessing={null}
       />
 
-      <Testimonials locale={locale} />
-      <PricingComparisonTable locale={locale} />
+      {/* <Testimonials locale={locale} /> */}
       <CallToAction locale={locale} />
     </>
   );

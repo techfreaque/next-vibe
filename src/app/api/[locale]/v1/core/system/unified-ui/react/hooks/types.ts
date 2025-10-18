@@ -190,7 +190,6 @@ export interface ApiQueryFormReturn<TRequest, TResponse, TUrlVariables>
 }
 
 // Form-specific types
-// @ts-ignore - Intentionally ignoring FieldValues constraint requirement
 export type ApiFormOptions<TRequest> = UseFormProps<TRequest> & {
   defaultValues?: Partial<TRequest>;
   /**

@@ -55,10 +55,10 @@ export default async function CronTaskEditPage({
     <div className="container mx-auto py-6">
       <div className="mb-6">
         <h1 className="text-3xl font-bold">
-          {t("admin.dashboard.cron.taskDetails.edit")}
+          {t("app.admin.cron.taskDetails.edit")}
         </h1>
         <p className="text-muted-foreground">
-          {t("admin.dashboard.cron.taskDetails.editDescription")}
+          {t("app.admin.cron.taskDetails.editDescription")}
         </p>
       </div>
 
@@ -78,7 +78,7 @@ export async function generateMetadata({
   const { t } = simpleT(locale);
 
   return {
-    title: t("admin.dashboard.cron.taskDetails.edit"),
-    description: t("admin.dashboard.cron.taskDetails.editDescription"),
+    title: t("app.admin.cron.taskDetails.edit"),
+    description: t("app.admin.cron.taskDetails.editDescription"),
   };
 }

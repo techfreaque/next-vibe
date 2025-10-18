@@ -1,16 +1,16 @@
-import type { ColumnDef, Row, SortingState } from "@tanstack/react-table";
+import type { ColumnDef, Row, SortingState } from '@tanstack/react-table';
 import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table";
-import * as React from "react";
-import { ActivityIndicator, Dimensions, RefreshControl } from "react-native";
-import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
+} from '@tanstack/react-table';
+import * as React from 'react';
+import { ActivityIndicator, Dimensions, RefreshControl } from 'react-native';
+import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated';
 
-import { cn } from "../../lib/utils";
-import type { TableRowsFlashListProps } from "./table";
+import { cn } from '../../lib/utils';
+import type { TableRowsFlashListProps } from './table';
 import {
   Table,
   TableBody,
@@ -19,15 +19,15 @@ import {
   TableHeader,
   TableRow,
   TableRowsList,
-} from "./table";
+} from './table';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onRowPress?: (row: Row<TData>) => void;
   estimatedItemSize?: number;
-  ListEmptyComponent?: TableRowsFlashListProps<TData>["ListEmptyComponent"];
-  ListFooterComponent?: TableRowsFlashListProps<TData>["ListFooterComponent"];
+  ListEmptyComponent?: TableRowsFlashListProps<TData>['ListEmptyComponent'];
+  ListFooterComponent?: TableRowsFlashListProps<TData>['ListFooterComponent'];
   isRefreshing?: boolean;
   onRefresh?: () => void;
 }
@@ -64,9 +64,9 @@ export function DataTable<TData, TValue>({
         <Animated.View
           entering={FadeInUp}
           exiting={FadeOutUp}
-          className="h-14 top-16 absolute items-center justify-center w-screen"
+          className='h-14 top-16 absolute items-center justify-center w-screen'
         >
-          <ActivityIndicator size="small" className="text-foreground" />
+          <ActivityIndicator size='small' className='text-foreground' />
         </Animated.View>
       )}
       <Table>
@@ -81,10 +81,7 @@ export function DataTable<TData, TValue>({
                   >
                     {header.isPlaceholder
                       ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                      : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 );
               })}
@@ -108,8 +105,8 @@ export function DataTable<TData, TValue>({
               return (
                 <TableRow
                   className={cn(
-                    "active:opacity-70",
-                    index % 2 && "bg-zinc-100/50 dark:bg-zinc-900/50",
+                    'active:opacity-70',
+                    index % 2 && 'bg-zinc-100/50 dark:bg-zinc-900/50'
                   )}
                   onPress={
                     onRowPress
@@ -122,15 +119,9 @@ export function DataTable<TData, TValue>({
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      width={getColumnWidth(
-                        cell.column.getSize(),
-                        columns.length,
-                      )}
+                      width={getColumnWidth(cell.column.getSize(), columns.length)}
                     >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -143,7 +134,7 @@ export function DataTable<TData, TValue>({
   );
 }
 
-const { width } = Dimensions.get("window");
+const { width } = Dimensions.get('window');
 
 function getColumnWidth(size: number, length: number) {
   const evenWidth = width / length;

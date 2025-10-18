@@ -3,6 +3,10 @@
  * Generates and stores sequential post numbers for messages
  */
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
 import { POST_NUMBER_CONFIG } from "../config/constants";
 
 const POST_NUMBER_KEY = "chat-post-numbers";
@@ -15,16 +19,16 @@ interface PostNumberMap {
 /**
  * Get all post numbers from localStorage
  */
-function getPostNumberMap(): PostNumberMap {
+function getPostNumberMap(logger: EndpointLogger): PostNumberMap {
   if (typeof window === "undefined") {
     return {};
   }
 
   try {
     const stored = localStorage.getItem(POST_NUMBER_KEY);
-    return stored ? JSON.parse(stored) : {};
+    return stored ? (JSON.parse(stored) as PostNumberMap) : {};
   } catch (error) {
-    console.error("[Post Numbers] Error reading post numbers:", error);
+    logger.error("Storage", "Error reading post numbers", error);
     return {};
   }
 }
@@ -32,7 +36,7 @@ function getPostNumberMap(): PostNumberMap {
 /**
  * Save post numbers to localStorage
  */
-function savePostNumberMap(map: PostNumberMap): void {
+function savePostNumberMap(map: PostNumberMap, logger: EndpointLogger): void {
   if (typeof window === "undefined") {
     return;
   }
@@ -40,14 +44,14 @@ function savePostNumberMap(map: PostNumberMap): void {
   try {
     localStorage.setItem(POST_NUMBER_KEY, JSON.stringify(map));
   } catch (error) {
-    console.error("[Post Numbers] Error saving post numbers:", error);
+    logger.error("Storage", "Error saving post numbers", error);
   }
 }
 
 /**
  * Get current counter value
  */
-function getCounter(): number {
+function getCounter(logger: EndpointLogger): number {
   if (typeof window === "undefined") {
     return POST_NUMBER_CONFIG.START_NUMBER;
   }
@@ -56,7 +60,7 @@ function getCounter(): number {
     const stored = localStorage.getItem(POST_NUMBER_COUNTER_KEY);
     return stored ? parseInt(stored, 10) : POST_NUMBER_CONFIG.START_NUMBER;
   } catch (error) {
-    console.error("[Post Numbers] Error reading counter:", error);
+    logger.error("Storage", "Error reading counter", error);
     return POST_NUMBER_CONFIG.START_NUMBER;
   }
 }
@@ -64,7 +68,7 @@ function getCounter(): number {
 /**
  * Save counter value
  */
-function saveCounter(value: number): void {
+function saveCounter(value: number, logger: EndpointLogger): void {
   if (typeof window === "undefined") {
     return;
   }
@@ -72,7 +76,7 @@ function saveCounter(value: number): void {
   try {
     localStorage.setItem(POST_NUMBER_COUNTER_KEY, value.toString());
   } catch (error) {
-    console.error("[Post Numbers] Error saving counter:", error);
+    logger.error("Storage", "Error saving counter", error);
   }
 }
 
@@ -80,8 +84,11 @@ function saveCounter(value: number): void {
  * Get or generate post number for a message
  * Returns existing number if already assigned, otherwise generates new one
  */
-export function getPostNumber(messageId: string): number {
-  const map = getPostNumberMap();
+export function getPostNumber(
+  messageId: string,
+  logger: EndpointLogger,
+): number {
+  const map = getPostNumberMap(logger);
 
   // Return existing number if found
   if (map[messageId]) {
@@ -89,13 +96,13 @@ export function getPostNumber(messageId: string): number {
   }
 
   // Generate new number
-  const counter = getCounter();
+  const counter = getCounter(logger);
   const newNumber = counter;
 
   // Save new number
   map[messageId] = newNumber;
-  savePostNumberMap(map);
-  saveCounter(counter + 1);
+  savePostNumberMap(map, logger);
+  saveCounter(counter + 1, logger);
 
   return newNumber;
 }
@@ -104,9 +111,12 @@ export function getPostNumber(messageId: string): number {
  * Get post numbers for multiple messages at once
  * More efficient than calling getPostNumber multiple times
  */
-export function getPostNumbers(messageIds: string[]): Record<string, number> {
-  const map = getPostNumberMap();
-  let counter = getCounter();
+export function getPostNumbers(
+  messageIds: string[],
+  logger: EndpointLogger,
+): Record<string, number> {
+  const map = getPostNumberMap(logger);
+  let counter = getCounter(logger);
   let hasNewNumbers = false;
 
   const result: Record<string, number> = {};
@@ -124,8 +134,8 @@ export function getPostNumbers(messageIds: string[]): Record<string, number> {
 
   // Save if we generated any new numbers
   if (hasNewNumbers) {
-    savePostNumberMap(map);
-    saveCounter(counter);
+    savePostNumberMap(map, logger);
+    saveCounter(counter, logger);
   }
 
   return result;
@@ -134,7 +144,7 @@ export function getPostNumbers(messageIds: string[]): Record<string, number> {
 /**
  * Clear all post numbers (for testing/reset)
  */
-export function clearPostNumbers(): void {
+export function clearPostNumbers(logger: EndpointLogger): void {
   if (typeof window === "undefined") {
     return;
   }
@@ -143,13 +153,17 @@ export function clearPostNumbers(): void {
     localStorage.removeItem(POST_NUMBER_KEY);
     localStorage.removeItem(POST_NUMBER_COUNTER_KEY);
   } catch (error) {
-    console.error("[Post Numbers] Error clearing post numbers:", error);
+    logger.error("Storage", "Error clearing post numbers", error);
   }
 }
 
 /**
  * Format post number for display (e.g., "No.1234567")
  */
-export function formatPostNumber(postNumber: number): string {
-  return `No.${postNumber}`;
+export function formatPostNumber(
+  postNumber: number,
+  locale: CountryLanguage,
+): string {
+  const { t } = simpleT(locale);
+  return t("app.chat.messages.postNumber", { number: postNumber });
 }

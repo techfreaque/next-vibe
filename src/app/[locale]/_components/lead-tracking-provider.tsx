@@ -30,7 +30,7 @@ export function LeadTrackingProvider(): null {
         const storedLeadId = result.success ? result.data?.leadId : undefined;
 
         // Call the engagement endpoint to validate/create lead ID
-        const apiUrl = `/api/${locale}/v1/leads/tracking/engagement`;
+        const apiUrl = `/api/${locale}/v1/core/leads/tracking/engagement`;
         const response = await fetch(apiUrl, {
           method: "POST",
           headers: {

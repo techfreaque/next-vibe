@@ -22,8 +22,6 @@ export function useImportJobEndpoint(
   },
   logger: EndpointLogger,
 ): EndpointReturn<typeof definitions> {
-  // TODO: Fix URL parameter typing issue
-  // For now, return a simplified hook without URL parameters
   return useEndpoint(
     definitions,
     {
@@ -33,6 +31,9 @@ export function useImportJobEndpoint(
       persistForm: false,
       // eslint-disable-next-line i18next/no-literal-string
       persistenceKey: `import-job-${params.jobId}-form`,
+      urlPathVariables: {
+        jobId: params.jobId,
+      },
     },
     logger,
   );

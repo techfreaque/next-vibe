@@ -13,6 +13,7 @@ import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
 import { cn } from "@/packages/next-vibe/shared/utils";
@@ -161,7 +162,7 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
 
       {/* Render main content */}
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkBreaks]}
         components={{
           h1: ({ children }) => (
             <h1 className="text-3xl font-bold mb-4 mt-8 first:mt-0 leading-tight text-slate-900 dark:text-slate-50 tracking-tight">

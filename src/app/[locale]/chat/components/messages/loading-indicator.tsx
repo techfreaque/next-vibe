@@ -1,14 +1,11 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import type { JSX } from "react";
 
-import {
-  chatAnimations,
-  chatColors,
-  chatShadows,
-} from "../../lib/design-tokens";
+import { chatAnimations } from "../../lib/design-tokens";
 
-export function LoadingIndicator() {
+export function LoadingIndicator(): JSX.Element {
   return (
     <div className={cn("flex items-start gap-3", chatAnimations.fadeIn)}>
       <div className="flex-1">

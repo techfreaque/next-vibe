@@ -46,7 +46,7 @@ export async function generateMetadata({
     title: "layout.metadata.defaultTitle",
     category: "layout.metadata.category",
     description: "layout.metadata.description",
-    image: "https://socialmediaservice.com/og-image.jpg",
+    image: "https://unbottled.ai/og-image.jpg",
     imageAlt: "layout.openGraph.imageAlt",
     keywords: ["meta.home.keywords"],
   });
@@ -67,24 +67,22 @@ export default async function RootLayoutServer({
   const structuredData = {
     "@context": "https://schema.org",
     "@type": t("layout.structuredData.organization.types.organization"),
-    "name": t("layout.structuredData.organization.name"),
-    "url": "https://socialmediaservice.com",
-    "logo": "https://socialmediaservice.com/logo.png",
-    "sameAs": [
+    name: t("layout.structuredData.organization.name"),
+    url: "https://unbottled.ai",
+    logo: "https://unbottled.ai/logo.png",
+    sameAs: [
       "https://facebook.com/socialmediaservice",
       "https://twitter.com/socialmediaservice",
       "https://instagram.com/socialmediaservice",
       "https://linkedin.com/company/socialmediaservice",
     ],
-    "contactPoint": {
+    contactPoint: {
       "@type": t("layout.structuredData.organization.types.contactPoint"),
-      "telephone": t(
-        "layout.structuredData.organization.contactPoint.telephone",
-      ),
-      "contactType": t(
+      telephone: t("layout.structuredData.organization.contactPoint.telephone"),
+      contactType: t(
         "layout.structuredData.organization.contactPoint.contactType",
       ),
-      "availableLanguage": [
+      availableLanguage: [
         t("constants.languages.en"),
         t("constants.languages.de"),
         t("constants.languages.pl"),

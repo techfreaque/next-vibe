@@ -223,6 +223,13 @@ export default allTasks;
     const taskFiles = await glob("src/app/api/**/task.ts", {
       cwd: process.cwd(),
       absolute: true,
+      ignore: [
+        "**/node_modules/**",
+        "**/.git/**",
+        "**/.next/**",
+        "**/dist/**",
+        "**/.dist/**",
+      ],
     });
     return taskFiles;
   }
@@ -236,6 +243,13 @@ export default allTasks;
     const runnerFiles = await glob("src/app/api/**/*task-runner.ts", {
       cwd: process.cwd(),
       absolute: true,
+      ignore: [
+        "**/node_modules/**",
+        "**/.git/**",
+        "**/.next/**",
+        "**/dist/**",
+        "**/.dist/**",
+      ],
     });
     return runnerFiles;
   }
@@ -252,6 +266,13 @@ export default allTasks;
     const candidateFiles = await glob("src/app/api/**/side-tasks.ts", {
       cwd: process.cwd(),
       absolute: true,
+      ignore: [
+        "**/node_modules/**",
+        "**/.git/**",
+        "**/.next/**",
+        "**/dist/**",
+        "**/.dist/**",
+      ],
     });
 
     const sideTaskFiles: string[] = [];
@@ -311,7 +332,7 @@ export default allTasks;
 
           if (hasLegacyExports) {
             logger.debug(
-              `Task file ${file} has legacy exports - ensure unified format is also present`,
+              `Task file ${file} has legacy exports - properly migrate to new format`,
             );
           }
         } catch (error) {

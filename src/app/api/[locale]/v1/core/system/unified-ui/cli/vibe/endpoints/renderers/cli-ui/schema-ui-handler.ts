@@ -4,7 +4,7 @@
  * Integrates with existing CLI handler system
  */
 
-import inquirer from "inquirer";
+import { input, select, confirm, checkbox } from "@inquirer/prompts";
 import { z } from "zod";
 
 /**
@@ -243,28 +243,59 @@ export class SchemaUIHandler {
     const answers: InquirerAnswer = {};
 
     for (const field of config.fields) {
-      const questionObj = {
-        type: field.type,
-        name: field.name,
-        message: this.formatFieldMessage(field),
-        ...(field.defaultValue !== undefined && {
-          default: field.defaultValue,
-        }),
-        ...(field.choices && { choices: field.choices }),
-        ...(field.validation && {
-          validate: (input: FormFieldValue): boolean | string =>
-            this.validateField(input, field.validation!),
-        }),
-        ...(field.type === "number" && {
-          filter: (input: string): string | number => {
-            const num = parseFloat(input);
-            return isNaN(num) ? input : num;
-          },
-        }),
-      };
+      const message = this.formatFieldMessage(field);
+      let value: FormFieldValue;
 
-      const result = await inquirer.prompt([questionObj]);
-      const value = result[field.name] as FormFieldValue;
+      // Use appropriate prompt function based on field type
+      if (field.type === "confirm") {
+        value = await confirm({
+          message,
+          default: field.defaultValue as boolean | undefined,
+        });
+      } else if (field.type === "list" && field.choices) {
+        value = await select({
+          message,
+          choices: field.choices.map((choice) => ({
+            name: choice,
+            value: choice,
+          })),
+          default: field.defaultValue as string | undefined,
+        });
+      } else if (field.type === "checkbox" && field.choices) {
+        value = await checkbox({
+          message,
+          choices: field.choices.map((choice) => ({
+            name: choice,
+            value: choice,
+          })),
+        });
+      } else if (field.type === "number") {
+        const inputValue = await input({
+          message,
+          default: field.defaultValue?.toString(),
+          validate: field.validation
+            ? (inputStr) => {
+                const num = parseFloat(inputStr);
+                if (isNaN(num)) {
+                  return "Please enter a valid number";
+                }
+                return this.validateField(num, field.validation!);
+              }
+            : undefined,
+        });
+        const num = parseFloat(inputValue);
+        value = isNaN(num) ? undefined : num;
+      } else {
+        // Default to input for string fields
+        value = await input({
+          message,
+          default: field.defaultValue?.toString(),
+          validate: field.validation
+            ? (inputStr) => this.validateField(inputStr, field.validation!)
+            : undefined,
+        });
+      }
+
       if (value !== undefined) {
         answers[field.name] = value;
       }

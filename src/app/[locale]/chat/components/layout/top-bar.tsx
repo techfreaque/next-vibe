@@ -11,9 +11,11 @@ import {
   VolumeX,
 } from "lucide-react";
 import type { JSX } from "react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-import { useTranslation } from "@/i18n/core/client";
+import { Logo } from "@/app/[locale]/_components/nav/logo";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 import {
   Button,
   DropdownMenu,
@@ -26,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "@/packages/next-vibe-ui/web/ui";
 
+import type { ChatMessage } from "../../lib/storage/types";
 import { LocaleSelectorContent } from "../locale-selector-content";
 
 interface TopBarProps {
@@ -38,6 +41,9 @@ interface TopBarProps {
   onOpenSearch: () => void;
   sidebarCollapsed: boolean;
   onNewChat: () => void;
+  locale: CountryLanguage;
+  onNavigateToThreads?: () => void;
+  messages: ChatMessage[];
 }
 
 export function TopBar({
@@ -50,18 +56,27 @@ export function TopBar({
   onOpenSearch,
   sidebarCollapsed,
   onNewChat,
+  locale,
+  onNavigateToThreads,
+  messages,
 }: TopBarProps): JSX.Element {
-  const { t } = useTranslation("chat");
+  const { t } = simpleT(locale);
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch by only rendering conditional UI after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
-    <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-51 flex gap-1">
+    <div className="absolute top-4 left-4 z-51 flex gap-1">
       {/* Menu Button */}
       <Button
         variant="ghost"
         size="icon"
         onClick={onToggleSidebar}
-        className="bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-10 w-10 sm:h-9 sm:w-9"
-        title={t("common.toggleSidebar")}
+        className="bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-9 w-9"
+        title={t("app.chat.common.toggleSidebar")}
       >
         <Menu className="h-5 w-5" />
       </Button>
@@ -72,8 +87,8 @@ export function TopBar({
           <Button
             variant="ghost"
             size="icon"
-            className="bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-10 w-10 sm:h-9 sm:w-9"
-            title={t("common.settings")}
+            className="bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-9 w-9"
+            title={t("app.chat.common.settings")}
           >
             <Settings className="h-5 w-5" />
           </Button>
@@ -84,12 +99,12 @@ export function TopBar({
             {theme === "dark" ? (
               <>
                 <Sun className="h-4 w-4 mr-2" />
-                {t("common.lightMode")}
+                {t("app.chat.common.lightMode")}
               </>
             ) : (
               <>
                 <Moon className="h-4 w-4 mr-2" />
-                {t("common.darkMode")}
+                {t("app.chat.common.darkMode")}
               </>
             )}
           </DropdownMenuItem>
@@ -99,12 +114,12 @@ export function TopBar({
             {ttsAutoplay ? (
               <>
                 <VolumeX className="h-4 w-4 mr-2" />
-                {t("common.disableTTSAutoplay")}
+                {t("app.chat.common.disableTTSAutoplay")}
               </>
             ) : (
               <>
                 <Volume2 className="h-4 w-4 mr-2" />
-                {t("common.enableTTSAutoplay")}
+                {t("app.chat.common.enableTTSAutoplay")}
               </>
             )}
           </DropdownMenuItem>
@@ -124,15 +139,15 @@ export function TopBar({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {sidebarCollapsed && (
+      {mounted && sidebarCollapsed && (
         <>
-          {/* Search Button */}
+          {/* Search Button - Navigate to threads page when sidebar collapsed */}
           <Button
             variant="ghost"
             size="icon"
-            onClick={onOpenSearch}
-            className="bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-10 w-10 sm:h-9 sm:w-9"
-            title={t("common.search")}
+            onClick={onNavigateToThreads || onOpenSearch}
+            className="bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-9 w-9"
+            title={t("app.chat.common.search")}
           >
             <Search className="h-5 w-5" />
           </Button>
@@ -141,12 +156,22 @@ export function TopBar({
             variant="ghost"
             size="icon"
             onClick={onNewChat}
-            className="bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-10 w-10 sm:h-9 sm:w-9"
-            title={t("common.newChat")}
+            className="bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 h-9 w-9"
+            title={t("app.chat.common.newChat")}
           >
             <MessageSquarePlus className="h-5 w-5" />
           </Button>
         </>
+      )}
+      {(!sidebarCollapsed || messages.length === 0) && (
+        <div className="flex-1 flex justify-center">
+          <Logo
+            locale={locale}
+            pathName=""
+            className="w-[150px] h-auto"
+            linkClassName="my-auto flex"
+          />
+        </div>
       )}
     </div>
   );

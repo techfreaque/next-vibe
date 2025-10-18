@@ -79,7 +79,7 @@ export const i18nConfig = [
               "key",
               "type",
               "className",
-              ".*ClassName$",
+              "*ClassName",
               "imageUrl",
               "style",
               "path",
@@ -105,6 +105,7 @@ export const i18nConfig = [
           "jsx-attributes": {
             exclude: [
               "className",
+              "*ClassName",
               "id",
               "data-testid",
               "to",

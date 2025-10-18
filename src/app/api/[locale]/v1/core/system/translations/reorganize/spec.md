@@ -67,12 +67,12 @@ export const apiV1Translations = {
 
 ```typescript
 export const api = {
-    title: "Contact Form Submission",
-    form: {
-        fields: {
-        name: { label: "Full Name" }
-        }
-    }
+  title: "Contact Form Submission",
+  form: {
+    fields: {
+      name: { label: "Full Name" },
+    },
+  },
 };
 ```
 

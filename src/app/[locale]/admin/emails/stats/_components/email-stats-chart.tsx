@@ -80,11 +80,13 @@ export function EmailStatsChart({
     return (
       <Card className={className}>
         <CardHeader>
-          <CardTitle>{t("common.noResults")}</CardTitle>
+          <CardTitle>{t("app.admin.emails.stats.common.noResults")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center" style={{ height }}>
-            <p className="text-muted-foreground">{t("common.noResults")}</p>
+            <p className="text-muted-foreground">
+              {t("app.admin.emails.stats.common.noResults")}
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -218,7 +220,7 @@ export function EmailStatsChart({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           {getChartIcon()}
-          {data.title || t("emails.admin.stats.chart.title")}
+          {data.title || t("app.admin.emails.stats.admin.stats.chart.title")}
         </CardTitle>
         {data.subtitle && (
           <p className="text-sm text-muted-foreground">{data.subtitle}</p>

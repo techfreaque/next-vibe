@@ -1,20 +1,15 @@
-import { FlashList, type FlashListProps } from "@shopify/flash-list";
-import type { ColumnDef, Row, SortingState } from "@tanstack/react-table";
+import { FlashList, type FlashListProps } from '@shopify/flash-list';
+import type { ColumnDef, Row, SortingState } from '@tanstack/react-table';
 import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table";
-import * as React from "react";
-import {
-  ActivityIndicator,
-  Dimensions,
-  RefreshControl,
-  ScrollView,
-} from "react-native";
-import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+} from '@tanstack/react-table';
+import * as React from 'react';
+import { ActivityIndicator, Dimensions, RefreshControl, ScrollView } from 'react-native';
+import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   Table,
@@ -23,16 +18,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../components/ui/table";
-import { cn } from "../../lib/utils";
+} from '../../components/ui/table';
+import { cn } from '../../lib/utils';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onRowPress?: (row: Row<TData>) => void;
   estimatedItemSize?: number;
-  ListEmptyComponent?: FlashListProps<TData>["ListEmptyComponent"];
-  ListFooterComponent?: FlashListProps<TData>["ListFooterComponent"];
+  ListEmptyComponent?: FlashListProps<TData>['ListEmptyComponent'];
+  ListFooterComponent?: FlashListProps<TData>['ListFooterComponent'];
   isRefreshing?: boolean;
   onRefresh?: () => void;
 }
@@ -70,16 +65,12 @@ export function DataTable<TData, TValue>({
         <Animated.View
           entering={FadeInUp}
           exiting={FadeOutUp}
-          className="h-14 top-16 absolute items-center justify-center w-screen"
+          className='h-14 top-16 absolute items-center justify-center w-screen'
         >
-          <ActivityIndicator size="small" className="text-foreground" />
+          <ActivityIndicator size='small' className='text-foreground' />
         </Animated.View>
       )}
-      <ScrollView
-        horizontal
-        bounces={false}
-        showsHorizontalScrollIndicator={false}
-      >
+      <ScrollView horizontal bounces={false} showsHorizontalScrollIndicator={false}>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -94,10 +85,7 @@ export function DataTable<TData, TValue>({
                     >
                       {header.isPlaceholder
                         ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                        : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   );
                 })}
@@ -125,8 +113,8 @@ export function DataTable<TData, TValue>({
                 return (
                   <TableRow
                     className={cn(
-                      "active:opacity-70",
-                      index % 2 && "bg-zinc-100/50 dark:bg-zinc-900/50",
+                      'active:opacity-70',
+                      index % 2 && 'bg-zinc-100/50 dark:bg-zinc-900/50'
                     )}
                     onPress={
                       onRowPress
@@ -140,16 +128,10 @@ export function DataTable<TData, TValue>({
                       <TableCell
                         key={cell.id}
                         style={{
-                          width: getColumnWidth(
-                            cell.column.getSize(),
-                            columns.length,
-                          ),
+                          width: getColumnWidth(cell.column.getSize(), columns.length),
                         }}
                       >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -163,7 +145,7 @@ export function DataTable<TData, TValue>({
   );
 }
 
-const { width } = Dimensions.get("window");
+const { width } = Dimensions.get('window');
 
 function getColumnWidth(size: number, length: number) {
   const evenWidth = width / length;

@@ -322,3 +322,9 @@ export function isFailureStatus(status: typeof CronTaskStatusValue): boolean {
 export function isSuccessStatus(status: typeof CronTaskStatusValue): boolean {
   return status === CronTaskStatus.COMPLETED;
 }
+
+/**
+ * Backward compatibility aliases
+ */
+export const TaskPriorityDB = CronTaskPriorityDB;
+export const TaskStatusDB = CronTaskStatusDB;

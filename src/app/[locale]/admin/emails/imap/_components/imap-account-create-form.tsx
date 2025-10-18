@@ -50,8 +50,8 @@ export function ImapAccountCreateForm({
             name="name"
             config={{
               type: "text",
-              label: "imap.account.fields.name",
-              placeholder: "imap.account.placeholders.name",
+              label: "app.admin.emails.imap.account.fields.name",
+              placeholder: "app.admin.emails.imap.account.placeholders.name",
             }}
             control={endpoint.create.form.control}
             theme={{
@@ -64,8 +64,8 @@ export function ImapAccountCreateForm({
             name="email"
             config={{
               type: "email",
-              label: "imap.account.fields.email",
-              placeholder: "imap.account.placeholders.email",
+              label: "app.admin.emails.imap.account.fields.email",
+              placeholder: "app.admin.emails.imap.account.placeholders.email",
             }}
             control={endpoint.create.form.control}
             theme={{
@@ -78,8 +78,8 @@ export function ImapAccountCreateForm({
             name="host"
             config={{
               type: "text",
-              label: "imap.account.fields.host",
-              placeholder: "imap.account.fields.host",
+              label: "app.admin.emails.imap.account.fields.host",
+              placeholder: "app.admin.emails.imap.account.fields.host",
             }}
             control={endpoint.create.form.control}
             theme={{
@@ -92,8 +92,8 @@ export function ImapAccountCreateForm({
             name="port"
             config={{
               type: "number",
-              label: "imap.account.fields.port",
-              placeholder: "imap.account.fields.port",
+              label: "app.admin.emails.imap.account.fields.port",
+              placeholder: "app.admin.emails.imap.account.fields.port",
             }}
             control={endpoint.create.form.control}
             theme={{
@@ -109,8 +109,8 @@ export function ImapAccountCreateForm({
             name="username"
             config={{
               type: "text",
-              label: "imap.account.fields.username",
-              placeholder: "imap.account.fields.username",
+              label: "app.admin.emails.imap.account.fields.username",
+              placeholder: "app.admin.emails.imap.account.fields.username",
             }}
             control={endpoint.create.form.control}
             theme={{
@@ -123,8 +123,8 @@ export function ImapAccountCreateForm({
             name="password"
             config={{
               type: "password",
-              label: "imap.account.fields.password",
-              placeholder: "imap.account.fields.password",
+              label: "app.admin.emails.imap.account.fields.password",
+              placeholder: "app.admin.emails.imap.account.fields.password",
             }}
             control={endpoint.create.form.control}
             theme={{
@@ -137,11 +137,11 @@ export function ImapAccountCreateForm({
             name="authMethod"
             config={{
               type: "select",
-              label: "imap.account.fields.authMethod",
-              placeholder: "imap.account.fields.authMethod",
+              label: "app.admin.emails.imap.account.fields.authMethod",
+              placeholder: "app.admin.emails.imap.account.fields.authMethod",
               options: [
-                { value: ImapAuthMethod.PLAIN, label: "imap.auth.plain" },
-                { value: ImapAuthMethod.OAUTH2, label: "imap.auth.oauth2" },
+                { value: ImapAuthMethod.PLAIN, label: "app.admin.emails.imap.auth.plain" },
+                { value: ImapAuthMethod.OAUTH2, label: "app.admin.emails.imap.auth.oauth2" },
               ],
             }}
             control={endpoint.create.form.control}
@@ -155,7 +155,7 @@ export function ImapAccountCreateForm({
             name="secure"
             config={{
               type: "checkbox",
-              label: "imap.account.fields.secure",
+              label: "app.admin.emails.imap.account.fields.secure",
             }}
             control={endpoint.create.form.control}
             theme={{
@@ -169,7 +169,7 @@ export function ImapAccountCreateForm({
       {/* Advanced Settings */}
       <div className="space-y-4">
         <h3 className="text-lg font-medium">
-          {t("imap.account.sections.advanced")}
+          {t("app.admin.emails.imap.account.sections.advanced")}
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -177,8 +177,8 @@ export function ImapAccountCreateForm({
             name="connectionTimeout"
             config={{
               type: "number",
-              label: "imap.account.fields.connectionTimeout",
-              placeholder: "imap.account.fields.connectionTimeout",
+              label: "app.admin.emails.imap.account.fields.connectionTimeout",
+              placeholder: "app.admin.emails.imap.account.fields.connectionTimeout",
             }}
             control={endpoint.create.form.control}
             theme={{
@@ -191,8 +191,8 @@ export function ImapAccountCreateForm({
             name="syncInterval"
             config={{
               type: "number",
-              label: "imap.account.fields.syncInterval",
-              placeholder: "imap.account.fields.syncInterval",
+              label: "app.admin.emails.imap.account.fields.syncInterval",
+              placeholder: "app.admin.emails.imap.account.fields.syncInterval",
             }}
             control={endpoint.create.form.control}
             theme={{
@@ -205,8 +205,8 @@ export function ImapAccountCreateForm({
             name="maxMessages"
             config={{
               type: "number",
-              label: "imap.account.fields.maxMessages",
-              placeholder: "imap.account.fields.maxMessages",
+              label: "app.admin.emails.imap.account.fields.maxMessages",
+              placeholder: "app.admin.emails.imap.account.fields.maxMessages",
             }}
             control={endpoint.create.form.control}
             theme={{
@@ -220,7 +220,7 @@ export function ImapAccountCreateForm({
           name="enabled"
           config={{
             type: "checkbox",
-            label: "imap.account.fields.enabled",
+            label: "app.admin.emails.imap.account.fields.enabled",
           }}
           control={endpoint.create.form.control}
           theme={{
@@ -233,7 +233,7 @@ export function ImapAccountCreateForm({
           name="keepAlive"
           config={{
             type: "checkbox",
-            label: "imap.account.fields.keepAlive",
+            label: "app.admin.emails.imap.account.fields.keepAlive",
           }}
           control={endpoint.create.form.control}
           theme={{
@@ -247,12 +247,12 @@ export function ImapAccountCreateForm({
       {/* Form Actions */}
       <div className="flex items-center justify-end space-x-4">
         <Button type="button" variant="outline" onClick={onCancel}>
-          {t("imap.common.cancel")}
+          {t("app.admin.emails.imap.common.cancel")}
         </Button>
         <Button type="submit" disabled={endpoint.create?.isSubmitting}>
           {endpoint.create?.isSubmitting
-            ? t("imap.common.saving")
-            : t("imap.account.create")}
+            ? t("app.admin.emails.imap.common.saving")
+            : t("app.admin.emails.imap.account.create")}
         </Button>
       </div>
     </Form>

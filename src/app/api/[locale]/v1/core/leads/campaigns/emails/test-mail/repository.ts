@@ -21,7 +21,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { Countries, Languages } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { LeadWithEmailType } from "../../../definition";
@@ -61,7 +60,7 @@ class TestEmailRepository {
       signedUpAt: null,
       consultationBookedAt: null,
       subscriptionConfirmedAt: null,
-      currentCampaignStage: data.emailCampaignStage,
+      currentCampaignStage: data.emailCampaignStage || null,
       emailJourneyVariant: data.emailJourneyVariant,
       emailsSent: 0,
       lastEmailSentAt: null,
@@ -94,19 +93,6 @@ class TestEmailRepository {
         userId: user.id,
       });
 
-      // Use the locale from the form data (leadData.country and leadData.language)
-      // instead of the user's current locale from the URL
-      const emailLocale: CountryLanguage = `${data.leadData.language}-${data.leadData.country}`;
-      const { t } = simpleT(emailLocale);
-
-      // Validate that the email template exists
-      if (!data.emailJourneyVariant || !data.emailCampaignStage) {
-        return createErrorResponse(
-          "leadsErrors.leads.get.error.validation.title",
-          ErrorResponseTypes.VALIDATION_ERROR,
-        );
-      }
-
       if (
         !emailService.hasTemplate(
           data.emailJourneyVariant,
@@ -123,18 +109,10 @@ class TestEmailRepository {
         );
       }
 
-      // Create a mock lead object from the provided data
-      // Ensure email is not null for testing
-      if (!data.testEmail) {
-        return createErrorResponse(
-          "leadsErrors.testEmail.validation.testEmail.invalid",
-          ErrorResponseTypes.VALIDATION_ERROR,
-        );
-      }
-
       const mockLead = this.createMockLead(data, data.testEmail);
+      const emailLocale: CountryLanguage = `${data.leadData.language}-${data.leadData.country}`;
+      const { t } = simpleT(emailLocale);
 
-      // Generate the email content using the email service
       const emailContent = await emailService.renderEmail(
         mockLead,
         data.emailJourneyVariant,
@@ -161,18 +139,16 @@ class TestEmailRepository {
         );
       }
 
-      // Generate unsubscribe URL
       const unsubscribeUrl = `${env.NEXT_PUBLIC_APP_URL}/${emailLocale}/newsletter/unsubscribe/${encodeURIComponent(
         data.testEmail,
       )}`;
 
-      // Build selection criteria from the form data (now single values)
       const selectionCriteria = {
         campaignType: data.campaignType || CampaignType.LEAD_CAMPAIGN,
         emailJourneyVariant: data.emailJourneyVariant,
         emailCampaignStage: data.emailCampaignStage,
-        country: data.leadData.country || Countries.GLOBAL,
-        language: data.leadData.language || Languages.EN,
+        country: data.leadData.country,
+        language: data.leadData.language,
       };
 
       // Use SMTP sending repository for test emails
@@ -182,16 +158,14 @@ class TestEmailRepository {
 
         const emailResponse = await smtpSendingRepository.sendEmail(
           {
-            params: {
-              to: data.testEmail,
-              toName: data.testEmail,
-              subject: emailContent.subject,
-              html,
-              replyTo: contactClientRepository.getSupportEmail(emailLocale),
-              unsubscribeUrl,
-              senderName: t("common.appName"),
-              selectionCriteria,
-            },
+            to: data.testEmail,
+            toName: data.testEmail,
+            subject: emailContent.subject,
+            html,
+            replyTo: contactClientRepository.getSupportEmail(emailLocale),
+            unsubscribeUrl,
+            senderName: t("common.appName"),
+            selectionCriteria,
           },
           user,
           emailLocale,

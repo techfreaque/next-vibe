@@ -1,6 +1,6 @@
-import RNCSlider from "@react-native-community/slider";
-import { useTheme } from "@react-navigation/native";
-import type * as React from "react";
+import RNCSlider from '@react-native-community/slider';
+import { useTheme } from '@react-navigation/native';
+import type * as React from 'react';
 
 /**
  * @docs https://github.com/callstack/react-native-slider?tab=readme-ov-file#-react-native-communityslider-
@@ -16,7 +16,7 @@ function Slider(props: React.ComponentProps<typeof RNCSlider>) {
   } = props;
   return (
     <RNCSlider
-      role="slider"
+      role='slider'
       minimumValue={minimumValue}
       maximumValue={maximumValue}
       minimumTrackTintColor={minimumTrackTintColor}

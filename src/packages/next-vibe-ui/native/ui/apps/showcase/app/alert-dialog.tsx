@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View } from 'react-native';
 
 import {
   AlertDialog,
@@ -10,16 +10,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "~/components/ui/alert-dialog";
-import { Button } from "~/components/ui/button";
-import { Text } from "~/components/ui/text";
+} from '~/components/ui/alert-dialog';
+import { Button } from '~/components/ui/button';
+import { Text } from '~/components/ui/text';
 
 export default function AlertDialogScreen() {
   return (
-    <View className="flex-1 justify-center items-center">
+    <View className='flex-1 justify-center items-center'>
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button variant="outline">
+          <Button variant='outline'>
             <Text>Show Alert Dialog</Text>
           </Button>
         </AlertDialogTrigger>
@@ -27,8 +27,8 @@ export default function AlertDialogScreen() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your
-              account and remove your data from our servers.
+              This action cannot be undone. This will permanently delete your account and remove
+              your data from our servers.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -86,7 +86,7 @@ export function SmtpAccountsTable({
     if (!campaignTypes || campaignTypes.length === 0) {
       return (
         <Badge variant="secondary">
-          {t("smtp.admin.fields.campaignTypes")}
+          {t("app.admin.emails.smtp.admin.fields.campaignTypes")}
         </Badge>
       );
     }
@@ -110,7 +110,7 @@ export function SmtpAccountsTable({
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
-          <p className="text-gray-500">{t("smtp.list.loading")}</p>
+          <p className="text-gray-500">{t("app.admin.emails.smtp.list.loading")}</p>
         </div>
       </div>
     );
@@ -121,10 +121,10 @@ export function SmtpAccountsTable({
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <p className="text-gray-500 mb-4">
-            {t("admin.dashboard.smtp.status.noAccounts")}
+            {t("app.admin.emails.smtp.list.no_results")}
           </p>
           <p className="text-sm text-gray-400">
-            {t("admin.dashboard.smtp.status.noAccountsDescription")}
+            {t("app.admin.emails.smtp.list.description")}
           </p>
         </div>
       </div>
@@ -136,15 +136,15 @@ export function SmtpAccountsTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t("admin.dashboard.smtp.table.name")}</TableHead>
-            <TableHead>{t("admin.dashboard.smtp.table.host")}</TableHead>
-            <TableHead>{t("smtp.admin.fields.campaignTypes")}</TableHead>
-            <TableHead>{t("admin.dashboard.smtp.table.status")}</TableHead>
-            <TableHead>{t("admin.dashboard.smtp.table.health")}</TableHead>
-            <TableHead>{t("admin.dashboard.smtp.table.fromEmail")}</TableHead>
-            <TableHead>{t("admin.dashboard.smtp.table.actions")}</TableHead>
+            <TableHead>{t("app.admin.emails.smtp.list.table.name")}</TableHead>
+            <TableHead>{t("app.admin.emails.smtp.list.table.host")}</TableHead>
+            <TableHead>{t("app.admin.emails.smtp.admin.fields.campaignTypes")}</TableHead>
+            <TableHead>{t("app.admin.emails.smtp.list.table.status")}</TableHead>
+            <TableHead>{t("app.admin.emails.smtp.list.table.health")}</TableHead>
+            <TableHead>{t("app.admin.emails.smtp.list.table.fromEmail")}</TableHead>
+            <TableHead>{t("app.admin.emails.smtp.list.table.actions")}</TableHead>
             <TableHead className="text-right">
-              {t("admin.dashboard.smtp.table.actions")}
+              {t("app.admin.emails.smtp.list.table.actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -191,12 +191,12 @@ export function SmtpAccountsTable({
                       }
                     >
                       {t(
-                        `admin.dashboard.smtp.health.${account.healthCheckStatus}`,
+                        `app.admin.emails.smtp.admin.health.${account.healthCheckStatus}`,
                       )}
                     </Badge>
                   ) : (
                     <span className="text-gray-400">
-                      {t("admin.dashboard.smtp.health.unknown")}
+                      {t("app.admin.emails.smtp.admin.health.unknown")}
                     </span>
                   )}
                 </div>
@@ -205,13 +205,13 @@ export function SmtpAccountsTable({
                 <div className="text-sm">
                   <div className="text-gray-900 dark:text-gray-100">
                     {account.emailsSentToday} /{" "}
-                    {account.rateLimitPerHour || t("common.actions.unlimited")}
+                    {account.rateLimitPerHour || t("app.admin.emails.smtp.list.table.unlimited")}
                   </div>
                   <div className="text-xs text-gray-500">
-                    {t("smtp.list.table.todayLimit")}
+                    {t("app.admin.emails.smtp.list.table.todayLimit")}
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
-                    {t("smtp.list.table.totalSent", {
+                    {t("app.admin.emails.smtp.list.table.totalSent", {
                       count: account.totalEmailsSent,
                     })}
                   </div>
@@ -223,13 +223,13 @@ export function SmtpAccountsTable({
                     <span className="font-medium">{account.priority || 0}</span>
                     {account.isDefault && (
                       <Badge variant="outline" className="text-xs">
-                        {t("smtp.list.table.default")}
+                        {t("app.admin.emails.smtp.list.table.default")}
                       </Badge>
                     )}
                   </div>
                   {account.weight && (
                     <div className="text-xs text-gray-500">
-                      {t("smtp.list.table.weight", {
+                      {t("app.admin.emails.smtp.list.table.weight", {
                         weight: account.weight,
                       })}
                     </div>
@@ -249,12 +249,12 @@ export function SmtpAccountsTable({
                         href={`/${locale}/admin/emails/smtp/edit/${account.id}`}
                       >
                         <Edit className="mr-2 h-4 w-4" />
-                        {t("smtp.admin.edit.title")}
+                        {t("app.admin.emails.smtp.admin.edit.title")}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem className="text-red-600">
                       <Trash2 className="mr-2 h-4 w-4" />
-                      {t("admin.dashboard.smtp.actions.delete")}
+                      {t("app.admin.emails.smtp.list.actions.delete")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

@@ -1,6 +1,6 @@
-import { Ear } from "lucide-react-native";
+import { Ear } from 'lucide-react-native';
 
-import { iconWithClassName } from "./iconWithClassName";
+import { iconWithClassName } from './iconWithClassName';
 
 iconWithClassName(Ear);
 export { Ear };

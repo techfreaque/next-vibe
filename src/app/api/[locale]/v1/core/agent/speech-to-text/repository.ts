@@ -82,15 +82,6 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
       mimeType: file.type,
     });
 
-    // Check API key
-    if (!env.EDEN_AI_API_KEY) {
-      logger.error("Eden AI API key not configured");
-      return createErrorResponse(
-        "app.api.v1.core.agent.speechToText.post.errors.apiKeyMissing",
-        ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-      );
-    }
-
     try {
       // Convert File to Buffer for Eden AI
       const arrayBuffer = await file.arrayBuffer();

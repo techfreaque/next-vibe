@@ -10,14 +10,11 @@ export class ChatError extends Error {
   constructor(
     message: string,
     readonly code?: string,
-    readonly details?: unknown,
+    // eslint-disable-next-line no-restricted-syntax -- Error details can be any type
+    readonly details?: Error | Record<string, unknown> | null,
   ) {
     super(message);
     this.name = this.constructor.name;
-    // Maintains proper stack trace for where error was thrown (only available on V8)
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, this.constructor);
-    }
   }
 }
 
@@ -29,8 +26,10 @@ export class APIError extends ChatError {
     message: string,
     readonly status?: number,
     readonly statusText?: string,
-    details?: unknown,
+    // eslint-disable-next-line no-restricted-syntax -- Error details can be any type
+    details?: Error | Record<string, unknown> | null,
   ) {
+    // eslint-disable-next-line i18next/no-literal-string -- Error code is technical identifier
     super(message, `API_ERROR_${status || "UNKNOWN"}`, details);
   }
 }
@@ -42,7 +41,8 @@ export class ValidationError extends ChatError {
   constructor(
     message: string,
     readonly field?: string,
-    details?: unknown,
+    // eslint-disable-next-line no-restricted-syntax -- Error details can be any type
+    details?: Error | Record<string, unknown> | null,
   ) {
     super(message, "VALIDATION_ERROR", details);
   }
@@ -55,7 +55,8 @@ export class StreamError extends ChatError {
   constructor(
     message: string,
     readonly streamPhase?: "init" | "reading" | "parsing" | "complete",
-    details?: unknown,
+    // eslint-disable-next-line no-restricted-syntax -- Error details can be any type
+    details?: Error | Record<string, unknown> | null,
   ) {
     super(message, "STREAM_ERROR", details);
   }
@@ -68,7 +69,8 @@ export class StorageError extends ChatError {
   constructor(
     message: string,
     readonly operation?: "read" | "write" | "delete",
-    details?: unknown,
+    // eslint-disable-next-line no-restricted-syntax -- Error details can be any type
+    details?: Error | Record<string, unknown> | null,
   ) {
     super(message, "STORAGE_ERROR", details);
   }
@@ -81,7 +83,8 @@ export class MessageTreeError extends ChatError {
   constructor(
     message: string,
     readonly operation?: string,
-    details?: unknown,
+    // eslint-disable-next-line no-restricted-syntax -- Error details can be any type
+    details?: Error | Record<string, unknown> | null,
   ) {
     super(message, "MESSAGE_TREE_ERROR", details);
   }
@@ -90,6 +93,7 @@ export class MessageTreeError extends ChatError {
 /**
  * Type guard to check if error is a ChatError
  */
+// eslint-disable-next-line no-restricted-syntax -- Type guards require unknown parameter
 export function isChatError(error: unknown): error is ChatError {
   return error instanceof ChatError;
 }
@@ -97,6 +101,7 @@ export function isChatError(error: unknown): error is ChatError {
 /**
  * Type guard to check if error is an APIError
  */
+// eslint-disable-next-line no-restricted-syntax -- Type guards require unknown parameter
 export function isAPIError(error: unknown): error is APIError {
   return error instanceof APIError;
 }
@@ -104,6 +109,7 @@ export function isAPIError(error: unknown): error is APIError {
 /**
  * Type guard to check if error is a ValidationError
  */
+// eslint-disable-next-line no-restricted-syntax -- Type guards require unknown parameter
 export function isValidationError(error: unknown): error is ValidationError {
   return error instanceof ValidationError;
 }
@@ -111,6 +117,7 @@ export function isValidationError(error: unknown): error is ValidationError {
 /**
  * Type guard to check if error is a StreamError
  */
+// eslint-disable-next-line no-restricted-syntax -- Type guards require unknown parameter
 export function isStreamError(error: unknown): error is StreamError {
   return error instanceof StreamError;
 }
@@ -118,6 +125,7 @@ export function isStreamError(error: unknown): error is StreamError {
 /**
  * Type guard to check if error is a StorageError
  */
+// eslint-disable-next-line no-restricted-syntax -- Type guards require unknown parameter
 export function isStorageError(error: unknown): error is StorageError {
   return error instanceof StorageError;
 }
@@ -125,13 +133,16 @@ export function isStorageError(error: unknown): error is StorageError {
 /**
  * Type guard to check if error is a MessageTreeError
  */
+// eslint-disable-next-line no-restricted-syntax -- Type guards require unknown parameter
 export function isMessageTreeError(error: unknown): error is MessageTreeError {
   return error instanceof MessageTreeError;
 }
 
 /**
  * Extract user-friendly error message from any error type
+ * @param error - The error to extract message from (unknown type for type guard usage)
  */
+// eslint-disable-next-line no-restricted-syntax -- Type guards require unknown parameter
 export function getErrorMessage(error: unknown): string {
   if (isChatError(error)) {
     return error.message;
@@ -145,16 +156,20 @@ export function getErrorMessage(error: unknown): string {
     return error;
   }
 
+  // eslint-disable-next-line i18next/no-literal-string -- Fallback error message for unknown error types
   return "An unknown error occurred";
 }
 
 /**
  * Extract error details for logging/debugging
+ * @param error - The error to extract details from (unknown type for type guard usage)
  */
+// eslint-disable-next-line no-restricted-syntax -- Type guards require unknown parameter and return type with unknown
 export function getErrorDetails(error: unknown): {
   message: string;
   code?: string;
-  details?: unknown;
+  // eslint-disable-next-line no-restricted-syntax -- Error details can be any type
+  details?: Error | Record<string, unknown> | null;
   stack?: string;
 } {
   if (isChatError(error)) {

@@ -5,7 +5,7 @@
 
 import { useCallback, useState } from "react";
 
-import { logError } from "../../lib/utils/error-handling";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 export type MessageActionType = "edit" | "retry" | "answer" | null;
 
@@ -62,7 +62,9 @@ export interface UseMessageActionsReturn {
 /**
  * Hook for managing message action states
  */
-export function useMessageActions(): UseMessageActionsReturn {
+export function useMessageActions(
+  logger: EndpointLogger,
+): UseMessageActionsReturn {
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [retryingMessageId, setRetryingMessageId] = useState<string | null>(
     null,
@@ -146,11 +148,16 @@ export function useMessageActions(): UseMessageActionsReturn {
         await onEdit(messageId, content);
         setEditingMessageId(null);
       } catch (error) {
-        logError(error, "handleSaveEdit");
+        const errorObj =
+          error instanceof Error ? error : new Error(String(error));
+        logger.error(
+          "app.chat.messages.actions.handleSaveEdit.error",
+          errorObj,
+        );
         // Don't clear editing state on error so user can retry
       }
     },
-    [],
+    [logger],
   );
 
   const handleBranchEdit = useCallback(
@@ -167,10 +174,15 @@ export function useMessageActions(): UseMessageActionsReturn {
         await onBranch(messageId, content);
         setEditingMessageId(null);
       } catch (error) {
-        logError(error, "handleBranchEdit");
+        const errorObj =
+          error instanceof Error ? error : new Error(String(error));
+        logger.error(
+          "app.chat.messages.actions.handleBranchEdit.error",
+          errorObj,
+        );
       }
     },
-    [],
+    [logger],
   );
 
   const handleConfirmRetry = useCallback(
@@ -183,10 +195,15 @@ export function useMessageActions(): UseMessageActionsReturn {
         await onRetry(messageId);
         setRetryingMessageId(null);
       } catch (error) {
-        logError(error, "handleConfirmRetry");
+        const errorObj =
+          error instanceof Error ? error : new Error(String(error));
+        logger.error(
+          "app.chat.messages.actions.handleConfirmRetry.error",
+          errorObj,
+        );
       }
     },
-    [],
+    [logger],
   );
 
   const handleConfirmAnswer = useCallback(
@@ -199,10 +216,15 @@ export function useMessageActions(): UseMessageActionsReturn {
         await onAnswer(messageId);
         setAnsweringMessageId(null);
       } catch (error) {
-        logError(error, "handleConfirmAnswer");
+        const errorObj =
+          error instanceof Error ? error : new Error(String(error));
+        logger.error(
+          "app.chat.messages.actions.handleConfirmAnswer.error",
+          errorObj,
+        );
       }
     },
-    [],
+    [logger],
   );
 
   const handleConfirmDelete = useCallback(
@@ -215,10 +237,15 @@ export function useMessageActions(): UseMessageActionsReturn {
         onDelete(messageId);
         setDeletingMessageId(null);
       } catch (error) {
-        logError(error, "handleConfirmDelete");
+        const errorObj =
+          error instanceof Error ? error : new Error(String(error));
+        logger.error(
+          "app.chat.messages.actions.handleConfirmDelete.error",
+          errorObj,
+        );
       }
     },
-    [],
+    [logger],
   );
 
   return {

@@ -41,16 +41,16 @@ export function SmtpAdminLayoutClient({
       key: "accounts",
       href: `/${locale}/admin/emails/smtp/accounts`,
       icon: Users,
-      label: t("smtp.list.title"),
-      description: t("smtp.list.description"),
+      label: t("app.admin.emails.smtp.list.title"),
+      description: t("app.admin.emails.smtp.list.description"),
       pattern: new RegExp(`^/${locale}/admin/emails/smtp/accounts`),
     },
     {
       key: "create",
       href: `/${locale}/admin/emails/smtp/create`,
       icon: Plus,
-      label: t("smtp.admin.create.title"),
-      description: t("smtp.admin.create.description"),
+      label: t("app.admin.emails.smtp.admin.create.title"),
+      description: t("app.admin.emails.smtp.admin.create.description"),
       pattern: new RegExp(`^/${locale}/admin/emails/smtp/create`),
     },
   ];
@@ -67,16 +67,16 @@ export function SmtpAdminLayoutClient({
           <div className="flex flex-col space-y-4">
             <div>
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {t("smtp.list.title")}
+                {t("app.admin.emails.smtp.list.title")}
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {t("smtp.list.description")}
+                {t("app.admin.emails.smtp.list.description")}
               </p>
             </div>
 
             {/* Sub Navigation Tabs */}
             <div className="border-b border-gray-200 dark:border-gray-700">
-              <nav className="flex space-x-8" aria-label={t("smtp.list.title")}>
+              <nav className="flex space-x-8" aria-label={t("app.admin.emails.smtp.list.title")}>
                 {subNavigationItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = currentSubSection?.key === item.key;

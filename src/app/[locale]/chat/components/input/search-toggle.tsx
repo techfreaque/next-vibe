@@ -5,38 +5,58 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React from "react";
 
-import { Button } from "@/packages/next-vibe-ui/web/ui";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+import { Switch } from "@/packages/next-vibe-ui/web/ui";
 
 interface SearchToggleProps {
   enabled: boolean;
   onChange: (enabled: boolean) => void;
   disabled?: boolean;
+  locale: CountryLanguage;
 }
 
 export function SearchToggle({
   enabled,
   onChange,
   disabled = false,
+  locale,
 }: SearchToggleProps): JSX.Element {
+  const { t } = simpleT(locale);
+  const titleText = enabled
+    ? t("app.chat.searchToggle.enabledTitle")
+    : t("app.chat.searchToggle.disabledTitle");
+
+  const handleClick = (): void => {
+    if (!disabled) {
+      onChange(!enabled);
+    }
+  };
+
   return (
-    <Button
-      type="button"
-      size="sm"
-      variant={enabled ? "default" : "outline"}
-      onClick={() => onChange(!enabled)}
-      disabled={disabled}
+    <div
+      onClick={handleClick}
       className={cn(
-        "gap-1.5 text-xs sm:text-sm h-8 sm:h-9 transition-colors",
-        enabled && "bg-primary text-primary-foreground hover:bg-primary/90",
+        "inline-flex items-center justify-center gap-2 text-sm min-h-9 h-auto transition-colors rounded-md border border-input bg-background px-3 hover:bg-accent hover:text-accent-foreground cursor-pointer",
+        enabled && "border-primary/50 bg-primary/5",
+        disabled && "opacity-50 cursor-not-allowed",
       )}
-      // eslint-disable-next-line i18next/no-literal-string
-      title={enabled ? "Search enabled" : "Search disabled"}
+      title={titleText}
     >
-      <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+      <Search className="h-4 w-4 flex-shrink-0" />
       <span className="hidden sm:inline">
-        {/* eslint-disable-next-line i18next/no-literal-string */}
-        {enabled ? "Search On" : "Search Off"}
+        {t("app.chat.searchToggle.search")}
       </span>
-    </Button>
+      <Switch
+        checked={enabled}
+        disabled={disabled}
+        className="h-4 w-7 data-[state=checked]:bg-primary pointer-events-none"
+      />
+      {enabled && (
+        <span className="hidden lg:inline text-[10px] opacity-75">
+          {t("app.chat.searchToggle.creditIndicator")}
+        </span>
+      )}
+    </div>
   );
 }

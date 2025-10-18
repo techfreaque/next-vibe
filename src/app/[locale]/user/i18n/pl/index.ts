@@ -1,54 +1,24 @@
 import type { translations as enTranslations } from "../en";
+import { translations as authClientTranslations } from "./authClient";
+import { translations as loginTranslations } from "./login";
+import { translations as resetPasswordTranslations } from "./resetPassword";
+import { translations as sessionTranslations } from "./session";
+import { translations as userAvatarTranslations } from "./userAvatar";
+import { translations as userMeTranslations } from "./userMe";
+import { translations as userPasswordTranslations } from "./userPassword";
+import { translations as authTranslations } from "./auth";
+import { translations as authErrorsTranslations } from "./authErrors";
+import { translations as userTranslations } from "./user";
 
 export const translations: typeof enTranslations = {
-  post: {
-    title: "Tytuł",
-    description: "Opis endpointu",
-    form: {
-      title: "Konfiguracja",
-      description: "Skonfiguruj parametry",
-    },
-    response: {
-      title: "Odpowiedź",
-      description: "Dane odpowiedzi",
-    },
-    errors: {
-      unauthorized: {
-        title: "Brak autoryzacji",
-        description: "Wymagana autoryzacja",
-      },
-      validation: {
-        title: "Błąd walidacji",
-        description: "Nieprawidłowe parametry żądania",
-      },
-      server: {
-        title: "Błąd serwera",
-        description: "Wystąpił wewnętrzny błąd serwera",
-      },
-      unknown: {
-        title: "Nieznany błąd",
-        description: "Wystąpił nieznany błąd",
-      },
-      network: {
-        title: "Błąd sieci",
-        description: "Wystąpił błąd sieci",
-      },
-      forbidden: {
-        title: "Zabronione",
-        description: "Dostęp zabroniony",
-      },
-      notFound: {
-        title: "Nie znaleziono",
-        description: "Zasób nie został znaleziony",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Wystąpił konflikt danych",
-      },
-    },
-    success: {
-      title: "Sukces",
-      description: "Operacja zakończona pomyślnie",
-    },
-  },
+  auth: authTranslations,
+  authClient: authClientTranslations,
+  authErrors: authErrorsTranslations,
+  login: loginTranslations,
+  resetPassword: resetPasswordTranslations,
+  session: sessionTranslations,
+  user: userTranslations,
+  userAvatar: userAvatarTranslations,
+  userMe: userMeTranslations,
+  userPassword: userPasswordTranslations,
 };

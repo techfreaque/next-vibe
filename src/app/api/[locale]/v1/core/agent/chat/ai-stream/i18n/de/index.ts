@@ -30,6 +30,11 @@ export const translations: typeof enTranslations = {
       description: "Optionale Systemanweisungen",
       placeholder: "System-Prompt eingeben...",
     },
+    enableSearch: {
+      label: "Web-Suche aktivieren",
+      description:
+        "KI erlauben, das Web nach aktuellen Informationen zu durchsuchen",
+    },
     response: {
       title: "Stream-Antwort",
       description: "KI-generierte Streaming-Antwort",
@@ -109,6 +114,9 @@ export const translations: typeof enTranslations = {
       openrouterApiKeyMissing: "OpenRouter API-Schlüssel nicht konfiguriert",
       streamCreationFailed: "Fehler beim Erstellen des Streams",
       unknownError: "Ein Fehler ist aufgetreten",
+      creditValidationFailed: "Fehler bei der Validierung des Guthabens",
+      noIdentifier: "Keine Benutzer- oder Lead-Kennung angegeben",
+      insufficientCredits: "Nicht genügend Guthaben für diese Anfrage",
     },
   },
   providers: {

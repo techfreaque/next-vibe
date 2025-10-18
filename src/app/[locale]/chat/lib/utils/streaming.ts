@@ -12,25 +12,31 @@ export function parseStreamChunk(line: string): string | null {
   }
 
   // Handle Vercel AI SDK format with prefix
+  // eslint-disable-next-line i18next/no-literal-string -- Protocol prefix check, not user-facing
   if (line.startsWith("0:")) {
     let content = line.slice(2);
     // Remove quotes if present and unescape
+    // eslint-disable-next-line i18next/no-literal-string -- JSON quote check, not user-facing
     if (content.startsWith('"') && content.endsWith('"')) {
       content = content.slice(1, -1);
       // Unescape JSON string escapes
-      content = content
-        .replace(/\\"/g, '"')
-        .replace(/\\\\/g, "\\")
-        .replace(/\\n/g, "\n");
+      // eslint-disable-next-line i18next/no-literal-string -- JSON escape sequences, not user-facing
+      content = content.replace(/\\"/g, '"');
+      // eslint-disable-next-line i18next/no-literal-string -- JSON escape sequences, not user-facing
+      content = content.replace(/\\\\/g, "\\");
+      content = content.replace(/\\n/g, "\n");
     }
     return content;
   }
 
   // Handle SSE format
+  // eslint-disable-next-line i18next/no-literal-string -- SSE protocol prefix, not user-facing
   if (line.startsWith("data: ")) {
     const data = line.slice(6);
     try {
-      const parsed = JSON.parse(data);
+      const parsed = JSON.parse(data) as {
+        choices?: Array<{ delta?: { content?: string } }>;
+      };
       return parsed.choices?.[0]?.delta?.content || "";
     } catch {
       return data;
@@ -96,6 +102,7 @@ export async function readStream(
     if (error instanceof Error && error.name === "AbortError") {
       return fullContent;
     }
+    // eslint-disable-next-line no-restricted-syntax -- Re-throwing caught error is acceptable
     throw error;
   }
 
@@ -109,10 +116,10 @@ export function debounce<T extends (...args: never[]) => void>(
   func: T,
   wait: number,
 ): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null;
+  let timeout: ReturnType<typeof setTimeout> | null = null;
 
-  return function executedFunction(...args: Parameters<T>) {
-    const later = () => {
+  return function executedFunction(...args: Parameters<T>): void {
+    const later = (): void => {
       timeout = null;
       func(...args);
     };
@@ -136,9 +143,9 @@ export function createDebouncedStreamUpdate(
   flush: () => void;
 } {
   let pendingContent: string | null = null;
-  let timeoutId: NodeJS.Timeout | null = null;
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-  const flush = () => {
+  const flush = (): void => {
     if (pendingContent !== null) {
       updateFn(pendingContent);
       pendingContent = null;
@@ -149,7 +156,7 @@ export function createDebouncedStreamUpdate(
     }
   };
 
-  const update = (content: string) => {
+  const update = (content: string): void => {
     pendingContent = content;
 
     if (!timeoutId) {

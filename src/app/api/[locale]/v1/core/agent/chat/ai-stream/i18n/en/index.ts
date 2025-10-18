@@ -28,6 +28,10 @@ export const translations = {
       description: "Optional system instructions",
       placeholder: "Enter system prompt...",
     },
+    enableSearch: {
+      label: "Enable Web Search",
+      description: "Allow AI to search the web for current information",
+    },
     response: {
       title: "Stream Response",
       description: "AI-generated streaming response",
@@ -106,6 +110,9 @@ export const translations = {
       openrouterApiKeyMissing: "OpenRouter API key not configured",
       streamCreationFailed: "Failed to create stream",
       unknownError: "An error occurred",
+      creditValidationFailed: "Failed to validate credit balance",
+      noIdentifier: "No user or lead identifier provided",
+      insufficientCredits: "Insufficient credits to complete this request",
     },
   },
   providers: {

@@ -1,0 +1,50 @@
+/**
+ * Chat Thread Detail Hooks
+ * React hooks for single thread operations (get, update, delete)
+ */
+
+"use client";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/use-endpoint";
+import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/use-endpoint";
+
+import definitions from "./definition";
+
+/**
+ * Hook for single thread operations (GET, PATCH, DELETE)
+ *
+ * Features:
+ * - GET: Fetch thread by ID
+ * - PATCH: Update thread (optimistic updates)
+ * - DELETE: Delete thread (with confirmation)
+ * - Cache invalidation on mutations
+ *
+ * @param params - Thread ID and optional enabled flag
+ * @param logger - Endpoint logger instance
+ */
+export function useThread(
+  params: {
+    threadId: string;
+    enabled?: boolean;
+  },
+  logger: EndpointLogger,
+): EndpointReturn<typeof definitions> {
+  return useEndpoint(
+    definitions,
+    {
+      urlParams: { id: params.threadId },
+      queryOptions: {
+        enabled: params.enabled ?? true,
+        refetchOnWindowFocus: false,
+        staleTime: 30 * 1000, // 30 seconds
+      },
+      formOptions: {
+        persistForm: false,
+      },
+    },
+    logger,
+  );
+}
+
+export type ThreadEndpointReturn = EndpointReturn<typeof definitions>;

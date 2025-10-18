@@ -28,9 +28,9 @@ export default async function ImapConfigPage({
   return (
     <div className="container mx-auto py-6 space-y-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">{t("imap.admin.config.title")}</h1>
+        <h1 className="text-3xl font-bold">{t("app.admin.emails.imap.admin.config.title")}</h1>
         <p className="text-muted-foreground">
-          {t("imap.admin.config.description")}
+          {t("app.admin.emails.imap.admin.config.description")}
         </p>
       </div>
 

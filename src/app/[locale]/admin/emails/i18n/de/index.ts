@@ -1,54 +1,17 @@
 import type { translations as enTranslations } from "../en";
 
+// Parent aggregator for admin/emails translations
+// Imports from co-located child directory i18n folders
+import { translations as componentsTranslations } from "../../_components/i18n/de";
+import { translations as imapTranslations } from "../../imap/i18n/de";
+import { translations as listTranslations } from "../../list/i18n/de";
+import { translations as smtpTranslations } from "../../smtp/i18n/de";
+import { translations as statsTranslations } from "../../stats/i18n/de";
+
 export const translations: typeof enTranslations = {
-  post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
-    form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
-    },
-    response: {
-      title: "Antwort",
-      description: "Antwortdaten",
-    },
-    errors: {
-      unauthorized: {
-        title: "Nicht autorisiert",
-        description: "Authentifizierung erforderlich",
-      },
-      validation: {
-        title: "Validierungsfehler",
-        description: "Ungültige Anfrageparameter",
-      },
-      server: {
-        title: "Serverfehler",
-        description: "Interner Serverfehler",
-      },
-      unknown: {
-        title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist aufgetreten",
-      },
-      network: {
-        title: "Netzwerkfehler",
-        description: "Netzwerkfehler aufgetreten",
-      },
-      forbidden: {
-        title: "Verboten",
-        description: "Zugriff verboten",
-      },
-      notFound: {
-        title: "Nicht gefunden",
-        description: "Ressource nicht gefunden",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Datenkonflikt aufgetreten",
-      },
-    },
-    success: {
-      title: "Erfolg",
-      description: "Vorgang erfolgreich abgeschlossen",
-    },
-  },
+  components: componentsTranslations,
+  imap: imapTranslations,
+  smtp: smtpTranslations,
+  list: listTranslations,
+  stats: statsTranslations,
 };

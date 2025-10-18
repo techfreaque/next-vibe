@@ -69,39 +69,39 @@ export function ImapAccountsList(): JSX.Element {
       case ImapSyncStatus.SYNCED:
         return (
           <Badge variant="default" className="bg-green-100 text-green-800">
-            {t("imap.account.status.connected")}
+            {t("app.admin.emails.imap.account.status.connected")}
           </Badge>
         );
       case ImapSyncStatus.SYNCING:
         return (
           <Badge variant="default" className="bg-blue-100 text-blue-800">
-            {t("imap.account.status.syncing")}
+            {t("app.admin.emails.imap.account.status.syncing")}
           </Badge>
         );
       case ImapSyncStatus.ERROR:
         return (
-          <Badge variant="destructive">{t("imap.account.status.error")}</Badge>
+          <Badge variant="destructive">{t("app.admin.emails.imap.account.status.error")}</Badge>
         );
       case ImapSyncStatus.PENDING:
         return (
-          <Badge variant="secondary">{t("imap.account.status.pending")}</Badge>
+          <Badge variant="secondary">{t("app.admin.emails.imap.account.status.pending")}</Badge>
         );
       default:
         return (
           <Badge variant="outline">
-            {t("imap.account.status.disconnected")}
+            {t("app.admin.emails.imap.account.status.disconnected")}
           </Badge>
         );
     }
   };
 
   if (queryLoading) {
-    return <div>{t("imap.common.loading")}</div>;
+    return <div>{t("app.admin.emails.imap.common.loading")}</div>;
   }
 
   if (queryError) {
     return (
-      <div>{t("imap.account.list_error", { error: queryError.message })}</div>
+      <div>{t("app.admin.emails.imap.account.list_error", { error: queryError.message })}</div>
     );
   }
 
@@ -110,7 +110,7 @@ export function ImapAccountsList(): JSX.Element {
       {/* Search and Filters */}
       <div className="flex items-center space-x-4">
         <Input
-          placeholder={t("imap.account.search_placeholder")}
+          placeholder={t("app.admin.emails.imap.account.search_placeholder")}
           value={searchValue}
           onChange={(e) => form?.setValue("search", e.target.value)}
           className="max-w-sm"
@@ -119,7 +119,7 @@ export function ImapAccountsList(): JSX.Element {
           variant="outline"
           onClick={() => accountsEndpoint.read?.refetch?.()}
         >
-          {t("imap.common.refresh")}
+          {t("app.admin.emails.imap.common.refresh")}
         </Button>
       </div>
 
@@ -128,13 +128,13 @@ export function ImapAccountsList(): JSX.Element {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t("imap.account.table.name")}</TableHead>
-              <TableHead>{t("imap.account.table.email")}</TableHead>
-              <TableHead>{t("imap.account.table.host")}</TableHead>
-              <TableHead>{t("imap.account.table.status")}</TableHead>
-              <TableHead>{t("imap.account.table.last_sync")}</TableHead>
-              <TableHead>{t("imap.account.table.max_messages")}</TableHead>
-              <TableHead>{t("imap.account.table.actions")}</TableHead>
+              <TableHead>{t("app.admin.emails.imap.account.table.name")}</TableHead>
+              <TableHead>{t("app.admin.emails.imap.account.table.email")}</TableHead>
+              <TableHead>{t("app.admin.emails.imap.account.table.host")}</TableHead>
+              <TableHead>{t("app.admin.emails.imap.account.table.status")}</TableHead>
+              <TableHead>{t("app.admin.emails.imap.account.table.last_sync")}</TableHead>
+              <TableHead>{t("app.admin.emails.imap.account.table.max_messages")}</TableHead>
+              <TableHead>{t("app.admin.emails.imap.account.table.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -142,8 +142,8 @@ export function ImapAccountsList(): JSX.Element {
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-8">
                   {searchValue
-                    ? t("imap.account.no_results")
-                    : t("imap.account.no_accounts")}
+                    ? t("app.admin.emails.imap.account.no_results")
+                    : t("app.admin.emails.imap.account.no_accounts")}
                 </TableCell>
               </TableRow>
             ) : (
@@ -156,7 +156,7 @@ export function ImapAccountsList(): JSX.Element {
                   <TableCell>
                     {account.lastSyncAt
                       ? new Date(account.lastSyncAt).toLocaleString()
-                      : t("imap.dashboard.never")}
+                      : t("app.admin.emails.imap.dashboard.never")}
                   </TableCell>
                   <TableCell>{account.maxMessages}</TableCell>
                   <TableCell>
@@ -170,7 +170,7 @@ export function ImapAccountsList(): JSX.Element {
                           );
                         }}
                       >
-                        {t("imap.common.edit")}
+                        {t("app.admin.emails.imap.common.edit")}
                       </Button>
                       <Button
                         variant="outline"
@@ -183,7 +183,7 @@ export function ImapAccountsList(): JSX.Element {
                           await testEndpoint.create.submitForm(undefined);
                         }}
                       >
-                        {t("imap.account.test")}
+                        {t("app.admin.emails.imap.account.test")}
                       </Button>
                     </div>
                   </TableCell>
@@ -198,7 +198,7 @@ export function ImapAccountsList(): JSX.Element {
       {totalAccounts > 0 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-600">
-            {t("imap.account.pagination.showing", {
+            {t("app.admin.emails.imap.account.pagination.showing", {
               start: (currentPage - 1) * limit + 1,
               end: Math.min(currentPage * limit, totalAccounts),
               total: totalAccounts,
@@ -211,7 +211,7 @@ export function ImapAccountsList(): JSX.Element {
               disabled={currentPage === 1}
               onClick={() => form?.setValue("page", currentPage - 1)}
             >
-              {t("imap.common.previous")}
+              {t("app.admin.emails.imap.common.previous")}
             </Button>
             <Button
               variant="outline"
@@ -219,7 +219,7 @@ export function ImapAccountsList(): JSX.Element {
               disabled={currentPage * limit >= totalAccounts}
               onClick={() => form?.setValue("page", currentPage + 1)}
             >
-              {t("imap.common.next")}
+              {t("app.admin.emails.imap.common.next")}
             </Button>
           </div>
         </div>

@@ -1,52 +1,23 @@
+import { translations as authClientTranslations } from "./authClient";
+import { translations as loginTranslations } from "./login";
+import { translations as resetPasswordTranslations } from "./resetPassword";
+import { translations as sessionTranslations } from "./session";
+import { translations as userAvatarTranslations } from "./userAvatar";
+import { translations as userMeTranslations } from "./userMe";
+import { translations as userPasswordTranslations } from "./userPassword";
+import { translations as authTranslations } from "./auth";
+import { translations as authErrorsTranslations } from "./authErrors";
+import { translations as userTranslations } from "./user";
+
 export const translations = {
-  post: {
-    title: "User",
-    description: "User endpoint",
-    form: {
-      title: "User Configuration",
-      description: "Configure user parameters",
-    },
-    response: {
-      title: "Response",
-      description: "User response data",
-    },
-    errors: {
-      unauthorized: {
-        title: "Unauthorized",
-        description: "Authentication required",
-      },
-      validation: {
-        title: "Validation Error",
-        description: "Invalid request parameters",
-      },
-      server: {
-        title: "Server Error",
-        description: "Internal server error occurred",
-      },
-      unknown: {
-        title: "Unknown Error",
-        description: "An unknown error occurred",
-      },
-      network: {
-        title: "Network Error",
-        description: "Network error occurred",
-      },
-      forbidden: {
-        title: "Forbidden",
-        description: "Access forbidden",
-      },
-      notFound: {
-        title: "Not Found",
-        description: "Resource not found",
-      },
-      conflict: {
-        title: "Conflict",
-        description: "Data conflict occurred",
-      },
-    },
-    success: {
-      title: "Success",
-      description: "Operation completed successfully",
-    },
-  },
+  auth: authTranslations,
+  authClient: authClientTranslations,
+  authErrors: authErrorsTranslations,
+  login: loginTranslations,
+  resetPassword: resetPasswordTranslations,
+  session: sessionTranslations,
+  user: userTranslations,
+  userAvatar: userAvatarTranslations,
+  userMe: userMeTranslations,
+  userPassword: userPasswordTranslations,
 };

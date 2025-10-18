@@ -5,10 +5,13 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { forwardRef } from "react";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 import { Button, Textarea } from "@/packages/next-vibe-ui/web/ui";
 
 import type { ModelId } from "../../lib/config/models";
+import { getModelById } from "../../lib/config/models";
 import { localeToSpeechLang } from "../../lib/utils/speech-utils";
 import { ModelSelector } from "./model-selector";
 import { PersonaSelector } from "./persona-selector";
@@ -28,7 +31,8 @@ interface ChatInputProps {
   onToneChange: (tone: string) => void;
   onModelChange: (model: ModelId) => void;
   onEnableSearchChange: (enabled: boolean) => void;
-  locale?: CountryLanguage;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
   className?: string;
 }
 
@@ -47,12 +51,19 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
       onToneChange,
       onModelChange,
       onEnableSearchChange,
-      locale = "en",
+      locale,
+      logger,
       className,
     },
     ref,
   ): JSX.Element => {
+    const { t } = simpleT(locale);
     const speechLang = localeToSpeechLang(locale);
+
+    // Check if current model supports tools (for search toggle visibility)
+    const currentModel = getModelById(selectedModel);
+    const modelSupportsTools = currentModel?.supportsTools ?? false;
+
     return (
       <form
         onSubmit={onSubmit}
@@ -67,9 +78,13 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
           <Textarea
             ref={ref}
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => {
+              onChange(e.target.value);
+            }}
             onKeyDown={onKeyDown}
             disabled={isLoading}
+            // Placeholder is handled below
+            placeholder={""}
             className="px-0 text-base"
             variant={"ghost"}
             rows={2}
@@ -78,15 +93,15 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
           {/* Hint Text - Shows when textarea is empty - Hidden on mobile */}
           {!value && (
             <div className="absolute top-2 left-0 pointer-events-none text-sm text-muted-foreground hidden sm:block">
-              Press{" "}
+              {t("app.chat.input.keyboardShortcuts.press")}{" "}
               <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
-                Enter
+                {t("app.chat.input.keyboardShortcuts.enter")}
               </kbd>{" "}
-              to send,{" "}
+              {t("app.chat.input.keyboardShortcuts.toSend")},{" "}
               <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
-                Shift+Enter
+                {t("app.chat.input.keyboardShortcuts.shiftEnter")}
               </kbd>{" "}
-              for new line
+              {t("app.chat.input.keyboardShortcuts.forNewLine")}
             </div>
           )}
         </div>
@@ -95,17 +110,31 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
         <div className="flex items-center gap-2 justify-between flex-wrap sm:flex-nowrap">
           <div className="flex items-center gap-2 flex-1 min-w-0">
             {/* Model Selector */}
-            <ModelSelector value={selectedModel} onChange={onModelChange} />
+            <ModelSelector
+              value={selectedModel}
+              onChange={onModelChange}
+              locale={locale}
+              logger={logger}
+            />
 
             {/* Persona Selector */}
-            <PersonaSelector value={selectedTone} onChange={onToneChange} />
-
-            {/* Search Toggle */}
-            <SearchToggle
-              enabled={enableSearch}
-              onChange={onEnableSearchChange}
-              disabled={isLoading}
+            <PersonaSelector
+              value={selectedTone}
+              onChange={onToneChange}
+              onModelChange={onModelChange}
+              locale={locale}
+              logger={logger}
             />
+
+            {/* Search Toggle - Only show if model supports tools */}
+            {modelSupportsTools && (
+              <SearchToggle
+                enabled={enableSearch}
+                onChange={onEnableSearchChange}
+                disabled={isLoading}
+                locale={locale}
+              />
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -119,6 +148,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
               disabled={isLoading}
               lang={speechLang}
               locale={locale}
+              logger={logger}
             />
 
             {/* Send/Stop Button */}
@@ -127,21 +157,21 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
                 type="button"
                 size="icon"
                 onClick={onStop}
-                className="h-11 w-11 sm:h-9 sm:w-9 rounded-full flex-shrink-0"
+                className="h-9 w-9 flex-shrink-0"
                 variant="destructive"
-                title="Stop generation"
+                title={t("app.chat.actions.stopGeneration")}
               >
-                <Square className="h-5 w-5 sm:h-4 sm:w-4" />
+                <Square className="h-4 w-4" />
               </Button>
             ) : (
               <Button
                 type="submit"
                 size="icon"
                 disabled={!value.trim() || isLoading}
-                className="h-11 w-11 sm:h-9 sm:w-9 flex-shrink-0"
-                title="Send message"
+                className="h-9 w-9 flex-shrink-0"
+                title={t("app.chat.actions.sendMessage")}
               >
-                <Send className="h-5 w-5 sm:h-4 sm:w-4" />
+                <Send className="h-4 w-4" />
               </Button>
             )}
           </div>

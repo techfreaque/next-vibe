@@ -1,7 +1,11 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import type { JSX } from "react";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 import { Markdown } from "@/packages/next-vibe-ui/web/ui/markdown";
 
 import { getModelById } from "../../lib/config/models";
@@ -12,23 +16,39 @@ import { MessageAuthorInfo } from "./message-author";
 
 interface AssistantMessageBubbleProps {
   message: ChatMessage;
+  ttsAutoplay: boolean;
+  locale?: CountryLanguage;
   onAnswerAsModel?: (messageId: string) => void;
   onDelete?: (messageId: string) => void;
   showAuthor?: boolean;
+  logger: EndpointLogger;
 }
 
 export function AssistantMessageBubble({
   message,
+  ttsAutoplay,
+  locale = "en-GLOBAL",
   onAnswerAsModel,
   onDelete,
   showAuthor = false,
-}: AssistantMessageBubbleProps) {
+  logger,
+}: AssistantMessageBubbleProps): JSX.Element {
+  const { t } = simpleT(locale);
+
   // Create author object from model and tone if not already present
+  const modelId = message.role === "assistant" ? message.model : undefined;
+  const tone =
+    message.role === "assistant" || message.role === "user"
+      ? message.tone
+      : undefined;
+
   const author = message.author || {
-    id: message.model || "assistant",
-    name: message.model ? getModelById(message.model).name : "Assistant",
+    id: modelId || "assistant",
+    name: modelId
+      ? getModelById(modelId).name
+      : t("app.chat.messages.assistant"),
     isAI: true,
-    modelId: message.model,
+    modelId,
   };
 
   return (
@@ -41,7 +61,8 @@ export function AssistantMessageBubble({
               author={author}
               timestamp={message.timestamp}
               edited={message.metadata?.edited}
-              tone={message.tone}
+              tone={tone}
+              locale={locale}
               compact
             />
           </div>
@@ -56,8 +77,11 @@ export function AssistantMessageBubble({
           <AssistantMessageActions
             messageId={message.id}
             content={message.content}
+            ttsAutoplay={ttsAutoplay}
+            locale={locale}
             onAnswerAsModel={onAnswerAsModel}
             onDelete={onDelete}
+            logger={logger}
           />
         </div>
       </div>

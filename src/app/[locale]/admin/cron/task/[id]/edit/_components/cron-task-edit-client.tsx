@@ -51,14 +51,14 @@ export function CronTaskEditClient({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold">
-            {t("admin.dashboard.cron.taskDetails.edit")}
+            {t("app.admin.cron.taskDetails.edit")}
           </h2>
           <p className="text-sm text-muted-foreground">
             {initialData.name} • {initialData.schedule}
           </p>
         </div>
         <Button onClick={handleBack} variant="outline">
-          {t("admin.dashboard.cron.taskDetails.back")}
+          {t("app.admin.cron.taskDetails.back")}
         </Button>
       </div>
 

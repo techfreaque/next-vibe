@@ -6,6 +6,20 @@
 import { z } from "zod";
 
 import {
+  CampaignType,
+  CampaignTypeOptions,
+} from "@/app/api/[locale]/v1/core/emails/smtp-client/enum";
+import {
+  EmailCampaignStage,
+  EmailCampaignStageOptions,
+  EmailJourneyVariant,
+  EmailJourneyVariantOptions,
+  LeadSource,
+  LeadSourceOptions,
+  LeadStatus,
+  LeadStatusOptions,
+} from "@/app/api/[locale]/v1/core/leads/enum";
+import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
@@ -18,8 +32,13 @@ import {
   requestDataField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
-
-import { UserRole } from "../../../../user/user-roles/enum";
+import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import {
+  Countries,
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "@/i18n/core/config";
 
 /**
  * Send Test Email Endpoint (POST)
@@ -54,7 +73,7 @@ const { POST } = createEndpoint({
       campaignType: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
+          fieldType: FieldDataType.SELECT,
           label:
             "app.api.v1.core.leads.campaigns.emails.testMail.post.campaignType.label",
           description:
@@ -62,13 +81,14 @@ const { POST } = createEndpoint({
           placeholder:
             "app.api.v1.core.leads.campaigns.emails.testMail.post.campaignType.placeholder",
           layout: { columns: 12 },
+          options: CampaignTypeOptions,
         },
-        z.string().optional(),
+        z.nativeEnum(CampaignType).optional(),
       ),
       emailJourneyVariant: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
+          fieldType: FieldDataType.SELECT,
           label:
             "app.api.v1.core.leads.campaigns.emails.testMail.post.emailJourneyVariant.label",
           description:
@@ -76,13 +96,14 @@ const { POST } = createEndpoint({
           placeholder:
             "app.api.v1.core.leads.campaigns.emails.testMail.post.emailJourneyVariant.placeholder",
           layout: { columns: 12 },
+          options: EmailJourneyVariantOptions,
         },
-        z.string().optional(),
+        z.nativeEnum(EmailJourneyVariant),
       ),
       emailCampaignStage: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
+          fieldType: FieldDataType.SELECT,
           label:
             "app.api.v1.core.leads.campaigns.emails.testMail.post.emailCampaignStage.label",
           description:
@@ -90,8 +111,9 @@ const { POST } = createEndpoint({
           placeholder:
             "app.api.v1.core.leads.campaigns.emails.testMail.post.emailCampaignStage.placeholder",
           layout: { columns: 12 },
+          options: EmailCampaignStageOptions,
         },
-        z.string().optional(),
+        z.nativeEnum(EmailCampaignStage),
       ),
 
       // Test recipient
@@ -189,7 +211,7 @@ const { POST } = createEndpoint({
           country: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
+              fieldType: FieldDataType.SELECT,
               label:
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.country.label",
               description:
@@ -198,13 +220,14 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.country.placeholder",
               layout: { columns: 6 },
               validation: { required: true },
+              options: CountriesOptions,
             },
-            z.string(),
+            z.nativeEnum(Countries),
           ),
           language: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
+              fieldType: FieldDataType.SELECT,
               label:
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.language.label",
               description:
@@ -213,13 +236,14 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.language.placeholder",
               layout: { columns: 6 },
               validation: { required: true },
+              options: LanguagesOptions,
             },
-            z.string(),
+            z.nativeEnum(Languages),
           ),
           status: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
+              fieldType: FieldDataType.SELECT,
               label:
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.status.label",
               description:
@@ -228,13 +252,14 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.status.placeholder",
               layout: { columns: 6 },
               validation: { required: true },
+              options: LeadStatusOptions,
             },
-            z.string(),
+            z.nativeEnum(LeadStatus),
           ),
           source: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
+              fieldType: FieldDataType.SELECT,
               label:
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.source.label",
               description:
@@ -242,8 +267,9 @@ const { POST } = createEndpoint({
               placeholder:
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.source.placeholder",
               layout: { columns: 6 },
+              options: LeadSourceOptions,
             },
-            z.string().optional().nullable(),
+            z.nativeEnum(LeadSource).optional().nullable(),
           ),
           notes: requestDataField(
             {
@@ -393,18 +419,18 @@ const { POST } = createEndpoint({
     urlPathVariables: undefined,
     requests: {
       default: {
-        campaignType: "newsletter",
-        emailJourneyVariant: "PERSONAL_APPROACH",
-        emailCampaignStage: "INITIAL",
+        campaignType: CampaignType.LEAD_CAMPAIGN,
+        emailJourneyVariant: EmailJourneyVariant.PERSONAL_APPROACH,
+        emailCampaignStage: EmailCampaignStage.INITIAL,
         testEmail: "test@example.com",
         leadData: {
           businessName: "Test Company",
           contactName: "John Doe",
           website: "https://example.com",
-          country: "GLOBAL",
-          language: "en",
-          status: "NEW",
-          source: "WEBSITE",
+          country: Countries.GLOBAL,
+          language: Languages.EN,
+          status: LeadStatus.NEW,
+          source: LeadSource.WEBSITE,
           notes: "Test email for campaign validation",
         },
       },

@@ -1377,7 +1377,7 @@ class AuthRepositoryImpl implements AuthRepository {
     );
 
     if (!hasAdminRole.success || !hasAdminRole.data) {
-      redirect(`/${locale}/app/onboarding`);
+      redirect(`/${locale}/`);
     }
 
     return user;

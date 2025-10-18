@@ -87,13 +87,8 @@ export function CronStatsChart({
   // Transform data for chart consumption
   const chartData = Object.entries(data).reduce(
     (acc, [key, series]) => {
-      if (
-        Array.isArray(series) &&
-        series.length > 0 &&
-        series[0] &&
-        Array.isArray(series[0].data)
-      ) {
-        series[0].data.forEach(
+      if (Array.isArray(series) && series.length > 0) {
+        series.forEach(
           (point: { date: string; value: number }, index: number) => {
             if (!acc[index]) {
               acc[index] = { date: point.date };

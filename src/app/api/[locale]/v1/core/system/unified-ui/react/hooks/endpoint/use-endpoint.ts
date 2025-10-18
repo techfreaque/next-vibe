@@ -12,6 +12,7 @@ import type { CreateApiEndpoint } from "../../../cli/vibe/endpoints/endpoint-typ
 import type { AutoPrefillConfig } from "../form/types";
 import {
   type EndpointReturn,
+  type EndpointUrlVariables,
   type FormAlertState,
   type GetEndpointTypes,
   type PrimaryMutationTypes,
@@ -35,9 +36,7 @@ function normalizeOptions<T>(options: UseEndpointOptions<T> = {}): {
     requestData?: GetEndpointTypes<T> extends never
       ? undefined
       : GetEndpointTypes<T>["request"];
-    urlParams?: GetEndpointTypes<T> extends never
-      ? undefined
-      : GetEndpointTypes<T>["urlVariables"];
+    urlParams?: EndpointUrlVariables<T>;
     staleTime: number;
     refetchOnWindowFocus: boolean;
   };
@@ -90,7 +89,6 @@ export function useEndpoint<
   T extends Partial<
     Record<
       Methods,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
     >
   >,

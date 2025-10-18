@@ -1,8 +1,13 @@
 /**
  * API utilities for chat functionality
+ * This file builds system prompts and context metadata for AI models.
+ * All strings here are technical instructions for AI, not user-facing text.
  */
 
+/* eslint-disable i18next/no-literal-string */
+
 import { formattingInstructions } from "@/app/api/[locale]/v1/core/agent/chat/ai-stream/sytem-prompt";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ModelId } from "../config/models";
 import { getModelById } from "../config/models";
@@ -18,9 +23,6 @@ const API_CONSTANTS = {
   /** Length of message ID prefix for display */
   ID_DISPLAY_LENGTH: 8,
 
-  /** Default locale for date formatting */
-  DEFAULT_LOCALE: "en-US",
-
   /** Default persona name */
   DEFAULT_PERSONA: "default",
 } as const;
@@ -29,8 +31,10 @@ const API_CONSTANTS = {
  * Handle API response errors consistently
  */
 export async function handleAPIError(response: Response): Promise<never> {
+  // eslint-disable-next-line no-restricted-syntax -- Error data can be any type
   let errorData: Record<string, unknown> = {};
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Response JSON can be any type
     errorData = await response.json();
   } catch {
     // If JSON parsing fails, use empty object
@@ -41,20 +45,25 @@ export async function handleAPIError(response: Response): Promise<never> {
     (errorData.message as string) ||
     `API error: ${response.statusText}`;
 
+  // eslint-disable-next-line no-restricted-syntax -- Throwing APIError is the correct pattern here
   throw new APIError(
     errorMessage,
     response.status,
     response.statusText,
-    errorData.details,
+    // eslint-disable-next-line no-restricted-syntax -- Error details can be any type
+    errorData.details as Error | Record<string, unknown> | null,
   );
 }
 
 /**
  * Format timestamp as readable date/time
  */
-function formatMessageTimestamp(timestamp: number): string {
+function formatMessageTimestamp(
+  timestamp: number,
+  locale: CountryLanguage,
+): string {
   const date = new Date(timestamp);
-  return date.toLocaleString(API_CONSTANTS.DEFAULT_LOCALE, {
+  return date.toLocaleString(locale, {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -123,6 +132,7 @@ export interface ChatCompletionRequest {
  */
 export function convertMessagesToAPIFormat(
   messages: ChatMessage[],
+  locale: CountryLanguage,
 ): APIMessage[] {
   return messages
     .filter((m) => m.role === "user" || m.role === "assistant")
@@ -136,13 +146,13 @@ export function convertMessagesToAPIFormat(
           m.author?.name ||
           m.author?.id?.substring(0, API_CONSTANTS.ID_DISPLAY_LENGTH) ||
           "User";
-        const timestamp = formatMessageTimestamp(m.timestamp);
+        const timestamp = formatMessageTimestamp(m.timestamp, locale);
         contextMetadata = `<context>User: ${userName} | ID: ${m.id.substring(0, API_CONSTANTS.ID_DISPLAY_LENGTH)} | ${timestamp}</context>\n`;
       } else if (m.role === "assistant") {
         // Assistant message context
         const modelName = m.model ? getModelById(m.model).name : "Assistant";
         const personaDetails = getPersonaDetails(m.tone);
-        const timestamp = formatMessageTimestamp(m.timestamp);
+        const timestamp = formatMessageTimestamp(m.timestamp, locale);
         contextMetadata = `<context>Assistant: ${modelName} (${personaDetails.name}) | ID: ${m.id.substring(0, API_CONSTANTS.ID_DISPLAY_LENGTH)} | ${timestamp}</context>\n`;
       }
 
@@ -164,7 +174,7 @@ function buildEnhancedSystemPrompt(
 ): string {
   const modelName = getModelById(modelId).name;
   const personaDetails = getPersonaDetails(tone);
-  const threadName = thread.name || "Untitled Conversation";
+  const threadName = thread.title || "Untitled Conversation";
 
   // Build context sections
   const sections: string[] = [formattingInstructions.join("; ")];
@@ -182,32 +192,92 @@ function buildEnhancedSystemPrompt(
     ? thread.messages[parentMessageId]
     : null;
   const isAnswerAsAI = parentMessage?.role === "assistant";
+  const isAnswerToUser = parentMessage?.role === "user";
 
   // Parent message context (if responding to a specific message)
-  if (parentMessageId) {
-    sections.push(
-      `Responding to message ID: ${parentMessageId.substring(0, API_CONSTANTS.ID_DISPLAY_LENGTH)}`,
+  if (parentMessageId && parentMessage) {
+    const parentId = parentMessageId.substring(
+      0,
+      API_CONSTANTS.ID_DISPLAY_LENGTH,
     );
+
+    if (isAnswerAsAI) {
+      // Responding to an AI message
+      const parentModelName = parentMessage.model
+        ? getModelById(parentMessage.model).name
+        : "Assistant";
+      const parentPersonaDetails = getPersonaDetails(parentMessage.tone);
+      sections.push(
+        `\nResponding to: AI message (${parentModelName} with ${parentPersonaDetails.name} persona) | ID: ${parentId}`,
+      );
+    } else if (isAnswerToUser) {
+      // Responding to a user message
+      const userName =
+        parentMessage.author?.name ||
+        parentMessage.author?.id?.substring(
+          0,
+          API_CONSTANTS.ID_DISPLAY_LENGTH,
+        ) ||
+        "User";
+      sections.push(
+        `\nResponding to: User message from ${userName} | ID: ${parentId}`,
+      );
+    }
   }
 
   // Model and persona context
-  sections.push(`You are: ${modelName} with ${personaDetails.name} persona`);
+  sections.push(`\nYou are: ${modelName} with ${personaDetails.name} persona`);
 
   // Special instruction for Answer as AI feature
   if (isAnswerAsAI) {
+    const parentModelName = parentMessage.model
+      ? getModelById(parentMessage.model).name
+      : "Assistant";
+    const parentPersonaDetails = getPersonaDetails(parentMessage.tone);
+
     sections.push(
-      `\nIMPORTANT: You are generating a new AI response continuing from a previous assistant message. You MUST respond according to the ${personaDetails.name} persona specified above, not based on the style or persona of the previous assistant message. Follow the persona instructions strictly.`,
+      `\n=== RESPOND AS AI MODE ===`,
+      `You are responding to a previous AI assistant message in this conversation branch.`,
+      ``,
+      `CONTEXT AWARENESS:`,
+      `- The last message in the conversation is from: ${parentModelName} (${parentPersonaDetails.name} persona)`,
+      `- You can see the full conversation history leading up to this point`,
+      `- Your response will create a new branch in the conversation`,
+      ``,
+      `YOUR ROLE:`,
+      `- You are ${modelName} with ${personaDetails.name} persona`,
+      `- Respond DIRECTLY to the last assistant message based on your persona`,
+      `- You can: agree, disagree, add context, correct mistakes, provide alternative perspectives, make jokes, challenge assumptions, or continue the discussion`,
+      `- Your response should be relevant to what the previous AI said`,
+      ``,
+      `IMPORTANT:`,
+      `- Follow your ${personaDetails.name} persona strictly - do NOT mimic the previous assistant's style or persona`,
+      `- Address the content of the last message directly`,
+      `- Be natural and conversational as if you're joining an ongoing discussion`,
+      `- Consider the full conversation context when forming your response`,
+    );
+  } else if (isAnswerToUser) {
+    sections.push(
+      `\n=== STANDARD RESPONSE MODE ===`,
+      `You are responding to a user message.`,
+      `Provide a helpful, relevant response based on your persona and the conversation context.`,
     );
   }
 
   // Persona system prompt
   if (personaDetails.systemPrompt) {
-    sections.push(`\n${personaDetails.systemPrompt}`);
+    sections.push(
+      `\n=== PERSONA INSTRUCTIONS ===`,
+      personaDetails.systemPrompt,
+    );
   }
 
   // Thread-specific system prompt (if any)
   if (thread.settings?.systemPrompt) {
-    sections.push(`\nAdditional instructions: ${thread.settings.systemPrompt}`);
+    sections.push(
+      `\n=== ADDITIONAL INSTRUCTIONS ===`,
+      thread.settings.systemPrompt,
+    );
   }
 
   return sections.join("\n");
@@ -224,6 +294,7 @@ export function buildChatCompletionRequest(
   temperature = 0.7,
   maxTokens = 2000,
   enableSearch = false,
+  locale: CountryLanguage,
 ): ChatCompletionRequest {
   const messages = getMessagesInPath(thread);
   const modelConfig = getModelById(modelId);
@@ -235,7 +306,7 @@ export function buildChatCompletionRequest(
   );
 
   return {
-    messages: convertMessagesToAPIFormat(messages),
+    messages: convertMessagesToAPIFormat(messages, locale),
     model: modelConfig.openRouterModel,
     temperature,
     maxTokens,

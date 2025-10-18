@@ -25,7 +25,7 @@ export async function generateMetadata(
     path: "imprint",
     title: "meta.imprint.title",
     description: "meta.imprint.description",
-    image: "https://socialmediaservice.com/images/imprint-hero.jpg",
+    image: "https://unbottled.ai/images/imprint-hero.jpg",
     category: "meta.imprint.category",
     imageAlt: "meta.imprint.imageAlt",
     keywords: ["meta.imprint.keywords"],
@@ -33,7 +33,7 @@ export async function generateMetadata(
       openGraph: {
         title: "meta.imprint.ogTitle",
         description: "meta.imprint.ogDescription",
-        url: `https://socialmediaservice.com/${locale}/imprint`,
+        url: `https://unbottled.ai/${locale}/imprint`,
         type: "website",
         images: [...previousImages],
       },
