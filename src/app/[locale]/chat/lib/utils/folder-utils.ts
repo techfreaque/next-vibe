@@ -122,8 +122,8 @@ export function getAncestorFolderIds(
   let currentId: string | null = folderId;
 
   while (currentId) {
-    const folder = folders[currentId];
-    if (!folder || !folder.parentId) {
+    const folder: ChatFolder | undefined = folders[currentId];
+    if (!folder?.parentId) {
       break;
     }
     ancestors.push(folder.parentId);
@@ -146,7 +146,7 @@ export function isFolderDescendant(
   }
 
   const folder = folders[folderId];
-  if (!folder || !folder.parentId) {
+  if (!folder?.parentId) {
     return false;
   }
 
@@ -194,4 +194,3 @@ export function getRootFolderIdForFolder(
 
   return folder.rootFolderId;
 }
-

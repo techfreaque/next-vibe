@@ -156,7 +156,7 @@ export const chatThreads = pgTable(
 
     // Settings
     defaultModel: text("default_model").$type<ModelId | null>(), // ModelId
-    defaultTone: text("default_tone").$type<PersonaId | null>(), // Persona/tone
+    defaultPersona: text("default_tone").$type<PersonaId | null>(), // Persona (DB column is "default_tone" for backwards compatibility)
     systemPrompt: text("system_prompt"),
 
     // Metadata
@@ -223,7 +223,7 @@ export const chatMessages = pgTable(
 
     // AI-specific fields
     model: text("model"), // ModelId if AI message
-    tone: text("tone"), // Persona/tone used
+    persona: text("tone"), // Persona used (DB column is "tone" for backwards compatibility)
 
     // Error information (for error messages)
     errorType: text("error_type"),

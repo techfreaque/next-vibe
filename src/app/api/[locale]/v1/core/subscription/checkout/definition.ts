@@ -20,11 +20,7 @@ import {
 import { LayoutType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import {
-  BillingInterval,
-  SubscriptionPlan,
-  SubscriptionPlanOptions,
-} from "../enum";
+import { BillingInterval, SubscriptionPlan } from "../enum";
 
 /**
  * POST endpoint for creating subscription checkout sessions
@@ -70,7 +66,12 @@ const { POST } = createEndpoint({
             "app.api.v1.core.subscription.checkout.form.fields.planId.placeholder" as const,
           layout: { columns: 6 },
           validation: { required: true },
-          options: SubscriptionPlanOptions,
+          options: [
+            {
+              value: SubscriptionPlan.SUBSCRIPTION,
+              label: "app.api.v1.core.subscription.plans.starter" as const,
+            },
+          ],
         },
         z.enum(SubscriptionPlan),
       ),

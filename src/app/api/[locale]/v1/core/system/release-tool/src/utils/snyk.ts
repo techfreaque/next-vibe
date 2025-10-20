@@ -7,7 +7,7 @@ import { logger, loggerError } from "./logger.js";
 /**
  * Runs Snyk vulnerability test for a package
  */
-export function runSnykTest(cwd: string, packageName: string): void {
+export function runSnykTest(cwd: string, packageName: string, logger: EndpointLogger): void {
   logger(`Running Snyk vulnerability test for ${packageName}`);
 
   try {
@@ -39,7 +39,7 @@ export function runSnykTest(cwd: string, packageName: string): void {
 /**
  * Runs Snyk monitor to upload project to Snyk dashboard (CI mode)
  */
-export function runSnykMonitor(cwd: string, packageName: string): void {
+export function runSnykMonitor(cwd: string, packageName: string, logger: EndpointLogger): void {
   logger(`Running Snyk monitor for ${packageName}`);
 
   try {

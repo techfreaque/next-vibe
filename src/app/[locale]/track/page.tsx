@@ -37,6 +37,7 @@ export default function TrackPage(): React.ReactElement {
           );
 
         if (!validationResult.success) {
+          // eslint-disable-next-line i18next/no-literal-string
           errorLogger("Invalid tracking parameters", {
             url: window.location.href,
             searchParams: Object.fromEntries(searchParams),
@@ -47,6 +48,7 @@ export default function TrackPage(): React.ReactElement {
 
         const { validatedParams } = validationResult.data;
         if (!validatedParams) {
+          // eslint-disable-next-line i18next/no-literal-string
           errorLogger("No validated parameters found", {
             url: window.location.href,
           });
@@ -54,6 +56,7 @@ export default function TrackPage(): React.ReactElement {
           return;
         }
 
+        // eslint-disable-next-line i18next/no-literal-string
         debugLogger("Processing tracking click", {
           id: validatedParams.id,
           campaignId: validatedParams.campaignId,
@@ -82,6 +85,7 @@ export default function TrackPage(): React.ReactElement {
             },
           );
 
+          // eslint-disable-next-line i18next/no-literal-string
           debugLogger("Making tracking API call", {
             trackingUrl,
           });
@@ -93,6 +97,7 @@ export default function TrackPage(): React.ReactElement {
             data?: { redirectUrl: string };
           };
 
+          // eslint-disable-next-line i18next/no-literal-string
           debugLogger("Tracking API response", {
             success: result.success,
             leadId: validatedParams.id,
@@ -107,6 +112,7 @@ export default function TrackPage(): React.ReactElement {
           window.location.assign(redirectUrl);
         }
       } catch (error) {
+        // eslint-disable-next-line i18next/no-literal-string
         errorLogger("Error in tracking page", error);
         // Fallback redirect to home page
         router.push(`/${locale}`);

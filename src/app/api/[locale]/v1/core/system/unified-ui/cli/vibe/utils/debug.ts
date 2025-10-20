@@ -6,8 +6,9 @@
  */
 
 /* eslint-disable no-console */
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../types/node.d.ts" />
 
-import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

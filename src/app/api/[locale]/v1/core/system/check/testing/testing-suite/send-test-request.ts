@@ -1,3 +1,6 @@
+/* eslint-disable i18next/no-literal-string */
+// Testing infrastructure - error messages are for test debugging, not end users
+
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -59,7 +62,6 @@ export async function sendTestRequest<
         searchParams.append(key, String(value));
       }
     }
-    // eslint-disable-next-line i18next/no-literal-string
     const url = `/${endpoint.path.join("/")}?${searchParams.toString()}`;
     // In a real implementation, we would create a session for the user
     // This is a placeholder for session creation
@@ -68,7 +70,6 @@ export async function sendTestRequest<
     const testServer = env.NEXT_PUBLIC_TEST_SERVER_URL;
     const response = await request(testServer)
       .post(url)
-      // eslint-disable-next-line i18next/no-literal-string
       .set("Authorization", `Bearer ${token}`)
       .send(data as Parameters<typeof request.Test.prototype.send>[0]);
 
@@ -76,11 +77,11 @@ export async function sendTestRequest<
     // This is a placeholder for session cleanup
 
     const responseData = response.body as
-      | ResponseType<TResponseInput>
+      | ResponseType<TResponseOutput>
       | undefined;
     if (!responseData) {
       return createErrorResponse(
-        "error.error.no_response_data",
+        "app.api.v1.core.system.check.testing.test.errors.internal.title",
         ErrorResponseTypes.NO_RESPONSE_DATA,
         { endpoint: endpoint.path.join("/") },
       );
@@ -89,7 +90,7 @@ export async function sendTestRequest<
     return responseData;
   } catch (error) {
     return createErrorResponse(
-      "error.error.endpoint_test_error",
+      "app.api.v1.core.system.check.testing.test.errors.internal.title",
       ErrorResponseTypes.INTERNAL_ERROR,
       { error: parseError(error).message },
     );

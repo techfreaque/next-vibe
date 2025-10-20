@@ -15,7 +15,6 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import type { JSX, ReactNode } from "react";
-import type { Control } from "react-hook-form";
 
 import type statsEndpoints from "@/app/api/[locale]/v1/core/system/tasks/cron/stats/definition";
 import {
@@ -32,11 +31,11 @@ interface CronStatsFiltersContainerProps {
   children: ReactNode;
   onRefresh?: () => void;
   title?: string;
-  form: EndpointReturn<typeof statsEndpoints.GET>["read"]["form"];
+  form: EndpointReturn<typeof statsEndpoints>["read"]["form"];
 }
 
 interface CronStatsFiltersProps {
-  control: EndpointReturn<typeof statsEndpoints.GET>["read"]["form"]["control"];
+  control: EndpointReturn<typeof statsEndpoints>["read"]["form"]["control"];
 }
 
 /**
@@ -170,8 +169,7 @@ export function CronStatsFilters({
           placeholder: "app.admin.cron.stats.filters.selectTaskStatus",
           options: Object.values(CronTaskStatusFilter).map((status) => ({
             value: status,
-            label:
-              `admin.dashboard.cron.stats.filters.status.${status}` as const,
+            label: `app.admin.cron.stats.filters.status.${status}`,
           })),
         }}
       />
@@ -185,8 +183,7 @@ export function CronStatsFilters({
           placeholder: "app.admin.cron.stats.filters.selectTaskPriority",
           options: Object.values(CronTaskPriorityFilter).map((priority) => ({
             value: priority,
-            label:
-              `admin.dashboard.cron.stats.filters.priority.${priority}` as const,
+            label: `app.admin.cron.stats.filters.priority.${priority}`,
           })),
         }}
       />
@@ -200,8 +197,7 @@ export function CronStatsFilters({
           placeholder: "app.admin.cron.stats.filters.selectHealthStatus",
           options: Object.values(PulseHealthStatus).map((status) => ({
             value: status,
-            label:
-              `admin.dashboard.cron.stats.filters.health.${status}` as const,
+            label: `app.admin.cron.stats.filters.health.${status}`,
           })),
         }}
       />

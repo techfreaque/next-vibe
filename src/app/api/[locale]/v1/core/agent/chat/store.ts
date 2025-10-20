@@ -7,7 +7,7 @@ import { create } from "zustand";
 
 import type { DefaultFolderId } from "./config";
 import type { IconValue } from "./model-access/icons";
-import type { ModelId } from "./model-access/models";
+import { ModelId, type ModelId as ModelIdType } from "./model-access/models";
 
 /**
  * Chat thread type
@@ -20,7 +20,7 @@ export interface ChatThread {
   folderId: string | null;
   status: "active" | "archived" | "deleted";
   defaultModel: ModelId | null;
-  defaultTone: string | null;
+  defaultPersona: string | null;
   systemPrompt: string | null;
   pinned: boolean;
   archived: boolean;
@@ -44,7 +44,7 @@ export interface ChatMessage {
   authorName: string | null;
   isAI: boolean;
   model: ModelId | null;
-  tone: string | null;
+  persona: string | null;
   errorType: string | null;
   errorMessage: string | null;
   edited: boolean;
@@ -73,6 +73,18 @@ export interface ChatFolder {
 }
 
 /**
+ * Chat settings type
+ */
+export interface ChatSettings {
+  selectedModel: ModelIdType;
+  selectedPersona: string;
+  temperature: number;
+  maxTokens: number;
+  ttsAutoplay: boolean;
+  sidebarCollapsed: boolean;
+}
+
+/**
  * Chat state
  */
 interface ChatState {
@@ -87,6 +99,9 @@ interface ChatState {
   currentSubFolderId: string | null;
   isLoading: boolean;
 
+  // Settings (persisted to localStorage)
+  settings: ChatSettings;
+
   // Thread actions
   addThread: (thread: ChatThread) => void;
   updateThread: (threadId: string, updates: Partial<ChatThread>) => void;
@@ -98,6 +113,9 @@ interface ChatState {
   updateMessage: (messageId: string, updates: Partial<ChatMessage>) => void;
   deleteMessage: (messageId: string) => void;
   getThreadMessages: (threadId: string) => ChatMessage[];
+
+  // Settings actions
+  updateSettings: (updates: Partial<ChatSettings>) => void;
 
   // Folder actions
   addFolder: (folder: ChatFolder) => void;
@@ -117,6 +135,51 @@ interface ChatState {
   reset: () => void;
 }
 
+// Helper to load settings from localStorage
+const loadSettings = (): ChatSettings => {
+  if (typeof window === "undefined") {
+    return {
+      selectedModel: ModelId.GPT_5_MINI,
+      selectedPersona: "default",
+      temperature: 0.7,
+      maxTokens: 2000,
+      ttsAutoplay: false,
+      sidebarCollapsed: false,
+    };
+  }
+
+  try {
+    const stored = localStorage.getItem("chat-settings");
+    if (stored) {
+      return JSON.parse(stored) as ChatSettings;
+    }
+  } catch {
+    // Silently fail and return defaults
+  }
+
+  return {
+    selectedModel: ModelId.GPT_5_MINI,
+    selectedPersona: "default",
+    temperature: 0.7,
+    maxTokens: 2000,
+    ttsAutoplay: false,
+    sidebarCollapsed: false,
+  };
+};
+
+// Helper to save settings to localStorage
+const saveSettings = (settings: ChatSettings): void => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    localStorage.setItem("chat-settings", JSON.stringify(settings));
+  } catch {
+    // Silently fail
+  }
+};
+
 /**
  * Create chat store
  */
@@ -129,6 +192,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
   currentRootFolderId: "private",
   currentSubFolderId: null,
   isLoading: false,
+
+  // Load settings from localStorage
+  settings: loadSettings(),
 
   // Thread actions
   addThread: (thread: ChatThread): void =>
@@ -255,6 +321,19 @@ export const useChatStore = create<ChatState>((set, get) => ({
       };
     }),
 
+  // Settings actions
+  updateSettings: (updates: Partial<ChatSettings>): void =>
+    set((state) => {
+      const newSettings = {
+        ...state.settings,
+        ...updates,
+      };
+      saveSettings(newSettings);
+      return {
+        settings: newSettings,
+      };
+    }),
+
   // Navigation
   setCurrentFolder: (
     rootFolderId: DefaultFolderId,
@@ -272,7 +351,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }),
 
   // Reset
-  reset: (): void =>
+  reset: (): void => {
+    const defaultSettings = {
+      selectedModel: ModelId.GPT_5_MINI,
+      selectedPersona: "default",
+      temperature: 0.7,
+      maxTokens: 2000,
+      ttsAutoplay: false,
+      sidebarCollapsed: false,
+    };
+    saveSettings(defaultSettings);
     set({
       threads: {},
       messages: {},
@@ -281,5 +369,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       currentRootFolderId: "private",
       currentSubFolderId: null,
       isLoading: false,
-    }),
+      settings: defaultSettings,
+    });
+  },
 }));

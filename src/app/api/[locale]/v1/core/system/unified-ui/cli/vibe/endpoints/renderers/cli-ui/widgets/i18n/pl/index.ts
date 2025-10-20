@@ -21,5 +21,6 @@ export const translations = {
     rule: "Reguła",
     andMoreItems: "... i {{count}} więcej elementów",
     errorsAndWarnings: "{{errorCount}} błędów, {{warningCount}} ostrzeżeń",
+    invalidDataFormat: "Nieprawidłowy format danych",
   },
 };

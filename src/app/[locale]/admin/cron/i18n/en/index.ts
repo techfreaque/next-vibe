@@ -11,8 +11,10 @@ export const translations = {
   task: taskTranslations,
   tasks: tasksTranslations,
   // Shared cron-level translations
+  taskManagement: "Task Management",
   taskDetails: {
     edit: "Edit Task",
+    editDescription: "Modify task configuration and settings",
     back: "Back",
   },
   nav: {
@@ -27,6 +29,7 @@ export const translations = {
   buttons: {
     previous: "Previous",
     next: "Next",
+    createTask: "Create Task",
   },
   executionHistory: {
     titleWithCount: "Execution History ({{count}})",

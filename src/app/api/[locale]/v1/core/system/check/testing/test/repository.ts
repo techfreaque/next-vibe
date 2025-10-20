@@ -3,6 +3,9 @@
  * Handles run tests operations
  */
 
+/* eslint-disable i18next/no-literal-string */
+// CLI output messages don't need internationalization
+
 import type { ResponseType as ApiResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,

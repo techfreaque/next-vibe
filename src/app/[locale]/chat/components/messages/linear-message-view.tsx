@@ -24,7 +24,7 @@ import { UserMessageBubble } from "./user-message-bubble";
 interface LinearMessageViewProps {
   messages: ChatMessage[];
   selectedModel: ModelId;
-  selectedTone: string;
+  selectedPersona: string;
   ttsAutoplay: boolean;
   locale: CountryLanguage;
 
@@ -34,13 +34,11 @@ interface LinearMessageViewProps {
   answeringMessageId: string | null;
 
   // Action handlers
-  onEditMessage: (messageId: string, newContent: string) => Promise<void>;
   onDeleteMessage: (messageId: string) => void;
-  onBranchMessage?: (messageId: string, newContent: string) => Promise<void>;
   onRetryMessage?: (messageId: string) => Promise<void>;
   onAnswerAsModel?: (messageId: string) => Promise<void>;
   onModelChange?: (model: ModelId) => void;
-  onToneChange?: (tone: string) => void;
+  onPersonaChange?: (persona: string) => void;
 
   // UI handlers
   onStartEdit: (messageId: string) => void;
@@ -56,7 +54,7 @@ interface LinearMessageViewProps {
 export function LinearMessageView({
   messages,
   selectedModel,
-  selectedTone,
+  selectedPersona,
   ttsAutoplay,
   locale,
   editingMessageId,
@@ -66,7 +64,7 @@ export function LinearMessageView({
   onRetryMessage,
   onAnswerAsModel,
   onModelChange,
-  onToneChange,
+  onPersonaChange,
   onStartEdit,
   onStartRetry,
   onStartAnswer,
@@ -89,11 +87,11 @@ export function LinearMessageView({
                 <MessageEditor
                   message={message}
                   selectedModel={selectedModel}
-                  selectedTone={selectedTone}
+                  selectedPersona={selectedPersona}
                   onSave={onSaveEdit}
                   onCancel={onCancelAction}
                   onModelChange={onModelChange}
-                  onToneChange={onToneChange}
+                  onPersonaChange={onPersonaChange}
                   onBranch={onBranchEdit}
                   locale={locale}
                   logger={logger}
@@ -105,15 +103,15 @@ export function LinearMessageView({
                   titleKey="app.chat.linearMessageView.retryModal.title"
                   descriptionKey="app.chat.linearMessageView.retryModal.description"
                   selectedModel={selectedModel}
-                  selectedTone={selectedTone}
+                  selectedPersona={selectedPersona}
                   onModelChange={
                     onModelChange ||
                     ((): void => {
                       /* no-op */
                     })
                   }
-                  onToneChange={
-                    onToneChange ||
+                  onPersonaChange={
+                    onPersonaChange ||
                     ((): void => {
                       /* no-op */
                     })
@@ -135,15 +133,15 @@ export function LinearMessageView({
                 titleKey="app.chat.linearMessageView.answerModal.title"
                 descriptionKey="app.chat.linearMessageView.answerModal.description"
                 selectedModel={selectedModel}
-                selectedTone={selectedTone}
+                selectedPersona={selectedPersona}
                 onModelChange={
                   onModelChange ||
                   ((): void => {
                     /* no-op */
                   })
                 }
-                onToneChange={
-                  onToneChange ||
+                onPersonaChange={
+                  onPersonaChange ||
                   ((): void => {
                     /* no-op */
                   })

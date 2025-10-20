@@ -1,4 +1,8 @@
+/// <reference types="node" />
+
 import { join } from "node:path";
+
+import { simpleT } from "@/i18n/core/shared";
 
 import type { LaunchpadConfig } from "../types/types.js";
 import { logger } from "../utils/logger.js";
@@ -9,13 +13,15 @@ import {
   repoExists,
 } from "../utils/repo-utils.js";
 
+const { t } = simpleT("en-GLOBAL");
+
 export async function cloneMissingRepos(
   rootDir: string,
   config: LaunchpadConfig,
 ): Promise<void> {
   // await updateRootRepo(false, rootDir);
 
-  logger("Checking for missing repositories...");
+  logger(t("app.api.v1.core.system.launchpad.cloneMissing.checking"));
   const repos = getAllRepos(config);
   let clonedCount = 0;
   let failedCount = 0;
@@ -37,21 +43,37 @@ export async function cloneMissingRepos(
         const repoPath = join(...repo.path);
         failedRepos.push(repoPath);
         logger(
-          `⚠️  Failed to clone ${repoPath}, continuing with other repositories...`,
+          t("app.api.v1.core.system.launchpad.cloneMissing.failedToCone", {
+            repoPath,
+          }),
         );
       }
     }
   }
 
   if (clonedCount === 0 && failedCount === 0) {
-    logger("No missing repositories found.");
+    logger(t("app.api.v1.core.system.launchpad.cloneMissing.noMissing"));
   } else {
     if (clonedCount > 0) {
-      logger(`✅ Successfully cloned ${clonedCount} missing repositories.`);
+      logger(
+        t("app.api.v1.core.system.launchpad.cloneMissing.success", {
+          count: clonedCount.toString(),
+        }),
+      );
     }
     if (failedCount > 0) {
-      logger(`❌ Failed to clone ${failedCount} repositories:`);
-      failedRepos.forEach((repo) => logger(`   - ${repo}`));
+      logger(
+        t("app.api.v1.core.system.launchpad.cloneMissing.failed", {
+          count: failedCount.toString(),
+        }),
+      );
+      failedRepos.forEach((repo) =>
+        logger(
+          t("app.api.v1.core.system.launchpad.cloneMissing.failedRepo", {
+            repo,
+          }),
+        ),
+      );
     }
   }
 

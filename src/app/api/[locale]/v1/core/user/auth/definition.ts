@@ -21,6 +21,7 @@ const publicJwtPayloadSchema = z.object({
 
 const privateJwtPayloadSchema = z.object({
   id: z.uuid(),
+  // user has always a leadId
   leadId: z.uuid(),
   isPublic: z.literal(false),
 });

@@ -9,4 +9,10 @@ export const translations: typeof enTranslations = {
     title: "Sukces",
     content: "Sukces",
   },
+  errors: {
+    server: {
+      title: "Błąd serwera",
+      description: "Wystąpił błąd podczas pobierania statusu cron",
+    },
+  },
 };

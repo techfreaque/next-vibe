@@ -98,7 +98,7 @@ class CronStatusRepositoryImpl implements ICronStatusRepository {
               schedule: scheduleDaily11PM,
             },
           ]
-        : undefined;
+        : [];
 
       // Filter by taskId if specified
       const filteredTasks =
@@ -130,7 +130,7 @@ class CronStatusRepositoryImpl implements ICronStatusRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "common.cronRepositoryStatisticsFetchFailed",
+        "app.api.v1.core.system.tasks.cronSystem.status.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message, taskId: data.taskId || "unknown" },
       );

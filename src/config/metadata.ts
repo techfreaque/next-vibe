@@ -48,8 +48,8 @@ export const METADATA_CONFIG: MetadataConfig = {
     index: true,
     follow: true,
     googleBot: {
-      index: true,
-      follow: true,
+      "index": true,
+      "follow": true,
       "max-image-preview": "large",
       "max-snippet": -1,
     },

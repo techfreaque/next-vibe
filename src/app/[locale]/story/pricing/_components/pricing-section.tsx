@@ -439,9 +439,7 @@ export default function PricingSection({
                           {/* Add "or" separator between posts and reels for Premium and Professional plans */}
                           {i === 0 &&
                             plan.premiumFeatures &&
-                            plan.premiumFeatures.length > 1 &&
-                            (plan.id === SubscriptionPlan.PREMIUM ||
-                              plan.id === SubscriptionPlan.PROFESSIONAL) && (
+                            plan.premiumFeatures.length > 1 && (
                               <div className="flex items-center justify-center my-2">
                                 <div className="flex-1 border-t border-gray-200 dark:border-gray-700" />
                                 <span className="px-3 text-xs text-gray-500 dark:text-gray-400 font-medium">

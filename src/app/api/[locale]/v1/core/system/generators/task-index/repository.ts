@@ -80,7 +80,7 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
       );
       if (!validationResult.success) {
         return createErrorResponse(
-          "error.errorTypes.validation_error",
+          "app.api.v1.core.system.generators.taskIndex.post.errors.validation.title",
           ErrorResponseTypes.VALIDATION_ERROR,
           { error: validationResult.error || "Validation failed" },
         );
@@ -204,7 +204,7 @@ export default allTasks;
     } catch (error) {
       const duration = Date.now() - startTime;
       return createErrorResponse(
-        "error.errorTypes.internal_error",
+        "app.api.v1.core.system.generators.taskIndex.post.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         {
           error: `Task index generation failed: ${parseError(error).message}`,

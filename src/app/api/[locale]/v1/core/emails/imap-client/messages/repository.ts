@@ -30,6 +30,8 @@ import {
   ImapSyncStatus,
   SortOrder,
 } from "../enum";
+import type { ImapMessagesListGetResponseOutput } from "./list/definition";
+import type { ImapMessageSyncPostResponseOutput } from "./sync/definition";
 
 // Local type definitions to replace problematic imports
 interface ImapMessageResponseType {
@@ -99,7 +101,7 @@ export interface ImapMessagesRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapMessageListResponseType>>;
+  ): Promise<ResponseType<ImapMessagesListGetResponseOutput>>;
 
   getMessageById(
     data: { id: string },
@@ -120,7 +122,7 @@ export interface ImapMessagesRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SyncResults>>;
+  ): Promise<ResponseType<ImapMessageSyncPostResponseOutput>>;
 
   updateMessageSyncStatus(
     data: { messageId: string; syncStatus: string },
@@ -171,7 +173,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapMessageListResponseType>> {
+  ): Promise<ResponseType<ImapMessagesListGetResponseOutput>> {
     try {
       logger.debug(
         "app.api.v1.core.emails.imapClient.messages.list.info.start",
@@ -368,8 +370,8 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
           this.formatMessageResponse(message),
         ),
         total: totalCount,
-        page,
-        limit,
+        pageNumber: page,
+        pageLimit: limit,
         totalPages,
       });
     } catch (error) {
@@ -500,7 +502,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SyncResults>> {
+  ): Promise<ResponseType<ImapMessageSyncPostResponseOutput>> {
     try {
       logger.debug("Syncing IMAP messages", { data, userId: user.id });
 
@@ -575,27 +577,22 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         );
 
         if (syncResult.success) {
-          const syncResults: SyncResults = {
-            accountsProcessed:
-              syncResult.data.result?.results?.accountsProcessed ?? 0,
-            foldersProcessed:
-              syncResult.data.result?.results?.foldersProcessed ?? 0,
-            messagesProcessed:
-              syncResult.data.result?.results?.messagesProcessed ?? 0,
-            foldersAdded: syncResult.data.result?.results?.foldersAdded ?? 0,
-            foldersUpdated:
-              syncResult.data.result?.results?.foldersUpdated ?? 0,
-            foldersDeleted:
-              syncResult.data.result?.results?.foldersDeleted ?? 0,
-            messagesAdded: syncResult.data.result?.results?.messagesAdded ?? 0,
-            messagesUpdated:
-              syncResult.data.result?.results?.messagesUpdated ?? 0,
-            messagesDeleted:
-              syncResult.data.result?.results?.messagesDeleted ?? 0,
-            duration: syncResult.data.result?.results?.duration ?? 0,
+          return createSuccessResponse({
+            success: true,
+            message: "Messages synchronized successfully",
+            results: {
+              messagesProcessed:
+                syncResult.data.result?.results?.messagesProcessed ?? 0,
+              messagesAdded:
+                syncResult.data.result?.results?.messagesAdded ?? 0,
+              messagesUpdated:
+                syncResult.data.result?.results?.messagesUpdated ?? 0,
+              messagesDeleted:
+                syncResult.data.result?.results?.messagesDeleted ?? 0,
+              duration: syncResult.data.result?.results?.duration ?? 0,
+            },
             errors: syncResult.data.result?.results?.errors ?? [],
-          };
-          return createSuccessResponse(syncResults);
+          });
         } else {
           return createErrorResponse(
             "app.api.v1.core.emails.imapClient.imapErrors.sync.message.failed",

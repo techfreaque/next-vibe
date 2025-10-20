@@ -4,11 +4,9 @@
  */
 
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import type React from "react";
 
 import type { IndividualCronTaskType } from "@/app/api/[locale]/v1/core/system/tasks/cron/task/[id]/definition";
-import { PulseHealthStatus } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 import { requireAdminUser } from "@/app/api/[locale]/v1/core/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -35,18 +33,18 @@ export default async function CronTaskEditPage({
   // For now, create stub data to demonstrate the structure
   const taskWithComputedFields: IndividualCronTaskType = {
     id,
-    name: "Sample Task",
-    description: "Task description",
+    name: "Sample Task", // eslint-disable-line i18next/no-literal-string -- Stub data
+    description: "Task description", // eslint-disable-line i18next/no-literal-string -- Stub data
     version: 1,
-    schedule: "0 * * * *",
+    schedule: "0 * * * *", // eslint-disable-line i18next/no-literal-string -- Stub data
     enabled: true,
     priority: "MEDIUM",
     status: "PENDING",
-    category: "GENERAL",
+    category: "SYSTEM",
     timeout: 3600,
     retries: 3,
-    lastRun: null,
-    nextRun: null,
+    lastRun: undefined,
+    nextRun: undefined,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };

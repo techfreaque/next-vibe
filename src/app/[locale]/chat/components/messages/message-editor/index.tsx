@@ -20,11 +20,11 @@ import { useMessageEditor } from "../use-message-editor";
 interface MessageEditorProps {
   message: ChatMessage;
   selectedModel: ModelId;
-  selectedTone: string;
+  selectedPersona: string;
   onSave: (messageId: string, newContent: string) => Promise<void>;
   onCancel: () => void;
   onModelChange?: (model: ModelId) => void;
-  onToneChange?: (tone: string) => void;
+  onPersonaChange?: (persona: string) => void;
   onBranch?: (messageId: string, content: string) => Promise<void>;
   locale: CountryLanguage;
   logger: EndpointLogger;
@@ -33,11 +33,11 @@ interface MessageEditorProps {
 export function MessageEditor({
   message,
   selectedModel,
-  selectedTone,
+  selectedPersona,
   onSave,
   onCancel,
   onModelChange,
-  onToneChange,
+  onPersonaChange,
   onBranch,
   locale,
   logger,
@@ -107,10 +107,10 @@ export function MessageEditor({
                 logger={logger}
               />
             )}
-            {onToneChange && (
+            {onPersonaChange && (
               <PersonaSelector
-                value={selectedTone}
-                onChange={onToneChange}
+                value={selectedPersona}
+                onChange={onPersonaChange}
                 locale={locale}
                 logger={logger}
               />

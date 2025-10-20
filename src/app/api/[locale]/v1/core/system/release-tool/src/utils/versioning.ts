@@ -9,7 +9,6 @@ import type {
   ReleasePackage,
 } from "../types/index.js";
 import { getLastVersionFromGitTag, promptVersionIncrement } from "./git.js";
-import { logger } from "./logger.js";
 
 interface VersionInfo {
   newVersion: string;
@@ -22,6 +21,7 @@ export async function getVersion(
   packageJson: PackageJson,
   config: ReleaseConfig,
   releaseConfig: ReleaseOptions,
+  logger: EndpointLogger,
 ): Promise<VersionInfo> {
   const tagPrefix = releaseConfig.tagPrefix || "";
   const currentGitVersionNumber = getLastVersionFromGitTag(
@@ -122,6 +122,7 @@ export function bumpVersion(
 export function updateVariableStringValue(
   newVersion: string,
   releaseConfig: ReleaseOptions,
+  logger: EndpointLogger,
 ): void {
   releaseConfig.versionBumper?.forEach((fileInfo) => {
     const fileContent = readFileSync(fileInfo.filePath, "utf8");

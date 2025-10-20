@@ -2,11 +2,47 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
+    title: "Guard-Status",
+    description: "Guard-Umgebungsstatus prüfen",
+    tag: "Status",
+    container: {
+      title: "Guard-Status-Konfiguration",
+      description: "Statusprüfungsparameter konfigurieren",
+    },
+    fields: {
+      projectPath: {
+        title: "Projektpfad",
+        description: "Pfad zum Guard-Projekt",
+        placeholder: "/pfad/zum/projekt",
+      },
+      guardId: {
+        title: "Guard-ID",
+        description: "Eindeutige Kennung für den Guard",
+        placeholder: "guard-123",
+      },
+      listAll: {
+        title: "Alle Guards auflisten",
+        description: "Alle Guard-Umgebungen auflisten",
+      },
+      success: {
+        title: "Erfolg",
+      },
+      output: {
+        title: "Ausgabe",
+      },
+      guards: {
+        title: "Guards",
+      },
+      totalGuards: {
+        title: "Gesamt Guards",
+      },
+      activeGuards: {
+        title: "Aktive Guards",
+      },
+    },
     form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
+      title: "Statuskonfiguration",
+      description: "Statusparameter konfigurieren",
     },
     response: {
       title: "Antwort",

@@ -43,7 +43,7 @@ interface ThreadedMessageProps {
   allMessages: ChatMessage[];
   depth: number;
   selectedModel: ModelId;
-  selectedTone: string;
+  selectedPersona: string;
   ttsAutoplay: boolean;
   locale: CountryLanguage;
   logger: EndpointLogger;
@@ -54,7 +54,7 @@ interface ThreadedMessageProps {
   onAnswerAsModel?: (messageId: string) => Promise<void>;
   onVoteMessage?: (messageId: string, vote: 1 | -1 | 0) => void;
   onModelChange?: (model: ModelId) => void;
-  onToneChange?: (tone: string) => void;
+  onPersonaChange?: (persona: string) => void;
   maxDepth?: number;
 }
 
@@ -64,7 +64,7 @@ export function ThreadedMessage({
   allMessages,
   depth,
   selectedModel,
-  selectedTone,
+  selectedPersona,
   ttsAutoplay,
   locale,
   logger,
@@ -75,7 +75,7 @@ export function ThreadedMessage({
   onAnswerAsModel,
   onVoteMessage,
   onModelChange,
-  onToneChange,
+  onPersonaChange,
   maxDepth = LAYOUT.MAX_THREAD_DEPTH,
 }: ThreadedMessageProps): JSX.Element {
   const { t } = simpleT(locale);
@@ -185,13 +185,13 @@ export function ThreadedMessage({
               <MessageEditor
                 message={message}
                 selectedModel={selectedModel}
-                selectedTone={selectedTone}
+                selectedPersona={selectedPersona}
                 onSave={(id, content) =>
                   messageActions.handleSaveEdit(id, content, onEditMessage)
                 }
                 onCancel={messageActions.cancelAction}
                 onModelChange={onModelChange}
-                onToneChange={onToneChange}
+                onPersonaChange={onPersonaChange}
                 onBranch={(id, content) =>
                   messageActions.handleBranchEdit(id, content, onBranchMessage)
                 }
@@ -205,9 +205,9 @@ export function ThreadedMessage({
                 titleKey="app.chat.threadedView.retryModal.title"
                 descriptionKey="app.chat.threadedView.retryModal.description"
                 selectedModel={selectedModel}
-                selectedTone={selectedTone}
+                selectedPersona={selectedPersona}
                 onModelChange={onModelChange || ((): void => {})}
-                onToneChange={onToneChange || ((): void => {})}
+                onPersonaChange={onPersonaChange || ((): void => {})}
                 onConfirm={(): Promise<void> =>
                   messageActions.handleConfirmRetry(message.id, onRetryMessage)
                 }
@@ -222,9 +222,9 @@ export function ThreadedMessage({
               titleKey="app.chat.threadedView.answerModal.title"
               descriptionKey="app.chat.threadedView.answerModal.description"
               selectedModel={selectedModel}
-              selectedTone={selectedTone}
+              selectedPersona={selectedPersona}
               onModelChange={onModelChange || ((): void => {})}
-              onToneChange={onToneChange || ((): void => {})}
+              onPersonaChange={onPersonaChange || ((): void => {})}
               onConfirm={(): Promise<void> =>
                 messageActions.handleConfirmAnswer(message.id, onAnswerAsModel)
               }
@@ -301,12 +301,12 @@ export function ThreadedMessage({
                         : t("app.chat.threadedView.assistantFallback")}
                   </button>
 
-                  {/* Persona/Tone - only for AI messages */}
-                  {message.role === "assistant" && message.tone && (
+                  {/* Persona - only for AI messages */}
+                  {message.role === "assistant" && message.persona && (
                     <>
                       <span>•</span>
                       <span className="text-muted-foreground/80">
-                        {getPersonaName(message.tone)}
+                        {getPersonaName(message.persona)}
                       </span>
                     </>
                   )}
@@ -566,7 +566,7 @@ export function ThreadedMessage({
                   allMessages={allMessages}
                   depth={depth + 1}
                   selectedModel={selectedModel}
-                  selectedTone={selectedTone}
+                  selectedPersona={selectedPersona}
                   ttsAutoplay={ttsAutoplay}
                   locale={locale}
                   logger={logger}
@@ -577,7 +577,7 @@ export function ThreadedMessage({
                   onAnswerAsModel={onAnswerAsModel}
                   onVoteMessage={onVoteMessage}
                   onModelChange={onModelChange}
-                  onToneChange={onToneChange}
+                  onPersonaChange={onPersonaChange}
                   maxDepth={maxDepth}
                 />
               ))}

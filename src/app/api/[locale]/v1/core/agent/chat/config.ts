@@ -5,6 +5,8 @@
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { IconValue } from "./model-access/icons";
+
 /**
  * Default folder IDs
  * These are special system folder IDs that exist outside the database
@@ -42,7 +44,7 @@ export interface DefaultFolderConfig {
   translationKey: TranslationKey;
 
   /** Icon identifier (lucide icon name or si icon name) */
-  icon: string;
+  icon: IconValue;
 
   /** Translation key for folder description */
   descriptionKey: TranslationKey;

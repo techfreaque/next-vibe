@@ -38,11 +38,12 @@ export class GenerateTrpcRouterRepositoryImpl
 {
   async generateTrpcRouter(
     data: GenerateTrpcRouterRequestType,
-    locale: CountryLanguage,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<ResponseType<GenerateTrpcRouterResponseType>> {
     try {
       // Execute tRPC router generation based on the original logic
-      const result = await this.executeTrpcRouterGeneration(data, logger);
+      const result = await this.executeTrpcRouterGeneration(data);
 
       const response: GenerateTrpcRouterResponseType = {
         success: result.success,
@@ -54,7 +55,7 @@ export class GenerateTrpcRouterRepositoryImpl
       return createSuccessResponse(response);
     } catch (error) {
       return createErrorResponse(
-        "error.errorTypes.internal_error",
+        ErrorResponseTypes.INTERNAL_ERROR.errorKey,
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: String(error) },
       );
@@ -151,6 +152,7 @@ export class GenerateTrpcRouterRepositoryImpl
       };
     } catch (error) {
       // tRPC router generation failed
+      // eslint-disable-next-line i18next/no-literal-string
       const errorMessage = `tRPC router generation failed: ${String(error)}`;
       outputLines.push(errorMessage);
 

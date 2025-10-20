@@ -290,7 +290,18 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         }
       }
 
-      return result;
+      // Return properly formatted response matching LeadEngagementResponseOutput
+      return createSuccessResponse({
+        id: engagementData.id,
+        responseLeadId: data.leadId,
+        responseEngagementType: data.engagementType,
+        responseCampaignId: data.campaignId,
+        responseMetadata: data.metadata,
+        timestamp: engagementData.timestamp,
+        ipAddress: clientInfo?.ipAddress,
+        userAgent: clientInfo?.userAgent,
+        createdAt: engagementData.createdAt,
+      });
     } catch (error) {
       logger.error("app.api.v1.core.leads.tracking.engagement.record.error", {
         error,

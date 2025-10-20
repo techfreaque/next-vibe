@@ -2,11 +2,47 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   post: {
-    title: "Tytuł",
-    description: "Opis endpointu",
+    title: "Status Strażnika",
+    description: "Sprawdź status środowiska strażnika",
+    tag: "Status",
+    container: {
+      title: "Konfiguracja Statusu Strażnika",
+      description: "Skonfiguruj parametry sprawdzania statusu",
+    },
+    fields: {
+      projectPath: {
+        title: "Ścieżka Projektu",
+        description: "Ścieżka do projektu strażnika",
+        placeholder: "/ścieżka/do/projektu",
+      },
+      guardId: {
+        title: "ID Strażnika",
+        description: "Unikalny identyfikator strażnika",
+        placeholder: "guard-123",
+      },
+      listAll: {
+        title: "Wyświetl Wszystkich Strażników",
+        description: "Wyświetl wszystkie środowiska strażników",
+      },
+      success: {
+        title: "Sukces",
+      },
+      output: {
+        title: "Wynik",
+      },
+      guards: {
+        title: "Strażnicy",
+      },
+      totalGuards: {
+        title: "Łącznie Strażników",
+      },
+      activeGuards: {
+        title: "Aktywni Strażnicy",
+      },
+    },
     form: {
-      title: "Konfiguracja",
-      description: "Skonfiguruj parametry",
+      title: "Konfiguracja Statusu",
+      description: "Skonfiguruj parametry statusu",
     },
     response: {
       title: "Odpowiedź",

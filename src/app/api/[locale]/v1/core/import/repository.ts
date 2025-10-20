@@ -21,6 +21,11 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { csvImportJobs, importBatches } from "../leads/import/db";
 import type {
+  ImportCsvResponseOutput,
+  ImportJobsListRequestOutput,
+  ImportJobsListResponseOutput,
+} from "./definition";
+import type {
   CsvImportConfig,
   DomainImportRepository,
   ImportJobsListRequestType,
@@ -552,7 +557,7 @@ export class ImportRepositoryImpl implements ImportRepository {
    * Import CSV wrapper for route handlers
    * NOTE: This is a placeholder. Domain-specific import should use importFromCsv with domain repository
    */
-  importCsv(): ResponseType<LeadsImportResponseOutput> {
+  importCsv(): ResponseType<ImportCsvResponseOutput> {
     return createErrorResponse(
       "app.api.v1.core.leads.leadsErrors.leadsImport.post.error.server.title",
       ErrorResponseTypes.INTERNAL_ERROR,
@@ -564,9 +569,9 @@ export class ImportRepositoryImpl implements ImportRepository {
    */
   async listImportJobs(
     userId: DbId,
-    options: ImportJobsListRequestType,
+    options: ImportJobsListRequestOutput,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImportJobsListResponseType>> {
+  ): Promise<ResponseType<ImportJobsListResponseOutput>> {
     try {
       const { status = "all", limit = 50, offset = 0 } = options;
 
@@ -588,25 +593,38 @@ export class ImportRepositoryImpl implements ImportRepository {
       // Transform database results to match API response format
       const transformedJobs = jobs.map((job) => ({
         id: job.id,
-        status: job.status,
-        createdAt: job.createdAt.toISOString(),
-        updatedAt: job.updatedAt.toISOString(),
-        error: job.error,
-        retryCount: job.retryCount,
         fileName: job.fileName,
-        batchSize: job.batchSize,
-        totalRows: job.totalRows,
-        processedRows: job.processedRows,
-        successfulImports: job.successfulImports,
-        failedImports: job.failedImports,
-        duplicateEmails: job.duplicateEmails,
-        currentBatchStart: job.currentBatchStart,
-        maxRetries: job.maxRetries,
-        startedAt: job.startedAt?.toISOString() || null,
-        completedAt: job.completedAt?.toISOString() || null,
+        domain: job.domain,
+        status: job.status,
+        progress: {
+          totalRows: job.totalRows,
+          processedRows: job.processedRows,
+          currentBatchStart: job.currentBatchStart,
+          batchSize: job.batchSize,
+          percentComplete:
+            job.totalRows > 0
+              ? Math.round((job.processedRows / job.totalRows) * 100)
+              : 0,
+        },
+        results: {
+          successfulImports: job.successfulImports,
+          failedImports: job.failedImports,
+          duplicateEmails: job.duplicateEmails,
+        },
+        timing: {
+          createdAt: job.createdAt.toISOString(),
+          updatedAt: job.updatedAt.toISOString(),
+          startedAt: job.startedAt?.toISOString() || null,
+          completedAt: job.completedAt?.toISOString() || null,
+        },
+        errorInfo: {
+          error: job.error,
+          retryCount: job.retryCount,
+          maxRetries: job.maxRetries,
+        },
       }));
 
-      return createSuccessResponse(transformedJobs);
+      return createSuccessResponse({ jobs: transformedJobs });
     } catch (error) {
       logger.error("Error listing import jobs", error);
       return createErrorResponse(

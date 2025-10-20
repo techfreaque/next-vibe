@@ -23,10 +23,13 @@ export interface CountryInfo {
 }
 
 // Enum-like objects to replace the enums
+// eslint-disable-next-line no-redeclare
 export const Countries = languageConfig.countries;
 export const CountriesArr = languageConfig.countriesArr;
+// eslint-disable-next-line no-redeclare
 export const Currencies = languageConfig.currencies;
 export const CurrenciesArr = languageConfig.currenciesArr;
+// eslint-disable-next-line no-redeclare
 export const Languages = languageConfig.languages;
 export const LanguagesArr = languageConfig.languagesArr;
 
@@ -119,7 +122,9 @@ export const translations = allTranslations;
 export const defaultLocaleConfig = languageDefaults;
 export const defaultLocale: CountryLanguage = `${languageDefaults.language}-${languageDefaults.country}`;
 export const globalCountryInfo = languageConfig.countryInfo.GLOBAL;
-export const availableCountries = Object.values(languageConfig.countryInfo);
+export const availableCountries: readonly CountryInfo[] = Object.values(
+  languageConfig.countryInfo,
+);
 export const availableLanguages = Object.values(languageConfig.languages);
 
 export interface TranslationsConfig<TTranslationSchema> {

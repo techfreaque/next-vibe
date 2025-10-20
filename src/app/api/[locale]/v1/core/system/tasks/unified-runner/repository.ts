@@ -40,6 +40,7 @@ import type {
 // System user for cron task execution
 const CRON_SYSTEM_USER: JwtPrivatePayloadType = {
   id: "system-cron",
+  leadId: "system-cron-lead",
   isPublic: false,
 };
 
@@ -80,7 +81,7 @@ export class UnifiedTaskRunnerRepositoryImpl
 
   // Execution context stored when runner starts
   private locale: CountryLanguage = "en-GLOBAL";
-  private logger: EndpointLogger;
+  private logger!: EndpointLogger;
   private cronUser: JwtPrivatePayloadType = CRON_SYSTEM_USER;
 
   async manageRunner(
@@ -302,16 +303,10 @@ export class UnifiedTaskRunnerRepositoryImpl
     tasks: Task[],
     signal: AbortSignal,
     locale: CountryLanguage,
-    logger: EndpointLogger,
-    cronUser?: JwtPrivatePayloadType,
   ): ResponseType<void> {
     try {
-      // Store execution context first so logger is available
+      // Store execution context
       this.locale = locale;
-      this.logger = logger;
-      if (cronUser) {
-        this.cronUser = cronUser;
-      }
 
       this.logger.info("Starting unified task runner", {
         taskCount: tasks.length,

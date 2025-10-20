@@ -19,7 +19,7 @@ export function useTaskHistory(): EndpointReturn<typeof endpoints> {
   const { locale } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);
 
-  return useEndpoint(endpoints.GET, {}, logger);
+  return useEndpoint(endpoints, {}, logger);
 }
 
 export type CronHistoryEndpointReturn = EndpointReturn<typeof endpoints>;

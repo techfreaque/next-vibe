@@ -60,7 +60,7 @@ export function ImapAccountsManagement(): JSX.Element {
         </CardHeader>
         <CardContent>
           {/* Accounts List - all state managed through useEndpoint */}
-          <ImapAccountsList />
+          <ImapAccountsList locale={locale} />
         </CardContent>
       </Card>
 

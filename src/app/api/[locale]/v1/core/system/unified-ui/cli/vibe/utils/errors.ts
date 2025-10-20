@@ -2,6 +2,9 @@
  * Production-ready error handling for Vibe CLI
  */
 
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../types/node.d.ts" />
+
 import type { EndpointLogger } from "../endpoints/endpoint-handler/logger";
 
 /**
@@ -60,7 +63,7 @@ export abstract class CliError extends Error {
   /**
    * Convert error to JSON for logging/serialization
    */
-  toJSON(): ErrorContext {
+  toJSON(): Record<string, string | number | ErrorContext | undefined> {
     return {
       name: this.name,
       code: this.code,
@@ -432,15 +435,18 @@ export class ErrorHandler {
  * Global error handler for unhandled errors
  */
 export function setupGlobalErrorHandlers(logger: EndpointLogger): void {
-  process.on("uncaughtException", (error) => {
+  process.on("uncaughtException", (error: Error): void => {
     const handled = ErrorHandler.handleError(error, logger);
     logger.error(handled.message);
     process.exit(handled.exitCode);
   });
 
-  process.on("unhandledRejection", (reason) => {
-    const handled = ErrorHandler.handleError(reason, logger);
-    logger.error(handled.message);
-    process.exit(handled.exitCode);
-  });
+  process.on(
+    "unhandledRejection",
+    (reason: Error | Record<string, never>): void => {
+      const handled = ErrorHandler.handleError(reason, logger);
+      logger.error(handled.message);
+      process.exit(handled.exitCode);
+    },
+  );
 }

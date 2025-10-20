@@ -12,8 +12,10 @@ export const translations: typeof enTranslations = {
   task: taskTranslations,
   tasks: tasksTranslations,
   // Shared cron-level translations (Polish)
+  taskManagement: "Zarządzanie zadaniami",
   taskDetails: {
     edit: "Edytuj zadanie",
+    editDescription: "Modyfikuj konfigurację i ustawienia zadania",
     back: "Powrót",
   },
   nav: {
@@ -27,6 +29,7 @@ export const translations: typeof enTranslations = {
   buttons: {
     previous: "Poprzedni",
     next: "Następny",
+    createTask: "Utwórz zadanie",
   },
   executionHistory: {
     titleWithCount: "Historia wykonań ({{count}})",

@@ -12,8 +12,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { leadCredits, leads } from "@/app/api/[locale]/v1/core/leads/db";
+import { LeadSource, LeadStatus } from "@/app/api/[locale]/v1/core/leads/enum";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { CountriesArr, LanguagesArr } from "@/i18n/core/config";
 
 import { creditTransactions, userCredits } from "./db";
 
@@ -196,16 +198,16 @@ class CreditRepository implements CreditRepositoryInterface {
       }
 
       // Create new lead with IP
-      const [language, country] = locale.split("-");
+      const [language, country] = locale.split("-") as [string, string];
       const [newLead] = await db
         .insert(leads)
         .values({
           ipAddress,
           businessName: "",
-          country: country || "GLOBAL",
-          language: language || "en",
-          status: "WEBSITE_USER",
-          source: "WEBSITE",
+          country: (country || "GLOBAL") as (typeof CountriesArr)[number],
+          language: (language || "en") as (typeof LanguagesArr)[number],
+          status: LeadStatus.WEBSITE_USER,
+          source: LeadSource.WEBSITE,
         })
         .returning();
 

@@ -34,7 +34,6 @@ export async function handleAPIError(response: Response): Promise<never> {
   // eslint-disable-next-line no-restricted-syntax -- Error data can be any type
   let errorData: Record<string, unknown> = {};
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Response JSON can be any type
     errorData = await response.json();
   } catch {
     // If JSON parsing fails, use empty object

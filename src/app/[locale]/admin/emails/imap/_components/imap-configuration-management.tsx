@@ -12,24 +12,34 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { JSX } from "react";
 
-import { useImapConfigEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/config/hooks";
+import {
+  type ImapConfigEndpointReturn,
+  useImapConfig,
+} from "@/app/api/[locale]/v1/core/emails/imap-client/config/hooks";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { useTranslation } from "@/i18n/core/client";
 
 import { ImapPerformanceConfigForm } from "./imap-performance-config-form";
 import { ImapServerConfigForm } from "./imap-server-config-form";
 import { ImapSyncConfigForm } from "./imap-sync-config-form";
 
+interface ImapConfigurationManagementProps {
+  locale: CountryLanguage;
+}
+
 /**
  * IMAP Configuration Management Component
  * Uses useEndpoint for all state management following leads/cron patterns
  */
-export function ImapConfigurationManagement(): JSX.Element {
+export function ImapConfigurationManagement({
+  locale,
+}: ImapConfigurationManagementProps): JSX.Element {
   const { t } = useTranslation();
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Use the IMAP config endpoint - no local useState
-  const configEndpoint = useImapConfigEndpoint({
-    enabled: true,
-  });
+  const configEndpoint = useImapConfig(logger);
 
   // Get config data from endpoint
   const configData = configEndpoint.read?.response?.success

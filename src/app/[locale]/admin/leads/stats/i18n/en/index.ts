@@ -2,6 +2,8 @@ export const translations = {
   // Page metadata
   title: "Leads Statistics",
   description: "View and analyze lead statistics and performance metrics",
+  filter: "Filter",
+  refresh: "Refresh",
 
   // UI Component translations
   totalLeads: "Total Leads",

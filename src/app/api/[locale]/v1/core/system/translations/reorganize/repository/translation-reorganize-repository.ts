@@ -383,7 +383,7 @@ export class TranslationReorganizeRepositoryImpl {
       });
 
       return createErrorResponse(
-        "error.errorTypes.internal_error",
+        "app.api.v1.core.system.translations.reorganize.repository.error.internal_error",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -647,7 +647,7 @@ export class TranslationReorganizeRepositoryImpl {
       });
 
       return createErrorResponse(
-        "error.errorTypes.internal_error",
+        "app.api.v1.core.system.translations.reorganize.repository.error.internal_error",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -1507,7 +1507,7 @@ export class TranslationReorganizeRepositoryImpl {
     } catch (error) {
       logger.error("Error getting translation stats", { error });
       return createErrorResponse(
-        "error.errorTypes.internal_error",
+        "app.api.v1.core.system.translations.reorganize.repository.error.internal_error",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }

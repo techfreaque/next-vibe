@@ -6,7 +6,7 @@
 
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -15,7 +15,10 @@ import { simpleT } from "@/i18n/core/shared";
 import { useAIStream } from "./ai-stream/hooks";
 import { useAIStreamStore } from "./ai-stream/store";
 import type { DefaultFolderId } from "./config";
-import { ModelId } from "./model-access/models";
+import type { IconValue } from "./model-access/icons";
+import { ModelId, type ModelId as ModelIdType } from "./model-access/models";
+import type { PersonaListResponseOutput } from "./personas/definition";
+import { usePersonasList } from "./personas/hooks";
 import {
   type ChatFolder,
   type ChatMessage,
@@ -47,7 +50,7 @@ export interface ThreadUpdate {
  */
 export interface FolderUpdate {
   name?: string;
-  icon?: string | null;
+  icon?: IconValue | null;
   color?: string | null;
   parentId?: string | null;
   expanded?: boolean;
@@ -62,6 +65,7 @@ export interface UseChatReturn {
   threads: Record<string, ChatThread>;
   messages: Record<string, ChatMessage>;
   folders: Record<string, ChatFolder>;
+  personas: Record<string, { id: string; name: string; icon: string }>;
   activeThread: ChatThread | null;
   activeThreadMessages: ChatMessage[];
   isLoading: boolean;
@@ -76,14 +80,12 @@ export interface UseChatReturn {
   setInput: (input: string) => void;
 
   // Settings
-  selectedTone: string;
-  selectedModel: ModelId;
-  selectedPersona: string | null;
+  selectedPersona: string;
+  selectedModel: ModelIdType;
   temperature: number;
   maxTokens: number;
-  setSelectedTone: (tone: string) => void;
-  setSelectedModel: (model: ModelId) => void;
-  setSelectedPersona: (persona: string | null) => void;
+  setSelectedPersona: (persona: string) => void;
+  setSelectedModel: (model: ModelIdType) => void;
   setTemperature: (temp: number) => void;
   setMaxTokens: (tokens: number) => void;
 
@@ -143,16 +145,70 @@ export function useChat(
   // Get AI stream hook with proper translation
   const aiStream = useAIStream(locale, logger, t);
 
-  // Local state for settings
+  // Fetch personas from server
+  const personasEndpoint = usePersonasList(logger);
+  const personas = useMemo(() => {
+    const response = personasEndpoint.read?.response as
+      | PersonaListResponseOutput
+      | undefined;
+    const personasList = response?.personas;
+    const personasMap: Record<
+      string,
+      { id: string; name: string; icon: string }
+    > = {};
+
+    if (personasList && Array.isArray(personasList)) {
+      personasList.forEach((p) => {
+        personasMap[p.id] = {
+          id: p.id,
+          name: p.name,
+          icon: p.icon,
+        };
+      });
+    }
+
+    return personasMap;
+  }, [personasEndpoint.read?.response]);
+
+  // Local state for input
   const [input, setInput] = useState("");
-  const [selectedTone, setSelectedTone] = useState("default");
-  const [selectedModel, setSelectedModel] = useState<ModelId>(
-    ModelId.GPT_5_MINI,
-  );
-  const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
-  const [temperature, setTemperature] = useState(0.7);
-  const [maxTokens, setMaxTokens] = useState(2000);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Get settings from store (persisted to localStorage)
+  const settings = chatStore.settings;
+  const selectedPersona = settings.selectedPersona;
+  const selectedModel = settings.selectedModel;
+  const temperature = settings.temperature;
+  const maxTokens = settings.maxTokens;
+
+  // Settings setters that update the store
+  const setSelectedPersona = useCallback(
+    (persona: string) => {
+      chatStore.updateSettings({ selectedPersona: persona });
+    },
+    [chatStore],
+  );
+
+  const setSelectedModel = useCallback(
+    (model: ModelIdType) => {
+      chatStore.updateSettings({ selectedModel: model });
+    },
+    [chatStore],
+  );
+
+  const setTemperature = useCallback(
+    (temp: number) => {
+      chatStore.updateSettings({ temperature: temp });
+    },
+    [chatStore],
+  );
+
+  const setMaxTokens = useCallback(
+    (tokens: number) => {
+      chatStore.updateSettings({ maxTokens: tokens });
+    },
+    [chatStore],
+  );
 
   // Get active thread and messages
   const activeThread = chatStore.activeThreadId
@@ -178,7 +234,7 @@ export function useChat(
           authorName: null,
           isAI: streamMsg.role === "assistant",
           model: streamMsg.model || null,
-          tone: null,
+          persona: null,
           errorType: streamMsg.error
             ? t("app.api.v1.core.agent.chat.aiStream.errorTypes.streamError")
             : null,
@@ -216,7 +272,7 @@ export function useChat(
           folderId: streamThread.subFolderId,
           status: "active",
           defaultModel: null,
-          defaultTone: null,
+          defaultPersona: null,
           systemPrompt: null,
           pinned: false,
           archived: false,
@@ -696,6 +752,7 @@ export function useChat(
     threads: chatStore.threads,
     messages: chatStore.messages,
     folders: chatStore.folders,
+    personas,
     activeThread,
     activeThreadMessages,
     isLoading: chatStore.isLoading,
@@ -710,14 +767,12 @@ export function useChat(
     setInput,
 
     // Settings
-    selectedTone,
-    selectedModel,
     selectedPersona,
+    selectedModel,
     temperature,
     maxTokens,
-    setSelectedTone,
-    setSelectedModel,
     setSelectedPersona,
+    setSelectedModel,
     setTemperature,
     setMaxTokens,
 

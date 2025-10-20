@@ -2,6 +2,7 @@
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+// @ts-expect-error - ESLint plugin without type declarations
 import useServerPlugin from "@c-ehrlich/eslint-plugin-use-server";
 import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
@@ -10,8 +11,10 @@ import tsParser from "@typescript-eslint/parser";
 import type { Linter } from "eslint";
 import importPlugin from "eslint-plugin-import";
 import jsxA11y from "eslint-plugin-jsx-a11y";
+// @ts-expect-error - ESLint plugin without type declarations
 import nodePlugin from "eslint-plugin-node";
 import eslintPluginPrettier from "eslint-plugin-prettier";
+// @ts-expect-error - ESLint plugin without type declarations
 import promisePlugin from "eslint-plugin-promise";
 import reactPlugin from "eslint-plugin-react";
 // import reactCompiler from "eslint-plugin-react-compiler";

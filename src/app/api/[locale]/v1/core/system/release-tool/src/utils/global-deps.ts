@@ -4,7 +4,6 @@ import { join } from "node:path";
 import inquirer from "inquirer";
 
 import type { ReleaseConfig, ReleasePackage } from "../types/index.js";
-import { logger, loggerError } from "./logger.js";
 import { getPackageJson } from "./package-json.js";
 
 /**
@@ -15,6 +14,7 @@ export async function handleGlobalDependencyUpdates(
   packageManager: string,
   originalCwd: string,
   forceUpdate = false,
+  logger: EndpointLogger,
 ): Promise<boolean> {
   // Find all packages that need dependency updates
   const packagesNeedingUpdates = config.packages.filter(

@@ -11,18 +11,19 @@ import {
   ensureMainBranch,
   hasNewCommitsSinceTag,
 } from "./git.js";
-import { logger } from "./logger.js";
 
 export async function publishPackage({
   newTag,
   lastTag,
   packageJson,
   pkg,
+  logger,
 }: {
   newTag: string; // version + optional tag prefix
   lastTag: string; // version + optional tag prefix
   packageJson: PackageJson;
   pkg: ReleasePackage;
+  logger: EndpointLogger;
 }): Promise<void> {
   logger(`Processing tag release (${newTag}) for ${packageJson.name}...`);
   if (await checkTagExists(newTag)) {
@@ -64,6 +65,7 @@ export async function zipFolders({
   newTag,
   packageJson,
   foldersToZip,
+  logger,
 }: {
   newTag: string;
   lastTag: string;
@@ -73,6 +75,7 @@ export async function zipFolders({
     input: string;
     output: string;
   }[];
+  logger: EndpointLogger;
 }): Promise<void> {
   if (foldersToZip.length > 0) {
     logger("Starting to zip folders");

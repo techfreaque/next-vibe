@@ -3,11 +3,11 @@ import { exec, execSync } from "node:child_process";
 
 import inquirer from "inquirer";
 
-import { logger, loggerError } from "./logger.js";
 
 export function getLastVersionFromGitTag(
   tagPrefix: string,
   mainPackagePath: string,
+  logger: EndpointLogger,
 ): string {
   try {
     // First check if any tags exist at all

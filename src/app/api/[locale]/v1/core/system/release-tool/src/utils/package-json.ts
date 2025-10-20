@@ -5,7 +5,6 @@ import { join } from "node:path";
 import inquirer from "inquirer";
 
 import type { PackageJson, ReleasePackage } from "../types/index.js";
-import { logger, loggerError } from "./logger.js";
 
 /**
  * Type guard to validate if parsed JSON matches PackageJson structure
@@ -41,6 +40,7 @@ export async function updateDependencies(
   pkg: ReleasePackage,
   packageManager: string,
   cwd: string,
+  logger: EndpointLogger,
 ): Promise<void> {
   if (pkg.updateDeps !== "force") {
     const { shouldUpdate } = await inquirer.prompt<{
@@ -98,6 +98,7 @@ export function updatePackageVersion(
   newVersion: string,
   cwd: string,
   originalCwd: string,
+  logger: EndpointLogger,
 ): void {
   // Update package's package.json
   const packageJson = getPackageJson(cwd);

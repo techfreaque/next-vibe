@@ -12,6 +12,7 @@ import type { FormEvent, JSX } from "react";
 
 import { useImapAccountCreateEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/create/hooks";
 import { ImapAuthMethod } from "@/app/api/[locale]/v1/core/emails/imap-client/enum";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -31,7 +32,8 @@ export function ImapAccountCreateForm({
   onCancel,
 }: ImapAccountCreateFormProps): JSX.Element {
   const { t } = useTranslation();
-  const endpoint = useImapAccountCreateEndpoint();
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const endpoint = useImapAccountCreateEndpoint(logger);
 
   // Handle form submission
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -50,7 +52,7 @@ export function ImapAccountCreateForm({
         {/* Basic Information */}
         <div className="space-y-4">
           <EndpointFormField
-            name="name"
+            name="basicInfo.name"
             config={{
               type: "text",
               label: "app.admin.emails.imap.account.fields.name",
@@ -64,7 +66,7 @@ export function ImapAccountCreateForm({
           />
 
           <EndpointFormField
-            name="email"
+            name="basicInfo.email"
             config={{
               type: "email",
               label: "app.admin.emails.imap.account.fields.email",
@@ -78,7 +80,7 @@ export function ImapAccountCreateForm({
           />
 
           <EndpointFormField
-            name="host"
+            name="serverConnection.host"
             config={{
               type: "text",
               label: "app.admin.emails.imap.account.fields.host",
@@ -92,7 +94,7 @@ export function ImapAccountCreateForm({
           />
 
           <EndpointFormField
-            name="port"
+            name="serverConnection.port"
             config={{
               type: "number",
               label: "app.admin.emails.imap.account.fields.port",
@@ -109,7 +111,7 @@ export function ImapAccountCreateForm({
         {/* Authentication */}
         <div className="space-y-4">
           <EndpointFormField
-            name="username"
+            name="authentication.username"
             config={{
               type: "text",
               label: "app.admin.emails.imap.account.fields.username",
@@ -123,7 +125,7 @@ export function ImapAccountCreateForm({
           />
 
           <EndpointFormField
-            name="password"
+            name="authentication.password"
             config={{
               type: "password",
               label: "app.admin.emails.imap.account.fields.password",
@@ -137,7 +139,7 @@ export function ImapAccountCreateForm({
           />
 
           <EndpointFormField
-            name="authMethod"
+            name="authentication.authMethod"
             config={{
               type: "select",
               label: "app.admin.emails.imap.account.fields.authMethod",
@@ -161,7 +163,7 @@ export function ImapAccountCreateForm({
           />
 
           <EndpointFormField
-            name="secure"
+            name="serverConnection.secure"
             config={{
               type: "checkbox",
               label: "app.admin.emails.imap.account.fields.secure",
@@ -183,7 +185,7 @@ export function ImapAccountCreateForm({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <EndpointFormField
-            name="connectionTimeout"
+            name="advancedSettings.connectionTimeout"
             config={{
               type: "number",
               label: "app.admin.emails.imap.account.fields.connectionTimeout",
@@ -198,7 +200,7 @@ export function ImapAccountCreateForm({
           />
 
           <EndpointFormField
-            name="syncInterval"
+            name="syncConfiguration.syncInterval"
             config={{
               type: "number",
               label: "app.admin.emails.imap.account.fields.syncInterval",
@@ -212,7 +214,7 @@ export function ImapAccountCreateForm({
           />
 
           <EndpointFormField
-            name="maxMessages"
+            name="syncConfiguration.maxMessages"
             config={{
               type: "number",
               label: "app.admin.emails.imap.account.fields.maxMessages",
@@ -227,7 +229,7 @@ export function ImapAccountCreateForm({
         </div>
 
         <EndpointFormField
-          name="enabled"
+          name="syncConfiguration.enabled"
           config={{
             type: "checkbox",
             label: "app.admin.emails.imap.account.fields.enabled",
@@ -240,7 +242,7 @@ export function ImapAccountCreateForm({
         />
 
         <EndpointFormField
-          name="keepAlive"
+          name="advancedSettings.keepAlive"
           config={{
             type: "checkbox",
             label: "app.admin.emails.imap.account.fields.keepAlive",

@@ -193,22 +193,10 @@ export class NewsletterSubscribeSmsServiceImpl
    */
   private generateWelcomeMessage(
     subscriptionData: NewsletterSubscriptionType,
-    locale: CountryLanguage,
+    t: TFunction,
   ): string {
     const name = subscriptionData.name || "there";
-
-    // Customize message based on locale
-    switch (locale.split("-")[0]) {
-      case "de":
-        // eslint-disable-next-line i18next/no-literal-string
-        return `${name}, willkommen beim Newsletter! Danke fürs Abonnieren.`;
-      case "pl":
-        // eslint-disable-next-line i18next/no-literal-string
-        return `${name}, witamy w newsletterze! Dziękujemy za subskrypcję.`;
-      default: // English
-        // eslint-disable-next-line i18next/no-literal-string
-        return `${name}, welcome to our newsletter! Thanks for subscribing.`;
-    }
+    return t("app.api.v1.core.newsletter.sms.welcome.message", { name });
   }
 
   /**
@@ -216,23 +204,17 @@ export class NewsletterSubscribeSmsServiceImpl
    */
   private generateAdminNotificationMessage(
     subscriptionData: NewsletterSubscriptionType,
-    locale: CountryLanguage,
+    t: TFunction,
   ): string {
     const { name, email } = subscriptionData;
     const displayName = name || email;
-
-    // Customize message based on locale
-    switch (locale.split("-")[0]) {
-      case "de":
-        // eslint-disable-next-line i18next/no-literal-string
-        return `Neue Newsletter-Anmeldung: ${displayName} (${email})`;
-      case "pl":
-        // eslint-disable-next-line i18next/no-literal-string
-        return `Nowa subskrypcja newslettera: ${displayName} (${email})`;
-      default: // English
-        // eslint-disable-next-line i18next/no-literal-string
-        return `New newsletter subscription: ${displayName} (${email})`;
-    }
+    return t(
+      "app.api.v1.core.newsletter.sms.admin_notification.message",
+      {
+        displayName,
+        email,
+      },
+    );
   }
 }
 

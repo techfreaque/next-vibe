@@ -19,9 +19,9 @@ interface ModelPersonaSelectorModalProps {
   titleKey: TranslationKey;
   descriptionKey: TranslationKey;
   selectedModel: ModelId;
-  selectedTone: string;
+  selectedPersona: string;
   onModelChange: (model: ModelId) => void;
-  onToneChange: (tone: string) => void;
+  onPersonaChange: (persona: string) => void;
   onConfirm: () => void;
   onCancel: () => void;
   confirmLabelKey?: TranslationKey;
@@ -38,9 +38,9 @@ export function ModelPersonaSelectorModal({
   titleKey,
   descriptionKey,
   selectedModel,
-  selectedTone,
+  selectedPersona,
   onModelChange,
-  onToneChange,
+  onPersonaChange,
   onConfirm,
   onCancel,
   confirmLabelKey,
@@ -101,8 +101,8 @@ export function ModelPersonaSelectorModal({
               logger={logger}
             />
             <PersonaSelector
-              value={selectedTone}
-              onChange={onToneChange}
+              value={selectedPersona}
+              onChange={onPersonaChange}
               locale={locale}
               logger={logger}
             />

@@ -93,6 +93,7 @@ export const translations = {
     },
     unsubscribe: {
       error: "Failed to unsubscribe from newsletter",
+      confirmQuestion: "Are you sure you want to unsubscribe?",
     },
   },
 };

@@ -309,12 +309,7 @@ const { POST } = createEndpoint({
         totalDestroyed: 1,
       },
     },
-    urlPathVariables: {
-      default: {},
-      byGuardId: {},
-      force: {},
-      dryRun: {},
-    },
+    urlPathVariables: undefined,
   },
 });
 

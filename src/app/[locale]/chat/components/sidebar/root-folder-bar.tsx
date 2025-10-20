@@ -1,7 +1,7 @@
 "use client";
 
 import type { JSX } from "react";
-import React from "react";
+import React, { useCallback } from "react";
 
 import {
   DEFAULT_FOLDER_CONFIGS,
@@ -94,9 +94,15 @@ export function RootFolderBar({
   // Get root folders from DEFAULT_FOLDER_CONFIGS
   const rootFolders = DEFAULT_FOLDER_CONFIGS;
 
-  const handleFolderClick = (folderId: DefaultFolderId): void => {
-    onSelectFolder(folderId);
-  };
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>): void => {
+      const folderId = event.currentTarget.dataset.folderId as DefaultFolderId;
+      if (folderId) {
+        onSelectFolder(folderId);
+      }
+    },
+    [onSelectFolder],
+  );
 
   return (
     <div className="overflow-x-auto bg-background/50">
@@ -120,7 +126,8 @@ export function RootFolderBar({
                     variant="ghost"
                     size="icon"
                     className={`h-11 w-11 ${colorClasses}`}
-                    onClick={() => handleFolderClick(folderConfig.id)}
+                    data-folder-id={folderConfig.id}
+                    onClick={handleClick}
                     suppressHydrationWarning
                   >
                     <FolderIcon className="h-6 w-6 flex items-center justify-center" />

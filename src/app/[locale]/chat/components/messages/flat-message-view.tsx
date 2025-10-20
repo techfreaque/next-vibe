@@ -11,17 +11,13 @@ import type { JSX } from "react";
 import React, { useState } from "react";
 
 import { Logo } from "@/app/[locale]/_components/nav/logo";
+import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import { Markdown } from "@/packages/next-vibe-ui/web/ui/markdown";
 
 import { useTouchDevice } from "../../hooks/use-touch-device";
-import { useTTSAudio } from "../../hooks/use-tts-audio";
-import type { ModelId } from "../../lib/config/models";
-import { getModelById } from "../../lib/config/models";
-import { getPersonaName } from "../../lib/config/personas";
-import type { ChatMessage, ChatThread } from "../../lib/storage/types";
 import {
   extractReferences,
   format4chanTimestamp,
@@ -29,6 +25,7 @@ import {
   getShortId,
 } from "../../lib/utils/formatting";
 import { formatPostNumber, getPostNumber } from "../../lib/utils/post-numbers";
+import type { ChatMessage, ChatThread, ModelId } from "../../types";
 import { MessageEditor } from "./message-editor";
 import { ModelPersonaSelectorModal } from "./model-persona-selector-modal";
 import { useMessageActions } from "./use-message-actions";
@@ -36,8 +33,9 @@ import { useMessageActions } from "./use-message-actions";
 interface FlatMessageViewProps {
   thread: ChatThread;
   messages: ChatMessage[];
+  personas: Record<string, { id: string; name: string; icon: string }>;
   selectedModel: ModelId;
-  selectedTone: string;
+  selectedPersona: string;
   ttsAutoplay: boolean;
   locale: CountryLanguage;
   logger: EndpointLogger;
@@ -48,44 +46,31 @@ interface FlatMessageViewProps {
   onDeleteMessage?: (messageId: string) => void;
   onEditMessage?: (messageId: string, newContent: string) => Promise<void>;
   onModelChange?: (model: ModelId) => void;
-  onToneChange?: (tone: string) => void;
+  onPersonaChange?: (persona: string) => void;
   onInsertQuote?: () => void; // Only inserts '>' character
 }
 
 /**
- * Count how many messages reference this message by post number
+ * Count how many messages are direct replies to this message
+ * Uses message structure (parentId) instead of parsing content
  */
-function countReplies(
-  messages: ChatMessage[],
-  targetPostNumber: number,
-): number {
-  let count = 0;
-  for (const msg of messages) {
-    const refs = extractReferences(msg.content);
-    // Check if content references the target post number
-    if (refs.some((ref) => ref === targetPostNumber.toString())) {
-      count++;
-    }
-  }
-  return count;
+function countReplies(messages: ChatMessage[], messageId: string): number {
+  return messages.filter((msg) => msg.parentId === messageId).length;
 }
 
 /**
- * Get backlinks (messages that reference this message) by post number
+ * Get backlinks (messages that are direct replies to this message)
+ * Uses message structure (parentId) instead of parsing content
  */
 function getBacklinks(
   messages: ChatMessage[],
-  targetPostNumber: number,
+  messageId: string,
   postNumberMap: Record<string, number>,
 ): number[] {
-  const backlinks: number[] = [];
-  for (const msg of messages) {
-    const refs = extractReferences(msg.content);
-    if (refs.some((ref) => ref === targetPostNumber.toString())) {
-      backlinks.push(postNumberMap[msg.id]);
-    }
-  }
-  return backlinks;
+  return messages
+    .filter((msg) => msg.parentId === messageId)
+    .map((msg) => postNumberMap[msg.id])
+    .filter((num): num is number => num !== undefined);
 }
 
 /**
@@ -102,7 +87,7 @@ function getDirectReplies(
  * Count posts by a specific user ID
  */
 function countPostsByUserId(messages: ChatMessage[], userId: string): number {
-  return messages.filter((m) => m.author?.id === userId).length;
+  return messages.filter((m) => m.authorId === userId).length;
 }
 
 /**
@@ -112,7 +97,7 @@ function getPostsByUserId(
   messages: ChatMessage[],
   userId: string,
 ): ChatMessage[] {
-  return messages.filter((m) => m.author?.id === userId);
+  return messages.filter((m) => m.authorId === userId);
 }
 
 /**
@@ -214,7 +199,7 @@ function MessagePreview({
         >
           {isUser
             ? t("app.chat.flatView.youLabel")
-            : message.author?.name || t("app.chat.flatView.assistantFallback")}
+            : message.authorName || t("app.chat.flatView.assistantFallback")}
         </span>
         <span
           className="px-1.5 py-0.5 rounded text-xs font-mono"
@@ -306,7 +291,7 @@ function UserIdHoverCard({
             >
               <div className="text-xs text-muted-foreground mb-1">
                 {/* eslint-disable-next-line i18next/no-literal-string -- Technical post number and separator */}
-                {`Post #${idx + 1} • ${format4chanTimestamp(post.timestamp, t)}`}
+                {`Post #${idx + 1} • ${format4chanTimestamp(post.createdAt.getTime(), t)}`}
               </div>
               <div className="text-sm text-foreground/90 line-clamp-2">
                 {post.content.substring(0, 100)}
@@ -330,8 +315,9 @@ interface FlatMessageProps {
   postNumberMap: Record<string, number>;
   postNumberToMessageId: Record<number, string>;
   messages: ChatMessage[];
+  personas: Record<string, { id: string; name: string; icon: string }>;
   selectedModel: ModelId;
-  selectedTone: string;
+  selectedPersona: string;
   ttsAutoplay: boolean;
   locale: CountryLanguage;
   logger: EndpointLogger;
@@ -352,7 +338,7 @@ interface FlatMessageProps {
   onDeleteMessage?: (messageId: string) => void;
   onEditMessage?: (messageId: string, newContent: string) => Promise<void>;
   onModelChange?: (model: ModelId) => void;
-  onToneChange?: (tone: string) => void;
+  onPersonaChange?: (persona: string) => void;
   onInsertQuote?: () => void;
 }
 
@@ -362,9 +348,9 @@ function FlatMessage({
   postNumberMap,
   postNumberToMessageId,
   messages,
+  personas,
   selectedModel,
-  selectedTone,
-  ttsAutoplay,
+  selectedPersona,
   locale,
   logger,
   messageActions,
@@ -378,28 +364,22 @@ function FlatMessage({
   onDeleteMessage,
   onEditMessage,
   onModelChange,
-  onToneChange,
+  onPersonaChange,
   onInsertQuote,
 }: FlatMessageProps): JSX.Element {
   const { t } = simpleT(locale);
 
   // TTS support for assistant messages
-  const {
-    isLoading: isTTSLoading,
-    isPlaying,
-    playAudio,
-    stopAudio,
-  } = useTTSAudio({
-    text: message.content,
-    enabled: message.role === "assistant" && ttsAutoplay,
-    locale,
-    logger,
-  });
+  // TODO: Implement useTTSAudio hook
+  const isTTSLoading = false;
+  const isPlaying = false;
+  const playAudio = async (): Promise<void> => {};
+  const stopAudio = (): void => {};
 
   // User ID logic
   const userId =
     message.role === "user"
-      ? message.author?.id || "local-user"
+      ? message.authorId || "local-user"
       : message.role === "assistant" && message.model
         ? message.model
         : "assistant";
@@ -415,9 +395,10 @@ function FlatMessage({
       : null;
   const modelDisplayName =
     modelData?.name || t("app.chat.flatView.assistantFallback");
+  // Get persona name from personas map (fetched from server)
   const personaDisplayName =
-    (message.role === "user" || message.role === "assistant") && message.tone
-      ? getPersonaName(message.tone)
+    (message.role === "user" || message.role === "assistant") && message.persona
+      ? personas[message.persona]?.name || message.persona
       : t("app.chat.flatView.anonymous");
 
   const displayName = isUser
@@ -425,8 +406,8 @@ function FlatMessage({
     : modelDisplayName;
 
   const references = extractReferences(message.content);
-  const replyCount = countReplies(messages, postNum);
-  const backlinks = getBacklinks(messages, postNum, postNumberMap);
+  const replyCount = countReplies(messages, message.id);
+  const backlinks = getBacklinks(messages, message.id, postNumberMap);
   const isHighlighted = hoveredRef === postNum.toString();
   const directReplies = getDirectReplies(messages, message.id);
 
@@ -505,7 +486,7 @@ function FlatMessage({
 
         {/* Timestamp */}
         <span className="text-muted-foreground/80 text-xs font-medium">
-          {format4chanTimestamp(message.timestamp, t)}
+          {format4chanTimestamp(message.createdAt.getTime(), t)}
         </span>
 
         {/* Post Number */}
@@ -578,7 +559,7 @@ function FlatMessage({
           <MessageEditor
             message={message}
             selectedModel={selectedModel}
-            selectedTone={selectedTone}
+            selectedPersona={selectedPersona}
             onSave={
               onEditMessage
                 ? (id, content): Promise<void> =>
@@ -587,7 +568,7 @@ function FlatMessage({
             }
             onCancel={messageActions.cancelAction}
             onModelChange={onModelChange}
-            onToneChange={onToneChange}
+            onPersonaChange={onPersonaChange}
             onBranch={
               onBranchMessage
                 ? (id, content): Promise<void> =>
@@ -608,9 +589,9 @@ function FlatMessage({
             titleKey="app.chat.flatView.retryModal.title"
             descriptionKey="app.chat.flatView.retryModal.description"
             selectedModel={selectedModel}
-            selectedTone={selectedTone}
+            selectedPersona={selectedPersona}
             onModelChange={onModelChange || ((): void => {})}
-            onToneChange={onToneChange || ((): void => {})}
+            onPersonaChange={onPersonaChange || ((): void => {})}
             onConfirm={(): Promise<void> =>
               messageActions.handleConfirmRetry(message.id, onRetryMessage)
             }
@@ -626,9 +607,9 @@ function FlatMessage({
             titleKey="app.chat.flatView.answerModal.title"
             descriptionKey="app.chat.flatView.answerModal.description"
             selectedModel={selectedModel}
-            selectedTone={selectedTone}
+            selectedPersona={selectedPersona}
             onModelChange={onModelChange || ((): void => {})}
-            onToneChange={onToneChange || ((): void => {})}
+            onPersonaChange={onPersonaChange || ((): void => {})}
             onConfirm={(): Promise<void> =>
               messageActions.handleConfirmAnswer(message.id, onAnswerAsModel)
             }
@@ -898,8 +879,9 @@ function FlatMessage({
 
 export function FlatMessageView({
   messages,
+  personas,
   selectedModel,
-  selectedTone,
+  selectedPersona,
   ttsAutoplay,
   locale,
   logger,
@@ -909,7 +891,7 @@ export function FlatMessageView({
   onDeleteMessage,
   onEditMessage,
   onModelChange,
-  onToneChange,
+  onPersonaChange,
   onInsertQuote: _onInsertQuote,
 }: FlatMessageViewProps): JSX.Element {
   const [hoveredRef, setHoveredRef] = useState<string | null>(null);
@@ -981,8 +963,9 @@ export function FlatMessageView({
           postNumberMap={postNumberMap}
           postNumberToMessageId={postNumberToMessageId}
           messages={messages}
+          personas={personas}
           selectedModel={selectedModel}
-          selectedTone={selectedTone}
+          selectedPersona={selectedPersona}
           ttsAutoplay={ttsAutoplay}
           locale={locale}
           logger={logger}
@@ -1003,7 +986,7 @@ export function FlatMessageView({
           onDeleteMessage={onDeleteMessage}
           onEditMessage={onEditMessage}
           onModelChange={onModelChange}
-          onToneChange={onToneChange}
+          onPersonaChange={onPersonaChange}
           onInsertQuote={_onInsertQuote}
         />
       ))}

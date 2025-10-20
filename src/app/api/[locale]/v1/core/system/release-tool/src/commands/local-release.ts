@@ -26,6 +26,7 @@ import { getVersion, updateVariableStringValue } from "../utils/versioning.js";
 export async function localRelease(
   configPath: string = DEFAULT_CONFIG_PATH,
   forceUpdate = false,
+  logger: EndpointLogger,
 ): Promise<void> {
   const config: ReleaseConfig = await loadConfig(configPath);
 

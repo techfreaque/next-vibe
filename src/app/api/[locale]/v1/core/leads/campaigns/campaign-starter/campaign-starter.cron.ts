@@ -259,7 +259,7 @@ export function validate(
       });
 
       return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.campaigns.common.error.validation.title",
+        "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: errorMessage },
       );
@@ -271,7 +271,7 @@ export function validate(
     // Validate business logic
     if (typedConfig.enabledHours.start >= typedConfig.enabledHours.end) {
       return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.campaigns.common.error.validation.title",
+        "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: "Start hour must be less than end hour" },
       );
@@ -279,7 +279,7 @@ export function validate(
 
     if (typedConfig.enabledDays.length === 0) {
       return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.campaigns.common.error.validation.title",
+        "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: "At least one enabled day must be specified" },
       );
@@ -291,7 +291,7 @@ export function validate(
     logger.error("Campaign starter validation error", { error: errorMessage });
 
     return createErrorResponse(
-      "app.api.v1.core.leads.leadsErrors.campaigns.common.error.validation.title",
+      "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",
       ErrorResponseTypes.INTERNAL_ERROR,
       { error: errorMessage },
     );

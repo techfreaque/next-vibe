@@ -7,4 +7,10 @@ export const translations = {
     title: "Success",
     content: "Success",
   },
+  errors: {
+    server: {
+      title: "Server Error",
+      description: "An error occurred while retrieving cron status",
+    },
+  },
 };

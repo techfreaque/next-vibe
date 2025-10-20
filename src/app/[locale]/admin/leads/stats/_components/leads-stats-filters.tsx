@@ -22,7 +22,7 @@ import {
   LeadSourceFilter,
   LeadStatusFilter,
 } from "@/app/api/[locale]/v1/core/leads/enum";
-import type { LeadsStatsRequestType } from "@/app/api/[locale]/v1/core/leads/stats/definition";
+import type { LeadsStatsRequestOutput } from "@/app/api/[locale]/v1/core/leads/stats/definition";
 import type statsEndpoints from "@/app/api/[locale]/v1/core/leads/stats/definition";
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
 import { CountryFilter, type CountryLanguage } from "@/i18n/core/config";
@@ -37,7 +37,7 @@ interface LeadsStatsFiltersContainerProps {
 }
 
 interface LeadsStatsFiltersProps {
-  control: Control<LeadsStatsRequestType>;
+  control: Control<LeadsStatsRequestOutput>;
 }
 
 export function LeadsStatsFilters({
@@ -323,7 +323,7 @@ export function LeadsStatsFiltersContainer({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-lg font-semibold">
-            {title || t("common.filter")}
+            {title || t("app.admin.leads.leads.admin.stats.filter")}
           </CardTitle>
           {onRefresh && (
             <Button
@@ -333,7 +333,7 @@ export function LeadsStatsFiltersContainer({
               className="flex items-center gap-2"
             >
               <RefreshCw className="h-4 w-4" />
-              {t("common.refresh")}
+              {t("app.admin.leads.leads.admin.stats.refresh")}
             </Button>
           )}
         </CardHeader>

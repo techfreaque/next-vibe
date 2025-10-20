@@ -18,6 +18,10 @@ import {
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { LayoutType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
+import {
+  CronTaskPriority,
+  CronTaskStatus,
+} from "@/app/api/[locale]/v1/core/system/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 // Stats period enum
@@ -334,8 +338,12 @@ const { GET } = createEndpoint({
           runningExecutions: z.number().optional(),
 
           // Distribution fields
-          tasksByPriority: z.record(z.string(), z.number()).optional(),
-          tasksByStatus: z.record(z.string(), z.number()).optional(),
+          tasksByPriority: z
+            .record(z.nativeEnum(CronTaskPriority), z.number())
+            .optional(),
+          tasksByStatus: z
+            .record(z.nativeEnum(CronTaskStatus), z.number())
+            .optional(),
           executionsByHour: z.record(z.string(), z.number()).optional(),
           executionsByDay: z.record(z.number(), z.number()).optional(),
 

@@ -128,6 +128,14 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Wystąpił konflikt danych",
       },
+      templateNotFound: {
+        title: "Nie znaleziono szablonu",
+        description: "Nie znaleziono szablonu e-mail dla podanych parametrów",
+      },
+      sendingFailed: {
+        title: "Wysyłanie nie powiodło się",
+        description: "Nie udało się wysłać testowego e-maila",
+      },
     },
     success: {
       title: "Sukces",

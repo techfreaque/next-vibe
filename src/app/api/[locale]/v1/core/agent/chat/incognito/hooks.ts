@@ -52,7 +52,7 @@ export interface UseIncognitoChatReturn {
     content: string,
     parentId?: string | null,
     model?: ModelId | null,
-    tone?: string | null,
+    persona?: string | null,
   ) => ChatMessage;
   updateMessage: (messageId: string, updates: Partial<ChatMessage>) => void;
   deleteMessage: (messageId: string) => void;
@@ -180,7 +180,7 @@ export function useIncognitoChat(
       content: string,
       parentId: string | null = null,
       model: ModelId | null = null,
-      tone: string | null = null,
+      persona: string | null = null,
     ): ChatMessage => {
       logger.debug("useIncognitoChat", "Adding message", {
         threadId,
@@ -194,7 +194,7 @@ export function useIncognitoChat(
         content,
         parentId,
         model,
-        tone,
+        persona,
       );
 
       setState((prev) => ({

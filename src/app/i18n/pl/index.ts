@@ -6,4 +6,19 @@ export const translations: typeof enTranslations = {
   appName: "unbottled.ai",
   api: apiTranslations,
   ...appTranslations,
+  error: {
+    unauthorized: "Nieautoryzowany dostęp",
+    form_validation_failed: "Walidacja formularza nie powiodła się",
+    errorTypes: {
+      invalid_response_error: "Nieprawidłowy format odpowiedzi",
+      internal_error: "Wewnętrzny błąd serwera",
+    },
+    errors: {
+      invalid_request_data: "Nieprawidłowy format danych żądania",
+      invalid_url_parameters: "Nieprawidłowe parametry URL",
+    },
+    general: {
+      internal_server_error: "Wystąpił wewnętrzny błąd serwera",
+    },
+  },
 };

@@ -72,6 +72,7 @@ interface GuardJailConfig {
  * Create default guard jail configuration
  */
 function createDefaultGuardConfig(projectName: string): GuardJailConfig {
+  /* eslint-disable i18next/no-literal-string */
   return {
     project: {
       name: projectName,
@@ -213,6 +214,7 @@ function createDefaultGuardConfig(projectName: string): GuardJailConfig {
       tempDirectory: ".vibe-guard-instance/guard-temp",
     },
   };
+  /* eslint-enable i18next/no-literal-string */
 }
 
 /**

@@ -36,6 +36,14 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  emailMetadata: {
+    errors: {
+      server: {
+        title: "Błąd serwera metadanych email",
+        description: "Nie udało się zapisać metadanych emaila",
+      },
+    },
+  },
   enums: {
     status: {
       active: "Aktywny",

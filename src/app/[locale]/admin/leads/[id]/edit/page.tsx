@@ -44,10 +44,10 @@ export default async function LeadEditPage({
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">
-          {t("app.admin.leads.leads.edit.title")}
+          {t("app.admin.leads.leads.edit.success.title")}
         </h1>
         <p className="text-muted-foreground mt-2">
-          {t("app.admin.leads.leads.edit.description")}
+          {t("app.admin.leads.leads.edit.success.description")}
         </p>
       </div>
 

@@ -11,9 +11,11 @@ export async function release(
   ciMode = false,
   forceUpdate = false,
 ): Promise<void> {
+  const logger = createEndpointLogger(true, Date.now(), "en-GLOBAL");
+
   if (ciMode) {
-    await ciRelease(configPath);
+    await ciRelease(configPath, logger);
   } else {
-    await localRelease(configPath, forceUpdate);
+    await localRelease(configPath, forceUpdate, logger);
   }
 }

@@ -20,41 +20,56 @@ import {
 } from "next-vibe-ui/ui/table";
 import type { JSX } from "react";
 
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/use-endpoint";
 import { useTranslation } from "@/i18n/core/client";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import imapAccountsListDefinition from "../../../../../api/[locale]/v1/core/emails/imap-client/accounts/list/definition";
 import imapAccountTestDefinition from "../../../../../api/[locale]/v1/core/emails/imap-client/accounts/test/definition";
 import { ImapSyncStatus } from "../../../../../api/[locale]/v1/core/emails/imap-client/enum";
 
+interface ImapAccountsListProps {
+  locale: CountryLanguage;
+}
+
 /**
  * IMAP Accounts List Component
  * Uses useEndpoint for all state management following leads/cron patterns
  */
-export function ImapAccountsList(): JSX.Element {
+export function ImapAccountsList({
+  locale,
+}: ImapAccountsListProps): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   // All state managed through useEndpoint - no local useState
-  const accountsEndpoint = useEndpoint(imapAccountsListDefinition, {
-    queryOptions: {
-      enabled: true,
-      refetchOnWindowFocus: false,
-      staleTime: 1 * 60 * 1000, // 1 minute
-    },
-    filterOptions: {
-      initialFilters: {
-        page: 1,
-        limit: 20,
+  const accountsEndpoint = useEndpoint(
+    imapAccountsListDefinition,
+    {
+      queryOptions: {
+        enabled: true,
+        refetchOnWindowFocus: false,
+        staleTime: 1 * 60 * 1000, // 1 minute
+      },
+      filterOptions: {
+        initialFilters: {
+          page: 1,
+          limit: 20,
+        },
       },
     },
-  });
-  const testEndpoint = useEndpoint(imapAccountTestDefinition);
+    logger,
+  );
+  const testEndpoint = useEndpoint(imapAccountTestDefinition, {}, logger);
 
   // Access data through the read operation following leads pattern
   const apiResponse = accountsEndpoint.read.response;
   const accounts = apiResponse?.success ? apiResponse.data.accounts : [];
-  const totalAccounts = apiResponse?.success ? apiResponse.data.total : 0;
+  const totalAccounts = apiResponse?.success
+    ? apiResponse.data.pagination.total
+    : 0;
   const queryLoading = accountsEndpoint.read.isLoading || false;
   const queryError = accountsEndpoint.read.error;
 
@@ -64,7 +79,9 @@ export function ImapAccountsList(): JSX.Element {
   const currentPage = form?.watch("page") || 1;
   const limit = form?.watch("limit") || 20;
 
-  const getStatusBadge = (status: ImapSyncStatus): JSX.Element => {
+  const getStatusBadge = (
+    status: (typeof ImapSyncStatus)[keyof typeof ImapSyncStatus],
+  ): JSX.Element => {
     switch (status) {
       case ImapSyncStatus.SYNCED:
         return (

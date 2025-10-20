@@ -249,19 +249,31 @@ class LeadAuthServiceImpl {
       // Check for existing anonymous lead with same IP and user agent within last 5 minutes
       // to prevent duplicate lead creation from multiple simultaneous requests
       const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+
+      // Build conditions array, only adding metadata checks if values exist
+      const conditions = [
+        eq(leads.status, LeadStatus.WEBSITE_USER),
+        eq(leads.source, LeadSource.WEBSITE),
+        isNull(leads.email), // Anonymous leads have no email
+        sql`${leads.createdAt} > ${fiveMinutesAgo}`,
+      ];
+
+      if (clientInfo.ipAddress) {
+        conditions.push(
+          sql`${leads.metadata}->>'ipAddress' = ${clientInfo.ipAddress}`,
+        );
+      }
+
+      if (clientInfo.userAgent) {
+        conditions.push(
+          sql`${leads.metadata}->>'userAgent' = ${clientInfo.userAgent}`,
+        );
+      }
+
       const [existingLead] = await db
         .select()
         .from(leads)
-        .where(
-          and(
-            eq(leads.status, LeadStatus.WEBSITE_USER),
-            eq(leads.source, LeadSource.WEBSITE),
-            isNull(leads.email), // Anonymous leads have no email
-            sql`${leads.createdAt} > ${fiveMinutesAgo}`,
-            sql`${leads.metadata}->>'ipAddress' = ${clientInfo.ipAddress}`,
-            sql`${leads.metadata}->>'userAgent' = ${clientInfo.userAgent}`,
-          ),
-        )
+        .where(and(...conditions))
         .limit(1);
 
       if (existingLead) {

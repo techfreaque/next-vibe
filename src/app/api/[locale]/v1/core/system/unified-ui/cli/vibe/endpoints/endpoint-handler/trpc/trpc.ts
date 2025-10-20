@@ -79,10 +79,11 @@ export const authenticatedProcedure = publicProcedure.use(isAuthenticated);
  * Role-based authorization middleware factory
  * Creates middleware that checks for specific user roles
  */
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function requireRoles<TRoles extends readonly (typeof UserRoleValue)[]>(
   roles: TRoles,
   logger: EndpointLogger,
-): any {
+) {
   return middleware(async ({ ctx, next }) => {
     if (!ctx.user || ctx.user.isPublic) {
       logger.error("tRPC: Role check failed - user not authenticated", {

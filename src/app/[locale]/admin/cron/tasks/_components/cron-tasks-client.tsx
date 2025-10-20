@@ -64,14 +64,7 @@ export function CronTasksClient({
         </CardHeader>
         <CardContent>
           <CronTasksTable
-            tasks={(tasksEndpoint.read.data?.tasks || []).map((task) => ({
-              ...task,
-              tags: Array.isArray(task.tags) ? task.tags : [],
-              defaultConfig: task.defaultConfig || {},
-              dependencies: Array.isArray(task.dependencies)
-                ? task.dependencies
-                : [],
-            }))}
+            tasks={tasksEndpoint.read.data?.tasks || []}
             loading={tasksEndpoint.read.isLoading}
             locale={locale}
             onTaskUpdated={tasksEndpoint.read.refetch}

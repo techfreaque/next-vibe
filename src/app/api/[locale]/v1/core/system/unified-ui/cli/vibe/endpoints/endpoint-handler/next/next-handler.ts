@@ -108,7 +108,7 @@ export function createNextHandler<
       );
       if (!authResult.success) {
         return createHTTPErrorResponse({
-          message: "error.unauthorized",
+          message: "app.error.unauthorized",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
           logger,
         });
@@ -145,7 +145,7 @@ export function createNextHandler<
           })`,
         );
         return createHTTPErrorResponse({
-          message: "error.errors.invalid_request_data",
+          message: "app.error.errors.invalid_request_data",
           errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
           messageParams: {
             message: validationResult.message,
@@ -213,7 +213,7 @@ export function createNextHandler<
       // Handle unexpected errors
       // Handle unexpected errors - error details are included in messageParams
       return createHTTPErrorResponse({
-        message: "error.general.internal_server_error",
+        message: "app.error.general.internal_server_error",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parseError(error).message,

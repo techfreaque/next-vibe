@@ -69,7 +69,12 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
         const statusStrings = data.status.split(",").map((s) => s.trim());
         if (statusStrings.length > 0) {
           // TypeScript can't infer enum types from string[], but Zod validation ensures correctness
-          conditions.push(inArray(cronTaskExecutions.status, statusStrings));
+          conditions.push(
+            inArray(
+              cronTaskExecutions.status,
+              statusStrings as (typeof CronTaskStatus)[keyof typeof CronTaskStatus][],
+            ),
+          );
         }
       }
 
@@ -165,9 +170,8 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
       logger.info(
         t(
           "app.api.v1.core.system.tasks.cronSystem.history.get.log.fetchSuccess",
-          "en",
           {
-            count: executions.length,
+            count: executions.length.toString(),
           },
         ),
       );
@@ -230,7 +234,7 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
       });
 
       return createErrorResponse(
-        "common.cronRepositoryExecutionsFetchFailed",
+        "app.api.v1.core.system.tasks.cronSystem.history.get.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         {
           error: parsedError.message,

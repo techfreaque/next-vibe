@@ -9,8 +9,46 @@ declare global {
 
   var gc: (() => void) | undefined;
 
+  /**
+   * Global process object
+   */
+  var process: NodeJS.Process;
+
+  /**
+   * Error constructor extensions
+   */
+  interface ErrorConstructor {
+    // eslint-disable-next-line no-restricted-syntax, @typescript-eslint/no-unsafe-function-type
+    captureStackTrace(targetObject: object, constructorOpt?: Function): void;
+  }
+
   namespace NodeJS {
+    interface ProcessEnv {
+      [key: string]: string | undefined;
+    }
+
     interface Process {
+      /**
+       * Current working directory
+       */
+      cwd: () => string;
+
+      /**
+       * Exit the process
+       */
+      exit: (code?: number) => never;
+
+      /**
+       * Environment variables
+       */
+      env: ProcessEnv;
+
+      /**
+       * Register event listeners
+       */
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      on: (event: string, listener: (...args: any[]) => any) => this;
+
       /**
        * Internal Node.js API to get active handles
        * @internal
@@ -29,6 +67,14 @@ declare global {
       _getActiveRequests?: () => Array<Record<string, string | number>>;
     }
   }
+}
+
+declare module "node:fs" {
+  export * from "fs";
+}
+
+declare module "node:path" {
+  export * from "path";
 }
 
 export {};

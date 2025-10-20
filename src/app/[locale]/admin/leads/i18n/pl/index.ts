@@ -547,6 +547,8 @@ export const translations: typeof enTranslations = {
         title: "Statystyki Leadów",
         description:
           "Przeglądaj i analizuj statystyki leadów oraz metryki wydajności",
+        filter: "Filtruj",
+        refresh: "Odśwież",
 
         // UI Component translations
         totalLeads: "Łączne Leady",

@@ -104,7 +104,7 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
       activeGuards: mockGuard.isRunning ? 1 : 0,
     };
 
-    return createSuccessResponse({ response });
+    return createSuccessResponse(response);
   }
 
   private getStatusByProject(
@@ -125,7 +125,7 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
         activeGuards: 0,
       };
 
-      return createSuccessResponse({ response });
+      return createSuccessResponse(response);
     }
 
     // Mock guard data based on project
@@ -153,7 +153,7 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
       activeGuards: 0,
     };
 
-    return createSuccessResponse({ response });
+    return createSuccessResponse(response);
   }
 
   private getAllGuardStatus(
@@ -187,7 +187,7 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
       activeGuards: activeCount,
     };
 
-    return createSuccessResponse({ response });
+    return createSuccessResponse(response);
   }
 }
 

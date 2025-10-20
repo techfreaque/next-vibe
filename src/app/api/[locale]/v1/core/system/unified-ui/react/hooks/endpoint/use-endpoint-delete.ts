@@ -7,11 +7,9 @@ import type {
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { useCallback } from "react";
-import type z from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
@@ -33,7 +31,8 @@ export function useEndpointDelete<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    any
+    // eslint-disable-next-line no-restricted-syntax
+    unknown
   >,
 >(
   deleteEndpoint: TEndpoint | null,

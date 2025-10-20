@@ -3,7 +3,6 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import type { PackageJson } from "../types/index.js";
-import { logger } from "./logger.js";
 import { runSnykMonitor, runSnykTest } from "./snyk.js";
 
 /**
@@ -59,7 +58,7 @@ export function runTests(packagePath: string): void {
   }
 }
 
-export const lint = (cwd: string): void => {
+export const lint = (cwd: string, logger: EndpointLogger): void => {
   let lintOutput = "";
   try {
     // Use the local eslint binary directly from node_modules
@@ -101,7 +100,7 @@ export const lint = (cwd: string): void => {
   }
 };
 
-export const typecheck = (cwd: string): void => {
+export const typecheck = (cwd: string, logger: EndpointLogger): void => {
   // Check if tsconfig.json exists in the package directory
   const tsconfigPath = join(cwd, "tsconfig.json");
   if (!existsSync(tsconfigPath)) {

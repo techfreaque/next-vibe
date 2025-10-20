@@ -305,5 +305,14 @@ export const translations = {
         },
       },
     },
+    campaigns: {
+      common: {
+        error: {
+          server: {
+            title: "Server error processing campaign",
+          },
+        },
+      },
+    },
   },
 };

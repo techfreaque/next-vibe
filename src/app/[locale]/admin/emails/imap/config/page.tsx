@@ -36,7 +36,7 @@ export default async function ImapConfigPage({
         </p>
       </div>
 
-      <ImapConfigurationManagement />
+      <ImapConfigurationManagement locale={locale} />
     </div>
   );
 }

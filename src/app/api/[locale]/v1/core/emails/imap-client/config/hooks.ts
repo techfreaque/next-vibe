@@ -20,6 +20,11 @@ export function useImapConfig(
   return useEndpoint(
     definitions,
     {
+      queryOptions: {
+        enabled: true,
+        refetchOnWindowFocus: false,
+        staleTime: 60 * 1000, // 60 seconds
+      },
       persistForm: false,
     },
     logger,

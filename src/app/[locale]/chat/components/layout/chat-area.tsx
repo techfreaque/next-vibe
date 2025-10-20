@@ -23,7 +23,7 @@ interface ChatAreaProps {
   thread: ChatThread | null;
   messages: ChatMessage[];
   selectedModel: ModelId;
-  selectedTone: string;
+  selectedPersona: string;
   enableSearch: boolean;
   ttsAutoplay: boolean;
   input: string;
@@ -37,7 +37,7 @@ interface ChatAreaProps {
   onDeleteMessage: (messageId: string) => void;
   onSwitchBranch: (messageId: string, branchIndex: number) => void;
   onModelChange: (model: ModelId) => void;
-  onToneChange: (tone: string) => void;
+  onPersonaChange: (persona: string) => void;
   onEnableSearchChange: (enabled: boolean) => void;
   onSendMessage: (prompt: string, personaId: string, modelId?: ModelId) => void;
   onBranchMessage?: (messageId: string, newContent: string) => Promise<void>;
@@ -58,7 +58,7 @@ export function ChatArea({
   thread,
   messages,
   selectedModel,
-  selectedTone,
+  selectedPersona,
   enableSearch,
   ttsAutoplay,
   input,
@@ -72,7 +72,7 @@ export function ChatArea({
   onDeleteMessage,
   onSwitchBranch,
   onModelChange,
-  onToneChange,
+  onPersonaChange,
   onEnableSearchChange,
   onSendMessage,
   onBranchMessage,
@@ -100,7 +100,7 @@ export function ChatArea({
       onInputChange(prompt);
 
       // Change persona
-      onToneChange(personaId);
+      onPersonaChange(personaId);
 
       // Change model if persona has preferred model
       if (modelId) {
@@ -112,7 +112,7 @@ export function ChatArea({
         inputRef.current.focus();
       }
     },
-    [onInputChange, onToneChange, onModelChange, inputRef],
+    [onInputChange, onPersonaChange, onModelChange, inputRef],
   );
   const [isCapturingScreenshot, setIsCapturingScreenshot] = useState(false);
 
@@ -209,13 +209,13 @@ export function ChatArea({
             thread={thread}
             messages={messages}
             selectedModel={selectedModel}
-            selectedTone={selectedTone}
+            selectedPersona={selectedPersona}
             ttsAutoplay={ttsAutoplay}
             onEditMessage={onEditMessage}
             onDeleteMessage={onDeleteMessage}
             onSwitchBranch={onSwitchBranch}
             onModelChange={onModelChange}
-            onToneChange={onToneChange}
+            onPersonaChange={onPersonaChange}
             onBranchMessage={onBranchMessage}
             onRetryMessage={onRetryMessage}
             onAnswerAsModel={onAnswerAsModel}
@@ -273,10 +273,10 @@ export function ChatArea({
             onKeyDown={onKeyDown}
             isLoading={isLoading}
             onStop={onStop}
-            selectedTone={selectedTone}
+            selectedPersona={selectedPersona}
             selectedModel={selectedModel}
             enableSearch={enableSearch}
-            onToneChange={onToneChange}
+            onPersonaChange={onPersonaChange}
             onModelChange={onModelChange}
             onEnableSearchChange={onEnableSearchChange}
             locale={locale}

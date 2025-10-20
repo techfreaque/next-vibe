@@ -59,7 +59,7 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
   const country = getCountryFromLocale(locale);
   const allPlans = getPricingPlansArray();
   const starterPlan = allPlans.find(
-    (plan) => plan.id === SubscriptionPlan.STARTER,
+    (plan) => plan.id === SubscriptionPlan.SUBSCRIPTION,
   );
   const starterPrice = starterPlan?.priceByCountry[country].monthly || 0;
   const starterCurrency =

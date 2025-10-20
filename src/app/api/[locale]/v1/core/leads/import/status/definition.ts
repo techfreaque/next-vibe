@@ -215,20 +215,13 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: undefined,
-    requests: {
+    requests: undefined,
+    urlPathVariables: {
       default: {
-        filters: {
-          status: CsvImportJobStatus.PROCESSING,
-          limit: 10,
-          offset: 0,
-        },
+        filters: {},
       },
       all: {
-        filters: {
-          limit: 50,
-          offset: 0,
-        },
+        filters: {},
       },
     },
     responses: {
@@ -253,6 +246,31 @@ const { GET } = createEndpoint({
               updatedAt: "2024-01-15T10:30:00Z",
               startedAt: null,
               completedAt: null,
+            },
+          ],
+        },
+      },
+      all: {
+        jobs: {
+          items: [
+            {
+              id: "123e4567-e89b-12d3-a456-426614174000",
+              fileName: "app.api.v1.core.leads.csv",
+              status: CsvImportJobStatus.COMPLETED,
+              totalRows: 100,
+              processedRows: 100,
+              successfulImports: 95,
+              failedImports: 5,
+              duplicateEmails: 2,
+              currentBatchStart: 100,
+              batchSize: 100,
+              error: null,
+              retryCount: 0,
+              maxRetries: 3,
+              createdAt: "2024-01-15T10:30:00Z",
+              updatedAt: "2024-01-15T10:35:00Z",
+              startedAt: "2024-01-15T10:30:00Z",
+              completedAt: "2024-01-15T10:35:00Z",
             },
           ],
         },

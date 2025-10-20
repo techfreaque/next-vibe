@@ -66,11 +66,12 @@ interface ImapFolderListResponseType {
 interface ImapFolderQueryType {
   accountId?: string;
   search?: string;
-  syncStatus?: string;
+  syncStatus?: string[];
+  specialUseType?: string[];
   page?: number;
   limit?: number;
-  sortBy?: string;
-  sortOrder?: string;
+  sortBy?: string[];
+  sortOrder?: string[];
 }
 
 interface ImapFolderSyncType {
@@ -208,20 +209,31 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         whereConditions.push(ilike(imapFolders.name, searchTerm));
       }
 
-      // Sync status filter
-      if (data.syncStatus && data.syncStatus !== ImapSyncStatusFilter.ALL) {
-        // Convert filter to database enum value
-        const syncStatusValue =
-          data.syncStatus === ImapSyncStatusFilter.PENDING
-            ? ImapSyncStatus.PENDING
-            : data.syncStatus === ImapSyncStatusFilter.SYNCING
-              ? ImapSyncStatus.SYNCING
-              : data.syncStatus === ImapSyncStatusFilter.SYNCED
-                ? ImapSyncStatus.SYNCED
-                : data.syncStatus === ImapSyncStatusFilter.ERROR
-                  ? ImapSyncStatus.ERROR
-                  : ImapSyncStatus.PENDING;
-        whereConditions.push(eq(imapFolders.syncStatus, syncStatusValue));
+      // Sync status filter (now supports arrays)
+      if (data.syncStatus && data.syncStatus.length > 0) {
+        // Filter out 'ALL' option and use the first status for now
+        // TODO: Implement proper array-based filtering with OR conditions
+        const firstStatus = data.syncStatus[0];
+        if (firstStatus && firstStatus !== ImapSyncStatusFilter.ALL) {
+          const syncStatusValue =
+            firstStatus === ImapSyncStatusFilter.PENDING
+              ? ImapSyncStatus.PENDING
+              : firstStatus === ImapSyncStatusFilter.SYNCING
+                ? ImapSyncStatus.SYNCING
+                : firstStatus === ImapSyncStatusFilter.SYNCED
+                  ? ImapSyncStatus.SYNCED
+                  : firstStatus === ImapSyncStatusFilter.ERROR
+                    ? ImapSyncStatus.ERROR
+                    : ImapSyncStatus.PENDING;
+          whereConditions.push(eq(imapFolders.syncStatus, syncStatusValue));
+        }
+      }
+
+      // Special use type filter
+      if (data.specialUseType && data.specialUseType.length > 0) {
+        // TODO: Implement proper array-based filtering with OR conditions
+        // For now, using first value
+        // whereConditions.push(eq(imapFolders.specialUseType, data.specialUseType[0]));
       }
 
       const whereClause =

@@ -23,16 +23,17 @@ import { ThreadedMessage } from "./threaded-message";
 import { useMessageActions } from "./use-message-actions";
 
 interface ChatMessagesProps {
+  chat: UseChatReturn;
   thread: ChatThread;
   messages: ChatMessage[];
   selectedModel: ModelId;
-  selectedTone: string;
+  selectedPersona: string;
   ttsAutoplay: boolean;
   onEditMessage: (messageId: string, newContent: string) => Promise<void>;
   onDeleteMessage: (messageId: string) => void;
   onSwitchBranch: (messageId: string, branchIndex: number) => void;
   onModelChange?: (model: ModelId) => void;
-  onToneChange?: (tone: string) => void;
+  onPersonaChange?: (persona: string) => void;
   onBranchMessage?: (messageId: string, newContent: string) => Promise<void>;
   onRetryMessage?: (messageId: string) => Promise<void>;
   onAnswerAsModel?: (messageId: string) => Promise<void>;
@@ -49,26 +50,23 @@ interface ChatMessagesProps {
   rootFolderId?: string;
   locale: CountryLanguage;
   logger: EndpointLogger;
-  chat: UseChatReturn;
 }
 
 export function ChatMessages({
   thread,
   messages,
   selectedModel,
-  selectedTone,
+  selectedPersona,
   ttsAutoplay,
   onEditMessage,
   onDeleteMessage,
-  onSwitchBranch,
   onModelChange,
-  onToneChange,
+  onPersonaChange,
   onBranchMessage,
   onRetryMessage,
   onAnswerAsModel,
   onVoteMessage,
   isLoading = false,
-  showBranchIndicators = true,
   onSendMessage,
   inputHeight = LAYOUT.DEFAULT_INPUT_HEIGHT,
   viewMode = "linear",
@@ -180,8 +178,9 @@ export function ChatMessages({
               <FlatMessageView
                 thread={thread}
                 messages={allMessages}
+                personas={chat.personas}
                 selectedModel={selectedModel}
-                selectedTone={selectedTone}
+                selectedPersona={selectedPersona}
                 ttsAutoplay={ttsAutoplay}
                 locale={locale}
                 logger={logger}
@@ -201,7 +200,7 @@ export function ChatMessages({
                 onDeleteMessage={onDeleteMessage}
                 onEditMessage={onEditMessage}
                 onModelChange={onModelChange}
-                onToneChange={onToneChange}
+                onPersonaChange={onPersonaChange}
                 onInsertQuote={() => {
                   chat.setInput(chat.input + QUOTE_CHARACTER);
                   chat.inputRef.current?.focus();
@@ -222,7 +221,7 @@ export function ChatMessages({
                 allMessages={allMessages}
                 depth={0}
                 selectedModel={selectedModel}
-                selectedTone={selectedTone}
+                selectedPersona={selectedPersona}
                 ttsAutoplay={ttsAutoplay}
                 locale={locale}
                 logger={logger}
@@ -233,31 +232,26 @@ export function ChatMessages({
                 onAnswerAsModel={onAnswerAsModel}
                 onVoteMessage={onVoteMessage}
                 onModelChange={onModelChange}
-                onToneChange={onToneChange}
+                onPersonaChange={onPersonaChange}
               />
             ));
           })()
         ) : (
           // Linear view (ChatGPT style)
           <LinearMessageView
-            thread={thread}
             messages={messages}
             selectedModel={selectedModel}
-            selectedTone={selectedTone}
-            showBranchIndicators={showBranchIndicators}
+            selectedPersona={selectedPersona}
             ttsAutoplay={ttsAutoplay}
             locale={locale}
             editingMessageId={messageActions.editingMessageId}
             retryingMessageId={messageActions.retryingMessageId}
             answeringMessageId={messageActions.answeringMessageId}
-            onEditMessage={onEditMessage}
             onDeleteMessage={onDeleteMessage}
-            onSwitchBranch={onSwitchBranch}
-            onBranchMessage={onBranchMessage}
             onRetryMessage={onRetryMessage}
             onAnswerAsModel={onAnswerAsModel}
             onModelChange={onModelChange}
-            onToneChange={onToneChange}
+            onPersonaChange={onPersonaChange}
             onStartEdit={messageActions.startEdit}
             onStartRetry={messageActions.startRetry}
             onStartAnswer={messageActions.startAnswer}

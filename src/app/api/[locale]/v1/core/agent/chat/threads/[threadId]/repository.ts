@@ -100,7 +100,10 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
       logger.debug("Thread found successfully", { threadId: thread.id });
 
       return createSuccessResponse({
-        thread,
+        thread: {
+          ...thread,
+          persona: thread.defaultPersona,
+        },
       }) as ResponseType<ThreadGetResponseOutput>;
     } catch (error) {
       logger.error("Error getting thread by ID", error);
@@ -178,8 +181,8 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
       if (data.updates?.defaultModel !== undefined) {
         updateData.defaultModel = data.updates.defaultModel;
       }
-      if (data.updates?.defaultTone !== undefined) {
-        updateData.defaultTone = data.updates.defaultTone as PersonaId | null;
+      if (data.updates?.persona !== undefined) {
+        updateData.defaultPersona = data.updates.persona as PersonaId | null;
       }
       if (data.updates?.systemPrompt !== undefined) {
         updateData.systemPrompt = data.updates.systemPrompt;
@@ -208,7 +211,10 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
       });
 
       return createSuccessResponse({
-        thread: updatedThread,
+        thread: {
+          ...updatedThread,
+          persona: updatedThread.defaultPersona,
+        },
       }) as ResponseType<ThreadPatchResponseOutput>;
     } catch (error) {
       logger.error("Error updating thread", error);

@@ -49,4 +49,7 @@ export const translations = {
       description: "Operation completed successfully",
     },
   },
+  error: {
+    internal_error: "Internal error occurred during translation reorganization",
+  },
 };

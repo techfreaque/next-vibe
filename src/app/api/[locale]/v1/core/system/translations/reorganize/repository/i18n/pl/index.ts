@@ -51,4 +51,7 @@ export const translations: typeof enTranslations = {
       description: "Operacja zakończona pomyślnie",
     },
   },
+  error: {
+    internal_error: "Wystąpił błąd wewnętrzny podczas reorganizacji tłumaczeń",
+  },
 };

@@ -2,7 +2,6 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 import type { ReleaseConfig } from "../types/index.js";
-import { logger, loggerError } from "./logger.js";
 
 export const DEFAULT_CONFIG_PATH = "release.config.ts";
 
@@ -87,7 +86,8 @@ function isReleaseConfigModule(
 /**
  * Loads and returns the release configuration.
  */
-export async function loadConfig(configPath: string): Promise<ReleaseConfig> {
+export async function loadConfig(configPath: string, logger: EndpointLogger,
+): Promise<ReleaseConfig> {
   logger(`Using config file: ${configPath}`);
   const resolvedConfigPath = resolve(process.cwd(), configPath);
 

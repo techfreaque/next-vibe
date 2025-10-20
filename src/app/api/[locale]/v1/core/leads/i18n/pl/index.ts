@@ -306,5 +306,14 @@ export const translations: typeof enTranslations = {
         },
       },
     },
+    campaigns: {
+      common: {
+        error: {
+          server: {
+            title: "Błąd serwera podczas przetwarzania kampanii",
+          },
+        },
+      },
+    },
   },
 };

@@ -5,7 +5,7 @@
  * Note: Triple-slash reference required for Node.js process type
  */
 
-/// <reference path="../../unified-ui/cli/vibe/types/node.d.ts" />
+/// <reference types="node" />
 
 import fs from "node:fs";
 import path from "node:path";

@@ -1,12 +1,13 @@
-import { execSync } from "node:child_process";
-import { join } from "node:path";
+import { execSync } from "child_process";
+import { join } from "path";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 import type {
   ReleaseConfig,
   ReleaseOptions,
   ReleasePackage,
 } from "../types/index.js";
-import { logger, loggerError } from "../utils/logger.js";
 import { getPackageJson } from "../utils/package-json.js";
 import { DEFAULT_CONFIG_PATH, loadConfig } from "../utils/release-config.js";
 import {
@@ -18,6 +19,34 @@ import {
   typecheck,
 } from "../utils/scripts.js";
 
+// CLI Messages
+const CLI_MESSAGES = {
+  runningCiMode: "Running release in CI mode...",
+  processingPackage: (name: string) => `Processing ${name} in CI mode...`,
+  runningSnykMonitor: (name: string) => `Running Snyk monitor for ${name}`,
+  errorProcessing: (name: string) => `Error processing ${name}:`,
+  ciErrorsSummary:
+    "The CI release process encountered the above errors for the following packages:",
+  linting: (name: string) => `Linting ${name}`,
+  typeChecking: (name: string) => `Type checking ${name}`,
+  building: (name: string) => `Building ${name}`,
+  runningTests: (name: string) => `Running tests for ${name}`,
+  runningSnykTest: (name: string) =>
+    `Running Snyk vulnerability test for ${name}`,
+  ciReleaseRequired: (name: string) =>
+    `CI mode requires ciReleaseCommand to be configured for ${name}`,
+  runningCiCommand: (name: string, cmd: string) =>
+    `Running CI release command for ${name}: ${cmd}`,
+  envVarNotString: (name: string) =>
+    `Environment variable mapping value must be a string for ${name}`,
+  envVarNotSet: (value: string, name: string) =>
+    `Required environment variable ${value} is not set for ${name}`,
+  ciCommandSuccess: (name: string) =>
+    `CI release command completed successfully for ${name}`,
+  ciCommandFailed: (name: string, msg: string) =>
+    `CI release command failed for ${name}: ${msg}`,
+} as const;
+
 /**
  * Runs the CI release process for packages defined in the config.
  * In CI mode:
@@ -26,12 +55,18 @@ import {
  * - No version bumping
  * - Uses ciReleaseCommand instead of git tagging
  */
+// Helper to get environment variable safely
+function getEnvVar(key: string): string | undefined {
+  return process.env[key];
+}
+
 export async function ciRelease(
   configPath: string = DEFAULT_CONFIG_PATH,
+  logger: EndpointLogger,
 ): Promise<void> {
-  const config: ReleaseConfig = await loadConfig(configPath);
+  const config: ReleaseConfig = await loadConfig(configPath, logger);
 
-  logger("Running release in CI mode...");
+  logger.info(CLI_MESSAGES.runningCiMode);
 
   let overallError = false;
   const affectedPackages: string[] = [];
@@ -42,24 +77,24 @@ export async function ciRelease(
     const packageJson = getPackageJson(cwd);
 
     try {
-      logger(`Processing ${packageJson.name} in CI mode...`);
+      logger.info(CLI_MESSAGES.processingPackage(packageJson.name));
 
       // Run quality checks (no dependency updates in CI)
-      runQualityChecks(pkg, cwd, packageJson.name);
+      runQualityChecks(pkg, cwd, packageJson.name, logger);
 
       // Handle release if configured
       const releaseConfig = pkg.release;
       if (releaseConfig !== false) {
         // Run Snyk monitor if configured (upload to Snyk dashboard)
         if (pkg.snyk) {
-          logger(`Running Snyk monitor for ${packageJson.name}`);
+          logger.info(CLI_MESSAGES.runningSnykMonitor(packageJson.name));
           snykMonitor(cwd);
         }
 
-        runCiReleaseCommand(releaseConfig, packageJson.name);
+        runCiReleaseCommand(releaseConfig, packageJson.name, logger);
       }
     } catch (error) {
-      loggerError(`Error processing ${packageJson.name}:`, error);
+      logger.error(CLI_MESSAGES.errorProcessing(packageJson.name), error);
       affectedPackages.push(pkg.directory);
       overallError = true;
     }
@@ -72,10 +107,8 @@ export async function ciRelease(
   }
 
   if (overallError) {
-    loggerError(
-      "The CI release process encountered the above errors for the following packages:",
-      affectedPackages.join(", "),
-    );
+    const packagesStr = affectedPackages.join(", ");
+    logger.error(CLI_MESSAGES.ciErrorsSummary, packagesStr);
     process.exit(1);
   }
 }
@@ -87,29 +120,30 @@ function runQualityChecks(
   pkg: ReleasePackage,
   cwd: string,
   packageName: string,
+  logger: EndpointLogger,
 ): void {
   if (pkg.lint) {
-    logger(`Linting ${packageName}`);
-    lint(cwd);
+    logger.info(CLI_MESSAGES.linting(packageName));
+    lint(cwd, logger);
   }
 
   if (pkg.typecheck) {
-    logger(`Type checking ${packageName}`);
-    typecheck(cwd);
+    logger.info(CLI_MESSAGES.typeChecking(packageName));
+    typecheck(cwd, logger);
   }
 
   if (pkg.build) {
-    logger(`Building ${packageName}`);
+    logger.info(CLI_MESSAGES.building(packageName));
     build(cwd);
   }
 
   if (pkg.test) {
-    logger(`Running tests for ${packageName}`);
+    logger.info(CLI_MESSAGES.runningTests(packageName));
     runTests(cwd);
   }
 
   if (pkg.snyk) {
-    logger(`Running Snyk vulnerability test for ${packageName}`);
+    logger.info(CLI_MESSAGES.runningSnykTest(packageName));
     snykTest(cwd);
   }
 }
@@ -120,46 +154,57 @@ function runQualityChecks(
 function runCiReleaseCommand(
   releaseConfig: ReleaseOptions,
   packageName: string,
+  logger: EndpointLogger,
 ): void {
   if (!releaseConfig.ciReleaseCommand) {
-    throw new Error(
-      `CI mode requires ciReleaseCommand to be configured for ${packageName}`,
-    );
+    const errorMsg = CLI_MESSAGES.ciReleaseRequired(packageName);
+    logger.error(errorMsg);
+    throw new Error(errorMsg);
   }
 
   const { command, env } = releaseConfig.ciReleaseCommand;
+  const commandStr = command.join(" ");
 
-  logger(`Running CI release command for ${packageName}: ${command.join(" ")}`);
+  logger.info(CLI_MESSAGES.runningCiCommand(packageName, commandStr));
 
   // Prepare environment variables
-  const processEnv = { ...process.env };
-  const ciEnv = { ...processEnv };
+  const ciEnv: Record<string, string> = {};
+
+  // Copy all environment variables
+  for (const key in process.env) {
+    const value = getEnvVar(key);
+    if (value !== undefined) {
+      ciEnv[key] = value;
+    }
+  }
+
   if (env) {
     for (const [key, value] of Object.entries(env)) {
       if (typeof value !== "string") {
-        throw new Error(
-          `Environment variable mapping value must be a string for ${packageName}`,
-        );
+        const errorMsg = CLI_MESSAGES.envVarNotString(packageName);
+        logger.error(errorMsg);
+        throw new Error(errorMsg);
       }
-      const envValue = processEnv[value];
+      const envValue = getEnvVar(value);
       if (!envValue) {
-        throw new Error(
-          `Required environment variable ${value} is not set for ${packageName}`,
-        );
+        const errorMsg = CLI_MESSAGES.envVarNotSet(value, packageName);
+        logger.error(errorMsg);
+        throw new Error(errorMsg);
       }
       ciEnv[key] = envValue;
     }
   }
 
   try {
-    execSync(command.join(" "), {
+    execSync(commandStr, {
       stdio: "inherit",
       env: ciEnv,
     });
-    logger(`CI release command completed successfully for ${packageName}`);
+    logger.info(CLI_MESSAGES.ciCommandSuccess(packageName));
   } catch (error) {
-    throw new Error(
-      `CI release command failed for ${packageName}: ${error instanceof Error ? error.message : String(error)}`,
-    );
+    const msg = error instanceof Error ? error.message : String(error);
+    const errorMsg = CLI_MESSAGES.ciCommandFailed(packageName, msg);
+    logger.error(errorMsg);
+    throw new Error(errorMsg);
   }
 }

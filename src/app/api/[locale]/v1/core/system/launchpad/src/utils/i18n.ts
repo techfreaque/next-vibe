@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import { translations as deTranslations } from "../../i18n/de/index.js";
 import { translations as enTranslations } from "../../i18n/en/index.js";
 import { translations as plTranslations } from "../../i18n/pl/index.js";
@@ -9,6 +11,13 @@ interface TranslationParams {
   [key: string]: string | number;
 }
 
+/**
+ * Nested translation value type
+ * Can be a string or an object containing more nested values
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type NestedTranslationValue = string | Record<string, any>;
+
 const translations: Record<string, Translations> = {
   en: enTranslations,
   de: deTranslations,
@@ -17,14 +26,11 @@ const translations: Record<string, Translations> = {
 
 function getNestedValue(obj: Translations, path: string): string {
   const keys = path.split(".");
-  let value: string | Record<string, unknown> | undefined = obj as Record<
-    string,
-    unknown
-  >;
+  let value: NestedTranslationValue | undefined = obj as NestedTranslationValue;
 
   for (const key of keys) {
     if (value && typeof value === "object" && key in value) {
-      value = value[key] as string | Record<string, unknown>;
+      value = value[key] as NestedTranslationValue;
     } else {
       return path;
     }

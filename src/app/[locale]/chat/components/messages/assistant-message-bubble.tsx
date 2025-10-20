@@ -35,10 +35,10 @@ export function AssistantMessageBubble({
 }: AssistantMessageBubbleProps): JSX.Element {
   const { t } = simpleT(locale);
 
-  // Get tone for assistant/user messages
+  // Get persona for assistant/user messages
   const tone =
     message.role === "assistant" || message.role === "user"
-      ? message.tone
+      ? message.persona
       : null;
 
   // Get display name for assistant

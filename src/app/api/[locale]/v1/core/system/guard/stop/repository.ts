@@ -106,7 +106,7 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
       totalStopped: 1,
     };
 
-    return createSuccessResponse({ response });
+    return createSuccessResponse(response);
   }
 
   private stopByProject(
@@ -143,7 +143,7 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
       totalStopped: 1,
     };
 
-    return createSuccessResponse({ response });
+    return createSuccessResponse(response);
   }
 
   private stopAllGuards(
@@ -173,7 +173,7 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
       totalStopped: mockGuards.length,
     };
 
-    return createSuccessResponse({ response });
+    return createSuccessResponse(response);
   }
 }
 

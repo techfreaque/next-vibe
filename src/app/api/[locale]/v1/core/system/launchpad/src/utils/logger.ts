@@ -1,16 +1,13 @@
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+
+// Create a logger instance for launchpad CLI operations
+const endpointLogger = createEndpointLogger(true, Date.now(), "en-GLOBAL");
+
 export function logger(message: string): void {
-  // eslint-disable-next-line no-console
-  console.log(
-    `%c[PWE-Launchpad][INFO] ${message}`,
-    "color: green; font-size: larger;",
-  );
+  endpointLogger.info(`[PWE-Launchpad] ${message}`);
 }
 
-export function loggerError(message: string, error: unknown): void {
-  // eslint-disable-next-line no-console
-  console.error(
-    `%c[PWE-Launchpad][ERROR] ${message}`,
-    "color: red; font-size: larger;",
-    error,
-  );
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function loggerError(message: string, error: any): void {
+  endpointLogger.error(`[PWE-Launchpad] ${message}`, error);
 }

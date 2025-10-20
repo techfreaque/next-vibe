@@ -264,7 +264,8 @@ async function processRouteFile(
 
     // Extract available HTTP methods
     methods = ["GET", "POST", "PUT", "PATCH", "DELETE"].filter(
-      (method) => (routeModule as Record<string, any>)[method],
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      (method) => routeModule[method],
     );
 
     // Validate the route file structure

@@ -188,7 +188,11 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
         };
       case FieldDataType.OBJECT:
         return (value) => {
-          if (typeof value === "object" && value !== null) {
+          if (
+            typeof value === "object" &&
+            value !== null &&
+            !Array.isArray(value)
+          ) {
             return this.formatter.formatObject(value);
           }
           return this.safeToString(value);
@@ -270,8 +274,8 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
     context: WidgetRenderContext,
   ): string {
     const cells = config.columns.map((col, index) => {
-      const label = context.translate(col.label);
-      const styledLabel = this.styleText(label, "bold", context);
+      // Column labels are literal strings, not translation keys
+      const styledLabel = this.styleText(col.label, "bold", context);
       return this.padText(styledLabel, columnWidths[index], col.align);
     });
 

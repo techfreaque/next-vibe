@@ -94,6 +94,7 @@ export const translations: typeof enTranslations = {
     },
     unsubscribe: {
       error: "Nie udało się wypisać z newslettera",
+      confirmQuestion: "Czy na pewno chcesz się wypisać?",
     },
   },
 };

@@ -124,7 +124,7 @@ const { GET } = createEndpoint({
             },
             z.string().nullable(),
           ),
-          defaultTone: responseField(
+          persona: responseField(
             {
               type: WidgetType.TEXT,
               content:
@@ -278,7 +278,7 @@ const { GET } = createEndpoint({
           folderId: null,
           status: ThreadStatus.ACTIVE,
           defaultModel: "gpt-4o",
-          defaultTone: "professional",
+          persona: "professional",
           systemPrompt: null,
           pinned: false,
           archived: false,
@@ -395,7 +395,7 @@ const { PATCH } = createEndpoint({
             },
             z.nativeEnum(ModelId).nullable().optional(),
           ),
-          defaultTone: requestDataField(
+          persona: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
@@ -517,7 +517,7 @@ const { PATCH } = createEndpoint({
             },
             z.string().nullable(),
           ),
-          defaultTone: responseField(
+          persona: responseField(
             {
               type: WidgetType.TEXT,
               content:
@@ -678,7 +678,7 @@ const { PATCH } = createEndpoint({
           folderId: null,
           status: ThreadStatus.ACTIVE,
           defaultModel: "gpt-4o",
-          defaultTone: "professional",
+          persona: "professional",
           systemPrompt: null,
           pinned: true,
           archived: false,

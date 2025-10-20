@@ -35,6 +35,14 @@ export const translations = {
       },
     },
   },
+  emailMetadata: {
+    errors: {
+      server: {
+        title: "Email Metadata Server Error",
+        description: "Failed to store email metadata",
+      },
+    },
+  },
   enums: {
     status: {
       active: "Active",

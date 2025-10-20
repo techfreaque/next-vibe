@@ -224,7 +224,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
           totalCriteria++;
           if (
             account.emailJourneyVariants?.includes(
-              selectionCriteria.emailJourneyVariant,
+              selectionCriteria.emailJourneyVariant as ((typeof account.emailJourneyVariants))[number],
             )
           ) {
             exactMatchCount++;
@@ -236,7 +236,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
           totalCriteria++;
           if (
             account.emailCampaignStages?.includes(
-              selectionCriteria.emailCampaignStage,
+              selectionCriteria.emailCampaignStage as ((typeof account.emailCampaignStages))[number],
             )
           ) {
             exactMatchCount++;

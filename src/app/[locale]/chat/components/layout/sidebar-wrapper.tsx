@@ -39,10 +39,7 @@ interface SidebarWrapperProps {
 }
 
 export function SidebarWrapper({
-  threads,
-  folders,
   activeThreadId,
-  activeRootFolderId,
   activeSubFolderId,
   collapsed,
   locale,
@@ -52,10 +49,7 @@ export function SidebarWrapper({
   onSelectThread,
   onDeleteThread,
   onUpdateFolder,
-  onDeleteFolder,
   onUpdateThreadTitle,
-  currentRootFolderId,
-  currentSubFolderId,
   chat,
 }: SidebarWrapperProps): JSX.Element {
   const { t } = simpleT(locale);
@@ -117,22 +111,23 @@ export function SidebarWrapper({
       >
         <div className={`h-full ${SIDEBAR_WIDTH} bg-background`}>
           <ChatSidebar
-            threads={threads}
-            folders={folders}
+            chat={chat}
             activeThreadId={activeThreadId}
-            activeRootFolderId={activeRootFolderId}
-            activeSubFolderId={activeSubFolderId}
+            activeFolderId={activeSubFolderId || undefined}
             locale={locale}
             logger={logger}
             onCreateThread={handleCreateThread}
             onSelectThread={handleSelectThread}
             onDeleteThread={onDeleteThread}
+            onMoveThread={() => {}}
+            onCreateFolder={() => ""}
             onUpdateFolder={onUpdateFolder}
-            onDeleteFolder={onDeleteFolder}
+            onDeleteFolder={() => {}}
+            onToggleFolderExpanded={() => {}}
+            onReorderFolder={() => {}}
+            onMoveFolderToParent={() => {}}
             onUpdateThreadTitle={onUpdateThreadTitle}
-            currentRootFolderId={currentRootFolderId}
-            currentSubFolderId={currentSubFolderId}
-            chat={chat}
+            searchThreads={() => []}
           />
         </div>
       </div>

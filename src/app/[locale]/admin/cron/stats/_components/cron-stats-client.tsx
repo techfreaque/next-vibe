@@ -25,12 +25,10 @@ import {
 } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { JSX } from "react";
 
-import type { CronStatsGetResponseOutput } from "@/app/api/[locale]/v1/core/system/tasks/cron/stats/definition";
 import { useCronStats } from "@/app/api/[locale]/v1/core/system/tasks/cron/stats/hooks";
 import {
   CronTaskPriority,
@@ -140,18 +138,15 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
   const statsEndpoint = useCronStats(logger);
 
   const apiResponse = statsEndpoint.read.response;
-  const stats: CronStatsGetResponseOutput["data"] | null = apiResponse?.success
-    ? apiResponse.data
-    : null;
+  const stats = apiResponse?.success ? apiResponse.data.data : null;
   const isLoading = statsEndpoint.read.isLoading;
 
   // Stub implementations for missing functionality
   const refreshStats = (): void => {
-    statsEndpoint.read.refetch();
+    void statsEndpoint.read.refetch();
   };
 
   const form = statsEndpoint.read.form;
-  const alert = statsEndpoint.read.alert;
 
   // Helper functions
   const formatNumber = (num: number): string => num.toLocaleString();
@@ -216,7 +211,6 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
         onRefresh={refreshStats}
         form={form}
       >
-        <FormAlert alert={alert} />
         <CronStatsFilters control={form.control} />
       </CronStatsFiltersContainer>
 
@@ -551,10 +545,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             {stats?.tasksByPriority && (
               <CronStatsDistributionChart
                 data={objectEntries(stats.tasksByPriority).map(
-                  ([priority, count]: [
-                    (typeof CronTaskPriority)[keyof typeof CronTaskPriority],
-                    number,
-                  ]) => ({
+                  ([priority, count]) => ({
                     name: t(getPriorityTranslation(priority)),
                     value: count,
                   }),
@@ -569,10 +560,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             {stats?.tasksByStatus && (
               <CronStatsDistributionChart
                 data={objectEntries(stats.tasksByStatus).map(
-                  ([status, count]: [
-                    (typeof CronTaskStatus)[keyof typeof CronTaskStatus],
-                    number,
-                  ]) => ({
+                  ([status, count]) => ({
                     name: t(getStatusTranslation(status)),
                     value: count,
                   }),
@@ -591,7 +579,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
               <CronStatsDistributionChart
                 data={objectEntries(stats.executionsByHour).map(
                   ([hour, count]: [string, number]) => ({
-                    name: t("cron.patterns.atHour", { hour }),
+                    name: hour,
                     value: count,
                   }),
                 )}
@@ -680,46 +668,35 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             <CardContent>
               <div className="space-y-4">
                 {}
-                {stats?.problemTasks?.map(
-                  (
-                    task: {
-                      taskName: string;
-                      failures: number;
-                      executions: number;
-                      failureRate: number;
-                      lastFailure: string;
-                    },
-                    index: number,
-                  ) => (
-                    <div
-                      key={task.taskName}
-                      className="flex items-center justify-between p-3 border rounded-lg"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Badge variant="destructive">#{index + 1}</Badge>
-                        <div>
-                          <p className="font-medium">{task.taskName}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {formatNumber(task.failures)}{" "}
-                            {t("app.admin.cron.stats.failures")} /{" "}
-                            {formatNumber(task.executions)}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium text-red-600">
-                          {formatPercentage(task.failureRate)}
-                        </p>
+                {stats?.problemTasks?.map((task, index: number) => (
+                  <div
+                    key={task.taskName}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Badge variant="destructive">#{index + 1}</Badge>
+                      <div>
+                        <p className="font-medium">{task.taskName}</p>
                         <p className="text-sm text-muted-foreground">
-                          {t("app.admin.cron.stats.lastFailure")}:{" "}
-                          {new Date(task.lastFailure).toLocaleDateString(
-                            locale,
-                          )}
+                          {formatNumber(task.failures)}{" "}
+                          {t("app.admin.cron.stats.failures")} /{" "}
+                          {formatNumber(task.executions)}
                         </p>
                       </div>
                     </div>
-                  ),
-                )}
+                    <div className="text-right">
+                      <p className="font-medium text-red-600">
+                        {formatPercentage(task.failureRate)}
+                      </p>
+                      {task.lastFailure && (
+                        <p className="text-sm text-muted-foreground">
+                          {t("app.admin.cron.stats.lastFailure")}:{" "}
+                          {new Date(task.lastFailure).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>

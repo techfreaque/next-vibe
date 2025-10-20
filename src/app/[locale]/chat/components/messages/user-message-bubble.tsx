@@ -36,7 +36,7 @@ export function UserMessageBubble({
 }: UserMessageBubbleProps): JSX.Element {
   const tone =
     message.role === "user" || message.role === "assistant"
-      ? message.tone
+      ? message.persona
       : undefined;
 
   return (

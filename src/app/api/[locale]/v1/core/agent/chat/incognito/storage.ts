@@ -230,7 +230,7 @@ export function createIncognitoThread(
     folderId: subFolderId,
     status: "active",
     defaultModel: null,
-    defaultTone: null,
+    defaultPersona: null,
     systemPrompt: null,
     pinned: false,
     archived: false,
@@ -253,7 +253,7 @@ export function createIncognitoMessage(
   content: string,
   parentId: string | null = null,
   model: ChatMessage["model"] = null,
-  tone: string | null = null,
+  persona: string | null = null,
 ): ChatMessage {
   const message: ChatMessage = {
     id: generateIncognitoId("msg"),
@@ -266,7 +266,7 @@ export function createIncognitoMessage(
     authorName: null,
     isAI: role === "assistant",
     model,
-    tone,
+    persona,
     errorType: null,
     errorMessage: null,
     edited: false,

@@ -128,6 +128,14 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Datenkonflikt aufgetreten",
       },
+      templateNotFound: {
+        title: "Vorlage nicht gefunden",
+        description: "E-Mail-Vorlage für angegebene Parameter nicht gefunden",
+      },
+      sendingFailed: {
+        title: "Senden fehlgeschlagen",
+        description: "Test-E-Mail konnte nicht gesendet werden",
+      },
     },
     success: {
       title: "Erfolg",

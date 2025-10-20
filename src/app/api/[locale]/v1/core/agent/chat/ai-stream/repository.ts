@@ -28,6 +28,7 @@ import { creditValidator } from "../credits/validator";
 import { chatMessages, chatThreads } from "../db";
 import { ChatMessageRole } from "../enum";
 import { getModelCost } from "../model-access/costs";
+import { getModelById, type ModelId } from "../model-access/models";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
@@ -531,7 +532,7 @@ export async function createAiStream({
         data.operation === "answer-as-ai" ? messageDepth : messageDepth + 1,
       isAI: true,
       model: data.model,
-      tone: data.persona || null,
+      persona: data.persona || null,
     } as typeof chatMessages.$inferInsert);
 
     logger.info("Created AI message placeholder", {
@@ -693,8 +694,13 @@ export async function createAiStream({
 
           // Start streaming
           let fullContent = "";
+
+          // Get the OpenRouter model ID (use openRouterModel if available, otherwise use model ID directly)
+          const modelConfig = getModelById(data.model as ModelId);
+          const openRouterModelId = modelConfig?.openRouterModel || data.model;
+
           const streamResult = streamText({
-            model: provider(data.model),
+            model: provider(openRouterModelId),
             messages,
             temperature: data.temperature,
             abortSignal: AbortSignal.timeout(maxDuration * 1000),

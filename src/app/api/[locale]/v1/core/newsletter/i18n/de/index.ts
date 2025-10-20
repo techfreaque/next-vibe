@@ -95,6 +95,7 @@ export const translations: typeof enTranslations = {
     },
     unsubscribe: {
       error: "Newsletter-Abmeldung fehlgeschlagen",
+      confirmQuestion: "Sind Sie sicher, dass Sie sich abmelden möchten?",
     },
   },
 };

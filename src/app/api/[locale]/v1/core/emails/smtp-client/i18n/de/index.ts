@@ -36,6 +36,14 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  emailMetadata: {
+    errors: {
+      server: {
+        title: "E-Mail-Metadaten Serverfehler",
+        description: "Speichern von E-Mail-Metadaten fehlgeschlagen",
+      },
+    },
+  },
   enums: {
     status: {
       active: "Aktiv",

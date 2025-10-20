@@ -4,11 +4,9 @@
 "use client";
 
 import { useMemo } from "react";
-import type { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
@@ -42,7 +40,8 @@ export function useEndpointRead<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    any
+    // eslint-disable-next-line no-restricted-syntax
+    unknown
   >,
 >(
   primaryEndpoint: TEndpoint | null,
@@ -97,7 +96,6 @@ export function useEndpointRead<
     const { finalData } = determineFormDataPriority(
       dataSources,
       autoPrefillConfig,
-      false, // isDirty will be determined by the form itself
     );
 
     return {

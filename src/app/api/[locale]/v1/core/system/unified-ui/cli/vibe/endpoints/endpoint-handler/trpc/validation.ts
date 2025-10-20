@@ -8,13 +8,11 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { validateData } from "next-vibe/shared/utils/validation";
-import type z from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { Methods } from "../../endpoint-types/core/enums";
-import type { UnifiedField } from "../../endpoint-types/core/types";
 import type { CreateApiEndpoint } from "../../endpoint-types/endpoint/create";
 import {
   type ValidatedRequestData,
@@ -64,7 +62,7 @@ export function validateTrpcRequestData<
     if (!urlValidation.success) {
       return {
         success: false,
-        message: "error.errors.invalid_url_parameters",
+        message: "app.error.errors.invalid_url_parameters",
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: urlValidation.message,
@@ -81,7 +79,7 @@ export function validateTrpcRequestData<
     if (!requestValidation.success) {
       return {
         success: false,
-        message: "error.errors.invalid_request_data",
+        message: "app.error.errors.invalid_request_data",
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: requestValidation.message,
@@ -101,7 +99,7 @@ export function validateTrpcRequestData<
   } catch (error) {
     return {
       success: false,
-      message: "error.form_validation_failed",
+      message: "app.error.form_validation_failed",
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
         error:

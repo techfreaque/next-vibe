@@ -63,10 +63,6 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
         return this.destroyByProject(data.projectPath, logger);
       }
 
-      if (data.destroyAll) {
-        return this.destroyAllGuards(logger);
-      }
-
       // Default to current project if no parameters specified
       const currentProjectPath = process.cwd();
       logger.info(
@@ -79,7 +75,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
         error instanceof Error ? error : new Error(String(error));
 
       return createErrorResponse(
-        "app.api.v1.core.system.guard.destroy.errors.internal.title",
+        "app.api.v1.core.system.guard.destroy.post.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message },
       );
@@ -100,7 +96,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
       totalDestroyed: 0,
     };
 
-    return createSuccessResponse({ response });
+    return createSuccessResponse(response);
   }
 
   private destroyByGuardId(
@@ -126,7 +122,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
       totalDestroyed: 1,
     };
 
-    return createSuccessResponse({ response });
+    return createSuccessResponse(response);
   }
 
   private destroyByProject(
@@ -140,7 +136,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
 
     if (!fs.existsSync(guardScriptPath)) {
       return createErrorResponse(
-        "app.api.v1.core.system.guard.destroy.errors.notFound.title",
+        "app.api.v1.core.system.guard.destroy.post.errors.notFound.title",
         ErrorResponseTypes.NOT_FOUND,
         { error: `No guard found for project '${projectName}'` }, // eslint-disable-line i18next/no-literal-string
       );
@@ -167,7 +163,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
       totalDestroyed: 1,
     };
 
-    return createSuccessResponse({ response });
+    return createSuccessResponse(response);
   }
 
   private destroyAllGuards(
@@ -194,7 +190,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
       totalDestroyed: mockGuards.length,
     };
 
-    return createSuccessResponse({ response });
+    return createSuccessResponse(response);
   }
 }
 

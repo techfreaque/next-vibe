@@ -126,6 +126,14 @@ export const translations = {
         title: "Conflict",
         description: "Data conflict occurred",
       },
+      templateNotFound: {
+        title: "Template Not Found",
+        description: "Email template not found for specified parameters",
+      },
+      sendingFailed: {
+        title: "Sending Failed",
+        description: "Failed to send test email",
+      },
     },
     success: {
       title: "Success",

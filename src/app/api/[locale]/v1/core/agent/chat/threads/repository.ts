@@ -251,8 +251,8 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         folderId: data.thread?.subFolderId ?? null,
         status: ThreadStatus.ACTIVE,
         defaultModel: data.thread?.model ?? null,
-        defaultTone: (data.thread?.persona ??
-          null) as typeof chatThreads.$inferInsert.defaultTone,
+        defaultPersona: (data.thread?.persona ??
+          null) as typeof chatThreads.$inferInsert.defaultPersona,
         systemPrompt: data.thread?.systemPrompt ?? null,
         pinned: false,
         archived: false,

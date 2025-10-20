@@ -233,8 +233,10 @@ export function useNewsletterManager(): NewsletterManagerResult {
   );
 
   // Use user email if logged in, otherwise use manual input
-  const email =
-    isLoggedIn && user && "email" in user ? user.email : manualEmail;
+  const email: string =
+    isLoggedIn && user && "email" in user && typeof user.email === "string"
+      ? user.email
+      : manualEmail;
 
   // Improved email validation
   const isValidEmail = useCallback((emailToValidate: string): boolean => {
@@ -307,60 +309,58 @@ export function useNewsletterManager(): NewsletterManagerResult {
       : isSubscribed;
 
   // Single notification state (priority: errors > success > confirmation > subscription status)
-  const notification: NewsletterManagerResult["notification"] = useMemo(() => {
-    if (subscriptionMutation.error) {
-      return {
-        type: "error" as const,
-        message:
-          "app.api.v1.core.newsletter.subscription.error.description" as const,
-      };
-    }
-    if (unsubscribeMutation.error) {
-      return {
-        type: "error" as const,
-        message:
-          "app.api.v1.core.newsletter.subscription.unsubscribe.error" as const,
-      };
-    }
-    if (subscriptionMutation.isSuccess) {
-      return {
-        type: "success" as const,
-        message:
-          "app.api.v1.core.newsletter.subscription.success.description" as const,
-      };
-    }
-    if (unsubscribeMutation.isSuccess) {
-      return {
-        type: "success" as const,
-        message:
-          "app.api.v1.core.newsletter.subscription.unsubscribe.success" as const,
-      };
-    }
-    if (showConfirmUnsubscribe) {
-      return {
-        type: "confirm" as const,
-        message:
-          "app.api.v1.core.newsletter.subscription.unsubscribe.confirmQuestion" as const,
-      };
-    }
-    // Show unsubscribe text when email is already subscribed
-    if (isSubscribed && isCurrentEmailValid) {
-      return {
-        type: "info" as const,
-        message:
-          "app.api.v1.core.newsletter.subscription.status.subscribed" as const,
-      };
-    }
-    return null;
-  }, [
-    subscriptionMutation.error,
-    subscriptionMutation.isSuccess,
-    unsubscribeMutation.error,
-    unsubscribeMutation.isSuccess,
-    showConfirmUnsubscribe,
-    isSubscribed,
-    isCurrentEmailValid,
-  ]);
+  const notification: NewsletterManagerResult["notification"] =
+    useMemo((): NewsletterManagerResult["notification"] => {
+      if (subscriptionMutation.error) {
+        return {
+          type: "error",
+          message: "app.api.v1.core.newsletter.subscription.error.description",
+        };
+      }
+      if (unsubscribeMutation.error) {
+        return {
+          type: "error",
+          message: "app.api.v1.core.newsletter.subscription.unsubscribe.error",
+        };
+      }
+      if (subscriptionMutation.isSuccess) {
+        return {
+          type: "success",
+          message:
+            "app.api.v1.core.newsletter.subscribe.post.success.description",
+        };
+      }
+      if (unsubscribeMutation.isSuccess) {
+        return {
+          type: "success",
+          message:
+            "app.api.v1.core.newsletter.unsubscribe.post.success.description",
+        };
+      }
+      if (showConfirmUnsubscribe) {
+        return {
+          type: "confirm",
+          message:
+            "app.api.v1.core.newsletter.subscription.unsubscribe.confirmQuestion",
+        };
+      }
+      // Show unsubscribe text when email is already subscribed
+      if (isSubscribed && isCurrentEmailValid) {
+        return {
+          type: "info",
+          message: "app.api.v1.core.newsletter.enum.status.subscribed",
+        };
+      }
+      return null;
+    }, [
+      subscriptionMutation.error,
+      subscriptionMutation.isSuccess,
+      unsubscribeMutation.error,
+      unsubscribeMutation.isSuccess,
+      showConfirmUnsubscribe,
+      isSubscribed,
+      isCurrentEmailValid,
+    ]);
 
   const subscribe = useCallback(
     (emailParam?: string): void => {

@@ -77,7 +77,11 @@ export function RenameFolderDialog({
           </div>
           <div className="space-y-2">
             <Label>{t("app.chat.renameFolder.folderIcon")}</Label>
-            <IconSelector value={icon} onChange={setIcon} locale={locale} />
+            <IconSelector
+              value={icon ?? "folder"}
+              onChange={setIcon}
+              locale={locale}
+            />
           </div>
           <div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={() => onOpenChange(false)}>

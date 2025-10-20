@@ -25,10 +25,10 @@ interface ChatInputProps {
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   isLoading: boolean;
   onStop: () => void;
-  selectedTone: string;
+  selectedPersona: string;
   selectedModel: ModelId;
   enableSearch: boolean;
-  onToneChange: (tone: string) => void;
+  onPersonaChange: (persona: string) => void;
   onModelChange: (model: ModelId) => void;
   onEnableSearchChange: (enabled: boolean) => void;
   locale: CountryLanguage;
@@ -45,10 +45,10 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
       onKeyDown,
       isLoading,
       onStop,
-      selectedTone,
+      selectedPersona,
       selectedModel,
       enableSearch,
-      onToneChange,
+      onPersonaChange,
       onModelChange,
       onEnableSearchChange,
       locale,
@@ -119,8 +119,8 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
 
             {/* Persona Selector */}
             <PersonaSelector
-              value={selectedTone}
-              onChange={onToneChange}
+              value={selectedPersona}
+              onChange={onPersonaChange}
               onModelChange={onModelChange}
               locale={locale}
               logger={logger}

@@ -33,11 +33,23 @@ export default async function UserEditPage({
     `/${locale}/admin/users/${id}/edit`,
   );
 
+  // Validate user has leadId (required for JWT payload)
+  if (!user.leadId) {
+    redirect(`/${locale}/admin/users/list`);
+  }
+
+  // Extract JWT payload from complete user
+  const jwtPayload = {
+    id: user.id,
+    leadId: user.leadId,
+    isPublic: false as const,
+  };
+
   // Fetch user data
   const logger = createEndpointLogger(false, Date.now(), locale);
   const userResponse = await userByIdRepository.getUserById(
     { id },
-    user,
+    jwtPayload,
     locale,
     logger,
   );

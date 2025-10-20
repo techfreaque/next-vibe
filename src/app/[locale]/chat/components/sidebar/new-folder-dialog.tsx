@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
 import {
   Button,
   Dialog,
@@ -23,7 +24,7 @@ interface NewFolderDialogProps {
   onSave: (name: string, icon: string) => void;
   locale: CountryLanguage;
   /** Optional custom title translation key. If not provided, uses default "app.chat.newFolder.title" */
-  titleKey?: string;
+  titleKey?: TranslationKey;
 }
 
 export function NewFolderDialog({
@@ -52,11 +53,13 @@ export function NewFolderDialog({
     }
   };
 
+  const title = titleKey ? t(titleKey) : t("app.chat.newFolder.title");
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
-          <DialogTitle>{t(titleKey || "app.chat.newFolder.title")}</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
