@@ -97,7 +97,7 @@ const { GET } = createEndpoint({
               text: "app.api.v1.core.manifest.response.display",
               variant: ComponentVariant.DEFAULT,
             },
-            z.nativeEnum(WebAppDisplayMode),
+            z.enum(WebAppDisplayMode),
           ),
           background_color: responseField(
             {
@@ -119,7 +119,7 @@ const { GET } = createEndpoint({
               text: "app.api.v1.core.manifest.response.orientation",
               variant: ComponentVariant.DEFAULT,
             },
-            z.nativeEnum(WebAppOrientation),
+            z.enum(WebAppOrientation),
           ),
           scope: responseField(
             {
@@ -141,7 +141,7 @@ const { GET } = createEndpoint({
               text: "app.api.v1.core.manifest.response.categories",
               variant: ComponentVariant.DEFAULT,
             },
-            z.array(z.nativeEnum(WebAppCategory)),
+            z.array(z.enum(WebAppCategory)),
           ),
           icons: responseArrayField(
             {
@@ -187,7 +187,7 @@ const { GET } = createEndpoint({
                     text: "app.api.v1.core.manifest.response.iconPurpose",
                     variant: ComponentVariant.DEFAULT,
                   },
-                  z.nativeEnum(IconPurpose),
+                  z.enum(IconPurpose),
                 ),
               },
             ),

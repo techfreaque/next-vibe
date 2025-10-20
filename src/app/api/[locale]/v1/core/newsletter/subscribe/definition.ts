@@ -103,7 +103,7 @@ const { POST } = createEndpoint({
           options: NewsletterPreferenceOptions,
           layout: { columns: 12 },
         },
-        z.array(z.nativeEnum(NewsletterPreference)).optional(),
+        z.array(z.enum(NewsletterPreference)).optional(),
       ),
       inputLeadId: requestDataField(
         {

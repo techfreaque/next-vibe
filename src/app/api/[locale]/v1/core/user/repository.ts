@@ -161,16 +161,25 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
       logger.debug("Getting user by auth", { roles, detailLevel });
 
+      // Locale is required for authentication
+      const locale = options.locale || logger.locale;
+      if (!locale) {
+        return createErrorResponse(
+          "app.api.v1.core.user.errors.locale_required",
+          ErrorResponseTypes.BAD_REQUEST,
+        );
+      }
+
       // Get the authenticated user
       const verifiedUser = await authRepository.getAuthMinimalUser(
         roles,
-        { platform: "next" },
+        { platform: "next", locale },
         logger,
       );
 
       if (!verifiedUser) {
         return createErrorResponse(
-          "user.errors.auth_required",
+          "app.api.v1.core.user.errors.auth_required",
           ErrorResponseTypes.UNAUTHORIZED,
           { roles: roles.join(",") },
         );
@@ -192,7 +201,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
           isPublic: verifiedUser.isPublic,
         });
         return createErrorResponse(
-          "auth.errors.jwt_payload_missing_id",
+          "app.api.v1.core.user.auth.errors.jwt_payload_missing_id",
           ErrorResponseTypes.INTERNAL_ERROR,
         );
       }
@@ -206,7 +215,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
     } catch (error) {
       logger.error("Error getting authenticated user", error);
       return createErrorResponse(
-        "user.errors.auth_retrieval_failed",
+        "app.api.v1.core.user.errors.auth_retrieval_failed",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -231,7 +240,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
       if (results.length === 0) {
         return createErrorResponse(
-          "user.errors.not_found",
+          "app.api.v1.core.user.errors.not_found",
           ErrorResponseTypes.NOT_FOUND,
           { userId },
         );
@@ -246,7 +255,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       );
       if (!userRolesResponse.success) {
         return createErrorResponse(
-          "user.errors.roles_lookup_failed",
+          "app.api.v1.core.user.errors.roles_lookup_failed",
           ErrorResponseTypes.INTERNAL_ERROR,
           { userId },
         );
@@ -287,7 +296,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
     } catch (error) {
       logger.error("Error getting user by ID", error);
       return createErrorResponse(
-        "user.errors.id_lookup_failed",
+        "app.api.v1.core.user.errors.id_lookup_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { userId, error: parseError(error).message },
       );
@@ -317,7 +326,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
       if (results.length === 0) {
         return createErrorResponse(
-          "user.errors.not_found",
+          "app.api.v1.core.user.errors.not_found",
           ErrorResponseTypes.NOT_FOUND,
           { email },
         );
@@ -329,7 +338,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       const errorMessage = parseError(error).message;
       logger.error("Error getting user by email", error);
       return createErrorResponse(
-        "user.errors.email_lookup_failed",
+        "app.api.v1.core.user.errors.email_lookup_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { email, error: errorMessage },
       );
@@ -353,7 +362,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
     } catch (error) {
       logger.error("Error checking if user exists", error);
       return createErrorResponse(
-        "user.errors.id_lookup_failed",
+        "app.api.v1.core.user.errors.id_lookup_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { userId, error: parseError(error).message },
       );
@@ -377,7 +386,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
     } catch (error) {
       logger.error("Error checking if email exists", error);
       return createErrorResponse(
-        "user.errors.email_check_failed",
+        "app.api.v1.core.user.errors.email_check_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { email, error: parseError(error).message },
       );
@@ -403,7 +412,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
     } catch (error) {
       logger.error("Error checking if email exists by other user", error);
       return createErrorResponse(
-        "user.errors.email_duplicate_check_failed",
+        "app.api.v1.core.user.errors.email_duplicate_check_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { email, excludeUserId, error: parseError(error).message },
       );
@@ -491,7 +500,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
     } catch (error) {
       logger.error("Error searching users", error);
       return createErrorResponse(
-        "user.errors.search_failed",
+        "app.api.v1.core.user.errors.search_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { query, error: parseError(error).message },
       );
@@ -555,7 +564,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
     } catch (error) {
       logger.error("Error getting all users", error);
       return createErrorResponse(
-        "user.errors.search_failed",
+        "app.api.v1.core.user.errors.search_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { error: parseError(error).message },
       );
@@ -602,7 +611,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
     } catch (error) {
       logger.error("Error getting user search count", error);
       return createErrorResponse(
-        "user.errors.search_failed",
+        "app.api.v1.core.user.errors.search_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { query, error: parseError(error).message },
       );
@@ -623,7 +632,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       const emailExistsResponse = await this.emailExists(data.email, logger);
       if (emailExistsResponse.success && emailExistsResponse.data) {
         return createErrorResponse(
-          "user.errors.email_already_in_use",
+          "app.api.v1.core.user.errors.email_already_in_use",
           ErrorResponseTypes.VALIDATION_ERROR,
           { email: data.email },
         );
@@ -632,16 +641,16 @@ export class BaseUserRepositoryImpl implements UserRepository {
       const results = await db.insert(users).values(validatedData).returning();
       if (results.length === 0) {
         return createErrorResponse(
-          "user.errors.creation_failed",
+          "app.api.v1.core.user.errors.creation_failed",
           ErrorResponseTypes.DATABASE_ERROR,
-          { error: "user.errors.no_data_returned" },
+          { error: "app.api.v1.core.user.errors.no_data_returned" },
         );
       }
       return createSuccessResponse(results[0] as User);
     } catch (error) {
       logger.error("Error creating user", error);
       return createErrorResponse(
-        "user.errors.creation_failed",
+        "app.api.v1.core.user.errors.creation_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { email: data.email, error: parseError(error).message },
       );
@@ -667,9 +676,9 @@ export class BaseUserRepositoryImpl implements UserRepository {
       const results = await db.insert(users).values(validatedData).returning();
       if (results.length === 0) {
         return createErrorResponse(
-          "user.errors.creation_failed",
+          "app.api.v1.core.user.errors.creation_failed",
           ErrorResponseTypes.DATABASE_ERROR,
-          { error: "user.errors.no_data_returned" },
+          { error: "app.api.v1.core.user.errors.no_data_returned" },
         );
       }
       const createdUser = results[0] as User;
@@ -683,7 +692,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
     } catch (error) {
       logger.error("Error creating user with hashed password", error);
       return createErrorResponse(
-        "user.errors.password_hashing_failed",
+        "app.api.v1.core.user.errors.password_hashing_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { email: data.email, error: parseError(error).message },
       );

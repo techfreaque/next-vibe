@@ -11,8 +11,8 @@ import { UserRole } from "./enum";
 // Re-export for external use
 export { UserRole };
 
-// Use z.nativeEnum instead of z.enum for proper enum validation
-const userRoleTypeSchema = z.nativeEnum(UserRole);
+// Use z.enum instead of z.enum for proper enum validation
+const userRoleTypeSchema = z.enum(UserRole);
 
 export const userRoleAdminCreateSchema = z.object({
   role: userRoleTypeSchema,

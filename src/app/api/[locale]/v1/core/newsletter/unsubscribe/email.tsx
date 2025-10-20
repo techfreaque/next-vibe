@@ -249,7 +249,7 @@ export const renderUnsubscribeConfirmationMail: EmailFunctionType<
     });
   } catch {
     return createErrorResponse(
-      "newsletter.errors.email_generation_failed",
+      "app.api.v1.core.newsletter.errors.email_generation_failed",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }
@@ -267,7 +267,7 @@ export const renderAdminUnsubscribeNotificationMail: EmailFunctionType<
   try {
     return createSuccessResponse({
       toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: t("common.appName"),
+      toName: t("app.common.appName"),
       subject: t(
         "app.api.v1.core.newsletter.email.unsubscribe.admin_unsubscribe_notification.subject",
       ),
@@ -279,7 +279,7 @@ export const renderAdminUnsubscribeNotificationMail: EmailFunctionType<
     });
   } catch {
     return createErrorResponse(
-      "newsletter.errors.email_generation_failed",
+      "app.api.v1.core.newsletter.errors.email_generation_failed",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }

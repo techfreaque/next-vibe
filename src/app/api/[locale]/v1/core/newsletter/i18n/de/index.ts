@@ -80,4 +80,21 @@ export const translations: typeof enTranslations = {
       missing_lead_id: "Newsletter-Abonnement: Fehlende leadId",
     },
   },
+  errors: {
+    email_generation_failed: "E-Mail-Generierung fehlgeschlagen",
+  },
+  error: {
+    general: {
+      internal_server_error: "Interner Serverfehler",
+    },
+    default: "Ein Fehler ist aufgetreten",
+  },
+  subscription: {
+    error: {
+      description: "Newsletter-Abonnement fehlgeschlagen",
+    },
+    unsubscribe: {
+      error: "Newsletter-Abmeldung fehlgeschlagen",
+    },
+  },
 };

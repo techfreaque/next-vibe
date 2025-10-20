@@ -43,12 +43,12 @@ export async function generateMetadata({
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "",
-    title: "layout.metadata.defaultTitle",
-    category: "layout.metadata.category",
-    description: "layout.metadata.description",
+    title: "app.layout.metadata.defaultTitle",
+    category: "app.layout.metadata.category",
+    description: "app.layout.metadata.description",
     image: "https://unbottled.ai/og-image.jpg",
-    imageAlt: "layout.openGraph.imageAlt",
-    keywords: ["meta.home.keywords"],
+    imageAlt: "app.layout.openGraph.imageAlt",
+    keywords: ["app.meta.home.keywords"],
   });
 }
 
@@ -66,26 +66,28 @@ export default async function RootLayoutServer({
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": t("layout.structuredData.organization.types.organization"),
-    name: t("layout.structuredData.organization.name"),
-    url: "https://unbottled.ai",
-    logo: "https://unbottled.ai/logo.png",
-    sameAs: [
+    "@type": t("app.layout.structuredData.organization.types.organization"),
+    "name": t("app.layout.structuredData.organization.name"),
+    "url": "https://unbottled.ai",
+    "logo": "https://unbottled.ai/logo.png",
+    "sameAs": [
       "https://facebook.com/socialmediaservice",
       "https://twitter.com/socialmediaservice",
       "https://instagram.com/socialmediaservice",
       "https://linkedin.com/company/socialmediaservice",
     ],
-    contactPoint: {
-      "@type": t("layout.structuredData.organization.types.contactPoint"),
-      telephone: t("layout.structuredData.organization.contactPoint.telephone"),
-      contactType: t(
-        "layout.structuredData.organization.contactPoint.contactType",
+    "contactPoint": {
+      "@type": t("app.layout.structuredData.organization.types.contactPoint"),
+      "telephone": t(
+        "app.layout.structuredData.organization.contactPoint.telephone",
       ),
-      availableLanguage: [
-        t("constants.languages.en"),
-        t("constants.languages.de"),
-        t("constants.languages.pl"),
+      "contactType": t(
+        "app.layout.structuredData.organization.contactPoint.contactType",
+      ),
+      "availableLanguage": [
+        t("app.constants.languages.en"),
+        t("app.constants.languages.de"),
+        t("app.constants.languages.pl"),
       ],
     },
   };

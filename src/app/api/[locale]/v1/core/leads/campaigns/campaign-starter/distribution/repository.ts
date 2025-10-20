@@ -92,7 +92,7 @@ export class DistributionRepositoryImpl implements DistributionRepository {
     } catch (error) {
       logger.error("Distribution calculation failed", { error });
       return createErrorResponse(
-        "leadsErrors.campaigns.common.error.server.title" as const,
+        "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -177,7 +177,7 @@ export class DistributionRepositoryImpl implements DistributionRepository {
     } catch (error) {
       logger.error("Locale quota calculation failed", { error });
       return createErrorResponse(
-        "leadsErrors.campaigns.common.error.server.title" as const,
+        "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }

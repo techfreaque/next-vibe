@@ -161,7 +161,7 @@ const { GET } = createEndpoint({
                 label:
                   "app.api.v1.core.agent.chat.threads.search.get.response.results.thread.id.label" as const,
               },
-              z.string().uuid(),
+              z.uuid(),
             ),
             threadTitle: responseField(
               {
@@ -211,7 +211,7 @@ const { GET } = createEndpoint({
                   "app.api.v1.core.agent.chat.threads.search.get.response.results.thread.status.label" as const,
                 options: ThreadStatusOptions,
               },
-              z.nativeEnum(ThreadStatus),
+              z.enum(ThreadStatus),
             ),
             createdAt: responseField(
               {

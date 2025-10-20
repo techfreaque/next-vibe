@@ -51,43 +51,43 @@ export default function Features({
   const features: FeatureItem[] = [
     {
       icon: <Brush className="h-10 w-10 text-cyan-500" />,
-      title: t("pages.home.features.contentCreation.title"),
-      description: t("pages.home.features.contentCreation.description"),
+      title: t("app.site.home.features.contentCreation.title"),
+      description: t("app.site.home.features.contentCreation.description"),
     },
     {
       icon: <LayoutTemplate className="h-10 w-10 text-blue-500" />,
-      title: t("pages.home.features.strategyDevelopment.title"),
-      description: t("pages.home.features.strategyDevelopment.description"),
+      title: t("app.site.home.features.strategyDevelopment.title"),
+      description: t("app.site.home.features.strategyDevelopment.description"),
     },
     {
       icon: <BarChart3 className="h-10 w-10 text-cyan-500" />,
-      title: t("pages.home.features.performanceAnalytics.title"),
-      description: t("pages.home.features.performanceAnalytics.description"),
+      title: t("app.site.home.features.performanceAnalytics.title"),
+      description: t("app.site.home.features.performanceAnalytics.description"),
     },
     {
       icon: <MessageSquare className="h-10 w-10 text-blue-500" />,
-      title: t("pages.home.features.communityEngagement.title"),
-      description: t("pages.home.features.communityEngagement.description"),
+      title: t("app.site.home.features.communityEngagement.title"),
+      description: t("app.site.home.features.communityEngagement.description"),
     },
     {
       icon: <TrendingUp className="h-10 w-10 text-cyan-500" />,
-      title: t("pages.home.features.growth.title"),
-      description: t("pages.home.features.growth.description"),
+      title: t("app.site.home.features.growth.title"),
+      description: t("app.site.home.features.growth.description"),
     },
     {
       icon: <Users className="h-10 w-10 text-blue-500" />,
-      title: t("pages.home.features.audience.title"),
-      description: t("pages.home.features.audience.description"),
+      title: t("app.site.home.features.audience.title"),
+      description: t("app.site.home.features.audience.description"),
     },
     {
       icon: <Globe className="h-10 w-10 text-cyan-500" />,
-      title: t("pages.home.features.global.title"),
-      description: t("pages.home.features.global.description"),
+      title: t("app.site.home.features.global.title"),
+      description: t("app.site.home.features.global.description"),
     },
     {
       icon: <Zap className="h-10 w-10 text-blue-500" />,
-      title: t("pages.home.features.adCampaigns.title"),
-      description: t("pages.home.features.adCampaigns.description"),
+      title: t("app.site.home.features.adCampaigns.title"),
+      description: t("app.site.home.features.adCampaigns.description"),
     },
   ];
 
@@ -119,7 +119,7 @@ export default function Features({
           animate={inView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {t("pages.home.features.subtitle")}
+          {t("app.site.home.features.subtitle")}
         </motion.p>
         <motion.h2
           className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-4"
@@ -127,7 +127,7 @@ export default function Features({
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          {t("pages.home.features.title")}
+          {t("app.site.home.features.title")}
         </motion.h2>
         <motion.p
           className="mx-auto max-w-[800px] text-gray-500 dark:text-gray-400 md:text-xl"
@@ -135,7 +135,7 @@ export default function Features({
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          {t("pages.home.features.description")}
+          {t("app.site.home.features.description")}
         </motion.p>
       </div>
 

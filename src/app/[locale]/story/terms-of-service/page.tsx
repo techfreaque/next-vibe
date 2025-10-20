@@ -22,24 +22,24 @@ export async function generateMetadata(
 
   return metadataGenerator(locale, {
     path: "terms-of-service",
-    title: "meta.termsOfService.title",
-    description: "meta.termsOfService.description",
+    title: "app.meta.termsOfService.title",
+    description: "app.meta.termsOfService.description",
     image: "https://unbottled.ai/images/terms-hero.jpg",
-    imageAlt: "meta.termsOfService.imageAlt",
-    keywords: ["meta.termsOfService.keywords"],
-    category: "meta.termsOfService.category",
+    imageAlt: "app.meta.termsOfService.imageAlt",
+    keywords: ["app.meta.termsOfService.keywords"],
+    category: "app.meta.termsOfService.category",
     additionalMetadata: {
       openGraph: {
-        title: "meta.termsOfService.ogTitle",
-        description: "meta.termsOfService.ogDescription",
+        title: "app.meta.termsOfService.ogTitle",
+        description: "app.meta.termsOfService.ogDescription",
         url: `https://unbottled.ai/${locale}/terms-of-service`,
         type: "website",
         images: [...previousImages],
       },
       twitter: {
         card: "summary_large_image",
-        title: "meta.termsOfService.twitterTitle",
-        description: "meta.termsOfService.twitterDescription",
+        title: "app.meta.termsOfService.twitterTitle",
+        description: "app.meta.termsOfService.twitterDescription",
       },
     },
   });
@@ -50,7 +50,7 @@ export default async function TermsOfServicePage({
 }: Props): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
-  const appName = t("common.appName");
+  const appName = t("app.common.appName");
   const supportEmail = contactClientRepository.getSupportEmail(locale);
 
   return (
@@ -62,10 +62,10 @@ export default async function TermsOfServicePage({
             <Scale className="h-8 w-8 text-blue-600 dark:text-blue-400" />
           </div>
           <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
-            {t("pages.termsOfService.title")}
+            {t("app.site.termsOfService.title")}
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400">
-            {t("pages.termsOfService.lastUpdated")}
+            {t("app.site.termsOfService.lastUpdated")}
           </p>
         </div>
 
@@ -73,7 +73,7 @@ export default async function TermsOfServicePage({
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 mb-8">
           <div className="prose dark:prose-invert max-w-none">
             <p className="lead text-lg">
-              {t("pages.termsOfService.introduction", {
+              {t("app.site.termsOfService.introduction", {
                 appName: appName,
               })}
             </p>
@@ -82,19 +82,19 @@ export default async function TermsOfServicePage({
 
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
               <FileText className="h-5 w-5 mr-2" />
-              {t("pages.termsOfService.sections.agreement.title")}
+              {t("app.site.termsOfService.sections.agreement.title")}
             </h2>
             <p className="mt-2">
-              {t("pages.termsOfService.sections.agreement.content")}
+              {t("app.site.termsOfService.sections.agreement.content")}
             </p>
 
             <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("pages.termsOfService.sections.description.title")}
+              {t("app.site.termsOfService.sections.description.title")}
             </h2>
             <p className="mt-2">
-              {t("pages.termsOfService.sections.description.content", {
+              {t("app.site.termsOfService.sections.description.content", {
                 appName: appName,
               })}
             </p>
@@ -102,100 +102,118 @@ export default async function TermsOfServicePage({
             <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("pages.termsOfService.sections.subscriptions.title")}
+              {t("app.site.termsOfService.sections.subscriptions.title")}
             </h2>
 
             <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("pages.termsOfService.sections.subscriptions.plans.title")}
+              {t("app.site.termsOfService.sections.subscriptions.plans.title")}
             </h3>
             <p className="mt-2">
-              {t("pages.termsOfService.sections.subscriptions.plans.content")}
-            </p>
-
-            <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("pages.termsOfService.sections.subscriptions.billing.title")}
-            </h3>
-            <p className="mt-2">
-              {t("pages.termsOfService.sections.subscriptions.billing.content")}
+              {t(
+                "app.site.termsOfService.sections.subscriptions.plans.content",
+              )}
             </p>
 
             <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
               {t(
-                "pages.termsOfService.sections.subscriptions.cancellation.title",
+                "app.site.termsOfService.sections.subscriptions.billing.title",
               )}
             </h3>
             <p className="mt-2">
               {t(
-                "pages.termsOfService.sections.subscriptions.cancellation.content",
+                "app.site.termsOfService.sections.subscriptions.billing.content",
+              )}
+            </p>
+
+            <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
+              {t(
+                "app.site.termsOfService.sections.subscriptions.cancellation.title",
+              )}
+            </h3>
+            <p className="mt-2">
+              {t(
+                "app.site.termsOfService.sections.subscriptions.cancellation.content",
               )}
             </p>
 
             <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("pages.termsOfService.sections.userAccounts.title")}
+              {t("app.site.termsOfService.sections.userAccounts.title")}
             </h2>
 
             <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("pages.termsOfService.sections.userAccounts.creation.title")}
-            </h3>
-            <p className="mt-2">
-              {t("pages.termsOfService.sections.userAccounts.creation.content")}
-            </p>
-
-            <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
               {t(
-                "pages.termsOfService.sections.userAccounts.responsibilities.title",
+                "app.site.termsOfService.sections.userAccounts.creation.title",
               )}
             </h3>
             <p className="mt-2">
               {t(
-                "pages.termsOfService.sections.userAccounts.responsibilities.content",
+                "app.site.termsOfService.sections.userAccounts.creation.content",
+              )}
+            </p>
+
+            <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
+              {t(
+                "app.site.termsOfService.sections.userAccounts.responsibilities.title",
+              )}
+            </h3>
+            <p className="mt-2">
+              {t(
+                "app.site.termsOfService.sections.userAccounts.responsibilities.content",
               )}
             </p>
 
             <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("pages.termsOfService.sections.userContent.title")}
+              {t("app.site.termsOfService.sections.userContent.title")}
             </h2>
 
             <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("pages.termsOfService.sections.userContent.ownership.title")}
+              {t(
+                "app.site.termsOfService.sections.userContent.ownership.title",
+              )}
             </h3>
             <p className="mt-2">
-              {t("pages.termsOfService.sections.userContent.ownership.content")}
+              {t(
+                "app.site.termsOfService.sections.userContent.ownership.content",
+              )}
             </p>
 
             <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("pages.termsOfService.sections.userContent.guidelines.title")}
+              {t(
+                "app.site.termsOfService.sections.userContent.guidelines.title",
+              )}
             </h3>
             <p className="mt-2">
-              {t("pages.termsOfService.sections.userContent.guidelines.intro")}
+              {t(
+                "app.site.termsOfService.sections.userContent.guidelines.intro",
+              )}
             </p>
             <ul className="space-y-1 mt-4">
               <li className="flex items-start">
                 <span className="mr-2 text-blue-500">•</span>
                 {t(
-                  "pages.termsOfService.sections.userContent.guidelines.items.item1",
+                  "app.site.termsOfService.sections.userContent.guidelines.items.item1",
                 )}
               </li>
               <li className="flex items-start">
                 <span className="mr-2 text-blue-500">•</span>
                 {t(
-                  "pages.termsOfService.sections.userContent.guidelines.items.item2",
+                  "app.site.termsOfService.sections.userContent.guidelines.items.item2",
                 )}
               </li>
               <li className="flex items-start">
                 <span className="mr-2 text-blue-500">•</span>
                 {t(
-                  "pages.termsOfService.sections.userContent.guidelines.items.item3",
+                  "app.site.termsOfService.sections.userContent.guidelines.items.item3",
                 )}
               </li>
               <li className="flex items-start">
                 <span className="mr-2 text-blue-500">•</span>
                 {t(
-                  "pages.termsOfService.sections.userContent.guidelines.items.item4",
+                  "app.site.termsOfService.sections.userContent.guidelines.items.item4",
                 )}
               </li>
             </ul>
@@ -203,10 +221,24 @@ export default async function TermsOfServicePage({
             <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("pages.termsOfService.sections.intellectualProperty.title")}
+              {t("app.site.termsOfService.sections.intellectualProperty.title")}
             </h2>
             <p className="mt-2">
-              {t("pages.termsOfService.sections.intellectualProperty.content", {
+              {t(
+                "app.site.termsOfService.sections.intellectualProperty.content",
+                {
+                  appName,
+                },
+              )}
+            </p>
+
+            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
+
+            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
+              {t("app.site.termsOfService.sections.limitation.title")}
+            </h2>
+            <p className="mt-2">
+              {t("app.site.termsOfService.sections.limitation.content", {
                 appName,
               })}
             </p>
@@ -214,10 +246,10 @@ export default async function TermsOfServicePage({
             <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("pages.termsOfService.sections.limitation.title")}
+              {t("app.site.termsOfService.sections.indemnification.title")}
             </h2>
             <p className="mt-2">
-              {t("pages.termsOfService.sections.limitation.content", {
+              {t("app.site.termsOfService.sections.indemnification.content", {
                 appName,
               })}
             </p>
@@ -225,50 +257,39 @@ export default async function TermsOfServicePage({
             <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("pages.termsOfService.sections.indemnification.title")}
+              {t("app.site.termsOfService.sections.termination.title")}
             </h2>
             <p className="mt-2">
-              {t("pages.termsOfService.sections.indemnification.content", {
-                appName,
+              {t("app.site.termsOfService.sections.termination.content")}
+            </p>
+
+            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
+
+            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
+              {t("app.site.termsOfService.sections.changes.title")}
+            </h2>
+            <p className="mt-2">
+              {t("app.site.termsOfService.sections.changes.content")}
+            </p>
+
+            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
+
+            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
+              {t("app.site.termsOfService.sections.governingLaw.title")}
+            </h2>
+            <p className="mt-2">
+              {t("app.site.termsOfService.sections.governingLaw.content", {
+                jurisdiction: t("app.common.company.address.country"),
               })}
             </p>
 
             <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("pages.termsOfService.sections.termination.title")}
+              {t("app.site.termsOfService.sections.contact.title")}
             </h2>
             <p className="mt-2">
-              {t("pages.termsOfService.sections.termination.content")}
-            </p>
-
-            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("pages.termsOfService.sections.changes.title")}
-            </h2>
-            <p className="mt-2">
-              {t("pages.termsOfService.sections.changes.content")}
-            </p>
-
-            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("pages.termsOfService.sections.governingLaw.title")}
-            </h2>
-            <p className="mt-2">
-              {t("pages.termsOfService.sections.governingLaw.content", {
-                jurisdiction: t("common.company.address.country"),
-              })}
-            </p>
-
-            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("pages.termsOfService.sections.contact.title")}
-            </h2>
-            <p className="mt-2">
-              {t("pages.termsOfService.sections.contact.content")}{" "}
+              {t("app.site.termsOfService.sections.contact.content")}{" "}
               <a
                 href={`mailto:${supportEmail}`}
                 className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"

@@ -142,7 +142,7 @@ const { POST } = createEndpoint({
             }),
           ),
         },
-        z.nativeEnum(Countries),
+        z.enum(Countries),
       ),
       defaultLanguage: requestDataField(
         {
@@ -162,7 +162,7 @@ const { POST } = createEndpoint({
             }),
           ),
         },
-        z.nativeEnum(Languages),
+        z.enum(Languages),
       ),
       defaultStatus: requestDataField(
         {
@@ -177,7 +177,7 @@ const { POST } = createEndpoint({
           layout: { columns: 6 },
           options: LeadStatusOptions,
         },
-        z.nativeEnum(LeadStatus).default(LeadStatus.NEW),
+        z.enum(LeadStatus).default(LeadStatus.NEW),
       ),
       defaultCampaignStage: requestDataField(
         {
@@ -209,7 +209,7 @@ const { POST } = createEndpoint({
           layout: { columns: 6 },
           options: LeadSourceOptions,
         },
-        z.nativeEnum(LeadSource).default(LeadSource.CSV_IMPORT),
+        z.enum(LeadSource).default(LeadSource.CSV_IMPORT),
       ),
       useChunkedProcessing: requestDataField(
         {
@@ -385,7 +385,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         file: "ZW1haWwsYnVzaW5lc3NfbmFtZSxjb250YWN0X25hbWUK...",
-        fileName: "leads.csv",
+        fileName: "app.api.v1.core.leads.csv",
         skipDuplicates: true,
         updateExisting: false,
         defaultCountry: "GLOBAL",
@@ -398,7 +398,7 @@ const { POST } = createEndpoint({
       },
       minimal: {
         file: "ZW1haWwsYnVzaW5lc3NfbmFtZSxjb250YWN0X25hbWUK...",
-        fileName: "leads.csv",
+        fileName: "app.api.v1.core.leads.csv",
         defaultCountry: "GLOBAL",
         defaultLanguage: "en",
       },

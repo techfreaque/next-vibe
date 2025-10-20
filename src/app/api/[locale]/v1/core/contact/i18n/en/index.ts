@@ -248,4 +248,28 @@ export const translations = {
     title: "Success",
     description: "Your contact form has been submitted successfully",
   },
+
+  email: {
+    partner: {
+      greeting: "Hello",
+      thankYou: "Thank you for contacting us!",
+      message: "Message",
+      additionalInfo: "Additional Information",
+      subject: "New Contact Form Submission",
+    },
+    company: {
+      contactDetails: "Contact Details",
+      name: "Name",
+      email: "Email",
+      company: "Company",
+      contactSubject: "Subject",
+      viewDetails: "View Details",
+    },
+  },
+
+  error: {
+    general: {
+      internal_server_error: "Internal server error occurred",
+    },
+  },
 };

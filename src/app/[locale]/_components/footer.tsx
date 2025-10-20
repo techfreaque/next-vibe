@@ -34,14 +34,14 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
           <div className="space-y-4">
             <Logo locale={locale} pathName="" />
             <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs">
-              {t("common.footer.description")}
+              {t("app.common.footer.description")}
             </p>
             {/* <div className="flex space-x-3">
               <Button
                 variant="ghost"
                 size="icon"
                 className="rounded-full hover:text-blue-600 dark:hover:text-blue-500"
-                aria-label={t("common.footer.social.facebook")}
+                aria-label={t("app.common.footer.social.facebook")}
               >
                 <Facebook className="h-5 w-5" />
               </Button>
@@ -49,7 +49,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                 variant="ghost"
                 size="icon"
                 className="rounded-full hover:text-blue-600 dark:hover:text-blue-500"
-                aria-label={t("common.footer.social.instagram")}
+                aria-label={t("app.common.footer.social.instagram")}
               >
                 <Instagram className="h-5 w-5" />
               </Button>
@@ -57,7 +57,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                 variant="ghost"
                 size="icon"
                 className="rounded-full hover:text-blue-600 dark:hover:text-blue-500"
-                aria-label={t("common.footer.social.twitter")}
+                aria-label={t("app.common.footer.social.twitter")}
               >
                 <Twitter className="h-5 w-5" />
               </Button>
@@ -65,7 +65,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                 variant="ghost"
                 size="icon"
                 className="rounded-full hover:text-blue-600 dark:hover:text-blue-500"
-                aria-label={t("common.footer.social.linkedin")}
+                aria-label={t("app.common.footer.social.linkedin")}
               >
                 <Linkedin className="h-5 w-5" />
               </Button>
@@ -74,7 +74,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
 
           <div>
             <h3 className="font-semibold text-lg mb-4">
-              {t("common.footer.services.title")}
+              {t("app.common.footer.services.title")}
             </h3>
             <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
               <li>
@@ -83,7 +83,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
                   <Settings className="h-4 w-4 text-blue-500" />
-                  {t("common.footer.services.socialAccountSetup")}
+                  {t("app.common.footer.services.socialAccountSetup")}
                 </Link>
               </li>
               <li>
@@ -92,7 +92,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
                   <Edit3 className="h-4 w-4 text-blue-500" />
-                  {t("common.footer.services.contentCreation")}
+                  {t("app.common.footer.services.contentCreation")}
                 </Link>
               </li>
               <li>
@@ -101,7 +101,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
                   <PenTool className="h-4 w-4 text-blue-500" />
-                  {t("common.footer.services.strategyDevelopment")}
+                  {t("app.common.footer.services.strategyDevelopment")}
                 </Link>
               </li>
               <li>
@@ -110,7 +110,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
                   <BarChart2 className="h-4 w-4 text-blue-500" />
-                  {t("common.footer.services.performanceAnalytics")}
+                  {t("app.common.footer.services.performanceAnalytics")}
                 </Link>
               </li>
               <li>
@@ -119,7 +119,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
                   <MessageCircle className="h-4 w-4 text-blue-500" />
-                  {t("common.footer.services.communityManagement")}
+                  {t("app.common.footer.services.communityManagement")}
                 </Link>
               </li>
               <li>
@@ -128,7 +128,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
                   <Users className="h-4 w-4 text-blue-500" />
-                  {t("common.footer.services.audienceBuilding")}
+                  {t("app.common.footer.services.audienceBuilding")}
                 </Link>
               </li>
               <li>
@@ -137,7 +137,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
                   <TrendingUp className="h-4 w-4 text-blue-500" />
-                  {t("common.footer.services.adCampaigns")}
+                  {t("app.common.footer.services.adCampaigns")}
                 </Link>
               </li>
             </ul>
@@ -145,7 +145,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
 
           <div>
             <h3 className="font-semibold text-lg mb-4">
-              {t("common.footer.company.title")}
+              {t("app.common.footer.company.title")}
             </h3>
             <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
               <li>
@@ -154,7 +154,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
                   <Info className="h-4 w-4 text-blue-500" />
-                  {t("common.footer.company.aboutUs")}
+                  {t("app.common.footer.company.aboutUs")}
                 </Link>
               </li>
               <li>
@@ -163,7 +163,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
                   <HelpCircle className="h-4 w-4 text-blue-500" />
-                  {t("common.footer.company.contactUs")}
+                  {t("app.common.footer.company.contactUs")}
                 </Link>
               </li>
               <li>
@@ -172,7 +172,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
                   <Building className="h-4 w-4 text-blue-500" />
-                  {t("common.footer.company.careers")}
+                  {t("app.common.footer.company.careers")}
                 </Link>
               </li>
               <li>
@@ -181,7 +181,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
                   <Shield className="h-4 w-4 text-blue-500" />
-                  {t("common.footer.company.privacyPolicy")}
+                  {t("app.common.footer.company.privacyPolicy")}
                 </Link>
               </li>
               <li>
@@ -190,7 +190,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
                   <FileText className="h-4 w-4 text-blue-500" />
-                  {t("common.footer.company.termsOfService")}
+                  {t("app.common.footer.company.termsOfService")}
                 </Link>
               </li>
               <li>
@@ -199,7 +199,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
                   <FileText className="h-4 w-4 text-blue-500" />
-                  {t("common.footer.company.imprint")}
+                  {t("app.common.footer.company.imprint")}
                 </Link>
               </li>
             </ul>
@@ -209,13 +209,13 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
 
         <div className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {t("common.footer.copyright", {
+            {t("app.common.footer.copyright", {
               year: new Date().getFullYear(),
-              appName: t("common.company.name"),
+              appName: t("app.common.company.name"),
             })}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-4 md:mt-0">
-            {t("common.footer.tagline")}
+            {t("app.common.footer.tagline")}
           </p>
         </div>
       </div>

@@ -18,7 +18,7 @@ const platform = {
 };
 
 export const envClientBaseSchema = z.object({
-  NODE_ENV: z.nativeEnum(Environment),
+  NODE_ENV: z.enum(Environment),
   NEXT_PUBLIC_APP_URL: z.string(),
   NEXT_PUBLIC_TEST_SERVER_URL: z.string(),
   NEXT_PUBLIC_DEBUG_PRODUCTION: z.string().transform((val: string): boolean => {

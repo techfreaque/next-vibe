@@ -36,12 +36,12 @@ function renderTermsCheckboxLabel(
 ): React.ReactElement {
   return (
     <span>
-      {t("auth.signup.termsAndConditions")}{" "}
+      {t("app.user.signup.auth.signup.termsAndConditions")}{" "}
       <Link
         href={`/${locale}/terms-of-service`}
         className="text-blue-600 hover:underline dark:text-blue-500"
       >
-        {t("footer.terms")}
+        {t("app.user.common.footer.terms")}
       </Link>
     </span>
   );
@@ -102,7 +102,9 @@ export default function SignUpForm({
                         >
                           <CreditCard className="h-7 w-7 flex-shrink-0" />
                           <span>
-                            {t("auth.signup.meetingPreferenceOptions.direct")}
+                            {t(
+                              "app.user.signup.auth.signup.meetingPreferenceOptions.direct",
+                            )}
                           </span>
                         </TabsTrigger>
                         <TabsTrigger
@@ -111,7 +113,9 @@ export default function SignUpForm({
                         >
                           <Calendar className="h-7 w-7 flex-shrink-0" />
                           <span>
-                            {t("auth.signup.meetingPreferenceOptions.schedule")}
+                            {t(
+                              "app.user.signup.auth.signup.meetingPreferenceOptions.schedule",
+                            )}
                           </span>
                         </TabsTrigger>
                       </TabsList>
@@ -119,10 +123,12 @@ export default function SignUpForm({
                       <TabsContent value="pricing" className="mt-0 mb-4">
                         <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
                           <h3 className="font-medium text-blue-800 dark:text-blue-300 mb-1">
-                            {t("auth.signup.meetingPreferenceOptions.direct")}
+                            {t(
+                              "app.user.signup.auth.signup.meetingPreferenceOptions.direct",
+                            )}
                           </h3>
                           <p className="text-sm text-blue-700 dark:text-blue-400">
-                            {t("auth.signup.directDescription")}
+                            {t("app.user.signup.auth.signup.directDescription")}
                           </p>
                         </div>
                       </TabsContent>
@@ -130,10 +136,14 @@ export default function SignUpForm({
                       <TabsContent value="meeting" className="mt-0 mb-4">
                         <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-100 dark:border-green-800">
                           <h3 className="font-medium text-green-800 dark:text-green-300 mb-1">
-                            {t("auth.signup.meetingPreferenceOptions.schedule")}
+                            {t(
+                              "app.user.signup.auth.signup.meetingPreferenceOptions.schedule",
+                            )}
                           </h3>
                           <p className="text-sm text-green-700 dark:text-green-400">
-                            {t("auth.signup.scheduleDescription")}
+                            {t(
+                              "app.user.signup.auth.signup.scheduleDescription",
+                            )}
                           </p>
                         </div>
                       </TabsContent>
@@ -148,8 +158,9 @@ export default function SignUpForm({
                 name="personalInfo.privateName"
                 config={{
                   type: "text",
-                  label: "auth.signup.privateName",
-                  placeholder: "auth.signup.privateNamePlaceholder",
+                  label: "app.user.signup.auth.signup.privateName",
+                  placeholder:
+                    "app.user.signup.auth.signup.privateNamePlaceholder",
                   disabled: isSubmitting,
                 }}
                 control={form.control}
@@ -163,8 +174,9 @@ export default function SignUpForm({
                 name="personalInfo.publicName"
                 config={{
                   type: "text",
-                  label: "auth.signup.publicName",
-                  placeholder: "auth.signup.publicNamePlaceholder",
+                  label: "app.user.signup.auth.signup.publicName",
+                  placeholder:
+                    "app.user.signup.auth.signup.publicNamePlaceholder",
                   disabled: isSubmitting,
                 }}
                 control={form.control}
@@ -179,8 +191,8 @@ export default function SignUpForm({
               name="personalInfo.email"
               config={{
                 type: "email",
-                label: "auth.signup.emailLabel",
-                placeholder: "auth.signup.emailPlaceholder",
+                label: "app.user.signup.auth.signup.emailLabel",
+                placeholder: "app.user.signup.auth.signup.emailPlaceholder",
                 disabled: isSubmitting,
               }}
               control={form.control}
@@ -200,8 +212,9 @@ export default function SignUpForm({
                       name="security.password"
                       config={{
                         type: "password",
-                        label: "auth.signup.passwordLabel",
-                        placeholder: "auth.signup.passwordPlaceholder",
+                        label: "app.user.signup.auth.signup.passwordLabel",
+                        placeholder:
+                          "app.user.signup.auth.signup.passwordPlaceholder",
                         disabled: isSubmitting,
                       }}
                       control={form.control}
@@ -222,8 +235,9 @@ export default function SignUpForm({
                 name="security.confirmPassword"
                 config={{
                   type: "password",
-                  label: "auth.signup.confirmPasswordLabel",
-                  placeholder: "auth.signup.confirmPasswordPlaceholder",
+                  label: "app.user.signup.auth.signup.confirmPasswordLabel",
+                  placeholder:
+                    "app.user.signup.auth.signup.confirmPasswordPlaceholder",
                   disabled: isSubmitting,
                 }}
                 control={form.control}
@@ -238,7 +252,8 @@ export default function SignUpForm({
                 config={{
                   type: "checkbox",
                   label: undefined,
-                  checkboxLabel: "auth.signup.newsletterSubscription",
+                  checkboxLabel:
+                    "app.user.signup.auth.signup.newsletterSubscription",
                   disabled: isSubmitting,
                 }}
                 control={form.control}
@@ -276,22 +291,22 @@ export default function SignUpForm({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {t("auth.signup.creatingAccount")}
+                    {t("app.user.signup.auth.signup.creatingAccount")}
                   </>
                 ) : signupType === SignupType.MEETING ? (
-                  t("auth.signup.createAccountAndBook")
+                  t("app.user.signup.auth.signup.createAccountAndBook")
                 ) : (
-                  t("auth.signup.createAccountButton")
+                  t("app.user.signup.auth.signup.createAccountButton")
                 )}
               </Button>
 
               <div className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">
-                {t("auth.signup.alreadyHaveAccount")}{" "}
+                {t("app.user.signup.auth.signup.alreadyHaveAccount")}{" "}
                 <Link
                   href={`/${locale}/user/login`}
                   className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                 >
-                  {t("auth.signup.signIn")}
+                  {t("app.user.signup.auth.signup.signIn")}
                 </Link>
               </div>
             </div>

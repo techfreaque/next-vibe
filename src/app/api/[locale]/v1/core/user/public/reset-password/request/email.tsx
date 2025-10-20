@@ -44,12 +44,15 @@ function renderPasswordResetRequestEmailContent(
     <EmailTemplate
       t={t}
       locale={locale}
-      title={t("auth.resetPassword.email.title", {
+      title={t("app.api.v1.core.user.auth.resetPassword.email.title", {
         appName: translatedAppName,
       })}
-      previewText={t("auth.resetPassword.email.previewText", {
-        appName: translatedAppName,
-      })}
+      previewText={t(
+        "app.api.v1.core.user.auth.resetPassword.email.previewText",
+        {
+          appName: translatedAppName,
+        },
+      )}
       tracking={tracking}
     >
       <Text
@@ -60,7 +63,7 @@ function renderPasswordResetRequestEmailContent(
           marginBottom: "16px",
         }}
       >
-        {t("auth.resetPassword.email.greeting", {
+        {t("app.api.v1.core.user.auth.resetPassword.email.greeting", {
           name: user.publicName,
         })}
       </Text>
@@ -73,7 +76,7 @@ function renderPasswordResetRequestEmailContent(
           marginBottom: "16px",
         }}
       >
-        {t("auth.resetPassword.email.requestInfo", {
+        {t("app.api.v1.core.user.auth.resetPassword.email.requestInfo", {
           appName: translatedAppName,
         })}
       </Text>
@@ -86,7 +89,7 @@ function renderPasswordResetRequestEmailContent(
           marginBottom: "16px",
         }}
       >
-        {t("auth.resetPassword.email.instructions")}
+        {t("app.api.v1.core.user.auth.resetPassword.email.instructions")}
       </Text>
 
       <Section style={{ textAlign: "center", marginTop: "32px" }}>
@@ -101,7 +104,7 @@ function renderPasswordResetRequestEmailContent(
             textDecoration: "none",
           }}
         >
-          {t("auth.resetPassword.email.buttonText")}
+          {t("app.api.v1.core.user.auth.resetPassword.email.buttonText")}
         </Button>
       </Section>
 
@@ -113,7 +116,7 @@ function renderPasswordResetRequestEmailContent(
           marginTop: "24px",
         }}
       >
-        {t("auth.resetPassword.email.expirationInfo")}
+        {t("app.api.v1.core.user.auth.resetPassword.email.expirationInfo")}
       </Text>
     </EmailTemplate>
   );
@@ -183,7 +186,7 @@ export const renderResetPasswordMail: EmailFunctionType<
     return createSuccessResponse({
       toEmail: requestData.emailInput.email,
       toName: user.publicName,
-      subject: t("auth.resetPassword.email.subject", {
+      subject: t("app.api.v1.core.user.auth.resetPassword.email.subject", {
         appName: translatedAppName,
       }),
       jsx: renderPasswordResetRequestEmailContent(

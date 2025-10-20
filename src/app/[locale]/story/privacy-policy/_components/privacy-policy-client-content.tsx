@@ -30,10 +30,10 @@ export function PrivacyPolicyClientInteraction({
       <button
         onClick={handlePrint}
         className="flex items-center gap-2 px-4 py-2 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 text-blue-700 dark:text-blue-300 rounded-md transition-colors"
-        aria-label={t("pages.privacyPolicy.printAriaLabel")}
+        aria-label={t("app.site.privacyPolicy.printAriaLabel")}
       >
         <Printer className="h-4 w-4" />
-        {t("pages.privacyPolicy.printButton")}
+        {t("app.site.privacyPolicy.printButton")}
       </button>
     </div>
   );

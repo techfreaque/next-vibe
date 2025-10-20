@@ -8,6 +8,7 @@ import { dateSchema } from "next-vibe/shared/types/common.schema";
 import { z } from "zod";
 
 import { leadId } from "@/app/api/[locale]/v1/core/leads/definition";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "./auth/definition";
 import {
@@ -83,6 +84,7 @@ export interface UserFetchOptions {
   includeInactive?: boolean;
   roles?: (typeof UserRoleValue)[keyof typeof UserRoleValue][];
   detailLevel?: UserDetailLevelType;
+  locale?: CountryLanguage; // Required for lead creation in authentication
 }
 
 /**

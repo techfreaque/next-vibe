@@ -245,7 +245,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.v1.core.payment.invoice.post.response.invoice.status" as const,
             },
-            z.nativeEnum(InvoiceStatus),
+            z.enum(InvoiceStatus),
           ),
           invoiceUrl: responseField(
             {

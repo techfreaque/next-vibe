@@ -8,14 +8,53 @@ export const translations: typeof enTranslations = {
       title: "KI-Chat-Konfiguration",
       description: "Konfigurieren Sie KI-Chat-Parameter und Nachrichten",
     },
-    messages: {
-      label: "Nachrichten",
-      description: "Chat-Nachrichten zur Verarbeitung",
-      placeholder: "Geben Sie Ihre Nachrichten ein...",
+    operation: {
+      label: "Operation",
+      description: "Art der Nachrichtenoperation",
+      options: {
+        send: "Nachricht senden",
+        retry: "Nachricht wiederholen",
+        edit: "Nachricht bearbeiten",
+        answerAsAi: "Als KI antworten",
+      },
+    },
+    rootFolderId: {
+      label: "Hauptordner",
+      description: "Hauptordner-Kontext für die Nachricht",
+    },
+    subFolderId: {
+      label: "Unterordner",
+      description: "Optionaler Unterordner im Hauptordner",
+    },
+    threadId: {
+      label: "Thread-ID",
+      description: "Thread-ID (null für neuen Thread)",
+    },
+    parentMessageId: {
+      label: "Eltern-Nachrichten-ID",
+      description: "Eltern-Nachrichten-ID für Verzweigung/Threading",
+    },
+    content: {
+      label: "Nachrichteninhalt",
+      description: "Inhalt der zu sendenden Nachricht",
+      placeholder: "Geben Sie Ihre Nachricht ein...",
+    },
+    role: {
+      label: "Rolle",
+      description: "Rolle des Nachrichtensenders",
+      options: {
+        user: "Benutzer",
+        assistant: "Assistent",
+        system: "System",
+      },
     },
     model: {
       label: "Modell",
       description: "KI-Modell für die Generierung verwenden",
+    },
+    persona: {
+      label: "Persona",
+      description: "Optionale Persona für die KI",
     },
     temperature: {
       label: "Temperatur",
@@ -34,6 +73,10 @@ export const translations: typeof enTranslations = {
       label: "Web-Suche aktivieren",
       description:
         "KI erlauben, das Web nach aktuellen Informationen zu durchsuchen",
+    },
+    resumeToken: {
+      label: "Wiederaufnahme-Token",
+      description: "Token zum Fortsetzen unterbrochener Streams",
     },
     response: {
       title: "Stream-Antwort",
@@ -117,7 +160,11 @@ export const translations: typeof enTranslations = {
       creditValidationFailed: "Fehler bei der Validierung des Guthabens",
       noIdentifier: "Keine Benutzer- oder Lead-Kennung angegeben",
       insufficientCredits: "Nicht genügend Guthaben für diese Anfrage",
+      noResponseBody: "Kein Antworttext vom Stream erhalten",
     },
+  },
+  errorTypes: {
+    streamError: "Stream-Fehler",
   },
   providers: {
     uncensoredHandler: {

@@ -64,7 +64,7 @@ export enum ChartType {
  */
 export const baseStatsFilterSchema = z.object({
   // Time-based filtering
-  timePeriod: z.nativeEnum(TimePeriod).default(TimePeriod.DAY),
+  timePeriod: z.enum(TimePeriod).default(TimePeriod.DAY),
   dateRangePreset: z
     .nativeEnum(DateRangePreset)
     .default(DateRangePreset.LAST_30_DAYS),
@@ -72,11 +72,11 @@ export const baseStatsFilterSchema = z.object({
   dateTo: dateSchema.optional(),
 
   // Chart configuration
-  chartType: z.nativeEnum(ChartType).default(ChartType.LINE),
+  chartType: z.enum(ChartType).default(ChartType.LINE),
 
   // Data options
   includeComparison: z.coerce.boolean().default(false),
-  comparisonPeriod: z.nativeEnum(DateRangePreset).optional(),
+  comparisonPeriod: z.enum(DateRangePreset).optional(),
 });
 
 export type BaseStatsFilterType = z.infer<typeof baseStatsFilterSchema>;
@@ -108,7 +108,7 @@ export const historicalDataSeriesSchema = z.object({
     .optional(),
   data: z.array(historicalDataPointSchema),
   color: z.string().optional(),
-  type: z.nativeEnum(ChartType).optional(),
+  type: z.enum(ChartType).optional(),
 });
 
 export type HistoricalDataSeriesType = z.infer<

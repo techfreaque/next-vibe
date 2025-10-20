@@ -131,7 +131,7 @@ const { GET } = createEndpoint({
               options: UserStatusFilterOptions,
               layout: { columns: 6 },
             },
-            z.array(z.nativeEnum(UserStatusFilter)).optional(),
+            z.array(z.enum(UserStatusFilter)).optional(),
           ),
           role: requestDataField(
             {
@@ -143,7 +143,7 @@ const { GET } = createEndpoint({
               options: UserRoleFilterOptions,
               layout: { columns: 6 },
             },
-            z.array(z.nativeEnum(UserRoleFilter)).optional(),
+            z.array(z.enum(UserRoleFilter)).optional(),
           ),
         },
       ),
@@ -188,7 +188,7 @@ const { GET } = createEndpoint({
               options: SortOrderOptions,
               layout: { columns: 6 },
             },
-            z.nativeEnum(SortOrder).optional().default(SortOrder.DESC),
+            z.enum(SortOrder).optional().default(SortOrder.DESC),
           ),
         },
       ),

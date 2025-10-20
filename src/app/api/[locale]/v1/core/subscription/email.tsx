@@ -44,15 +44,15 @@ function getPlanName(
 ): string {
   switch (planId) {
     case SubscriptionPlan.STARTER:
-      return t("subscription.plans.starter.title");
+      return t("app.api.v1.core.subscription.plans.starter.title");
     case SubscriptionPlan.PROFESSIONAL:
-      return t("subscription.plans.professional.title");
+      return t("app.api.v1.core.subscription.plans.professional.title");
     case SubscriptionPlan.PREMIUM:
-      return t("subscription.plans.premium.title");
+      return t("app.api.v1.core.subscription.plans.premium.title");
     case SubscriptionPlan.ENTERPRISE:
-      return t("subscription.plans.enterprise.title");
+      return t("app.api.v1.core.subscription.plans.enterprise.title");
     default:
-      return t("subscription.plans.starter.title");
+      return t("app.api.v1.core.subscription.plans.starter.title");
   }
 }
 
@@ -65,23 +65,23 @@ function getStatusName(
 ): string {
   switch (status) {
     case SubscriptionStatus.ACTIVE:
-      return t("subscription.status.active");
+      return t("app.api.v1.core.subscription.status.active");
     case SubscriptionStatus.TRIALING:
-      return t("subscription.status.trialing");
+      return t("app.api.v1.core.subscription.status.trialing");
     case SubscriptionStatus.PAST_DUE:
-      return t("subscription.status.pastDue");
+      return t("app.api.v1.core.subscription.status.pastDue");
     case SubscriptionStatus.CANCELED:
-      return t("subscription.status.canceled");
+      return t("app.api.v1.core.subscription.status.canceled");
     case SubscriptionStatus.INCOMPLETE:
-      return t("subscription.status.incomplete");
+      return t("app.api.v1.core.subscription.status.incomplete");
     case SubscriptionStatus.INCOMPLETE_EXPIRED:
-      return t("subscription.status.incomplete_expired");
+      return t("app.api.v1.core.subscription.status.incomplete_expired");
     case SubscriptionStatus.UNPAID:
-      return t("subscription.status.unpaid");
+      return t("app.api.v1.core.subscription.status.unpaid");
     case SubscriptionStatus.PAUSED:
-      return t("subscription.status.paused");
+      return t("app.api.v1.core.subscription.status.paused");
     default:
-      return t("subscription.status.incomplete");
+      return t("app.api.v1.core.subscription.status.incomplete");
   }
 }
 
@@ -105,12 +105,12 @@ function renderSubscriptionSuccessEmailContent(
     <EmailTemplate
       t={t}
       locale={locale}
-      title={t("subscription.email.success.title", {
-        appName: t("common.appName"),
+      title={t("app.api.v1.core.subscription.email.success.title", {
+        appName: t("app.common.appName"),
         firstName: user.firstName,
       })}
-      previewText={t("subscription.email.success.previewText", {
-        appName: t("common.appName"),
+      previewText={t("app.api.v1.core.subscription.email.success.previewText", {
+        appName: t("app.common.appName"),
         planName,
       })}
       tracking={tracking}
@@ -125,7 +125,7 @@ function renderSubscriptionSuccessEmailContent(
           fontWeight: "600",
         }}
       >
-        {t("subscription.email.success.welcomeMessage", {
+        {t("app.api.v1.core.subscription.email.success.welcomeMessage", {
           planName,
         })}
       </Text>
@@ -138,8 +138,8 @@ function renderSubscriptionSuccessEmailContent(
           marginBottom: "24px",
         }}
       >
-        {t("subscription.email.success.description", {
-          appName: t("common.appName"),
+        {t("app.api.v1.core.subscription.email.success.description", {
+          appName: t("app.common.appName"),
         })}
       </Text>
 
@@ -164,7 +164,7 @@ function renderSubscriptionSuccessEmailContent(
             textAlign: "center",
           }}
         >
-          {t("subscription.email.success.nextSteps.title")}
+          {t("app.api.v1.core.subscription.email.success.nextSteps.title")}
         </Text>
         <Text
           style={{
@@ -175,7 +175,9 @@ function renderSubscriptionSuccessEmailContent(
             textAlign: "center",
           }}
         >
-          {t("subscription.email.success.nextSteps.description")}
+          {t(
+            "app.api.v1.core.subscription.email.success.nextSteps.description",
+          )}
         </Text>
 
         <div style={{ textAlign: "center", marginBottom: "16px" }}>
@@ -192,7 +194,7 @@ function renderSubscriptionSuccessEmailContent(
               boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
             }}
           >
-            {t("subscription.email.success.nextSteps.cta")}
+            {t("app.api.v1.core.subscription.email.success.nextSteps.cta")}
           </Button>
         </div>
       </Section>
@@ -216,7 +218,7 @@ function renderSubscriptionSuccessEmailContent(
             marginBottom: "12px",
           }}
         >
-          {t("subscription.email.success.support.title")}
+          {t("app.api.v1.core.subscription.email.success.support.title")}
         </Text>
         <Text
           style={{
@@ -226,7 +228,7 @@ function renderSubscriptionSuccessEmailContent(
             marginBottom: "16px",
           }}
         >
-          {t("subscription.email.success.support.description")}
+          {t("app.api.v1.core.subscription.email.success.support.description")}
         </Text>
         <Button
           href={`${baseUrl}/${locale}/help`}
@@ -242,7 +244,7 @@ function renderSubscriptionSuccessEmailContent(
             display: "inline-block",
           }}
         >
-          {t("subscription.email.success.support.cta")}
+          {t("app.api.v1.core.subscription.email.success.support.cta")}
         </Button>
       </Section>
 
@@ -257,7 +259,7 @@ function renderSubscriptionSuccessEmailContent(
           textAlign: "center",
         }}
       >
-        {t("subscription.email.success.footer.message")}
+        {t("app.api.v1.core.subscription.email.success.footer.message")}
       </Text>
 
       <Text
@@ -269,8 +271,8 @@ function renderSubscriptionSuccessEmailContent(
           whiteSpace: "pre-line",
         }}
       >
-        {t("subscription.email.success.footer.signoff", {
-          appName: t("common.appName"),
+        {t("app.api.v1.core.subscription.email.success.footer.signoff", {
+          appName: t("app.common.appName"),
         })}
       </Text>
     </EmailTemplate>
@@ -296,10 +298,13 @@ function renderAdminSubscriptionNotificationEmailContent(
     <EmailTemplate
       t={t}
       locale={locale}
-      title={t("subscription.email.admin_notification.title")}
-      previewText={t("subscription.email.admin_notification.preview", {
-        appName: t("common.appName"),
-      })}
+      title={t("app.api.v1.core.subscription.email.admin_notification.title")}
+      previewText={t(
+        "app.api.v1.core.subscription.email.admin_notification.preview",
+        {
+          appName: t("app.common.appName"),
+        },
+      )}
       tracking={tracking}
     >
       {/* Header Message */}
@@ -312,7 +317,7 @@ function renderAdminSubscriptionNotificationEmailContent(
           fontWeight: "600",
         }}
       >
-        {t("subscription.email.admin_notification.title")}
+        {t("app.api.v1.core.subscription.email.admin_notification.title")}
       </Text>
 
       <Text
@@ -323,8 +328,8 @@ function renderAdminSubscriptionNotificationEmailContent(
           marginBottom: "24px",
         }}
       >
-        {t("subscription.email.admin_notification.message", {
-          appName: t("common.appName"),
+        {t("app.api.v1.core.subscription.email.admin_notification.message", {
+          appName: t("app.common.appName"),
         })}
       </Text>
 
@@ -349,7 +354,7 @@ function renderAdminSubscriptionNotificationEmailContent(
             paddingBottom: "8px",
           }}
         >
-          {t("subscription.email.admin_notification.details")}
+          {t("app.api.v1.core.subscription.email.admin_notification.details")}
         </Text>
 
         <div style={{ marginBottom: "16px" }}>
@@ -362,7 +367,10 @@ function renderAdminSubscriptionNotificationEmailContent(
             }}
           >
             <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-              {t("subscription.email.admin_notification.user_name")}:
+              {t(
+                "app.api.v1.core.subscription.email.admin_notification.user_name",
+              )}
+              :
             </Text>{" "}
             {user.firstName} {user.lastName}
           </Text>
@@ -376,7 +384,10 @@ function renderAdminSubscriptionNotificationEmailContent(
             }}
           >
             <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-              {t("subscription.email.admin_notification.user_email")}:
+              {t(
+                "app.api.v1.core.subscription.email.admin_notification.user_email",
+              )}
+              :
             </Text>{" "}
             <a
               href={`mailto:${user.email}`}
@@ -395,7 +406,7 @@ function renderAdminSubscriptionNotificationEmailContent(
             }}
           >
             <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-              {t("subscription.email.admin_notification.plan")}:
+              {t("app.api.v1.core.subscription.email.admin_notification.plan")}:
             </Text>{" "}
             <span
               style={{
@@ -420,7 +431,10 @@ function renderAdminSubscriptionNotificationEmailContent(
             }}
           >
             <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-              {t("subscription.email.admin_notification.status")}:
+              {t(
+                "app.api.v1.core.subscription.email.admin_notification.status",
+              )}
+              :
             </Text>{" "}
             <span
               style={{
@@ -453,7 +467,9 @@ function renderAdminSubscriptionNotificationEmailContent(
             display: "inline-block",
           }}
         >
-          {t("subscription.email.admin_notification.contact_user")}
+          {t(
+            "app.api.v1.core.subscription.email.admin_notification.contact_user",
+          )}
         </Button>
       </Section>
 
@@ -469,8 +485,8 @@ function renderAdminSubscriptionNotificationEmailContent(
           paddingTop: "16px",
         }}
       >
-        {t("subscription.email.admin_notification.footer", {
-          appName: t("common.appName"),
+        {t("app.api.v1.core.subscription.email.admin_notification.footer", {
+          appName: t("app.common.appName"),
         })}
       </Text>
     </EmailTemplate>
@@ -502,8 +518,8 @@ export const renderSubscriptionSuccessEmail = ({
     data: {
       toEmail: user.email,
       toName: user.firstName,
-      subject: t("subscription.email.success.subject", {
-        appName: t("common.appName"),
+      subject: t("app.api.v1.core.subscription.email.success.subject", {
+        appName: t("app.common.appName"),
         planName,
       }),
       jsx: renderSubscriptionSuccessEmailContent(
@@ -545,11 +561,14 @@ export const renderAdminSubscriptionNotification = ({
     success: true,
     data: {
       toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: t("common.appName"),
-      subject: t("subscription.email.admin_notification.subject", {
-        userName: user.firstName,
-        planName,
-      }),
+      toName: t("app.common.appName"),
+      subject: t(
+        "app.api.v1.core.subscription.email.admin_notification.subject",
+        {
+          userName: user.firstName,
+          planName,
+        },
+      ),
       jsx: renderAdminSubscriptionNotificationEmailContent(
         t,
         locale,

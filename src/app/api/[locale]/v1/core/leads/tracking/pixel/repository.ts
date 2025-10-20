@@ -76,6 +76,7 @@ export class PixelTrackingRepository {
             leadId,
             campaignId,
             clientInfo,
+            logger,
           );
 
           if (result.success) {

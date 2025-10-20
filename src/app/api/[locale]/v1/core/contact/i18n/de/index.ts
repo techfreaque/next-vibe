@@ -265,4 +265,28 @@ export const translations: typeof enTranslations = {
     title: "Erfolg",
     description: "Ihr Kontaktformular wurde erfolgreich eingereicht",
   },
+
+  email: {
+    partner: {
+      greeting: "Hallo",
+      thankYou: "Vielen Dank für Ihre Kontaktaufnahme!",
+      message: "Nachricht",
+      additionalInfo: "Zusätzliche Informationen",
+      subject: "Neue Kontaktformular-Einreichung",
+    },
+    company: {
+      contactDetails: "Kontaktdaten",
+      name: "Name",
+      email: "E-Mail",
+      company: "Unternehmen",
+      contactSubject: "Betreff",
+      viewDetails: "Details anzeigen",
+    },
+  },
+
+  error: {
+    general: {
+      internal_server_error: "Interner Serverfehler aufgetreten",
+    },
+  },
 };

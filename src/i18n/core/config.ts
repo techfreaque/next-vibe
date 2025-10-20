@@ -99,7 +99,7 @@ export function convertLanguageFilter(
   return language as Languages;
 }
 
-// Create a proper enum-like object for CountryLanguageValues that works with z.nativeEnum()
+// Create a proper enum-like object for CountryLanguageValues that works with z.enum()
 export const CountryLanguageValues = Object.values(
   languageConfig.languages,
 ).reduce(

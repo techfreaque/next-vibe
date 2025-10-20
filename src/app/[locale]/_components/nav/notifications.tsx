@@ -31,8 +31,8 @@ export function Notifications({
     href: string;
   }[] = [
     {
-      title: "common.api.notifications.welcome.title",
-      description: "common.api.notifications.welcome.description",
+      title: "app.common.api.notifications.welcome.title",
+      description: "app.common.api.notifications.welcome.description",
       level: "info",
       href: "/",
     },
@@ -116,7 +116,7 @@ function NotificationButton({
         </DropdownMenuTrigger>
       </TooltipTrigger>
       <TooltipContent>
-        <p>{t("nav.notifications")}</p>
+        <p>{t("app.nav.notifications")}</p>
       </TooltipContent>
     </Tooltip>
   );

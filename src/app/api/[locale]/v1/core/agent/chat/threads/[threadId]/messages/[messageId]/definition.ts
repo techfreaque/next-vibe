@@ -126,7 +126,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.threadId.description" as const,
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
       messageId: requestUrlParamsField(
         {
@@ -137,7 +137,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.messageId.description" as const,
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
 
       // === RESPONSE ===
@@ -156,7 +156,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.response.message.id.content" as const,
             },
-            z.string().uuid(),
+            z.uuid(),
           ),
           threadId: responseField(
             {
@@ -164,7 +164,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.response.message.threadId.content" as const,
             },
-            z.string().uuid(),
+            z.uuid(),
           ),
           role: responseField(
             {
@@ -172,7 +172,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.response.message.role.content" as const,
             },
-            z.nativeEnum(ChatMessageRole),
+            z.enum(ChatMessageRole),
           ),
           content: responseField(
             {
@@ -188,7 +188,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.response.message.parentId.content" as const,
             },
-            z.string().uuid().nullable(),
+            z.uuid().nullable(),
           ),
           depth: responseField(
             {
@@ -390,7 +390,7 @@ const { PATCH } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.threadId.description" as const,
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
       messageId: requestUrlParamsField(
         {
@@ -401,7 +401,7 @@ const { PATCH } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.messageId.description" as const,
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
 
       // === REQUEST DATA ===
@@ -427,7 +427,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.role.description" as const,
           options: ChatMessageRoleOptions,
         },
-        z.nativeEnum(ChatMessageRole).optional(),
+        z.enum(ChatMessageRole).optional(),
       ),
 
       // === RESPONSE ===
@@ -446,7 +446,7 @@ const { PATCH } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.response.message.id.content" as const,
             },
-            z.string().uuid(),
+            z.uuid(),
           ),
           content: responseField(
             {
@@ -462,7 +462,7 @@ const { PATCH } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.response.message.role.content" as const,
             },
-            z.nativeEnum(ChatMessageRole),
+            z.enum(ChatMessageRole),
           ),
           updatedAt: responseField(
             {
@@ -613,7 +613,7 @@ const { DELETE } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.threadId.description" as const,
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
       messageId: requestUrlParamsField(
         {
@@ -624,7 +624,7 @@ const { DELETE } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.messageId.description" as const,
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
 
       // === RESPONSE ===

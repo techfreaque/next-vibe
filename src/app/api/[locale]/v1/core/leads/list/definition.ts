@@ -148,7 +148,7 @@ const { GET } = createEndpoint({
               options: LeadStatusFilterOptions,
               layout: { columns: 6 },
             },
-            z.array(z.nativeEnum(LeadStatusFilter)).optional(),
+            z.array(z.enum(LeadStatusFilter)).optional(),
           ),
           currentCampaignStage: requestDataField(
             {
@@ -163,7 +163,7 @@ const { GET } = createEndpoint({
               options: EmailCampaignStageFilterOptions,
               layout: { columns: 6 },
             },
-            z.array(z.nativeEnum(EmailCampaignStageFilter)).optional(),
+            z.array(z.enum(EmailCampaignStageFilter)).optional(),
           ),
           source: requestDataField(
             {
@@ -177,7 +177,7 @@ const { GET } = createEndpoint({
               options: LeadSourceFilterOptions,
               layout: { columns: 12 },
             },
-            z.array(z.nativeEnum(LeadSourceFilter)).optional(),
+            z.array(z.enum(LeadSourceFilter)).optional(),
           ),
         },
       ),
@@ -206,7 +206,7 @@ const { GET } = createEndpoint({
               options: CountriesOptions,
               layout: { columns: 6 },
             },
-            z.array(z.nativeEnum(Countries)).optional(),
+            z.array(z.enum(Countries)).optional(),
           ),
           language: requestDataField(
             {
@@ -220,7 +220,7 @@ const { GET } = createEndpoint({
               options: LanguagesOptions,
               layout: { columns: 6 },
             },
-            z.array(z.nativeEnum(Languages)).optional(),
+            z.array(z.enum(Languages)).optional(),
           ),
         },
       ),
@@ -265,7 +265,7 @@ const { GET } = createEndpoint({
               options: SortOrderOptions,
               layout: { columns: 6 },
             },
-            z.nativeEnum(SortOrder).optional().default(SortOrder.DESC),
+            z.enum(SortOrder).optional().default(SortOrder.DESC),
           ),
         },
       ),
@@ -354,7 +354,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.v1.core.leads.list.get.response.leads.country" as const,
                   },
-                  z.nativeEnum(Countries),
+                  z.enum(Countries),
                 ),
                 language: responseField(
                   {
@@ -362,7 +362,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.v1.core.leads.list.get.response.leads.language" as const,
                   },
-                  z.nativeEnum(Languages),
+                  z.enum(Languages),
                 ),
                 status: responseField(
                   {
@@ -370,7 +370,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.v1.core.leads.list.get.response.leads.status" as const,
                   },
-                  z.nativeEnum(LeadStatus),
+                  z.enum(LeadStatus),
                 ),
                 source: responseField(
                   {
@@ -378,7 +378,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.v1.core.leads.list.get.response.leads.source" as const,
                   },
-                  z.nativeEnum(LeadSource).nullable(),
+                  z.enum(LeadSource).nullable(),
                 ),
                 notes: responseField(
                   {
@@ -434,7 +434,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.v1.core.leads.list.get.response.leads.currentCampaignStage" as const,
                   },
-                  z.nativeEnum(EmailCampaignStage).nullable(),
+                  z.enum(EmailCampaignStage).nullable(),
                 ),
                 emailsSent: responseField(
                   {

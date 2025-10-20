@@ -44,7 +44,7 @@ export const envSchema = envClientBaseSchema.extend({
 
   // SMS environment variables
   // TODO validate based on provider
-  SMS_PROVIDER: z.nativeEnum(SmsProviders),
+  SMS_PROVIDER: z.enum(SmsProviders),
   SMS_FROM_NUMBER: z.string(),
   SMS_MAX_LENGTH: z.string().optional(),
   SMS_MAX_RETRY_ATTEMPTS: z.string().optional(),
@@ -61,7 +61,7 @@ export const envSchema = envClientBaseSchema.extend({
   // AWS SNS provider
   AWS_ACCESS_KEY_ID: z.string().optional(),
   AWS_SECRET_ACCESS_KEY: z.string().optional(),
-  AWS_REGION: z.nativeEnum(AwsSnsAwsRegions).optional(),
+  AWS_REGION: z.enum(AwsSnsAwsRegions).optional(),
 
   // HTTP provider
   SMS_HTTP_API_URL: z.string().optional(),

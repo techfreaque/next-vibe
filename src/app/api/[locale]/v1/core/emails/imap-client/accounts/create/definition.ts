@@ -214,7 +214,7 @@ const { POST } = createEndpoint({
               options: ImapAuthMethodOptions,
               validation: { required: true },
             },
-            z.nativeEnum(ImapAuthMethod),
+            z.enum(ImapAuthMethod),
           ),
         },
       ),
@@ -442,7 +442,7 @@ const { POST } = createEndpoint({
                   type: WidgetType.BADGE,
                   text: "app.api.v1.core.emails.imapClient.accounts.create.response.authMethod.title",
                 },
-                z.nativeEnum(ImapAuthMethod),
+                z.enum(ImapAuthMethod),
               ),
               connectionTimeout: responseField(
                 {
@@ -479,7 +479,7 @@ const { POST } = createEndpoint({
                   type: WidgetType.BADGE,
                   text: "app.api.v1.core.emails.imapClient.accounts.create.response.syncStatus.title",
                 },
-                z.nativeEnum(ImapSyncStatus),
+                z.enum(ImapSyncStatus),
               ),
               syncInterval: responseField(
                 {
@@ -640,7 +640,7 @@ const { POST } = createEndpoint({
           email: "user@gmail.com",
         },
         serverConnection: {
-          host: "imap.gmail.com",
+          host: "app.api.v1.core.emails.imapClient.imap.gmail.com",
           port: 993,
           secure: true,
         },
@@ -697,7 +697,7 @@ const { POST } = createEndpoint({
             connectionStatus: true,
           },
           connectionDetails: {
-            host: "imap.gmail.com",
+            host: "app.api.v1.core.emails.imapClient.imap.gmail.com",
             port: 993,
             secure: true,
             username: "user@gmail.com",

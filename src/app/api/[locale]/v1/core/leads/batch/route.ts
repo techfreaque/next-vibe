@@ -42,7 +42,7 @@ export const { PATCH, DELETE, tools } = endpointsHandler({
         });
       }
       return createErrorResponse(
-        "error.general.internal_server_error",
+        "app.api.v1.core.leads.error.general.internal_server_error",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     },
@@ -68,7 +68,7 @@ export const { PATCH, DELETE, tools } = endpointsHandler({
         });
       }
       return createErrorResponse(
-        "error.general.internal_server_error",
+        "app.api.v1.core.leads.error.general.internal_server_error",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     },

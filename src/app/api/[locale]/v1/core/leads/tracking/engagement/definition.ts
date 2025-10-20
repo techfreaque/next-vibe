@@ -48,7 +48,7 @@ const engagementMetadataSchema = z
 
     // Campaign metadata
     campaignName: z.string().optional(),
-    campaignStage: z.nativeEnum(EmailCampaignStage).optional(),
+    campaignStage: z.enum(EmailCampaignStage).optional(),
     abTestVariant: z.string().optional(),
 
     // Form metadata
@@ -111,7 +111,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.tracking.engagement.post.leadId.helpText" as const,
           layout: { columns: 12 },
         },
-        z.string().uuid().nullable().optional(),
+        z.uuid().nullable().optional(),
       ),
       engagementType: requestDataField(
         {
@@ -128,7 +128,7 @@ const { POST } = createEndpoint({
           options: EngagementTypesOptions,
           layout: { columns: 6 },
         },
-        z.nativeEnum(EngagementTypes),
+        z.enum(EngagementTypes),
       ),
       campaignId: requestDataField(
         {
@@ -144,7 +144,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.tracking.engagement.post.campaignId.helpText" as const,
           layout: { columns: 6 },
         },
-        z.string().uuid().optional(),
+        z.uuid().optional(),
       ),
       metadata: requestDataField(
         {
@@ -176,7 +176,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.tracking.engagement.post.userId.helpText" as const,
           layout: { columns: 12 },
         },
-        z.string().uuid().optional(),
+        z.uuid().optional(),
       ),
 
       // === RESPONSE FIELDS ===
@@ -186,7 +186,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.v1.core.leads.tracking.engagement.post.response.id" as const,
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
       responseLeadId: responseField(
         {
@@ -194,7 +194,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.v1.core.leads.tracking.engagement.post.response.leadId" as const,
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
       responseEngagementType: responseField(
         {
@@ -202,7 +202,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.v1.core.leads.tracking.engagement.post.response.engagementType" as const,
         },
-        z.nativeEnum(EngagementTypes),
+        z.enum(EngagementTypes),
       ),
       responseCampaignId: responseField(
         {
@@ -210,7 +210,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.v1.core.leads.tracking.engagement.post.response.campaignId" as const,
         },
-        z.string().uuid().optional(),
+        z.uuid().optional(),
       ),
       responseMetadata: responseField(
         {
@@ -443,7 +443,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.leads.tracking.engagement.get.id.helpText" as const,
           layout: { columns: 12 },
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
       campaignId: requestDataField(
         {
@@ -459,7 +459,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.leads.tracking.engagement.post.campaignId.helpText" as const,
           layout: { columns: 6 },
         },
-        z.string().uuid().optional(),
+        z.uuid().optional(),
       ),
       stage: requestDataField(
         {
@@ -476,7 +476,7 @@ const { GET } = createEndpoint({
           options: EmailCampaignStageOptions,
           layout: { columns: 6 },
         },
-        z.nativeEnum(EmailCampaignStage).optional(),
+        z.enum(EmailCampaignStage).optional(),
       ),
       source: requestDataField(
         {
@@ -493,7 +493,7 @@ const { GET } = createEndpoint({
           options: LeadSourceOptions,
           layout: { columns: 6 },
         },
-        z.nativeEnum(LeadSource).default(LeadSource.EMAIL_CAMPAIGN),
+        z.enum(LeadSource).default(LeadSource.EMAIL_CAMPAIGN),
       ),
       url: requestDataField(
         {
@@ -535,7 +535,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.v1.core.leads.tracking.engagement.get.response.leadId" as const,
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
       responseCampaignId: responseField(
         {
@@ -543,7 +543,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.v1.core.leads.tracking.engagement.get.response.campaignId" as const,
         },
-        z.string().uuid().optional(),
+        z.uuid().optional(),
       ),
       engagementRecorded: responseField(
         {

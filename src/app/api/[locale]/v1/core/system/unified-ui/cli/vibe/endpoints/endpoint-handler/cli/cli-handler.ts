@@ -64,6 +64,7 @@ export function createCliHandler<
       {
         platform: "cli",
         jwtPayload: user,
+        locale,
       },
       logger,
     );

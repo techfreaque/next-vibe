@@ -149,4 +149,7 @@ export const translations: typeof enTranslations = {
       description: "Checkout-Sitzung erfolgreich erstellt",
     },
   },
+
+  // General error message
+  error: "Ein Fehler ist beim Checkout aufgetreten",
 };

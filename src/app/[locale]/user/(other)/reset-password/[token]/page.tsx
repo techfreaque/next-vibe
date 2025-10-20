@@ -22,17 +22,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "reset-password-confirm",
-    title: "meta.passwordReset.title",
-    description: "meta.passwordReset.description",
+    title: "app.user.other.resetPassword.meta.passwordReset.title",
+    description: "app.user.other.resetPassword.meta.passwordReset.description",
     image:
       "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200&h=630&auto=format&fit=crop",
-    imageAlt: "meta.passwordReset.imageAlt",
-    keywords: ["meta.passwordReset.keywords"],
-    category: "meta.passwordReset.category",
+    imageAlt: "app.user.other.resetPassword.meta.passwordReset.imageAlt",
+    keywords: ["app.user.other.resetPassword.meta.passwordReset.keywords"],
+    category: "app.user.other.resetPassword.meta.passwordReset.category",
     additionalMetadata: {
       openGraph: {
-        title: "meta.passwordReset.title",
-        description: "meta.passwordReset.description",
+        title: "app.user.other.resetPassword.meta.passwordReset.title",
+        description:
+          "app.user.other.resetPassword.meta.passwordReset.description",
         url: `https://nextvibe.dev/${locale}/reset-password`,
         type: "website",
         images: [
@@ -40,14 +41,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             url: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200&h=630&auto=format&fit=crop",
             width: 1200,
             height: 630,
-            alt: "meta.passwordReset.imageAlt",
+            alt: "app.user.other.resetPassword.meta.passwordReset.imageAlt",
           },
         ],
       },
       twitter: {
         card: "summary_large_image",
-        title: "meta.passwordReset.title",
-        description: "meta.passwordReset.description",
+        title: "app.user.other.resetPassword.meta.passwordReset.title",
+        description:
+          "app.user.other.resetPassword.meta.passwordReset.description",
         images: [
           "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200&h=630&auto=format&fit=crop",
         ],
@@ -86,15 +88,17 @@ export default async function ResetPasswordConfirmPage({
       fallback={
         <Alert variant="destructive" className="mb-8">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>{t("common.error.title")}</AlertTitle>
+          <AlertTitle>{t("app.user.common.error.title")}</AlertTitle>
           <AlertDescription>
-            {t("auth.resetPassword.errors.loadingError")}
+            {t(
+              "app.user.other.resetPassword.auth.resetPassword.errors.loadingError",
+            )}
           </AlertDescription>
         </Alert>
       }
       locale={locale}
     >
-      <Suspense fallback={<div>{t("common.loading")}</div>}>
+      <Suspense fallback={<div>{t("app.user.common.loading")}</div>}>
         <div className="max-w-md mx-auto">
           <ResetPasswordConfirmForm
             locale={locale}

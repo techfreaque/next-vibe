@@ -60,7 +60,7 @@ const { PATCH } = createEndpoint({
           layout: { columns: 12 },
           validation: { required: true },
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
 
       // === REQUEST FIELDS ===
@@ -135,7 +135,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.v1.core.leads.import.jobs.jobId.patch.response.id.content",
                 },
-                z.string().uuid(),
+                z.uuid(),
               ),
               fileName: responseField(
                 {
@@ -150,7 +150,7 @@ const { PATCH } = createEndpoint({
                   type: WidgetType.BADGE,
                   text: "app.api.v1.core.leads.import.jobs.jobId.patch.response.status.content",
                 },
-                z.nativeEnum(CsvImportJobStatus),
+                z.enum(CsvImportJobStatus),
               ),
             },
           ),
@@ -386,7 +386,7 @@ const { PATCH } = createEndpoint({
         job: {
           info: {
             id: "550e8400-e29b-41d4-a716-446655440000",
-            fileName: "leads.csv",
+            fileName: "app.api.v1.core.leads.csv",
             status: "PROCESSING" as const,
           },
           progress: {
@@ -452,7 +452,7 @@ const { DELETE } = createEndpoint({
           layout: { columns: 12 },
           validation: { required: true },
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
 
       // === RESPONSE FIELDS ===

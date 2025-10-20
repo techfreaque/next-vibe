@@ -66,7 +66,7 @@ const { GET } = createEndpoint({
           layout: { columns: 12 },
           validation: { required: true },
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
 
       // === RESPONSE FIELDS ===
@@ -97,7 +97,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.v1.core.leads.lead.id.get.response.id.content",
                 },
-                z.string().uuid(),
+                z.uuid(),
               ),
               email: responseField(
                 {
@@ -128,7 +128,7 @@ const { GET } = createEndpoint({
                   type: WidgetType.BADGE,
                   text: "app.api.v1.core.leads.lead.id.get.response.status.content",
                 },
-                z.nativeEnum(LeadStatus),
+                z.enum(LeadStatus),
               ),
             },
           ),
@@ -167,7 +167,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.v1.core.leads.lead.id.get.response.country.content",
                 },
-                z.nativeEnum(Countries),
+                z.enum(Countries),
               ),
               language: responseField(
                 {
@@ -175,7 +175,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.v1.core.leads.lead.id.get.response.language.content",
                 },
-                z.nativeEnum(Languages),
+                z.enum(Languages),
               ),
             },
           ),
@@ -197,14 +197,14 @@ const { GET } = createEndpoint({
                   type: WidgetType.BADGE,
                   text: "app.api.v1.core.leads.lead.id.get.response.source.content",
                 },
-                z.nativeEnum(LeadSource).nullable(),
+                z.enum(LeadSource).nullable(),
               ),
               currentCampaignStage: responseField(
                 {
                   type: WidgetType.BADGE,
                   text: "app.api.v1.core.leads.lead.id.get.response.currentCampaignStage.content",
                 },
-                z.nativeEnum(EmailCampaignStage).nullable(),
+                z.enum(EmailCampaignStage).nullable(),
               ),
               emailJourneyVariant: responseField(
                 {
@@ -212,7 +212,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.v1.core.leads.lead.id.get.response.emailJourneyVariant.content",
                 },
-                z.nativeEnum(EmailJourneyVariant).nullable(),
+                z.enum(EmailJourneyVariant).nullable(),
               ),
               emailsSent: responseField(
                 {
@@ -527,7 +527,7 @@ const { PATCH } = createEndpoint({
           layout: { columns: 12 },
           validation: { required: true },
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
 
       // === UPDATE FIELDS ===
@@ -607,7 +607,7 @@ const { PATCH } = createEndpoint({
                   layout: { columns: 6 },
                   options: LeadStatusOptions,
                 },
-                z.nativeEnum(LeadStatus).optional(),
+                z.enum(LeadStatus).optional(),
               ),
             },
           ),
@@ -669,7 +669,7 @@ const { PATCH } = createEndpoint({
                     label: `app.api.v1.core.leads.enums.country.${String(value).toLowerCase()}`,
                   })),
                 },
-                z.nativeEnum(Countries).optional(),
+                z.enum(Countries).optional(),
               ),
               language: requestDataField(
                 {
@@ -686,7 +686,7 @@ const { PATCH } = createEndpoint({
                     label: `app.api.v1.core.leads.enums.language.${String(value).toLowerCase()}`,
                   })),
                 },
-                z.nativeEnum(Languages).optional(),
+                z.enum(Languages).optional(),
               ),
             },
           ),
@@ -719,7 +719,7 @@ const { PATCH } = createEndpoint({
                     label: `app.api.v1.core.leads.enums.source.${String(source).toLowerCase()}`,
                   })),
                 },
-                z.nativeEnum(LeadSource).optional(),
+                z.enum(LeadSource).optional(),
               ),
               currentCampaignStage: requestDataField(
                 {
@@ -734,7 +734,7 @@ const { PATCH } = createEndpoint({
                   layout: { columns: 12 },
                   options: EmailCampaignStageOptions,
                 },
-                z.nativeEnum(EmailCampaignStage).optional(),
+                z.enum(EmailCampaignStage).optional(),
               ),
             },
           ),
@@ -793,7 +793,7 @@ const { PATCH } = createEndpoint({
                     "app.api.v1.core.leads.lead.id.patch.convertedUserId.placeholder",
                   layout: { columns: 12 },
                 },
-                z.string().uuid().nullable().optional(),
+                z.uuid().nullable().optional(),
               ),
               consultationBookedAt: requestDataField(
                 {
@@ -857,7 +857,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.v1.core.leads.lead.id.patch.response.id.content",
                 },
-                z.string().uuid(),
+                z.uuid(),
               ),
               email: responseField(
                 {
@@ -888,7 +888,7 @@ const { PATCH } = createEndpoint({
                   type: WidgetType.BADGE,
                   text: "app.api.v1.core.leads.lead.id.patch.response.status.content",
                 },
-                z.nativeEnum(LeadStatus),
+                z.enum(LeadStatus),
               ),
             },
           ),
@@ -926,7 +926,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.v1.core.leads.lead.id.patch.response.country.content",
                 },
-                z.nativeEnum(Countries),
+                z.enum(Countries),
               ),
               language: responseField(
                 {
@@ -934,7 +934,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.v1.core.leads.lead.id.patch.response.language.content",
                 },
-                z.nativeEnum(Languages),
+                z.enum(Languages),
               ),
             },
           ),
@@ -955,14 +955,14 @@ const { PATCH } = createEndpoint({
                   type: WidgetType.BADGE,
                   text: "app.api.v1.core.leads.lead.id.patch.response.source.content",
                 },
-                z.nativeEnum(LeadSource).nullable(),
+                z.enum(LeadSource).nullable(),
               ),
               currentCampaignStage: responseField(
                 {
                   type: WidgetType.BADGE,
                   text: "app.api.v1.core.leads.lead.id.patch.response.currentCampaignStage.content",
                 },
-                z.nativeEnum(EmailCampaignStage).nullable(),
+                z.enum(EmailCampaignStage).nullable(),
               ),
               emailJourneyVariant: responseField(
                 {
@@ -970,7 +970,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.v1.core.leads.lead.id.patch.response.emailJourneyVariant.content",
                 },
-                z.nativeEnum(EmailJourneyVariant).nullable(),
+                z.enum(EmailJourneyVariant).nullable(),
               ),
               emailsSent: responseField(
                 {

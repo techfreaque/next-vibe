@@ -413,7 +413,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
         if (existingLead.length > 0) {
           return createErrorResponse(
-            "leadsErrors.leads.post.error.duplicate.title",
+            "app.api.v1.core.leads.leadsErrors.leads.post.error.duplicate.title",
             ErrorResponseTypes.CONFLICT,
           );
         }
@@ -477,7 +477,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
     } catch (error) {
       logger.error("Error creating lead", error);
       return createErrorResponse(
-        "leadsErrors.leads.post.error.server.title",
+        "app.api.v1.core.leads.leadsErrors.leads.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -516,7 +516,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       if (!lead) {
         return createErrorResponse(
-          "leadsErrors.leads.get.error.not_found.title",
+          "app.api.v1.core.leads.leadsErrors.leads.get.error.not_found.title",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -525,7 +525,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
     } catch (error) {
       logger.error("Error fetching lead by tracking ID", error);
       return createErrorResponse(
-        "leadsErrors.leads.get.error.server.title",
+        "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -551,7 +551,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       if (!lead) {
         return createErrorResponse(
-          "leadsErrors.leads.get.error.not_found.title",
+          "app.api.v1.core.leads.leadsErrors.leads.get.error.not_found.title",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -560,7 +560,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
     } catch (error) {
       logger.error("Error fetching lead by email", error);
       return createErrorResponse(
-        "leadsErrors.leads.get.error.server.title",
+        "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -587,7 +587,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         const currentLeadResult = await this.getLeadByIdInternal(id, logger);
         if (!currentLeadResult.success) {
           return createErrorResponse(
-            "leadsErrors.leads.patch.error.not_found.title",
+            "app.api.v1.core.leads.leadsErrors.leads.patch.error.not_found.title",
             ErrorResponseTypes.NOT_FOUND,
           );
         }
@@ -620,7 +620,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
     } catch (error) {
       logger.error("Error updating lead", error);
       return createErrorResponse(
-        "leadsErrors.leads.patch.error.server.title",
+        "app.api.v1.core.leads.leadsErrors.leads.patch.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -791,7 +791,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
     } catch (error) {
       logger.error("Error listing leads", error);
       return createErrorResponse(
-        "leadsErrors.leads.get.error.server.title",
+        "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -932,14 +932,14 @@ class LeadsRepositoryImpl implements LeadsRepository {
         email = data.email;
       } else {
         return createErrorResponse(
-          "leadsErrors.leadsUnsubscribe.post.error.validation.title",
+          "app.api.v1.core.leads.leadsErrors.leadsUnsubscribe.post.error.validation.title",
           ErrorResponseTypes.BAD_REQUEST,
         );
       }
 
       if (!email) {
         return createErrorResponse(
-          "leadsErrors.leads.get.error.not_found.title",
+          "app.api.v1.core.leads.leadsErrors.leads.get.error.not_found.title",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -957,7 +957,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       if (!updatedLead) {
         return createErrorResponse(
-          "leadsErrors.leads.get.error.not_found.title",
+          "app.api.v1.core.leads.leadsErrors.leads.get.error.not_found.title",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -972,13 +972,13 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       return createSuccessResponse({
         success: true,
-        message: "leadsErrors.leadsUnsubscribe.post.success.description",
+        message: "app.api.v1.core.leads.leadsErrors.leadsUnsubscribe.post.success.description",
         unsubscribedAt: updatedLead.unsubscribedAt || undefined,
       });
     } catch (error) {
       logger.error("Error unsubscribing lead and newsletter", error);
       return createErrorResponse(
-        "leadsErrors.leadsUnsubscribe.post.error.server.title",
+        "app.api.v1.core.leads.leadsErrors.leadsUnsubscribe.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -1101,7 +1101,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         error,
       );
       return createErrorResponse(
-        "leadsErrors.leads.get.error.server.title",
+        "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -1126,7 +1126,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       if (!lead) {
         return createErrorResponse(
-          "leadsErrors.leads.get.error.not_found.title",
+          "app.api.v1.core.leads.leadsErrors.leads.get.error.not_found.title",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -1135,7 +1135,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
     } catch (error) {
       logger.error("Error fetching lead by ID (internal)", error);
       return createErrorResponse(
-        "leadsErrors.leads.get.error.server.title",
+        "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -1185,7 +1185,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       if (!updatedLead) {
         return createErrorResponse(
-          "leadsErrors.leads.patch.error.not_found.title",
+          "app.api.v1.core.leads.leadsErrors.leads.patch.error.not_found.title",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -1196,7 +1196,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
     } catch (error) {
       logger.error("Error updating lead (internal)", error);
       return createErrorResponse(
-        "leadsErrors.leads.patch.error.server.title",
+        "app.api.v1.core.leads.leadsErrors.leads.patch.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -1241,7 +1241,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
           if (!existingLead) {
             return createErrorResponse(
-              "leadsErrors.leads.patch.error.not_found.title",
+              "app.api.v1.core.leads.leadsErrors.leads.patch.error.not_found.title",
               ErrorResponseTypes.NOT_FOUND,
             );
           }
@@ -1281,7 +1281,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
             if (duplicateLead && duplicateLead.id !== existingLead.id) {
               return createErrorResponse(
-                "leadsErrors.leads.post.error.duplicate.title",
+                "app.api.v1.core.leads.leadsErrors.leads.post.error.duplicate.title",
                 ErrorResponseTypes.CONFLICT,
               );
             }
@@ -1357,7 +1357,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
     } catch (error) {
       logger.error("Error converting lead (internal)", error);
       return createErrorResponse(
-        "leadsErrors.leads.patch.error.server.title",
+        "app.api.v1.core.leads.leadsErrors.leads.patch.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -1394,7 +1394,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       if (!lead) {
         return createErrorResponse(
-          "leadsErrors.leadsEngagement.post.error.validation.title",
+          "app.api.v1.core.leads.leadsErrors.leadsEngagement.post.error.validation.title",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -1414,7 +1414,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       if (!engagement) {
         return createErrorResponse(
-          "leadsErrors.leadsEngagement.post.error.server.title",
+          "app.api.v1.core.leads.leadsErrors.leadsEngagement.post.error.server.title",
           ErrorResponseTypes.DATABASE_ERROR,
         );
       }
@@ -1483,7 +1483,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
     } catch (error) {
       logger.error("Error recording engagement", error);
       return createErrorResponse(
-        "leadsErrors.leadsEngagement.post.error.server.title",
+        "app.api.v1.core.leads.leadsErrors.leadsEngagement.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -1603,7 +1603,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
     } catch (error) {
       logger.error("Error exporting leads", error);
       return createErrorResponse(
-        "leadsErrors.leadsExport.get.error.server.title",
+        "app.api.v1.core.leads.leadsErrors.leadsExport.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -1619,33 +1619,33 @@ class LeadsRepositoryImpl implements LeadsRepository {
     t: TFunction,
   ): string {
     const headers = [
-      t("leads.export.headers.email"),
-      t("leads.export.headers.businessName"),
-      t("leads.export.headers.contactName"),
-      t("leads.export.headers.phone"),
-      t("leads.export.headers.website"),
-      t("leads.export.headers.country"),
-      t("leads.export.headers.language"),
-      t("leads.export.headers.status"),
-      t("leads.export.headers.source"),
-      t("leads.export.headers.notes"),
-      t("leads.export.headers.createdAt"),
-      t("leads.export.headers.updatedAt"),
+      t("app.api.v1.core.leads.export.headers.email"),
+      t("app.api.v1.core.leads.export.headers.businessName"),
+      t("app.api.v1.core.leads.export.headers.contactName"),
+      t("app.api.v1.core.leads.export.headers.phone"),
+      t("app.api.v1.core.leads.export.headers.website"),
+      t("app.api.v1.core.leads.export.headers.country"),
+      t("app.api.v1.core.leads.export.headers.language"),
+      t("app.api.v1.core.leads.export.headers.status"),
+      t("app.api.v1.core.leads.export.headers.source"),
+      t("app.api.v1.core.leads.export.headers.notes"),
+      t("app.api.v1.core.leads.export.headers.createdAt"),
+      t("app.api.v1.core.leads.export.headers.updatedAt"),
     ];
 
     if (includeEngagementData) {
       headers.push(
-        t("leads.export.headers.emailsSent"),
-        t("leads.export.headers.emailsOpened"),
-        t("leads.export.headers.emailsClicked"),
-        t("leads.export.headers.lastEmailSent"),
-        t("leads.export.headers.lastEngagement"),
-        t("leads.export.headers.unsubscribedAt"),
+        t("app.api.v1.core.leads.export.headers.emailsSent"),
+        t("app.api.v1.core.leads.export.headers.emailsOpened"),
+        t("app.api.v1.core.leads.export.headers.emailsClicked"),
+        t("app.api.v1.core.leads.export.headers.lastEmailSent"),
+        t("app.api.v1.core.leads.export.headers.lastEngagement"),
+        t("app.api.v1.core.leads.export.headers.unsubscribedAt"),
       );
     }
 
     if (includeMetadata) {
-      headers.push(t("leads.export.headers.metadata"));
+      headers.push(t("app.api.v1.core.leads.export.headers.metadata"));
     }
 
     const rows = leadsData.map((lead) => {
@@ -2042,7 +2042,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
     } catch (error) {
       logger.error("Error in batch update", error);
       return createErrorResponse(
-        "leadsErrors.batch.update.error.server.title",
+        "app.api.v1.core.leads.leadsErrors.batch.update.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -2125,7 +2125,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
       // Validation: confirmDelete must be true for actual deletion
       if (!dryRun && !confirmDelete) {
         return createErrorResponse(
-          "leadsErrors.batch.update.error.validation.title",
+          "app.api.v1.core.leads.leadsErrors.batch.update.error.validation.title",
           ErrorResponseTypes.VALIDATION_ERROR,
         );
       }
@@ -2380,7 +2380,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
     } catch (error) {
       logger.error("Error in batch delete", error);
       return createErrorResponse(
-        "leadsErrors.batch.update.error.server.title",
+        "app.api.v1.core.leads.leadsErrors.batch.update.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }

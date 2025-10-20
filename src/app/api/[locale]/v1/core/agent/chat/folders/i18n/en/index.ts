@@ -9,6 +9,10 @@ export const translations = {
   get: {
     title: "List Folders",
     description: "Retrieve all folders for the current user",
+    rootFolderId: {
+      label: "Root Folder",
+      description: "Filter by root folder (private, shared, public, incognito)",
+    },
     container: {
       title: "Folders List",
       description: "Hierarchical folder structure",
@@ -24,6 +28,7 @@ export const translations = {
           description: "Individual folder details",
           id: { content: "Folder ID" },
           userId: { content: "User ID" },
+          rootFolderId: { content: "Root Folder" },
           name: { content: "Folder Name" },
           icon: { content: "Icon" },
           color: { content: "Color" },
@@ -90,6 +95,10 @@ export const translations = {
       folder: {
         title: "Folder Details",
         description: "Basic folder information",
+        rootFolderId: {
+          label: "Root Folder",
+          description: "Root folder (private, shared, public, incognito)",
+        },
         name: {
           label: "Folder Name",
           description: "Name of the folder",
@@ -116,6 +125,7 @@ export const translations = {
         description: "Created folder object",
         id: { content: "Folder ID" },
         userId: { content: "User ID" },
+        rootFolderId: { content: "Root Folder" },
         name: { content: "Folder Name" },
         icon: { content: "Icon" },
         color: { content: "Color" },
@@ -139,6 +149,8 @@ export const translations = {
       forbidden: {
         title: "Forbidden",
         description: "You don't have permission to create folders",
+        incognitoNotAllowed:
+          "Incognito folders cannot be created on the server",
       },
       notFound: {
         title: "Not Found",

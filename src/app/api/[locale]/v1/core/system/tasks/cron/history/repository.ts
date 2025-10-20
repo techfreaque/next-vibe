@@ -169,8 +169,8 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
       );
 
       // Zod schemas for runtime validation and type narrowing
-      const statusSchema = z.nativeEnum(CronTaskStatus);
-      const prioritySchema = z.nativeEnum(CronTaskPriority);
+      const statusSchema = z.enum(CronTaskStatus);
+      const prioritySchema = z.enum(CronTaskPriority);
       const errorSchema = z
         .object({
           message: z.string(),

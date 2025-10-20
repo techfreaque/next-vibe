@@ -34,31 +34,31 @@ export default function ErrorPage({
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4">
-      <h2 className="text-3xl font-bold mb-4">{t("pages.error.title")}</h2>
+      <h2 className="text-3xl font-bold mb-4">{t("app.pages.error.title")}</h2>
       <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md">
-        {t("pages.error.message")}
+        {t("app.pages.error.message")}
         {digest && (
           <span className="block mt-2 text-xs text-gray-500">
-            {t("pages.error.errorId", { id: digest })}
+            {t("app.pages.error.errorId", { id: digest })}
           </span>
         )}
         {error.message && (
           <span className="block mt-2 text-xs text-gray-500">
-            {t("pages.error.error_message", { message: error.message })}
+            {t("app.pages.error.error_message", { message: error.message })}
           </span>
         )}
         {error.stack && (
           <span className="block mt-2 text-xs text-gray-500">
-            {t("pages.error.stackTrace", { stack: error.stack })}
+            {t("app.pages.error.stackTrace", { stack: error.stack })}
           </span>
         )}
       </p>
       <div className="flex flex-col sm:flex-row gap-4">
         <Button onClick={() => reset()} variant="outline">
-          {t("pages.error.tryAgain")}
+          {t("app.pages.error.tryAgain")}
         </Button>
         <Button asChild>
-          <Link href={`/${locale}`}>{t("pages.error.backToHome")}</Link>
+          <Link href={`/${locale}`}>{t("app.pages.error.backToHome")}</Link>
         </Button>
       </div>
     </div>

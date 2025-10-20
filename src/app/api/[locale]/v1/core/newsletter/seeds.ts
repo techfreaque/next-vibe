@@ -74,7 +74,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
         },
       }),
       createNewsletterSeed({
-        email: "newsletter.test@example.com",
+        email: "app.api.v1.core.newsletter.test@example.com",
         status: NewsletterSubscriptionStatus.PENDING,
         preferences: {
           frequency: "monthly",

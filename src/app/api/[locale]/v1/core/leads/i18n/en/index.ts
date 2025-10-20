@@ -24,6 +24,59 @@ export const translations = {
     jobs: "Jobs",
     list: "List",
   },
+  auth: {
+    public: {
+      validCookie: "Valid cookie lead found",
+      invalidCookie: "Invalid cookie lead",
+      created: "Anonymous lead created",
+      error: "Error in public lead auth",
+    },
+    authenticated: {
+      primaryFound: "Primary lead found for user",
+      noPrimary: "No primary lead found for user",
+      error: "Error in authenticated lead auth",
+    },
+    link: {
+      alreadyExists: "Lead link already exists",
+      created: "Lead link created",
+      error: "Error linking leads",
+    },
+    validate: {
+      error: "Error validating lead",
+    },
+    getOrCreate: {
+      invalid: "Invalid lead ID",
+      error: "Error getting or creating lead",
+    },
+    create: {
+      existingFound: "Existing anonymous lead found",
+      success: "Lead created successfully",
+      error: "Error creating lead",
+    },
+    createForUser: {
+      success: "Lead created for user",
+      error: "Error creating lead for user",
+    },
+    cookie: {
+      set: "Lead cookie set",
+      error: "Error setting lead cookie",
+    },
+    getUserLeads: {
+      error: "Error getting user leads",
+    },
+    linkLeads: {
+      sameId: "Cannot link lead to itself",
+      alreadyExists: "Lead link already exists",
+      created: "Leads linked successfully",
+      error: "Error linking leads",
+    },
+    getLinkedLeads: {
+      error: "Error getting linked leads",
+    },
+    getAllLinkedLeads: {
+      error: "Error getting all linked leads",
+    },
+  },
   batch: batchTranslations,
   campaigns: campaignsTranslations,
   create: createTranslations,
@@ -174,6 +227,30 @@ export const translations = {
       de: "German",
       pl: "Polish",
       en: "English",
+    },
+  },
+  error: {
+    general: {
+      internal_server_error: "Internal server error",
+      not_found: "Not found",
+      unauthorized: "Unauthorized",
+      forbidden: "Forbidden",
+      bad_request: "Bad request",
+      validation_error: "Validation error",
+    },
+  },
+  leadsErrors: {
+    leads: {
+      get: {
+        error: {
+          server: {
+            title: "Server error retrieving leads",
+          },
+          not_found: {
+            title: "Leads not found",
+          },
+        },
+      },
     },
   },
 };

@@ -29,7 +29,7 @@ export async function requireAdminUser(
     // Check authentication and role
     const minimalUser = await authRepository.getAuthMinimalUser<
       [typeof UserRole.ADMIN]
-    >([UserRole.ADMIN], { platform: "next" }, logger);
+    >([UserRole.ADMIN], { platform: "next", locale }, logger);
 
     // Check if user is public (not authenticated)
     if (minimalUser.isPublic) {
@@ -74,7 +74,7 @@ export async function requireUser(
     // Check authentication (any authenticated user)
     const minimalUser = await authRepository.getAuthMinimalUser<[]>(
       [],
-      { platform: "next" },
+      { platform: "next", locale },
       logger,
     );
 

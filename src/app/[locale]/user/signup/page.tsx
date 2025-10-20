@@ -25,17 +25,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "signup",
-    title: "meta.signup.title",
-    description: "meta.signup.description",
-    category: "meta.signup.category",
+    title: "app.user.signup.meta.title",
+    description: "app.user.signup.meta.description",
+    category: "app.user.signup.meta.category",
     image:
       "https://images.unsplash.com/photo-1579547945413-497e1b99dac0?q=80&w=1200&h=630&auto=format&fit=crop",
-    imageAlt: "meta.signup.imageAlt",
-    keywords: ["meta.signup.keywords"],
+    imageAlt: "app.user.signup.meta.imageAlt",
+    keywords: ["app.user.signup.meta.keywords"],
     additionalMetadata: {
       openGraph: {
-        title: "meta.signup.ogTitle",
-        description: "meta.signup.ogDescription",
+        title: "app.user.signup.meta.ogTitle",
+        description: "app.user.signup.meta.ogDescription",
         url: `https://nextvibe.dev/${locale}/user/signup`,
         type: "website",
         images: [
@@ -43,14 +43,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             url: "https://images.unsplash.com/photo-1579547945413-497e1b99dac0?q=80&w=1200&h=630&auto=format&fit=crop",
             width: 1200,
             height: 630,
-            alt: "meta.signup.imageAlt",
+            alt: "app.user.signup.meta.imageAlt",
           },
         ],
       },
       twitter: {
         card: "summary_large_image",
-        title: "meta.signup.twitterTitle",
-        description: "meta.signup.twitterDescription",
+        title: "app.user.signup.meta.twitterTitle",
+        description: "app.user.signup.meta.twitterDescription",
         images: [
           "https://images.unsplash.com/photo-1579547945413-497e1b99dac0?q=80&w=1200&h=630&auto=format&fit=crop",
         ],
@@ -78,7 +78,7 @@ export default async function SignUpPage({
         className="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 mb-8"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        {t("common.backToHome")}
+        {t("app.user.common.backToHome")}
       </Link>
       <div className="grid xl:grid-cols-2 gap-8 items-center">
         <div className="order-2 xl:order-1">
@@ -88,10 +88,10 @@ export default async function SignUpPage({
         <div className="order-1 xl:order-2 text-center xl:text-left">
           <div className="mb-8">
             <h1 className="text-3xl xl:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
-              {t("auth.signup.title")}
+              {t("app.user.signup.auth.signup.title")}
             </h1>
             <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">
-              {t("auth.signup.subtitle")}
+              {t("app.user.signup.auth.signup.subtitle")}
             </p>
 
             <div className="hidden xl:block">
@@ -114,10 +114,14 @@ export default async function SignUpPage({
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-1">
-                      {t("auth.signup.benefits.contentCreation.title")}
+                      {t(
+                        "app.user.signup.auth.signup.benefits.contentCreation.title",
+                      )}
                     </h3>
                     <p className="text-gray-600 dark:text-gray-400 text-sm">
-                      {t("auth.signup.benefits.contentCreation.description")}
+                      {t(
+                        "app.user.signup.auth.signup.benefits.contentCreation.description",
+                      )}
                     </p>
                   </div>
                 </div>
@@ -140,10 +144,14 @@ export default async function SignUpPage({
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-1">
-                      {t("auth.signup.benefits.dataStrategy.title")}
+                      {t(
+                        "app.user.signup.auth.signup.benefits.dataStrategy.title",
+                      )}
                     </h3>
                     <p className="text-gray-600 dark:text-gray-400 text-sm">
-                      {t("auth.signup.benefits.dataStrategy.description")}
+                      {t(
+                        "app.user.signup.auth.signup.benefits.dataStrategy.description",
+                      )}
                     </p>
                   </div>
                 </div>
@@ -166,10 +174,12 @@ export default async function SignUpPage({
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-1">
-                      {t("auth.signup.benefits.saveTime.title")}
+                      {t("app.user.signup.auth.signup.benefits.saveTime.title")}
                     </h3>
                     <p className="text-gray-600 dark:text-gray-400 text-sm">
-                      {t("auth.signup.benefits.saveTime.description")}
+                      {t(
+                        "app.user.signup.auth.signup.benefits.saveTime.description",
+                      )}
                     </p>
                   </div>
                 </div>
@@ -182,27 +192,29 @@ export default async function SignUpPage({
                   src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&auto=format&fit=crop&crop=face"
                   width={40}
                   height={40}
-                  alt={t("auth.signup.avatarAlt")}
+                  alt={t("app.user.signup.auth.signup.avatarAlt")}
                   className="rounded-full border-2 border-white dark:border-gray-800"
                 />
                 <Image
                   src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&auto=format&fit=crop&crop=face"
                   width={40}
                   height={40}
-                  alt={t("auth.signup.avatarAlt")}
+                  alt={t("app.user.signup.auth.signup.avatarAlt")}
                   className="rounded-full border-2 border-white dark:border-gray-800"
                 />
                 <Image
                   src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=40&h=40&auto=format&fit=crop&crop=face"
                   width={40}
                   height={40}
-                  alt={t("auth.signup.avatarAlt")}
+                  alt={t("app.user.signup.auth.signup.avatarAlt")}
                   className="rounded-full border-2 border-white dark:border-gray-800"
                 />
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {t("auth.signup.userCount", { count: clientCount })}{" "}
-                {t("auth.signup.trustText")}
+                {t("app.user.signup.auth.signup.userCount", {
+                  count: clientCount,
+                })}{" "}
+                {t("app.user.signup.auth.signup.trustText")}
               </p>
             </div>
           </div>

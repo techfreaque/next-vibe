@@ -23,7 +23,7 @@ export function PasswordStrengthIndicator({
   // Calculate password strength
   let strength = 0;
   let color = "bg-red-500";
-  let labelText = t("auth.common.passwordStrength.weak");
+  let labelText = t("app.user.components.auth.common.passwordStrength.weak");
 
   // Length check
   if (password.length >= 8) {
@@ -47,16 +47,16 @@ export function PasswordStrengthIndicator({
   // Determine color and label based on strength
   if (strength <= 2) {
     color = "bg-red-500";
-    labelText = t("auth.common.passwordStrength.weak");
+    labelText = t("app.user.components.auth.common.passwordStrength.weak");
   } else if (strength <= 3) {
     color = "bg-orange-500";
-    labelText = t("auth.common.passwordStrength.fair");
+    labelText = t("app.user.components.auth.common.passwordStrength.fair");
   } else if (strength <= 4) {
     color = "bg-yellow-500";
-    labelText = t("auth.common.passwordStrength.good");
+    labelText = t("app.user.components.auth.common.passwordStrength.good");
   } else {
     color = "bg-green-500";
-    labelText = t("auth.common.passwordStrength.strong");
+    labelText = t("app.user.components.auth.common.passwordStrength.strong");
   }
 
   // Calculate width percentage (between 20% and 100%)
@@ -65,7 +65,9 @@ export function PasswordStrengthIndicator({
   return (
     <div className="mt-2 space-y-1">
       <div className="flex justify-between text-xs">
-        <span>{t("auth.common.passwordStrength.label")}</span>
+        <span>
+          {t("app.user.components.auth.common.passwordStrength.label")}
+        </span>
         <span
           className={
             strength <= 2
@@ -88,7 +90,7 @@ export function PasswordStrengthIndicator({
       </div>
       {strength <= 2 && (
         <p className="text-xs text-red-500 mt-1">
-          {t("auth.common.passwordStrength.suggestion")}
+          {t("app.user.components.auth.common.passwordStrength.suggestion")}
         </p>
       )}
     </div>

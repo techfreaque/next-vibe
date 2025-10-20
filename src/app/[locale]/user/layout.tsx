@@ -15,23 +15,23 @@ export async function generateMetadata({
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "user",
-    title: "meta.profile.title",
-    description: "meta.profile.description",
-    category: "meta.profile.category",
+    title: "app.user.meta.profile.title",
+    description: "app.user.meta.profile.description",
+    category: "app.user.meta.profile.category",
     image: "https://unbottled.ai/images/user-hero.jpg",
-    imageAlt: "meta.profile.imageAlt",
-    keywords: ["meta.profile.keywords"],
+    imageAlt: "app.user.meta.profile.imageAlt",
+    keywords: ["app.user.meta.profile.keywords"],
     additionalMetadata: {
       openGraph: {
-        title: "meta.profile.ogTitle",
-        description: "meta.profile.ogDescription",
+        title: "app.user.meta.profile.ogTitle",
+        description: "app.user.meta.profile.ogDescription",
         url: `https://unbottled.ai/${locale}/user`,
         type: "website",
       },
       twitter: {
         card: "summary_large_image",
-        title: "meta.profile.twitterTitle",
-        description: "meta.profile.twitterDescription",
+        title: "app.user.meta.profile.twitterTitle",
+        description: "app.user.meta.profile.twitterDescription",
       },
     },
   });

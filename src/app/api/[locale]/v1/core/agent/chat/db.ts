@@ -75,6 +75,9 @@ export const chatFolders = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
 
+    // Root folder (constant: private, shared, public, incognito)
+    rootFolderId: text("root_folder_id").notNull().default("private"),
+
     // Folder details
     name: text("name").notNull(),
     icon: text("icon"), // lucide icon name or si icon name
@@ -100,6 +103,9 @@ export const chatFolders = pgTable(
   (table) => ({
     // Indexes for common queries
     userIdIdx: index("chat_folders_user_id_idx").on(table.userId),
+    rootFolderIdIdx: index("chat_folders_root_folder_id_idx").on(
+      table.rootFolderId,
+    ),
     parentIdIdx: index("chat_folders_parent_id_idx").on(table.parentId),
     sortOrderIdx: index("chat_folders_sort_order_idx").on(table.sortOrder),
   }),
@@ -119,6 +125,11 @@ export const chatThreads = pgTable(
 
     // Thread details
     title: text("title").notNull(),
+
+    // Root folder (constant: private, shared, public, incognito)
+    rootFolderId: text("root_folder_id").notNull().default("private"),
+
+    // Subfolder (UUID reference to chat_folders table, can be null for root-level threads)
     folderId: uuid("folder_id").references(() => chatFolders.id, {
       onDelete: "set null",
     }),
@@ -155,6 +166,9 @@ export const chatThreads = pgTable(
     ),
     // Additional indexes for common queries
     userIdIdx: index("chat_threads_user_id_idx").on(table.userId),
+    rootFolderIdIdx: index("chat_threads_root_folder_id_idx").on(
+      table.rootFolderId,
+    ),
     folderIdIdx: index("chat_threads_folder_id_idx").on(table.folderId),
     statusIdx: index("chat_threads_status_idx").on(table.status),
     createdAtIdx: index("chat_threads_created_at_idx").on(table.createdAt),

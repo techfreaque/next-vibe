@@ -78,73 +78,73 @@ export interface NavParentItemType {
 export const navItems: NavItemType[] = [
   {
     icon: <Home className="h-4 w-4" />,
-    title: "nav.home",
+    title: "app.nav.home",
     href: "",
   },
   {
     icon: <TagIcon className="h-4 w-4" />,
-    title: "nav.pricing",
+    title: "app.nav.pricing",
     href: "#pricing",
   },
   // {
-  //   translationKey: "nav.blog",
+  //   translationKey: "app.nav.blog",
   //   href: "/blog",
   // },
   // {
-  //   translationKey: "nav.caseStudies",
+  //   translationKey: "app.nav.caseStudies",
   //   href: "/case-studies",
   // },
 
   {
-    title: "nav.services.title",
+    title: "app.nav.services.title",
     icon: <Brush className="h-4 w-4" />,
     children: [
       {
         icon: <Brush className="h-4 w-4" />,
-        title: "nav.services.features.title",
-        description: "nav.services.features.description",
+        title: "app.nav.services.features.title",
+        description: "app.nav.services.features.description",
         href: "#features",
       },
       {
         icon: <BarChart3 className="h-4 w-4" />,
-        title: "nav.services.process.title",
-        description: "nav.services.process.description",
+        title: "app.nav.services.process.title",
+        description: "app.nav.services.process.description",
         href: "#process",
       },
       {
         icon: <Video className="h-4 w-4" />,
-        title: "nav.services.premiumContent.title",
-        description: "nav.services.premiumContent.description",
+        title: "app.nav.services.premiumContent.title",
+        description: "app.nav.services.premiumContent.description",
         href: "#features",
       },
       // {
       //   icon: LayoutDashboard,
-      //   title: "nav.services.dashboard.title",
-      //   description: "nav.services.dashboard.description",
+      //   title: "app.nav.services.dashboard.title",
+      //   description: "app.nav.services.dashboard.description",
       //   href: "/dashboard",
       // } ,
       {
         icon: <MessageSquare className="h-4 w-4" />,
-        title: "nav.services.contact.title",
-        description: "nav.services.contact.description",
+        title: "app.nav.services.contact.title",
+        description: "app.nav.services.contact.description",
         href: "#features",
       },
     ],
   },
   {
-    title: "nav.company",
+    title: "app.nav.company",
     icon: <Building className="h-4 w-4" />,
     children: [
       {
         icon: <Info className="h-4 w-4" />,
-        title: "nav.about.title",
-        description: "nav.about.description",
+        title: "app.nav.about.title",
+        description: "app.nav.about.description",
         href: "/about-us",
       },
       {
         icon: <Building className="h-4 w-4" />,
-        title: "nav.careers.title",
-        description: "nav.careers.description",
+        title: "app.nav.careers.title",
+        description: "app.nav.careers.description",
         href: "/careers",
       },
     ],

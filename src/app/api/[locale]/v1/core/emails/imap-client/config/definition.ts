@@ -174,7 +174,7 @@ const { GET, POST } = createFormEndpoint({
 
       // Logging level field
       loggingLevel: field(
-        z.nativeEnum(ImapLoggingLevel),
+        z.enum(ImapLoggingLevel),
         {
           GET: { response: true },
           POST: { request: "data", response: true },
@@ -265,7 +265,7 @@ const { GET, POST } = createFormEndpoint({
     GET: {
       responses: {
         default: {
-          host: "imap.gmail.com",
+          host: "app.api.v1.core.emails.imapClient.imap.gmail.com",
           port: 993,
           username: "user@gmail.com",
           password: "app-password",
@@ -287,7 +287,7 @@ const { GET, POST } = createFormEndpoint({
     POST: {
       requests: {
         default: {
-          host: "imap.gmail.com",
+          host: "app.api.v1.core.emails.imapClient.imap.gmail.com",
           port: 993,
           username: "user@gmail.com",
           password: "app-password",
@@ -296,7 +296,7 @@ const { GET, POST } = createFormEndpoint({
           loggingLevel: ImapLoggingLevel.INFO,
         },
         minimal: {
-          host: "imap.gmail.com",
+          host: "app.api.v1.core.emails.imapClient.imap.gmail.com",
           port: 993,
           username: "user@gmail.com",
           password: "app-password",
@@ -307,7 +307,7 @@ const { GET, POST } = createFormEndpoint({
       },
       responses: {
         default: {
-          host: "imap.gmail.com",
+          host: "app.api.v1.core.emails.imapClient.imap.gmail.com",
           port: 993,
           username: "user@gmail.com",
           password: "app-password",
@@ -317,7 +317,7 @@ const { GET, POST } = createFormEndpoint({
           message: "IMAP configuration updated successfully",
         },
         minimal: {
-          host: "imap.gmail.com",
+          host: "app.api.v1.core.emails.imapClient.imap.gmail.com",
           port: 993,
           username: "user@gmail.com",
           password: "app-password",

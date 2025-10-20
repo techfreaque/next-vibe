@@ -779,7 +779,7 @@ export class UserDataRepositoryImpl implements UserDataRepository {
 
    ```typescript
    // If definition expects single value:
-   preferredContactMethod: z.nativeEnum(PreferredContactMethod)
+   preferredContactMethod: z.enum(PreferredContactMethod)
    
    // Repository must return single value, not array:
    responsePreferredContactMethod: (JSON.parse(user.preferredContactMethod) as string[])[0]

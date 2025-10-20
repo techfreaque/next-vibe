@@ -21,7 +21,9 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
+import { DEFAULT_FOLDER_IDS } from "../config";
 import { ThreadStatus, ThreadStatusOptions } from "../enum";
+import { ModelId } from "../model-access/models";
 
 /**
  * Get Threads List Endpoint (GET)
@@ -97,17 +99,56 @@ const { GET } = createEndpoint({
         },
         { request: "data" },
         {
-          folderId: requestDataField(
+          rootFolderId: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label:
+                "app.api.v1.core.agent.chat.threads.get.rootFolderId.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.get.rootFolderId.description" as const,
+              layout: { columns: 6 },
+              options: [
+                {
+                  value: DEFAULT_FOLDER_IDS.PRIVATE,
+                  label:
+                    "app.api.v1.core.agent.chat.config.folders.private" as const,
+                },
+                {
+                  value: DEFAULT_FOLDER_IDS.SHARED,
+                  label:
+                    "app.api.v1.core.agent.chat.config.folders.shared" as const,
+                },
+                {
+                  value: DEFAULT_FOLDER_IDS.PUBLIC,
+                  label:
+                    "app.api.v1.core.agent.chat.config.folders.public" as const,
+                },
+                {
+                  value: DEFAULT_FOLDER_IDS.INCOGNITO,
+                  label:
+                    "app.api.v1.core.agent.chat.config.folders.incognito" as const,
+                },
+              ],
+            },
+            z.enum([
+              DEFAULT_FOLDER_IDS.PRIVATE,
+              DEFAULT_FOLDER_IDS.SHARED,
+              DEFAULT_FOLDER_IDS.PUBLIC,
+              DEFAULT_FOLDER_IDS.INCOGNITO,
+            ]),
+          ),
+          subFolderId: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.UUID,
               label:
-                "app.api.v1.core.agent.chat.threads.get.folderId.label" as const,
+                "app.api.v1.core.agent.chat.threads.get.subFolderId.label" as const,
               description:
-                "app.api.v1.core.agent.chat.threads.get.folderId.description" as const,
+                "app.api.v1.core.agent.chat.threads.get.subFolderId.description" as const,
               layout: { columns: 6 },
             },
-            z.string().uuid().optional().nullable(),
+            z.uuid().optional().nullable(),
           ),
           status: requestDataField(
             {
@@ -120,7 +161,7 @@ const { GET } = createEndpoint({
               layout: { columns: 6 },
               options: ThreadStatusOptions,
             },
-            z.nativeEnum(ThreadStatus).optional(),
+            z.enum(ThreadStatus).optional(),
           ),
           search: requestDataField(
             {
@@ -205,7 +246,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.v1.core.agent.chat.threads.get.response.threads.thread.id.content" as const,
                   },
-                  z.string().uuid(),
+                  z.uuid(),
                 ),
                 title: responseField(
                   {
@@ -215,20 +256,33 @@ const { GET } = createEndpoint({
                   },
                   z.string(),
                 ),
+                rootFolderId: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.v1.core.agent.chat.threads.get.response.threads.thread.rootFolderId.content" as const,
+                  },
+                  z.enum([
+                    DEFAULT_FOLDER_IDS.PRIVATE,
+                    DEFAULT_FOLDER_IDS.SHARED,
+                    DEFAULT_FOLDER_IDS.PUBLIC,
+                    DEFAULT_FOLDER_IDS.INCOGNITO,
+                  ]),
+                ),
                 folderId: responseField(
                   {
                     type: WidgetType.TEXT,
                     content:
                       "app.api.v1.core.agent.chat.threads.get.response.threads.thread.folderId.content" as const,
                   },
-                  z.string().uuid().nullable(),
+                  z.uuid().nullable(),
                 ),
                 status: responseField(
                   {
                     type: WidgetType.BADGE,
                     text: "app.api.v1.core.agent.chat.threads.get.response.threads.thread.status.content" as const,
                   },
-                  z.nativeEnum(ThreadStatus),
+                  z.enum(ThreadStatus),
                 ),
                 preview: responseField(
                   {
@@ -360,7 +414,9 @@ const { GET } = createEndpoint({
     requests: {
       default: {
         pagination: { page: 1, limit: 20 },
-        filters: {},
+        filters: {
+          rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
+        },
       },
     },
     responses: {
@@ -425,19 +481,58 @@ const { POST } = createEndpoint({
             },
             z.string().min(1).max(255).optional().default("New Chat"),
           ),
-          folderId: requestDataField(
+          rootFolderId: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label:
+                "app.api.v1.core.agent.chat.threads.post.rootFolderId.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.threads.post.rootFolderId.description" as const,
+              layout: { columns: 6 },
+              options: [
+                {
+                  value: DEFAULT_FOLDER_IDS.PRIVATE,
+                  label:
+                    "app.api.v1.core.agent.chat.config.folders.private" as const,
+                },
+                {
+                  value: DEFAULT_FOLDER_IDS.SHARED,
+                  label:
+                    "app.api.v1.core.agent.chat.config.folders.shared" as const,
+                },
+                {
+                  value: DEFAULT_FOLDER_IDS.PUBLIC,
+                  label:
+                    "app.api.v1.core.agent.chat.config.folders.public" as const,
+                },
+                {
+                  value: DEFAULT_FOLDER_IDS.INCOGNITO,
+                  label:
+                    "app.api.v1.core.agent.chat.config.folders.incognito" as const,
+                },
+              ],
+            },
+            z.enum([
+              DEFAULT_FOLDER_IDS.PRIVATE,
+              DEFAULT_FOLDER_IDS.SHARED,
+              DEFAULT_FOLDER_IDS.PUBLIC,
+              DEFAULT_FOLDER_IDS.INCOGNITO,
+            ]),
+          ),
+          subFolderId: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.UUID,
               label:
-                "app.api.v1.core.agent.chat.threads.post.folderId.label" as const,
+                "app.api.v1.core.agent.chat.threads.post.subFolderId.label" as const,
               description:
-                "app.api.v1.core.agent.chat.threads.post.folderId.description" as const,
+                "app.api.v1.core.agent.chat.threads.post.subFolderId.description" as const,
               layout: { columns: 6 },
             },
-            z.string().uuid().optional().nullable(),
+            z.uuid().optional().nullable(),
           ),
-          defaultModel: requestDataField(
+          model: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
@@ -447,9 +542,9 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.post.defaultModel.description" as const,
               layout: { columns: 6 },
             },
-            z.string().optional(),
+            z.nativeEnum(ModelId),
           ),
-          defaultTone: requestDataField(
+          persona: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
@@ -459,7 +554,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.post.defaultTone.description" as const,
               layout: { columns: 6 },
             },
-            z.string().optional(),
+            z.string(),
           ),
           systemPrompt: requestDataField(
             {
@@ -503,7 +598,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.threads.post.response.thread.id.content" as const,
                 },
-                z.string().uuid(),
+                z.uuid(),
               ),
               title: responseField(
                 {
@@ -513,20 +608,33 @@ const { POST } = createEndpoint({
                 },
                 z.string(),
               ),
-              folderId: responseField(
+              rootFolderId: responseField(
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.agent.chat.threads.post.response.thread.folderId.content" as const,
+                    "app.api.v1.core.agent.chat.threads.post.response.thread.rootFolderId.content" as const,
                 },
-                z.string().uuid().nullable(),
+                z.enum([
+                  DEFAULT_FOLDER_IDS.PRIVATE,
+                  DEFAULT_FOLDER_IDS.SHARED,
+                  DEFAULT_FOLDER_IDS.PUBLIC,
+                  DEFAULT_FOLDER_IDS.INCOGNITO,
+                ]),
+              ),
+              subFolderId: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.agent.chat.threads.post.response.thread.subFolderId.content" as const,
+                },
+                z.uuid().nullable(),
               ),
               status: responseField(
                 {
                   type: WidgetType.BADGE,
                   text: "app.api.v1.core.agent.chat.threads.post.response.thread.status.content" as const,
                 },
-                z.nativeEnum(ThreadStatus),
+                z.enum(ThreadStatus),
               ),
               createdAt: responseField(
                 {
@@ -611,7 +719,10 @@ const { POST } = createEndpoint({
       default: {
         thread: {
           title: "New Chat",
-          folderId: null,
+          rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
+          subFolderId: null,
+          model: ModelId.GPT_5_NANO,
+          persona: "default",
         },
       },
     },
@@ -621,7 +732,8 @@ const { POST } = createEndpoint({
           thread: {
             id: "550e8400-e29b-41d4-a716-446655440000",
             title: "New Chat",
-            folderId: null,
+            rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
+            subFolderId: null,
             status: ThreadStatus.ACTIVE,
             createdAt: new Date(),
             updatedAt: new Date(),

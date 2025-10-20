@@ -2,6 +2,24 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   tag: "avatar",
+  errors: {
+    user_not_found: "Benutzer nicht gefunden",
+    failed_to_upload_avatar: "Avatar konnte nicht hochgeladen werden",
+    failed_to_delete_avatar: "Avatar konnte nicht gelöscht werden",
+  },
+  debug: {
+    errorUploadingUserAvatar: "Fehler beim Hochladen des Benutzer-Avatars",
+    errorDeletingUserAvatar: "Fehler beim Löschen des Benutzer-Avatars",
+  },
+  success: {
+    uploaded: "Avatar erfolgreich hochgeladen",
+    deleted: "Avatar erfolgreich gelöscht",
+    nextSteps: {
+      visible: "Ihr Avatar ist jetzt in Ihrem Profil sichtbar",
+      update:
+        "Sie können ihn jederzeit in Ihren Profileinstellungen aktualisieren",
+    },
+  },
   upload: {
     title: "Avatar Hochladen",
     description: "Ein Profilbild hochladen",

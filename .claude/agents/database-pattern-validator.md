@@ -248,7 +248,7 @@ export const requestSchema = z.object({
 
 3. **Inconsistent enum usage**
    - Ensure database enums use pgEnum in db.ts
-   - API enums use z.nativeEnum in definition.ts
+   - API enums use z.enum in definition.ts
 
 4. **Missing database patterns**
    - Add createInsertSchema/createSelectSchema

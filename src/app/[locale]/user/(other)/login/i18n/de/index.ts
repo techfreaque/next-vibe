@@ -1,54 +1,35 @@
+import { translations as componentsTranslations } from "../../_components/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
-    form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
+  components: componentsTranslations,
+  meta: {
+    title: "Anmelden - Next Vibe",
+    description: "Melden Sie sich bei Ihrem Next Vibe Konto an",
+    category: "Authentifizierung",
+    imageAlt: "Next Vibe Anmeldung",
+    keywords: "anmelden, einloggen, authentifizierung, next vibe",
+    ogTitle: "Bei Next Vibe anmelden",
+    ogDescription: "Greifen Sie auf Ihr Next Vibe Konto zu",
+    twitterTitle: "Bei Next Vibe anmelden",
+    twitterDescription: "Melden Sie sich bei Ihrem Konto an",
+  },
+  auth: {
+    login: {
+      title: "Willkommen zurück",
+      subtitle: "Melden Sie sich bei Ihrem Konto an, um fortzufahren",
+      signInButton: "Anmelden",
+      forgotPassword: "Passwort vergessen?",
+      createAccount: "Konto erstellen",
+      orContinueWith: "Oder fortfahren mit",
+      emailLabel: "E-Mail-Adresse",
+      emailPlaceholder: "Geben Sie Ihre E-Mail ein",
+      passwordLabel: "Passwort",
+      passwordPlaceholder: "Geben Sie Ihr Passwort ein",
+      rememberMe: "Angemeldet bleiben",
     },
-    response: {
-      title: "Antwort",
-      description: "Antwortdaten",
-    },
-    errors: {
-      unauthorized: {
-        title: "Nicht autorisiert",
-        description: "Authentifizierung erforderlich",
-      },
-      validation: {
-        title: "Validierungsfehler",
-        description: "Ungültige Anfrageparameter",
-      },
-      server: {
-        title: "Serverfehler",
-        description: "Interner Serverfehler",
-      },
-      unknown: {
-        title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist aufgetreten",
-      },
-      network: {
-        title: "Netzwerkfehler",
-        description: "Netzwerkfehler aufgetreten",
-      },
-      forbidden: {
-        title: "Verboten",
-        description: "Zugriff verboten",
-      },
-      notFound: {
-        title: "Nicht gefunden",
-        description: "Ressource nicht gefunden",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Datenkonflikt aufgetreten",
-      },
-    },
-    success: {
-      title: "Erfolg",
-      description: "Vorgang erfolgreich abgeschlossen",
-    },
+  },
+  login: {
+    dontHaveAccount: "Noch kein Konto?",
   },
 };

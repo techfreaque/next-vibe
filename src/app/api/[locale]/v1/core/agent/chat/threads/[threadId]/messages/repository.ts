@@ -94,6 +94,15 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
         );
       }
 
+      // Reject incognito threads - they should never be accessed on server
+      if (thread.rootFolderId === "incognito") {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.forbidden.title" as const,
+          ErrorResponseTypes.FORBIDDEN,
+          { message: "Incognito threads cannot be accessed on the server" },
+        );
+      }
+
       // Get all messages in thread
       const messages = await db
         .select()
@@ -159,6 +168,15 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
         return createErrorResponse(
           "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.notFound.title",
           ErrorResponseTypes.NOT_FOUND,
+        );
+      }
+
+      // Reject incognito threads - they should never be accessed on server
+      if (thread.rootFolderId === "incognito") {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,
+          ErrorResponseTypes.FORBIDDEN,
+          { message: "Incognito threads cannot be accessed on the server" },
         );
       }
 

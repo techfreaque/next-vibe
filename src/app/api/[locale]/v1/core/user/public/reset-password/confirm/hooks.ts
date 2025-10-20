@@ -89,14 +89,16 @@ export function useResetPasswordConfirm(
         setIsSuccess(true);
 
         toast({
-          title: t("auth.resetPassword.success.title"),
-          description: t("auth.resetPassword.success.password_reset"),
+          title: t("app.api.v1.core.user.auth.resetPassword.success.title"),
+          description: t(
+            "app.api.v1.core.user.auth.resetPassword.success.password_reset",
+          ),
           variant: "default",
         });
       },
       onError: ({ error }) => {
         toast({
-          title: t("auth.resetPassword.errors.title"),
+          title: t("app.api.v1.core.user.auth.resetPassword.errors.title"),
           description: t(error.message, error.messageParams),
           variant: "destructive",
         });
@@ -111,7 +113,7 @@ export function useResetPasswordConfirm(
       return {
         variant: "destructive",
         title: {
-          message: "auth.resetPassword.errors.title",
+          message: "app.api.v1.core.user.auth.resetPassword.errors.title",
         },
         message: {
           message: tokenValidationResponse.message,
@@ -125,7 +127,7 @@ export function useResetPasswordConfirm(
       return {
         variant: "destructive",
         title: {
-          message: "auth.resetPassword.errors.title",
+          message: "app.api.v1.core.user.auth.resetPassword.errors.title",
         },
         message: {
           message: formResult.submitError.message,
@@ -139,10 +141,11 @@ export function useResetPasswordConfirm(
       return {
         variant: "success",
         title: {
-          message: "auth.resetPassword.success.title",
+          message: "app.api.v1.core.user.auth.resetPassword.success.title",
         },
         message: {
-          message: "auth.resetPassword.success.password_reset",
+          message:
+            "app.api.v1.core.user.auth.resetPassword.success.password_reset",
         },
       };
     }
@@ -156,7 +159,7 @@ export function useResetPasswordConfirm(
   const tokenError = tokenIsValid
     ? ""
     : (tokenValidationResponse.message as string) ||
-      "auth.reset.errors.token_invalid";
+      "app.api.v1.core.user.auth.reset.errors.token_invalid";
 
   return {
     form: formResult.form,

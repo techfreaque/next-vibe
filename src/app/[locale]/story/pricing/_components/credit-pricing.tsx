@@ -41,10 +41,11 @@ import type { JSX } from "react";
 import { useState } from "react";
 import { useInView } from "react-intersection-observer";
 
-import { modelOptions } from "@/app/[locale]/chat/lib/config/models";
 import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/definition";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+import { modelOptions } from "./models-config";
 
 interface CreditPricingSectionProps {
   locale: CountryLanguage;
@@ -150,7 +151,7 @@ export default function CreditPricingSection({
         >
           <Sparkles className="h-3.5 w-3.5 mr-1" />
           <span className="font-medium">
-            {t("pricing.creditPricing.badge")}
+            {t("app.site.pricing.creditPricing.badge")}
           </span>
         </motion.div>
 
@@ -160,7 +161,7 @@ export default function CreditPricingSection({
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          {t("pricing.creditPricing.title")}
+          {t("app.site.pricing.creditPricing.title")}
         </motion.h2>
 
         <motion.p
@@ -169,7 +170,7 @@ export default function CreditPricingSection({
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          {t("pricing.creditPricing.subtitle")}
+          {t("app.site.pricing.creditPricing.subtitle")}
         </motion.p>
       </div>
 
@@ -184,7 +185,7 @@ export default function CreditPricingSection({
         <motion.div variants={item}>
           <Card className="flex flex-col h-full border-2 border-blue-500 shadow-xl relative hover:shadow-2xl hover:-translate-y-1 transition-all">
             <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
-              {t("pricing.creditPricing.subscription.badge")}
+              {t("app.site.pricing.creditPricing.subscription.badge")}
             </div>
             <CardHeader className="pt-8 pb-4">
               <div className="mb-6">
@@ -194,22 +195,22 @@ export default function CreditPricingSection({
                   </div>
                 </div>
                 <CardTitle className="text-xl text-center">
-                  {t("pricing.creditPricing.subscription.title")}
+                  {t("app.site.pricing.creditPricing.subscription.title")}
                 </CardTitle>
               </div>
 
               <div className="flex items-baseline justify-center">
                 <span className="text-4xl font-extrabold">
-                  {t("pricing.creditPricing.subscription.price", {
+                  {t("app.site.pricing.creditPricing.subscription.price", {
                     price: SUBSCRIPTION_PRICE,
                   })}
                 </span>
                 <span className="ml-1 text-gray-500 dark:text-gray-400">
-                  {t("pricing.creditPricing.subscription.perMonth")}
+                  {t("app.site.pricing.creditPricing.subscription.perMonth")}
                 </span>
               </div>
               <CardDescription className="mt-4 text-center">
-                {t("pricing.creditPricing.subscription.description", {
+                {t("app.site.pricing.creditPricing.subscription.description", {
                   credits: SUBSCRIPTION_CREDITS,
                 })}
               </CardDescription>
@@ -218,7 +219,9 @@ export default function CreditPricingSection({
                 <div className="flex items-start gap-2">
                   <Info className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
                   <p className="text-xs text-amber-800 dark:text-amber-200">
-                    {t("pricing.creditPricing.subscription.expiryInfo")}
+                    {t(
+                      "app.site.pricing.creditPricing.subscription.expiryInfo",
+                    )}
                   </p>
                 </div>
               </div>
@@ -230,26 +233,11 @@ export default function CreditPricingSection({
                     <Check className="h-3 w-3 text-cyan-600 dark:text-cyan-400" />
                   </div>
                   <span className="ml-3 text-sm">
-                    {t("pricing.creditPricing.subscription.features.credits", {
-                      credits: SUBSCRIPTION_CREDITS,
-                    })}
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-cyan-100 dark:bg-cyan-900/30">
-                    <Check className="h-3 w-3 text-cyan-600 dark:text-cyan-400" />
-                  </div>
-                  <span className="ml-3 text-sm">
-                    {t("pricing.creditPricing.subscription.features.allModels")}
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-cyan-100 dark:bg-cyan-900/30">
-                    <Check className="h-3 w-3 text-cyan-600 dark:text-cyan-400" />
-                  </div>
-                  <span className="ml-3 text-sm">
                     {t(
-                      "pricing.creditPricing.subscription.features.allFeatures",
+                      "app.site.pricing.creditPricing.subscription.features.credits",
+                      {
+                        credits: SUBSCRIPTION_CREDITS,
+                      },
                     )}
                   </span>
                 </li>
@@ -258,7 +246,29 @@ export default function CreditPricingSection({
                     <Check className="h-3 w-3 text-cyan-600 dark:text-cyan-400" />
                   </div>
                   <span className="ml-3 text-sm">
-                    {t("pricing.creditPricing.subscription.features.cancel")}
+                    {t(
+                      "app.site.pricing.creditPricing.subscription.features.allModels",
+                    )}
+                  </span>
+                </li>
+                <li className="flex items-start">
+                  <div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-cyan-100 dark:bg-cyan-900/30">
+                    <Check className="h-3 w-3 text-cyan-600 dark:text-cyan-400" />
+                  </div>
+                  <span className="ml-3 text-sm">
+                    {t(
+                      "app.site.pricing.creditPricing.subscription.features.allFeatures",
+                    )}
+                  </span>
+                </li>
+                <li className="flex items-start">
+                  <div className="flex-shrink-0 rounded-full p-1 mt-0.5 bg-cyan-100 dark:bg-cyan-900/30">
+                    <Check className="h-3 w-3 text-cyan-600 dark:text-cyan-400" />
+                  </div>
+                  <span className="ml-3 text-sm">
+                    {t(
+                      "app.site.pricing.creditPricing.subscription.features.cancel",
+                    )}
                   </span>
                 </li>
               </ul>
@@ -273,10 +283,10 @@ export default function CreditPricingSection({
                 {isProcessing ? (
                   <div className="flex items-center">
                     <Loader className="mr-2 h-4 w-4 animate-spin" />
-                    {t("pricing.creditPricing.common.processing")}
+                    {t("app.site.pricing.creditPricing.common.processing")}
                   </div>
                 ) : (
-                  t("pricing.creditPricing.subscription.button")
+                  t("app.site.pricing.creditPricing.subscription.button")
                 )}
               </Button>
             </CardFooter>
@@ -287,7 +297,7 @@ export default function CreditPricingSection({
         <motion.div variants={item}>
           <Card className="flex flex-col h-full border-2 border-purple-500 shadow-xl relative hover:shadow-2xl hover:-translate-y-1 transition-all">
             <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-purple-600 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
-              {t("pricing.creditPricing.creditPack.badge")}
+              {t("app.site.pricing.creditPricing.creditPack.badge")}
             </div>
             <CardHeader className="pt-8 pb-4">
               <div className="mb-6">
@@ -297,19 +307,19 @@ export default function CreditPricingSection({
                   </div>
                 </div>
                 <CardTitle className="text-xl text-center">
-                  {t("pricing.creditPricing.creditPack.title")}
+                  {t("app.site.pricing.creditPricing.creditPack.title")}
                 </CardTitle>
               </div>
 
               <div className="flex items-baseline justify-center">
                 <span className="text-4xl font-extrabold">
-                  {t("pricing.creditPricing.creditPack.price", {
+                  {t("app.site.pricing.creditPricing.creditPack.price", {
                     price: PACK_PRICE * packQuantity,
                   })}
                 </span>
               </div>
               <CardDescription className="mt-4 text-center">
-                {t("pricing.creditPricing.creditPack.description", {
+                {t("app.site.pricing.creditPricing.creditPack.description", {
                   credits: PACK_CREDITS * packQuantity,
                 })}
               </CardDescription>
@@ -319,14 +329,18 @@ export default function CreditPricingSection({
                   <div className="flex items-start gap-2">
                     <Sparkles className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
                     <p className="text-xs text-green-800 dark:text-green-200">
-                      {t("pricing.creditPricing.creditPack.permanentInfo")}
+                      {t(
+                        "app.site.pricing.creditPricing.creditPack.permanentInfo",
+                      )}
                     </p>
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="quantity">
-                    {t("pricing.creditPricing.creditPack.quantityLabel")}
+                    {t(
+                      "app.site.pricing.creditPricing.creditPack.quantityLabel",
+                    )}
                   </Label>
                   <Input
                     id="quantity"
@@ -343,10 +357,13 @@ export default function CreditPricingSection({
                     className="text-center font-bold"
                   />
                   <p className="text-xs text-muted-foreground text-center">
-                    {t("pricing.creditPricing.creditPack.pricePerPack", {
-                      price: PACK_PRICE,
-                      credits: PACK_CREDITS,
-                    })}
+                    {t(
+                      "app.site.pricing.creditPricing.creditPack.pricePerPack",
+                      {
+                        price: PACK_PRICE,
+                        credits: PACK_CREDITS,
+                      },
+                    )}
                   </p>
                 </div>
               </div>
@@ -358,9 +375,12 @@ export default function CreditPricingSection({
                     <Check className="h-3 w-3 text-purple-600 dark:text-purple-400" />
                   </div>
                   <span className="ml-3 text-sm">
-                    {t("pricing.creditPricing.creditPack.features.credits", {
-                      credits: PACK_CREDITS * packQuantity,
-                    })}
+                    {t(
+                      "app.site.pricing.creditPricing.creditPack.features.credits",
+                      {
+                        credits: PACK_CREDITS * packQuantity,
+                      },
+                    )}
                   </span>
                 </li>
                 <li className="flex items-start">
@@ -368,7 +388,9 @@ export default function CreditPricingSection({
                     <Check className="h-3 w-3 text-purple-600 dark:text-purple-400" />
                   </div>
                   <span className="ml-3 text-sm">
-                    {t("pricing.creditPricing.creditPack.features.allModels")}
+                    {t(
+                      "app.site.pricing.creditPricing.creditPack.features.allModels",
+                    )}
                   </span>
                 </li>
                 <li className="flex items-start">
@@ -376,7 +398,9 @@ export default function CreditPricingSection({
                     <Check className="h-3 w-3 text-purple-600 dark:text-purple-400" />
                   </div>
                   <span className="ml-3 text-sm">
-                    {t("pricing.creditPricing.creditPack.features.allFeatures")}
+                    {t(
+                      "app.site.pricing.creditPricing.creditPack.features.allFeatures",
+                    )}
                   </span>
                 </li>
                 <li className="flex items-start">
@@ -384,7 +408,9 @@ export default function CreditPricingSection({
                     <Check className="h-3 w-3 text-purple-600 dark:text-purple-400" />
                   </div>
                   <span className="ml-3 text-sm">
-                    {t("pricing.creditPricing.creditPack.features.multiple")}
+                    {t(
+                      "app.site.pricing.creditPricing.creditPack.features.multiple",
+                    )}
                   </span>
                 </li>
               </ul>
@@ -399,14 +425,14 @@ export default function CreditPricingSection({
                 {isProcessing ? (
                   <div className="flex items-center">
                     <Loader className="mr-2 h-4 w-4 animate-spin" />
-                    {t("pricing.creditPricing.common.processing")}
+                    {t("app.site.pricing.creditPricing.common.processing")}
                   </div>
                 ) : packQuantity > 1 ? (
-                  t("pricing.creditPricing.creditPack.buttonPlural", {
+                  t("app.site.pricing.creditPricing.creditPack.buttonPlural", {
                     quantity: packQuantity,
                   })
                 ) : (
-                  t("pricing.creditPricing.creditPack.button", {
+                  t("app.site.pricing.creditPricing.creditPack.button", {
                     quantity: packQuantity,
                   })
                 )}
@@ -424,15 +450,17 @@ export default function CreditPricingSection({
         transition={{ duration: 0.5, delay: 0.4 }}
       >
         <h3 className="text-2xl font-bold text-center mb-6">
-          {t("pricing.creditPricing.costTransparency.title")}
+          {t("app.site.pricing.creditPricing.costTransparency.title")}
         </h3>
         <Card className="max-w-4xl mx-auto">
           <CardHeader>
             <CardTitle>
-              {t("pricing.creditPricing.costTransparency.card.title")}
+              {t("app.site.pricing.creditPricing.costTransparency.card.title")}
             </CardTitle>
             <CardDescription>
-              {t("pricing.creditPricing.costTransparency.card.description")}
+              {t(
+                "app.site.pricing.creditPricing.costTransparency.card.description",
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -440,14 +468,18 @@ export default function CreditPricingSection({
               <TableHeader>
                 <TableRow>
                   <TableHead>
-                    {t("pricing.creditPricing.costTransparency.table.provider")}
+                    {t(
+                      "app.site.pricing.creditPricing.costTransparency.table.provider",
+                    )}
                   </TableHead>
                   <TableHead>
-                    {t("pricing.creditPricing.costTransparency.table.model")}
+                    {t(
+                      "app.site.pricing.creditPricing.costTransparency.table.model",
+                    )}
                   </TableHead>
                   <TableHead className="text-right">
                     {t(
-                      "pricing.creditPricing.costTransparency.table.costPerMessage",
+                      "app.site.pricing.creditPricing.costTransparency.table.costPerMessage",
                     )}
                   </TableHead>
                 </TableRow>
@@ -484,7 +516,7 @@ export default function CreditPricingSection({
                               {model.parameterCount && (
                                 <p className="text-xs text-muted-foreground">
                                   {t(
-                                    "pricing.creditPricing.costTransparency.table.parameters",
+                                    "app.site.pricing.creditPricing.costTransparency.table.parameters",
                                     { count: model.parameterCount },
                                   )}
                                 </p>
@@ -497,18 +529,18 @@ export default function CreditPricingSection({
                         {model.creditCost === 0 ? (
                           <Badge variant="outline" className="bg-green-50">
                             {t(
-                              "pricing.creditPricing.costTransparency.table.free",
+                              "app.site.pricing.creditPricing.costTransparency.table.free",
                             )}
                           </Badge>
                         ) : (
                           <span className="font-mono">
                             {model.creditCost > 1
                               ? t(
-                                  "pricing.creditPricing.costTransparency.table.creditsPlural",
+                                  "app.site.pricing.creditPricing.costTransparency.table.creditsPlural",
                                   { count: model.creditCost },
                                 )
                               : t(
-                                  "pricing.creditPricing.costTransparency.table.credits",
+                                  "app.site.pricing.creditPricing.costTransparency.table.credits",
                                   { count: model.creditCost },
                                 )}
                           </span>
@@ -520,17 +552,19 @@ export default function CreditPricingSection({
                 {/* Feature Costs */}
                 <TableRow>
                   <TableCell className="font-medium">
-                    {t("pricing.creditPricing.costTransparency.table.features")}
+                    {t(
+                      "app.site.pricing.creditPricing.costTransparency.table.features",
+                    )}
                   </TableCell>
                   <TableCell>
                     {t(
-                      "pricing.creditPricing.costTransparency.table.braveSearch",
+                      "app.site.pricing.creditPricing.costTransparency.table.braveSearch",
                     )}
                   </TableCell>
                   <TableCell className="text-right">
                     <span className="font-mono">
                       {t(
-                        "pricing.creditPricing.costTransparency.table.braveSearchCost",
+                        "app.site.pricing.creditPricing.costTransparency.table.braveSearchCost",
                       )}
                     </span>
                   </TableCell>
@@ -538,12 +572,14 @@ export default function CreditPricingSection({
                 <TableRow>
                   <TableCell className="font-medium" />
                   <TableCell>
-                    {t("pricing.creditPricing.costTransparency.table.tts")}
+                    {t(
+                      "app.site.pricing.creditPricing.costTransparency.table.tts",
+                    )}
                   </TableCell>
                   <TableCell className="text-right">
                     <span className="font-mono">
                       {t(
-                        "pricing.creditPricing.costTransparency.table.ttsCost",
+                        "app.site.pricing.creditPricing.costTransparency.table.ttsCost",
                       )}
                     </span>
                   </TableCell>
@@ -551,12 +587,14 @@ export default function CreditPricingSection({
                 <TableRow>
                   <TableCell className="font-medium" />
                   <TableCell>
-                    {t("pricing.creditPricing.costTransparency.table.stt")}
+                    {t(
+                      "app.site.pricing.creditPricing.costTransparency.table.stt",
+                    )}
                   </TableCell>
                   <TableCell className="text-right">
                     <span className="font-mono">
                       {t(
-                        "pricing.creditPricing.costTransparency.table.sttCost",
+                        "app.site.pricing.creditPricing.costTransparency.table.sttCost",
                       )}
                     </span>
                   </TableCell>
@@ -574,21 +612,21 @@ export default function CreditPricingSection({
         transition={{ duration: 0.5, delay: 0.5 }}
       >
         <h3 className="text-2xl font-bold text-center mb-6">
-          {t("pricing.creditPricing.calculator.title")}
+          {t("app.site.pricing.creditPricing.calculator.title")}
         </h3>
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
             <CardTitle>
-              {t("pricing.creditPricing.calculator.card.title")}
+              {t("app.site.pricing.creditPricing.calculator.card.title")}
             </CardTitle>
             <CardDescription>
-              {t("pricing.creditPricing.calculator.card.description")}
+              {t("app.site.pricing.creditPricing.calculator.card.description")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="messages">
-                {t("pricing.creditPricing.calculator.messagesLabel")}
+                {t("app.site.pricing.creditPricing.calculator.messagesLabel")}
               </Label>
               <Input
                 id="messages"
@@ -605,43 +643,51 @@ export default function CreditPricingSection({
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm">
-                    {t("pricing.creditPricing.calculator.estimates.free")}
+                    {t(
+                      "app.site.pricing.creditPricing.calculator.estimates.free",
+                    )}
                   </span>
                   <span className="font-bold">
                     {t(
-                      "pricing.creditPricing.calculator.estimates.freeCredits",
+                      "app.site.pricing.creditPricing.calculator.estimates.freeCredits",
                     )}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">
-                    {t("pricing.creditPricing.calculator.estimates.basic")}
+                    {t(
+                      "app.site.pricing.creditPricing.calculator.estimates.basic",
+                    )}
                   </span>
                   <span className="font-bold">
                     {t(
-                      "pricing.creditPricing.calculator.estimates.basicCredits",
+                      "app.site.pricing.creditPricing.calculator.estimates.basicCredits",
                       { count: calculatorMessages },
                     )}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">
-                    {t("pricing.creditPricing.calculator.estimates.pro")}
+                    {t(
+                      "app.site.pricing.creditPricing.calculator.estimates.pro",
+                    )}
                   </span>
                   <span className="font-bold">
                     {t(
-                      "pricing.creditPricing.calculator.estimates.proCredits",
+                      "app.site.pricing.creditPricing.calculator.estimates.proCredits",
                       { count: calculatorMessages * 2 },
                     )}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">
-                    {t("pricing.creditPricing.calculator.estimates.premium")}
+                    {t(
+                      "app.site.pricing.creditPricing.calculator.estimates.premium",
+                    )}
                   </span>
                   <span className="font-bold">
                     {t(
-                      "pricing.creditPricing.calculator.estimates.premiumCredits",
+                      "app.site.pricing.creditPricing.calculator.estimates.premiumCredits",
                       { count: calculatorMessages * 5 },
                     )}
                   </span>
@@ -651,12 +697,14 @@ export default function CreditPricingSection({
 
             <div className="p-4 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
               <p className="text-sm font-medium mb-2">
-                {t("pricing.creditPricing.calculator.recommendation.title")}
+                {t(
+                  "app.site.pricing.creditPricing.calculator.recommendation.title",
+                )}
               </p>
               {calculatorMessages <= 0 && (
                 <p className="text-sm">
                   {t(
-                    "pricing.creditPricing.calculator.recommendation.freeTier",
+                    "app.site.pricing.creditPricing.calculator.recommendation.freeTier",
                   )}
                 </p>
               )}
@@ -664,7 +712,7 @@ export default function CreditPricingSection({
                 calculatorMessages * 2 <= SUBSCRIPTION_CREDITS && (
                   <p className="text-sm">
                     {t(
-                      "pricing.creditPricing.calculator.recommendation.subscription",
+                      "app.site.pricing.creditPricing.calculator.recommendation.subscription",
                       { credits: SUBSCRIPTION_CREDITS },
                     )}
                   </p>
@@ -672,7 +720,7 @@ export default function CreditPricingSection({
               {calculatorMessages * 2 > SUBSCRIPTION_CREDITS && (
                 <p className="text-sm">
                   {t(
-                    "pricing.creditPricing.calculator.recommendation.additionalPacks",
+                    "app.site.pricing.creditPricing.calculator.recommendation.additionalPacks",
                     {
                       packs: Math.ceil(
                         (calculatorMessages * 2 - SUBSCRIPTION_CREDITS) /
@@ -698,11 +746,11 @@ export default function CreditPricingSection({
           <div className="flex items-center justify-center gap-2 mb-2">
             <Sparkles className="h-5 w-5 text-green-600 dark:text-green-400" />
             <h4 className="text-lg font-bold text-green-900 dark:text-green-100">
-              {t("pricing.creditPricing.freeTier.title")}
+              {t("app.site.pricing.creditPricing.freeTier.title")}
             </h4>
           </div>
           <p className="text-gray-700 dark:text-gray-300">
-            {t("pricing.creditPricing.freeTier.description")}
+            {t("app.site.pricing.creditPricing.freeTier.description")}
           </p>
           <Link
             href={
@@ -715,7 +763,7 @@ export default function CreditPricingSection({
           >
             <Button className="mt-4" variant="outline" size="sm">
               <CreditCard className="mr-2 h-4 w-4" />
-              {t("pricing.creditPricing.freeTier.button")}
+              {t("app.site.pricing.creditPricing.freeTier.button")}
             </Button>
           </Link>
         </div>

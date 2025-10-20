@@ -52,7 +52,7 @@ export function validateLocale(
 ): CountryLanguage {
   const localeValidation = validateData(
     locale,
-    z.nativeEnum(CountryLanguageValues).optional(),
+    z.enum(CountryLanguageValues).optional(),
     logger,
   );
   const validatedLocale = localeValidation.success

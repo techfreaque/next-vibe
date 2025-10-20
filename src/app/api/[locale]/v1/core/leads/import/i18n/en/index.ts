@@ -18,7 +18,7 @@ export const translations = {
     fileName: {
       label: "File Name",
       description: "Name of the CSV file",
-      placeholder: "leads.csv",
+      placeholder: "app.api.v1.core.leads.csv",
       helpText: "Provide a descriptive file name",
     },
     skipDuplicates: {

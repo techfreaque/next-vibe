@@ -54,16 +54,18 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
             transition={{ duration: 0.5 }}
           >
             <div className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm text-blue-600 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400 mb-2 w-fit">
-              <span className="font-medium">{t("pages.home.hero.badge")}</span>
+              <span className="font-medium">
+                {t("app.site.home.hero.badge")}
+              </span>
             </div>
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600 leading-[1.15]">
-              {t("pages.home.hero.title")}
+              {t("app.site.home.hero.title")}
             </h1>
             <p className="text-gray-600 dark:text-gray-300 text-lg md:text-xl max-w-[600px] leading-relaxed">
-              {t("pages.home.hero.subtitle")}
+              {t("app.site.home.hero.subtitle")}
             </p>
             <p className="text-gray-500 md:text-lg dark:text-gray-400 max-w-[600px] leading-relaxed">
-              {t("pages.home.hero.description")}
+              {t("app.site.home.hero.description")}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 pt-3">
               <Button
@@ -72,14 +74,14 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
                 asChild
               >
                 <Link href={`/${locale}/user/signup`}>
-                  {t("pages.home.hero.cta")}
+                  {t("app.site.home.hero.cta")}
                   <Play className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="group" asChild>
                 <Link href={`/${locale}#brands`}>
                   <ArrowDown className="mr-2 h-4 w-4 fill-blue-600 text-blue-600 group-hover:fill-blue-700 group-hover:text-blue-700" />
-                  {t("pages.home.hero.learnMore")}
+                  {t("app.site.home.hero.learnMore")}
                 </Link>
               </Button>
             </div>
@@ -89,21 +91,21 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
                   src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&auto=format&fit=crop&crop=face"
                   width={40}
                   height={40}
-                  alt={t("pages.home.hero.userAvatarAlt")}
+                  alt={t("app.site.home.hero.userAvatarAlt")}
                   className="rounded-full border-2 border-white dark:border-gray-800"
                 />
                 <Image
                   src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&auto=format&fit=crop&crop=face"
                   width={40}
                   height={40}
-                  alt={t("pages.home.hero.userAvatarAlt")}
+                  alt={t("app.site.home.hero.userAvatarAlt")}
                   className="rounded-full border-2 border-white dark:border-gray-800"
                 />
                 <Image
                   src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=40&h=40&auto=format&fit=crop&crop=face"
                   width={40}
                   height={40}
-                  alt={t("pages.home.hero.userAvatarAlt")}
+                  alt={t("app.site.home.hero.userAvatarAlt")}
                   className="rounded-full border-2 border-white dark:border-gray-800"
                 />
               </div>
@@ -111,7 +113,7 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
                 <span className="font-semibold text-gray-900 dark:text-white">
                   {clientCount}+
                 </span>{" "}
-                {t("pages.home.hero.satisfiedClients")}
+                {t("app.site.home.hero.satisfiedClients")}
               </div>
             </div>
           </motion.div>
@@ -126,7 +128,7 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
               <div className="relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl">
                 <Image
                   src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=600&h=600&auto=format&fit=crop"
-                  alt={t("pages.home.hero.imageAlt")}
+                  alt={t("app.site.home.hero.imageAlt")}
                   width={600}
                   height={600}
                   className="object-cover w-full h-full"
@@ -138,7 +140,7 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
                     <div className="flex items-center gap-3 mb-3">
                       <div className="h-3 w-3 rounded-full bg-blue-500" />
                       <span className="text-sm font-medium">
-                        {t("pages.home.hero.imageOverlay.title")}
+                        {t("app.site.home.hero.imageOverlay.title")}
                       </span>
                     </div>
 
@@ -148,12 +150,12 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
                         <div>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
                             {t(
-                              "pages.home.hero.imageOverlay.metrics.yearlyGrowth.label",
+                              "app.site.home.hero.imageOverlay.metrics.yearlyGrowth.label",
                             )}
                           </p>
                           <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
                             {t(
-                              "pages.home.hero.imageOverlay.metrics.yearlyGrowth.value",
+                              "app.site.home.hero.imageOverlay.metrics.yearlyGrowth.value",
                               { growth: 187 },
                             )}
                           </p>
@@ -172,12 +174,12 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
                       <div className="p-2 bg-green-50/50 dark:bg-green-900/20 rounded-md">
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           {t(
-                            "pages.home.hero.imageOverlay.metrics.engagement.label",
+                            "app.site.home.hero.imageOverlay.metrics.engagement.label",
                           )}
                         </p>
                         <p className="text-md font-bold text-green-600 dark:text-green-400">
                           {t(
-                            "pages.home.hero.imageOverlay.metrics.engagement.value",
+                            "app.site.home.hero.imageOverlay.metrics.engagement.value",
                             { engagement: 42 },
                           )}
                         </p>
@@ -187,12 +189,12 @@ const Hero = ({ locale }: { locale: CountryLanguage }): JSX.Element => {
                       <div className="p-2 bg-purple-50/50 dark:bg-purple-900/20 rounded-md">
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           {t(
-                            "pages.home.hero.imageOverlay.metrics.reach.label",
+                            "app.site.home.hero.imageOverlay.metrics.reach.label",
                           )}
                         </p>
                         <p className="text-md font-bold text-purple-600 dark:text-purple-400">
                           {t(
-                            "pages.home.hero.imageOverlay.metrics.reach.value",
+                            "app.site.home.hero.imageOverlay.metrics.reach.value",
                             { reach: 215 },
                           )}
                         </p>

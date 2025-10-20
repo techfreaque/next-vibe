@@ -23,6 +23,178 @@ export const translations = {
   health: healthTranslations,
   messages: messagesTranslations,
   sync: syncTranslations,
+  imapErrors: {
+    accounts: {
+      post: {
+        error: {
+          duplicate: {
+            title: "Account already exists",
+          },
+          server: {
+            title: "Server error creating account",
+          },
+        },
+      },
+      get: {
+        error: {
+          not_found: {
+            title: "Account not found",
+          },
+          server: {
+            title: "Server error retrieving account",
+          },
+        },
+      },
+      put: {
+        error: {
+          not_found: {
+            title: "Account not found",
+          },
+          duplicate: {
+            title: "Account with this email already exists",
+          },
+          server: {
+            title: "Server error updating account",
+          },
+        },
+      },
+      delete: {
+        error: {
+          not_found: {
+            title: "Account not found",
+          },
+          server: {
+            title: "Server error deleting account",
+          },
+        },
+        success: {
+          title: "Account deleted successfully",
+        },
+      },
+    },
+    folders: {
+      get: {
+        error: {
+          not_found: {
+            title: "Folder not found",
+          },
+          server: {
+            title: "Server error retrieving folder",
+          },
+        },
+      },
+      sync: {
+        error: {
+          missing_account: {
+            title: "Account not found for folder sync",
+          },
+        },
+      },
+    },
+    messages: {
+      get: {
+        error: {
+          not_found: {
+            title: "Message not found",
+          },
+          server: {
+            title: "Server error retrieving message",
+          },
+        },
+      },
+    },
+    connection: {
+      failed: "Connection failed",
+      timeout: {
+        title: "Connection timeout",
+      },
+      test: {
+        failed: "Connection test failed",
+      },
+      close: {
+        failed: "Failed to close connection",
+      },
+      folders: {
+        list: {
+          failed: "Failed to list folders",
+        },
+      },
+      messages: {
+        list: {
+          failed: "Failed to list messages",
+        },
+      },
+    },
+    sync: {
+      failed: "Sync failed",
+      account: {
+        failed: "Account sync failed",
+      },
+      folder: {
+        failed: "Folder sync failed",
+      },
+      message: {
+        failed: "Message sync failed",
+      },
+      post: {
+        error: {
+          server: {
+            title: "Server error during sync",
+          },
+        },
+      },
+    },
+    validation: {
+      account: {
+        username: {
+          required: "Username is required",
+        },
+        port: {
+          invalid: "Invalid port number",
+        },
+        host: {
+          invalid: "Invalid host",
+        },
+      },
+    },
+  },
+  imap: {
+    "example.com": "imap.example.com",
+    "gmail.com": "imap.gmail.com",
+    connection: {
+      test: {
+        success: "Connection test successful",
+        failed: "Connection test failed",
+        timeout: "Connection test timeout",
+      },
+    },
+    sync: {
+      messages: {
+        accounts: {
+          success: "All accounts synced successfully",
+          successWithErrors: "Accounts synced with errors",
+        },
+        account: {
+          success: "Account synced successfully",
+          successWithErrors: "Account synced with errors",
+        },
+        folders: {
+          success: "Folders synced successfully",
+          successWithErrors: "Folders synced with errors",
+        },
+        messages: {
+          success: "Messages synced successfully",
+          successWithErrors: "Messages synced with errors",
+        },
+      },
+      errors: {
+        account_failed: "Account sync failed",
+        folder_sync_failed: "Folder sync failed",
+        message_sync_error: "Message sync error",
+        message_sync_failed: "Message sync failed",
+      },
+    },
+  },
   enums: {
     syncStatus: {
       pending: "Pending",

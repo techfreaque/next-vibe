@@ -75,7 +75,10 @@ export function useLeadsImportEndpoint(
         // Trigger validation to ensure form is valid
         await form.create.form.trigger(["file", "fileName"]);
       } catch (error) {
-        logger.error("leads.import.file.processing.error", error);
+        logger.error(
+          "app.api.v1.core.leads.import.file.processing.error",
+          error,
+        );
       }
     },
     [form.create, logger],

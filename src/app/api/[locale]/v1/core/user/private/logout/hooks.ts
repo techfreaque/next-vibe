@@ -41,8 +41,8 @@ export function useLogout(logger: EndpointLogger): () => void {
   const logout = useApiMutation(logoutEndpoints.POST, logger, {
     onSuccess: async () => {
       toast({
-        title: t("auth.logout.success.title"),
-        description: t("auth.logout.success.description"),
+        title: t("app.api.v1.core.user.auth.logout.success.title"),
+        description: t("app.api.v1.core.user.auth.logout.success.description"),
         variant: "default",
       });
 
@@ -57,8 +57,8 @@ export function useLogout(logger: EndpointLogger): () => void {
     onError: async () => {
       // Even if the API call fails, we still want to log the user out locally
       toast({
-        title: t("auth.logout.success.title"),
-        description: t("auth.logout.success.description"),
+        title: t("app.api.v1.core.user.auth.logout.success.title"),
+        description: t("app.api.v1.core.user.auth.logout.success.description"),
         variant: "default",
       });
 

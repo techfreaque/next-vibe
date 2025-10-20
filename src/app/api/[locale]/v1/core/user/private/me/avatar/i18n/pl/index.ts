@@ -2,6 +2,24 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   tag: "awatar",
+  errors: {
+    user_not_found: "Użytkownik nie znaleziony",
+    failed_to_upload_avatar: "Nie udało się przesłać awatara",
+    failed_to_delete_avatar: "Nie udało się usunąć awatara",
+  },
+  debug: {
+    errorUploadingUserAvatar: "Błąd podczas przesyłania awatara użytkownika",
+    errorDeletingUserAvatar: "Błąd podczas usuwania awatara użytkownika",
+  },
+  success: {
+    uploaded: "Awatar przesłany pomyślnie",
+    deleted: "Awatar usunięty pomyślnie",
+    nextSteps: {
+      visible: "Twój awatar jest teraz widoczny w Twoim profilu",
+      update:
+        "Możesz go zaktualizować w dowolnym momencie w ustawieniach profilu",
+    },
+  },
   upload: {
     title: "Prześlij Awatar",
     description: "Prześlij zdjęcie profilowe",

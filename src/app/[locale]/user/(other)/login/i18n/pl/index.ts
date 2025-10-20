@@ -1,54 +1,35 @@
+import { translations as componentsTranslations } from "../../_components/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  post: {
-    title: "Tytuł",
-    description: "Opis endpointu",
-    form: {
-      title: "Konfiguracja",
-      description: "Skonfiguruj parametry",
+  components: componentsTranslations,
+  meta: {
+    title: "Zaloguj się - Next Vibe",
+    description: "Zaloguj się do swojego konta Next Vibe",
+    category: "Uwierzytelnianie",
+    imageAlt: "Logowanie Next Vibe",
+    keywords: "logowanie, zaloguj się, uwierzytelnianie, next vibe",
+    ogTitle: "Zaloguj się do Next Vibe",
+    ogDescription: "Uzyskaj dostęp do swojego konta Next Vibe",
+    twitterTitle: "Zaloguj się do Next Vibe",
+    twitterDescription: "Zaloguj się do swojego konta",
+  },
+  auth: {
+    login: {
+      title: "Witamy ponownie",
+      subtitle: "Zaloguj się do swojego konta, aby kontynuować",
+      signInButton: "Zaloguj się",
+      forgotPassword: "Zapomniałeś hasła?",
+      createAccount: "Utwórz konto",
+      orContinueWith: "Lub kontynuuj z",
+      emailLabel: "Adres e-mail",
+      emailPlaceholder: "Wprowadź swój e-mail",
+      passwordLabel: "Hasło",
+      passwordPlaceholder: "Wprowadź swoje hasło",
+      rememberMe: "Zapamiętaj mnie",
     },
-    response: {
-      title: "Odpowiedź",
-      description: "Dane odpowiedzi",
-    },
-    errors: {
-      unauthorized: {
-        title: "Brak autoryzacji",
-        description: "Wymagana autoryzacja",
-      },
-      validation: {
-        title: "Błąd walidacji",
-        description: "Nieprawidłowe parametry żądania",
-      },
-      server: {
-        title: "Błąd serwera",
-        description: "Wystąpił wewnętrzny błąd serwera",
-      },
-      unknown: {
-        title: "Nieznany błąd",
-        description: "Wystąpił nieznany błąd",
-      },
-      network: {
-        title: "Błąd sieci",
-        description: "Wystąpił błąd sieci",
-      },
-      forbidden: {
-        title: "Zabronione",
-        description: "Dostęp zabroniony",
-      },
-      notFound: {
-        title: "Nie znaleziono",
-        description: "Zasób nie został znaleziony",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Wystąpił konflikt danych",
-      },
-    },
-    success: {
-      title: "Sukces",
-      description: "Operacja zakończona pomyślnie",
-    },
+  },
+  login: {
+    dontHaveAccount: "Nie masz konta?",
   },
 };

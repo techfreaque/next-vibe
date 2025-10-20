@@ -104,7 +104,7 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
             >
               {/* <GlobeIcon className="h-4 w-4" /> */}
               <span className="text-sm">{currentCountry.flag}</span>
-              {t("common.selector.country")}
+              {t("app.common.selector.country")}
             </TabsTrigger>
             <TabsTrigger
               value="language"
@@ -113,7 +113,7 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
               onMouseLeave={() => setTabHover(null)}
             >
               <span className="text-sm">{currentLanguageFlag}</span>
-              {t("common.selector.language")}
+              {t("app.common.selector.language")}
             </TabsTrigger>
           </TabsList>
 

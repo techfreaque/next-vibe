@@ -134,7 +134,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.threads.threadId.messages.search.get.threadId.description" as const,
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
 
       // === REQUEST DATA ===
@@ -207,7 +207,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.threads.threadId.messages.search.get.response.results.message.id.content" as const,
               },
-              z.string().uuid(),
+              z.uuid(),
             ),
             content: responseField(
               {
@@ -222,7 +222,7 @@ const { GET } = createEndpoint({
                 type: WidgetType.BADGE,
                 text: "app.api.v1.core.agent.chat.threads.threadId.messages.search.get.response.results.message.role.content" as const,
               },
-              z.nativeEnum(ChatMessageRole),
+              z.enum(ChatMessageRole),
             ),
             rank: responseField(
               {

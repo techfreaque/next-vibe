@@ -79,4 +79,21 @@ export const translations: typeof enTranslations = {
       missing_lead_id: "Subskrypcja newslettera: Brak leadId",
     },
   },
+  errors: {
+    email_generation_failed: "Nie udało się wygenerować e-maila",
+  },
+  error: {
+    general: {
+      internal_server_error: "Wewnętrzny błąd serwera",
+    },
+    default: "Wystąpił błąd",
+  },
+  subscription: {
+    error: {
+      description: "Nie udało się zasubskrybować newslettera",
+    },
+    unsubscribe: {
+      error: "Nie udało się wypisać z newslettera",
+    },
+  },
 };

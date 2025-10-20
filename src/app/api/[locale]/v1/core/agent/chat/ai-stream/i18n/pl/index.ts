@@ -9,14 +9,53 @@ export const translations: typeof enTranslations = {
       title: "Konfiguracja czatu AI",
       description: "Skonfiguruj parametry czatu AI i wiadomości",
     },
-    messages: {
-      label: "Wiadomości",
-      description: "Wiadomości czatu do przetworzenia",
-      placeholder: "Wprowadź swoje wiadomości...",
+    operation: {
+      label: "Operacja",
+      description: "Typ operacji wiadomości",
+      options: {
+        send: "Wyślij wiadomość",
+        retry: "Ponów wiadomość",
+        edit: "Edytuj wiadomość",
+        answerAsAi: "Odpowiedz jako AI",
+      },
+    },
+    rootFolderId: {
+      label: "Folder główny",
+      description: "Kontekst folderu głównego dla wiadomości",
+    },
+    subFolderId: {
+      label: "Podfolder",
+      description: "Opcjonalny podfolder w folderze głównym",
+    },
+    threadId: {
+      label: "ID wątku",
+      description: "ID wątku (null dla nowego wątku)",
+    },
+    parentMessageId: {
+      label: "ID wiadomości nadrzędnej",
+      description: "ID wiadomości nadrzędnej dla rozgałęzienia/wątku",
+    },
+    content: {
+      label: "Treść wiadomości",
+      description: "Treść wiadomości do wysłania",
+      placeholder: "Wprowadź swoją wiadomość...",
+    },
+    role: {
+      label: "Rola",
+      description: "Rola nadawcy wiadomości",
+      options: {
+        user: "Użytkownik",
+        assistant: "Asystent",
+        system: "System",
+      },
     },
     model: {
       label: "Model",
       description: "Model AI do użycia podczas generowania",
+    },
+    persona: {
+      label: "Persona",
+      description: "Opcjonalna persona dla AI",
     },
     temperature: {
       label: "Temperatura",
@@ -35,6 +74,10 @@ export const translations: typeof enTranslations = {
       label: "Włącz wyszukiwanie internetowe",
       description:
         "Zezwól AI na przeszukiwanie sieci w poszukiwaniu aktualnych informacji",
+    },
+    resumeToken: {
+      label: "Token wznowienia",
+      description: "Token do wznowienia przerwanych strumieni",
     },
     response: {
       title: "Odpowiedź strumieniowa",
@@ -120,7 +163,11 @@ export const translations: typeof enTranslations = {
       noIdentifier: "Nie podano identyfikatora użytkownika lub leada",
       insufficientCredits:
         "Niewystarczająca liczba kredytów do wykonania żądania",
+      noResponseBody: "Nie otrzymano treści odpowiedzi ze strumienia",
     },
+  },
+  errorTypes: {
+    streamError: "Błąd strumienia",
   },
   providers: {
     uncensoredHandler: {

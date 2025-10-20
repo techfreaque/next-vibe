@@ -25,12 +25,12 @@ export async function generateMetadata({
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "not-found",
-    title: "meta.notFound.title",
-    category: "meta.notFound.category",
-    description: "meta.notFound.description",
+    title: "app.meta.notFound.title",
+    category: "app.meta.notFound.category",
+    description: "app.meta.notFound.description",
     image: "https://unbottled.ai/images/not-found.jpg",
-    imageAlt: "meta.notFound.imageAlt",
-    keywords: ["meta.notFound.keywords"],
+    imageAlt: "app.meta.notFound.imageAlt",
+    keywords: ["app.meta.notFound.keywords"],
   });
 }
 
@@ -58,7 +58,7 @@ export default async function NotFound({
                   <div className="animate-float">
                     <Image
                       src="https://illustrations.popsy.co/white/crashed-error.svg"
-                      alt={t("pages.notFound.title")}
+                      alt={t("app.pages.notFound.title")}
                       width={250}
                       height={250}
                       className="mx-auto"
@@ -73,10 +73,10 @@ export default async function NotFound({
               {/* Right side - Content */}
               <div className="p-8 md:p-10 flex flex-col justify-center">
                 <h2 className="text-3xl font-bold mb-4 text-blue-600 dark:text-blue-400">
-                  {t("pages.notFound.title")}
+                  {t("app.pages.notFound.title")}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-300 mb-8">
-                  {t("pages.notFound.description")}
+                  {t("app.pages.notFound.description")}
                 </p>
 
                 {/* Buttons */}
@@ -88,7 +88,7 @@ export default async function NotFound({
                   >
                     <Link href={`/${locale}`}>
                       <Home className="mr-2 h-4 w-4" />
-                      {t("pages.notFound.goHome")}
+                      {t("app.pages.notFound.goHome")}
                     </Link>
                   </Button>
                 </div>

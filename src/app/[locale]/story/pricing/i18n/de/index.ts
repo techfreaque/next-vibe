@@ -1,54 +1,204 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
-    form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
+  creditPricing: {
+    badge: "Flexible Preisgestaltung",
+    title: "Wählen Sie Ihren Plan",
+    subtitle:
+      "Zahlen Sie nur für das, was Sie nutzen, oder wählen Sie unbegrenzt",
+    subscription: {
+      badge: "Am beliebtesten",
+      title: "Unbegrenzt",
+      price: "€10",
+      perMonth: "/Monat",
+      description: "Bestes Preis-Leistungs-Verhältnis für Power-User",
+      expiryInfo: "Monatlich abgerechnet, jederzeit kündbar",
+      features: {
+        credits: "Unbegrenzte Nachrichten",
+        allModels: "Alle 40+ KI-Modelle",
+        allFeatures: "Alle Funktionen enthalten",
+        cancel: "Jederzeit kündbar",
+      },
+      button: "Jetzt abonnieren",
     },
-    response: {
-      title: "Antwort",
-      description: "Antwortdaten",
+    creditPack: {
+      badge: "Pay-as-you-go",
+      title: "Guthaben-Paket",
+      price: "€5",
+      description: "Perfekt für gelegentliche Nutzung",
+      permanentInfo: "Guthaben verfallen nie",
+      quantityLabel: "Anzahl der Pakete",
+      pricePerPack: "€5 pro Paket",
+      features: {
+        credits: "€5 Guthaben-Paket",
+        allModels: "Alle KI-Modelle enthalten",
+        allFeatures: "Alle Funktionen enthalten",
+        multiple: "Mehrere Pakete kaufen",
+      },
+      button: "Guthaben kaufen",
+      buttonPlural: "{{quantity}} Guthaben-Pakete kaufen",
     },
-    errors: {
-      unauthorized: {
-        title: "Nicht autorisiert",
-        description: "Authentifizierung erforderlich",
+    common: {
+      processing: "Wird verarbeitet...",
+    },
+    costTransparency: {
+      title: "Kostentransparenz",
+      card: {
+        title: "Modellkosten",
+        description:
+          "Sehen Sie genau, wie viele Credits jedes KI-Modell pro Nachricht kostet",
       },
-      validation: {
-        title: "Validierungsfehler",
-        description: "Ungültige Anfrageparameter",
-      },
-      server: {
-        title: "Serverfehler",
-        description: "Interner Serverfehler",
-      },
-      unknown: {
-        title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist aufgetreten",
-      },
-      network: {
-        title: "Netzwerkfehler",
-        description: "Netzwerkfehler aufgetreten",
-      },
-      forbidden: {
-        title: "Verboten",
-        description: "Zugriff verboten",
-      },
-      notFound: {
-        title: "Nicht gefunden",
-        description: "Ressource nicht gefunden",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Datenkonflikt aufgetreten",
+      table: {
+        provider: "Anbieter",
+        model: "Modell",
+        costPerMessage: "Kosten pro Nachricht",
+        free: "Kostenlos",
+        credits: "{{count}} Guthaben",
+        creditsPlural: "{{count}} Guthaben",
+        parameters: "{{count}} Parameter",
+        features: "Funktionen",
+        braveSearch: "Brave-Suche",
+        braveSearchCost: "1 Guthaben",
+        tts: "Text-zu-Sprache",
+        ttsCost: "1 Guthaben",
+        stt: "Sprache-zu-Text",
+        sttCost: "1 Guthaben",
       },
     },
-    success: {
-      title: "Erfolg",
-      description: "Vorgang erfolgreich abgeschlossen",
+    calculator: {
+      title: "Guthaben-Rechner",
+      card: {
+        title: "Schätzen Sie Ihre Nutzung",
+        description:
+          "Berechnen Sie, wie viele Credits Sie basierend auf Ihrer Nutzung benötigen",
+      },
+      messagesLabel: "Nachrichten pro Monat",
+      estimates: {
+        free: "Kostenlose Stufe (10 Nachrichten/Tag)",
+        freeCredits: "€0",
+        basic: "Basis-Modelle (GPT-3.5, Claude Haiku)",
+        basicCredits: "~€{{count}}",
+        pro: "Pro-Modelle (GPT-4, Claude Sonnet)",
+        proCredits: "~€{{count}}",
+        premium: "Premium-Modelle (GPT-4 Turbo, Claude Opus)",
+        premiumCredits: "~€{{count}}",
+      },
+      recommendation: {
+        title: "Unsere Empfehlung",
+        freeTier:
+          "Beginnen Sie mit unserer kostenlosen Stufe, um die Plattform auszuprobieren!",
+        subscription:
+          "Abonnieren Sie für unbegrenzte Nachrichten (€10/Monat deckt bis zu €{{credits}} Nutzung ab)",
+        additionalPacks:
+          "Abonnieren + {{packs}} zusätzliche(s) Guthaben-Paket(e) für intensive Nutzung kaufen",
+      },
     },
+    freeTier: {
+      title: "Probieren Sie es zuerst kostenlos!",
+      description:
+        "Erhalten Sie 10 kostenlose Nachrichten pro Tag, um alle unsere KI-Modelle zu erkunden. Keine Kreditkarte erforderlich.",
+      button: "Kostenlose Testversion starten",
+    },
+    buttons: {
+      upgrade: "Upgrade",
+      downgrade: "Downgrade",
+      currentPlan: "Aktueller Plan",
+      processing: "Wird verarbeitet...",
+    },
+  },
+  comparison: {
+    title: "Einfache, transparente Preisgestaltung",
+    subtitle: "Wählen Sie den Plan, der am besten zu Ihnen passt",
+    monthly: "Monatlich",
+    annually: "Jährlich",
+    customNote:
+      "Benötigen Sie einen individuellen Plan? Kontaktieren Sie uns für Enterprise-Preise.",
+  },
+  plans: {
+    title: "Wählen Sie Ihren Plan",
+    subtitle: "Wählen Sie den perfekten Plan für Ihre Bedürfnisse",
+    badge: "Beliebt",
+    flexibleBadge: "Flexibel",
+    supportBadge: "24/7 Support",
+    guaranteeBadge: "Geld-zurück-Garantie",
+    orSeparator: "oder",
+    customSolutionText: "Benötigen Sie eine individuelle Lösung?",
+    tailoredPackageText:
+      "Wir können ein maßgeschneidertes Paket für Ihre spezifischen Bedürfnisse erstellen",
+    monthly: "Monatlich",
+    annually: "Jährlich",
+    savePercent: "{{percent}}% sparen",
+    perMonth: "/Monat",
+    contactUsLink: "Kontaktieren Sie uns",
+    STARTER: {
+      name: "Kostenlos",
+      price: "€0",
+      description: "Perfekt zum Ausprobieren von Unbottled.ai",
+      cta: "Jetzt starten",
+      features: [
+        "10 Nachrichten pro Tag",
+        "Zugriff auf alle 40+ KI-Modelle",
+        "Basis-Ordnerverwaltung",
+        "Community-Personas",
+      ],
+    },
+    PROFESSIONAL: {
+      name: "Guthaben-Paket",
+      price: "€5",
+      description: "Pay-as-you-go mit Guthaben-Paketen",
+      cta: "Guthaben kaufen",
+      features: [
+        "€5 Guthaben-Paket",
+        "Guthaben verfallen nie",
+        "Alle KI-Modelle enthalten",
+        "Krypto-Zahlung akzeptiert",
+        "Kein Abonnement erforderlich",
+      ],
+    },
+    PREMIUM: {
+      name: "Unbegrenzt",
+      price: "€10",
+      description: "Bestes Preis-Leistungs-Verhältnis für Power-User",
+      cta: "Jetzt abonnieren",
+      featureBadge: "Am beliebtesten",
+      features: [
+        "Unbegrenzte Nachrichten",
+        "Alle 40+ KI-Modelle",
+        "Erweiterte Ordnerverwaltung",
+        "Benutzerdefinierte Personas",
+        "Prioritäts-Support",
+        "Früher Zugang zu neuen Funktionen",
+      ],
+    },
+    ENTERPRISE: {
+      name: "Enterprise",
+      price: "Individuell",
+      description: "Für Teams und Unternehmen",
+      cta: "Vertrieb kontaktieren",
+      featureBadge: "Enterprise",
+      features: [
+        "Individuelle Preisgestaltung",
+        "Dedizierter Support",
+        "SLA-Garantien",
+        "White-Label-Optionen",
+        "Benutzerdefinierte KI-Modell-Integration",
+        "Team-Verwaltung",
+      ],
+    },
+  },
+  currentPlan: {
+    badge: "Aktueller Plan",
+  },
+  upgrade: {
+    processing: "Upgrade wird verarbeitet...",
+  },
+  subscribe: {
+    processing: "Abonnement wird verarbeitet...",
+  },
+  downgrade: {
+    title: "Plan herabstufen",
+    description: "Sind Sie sicher, dass Sie Ihren Plan herabstufen möchten?",
+    nextCycle:
+      "Änderungen werden am Ende Ihres aktuellen Abrechnungszeitraums wirksam",
   },
 };

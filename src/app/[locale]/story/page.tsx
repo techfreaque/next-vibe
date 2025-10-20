@@ -31,16 +31,16 @@ export async function generateMetadata({
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "",
-    title: "meta.home.title",
-    category: "meta.home.category",
-    description: "meta.home.description",
+    title: "app.meta.home.title",
+    category: "app.meta.home.category",
+    description: "app.meta.home.description",
     image: "https://unbottled.ai/images/home-hero.jpg",
-    imageAlt: "meta.home.imageAlt",
-    keywords: ["meta.home.keywords"],
+    imageAlt: "app.meta.home.imageAlt",
+    keywords: ["app.meta.home.keywords"],
     additionalMetadata: {
       openGraph: {
-        title: "meta.home.ogTitle",
-        description: "meta.home.ogDescription",
+        title: "app.meta.home.ogTitle",
+        description: "app.meta.home.ogDescription",
         url: `https://unbottled.ai/${locale}`,
         type: "website",
         images: [
@@ -48,14 +48,14 @@ export async function generateMetadata({
             url: "https://unbottled.ai/images/home-hero.jpg",
             width: 1200,
             height: 630,
-            alt: "meta.home.imageAlt",
+            alt: "app.meta.home.imageAlt",
           },
         ],
       },
       twitter: {
         card: "summary_large_image",
-        title: "meta.home.twitterTitle",
-        description: "meta.home.twitterDescription",
+        title: "app.meta.home.twitterTitle",
+        description: "app.meta.home.twitterDescription",
         images: ["https://unbottled.ai/images/home-hero.jpg"],
       },
     },

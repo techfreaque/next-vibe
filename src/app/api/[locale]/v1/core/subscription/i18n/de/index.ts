@@ -20,10 +20,18 @@ export const translations: typeof enTranslations = {
 
   // Subscription plans
   plans: {
-    starter: "Starter-Plan",
-    professional: "Professional-Plan",
-    premium: "Premium-Plan",
-    enterprise: "Enterprise-Plan",
+    starter: {
+      title: "Starter-Plan",
+    },
+    professional: {
+      title: "Professional-Plan",
+    },
+    premium: {
+      title: "Premium-Plan",
+    },
+    enterprise: {
+      title: "Enterprise-Plan",
+    },
   },
 
   // Billing intervals
@@ -141,6 +149,10 @@ export const translations: typeof enTranslations = {
       title: "Nicht gefunden",
       description: "Abonnement nicht gefunden",
     },
+    server: {
+      title: "Serverfehler",
+      description: "Interner Serverfehler aufgetreten",
+    },
     serverError: {
       title: "Serverfehler",
       description: "Interner Serverfehler aufgetreten",
@@ -157,12 +169,65 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Datenkonflikt aufgetreten",
     },
+    user_not_found: "Benutzer nicht gefunden",
+    stripe_customer_creation_failed:
+      "Stripe-Kunde konnte nicht erstellt werden",
   },
 
   // Success types
   success: {
     title: "Erfolg",
     description: "Vorgang erfolgreich abgeschlossen",
+  },
+
+  // Status translations
+  status: {
+    incomplete: "Unvollständig",
+    incomplete_expired: "Unvollständig abgelaufen",
+    trialing: "Testphase",
+    active: "Aktiv",
+    pastDue: "Überfällig",
+    canceled: "Gekündigt",
+    unpaid: "Unbezahlt",
+    paused: "Pausiert",
+  },
+
+  // Email translations
+  email: {
+    success: {
+      title: "Abonnement erfolgreich!",
+      subject: "Willkommen zu Ihrem Abonnement!",
+      previewText: "Willkommen zu Ihrem neuen Abonnement",
+      welcomeMessage: "Willkommen zu Ihrem Abonnement!",
+      description: "Vielen Dank für Ihr Abonnement bei {{appName}}",
+      nextSteps: {
+        title: "Nächste Schritte",
+        description: "Das können Sie als Nächstes tun",
+        cta: "Jetzt starten",
+      },
+      support: {
+        title: "Benötigen Sie Hilfe?",
+        description: "Unser Support-Team hilft Ihnen gerne weiter",
+        cta: "Support kontaktieren",
+      },
+      footer: {
+        message: "Vielen Dank, dass Sie sich für uns entschieden haben!",
+        signoff: "Mit freundlichen Grüßen, Das Team",
+      },
+    },
+    admin_notification: {
+      title: "Neues Abonnement",
+      subject: "Neues Abonnement - Admin-Benachrichtigung",
+      preview: "Ein neues Abonnement wurde erstellt",
+      message: "Ein neues Abonnement wurde erstellt",
+      details: "Abonnement-Details",
+      user_name: "Benutzername",
+      user_email: "Benutzer-E-Mail",
+      plan: "Plan",
+      status: "Status",
+      contact_user: "Benutzer kontaktieren",
+      footer: "Dies ist eine automatische Benachrichtigung",
+    },
   },
 
   // Enum translations

@@ -61,23 +61,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, jobId } = await params;
   return metadataGenerator(locale, {
     path: `careers/${jobId}`,
-    title: "meta.careers.title",
-    description: "meta.careers.description",
-    category: "meta.careers.category",
+    title: "app.meta.careers.title",
+    description: "app.meta.careers.description",
+    category: "app.meta.careers.category",
     image: "https://unbottled.ai/images/careers-hero.jpg",
-    imageAlt: "meta.careers.imageAlt",
-    keywords: ["meta.careers.keywords"],
+    imageAlt: "app.meta.careers.imageAlt",
+    keywords: ["app.meta.careers.keywords"],
     additionalMetadata: {
       openGraph: {
-        title: "meta.careers.ogTitle",
-        description: "meta.careers.ogDescription",
+        title: "app.meta.careers.ogTitle",
+        description: "app.meta.careers.ogDescription",
         url: `https://unbottled.ai/${locale}/careers/${jobId}`,
         type: "website",
       },
       twitter: {
         card: "summary_large_image",
-        title: "meta.careers.twitterTitle",
-        description: "meta.careers.twitterDescription",
+        title: "app.meta.careers.twitterTitle",
+        description: "app.meta.careers.twitterDescription",
       },
     },
   });
@@ -92,66 +92,66 @@ export default async function JobPostingPage({
   // Mock job data - in a real app, this would come from an API or database
   const jobs = {
     socialMediaManager: {
-      title: t("pages.careers.jobs.socialMediaManager.title"),
+      title: t("app.site.careers.jobs.socialMediaManager.title"),
       shortDescription: t(
-        "pages.careers.jobs.socialMediaManager.shortDescription",
+        "app.site.careers.jobs.socialMediaManager.shortDescription",
       ),
       longDescription: t(
-        "pages.careers.jobs.socialMediaManager.longDescription",
+        "app.site.careers.jobs.socialMediaManager.longDescription",
       ),
       responsibilities: {
         item1: t(
-          "pages.careers.jobs.socialMediaManager.responsibilities.item1",
+          "app.site.careers.jobs.socialMediaManager.responsibilities.item1",
         ),
         item2: t(
-          "pages.careers.jobs.socialMediaManager.responsibilities.item2",
+          "app.site.careers.jobs.socialMediaManager.responsibilities.item2",
         ),
         item3: t(
-          "pages.careers.jobs.socialMediaManager.responsibilities.item3",
+          "app.site.careers.jobs.socialMediaManager.responsibilities.item3",
         ),
         item4: t(
-          "pages.careers.jobs.socialMediaManager.responsibilities.item4",
+          "app.site.careers.jobs.socialMediaManager.responsibilities.item4",
         ),
         item5: t(
-          "pages.careers.jobs.socialMediaManager.responsibilities.item5",
+          "app.site.careers.jobs.socialMediaManager.responsibilities.item5",
         ),
       },
       requirements: {
-        item1: t("pages.careers.jobs.socialMediaManager.requirements.item1"),
-        item2: t("pages.careers.jobs.socialMediaManager.requirements.item2"),
-        item3: t("pages.careers.jobs.socialMediaManager.requirements.item3"),
-        item4: t("pages.careers.jobs.socialMediaManager.requirements.item4"),
-        item5: t("pages.careers.jobs.socialMediaManager.requirements.item5"),
+        item1: t("app.site.careers.jobs.socialMediaManager.requirements.item1"),
+        item2: t("app.site.careers.jobs.socialMediaManager.requirements.item2"),
+        item3: t("app.site.careers.jobs.socialMediaManager.requirements.item3"),
+        item4: t("app.site.careers.jobs.socialMediaManager.requirements.item4"),
+        item5: t("app.site.careers.jobs.socialMediaManager.requirements.item5"),
       },
       qualifications: {
         required: {
           item1: t(
-            "pages.careers.jobs.socialMediaManager.qualifications.required.item1",
+            "app.site.careers.jobs.socialMediaManager.qualifications.required.item1",
           ),
           item2: t(
-            "pages.careers.jobs.socialMediaManager.qualifications.required.item2",
+            "app.site.careers.jobs.socialMediaManager.qualifications.required.item2",
           ),
           item3: t(
-            "pages.careers.jobs.socialMediaManager.qualifications.required.item3",
+            "app.site.careers.jobs.socialMediaManager.qualifications.required.item3",
           ),
         },
         preferred: {
           item1: t(
-            "pages.careers.jobs.socialMediaManager.qualifications.preferred.item1",
+            "app.site.careers.jobs.socialMediaManager.qualifications.preferred.item1",
           ),
           item2: t(
-            "pages.careers.jobs.socialMediaManager.qualifications.preferred.item2",
+            "app.site.careers.jobs.socialMediaManager.qualifications.preferred.item2",
           ),
           item3: t(
-            "pages.careers.jobs.socialMediaManager.qualifications.preferred.item3",
+            "app.site.careers.jobs.socialMediaManager.qualifications.preferred.item3",
           ),
         },
       },
-      location: t("pages.careers.jobs.socialMediaManager.location"),
-      department: t("pages.careers.jobs.socialMediaManager.department"),
-      type: t("pages.careers.jobs.socialMediaManager.type"),
+      location: t("app.site.careers.jobs.socialMediaManager.location"),
+      department: t("app.site.careers.jobs.socialMediaManager.department"),
+      type: t("app.site.careers.jobs.socialMediaManager.type"),
       experienceLevel: t(
-        "pages.careers.jobs.socialMediaManager.experienceLevel",
+        "app.site.careers.jobs.socialMediaManager.experienceLevel",
       ),
       // current date - 2.5 weeks
       postedDate: new Date(
@@ -163,54 +163,60 @@ export default async function JobPostingPage({
       ).toLocaleDateString(locale),
     },
     contentCreator: {
-      title: t("pages.careers.jobs.contentCreator.title"),
-      shortDescription: t("pages.careers.jobs.contentCreator.shortDescription"),
-      longDescription: t("pages.careers.jobs.contentCreator.longDescription"),
+      title: t("app.site.careers.jobs.contentCreator.title"),
+      shortDescription: t(
+        "app.site.careers.jobs.contentCreator.shortDescription",
+      ),
+      longDescription: t(
+        "app.site.careers.jobs.contentCreator.longDescription",
+      ),
       responsibilities: {
-        item1: t("pages.careers.jobs.contentCreator.responsibilities.item1"),
-        item2: t("pages.careers.jobs.contentCreator.responsibilities.item2"),
-        item3: t("pages.careers.jobs.contentCreator.responsibilities.item3"),
-        item4: t("pages.careers.jobs.contentCreator.responsibilities.item4"),
-        item5: t("pages.careers.jobs.contentCreator.responsibilities.item5"),
+        item1: t("app.site.careers.jobs.contentCreator.responsibilities.item1"),
+        item2: t("app.site.careers.jobs.contentCreator.responsibilities.item2"),
+        item3: t("app.site.careers.jobs.contentCreator.responsibilities.item3"),
+        item4: t("app.site.careers.jobs.contentCreator.responsibilities.item4"),
+        item5: t("app.site.careers.jobs.contentCreator.responsibilities.item5"),
       },
       requirements: {
-        item1: t("pages.careers.jobs.contentCreator.requirements.item1"),
-        item2: t("pages.careers.jobs.contentCreator.requirements.item2"),
-        item3: t("pages.careers.jobs.contentCreator.requirements.item3"),
-        item4: t("pages.careers.jobs.contentCreator.requirements.item4"),
-        item5: t("pages.careers.jobs.contentCreator.requirements.item5"),
+        item1: t("app.site.careers.jobs.contentCreator.requirements.item1"),
+        item2: t("app.site.careers.jobs.contentCreator.requirements.item2"),
+        item3: t("app.site.careers.jobs.contentCreator.requirements.item3"),
+        item4: t("app.site.careers.jobs.contentCreator.requirements.item4"),
+        item5: t("app.site.careers.jobs.contentCreator.requirements.item5"),
       },
       qualifications: {
         required: {
           item1: t(
-            "pages.careers.jobs.contentCreator.qualifications.required.item1",
+            "app.site.careers.jobs.contentCreator.qualifications.required.item1",
           ),
           item2: t(
-            "pages.careers.jobs.contentCreator.qualifications.required.item2",
+            "app.site.careers.jobs.contentCreator.qualifications.required.item2",
           ),
           item3: t(
-            "pages.careers.jobs.contentCreator.qualifications.required.item3",
+            "app.site.careers.jobs.contentCreator.qualifications.required.item3",
           ),
         },
         preferred: {
           item1: t(
-            "pages.careers.jobs.contentCreator.qualifications.preferred.item1",
+            "app.site.careers.jobs.contentCreator.qualifications.preferred.item1",
           ),
           item2: t(
-            "pages.careers.jobs.contentCreator.qualifications.preferred.item2",
+            "app.site.careers.jobs.contentCreator.qualifications.preferred.item2",
           ),
           item3: t(
-            "pages.careers.jobs.contentCreator.qualifications.preferred.item3",
+            "app.site.careers.jobs.contentCreator.qualifications.preferred.item3",
           ),
         },
       },
-      location: t("pages.careers.jobs.contentCreator.location"),
-      department: t("pages.careers.jobs.contentCreator.department"),
-      type: t("pages.careers.jobs.contentCreator.type"),
-      experienceLevel: t("pages.careers.jobs.contentCreator.experienceLevel"),
-      postedDate: t("pages.careers.jobs.contentCreator.postedDate"),
+      location: t("app.site.careers.jobs.contentCreator.location"),
+      department: t("app.site.careers.jobs.contentCreator.department"),
+      type: t("app.site.careers.jobs.contentCreator.type"),
+      experienceLevel: t(
+        "app.site.careers.jobs.contentCreator.experienceLevel",
+      ),
+      postedDate: t("app.site.careers.jobs.contentCreator.postedDate"),
       applicationDeadline: t(
-        "pages.careers.jobs.contentCreator.applicationDeadline",
+        "app.site.careers.jobs.contentCreator.applicationDeadline",
       ),
     },
   };
@@ -233,7 +239,7 @@ export default async function JobPostingPage({
           >
             <Link href={`/${locale}/careers`}>
               <ArrowLeft className="h-4 w-4" />
-              <span>{t("pages.careers.openPositions")}</span>
+              <span>{t("app.site.careers.openPositions")}</span>
             </Link>
           </Button>
         </div>
@@ -250,7 +256,7 @@ export default async function JobPostingPage({
               <div className="space-y-8">
                 <section>
                   <h2 className="text-2xl font-bold mb-4">
-                    {t("pages.careers.jobDetail.jobOverview")}
+                    {t("app.site.careers.jobDetail.jobOverview")}
                   </h2>
                   <p className="text-gray-700 dark:text-gray-300">
                     {job.longDescription}
@@ -259,7 +265,7 @@ export default async function JobPostingPage({
 
                 <section>
                   <h2 className="text-2xl font-bold mb-4">
-                    {t("pages.careers.jobDetail.responsibilities")}
+                    {t("app.site.careers.jobDetail.responsibilities")}
                   </h2>
                   <ul className="list-disc pl-6 space-y-2">
                     {Object.values(job.responsibilities).map(
@@ -277,7 +283,7 @@ export default async function JobPostingPage({
 
                 <section>
                   <h2 className="text-2xl font-bold mb-4">
-                    {t("pages.careers.jobDetail.requirements")}
+                    {t("app.site.careers.jobDetail.requirements")}
                   </h2>
                   <ul className="list-disc pl-6 space-y-2">
                     {Object.values(job.requirements).map(
@@ -295,11 +301,11 @@ export default async function JobPostingPage({
 
                 <section>
                   <h2 className="text-2xl font-bold mb-4">
-                    {t("pages.careers.jobDetail.qualifications")}
+                    {t("app.site.careers.jobDetail.qualifications")}
                   </h2>
 
                   <h3 className="text-xl font-semibold mb-2">
-                    {t("pages.careers.jobDetail.qualificationsRequired")}
+                    {t("app.site.careers.jobDetail.qualificationsRequired")}
                   </h3>
                   <ul className="list-disc pl-6 space-y-2 mb-4">
                     {Object.values(job.qualifications.required).map(
@@ -315,7 +321,7 @@ export default async function JobPostingPage({
                   </ul>
 
                   <h3 className="text-xl font-semibold mb-2">
-                    {t("pages.careers.jobDetail.qualificationsPreferred")}
+                    {t("app.site.careers.jobDetail.qualificationsPreferred")}
                   </h3>
                   <ul className="list-disc pl-6 space-y-2">
                     {Object.values(job.qualifications.preferred).map(
@@ -333,46 +339,46 @@ export default async function JobPostingPage({
 
                 <section>
                   <h2 className="text-2xl font-bold mb-4">
-                    {t("pages.careers.benefits.title")}
+                    {t("app.site.careers.benefits.title")}
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Card>
                       <CardContent className="p-4">
                         <h3 className="font-semibold mb-2">
-                          {t("pages.careers.benefits.growthTitle")}
+                          {t("app.site.careers.benefits.growthTitle")}
                         </h3>
                         <p className="text-sm text-gray-700 dark:text-gray-300">
-                          {t("pages.careers.benefits.growthDesc")}
+                          {t("app.site.careers.benefits.growthDesc")}
                         </p>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4">
                         <h3 className="font-semibold mb-2">
-                          {t("pages.careers.benefits.meaningfulTitle")}
+                          {t("app.site.careers.benefits.meaningfulTitle")}
                         </h3>
                         <p className="text-sm text-gray-700 dark:text-gray-300">
-                          {t("pages.careers.benefits.meaningfulDesc")}
+                          {t("app.site.careers.benefits.meaningfulDesc")}
                         </p>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4">
                         <h3 className="font-semibold mb-2">
-                          {t("pages.careers.benefits.balanceTitle")}
+                          {t("app.site.careers.benefits.balanceTitle")}
                         </h3>
                         <p className="text-sm text-gray-700 dark:text-gray-300">
-                          {t("pages.careers.benefits.balanceDesc")}
+                          {t("app.site.careers.benefits.balanceDesc")}
                         </p>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4">
                         <h3 className="font-semibold mb-2">
-                          {t("pages.careers.benefits.compensationTitle")}
+                          {t("app.site.careers.benefits.compensationTitle")}
                         </h3>
                         <p className="text-sm text-gray-700 dark:text-gray-300">
-                          {t("pages.careers.benefits.compensationDesc")}
+                          {t("app.site.careers.benefits.compensationDesc")}
                         </p>
                       </CardContent>
                     </Card>
@@ -386,37 +392,37 @@ export default async function JobPostingPage({
                 <Card>
                   <CardContent className="p-6">
                     <h3 className="text-xl font-bold mb-4">
-                      {t("pages.careers.jobDetail.applyNow")}
+                      {t("app.site.careers.jobDetail.applyNow")}
                     </h3>
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div className="text-gray-500 dark:text-gray-400">
-                          {t("pages.careers.jobDetail.location")}:
+                          {t("app.site.careers.jobDetail.location")}:
                         </div>
                         <div className="font-medium">{job.location}</div>
 
                         <div className="text-gray-500 dark:text-gray-400">
-                          {t("pages.careers.jobDetail.department")}:
+                          {t("app.site.careers.jobDetail.department")}:
                         </div>
                         <div className="font-medium">{job.department}</div>
 
                         <div className="text-gray-500 dark:text-gray-400">
-                          {t("pages.careers.jobDetail.employmentType")}:
+                          {t("app.site.careers.jobDetail.employmentType")}:
                         </div>
                         <div className="font-medium">{job.type}</div>
 
                         <div className="text-gray-500 dark:text-gray-400">
-                          {t("pages.careers.jobDetail.experienceLevel")}:
+                          {t("app.site.careers.jobDetail.experienceLevel")}:
                         </div>
                         <div className="font-medium">{job.experienceLevel}</div>
 
                         <div className="text-gray-500 dark:text-gray-400">
-                          {t("pages.careers.jobDetail.postedDate")}:
+                          {t("app.site.careers.jobDetail.postedDate")}:
                         </div>
                         <div className="font-medium">{job.postedDate}</div>
 
                         <div className="text-gray-500 dark:text-gray-400">
-                          {t("pages.careers.jobDetail.applicationDeadline")}:
+                          {t("app.site.careers.jobDetail.applicationDeadline")}:
                         </div>
                         <div className="font-medium">
                           {job.applicationDeadline}
@@ -429,7 +435,7 @@ export default async function JobPostingPage({
                         <Link
                           href={`mailto:${contactClientRepository.getSupportEmail(locale)}?subject=Application for ${job.title}`}
                         >
-                          {t("pages.careers.applyNow")}
+                          {t("app.site.careers.applyNow")}
                         </Link>
                       </Button>
                     </div>
@@ -439,7 +445,7 @@ export default async function JobPostingPage({
                 <Card>
                   <CardContent className="p-6">
                     <h3 className="text-lg font-bold mb-4">
-                      {t("pages.careers.jobDetail.relatedPositions")}
+                      {t("app.site.careers.jobDetail.relatedPositions")}
                     </h3>
                     <div className="space-y-3">
                       {Object.entries(jobs)

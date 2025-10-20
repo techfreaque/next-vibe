@@ -26,9 +26,15 @@ export default function TrackPage(): React.ReactElement {
 
     const handleTracking = async (): Promise<void> => {
       try {
+        // Create logger for tracking operations
+        const logger = LeadTrackingClientRepository.createLogger(locale);
+
         // Process tracking parameters using client repository
         const validationResult =
-          LeadTrackingClientRepository.validateTrackingParams(searchParams);
+          LeadTrackingClientRepository.validateTrackingParams(
+            searchParams,
+            logger,
+          );
 
         if (!validationResult.success) {
           errorLogger("Invalid tracking parameters", {
@@ -58,7 +64,10 @@ export default function TrackPage(): React.ReactElement {
 
         if (isMounted) {
           // Store tracking data for signup form
-          await LeadTrackingClientRepository.captureTrackingData(searchParams);
+          await LeadTrackingClientRepository.captureTrackingData(
+            searchParams,
+            logger,
+          );
 
           // Make a direct request to the consolidated engagement endpoint for click tracking
           const trackingUrl = generateEngagementTrackingApiUrl(
@@ -118,7 +127,7 @@ export default function TrackPage(): React.ReactElement {
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
         <p className="text-gray-600 dark:text-gray-400">
-          {t("tracking.redirecting")}
+          {t("app.track.tracking.redirecting")}
         </p>
       </div>
     </div>

@@ -31,7 +31,7 @@ import { ImapLoggingLevel } from "./enum";
  * Default IMAP Configuration (matches API definition shape)
  */
 const DEFAULT_IMAP_CONFIG = {
-  host: "imap.gmail.com",
+  host: "app.api.v1.core.emails.imapClient.imap.gmail.com",
   port: 993,
   username: "",
   password: "",

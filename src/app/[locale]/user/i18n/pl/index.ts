@@ -1,24 +1,39 @@
+import { translations as componentsTranslations } from "../../_components/i18n/pl";
+import { translations as otherTranslations } from "../../(other)/i18n/pl";
+import { translations as authTranslations } from "../../auth/i18n/pl";
+import { translations as signupTranslations } from "../../signup/i18n/pl";
+import { translations as userTranslations } from "../../user/i18n/pl";
 import type { translations as enTranslations } from "../en";
-import { translations as authClientTranslations } from "./authClient";
-import { translations as loginTranslations } from "./login";
-import { translations as resetPasswordTranslations } from "./resetPassword";
-import { translations as sessionTranslations } from "./session";
-import { translations as userAvatarTranslations } from "./userAvatar";
-import { translations as userMeTranslations } from "./userMe";
-import { translations as userPasswordTranslations } from "./userPassword";
-import { translations as authTranslations } from "./auth";
-import { translations as authErrorsTranslations } from "./authErrors";
-import { translations as userTranslations } from "./user";
 
 export const translations: typeof enTranslations = {
   auth: authTranslations,
-  authClient: authClientTranslations,
-  authErrors: authErrorsTranslations,
-  login: loginTranslations,
-  resetPassword: resetPasswordTranslations,
-  session: sessionTranslations,
+  components: componentsTranslations,
+  other: otherTranslations,
+  signup: signupTranslations,
   user: userTranslations,
-  userAvatar: userAvatarTranslations,
-  userMe: userMeTranslations,
-  userPassword: userPasswordTranslations,
+  common: {
+    appName: "Next Vibe",
+    backToHome: "Powrót do strony głównej",
+    loading: "Ładowanie...",
+    error: {
+      title: "Błąd",
+    },
+    footer: {
+      copyright: "© 2024 Next Vibe. Wszelkie prawa zastrzeżone.",
+      terms: "Warunki korzystania z usługi",
+    },
+  },
+  meta: {
+    profile: {
+      title: "Profil użytkownika - Next Vibe",
+      description: "Zarządzaj swoim kontem Next Vibe i preferencjami",
+      category: "Konto użytkownika",
+      imageAlt: "Profil użytkownika",
+      keywords: "profil, konto, ustawienia, next vibe",
+      ogTitle: "Twój profil Next Vibe",
+      ogDescription: "Zarządzaj swoim kontem i preferencjami",
+      twitterTitle: "Twój profil Next Vibe",
+      twitterDescription: "Zarządzaj swoim kontem i preferencjami",
+    },
+  },
 };

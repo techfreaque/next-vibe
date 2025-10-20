@@ -164,7 +164,7 @@ const { GET } = createEndpoint({
           options: SortOrderOptions,
           layout: { columns: 2 },
         },
-        z.nativeEnum(SortOrder).default(SortOrder.DESC),
+        z.enum(SortOrder).default(SortOrder.DESC),
       ),
 
       // === RESPONSE FIELDS ===
@@ -247,7 +247,7 @@ const { GET } = createEndpoint({
                 type: WidgetType.BADGE,
                 text: "app.api.v1.core.emails.imapClient.accounts.list.response.accounts.item.authMethod",
               },
-              z.nativeEnum(ImapAuthMethod),
+              z.enum(ImapAuthMethod),
             ),
             connectionTimeout: responseField(
               {
@@ -308,7 +308,7 @@ const { GET } = createEndpoint({
                 type: WidgetType.BADGE,
                 text: "app.api.v1.core.emails.imapClient.accounts.list.response.accounts.item.syncStatus",
               },
-              z.nativeEnum(ImapSyncStatus),
+              z.enum(ImapSyncStatus),
             ),
             syncError: responseField(
               {
@@ -478,7 +478,7 @@ const { GET } = createEndpoint({
             id: "123e4567-e89b-12d3-a456-426614174000",
             name: "Gmail Account",
             email: "user@gmail.com",
-            host: "imap.gmail.com",
+            host: "app.api.v1.core.emails.imapClient.imap.gmail.com",
             port: 993,
             secure: true,
             username: "user@gmail.com",

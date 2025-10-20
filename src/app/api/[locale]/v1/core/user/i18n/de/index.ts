@@ -52,6 +52,20 @@ export const translations: typeof enTranslations = {
   },
   errors: {
     emailAlreadyInUse: "E-Mail-Adresse wird bereits verwendet",
+    locale_required: "Locale ist erforderlich",
+    auth_required: "Authentifizierung ist erforderlich",
+    auth_retrieval_failed: "Authentifizierung konnte nicht abgerufen werden",
+    not_found: "Benutzer nicht gefunden",
+    roles_lookup_failed: "Benutzerrollen konnten nicht abgerufen werden",
+    id_lookup_failed: "Benutzer konnte nicht über ID gefunden werden",
+    email_lookup_failed: "Benutzer konnte nicht über E-Mail gefunden werden",
+    email_check_failed: "E-Mail-Prüfung fehlgeschlagen",
+    email_duplicate_check_failed: "Duplikat-E-Mail-Prüfung fehlgeschlagen",
+    search_failed: "Benutzersuche fehlgeschlagen",
+    email_already_in_use: "E-Mail-Adresse wird bereits verwendet",
+    creation_failed: "Benutzer konnte nicht erstellt werden",
+    no_data_returned: "Keine Daten von der Datenbank zurückgegeben",
+    password_hashing_failed: "Passwort-Hashing fehlgeschlagen",
   },
   notifications: {
     profileUpdated: {

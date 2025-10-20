@@ -2,51 +2,20 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   errors: {
-    token_generation_failed: {
-      title: "Token-Generierung fehlgeschlagen",
-      description: "Authentifizierungs-Token konnte nicht generiert werden",
-    },
-    invalid_session: {
-      title: "Ungültige Sitzung",
-      description: "Die Sitzung ist ungültig oder abgelaufen",
-    },
-    missing_request_context: {
-      title: "Fehlender Request-Kontext",
-      description: "Request-Kontext fehlt",
-    },
-    unsupported_platform: {
-      title: "Nicht unterstützte Plattform",
-      description: "Plattform wird nicht unterstützt",
-    },
-    session_retrieval_failed: {
-      title: "Sitzungsabruf fehlgeschlagen",
-      description: "Sitzung konnte nicht abgerufen werden",
-    },
-    missing_token: {
-      title: "Fehlender Token",
-      description: "Authentifizierungs-Token fehlt",
-    },
-    invalid_token_signature: {
-      title: "Ungültige Token-Signatur",
-      description: "Token-Signatur ist ungültig",
-    },
-    jwt_payload_missing_id: {
-      title: "JWT-Payload fehlt ID",
-      description: "JWT-Payload fehlt Benutzer-ID",
-    },
-    cookie_set_failed: {
-      title: "Cookie setzen fehlgeschlagen",
-      description: "Authentifizierungs-Cookie konnte nicht gesetzt werden",
-    },
-    cookie_clear_failed: {
-      title: "Cookie löschen fehlgeschlagen",
-      description: "Authentifizierungs-Cookie konnte nicht gelöscht werden",
-    },
-    publicPayloadNotSupported: {
-      title: "Öffentlicher Payload nicht unterstützt",
-      description:
-        "Öffentlicher JWT-Payload wird für CLI-Authentifizierung nicht unterstützt",
-    },
+    token_generation_failed: "Authentifizierungs-Token konnte nicht generiert werden",
+    invalid_session: "Die Sitzung ist ungültig oder abgelaufen",
+    missing_request_context: "Request-Kontext fehlt",
+    unsupported_platform: "Plattform wird nicht unterstützt",
+    session_retrieval_failed: "Sitzung konnte nicht abgerufen werden",
+    missing_token: "Authentifizierungs-Token fehlt",
+    invalid_token_signature: "Token-Signatur ist ungültig",
+    jwt_payload_missing_id: "JWT-Payload fehlt Benutzer-ID",
+    cookie_set_failed: "Authentifizierungs-Cookie konnte nicht gesetzt werden",
+    cookie_clear_failed: "Authentifizierungs-Cookie konnte nicht gelöscht werden",
+    publicPayloadNotSupported:
+      "Öffentlicher JWT-Payload wird für CLI-Authentifizierung nicht unterstützt",
+    jwt_signing_failed: "JWT-Token konnte nicht signiert werden",
+    validation_failed: "Validierung fehlgeschlagen",
   },
   post: {
     title: "Titel",

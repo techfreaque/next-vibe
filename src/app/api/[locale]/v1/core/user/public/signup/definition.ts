@@ -224,7 +224,7 @@ const { POST } = createEndpoint({
               helpText:
                 "app.api.v1.core.user.public.signup.fields.signupType.help" as const,
             },
-            z.nativeEnum(SignupType),
+            z.enum(SignupType),
           ),
         },
       ),

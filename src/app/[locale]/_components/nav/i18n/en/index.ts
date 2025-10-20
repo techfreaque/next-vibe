@@ -1,6 +1,45 @@
 export const translations = {
   help: "Help",
   logout: "Log Out",
+  enableLightMode: "Enable light mode",
+  enableDarkMode: "Enable dark mode",
+  notifications: "Notifications",
+  company: "Company",
+  about: {
+    title: "About Us",
+    description: "Learn more about our company",
+  },
+  careers: {
+    title: "Careers",
+    description: "Join our team",
+  },
+  user: {
+    dashboard: "Dashboard",
+    completeOnboarding: "Complete Onboarding",
+    login: "Log In",
+    signup: "Sign Up",
+  },
+  home: "Home",
+  pricing: "Pricing",
+  services: {
+    title: "Services",
+    features: {
+      title: "Features",
+      description: "Explore our powerful features",
+    },
+    process: {
+      title: "Our Process",
+      description: "How we work with you",
+    },
+    premiumContent: {
+      title: "Premium Content",
+      description: "Access exclusive content",
+    },
+    contact: {
+      title: "Contact Us",
+      description: "Get in touch with our team",
+    },
+  },
   post: {
     title: "Nav",
     description: "Nav endpoint",

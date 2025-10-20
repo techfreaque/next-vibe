@@ -126,7 +126,7 @@ export async function callApi<
       if (!tokenResponse.success || !tokenResponse.data) {
         // Return error - server should provide proper translation key
         return createErrorResponse(
-          "app.user.auth.errors.auth_required" as TranslationKey,
+          "app.user.auth.errors.auth_required" ,
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
@@ -161,7 +161,7 @@ export async function callApi<
 
       // Fallback error when server doesn't return proper error format
       return createErrorResponse(
-        "error.api.http_error" as TranslationKey,
+        "error.api.http_error" ,
         ErrorResponseTypes.HTTP_ERROR,
         {
           statusCode: response.status,
@@ -181,7 +181,7 @@ export async function callApi<
       if (!validationResponse.success) {
         // Fallback error when response validation fails
         return createErrorResponse(
-          "error.api.validation_error" as TranslationKey,
+          "error.api.validation_error" ,
           ErrorResponseTypes.VALIDATION_ERROR,
           {
             message: validationResponse.message,
@@ -202,7 +202,7 @@ export async function callApi<
 
     // Fallback error when server returns success but no data
     return createErrorResponse(
-      "error.api.internal_error" as TranslationKey,
+      "error.api.internal_error" ,
       ErrorResponseTypes.INTERNAL_ERROR,
       {
         url: endpointUrl,
@@ -211,7 +211,7 @@ export async function callApi<
   } catch (error) {
     // Fallback error when request fails completely
     return createErrorResponse(
-      "error.api.internal_error" as TranslationKey,
+      "error.api.internal_error" ,
       ErrorResponseTypes.INTERNAL_ERROR,
       { error: parseError(error).message, endpoint: endpoint.path.join("/") },
     );

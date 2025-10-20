@@ -85,7 +85,7 @@ const { POST } = createEndpoint({
             },
           ],
         },
-        z.nativeEnum(SubscriptionPlan),
+        z.enum(SubscriptionPlan),
       ),
 
       billingInterval: requestDataField(
@@ -111,7 +111,7 @@ const { POST } = createEndpoint({
             },
           ],
         },
-        z.nativeEnum(BillingInterval).default(BillingInterval.MONTHLY),
+        z.enum(BillingInterval).default(BillingInterval.MONTHLY),
       ),
 
       metadata: requestDataField(

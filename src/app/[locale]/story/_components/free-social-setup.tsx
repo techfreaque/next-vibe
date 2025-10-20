@@ -51,56 +51,56 @@ export default function FreeSocialSetup({
   const socialPlatforms: SocialPlatform[] = [
     {
       icon: <Facebook className="h-8 w-8" />,
-      name: t("socialMedia.platforms.facebook"),
+      name: t("app.socialMedia.platforms.facebook"),
       color: "text-blue-600",
     },
     {
       icon: <Instagram className="h-8 w-8" />,
-      name: t("socialMedia.platforms.instagram"),
+      name: t("app.socialMedia.platforms.instagram"),
       color: "text-pink-600",
     },
     {
       icon: <Twitter className="h-8 w-8" />,
-      name: t("socialMedia.platforms.twitter"),
+      name: t("app.socialMedia.platforms.twitter"),
       color: "text-gray-900 dark:text-white",
     },
     {
       icon: <Linkedin className="h-8 w-8" />,
-      name: t("socialMedia.platforms.linkedin"),
+      name: t("app.socialMedia.platforms.linkedin"),
       color: "text-blue-700",
     },
     {
       icon: <Youtube className="h-8 w-8" />,
-      name: t("socialMedia.platforms.youtube"),
+      name: t("app.socialMedia.platforms.youtube"),
       color: "text-red-600",
     },
     {
       icon: <MessageCircle className="h-8 w-8" />,
-      name: t("socialMedia.platforms.tiktok"),
+      name: t("app.socialMedia.platforms.tiktok"),
       color: "text-gray-900 dark:text-white",
     },
     {
       icon: <MessageCircle className="h-8 w-8" />,
-      name: t("socialMedia.platforms.pinterest"),
+      name: t("app.socialMedia.platforms.pinterest"),
       color: "text-red-500",
     },
     {
       icon: <MessageCircle className="h-8 w-8" />,
-      name: t("socialMedia.platforms.snapchat"),
+      name: t("app.socialMedia.platforms.snapchat"),
       color: "text-yellow-500",
     },
     {
       icon: <MessageCircle className="h-8 w-8" />,
-      name: t("socialMedia.platforms.whatsapp"),
+      name: t("app.socialMedia.platforms.whatsapp"),
       color: "text-green-600",
     },
   ];
 
   const benefits = [
-    t("pages.home.freeSocialSetup.benefits.professionalSetup"),
-    t("pages.home.freeSocialSetup.benefits.optimizedProfiles"),
-    t("pages.home.freeSocialSetup.benefits.brandConsistency"),
-    t("pages.home.freeSocialSetup.benefits.strategicPlanning"),
+    t("app.site.home.freeSocialSetup.benefits.professionalSetup"),
+    t("app.site.home.freeSocialSetup.benefits.optimizedProfiles"),
+    t("app.site.home.freeSocialSetup.benefits.brandConsistency"),
+    t("app.site.home.freeSocialSetup.benefits.strategicPlanning"),
   ];
 
   const container = {
@@ -135,7 +135,7 @@ export default function FreeSocialSetup({
             transition={{ duration: 0.5 }}
           >
             <CheckCircle className="h-4 w-4" />
-            {t("pages.home.freeSocialSetup.badge")}
+            {t("app.site.home.freeSocialSetup.badge")}
           </motion.div>
 
           <motion.h2
@@ -144,7 +144,7 @@ export default function FreeSocialSetup({
             animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            {t("pages.home.freeSocialSetup.title")}
+            {t("app.site.home.freeSocialSetup.title")}
           </motion.h2>
 
           <motion.p
@@ -153,7 +153,7 @@ export default function FreeSocialSetup({
             animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            {t("pages.home.freeSocialSetup.description")}
+            {t("app.site.home.freeSocialSetup.description")}
           </motion.p>
         </div>
 
@@ -172,10 +172,10 @@ export default function FreeSocialSetup({
                   </div>
                   <div>
                     <CardTitle className="text-2xl">
-                      {t("pages.home.freeSocialSetup.card.title")}
+                      {t("app.site.home.freeSocialSetup.card.title")}
                     </CardTitle>
                     <CardDescription className="text-base">
-                      {t("pages.home.freeSocialSetup.card.subtitle")}
+                      {t("app.site.home.freeSocialSetup.card.subtitle")}
                     </CardDescription>
                   </div>
                 </div>
@@ -214,7 +214,7 @@ export default function FreeSocialSetup({
                       size="lg"
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                     >
-                      {t("pages.home.freeSocialSetup.cta")}
+                      {t("app.site.home.freeSocialSetup.cta")}
                     </Button>
                   </Link>
                 </motion.div>
@@ -235,7 +235,7 @@ export default function FreeSocialSetup({
               animate={inView ? { opacity: 1 } : { opacity: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
-              {t("pages.home.freeSocialSetup.platforms.title")}
+              {t("app.site.home.freeSocialSetup.platforms.title")}
             </motion.h3>
 
             <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -261,7 +261,7 @@ export default function FreeSocialSetup({
               animate={inView ? { opacity: 1 } : { opacity: 0 }}
               transition={{ duration: 0.5, delay: 0.9 }}
             >
-              {t("pages.home.freeSocialSetup.platforms.subtitle")}
+              {t("app.site.home.freeSocialSetup.platforms.subtitle")}
             </motion.p>
           </motion.div>
         </div>

@@ -20,10 +20,18 @@ export const translations: typeof enTranslations = {
 
   // Subscription plans
   plans: {
-    starter: "Plan Starter",
-    professional: "Plan Professional",
-    premium: "Plan Premium",
-    enterprise: "Plan Enterprise",
+    starter: {
+      title: "Plan Starter",
+    },
+    professional: {
+      title: "Plan Professional",
+    },
+    premium: {
+      title: "Plan Premium",
+    },
+    enterprise: {
+      title: "Plan Enterprise",
+    },
   },
 
   // Billing intervals
@@ -140,6 +148,10 @@ export const translations: typeof enTranslations = {
       title: "Nie znaleziono",
       description: "Subskrypcja nie została znaleziona",
     },
+    server: {
+      title: "Błąd serwera",
+      description: "Wystąpił wewnętrzny błąd serwera",
+    },
     serverError: {
       title: "Błąd serwera",
       description: "Wystąpił wewnętrzny błąd serwera",
@@ -156,12 +168,45 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Wystąpił konflikt danych",
     },
+    user_not_found: "Nie znaleziono użytkownika",
+    stripe_customer_creation_failed: "Nie udało się utworzyć klienta Stripe",
   },
 
   // Success types
   success: {
     title: "Sukces",
     description: "Operacja zakończona pomyślnie",
+  },
+
+  // Status translations
+  status: {
+    incomplete: "Niekompletny",
+    incomplete_expired: "Niekompletny wygasły",
+    trialing: "Okres próbny",
+    active: "Aktywny",
+    pastDue: "Zaległy",
+    canceled: "Anulowany",
+    unpaid: "Nieopłacony",
+    paused: "Wstrzymany",
+  },
+
+  // Email translations
+  email: {
+    success: {
+      title: "Subskrypcja pomyślna!",
+      previewText: "Witamy w nowej subskrypcji",
+      welcomeMessage: "Witamy w subskrypcji!",
+      description: "Dziękujemy za subskrypcję {{appName}}",
+      nextSteps: {
+        title: "Następne kroki",
+        description: "Oto co możesz zrobić dalej",
+        cta: "Rozpocznij",
+      },
+      support: {
+        title: "Potrzebujesz pomocy?",
+        description: "Nasz zespół wsparcia jest tutaj, aby Ci pomóc",
+      },
+    },
   },
 
   // Enum translations

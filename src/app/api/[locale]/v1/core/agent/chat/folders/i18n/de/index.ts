@@ -10,6 +10,11 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Ordner auflisten",
     description: "Alle Ordner für den aktuellen Benutzer abrufen",
+    rootFolderId: {
+      label: "Stammordner",
+      description:
+        "Nach Stammordner filtern (privat, geteilt, öffentlich, inkognito)",
+    },
     container: {
       title: "Ordnerliste",
       description: "Hierarchische Ordnerstruktur",
@@ -25,6 +30,7 @@ export const translations: typeof enTranslations = {
           description: "Einzelne Ordnerdetails",
           id: { content: "Ordner-ID" },
           userId: { content: "Benutzer-ID" },
+          rootFolderId: { content: "Stammordner" },
           name: { content: "Ordnername" },
           icon: { content: "Symbol" },
           color: { content: "Farbe" },
@@ -93,6 +99,10 @@ export const translations: typeof enTranslations = {
       folder: {
         title: "Ordnerdetails",
         description: "Grundlegende Ordnerinformationen",
+        rootFolderId: {
+          label: "Stammordner",
+          description: "Stammordner (private, shared, public, incognito)",
+        },
         name: {
           label: "Ordnername",
           description: "Name des Ordners",
@@ -119,6 +129,7 @@ export const translations: typeof enTranslations = {
         description: "Erstelltes Ordnerobjekt",
         id: { content: "Ordner-ID" },
         userId: { content: "Benutzer-ID" },
+        rootFolderId: { content: "Stammordner" },
         name: { content: "Ordnername" },
         icon: { content: "Symbol" },
         color: { content: "Farbe" },
@@ -142,6 +153,8 @@ export const translations: typeof enTranslations = {
       forbidden: {
         title: "Verboten",
         description: "Sie haben keine Berechtigung, Ordner zu erstellen",
+        incognitoNotAllowed:
+          "Inkognito-Ordner können nicht auf dem Server erstellt werden",
       },
       notFound: {
         title: "Nicht gefunden",

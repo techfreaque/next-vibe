@@ -83,6 +83,13 @@ export const translations: typeof enTranslations = {
     error: "Błąd synchronizacji wypisania z newslettera",
   },
   sms: {
+    confirmation: {
+      message:
+        "Pomyślnie wypisałeś się z newslettera {{appName}}. Jeśli to pomyłka, odwiedź naszą stronę, aby ponownie się zapisać.",
+    },
+    admin_notification: {
+      message: "Wypisanie z newslettera: {{email}} wypisał się z newslettera.",
+    },
     errors: {
       confirmation_failed: {
         title: "Nieudane potwierdzenie SMS",

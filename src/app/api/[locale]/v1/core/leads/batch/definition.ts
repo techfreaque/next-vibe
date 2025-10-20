@@ -86,7 +86,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.leads.batch.patch.status.description" as const,
           options: LeadStatusFilterOptions,
         },
-        z.nativeEnum(LeadStatusFilter).optional().default(LeadStatusFilter.ALL),
+        z.enum(LeadStatusFilter).optional().default(LeadStatusFilter.ALL),
       ),
       currentCampaignStage: requestDataField(
         {
@@ -112,7 +112,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.leads.batch.patch.source.description" as const,
           options: LeadSourceFilterOptions,
         },
-        z.nativeEnum(LeadSourceFilter).optional().default(LeadSourceFilter.ALL),
+        z.enum(LeadSourceFilter).optional().default(LeadSourceFilter.ALL),
       ),
       scope: requestDataField(
         {
@@ -171,7 +171,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.leads.batch.patch.updates.status.description" as const,
               options: LeadStatusOptions,
             },
-            z.nativeEnum(LeadStatus).optional(),
+            z.enum(LeadStatus).optional(),
           ),
           currentCampaignStage: requestDataField(
             {
@@ -183,7 +183,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.leads.batch.patch.updates.currentCampaignStage.description" as const,
               options: EmailCampaignStageOptions,
             },
-            z.nativeEnum(EmailCampaignStage).optional(),
+            z.enum(EmailCampaignStage).optional(),
           ),
           source: requestDataField(
             {
@@ -195,7 +195,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.leads.batch.patch.updates.source.description" as const,
               options: LeadSourceOptions,
             },
-            z.nativeEnum(LeadSource).optional(),
+            z.enum(LeadSource).optional(),
           ),
           notes: requestDataField(
             {
@@ -266,7 +266,7 @@ const { PATCH } = createEndpoint({
                   id: z.string(),
                   email: z.string().nullable(),
                   businessName: z.string(),
-                  currentStatus: z.nativeEnum(LeadStatus),
+                  currentStatus: z.enum(LeadStatus),
                   currentCampaignStage: z
                     .nativeEnum(EmailCampaignStage)
                     .nullable(),
@@ -429,7 +429,7 @@ const { DELETE } = createEndpoint({
             "app.api.v1.core.leads.batch.delete.status.description" as const,
           options: LeadStatusFilterOptions,
         },
-        z.nativeEnum(LeadStatusFilter).optional().default(LeadStatusFilter.ALL),
+        z.enum(LeadStatusFilter).optional().default(LeadStatusFilter.ALL),
       ),
       confirmDelete: requestDataField(
         {
@@ -521,7 +521,7 @@ const { DELETE } = createEndpoint({
                   id: z.string(),
                   email: z.string().nullable(),
                   businessName: z.string(),
-                  currentStatus: z.nativeEnum(LeadStatus),
+                  currentStatus: z.enum(LeadStatus),
                   currentCampaignStage: z
                     .nativeEnum(EmailCampaignStage)
                     .nullable(),

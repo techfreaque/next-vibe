@@ -178,7 +178,7 @@ Verify CLI responses include:
 
 ```bash
 # Error: Invalid enum value
-# Solution: Check enum.ts exports and z.nativeEnum() usage
+# Solution: Check enum.ts exports and z.enum() usage
 ```
 
 **Issue 4: Authentication Errors**

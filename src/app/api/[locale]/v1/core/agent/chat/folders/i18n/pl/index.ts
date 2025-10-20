@@ -10,6 +10,11 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Lista folderów",
     description: "Pobierz wszystkie foldery dla bieżącego użytkownika",
+    rootFolderId: {
+      label: "Folder główny",
+      description:
+        "Filtruj według folderu głównego (private, shared, public, incognito)",
+    },
     container: {
       title: "Lista folderów",
       description: "Hierarchiczna struktura folderów",
@@ -25,6 +30,7 @@ export const translations: typeof enTranslations = {
           description: "Szczegóły pojedynczego folderu",
           id: { content: "ID folderu" },
           userId: { content: "ID użytkownika" },
+          rootFolderId: { content: "Folder główny" },
           name: { content: "Nazwa folderu" },
           icon: { content: "Ikona" },
           color: { content: "Kolor" },
@@ -91,6 +97,10 @@ export const translations: typeof enTranslations = {
       folder: {
         title: "Szczegóły folderu",
         description: "Podstawowe informacje o folderze",
+        rootFolderId: {
+          label: "Folder główny",
+          description: "Folder główny (private, shared, public, incognito)",
+        },
         name: {
           label: "Nazwa folderu",
           description: "Nazwa folderu",
@@ -117,6 +127,7 @@ export const translations: typeof enTranslations = {
         description: "Utworzony obiekt folderu",
         id: { content: "ID folderu" },
         userId: { content: "ID użytkownika" },
+        rootFolderId: { content: "Folder główny" },
         name: { content: "Nazwa folderu" },
         icon: { content: "Ikona" },
         color: { content: "Kolor" },
@@ -140,6 +151,8 @@ export const translations: typeof enTranslations = {
       forbidden: {
         title: "Zabronione",
         description: "Nie masz uprawnień do tworzenia folderów",
+        incognitoNotAllowed:
+          "Foldery incognito nie mogą być tworzone na serwerze",
       },
       notFound: {
         title: "Nie znaleziono",

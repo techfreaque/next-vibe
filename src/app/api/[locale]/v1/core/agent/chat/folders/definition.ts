@@ -21,6 +21,8 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
+import { DEFAULT_FOLDER_IDS } from "../config";
+
 /**
  * Get Folders List Endpoint (GET)
  * Retrieves all folders for the current user in hierarchical structure
@@ -43,8 +45,49 @@ const { GET } = createEndpoint({
         "app.api.v1.core.agent.chat.folders.get.container.description" as const,
       layout: { type: LayoutType.STACKED },
     },
-    { response: true },
+    { request: "data", response: true },
     {
+      // === REQUEST FILTERS ===
+      rootFolderId: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label:
+            "app.api.v1.core.agent.chat.folders.get.rootFolderId.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.folders.get.rootFolderId.description" as const,
+          layout: { columns: 12 },
+          options: [
+            {
+              value: DEFAULT_FOLDER_IDS.PRIVATE,
+              label:
+                "app.api.v1.core.agent.chat.config.folders.private" as const,
+            },
+            {
+              value: DEFAULT_FOLDER_IDS.SHARED,
+              label:
+                "app.api.v1.core.agent.chat.config.folders.shared" as const,
+            },
+            {
+              value: DEFAULT_FOLDER_IDS.PUBLIC,
+              label:
+                "app.api.v1.core.agent.chat.config.folders.public" as const,
+            },
+            {
+              value: DEFAULT_FOLDER_IDS.INCOGNITO,
+              label:
+                "app.api.v1.core.agent.chat.config.folders.incognito" as const,
+            },
+          ],
+        },
+        z.enum([
+          DEFAULT_FOLDER_IDS.PRIVATE,
+          DEFAULT_FOLDER_IDS.SHARED,
+          DEFAULT_FOLDER_IDS.PUBLIC,
+          DEFAULT_FOLDER_IDS.INCOGNITO,
+        ]),
+      ),
+
       // === RESPONSE ===
       folders: responseArrayField(
         {
@@ -66,7 +109,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.folders.get.response.folders.folder.id.content" as const,
               },
-              z.string().uuid(),
+              z.uuid(),
             ),
             userId: responseField(
               {
@@ -74,7 +117,20 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.folders.get.response.folders.folder.userId.content" as const,
               },
-              z.string().uuid(),
+              z.uuid(),
+            ),
+            rootFolderId: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.agent.chat.folders.get.response.folders.folder.rootFolderId.content" as const,
+              },
+              z.enum([
+                DEFAULT_FOLDER_IDS.PRIVATE,
+                DEFAULT_FOLDER_IDS.SHARED,
+                DEFAULT_FOLDER_IDS.PUBLIC,
+                DEFAULT_FOLDER_IDS.INCOGNITO,
+              ]),
             ),
             name: responseField(
               {
@@ -106,7 +162,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.folders.get.response.folders.folder.parentId.content" as const,
               },
-              z.string().uuid().nullable(),
+              z.uuid().nullable(),
             ),
             expanded: responseField(
               {
@@ -209,7 +265,11 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    requests: undefined,
+    requests: {
+      default: {
+        rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
+      },
+    },
     responses: {
       default: {
         folders: [],
@@ -254,6 +314,46 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
+          rootFolderId: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label:
+                "app.api.v1.core.agent.chat.folders.post.sections.folder.rootFolderId.label" as const,
+              description:
+                "app.api.v1.core.agent.chat.folders.post.sections.folder.rootFolderId.description" as const,
+              layout: { columns: 12 },
+              validation: { required: true },
+              options: [
+                {
+                  value: DEFAULT_FOLDER_IDS.PRIVATE,
+                  label:
+                    "app.api.v1.core.agent.chat.config.folders.private" as const,
+                },
+                {
+                  value: DEFAULT_FOLDER_IDS.SHARED,
+                  label:
+                    "app.api.v1.core.agent.chat.config.folders.shared" as const,
+                },
+                {
+                  value: DEFAULT_FOLDER_IDS.PUBLIC,
+                  label:
+                    "app.api.v1.core.agent.chat.config.folders.public" as const,
+                },
+                {
+                  value: DEFAULT_FOLDER_IDS.INCOGNITO,
+                  label:
+                    "app.api.v1.core.agent.chat.config.folders.incognito" as const,
+                },
+              ],
+            },
+            z.enum([
+              DEFAULT_FOLDER_IDS.PRIVATE,
+              DEFAULT_FOLDER_IDS.SHARED,
+              DEFAULT_FOLDER_IDS.PUBLIC,
+              DEFAULT_FOLDER_IDS.INCOGNITO,
+            ]),
+          ),
           name: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
@@ -304,7 +404,7 @@ const { POST } = createEndpoint({
               layout: { columns: 12 },
               validation: { required: false },
             },
-            z.string().uuid().optional(),
+            z.uuid().optional(),
           ),
         },
       ),
@@ -336,7 +436,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.post.response.folder.id.content" as const,
                 },
-                z.string().uuid(),
+                z.uuid(),
               ),
               userId: responseField(
                 {
@@ -344,7 +444,20 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.post.response.folder.userId.content" as const,
                 },
-                z.string().uuid(),
+                z.uuid(),
+              ),
+              rootFolderId: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.agent.chat.folders.post.response.folder.rootFolderId.content" as const,
+                },
+                z.enum([
+                  DEFAULT_FOLDER_IDS.PRIVATE,
+                  DEFAULT_FOLDER_IDS.SHARED,
+                  DEFAULT_FOLDER_IDS.PUBLIC,
+                  DEFAULT_FOLDER_IDS.INCOGNITO,
+                ]),
               ),
               name: responseField(
                 {
@@ -376,7 +489,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.post.response.folder.parentId.content" as const,
                 },
-                z.string().uuid().nullable(),
+                z.uuid().nullable(),
               ),
               expanded: responseField(
                 {
@@ -484,6 +597,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         folder: {
+          rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
           name: "Work",
           icon: "folder",
           color: "#3b82f6",
@@ -496,6 +610,7 @@ const { POST } = createEndpoint({
           folder: {
             id: "123e4567-e89b-12d3-a456-426614174000",
             userId: "123e4567-e89b-12d3-a456-426614174001",
+            rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
             name: "Work",
             icon: "folder",
             color: "#3b82f6",

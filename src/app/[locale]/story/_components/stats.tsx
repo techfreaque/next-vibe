@@ -31,17 +31,17 @@ export function Stats({ locale }: { locale: CountryLanguage }): JSX.Element {
     {
       value: 500,
       suffix: "+",
-      title: t("pages.home.stats.clients"),
+      title: t("app.site.home.stats.clients"),
     },
     {
       value: 15000,
       suffix: "+",
-      title: t("pages.home.stats.posts"),
+      title: t("app.site.home.stats.posts"),
     },
     {
       value: 300,
       suffix: "%",
-      title: t("pages.home.stats.growth"),
+      title: t("app.site.home.stats.growth"),
     },
   ];
 

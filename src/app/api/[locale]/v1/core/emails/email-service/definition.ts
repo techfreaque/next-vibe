@@ -218,7 +218,7 @@ const { POST } = createEndpoint({
               options: CampaignTypeOptions,
               layout: { columns: 12 },
             },
-            z.nativeEnum(CampaignType).optional(),
+            z.enum(CampaignType).optional(),
           ),
 
           unsubscribeUrl: requestDataField(

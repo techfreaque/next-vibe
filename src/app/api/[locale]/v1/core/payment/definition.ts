@@ -94,7 +94,7 @@ const { GET, POST } = createFormEndpoint({
 
       // Checkout mode field
       mode: field(
-        z.nativeEnum(CheckoutMode),
+        z.enum(CheckoutMode),
         {
           GET: { response: true },
           POST: { request: "data", response: true },
@@ -112,7 +112,7 @@ const { GET, POST } = createFormEndpoint({
 
       // Payment method types field
       paymentMethodTypes: field(
-        z.array(z.nativeEnum(PaymentMethodType)).optional(),
+        z.array(z.enum(PaymentMethodType)).optional(),
         {
           GET: { response: true },
           POST: { request: "data", response: true },

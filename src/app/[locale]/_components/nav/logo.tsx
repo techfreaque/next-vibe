@@ -28,7 +28,7 @@ export function Logo({
       <Image
         fetchPriority="high"
         src={logoWhite}
-        alt={t("common.appName")}
+        alt={t("app.common.appName")}
         width={250}
         height={80}
         className={cn("hidden dark:block h-18 w-auto", className)}
@@ -37,7 +37,7 @@ export function Logo({
       <Image
         fetchPriority="high"
         src={logoBlack}
-        alt={t("common.appName")}
+        alt={t("app.common.appName")}
         width={250}
         height={80}
         className={cn("hidden light:block h-18 w-auto", className)}

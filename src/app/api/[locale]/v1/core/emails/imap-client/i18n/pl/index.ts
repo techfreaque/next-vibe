@@ -24,6 +24,178 @@ export const translations: typeof enTranslations = {
   health: healthTranslations,
   messages: messagesTranslations,
   sync: syncTranslations,
+  imapErrors: {
+    accounts: {
+      post: {
+        error: {
+          duplicate: {
+            title: "Konto już istnieje",
+          },
+          server: {
+            title: "Błąd serwera podczas tworzenia konta",
+          },
+        },
+      },
+      get: {
+        error: {
+          not_found: {
+            title: "Konto nie znalezione",
+          },
+          server: {
+            title: "Błąd serwera podczas pobierania konta",
+          },
+        },
+      },
+      put: {
+        error: {
+          not_found: {
+            title: "Konto nie znalezione",
+          },
+          duplicate: {
+            title: "Konto z tym adresem e-mail już istnieje",
+          },
+          server: {
+            title: "Błąd serwera podczas aktualizacji konta",
+          },
+        },
+      },
+      delete: {
+        error: {
+          not_found: {
+            title: "Konto nie znalezione",
+          },
+          server: {
+            title: "Błąd serwera podczas usuwania konta",
+          },
+        },
+        success: {
+          title: "Konto zostało pomyślnie usunięte",
+        },
+      },
+    },
+    folders: {
+      get: {
+        error: {
+          not_found: {
+            title: "Folder nie znaleziony",
+          },
+          server: {
+            title: "Błąd serwera podczas pobierania folderu",
+          },
+        },
+      },
+      sync: {
+        error: {
+          missing_account: {
+            title: "Konto nie znalezione dla synchronizacji folderu",
+          },
+        },
+      },
+    },
+    messages: {
+      get: {
+        error: {
+          not_found: {
+            title: "Wiadomość nie znaleziona",
+          },
+          server: {
+            title: "Błąd serwera podczas pobierania wiadomości",
+          },
+        },
+      },
+    },
+    connection: {
+      failed: "Połączenie nie powiodło się",
+      timeout: {
+        title: "Przekroczono limit czasu połączenia",
+      },
+      test: {
+        failed: "Test połączenia nie powiódł się",
+      },
+      close: {
+        failed: "Nie udało się zamknąć połączenia",
+      },
+      folders: {
+        list: {
+          failed: "Nie udało się wyświetlić folderów",
+        },
+      },
+      messages: {
+        list: {
+          failed: "Nie udało się wyświetlić wiadomości",
+        },
+      },
+    },
+    sync: {
+      failed: "Synchronizacja nie powiodła się",
+      account: {
+        failed: "Synchronizacja konta nie powiodła się",
+      },
+      folder: {
+        failed: "Synchronizacja folderu nie powiodła się",
+      },
+      message: {
+        failed: "Synchronizacja wiadomości nie powiodła się",
+      },
+      post: {
+        error: {
+          server: {
+            title: "Błąd serwera podczas synchronizacji",
+          },
+        },
+      },
+    },
+    validation: {
+      account: {
+        username: {
+          required: "Nazwa użytkownika jest wymagana",
+        },
+        port: {
+          invalid: "Nieprawidłowy numer portu",
+        },
+        host: {
+          invalid: "Nieprawidłowy host",
+        },
+      },
+    },
+  },
+  imap: {
+    "example.com": "imap.example.com",
+    "gmail.com": "imap.gmail.com",
+    connection: {
+      test: {
+        success: "Test połączenia zakończony sukcesem",
+        failed: "Test połączenia nie powiódł się",
+        timeout: "Przekroczono limit czasu testu połączenia",
+      },
+    },
+    sync: {
+      messages: {
+        accounts: {
+          success: "Wszystkie konta zsynchronizowane pomyślnie",
+          successWithErrors: "Konta zsynchronizowane z błędami",
+        },
+        account: {
+          success: "Konto zsynchronizowane pomyślnie",
+          successWithErrors: "Konto zsynchronizowane z błędami",
+        },
+        folders: {
+          success: "Foldery zsynchronizowane pomyślnie",
+          successWithErrors: "Foldery zsynchronizowane z błędami",
+        },
+        messages: {
+          success: "Wiadomości zsynchronizowane pomyślnie",
+          successWithErrors: "Wiadomości zsynchronizowane z błędami",
+        },
+      },
+      errors: {
+        account_failed: "Synchronizacja konta nie powiodła się",
+        folder_sync_failed: "Synchronizacja folderu nie powiodła się",
+        message_sync_error: "Błąd synchronizacji wiadomości",
+        message_sync_failed: "Synchronizacja wiadomości nie powiodła się",
+      },
+    },
+  },
   enums: {
     syncStatus: {
       pending: "Oczekujący",

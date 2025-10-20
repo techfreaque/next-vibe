@@ -19,7 +19,7 @@ export const SocialMediaImages = {
     return (
       <Image
         src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Facebook_f_logo_%282019%29.svg/1200px-Facebook_f_logo_%282019%29.svg.png"
-        alt={t("socialMedia.platforms.facebook")}
+        alt={t("app.socialMedia.platforms.facebook")}
         width={props.width || props.size || 24}
         height={props.height || props.size || 24}
         className={props.className}
@@ -31,7 +31,7 @@ export const SocialMediaImages = {
     return (
       <Image
         src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/X_Twitter_icon.svg/512px-X_Twitter_icon.svg.png?20231024193314"
-        alt={t("socialMedia.platforms.twitter")}
+        alt={t("app.socialMedia.platforms.twitter")}
         width={props.width || props.size || 24}
         height={props.height || props.size || 24}
         className={cn(props.className, "dark:invert")}
@@ -43,7 +43,7 @@ export const SocialMediaImages = {
     return (
       <Image
         src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/1200px-Instagram_logo_2016.svg.png"
-        alt={t("socialMedia.platforms.instagram")}
+        alt={t("app.socialMedia.platforms.instagram")}
         width={props.width || props.size || 24}
         height={props.height || props.size || 24}
         className={props.className}
@@ -55,7 +55,7 @@ export const SocialMediaImages = {
     return (
       <Image
         src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/1200px-LinkedIn_logo_initials.png"
-        alt={t("socialMedia.platforms.linkedin")}
+        alt={t("app.socialMedia.platforms.linkedin")}
         width={props.width || props.size || 24}
         height={props.height || props.size || 24}
         className={props.className}
@@ -67,7 +67,7 @@ export const SocialMediaImages = {
     return (
       <Image
         src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1200px-YouTube_full-color_icon_%282017%29.svg.png"
-        alt={t("socialMedia.platforms.youtube")}
+        alt={t("app.socialMedia.platforms.youtube")}
         width={props.width || props.size || 24}
         height={props.height || props.size || 24}
         className={props.className}
@@ -79,7 +79,7 @@ export const SocialMediaImages = {
     return (
       <Image
         src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Threads_%28app%29_logo.svg/1200px-Threads_%28app%29_logo.svg.png"
-        alt={t("socialMedia.platforms.threads")}
+        alt={t("app.socialMedia.platforms.threads")}
         width={props.width || props.size || 24}
         height={props.height || props.size || 24}
         className={props.className}
@@ -91,7 +91,7 @@ export const SocialMediaImages = {
     return (
       <Image
         src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Mastodon_Logotype_%28Simple%29.svg/1200px-Mastodon_Logotype_%28Simple%29.svg.png"
-        alt={t("socialMedia.platforms.mastodon")}
+        alt={t("app.socialMedia.platforms.mastodon")}
         width={props.width || props.size || 24}
         height={props.height || props.size || 24}
         className={props.className}

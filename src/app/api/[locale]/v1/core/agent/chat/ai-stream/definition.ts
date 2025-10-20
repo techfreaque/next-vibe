@@ -20,6 +20,9 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
+import { DEFAULT_FOLDER_IDS } from "../config";
+import { ModelId } from "../model-access/models";
+
 /**
  * Chat message schema
  */
@@ -56,30 +59,178 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      // === REQUEST FIELDS ===
-      messages: requestDataField(
+      // === OPERATION CONTEXT ===
+      operation: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "app.api.v1.core.agent.chat.aiStream.post.operation.label",
+          description:
+            "app.api.v1.core.agent.chat.aiStream.post.operation.description",
+          layout: { columns: 3 },
+          options: [
+            {
+              value: "send",
+              label:
+                "app.api.v1.core.agent.chat.aiStream.post.operation.options.send" as const,
+            },
+            {
+              value: "retry",
+              label:
+                "app.api.v1.core.agent.chat.aiStream.post.operation.options.retry" as const,
+            },
+            {
+              value: "edit",
+              label:
+                "app.api.v1.core.agent.chat.aiStream.post.operation.options.edit" as const,
+            },
+            {
+              value: "answer-as-ai",
+              label:
+                "app.api.v1.core.agent.chat.aiStream.post.operation.options.answerAsAi" as const,
+            },
+          ],
+        },
+        z.enum(["send", "retry", "edit", "answer-as-ai"]).default("send"),
+      ),
+      rootFolderId: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "app.api.v1.core.agent.chat.aiStream.post.rootFolderId.label",
+          description:
+            "app.api.v1.core.agent.chat.aiStream.post.rootFolderId.description",
+          layout: { columns: 3 },
+          options: [
+            {
+              value: DEFAULT_FOLDER_IDS.PRIVATE,
+              label:
+                "app.api.v1.core.agent.chat.config.folders.private" as const,
+            },
+            {
+              value: DEFAULT_FOLDER_IDS.SHARED,
+              label:
+                "app.api.v1.core.agent.chat.config.folders.shared" as const,
+            },
+            {
+              value: DEFAULT_FOLDER_IDS.PUBLIC,
+              label:
+                "app.api.v1.core.agent.chat.config.folders.public" as const,
+            },
+            {
+              value: DEFAULT_FOLDER_IDS.INCOGNITO,
+              label:
+                "app.api.v1.core.agent.chat.config.folders.incognito" as const,
+            },
+          ],
+        },
+        z.enum([
+          DEFAULT_FOLDER_IDS.PRIVATE,
+          DEFAULT_FOLDER_IDS.SHARED,
+          DEFAULT_FOLDER_IDS.PUBLIC,
+          DEFAULT_FOLDER_IDS.INCOGNITO,
+        ]),
+      ),
+      subFolderId: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.UUID,
+          label: "app.api.v1.core.agent.chat.aiStream.post.subFolderId.label",
+          description:
+            "app.api.v1.core.agent.chat.aiStream.post.subFolderId.description",
+          layout: { columns: 3 },
+        },
+        z.uuid().nullable().optional(),
+      ),
+      threadId: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.UUID,
+          label: "app.api.v1.core.agent.chat.aiStream.post.threadId.label",
+          description:
+            "app.api.v1.core.agent.chat.aiStream.post.threadId.description",
+          layout: { columns: 3 },
+        },
+        z.uuid().nullable().optional(),
+      ),
+      parentMessageId: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.UUID,
+          label:
+            "app.api.v1.core.agent.chat.aiStream.post.parentMessageId.label",
+          description:
+            "app.api.v1.core.agent.chat.aiStream.post.parentMessageId.description",
+          layout: { columns: 3 },
+        },
+        z.uuid().nullable().optional(),
+      ),
+
+      // === MESSAGE CONTENT ===
+      content: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXTAREA,
-          label: "app.api.v1.core.agent.chat.aiStream.post.messages.label",
+          label: "app.api.v1.core.agent.chat.aiStream.post.content.label",
           description:
-            "app.api.v1.core.agent.chat.aiStream.post.messages.description",
+            "app.api.v1.core.agent.chat.aiStream.post.content.description",
           layout: { columns: 12 },
           placeholder:
-            "app.api.v1.core.agent.chat.aiStream.post.messages.placeholder",
+            "app.api.v1.core.agent.chat.aiStream.post.content.placeholder",
         },
-        z.array(chatMessageSchema).min(1).max(50),
+        z.string().min(1).max(10000),
       ),
+      role: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "app.api.v1.core.agent.chat.aiStream.post.role.label",
+          description:
+            "app.api.v1.core.agent.chat.aiStream.post.role.description",
+          layout: { columns: 4 },
+          options: [
+            {
+              value: "user",
+              label:
+                "app.api.v1.core.agent.chat.aiStream.post.role.options.user" as const,
+            },
+            {
+              value: "assistant",
+              label:
+                "app.api.v1.core.agent.chat.aiStream.post.role.options.assistant" as const,
+            },
+            {
+              value: "system",
+              label:
+                "app.api.v1.core.agent.chat.aiStream.post.role.options.system" as const,
+            },
+          ],
+        },
+        z.enum(["user", "assistant", "system"]).default("user"),
+      ),
+
+      // === AI CONFIGURATION ===
       model: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
+          fieldType: FieldDataType.SELECT,
           label: "app.api.v1.core.agent.chat.aiStream.post.model.label",
           description:
             "app.api.v1.core.agent.chat.aiStream.post.model.description",
           layout: { columns: 4 },
         },
-        z.string().default("gpt-4o"),
+        z.nativeEnum(ModelId),
+      ),
+      persona: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.v1.core.agent.chat.aiStream.post.persona.label",
+          description:
+            "app.api.v1.core.agent.chat.aiStream.post.persona.description",
+          layout: { columns: 4 },
+        },
+        z.string().nullable().optional(),
       ),
       temperature: requestDataField(
         {
@@ -126,6 +277,19 @@ const { POST } = createEndpoint({
           layout: { columns: 4 },
         },
         z.boolean().optional().default(false),
+      ),
+
+      // === RESUMABLE STREAM SUPPORT ===
+      resumeToken: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.v1.core.agent.chat.aiStream.post.resumeToken.label",
+          description:
+            "app.api.v1.core.agent.chat.aiStream.post.resumeToken.description",
+          layout: { columns: 6 },
+        },
+        z.string().nullable().optional(),
       ),
 
       // === RESPONSE FIELDS ===
@@ -234,46 +398,43 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        messages: [
-          {
-            role: "user",
-            content: "Hello, can you help me write a professional email?",
-          },
-        ],
-        model: "gpt-4o",
+        operation: "send",
+        rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
+        subFolderId: null,
+        threadId: null,
+        parentMessageId: null,
+        content: "Hello, can you help me write a professional email?",
+        role: "user",
+        model: ModelId.GPT_5_MINI,
+        persona: null,
         temperature: 0.7,
         maxTokens: 1000,
       },
       withSystemPrompt: {
-        messages: [
-          {
-            role: "user",
-            content: "Write a marketing email for our new product launch",
-          },
-        ],
-        model: "gpt-4o",
+        operation: "send",
+        rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
+        subFolderId: null,
+        threadId: null,
+        parentMessageId: null,
+        content: "Write a marketing email for our new product launch",
+        role: "user",
+        model: ModelId.GPT_5,
+        persona: null,
         temperature: 0.8,
         maxTokens: 1500,
         systemPrompt:
           "You are a professional marketing copywriter specializing in email campaigns.",
       },
-      conversation: {
-        messages: [
-          {
-            role: "user",
-            content: "I need help with email templates",
-          },
-          {
-            role: "assistant",
-            content:
-              "I'd be happy to help you with email templates. What type of email are you looking to create?",
-          },
-          {
-            role: "user",
-            content: "A welcome email for new subscribers",
-          },
-        ],
-        model: "gpt-4o",
+      retry: {
+        operation: "retry",
+        rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
+        subFolderId: null,
+        threadId: "550e8400-e29b-41d4-a716-446655440000",
+        parentMessageId: "660e8400-e29b-41d4-a716-446655440001",
+        content: "Can you try that again with more detail?",
+        role: "user",
+        model: ModelId.CLAUDE_SONNET_4_5,
+        persona: null,
         temperature: 0.7,
         maxTokens: 1200,
       },
@@ -295,7 +456,7 @@ const { POST } = createEndpoint({
           finishReason: "stop",
         },
       },
-      conversation: {
+      retry: {
         response: {
           success: true,
           messageId: "msg_789e0123-e89b-12d3-a456-426614174002",

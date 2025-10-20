@@ -18,7 +18,7 @@ import Stripe from "stripe";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { CountryLanguage,Countries } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
@@ -115,7 +115,7 @@ const getCountryFromLocale = (
   locale: CountryLanguage,
 ): keyof typeof STRIPE_PRICE_IDS => {
   const countryPart = locale.split("-")[1];
-  return countryPart || "GLOBAL";
+  return countryPart;
 };
 
 /**
@@ -173,7 +173,7 @@ const ensureStripeCustomer = async (
 
     if (!user[0]) {
       return createErrorResponse(
-        "subscription.errors.user_not_found",
+        "app.api.v1.core.subscription.errors.user_not_found",
         ErrorResponseTypes.NOT_FOUND,
         { userId },
       );
@@ -206,7 +206,7 @@ const ensureStripeCustomer = async (
       userId,
     });
     return createErrorResponse(
-      "subscription.errors.stripe_customer_creation_failed",
+      "app.api.v1.core.subscription.errors.stripe_customer_creation_failed",
       ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       { error: parseError(error).message, userId },
     );

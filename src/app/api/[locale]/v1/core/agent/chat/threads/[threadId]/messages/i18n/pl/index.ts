@@ -75,8 +75,10 @@ export const translations: typeof enTranslations = {
         description: "You must be logged in to view messages",
       },
       forbidden: {
-        title: "Forbidden",
-        description: "You don't have permission to view these messages",
+        title: "Zabronione",
+        description: "Nie masz uprawnień do przeglądania tych wiadomości",
+        incognitoNotAllowed:
+          "Wątki incognito nie mogą być dostępne na serwerze",
       },
       notFound: {
         title: "Not Found",

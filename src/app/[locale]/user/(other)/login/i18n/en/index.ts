@@ -1,52 +1,34 @@
+import { translations as componentsTranslations } from "../../_components/i18n/en";
+
 export const translations = {
-  post: {
-    title: "Login",
-    description: "Login endpoint",
-    form: {
-      title: "Login Configuration",
-      description: "Configure login parameters",
+  components: componentsTranslations,
+  meta: {
+    title: "Login - Next Vibe",
+    description: "Sign in to your Next Vibe account",
+    category: "Authentication",
+    imageAlt: "Next Vibe Login",
+    keywords: "login, sign in, authentication, next vibe",
+    ogTitle: "Login to Next Vibe",
+    ogDescription: "Access your Next Vibe account",
+    twitterTitle: "Login to Next Vibe",
+    twitterDescription: "Sign in to your account",
+  },
+  auth: {
+    login: {
+      title: "Welcome Back",
+      subtitle: "Sign in to your account to continue",
+      signInButton: "Sign In",
+      forgotPassword: "Forgot password?",
+      createAccount: "Create an account",
+      orContinueWith: "Or continue with",
+      emailLabel: "Email Address",
+      emailPlaceholder: "Enter your email",
+      passwordLabel: "Password",
+      passwordPlaceholder: "Enter your password",
+      rememberMe: "Remember me",
     },
-    response: {
-      title: "Response",
-      description: "Login response data",
-    },
-    errors: {
-      unauthorized: {
-        title: "Unauthorized",
-        description: "Authentication required",
-      },
-      validation: {
-        title: "Validation Error",
-        description: "Invalid request parameters",
-      },
-      server: {
-        title: "Server Error",
-        description: "Internal server error occurred",
-      },
-      unknown: {
-        title: "Unknown Error",
-        description: "An unknown error occurred",
-      },
-      network: {
-        title: "Network Error",
-        description: "Network error occurred",
-      },
-      forbidden: {
-        title: "Forbidden",
-        description: "Access forbidden",
-      },
-      notFound: {
-        title: "Not Found",
-        description: "Resource not found",
-      },
-      conflict: {
-        title: "Conflict",
-        description: "Data conflict occurred",
-      },
-    },
-    success: {
-      title: "Success",
-      description: "Operation completed successfully",
-    },
+  },
+  login: {
+    dontHaveAccount: "Don't have an account?",
   },
 };

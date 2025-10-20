@@ -110,7 +110,7 @@ export class LeadTrackingClientRepository {
         trackingData,
       );
 
-      logger.debug("leads.tracking.data.captured", {
+      logger.debug("app.api.v1.core.leads.tracking.data.captured", {
         leadId,
         source: validatedSource,
         campaign: trackingData.campaign,
@@ -120,7 +120,7 @@ export class LeadTrackingClientRepository {
 
       return createSuccessResponse(trackingData);
     } catch (error) {
-      logger.error("leads.tracking.data.capture.error", error);
+      logger.error("app.api.v1.core.leads.tracking.data.capture.error", error);
       return createErrorResponse(
         "error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -150,7 +150,7 @@ export class LeadTrackingClientRepository {
 
       return createSuccessResponse(data);
     } catch (error) {
-      logger.error("leads.tracking.data.retrieve.error", error);
+      logger.error("app.api.v1.core.leads.tracking.data.retrieve.error", error);
       return createErrorResponse(
         "error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -167,7 +167,7 @@ export class LeadTrackingClientRepository {
     try {
       const result = await LeadTrackingClientRepository.getTrackingData(logger);
       if (result.success && result.data) {
-        logger.debug("leads.tracking.data.loaded.signup", {
+        logger.debug("app.api.v1.core.leads.tracking.data.loaded.signup", {
           leadId: result.data.leadId,
           source: result.data.source,
           campaign: result.data.campaign,
@@ -177,7 +177,10 @@ export class LeadTrackingClientRepository {
       }
       return null;
     } catch (error) {
-      logger.debug("leads.tracking.data.load.error.noncritical", error);
+      logger.debug(
+        "app.api.v1.core.leads.tracking.data.load.error.noncritical",
+        error,
+      );
       return null;
     }
   }
@@ -199,7 +202,7 @@ export class LeadTrackingClientRepository {
         trackingData,
       );
 
-      logger.debug("leads.tracking.data.stored", {
+      logger.debug("app.api.v1.core.leads.tracking.data.stored", {
         leadId: trackingData.leadId,
         source: trackingData.source,
         campaign: trackingData.campaign,
@@ -208,7 +211,7 @@ export class LeadTrackingClientRepository {
 
       return createSuccessResponse(undefined);
     } catch (error) {
-      logger.error("leads.tracking.data.store.error", error);
+      logger.error("app.api.v1.core.leads.tracking.data.store.error", error);
       return createErrorResponse(
         "error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -229,10 +232,10 @@ export class LeadTrackingClientRepository {
       }
 
       await setStorageItem(LeadTrackingClientRepository.STORAGE_KEY, null);
-      logger.debug("leads.tracking.data.cleared");
+      logger.debug("app.api.v1.core.leads.tracking.data.cleared");
       return createSuccessResponse(undefined);
     } catch (error) {
-      logger.error("leads.tracking.data.clear.error", error);
+      logger.error("app.api.v1.core.leads.tracking.data.clear.error", error);
       return createErrorResponse(
         "error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -259,7 +262,7 @@ export class LeadTrackingClientRepository {
       if (!id) {
         errors.push(
           createErrorResponse(
-            "leads.tracking.errors.missingId",
+            "app.api.v1.core.leads.tracking.errors.missingId",
             ErrorResponseTypes.VALIDATION_ERROR,
           ),
         );
@@ -275,7 +278,7 @@ export class LeadTrackingClientRepository {
         } catch {
           errors.push(
             createErrorResponse(
-              "leads.tracking.errors.invalidUrl",
+              "app.api.v1.core.leads.tracking.errors.invalidUrl",
               ErrorResponseTypes.VALIDATION_ERROR,
             ),
           );
@@ -302,7 +305,10 @@ export class LeadTrackingClientRepository {
         errors: [],
       });
     } catch (error) {
-      logger.error("leads.tracking.params.validate.error", error);
+      logger.error(
+        "app.api.v1.core.leads.tracking.params.validate.error",
+        error,
+      );
       return createErrorResponse(
         "error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -331,7 +337,7 @@ export class LeadTrackingClientRepository {
 
       return createSuccessResponse(trackingData);
     } catch (error) {
-      logger.error("leads.tracking.data.format.error", error);
+      logger.error("app.api.v1.core.leads.tracking.data.format.error", error);
       return createErrorResponse(
         "error.default",
         ErrorResponseTypes.INTERNAL_ERROR,

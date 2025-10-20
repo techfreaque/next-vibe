@@ -4,6 +4,15 @@ export const translations = {
       noTokenInCookies: "No token in cookies",
     },
   },
+  errors: {
+    session_not_found: "Session not found",
+    session_lookup_failed: "Failed to lookup session",
+    expired_sessions_delete_failed: "Failed to delete expired sessions",
+    session_creation_failed: "Failed to create session",
+    session_creation_database_error: "Database error while creating session",
+    user_sessions_delete_failed: "Failed to delete user sessions",
+    expired: "Session has expired",
+  },
   post: {
     title: "Session",
     description: "Session endpoint",

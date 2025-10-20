@@ -82,6 +82,14 @@ export const translations = {
     error: "Newsletter unsubscribe sync error",
   },
   sms: {
+    confirmation: {
+      message:
+        "You have successfully unsubscribed from {{appName}} newsletter. If this was a mistake, please visit our website to resubscribe.",
+    },
+    admin_notification: {
+      message:
+        "Newsletter Unsubscribe: {{email}} has unsubscribed from the newsletter.",
+    },
     errors: {
       confirmation_failed: {
         title: "SMS Confirmation Failed",

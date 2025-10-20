@@ -61,7 +61,7 @@ const { GET } = createEndpoint({
           layout: { columns: 12 },
           validation: { required: true },
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
 
       // === RESPONSE ===
@@ -82,7 +82,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.get.response.thread.id.content" as const,
             },
-            z.string().uuid(),
+            z.uuid(),
           ),
           userId: responseField(
             {
@@ -90,7 +90,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.get.response.thread.userId.content" as const,
             },
-            z.string().uuid(),
+            z.uuid(),
           ),
           title: responseField(
             {
@@ -106,14 +106,14 @@ const { GET } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.get.response.thread.folderId.content" as const,
             },
-            z.string().uuid().nullable(),
+            z.uuid().nullable(),
           ),
           status: responseField(
             {
               type: WidgetType.BADGE,
               text: "app.api.v1.core.agent.chat.threads.threadId.get.response.thread.status.content" as const,
             },
-            z.nativeEnum(ThreadStatus),
+            z.enum(ThreadStatus),
           ),
           defaultModel: responseField(
             {
@@ -330,7 +330,7 @@ const { PATCH } = createEndpoint({
           layout: { columns: 12 },
           validation: { required: true },
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
 
       // === UPDATE FIELDS ===
@@ -367,7 +367,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.threadId.patch.folderId.description" as const,
               layout: { columns: 6 },
             },
-            z.string().uuid().optional().nullable(),
+            z.uuid().optional().nullable(),
           ),
           status: requestDataField(
             {
@@ -380,7 +380,7 @@ const { PATCH } = createEndpoint({
               layout: { columns: 6 },
               options: ThreadStatusOptions,
             },
-            z.nativeEnum(ThreadStatus).optional(),
+            z.enum(ThreadStatus).optional(),
           ),
           defaultModel: requestDataField(
             {
@@ -475,7 +475,7 @@ const { PATCH } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.patch.response.thread.id.content" as const,
             },
-            z.string().uuid(),
+            z.uuid(),
           ),
           userId: responseField(
             {
@@ -483,7 +483,7 @@ const { PATCH } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.patch.response.thread.userId.content" as const,
             },
-            z.string().uuid(),
+            z.uuid(),
           ),
           title: responseField(
             {
@@ -499,14 +499,14 @@ const { PATCH } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.patch.response.thread.folderId.content" as const,
             },
-            z.string().uuid().nullable(),
+            z.uuid().nullable(),
           ),
           status: responseField(
             {
               type: WidgetType.BADGE,
               text: "app.api.v1.core.agent.chat.threads.threadId.patch.response.thread.status.content" as const,
             },
-            z.nativeEnum(ThreadStatus),
+            z.enum(ThreadStatus),
           ),
           defaultModel: responseField(
             {
@@ -730,7 +730,7 @@ const { DELETE } = createEndpoint({
           layout: { columns: 12 },
           validation: { required: true },
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
 
       // === RESPONSE ===
@@ -748,7 +748,7 @@ const { DELETE } = createEndpoint({
           content:
             "app.api.v1.core.agent.chat.threads.threadId.delete.response.deletedId.content" as const,
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
     },
   ),

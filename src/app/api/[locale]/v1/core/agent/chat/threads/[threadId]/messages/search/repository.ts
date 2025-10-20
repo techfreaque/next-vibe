@@ -79,7 +79,7 @@ export class MessageSearchRepositoryImpl
 
       // Verify thread exists and belongs to user
       const [thread] = await db
-        .select({ id: chatThreads.id })
+        .select({ id: chatThreads.id, rootFolderId: chatThreads.rootFolderId })
         .from(chatThreads)
         .where(
           and(eq(chatThreads.id, threadId), eq(chatThreads.userId, user.id)),
@@ -90,6 +90,15 @@ export class MessageSearchRepositoryImpl
         return createErrorResponse(
           "app.api.v1.core.agent.chat.threads.threadId.messages.search.get.errors.notFound.title",
           ErrorResponseTypes.NOT_FOUND,
+        );
+      }
+
+      // Reject incognito threads
+      if (thread.rootFolderId === "incognito") {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.threads.threadId.messages.search.get.errors.forbidden.title" as const,
+          ErrorResponseTypes.FORBIDDEN,
+          { message: "Incognito threads cannot be accessed on the server" },
         );
       }
 

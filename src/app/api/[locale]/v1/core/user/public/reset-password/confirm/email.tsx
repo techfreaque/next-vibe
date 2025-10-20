@@ -40,12 +40,15 @@ function renderPasswordResetConfirmEmailContent(
     <EmailTemplate
       t={t}
       locale={locale}
-      title={t("auth.resetPassword.confirmEmail.title", {
+      title={t("app.api.v1.core.user.auth.resetPassword.confirmEmail.title", {
         appName,
       })}
-      previewText={t("auth.resetPassword.confirmEmail.previewText", {
-        appName,
-      })}
+      previewText={t(
+        "app.api.v1.core.user.auth.resetPassword.confirmEmail.previewText",
+        {
+          appName,
+        },
+      )}
       tracking={tracking}
     >
       <Text
@@ -56,7 +59,7 @@ function renderPasswordResetConfirmEmailContent(
           marginBottom: "16px",
         }}
       >
-        {t("auth.resetPassword.confirmEmail.greeting", {
+        {t("app.api.v1.core.user.auth.resetPassword.confirmEmail.greeting", {
           name: user.publicName,
         })}
       </Text>
@@ -69,9 +72,12 @@ function renderPasswordResetConfirmEmailContent(
           marginBottom: "16px",
         }}
       >
-        {t("auth.resetPassword.confirmEmail.successMessage", {
-          appName,
-        })}
+        {t(
+          "app.api.v1.core.user.auth.resetPassword.confirmEmail.successMessage",
+          {
+            appName,
+          },
+        )}
       </Text>
 
       <Text
@@ -82,7 +88,9 @@ function renderPasswordResetConfirmEmailContent(
           marginBottom: "16px",
         }}
       >
-        {t("auth.resetPassword.confirmEmail.loginInstructions")}
+        {t(
+          "app.api.v1.core.user.auth.resetPassword.confirmEmail.loginInstructions",
+        )}
       </Text>
 
       <Section style={{ marginTop: "32px" }}>
@@ -94,7 +102,9 @@ function renderPasswordResetConfirmEmailContent(
             marginBottom: "16px",
           }}
         >
-          {t("auth.resetPassword.confirmEmail.securityWarning")}
+          {t(
+            "app.api.v1.core.user.auth.resetPassword.confirmEmail.securityWarning",
+          )}
         </Text>
       </Section>
 
@@ -106,7 +116,7 @@ function renderPasswordResetConfirmEmailContent(
           marginTop: "24px",
         }}
       >
-        {t("auth.resetPassword.confirmEmail.securityTip")}
+        {t("app.api.v1.core.user.auth.resetPassword.confirmEmail.securityTip")}
       </Text>
     </EmailTemplate>
   );
@@ -153,7 +163,7 @@ export const renderResetPasswordConfirmMail: EmailFunctionType<
   return createSuccessResponse({
     toEmail: requestData.verification.email,
     toName: user.publicName,
-    subject: t("auth.resetPassword.confirmEmail.subject", {
+    subject: t("app.api.v1.core.user.auth.resetPassword.confirmEmail.subject", {
       appName,
     }),
     jsx: renderPasswordResetConfirmEmailContent(

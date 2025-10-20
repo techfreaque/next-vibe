@@ -83,7 +83,7 @@ const { POST } = createEndpoint({
           layout: { columns: 12 },
           options: CampaignTypeOptions,
         },
-        z.nativeEnum(CampaignType).optional(),
+        z.enum(CampaignType).optional(),
       ),
       emailJourneyVariant: requestDataField(
         {
@@ -98,7 +98,7 @@ const { POST } = createEndpoint({
           layout: { columns: 12 },
           options: EmailJourneyVariantOptions,
         },
-        z.nativeEnum(EmailJourneyVariant),
+        z.enum(EmailJourneyVariant),
       ),
       emailCampaignStage: requestDataField(
         {
@@ -113,7 +113,7 @@ const { POST } = createEndpoint({
           layout: { columns: 12 },
           options: EmailCampaignStageOptions,
         },
-        z.nativeEnum(EmailCampaignStage),
+        z.enum(EmailCampaignStage),
       ),
 
       // Test recipient
@@ -222,7 +222,7 @@ const { POST } = createEndpoint({
               validation: { required: true },
               options: CountriesOptions,
             },
-            z.nativeEnum(Countries),
+            z.enum(Countries),
           ),
           language: requestDataField(
             {
@@ -238,7 +238,7 @@ const { POST } = createEndpoint({
               validation: { required: true },
               options: LanguagesOptions,
             },
-            z.nativeEnum(Languages),
+            z.enum(Languages),
           ),
           status: requestDataField(
             {
@@ -254,7 +254,7 @@ const { POST } = createEndpoint({
               validation: { required: true },
               options: LeadStatusOptions,
             },
-            z.nativeEnum(LeadStatus),
+            z.enum(LeadStatus),
           ),
           source: requestDataField(
             {
@@ -269,7 +269,7 @@ const { POST } = createEndpoint({
               layout: { columns: 6 },
               options: LeadSourceOptions,
             },
-            z.nativeEnum(LeadSource).optional().nullable(),
+            z.enum(LeadSource).optional().nullable(),
           ),
           notes: requestDataField(
             {

@@ -29,9 +29,13 @@ export const translations = {
       label: "Limit",
       description: "Number of threads per page",
     },
-    folderId: {
-      label: "Folder",
-      description: "Filter by folder ID",
+    rootFolderId: {
+      label: "Root Folder",
+      description: "Filter by root folder (private, shared, public, incognito)",
+    },
+    subFolderId: {
+      label: "Subfolder",
+      description: "Filter by subfolder ID (optional)",
     },
     status: {
       label: "Status",
@@ -66,8 +70,11 @@ export const translations = {
           threadTitle: {
             content: "Title",
           },
+          rootFolderId: {
+            content: "Root Folder",
+          },
           folderId: {
-            content: "Folder ID",
+            content: "Subfolder ID",
           },
           status: {
             content: "Status",
@@ -161,9 +168,13 @@ export const translations = {
       placeholder: "Enter thread title...",
       default: "New Chat",
     },
-    folderId: {
-      label: "Folder",
-      description: "Folder to place thread in",
+    rootFolderId: {
+      label: "Root Folder",
+      description: "Root folder (private, shared, public, incognito)",
+    },
+    subFolderId: {
+      label: "Subfolder",
+      description: "Subfolder to place thread in (optional)",
     },
     defaultModel: {
       label: "Default Model",
@@ -189,8 +200,11 @@ export const translations = {
         threadTitle: {
           content: "Title",
         },
-        folderId: {
-          content: "Folder ID",
+        rootFolderId: {
+          content: "Root Folder",
+        },
+        subFolderId: {
+          content: "Subfolder ID",
         },
         status: {
           content: "Status",

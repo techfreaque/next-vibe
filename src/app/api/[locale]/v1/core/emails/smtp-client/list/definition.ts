@@ -65,7 +65,7 @@ const { GET } = createEndpoint({
           layout: { columns: 3 },
           options: CampaignTypeFilterOptions,
         },
-        z.nativeEnum(CampaignTypeFilter).optional(),
+        z.enum(CampaignTypeFilter).optional(),
       ),
 
       status: requestDataField(
@@ -78,7 +78,7 @@ const { GET } = createEndpoint({
           layout: { columns: 3 },
           options: SmtpAccountStatusFilterOptions,
         },
-        z.nativeEnum(SmtpAccountStatusFilter).optional(),
+        z.enum(SmtpAccountStatusFilter).optional(),
       ),
 
       healthStatus: requestDataField(
@@ -92,7 +92,7 @@ const { GET } = createEndpoint({
           layout: { columns: 3 },
           options: SmtpHealthStatusFilterOptions,
         },
-        z.nativeEnum(SmtpHealthStatusFilter).optional(),
+        z.enum(SmtpHealthStatusFilter).optional(),
       ),
 
       search: requestDataField(
@@ -119,7 +119,7 @@ const { GET } = createEndpoint({
           layout: { columns: 3 },
           options: SmtpAccountSortFieldOptions,
         },
-        z.nativeEnum(SmtpAccountSortField).optional(),
+        z.enum(SmtpAccountSortField).optional(),
       ),
 
       sortOrder: requestDataField(
@@ -133,7 +133,7 @@ const { GET } = createEndpoint({
           layout: { columns: 3 },
           options: SortOrderOptions,
         },
-        z.nativeEnum(SortOrder).optional(),
+        z.enum(SortOrder).optional(),
       ),
 
       page: requestDataField(
@@ -198,14 +198,14 @@ const { GET } = createEndpoint({
                 type: WidgetType.BADGE,
                 text: "app.api.v1.core.emails.smtpClient.list.response.account.status",
               },
-              z.nativeEnum(SmtpAccountStatus),
+              z.enum(SmtpAccountStatus),
             ),
             healthCheckStatus: responseField(
               {
                 type: WidgetType.BADGE,
                 text: "app.api.v1.core.emails.smtpClient.list.response.account.healthStatus",
               },
-              z.nativeEnum(SmtpHealthStatus).nullable(),
+              z.enum(SmtpHealthStatus).nullable(),
             ),
             priority: responseField(
               {

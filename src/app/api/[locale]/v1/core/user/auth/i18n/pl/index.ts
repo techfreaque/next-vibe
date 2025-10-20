@@ -47,6 +47,8 @@ export const translations: typeof enTranslations = {
       description:
         "Publiczny payload JWT nie jest obsługiwany dla uwierzytelniania CLI",
     },
+    jwt_signing_failed: "Nie udało się podpisać tokenu JWT",
+    validation_failed: "Walidacja nie powiodła się",
   },
   post: {
     title: "Tytuł",

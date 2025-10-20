@@ -260,4 +260,28 @@ export const translations: typeof enTranslations = {
     title: "Sukces",
     description: "Twój formularz kontaktowy został pomyślnie przesłany",
   },
+
+  email: {
+    partner: {
+      greeting: "Witaj",
+      thankYou: "Dziękujemy za kontakt!",
+      message: "Wiadomość",
+      additionalInfo: "Dodatkowe informacje",
+      subject: "Nowe zgłoszenie formularza kontaktowego",
+    },
+    company: {
+      contactDetails: "Dane kontaktowe",
+      name: "Imię i nazwisko",
+      email: "E-mail",
+      company: "Firma",
+      contactSubject: "Temat",
+      viewDetails: "Zobacz szczegóły",
+    },
+  },
+
+  error: {
+    general: {
+      internal_server_error: "Wystąpił wewnętrzny błąd serwera",
+    },
+  },
 };

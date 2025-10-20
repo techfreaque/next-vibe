@@ -78,4 +78,21 @@ export const translations = {
       missing_lead_id: "Newsletter subscription: Missing leadId",
     },
   },
+  errors: {
+    email_generation_failed: "Failed to generate email",
+  },
+  error: {
+    general: {
+      internal_server_error: "Internal server error",
+    },
+    default: "An error occurred",
+  },
+  subscription: {
+    error: {
+      description: "Failed to subscribe to newsletter",
+    },
+    unsubscribe: {
+      error: "Failed to unsubscribe from newsletter",
+    },
+  },
 };

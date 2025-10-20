@@ -142,7 +142,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.priority" as const,
             },
-            z.nativeEnum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
+            z.enum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
           ),
           timeout: responseField(
             {
@@ -443,7 +443,7 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.priority.description" as const,
           options: CronTaskPriorityOptions,
         },
-        z.nativeEnum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
+        z.enum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
       ),
       timeout: requestDataField(
         {
@@ -570,7 +570,7 @@ const { PUT } = createEndpoint({
               content:
                 "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.priority" as const,
             },
-            z.nativeEnum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
+            z.enum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
           ),
           timeout: responseField(
             {

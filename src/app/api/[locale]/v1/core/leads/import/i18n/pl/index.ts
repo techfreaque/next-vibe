@@ -19,7 +19,7 @@ export const translations: typeof enTranslations = {
     fileName: {
       label: "Nazwa pliku",
       description: "Nazwa pliku CSV",
-      placeholder: "leads.csv",
+      placeholder: "app.api.v1.core.leads.csv",
       helpText: "Podaj opisową nazwę pliku",
     },
     skipDuplicates: {

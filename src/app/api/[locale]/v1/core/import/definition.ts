@@ -108,7 +108,7 @@ const { POST: ImportCsvPost } = createEndpoint({
               options: ImportDomainOptions,
               validation: { required: true },
             },
-            z.nativeEnum(ImportDomain),
+            z.enum(ImportDomain),
           ),
         },
       ),
@@ -254,7 +254,7 @@ const { POST: ImportCsvPost } = createEndpoint({
                   content:
                     "app.api.v1.core.import.csv.post.response.batchId.label",
                 },
-                z.string().uuid(),
+                z.uuid(),
               ),
               totalRows: responseField(
                 {
@@ -278,7 +278,7 @@ const { POST: ImportCsvPost } = createEndpoint({
                   content:
                     "app.api.v1.core.import.csv.post.response.jobId.label",
                 },
-                z.string().uuid().optional(),
+                z.uuid().optional(),
               ),
             },
           ),
@@ -614,7 +614,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
           layout: { type: LayoutType.STACKED },
         },
         z.object({
-          id: z.string().uuid().describe("Unique job identifier"),
+          id: z.uuid().describe("Unique job identifier"),
           fileName: z.string().describe("Original CSV file name"),
           domain: z.string().describe("Import domain (leads, contacts, etc.)"),
           status: z

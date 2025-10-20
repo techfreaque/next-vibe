@@ -1,6 +1,16 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  errors: {
+    find_failed: "Benutzerrollen konnten nicht gefunden werden",
+    not_found: "Benutzerrolle nicht gefunden",
+    lookup_failed: "Benutzerrolle konnte nicht abgerufen werden",
+    add_failed: "Rolle konnte nicht zum Benutzer hinzugefügt werden",
+    no_data_returned: "Keine Daten von der Datenbank zurückgegeben",
+    remove_failed: "Rolle konnte nicht vom Benutzer entfernt werden",
+    check_failed: "Überprüfung ob Benutzer Rolle hat fehlgeschlagen",
+    delete_failed: "Benutzerrollen konnten nicht gelöscht werden",
+  },
   post: {
     title: "Benutzerrollen",
     description: "Benutzerrollen-Endpunkt",

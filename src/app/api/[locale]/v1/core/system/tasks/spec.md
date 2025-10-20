@@ -295,7 +295,7 @@ CREATE TABLE task_runner_state (
 - **Subdomain structure**: Each has `definition.ts`, `repository.ts`, `route.ts`, `i18n/en/api.ts`
 - **Business logic**: ALL in `repository.ts` files (MANDATORY)
 - **Enums**: Use `createEnumOptions` pattern with translation keys
-- **Field definitions**: Use field utilities with proper enum handling (`z.nativeEnum(EnumName)`)
+- **Field definitions**: Use field utilities with proper enum handling (`z.enum(EnumName)`)
 - **Type Safety**: Everything must be fully type-safe with proper TypeScript types
 - **Task Index**: Generated at `src/app/api/[locale]/v1/core/system/generated/tasks-index.ts`
 - **Single Runner**: One unified task runner handles both cron tasks and side tasks

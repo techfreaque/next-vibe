@@ -311,38 +311,44 @@ export function useNewsletterManager(): NewsletterManagerResult {
     if (subscriptionMutation.error) {
       return {
         type: "error" as const,
-        message: "newsletter.subscription.error.description" as const,
+        message:
+          "app.api.v1.core.newsletter.subscription.error.description" as const,
       };
     }
     if (unsubscribeMutation.error) {
       return {
         type: "error" as const,
-        message: "newsletter.subscription.unsubscribe.error" as const,
+        message:
+          "app.api.v1.core.newsletter.subscription.unsubscribe.error" as const,
       };
     }
     if (subscriptionMutation.isSuccess) {
       return {
         type: "success" as const,
-        message: "newsletter.subscription.success.description" as const,
+        message:
+          "app.api.v1.core.newsletter.subscription.success.description" as const,
       };
     }
     if (unsubscribeMutation.isSuccess) {
       return {
         type: "success" as const,
-        message: "newsletter.subscription.unsubscribe.success" as const,
+        message:
+          "app.api.v1.core.newsletter.subscription.unsubscribe.success" as const,
       };
     }
     if (showConfirmUnsubscribe) {
       return {
         type: "confirm" as const,
-        message: "newsletter.subscription.unsubscribe.confirmQuestion" as const,
+        message:
+          "app.api.v1.core.newsletter.subscription.unsubscribe.confirmQuestion" as const,
       };
     }
     // Show unsubscribe text when email is already subscribed
     if (isSubscribed && isCurrentEmailValid) {
       return {
         type: "info" as const,
-        message: "newsletter.subscription.status.subscribed" as const,
+        message:
+          "app.api.v1.core.newsletter.subscription.status.subscribed" as const,
       };
     }
     return null;
@@ -374,7 +380,9 @@ export function useNewsletterManager(): NewsletterManagerResult {
           // Ensure we have valid leadId before proceeding
           const finalLeadId = typeof leadId === "string" ? leadId : "";
           if (!finalLeadId) {
-            logger.error("newsletter.hooks.errors.missing_lead_id");
+            logger.error(
+              "app.api.v1.core.newsletter.hooks.errors.missing_lead_id",
+            );
             return;
           }
 

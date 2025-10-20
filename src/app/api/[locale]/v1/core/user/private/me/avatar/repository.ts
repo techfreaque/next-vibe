@@ -78,7 +78,7 @@ export class AvatarRepositoryImpl
       );
       if (!userResponse.success) {
         return createErrorResponse(
-          "userAvatar.errors.user_not_found",
+          "app.api.v1.core.user.private.me.avatar.errors.user_not_found",
           ErrorResponseTypes.NOT_FOUND,
           { userId },
         );
@@ -120,7 +120,7 @@ export class AvatarRepositoryImpl
         error,
       );
       return createErrorResponse(
-        "userAvatar.errors.failed_to_upload_avatar",
+        "app.api.v1.core.user.private.me.avatar.errors.failed_to_upload_avatar",
         ErrorResponseTypes.INTERNAL_ERROR,
         { userId, error: String(error) },
       );
@@ -151,7 +151,7 @@ export class AvatarRepositoryImpl
       );
       if (!userResponse.success) {
         return createErrorResponse(
-          "userAvatar.errors.user_not_found",
+          "app.api.v1.core.user.private.me.avatar.errors.user_not_found",
           ErrorResponseTypes.NOT_FOUND,
           { userId },
         );
@@ -187,7 +187,7 @@ export class AvatarRepositoryImpl
         error,
       );
       return createErrorResponse(
-        "userAvatar.errors.failed_to_delete_avatar",
+        "app.api.v1.core.user.private.me.avatar.errors.failed_to_delete_avatar",
         ErrorResponseTypes.INTERNAL_ERROR,
         { userId, error: String(error) },
       );

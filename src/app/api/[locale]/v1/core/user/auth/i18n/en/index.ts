@@ -1,49 +1,19 @@
 export const translations = {
   errors: {
-    token_generation_failed: {
-      title: "Token Generation Failed",
-      description: "Failed to generate authentication token",
-    },
-    invalid_session: {
-      title: "Invalid Session",
-      description: "The session is invalid or expired",
-    },
-    missing_request_context: {
-      title: "Missing Request Context",
-      description: "Request context is missing",
-    },
-    unsupported_platform: {
-      title: "Unsupported Platform",
-      description: "Platform is not supported",
-    },
-    session_retrieval_failed: {
-      title: "Session Retrieval Failed",
-      description: "Failed to retrieve session",
-    },
-    missing_token: {
-      title: "Missing Token",
-      description: "Authentication token is missing",
-    },
-    invalid_token_signature: {
-      title: "Invalid Token Signature",
-      description: "Token signature is invalid",
-    },
-    jwt_payload_missing_id: {
-      title: "JWT Payload Missing ID",
-      description: "JWT payload is missing user ID",
-    },
-    cookie_set_failed: {
-      title: "Cookie Set Failed",
-      description: "Failed to set authentication cookie",
-    },
-    cookie_clear_failed: {
-      title: "Cookie Clear Failed",
-      description: "Failed to clear authentication cookie",
-    },
-    publicPayloadNotSupported: {
-      title: "Public Payload Not Supported",
-      description: "Public JWT payload is not supported for CLI authentication",
-    },
+    token_generation_failed: "Failed to generate authentication token",
+    invalid_session: "The session is invalid or expired",
+    missing_request_context: "Request context is missing",
+    unsupported_platform: "Platform is not supported",
+    session_retrieval_failed: "Failed to retrieve session",
+    missing_token: "Authentication token is missing",
+    invalid_token_signature: "Token signature is invalid",
+    jwt_payload_missing_id: "JWT payload is missing user ID",
+    cookie_set_failed: "Failed to set authentication cookie",
+    cookie_clear_failed: "Failed to clear authentication cookie",
+    publicPayloadNotSupported:
+      "Public JWT payload is not supported for CLI authentication",
+    jwt_signing_failed: "Failed to sign JWT token",
+    validation_failed: "Validation failed",
   },
   post: {
     title: "Auth",

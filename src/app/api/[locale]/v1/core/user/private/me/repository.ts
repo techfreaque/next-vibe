@@ -193,7 +193,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
 
         if (emailExistsResponse.success && emailExistsResponse.data) {
           return createErrorResponse(
-            "auth.errors.validation_failed",
+            "app.api.v1.core.user.auth.errors.validation_failed",
             ErrorResponseTypes.VALIDATION_ERROR,
             {
               field: "email",

@@ -25,17 +25,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "login",
-    title: "meta.login.title",
-    description: "meta.login.description",
-    category: "meta.login.category",
+    title: "app.user.other.login.meta.title",
+    description: "app.user.other.login.meta.description",
+    category: "app.user.other.login.meta.category",
     image:
       "https://images.unsplash.com/photo-1611926653458-09294b3142bf?q=80&w=1200&h=630&auto=format&fit=crop",
-    imageAlt: "meta.login.imageAlt",
-    keywords: ["meta.login.keywords"],
+    imageAlt: "app.user.other.login.meta.imageAlt",
+    keywords: ["app.user.other.login.meta.keywords"],
     additionalMetadata: {
       openGraph: {
-        title: "meta.login.ogTitle",
-        description: "meta.login.ogDescription",
+        title: "app.user.other.login.meta.ogTitle",
+        description: "app.user.other.login.meta.ogDescription",
         url: `https://nextvibe.dev/${locale}/login`,
         type: "website",
         images: [
@@ -43,14 +43,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             url: "https://images.unsplash.com/photo-1611926653458-09294b3142bf?q=80&w=1200&h=630&auto=format&fit=crop",
             width: 1200,
             height: 630,
-            alt: "meta.login.imageAlt",
+            alt: "app.user.other.login.meta.imageAlt",
           },
         ],
       },
       twitter: {
         card: "summary_large_image",
-        title: "meta.login.twitterTitle",
-        description: "meta.login.twitterDescription",
+        title: "app.user.other.login.meta.twitterTitle",
+        description: "app.user.other.login.meta.twitterDescription",
         images: [
           "https://images.unsplash.com/photo-1611926653458-09294b3142bf?q=80&w=1200&h=630&auto=format&fit=crop",
         ],
@@ -105,16 +105,16 @@ export default async function LoginPage({
         className="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 mb-8"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        {t("common.backToHome")}
+        {t("app.user.common.backToHome")}
       </Link>
       <div className="">
         <div className="order-1 md:order-2 text-center">
           <div className="mb-8">
             <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
-              {t("auth.login.title")}
+              {t("app.user.other.login.auth.login.title")}
             </h1>
             <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">
-              {t("auth.login.subtitle")}
+              {t("app.user.other.login.auth.login.subtitle")}
             </p>
           </div>
         </div>

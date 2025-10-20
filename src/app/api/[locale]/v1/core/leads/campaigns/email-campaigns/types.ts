@@ -15,7 +15,7 @@ export const emailCampaignConfigSchema = z.object({
   batchSize: z.number().min(1).max(100),
   maxEmailsPerRun: z.number().min(1).max(1000),
   dryRun: z.boolean(),
-  enabledStages: z.array(z.nativeEnum(EmailCampaignStage)),
+  enabledStages: z.array(z.enum(EmailCampaignStage)),
   delayBetweenStages: z.object({
     [EmailCampaignStage.INITIAL]: z.number(),
     [EmailCampaignStage.FOLLOWUP_1]: z.number(),

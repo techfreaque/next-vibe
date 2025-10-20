@@ -80,24 +80,24 @@ export function SubscriptionClientContent({
   const getTransactionTypeKey = (
     type: string,
   ):
-    | "subscription.history.types.purchase"
-    | "subscription.history.types.subscription"
-    | "subscription.history.types.usage"
-    | "subscription.history.types.expiry"
-    | "subscription.history.types.free_tier" => {
+    | "app.subscription.subscription.history.types.purchase"
+    | "app.subscription.subscription.history.types.subscription"
+    | "app.subscription.subscription.history.types.usage"
+    | "app.subscription.subscription.history.types.expiry"
+    | "app.subscription.subscription.history.types.free_tier" => {
     switch (type) {
       case "purchase":
-        return "subscription.history.types.purchase";
+        return "app.subscription.subscription.history.types.purchase";
       case "subscription":
-        return "subscription.history.types.subscription";
+        return "app.subscription.subscription.history.types.subscription";
       case "usage":
-        return "subscription.history.types.usage";
+        return "app.subscription.subscription.history.types.usage";
       case "expiry":
-        return "subscription.history.types.expiry";
+        return "app.subscription.subscription.history.types.expiry";
       case "free_tier":
-        return "subscription.history.types.free_tier";
+        return "app.subscription.subscription.history.types.free_tier";
       default:
-        return "subscription.history.types.usage"; // fallback
+        return "app.subscription.subscription.history.types.usage"; // fallback
     }
   };
 
@@ -129,10 +129,10 @@ export function SubscriptionClientContent({
         className="text-center space-y-4"
       >
         <h1 className="text-4xl font-bold tracking-tight">
-          {t("subscription.title")}
+          {t("app.subscription.subscription.title")}
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          {t("subscription.description")}
+          {t("app.subscription.subscription.description")}
         </p>
       </motion.div>
 
@@ -150,14 +150,15 @@ export function SubscriptionClientContent({
                   <div className="p-2 rounded-lg bg-primary/10">
                     <Coins className="h-6 w-6 text-primary" />
                   </div>
-                  {t("subscription.balance.title")}
+                  {t("app.subscription.subscription.balance.title")}
                 </CardTitle>
                 <CardDescription>
-                  {t("subscription.balance.description")}
+                  {t("app.subscription.subscription.balance.description")}
                 </CardDescription>
               </div>
               <Badge className="text-lg font-bold px-4 py-2">
-                {initialCredits?.total ?? 0} {t("subscription.balance.total")}
+                {initialCredits?.total ?? 0}{" "}
+                {t("app.subscription.subscription.balance.total")}
               </Badge>
             </div>
           </CardHeader>
@@ -167,13 +168,15 @@ export function SubscriptionClientContent({
               <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
                 <div className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300 mb-2">
                   <Calendar className="h-4 w-4" />
-                  {t("subscription.balance.expiring.title")}
+                  {t("app.subscription.subscription.balance.expiring.title")}
                 </div>
                 <div className="text-2xl font-bold text-amber-900 dark:text-amber-100">
                   {initialCredits?.expiring ?? 0}
                 </div>
                 <div className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                  {t("subscription.balance.expiring.description")}
+                  {t(
+                    "app.subscription.subscription.balance.expiring.description",
+                  )}
                 </div>
               </div>
 
@@ -181,13 +184,15 @@ export function SubscriptionClientContent({
               <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
                 <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-300 mb-2">
                   <Sparkles className="h-4 w-4" />
-                  {t("subscription.balance.permanent.title")}
+                  {t("app.subscription.subscription.balance.permanent.title")}
                 </div>
                 <div className="text-2xl font-bold text-green-900 dark:text-green-100">
                   {initialCredits?.permanent ?? 0}
                 </div>
                 <div className="text-xs text-green-600 dark:text-green-400 mt-1">
-                  {t("subscription.balance.permanent.description")}
+                  {t(
+                    "app.subscription.subscription.balance.permanent.description",
+                  )}
                 </div>
               </div>
 
@@ -195,13 +200,13 @@ export function SubscriptionClientContent({
               <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
                 <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300 mb-2">
                   <Zap className="h-4 w-4" />
-                  {t("subscription.balance.free.title")}
+                  {t("app.subscription.subscription.balance.free.title")}
                 </div>
                 <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
                   {initialCredits?.free ?? 0}
                 </div>
                 <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                  {t("subscription.balance.free.description")}
+                  {t("app.subscription.subscription.balance.free.description")}
                 </div>
               </div>
 
@@ -210,13 +215,14 @@ export function SubscriptionClientContent({
                 <div className="p-4 rounded-lg bg-muted/50 border">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                     <AlertCircle className="h-4 w-4" />
-                    {t("subscription.balance.nextExpiration")}
+                    {t("app.subscription.subscription.balance.nextExpiration")}
                   </div>
                   <div className="text-lg font-semibold">
                     {formatDate(initialCredits.expiresAt)}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    {initialCredits.expiring} {t("subscription.balance.total")}
+                    {initialCredits.expiring}{" "}
+                    {t("app.subscription.subscription.balance.total")}
                   </div>
                 </div>
               )}
@@ -234,15 +240,15 @@ export function SubscriptionClientContent({
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
-            {t("subscription.tabs.overview")}
+            {t("app.subscription.subscription.tabs.overview")}
           </TabsTrigger>
           <TabsTrigger value="buy" className="flex items-center gap-2">
             <CreditCard className="h-4 w-4" />
-            {t("subscription.tabs.buy")}
+            {t("app.subscription.subscription.tabs.buy")}
           </TabsTrigger>
           <TabsTrigger value="history" className="flex items-center gap-2">
             <History className="h-4 w-4" />
-            {t("subscription.tabs.history")}
+            {t("app.subscription.subscription.tabs.history")}
           </TabsTrigger>
         </TabsList>
 
@@ -257,10 +263,12 @@ export function SubscriptionClientContent({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Info className="h-5 w-5" />
-                  {t("subscription.overview.howItWorks.title")}
+                  {t("app.subscription.subscription.overview.howItWorks.title")}
                 </CardTitle>
                 <CardDescription>
-                  {t("subscription.overview.howItWorks.description")}
+                  {t(
+                    "app.subscription.subscription.overview.howItWorks.description",
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -269,11 +277,13 @@ export function SubscriptionClientContent({
                     <Calendar className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5" />
                     <div>
                       <p className="font-medium text-amber-900 dark:text-amber-100">
-                        {t("subscription.overview.howItWorks.expiring.title")}
+                        {t(
+                          "app.subscription.subscription.overview.howItWorks.expiring.title",
+                        )}
                       </p>
                       <p className="text-sm text-amber-700 dark:text-amber-300">
                         {t(
-                          "subscription.overview.howItWorks.expiring.description",
+                          "app.subscription.subscription.overview.howItWorks.expiring.description",
                         )}
                       </p>
                     </div>
@@ -283,11 +293,13 @@ export function SubscriptionClientContent({
                     <Sparkles className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5" />
                     <div>
                       <p className="font-medium text-green-900 dark:text-green-100">
-                        {t("subscription.overview.howItWorks.permanent.title")}
+                        {t(
+                          "app.subscription.subscription.overview.howItWorks.permanent.title",
+                        )}
                       </p>
                       <p className="text-sm text-green-700 dark:text-green-300">
                         {t(
-                          "subscription.overview.howItWorks.permanent.description",
+                          "app.subscription.subscription.overview.howItWorks.permanent.description",
                         )}
                       </p>
                     </div>
@@ -297,10 +309,14 @@ export function SubscriptionClientContent({
                     <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
                     <div>
                       <p className="font-medium text-blue-900 dark:text-blue-100">
-                        {t("subscription.overview.howItWorks.free.title")}
+                        {t(
+                          "app.subscription.subscription.overview.howItWorks.free.title",
+                        )}
                       </p>
                       <p className="text-sm text-blue-700 dark:text-blue-300">
-                        {t("subscription.overview.howItWorks.free.description")}
+                        {t(
+                          "app.subscription.subscription.overview.howItWorks.free.description",
+                        )}
                       </p>
                     </div>
                   </div>
@@ -313,57 +329,81 @@ export function SubscriptionClientContent({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Coins className="h-5 w-5" />
-                  {t("subscription.overview.costs.title")}
+                  {t("app.subscription.subscription.overview.costs.title")}
                 </CardTitle>
                 <CardDescription>
-                  {t("subscription.overview.costs.description")}
+                  {t(
+                    "app.subscription.subscription.overview.costs.description",
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-semibold mb-2">
-                      {t("subscription.overview.costs.models.title")}
+                      {t(
+                        "app.subscription.subscription.overview.costs.models.title",
+                      )}
                     </h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex justify-between p-2 rounded bg-muted/50">
                         <span>
-                          {t("subscription.overview.costs.models.gpt4")}
+                          {t(
+                            "app.subscription.subscription.overview.costs.models.gpt4",
+                          )}
                         </span>
                         <span className="font-mono">
-                          {t("subscription.overview.costs.models.cost", {
-                            count: 5,
-                          })}
+                          {t(
+                            "app.subscription.subscription.overview.costs.models.cost",
+                            {
+                              count: 5,
+                            },
+                          )}
                         </span>
                       </div>
                       <div className="flex justify-between p-2 rounded bg-muted/50">
                         <span>
-                          {t("subscription.overview.costs.models.claude")}
+                          {t(
+                            "app.subscription.subscription.overview.costs.models.claude",
+                          )}
                         </span>
                         <span className="font-mono">
-                          {t("subscription.overview.costs.models.cost", {
-                            count: 4,
-                          })}
+                          {t(
+                            "app.subscription.subscription.overview.costs.models.cost",
+                            {
+                              count: 4,
+                            },
+                          )}
                         </span>
                       </div>
                       <div className="flex justify-between p-2 rounded bg-muted/50">
                         <span>
-                          {t("subscription.overview.costs.models.gpt35")}
+                          {t(
+                            "app.subscription.subscription.overview.costs.models.gpt35",
+                          )}
                         </span>
                         <span className="font-mono">
-                          {t("subscription.overview.costs.models.cost", {
-                            count: 2,
-                          })}
+                          {t(
+                            "app.subscription.subscription.overview.costs.models.cost",
+                            {
+                              count: 2,
+                            },
+                          )}
                         </span>
                       </div>
                       <div className="flex justify-between p-2 rounded bg-muted/50">
                         <span>
-                          {t("subscription.overview.costs.models.llama")}
+                          {t(
+                            "app.subscription.subscription.overview.costs.models.llama",
+                          )}
                         </span>
                         <span className="font-mono">
-                          {t("subscription.overview.costs.models.cost", {
-                            count: 2,
-                          })}
+                          {t(
+                            "app.subscription.subscription.overview.costs.models.cost",
+                            {
+                              count: 2,
+                            },
+                          )}
                         </span>
                       </div>
                     </div>
@@ -371,31 +411,45 @@ export function SubscriptionClientContent({
 
                   <div>
                     <h4 className="font-semibold mb-2">
-                      {t("subscription.overview.costs.features.title")}
+                      {t(
+                        "app.subscription.subscription.overview.costs.features.title",
+                      )}
                     </h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex justify-between p-2 rounded bg-muted/50">
                         <span>
-                          {t("subscription.overview.costs.features.search")}
+                          {t(
+                            "app.subscription.subscription.overview.costs.features.search",
+                          )}
                         </span>
                         <span className="font-mono">
-                          {t("subscription.overview.costs.features.searchCost")}
+                          {t(
+                            "app.subscription.subscription.overview.costs.features.searchCost",
+                          )}
                         </span>
                       </div>
                       <div className="flex justify-between p-2 rounded bg-muted/50">
                         <span>
-                          {t("subscription.overview.costs.features.tts")}
+                          {t(
+                            "app.subscription.subscription.overview.costs.features.tts",
+                          )}
                         </span>
                         <span className="font-mono">
-                          {t("subscription.overview.costs.features.audioCost")}
+                          {t(
+                            "app.subscription.subscription.overview.costs.features.audioCost",
+                          )}
                         </span>
                       </div>
                       <div className="flex justify-between p-2 rounded bg-muted/50">
                         <span>
-                          {t("subscription.overview.costs.features.stt")}
+                          {t(
+                            "app.subscription.subscription.overview.costs.features.stt",
+                          )}
                         </span>
                         <span className="font-mono">
-                          {t("subscription.overview.costs.features.audioCost")}
+                          {t(
+                            "app.subscription.subscription.overview.costs.features.audioCost",
+                          )}
                         </span>
                       </div>
                     </div>
@@ -418,22 +472,26 @@ export function SubscriptionClientContent({
             <Card className="relative overflow-hidden border-2 border-primary">
               <div className="absolute top-4 right-4">
                 <Badge className="bg-primary">
-                  {t("subscription.buy.subscription.badge")}
+                  {t("app.subscription.subscription.buy.subscription.badge")}
                 </Badge>
               </div>
               <CardHeader>
                 <CardTitle className="text-2xl">
-                  {t("subscription.buy.subscription.title")}
+                  {t("app.subscription.subscription.buy.subscription.title")}
                 </CardTitle>
                 <CardDescription>
-                  {t("subscription.buy.subscription.description")}
+                  {t(
+                    "app.subscription.subscription.buy.subscription.description",
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <div className="text-4xl font-bold">{formatPrice(10)}</div>
                   <div className="text-sm text-muted-foreground">
-                    {t("subscription.buy.subscription.perMonth")}
+                    {t(
+                      "app.subscription.subscription.buy.subscription.perMonth",
+                    )}
                   </div>
                 </div>
 
@@ -441,25 +499,31 @@ export function SubscriptionClientContent({
                   <div className="flex items-center gap-2">
                     <Zap className="h-4 w-4 text-primary" />
                     <span>
-                      {t("subscription.buy.subscription.features.credits")}
+                      {t(
+                        "app.subscription.subscription.buy.subscription.features.credits",
+                      )}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-amber-600" />
                     <span>
-                      {t("subscription.buy.subscription.features.expiry")}
+                      {t(
+                        "app.subscription.subscription.buy.subscription.features.expiry",
+                      )}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-green-600" />
                     <span>
-                      {t("subscription.buy.subscription.features.bestFor")}
+                      {t(
+                        "app.subscription.subscription.buy.subscription.features.bestFor",
+                      )}
                     </span>
                   </div>
                 </div>
 
                 <Button className="w-full" size="lg">
-                  {t("subscription.buy.subscription.button")}
+                  {t("app.subscription.subscription.buy.subscription.button")}
                 </Button>
               </CardContent>
             </Card>
@@ -468,39 +532,51 @@ export function SubscriptionClientContent({
             <Card className="relative overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-2xl">
-                  {t("subscription.buy.pack.title")}
+                  {t("app.subscription.subscription.buy.pack.title")}
                 </CardTitle>
                 <CardDescription>
-                  {t("subscription.buy.pack.description")}
+                  {t("app.subscription.subscription.buy.pack.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <div className="text-4xl font-bold">{formatPrice(5)}</div>
                   <div className="text-sm text-muted-foreground">
-                    {t("subscription.buy.pack.perPack")}
+                    {t("app.subscription.subscription.buy.pack.perPack")}
                   </div>
                 </div>
 
                 <div className="space-y-3 text-sm">
                   <div className="flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-green-600" />
-                    <span>{t("subscription.buy.pack.features.credits")}</span>
+                    <span>
+                      {t(
+                        "app.subscription.subscription.buy.pack.features.credits",
+                      )}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <AlertCircle className="h-4 w-4 text-green-600" />
-                    <span>{t("subscription.buy.pack.features.expiry")}</span>
+                    <span>
+                      {t(
+                        "app.subscription.subscription.buy.pack.features.expiry",
+                      )}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-blue-600" />
-                    <span>{t("subscription.buy.pack.features.bestFor")}</span>
+                    <span>
+                      {t(
+                        "app.subscription.subscription.buy.pack.features.bestFor",
+                      )}
+                    </span>
                   </div>
                 </div>
 
                 {/* Quantity Selector */}
                 <div className="space-y-3">
                   <label className="text-sm font-medium">
-                    {t("subscription.buy.pack.quantity")}
+                    {t("app.subscription.subscription.buy.pack.quantity")}
                   </label>
                   <div className="flex items-center gap-3">
                     <Button
@@ -518,7 +594,7 @@ export function SubscriptionClientContent({
                         {packQuantity}
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {t("subscription.buy.pack.total", {
+                        {t("app.subscription.subscription.buy.pack.total", {
                           count: packQuantity * 500,
                         })}
                       </div>
@@ -535,19 +611,19 @@ export function SubscriptionClientContent({
                     </Button>
                   </div>
                   <div className="text-center text-sm text-muted-foreground">
-                    {t("subscription.buy.pack.totalPrice", {
+                    {t("app.subscription.subscription.buy.pack.totalPrice", {
                       price: formatPrice(5 * packQuantity),
                     })}
                   </div>
                 </div>
 
                 <Button className="w-full" size="lg" variant="outline">
-                  {t("subscription.buy.pack.button", {
+                  {t("app.subscription.subscription.buy.pack.button", {
                     count: packQuantity,
                     type:
                       packQuantity === 1
-                        ? t("subscription.buy.pack.pack")
-                        : t("subscription.buy.pack.packs"),
+                        ? t("app.subscription.subscription.buy.pack.pack")
+                        : t("app.subscription.subscription.buy.pack.packs"),
                   })}
                 </Button>
               </CardContent>
@@ -566,10 +642,10 @@ export function SubscriptionClientContent({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <History className="h-5 w-5" />
-                  {t("subscription.history.title")}
+                  {t("app.subscription.subscription.history.title")}
                 </CardTitle>
                 <CardDescription>
-                  {t("subscription.history.description")}
+                  {t("app.subscription.subscription.history.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -578,10 +654,12 @@ export function SubscriptionClientContent({
                     <History className="h-12 w-12 text-muted-foreground mx-auto" />
                     <div>
                       <p className="text-lg font-medium">
-                        {t("subscription.history.empty.title")}
+                        {t("app.subscription.subscription.history.empty.title")}
                       </p>
                       <p className="text-sm text-muted-foreground mt-2">
-                        {t("subscription.history.empty.description")}
+                        {t(
+                          "app.subscription.subscription.history.empty.description",
+                        )}
                       </p>
                     </div>
                   </div>
@@ -625,9 +703,12 @@ export function SubscriptionClientContent({
                             {transaction.amount}
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            {t("subscription.history.balance", {
-                              count: transaction.balanceAfter,
-                            })}
+                            {t(
+                              "app.subscription.subscription.history.balance",
+                              {
+                                count: transaction.balanceAfter,
+                              },
+                            )}
                           </div>
                         </div>
                       </div>
@@ -636,7 +717,7 @@ export function SubscriptionClientContent({
                     {initialHistory.totalCount > 10 && (
                       <div className="text-center pt-4">
                         <Button variant="outline">
-                          {t("subscription.history.loadMore")}
+                          {t("app.subscription.subscription.history.loadMore")}
                         </Button>
                       </div>
                     )}

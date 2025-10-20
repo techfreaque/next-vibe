@@ -57,24 +57,30 @@ export default function ResetPasswordForm({
               <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
             </div>
             <CardTitle className="text-2xl font-bold text-green-700 dark:text-green-400">
-              {t("auth.resetPassword.successTitle")}
+              {t(
+                "app.user.other.resetPassword.auth.resetPassword.successTitle",
+              )}
             </CardTitle>
             <CardDescription className="text-gray-600 dark:text-gray-300 text-base">
-              {t("auth.resetPassword.successMessage")}
+              {t(
+                "app.user.other.resetPassword.auth.resetPassword.successMessage",
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
               <Mail className="w-6 h-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
               <p className="text-sm text-blue-700 dark:text-blue-300">
-                {t("auth.resetPassword.emailSent")}
+                {t("app.user.other.resetPassword.auth.resetPassword.emailSent")}
               </p>
             </div>
             <div className="flex pt-2">
               <Button asChild variant="outline" className="flex-1">
                 <Link href={`/${locale}/user/login`}>
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  {t("auth.resetPassword.backToLogin")}
+                  {t(
+                    "app.user.other.resetPassword.auth.resetPassword.backToLogin",
+                  )}
                 </Link>
               </Button>
             </div>
@@ -96,10 +102,10 @@ export default function ResetPasswordForm({
             <Mail className="w-8 h-8 text-blue-600 dark:text-blue-400" />
           </div>
           <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
-            {t("auth.resetPassword.title")}
+            {t("app.user.other.resetPassword.auth.resetPassword.title")}
           </CardTitle>
           <CardDescription className="text-gray-600 dark:text-gray-300 text-base mt-2">
-            {t("auth.resetPassword.subtitle")}
+            {t("app.user.other.resetPassword.auth.resetPassword.subtitle")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -111,8 +117,10 @@ export default function ResetPasswordForm({
               name="emailInput.email"
               config={{
                 type: "email",
-                label: "auth.resetPassword.emailLabel",
-                placeholder: "auth.resetPassword.emailPlaceholder",
+                label:
+                  "app.user.other.resetPassword.auth.resetPassword.emailLabel",
+                placeholder:
+                  "app.user.other.resetPassword.auth.resetPassword.emailPlaceholder",
                 disabled: isSubmitting,
               }}
               control={form.control}
@@ -130,12 +138,14 @@ export default function ResetPasswordForm({
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  {t("common.loading")}
+                  {t("app.user.common.loading")}
                 </>
               ) : (
                 <>
                   <Mail className="mr-2 h-5 w-5" />
-                  {t("auth.resetPassword.sendResetLink")}
+                  {t(
+                    "app.user.other.resetPassword.auth.resetPassword.sendResetLink",
+                  )}
                 </>
               )}
             </Button>

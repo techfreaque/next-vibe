@@ -36,13 +36,13 @@ export function DefaultErrorFallback({
       <CardContent className="pt-6 flex flex-col items-center text-center">
         <AlertTriangleIcon className="h-12 w-12 text-destructive mb-4" />
         <h3 className="text-xl font-semibold mb-2">
-          {t("common.error.title")}
+          {t("app.common.error.title")}
         </h3>
         <p className="text-muted-foreground mb-4">
-          {t("common.error.message")}
+          {t("app.common.error.message")}
         </p>
         <p className="text-sm text-muted-foreground mb-6">
-          {error.message || t("common.errors.unknown")}
+          {error.message || t("app.common.errors.unknown")}
         </p>
         <Button
           onClick={reset}
@@ -50,7 +50,7 @@ export function DefaultErrorFallback({
           className="flex items-center gap-2"
         >
           <RefreshCwIcon className="h-4 w-4" />
-          {t("common.error.tryAgain")}
+          {t("app.common.error.tryAgain")}
         </Button>
       </CardContent>
     </Card>

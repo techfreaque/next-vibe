@@ -84,6 +84,14 @@ export const translations: typeof enTranslations = {
     error: "Newsletter-Abmeldung Synchronisation Fehler",
   },
   sms: {
+    confirmation: {
+      message:
+        "Sie haben sich erfolgreich vom {{appName}} Newsletter abgemeldet. Falls dies ein Fehler war, besuchen Sie bitte unsere Website, um sich erneut anzumelden.",
+    },
+    admin_notification: {
+      message:
+        "Newsletter-Abmeldung: {{email}} hat sich vom Newsletter abgemeldet.",
+    },
     errors: {
       confirmation_failed: {
         title: "SMS-Bestätigung fehlgeschlagen",

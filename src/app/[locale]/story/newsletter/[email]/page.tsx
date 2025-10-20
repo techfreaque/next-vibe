@@ -29,23 +29,23 @@ export async function generateMetadata({
   // Validate email parameter
   if (!isValidEmail(email)) {
     return {
-      title: t("newsletter.page.invalidEmail.title"),
-      description: t("newsletter.page.invalidEmail.description"),
+      title: t("app.site.newsletter.page.invalidEmail.title"),
+      description: t("app.site.newsletter.page.invalidEmail.description"),
     };
   }
 
   return {
-    title: t("newsletter.page.emailProvided.title"),
-    description: t("newsletter.page.emailProvided.description"),
+    title: t("app.site.newsletter.page.emailProvided.title"),
+    description: t("app.site.newsletter.page.emailProvided.description"),
     openGraph: {
-      title: t("newsletter.page.emailProvided.title"),
-      description: t("newsletter.page.emailProvided.description"),
+      title: t("app.site.newsletter.page.emailProvided.title"),
+      description: t("app.site.newsletter.page.emailProvided.description"),
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: t("newsletter.page.emailProvided.title"),
-      description: t("newsletter.page.emailProvided.description"),
+      title: t("app.site.newsletter.page.emailProvided.title"),
+      description: t("app.site.newsletter.page.emailProvided.description"),
     },
   };
 }

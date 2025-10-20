@@ -273,7 +273,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         error,
       );
       return createErrorResponse(
-        "imapErrors.folders.get.error.server.title",
+        "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -303,7 +303,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
 
       if (!folder) {
         return createErrorResponse(
-          "imapErrors.folders.get.error.not_found.title",
+          "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.not_found.title",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -315,7 +315,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         error,
       );
       return createErrorResponse(
-        "imapErrors.folders.get.error.server.title",
+        "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -353,7 +353,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
 
         if (account.length === 0) {
           return createErrorResponse(
-            "imapErrors.accounts.get.error.not_found.title",
+            "app.api.v1.core.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
             ErrorResponseTypes.NOT_FOUND,
           );
         }
@@ -396,13 +396,13 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
           return createSuccessResponse(syncResults);
         } else {
           return createErrorResponse(
-            "imapErrors.sync.folder.failed",
+            "app.api.v1.core.emails.imapClient.imapErrors.sync.folder.failed",
             ErrorResponseTypes.INTERNAL_ERROR,
           );
         }
       } else {
         return createErrorResponse(
-          "imapErrors.folders.sync.error.missing_account.title",
+          "app.api.v1.core.emails.imapClient.imapErrors.folders.sync.error.missing_account.title",
           ErrorResponseTypes.BAD_REQUEST,
         );
       }
@@ -412,7 +412,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         error,
       );
       return createErrorResponse(
-        "imapErrors.folders.get.error.server.title",
+        "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -456,7 +456,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         parseError(error),
       );
       return createErrorResponse(
-        "imapErrors.folders.get.error.server.title",
+        "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -497,7 +497,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
 
       if (!updatedFolder) {
         return createErrorResponse(
-          "imapErrors.folders.get.error.not_found.title",
+          "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.not_found.title",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -509,7 +509,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         error,
       );
       return createErrorResponse(
-        "imapErrors.folders.get.error.server.title",
+        "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -548,7 +548,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
 
       if (!updatedFolder) {
         return createErrorResponse(
-          "imapErrors.folders.get.error.not_found.title",
+          "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.not_found.title",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -560,7 +560,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         error,
       );
       return createErrorResponse(
-        "imapErrors.folders.get.error.server.title",
+        "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );

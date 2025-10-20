@@ -55,7 +55,7 @@ export const { GET, POST, tools } = endpointsHandler({
       const source = (data.source ?? null) as string | null;
       const targetUrl = data.url as string;
 
-      logger.info("leads.tracking.click.start", {
+      logger.info("app.api.v1.core.leads.tracking.click.start", {
         id: leadId,
         campaignId,
         url: targetUrl,
@@ -73,12 +73,12 @@ export const { GET, POST, tools } = endpointsHandler({
         const userId = authRepository.extractUserId(user);
 
         if (isLoggedIn && userId) {
-          logger.debug("leads.tracking.user.authenticated", {
+          logger.debug("app.api.v1.core.leads.tracking.user.authenticated", {
             userId,
             leadId,
           });
         } else {
-          logger.debug("leads.tracking.user.anonymous", {
+          logger.debug("app.api.v1.core.leads.tracking.user.anonymous", {
             leadId,
           });
         }
@@ -102,7 +102,7 @@ export const { GET, POST, tools } = endpointsHandler({
         );
 
         const duration = Date.now() - startTime;
-        logger.info("leads.tracking.click.completed", {
+        logger.info("app.api.v1.core.leads.tracking.click.completed", {
           id: leadId,
           url: targetUrl,
           duration,
@@ -120,7 +120,7 @@ export const { GET, POST, tools } = endpointsHandler({
         return createSuccessResponse(result.data);
       } catch (error) {
         const duration = Date.now() - startTime;
-        logger.error("leads.tracking.click.error", error, {
+        logger.error("app.api.v1.core.leads.tracking.click.error", error, {
           id: leadId,
           url: targetUrl,
           duration,

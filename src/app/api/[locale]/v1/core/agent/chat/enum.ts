@@ -5,19 +5,13 @@
 
 import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/enum-helpers";
 
-/**
- * Chat message role enum
- */
-export const {
-  enum: ChatMessageRole,
-  options: ChatMessageRoleOptions,
-  Value: ChatMessageRoleValue,
-} = createEnumOptions({
-  USER: "app.api.v1.core.agent.chat.enums.role.user",
-  ASSISTANT: "app.api.v1.core.agent.chat.enums.role.assistant",
-  SYSTEM: "app.api.v1.core.agent.chat.enums.role.system",
-  ERROR: "app.api.v1.core.agent.chat.enums.role.error",
-});
+// using a regular enum as this needs no translation
+export enum ChatMessageRole {
+  USER = "user",
+  ASSISTANT = "assistant",
+  SYSTEM = "system",
+  ERROR = "error",
+}
 
 // Create DB enum array for Drizzle
 export const ChatMessageRoleDB = [
@@ -25,6 +19,30 @@ export const ChatMessageRoleDB = [
   ChatMessageRole.ASSISTANT,
   ChatMessageRole.SYSTEM,
   ChatMessageRole.ERROR,
+] as const;
+
+// Create options for select fields
+export const ChatMessageRoleOptions = [
+  {
+    value: ChatMessageRole.USER,
+    // eslint-disable-next-line i18next/no-literal-string
+    label: "User",
+  },
+  {
+    value: ChatMessageRole.ASSISTANT,
+    // eslint-disable-next-line i18next/no-literal-string
+    label: "Assistant",
+  },
+  {
+    value: ChatMessageRole.SYSTEM,
+    // eslint-disable-next-line i18next/no-literal-string
+    label: "System",
+  },
+  {
+    value: ChatMessageRole.ERROR,
+    // eslint-disable-next-line i18next/no-literal-string
+    label: "Error",
+  },
 ] as const;
 
 /**

@@ -266,7 +266,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
 - All regular TypeScript enums → createEnumOptions pattern
 - Enum values use translation keys, not hardcoded strings
-- Proper z.nativeEnum() usage in definitions
+- Proper z.enum() usage in definitions
 - Consistent enum naming conventions
 - EnumOptions used in UI components
 

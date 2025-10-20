@@ -40,7 +40,7 @@ export function useResetPasswordValidate(
       enabled: !!token,
       onError: ({ error }) => {
         toast({
-          title: t("auth.resetPassword.errors.title"),
+          title: t("app.api.v1.core.user.auth.resetPassword.errors.title"),
           description: t(error.message),
           variant: "destructive",
         });

@@ -39,7 +39,7 @@ export const { POST, tools } = endpointsHandler({
       // Validate passwords match
       if (data.newPassword.password !== data.newPassword.confirmPassword) {
         return createErrorResponse(
-          "auth.resetPassword.errors.passwords_do_not_match",
+          "app.api.v1.core.user.auth.resetPassword.errors.passwords_do_not_match",
           ErrorResponseTypes.VALIDATION_ERROR,
         );
       }
@@ -59,7 +59,8 @@ export const { POST, tools } = endpointsHandler({
       return createSuccessResponse({
         response: {
           success: true,
-          message: "auth.resetPassword.success.password_reset",
+          message:
+            "app.api.v1.core.user.auth.resetPassword.success.password_reset",
           securityTip: t(
             "app.api.v1.core.user.public.resetPassword.confirm.response.securityTip",
           ),

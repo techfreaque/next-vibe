@@ -246,7 +246,7 @@ Use codebase search to find where these enums are used:
 **Step 3: Validate Usage Patterns**
 In the found files, check for:
 
-- **definition.ts files**: Proper `z.nativeEnum()` usage, correct imports
+- **definition.ts files**: Proper `z.enum()` usage, correct imports
 - **repository.ts files**: Enum values in database queries, filtering logic
 - **component files**: Proper enum types, `EnumOptions` usage
 - **page.ts files**: Server-side enum usage
@@ -259,7 +259,7 @@ In the found files, check for:
 - String literals in arrays: `["pending", "completed"]` → `StatusOptions` (from createEnumOptions)
 - Manual type definitions: `type Status = "pending" | "completed"` → `type Status = StatusValue`
 - Regular enums: `enum Status { PENDING = "pending" }` → `createEnumOptions` pattern
-- Wrong validation: `EnumSchema` → `z.nativeEnum(EnumName)`
+- Wrong validation: `EnumSchema` → `z.enum(EnumName)`
 - Hardcoded Field.Enum arrays: `Field.Enum(["a", "b"])` → `Field.Enum(EnumOptions)`
 
 **MANDATORY PROCESS for Each Violation:**
@@ -288,9 +288,9 @@ For each file type, ensure proper enum usage:
 **Definition.ts files:**
 
 - Import enum objects (not schemas): `import { EnumName, EnumOptions } from "./enum"`
-- Use `z.nativeEnum(EnumName)` for Zod validation (NOT `EnumSchema`)
+- Use `z.enum(EnumName)` for Zod validation (NOT `EnumSchema`)
 - Use `EnumOptions` for select/multiselect field options
-- For multi-select fields: `z.array(z.nativeEnum(EnumName))`
+- For multi-select fields: `z.array(z.enum(EnumName))`
 - Translation keys must follow pattern: `app.api.v1.domain.subdomain.enums.enumName.value`
 
 **Database schema files (db.ts):**
@@ -338,10 +338,10 @@ For each file type, ensure proper enum usage:
 - Ensure all enum values are translation keys (not hardcoded strings)
 - Verify proper TypeScript types are exported and used
 - Check for consistent enum naming conventions
-- Validate that `z.nativeEnum()` is used instead of schema exports
+- Validate that `z.enum()` is used instead of schema exports
 - Ensure no string literals exist where enums should be used
 - Verify proper enum value handling in UI components
-- **Note**: `z.nativeEnum()` deprecation warnings are acceptable - this is the established pattern
+- **Note**: `z.enum()` deprecation warnings are acceptable - this is the established pattern
 
 ### 8. **Reporting**
 
@@ -361,7 +361,7 @@ For each file type, ensure proper enum usage:
 - Export both the enum and the Value type: `export type EnumValue = typeof EnumValue`
 - Use `EnumOptions` for UI component options (select, radio, etc.)
 - Use `EnumValue` types for function parameters and component props
-- Use `z.nativeEnum(EnumName)` for Zod validation in API definitions (NOT `EnumSchema`)
+- Use `z.enum(EnumName)` for Zod validation in API definitions (NOT `EnumSchema`)
 - Maintain consistent naming: `EnumName`, `EnumOptions`, `EnumValue`, `EnumSchema`
 - Always import enum values, never use string literals
 - Test that enum changes don't break existing functionality
@@ -410,7 +410,7 @@ brandPersonality: requestResponseField(
     layout: { columns: 6 },
     validation: { required: false },
   },
-  z.nativeEnum(BrandPersonality).optional(),
+  z.enum(BrandPersonality).optional(),
 ),
 
 // ✅ CORRECT - Using enum in examples
@@ -590,10 +590,10 @@ import { GenderSchema } from "./enum";
 ### Validation Patterns
 
 ```typescript
-// ✅ Correct - Use z.nativeEnum()
+// ✅ Correct - Use z.enum()
 z.object({
-  gender: z.nativeEnum(Gender),
-  preferences: z.array(z.nativeEnum(CommunicationChannel))
+  gender: z.enum(Gender),
+  preferences: z.array(z.enum(CommunicationChannel))
 });
 
 // ❌ Wrong - Don't use schema exports
@@ -680,7 +680,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
 1. **NEVER use regular TypeScript enums** - Always use `createEnumOptions`
 2. **NEVER use hardcoded strings** - Always use enum values
-3. **Use z.nativeEnum() for validation** - NOT schema exports (deprecation warnings are OK)
+3. **Use z.enum() for validation** - NOT schema exports (deprecation warnings are OK)
 4. **Follow translation key patterns** - Based on domain and subdomain structure
 5. **Import enum objects, not schemas** - For definition.ts files
 6. **Use dedicated DB arrays for pgEnum** - Import `EnumNameDB` and use with `pgEnum("name", EnumNameDB)`

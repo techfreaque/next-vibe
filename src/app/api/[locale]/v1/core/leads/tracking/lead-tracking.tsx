@@ -43,7 +43,7 @@ export function LeadTracking({ locale }: LeadTrackingProps): null {
         const existingResult =
           await LeadTrackingClientRepository.getTrackingData(logger);
         if (existingResult.success && existingResult.data?.leadId) {
-          logger.debug("leads.tracking.existing.found", {
+          logger.debug("app.api.v1.core.leads.tracking.existing.found", {
             leadId: existingResult.data.leadId,
           });
           setIsInitialized(true);
@@ -51,14 +51,14 @@ export function LeadTracking({ locale }: LeadTrackingProps): null {
         }
 
         // 3. Lead tracking will be handled server-side when engagement occurs
-        logger.debug("leads.tracking.component.initialized", {
+        logger.debug("app.api.v1.core.leads.tracking.component.initialized", {
           locale,
           hasUrlParams: searchParams.toString().length > 0,
         });
 
         setIsInitialized(true);
       } catch (error) {
-        logger.error("leads.tracking.error", error);
+        logger.error("app.api.v1.core.leads.tracking.error", error);
         setIsInitialized(true); // Set to true even on error to prevent infinite retries
       }
     };

@@ -67,6 +67,9 @@ export const translations: typeof enTranslations = {
           threadTitle: {
             content: "Titel",
           },
+          rootFolderId: {
+            content: "Hauptordner",
+          },
           folderId: {
             content: "Ordner-ID",
           },
@@ -190,8 +193,11 @@ export const translations: typeof enTranslations = {
         threadTitle: {
           content: "Titel",
         },
-        folderId: {
-          content: "Ordner-ID",
+        rootFolderId: {
+          content: "Hauptordner",
+        },
+        subFolderId: {
+          content: "Unterordner-ID",
         },
         status: {
           content: "Status",

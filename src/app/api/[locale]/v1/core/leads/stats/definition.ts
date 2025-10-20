@@ -54,7 +54,7 @@ const historicalDataPointSchema = z.object({
 // Chart data schema for a single metric
 const chartDataSchema = z.object({
   name: z.string(),
-  type: z.nativeEnum(ChartType),
+  type: z.enum(ChartType),
   data: z.array(historicalDataPointSchema),
   color: z.string(),
 });
@@ -120,7 +120,7 @@ const topPerformingCampaignSchema = z.object({
 
 // Top performing source schema
 const topPerformingSourceSchema = z.object({
-  source: z.nativeEnum(LeadSource),
+  source: z.enum(LeadSource),
   leadsGenerated: z.number(),
   conversionRate: z.number(),
   qualityScore: z.number(),
@@ -128,7 +128,7 @@ const topPerformingSourceSchema = z.object({
 
 // Recent activity details schema
 const recentActivityDetailsSchema = z.object({
-  status: z.nativeEnum(LeadStatus),
+  status: z.enum(LeadStatus),
   source: z.string(),
   country: z.string(),
   emailsSent: z.number(),
@@ -144,7 +144,7 @@ const recentActivitySchema = z.object({
   leadEmail: z.string(),
   leadBusinessName: z.string(),
   timestamp: z.string(),
-  type: z.nativeEnum(ActivityType),
+  type: z.enum(ActivityType),
   details: recentActivityDetailsSchema,
 });
 
@@ -342,7 +342,7 @@ const { GET } = createEndpoint({
           options: TimePeriodOptions,
           layout: { columns: 4 },
         },
-        z.nativeEnum(TimePeriod).default(TimePeriod.DAY),
+        z.enum(TimePeriod).default(TimePeriod.DAY),
       ),
 
       dateRangePreset: requestDataField(
@@ -355,7 +355,7 @@ const { GET } = createEndpoint({
           options: DateRangePresetOptions,
           layout: { columns: 4 },
         },
-        z.nativeEnum(DateRangePreset).default(DateRangePreset.LAST_30_DAYS),
+        z.enum(DateRangePreset).default(DateRangePreset.LAST_30_DAYS),
       ),
 
       dateFrom: requestDataField(
@@ -389,7 +389,7 @@ const { GET } = createEndpoint({
           options: ChartTypeOptions,
           layout: { columns: 4 },
         },
-        z.nativeEnum(ChartType).default(ChartType.LINE),
+        z.enum(ChartType).default(ChartType.LINE),
       ),
 
       includeComparison: requestDataField(
@@ -414,7 +414,7 @@ const { GET } = createEndpoint({
           options: DateRangePresetOptions,
           layout: { columns: 6 },
         },
-        z.nativeEnum(DateRangePreset).optional(),
+        z.enum(DateRangePreset).optional(),
       ),
 
       // Lead-specific filters
@@ -427,7 +427,7 @@ const { GET } = createEndpoint({
           options: LeadStatusFilterOptions,
           layout: { columns: 4 },
         },
-        z.nativeEnum(LeadStatusFilter).default(LeadStatusFilter.ALL),
+        z.enum(LeadStatusFilter).default(LeadStatusFilter.ALL),
       ),
 
       source: requestDataField(
@@ -439,7 +439,7 @@ const { GET } = createEndpoint({
           options: LeadSourceFilterOptions,
           layout: { columns: 4 },
         },
-        z.nativeEnum(LeadSourceFilter).default(LeadSourceFilter.ALL),
+        z.enum(LeadSourceFilter).default(LeadSourceFilter.ALL),
       ),
 
       country: requestDataField(
@@ -451,7 +451,7 @@ const { GET } = createEndpoint({
           options: CountryFilterOptions,
           layout: { columns: 4 },
         },
-        z.nativeEnum(CountryFilter).default(CountryFilter.ALL),
+        z.enum(CountryFilter).default(CountryFilter.ALL),
       ),
 
       language: requestDataField(
@@ -463,7 +463,7 @@ const { GET } = createEndpoint({
           options: LanguageFilterOptions,
           layout: { columns: 4 },
         },
-        z.nativeEnum(LanguageFilter).default(LanguageFilter.ALL),
+        z.enum(LanguageFilter).default(LanguageFilter.ALL),
       ),
 
       campaignStage: requestDataField(
@@ -652,7 +652,7 @@ const { GET } = createEndpoint({
           description: "app.api.v1.core.leads.stats.journeyVariant.description",
           layout: { columns: 6 },
         },
-        z.nativeEnum(EmailJourneyVariant).optional(),
+        z.enum(EmailJourneyVariant).optional(),
       ),
 
       minEmailsSent: requestDataField(
@@ -734,7 +734,7 @@ const { GET } = createEndpoint({
           options: LeadSortFieldOptions,
           layout: { columns: 6 },
         },
-        z.nativeEnum(LeadSortField).default(LeadSortField.CREATED_AT),
+        z.enum(LeadSortField).default(LeadSortField.CREATED_AT),
       ),
 
       sortOrder: requestDataField(
@@ -746,7 +746,7 @@ const { GET } = createEndpoint({
           options: SortOrderOptions,
           layout: { columns: 6 },
         },
-        z.nativeEnum(SortOrder).default(SortOrder.DESC),
+        z.enum(SortOrder).default(SortOrder.DESC),
       ),
 
       // === RESPONSE FIELDS ===

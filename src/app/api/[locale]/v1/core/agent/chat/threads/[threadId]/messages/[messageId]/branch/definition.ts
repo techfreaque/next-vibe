@@ -127,7 +127,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.threadId.description" as const,
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
       messageId: requestUrlParamsField(
         {
@@ -138,7 +138,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.messageId.description" as const,
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
 
       // === REQUEST DATA ===
@@ -165,7 +165,7 @@ const { POST } = createEndpoint({
           options: ChatMessageRoleOptions,
           validation: { required: true },
         },
-        z.nativeEnum(ChatMessageRole),
+        z.enum(ChatMessageRole),
       ),
       model: requestDataField(
         {
@@ -195,7 +195,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.id.content" as const,
             },
-            z.string().uuid(),
+            z.uuid(),
           ),
           threadId: responseField(
             {
@@ -203,7 +203,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.threadId.content" as const,
             },
-            z.string().uuid(),
+            z.uuid(),
           ),
           role: responseField(
             {
@@ -211,7 +211,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.role.content" as const,
             },
-            z.nativeEnum(ChatMessageRole),
+            z.enum(ChatMessageRole),
           ),
           content: responseField(
             {
@@ -227,7 +227,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.parentId.content" as const,
             },
-            z.string().uuid().nullable(),
+            z.uuid().nullable(),
           ),
           depth: responseField(
             {

@@ -84,7 +84,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
     } catch (error) {
       logger.error("Error setting auth status", error);
       return createErrorResponse(
-        "authClient.errors.status_save_failed",
+        "app.api.v1.core.user.auth.authClient.errors.status_save_failed",
         ErrorResponseTypes.AUTH_ERROR,
         { error: String(error) },
       );
@@ -108,7 +108,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
     } catch (error) {
       logger.error("Error removing auth status", error);
       return createErrorResponse(
-        "authClient.errors.status_remove_failed",
+        "app.api.v1.core.user.auth.authClient.errors.status_remove_failed",
         ErrorResponseTypes.AUTH_ERROR,
         { error: String(error) },
       );
@@ -141,7 +141,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
     } catch (error) {
       logger.error("Error in hasAuthStatus", error);
       return createErrorResponse(
-        "authClient.errors.status_check_failed",
+        "app.api.v1.core.user.auth.authClient.errors.status_check_failed",
         ErrorResponseTypes.AUTH_ERROR,
         { error: String(error) },
       );

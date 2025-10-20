@@ -1,54 +1,52 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
-    form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
-    },
-    response: {
-      title: "Antwort",
-      description: "Antwortdaten",
-    },
-    errors: {
-      unauthorized: {
-        title: "Nicht autorisiert",
-        description: "Authentifizierung erforderlich",
+  pages: {
+    help: {
+      form: {
+        title: "Senden Sie uns eine Nachricht",
+        name: "Name",
+        namePlaceholder: "Ihr Name",
+        email: "E-Mail",
+        emailPlaceholder: "ihre.email@beispiel.de",
+        company: "Unternehmen",
+        companyPlaceholder: "Ihr Firmenname (optional)",
+        subject: "Betreff",
+        subjectPlaceholder: "Wählen Sie einen Betreff",
+        message: "Nachricht",
+        messagePlaceholder: "Sagen Sie uns, wie wir Ihnen helfen können...",
+        submit: "Nachricht senden",
+        sending: "Wird gesendet...",
       },
-      validation: {
-        title: "Validierungsfehler",
-        description: "Ungültige Anfrageparameter",
-      },
-      server: {
-        title: "Serverfehler",
-        description: "Interner Serverfehler",
-      },
-      unknown: {
-        title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist aufgetreten",
-      },
-      network: {
-        title: "Netzwerkfehler",
-        description: "Netzwerkfehler aufgetreten",
-      },
-      forbidden: {
-        title: "Verboten",
-        description: "Zugriff verboten",
-      },
-      notFound: {
-        title: "Nicht gefunden",
-        description: "Ressource nicht gefunden",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Datenkonflikt aufgetreten",
+      info: {
+        title: "Kontaktinformationen",
+        email: "E-Mail",
+        supportEmail: "support@unbottled.ai",
+        community: "Community",
+        discord: "Treten Sie unserem Discord bei",
+        discordDescription:
+          "Erhalten Sie Hilfe von unserer Community und unserem Team",
+        twitter: "Folgen Sie uns auf Twitter",
+        twitterHandle: "@unbottled_ai",
+        website: "Webseite",
+        websiteUrl: "unbottled.ai",
       },
     },
-    success: {
-      title: "Erfolg",
-      description: "Vorgang erfolgreich abgeschlossen",
+  },
+  contact: {
+    subjects: {
+      HELP_SUPPORT: "Hilfe & Support",
+      GENERAL_INQUIRY: "Allgemeine Anfrage",
+      TECHNICAL_SUPPORT: "Technischer Support",
+      ACCOUNT_QUESTION: "Kontofrage",
+      BILLING_QUESTION: "Abrechnung & Guthaben",
+      SALES_INQUIRY: "Vertriebsanfrage",
+      FEATURE_REQUEST: "Feature-Anfrage",
+      BUG_REPORT: "Fehlerbericht",
+      FEEDBACK: "Feedback",
+      COMPLAINT: "Beschwerde",
+      PARTNERSHIP: "Partnerschaft",
+      OTHER: "Sonstiges",
     },
   },
 };

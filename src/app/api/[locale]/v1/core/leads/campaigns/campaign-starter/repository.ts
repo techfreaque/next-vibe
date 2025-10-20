@@ -89,9 +89,10 @@ export class CampaignStarterRepositoryImpl
       // Get current SMTP sending capacity to determine optimal queue size
       // Use system/public user context for cron job
       // Note: smtpRepository.getTotalSendingCapacity expects just country, not full locale
+      const SYSTEM_LEAD_ID = "00000000-0000-0000-0000-000000000000";
       const capacityResult = await smtpRepository.getTotalSendingCapacity(
         {},
-        { isPublic: true },
+        { isPublic: true, leadId: SYSTEM_LEAD_ID },
         country,
         logger,
       );
@@ -244,7 +245,7 @@ export class CampaignStarterRepositoryImpl
         locale,
       });
       return createErrorResponse(
-        "leadsErrors.campaigns.common.error.server.title" as const,
+        "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -309,7 +310,7 @@ export class CampaignStarterRepositoryImpl
         locale,
       });
       return createErrorResponse(
-        "leadsErrors.campaigns.common.error.server.title" as const,
+        "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -373,7 +374,7 @@ export class CampaignStarterRepositoryImpl
         locale,
       });
       return createErrorResponse(
-        "leadsErrors.campaigns.common.error.server.title" as const,
+        "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }

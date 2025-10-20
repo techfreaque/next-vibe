@@ -114,7 +114,7 @@ const { GET } = createEndpoint({
               type: WidgetType.BADGE,
               text: "app.api.v1.core.emails.imapClient.health.health.get.response.data.status",
             },
-            z.nativeEnum(ImapHealthStatus),
+            z.enum(ImapHealthStatus),
           ),
         },
       ),

@@ -152,7 +152,7 @@ const { POST } = createEndpoint({
               layout: { columns: 12 },
               options: UserRoleOptions,
             },
-            z.array(z.nativeEnum(UserRole)).optional(),
+            z.array(z.enum(UserRole)).optional(),
           ),
           emailVerified: requestDataField(
             {

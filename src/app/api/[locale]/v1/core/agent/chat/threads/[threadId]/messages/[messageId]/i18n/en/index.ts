@@ -1,4 +1,5 @@
 import { translations as branchTranslations } from "../../branch/i18n/en";
+import { translations as voteTranslations } from "../../vote/i18n/en";
 
 export const translations = {
   get: {
@@ -298,4 +299,5 @@ export const translations = {
     },
   },
   branch: branchTranslations,
+  vote: voteTranslations,
 };

@@ -115,14 +115,14 @@ const { GET } = createEndpoint({
               type: WidgetType.BADGE,
               text: "app.api.v1.core.emails.messages.id.response.email.type",
             },
-            z.nativeEnum(EmailType),
+            z.enum(EmailType),
           ),
           status: responseField(
             {
               type: WidgetType.BADGE,
               text: "app.api.v1.core.emails.messages.id.response.email.status",
             },
-            z.nativeEnum(EmailStatus),
+            z.enum(EmailStatus),
           ),
           templateName: responseField(
             {

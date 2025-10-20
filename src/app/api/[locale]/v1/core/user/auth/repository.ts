@@ -5,6 +5,7 @@
  */
 import "server-only";
 
+import { and, eq } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -27,6 +28,9 @@ import { Environment, parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { leadAuthService } from "../../leads/auth-service";
+import { leads, userLeads } from "../../leads/db";
+import { db } from "../../system/db";
 import type { CompleteUserType } from "../definition";
 import { UserDetailLevel } from "../enum";
 import { sessionRepository } from "../private/session/repository";
@@ -48,6 +52,7 @@ export interface AuthContext {
   request?: NextRequest; // Required for tRPC
   token?: string; // Required for CLI
   jwtPayload?: JwtPayloadType; // Optional for CLI direct payload auth (can be public or private)
+  locale?: CountryLanguage; // Required for lead creation
 }
 
 /**
@@ -65,8 +70,8 @@ export type InferUserType<
  */
 function createPublicUser<
   TRoles extends readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
->(): InferUserType<TRoles> {
-  return { isPublic: true } as InferUserType<TRoles>;
+>(leadId: string): InferUserType<TRoles> {
+  return { isPublic: true, leadId } as InferUserType<TRoles>;
 }
 
 /**
@@ -74,8 +79,8 @@ function createPublicUser<
  */
 function createPrivateUser<
   TRoles extends readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
->(userId: string): InferUserType<TRoles> {
-  return { isPublic: false, id: userId } as InferUserType<TRoles>;
+>(userId: string, leadId: string): InferUserType<TRoles> {
+  return { isPublic: false, id: userId, leadId } as InferUserType<TRoles>;
 }
 
 /**
@@ -236,7 +241,34 @@ class AuthRepositoryImpl implements AuthRepository {
         return null;
       }
 
-      return { isPublic: false, id: userId };
+      // Get primary leadId for user and use lead's locale
+      // First try to get existing lead to use its locale
+      const [userLead] = await db
+        .select({ leadId: userLeads.leadId })
+        .from(userLeads)
+        .where(and(eq(userLeads.userId, userId), eq(userLeads.isPrimary, true)))
+        .limit(1);
+
+      let locale: CountryLanguage = "en-GLOBAL";
+      if (userLead) {
+        const [lead] = await db
+          .select({ language: leads.language, country: leads.country })
+          .from(leads)
+          .where(eq(leads.id, userLead.leadId))
+          .limit(1);
+        if (lead) {
+          locale = `${lead.language}-${lead.country}` as CountryLanguage;
+        }
+      }
+
+      const leadIdResult = await leadAuthService.getAuthenticatedUserLeadId(
+        userId,
+        undefined, // No cookie leadId in this context
+        locale,
+        logger,
+      );
+
+      return { isPublic: false, id: userId, leadId: leadIdResult.leadId };
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.auth.debug.errorValidatingUserSession",
@@ -297,8 +329,109 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   /**
+   * Get leadId for authenticated user
+   * @param userId - User ID
+   * @param locale - User locale for lead creation fallback
+   * @param logger - Logger for debugging
+   * @param skipCookies - Skip cookie reading (for CLI context)
+   * @returns leadId
+   */
+  private async getLeadIdForUser(
+    userId: string,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+    skipCookies = false,
+  ): Promise<string> {
+    try {
+      // Get leadId from cookie (skip for CLI)
+      let cookieLeadId: string | undefined;
+      if (!skipCookies) {
+        try {
+          const cookieStore = await cookies();
+          cookieLeadId = cookieStore.get("leadId")?.value;
+        } catch (error) {
+          // Cookies not available (e.g., CLI context)
+          logger.debug(
+            "app.api.v1.core.user.auth.debug.cookiesNotAvailable",
+            error,
+          );
+        }
+      }
+
+      // Get primary leadId for user
+      const result = await leadAuthService.getAuthenticatedUserLeadId(
+        userId,
+        cookieLeadId,
+        locale,
+        logger,
+      );
+
+      return result.leadId;
+    } catch (error) {
+      logger.error("app.api.v1.core.user.auth.debug.errorGettingLeadId", error);
+      // Fallback: create a new lead for this user with proper locale
+      return await leadAuthService.createLeadForUser(userId, locale, logger);
+    }
+  }
+
+  /**
+   * Get leadId for public user
+   * @param locale - Locale for lead creation
+   * @param logger - Logger for debugging
+   * @param skipCookies - Skip cookie reading (for CLI context)
+   * @returns leadId
+   */
+  private async getLeadIdForPublicUser(
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+    skipCookies = false,
+  ): Promise<string> {
+    try {
+      // Get leadId from cookie (skip for CLI)
+      let cookieLeadId: string | undefined;
+      if (!skipCookies) {
+        try {
+          const cookieStore = await cookies();
+          cookieLeadId = cookieStore.get("leadId")?.value;
+        } catch (error) {
+          // Cookies not available (e.g., CLI context)
+          logger.debug(
+            "app.api.v1.core.user.auth.debug.cookiesNotAvailable",
+            error,
+          );
+        }
+      }
+
+      // Get client info from headers
+      const clientInfo = {
+        userAgent: undefined,
+        ipAddress: undefined,
+        referer: undefined,
+      };
+
+      // Ensure public user has valid leadId
+      const result = await leadAuthService.ensurePublicLeadId(
+        cookieLeadId,
+        clientInfo,
+        locale,
+        logger,
+      );
+
+      return result.leadId;
+    } catch (error) {
+      logger.error(
+        "app.api.v1.core.user.auth.debug.errorGettingPublicLeadId",
+        error,
+      );
+      // eslint-disable-next-line no-restricted-syntax
+      throw error;
+    }
+  }
+
+  /**
    * Authenticate user with role checking
    * @param userId - User ID
+   * @param leadId - Lead ID
    * @param requiredRoles - Required roles
    * @param logger - Logger for debugging
    * @returns Authenticated user or public user
@@ -308,17 +441,18 @@ class AuthRepositoryImpl implements AuthRepository {
       readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
   >(
     userId: string,
+    leadId: string,
     requiredRoles: TRoles,
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
     // Public role is always allowed
     if (requiredRoles.includes(UserRole.PUBLIC)) {
-      return createPublicUser<TRoles>();
+      return createPublicUser<TRoles>(leadId);
     }
 
     // Customer role is allowed for any authenticated user
     if (requiredRoles.includes(UserRole.CUSTOMER)) {
-      return createPrivateUser<TRoles>(userId);
+      return createPrivateUser<TRoles>(userId, leadId);
     }
 
     // For other roles, check the user's roles
@@ -328,7 +462,7 @@ class AuthRepositoryImpl implements AuthRepository {
         logger,
       );
       if (!userRolesResponse.success) {
-        return createPublicUser<TRoles>();
+        return createPublicUser<TRoles>(leadId);
       }
 
       // Check for required roles
@@ -337,16 +471,16 @@ class AuthRepositoryImpl implements AuthRepository {
       );
 
       if (hasRequiredRole) {
-        return createPrivateUser<TRoles>(userId);
+        return createPrivateUser<TRoles>(userId, leadId);
       }
 
-      return createPublicUser<TRoles>();
+      return createPublicUser<TRoles>(leadId);
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.auth.debug.errorCheckingUserAuth",
         error,
       );
-      return createPublicUser<TRoles>();
+      return createPublicUser<TRoles>(leadId);
     }
   }
 
@@ -455,7 +589,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (error) {
       logger.error("app.api.v1.core.user.auth.debug.errorSigningJwt", error);
       return createErrorResponse(
-        "auth.errors.jwt_signing_failed",
+        "app.api.v1.core.user.auth.errors.jwt_signing_failed",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -487,10 +621,23 @@ class AuthRepositoryImpl implements AuthRepository {
           payload,
         });
         return createErrorResponse(
-          "auth.errors.invalid_token_signature",
+          "app.api.v1.core.user.auth.errors.invalid_token_signature",
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
+
+      // Validate leadId is present
+      if (!payload.leadId || typeof payload.leadId !== "string") {
+        logger.debug("app.api.v1.core.user.auth.debug.invalidTokenPayload", {
+          payload,
+          reason: "missing_leadId",
+        });
+        return createErrorResponse(
+          "app.api.v1.core.user.auth.errors.invalid_token_signature",
+          ErrorResponseTypes.UNAUTHORIZED,
+        );
+      }
+
       logger.debug("app.api.v1.core.user.auth.debug.jwtVerifiedSuccessfully", {
         payload,
       });
@@ -498,13 +645,14 @@ class AuthRepositoryImpl implements AuthRepository {
       return createSuccessResponse({
         isPublic: false,
         id: payload.id,
+        leadId: payload.leadId,
       });
     } catch (error) {
       logger.debug("app.api.v1.core.user.auth.debug.errorVerifyingJwt", {
         error: parseError(error).message,
       });
       return createErrorResponse(
-        "auth.errors.invalid_token_signature",
+        "app.api.v1.core.user.auth.errors.invalid_token_signature",
         ErrorResponseTypes.UNAUTHORIZED,
         { error: parseError(error).message },
       );
@@ -531,7 +679,7 @@ class AuthRepositoryImpl implements AuthRepository {
         case "trpc":
           if (!context.request) {
             return createErrorResponse(
-              "auth.errors.missing_request_context",
+              "app.api.v1.core.user.auth.errors.missing_request_context",
               ErrorResponseTypes.INTERNAL_ERROR,
             );
           }
@@ -540,7 +688,7 @@ class AuthRepositoryImpl implements AuthRepository {
         case "cli":
           if (!context.token) {
             return createErrorResponse(
-              "auth.errors.missing_token",
+              "app.api.v1.core.user.auth.errors.missing_token",
               ErrorResponseTypes.UNAUTHORIZED,
             );
           }
@@ -548,7 +696,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
         default:
           return createErrorResponse(
-            "auth.errors.unsupported_platform",
+            "app.api.v1.core.user.auth.errors.unsupported_platform",
             ErrorResponseTypes.INTERNAL_ERROR,
           );
       }
@@ -558,7 +706,7 @@ class AuthRepositoryImpl implements AuthRepository {
         error,
       );
       return createErrorResponse(
-        "auth.errors.session_retrieval_failed",
+        "app.api.v1.core.user.auth.errors.session_retrieval_failed",
         ErrorResponseTypes.UNAUTHORIZED,
         { error: parseError(error).message },
       );
@@ -584,7 +732,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
       if (!token) {
         return createErrorResponse(
-          "auth.errors.missing_token",
+          "app.api.v1.core.user.auth.errors.missing_token",
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
@@ -607,7 +755,7 @@ class AuthRepositoryImpl implements AuthRepository {
         cookieStore.delete(AUTH_STATUS_COOKIE_NAME);
 
         return createErrorResponse(
-          "auth.errors.invalid_session",
+          "app.api.v1.core.user.auth.errors.invalid_session",
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
@@ -619,7 +767,7 @@ class AuthRepositoryImpl implements AuthRepository {
         error,
       );
       return createErrorResponse(
-        "auth.errors.session_retrieval_failed",
+        "app.api.v1.core.user.auth.errors.session_retrieval_failed",
         ErrorResponseTypes.UNAUTHORIZED,
         { error: parseError(error).message },
       );
@@ -646,7 +794,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
       if (!token) {
         return createErrorResponse(
-          "auth.errors.missing_token",
+          "app.api.v1.core.user.auth.errors.missing_token",
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
@@ -665,7 +813,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       if (!user) {
         return createErrorResponse(
-          "auth.errors.invalid_session",
+          "app.api.v1.core.user.auth.errors.invalid_session",
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
@@ -677,7 +825,7 @@ class AuthRepositoryImpl implements AuthRepository {
         error,
       );
       return createErrorResponse(
-        "auth.errors.session_retrieval_failed",
+        "app.api.v1.core.user.auth.errors.session_retrieval_failed",
         ErrorResponseTypes.UNAUTHORIZED,
         { error: parseError(error).message },
       );
@@ -701,7 +849,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
       if (!token) {
         return createErrorResponse(
-          "auth.errors.missing_token",
+          "app.api.v1.core.user.auth.errors.missing_token",
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
@@ -720,7 +868,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       if (!user) {
         return createErrorResponse(
-          "auth.errors.invalid_session",
+          "app.api.v1.core.user.auth.errors.invalid_session",
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
@@ -732,7 +880,7 @@ class AuthRepositoryImpl implements AuthRepository {
         error,
       );
       return createErrorResponse(
-        "auth.errors.session_retrieval_failed",
+        "app.api.v1.core.user.auth.errors.session_retrieval_failed",
         ErrorResponseTypes.UNAUTHORIZED,
         { error: parseError(error).message },
       );
@@ -751,14 +899,29 @@ class AuthRepositoryImpl implements AuthRepository {
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
     try {
+      // Locale is required for lead creation
+      if (!context.locale) {
+        logger.error("app.api.v1.core.user.auth.debug.missingLocaleInContext");
+        // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+        throw new Error("Locale is required in AuthContext for lead creation");
+      }
+
       if (!context.platform) {
         // Default to Next.js behavior for backward compatibility
-        return await this.getAuthMinimalUserNext<TRoles>(roles, logger);
+        return await this.getAuthMinimalUserNext<TRoles>(
+          roles,
+          context.locale,
+          logger,
+        );
       }
 
       switch (context.platform) {
         case "next":
-          return await this.getAuthMinimalUserNext(roles, logger);
+          return await this.getAuthMinimalUserNext(
+            roles,
+            context.locale,
+            logger,
+          );
 
         case "trpc":
           if (!context.request) {
@@ -770,6 +933,7 @@ class AuthRepositoryImpl implements AuthRepository {
           return await this.getAuthMinimalUserTrpc(
             context.request,
             roles,
+            context.locale,
             logger,
           );
 
@@ -777,13 +941,7 @@ class AuthRepositoryImpl implements AuthRepository {
           if (context.jwtPayload) {
             // Direct payload authentication
             // Ensure payload is private (has id and isPublic: false)
-            if (!context.jwtPayload.isPublic && context.jwtPayload.id) {
-              return await this.authenticateWithPayload<TRoles>(
-                context.jwtPayload,
-                roles,
-                logger,
-              );
-            } else {
+            if (context.jwtPayload.isPublic) {
               logger.error(
                 "app.api.v1.core.user.auth.debug.publicPayloadNotSupportedForCli",
               );
@@ -792,18 +950,30 @@ class AuthRepositoryImpl implements AuthRepository {
                 ErrorResponseTypes.UNAUTHORIZED,
               );
             }
+            // TypeScript now knows this is JwtPrivatePayloadType after the check
+            return await this.authenticateWithPayload<TRoles>(
+              context.jwtPayload,
+              roles,
+              context.locale,
+              logger,
+            );
           } else if (context.token) {
             // Token-based authentication
             return await this.getAuthMinimalUserCli<TRoles>(
               context.token,
               roles,
+              context.locale,
               logger,
             );
           } else {
             logger.error(
               "app.api.v1.core.user.auth.debug.missingTokenOrPayloadForCli",
             );
-            return { isPublic: true } as InferUserType<TRoles>;
+            const leadId = await this.getLeadIdForPublicUser(
+              context.locale,
+              logger,
+            );
+            return createPublicUser<TRoles>(leadId);
           }
 
         default:
@@ -827,17 +997,24 @@ class AuthRepositoryImpl implements AuthRepository {
   /**
    * Get authenticated user with role checking for Next.js
    * @param roles - Required roles
+   * @param locale - Locale for lead creation
    * @param logger - Logger for debugging
    * @returns Authenticated user
    */
   private async getAuthMinimalUserNext<
     TRoles extends
       readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
-  >(roles: TRoles, logger: EndpointLogger): Promise<InferUserType<TRoles>> {
+  >(
+    roles: TRoles,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<InferUserType<TRoles>> {
     try {
       // Public role is always allowed
       if (roles.includes(UserRole.PUBLIC)) {
-        return { isPublic: true } as InferUserType<TRoles>;
+        // Get leadId for public user
+        const leadId = await this.getLeadIdForPublicUser(locale, logger);
+        return createPublicUser<TRoles>(leadId);
       }
 
       // Get user from cookies
@@ -847,12 +1024,22 @@ class AuthRepositoryImpl implements AuthRepository {
         !userResult.data?.id ||
         userResult.data.isPublic
       ) {
-        return { isPublic: true } as InferUserType<TRoles>;
+        // User not authenticated, return public user with leadId
+        const leadId = await this.getLeadIdForPublicUser(locale, logger);
+        return createPublicUser<TRoles>(leadId);
       }
+
+      // Get leadId for authenticated user
+      const leadId = await this.getLeadIdForUser(
+        userResult.data.id,
+        locale,
+        logger,
+      );
 
       // Use internal method to check authentication with roles
       return await this.getAuthenticatedUserInternal<TRoles>(
         userResult.data.id,
+        leadId,
         roles,
         logger,
       );
@@ -861,7 +1048,9 @@ class AuthRepositoryImpl implements AuthRepository {
         "app.api.v1.core.user.auth.debug.errorGettingAuthUserForNextjs",
         error,
       );
-      return { isPublic: true } as InferUserType<TRoles>;
+      // Fallback to public user with leadId
+      const leadId = await this.getLeadIdForPublicUser(locale, logger);
+      return createPublicUser<TRoles>(leadId);
     }
   }
 
@@ -869,6 +1058,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * Get authenticated user with role checking for tRPC
    * @param request - NextRequest from tRPC context
    * @param roles - Required roles
+   * @param locale - Locale for lead creation
    * @param logger - Logger for debugging
    * @returns Authenticated user
    */
@@ -878,12 +1068,15 @@ class AuthRepositoryImpl implements AuthRepository {
   >(
     request: NextRequest,
     roles: TRoles,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
     try {
       // Public role is always allowed
       if (roles.includes(UserRole.PUBLIC)) {
-        return { isPublic: true } as InferUserType<TRoles>;
+        // Get leadId for public user
+        const leadId = await this.getLeadIdForPublicUser(locale, logger);
+        return createPublicUser<TRoles>(leadId);
       }
 
       // Get user from request
@@ -893,12 +1086,22 @@ class AuthRepositoryImpl implements AuthRepository {
         !userResult.data?.id ||
         userResult.data.isPublic
       ) {
-        return { isPublic: true } as InferUserType<TRoles>;
+        // User not authenticated, return public user with leadId
+        const leadId = await this.getLeadIdForPublicUser(locale, logger);
+        return createPublicUser<TRoles>(leadId);
       }
+
+      // Get leadId for authenticated user
+      const leadId = await this.getLeadIdForUser(
+        userResult.data.id,
+        locale,
+        logger,
+      );
 
       // Use internal method to check authentication with roles
       return await this.getAuthenticatedUserInternal<TRoles>(
         userResult.data.id,
+        leadId,
         roles,
         logger,
       );
@@ -907,7 +1110,9 @@ class AuthRepositoryImpl implements AuthRepository {
         "app.api.v1.core.user.auth.debug.errorGettingAuthUserForTrpc",
         error,
       );
-      return { isPublic: true } as InferUserType<TRoles>;
+      // Fallback to public user with leadId
+      const leadId = await this.getLeadIdForPublicUser(locale, logger);
+      return createPublicUser<TRoles>(leadId);
     }
   }
 
@@ -915,6 +1120,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * Get authenticated user with role checking for CLI
    * @param token - JWT token provided by CLI
    * @param roles - Required roles
+   * @param locale - Locale for lead creation
    * @param logger - Logger for debugging
    * @returns Authenticated user
    */
@@ -924,12 +1130,15 @@ class AuthRepositoryImpl implements AuthRepository {
   >(
     token: string,
     roles: TRoles,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
     try {
       // Public role is always allowed, or if no roles specified (empty array means public)
       if (roles.includes(UserRole.PUBLIC) || roles.length === 0) {
-        return { isPublic: true } as InferUserType<TRoles>;
+        // Get leadId for public user (skip cookies for CLI)
+        const leadId = await this.getLeadIdForPublicUser(locale, logger, true);
+        return createPublicUser<TRoles>(leadId);
       }
 
       // Get user from token
@@ -939,12 +1148,23 @@ class AuthRepositoryImpl implements AuthRepository {
         !userResult.data?.id ||
         userResult.data.isPublic
       ) {
-        return { isPublic: true } as InferUserType<TRoles>;
+        // User not authenticated, return public user with leadId
+        const leadId = await this.getLeadIdForPublicUser(locale, logger, true);
+        return createPublicUser<TRoles>(leadId);
       }
+
+      // Get leadId for authenticated user (skip cookies for CLI)
+      const leadId = await this.getLeadIdForUser(
+        userResult.data.id,
+        locale,
+        logger,
+        true,
+      );
 
       // Use internal method to check authentication with roles
       return await this.getAuthenticatedUserInternal(
         userResult.data.id,
+        leadId,
         roles,
         logger,
       );
@@ -953,7 +1173,9 @@ class AuthRepositoryImpl implements AuthRepository {
         "app.api.v1.core.user.auth.debug.errorGettingAuthUserForCli",
         error,
       );
-      return { isPublic: true } as InferUserType<TRoles>;
+      // Fallback to public user with leadId
+      const leadId = await this.getLeadIdForPublicUser(locale, logger, true);
+      return createPublicUser<TRoles>(leadId);
     }
   }
 
@@ -962,6 +1184,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * Used when CLI provides a pre-validated JWT payload
    * @param jwtPayload - Pre-validated JWT payload
    * @param roles - Required roles
+   * @param locale - Locale for lead creation
    * @param logger - Logger for debugging
    * @returns Authenticated user
    */
@@ -971,6 +1194,7 @@ class AuthRepositoryImpl implements AuthRepository {
   >(
     jwtPayload: JwtPrivatePayloadType,
     roles: TRoles,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
     try {
@@ -979,22 +1203,29 @@ class AuthRepositoryImpl implements AuthRepository {
         {
           userId: jwtPayload.id,
           isPublic: jwtPayload.isPublic,
+          leadId: jwtPayload.leadId,
         },
       );
 
       // Public role is always allowed, or if no roles specified (empty array means public)
       if (roles.includes(UserRole.PUBLIC) || roles.length === 0) {
-        return { isPublic: true } as InferUserType<TRoles>;
+        // Use leadId from payload (always present)
+        return createPublicUser<TRoles>(jwtPayload.leadId);
       }
 
       // Check if user is public
       if (jwtPayload.isPublic || !jwtPayload.id) {
-        return { isPublic: true } as InferUserType<TRoles>;
+        // Use leadId from payload (always present)
+        return createPublicUser<TRoles>(jwtPayload.leadId);
       }
+
+      // Use leadId from payload (always present)
+      const leadId = jwtPayload.leadId;
 
       // Use internal method to check authentication with roles
       return await this.getAuthenticatedUserInternal(
         jwtPayload.id,
+        leadId,
         roles,
         logger,
       );
@@ -1003,7 +1234,8 @@ class AuthRepositoryImpl implements AuthRepository {
         "app.api.v1.core.user.auth.debug.errorAuthenticatingCliUserWithPayload",
         error,
       );
-      return { isPublic: true } as InferUserType<TRoles>;
+      const leadId = await this.getLeadIdForPublicUser(locale, logger, true);
+      return createPublicUser<TRoles>(leadId);
     }
   }
 
@@ -1032,9 +1264,19 @@ class AuthRepositoryImpl implements AuthRepository {
     logger: EndpointLogger,
   ): Promise<(typeof UserRoleValue)[keyof typeof UserRoleValue][]> {
     try {
+      // Locale is required for lead creation
+      if (!context.locale) {
+        logger.error("app.api.v1.core.user.auth.debug.missingLocaleInContext");
+        return [];
+      }
+
       if (!context.platform) {
         // Default behavior - try to get user and return roles
-        const user = await this.getAuthMinimalUserNext(requiredRoles, logger);
+        const user = await this.getAuthMinimalUserNext(
+          requiredRoles,
+          context.locale,
+          logger,
+        );
         return user?.id
           ? await this.getUserRolesInternal(user.id, requiredRoles, logger)
           : [];
@@ -1044,6 +1286,7 @@ class AuthRepositoryImpl implements AuthRepository {
         case "next": {
           const nextUser = await this.getAuthMinimalUserNext(
             requiredRoles,
+            context.locale,
             logger,
           );
           return nextUser?.id
@@ -1204,7 +1447,7 @@ class AuthRepositoryImpl implements AuthRepository {
         error,
       );
       return createErrorResponse(
-        "auth.errors.cookie_set_failed",
+        "app.api.v1.core.user.auth.errors.cookie_set_failed",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -1233,7 +1476,7 @@ class AuthRepositoryImpl implements AuthRepository {
         error,
       );
       return createErrorResponse(
-        "auth.errors.cookie_clear_failed",
+        "app.api.v1.core.user.auth.errors.cookie_clear_failed",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -1252,9 +1495,37 @@ class AuthRepositoryImpl implements AuthRepository {
         userId,
       });
 
+      // Get primary leadId for user and use lead's locale
+      // First try to get existing lead to use its locale
+      const [userLead] = await db
+        .select({ leadId: userLeads.leadId })
+        .from(userLeads)
+        .where(and(eq(userLeads.userId, userId), eq(userLeads.isPrimary, true)))
+        .limit(1);
+
+      let locale: CountryLanguage = "en-GLOBAL";
+      if (userLead) {
+        const [lead] = await db
+          .select({ language: leads.language, country: leads.country })
+          .from(leads)
+          .where(eq(leads.id, userLead.leadId))
+          .limit(1);
+        if (lead) {
+          locale = `${lead.language}-${lead.country}` as CountryLanguage;
+        }
+      }
+
+      const leadIdResult = await leadAuthService.getAuthenticatedUserLeadId(
+        userId,
+        undefined, // No cookie leadId in CLI context
+        locale,
+        logger,
+      );
+
       const payload: JwtPrivatePayloadType = {
         isPublic: false,
         id: userId,
+        leadId: leadIdResult.leadId,
       };
 
       return await this.signJwt(payload, logger);
@@ -1264,7 +1535,7 @@ class AuthRepositoryImpl implements AuthRepository {
         error,
       );
       return createErrorResponse(
-        "auth.errors.jwt_signing_failed",
+        "app.api.v1.core.user.auth.errors.jwt_signing_failed",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -1334,7 +1605,7 @@ class AuthRepositoryImpl implements AuthRepository {
     const userId = this.extractUserId(payload);
     if (!userId) {
       throwErrorResponse(
-        "auth.errors.jwt_payload_missing_id",
+        "app.api.v1.core.user.auth.errors.jwt_payload_missing_id",
         ErrorResponseTypes.UNAUTHORIZED,
       );
     }

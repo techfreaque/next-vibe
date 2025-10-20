@@ -22,21 +22,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "contact",
-    title: "meta.contact.title",
-    description: "meta.contact.description",
-    category: "meta.contact.category",
+    title: "app.help.meta.contact.title",
+    description: "app.help.meta.contact.description",
+    category: "app.help.meta.contact.category",
     image:
       "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&h=630&auto=format&fit=crop",
-    imageAlt: "meta.contact.imageAlt",
-    keywords: ["meta.contact.keywords"],
+    imageAlt: "app.help.meta.contact.imageAlt",
+    keywords: ["app.help.meta.contact.keywords"],
     additionalMetadata: {
       openGraph: {
-        title: "meta.contact.ogTitle",
-        description: "meta.contact.ogDescription",
+        title: "app.help.meta.contact.ogTitle",
+        description: "app.help.meta.contact.ogDescription",
       },
       twitter: {
-        title: "meta.contact.twitterTitle",
-        description: "meta.contact.twitterDescription",
+        title: "app.help.meta.contact.twitterTitle",
+        description: "app.help.meta.contact.twitterDescription",
       },
     },
   });
@@ -69,15 +69,15 @@ export default async function ContactPage({
           className="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 mb-8"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          {t("nav.home")}
+          {t("app.help.nav.home")}
         </Link>
 
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
-            {t("pages.help.title")}
+            {t("app.help.pages.help.title")}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            {t("pages.help.subtitle")}
+            {t("app.help.pages.help.subtitle")}
           </p>
         </div>
 
@@ -88,39 +88,39 @@ export default async function ContactPage({
 
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 mb-16">
           <h2 className="text-2xl font-bold mb-6 text-center">
-            {t("pages.help.faq.title")}
+            {t("app.help.pages.help.faq.title")}
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div>
               <h3 className="text-lg font-semibold mb-2">
-                {t("pages.help.faq.questions.q1.question")}
+                {t("app.help.pages.help.faq.questions.q1.question")}
               </h3>
               <p className="text-gray-600 dark:text-gray-300">
-                {t("pages.help.faq.questions.q1.answer")}
+                {t("app.help.pages.help.faq.questions.q1.answer")}
               </p>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-2">
-                {t("pages.help.faq.questions.q2.question")}
+                {t("app.help.pages.help.faq.questions.q2.question")}
               </h3>
               <p className="text-gray-600 dark:text-gray-300">
-                {t("pages.help.faq.questions.q2.answer")}
+                {t("app.help.pages.help.faq.questions.q2.answer")}
               </p>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-2">
-                {t("pages.help.faq.questions.q3.question")}
+                {t("app.help.pages.help.faq.questions.q3.question")}
               </h3>
               <p className="text-gray-600 dark:text-gray-300">
-                {t("pages.help.faq.questions.q3.answer")}
+                {t("app.help.pages.help.faq.questions.q3.answer")}
               </p>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-2">
-                {t("pages.help.faq.questions.q4.question")}
+                {t("app.help.pages.help.faq.questions.q4.question")}
               </h3>
               <p className="text-gray-600 dark:text-gray-300">
-                {t("pages.help.faq.questions.q4.answer")}
+                {t("app.help.pages.help.faq.questions.q4.answer")}
               </p>
             </div>
           </div>

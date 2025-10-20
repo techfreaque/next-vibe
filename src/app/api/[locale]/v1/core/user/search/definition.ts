@@ -385,7 +385,7 @@ const { GET } = createEndpoint({
                           type: WidgetType.BADGE,
                           text: "app.api.v1.core.user.search.response.users.userRoles.role" as const,
                         },
-                        z.nativeEnum(UserRole),
+                        z.enum(UserRole),
                       ),
                     },
                   ),

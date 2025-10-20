@@ -406,7 +406,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       if (!message) {
         return createErrorResponse(
-          "imapErrors.messages.get.error.not_found.title",
+          "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.not_found.title",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -415,7 +415,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     } catch (error) {
       logger.error("Error getting IMAP message by ID", error);
       return createErrorResponse(
-        "imapErrors.messages.get.error.server.title",
+        "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -445,7 +445,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       if (!existingMessage) {
         return createErrorResponse(
-          "imapErrors.messages.get.error.not_found.title",
+          "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.not_found.title",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -477,7 +477,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       if (!updatedMessage) {
         return createErrorResponse(
-          "imapErrors.messages.get.error.server.title",
+          "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
           ErrorResponseTypes.INTERNAL_ERROR,
         );
       }
@@ -486,7 +486,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     } catch (error) {
       logger.error("Error updating IMAP message", error);
       return createErrorResponse(
-        "imapErrors.messages.get.error.server.title",
+        "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -517,7 +517,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
         if (account.length === 0) {
           return createErrorResponse(
-            "imapErrors.accounts.get.error.not_found.title",
+            "app.api.v1.core.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
             ErrorResponseTypes.NOT_FOUND,
           );
         }
@@ -558,7 +558,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
           return createSuccessResponse(syncResults);
         } else {
           return createErrorResponse(
-            "imapErrors.sync.message.failed",
+            "app.api.v1.core.emails.imapClient.imapErrors.sync.message.failed",
             ErrorResponseTypes.INTERNAL_ERROR,
           );
         }
@@ -598,7 +598,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
           return createSuccessResponse(syncResults);
         } else {
           return createErrorResponse(
-            "imapErrors.sync.message.failed",
+            "app.api.v1.core.emails.imapClient.imapErrors.sync.message.failed",
             ErrorResponseTypes.INTERNAL_ERROR,
           );
         }
@@ -606,7 +606,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     } catch (error) {
       logger.error("Error syncing IMAP messages", error);
       return createErrorResponse(
-        "imapErrors.sync.post.error.server.title",
+        "app.api.v1.core.emails.imapClient.imapErrors.sync.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -657,7 +657,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       if (!updatedMessage) {
         return createErrorResponse(
-          "imapErrors.messages.get.error.not_found.title",
+          "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.not_found.title",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -666,7 +666,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     } catch (error) {
       logger.error("Error updating message sync status", error);
       return createErrorResponse(
-        "imapErrors.messages.get.error.server.title",
+        "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -698,7 +698,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       if (!updatedMessage) {
         return createErrorResponse(
-          "imapErrors.messages.get.error.not_found.title",
+          "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.not_found.title",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -707,7 +707,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     } catch (error) {
       logger.error("Error updating message read status", error);
       return createErrorResponse(
-        "imapErrors.messages.get.error.server.title",
+        "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }

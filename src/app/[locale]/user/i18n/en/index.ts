@@ -1,23 +1,38 @@
-import { translations as authClientTranslations } from "./authClient";
-import { translations as loginTranslations } from "./login";
-import { translations as resetPasswordTranslations } from "./resetPassword";
-import { translations as sessionTranslations } from "./session";
-import { translations as userAvatarTranslations } from "./userAvatar";
-import { translations as userMeTranslations } from "./userMe";
-import { translations as userPasswordTranslations } from "./userPassword";
-import { translations as authTranslations } from "./auth";
-import { translations as authErrorsTranslations } from "./authErrors";
-import { translations as userTranslations } from "./user";
+import { translations as componentsTranslations } from "../../_components/i18n/en";
+import { translations as otherTranslations } from "../../(other)/i18n/en";
+import { translations as authTranslations } from "../../auth/i18n/en";
+import { translations as signupTranslations } from "../../signup/i18n/en";
+import { translations as userTranslations } from "../../user/i18n/en";
 
 export const translations = {
   auth: authTranslations,
-  authClient: authClientTranslations,
-  authErrors: authErrorsTranslations,
-  login: loginTranslations,
-  resetPassword: resetPasswordTranslations,
-  session: sessionTranslations,
+  components: componentsTranslations,
+  other: otherTranslations,
+  signup: signupTranslations,
   user: userTranslations,
-  userAvatar: userAvatarTranslations,
-  userMe: userMeTranslations,
-  userPassword: userPasswordTranslations,
+  common: {
+    appName: "Next Vibe",
+    backToHome: "Back to Home",
+    loading: "Loading...",
+    error: {
+      title: "Error",
+    },
+    footer: {
+      copyright: "© 2024 Next Vibe. All rights reserved.",
+      terms: "Terms of Service",
+    },
+  },
+  meta: {
+    profile: {
+      title: "User Profile - Next Vibe",
+      description: "Manage your Next Vibe account and preferences",
+      category: "User Account",
+      imageAlt: "User Profile",
+      keywords: "profile, account, settings, next vibe",
+      ogTitle: "Your Next Vibe Profile",
+      ogDescription: "Manage your account and preferences",
+      twitterTitle: "Your Next Vibe Profile",
+      twitterDescription: "Manage your account and preferences",
+    },
+  },
 };

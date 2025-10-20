@@ -97,6 +97,7 @@ export type NewUserRole = z.infer<typeof insertUserRoleSchema>;
  */
 export const usersRelations = relations(users, ({ many }) => ({
   roles: many(userRoles),
+  // Note: userLeads relation is defined in leads/db.ts to avoid circular dependency
 }));
 
 /**

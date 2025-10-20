@@ -66,6 +66,15 @@ export const branchRepository = {
         );
       }
 
+      // Reject incognito threads
+      if (thread.rootFolderId === "incognito") {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.forbidden.title" as const,
+          ErrorResponseTypes.FORBIDDEN,
+          { message: "Incognito threads cannot be accessed on the server" },
+        );
+      }
+
       // Get the source message to branch from
       const [sourceMessage] = await db
         .select()

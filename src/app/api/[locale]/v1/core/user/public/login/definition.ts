@@ -124,23 +124,6 @@ const { POST } = createEndpoint({
           ),
         },
       ),
-      leadId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label: "app.api.v1.core.user.public.login.fields.leadId.label",
-          description:
-            "app.api.v1.core.user.public.login.fields.leadId.description",
-          placeholder:
-            "app.api.v1.core.user.public.login.fields.leadId.placeholder",
-          required: false,
-          layout: { columns: 12 },
-          visible: false,
-          helpText:
-            "app.api.v1.core.user.public.login.fields.leadId.description",
-        },
-        z.uuid().optional(),
-      ),
 
       // === RESPONSE FIELDS ===
       success: responseField(
@@ -313,7 +296,6 @@ const { POST } = createEndpoint({
         options: {
           rememberMe: true,
         },
-        leadId: undefined,
       },
       failed: {
         credentials: {
@@ -323,7 +305,6 @@ const { POST } = createEndpoint({
         options: {
           rememberMe: true,
         },
-        leadId: undefined,
       },
       withAdvanced: {
         credentials: {
@@ -333,7 +314,6 @@ const { POST } = createEndpoint({
         options: {
           rememberMe: false,
         },
-        leadId: "00000000-0000-0000-0000-000000000000",
       },
       accountLocked: {
         credentials: {
@@ -343,7 +323,6 @@ const { POST } = createEndpoint({
         options: {
           rememberMe: true,
         },
-        leadId: undefined,
       },
     },
     responses: {

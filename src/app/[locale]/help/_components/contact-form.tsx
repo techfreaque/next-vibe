@@ -39,7 +39,7 @@ export default function ContactForm({
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
         <h2 className="text-2xl font-bold mb-6">
-          {t("pages.help.form.title")}
+          {t("app.help.components.pages.help.form.title")}
         </h2>
         <FormAlert alert={contactResult.alert} className="mb-6" />
       </div>
@@ -48,7 +48,9 @@ export default function ContactForm({
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
-      <h2 className="text-2xl font-bold mb-6">{t("pages.help.form.title")}</h2>
+      <h2 className="text-2xl font-bold mb-6">
+        {t("app.help.components.pages.help.form.title")}
+      </h2>
       {/* Show form alert if any */}
       <FormAlert alert={contactResult.alert} className="mb-6" />
       <Form form={form} onSubmit={submitForm} className="space-y-6">
@@ -57,8 +59,9 @@ export default function ContactForm({
             name="name"
             config={{
               type: "text",
-              label: "pages.help.form.name",
-              placeholder: "pages.help.form.namePlaceholder",
+              label: "app.help.components.pages.help.form.name",
+              placeholder:
+                "app.help.components.pages.help.form.namePlaceholder",
               disabled: isSubmitting,
             }}
             control={form.control}
@@ -72,8 +75,9 @@ export default function ContactForm({
             name="email"
             config={{
               type: "email",
-              label: "pages.help.form.email",
-              placeholder: "pages.help.form.emailPlaceholder",
+              label: "app.help.components.pages.help.form.email",
+              placeholder:
+                "app.help.components.pages.help.form.emailPlaceholder",
               disabled: isSubmitting,
             }}
             control={form.control}
@@ -88,8 +92,9 @@ export default function ContactForm({
           name="company"
           config={{
             type: "text",
-            label: "pages.help.form.company",
-            placeholder: "pages.help.form.companyPlaceholder",
+            label: "app.help.components.pages.help.form.company",
+            placeholder:
+              "app.help.components.pages.help.form.companyPlaceholder",
             disabled: isSubmitting,
           }}
           control={form.control}
@@ -103,40 +108,59 @@ export default function ContactForm({
           name="subject"
           config={{
             type: "select",
-            label: "pages.help.form.subject",
-            placeholder: "pages.help.form.subjectPlaceholder",
+            label: "app.help.components.pages.help.form.subject",
+            placeholder:
+              "app.help.components.pages.help.form.subjectPlaceholder",
             disabled: isSubmitting,
             options: [
-              { value: "HELP_SUPPORT", label: "contact.subjects.HELP_SUPPORT" },
+              {
+                value: "HELP_SUPPORT",
+                label: "app.help.components.contact.subjects.HELP_SUPPORT",
+              },
               {
                 value: "GENERAL_INQUIRY",
-                label: "contact.subjects.GENERAL_INQUIRY",
+                label: "app.help.components.contact.subjects.GENERAL_INQUIRY",
               },
               {
                 value: "TECHNICAL_SUPPORT",
-                label: "contact.subjects.TECHNICAL_SUPPORT",
+                label: "app.help.components.contact.subjects.TECHNICAL_SUPPORT",
               },
               {
                 value: "ACCOUNT_QUESTION",
-                label: "contact.subjects.ACCOUNT_QUESTION",
+                label: "app.help.components.contact.subjects.ACCOUNT_QUESTION",
               },
               {
                 value: "BILLING_QUESTION",
-                label: "contact.subjects.BILLING_QUESTION",
+                label: "app.help.components.contact.subjects.BILLING_QUESTION",
               },
               {
                 value: "SALES_INQUIRY",
-                label: "contact.subjects.SALES_INQUIRY",
+                label: "app.help.components.contact.subjects.SALES_INQUIRY",
               },
               {
                 value: "FEATURE_REQUEST",
-                label: "contact.subjects.FEATURE_REQUEST",
+                label: "app.help.components.contact.subjects.FEATURE_REQUEST",
               },
-              { value: "BUG_REPORT", label: "contact.subjects.BUG_REPORT" },
-              { value: "FEEDBACK", label: "contact.subjects.FEEDBACK" },
-              { value: "COMPLAINT", label: "contact.subjects.COMPLAINT" },
-              { value: "PARTNERSHIP", label: "contact.subjects.PARTNERSHIP" },
-              { value: "OTHER", label: "contact.subjects.OTHER" },
+              {
+                value: "BUG_REPORT",
+                label: "app.help.components.contact.subjects.BUG_REPORT",
+              },
+              {
+                value: "FEEDBACK",
+                label: "app.help.components.contact.subjects.FEEDBACK",
+              },
+              {
+                value: "COMPLAINT",
+                label: "app.help.components.contact.subjects.COMPLAINT",
+              },
+              {
+                value: "PARTNERSHIP",
+                label: "app.help.components.contact.subjects.PARTNERSHIP",
+              },
+              {
+                value: "OTHER",
+                label: "app.help.components.contact.subjects.OTHER",
+              },
             ],
           }}
           control={form.control}
@@ -150,8 +174,9 @@ export default function ContactForm({
           name="message"
           config={{
             type: "textarea",
-            label: "pages.help.form.message",
-            placeholder: "pages.help.form.messagePlaceholder",
+            label: "app.help.components.pages.help.form.message",
+            placeholder:
+              "app.help.components.pages.help.form.messagePlaceholder",
             disabled: isSubmitting,
             rows: 6,
           }}
@@ -170,10 +195,10 @@ export default function ContactForm({
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {t("pages.help.form.sending")}
+              {t("app.help.components.pages.help.form.sending")}
             </>
           ) : (
-            t("pages.help.form.submit")
+            t("app.help.components.pages.help.form.submit")
           )}
         </Button>
       </Form>

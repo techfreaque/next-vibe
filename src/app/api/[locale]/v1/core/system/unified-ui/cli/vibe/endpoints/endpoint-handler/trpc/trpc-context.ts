@@ -106,7 +106,7 @@ export async function createTRPCContext<
   try {
     // Use existing auth system to get user - this handles cookies, JWT verification, and session validation
     const authResult = await authRepository.getCurrentUser(
-      { platform: "trpc", request: req },
+      { platform: "trpc", request: req, locale: opts.locale },
       opts.logger,
     );
     if (authResult.success && authResult.data) {
@@ -117,7 +117,7 @@ export async function createTRPCContext<
         // Use the existing role checking system from authRepository
         const authenticatedUser = await authRepository.getAuthMinimalUser(
           [UserRole.CUSTOMER],
-          { platform: "trpc", request: req },
+          { platform: "trpc", request: req, locale: opts.locale },
           opts.logger,
         );
         if (authenticatedUser && !authenticatedUser.isPublic) {
@@ -126,7 +126,7 @@ export async function createTRPCContext<
           // Check for admin role
           const adminUser = await authRepository.getAuthMinimalUser(
             [UserRole.ADMIN],
-            { platform: "trpc", request: req },
+            { platform: "trpc", request: req, locale: opts.locale },
             opts.logger,
           );
           if (adminUser && !adminUser.isPublic) {

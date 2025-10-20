@@ -25,6 +25,59 @@ export const translations: typeof enTranslations = {
     jobs: "Zadania",
     list: "Lista",
   },
+  auth: {
+    public: {
+      validCookie: "Znaleziono ważny lead z cookie",
+      invalidCookie: "Nieprawidłowy lead z cookie",
+      created: "Utworzono anonimowy lead",
+      error: "Błąd w autoryzacji publicznego leada",
+    },
+    authenticated: {
+      primaryFound: "Znaleziono główny lead dla użytkownika",
+      noPrimary: "Nie znaleziono głównego leada dla użytkownika",
+      error: "Błąd w autoryzacji uwierzytelnionego leada",
+    },
+    link: {
+      alreadyExists: "Połączenie leadów już istnieje",
+      created: "Utworzono połączenie leadów",
+      error: "Błąd łączenia leadów",
+    },
+    validate: {
+      error: "Błąd walidacji leada",
+    },
+    getOrCreate: {
+      invalid: "Nieprawidłowy ID leada",
+      error: "Błąd pobierania lub tworzenia leada",
+    },
+    create: {
+      existingFound: "Znaleziono istniejący anonimowy lead",
+      success: "Lead utworzony pomyślnie",
+      error: "Błąd tworzenia leada",
+    },
+    createForUser: {
+      success: "Lead utworzony dla użytkownika",
+      error: "Błąd tworzenia leada dla użytkownika",
+    },
+    cookie: {
+      set: "Ustawiono cookie leada",
+      error: "Błąd ustawiania cookie leada",
+    },
+    getUserLeads: {
+      error: "Błąd pobierania leadów użytkownika",
+    },
+    linkLeads: {
+      sameId: "Nie można połączyć leada z samym sobą",
+      alreadyExists: "Połączenie leadów już istnieje",
+      created: "Leady połączone pomyślnie",
+      error: "Błąd łączenia leadów",
+    },
+    getLinkedLeads: {
+      error: "Błąd pobierania połączonych leadów",
+    },
+    getAllLinkedLeads: {
+      error: "Błąd pobierania wszystkich połączonych leadów",
+    },
+  },
   batch: batchTranslations,
   campaigns: campaignsTranslations,
   create: createTranslations,
@@ -175,6 +228,30 @@ export const translations: typeof enTranslations = {
       de: "Niemiecki",
       pl: "Polski",
       en: "Angielski",
+    },
+  },
+  error: {
+    general: {
+      internal_server_error: "Wewnętrzny błąd serwera",
+      not_found: "Nie znaleziono",
+      unauthorized: "Nieautoryzowany",
+      forbidden: "Zabronione",
+      bad_request: "Nieprawidłowe żądanie",
+      validation_error: "Błąd walidacji",
+    },
+  },
+  leadsErrors: {
+    leads: {
+      get: {
+        error: {
+          server: {
+            title: "Błąd serwera podczas pobierania leadów",
+          },
+          not_found: {
+            title: "Leady nie znalezione",
+          },
+        },
+      },
     },
   },
 };

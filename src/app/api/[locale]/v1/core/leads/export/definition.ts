@@ -70,7 +70,7 @@ const { GET } = createEndpoint({
           options: ExportFormatOptions,
           layout: { columns: 6 },
         },
-        z.nativeEnum(ExportFormat).default(ExportFormat.CSV),
+        z.enum(ExportFormat).default(ExportFormat.CSV),
       ),
 
       status: requestDataField(
@@ -82,7 +82,7 @@ const { GET } = createEndpoint({
           options: LeadStatusOptions,
           layout: { columns: 6 },
         },
-        z.nativeEnum(LeadStatus).optional(),
+        z.enum(LeadStatus).optional(),
       ),
 
       country: requestDataField(
@@ -201,7 +201,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.v1.core.leads.export.get.response.mimeType",
         },
-        z.nativeEnum(MimeType),
+        z.enum(MimeType),
       ),
 
       totalRecords: responseField(

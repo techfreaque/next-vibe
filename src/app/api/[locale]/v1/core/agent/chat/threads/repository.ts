@@ -64,7 +64,8 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       const page = data.pagination?.page ?? 1;
       const limit = data.pagination?.limit ?? 20;
       const search = data.filters?.search;
-      const folderId = data.filters?.folderId;
+      const rootFolderId = data.filters?.rootFolderId;
+      const subFolderId = data.filters?.subFolderId;
       const status = data.filters?.status;
       const isPinned = data.filters?.isPinned;
       const dateFrom = data.filters?.dateFrom;
@@ -75,7 +76,8 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         page,
         limit,
         search,
-        folderId,
+        rootFolderId,
+        subFolderId,
         status,
         isPinned,
         dateFrom,
@@ -93,13 +95,16 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       // Build where clause
       const conditions = [eq(chatThreads.userId, user.id)];
 
-      // Filter by folder
-      if (folderId !== undefined) {
-        if (folderId === null) {
-          // No folder (root level)
+      // Filter by root folder (required)
+      conditions.push(eq(chatThreads.rootFolderId, rootFolderId));
+
+      // Filter by subfolder (optional)
+      if (subFolderId !== undefined) {
+        if (subFolderId === null) {
+          // No subfolder (root level within the root folder)
           conditions.push(isNull(chatThreads.folderId));
         } else {
-          conditions.push(eq(chatThreads.folderId, folderId));
+          conditions.push(eq(chatThreads.folderId, subFolderId));
         }
       }
 
@@ -145,6 +150,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         .select({
           id: chatThreads.id,
           title: chatThreads.title,
+          rootFolderId: chatThreads.rootFolderId,
           folderId: chatThreads.folderId,
           status: chatThreads.status,
           preview: chatThreads.preview,
@@ -200,11 +206,21 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       logger.debug("Creating thread", {
         userId: user.id,
         title: data.thread?.title,
-        folderId: data.thread?.folderId,
+        rootFolderId: data.thread?.rootFolderId,
+        subFolderId: data.thread?.subFolderId,
       });
 
-      // Validate folder exists if provided
-      if (data.thread?.folderId) {
+      // Reject incognito threads - they should never be created on server
+      if (data.thread?.rootFolderId === "incognito") {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.threads.post.errors.forbidden.title",
+          ErrorResponseTypes.FORBIDDEN,
+          { message: "Incognito threads cannot be created on the server" },
+        );
+      }
+
+      // Validate subfolder exists if provided
+      if (data.thread?.subFolderId) {
         // TODO: Add folder validation when folders repository is implemented
       }
 
@@ -222,10 +238,11 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
           userId: user.id,
           // eslint-disable-next-line i18next/no-literal-string
           title: data.thread?.title || "New Chat",
-          folderId: data.thread?.folderId ?? null,
+          rootFolderId: data.thread?.rootFolderId,
+          folderId: data.thread?.subFolderId ?? null,
           status: ThreadStatus.ACTIVE,
-          defaultModel: data.thread?.defaultModel ?? null,
-          defaultTone: data.thread?.defaultTone ?? null,
+          defaultModel: data.thread?.model ?? null,
+          defaultTone: data.thread?.persona ?? null,
           systemPrompt: data.thread?.systemPrompt ?? null,
           pinned: false,
           archived: false,
@@ -236,6 +253,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         .returning({
           id: chatThreads.id,
           title: chatThreads.title,
+          rootFolderId: chatThreads.rootFolderId,
           folderId: chatThreads.folderId,
           status: chatThreads.status,
           createdAt: chatThreads.createdAt,

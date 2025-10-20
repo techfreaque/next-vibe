@@ -113,7 +113,7 @@ const ensureStripeCustomer = async (
 
     if (!user[0]) {
       return createErrorResponse(
-        "subscription.errors.user_not_found",
+        "app.api.v1.core.subscription.errors.user_not_found",
         ErrorResponseTypes.NOT_FOUND,
         { userId },
       );
@@ -147,7 +147,7 @@ const ensureStripeCustomer = async (
     });
     const parsedError = parseError(error);
     return createErrorResponse(
-      "subscription.errors.stripe_customer_creation_failed",
+      "app.api.v1.core.subscription.errors.stripe_customer_creation_failed",
       ErrorResponseTypes.INTERNAL_ERROR,
       { error: parsedError.message, userId },
     );
@@ -264,7 +264,7 @@ const syncStripeSubscription = async (
       subscriptionId: stripeSubscription.id,
     });
     return createErrorResponse(
-      "subscription.errors.sync_failed",
+      "app.api.v1.core.subscription.errors.sync_failed",
       ErrorResponseTypes.DATABASE_ERROR,
       {
         error: parseError(error).message,
@@ -412,7 +412,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       logger.error("Error getting subscription:", error);
       const parsedError = parseError(error);
       return createErrorResponse(
-        "subscription.errors.database_error",
+        "app.api.v1.core.subscription.errors.database_error",
         ErrorResponseTypes.DATABASE_ERROR,
         { error: parsedError.message },
       );
@@ -471,7 +471,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       logger.error("Error creating subscription:", error);
       const parsedError = parseError(error);
       return createErrorResponse(
-        "subscription.errors.create_crashed",
+        "app.api.v1.core.subscription.errors.create_crashed",
         ErrorResponseTypes.DATABASE_ERROR,
         { error: parsedError.message },
       );
@@ -498,7 +498,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
       if (!currentSubscription[0]) {
         return createErrorResponse(
-          "subscription.errors.not_found",
+          "app.api.v1.core.subscription.errors.not_found",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -588,7 +588,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
       if (results.length === 0) {
         return createErrorResponse(
-          "subscription.errors.not_found",
+          "app.api.v1.core.subscription.errors.not_found",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -614,7 +614,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       logger.error("Error updating subscription:", error);
       const parsedError = parseError(error);
       return createErrorResponse(
-        "subscription.errors.database_error",
+        "app.api.v1.core.subscription.errors.database_error",
         ErrorResponseTypes.DATABASE_ERROR,
         { error: parsedError.message },
       );
@@ -640,7 +640,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
       if (!currentSubscription[0]) {
         return createErrorResponse(
-          "subscription.errors.not_found",
+          "app.api.v1.core.subscription.errors.not_found",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -724,7 +724,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
       if (results.length === 0) {
         return createErrorResponse(
-          "subscription.errors.not_found",
+          "app.api.v1.core.subscription.errors.not_found",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -741,7 +741,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       logger.error("Error canceling subscription:", error);
       const parsedError = parseError(error);
       return createErrorResponse(
-        "subscription.errors.cancel_failed",
+        "app.api.v1.core.subscription.errors.cancel_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { error: parsedError.message },
       );
@@ -784,7 +784,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
       if (!user[0]) {
         return createErrorResponse(
-          "subscription.errors.user_not_found",
+          "app.api.v1.core.subscription.errors.user_not_found",
           ErrorResponseTypes.NOT_FOUND,
           { userId },
         );
@@ -818,7 +818,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       });
       const parsedError = parseError(error);
       return createErrorResponse(
-        "subscription.errors.stripe_customer_creation_failed",
+        "app.api.v1.core.subscription.errors.stripe_customer_creation_failed",
         ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         { userId, error: parsedError.message },
       );

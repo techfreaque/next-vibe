@@ -1,6 +1,7 @@
 import { translations as aiStreamTranslations } from "../../ai-stream/i18n/pl";
 import { translations as creditsTranslations } from "../../credits/i18n/pl";
 import { translations as foldersTranslations } from "../../folders/i18n/pl";
+import { translations as personasTranslations } from "../../personas/i18n/pl";
 import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/pl";
 import { translations as threadsTranslations } from "../../threads/i18n/pl";
 import type { translations as enTranslations } from "../en";
@@ -11,8 +12,17 @@ export const translations: typeof enTranslations = {
     threads: "Wątki",
     folders: "Foldery",
     messages: "Wiadomości",
+    personas: "Persony",
     credits: "Kredyty",
     balance: "Saldo",
+  },
+  config: {
+    folders: {
+      private: "Prywatny",
+      shared: "Udostępniony",
+      public: "Publiczny",
+      incognito: "Incognito",
+    },
   },
   enums: {
     role: {
@@ -106,6 +116,9 @@ export const translations: typeof enTranslations = {
     answerFailed: "Nie udało się odpowiedzieć",
     deleteFailed: "Nie udało się usunąć",
   },
+  errorTypes: {
+    streamError: "Błąd strumienia",
+  },
   hooks: {
     stt: {
       "endpoint-not-available": "Punkt końcowy mowy na tekst niedostępny",
@@ -129,6 +142,7 @@ export const translations: typeof enTranslations = {
   aiStream: aiStreamTranslations,
   credits: creditsTranslations,
   folders: foldersTranslations,
+  personas: personasTranslations,
   threads: {
     ...threadsTranslations,
     messages: messagesTranslations,

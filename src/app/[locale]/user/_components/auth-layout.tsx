@@ -19,7 +19,7 @@ export function AuthLayout({
   locale,
 }: AuthLayoutProps): JSX.Element {
   const { t } = simpleT(locale);
-  const appName = t("common.appName");
+  const appName = t("app.user.common.appName");
   const year = new Date().getFullYear();
   return (
     <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8">
@@ -53,7 +53,7 @@ export function AuthLayout({
       </div>
 
       <div className="mt-8 text-center text-sm text-muted-foreground">
-        <p>{t("common.footer.copyright", { year, appName })}</p>
+        <p>{t("app.user.common.footer.copyright", { year, appName })}</p>
       </div>
     </div>
   );

@@ -149,4 +149,7 @@ export const translations: typeof enTranslations = {
       description: "Sesja płatności utworzona pomyślnie",
     },
   },
+
+  // General error message
+  error: "Wystąpił błąd podczas płatności",
 };

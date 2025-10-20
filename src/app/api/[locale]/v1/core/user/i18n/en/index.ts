@@ -51,6 +51,20 @@ export const translations = {
   },
   errors: {
     emailAlreadyInUse: "Email address is already in use",
+    locale_required: "Locale is required",
+    auth_required: "Authentication is required",
+    auth_retrieval_failed: "Failed to retrieve authentication",
+    not_found: "User not found",
+    roles_lookup_failed: "Failed to lookup user roles",
+    id_lookup_failed: "Failed to lookup user by ID",
+    email_lookup_failed: "Failed to lookup user by email",
+    email_check_failed: "Failed to check email",
+    email_duplicate_check_failed: "Failed to check for duplicate email",
+    search_failed: "Failed to search users",
+    email_already_in_use: "Email address is already in use",
+    creation_failed: "Failed to create user",
+    no_data_returned: "No data returned from database",
+    password_hashing_failed: "Failed to hash password",
   },
   notifications: {
     profileUpdated: {

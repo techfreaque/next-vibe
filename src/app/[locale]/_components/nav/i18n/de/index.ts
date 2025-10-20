@@ -3,6 +3,45 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   help: "Hilfe",
   logout: "Abmelden",
+  enableLightMode: "Hellen Modus aktivieren",
+  enableDarkMode: "Dunklen Modus aktivieren",
+  notifications: "Benachrichtigungen",
+  company: "Unternehmen",
+  about: {
+    title: "Über uns",
+    description: "Erfahren Sie mehr über unser Unternehmen",
+  },
+  careers: {
+    title: "Karriere",
+    description: "Werden Sie Teil unseres Teams",
+  },
+  user: {
+    dashboard: "Dashboard",
+    completeOnboarding: "Onboarding abschließen",
+    login: "Anmelden",
+    signup: "Registrieren",
+  },
+  home: "Startseite",
+  pricing: "Preise",
+  services: {
+    title: "Dienstleistungen",
+    features: {
+      title: "Funktionen",
+      description: "Entdecken Sie unsere leistungsstarken Funktionen",
+    },
+    process: {
+      title: "Unser Prozess",
+      description: "Wie wir mit Ihnen arbeiten",
+    },
+    premiumContent: {
+      title: "Premium-Inhalte",
+      description: "Zugang zu exklusiven Inhalten",
+    },
+    contact: {
+      title: "Kontakt",
+      description: "Nehmen Sie Kontakt mit unserem Team auf",
+    },
+  },
   post: {
     title: "Titel",
     description: "Endpunkt-Beschreibung",

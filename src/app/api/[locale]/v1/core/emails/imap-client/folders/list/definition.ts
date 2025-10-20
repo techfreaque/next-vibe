@@ -122,7 +122,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.folders.list.specialUseType.placeholder",
           options: ImapSpecialUseTypeOptions,
         },
-        z.array(z.nativeEnum(ImapSpecialUseType)).optional(),
+        z.array(z.enum(ImapSpecialUseType)).optional(),
       ),
 
       syncStatus: requestUrlParamsField(
@@ -137,7 +137,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.folders.list.syncStatus.placeholder",
           options: ImapSyncStatusOptions,
         },
-        z.array(z.nativeEnum(ImapSyncStatus)).optional(),
+        z.array(z.enum(ImapSyncStatus)).optional(),
       ),
 
       sortBy: requestUrlParamsField(
@@ -152,7 +152,7 @@ const { GET } = createEndpoint({
           options: ImapFolderSortFieldOptions,
         },
         z
-          .array(z.nativeEnum(ImapFolderSortField))
+          .array(z.enum(ImapFolderSortField))
           .default([ImapFolderSortField.NAME]),
       ),
 
@@ -168,7 +168,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.folders.list.sortOrder.placeholder",
           options: SortOrderOptions,
         },
-        z.array(z.nativeEnum(SortOrder)).default([SortOrder.ASC]),
+        z.array(z.enum(SortOrder)).default([SortOrder.ASC]),
       ),
 
       // === RESPONSE FIELDS ===
@@ -242,7 +242,7 @@ const { GET } = createEndpoint({
                 type: WidgetType.BADGE,
                 text: "app.api.v1.core.emails.imapClient.folders.list.response.folder.specialUseType",
               },
-              z.nativeEnum(ImapSpecialUseType).nullable(),
+              z.enum(ImapSpecialUseType).nullable(),
             ),
             messageCount: responseField(
               {
@@ -265,7 +265,7 @@ const { GET } = createEndpoint({
                 type: WidgetType.BADGE,
                 text: "app.api.v1.core.emails.imapClient.folders.list.response.folder.syncStatus",
               },
-              z.nativeEnum(ImapSyncStatus),
+              z.enum(ImapSyncStatus),
             ),
             createdAt: responseField(
               {

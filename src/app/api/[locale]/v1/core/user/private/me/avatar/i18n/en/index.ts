@@ -1,5 +1,22 @@
 export const translations = {
   tag: "avatar",
+  errors: {
+    user_not_found: "User not found",
+    failed_to_upload_avatar: "Failed to upload avatar",
+    failed_to_delete_avatar: "Failed to delete avatar",
+  },
+  debug: {
+    errorUploadingUserAvatar: "Error uploading user avatar",
+    errorDeletingUserAvatar: "Error deleting user avatar",
+  },
+  success: {
+    uploaded: "Avatar uploaded successfully",
+    deleted: "Avatar deleted successfully",
+    nextSteps: {
+      visible: "Your avatar is now visible on your profile",
+      update: "You can update it anytime from your profile settings",
+    },
+  },
   upload: {
     title: "Upload Avatar",
     description: "Upload a profile avatar image",

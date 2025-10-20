@@ -51,7 +51,7 @@ export default function PricingComparison({
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5 }}
         >
-          {t("pricing.comparison.title")}
+          {t("app.site.pricing.comparison.title")}
         </motion.h2>
         <motion.p
           className="mx-auto max-w-[700px] text-gray-500 dark:text-gray-400 md:text-lg"
@@ -59,7 +59,7 @@ export default function PricingComparison({
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          {t("pricing.comparison.subtitle")}
+          {t("app.site.pricing.comparison.subtitle")}
         </motion.p>
 
         <motion.div
@@ -76,7 +76,7 @@ export default function PricingComparison({
                 : "font-medium text-blue-600 dark:text-blue-400"
             } transition-colors`}
           >
-            {t("pricing.plans.monthly")}
+            {t("app.site.pricing.plans.monthly")}
           </Label>
           <Switch
             id="billing-toggle-comparison"
@@ -92,9 +92,9 @@ export default function PricingComparison({
                 : "text-gray-500 dark:text-gray-400"
             } transition-colors flex items-center`}
           >
-            {t("pricing.plans.annually")}{" "}
+            {t("app.site.pricing.plans.annually")}{" "}
             <span className="ml-1.5 text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 px-2 py-0.5 rounded-full">
-              {t("pricing.plans.savePercent", {
+              {t("app.site.pricing.plans.savePercent", {
                 percent: calculateSavingsPercent(currentCountry.code),
               })}
             </span>
@@ -140,16 +140,16 @@ export default function PricingComparison({
                           })}
                       {plan.isEnterprise ? null : (
                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                          {t("pricing.plans.perMonth")}
+                          {t("app.site.pricing.plans.perMonth")}
                         </span>
                       )}
                     </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                       {plan.id === SubscriptionPlan.ENTERPRISE
-                        ? t("pricing.comparison.annually")
+                        ? t("app.site.pricing.comparison.annually")
                         : annual
-                          ? t("pricing.comparison.annually")
-                          : t("pricing.comparison.monthly")}
+                          ? t("app.site.pricing.comparison.annually")
+                          : t("app.site.pricing.comparison.monthly")}
                     </div>
                     <Link
                       href={{
@@ -179,15 +179,17 @@ export default function PricingComparison({
                         {((): string => {
                           switch (plan.id) {
                             case SubscriptionPlan.STARTER:
-                              return t("pricing.plans.STARTER.cta");
+                              return t("app.site.pricing.plans.STARTER.cta");
                             case SubscriptionPlan.PROFESSIONAL:
-                              return t("pricing.plans.PROFESSIONAL.cta");
+                              return t(
+                                "app.site.pricing.plans.PROFESSIONAL.cta",
+                              );
                             case SubscriptionPlan.PREMIUM:
-                              return t("pricing.plans.PREMIUM.cta");
+                              return t("app.site.pricing.plans.PREMIUM.cta");
                             case SubscriptionPlan.ENTERPRISE:
-                              return t("pricing.plans.ENTERPRISE.cta");
+                              return t("app.site.pricing.plans.ENTERPRISE.cta");
                             default:
-                              return t("pricing.plans.STARTER.cta");
+                              return t("app.site.pricing.plans.STARTER.cta");
                           }
                         })()}
                       </Button>
@@ -316,7 +318,7 @@ export default function PricingComparison({
           animate={inView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          {t("pricing.comparison.customNote")}
+          {t("app.site.pricing.comparison.customNote")}
         </motion.p>
         <motion.div
           className="flex flex-wrap justify-center items-center gap-4 mt-6"
@@ -330,7 +332,7 @@ export default function PricingComparison({
             }}
             className="text-blue-600 hover:underline dark:text-blue-400 font-medium"
           >
-            {t("pricing.plans.contactUsLink")}
+            {t("app.site.pricing.plans.contactUsLink")}
           </Link>
         </motion.div>
       </div>

@@ -127,7 +127,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.threads.threadId.messages.path.get.threadId.description" as const,
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
 
       // === REQUEST DATA ===
@@ -164,7 +164,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.threads.threadId.messages.path.get.response.messages.message.id.content" as const,
               },
-              z.string().uuid(),
+              z.uuid(),
             ),
             threadId: responseField(
               {
@@ -172,7 +172,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.threads.threadId.messages.path.get.response.messages.message.threadId.content" as const,
               },
-              z.string().uuid(),
+              z.uuid(),
             ),
             role: responseField(
               {
@@ -180,7 +180,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.threads.threadId.messages.path.get.response.messages.message.role.content" as const,
               },
-              z.nativeEnum(ChatMessageRole),
+              z.enum(ChatMessageRole),
             ),
             content: responseField(
               {
@@ -196,7 +196,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.threads.threadId.messages.path.get.response.messages.message.parentId.content" as const,
               },
-              z.string().uuid().nullable(),
+              z.uuid().nullable(),
             ),
             depth: responseField(
               {

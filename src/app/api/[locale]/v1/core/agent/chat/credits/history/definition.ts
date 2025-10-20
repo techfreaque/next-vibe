@@ -97,7 +97,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.credits.history.get.transaction.id.content",
               },
-              z.string().uuid(),
+              z.uuid(),
             ),
 
             amount: responseField(
@@ -148,7 +148,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.credits.history.get.transaction.messageId.content",
               },
-              z.string().uuid().nullable(),
+              z.uuid().nullable(),
             ),
 
             createdAt: responseField(

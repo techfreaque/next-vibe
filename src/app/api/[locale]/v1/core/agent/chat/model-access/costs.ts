@@ -3,11 +3,7 @@
  * Reads credit costs from model configuration
  */
 
-import {
-  getModelById,
-  type ModelId,
-  modelOptions,
-} from "@/app/[locale]/chat/lib/config/models";
+import { getModelById, type ModelId, modelOptions } from "./models";
 
 /**
  * Feature costs (non-model)

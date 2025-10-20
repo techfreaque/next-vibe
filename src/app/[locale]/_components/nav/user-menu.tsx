@@ -68,13 +68,13 @@ export function UserMenu({
             {isOnboardingComplete ? (
               <>
                 <User className="mr-2 h-4 w-4" />
-                <span>{t("nav.user.dashboard")}</span>
+                <span>{t("app.nav.user.dashboard")}</span>
               </>
             ) : (
               <>
                 <User className="mr-2 h-4 w-4 text-orange-500" />
                 <span className="text-orange-600 dark:text-orange-400">
-                  {t("nav.user.completeOnboarding")}
+                  {t("app.nav.user.completeOnboarding")}
                 </span>
               </>
             )}
@@ -83,13 +83,13 @@ export function UserMenu({
         <DropdownMenuItem asChild>
           <Link href={`/${locale}/help`}>
             <HelpCircle className="mr-2 h-4 w-4" />
-            <span>{t("app.components.nav.help")}</span>
+            <span>{t("app.nav.help")}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout}>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>{t("app.components.nav.logout")}</span>
+          <span>{t("app.nav.logout")}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

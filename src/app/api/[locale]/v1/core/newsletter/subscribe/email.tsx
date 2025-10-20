@@ -51,14 +51,14 @@ function WelcomeEmailContent({
     undefined, // no campaignId for transactional emails
   );
 
-  const appName = t("common.appName");
+  const appName = t("app.common.appName");
 
   return (
     <EmailTemplate
       t={t}
       locale={locale}
-      title={t("newsletter.email.welcome.title")}
-      previewText={t("newsletter.email.welcome.preview")}
+      title={t("app.api.v1.core.newsletter.email.welcome.title")}
+      previewText={t("app.api.v1.core.newsletter.email.welcome.preview")}
       tracking={tracking}
     >
       {/* Greeting */}
@@ -71,10 +71,10 @@ function WelcomeEmailContent({
         }}
       >
         {requestData.name
-          ? t("newsletter.email.welcome.greeting_with_name", {
+          ? t("app.api.v1.core.newsletter.email.welcome.greeting_with_name", {
               name: requestData.name,
             })
-          : t("newsletter.email.welcome.greeting")}
+          : t("app.api.v1.core.newsletter.email.welcome.greeting")}
       </Text>
 
       {/* Welcome message */}
@@ -86,7 +86,7 @@ function WelcomeEmailContent({
           marginBottom: "16px",
         }}
       >
-        {t("newsletter.email.welcome.message", { appName })}
+        {t("app.api.v1.core.newsletter.email.welcome.message", { appName })}
       </Text>
 
       {/* What to expect */}
@@ -98,7 +98,7 @@ function WelcomeEmailContent({
           marginBottom: "8px",
         }}
       >
-        {t("newsletter.email.welcome.what_to_expect")}
+        {t("app.api.v1.core.newsletter.email.welcome.what_to_expect")}
       </Text>
 
       <ul
@@ -109,16 +109,16 @@ function WelcomeEmailContent({
         }}
       >
         <li style={{ margin: "8px 0" }}>
-          {t("newsletter.email.welcome.benefit_1")}
+          {t("app.api.v1.core.newsletter.email.welcome.benefit_1")}
         </li>
         <li style={{ margin: "8px 0" }}>
-          {t("newsletter.email.welcome.benefit_2")}
+          {t("app.api.v1.core.newsletter.email.welcome.benefit_2")}
         </li>
         <li style={{ margin: "8px 0" }}>
-          {t("newsletter.email.welcome.benefit_3")}
+          {t("app.api.v1.core.newsletter.email.welcome.benefit_3")}
         </li>
         <li style={{ margin: "8px 0" }}>
-          {t("newsletter.email.welcome.benefit_4")}
+          {t("app.api.v1.core.newsletter.email.welcome.benefit_4")}
         </li>
       </ul>
 
@@ -131,7 +131,7 @@ function WelcomeEmailContent({
           marginBottom: "24px",
         }}
       >
-        {t("newsletter.email.welcome.frequency")}
+        {t("app.api.v1.core.newsletter.email.welcome.frequency")}
       </Text>
 
       {/* Unsubscribe link */}
@@ -143,14 +143,14 @@ function WelcomeEmailContent({
           marginTop: "32px",
         }}
       >
-        {t("newsletter.email.welcome.unsubscribe_text")}{" "}
+        {t("app.api.v1.core.newsletter.email.welcome.unsubscribe_text")}{" "}
         <Link
           href={`${env.NEXT_PUBLIC_APP_URL}/${locale}/newsletter/unsubscribe/${encodeURIComponent(
             requestData.email,
           )}`}
           style={{ color: "#4f46e5" }}
         >
-          {t("newsletter.email.welcome.unsubscribe_link")}
+          {t("app.api.v1.core.newsletter.email.welcome.unsubscribe_link")}
         </Link>
       </Text>
     </EmailTemplate>
@@ -181,8 +181,10 @@ function AdminNotificationEmailContent({
     <EmailTemplate
       t={t}
       locale={locale}
-      title={t("newsletter.email.admin_notification.title")}
-      previewText={t("newsletter.email.admin_notification.preview")}
+      title={t("app.api.v1.core.newsletter.email.admin_notification.title")}
+      previewText={t(
+        "app.api.v1.core.newsletter.email.admin_notification.preview",
+      )}
       tracking={tracking}
     >
       <Text
@@ -193,7 +195,7 @@ function AdminNotificationEmailContent({
           marginBottom: "16px",
         }}
       >
-        {t("newsletter.email.admin_notification.message")}
+        {t("app.api.v1.core.newsletter.email.admin_notification.message")}
       </Text>
 
       <Hr style={{ borderColor: "#e5e7eb", margin: "16px 0" }} />
@@ -207,7 +209,10 @@ function AdminNotificationEmailContent({
           marginBottom: "12px",
         }}
       >
-        {t("newsletter.email.admin_notification.subscriber_details")}:
+        {t(
+          "app.api.v1.core.newsletter.email.admin_notification.subscriber_details",
+        )}
+        :
       </Text>
 
       <Text
@@ -218,7 +223,9 @@ function AdminNotificationEmailContent({
           marginBottom: "8px",
         }}
       >
-        <strong>{t("newsletter.email.admin_notification.email")}:</strong>{" "}
+        <strong>
+          {t("app.api.v1.core.newsletter.email.admin_notification.email")}:
+        </strong>{" "}
         {requestData.email}
       </Text>
 
@@ -231,7 +238,9 @@ function AdminNotificationEmailContent({
             marginBottom: "8px",
           }}
         >
-          <strong>{t("newsletter.email.admin_notification.name")}:</strong>{" "}
+          <strong>
+            {t("app.api.v1.core.newsletter.email.admin_notification.name")}:
+          </strong>{" "}
           {requestData.name}
         </Text>
       )}
@@ -247,7 +256,10 @@ function AdminNotificationEmailContent({
             }}
           >
             <strong>
-              {t("newsletter.email.admin_notification.preferences")}:
+              {t(
+                "app.api.v1.core.newsletter.email.admin_notification.preferences",
+              )}
+              :
             </strong>
           </Text>
           <ul style={{ color: "#4b5563", paddingLeft: "20px" }}>
@@ -275,7 +287,9 @@ function AdminNotificationEmailContent({
             textDecoration: "none",
           }}
         >
-          {t("newsletter.email.admin_notification.view_in_admin")}
+          {t(
+            "app.api.v1.core.newsletter.email.admin_notification.view_in_admin",
+          )}
         </Button>
       </Section>
     </EmailTemplate>
@@ -295,7 +309,7 @@ export const renderWelcomeMail: EmailFunctionType<
     return createSuccessResponse({
       toEmail: requestData.email,
       toName: requestData.name || requestData.email,
-      subject: t("newsletter.email.welcome.subject"),
+      subject: t("app.api.v1.core.newsletter.email.welcome.subject"),
       jsx: WelcomeEmailContent({
         requestData,
         t,
@@ -306,7 +320,7 @@ export const renderWelcomeMail: EmailFunctionType<
     });
   } catch {
     return createErrorResponse(
-      "newsletter.errors.email_generation_failed",
+      "app.api.v1.core.newsletter.errors.email_generation_failed",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }
@@ -324,8 +338,8 @@ export const renderAdminNotificationMail: EmailFunctionType<
   try {
     return createSuccessResponse({
       toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: t("common.appName"),
-      subject: t("newsletter.email.admin_notification.subject"),
+      toName: t("app.common.appName"),
+      subject: t("app.api.v1.core.newsletter.email.admin_notification.subject"),
       jsx: AdminNotificationEmailContent({
         requestData,
         t,
@@ -334,7 +348,7 @@ export const renderAdminNotificationMail: EmailFunctionType<
     });
   } catch {
     return createErrorResponse(
-      "newsletter.errors.email_generation_failed",
+      "app.api.v1.core.newsletter.errors.email_generation_failed",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }

@@ -25,6 +25,59 @@ export const translations: typeof enTranslations = {
     jobs: "Jobs",
     list: "Liste",
   },
+  auth: {
+    public: {
+      validCookie: "Gültiger Cookie-Lead gefunden",
+      invalidCookie: "Ungültiger Cookie-Lead",
+      created: "Anonymer Lead erstellt",
+      error: "Fehler bei öffentlicher Lead-Authentifizierung",
+    },
+    authenticated: {
+      primaryFound: "Primärer Lead für Benutzer gefunden",
+      noPrimary: "Kein primärer Lead für Benutzer gefunden",
+      error: "Fehler bei authentifizierter Lead-Authentifizierung",
+    },
+    link: {
+      alreadyExists: "Lead-Verknüpfung existiert bereits",
+      created: "Lead-Verknüpfung erstellt",
+      error: "Fehler beim Verknüpfen von Leads",
+    },
+    validate: {
+      error: "Fehler bei Lead-Validierung",
+    },
+    getOrCreate: {
+      invalid: "Ungültige Lead-ID",
+      error: "Fehler beim Abrufen oder Erstellen von Lead",
+    },
+    create: {
+      existingFound: "Bestehender anonymer Lead gefunden",
+      success: "Lead erfolgreich erstellt",
+      error: "Fehler beim Erstellen von Lead",
+    },
+    createForUser: {
+      success: "Lead für Benutzer erstellt",
+      error: "Fehler beim Erstellen von Lead für Benutzer",
+    },
+    cookie: {
+      set: "Lead-Cookie gesetzt",
+      error: "Fehler beim Setzen von Lead-Cookie",
+    },
+    getUserLeads: {
+      error: "Fehler beim Abrufen von Benutzer-Leads",
+    },
+    linkLeads: {
+      sameId: "Lead kann nicht mit sich selbst verknüpft werden",
+      alreadyExists: "Lead-Verknüpfung existiert bereits",
+      created: "Leads erfolgreich verknüpft",
+      error: "Fehler beim Verknüpfen von Leads",
+    },
+    getLinkedLeads: {
+      error: "Fehler beim Abrufen verknüpfter Leads",
+    },
+    getAllLinkedLeads: {
+      error: "Fehler beim Abrufen aller verknüpften Leads",
+    },
+  },
   batch: batchTranslations,
   campaigns: campaignsTranslations,
   create: createTranslations,
@@ -175,6 +228,30 @@ export const translations: typeof enTranslations = {
       de: "Deutsch",
       pl: "Polnisch",
       en: "Englisch",
+    },
+  },
+  error: {
+    general: {
+      internal_server_error: "Interner Serverfehler",
+      not_found: "Nicht gefunden",
+      unauthorized: "Nicht autorisiert",
+      forbidden: "Verboten",
+      bad_request: "Ungültige Anfrage",
+      validation_error: "Validierungsfehler",
+    },
+  },
+  leadsErrors: {
+    leads: {
+      get: {
+        error: {
+          server: {
+            title: "Serverfehler beim Abrufen der Leads",
+          },
+          not_found: {
+            title: "Leads nicht gefunden",
+          },
+        },
+      },
     },
   },
 };

@@ -194,10 +194,13 @@ export function useBatchOperations(
       batchDeleteEndpoint.create?.response?.data?.response?.preview &&
       !batchDialogOpen
     ) {
-      logger.debug("leads.batch.delete.preview.modal.auto.open", {
-        previewCount:
-          batchDeleteEndpoint.create.response.data.response.preview.length,
-      });
+      logger.debug(
+        "app.api.v1.core.leads.batch.delete.preview.modal.auto.open",
+        {
+          previewCount:
+            batchDeleteEndpoint.create.response.data.response.preview.length,
+        },
+      );
       setPreviewLeads(
         batchDeleteEndpoint.create.response.data.response.preview,
       );
@@ -218,10 +221,13 @@ export function useBatchOperations(
       batchUpdateEndpoint.create?.response?.data?.response?.preview &&
       !batchDialogOpen
     ) {
-      logger.debug("leads.batch.update.preview.modal.auto.open", {
-        previewCount:
-          batchUpdateEndpoint.create.response.data.response.preview.length,
-      });
+      logger.debug(
+        "app.api.v1.core.leads.batch.update.preview.modal.auto.open",
+        {
+          previewCount:
+            batchUpdateEndpoint.create.response.data.response.preview.length,
+        },
+      );
       setPreviewLeads(
         batchUpdateEndpoint.create.response.data.response.preview,
       );
@@ -264,7 +270,7 @@ export function useBatchOperations(
 
         // Response will be handled by useEffect
       } catch (error) {
-        logger.error("leads.batch.preview.failed", error);
+        logger.error("app.api.v1.core.leads.batch.preview.failed", error);
       }
     },
     [batchUpdateEndpoint.create, logger],
@@ -284,7 +290,9 @@ export function useBatchOperations(
       try {
         // Prevent double calls by checking if already submitting
         if (batchUpdateEndpoint.create.isSubmitting) {
-          logger.debug("leads.batch.update.in.progress.ignored");
+          logger.debug(
+            "app.api.v1.core.leads.batch.update.in.progress.ignored",
+          );
           return;
         }
 
@@ -314,7 +322,7 @@ export function useBatchOperations(
           setBatchDialogOpen(true);
         }
       } catch (error) {
-        logger.error("leads.batch.update.failed", error);
+        logger.error("app.api.v1.core.leads.batch.update.failed", error);
       }
     },
     [batchUpdateEndpoint.create, logger],
@@ -346,7 +354,7 @@ export function useBatchOperations(
           onOperationComplete?.();
         }
       } catch (error) {
-        logger.error("leads.batch.update.failed", error);
+        logger.error("app.api.v1.core.leads.batch.update.failed", error);
       }
     },
     [batchUpdateEndpoint.create, pendingUpdates, onOperationComplete, logger],
@@ -383,7 +391,10 @@ export function useBatchOperations(
           setBatchDialogOpen(true);
         }
       } catch (error) {
-        logger.error("leads.batch.delete.preview.failed", error);
+        logger.error(
+          "app.api.v1.core.leads.batch.delete.preview.failed",
+          error,
+        );
       }
     },
     [batchDeleteEndpoint.create, logger],
@@ -397,11 +408,15 @@ export function useBatchOperations(
       try {
         // Prevent double calls by checking if already submitting
         if (batchDeleteEndpoint.create.isSubmitting) {
-          logger.debug("leads.batch.delete.in.progress.ignored");
+          logger.debug(
+            "app.api.v1.core.leads.batch.delete.in.progress.ignored",
+          );
           return;
         }
 
-        logger.debug("leads.batch.delete.hook.called", { currentFilters });
+        logger.debug("app.api.v1.core.leads.batch.delete.hook.called", {
+          currentFilters,
+        });
         setOperationType("delete");
 
         // Set form values for delete preview with all filters including scope
@@ -412,17 +427,24 @@ export function useBatchOperations(
           maxRecords: 1000,
         };
 
-        logger.debug("leads.batch.delete.form.data.set", { formData });
+        logger.debug("app.api.v1.core.leads.batch.delete.form.data.set", {
+          formData,
+        });
         batchDeleteEndpoint.create.form.reset(formData);
 
         // Submit the form
-        logger.debug("leads.batch.delete.form.submitting");
+        logger.debug("app.api.v1.core.leads.batch.delete.form.submitting");
         await batchDeleteEndpoint.create.submitForm(undefined);
 
         // Response will be handled by useEffect
-        logger.debug("leads.batch.delete.form.submitted.waiting.response");
+        logger.debug(
+          "app.api.v1.core.leads.batch.delete.form.submitted.waiting.response",
+        );
       } catch (error) {
-        logger.error("leads.batch.delete.preview.failed", error);
+        logger.error(
+          "app.api.v1.core.leads.batch.delete.preview.failed",
+          error,
+        );
       }
     },
     [batchDeleteEndpoint.create, logger],
@@ -454,7 +476,7 @@ export function useBatchOperations(
           onOperationComplete?.();
         }
       } catch (error) {
-        logger.error("leads.batch.delete.failed", error);
+        logger.error("app.api.v1.core.leads.batch.delete.failed", error);
       }
     },
     [batchDeleteEndpoint.create, onOperationComplete, logger],

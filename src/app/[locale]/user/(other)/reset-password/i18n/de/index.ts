@@ -1,54 +1,44 @@
+import { translations as componentsTranslations } from "../../_components/i18n/de";
+import { translations as tokenTranslations } from "../../[token]/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
-    form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
+  components: componentsTranslations,
+  token: tokenTranslations,
+  meta: {
+    passwordReset: {
+      title: "Passwort zurücksetzen - Next Vibe",
+      description: "Setzen Sie Ihr Next Vibe Kontopasswort zurück",
+      category: "Authentifizierung",
+      imageAlt: "Passwort zurücksetzen",
+      keywords: "passwort zurücksetzen, passwort vergessen, next vibe",
     },
-    response: {
-      title: "Antwort",
-      description: "Antwortdaten",
-    },
-    errors: {
-      unauthorized: {
-        title: "Nicht autorisiert",
-        description: "Authentifizierung erforderlich",
+  },
+  auth: {
+    resetPassword: {
+      title: "Passwort zurücksetzen",
+      subtitle:
+        "Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen einen Reset-Link",
+      sendResetLink: "Reset-Link senden",
+      backToLogin: "Zurück zur Anmeldung",
+      emailSent: "E-Mail gesendet!",
+      successTitle: "Überprüfen Sie Ihre E-Mail",
+      successMessage:
+        "Wir haben Ihnen einen Link zum Zurücksetzen des Passworts gesendet. Bitte überprüfen Sie Ihren Posteingang.",
+      requestNewLink: "Neuen Link anfordern",
+      createNewPasswordTitle: "Neues Passwort erstellen",
+      createNewPasswordSubtitle: "Geben Sie unten Ihr neues Passwort ein",
+      resetPasswordButton: "Passwort zurücksetzen",
+      emailLabel: "E-Mail-Adresse",
+      emailPlaceholder: "Geben Sie Ihre E-Mail ein",
+      newPasswordLabel: "Neues Passwort",
+      newPasswordPlaceholder: "Geben Sie Ihr neues Passwort ein",
+      confirmPasswordLabel: "Passwort bestätigen",
+      confirmPasswordPlaceholder: "Bestätigen Sie Ihr neues Passwort",
+      errors: {
+        loadingError:
+          "Fehler beim Laden des Formulars zum Zurücksetzen des Passworts",
       },
-      validation: {
-        title: "Validierungsfehler",
-        description: "Ungültige Anfrageparameter",
-      },
-      server: {
-        title: "Serverfehler",
-        description: "Interner Serverfehler",
-      },
-      unknown: {
-        title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist aufgetreten",
-      },
-      network: {
-        title: "Netzwerkfehler",
-        description: "Netzwerkfehler aufgetreten",
-      },
-      forbidden: {
-        title: "Verboten",
-        description: "Zugriff verboten",
-      },
-      notFound: {
-        title: "Nicht gefunden",
-        description: "Ressource nicht gefunden",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Datenkonflikt aufgetreten",
-      },
-    },
-    success: {
-      title: "Erfolg",
-      description: "Vorgang erfolgreich abgeschlossen",
     },
   },
 };

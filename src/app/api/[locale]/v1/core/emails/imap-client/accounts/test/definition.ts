@@ -74,7 +74,7 @@ const { POST } = createEndpoint({
           type: WidgetType.BADGE,
           text: "app.api.v1.core.emails.imapClient.accounts.test.response.connectionStatus",
         },
-        z.nativeEnum(ImapConnectionStatus),
+        z.enum(ImapConnectionStatus),
       ),
 
       message: responseField(
@@ -125,7 +125,7 @@ const { POST } = createEndpoint({
               type: WidgetType.BADGE,
               text: "app.api.v1.core.emails.imapClient.accounts.test.response.details.authMethod",
             },
-            z.nativeEnum(ImapAuthMethod).optional(),
+            z.enum(ImapAuthMethod).optional(),
           ),
           responseTime: responseField(
             {
@@ -223,7 +223,7 @@ const { POST } = createEndpoint({
         connectionStatus: ImapConnectionStatus.CONNECTED,
         message: "Connection test successful",
         details: {
-          host: "imap.gmail.com",
+          host: "app.api.v1.core.emails.imapClient.imap.gmail.com",
           port: 993,
           secure: true,
           authMethod: ImapAuthMethod.PLAIN,

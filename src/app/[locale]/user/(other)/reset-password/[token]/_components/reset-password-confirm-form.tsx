@@ -71,7 +71,9 @@ export default function ResetPasswordConfirmForm({
             <div className="text-center">
               <Button asChild>
                 <Link href={`/${locale}/user/reset-password`}>
-                  {t("auth.resetPassword.requestNewLink")}
+                  {t(
+                    "app.user.other.resetPassword.auth.resetPassword.requestNewLink",
+                  )}
                 </Link>
               </Button>
             </div>
@@ -98,7 +100,7 @@ export default function ResetPasswordConfirmForm({
                 className="bg-green-600 hover:bg-green-700 text-white"
               >
                 <Link href={`/${locale}/user/login`}>
-                  {t("auth.login.signInButton")}
+                  {t("app.user.other.login.auth.login.signInButton")}
                 </Link>
               </Button>
             </div>
@@ -118,10 +120,14 @@ export default function ResetPasswordConfirmForm({
       <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
         <CardHeader className="space-y-1 pb-2">
           <CardTitle className="text-2xl font-bold text-center">
-            {t("auth.resetPassword.createNewPasswordTitle")}
+            {t(
+              "app.user.other.resetPassword.auth.resetPassword.createNewPasswordTitle",
+            )}
           </CardTitle>
           <CardDescription className="text-center">
-            {t("auth.resetPassword.createNewPasswordSubtitle")}
+            {t(
+              "app.user.other.resetPassword.auth.resetPassword.createNewPasswordSubtitle",
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -133,8 +139,10 @@ export default function ResetPasswordConfirmForm({
               name="verification.email"
               config={{
                 type: "email",
-                label: "auth.resetPassword.emailLabel",
-                placeholder: "auth.resetPassword.emailPlaceholder",
+                label:
+                  "app.user.other.resetPassword.auth.resetPassword.emailLabel",
+                placeholder:
+                  "app.user.other.resetPassword.auth.resetPassword.emailPlaceholder",
                 disabled: isSubmitting,
               }}
               control={form.control}
@@ -149,8 +157,10 @@ export default function ResetPasswordConfirmForm({
                 name="newPassword.password"
                 config={{
                   type: "password",
-                  label: "auth.resetPassword.newPasswordLabel",
-                  placeholder: "auth.resetPassword.newPasswordPlaceholder",
+                  label:
+                    "app.user.other.resetPassword.auth.resetPassword.newPasswordLabel",
+                  placeholder:
+                    "app.user.other.resetPassword.auth.resetPassword.newPasswordPlaceholder",
                   disabled: isSubmitting,
                 }}
                 control={form.control}
@@ -169,8 +179,10 @@ export default function ResetPasswordConfirmForm({
               name="newPassword.confirmPassword"
               config={{
                 type: "password",
-                label: "auth.resetPasswordConfirm.confirmPassword",
-                placeholder: "auth.resetPassword.confirmPasswordPlaceholder",
+                label:
+                  "app.user.other.resetPassword.auth.resetPassword.confirmPasswordLabel",
+                placeholder:
+                  "app.user.other.resetPassword.auth.resetPassword.confirmPasswordPlaceholder",
                 disabled: isSubmitting,
               }}
               control={form.control}
@@ -184,10 +196,12 @@ export default function ResetPasswordConfirmForm({
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t("common.loading")}
+                  {t("app.user.common.loading")}
                 </>
               ) : (
-                t("auth.resetPassword.resetPasswordButton")
+                t(
+                  "app.user.other.resetPassword.auth.resetPassword.resetPasswordButton",
+                )
               )}
             </Button>
           </Form>

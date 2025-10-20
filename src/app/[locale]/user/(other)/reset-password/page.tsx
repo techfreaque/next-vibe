@@ -23,17 +23,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "reset-password",
-    title: "meta.passwordReset.title",
-    description: "meta.passwordReset.description",
-    category: "meta.passwordReset.category",
+    title: "app.user.other.resetPassword.meta.passwordReset.title",
+    description: "app.user.other.resetPassword.meta.passwordReset.description",
+    category: "app.user.other.resetPassword.meta.passwordReset.category",
     image:
       "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200&h=630&auto=format&fit=crop",
-    imageAlt: "meta.passwordReset.imageAlt",
-    keywords: ["meta.passwordReset.keywords"],
+    imageAlt: "app.user.other.resetPassword.meta.passwordReset.imageAlt",
+    keywords: ["app.user.other.resetPassword.meta.passwordReset.keywords"],
     additionalMetadata: {
       openGraph: {
-        title: "meta.passwordReset.title",
-        description: "meta.passwordReset.description",
+        title: "app.user.other.resetPassword.meta.passwordReset.title",
+        description:
+          "app.user.other.resetPassword.meta.passwordReset.description",
         url: `https://nextvibe.dev/${locale}/reset-password`,
         type: "website",
         images: [
@@ -41,14 +42,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             url: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200&h=630&auto=format&fit=crop",
             width: 1200,
             height: 630,
-            alt: "meta.passwordReset.imageAlt",
+            alt: "app.user.other.resetPassword.meta.passwordReset.imageAlt",
           },
         ],
       },
       twitter: {
         card: "summary_large_image",
-        title: "meta.passwordReset.title",
-        description: "meta.passwordReset.description",
+        title: "app.user.other.resetPassword.meta.passwordReset.title",
+        description:
+          "app.user.other.resetPassword.meta.passwordReset.description",
         images: [
           "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200&h=630&auto=format&fit=crop",
         ],
@@ -79,7 +81,7 @@ export default async function ResetPasswordPage({
         className="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 mb-8"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        {t("common.backToHome")}
+        {t("app.user.common.backToHome")}
       </Link>
 
       <ResetPasswordForm locale={locale} />

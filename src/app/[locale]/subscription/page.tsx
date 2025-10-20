@@ -24,16 +24,16 @@ export async function generateMetadata({
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "subscription",
-    title: "meta.subscription.title",
-    description: "meta.subscription.description",
-    category: "meta.subscription.category",
+    title: "app.subscription.meta.subscription.title",
+    description: "app.subscription.meta.subscription.description",
+    category: "app.subscription.meta.subscription.category",
     image: "https://unbottled.ai/images/subscription-plans.jpg",
-    imageAlt: "meta.subscription.imageAlt",
+    imageAlt: "app.subscription.meta.subscription.imageAlt",
     keywords: [
-      "meta.subscription.keywords.subscription",
-      "meta.subscription.keywords.billing",
-      "meta.subscription.keywords.plans",
-      "meta.subscription.keywords.pricing",
+      "app.subscription.meta.subscription.keywords.subscription",
+      "app.subscription.meta.subscription.keywords.billing",
+      "app.subscription.meta.subscription.keywords.plans",
+      "app.subscription.meta.subscription.keywords.pricing",
     ],
   });
 }

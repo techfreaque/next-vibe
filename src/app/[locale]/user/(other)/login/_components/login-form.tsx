@@ -55,8 +55,8 @@ export function LoginForm({
               name="credentials.email"
               config={{
                 type: "email",
-                label: "auth.login.emailLabel",
-                placeholder: "auth.login.emailPlaceholder",
+                label: "app.user.other.login.auth.login.emailLabel",
+                placeholder: "app.user.other.login.auth.login.emailPlaceholder",
                 disabled: isSubmitting || isAccountLocked,
               }}
               control={form.control}
@@ -70,8 +70,9 @@ export function LoginForm({
               name="credentials.password"
               config={{
                 type: "password",
-                label: "auth.login.passwordLabel",
-                placeholder: "auth.login.passwordPlaceholder",
+                label: "app.user.other.login.auth.login.passwordLabel",
+                placeholder:
+                  "app.user.other.login.auth.login.passwordPlaceholder",
                 disabled: isSubmitting || isAccountLocked,
               }}
               control={form.control}
@@ -87,7 +88,7 @@ export function LoginForm({
                 config={{
                   type: "checkbox",
                   label: undefined, // Empty label for checkbox
-                  checkboxLabel: "auth.login.rememberMe",
+                  checkboxLabel: "app.user.other.login.auth.login.rememberMe",
                   disabled: isSubmitting || isAccountLocked,
                 }}
                 control={form.control}
@@ -100,7 +101,7 @@ export function LoginForm({
                 href={`/${locale}/user/reset-password`}
                 className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
               >
-                {t("auth.login.forgotPassword")}
+                {t("app.user.other.login.auth.login.forgotPassword")}
               </Link>
             </div>
 
@@ -116,10 +117,10 @@ export function LoginForm({
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t("common.loading")}
+                  {t("app.user.common.loading")}
                 </>
               ) : (
-                t("auth.login.signInButton")
+                t("app.user.other.login.auth.login.signInButton")
               )}
             </Button>
 
@@ -131,7 +132,7 @@ export function LoginForm({
                   <div className="relative flex items-center justify-center">
                     <span className="absolute inset-x-0 h-px bg-gray-300 dark:bg-gray-700" />
                     <span className="relative bg-white dark:bg-gray-900 px-4 text-sm text-gray-500 dark:text-gray-400">
-                      {t("auth.login.orContinueWith")}
+                      {t("app.user.other.login.auth.login.orContinueWith")}
                     </span>
                   </div>
 
@@ -152,12 +153,12 @@ export function LoginForm({
               )}
 
             <div className="text-center text-sm text-gray-500 dark:text-gray-400">
-              {t("login.dontHaveAccount")}{" "}
+              {t("app.user.other.login.login.dontHaveAccount")}{" "}
               <Link
                 href={`/${locale}/user/signup`}
                 className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
               >
-                {t("auth.login.createAccount")}
+                {t("app.user.other.login.auth.login.createAccount")}
               </Link>
             </div>
           </Form>

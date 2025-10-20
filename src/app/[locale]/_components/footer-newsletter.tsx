@@ -35,9 +35,11 @@ export function NewsletterSignupFooter({
   return (
     <div>
       <div className="mb-6">
-        <h3 className="font-semibold text-lg mb-4">{t("newsletter.title")}</h3>
+        <h3 className="font-semibold text-lg mb-4">
+          {t("app.newsletter.title")}
+        </h3>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          {t("newsletter.description")}
+          {t("app.newsletter.description")}
         </p>
 
         {/* Email input and action button */}
@@ -58,14 +60,14 @@ export function NewsletterSignupFooter({
         >
           <Input
             type="email"
-            placeholder={t("newsletter.emailPlaceholder")}
+            placeholder={t("app.newsletter.emailPlaceholder")}
             className="max-w-[220px]"
             autoComplete="email"
             autoCorrect="off"
             spellCheck="false"
             value={email}
             onChange={handleEmailChange}
-            aria-label={t("newsletter.emailPlaceholder")}
+            aria-label={t("app.newsletter.emailPlaceholder")}
             disabled={isAnyOperationInProgress || isLoggedIn}
             name="email"
             id="newsletter-email-footer"
@@ -86,9 +88,9 @@ export function NewsletterSignupFooter({
             aria-label={
               isSubscribed
                 ? showConfirmUnsubscribe
-                  ? t("newsletter.subscription.unsubscribe.confirmButton")
-                  : t("newsletter.subscription.unsubscribe.title")
-                : t("newsletter.subscribe")
+                  ? t("app.newsletter.subscription.unsubscribe.confirmButton")
+                  : t("app.newsletter.subscription.unsubscribe.title")
+                : t("app.newsletter.subscribe")
             }
             disabled={isAnyOperationInProgress}
           >
@@ -128,7 +130,8 @@ export function NewsletterSignupFooter({
 
       <div className="mt-8">
         <h3 className="font-semibold text-lg mb-4">
-          {t("common.selector.country")} / {t("common.selector.language")}
+          {t("app.common.selector.country")} /{" "}
+          {t("app.common.selector.language")}
         </h3>
         <div className="inline-block">
           <CountrySelector locale={locale} />

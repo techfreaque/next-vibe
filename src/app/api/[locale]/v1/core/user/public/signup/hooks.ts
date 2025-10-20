@@ -2,7 +2,6 @@ import { useRouter } from "next/navigation";
 import { useToast } from "next-vibe-ui/ui";
 import { useMemo } from "react";
 
-import { useLeadId } from "@/app/api/[locale]/v1/core/leads/tracking/engagement/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type {
   FormAlertState,
@@ -76,12 +75,12 @@ export function useRegister(): InferApiFormReturn<
     {
       onSuccess: async () => {
         // Clear lead tracking data on successful signup
-        logger.info("auth.signup.success.processing");
+        logger.info("app.api.v1.core.user.auth.signup.success.processing");
 
         const setTokenResponse = authClientRepository.setAuthStatus(logger);
         if (!setTokenResponse.success) {
           toast({
-            title: t("auth.signup.errors.title"),
+            title: t("app.api.v1.core.user.auth.signup.errors.title"),
             description: t("authClient.errors.token_save_failed"),
             variant: "destructive",
           });
@@ -89,8 +88,10 @@ export function useRegister(): InferApiFormReturn<
         }
 
         toast({
-          title: t("auth.signup.success.title"),
-          description: t("auth.signup.success.description"),
+          title: t("app.api.v1.core.user.auth.signup.success.title"),
+          description: t(
+            "app.api.v1.core.user.auth.signup.success.description",
+          ),
           variant: "default",
         });
 
@@ -110,18 +111,13 @@ export function useRegister(): InferApiFormReturn<
       },
       onError: ({ error }) => {
         toast({
-          title: t("auth.signup.errors.title"),
+          title: t("app.api.v1.core.user.auth.signup.errors.title"),
           description: t(error.message, error.messageParams),
           variant: "destructive",
         });
       },
     },
   );
-
-  // Use lead ID hook with callback to set lead ID in form
-  useLeadId((leadId) => {
-    formResult.form.setValue("advanced.leadId", leadId);
-  });
 
   // Generate alert state from error/success states
   const alert: FormAlertState | null = useMemo(() => {
@@ -130,10 +126,10 @@ export function useRegister(): InferApiFormReturn<
       return {
         variant: "success",
         title: {
-          message: "auth.signup.success.title",
+          message: "app.api.v1.core.user.auth.signup.success.title",
         },
         message: {
-          message: "auth.signup.success.description",
+          message: "app.api.v1.core.user.auth.signup.success.description",
         },
       };
     }
@@ -143,7 +139,7 @@ export function useRegister(): InferApiFormReturn<
       return {
         variant: "destructive",
         title: {
-          message: "auth.signup.errors.title",
+          message: "app.api.v1.core.user.auth.signup.errors.title",
         },
         message: {
           message: formResult.response.message,
@@ -197,7 +193,7 @@ export function useEmailCheck(
       enabled: !!email && email.includes("@") && email.includes("."),
       onError: ({ error }) => {
         toast({
-          title: t("auth.signup.errors.title"),
+          title: t("app.api.v1.core.user.auth.signup.errors.title"),
           description: t(error.message),
           variant: "destructive",
         });

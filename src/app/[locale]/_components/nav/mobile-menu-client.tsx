@@ -84,7 +84,7 @@ export function MobileMenuClient({
         size="icon"
         className="md:hidden"
         onClick={toggleMenu}
-        aria-label={t("common.accessibility.srOnly.toggleMenu")}
+        aria-label={t("app.common.accessibility.srOnly.toggleMenu")}
       >
         {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
       </Button>

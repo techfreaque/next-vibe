@@ -19,10 +19,18 @@ export const translations = {
 
   // Subscription plans
   plans: {
-    starter: "Starter Plan",
-    professional: "Professional Plan",
-    premium: "Premium Plan",
-    enterprise: "Enterprise Plan",
+    starter: {
+      title: "Starter Plan",
+    },
+    professional: {
+      title: "Professional Plan",
+    },
+    premium: {
+      title: "Premium Plan",
+    },
+    enterprise: {
+      title: "Enterprise Plan",
+    },
   },
 
   // Billing intervals
@@ -139,6 +147,10 @@ export const translations = {
       title: "Not Found",
       description: "Subscription not found",
     },
+    server: {
+      title: "Server Error",
+      description: "Internal server error occurred",
+    },
     serverError: {
       title: "Server Error",
       description: "Internal server error occurred",
@@ -155,12 +167,64 @@ export const translations = {
       title: "Conflict",
       description: "Data conflict occurred",
     },
+    user_not_found: "User not found",
+    stripe_customer_creation_failed: "Failed to create Stripe customer",
   },
 
   // Success types
   success: {
     title: "Success",
     description: "Operation completed successfully",
+  },
+
+  // Status translations
+  status: {
+    incomplete: "Incomplete",
+    incomplete_expired: "Incomplete Expired",
+    trialing: "Trialing",
+    active: "Active",
+    pastDue: "Past Due",
+    canceled: "Canceled",
+    unpaid: "Unpaid",
+    paused: "Paused",
+  },
+
+  // Email translations
+  email: {
+    success: {
+      title: "Subscription Successful!",
+      subject: "Welcome to Your Subscription!",
+      previewText: "Welcome to your new subscription",
+      welcomeMessage: "Welcome to your subscription!",
+      description: "Thank you for subscribing to {{appName}}",
+      nextSteps: {
+        title: "Next Steps",
+        description: "Here's what you can do next",
+        cta: "Get Started",
+      },
+      support: {
+        title: "Need Help?",
+        description: "Our support team is here to help you",
+        cta: "Contact Support",
+      },
+      footer: {
+        message: "Thank you for choosing us!",
+        signoff: "Best regards, The Team",
+      },
+    },
+    admin_notification: {
+      title: "New Subscription",
+      subject: "New Subscription - Admin Notification",
+      preview: "A new subscription has been created",
+      message: "A new subscription has been created",
+      details: "Subscription Details",
+      user_name: "User Name",
+      user_email: "User Email",
+      plan: "Plan",
+      status: "Status",
+      contact_user: "Contact User",
+      footer: "This is an automated notification",
+    },
   },
 
   // Enum translations

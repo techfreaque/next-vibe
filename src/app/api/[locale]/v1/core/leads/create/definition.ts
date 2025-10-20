@@ -207,7 +207,7 @@ const { POST } = createEndpoint({
               layout: { columns: 12 },
               options: LeadSourceOptions,
             },
-            z.nativeEnum(LeadSource).optional(),
+            z.enum(LeadSource).optional(),
           ),
 
           notes: requestDataField(
@@ -254,7 +254,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.v1.core.leads.create.post.response.summary.id",
                 },
-                z.string().uuid(),
+                z.uuid(),
               ),
               businessName: responseField(
                 {
@@ -277,7 +277,7 @@ const { POST } = createEndpoint({
                   type: WidgetType.BADGE,
                   text: "app.api.v1.core.leads.create.post.response.summary.status",
                 },
-                z.nativeEnum(LeadStatus),
+                z.enum(LeadStatus),
               ),
             },
           ),
@@ -344,7 +344,7 @@ const { POST } = createEndpoint({
                   type: WidgetType.BADGE,
                   text: "app.api.v1.core.leads.create.post.response.trackingInfo.source",
                 },
-                z.nativeEnum(LeadSource).nullable(),
+                z.enum(LeadSource).nullable(),
               ),
               emailsSent: responseField(
                 {

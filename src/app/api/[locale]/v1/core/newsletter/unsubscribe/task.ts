@@ -243,7 +243,7 @@ async function executeNewsletterUnsubscribeSync(
     });
 
     return createErrorResponse(
-      "error.default",
+      "app.api.v1.core.newsletter.error.default",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }
@@ -262,7 +262,7 @@ async function validateNewsletterUnsubscribeSync(): Promise<
     return createSuccessResponse(true);
   } catch {
     return createErrorResponse(
-      "error.default",
+      "app.api.v1.core.newsletter.error.default",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }

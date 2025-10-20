@@ -201,7 +201,7 @@ const { GET } = createEndpoint({
           options: TimePeriodOptions,
           layout: { columns: 4 },
         },
-        z.nativeEnum(TimePeriod).default(TimePeriod.DAY),
+        z.enum(TimePeriod).default(TimePeriod.DAY),
       ),
 
       dateRangePreset: requestDataField(
@@ -215,7 +215,7 @@ const { GET } = createEndpoint({
           options: DateRangePresetOptions,
           layout: { columns: 4 },
         },
-        z.nativeEnum(DateRangePreset).default(DateRangePreset.LAST_30_DAYS),
+        z.enum(DateRangePreset).default(DateRangePreset.LAST_30_DAYS),
       ),
 
       dateFrom: requestDataField(
@@ -252,7 +252,7 @@ const { GET } = createEndpoint({
           options: ChartTypeOptions,
           layout: { columns: 4 },
         },
-        z.nativeEnum(ChartType).default(ChartType.LINE),
+        z.enum(ChartType).default(ChartType.LINE),
       ),
 
       includeComparison: requestDataField(
@@ -279,7 +279,7 @@ const { GET } = createEndpoint({
           layout: { columns: 3 },
           options: EmailStatusFilterOptions,
         },
-        z.nativeEnum(EmailStatusFilter).default(EmailStatusFilter.ALL),
+        z.enum(EmailStatusFilter).default(EmailStatusFilter.ALL),
       ),
 
       type: requestDataField(
@@ -292,7 +292,7 @@ const { GET } = createEndpoint({
           layout: { columns: 3 },
           options: EmailTypeFilterOptions,
         },
-        z.nativeEnum(EmailTypeFilter).default(EmailTypeFilter.ALL),
+        z.enum(EmailTypeFilter).default(EmailTypeFilter.ALL),
       ),
 
       search: requestDataField(
@@ -318,7 +318,7 @@ const { GET } = createEndpoint({
           options: EmailSortFieldOptions,
           layout: { columns: 6 },
         },
-        z.nativeEnum(EmailSortField).default(EmailSortField.CREATED_AT),
+        z.enum(EmailSortField).default(EmailSortField.CREATED_AT),
       ),
 
       sortOrder: requestDataField(
@@ -331,7 +331,7 @@ const { GET } = createEndpoint({
           options: SortOrderOptions,
           layout: { columns: 6 },
         },
-        z.nativeEnum(SortOrder).default(SortOrder.DESC),
+        z.enum(SortOrder).default(SortOrder.DESC),
       ),
 
       // === RESPONSE FIELDS ===

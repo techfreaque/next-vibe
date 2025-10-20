@@ -16,11 +16,12 @@ import { WebSocketErrorCode } from "./enum";
 
 const publicJwtPayloadSchema = z.object({
   isPublic: z.literal(true),
-  // id, iat and exp are explicitly omitted for public tokens
+  leadId: z.uuid(),
 });
 
 const privateJwtPayloadSchema = z.object({
   id: z.uuid(),
+  leadId: z.uuid(),
   isPublic: z.literal(false),
 });
 
@@ -77,7 +78,7 @@ export type WebSocketUserType = z.infer<typeof webSocketUserSchema>;
  * WebSocket Error Code Enum
  * Defines error codes for WebSocket authentication
  */
-export const webSocketErrorCodeEnum = z.nativeEnum(WebSocketErrorCode);
+export const webSocketErrorCodeEnum = z.enum(WebSocketErrorCode);
 export type WebSocketErrorCodeType = z.infer<typeof webSocketErrorCodeEnum>;
 
 /**

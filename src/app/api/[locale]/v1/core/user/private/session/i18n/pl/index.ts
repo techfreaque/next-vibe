@@ -6,6 +6,15 @@ export const translations: typeof enTranslations = {
       noTokenInCookies: "Brak tokenu w ciasteczkach",
     },
   },
+  errors: {
+    session_not_found: "Sesja nie znaleziona",
+    session_lookup_failed: "Wyszukiwanie sesji nie powiodło się",
+    expired_sessions_delete_failed: "Usuwanie wygasłych sesji nie powiodło się",
+    session_creation_failed: "Tworzenie sesji nie powiodło się",
+    session_creation_database_error: "Błąd bazy danych podczas tworzenia sesji",
+    user_sessions_delete_failed: "Usuwanie sesji użytkownika nie powiodło się",
+    expired: "Sesja wygasła",
+  },
   post: {
     title: "Tytuł",
     description: "Opis endpointu",

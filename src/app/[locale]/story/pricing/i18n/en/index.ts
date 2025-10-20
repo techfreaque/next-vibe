@@ -1,52 +1,199 @@
 export const translations = {
-  post: {
-    title: "Pricing",
-    description: "Pricing endpoint",
-    form: {
-      title: "Pricing Configuration",
-      description: "Configure pricing parameters",
+  creditPricing: {
+    badge: "Flexible Pricing",
+    title: "Choose Your Plan",
+    subtitle: "Pay only for what you use, or go unlimited",
+    subscription: {
+      badge: "Most Popular",
+      title: "Unlimited",
+      price: "€10",
+      perMonth: "/month",
+      description: "Best value for power users",
+      expiryInfo: "Billed monthly, cancel anytime",
+      features: {
+        credits: "Unlimited messages",
+        allModels: "All 40+ AI models",
+        allFeatures: "All features included",
+        cancel: "Cancel anytime",
+      },
+      button: "Subscribe Now",
     },
-    response: {
-      title: "Response",
-      description: "Pricing response data",
+    creditPack: {
+      badge: "Pay As You Go",
+      title: "Credit Pack",
+      price: "€5",
+      description: "Perfect for occasional use",
+      permanentInfo: "Credits never expire",
+      quantityLabel: "Number of packs",
+      pricePerPack: "€5 per pack",
+      features: {
+        credits: "€5 credit pack",
+        allModels: "All AI models included",
+        allFeatures: "All features included",
+        multiple: "Buy multiple packs",
+      },
+      button: "Buy Credits",
+      buttonPlural: "Buy {{quantity}} Credit Packs",
     },
-    errors: {
-      unauthorized: {
-        title: "Unauthorized",
-        description: "Authentication required",
+    common: {
+      processing: "Processing...",
+    },
+    costTransparency: {
+      title: "Cost Transparency",
+      card: {
+        title: "Model Costs",
+        description:
+          "See exactly how many credits each AI model costs per message",
       },
-      validation: {
-        title: "Validation Error",
-        description: "Invalid request parameters",
-      },
-      server: {
-        title: "Server Error",
-        description: "Internal server error occurred",
-      },
-      unknown: {
-        title: "Unknown Error",
-        description: "An unknown error occurred",
-      },
-      network: {
-        title: "Network Error",
-        description: "Network error occurred",
-      },
-      forbidden: {
-        title: "Forbidden",
-        description: "Access forbidden",
-      },
-      notFound: {
-        title: "Not Found",
-        description: "Resource not found",
-      },
-      conflict: {
-        title: "Conflict",
-        description: "Data conflict occurred",
+      table: {
+        provider: "Provider",
+        model: "Model",
+        costPerMessage: "Cost per Message",
+        free: "Free",
+        credits: "{{count}} credit",
+        creditsPlural: "{{count}} credits",
+        parameters: "{{count}} parameters",
+        features: "Features",
+        braveSearch: "Brave Search",
+        braveSearchCost: "1 credit",
+        tts: "Text-to-Speech",
+        ttsCost: "1 credit",
+        stt: "Speech-to-Text",
+        sttCost: "1 credit",
       },
     },
-    success: {
-      title: "Success",
-      description: "Operation completed successfully",
+    calculator: {
+      title: "Credit Calculator",
+      card: {
+        title: "Estimate Your Usage",
+        description:
+          "Calculate how many credits you'll need based on your usage",
+      },
+      messagesLabel: "Messages per month",
+      estimates: {
+        free: "Free tier (10 messages/day)",
+        freeCredits: "€0",
+        basic: "Basic models (GPT-3.5, Claude Haiku)",
+        basicCredits: "~€{{count}}",
+        pro: "Pro models (GPT-4, Claude Sonnet)",
+        proCredits: "~€{{count}}",
+        premium: "Premium models (GPT-4 Turbo, Claude Opus)",
+        premiumCredits: "~€{{count}}",
+      },
+      recommendation: {
+        title: "Our Recommendation",
+        freeTier: "Start with our free tier to try out the platform!",
+        subscription:
+          "Subscribe for unlimited messages (€10/month covers up to €{{credits}} in usage)",
+        additionalPacks:
+          "Subscribe + buy {{packs}} additional credit pack(s) for heavy usage",
+      },
     },
+    freeTier: {
+      title: "Try It Free First!",
+      description:
+        "Get 10 free messages per day to explore all our AI models. No credit card required.",
+      button: "Start Free Trial",
+    },
+    buttons: {
+      upgrade: "Upgrade",
+      downgrade: "Downgrade",
+      currentPlan: "Current Plan",
+      processing: "Processing...",
+    },
+  },
+  comparison: {
+    title: "Simple, Transparent Pricing",
+    subtitle: "Choose the plan that works best for you",
+    monthly: "Monthly",
+    annually: "Annually",
+    customNote: "Need a custom plan? Contact us for enterprise pricing.",
+  },
+  plans: {
+    title: "Choose Your Plan",
+    subtitle: "Select the perfect plan for your needs",
+    badge: "Popular",
+    flexibleBadge: "Flexible",
+    supportBadge: "24/7 Support",
+    guaranteeBadge: "Money-back Guarantee",
+    orSeparator: "or",
+    customSolutionText: "Need a custom solution?",
+    tailoredPackageText:
+      "We can create a tailored package for your specific needs",
+    monthly: "Monthly",
+    annually: "Annually",
+    savePercent: "Save {{percent}}%",
+    perMonth: "/month",
+    contactUsLink: "Contact Us",
+    STARTER: {
+      name: "Free",
+      price: "€0",
+      description: "Perfect for trying out Unbottled.ai",
+      cta: "Get Started",
+      features: [
+        "10 messages per day",
+        "Access to all 40+ AI models",
+        "Basic folder management",
+        "Community personas",
+      ],
+    },
+    PROFESSIONAL: {
+      name: "Credit Pack",
+      price: "€5",
+      description: "Pay as you go with credit packs",
+      cta: "Buy Credits",
+      features: [
+        "€5 credit pack",
+        "Credits never expire",
+        "All AI models included",
+        "Crypto payment accepted",
+        "No subscription required",
+      ],
+    },
+    PREMIUM: {
+      name: "Unlimited",
+      price: "€10",
+      description: "Best value for power users",
+      cta: "Subscribe Now",
+      featureBadge: "Most Popular",
+      features: [
+        "Unlimited messages",
+        "All 40+ AI models",
+        "Advanced folder management",
+        "Custom personas",
+        "Priority support",
+        "Early access to new features",
+      ],
+    },
+    ENTERPRISE: {
+      name: "Enterprise",
+      price: "Custom",
+      description: "For teams and businesses",
+      cta: "Contact Sales",
+      featureBadge: "Enterprise",
+      features: [
+        "Custom pricing",
+        "Dedicated support",
+        "SLA guarantees",
+        "White-label options",
+        "Custom AI model integration",
+        "Team management",
+      ],
+    },
+  },
+  currentPlan: {
+    badge: "Current Plan",
+  },
+  upgrade: {
+    processing: "Processing upgrade...",
+  },
+  subscribe: {
+    processing: "Processing subscription...",
+  },
+  downgrade: {
+    title: "Downgrade Plan",
+    description: "Are you sure you want to downgrade your plan?",
+    nextCycle:
+      "Changes will take effect at the end of your current billing cycle",
   },
 };

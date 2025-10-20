@@ -108,7 +108,7 @@ export function useSubscriptionCheckout(): {
       // Handle different error types and return appropriate error responses
       if (error instanceof Error) {
         return createErrorResponse(
-          "subscription.checkout.error",
+          "app.api.v1.core.subscription.checkout.error",
           ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           { error: error.message },
         );
@@ -116,7 +116,7 @@ export function useSubscriptionCheckout(): {
 
       // For unknown error types, return a generic checkout error
       return createErrorResponse(
-        "subscription.checkout.error",
+        "app.api.v1.core.subscription.checkout.error",
         ErrorResponseTypes.UNKNOWN_ERROR,
       );
     }

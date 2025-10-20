@@ -70,8 +70,8 @@ const { GET, POST } = createFormEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.subscription.get.response.title",
-      description: "app.api.v1.core.subscription.get.response.description",
+      title: "app.api.v1.core.subscription.response.title",
+      description: "app.api.v1.core.subscription.response.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     {
@@ -88,7 +88,7 @@ const { GET, POST } = createFormEndpoint({
         },
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.subscription.get.response.id",
+          content: "app.api.v1.core.subscription.response.id",
         },
       ),
 
@@ -101,13 +101,13 @@ const { GET, POST } = createFormEndpoint({
         },
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.subscription.get.response.userId",
+          content: "app.api.v1.core.subscription.response.userId",
         },
       ),
 
       // Subscription plan field
       plan: field(
-        z.nativeEnum(SubscriptionPlan),
+        z.enum(SubscriptionPlan),
         {
           GET: { response: true },
           POST: { request: "data", response: true },
@@ -115,8 +115,8 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "app.api.v1.core.subscription.put.plan.label",
-          description: "app.api.v1.core.subscription.put.plan.description",
+          label: "app.api.v1.core.subscription.put.label",
+          description: "app.api.v1.core.subscription.put.description",
           options: SubscriptionPlanOptions,
           layout: { columns: 6 },
         },
@@ -124,7 +124,7 @@ const { GET, POST } = createFormEndpoint({
 
       // Billing interval field
       billingInterval: field(
-        z.nativeEnum(BillingInterval),
+        z.enum(BillingInterval),
         {
           GET: { response: true },
           POST: { request: "data", response: true },
@@ -132,9 +132,10 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "app.api.v1.core.subscription.put.billingInterval.label",
+          label:
+            "app.api.v1.core.subscription.form.fields.billingInterval.label",
           description:
-            "app.api.v1.core.subscription.put.billingInterval.description",
+            "app.api.v1.core.subscription.form.fields.billingInterval.description",
           options: BillingIntervalOptions,
           layout: { columns: 6 },
         },
@@ -142,14 +143,14 @@ const { GET, POST } = createFormEndpoint({
 
       // Status - response only
       status: field(
-        z.nativeEnum(SubscriptionStatus),
+        z.enum(SubscriptionStatus),
         {
           GET: { response: true },
           POST: { response: true },
         },
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.subscription.get.response.status",
+          content: "app.api.v1.core.subscription.response.status",
         },
       ),
 
@@ -162,8 +163,7 @@ const { GET, POST } = createFormEndpoint({
         },
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.subscription.get.response.currentPeriodStart",
+          content: "app.api.v1.core.subscription.response.currentPeriodStart",
         },
       ),
 
@@ -176,7 +176,7 @@ const { GET, POST } = createFormEndpoint({
         },
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.subscription.get.response.currentPeriodEnd",
+          content: "app.api.v1.core.subscription.response.currentPeriodEnd",
         },
       ),
 
@@ -190,9 +190,10 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.v1.core.subscription.put.cancelAtPeriodEnd.label",
+          label:
+            "app.api.v1.core.subscription.form.fields.cancelAtPeriodEnd.label",
           description:
-            "app.api.v1.core.subscription.put.cancelAtPeriodEnd.description",
+            "app.api.v1.core.subscription.form.fields.cancelAtPeriodEnd.description",
           layout: { columns: 12 },
         },
       ),
@@ -206,7 +207,7 @@ const { GET, POST } = createFormEndpoint({
         },
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.subscription.get.response.createdAt",
+          content: "app.api.v1.core.subscription.response.createdAt",
         },
       ),
 
@@ -219,7 +220,7 @@ const { GET, POST } = createFormEndpoint({
         },
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.subscription.get.response.updatedAt",
+          content: "app.api.v1.core.subscription.response.updatedAt",
         },
       ),
 
@@ -240,53 +241,47 @@ const { GET, POST } = createFormEndpoint({
   // Shared error and success configuration
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.v1.core.subscription.get.errors.validation.title",
-      description:
-        "app.api.v1.core.subscription.get.errors.validation.description",
+      title: "app.api.v1.core.subscription.errors.validation.title",
+      description: "app.api.v1.core.subscription.errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.v1.core.subscription.get.errors.notFound.title",
-      description:
-        "app.api.v1.core.subscription.get.errors.notFound.description",
+      title: "app.api.v1.core.subscription.errors.notFound.title",
+      description: "app.api.v1.core.subscription.errors.notFound.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.v1.core.subscription.get.errors.unauthorized.title",
+      title: "app.api.v1.core.subscription.errors.unauthorized.title",
       description:
-        "app.api.v1.core.subscription.get.errors.unauthorized.description",
+        "app.api.v1.core.subscription.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.v1.core.subscription.get.errors.forbidden.title",
-      description:
-        "app.api.v1.core.subscription.get.errors.forbidden.description",
+      title: "app.api.v1.core.subscription.errors.forbidden.title",
+      description: "app.api.v1.core.subscription.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.v1.core.subscription.get.errors.server.title",
-      description: "app.api.v1.core.subscription.get.errors.server.description",
+      title: "app.api.v1.core.subscription.errors.server.title",
+      description: "app.api.v1.core.subscription.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.v1.core.subscription.get.errors.network.title",
-      description:
-        "app.api.v1.core.subscription.get.errors.network.description",
+      title: "app.api.v1.core.subscription.errors.network.title",
+      description: "app.api.v1.core.subscription.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.v1.core.subscription.get.errors.unknown.title",
-      description:
-        "app.api.v1.core.subscription.get.errors.unknown.description",
+      title: "app.api.v1.core.subscription.errors.unknown.title",
+      description: "app.api.v1.core.subscription.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.v1.core.subscription.get.errors.unsavedChanges.title",
+      title: "app.api.v1.core.subscription.errors.unsavedChanges.title",
       description:
-        "app.api.v1.core.subscription.get.errors.unsavedChanges.description",
+        "app.api.v1.core.subscription.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.v1.core.subscription.get.errors.conflict.title",
-      description:
-        "app.api.v1.core.subscription.get.errors.conflict.description",
+      title: "app.api.v1.core.subscription.errors.conflict.title",
+      description: "app.api.v1.core.subscription.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.v1.core.subscription.get.success.title",
-    description: "app.api.v1.core.subscription.get.success.description",
+    title: "app.api.v1.core.subscription.success.title",
+    description: "app.api.v1.core.subscription.success.description",
   },
 
   // Method-specific examples
@@ -421,35 +416,34 @@ const { PUT } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "app.api.v1.core.subscription.put.plan.label" as const,
-          description:
-            "app.api.v1.core.subscription.put.plan.description" as const,
+          label: "app.api.v1.core.subscription.put.label" as const,
+          description: "app.api.v1.core.subscription.put.description" as const,
           options: SubscriptionPlanOptions,
           layout: { columns: 6 },
         },
-        z.nativeEnum(SubscriptionPlan),
+        z.enum(SubscriptionPlan),
       ),
       billingInterval: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label:
-            "app.api.v1.core.subscription.put.billingInterval.label" as const,
+            "app.api.v1.core.subscription.form.fields.billingInterval.label" as const,
           description:
-            "app.api.v1.core.subscription.put.billingInterval.description" as const,
+            "app.api.v1.core.subscription.form.fields.billingInterval.description" as const,
           options: BillingIntervalOptions,
           layout: { columns: 6 },
         },
-        z.nativeEnum(BillingInterval),
+        z.enum(BillingInterval),
       ),
       cancelAtPeriodEnd: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.subscription.put.cancelAtPeriodEnd.label" as const,
+            "app.api.v1.core.subscription.form.fields.cancelAtPeriodEnd.label" as const,
           description:
-            "app.api.v1.core.subscription.put.cancelAtPeriodEnd.description" as const,
+            "app.api.v1.core.subscription.form.fields.cancelAtPeriodEnd.description" as const,
           layout: { columns: 12 },
         },
         z.boolean(),
@@ -459,44 +453,44 @@ const { PUT } = createEndpoint({
       id: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.subscription.put.response.id" as const,
+          content: "app.api.v1.core.subscription.response.id" as const,
         },
         z.uuid(),
       ),
       userId: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.subscription.put.response.userId" as const,
+          content: "app.api.v1.core.subscription.response.userId" as const,
         },
         z.uuid(),
       ),
       responsePlan: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.subscription.put.response.plan" as const,
+          content: "app.api.v1.core.subscription.response.plan" as const,
         },
-        z.nativeEnum(SubscriptionPlan),
+        z.enum(SubscriptionPlan),
       ),
       responseBillingInterval: responseField(
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.subscription.put.response.billingInterval" as const,
+            "app.api.v1.core.subscription.response.billingInterval" as const,
         },
-        z.nativeEnum(BillingInterval),
+        z.enum(BillingInterval),
       ),
       status: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.subscription.put.response.status" as const,
+          content: "app.api.v1.core.subscription.response.status" as const,
         },
-        z.nativeEnum(SubscriptionStatus),
+        z.enum(SubscriptionStatus),
       ),
       currentPeriodStart: responseField(
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.subscription.put.response.currentPeriodStart" as const,
+            "app.api.v1.core.subscription.response.currentPeriodStart" as const,
         },
         z.string(),
       ),
@@ -504,7 +498,7 @@ const { PUT } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.subscription.put.response.currentPeriodEnd" as const,
+            "app.api.v1.core.subscription.response.currentPeriodEnd" as const,
         },
         z.string(),
       ),
@@ -512,30 +506,28 @@ const { PUT } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.subscription.put.response.cancelAtPeriodEnd" as const,
+            "app.api.v1.core.subscription.response.cancelAtPeriodEnd" as const,
         },
         z.boolean(),
       ),
       createdAt: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.subscription.put.response.createdAt" as const,
+          content: "app.api.v1.core.subscription.response.createdAt" as const,
         },
         z.string(),
       ),
       updatedAt: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.subscription.put.response.updatedAt" as const,
+          content: "app.api.v1.core.subscription.response.updatedAt" as const,
         },
         z.string(),
       ),
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.subscription.put.response.message" as const,
+          content: "app.api.v1.core.subscription.response.message" as const,
         },
         z.string(),
       ),

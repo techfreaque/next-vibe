@@ -29,8 +29,8 @@ export function ThemeToggle({
       suppressHydrationWarning
       aria-label={
         resolvedTheme === "dark" || !isMounted
-          ? t("common.accessibility.srOnly.enableLightMode")
-          : t("common.accessibility.srOnly.enableDarkMode")
+          ? t("app.common.accessibility.srOnly.enableLightMode")
+          : t("app.common.accessibility.srOnly.enableDarkMode")
       }
     >
       {resolvedTheme === "dark" || !isMounted ? (
@@ -68,8 +68,8 @@ export function ThemeToggleMobile({
       )}
       <span className="text-base font-medium my-auto">
         {resolvedTheme === "dark" || !isMounted
-          ? t("nav.enableLightMode")
-          : t("nav.enableDarkMode")}
+          ? t("app.nav.enableLightMode")
+          : t("app.nav.enableDarkMode")}
       </span>
     </div>
   );

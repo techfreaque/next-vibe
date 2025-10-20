@@ -73,7 +73,7 @@ const { GET } = createEndpoint({
               layout: { columns: 4 },
               options: CsvImportJobStatusOptions,
             },
-            z.nativeEnum(CsvImportJobStatus).optional(),
+            z.enum(CsvImportJobStatus).optional(),
           ),
           limit: requestDataField(
             {
@@ -126,9 +126,9 @@ const { GET } = createEndpoint({
             z.array(
               z.object({
                 // Job Identity
-                id: z.string().uuid(),
+                id: z.uuid(),
                 fileName: z.string(),
-                status: z.nativeEnum(CsvImportJobStatus),
+                status: z.enum(CsvImportJobStatus),
 
                 // Progress Tracking
                 totalRows: z.number().nullable(),
@@ -237,7 +237,7 @@ const { GET } = createEndpoint({
           items: [
             {
               id: "123e4567-e89b-12d3-a456-426614174000",
-              fileName: "leads.csv",
+              fileName: "app.api.v1.core.leads.csv",
               status: CsvImportJobStatus.PROCESSING,
               totalRows: 100,
               processedRows: 0,

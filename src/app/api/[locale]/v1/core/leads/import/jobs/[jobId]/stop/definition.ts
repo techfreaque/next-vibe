@@ -58,7 +58,7 @@ const { POST } = createEndpoint({
           layout: { columns: 12 },
           validation: { required: true },
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
 
       // === RESPONSE FIELDS ===

@@ -1,6 +1,16 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  errors: {
+    find_failed: "Nie udało się znaleźć ról użytkownika",
+    not_found: "Rola użytkownika nie znaleziona",
+    lookup_failed: "Nie udało się pobrać roli użytkownika",
+    add_failed: "Nie udało się dodać roli do użytkownika",
+    no_data_returned: "Brak danych zwróconych z bazy danych",
+    remove_failed: "Nie udało się usunąć roli od użytkownika",
+    check_failed: "Sprawdzenie czy użytkownik ma rolę nie powiodło się",
+    delete_failed: "Nie udało się usunąć ról użytkownika",
+  },
   post: {
     title: "Role użytkowników",
     description: "Endpoint ról użytkowników",

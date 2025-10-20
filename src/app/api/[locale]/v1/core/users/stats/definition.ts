@@ -56,7 +56,7 @@ const { GET } = createEndpoint({
           options: UserStatusFilterOptions,
           layout: { columns: 3 },
         },
-        z.nativeEnum(UserStatusFilter).default(UserStatusFilter.ALL),
+        z.enum(UserStatusFilter).default(UserStatusFilter.ALL),
       ),
       role: requestDataField(
         {
@@ -68,7 +68,7 @@ const { GET } = createEndpoint({
           options: UserRoleFilterOptions,
           layout: { columns: 3 },
         },
-        z.nativeEnum(UserRoleFilter).default(UserRoleFilter.ALL),
+        z.enum(UserRoleFilter).default(UserRoleFilter.ALL),
       ),
       country: requestDataField(
         {
@@ -81,7 +81,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.users.stats.fields.country.placeholder" as const,
           layout: { columns: 3 },
         },
-        z.nativeEnum(Countries).optional(),
+        z.enum(Countries).optional(),
       ),
       language: requestDataField(
         {
@@ -94,7 +94,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.users.stats.fields.language.placeholder" as const,
           layout: { columns: 3 },
         },
-        z.nativeEnum(Languages).optional(),
+        z.enum(Languages).optional(),
       ),
       search: requestDataField(
         {

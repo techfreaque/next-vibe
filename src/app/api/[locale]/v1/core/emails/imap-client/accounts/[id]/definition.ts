@@ -135,7 +135,7 @@ const { GET } = createEndpoint({
               type: WidgetType.BADGE,
               text: "app.api.v1.core.emails.imapClient.accounts.id.get.response.account.authMethod",
             },
-            z.nativeEnum(ImapAuthMethod),
+            z.enum(ImapAuthMethod),
           ),
           connectionTimeout: responseField(
             {
@@ -302,7 +302,7 @@ const { GET } = createEndpoint({
           id: "123e4567-e89b-12d3-a456-426614174000",
           name: "Primary IMAP Account",
           email: "user@example.com",
-          host: "imap.example.com",
+          host: "app.api.v1.core.emails.imapClient.imap.example.com",
           port: 993,
           secure: true,
           username: "user@example.com",
@@ -461,7 +461,7 @@ const { PUT } = createEndpoint({
           options: ImapAuthMethodOptions,
           layout: { columns: 6 },
         },
-        z.nativeEnum(ImapAuthMethod),
+        z.enum(ImapAuthMethod),
       ),
 
       enabled: requestDataField(
@@ -608,7 +608,7 @@ const { PUT } = createEndpoint({
               type: WidgetType.BADGE,
               text: "app.api.v1.core.emails.imapClient.accounts.id.post.response.account.authMethod",
             },
-            z.nativeEnum(ImapAuthMethod),
+            z.enum(ImapAuthMethod),
           ),
           enabled: responseField(
             {
@@ -711,7 +711,7 @@ const { PUT } = createEndpoint({
       default: {
         name: "Updated IMAP Account",
         email: "updated@example.com",
-        host: "imap.example.com",
+        host: "app.api.v1.core.emails.imapClient.imap.example.com",
         port: 993,
         secure: true,
         username: "updated@example.com",
@@ -726,7 +726,7 @@ const { PUT } = createEndpoint({
           id: "123e4567-e89b-12d3-a456-426614174000",
           name: "Updated IMAP Account",
           email: "updated@example.com",
-          host: "imap.example.com",
+          host: "app.api.v1.core.emails.imapClient.imap.example.com",
           port: 993,
           secure: true,
           username: "updated@example.com",

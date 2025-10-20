@@ -139,7 +139,7 @@ const { GET } = createEndpoint({
           options: ImapMessageStatusFilterOptions,
           layout: { columns: 4 },
         },
-        z.nativeEnum(ImapMessageStatusFilter).optional(),
+        z.enum(ImapMessageStatusFilter).optional(),
       ),
 
       sortBy: requestUrlParamsField(
@@ -169,7 +169,7 @@ const { GET } = createEndpoint({
           options: SortOrderOptions,
           layout: { columns: 4 },
         },
-        z.nativeEnum(SortOrder).default(SortOrder.DESC),
+        z.enum(SortOrder).default(SortOrder.DESC),
       ),
 
       dateFrom: requestUrlParamsField(

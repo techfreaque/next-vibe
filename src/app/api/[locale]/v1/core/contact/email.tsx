@@ -55,7 +55,7 @@ function ContactEmailContent({
     <EmailTemplate
       t={t}
       locale={locale}
-      title={t("email.contact.partner.greeting", {
+      title={t("app.api.v1.core.contact.email.partner.greeting", {
         name: requestData.name,
       })}
       previewText={requestData.subject}
@@ -69,7 +69,7 @@ function ContactEmailContent({
           marginBottom: "16px",
         }}
       >
-        {t("email.contact.partner.thankYou")}
+        {t("app.api.v1.core.contact.email.partner.thankYou")}
       </Text>
 
       {/* Contact Details Section */}
@@ -89,7 +89,7 @@ function ContactEmailContent({
             marginBottom: "12px",
           }}
         >
-          {t("email.contact.company.contactDetails")}
+          {t("app.api.v1.core.contact.email.company.contactDetails")}
         </Text>
 
         <Text
@@ -100,7 +100,7 @@ function ContactEmailContent({
           }}
         >
           <Text style={{ fontWeight: "700" }}>
-            {t("email.contact.company.name")}:
+            {t("app.api.v1.core.contact.email.company.name")}:
           </Text>{" "}
           {requestData.name}
         </Text>
@@ -113,7 +113,7 @@ function ContactEmailContent({
           }}
         >
           <Text style={{ fontWeight: "700" }}>
-            {t("email.contact.company.email")}:
+            {t("app.api.v1.core.contact.email.company.email")}:
           </Text>{" "}
           <Link
             href={`mailto:${requestData.email}`}
@@ -132,7 +132,7 @@ function ContactEmailContent({
             }}
           >
             <Text style={{ fontWeight: "700" }}>
-              {t("email.contact.company.company")}:
+              {t("app.api.v1.core.contact.email.company.company")}:
             </Text>{" "}
             {requestData.company}
           </Text>
@@ -146,7 +146,7 @@ function ContactEmailContent({
           }}
         >
           <Text style={{ fontWeight: "700" }}>
-            {t("email.contact.company.contactSubject")}:
+            {t("app.api.v1.core.contact.email.company.contactSubject")}:
           </Text>{" "}
           {requestData.subject}
         </Text>
@@ -161,7 +161,7 @@ function ContactEmailContent({
             marginBottom: "8px",
           }}
         >
-          {t("email.contact.partner.message")}
+          {t("app.api.v1.core.contact.email.partner.message")}
         </Text>
 
         <Text
@@ -188,7 +188,7 @@ function ContactEmailContent({
           marginBottom: "24px",
         }}
       >
-        {t("email.contact.partner.additionalInfo")}
+        {t("app.api.v1.core.contact.email.partner.additionalInfo")}
       </Text>
 
       {/* Admin Button for Company Emails */}
@@ -205,7 +205,7 @@ function ContactEmailContent({
               textDecoration: "none",
             }}
           >
-            {t("email.contact.company.viewDetails")}
+            {t("app.api.v1.core.contact.email.company.viewDetails")}
           </Button>
         </Section>
       )}
@@ -225,8 +225,8 @@ export const renderCompanyMail: EmailFunctionType<
   try {
     return createSuccessResponse({
       toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: t("common.appName"),
-      subject: t("email.contact.partner.subject", {
+      toName: t("app.common.appName"),
+      subject: t("app.api.v1.core.contact.email.partner.subject", {
         subject: requestData.subject,
       }),
       replyToEmail: requestData.email,
@@ -241,7 +241,7 @@ export const renderCompanyMail: EmailFunctionType<
     });
   } catch {
     return createErrorResponse(
-      "error.general.internal_server_error",
+      "app.api.v1.core.contact.error.general.internal_server_error",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }
@@ -260,11 +260,11 @@ export const renderPartnerMail: EmailFunctionType<
     return createSuccessResponse({
       toEmail: requestData.email,
       toName: requestData.name,
-      subject: t("email.contact.partner.subject", {
+      subject: t("app.api.v1.core.contact.email.partner.subject", {
         subject: requestData.subject,
       }),
       replyToEmail: contactClientRepository.getSupportEmail(locale),
-      replyToName: t("common.appName"),
+      replyToName: t("app.common.appName"),
 
       jsx: ContactEmailContent({
         requestData,
@@ -277,7 +277,7 @@ export const renderPartnerMail: EmailFunctionType<
     });
   } catch {
     return createErrorResponse(
-      "error.general.internal_server_error",
+      "app.api.v1.core.contact.error.general.internal_server_error",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }

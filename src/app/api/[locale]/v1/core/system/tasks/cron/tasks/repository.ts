@@ -146,9 +146,9 @@ function formatTaskResponse(
 ): CronTaskResponseType {
   // Validate enum values from database using Zod schemas
   // This provides runtime validation and type narrowing without type assertions
-  const prioritySchema = z.nativeEnum(CronTaskPriority);
-  const statusSchema = z.nativeEnum(CronTaskStatus);
-  const categorySchema = z.nativeEnum(TaskCategory);
+  const prioritySchema = z.enum(CronTaskPriority);
+  const statusSchema = z.enum(CronTaskStatus);
+  const categorySchema = z.enum(TaskCategory);
 
   const formatted: CronTaskResponseType = {
     id: task.id,
@@ -364,9 +364,9 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
           description: createdTask.description || undefined,
           schedule: createdTask.schedule || DEFAULT_CRON_SCHEDULE,
           enabled: createdTask.enabled,
-          priority: z.nativeEnum(CronTaskPriority).parse(createdTask.priority),
+          priority: z.enum(CronTaskPriority).parse(createdTask.priority),
           status: CronTaskStatus.PENDING, // New tasks are always pending
-          category: z.nativeEnum(TaskCategory).parse(createdTask.category),
+          category: z.enum(TaskCategory).parse(createdTask.category),
           timeout: createdTask.timeout || 300000,
           retries: createdTask.retries || 3,
           retryDelay:

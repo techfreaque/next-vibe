@@ -106,7 +106,7 @@ export class SessionRepositoryImpl implements SessionRepository {
 
       if (results.length === 0) {
         return createErrorResponse(
-          "session.errors.session_not_found",
+          "app.api.v1.core.user.private.session.errors.session_not_found",
           ErrorResponseTypes.NOT_FOUND,
           { token },
         );
@@ -116,7 +116,7 @@ export class SessionRepositoryImpl implements SessionRepository {
     } catch (error) {
       // Note: Logger not available for internal session methods
       return createErrorResponse(
-        "session.errors.session_lookup_failed",
+        "app.api.v1.core.user.private.session.errors.session_lookup_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         {
           token,
@@ -147,7 +147,7 @@ export class SessionRepositoryImpl implements SessionRepository {
     } catch (error) {
       // Note: Logger not available for internal cleanup methods
       return createErrorResponse(
-        "session.errors.expired_sessions_delete_failed",
+        "app.api.v1.core.user.private.session.errors.expired_sessions_delete_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         {
           error: parseError(error).message,
@@ -177,7 +177,7 @@ export class SessionRepositoryImpl implements SessionRepository {
 
       if (result.length === 0) {
         return createErrorResponse(
-          "session.errors.session_not_found",
+          "app.api.v1.core.user.private.session.errors.session_not_found",
           ErrorResponseTypes.NOT_FOUND,
           { token },
         );
@@ -189,7 +189,7 @@ export class SessionRepositoryImpl implements SessionRepository {
     } catch (error) {
       // Note: Logger not available for internal session methods
       return createErrorResponse(
-        "session.errors.session_lookup_failed",
+        "app.api.v1.core.user.private.session.errors.session_lookup_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         {
           token,
@@ -212,7 +212,7 @@ export class SessionRepositoryImpl implements SessionRepository {
 
       if (results.length === 0) {
         return createErrorResponse(
-          "session.errors.session_creation_failed",
+          "app.api.v1.core.user.private.session.errors.session_creation_failed",
           ErrorResponseTypes.DATABASE_ERROR,
           { userId: data.userId, operation: "create" },
         );
@@ -222,7 +222,7 @@ export class SessionRepositoryImpl implements SessionRepository {
     } catch (error) {
       // Note: Logger not available for internal session methods
       return createErrorResponse(
-        "session.errors.session_creation_database_error",
+        "app.api.v1.core.user.private.session.errors.session_creation_database_error",
         ErrorResponseTypes.DATABASE_ERROR,
         {
           userId: data.userId,
@@ -248,7 +248,7 @@ export class SessionRepositoryImpl implements SessionRepository {
     } catch (error) {
       // Note: Logger not available for internal session methods
       return createErrorResponse(
-        "session.errors.user_sessions_delete_failed",
+        "app.api.v1.core.user.private.session.errors.user_sessions_delete_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         {
           userId,
@@ -272,7 +272,7 @@ export class SessionRepositoryImpl implements SessionRepository {
 
       if (!token) {
         return createErrorResponse(
-          "session.errors.session_not_found",
+          "app.api.v1.core.user.private.session.errors.session_not_found",
           ErrorResponseTypes.UNAUTHORIZED,
           { reason: SessionErrorReason.NO_TOKEN_IN_COOKIES },
         );
@@ -290,7 +290,7 @@ export class SessionRepositoryImpl implements SessionRepository {
       // Check if session is expired
       if (session.expiresAt <= now) {
         return createErrorResponse(
-          "session.errors.expired",
+          "app.api.v1.core.user.private.session.errors.expired",
           ErrorResponseTypes.UNAUTHORIZED,
           { expiresAt: session.expiresAt.toISOString() },
         );
@@ -304,7 +304,7 @@ export class SessionRepositoryImpl implements SessionRepository {
     } catch (error) {
       // Note: Logger not available for internal session methods
       return createErrorResponse(
-        "session.errors.session_lookup_failed",
+        "app.api.v1.core.user.private.session.errors.session_lookup_failed",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: error instanceof Error ? error.message : String(error) },
       );

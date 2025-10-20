@@ -11,7 +11,6 @@ import { useToast } from "next-vibe-ui/ui";
 import type { ChangeEvent } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import { useLeadId } from "@/app/api/[locale]/v1/core/leads/tracking/engagement/hooks";
 import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { FormAlertState } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
 import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation-form";
@@ -148,33 +147,41 @@ export function useLogin(
         options: {
           rememberMe: false,
         },
-        leadId: undefined,
       },
       persistForm: false,
     },
     {
       onSuccess: async (data) => {
         try {
-          logger.debug("auth.login.onSuccess.start", { data });
+          logger.debug("app.api.v1.core.user.auth.login.onSuccess.start", {
+            data,
+          });
 
           // Set the auth status to indicate successful login
           // No need to clear first since the server has already set the httpOnly cookie
           const tokenResult = authClientRepository.setAuthStatus(logger);
           if (!tokenResult.success) {
-            logger.error("auth.login.token.save.failed", tokenResult);
+            logger.error(
+              "app.api.v1.core.user.auth.login.token.save.failed",
+              tokenResult,
+            );
             toast({
-              title: t("auth.login.errors.title"),
-              description: t("auth.login.errors.token_save_failed"),
+              title: t("app.api.v1.core.user.auth.login.errors.title"),
+              description: t(
+                "app.api.v1.core.user.auth.login.errors.token_save_failed",
+              ),
               variant: "destructive",
             });
             return;
           }
-          logger.debug("auth.login.token.save.success");
+          logger.debug("app.api.v1.core.user.auth.login.token.save.success");
 
           // Show success message immediately
           toast({
-            title: t("auth.login.success.title"),
-            description: t("auth.login.success.description"),
+            title: t("app.api.v1.core.user.auth.login.success.title"),
+            description: t(
+              "app.api.v1.core.user.auth.login.success.description",
+            ),
             variant: "default",
           });
 
@@ -185,19 +192,21 @@ export function useLogin(
           const redirectTo: Route = (redirectParam ||
             `/${locale}/`) satisfies Route;
 
-          logger.debug("auth.login.refetch.start");
+          logger.debug("app.api.v1.core.user.auth.login.refetch.start");
           // Refetch user data after successful login
           await refetch();
-          logger.debug("auth.login.refetch.success");
+          logger.debug("app.api.v1.core.user.auth.login.refetch.success");
 
           // Navigate immediately - the new page will handle user data fetching
           // Remove router.refresh() to prevent re-render loop
-          logger.debug("auth.login.redirect", { redirectTo });
+          logger.debug("app.api.v1.core.user.auth.login.redirect", {
+            redirectTo,
+          });
           router.push(redirectTo);
         } catch (error) {
-          logger.error("auth.login.process.failed", error);
+          logger.error("app.api.v1.core.user.auth.login.process.failed", error);
           toast({
-            title: t("auth.login.errors.title"),
+            title: t("app.api.v1.core.user.auth.login.errors.title"),
             description: t("authErrors.login.form.error.unknown.description"),
             variant: "destructive",
           });
@@ -206,18 +215,13 @@ export function useLogin(
       onError: (data) => {
         setErrorMessage(data.error.message);
         toast({
-          title: t("auth.login.errors.title"),
+          title: t("app.api.v1.core.user.auth.login.errors.title"),
           description: t(data.error.message),
           variant: "destructive",
         });
       },
     },
   );
-
-  // Use lead ID hook with callback to set lead ID in form
-  useLeadId((leadId) => {
-    formResult.form.setValue("leadId", leadId);
-  });
 
   // Extract response values to avoid complex union types in useMemo
   const responseSuccess = formResult.response?.success;
@@ -227,7 +231,7 @@ export function useLogin(
   let responseMessage: TranslationKey | null = null;
   let responseMessageParams: TParams | undefined;
   if (hasError && formResult.response) {
-    responseMessage = formResult.response.message as TranslationKey;
+    responseMessage = formResult.response.message;
     responseMessageParams = formResult.response.messageParams;
   }
 
@@ -243,11 +247,11 @@ export function useLogin(
       return {
         variant: "destructive" as const,
         title: {
-          message: "auth.login.errors.accountLocked" as TranslationKey,
+          message: "app.api.v1.core.user.auth.login.errors.accountLocked",
         },
         message: {
           message:
-            "auth.login.errors.accountLockedDescription" as TranslationKey,
+            "app.api.v1.core.user.auth.login.errors.accountLockedDescription",
         },
       };
     }
@@ -257,7 +261,7 @@ export function useLogin(
       return {
         variant: "destructive" as const,
         title: {
-          message: "auth.login.errors.title" as TranslationKey,
+          message: "app.api.v1.core.user.auth.login.errors.title",
         },
         message: {
           message: responseMessage,
@@ -271,7 +275,7 @@ export function useLogin(
       return {
         variant: "destructive" as const,
         title: {
-          message: "auth.login.errors.title" as TranslationKey,
+          message: "app.api.v1.core.user.auth.login.errors.title",
         },
         message: {
           message: errorMessage,
@@ -284,6 +288,7 @@ export function useLogin(
     isAccountLocked,
     errorMessage,
     responseMessage,
+    responseMessageParams,
     responseMessageParamsKey,
     responseSuccess,
   ]);

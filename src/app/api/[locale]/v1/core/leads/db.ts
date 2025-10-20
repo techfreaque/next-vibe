@@ -5,6 +5,7 @@
 
 import { relations } from "drizzle-orm";
 import {
+  boolean,
   integer,
   jsonb,
   pgEnum,
@@ -201,6 +202,13 @@ export const leadsRelations = relations(leads, ({ one, many }) => ({
   }),
   emailCampaigns: many(emailCampaigns),
   engagements: many(leadEngagements),
+  userLeads: many(userLeads),
+  primaryLeadLinks: many(leadLinks, {
+    relationName: "primaryLeadLinks",
+  }),
+  linkedLeadLinks: many(leadLinks, {
+    relationName: "linkedLeadLinks",
+  }),
 }));
 
 export const emailCampaignsRelations = relations(
@@ -243,6 +251,73 @@ export const leadCredits = pgTable("lead_credits", {
 });
 
 /**
+ * User Leads Table
+ * Tracks the relationship between users and leads
+ * A user can have multiple leads (e.g., anonymous lead before signup, then linked on signup)
+ * One lead is marked as primary for the user
+ */
+export const userLeads = pgTable("user_leads", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  leadId: uuid("lead_id")
+    .notNull()
+    .references(() => leads.id, { onDelete: "cascade" }),
+  isPrimary: boolean("is_primary").notNull().default(false),
+  linkedAt: timestamp("linked_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/**
+ * Lead Links Table
+ * Tracks relationships between leads (e.g., when merging leads or linking anonymous leads)
+ */
+export const leadLinks = pgTable("lead_links", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  primaryLeadId: uuid("primary_lead_id")
+    .notNull()
+    .references(() => leads.id, { onDelete: "cascade" }),
+  linkedLeadId: uuid("linked_lead_id")
+    .notNull()
+    .references(() => leads.id, { onDelete: "cascade" }),
+  linkReason: text("link_reason").notNull(),
+  metadata: jsonb("metadata")
+    .$type<Record<string, string | number | boolean>>()
+    .notNull()
+    .default({}),
+  linkedAt: timestamp("linked_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/**
+ * Relations
+ */
+export const userLeadsRelations = relations(userLeads, ({ one }) => ({
+  user: one(users, {
+    fields: [userLeads.userId],
+    references: [users.id],
+  }),
+  lead: one(leads, {
+    fields: [userLeads.leadId],
+    references: [leads.id],
+  }),
+}));
+
+export const leadLinksRelations = relations(leadLinks, ({ one }) => ({
+  primaryLead: one(leads, {
+    fields: [leadLinks.primaryLeadId],
+    references: [leads.id],
+    relationName: "primaryLeadLinks",
+  }),
+  linkedLead: one(leads, {
+    fields: [leadLinks.linkedLeadId],
+    references: [leads.id],
+    relationName: "linkedLeadLinks",
+  }),
+}));
+
+/**
  * Zod Schemas
  */
 export const selectLeadSchema = createSelectSchema(leads);
@@ -253,6 +328,10 @@ export const selectLeadEngagementSchema = createSelectSchema(leadEngagements);
 export const insertLeadEngagementSchema = createInsertSchema(leadEngagements);
 export const selectLeadCreditSchema = createSelectSchema(leadCredits);
 export const insertLeadCreditSchema = createInsertSchema(leadCredits);
+export const selectUserLeadSchema = createSelectSchema(userLeads);
+export const insertUserLeadSchema = createInsertSchema(userLeads);
+export const selectLeadLinkSchema = createSelectSchema(leadLinks);
+export const insertLeadLinkSchema = createInsertSchema(leadLinks);
 
 /**
  * Types
@@ -265,3 +344,7 @@ export type LeadEngagement = z.infer<typeof selectLeadEngagementSchema>;
 export type NewLeadEngagement = z.infer<typeof insertLeadEngagementSchema>;
 export type LeadCredit = z.infer<typeof selectLeadCreditSchema>;
 export type NewLeadCredit = z.infer<typeof insertLeadCreditSchema>;
+export type UserLead = z.infer<typeof selectUserLeadSchema>;
+export type NewUserLead = z.infer<typeof insertUserLeadSchema>;
+export type LeadLink = z.infer<typeof selectLeadLinkSchema>;
+export type NewLeadLink = z.infer<typeof insertLeadLinkSchema>;

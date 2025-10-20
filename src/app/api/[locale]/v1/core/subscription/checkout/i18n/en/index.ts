@@ -146,4 +146,7 @@ export const translations = {
       description: "Checkout session created successfully",
     },
   },
+
+  // General error message
+  error: "An error occurred during checkout",
 };

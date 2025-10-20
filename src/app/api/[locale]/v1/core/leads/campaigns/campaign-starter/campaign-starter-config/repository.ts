@@ -247,7 +247,7 @@ class CampaignStarterConfigRepositoryImpl
     } catch (error) {
       logger.error("Error fetching campaign starter config", error);
       return createErrorResponse(
-        "leadsErrors.leads.get.error.server.title",
+        "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -318,7 +318,7 @@ class CampaignStarterConfigRepositoryImpl
     } catch (error) {
       logger.error("Error updating campaign starter config", error);
       return createErrorResponse(
-        "leadsErrors.leads.get.error.server.title",
+        "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }

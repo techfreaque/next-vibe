@@ -14,6 +14,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import { verifyPassword } from "next-vibe/shared/utils/password";
 
+import { leadAuthService } from "@/app/api/[locale]/v1/core/leads/auth-service";
 import { leadsRepository } from "@/app/api/[locale]/v1/core/leads/repository";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
@@ -24,7 +25,6 @@ import type { JWTPublicPayloadType } from "../../auth/definition";
 import { authRepository } from "../../auth/repository";
 import { users } from "../../db";
 import { UserDetailLevel } from "../../enum";
-import type { NewSession } from "../../private/session/db";
 import { sessionRepository } from "../../private/session/repository";
 import { userRepository } from "../../repository";
 import type {
@@ -124,7 +124,9 @@ export class LoginRepositoryImpl implements LoginRepository {
     // Extract data from request
     const { email, password } = data.credentials;
     const { rememberMe } = data.options;
-    const { leadId } = data;
+
+    // Get leadId from user prop (JWT payload) - always present
+    const leadId = user.leadId;
 
     // Get client IP for security monitoring
     const ipAddress =
@@ -148,7 +150,7 @@ export class LoginRepositoryImpl implements LoginRepository {
         });
 
         return createErrorResponse(
-          "login.errors.account_locked",
+          "app.api.v1.core.user.public.login.errors.account_locked",
           ErrorResponseTypes.FORBIDDEN,
         );
       }
@@ -173,7 +175,7 @@ export class LoginRepositoryImpl implements LoginRepository {
         });
 
         return createErrorResponse(
-          "login.errors.invalid_credentials",
+          "app.api.v1.core.user.public.login.errors.invalid_credentials",
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
@@ -198,7 +200,7 @@ export class LoginRepositoryImpl implements LoginRepository {
         });
 
         return createErrorResponse(
-          "login.errors.invalid_credentials",
+          "app.api.v1.core.user.public.login.errors.invalid_credentials",
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
@@ -209,7 +211,7 @@ export class LoginRepositoryImpl implements LoginRepository {
         // Here you would implement 2FA flow
         // This is a placeholder for the actual implementation
         return createErrorResponse(
-          "login.errors.two_factor_required",
+          "app.api.v1.core.user.public.login.errors.two_factor_required",
           ErrorResponseTypes.TWO_FACTOR_REQUIRED,
         );
       }
@@ -237,21 +239,19 @@ export class LoginRepositoryImpl implements LoginRepository {
         return sessionResponse;
       }
 
-      // Handle lead conversion if leadId is provided
-      if (leadId && userResponse.data.id) {
-        await this.handleLeadConversion(
-          leadId,
-          email,
-          userResponse.data.id,
-          locale,
-          logger,
-        );
-      }
+      // Link leadId to user (always happens during login)
+      await this.handleLeadConversion(
+        leadId,
+        email,
+        userResponse.data.id,
+        locale,
+        logger,
+      );
 
       return sessionResponse;
     } catch (error) {
       return createErrorResponse(
-        "login.errors.auth_error",
+        "app.api.v1.core.user.public.login.errors.auth_error",
         ErrorResponseTypes.INTERNAL_ERROR,
         {
           email,
@@ -329,20 +329,29 @@ export class LoginRepositoryImpl implements LoginRepository {
       );
       if (!userResponse.success) {
         return createErrorResponse(
-          "login.errors.user_not_found",
+          "app.api.v1.core.user.public.login.errors.user_not_found",
           ErrorResponseTypes.NOT_FOUND,
           { userId },
         );
       }
+
+      // Get primary leadId for user
+      const leadIdResult = await leadAuthService.getAuthenticatedUserLeadId(
+        userId,
+        undefined, // No cookie leadId in this context
+        locale,
+        logger,
+      );
 
       // Set session duration based on rememberMe flag
       // Remember me: 30 days, Regular session: 7 days
       const sessionDurationDays = rememberMe ? 30 : 7;
       const sessionDurationSeconds = sessionDurationDays * 24 * 60 * 60;
 
-      // Create JWT payload with proper structure
+      // Create JWT payload with proper structure including leadId
       const tokenPayload = {
         id: userResponse.data.id,
+        leadId: leadIdResult.leadId,
         isPublic: false as const,
       };
 
@@ -360,7 +369,7 @@ export class LoginRepositoryImpl implements LoginRepository {
       }
 
       // Create a session in the database
-      const sessionData: NewSession = {
+      const sessionData = {
         userId,
         token: tokenResponse.data,
         expiresAt,
@@ -416,7 +425,7 @@ export class LoginRepositoryImpl implements LoginRepository {
         error: parseError(error).message,
       });
       return createErrorResponse(
-        "login.errors.session_creation_failed",
+        "app.api.v1.core.user.public.login.errors.session_creation_failed",
         ErrorResponseTypes.INTERNAL_ERROR,
         {
           userId,
@@ -448,17 +457,17 @@ export class LoginRepositoryImpl implements LoginRepository {
         socialProviders: [
           {
             enabled: true,
-            name: "auth.login.providers.google",
+            name: "app.api.v1.core.user.public.login.providers.google",
             providers: [SocialProviders.GOOGLE],
           },
           {
             enabled: true,
-            name: "auth.login.providers.github",
+            name: "app.api.v1.core.user.public.login.providers.github",
             providers: [SocialProviders.GITHUB],
           },
           {
             enabled: true,
-            name: "auth.login.providers.facebook",
+            name: "app.api.v1.core.user.public.login.providers.facebook",
             providers: [SocialProviders.FACEBOOK],
           },
         ],
@@ -473,7 +482,7 @@ export class LoginRepositoryImpl implements LoginRepository {
         );
         if (!user.success) {
           return createErrorResponse(
-            "login.errors.user_not_found",
+            "app.api.v1.core.user.public.login.errors.user_not_found",
             ErrorResponseTypes.NOT_FOUND,
             { userId: email },
           );
@@ -492,7 +501,7 @@ export class LoginRepositoryImpl implements LoginRepository {
       return createSuccessResponse(options);
     } catch (error) {
       return createErrorResponse(
-        "login.errors.auth_error",
+        "app.api.v1.core.user.public.login.errors.auth_error",
         ErrorResponseTypes.INTERNAL_ERROR,
         {
           email: email || "unknown",
@@ -557,7 +566,7 @@ export class LoginRepositoryImpl implements LoginRepository {
           email,
           userId,
         },
-        { id: userId, isPublic: false },
+        { id: userId, leadId, isPublic: false },
         locale,
         logger,
       );

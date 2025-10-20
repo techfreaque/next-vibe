@@ -131,7 +131,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
         parsedError.message.includes("connect")
       ) {
         return createErrorResponse(
-          "user.roles.errors.find_failed",
+          "app.api.v1.core.user.userRoles.errors.find_failed",
           ErrorResponseTypes.DATABASE_ERROR,
           {
             userId,
@@ -142,7 +142,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
       }
 
       return createErrorResponse(
-        "user.roles.errors.find_failed",
+        "app.api.v1.core.user.userRoles.errors.find_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { userId, error: parsedError.message },
       );
@@ -182,7 +182,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
           return createSuccessResponse(cliRole);
         } else {
           return createErrorResponse(
-            "user.roles.errors.not_found",
+            "app.api.v1.core.user.userRoles.errors.not_found",
             ErrorResponseTypes.NOT_FOUND,
             { userId, role },
           );
@@ -196,7 +196,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
 
       if (results.length === 0) {
         return createErrorResponse(
-          "user.roles.errors.not_found",
+          "app.api.v1.core.user.userRoles.errors.not_found",
           ErrorResponseTypes.NOT_FOUND,
           { userId, role },
         );
@@ -206,7 +206,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
     } catch (error) {
       logger.error("Error finding user role by user ID and role", error);
       return createErrorResponse(
-        "user.roles.errors.lookup_failed",
+        "app.api.v1.core.user.userRoles.errors.lookup_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { userId, role, error: parseError(error).message },
       );
@@ -254,9 +254,9 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
 
       if (results.length === 0) {
         return createErrorResponse(
-          "user.roles.errors.add_failed",
+          "app.api.v1.core.user.userRoles.errors.add_failed",
           ErrorResponseTypes.DATABASE_ERROR,
-          { error: "user.roles.errors.no_data_returned" },
+          { error: "app.api.v1.core.user.userRoles.errors.no_data_returned" },
         );
       }
 
@@ -264,7 +264,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
     } catch (error) {
       logger.error("Error adding role to user", error);
       return createErrorResponse(
-        "user.roles.errors.add_failed",
+        "app.api.v1.core.user.userRoles.errors.add_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         {
           userId: data.userId,
@@ -298,7 +298,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
     } catch (error) {
       logger.error("Error removing role from user", error);
       return createErrorResponse(
-        "user.roles.errors.remove_failed",
+        "app.api.v1.core.user.userRoles.errors.remove_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { userId, role, error: parseError(error).message },
       );
@@ -329,7 +329,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
     } catch (error) {
       logger.error("Error checking if user has role", error);
       return createErrorResponse(
-        "user.roles.errors.check_failed",
+        "app.api.v1.core.user.userRoles.errors.check_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { userId, role, error: parseError(error).message },
       );
@@ -354,7 +354,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
     } catch (error) {
       logger.error("Error deleting user roles by user ID", error);
       return createErrorResponse(
-        "user.roles.errors.delete_failed",
+        "app.api.v1.core.user.userRoles.errors.delete_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { userId, error: parseError(error).message },
       );

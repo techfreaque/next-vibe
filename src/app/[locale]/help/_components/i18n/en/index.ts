@@ -1,52 +1,49 @@
 export const translations = {
-  post: {
-    title: "_components",
-    description: "_components endpoint",
-    form: {
-      title: "_components Configuration",
-      description: "Configure _components parameters",
-    },
-    response: {
-      title: "Response",
-      description: "_components response data",
-    },
-    errors: {
-      unauthorized: {
-        title: "Unauthorized",
-        description: "Authentication required",
+  pages: {
+    help: {
+      form: {
+        title: "Send us a Message",
+        name: "Name",
+        namePlaceholder: "Your name",
+        email: "Email",
+        emailPlaceholder: "your.email@example.com",
+        company: "Company",
+        companyPlaceholder: "Your company name (optional)",
+        subject: "Subject",
+        subjectPlaceholder: "Select a subject",
+        message: "Message",
+        messagePlaceholder: "Tell us how we can help you...",
+        submit: "Send Message",
+        sending: "Sending...",
       },
-      validation: {
-        title: "Validation Error",
-        description: "Invalid request parameters",
-      },
-      server: {
-        title: "Server Error",
-        description: "Internal server error occurred",
-      },
-      unknown: {
-        title: "Unknown Error",
-        description: "An unknown error occurred",
-      },
-      network: {
-        title: "Network Error",
-        description: "Network error occurred",
-      },
-      forbidden: {
-        title: "Forbidden",
-        description: "Access forbidden",
-      },
-      notFound: {
-        title: "Not Found",
-        description: "Resource not found",
-      },
-      conflict: {
-        title: "Conflict",
-        description: "Data conflict occurred",
+      info: {
+        title: "Contact Information",
+        email: "Email",
+        supportEmail: "support@unbottled.ai",
+        community: "Community",
+        discord: "Join our Discord",
+        discordDescription: "Get help from our community and team",
+        twitter: "Follow us on Twitter",
+        twitterHandle: "@unbottled_ai",
+        website: "Website",
+        websiteUrl: "unbottled.ai",
       },
     },
-    success: {
-      title: "Success",
-      description: "Operation completed successfully",
+  },
+  contact: {
+    subjects: {
+      HELP_SUPPORT: "Help & Support",
+      GENERAL_INQUIRY: "General Inquiry",
+      TECHNICAL_SUPPORT: "Technical Support",
+      ACCOUNT_QUESTION: "Account Question",
+      BILLING_QUESTION: "Billing & Credits",
+      SALES_INQUIRY: "Sales Inquiry",
+      FEATURE_REQUEST: "Feature Request",
+      BUG_REPORT: "Bug Report",
+      FEEDBACK: "Feedback",
+      COMPLAINT: "Complaint",
+      PARTNERSHIP: "Partnership",
+      OTHER: "Other",
     },
   },
 };

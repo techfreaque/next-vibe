@@ -73,7 +73,7 @@ const accountResponseFields = {
       type: WidgetType.BADGE,
       text: "app.api.v1.core.emails.smtpClient.edit.id.response.account.securityType",
     },
-    z.nativeEnum(SmtpSecurityType),
+    z.enum(SmtpSecurityType),
   ),
   username: responseField(
     {
@@ -96,14 +96,14 @@ const accountResponseFields = {
       type: WidgetType.BADGE,
       text: "app.api.v1.core.emails.smtpClient.edit.id.response.account.status",
     },
-    z.nativeEnum(SmtpAccountStatus),
+    z.enum(SmtpAccountStatus),
   ),
   healthCheckStatus: responseField(
     {
       type: WidgetType.BADGE,
       text: "app.api.v1.core.emails.smtpClient.edit.id.response.account.healthCheckStatus",
     },
-    z.nativeEnum(SmtpHealthStatus).nullable(),
+    z.enum(SmtpHealthStatus).nullable(),
   ),
   priority: responseField(
     {
@@ -411,7 +411,7 @@ const { PUT } = createEndpoint({
               layout: { columns: 6 },
               options: SmtpSecurityTypeOptions,
             },
-            z.nativeEnum(SmtpSecurityType).optional(),
+            z.enum(SmtpSecurityType).optional(),
           ),
 
           username: requestDataField(

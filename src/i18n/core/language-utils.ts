@@ -196,3 +196,16 @@ export function getCountryFromLocale(locale: CountryLanguage): Countries {
 export function getLanguageFromLocale(locale: CountryLanguage): Languages {
   return locale.split("-")[0] as Languages;
 }
+
+/**
+ * Extract both language and country codes from locale string
+ */
+export function getLanguageAndCountryFromLocale(locale: CountryLanguage): {
+  language: Languages;
+  country: Countries;
+} {
+  return {
+    language: getLanguageFromLocale(locale),
+    country: getCountryFromLocale(locale),
+  };
+}

@@ -66,6 +66,15 @@ export const pathRepository = {
         );
       }
 
+      // Reject incognito threads
+      if (thread.rootFolderId === "incognito") {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.threads.threadId.messages.path.get.errors.forbidden.title" as const,
+          ErrorResponseTypes.FORBIDDEN,
+          { message: "Incognito threads cannot be accessed on the server" },
+        );
+      }
+
       // Get all messages in the thread
       const allMessages = await db
         .select()

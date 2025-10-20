@@ -1,52 +1,41 @@
+import { translations as componentsTranslations } from "../../_components/i18n/en";
+import { translations as tokenTranslations } from "../../[token]/i18n/en";
+
 export const translations = {
-  post: {
-    title: "Reset Password",
-    description: "Reset Password endpoint",
-    form: {
-      title: "Reset Password Configuration",
-      description: "Configure reset password parameters",
+  components: componentsTranslations,
+  token: tokenTranslations,
+  meta: {
+    passwordReset: {
+      title: "Reset Password - Next Vibe",
+      description: "Reset your Next Vibe account password",
+      category: "Authentication",
+      imageAlt: "Password Reset",
+      keywords: "reset password, forgot password, next vibe",
     },
-    response: {
-      title: "Response",
-      description: "Reset Password response data",
-    },
-    errors: {
-      unauthorized: {
-        title: "Unauthorized",
-        description: "Authentication required",
+  },
+  auth: {
+    resetPassword: {
+      title: "Reset Your Password",
+      subtitle: "Enter your email address and we'll send you a reset link",
+      sendResetLink: "Send Reset Link",
+      backToLogin: "Back to Login",
+      emailSent: "Email Sent!",
+      successTitle: "Check Your Email",
+      successMessage:
+        "We've sent you a password reset link. Please check your inbox.",
+      requestNewLink: "Request New Link",
+      createNewPasswordTitle: "Create New Password",
+      createNewPasswordSubtitle: "Enter your new password below",
+      resetPasswordButton: "Reset Password",
+      emailLabel: "Email Address",
+      emailPlaceholder: "Enter your email",
+      newPasswordLabel: "New Password",
+      newPasswordPlaceholder: "Enter your new password",
+      confirmPasswordLabel: "Confirm Password",
+      confirmPasswordPlaceholder: "Confirm your new password",
+      errors: {
+        loadingError: "Failed to load reset password form",
       },
-      validation: {
-        title: "Validation Error",
-        description: "Invalid request parameters",
-      },
-      server: {
-        title: "Server Error",
-        description: "Internal server error occurred",
-      },
-      unknown: {
-        title: "Unknown Error",
-        description: "An unknown error occurred",
-      },
-      network: {
-        title: "Network Error",
-        description: "Network error occurred",
-      },
-      forbidden: {
-        title: "Forbidden",
-        description: "Access forbidden",
-      },
-      notFound: {
-        title: "Not Found",
-        description: "Resource not found",
-      },
-      conflict: {
-        title: "Conflict",
-        description: "Data conflict occurred",
-      },
-    },
-    success: {
-      title: "Success",
-      description: "Operation completed successfully",
     },
   },
 };

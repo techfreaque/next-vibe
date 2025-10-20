@@ -103,7 +103,7 @@ export function createNextHandler<
       // Authenticate user using unified core with Next.js context
       const authResult = await authenticateUser(
         endpoint,
-        { platform: "next" },
+        { platform: "next", locale },
         logger,
       );
       if (!authResult.success) {

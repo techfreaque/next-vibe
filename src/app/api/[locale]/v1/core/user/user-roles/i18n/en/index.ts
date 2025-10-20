@@ -1,4 +1,14 @@
 export const translations = {
+  errors: {
+    find_failed: "Failed to find user roles",
+    not_found: "User role not found",
+    lookup_failed: "Failed to lookup user role",
+    add_failed: "Failed to add role to user",
+    no_data_returned: "No data returned from database",
+    remove_failed: "Failed to remove role from user",
+    check_failed: "Failed to check if user has role",
+    delete_failed: "Failed to delete user roles",
+  },
   post: {
     title: "User Roles",
     description: "User Roles endpoint",

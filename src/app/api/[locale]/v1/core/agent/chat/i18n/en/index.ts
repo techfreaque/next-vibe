@@ -1,6 +1,7 @@
 import { translations as aiStreamTranslations } from "../../ai-stream/i18n/en";
 import { translations as creditsTranslations } from "../../credits/i18n/en";
 import { translations as foldersTranslations } from "../../folders/i18n/en";
+import { translations as personasTranslations } from "../../personas/i18n/en";
 import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/en";
 import { translations as threadsTranslations } from "../../threads/i18n/en";
 
@@ -10,8 +11,17 @@ export const translations = {
     threads: "Threads",
     folders: "Folders",
     messages: "Messages",
+    personas: "Personas",
     credits: "Credits",
     balance: "Balance",
+  },
+  config: {
+    folders: {
+      private: "Private",
+      shared: "Shared",
+      public: "Public",
+      incognito: "Incognito",
+    },
   },
   enums: {
     role: {
@@ -103,6 +113,9 @@ export const translations = {
     answerFailed: "Failed to answer",
     deleteFailed: "Failed to delete",
   },
+  errorTypes: {
+    streamError: "Stream error",
+  },
   hooks: {
     stt: {
       "endpoint-not-available": "Speech-to-text endpoint not available",
@@ -126,6 +139,7 @@ export const translations = {
   aiStream: aiStreamTranslations,
   credits: creditsTranslations,
   folders: foldersTranslations,
+  personas: personasTranslations,
   threads: {
     ...threadsTranslations,
     messages: messagesTranslations,

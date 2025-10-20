@@ -135,7 +135,7 @@ const { POST } = createEndpoint({
           validation: { required: false },
           behavior: { searchable: false, clearable: true },
         },
-        z.nativeEnum(ContactPriority).optional(),
+        z.enum(ContactPriority).optional(),
       ),
       leadId: requestDataField(
         {

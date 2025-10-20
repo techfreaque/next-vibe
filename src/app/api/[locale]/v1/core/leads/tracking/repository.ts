@@ -207,7 +207,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadEngagementResponseOutput>> {
     try {
-      logger.debug("leads.tracking.engagement.record.start", {
+      logger.debug("app.api.v1.core.leads.tracking.engagement.record.start", {
         leadId: data.leadId,
         engagementType: data.engagementType,
         campaignId: data.campaignId,
@@ -239,7 +239,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       // Type guard: result is now success response with data
       const engagementData = result.data;
 
-      logger.debug("leads.tracking.engagement.record.success", {
+      logger.debug("app.api.v1.core.leads.tracking.engagement.record.success", {
         leadId: data.leadId,
         engagementType: data.engagementType,
         engagementId: engagementData.id,
@@ -279,17 +279,20 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           );
         } catch (error) {
           // Don't fail the engagement recording if status transition fails
-          logger.warn("leads.tracking.engagement.status.transition.failed", {
-            error,
-            leadId: data.leadId,
-            engagementType: data.engagementType,
-          });
+          logger.warn(
+            "app.api.v1.core.leads.tracking.engagement.status.transition.failed",
+            {
+              error,
+              leadId: data.leadId,
+              engagementType: data.engagementType,
+            },
+          );
         }
       }
 
       return result;
     } catch (error) {
-      logger.error("leads.tracking.engagement.record.error", {
+      logger.error("app.api.v1.core.leads.tracking.engagement.record.error", {
         error,
         leadId: data.leadId,
         engagementType: data.engagementType,
@@ -319,7 +322,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         .limit(1);
 
       if (!emailRecord) {
-        logger.debug("leads.tracking.email.record.not.found", {
+        logger.debug("app.api.v1.core.leads.tracking.email.record.not.found", {
           campaignId,
           engagementType,
         });
@@ -352,19 +355,25 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           })
           .where(eq(emails.id, emailRecord.id));
 
-        logger.debug("leads.tracking.email.engagement.updated", {
-          emailId: emailRecord.id,
-          campaignId,
-          engagementType,
-          engagement,
-        });
+        logger.debug(
+          "app.api.v1.core.leads.tracking.email.engagement.updated",
+          {
+            emailId: emailRecord.id,
+            campaignId,
+            engagementType,
+            engagement,
+          },
+        );
       }
     } catch (error) {
-      logger.error("leads.tracking.email.engagement.update.error", {
-        error,
-        campaignId,
-        engagementType,
-      });
+      logger.error(
+        "app.api.v1.core.leads.tracking.email.engagement.update.error",
+        {
+          error,
+          campaignId,
+          engagementType,
+        },
+      );
       // Don't throw - this is a secondary operation
     }
   }
@@ -400,7 +409,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         engagementRecorded = engagementResult.success;
       }
 
-      logger.debug("leads.tracking.pixel.processed", {
+      logger.debug("app.api.v1.core.leads.tracking.pixel.processed", {
         leadId,
         campaignId,
         engagementRecorded,
@@ -413,7 +422,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         engagementRecorded,
       });
     } catch (error) {
-      logger.error("leads.tracking.pixel.failed", {
+      logger.error("app.api.v1.core.leads.tracking.pixel.failed", {
         error,
         leadId,
         campaignId,
@@ -494,17 +503,23 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
 
           engagementRecorded = clickResult.success;
 
-          logger.debug("leads.tracking.click.engagement.recorded", {
-            leadId,
-            campaignId,
-            engagementRecorded,
-          });
+          logger.debug(
+            "app.api.v1.core.leads.tracking.click.engagement.recorded",
+            {
+              leadId,
+              campaignId,
+              engagementRecorded,
+            },
+          );
         } catch (error) {
-          logger.error("leads.tracking.click.engagement.failed", {
-            error,
-            leadId,
-            campaignId,
-          });
+          logger.error(
+            "app.api.v1.core.leads.tracking.click.engagement.failed",
+            {
+              error,
+              leadId,
+              campaignId,
+            },
+          );
         }
       }
 
@@ -527,13 +542,16 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
             );
 
             leadStatusUpdated = true;
-            logger.debug("leads.tracking.click.status.updated", {
-              leadId,
-              isLoggedIn,
-            });
+            logger.debug(
+              "app.api.v1.core.leads.tracking.click.status.updated",
+              {
+                leadId,
+                isLoggedIn,
+              },
+            );
           }
         } catch (error) {
-          logger.error("leads.tracking.click.status.failed", {
+          logger.error("app.api.v1.core.leads.tracking.click.status.failed", {
             error,
             leadId,
             isLoggedIn,
@@ -551,7 +569,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         isLoggedIn,
       };
 
-      logger.debug("leads.tracking.click.completed", {
+      logger.debug("app.api.v1.core.leads.tracking.click.completed", {
         leadId,
         redirectUrl: url,
         engagementRecorded,
@@ -561,7 +579,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
 
       return createSuccessResponse(result);
     } catch (error) {
-      logger.error("leads.tracking.click.failed", {
+      logger.error("app.api.v1.core.leads.tracking.click.failed", {
         error: error instanceof Error ? error.message : String(error),
       });
       return createErrorResponse(
@@ -579,7 +597,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<{ leadStatusUpdated: boolean }>> {
     try {
-      logger.debug("leads.tracking.consultation.booking", {
+      logger.debug("app.api.v1.core.leads.tracking.consultation.booking", {
         leadId,
       });
 
@@ -593,7 +611,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         logger,
       );
 
-      logger.debug("leads.tracking.consultation.updated", {
+      logger.debug("app.api.v1.core.leads.tracking.consultation.updated", {
         leadId,
       });
 
@@ -601,7 +619,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         leadStatusUpdated: true,
       });
     } catch (error) {
-      logger.error("leads.tracking.consultation.failed", {
+      logger.error("app.api.v1.core.leads.tracking.consultation.failed", {
         error,
         leadId,
       });
@@ -620,7 +638,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<{ leadStatusUpdated: boolean }>> {
     try {
-      logger.debug("leads.tracking.subscription.confirmation", {
+      logger.debug("app.api.v1.core.leads.tracking.subscription.confirmation", {
         leadId,
       });
 
@@ -634,7 +652,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         logger,
       );
 
-      logger.debug("leads.tracking.subscription.updated", {
+      logger.debug("app.api.v1.core.leads.tracking.subscription.updated", {
         leadId,
       });
 
@@ -642,7 +660,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         leadStatusUpdated: true,
       });
     } catch (error) {
-      logger.error("leads.tracking.subscription.failed", {
+      logger.error("app.api.v1.core.leads.tracking.subscription.failed", {
         error,
         leadId,
       });
@@ -662,7 +680,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<{ leadId: string }>> {
     try {
-      logger.debug("leads.tracking.anonymous.creating", {
+      logger.debug("app.api.v1.core.leads.tracking.anonymous.creating", {
         userAgent: clientInfo.userAgent,
         ipAddress: clientInfo.ipAddress,
         locale,
@@ -687,7 +705,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         .limit(1);
 
       if (existingLead.length > 0) {
-        logger.debug("leads.tracking.anonymous.existing", {
+        logger.debug("app.api.v1.core.leads.tracking.anonymous.existing", {
           leadId: existingLead[0].id,
           createdAt: existingLead[0].createdAt,
         });
@@ -722,8 +740,9 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       const [createdLead] = await db.insert(leads).values(newLead).returning();
 
       if (!createdLead) {
-        logger.error("leads.tracking.anonymous.create.failed", {
-          errorKey: "leads.tracking.anonymous.create.noLeadReturned",
+        logger.error("app.api.v1.core.leads.tracking.anonymous.create.failed", {
+          errorKey:
+            "app.api.v1.core.leads.tracking.anonymous.create.noLeadReturned",
           clientInfo,
           locale,
         });
@@ -733,7 +752,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         );
       }
 
-      logger.debug("leads.tracking.anonymous.created", {
+      logger.debug("app.api.v1.core.leads.tracking.anonymous.created", {
         leadId: createdLead.id,
         email: createdLead.email,
         source: createdLead.source,
@@ -743,7 +762,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         leadId: createdLead.id,
       });
     } catch (error) {
-      logger.error("leads.tracking.anonymous.error", {
+      logger.error("app.api.v1.core.leads.tracking.anonymous.error", {
         error,
         clientInfo,
         locale,
@@ -772,8 +791,8 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         "Content-Length": pixel.length.toString(),
         // eslint-disable-next-line i18next/no-literal-string
         "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Pragma": "no-cache",
-        "Expires": "0",
+        Pragma: "no-cache",
+        Expires: "0",
       },
     });
   }
@@ -802,11 +821,14 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
     }>
   > {
     try {
-      logger.debug("leads.tracking.status.transition.processing", {
-        leadId,
-        action,
-        metadata,
-      });
+      logger.debug(
+        "app.api.v1.core.leads.tracking.status.transition.processing",
+        {
+          leadId,
+          action,
+          metadata,
+        },
+      );
 
       // Get current lead
       const leadResult = await leadsRepository.getLeadByIdInternal(
@@ -850,12 +872,15 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           statusChanged = currentStatus !== newStatus;
 
           if (statusChanged) {
-            logger.debug("leads.tracking.status.transitioning", {
-              leadId,
-              action,
-              from: currentStatus,
-              to: newStatus,
-            });
+            logger.debug(
+              "app.api.v1.core.leads.tracking.status.transitioning",
+              {
+                leadId,
+                action,
+                from: currentStatus,
+                to: newStatus,
+              },
+            );
 
             // Helper to safely extract number from metadata
             const getMetadataNumber = (
@@ -912,42 +937,48 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
             );
 
             if (!updateResult.success) {
-              logger.error("leads.tracking.status.update.failed", {
-                leadId,
-                action,
-                from: currentStatus,
-                to: newStatus,
-                error: updateResult.message,
-              });
+              logger.error(
+                "app.api.v1.core.leads.tracking.status.update.failed",
+                {
+                  leadId,
+                  action,
+                  from: currentStatus,
+                  to: newStatus,
+                  error: updateResult.message,
+                },
+              );
               return createErrorResponse(
                 "error.default",
                 ErrorResponseTypes.INTERNAL_ERROR,
               );
             }
 
-            logger.debug("leads.tracking.status.transitioned", {
+            logger.debug("app.api.v1.core.leads.tracking.status.transitioned", {
               leadId,
               action,
               from: currentStatus,
               to: newStatus,
             });
           } else {
-            logger.debug("leads.tracking.status.unchanged", {
+            logger.debug("app.api.v1.core.leads.tracking.status.unchanged", {
               leadId,
               action,
               currentStatus,
             });
           }
         } else {
-          logger.debug("leads.tracking.status.transition.notAllowed", {
-            leadId,
-            action,
-            currentStatus,
-            targetStatus,
-          });
+          logger.debug(
+            "app.api.v1.core.leads.tracking.status.transition.notAllowed",
+            {
+              leadId,
+              action,
+              currentStatus,
+              targetStatus,
+            },
+          );
         }
       } else {
-        logger.debug("leads.tracking.status.unknownAction", {
+        logger.debug("app.api.v1.core.leads.tracking.status.unknownAction", {
           leadId,
           action,
           currentStatus,
@@ -960,7 +991,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         previousStatus: currentStatus,
       });
     } catch (error) {
-      logger.error("leads.tracking.status.error", {
+      logger.error("app.api.v1.core.leads.tracking.status.error", {
         error,
         leadId,
         action,
@@ -984,12 +1015,15 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadEngagementResponseOutput>> {
     try {
-      logger.debug("leads.tracking.engagement.relationship.handling", {
-        leadId: data.leadId,
-        engagementType: data.engagementType,
-        userId: data.userId || user.id,
-        isLoggedIn: !user.isPublic,
-      });
+      logger.debug(
+        "app.api.v1.core.leads.tracking.engagement.relationship.handling",
+        {
+          leadId: data.leadId,
+          engagementType: data.engagementType,
+          userId: data.userId || user.id,
+          isLoggedIn: !user.isPublic,
+        },
+      );
 
       let leadId = data.leadId;
       let leadCreated = false;
@@ -1002,9 +1036,12 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           logger,
         );
         if (!leadResult.success) {
-          logger.debug("leads.tracking.engagement.invalidLeadId", {
-            invalidLeadId: leadId,
-          });
+          logger.debug(
+            "app.api.v1.core.leads.tracking.engagement.invalidLeadId",
+            {
+              invalidLeadId: leadId,
+            },
+          );
           leadId = undefined; // Clear invalid lead ID
         }
       }
@@ -1021,9 +1058,12 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         if (anonymousLeadResult.success && anonymousLeadResult.data) {
           leadId = anonymousLeadResult.data.leadId;
           leadCreated = true;
-          logger.debug("leads.tracking.engagement.anonymousCreated", {
-            newLeadId: leadId,
-          });
+          logger.debug(
+            "app.api.v1.core.leads.tracking.engagement.anonymousCreated",
+            {
+              newLeadId: leadId,
+            },
+          );
         } else {
           return createErrorResponse(
             "error.default",
@@ -1054,18 +1094,24 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           );
           if (convertResult.success) {
             relationshipEstablished = true;
-            logger.debug("leads.tracking.engagement.relationshipEstablished", {
-              leadId,
-              userId: currentUserId,
-            });
+            logger.debug(
+              "app.api.v1.core.leads.tracking.engagement.relationshipEstablished",
+              {
+                leadId,
+                userId: currentUserId,
+              },
+            );
           }
         } catch (error) {
           // Don't fail the engagement if relationship establishment fails
-          logger.debug("leads.tracking.engagement.relationshipFailed", {
-            error,
-            leadId,
-            userId: currentUserId,
-          });
+          logger.debug(
+            "app.api.v1.core.leads.tracking.engagement.relationshipFailed",
+            {
+              error,
+              leadId,
+              userId: currentUserId,
+            },
+          );
         }
       }
 
@@ -1152,10 +1198,13 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
 
       return result;
     } catch (error) {
-      logger.error("leads.tracking.engagement.relationship.error", {
-        error,
-        data,
-      });
+      logger.error(
+        "app.api.v1.core.leads.tracking.engagement.relationship.error",
+        {
+          error,
+          data,
+        },
+      );
       return createErrorResponse(
         "error.default",
         ErrorResponseTypes.INTERNAL_ERROR,

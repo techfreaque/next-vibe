@@ -98,7 +98,7 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
       // Validate passwords match
       if (newPassword !== confirmPassword) {
         return createErrorResponse(
-          "userPassword.errors.passwords_do_not_match",
+          "app.api.v1.core.user.private.me.password.errors.passwords_do_not_match",
           ErrorResponseTypes.VALIDATION_ERROR,
         );
       }
@@ -111,7 +111,7 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
       );
       if (!userResponse.success) {
         return createErrorResponse(
-          "userPassword.errors.user_not_found",
+          "app.api.v1.core.user.private.me.password.errors.user_not_found",
           ErrorResponseTypes.NOT_FOUND,
           { userId },
         );
@@ -126,7 +126,7 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
 
       if (!user) {
         return createErrorResponse(
-          "userPassword.errors.user_not_found",
+          "app.api.v1.core.user.private.me.password.errors.user_not_found",
           ErrorResponseTypes.NOT_FOUND,
           { userId },
         );
@@ -139,7 +139,7 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
       );
       if (!isPasswordValid) {
         return createErrorResponse(
-          "userPassword.errors.incorrect_password",
+          "app.api.v1.core.user.private.me.password.errors.incorrect_password",
           ErrorResponseTypes.VALIDATION_ERROR,
         );
       }
@@ -171,7 +171,7 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         error,
       );
       return createErrorResponse(
-        "userPassword.errors.update_failed",
+        "app.api.v1.core.user.private.me.password.errors.update_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         {
           userId,
@@ -218,7 +218,7 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         error,
       );
       return createErrorResponse(
-        "userPassword.errors.token_creation_failed",
+        "app.api.v1.core.user.private.me.password.errors.token_creation_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         {
           userId,

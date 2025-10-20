@@ -6,14 +6,53 @@ export const translations = {
       title: "AI Chat Configuration",
       description: "Configure AI chat parameters and messages",
     },
-    messages: {
-      label: "Messages",
-      description: "Chat messages to process",
-      placeholder: "Enter your messages...",
+    operation: {
+      label: "Operation",
+      description: "Type of message operation to perform",
+      options: {
+        send: "Send Message",
+        retry: "Retry Message",
+        edit: "Edit Message",
+        answerAsAi: "Answer as AI",
+      },
+    },
+    rootFolderId: {
+      label: "Root Folder",
+      description: "Root folder context for the message",
+    },
+    subFolderId: {
+      label: "Subfolder",
+      description: "Optional subfolder within the root folder",
+    },
+    threadId: {
+      label: "Thread ID",
+      description: "Thread ID (null to create new thread)",
+    },
+    parentMessageId: {
+      label: "Parent Message ID",
+      description: "Parent message ID for branching/threading",
+    },
+    content: {
+      label: "Message Content",
+      description: "Content of the message to send",
+      placeholder: "Enter your message...",
+    },
+    role: {
+      label: "Role",
+      description: "Role of the message sender",
+      options: {
+        user: "User",
+        assistant: "Assistant",
+        system: "System",
+      },
     },
     model: {
       label: "Model",
       description: "AI model to use for generation",
+    },
+    persona: {
+      label: "Persona",
+      description: "Optional persona to use for the AI",
     },
     temperature: {
       label: "Temperature",
@@ -31,6 +70,10 @@ export const translations = {
     enableSearch: {
       label: "Enable Web Search",
       description: "Allow AI to search the web for current information",
+    },
+    resumeToken: {
+      label: "Resume Token",
+      description: "Token for resuming interrupted streams",
     },
     response: {
       title: "Stream Response",
@@ -113,7 +156,11 @@ export const translations = {
       creditValidationFailed: "Failed to validate credit balance",
       noIdentifier: "No user or lead identifier provided",
       insufficientCredits: "Insufficient credits to complete this request",
+      noResponseBody: "No response body received from stream",
     },
+  },
+  errorTypes: {
+    streamError: "Stream Error",
   },
   providers: {
     uncensoredHandler: {

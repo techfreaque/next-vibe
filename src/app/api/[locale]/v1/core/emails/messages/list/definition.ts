@@ -93,7 +93,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.emails.messages.list.fields.status.placeholder",
               options: EmailStatusFilterOptions,
             },
-            z.nativeEnum(EmailStatusFilter).default(EmailStatusFilter.ALL),
+            z.enum(EmailStatusFilter).default(EmailStatusFilter.ALL),
           ),
 
           type: requestDataField(
@@ -107,7 +107,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.emails.messages.list.fields.type.placeholder",
               options: EmailTypeFilterOptions,
             },
-            z.nativeEnum(EmailTypeFilter).default(EmailTypeFilter.ALL),
+            z.enum(EmailTypeFilter).default(EmailTypeFilter.ALL),
           ),
 
           dateRange: objectField(
@@ -171,7 +171,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.emails.messages.list.fields.sortBy.placeholder",
               options: EmailSortFieldOptions,
             },
-            z.nativeEnum(EmailSortField).default(EmailSortField.CREATED_AT),
+            z.enum(EmailSortField).default(EmailSortField.CREATED_AT),
           ),
 
           sortOrder: requestDataField(
@@ -186,7 +186,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.emails.messages.list.fields.sortOrder.placeholder",
               options: SortOrderOptions,
             },
-            z.nativeEnum(SortOrder).default(SortOrder.DESC),
+            z.enum(SortOrder).default(SortOrder.DESC),
           ),
 
           page: requestDataField(
@@ -267,7 +267,7 @@ const { GET } = createEndpoint({
                     type: WidgetType.BADGE,
                     text: "app.api.v1.core.emails.messages.list.response.emails.item.status",
                   },
-                  z.nativeEnum(EmailStatus),
+                  z.enum(EmailStatus),
                 ),
               },
             ),
@@ -354,7 +354,7 @@ const { GET } = createEndpoint({
                     type: WidgetType.BADGE,
                     text: "app.api.v1.core.emails.messages.list.response.emails.item.type",
                   },
-                  z.nativeEnum(EmailType),
+                  z.enum(EmailType),
                 ),
                 templateName: responseField(
                   {

@@ -40,10 +40,10 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
         <div className="relative p-8 md:p-16 text-white text-center">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4 leading-tight">
-              {t("pages.home.cta.title")}
+              {t("app.site.home.cta.title")}
             </h2>
             <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto mb-8 leading-relaxed">
-              {t("pages.home.cta.subtitle")}
+              {t("app.site.home.cta.subtitle")}
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -53,7 +53,7 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
                 asChild
               >
                 <Link href={`/${locale}/user/signup`}>
-                  {t("pages.home.cta.button")}
+                  {t("app.site.home.cta.button")}
                 </Link>
               </Button>
 
@@ -64,13 +64,13 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
                 asChild
               >
                 <Link href={`/${locale}#pricing`}>
-                  {t("pages.home.cta.viewPlans")}
+                  {t("app.site.home.cta.viewPlans")}
                 </Link>
               </Button>
             </div>
 
             <p className="text-sm mt-6 text-blue-100">
-              {t("pages.home.cta.noCredit")}
+              {t("app.site.home.cta.noCredit")}
             </p>
           </div>
         </div>

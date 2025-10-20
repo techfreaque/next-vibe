@@ -20,7 +20,6 @@ import { simpleT } from "@/i18n/core/shared";
 
 // import { newsletterSubscribeRepository } from "../../../../newsletter/subscribe/repository";
 import type { JwtPayloadType } from "../../auth/definition";
-import type { NewUser } from "../../db";
 import type { StandardUserType } from "../../definition";
 import { UserDetailLevel } from "../../enum";
 import { userRepository } from "../../repository";
@@ -97,7 +96,7 @@ export class SignupRepositoryImpl implements SignupRepository {
           email: data.personalInfo.email,
         });
         return createErrorResponse(
-          "auth.errors.validation_failed",
+          "app.api.v1.core.user.auth.errors.validation_failed",
           ErrorResponseTypes.VALIDATION_ERROR,
           {
             field: "confirmPassword",
@@ -127,8 +126,16 @@ export class SignupRepositoryImpl implements SignupRepository {
         );
       }
 
+      // Get leadId from user prop (JWT payload) - always present
+      const leadId = user.leadId;
+
       // Create the user account
-      const result = await this.createUserInternal(data, locale, logger);
+      const result = await this.createUserInternal(
+        data,
+        leadId,
+        locale,
+        logger,
+      );
 
       if (!result.success) {
         logger.debug("User registration failed", {
@@ -142,6 +149,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       logger.debug("User registration completed successfully", {
         email: data.personalInfo.email,
         userId: userData.id,
+        leadId,
       });
 
       return createSuccessResponse<SignupPostResponseOutput>({
@@ -229,6 +237,7 @@ export class SignupRepositoryImpl implements SignupRepository {
   /**
    * Internal helper: Create a new user account
    * @param userInput - User registration data
+   * @param leadId - Lead ID from JWT payload
    * @param locale - User locale
    * @param logger - Logger instance
    * @param role - User role (default: CUSTOMER)
@@ -236,6 +245,7 @@ export class SignupRepositoryImpl implements SignupRepository {
    */
   private async createUserInternal(
     userInput: SignupPostRequestOutput,
+    leadId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
     role: typeof UserRoleValue = UserRole.CUSTOMER,
@@ -276,13 +286,13 @@ export class SignupRepositoryImpl implements SignupRepository {
       if (password !== confirmPassword) {
         logger.debug("Registration failed: Passwords do not match", { email });
         return createErrorResponse(
-          "auth.errors.validation_failed",
+          "app.api.v1.core.user.auth.errors.validation_failed",
           ErrorResponseTypes.VALIDATION_ERROR,
         );
       }
 
       // Create user data object
-      const userData: NewUser = {
+      const userData = {
         email,
         password,
         privateName,
@@ -312,20 +322,18 @@ export class SignupRepositoryImpl implements SignupRepository {
       logger.debug("User created successfully", {
         email,
         userId: userResponse.data.id,
+        leadId,
       });
 
-      // Check for lead conversion (if user came from email campaign)
-      const leadId = (userInput as { leadId?: string }).leadId;
-      if (leadId) {
-        await this.handleLeadConversion(
-          email,
-          leadId,
-          userResponse.data.id,
-          { id: userResponse.data.id, isPublic: false },
-          locale,
-          logger,
-        );
-      }
+      // Link leadId to user (always happens during signup)
+      await this.handleLeadConversion(
+        email,
+        leadId,
+        userResponse.data.id,
+        { id: userResponse.data.id, isPublic: false, leadId },
+        locale,
+        logger,
+      );
 
       // Handle newsletter subscription if user opted in
       if (subscribeToNewsletter) {

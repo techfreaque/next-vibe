@@ -83,10 +83,10 @@ As THE FOUNDATION agent, you handle:
    - Proper relative paths for domain-specific imports
 
 4. **Enum Standards**:
-   - Use z.nativeEnum(EnumName), not schema wrappers
+   - Use z.enum(EnumName), not schema wrappers
    - Import actual enum objects
-   - Arrays: z.array(z.nativeEnum(EnumName))
-   - Single values: z.nativeEnum(EnumName)
+   - Arrays: z.array(z.enum(EnumName))
+   - Single values: z.enum(EnumName)
 
 5. **Translation Keys**:
    - Pattern: app.api.v1.domain.subdomain.action.field.property
@@ -317,7 +317,7 @@ status: requestResponseField({
   type: WidgetType.FORM_FIELD,
   fieldType: FieldDataType.SELECT,
   options: ConsultationStatusOptions,  // ✅ Proper enum options
-}, z.nativeEnum(ConsultationStatus)),   // ✅ Proper enum validation
+}, z.enum(ConsultationStatus)),   // ✅ Proper enum validation
 ```
 
 **TRANSLATION KEY CREATION PROCESS:**
@@ -469,7 +469,7 @@ brandPersonality: requestResponseField(
     layout: { columns: 6 },
     validation: { required: false },
   },
-  z.nativeEnum(BrandPersonality).optional(),
+  z.enum(BrandPersonality).optional(),
 ),
 ```
 

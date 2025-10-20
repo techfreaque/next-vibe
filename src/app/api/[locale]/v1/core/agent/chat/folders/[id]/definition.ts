@@ -50,7 +50,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.folders.id.get.id.description" as const,
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
 
       // === RESPONSE ===
@@ -80,7 +80,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.id.get.response.folder.id.content" as const,
                 },
-                z.string().uuid(),
+                z.uuid(),
               ),
               userId: responseField(
                 {
@@ -88,7 +88,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.id.get.response.folder.userId.content" as const,
                 },
-                z.string().uuid(),
+                z.uuid(),
               ),
               name: responseField(
                 {
@@ -120,7 +120,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.id.get.response.folder.parentId.content" as const,
                 },
-                z.string().uuid().nullable(),
+                z.uuid().nullable(),
               ),
               expanded: responseField(
                 {
@@ -289,7 +289,7 @@ const { PATCH } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.folders.id.patch.id.description" as const,
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
 
       // === REQUEST DATA ===
@@ -350,7 +350,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.agent.chat.folders.id.patch.parentId.description" as const,
               layout: { columns: 6 },
             },
-            z.string().uuid().nullable().optional(),
+            z.uuid().nullable().optional(),
           ),
           expanded: requestDataField(
             {
@@ -418,7 +418,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.id.patch.response.folder.id.content" as const,
                 },
-                z.string().uuid(),
+                z.uuid(),
               ),
               userId: responseField(
                 {
@@ -426,7 +426,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.id.patch.response.folder.userId.content" as const,
                 },
-                z.string().uuid(),
+                z.uuid(),
               ),
               name: responseField(
                 {
@@ -458,7 +458,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.id.patch.response.folder.parentId.content" as const,
                 },
-                z.string().uuid().nullable(),
+                z.uuid().nullable(),
               ),
               expanded: responseField(
                 {
@@ -637,7 +637,7 @@ const { DELETE } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.folders.id.delete.id.description" as const,
         },
-        z.string().uuid(),
+        z.uuid(),
       ),
 
       // === RESPONSE ===
@@ -666,7 +666,7 @@ const { DELETE } = createEndpoint({
               content:
                 "app.api.v1.core.agent.chat.folders.id.delete.response.deletedFolderId.content" as const,
             },
-            z.string().uuid(),
+            z.uuid(),
           ),
         },
       ),

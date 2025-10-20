@@ -99,6 +99,15 @@ class MessageRepository implements MessageRepositoryInterface {
         );
       }
 
+      // Reject incognito threads
+      if (thread.rootFolderId === "incognito") {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.errors.forbidden.title" as const,
+          ErrorResponseTypes.FORBIDDEN,
+          { message: "Incognito threads cannot be accessed on the server" },
+        );
+      }
+
       // Get message
       const [message] = await db
         .select()
@@ -180,6 +189,15 @@ class MessageRepository implements MessageRepositoryInterface {
         return createErrorResponse(
           "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.threadNotFound.title" as const,
           ErrorResponseTypes.NOT_FOUND,
+        );
+      }
+
+      // Reject incognito threads
+      if (thread.rootFolderId === "incognito") {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.forbidden.title" as const,
+          ErrorResponseTypes.FORBIDDEN,
+          { message: "Incognito threads cannot be accessed on the server" },
         );
       }
 
@@ -273,6 +291,15 @@ class MessageRepository implements MessageRepositoryInterface {
         return createErrorResponse(
           "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.threadNotFound.title" as const,
           ErrorResponseTypes.NOT_FOUND,
+        );
+      }
+
+      // Reject incognito threads
+      if (thread.rootFolderId === "incognito") {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.forbidden.title" as const,
+          ErrorResponseTypes.FORBIDDEN,
+          { message: "Incognito threads cannot be accessed on the server" },
         );
       }
 

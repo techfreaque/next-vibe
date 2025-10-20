@@ -112,7 +112,7 @@ export class NewsletterUnsubscribeSmsServiceImpl
         return createErrorResponse(
           "app.api.v1.core.newsletter.unsubscribe.sms.errors.confirmation_failed.title",
           ErrorResponseTypes.INTERNAL_ERROR,
-          { error: smsResult.message || t("common.error.sending_sms") },
+          { error: smsResult.message || t("app.common.error.sending_sms") },
         );
       }
 
@@ -193,7 +193,7 @@ export class NewsletterUnsubscribeSmsServiceImpl
         return createErrorResponse(
           "app.api.v1.core.newsletter.unsubscribe.sms.errors.admin_notification_failed.title",
           ErrorResponseTypes.INTERNAL_ERROR,
-          { error: t(smsResult.message) || t("common.error.sending_sms") },
+          { error: t(smsResult.message) || t("app.common.error.sending_sms") },
         );
       }
 

@@ -83,7 +83,7 @@ const { POST } = createEndpoint({
           layout: { columns: 6 },
           options: CampaignTypeOptions,
         },
-        z.nativeEnum(CampaignType).optional(),
+        z.enum(CampaignType).optional(),
       ),
 
       leadId: requestDataField(
