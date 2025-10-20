@@ -233,6 +233,7 @@ export class LoginRepositoryImpl implements LoginRepository {
       const sessionResponse = await this.createSessionAndGetUser(
         userResponse.data.id,
         rememberMe,
+        locale,
         logger,
       );
       if (!sessionResponse.success) {
@@ -265,33 +266,44 @@ export class LoginRepositoryImpl implements LoginRepository {
    * Create user session and return user data (private helper method)
    * @param userId - User ID
    * @param rememberMe - Whether to extend session duration
+   * @param locale - Locale for lead tracking
    * @param logger - Logger instance
    * @returns Login response with user session
    */
   private async createSessionAndGetUser(
     userId: string,
     rememberMe = false,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
-    return await this.createOrRenewSession(userId, false, rememberMe, logger);
+    return await this.createOrRenewSession(
+      userId,
+      false,
+      rememberMe,
+      locale,
+      logger,
+    );
   }
 
   /**
    * Renew user session with fresh JWT token and update database session (private helper method)
    * @param userId - User ID
    * @param rememberMe - Whether to extend session duration
+   * @param locale - Locale for lead tracking
    * @param logger - Logger instance
    * @returns Login response with renewed session
    */
   private async renewSession(
     userId: string,
     rememberMe = false,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     return await this.createOrRenewSession(
       userId,
       true, // isRenewal
       rememberMe,
+      locale,
       logger,
     );
   }
@@ -302,12 +314,14 @@ export class LoginRepositoryImpl implements LoginRepository {
    * @param setCookies - Whether to set auth cookies
    * @param isRenewal - Whether this is a session renewal
    * @param rememberMe - Whether to extend session duration
+   * @param locale - Locale for lead tracking
    * @returns Login response with session data
    */
   private async createOrRenewSession(
     userId: string,
     isRenewal = false,
     rememberMe = false,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     try {
@@ -457,17 +471,17 @@ export class LoginRepositoryImpl implements LoginRepository {
         socialProviders: [
           {
             enabled: true,
-            name: "app.api.v1.core.user.public.login.providers.google",
+            name: "app.api.v1.core.user.public.login.enums.socialProviders.google",
             providers: [SocialProviders.GOOGLE],
           },
           {
             enabled: true,
-            name: "app.api.v1.core.user.public.login.providers.github",
+            name: "app.api.v1.core.user.public.login.enums.socialProviders.github",
             providers: [SocialProviders.GITHUB],
           },
           {
             enabled: true,
-            name: "app.api.v1.core.user.public.login.providers.facebook",
+            name: "app.api.v1.core.user.public.login.enums.socialProviders.facebook",
             providers: [SocialProviders.FACEBOOK],
           },
         ],

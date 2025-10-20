@@ -121,7 +121,7 @@ export function EmailHeader({
               textAlign: "left",
             }}
           >
-            {t("common.logoPart1")}
+            {t("app.api.v1.core.leads.campaigns.emails.common.logoPart1")}
           </Text>
           <Text
             style={{
@@ -137,7 +137,7 @@ export function EmailHeader({
               textAlign: "left",
             }}
           >
-            {t("common.logoPart2")}
+            {t("app.api.v1.core.leads.campaigns.emails.common.logoPart2")}
           </Text>
         </div>
         <Text
@@ -148,7 +148,7 @@ export function EmailHeader({
             fontStyle: "italic",
           }}
         >
-          {t("email.template.tagline")}
+          {t("app.api.v1.core.leads.campaigns.emails.email.template.tagline")}
         </Text>
       </div>
     </Section>
@@ -222,10 +222,13 @@ export function EmailFooter({
           margin: "0 0 12px 0",
         }}
       >
-        {t("emailJourneys.components.footer.copyright", {
-          currentYear,
-          companyName,
-        })}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.emailJourneys.components.footer.copyright",
+          {
+            currentYear,
+            companyName,
+          },
+        )}
       </Text>
 
       <Text
@@ -235,7 +238,9 @@ export function EmailFooter({
           margin: "0 0 8px 0",
         }}
       >
-        {t("emailJourneys.components.footer.helpText")}{" "}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.emailJourneys.components.footer.helpText",
+        )}{" "}
         <TrackedLink
           href={`mailto:${companyEmail}`}
           tracking={tracking}
@@ -255,7 +260,9 @@ export function EmailFooter({
           margin: "0",
         }}
       >
-        {t("emailJourneys.components.footer.unsubscribeText")}{" "}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.emailJourneys.components.footer.unsubscribeText",
+        )}{" "}
         <TrackedLink
           href={unsubscribeUrl}
           tracking={tracking}
@@ -264,7 +271,9 @@ export function EmailFooter({
             textDecoration: "underline",
           }}
         >
-          {t("emailJourneys.components.footer.unsubscribeLink")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.emailJourneys.components.footer.unsubscribeLink",
+          )}
         </TrackedLink>
       </Text>
     </Section>
@@ -356,9 +365,13 @@ export function SocialProofBox({
           lineHeight: "1.6",
         }}
       >
-        {t("emailJourneys.components.socialProof.quotePrefix")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.emailJourneys.components.socialProof.quotePrefix",
+        )}
         {quote}
-        {t("emailJourneys.components.socialProof.quoteSuffix")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.emailJourneys.components.socialProof.quoteSuffix",
+        )}
       </Text>
       <Text
         style={{
@@ -368,10 +381,13 @@ export function SocialProofBox({
           margin: "0",
         }}
       >
-        {t("emailJourneys.components.socialProof.attribution", {
-          author,
-          company,
-        })}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.emailJourneys.components.socialProof.attribution",
+          {
+            author,
+            company,
+          },
+        )}
       </Text>
     </Section>
   );

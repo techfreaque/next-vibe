@@ -9,6 +9,7 @@ export const translations = {
     rollback: "Rollback nie ma zastosowania dla operacji czyszczenia",
   },
   errors: {
+    default: "Wystąpił błąd podczas czyszczenia sesji",
     execution_failed: {
       title: "Oczyszczanie sesji nie powiodło się",
       description: "Błąd podczas oczyszczania wygasłych sesji",

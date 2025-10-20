@@ -4,7 +4,7 @@
  * Integrates with existing CLI handler system
  */
 
-import { input, select, confirm, checkbox } from "@inquirer/prompts";
+import { checkbox, confirm, input, select } from "@inquirer/prompts";
 import { z } from "zod";
 
 /**

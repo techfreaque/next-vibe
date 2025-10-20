@@ -4,8 +4,9 @@ import { translations as historyTranslations } from "../../history/i18n/de";
 import { translations as statsTranslations } from "../../stats/i18n/de";
 import { translations as taskTranslations } from "../../task/i18n/de";
 import { translations as tasksTranslations } from "../../tasks/i18n/de";
+import type { translations as enTranslations } from "../en";
 
-export const translations = {
+export const translations: typeof enTranslations = {
   history: historyTranslations,
   stats: statsTranslations,
   task: taskTranslations,
@@ -13,11 +14,13 @@ export const translations = {
   // Shared cron-level translations (German)
   nav: {
     stats: "Statistiken",
-    stats_description: "Zeigen Sie Statistiken und Leistungsmetriken für Cron-Aufgaben an",
+    stats_description:
+      "Zeigen Sie Statistiken und Leistungsmetriken für Cron-Aufgaben an",
     tasks: "Aufgaben",
     tasks_description: "Verwalten und konfigurieren Sie Cron-Aufgaben",
     history: "Verlauf",
-    history_description: "Zeigen Sie den Ausführungsverlauf von Cron-Aufgaben an",
+    history_description:
+      "Zeigen Sie den Ausführungsverlauf von Cron-Aufgaben an",
   },
   buttons: {
     previous: "Zurück",
@@ -49,4 +52,4 @@ export const translations = {
       },
     },
   },
-} as const;
+};

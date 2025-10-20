@@ -97,10 +97,10 @@ export default function FreeSocialSetup({
   ];
 
   const benefits = [
-    t("app.site.home.freeSocialSetup.benefits.professionalSetup"),
-    t("app.site.home.freeSocialSetup.benefits.optimizedProfiles"),
-    t("app.site.home.freeSocialSetup.benefits.brandConsistency"),
-    t("app.site.home.freeSocialSetup.benefits.strategicPlanning"),
+    t("app.story._components.home.freeSocialSetup.benefits.professionalSetup"),
+    t("app.story._components.home.freeSocialSetup.benefits.optimizedProfiles"),
+    t("app.story._components.home.freeSocialSetup.benefits.brandConsistency"),
+    t("app.story._components.home.freeSocialSetup.benefits.strategicPlanning"),
   ];
 
   const container = {
@@ -135,7 +135,7 @@ export default function FreeSocialSetup({
             transition={{ duration: 0.5 }}
           >
             <CheckCircle className="h-4 w-4" />
-            {t("app.site.home.freeSocialSetup.badge")}
+            {t("app.story._components.home.freeSocialSetup.badge")}
           </motion.div>
 
           <motion.h2
@@ -144,7 +144,7 @@ export default function FreeSocialSetup({
             animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            {t("app.site.home.freeSocialSetup.title")}
+            {t("app.story._components.home.freeSocialSetup.title")}
           </motion.h2>
 
           <motion.p
@@ -153,7 +153,7 @@ export default function FreeSocialSetup({
             animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            {t("app.site.home.freeSocialSetup.description")}
+            {t("app.story._components.home.freeSocialSetup.description")}
           </motion.p>
         </div>
 
@@ -172,10 +172,14 @@ export default function FreeSocialSetup({
                   </div>
                   <div>
                     <CardTitle className="text-2xl">
-                      {t("app.site.home.freeSocialSetup.card.title")}
+                      {t(
+                        "app.story._components.home.freeSocialSetup.card.title",
+                      )}
                     </CardTitle>
                     <CardDescription className="text-base">
-                      {t("app.site.home.freeSocialSetup.card.subtitle")}
+                      {t(
+                        "app.story._components.home.freeSocialSetup.card.subtitle",
+                      )}
                     </CardDescription>
                   </div>
                 </div>
@@ -214,7 +218,7 @@ export default function FreeSocialSetup({
                       size="lg"
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                     >
-                      {t("app.site.home.freeSocialSetup.cta")}
+                      {t("app.story._components.home.freeSocialSetup.cta")}
                     </Button>
                   </Link>
                 </motion.div>
@@ -235,7 +239,7 @@ export default function FreeSocialSetup({
               animate={inView ? { opacity: 1 } : { opacity: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
-              {t("app.site.home.freeSocialSetup.platforms.title")}
+              {t("app.story._components.home.freeSocialSetup.platforms.title")}
             </motion.h3>
 
             <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -261,7 +265,9 @@ export default function FreeSocialSetup({
               animate={inView ? { opacity: 1 } : { opacity: 0 }}
               transition={{ duration: 0.5, delay: 0.9 }}
             >
-              {t("app.site.home.freeSocialSetup.platforms.subtitle")}
+              {t(
+                "app.story._components.home.freeSocialSetup.platforms.subtitle",
+              )}
             </motion.p>
           </motion.div>
         </div>

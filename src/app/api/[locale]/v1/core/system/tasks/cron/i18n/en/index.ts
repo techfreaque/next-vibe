@@ -1,12 +1,14 @@
 import { translations as historyTranslations } from "../../history/i18n/en";
 import { translations as statsTranslations } from "../../stats/i18n/en";
 import { translations as statusTranslations } from "../../status/i18n/en";
+import { translations as taskTranslations } from "../../task/[id]/i18n/en";
 import { translations as tasksTranslations } from "../../tasks/i18n/en";
 
 export const translations = {
   history: historyTranslations,
   stats: statsTranslations,
   status: statusTranslations,
+  task: taskTranslations,
   tasks: tasksTranslations,
   errors: {
     fetch_all_failed: "Failed to fetch cron tasks",

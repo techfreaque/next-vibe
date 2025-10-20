@@ -56,7 +56,11 @@ export function ImapMessagesTable({
         </Badge>
       );
     }
-    return <Badge variant="outline">{t("app.admin.emails.imap.messages.read")}</Badge>;
+    return (
+      <Badge variant="outline">
+        {t("app.admin.emails.imap.messages.read")}
+      </Badge>
+    );
   };
 
   const formatDate = (dateString: string | null): string => {
@@ -90,7 +94,9 @@ export function ImapMessagesTable({
   if (messages.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-muted-foreground">{t("app.admin.emails.imap.messages.noMessages")}</p>
+        <p className="text-muted-foreground">
+          {t("app.admin.emails.imap.messages.noMessages")}
+        </p>
       </div>
     );
   }
@@ -99,7 +105,9 @@ export function ImapMessagesTable({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-12">{t("app.admin.emails.imap.common.status")}</TableHead>
+          <TableHead className="w-12">
+            {t("app.admin.emails.imap.common.status")}
+          </TableHead>
           <TableHead>{t("app.admin.emails.imap.messages.subject")}</TableHead>
           <TableHead>{t("app.admin.emails.imap.messages.sender")}</TableHead>
           <TableHead>{t("app.admin.emails.imap.messages.recipient")}</TableHead>
@@ -107,8 +115,12 @@ export function ImapMessagesTable({
           <TableHead className="w-12">
             {t("app.admin.emails.imap.messages.attachments")}
           </TableHead>
-          <TableHead className="w-12">{t("app.admin.emails.imap.messages.flagged")}</TableHead>
-          <TableHead className="w-32">{t("app.admin.emails.imap.common.actions")}</TableHead>
+          <TableHead className="w-12">
+            {t("app.admin.emails.imap.messages.flagged")}
+          </TableHead>
+          <TableHead className="w-32">
+            {t("app.admin.emails.imap.common.actions")}
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -128,7 +140,8 @@ export function ImapMessagesTable({
                   className={`font-medium ${!message.isRead ? "font-bold" : ""}`}
                 >
                   {truncateText(
-                    message.subject || t("app.admin.emails.imap.messages.noSubject"),
+                    message.subject ||
+                      t("app.admin.emails.imap.messages.noSubject"),
                   )}
                 </div>
                 {getStatusBadge(message)}

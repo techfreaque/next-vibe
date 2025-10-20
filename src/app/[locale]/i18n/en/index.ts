@@ -9,7 +9,7 @@ import { translations as userTranslations } from "../../user/i18n/en";
 
 export const translations = {
   ...componentsTranslations,
-  site: siteTranslations,
+  story: siteTranslations,
   notFound: notFoundTranslations,
   admin: adminTranslations,
   chat: chatTranslations,

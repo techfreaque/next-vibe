@@ -187,6 +187,8 @@ export const translations: typeof enTranslations = {
       forbidden: {
         title: "Forbidden",
         description: "You don't have permission to create messages",
+        incognitoNotAllowed:
+          "Wątki incognito nie mogą być dostępne na serwerze",
       },
       notFound: {
         title: "Not Found",

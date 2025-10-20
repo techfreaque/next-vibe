@@ -1,16 +1,20 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  post: {
-    title: "Tytuł",
-    description: "Opis endpointu",
-    form: {
-      title: "Konfiguracja",
-      description: "Skonfiguruj parametry",
+  get: {
+    title: "Statystyki tłumaczeń",
+    description: "Pobierz statystyki i analizy tłumaczeń",
+    container: {
+      title: "Statystyki tłumaczeń",
+      description: "Wyświetl użycie plików tłumaczeń i metryki kluczy",
     },
     response: {
-      title: "Odpowiedź",
-      description: "Dane odpowiedzi",
+      title: "Statystyki",
+      description: "Dane statystyk tłumaczeń",
+    },
+    success: {
+      title: "Statystyki pobrane",
+      description: "Statystyki tłumaczeń pobrane pomyślnie",
     },
     errors: {
       unauthorized: {
@@ -45,10 +49,6 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Wystąpił konflikt danych",
       },
-    },
-    success: {
-      title: "Sukces",
-      description: "Operacja zakończona pomyślnie",
     },
   },
 };

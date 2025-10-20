@@ -57,6 +57,8 @@ export const translations = {
       forbidden: {
         title: "Zabronione",
         description: "Nie masz uprawnień do głosowania na tę wiadomość",
+        incognitoNotAllowed:
+          "Wątki incognito nie mogą być dostępne na serwerze",
       },
       notFound: {
         title: "Nie znaleziono",

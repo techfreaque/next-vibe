@@ -7,6 +7,18 @@ export const translations: typeof enTranslations = {
     appName: "unbottled.ai",
     company: {
       name: "unbottled.ai",
+      legalForm: "GmbH (Spółka z ograniczoną odpowiedzialnością)",
+      registrationNumber: "CHE-123.456.789",
+      address: {
+        title: "Adres",
+        street: "Musterstrasse 123",
+        city: "8000 Zurych",
+        country: "Szwajcaria",
+        addressIn1Line: "Musterstrasse 123, 8000 Zurych, Szwajcaria",
+      },
+      responsiblePerson: {
+        name: "Max Mustermann",
+      },
     },
     selector: {
       country: "Kraj",

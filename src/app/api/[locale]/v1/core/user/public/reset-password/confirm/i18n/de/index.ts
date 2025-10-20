@@ -4,6 +4,22 @@ export const translations: typeof enTranslations = {
   title: "Passwort-Reset bestätigen",
   description: "Bestätigen Sie Ihr Passwort-Reset mit einem neuen Passwort",
   tag: "Passwort-Reset",
+  email: {
+    title: "Passwort erfolgreich zurückgesetzt",
+    subject: "Ihr Passwort wurde zurückgesetzt",
+    previewText: "Ihr Passwort wurde erfolgreich zurückgesetzt",
+    greeting: "Hallo,",
+    confirmationMessage: "Ihr Passwort wurde erfolgreich zurückgesetzt.",
+    successMessage: "Ihr Passwort wurde erfolgreich zurückgesetzt.",
+    loginInstructions:
+      "Sie können sich jetzt mit Ihrem neuen Passwort anmelden.",
+    securityWarning:
+      "Wenn Sie diese Änderung nicht vorgenommen haben, wenden Sie sich bitte sofort an den Support.",
+    securityTip:
+      "Zu Ihrer Sicherheit empfehlen wir die Verwendung eines starken, eindeutigen Passworts.",
+    securityNote:
+      "Wenn Sie diese Änderung nicht vorgenommen haben, wenden Sie sich bitte sofort an den Support.",
+  },
   groups: {
     verification: {
       title: "Verifizierung",
@@ -71,10 +87,12 @@ export const translations: typeof enTranslations = {
     ],
   },
   errors: {
+    title: "Fehler beim Zurücksetzen des Passworts",
     validation: {
       title: "Validierungsfehler",
       description:
         "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+      passwordsDoNotMatch: "Passwörter stimmen nicht überein",
     },
     unauthorized: {
       title: "Nicht autorisiert",
@@ -114,5 +132,6 @@ export const translations: typeof enTranslations = {
     title: "Passwort-Reset erfolgreich",
     description: "Ihr Passwort wurde erfolgreich zurückgesetzt",
     message: "Passwort wurde erfolgreich zurückgesetzt",
+    password_reset: "Ihr Passwort wurde erfolgreich zurückgesetzt",
   },
 };

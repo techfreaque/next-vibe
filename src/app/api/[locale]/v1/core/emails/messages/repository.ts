@@ -21,8 +21,8 @@ import type { Countries, Languages } from "@/i18n/core/config";
 import { db } from "../../system/db";
 import { SortOrder } from "../imap-client/enum";
 import type {
-  EmailGetGETRequestOutput,
   EmailGetGETResponseOutput,
+  EmailGetGETUrlVariablesOutput,
 } from "./[id]/definition";
 import { emails, type NewEmail } from "./db";
 import {
@@ -52,7 +52,7 @@ export interface EmailsRepository {
   ): Promise<ResponseType<EmailsListResponseOutput>>;
 
   getEmailById(
-    data: EmailGetGETRequestOutput,
+    urlVariables: EmailGetGETUrlVariablesOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -264,13 +264,13 @@ class EmailsRepositoryImpl implements EmailsRepository {
    * Get email by ID
    */
   async getEmailById(
-    data: EmailGetGETRequestOutput,
+    urlVariables: EmailGetGETUrlVariablesOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailGetGETResponseOutput>> {
     try {
-      const emailId: string = "id" in data ? String(data.id) : "";
+      const emailId = urlVariables.id;
       logger.debug("Fetching email by ID", {
         id: emailId,
         userId: user.id,

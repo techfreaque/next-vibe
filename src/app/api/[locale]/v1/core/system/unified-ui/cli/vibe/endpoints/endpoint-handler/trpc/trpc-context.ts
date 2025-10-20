@@ -100,7 +100,7 @@ export async function createTRPCContext<
 
   // Authenticate user using the existing auth system
   // The authRepository.getCurrentUser() method handles server-only cookies properly
-  let user: JwtPayloadType | null = null;
+  let user: JwtPayloadType;
   let userRoles: (typeof UserRoleValue)[] = [];
 
   try {

@@ -44,7 +44,13 @@ export const envSchema = envClientBaseSchema.extend({
 
   // SMS environment variables
   // TODO validate based on provider
-  SMS_PROVIDER: z.enum(SmsProviders),
+  SMS_PROVIDER: z.enum([
+    SmsProviders.TWILIO,
+    SmsProviders.AWS,
+    SmsProviders.AWS_SNS,
+    SmsProviders.MESSAGEBIRD,
+    SmsProviders.HTTP,
+  ]),
   SMS_FROM_NUMBER: z.string(),
   SMS_MAX_LENGTH: z.string().optional(),
   SMS_MAX_RETRY_ATTEMPTS: z.string().optional(),
@@ -61,7 +67,27 @@ export const envSchema = envClientBaseSchema.extend({
   // AWS SNS provider
   AWS_ACCESS_KEY_ID: z.string().optional(),
   AWS_SECRET_ACCESS_KEY: z.string().optional(),
-  AWS_REGION: z.enum(AwsSnsAwsRegions).optional(),
+  AWS_REGION: z
+    .enum([
+      AwsSnsAwsRegions.US_EAST_1,
+      AwsSnsAwsRegions.US_WEST_1,
+      AwsSnsAwsRegions.US_WEST_2,
+      AwsSnsAwsRegions.EU_WEST_1,
+      AwsSnsAwsRegions.EU_CENTRAL_1,
+      AwsSnsAwsRegions.AP_SOUTHEAST_1,
+      AwsSnsAwsRegions.AP_SOUTHEAST_2,
+      AwsSnsAwsRegions.AP_NORTHEAST_1,
+      AwsSnsAwsRegions.AP_NORTHEAST_2,
+      AwsSnsAwsRegions.AP_SOUTH_1,
+      AwsSnsAwsRegions.AP_EAST_1,
+      AwsSnsAwsRegions.CA_CENTRAL_1,
+      AwsSnsAwsRegions.SA_EAST_1,
+      AwsSnsAwsRegions.AF_SOUTH_1,
+      AwsSnsAwsRegions.EU_SOUTH_1,
+      AwsSnsAwsRegions.ME_SOUTH_1,
+      AwsSnsAwsRegions.EU_NORTH_1,
+    ])
+    .optional(),
 
   // HTTP provider
   SMS_HTTP_API_URL: z.string().optional(),

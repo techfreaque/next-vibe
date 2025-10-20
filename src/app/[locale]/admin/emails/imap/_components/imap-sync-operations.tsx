@@ -70,7 +70,9 @@ export function ImapSyncOperations(): JSX.Element {
     startTime: null,
     estimatedCompletion: null,
     lastSync:
-      lastSyncTimes.length > 0 ? lastSyncTimes[0] : t("app.admin.emails.imap.common.never"),
+      lastSyncTimes.length > 0
+        ? lastSyncTimes[0]
+        : t("app.admin.emails.imap.common.never"),
     nextSync: t("app.admin.emails.imap.sync.nextSync"),
   };
 
@@ -258,7 +260,9 @@ export function ImapSyncOperations(): JSX.Element {
                 <Square className="h-4 w-4" />
                 <span>{t("app.admin.emails.imap.sync.stop")}</span>
               </Button>
-              <Button variant="outline">{t("app.admin.emails.imap.sync.manual")}</Button>
+              <Button variant="outline">
+                {t("app.admin.emails.imap.sync.manual")}
+              </Button>
             </div>
           </div>
         </CardContent>
@@ -315,7 +319,9 @@ export function ImapSyncOperations(): JSX.Element {
                 <p className="text-sm font-medium text-gray-600">
                   {t("app.admin.emails.imap.sync.statistics.avgDuration")}
                 </p>
-                <p className="text-2xl font-bold">{t("app.admin.emails.imap.common.never")}</p>
+                <p className="text-2xl font-bold">
+                  {t("app.admin.emails.imap.common.never")}
+                </p>
               </div>
               <Clock className="h-8 w-8 text-gray-600" />
             </div>
@@ -332,13 +338,27 @@ export function ImapSyncOperations(): JSX.Element {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t("app.admin.emails.imap.sync.history.startTime")}</TableHead>
-                <TableHead>{t("app.admin.emails.imap.sync.history.status")}</TableHead>
-                <TableHead>{t("app.admin.emails.imap.sync.history.duration")}</TableHead>
-                <TableHead>{t("app.admin.emails.imap.sync.history.accounts")}</TableHead>
-                <TableHead>{t("app.admin.emails.imap.sync.history.folders")}</TableHead>
-                <TableHead>{t("app.admin.emails.imap.sync.history.messages")}</TableHead>
-                <TableHead>{t("app.admin.emails.imap.sync.history.errors")}</TableHead>
+                <TableHead>
+                  {t("app.admin.emails.imap.sync.history.startTime")}
+                </TableHead>
+                <TableHead>
+                  {t("app.admin.emails.imap.sync.history.status")}
+                </TableHead>
+                <TableHead>
+                  {t("app.admin.emails.imap.sync.history.duration")}
+                </TableHead>
+                <TableHead>
+                  {t("app.admin.emails.imap.sync.history.accounts")}
+                </TableHead>
+                <TableHead>
+                  {t("app.admin.emails.imap.sync.history.folders")}
+                </TableHead>
+                <TableHead>
+                  {t("app.admin.emails.imap.sync.history.messages")}
+                </TableHead>
+                <TableHead>
+                  {t("app.admin.emails.imap.sync.history.errors")}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

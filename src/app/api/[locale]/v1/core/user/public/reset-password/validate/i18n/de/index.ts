@@ -35,6 +35,7 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
+    title: "Fehler",
     validation: {
       title: "Validierungsfehler",
       description: "Token-Validierung fehlgeschlagen",

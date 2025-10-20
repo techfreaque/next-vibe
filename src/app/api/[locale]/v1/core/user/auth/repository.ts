@@ -946,7 +946,7 @@ class AuthRepositoryImpl implements AuthRepository {
                 "app.api.v1.core.user.auth.debug.publicPayloadNotSupportedForCli",
               );
               return throwErrorResponse(
-                "app.api.v1.core.user.auth.errors.publicPayloadNotSupported.title",
+                "app.api.v1.core.user.auth.errors.publicPayloadNotSupported",
                 ErrorResponseTypes.UNAUTHORIZED,
               );
             }

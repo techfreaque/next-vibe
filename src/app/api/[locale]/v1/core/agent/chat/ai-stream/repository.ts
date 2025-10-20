@@ -106,7 +106,7 @@ async function ensureThread({
       title,
       rootFolderId,
       folderId: subFolderId || null,
-    });
+    } as typeof chatThreads.$inferInsert);
 
     logger.info("Created new thread", { threadId: newThreadId, title });
   } else {
@@ -468,7 +468,7 @@ export async function createAiStream({
         depth: messageDepth,
         authorId: userId,
         isAI: false,
-      });
+      } as typeof chatMessages.$inferInsert);
 
       logger.info("Created user message", {
         messageId: userMessageId,
@@ -532,7 +532,7 @@ export async function createAiStream({
       isAI: true,
       model: data.model,
       tone: data.persona || null,
-    });
+    } as typeof chatMessages.$inferInsert);
 
     logger.info("Created AI message placeholder", {
       messageId: aiMessageId,
@@ -606,7 +606,7 @@ export async function createAiStream({
         headers: {
           "Content-Type": "text/event-stream",
           "Cache-Control": "no-cache",
-          Connection: "keep-alive",
+          "Connection": "keep-alive",
         },
       }),
     );
@@ -833,7 +833,7 @@ export async function createAiStream({
         headers: {
           "Content-Type": "text/event-stream",
           "Cache-Control": "no-cache",
-          Connection: "keep-alive",
+          "Connection": "keep-alive",
         },
       }),
     );

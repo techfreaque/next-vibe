@@ -403,22 +403,56 @@ export const translations = {
         "This imprint provides legally required information about Unbottled.ai in accordance with applicable laws.",
       printButton: "Print",
       printAriaLabel: "Print this page",
-      companyInfo: {
-        title: "Company Information",
-        name: "Unbottled.ai",
-        address: "[Company Address]",
-        email: "legal@unbottled.ai",
-        representative: "[Legal Representative]",
-      },
-      contact: {
-        title: "Contact",
-        email: "Email",
-        support: "Support",
-      },
-      disclaimer: {
-        title: "Disclaimer",
-        content:
-          "The information provided on this website is for general informational purposes only. While we strive to keep the information up to date and correct, we make no representations or warranties of any kind about the completeness, accuracy, reliability, or availability of the website or the information contained on the website.",
+      sections: {
+        partnerships: {
+          title: "Partnerships & Affiliations",
+          description:
+            "Information about our business partnerships and affiliations.",
+          content:
+            "Unbottled.ai maintains partnerships with leading AI providers to deliver the best possible service to our users.",
+        },
+        companyInfo: {
+          title: "Company Information",
+          description:
+            "Legal information about Unbottled.ai and our registered business entity.",
+        },
+        responsiblePerson: {
+          title: "Responsible Person",
+          description:
+            "Information about the person responsible for the content of this website.",
+        },
+        contactInfo: {
+          title: "Contact Information",
+          description: "How to reach us for legal and business inquiries.",
+          communication: {
+            phone: "+1 (555) 123-4567",
+          },
+        },
+        disclaimer: {
+          title: "Disclaimer",
+          copyright: {
+            title: "Copyright",
+            content:
+              "All content on this website is protected by copyright. Unauthorized use is prohibited.",
+          },
+          liability: {
+            title: "Liability",
+            content:
+              "We make no representations or warranties about the completeness, accuracy, or reliability of information on this website.",
+          },
+          links: {
+            title: "External Links",
+            content:
+              "Our website may contain links to external sites. We are not responsible for the content of external websites.",
+          },
+        },
+        disputeResolution: {
+          title: "Dispute Resolution",
+          description:
+            "Information about how disputes are handled and resolved.",
+          content:
+            "Any disputes arising from the use of this website shall be resolved in accordance with applicable law.",
+        },
       },
     },
     privacyPolicy: {
@@ -500,6 +534,46 @@ export const translations = {
           title: "Data Retention",
           description:
             "We retain your data only as long as necessary to provide our services and comply with legal obligations. You can delete your account and all associated data at any time.",
+        },
+        cookies: {
+          title: "Cookies and Tracking",
+          description:
+            "We use cookies and similar tracking technologies to improve your experience and analyze usage patterns.",
+        },
+        derivativeData: {
+          title: "Derivative Data",
+          description:
+            "We may create anonymized, aggregated data from your usage to improve our services.",
+        },
+        disclosure: {
+          title: "Information Disclosure",
+          description:
+            "We may disclose your information when required by law or to protect our rights and safety.",
+        },
+        gdpr: {
+          title: "GDPR Compliance",
+          description:
+            "For users in the European Union, we comply with all GDPR requirements and respect your data protection rights.",
+        },
+        ccpa: {
+          title: "CCPA Compliance",
+          description:
+            "For California residents, we comply with the California Consumer Privacy Act and respect your privacy rights.",
+        },
+        children: {
+          title: "Children's Privacy",
+          description:
+            "Our service is not intended for children under 13. We do not knowingly collect data from children.",
+        },
+        businessTransfers: {
+          title: "Business Transfers",
+          description:
+            "In the event of a merger, acquisition, or sale of assets, your data may be transferred to the new entity.",
+        },
+        changes: {
+          title: "Changes to This Policy",
+          description:
+            "We may update this Privacy Policy from time to time. We will notify you of any significant changes.",
         },
         contact: {
           title: "Contact Us",

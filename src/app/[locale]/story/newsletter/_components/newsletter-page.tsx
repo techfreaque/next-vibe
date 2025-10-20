@@ -60,23 +60,23 @@ export function NewsletterPage({
   const benefits = [
     {
       icon: TrendingUp,
-      title: t("app.site.newsletter.page.benefits.benefit1.title"),
-      description: t("app.site.newsletter.page.benefits.benefit1.description"),
+      title: t("app.story.newsletter.page.benefits.benefit1.title"),
+      description: t("app.story.newsletter.page.benefits.benefit1.description"),
     },
     {
       icon: Zap,
-      title: t("app.site.newsletter.page.benefits.benefit2.title"),
-      description: t("app.site.newsletter.page.benefits.benefit2.description"),
+      title: t("app.story.newsletter.page.benefits.benefit2.title"),
+      description: t("app.story.newsletter.page.benefits.benefit2.description"),
     },
     {
       icon: Mail,
-      title: t("app.site.newsletter.page.benefits.benefit3.title"),
-      description: t("app.site.newsletter.page.benefits.benefit3.description"),
+      title: t("app.story.newsletter.page.benefits.benefit3.title"),
+      description: t("app.story.newsletter.page.benefits.benefit3.description"),
     },
     {
       icon: Users,
-      title: t("app.site.newsletter.page.benefits.benefit4.title"),
-      description: t("app.site.newsletter.page.benefits.benefit4.description"),
+      title: t("app.story.newsletter.page.benefits.benefit4.title"),
+      description: t("app.story.newsletter.page.benefits.benefit4.description"),
     },
   ];
 
@@ -87,16 +87,16 @@ export function NewsletterPage({
         <div className="container mx-auto max-w-4xl text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
             {prefilledEmail !== undefined && prefilledEmail.length > 0
-              ? t("app.site.newsletter.page.emailProvided.title")
-              : t("app.site.newsletter.page.title")}
+              ? t("app.story.newsletter.page.emailProvided.title")
+              : t("app.story.newsletter.page.title")}
           </h1>
           <h2 className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8">
-            {t("app.site.newsletter.page.subtitle")}
+            {t("app.story.newsletter.page.subtitle")}
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
             {prefilledEmail !== undefined && prefilledEmail.length > 0
-              ? t("app.site.newsletter.page.emailProvided.description")
-              : t("app.site.newsletter.page.heroDescription")}
+              ? t("app.story.newsletter.page.emailProvided.description")
+              : t("app.story.newsletter.page.heroDescription")}
           </p>
 
           {/* Newsletter Form */}
@@ -119,14 +119,14 @@ export function NewsletterPage({
               <div className="flex flex-col space-y-3">
                 <Input
                   type="email"
-                  placeholder={t("app.site.newsletter.emailPlaceholder")}
+                  placeholder={t("app.story.newsletter.emailPlaceholder")}
                   className="text-center text-lg py-3"
                   autoComplete="email"
                   autoCorrect="off"
                   spellCheck="false"
                   value={email}
                   onChange={handleEmailChange}
-                  aria-label={t("app.site.newsletter.emailPlaceholder")}
+                  aria-label={t("app.story.newsletter.emailPlaceholder")}
                   disabled={isAnyOperationInProgress || isLoggedIn}
                   name="email"
                   id="newsletter-email-page"
@@ -150,12 +150,12 @@ export function NewsletterPage({
                     isSubscribed
                       ? showConfirmUnsubscribe
                         ? t(
-                            "app.site.newsletter.subscription.unsubscribe.confirmButton",
+                            "app.story.newsletter.subscription.unsubscribe.confirmButton",
                           )
                         : t(
-                            "app.site.newsletter.subscription.unsubscribe.title",
+                            "app.story.newsletter.subscription.unsubscribe.title",
                           )
-                      : t("app.site.newsletter.page.cta.subscribeButton")
+                      : t("app.story.newsletter.page.cta.subscribeButton")
                   }
                   disabled={isAnyOperationInProgress}
                 >
@@ -175,10 +175,10 @@ export function NewsletterPage({
                   {isSubscribed
                     ? showConfirmUnsubscribe
                       ? t(
-                          "app.site.newsletter.subscription.unsubscribe.confirmButton",
+                          "app.story.newsletter.subscription.unsubscribe.confirmButton",
                         )
-                      : t("app.site.newsletter.subscription.unsubscribe.title")
-                    : t("app.site.newsletter.page.cta.subscribeButton")}
+                      : t("app.story.newsletter.subscription.unsubscribe.title")
+                    : t("app.story.newsletter.page.cta.subscribeButton")}
                 </Button>
               </div>
 
@@ -203,12 +203,12 @@ export function NewsletterPage({
             {/* Unsubscribe link */}
             <div className="text-center mt-4">
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t("app.site.newsletter.page.unsubscribeText")}{" "}
+                {t("app.story.newsletter.page.unsubscribeText")}{" "}
                 <a
                   href={`/${locale}/newsletter/unsubscribe`}
                   className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
                 >
-                  {t("app.site.newsletter.page.unsubscribeLink")}
+                  {t("app.story.newsletter.page.unsubscribeLink")}
                 </a>
               </p>
             </div>
@@ -221,10 +221,10 @@ export function NewsletterPage({
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t("app.site.newsletter.page.benefits.title")}
+              {t("app.story.newsletter.page.benefits.title")}
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-400">
-              {t("app.site.newsletter.page.benefits.subtitle")}
+              {t("app.story.newsletter.page.benefits.subtitle")}
             </p>
           </div>
 
@@ -256,10 +256,10 @@ export function NewsletterPage({
       <section className="py-16 px-4 md:px-6">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            {t("app.site.newsletter.page.frequency.title")}
+            {t("app.story.newsletter.page.frequency.title")}
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400">
-            {t("app.site.newsletter.page.frequency.description")}
+            {t("app.story.newsletter.page.frequency.description")}
           </p>
         </div>
       </section>
@@ -268,10 +268,10 @@ export function NewsletterPage({
       <section className="py-20 px-4 md:px-6 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600">
         <div className="container mx-auto max-w-4xl text-center text-white">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            {t("app.site.newsletter.page.cta.title")}
+            {t("app.story.newsletter.page.cta.title")}
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            {t("app.site.newsletter.page.cta.description")}
+            {t("app.story.newsletter.page.cta.description")}
           </p>
           <Button
             onClick={() => {
@@ -282,7 +282,7 @@ export function NewsletterPage({
             size="lg"
             className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-3"
           >
-            {t("app.site.newsletter.page.cta.subscribeButton")}
+            {t("app.story.newsletter.page.cta.subscribeButton")}
           </Button>
         </div>
       </section>

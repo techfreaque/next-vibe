@@ -84,6 +84,18 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
+    title: "Anmeldefehler",
+    account_locked: "Konto ist gesperrt",
+    accountLocked: "Konto ist gesperrt",
+    accountLockedDescription:
+      "Ihr Konto wurde gesperrt. Bitte kontaktieren Sie den Support.",
+    invalid_credentials: "Ungültige E-Mail oder Passwort",
+    two_factor_required: "Zwei-Faktor-Authentifizierung erforderlich",
+    auth_error: "Authentifizierungsfehler aufgetreten",
+    user_not_found: "Benutzer nicht gefunden",
+    session_creation_failed: "Sitzung konnte nicht erstellt werden",
+    token_save_failed:
+      "Authentifizierungs-Token konnte nicht gespeichert werden",
     validation: {
       title: "Validierung fehlgeschlagen",
       description: "Bitte überprüfen Sie Ihre Eingabe",

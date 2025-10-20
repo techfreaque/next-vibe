@@ -9,6 +9,7 @@ export const translations = {
     rollback: "Rollback nicht anwendbar für Bereinigungsoperationen",
   },
   errors: {
+    default: "Ein Fehler ist beim Bereinigen der Sitzungen aufgetreten",
     execution_failed: {
       title: "Sitzungsbereinigung fehlgeschlagen",
       description: "Fehler beim Bereinigen abgelaufener Sitzungen",

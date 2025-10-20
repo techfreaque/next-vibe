@@ -10,17 +10,16 @@
  * - Generated at: 2025-10-10T17:19:42.646Z
  */
 
-import type { Task, TaskRegistry } from "../types/repository";
-import { UnifiedTaskRunnerRepositoryImpl } from "../unified-runner/repository";
-
+import { tasks as taskModule4 } from "../../agent/classification/task";
+import { tasks as taskModule3 } from "../../agent/execution/task";
+import { tasks as taskModule5 } from "../../emails/imap-client/sync/task";
+import { tasks as taskModule2 } from "../../leads/import/task";
 import { tasks as taskModule0 } from "../../newsletter/unsubscribe/task";
 import { tasks as taskModule1 } from "../../user/session-cleanup/task";
-import { tasks as taskModule2 } from "../../leads/import/task";
-import { tasks as taskModule3 } from "../../agent/execution/task";
-import { tasks as taskModule4 } from "../../agent/classification/task";
-import { tasks as taskModule5 } from "../../emails/imap-client/sync/task";
-import { taskRunners as runnerModule6 } from "../tasks/pulse-runner/task-runner";
 import { taskRunners as runnerModule7 } from "../tasks/dev-watcher/task-runner";
+import { taskRunners as runnerModule6 } from "../tasks/pulse-runner/task-runner";
+import type { Task, TaskRegistry } from "../types/repository";
+import { UnifiedTaskRunnerRepositoryImpl } from "../unified-runner/repository";
 
 const allTasks: Task[] = [
   ...taskModule0,

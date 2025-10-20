@@ -365,4 +365,7 @@ export const translations: typeof enTranslations = {
     statistics: "Statystyki",
     analytics: "Analityka",
   },
+  error: {
+    default: "Wystąpił błąd",
+  },
 };

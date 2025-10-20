@@ -104,7 +104,7 @@ async function executeImapSync(
         error: syncResult.message,
       });
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.emails.error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -117,7 +117,7 @@ async function executeImapSync(
     });
 
     return createErrorResponse(
-      "error.default",
+      "app.api.v1.core.emails.error.default",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }
@@ -144,13 +144,13 @@ function validateImapSync(
       return createSuccessResponse(validationResult.data.isValid);
     } else {
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.emails.error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
   } catch {
     return createErrorResponse(
-      "error.default",
+      "app.api.v1.core.emails.error.default",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }
@@ -197,7 +197,7 @@ const imapSyncTask: Task = {
 
     if (!result.success) {
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.emails.error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }

@@ -4,6 +4,18 @@ export const translations: typeof enTranslations = {
   title: "Passwort-Reset Anfrage",
   description: "Passwort-Reset anfordern",
   tag: "Passwort-Reset",
+  email: {
+    title: "Setzen Sie Ihr Passwort zurück",
+    subject: "Anfrage zur Passwortzurücksetzung",
+    previewText: "Setzen Sie Ihr Passwort zurück",
+    greeting: "Hallo,",
+    requestInfo:
+      "Wir haben eine Anfrage zur Zurücksetzung Ihres Passworts erhalten.",
+    instructions:
+      "Klicken Sie auf die Schaltfläche unten, um Ihr Passwort zurückzusetzen:",
+    buttonText: "Passwort zurücksetzen",
+    expirationInfo: "Dieser Link läuft in 24 Stunden ab.",
+  },
   groups: {
     emailInput: {
       title: "E-Mail-Eingabe",
@@ -39,6 +51,7 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
+    title: "Fehler",
     validation: {
       title: "Validierungsfehler",
       description: "Ungültige Eingabe bereitgestellt",

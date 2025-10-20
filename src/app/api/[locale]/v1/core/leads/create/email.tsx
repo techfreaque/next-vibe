@@ -333,7 +333,7 @@ function AdminNotificationEmailContent({
             {t("app.api.v1.core.leads.create.email.admin.newLead.source")}:
           </Text>{" "}
           {lead.trackingInfo.source
-            ? t(LeadSource[lead.trackingInfo.source] )
+            ? t(LeadSource[lead.trackingInfo.source])
             : t("app.api.v1.core.leads.create.email.admin.newLead.notProvided")}
         </Text>
 
@@ -347,7 +347,7 @@ function AdminNotificationEmailContent({
           <Text style={{ fontWeight: "700" }}>
             {t("app.api.v1.core.leads.create.email.admin.newLead.status")}:
           </Text>{" "}
-          {t(LeadStatus[lead.summary.status] )}
+          {t(LeadStatus[lead.summary.status])}
         </Text>
 
         {lead.metadata.notes && (

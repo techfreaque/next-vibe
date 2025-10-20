@@ -52,7 +52,7 @@ import { LocationAnalyzer } from "./location-analyzer";
 interface TranslationModule {
   default?: TranslationObject;
   translations?: TranslationObject;
-  [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  [key: string]: TranslationObject | undefined;
 }
 
 export class TranslationReorganizeRepositoryImpl {
@@ -84,7 +84,9 @@ export class TranslationReorganizeRepositoryImpl {
 
     try {
       output.push(
-        t("app.api.v1.core.system.translations.reorganize.messages.starting"),
+        t(
+          "app.api.v1.core.system.translations.reorganize.post.messages.starting",
+        ),
       );
 
       // Create backup if requested
@@ -94,7 +96,7 @@ export class TranslationReorganizeRepositoryImpl {
 
         output.push(
           t(
-            "app.api.v1.core.system.translations.reorganize.messages.backupCreated",
+            "app.api.v1.core.system.translations.reorganize.post.messages.backupCreated",
             { path: backupPath },
           ),
         );
@@ -102,7 +104,7 @@ export class TranslationReorganizeRepositoryImpl {
 
       output.push(
         t(
-          "app.api.v1.core.system.translations.reorganize.messages.scanningUsage",
+          "app.api.v1.core.system.translations.reorganize.post.messages.scanningUsage",
         ),
       );
 
@@ -110,7 +112,7 @@ export class TranslationReorganizeRepositoryImpl {
 
       output.push(
         t(
-          "app.api.v1.core.system.translations.reorganize.messages.loadingFiles",
+          "app.api.v1.core.system.translations.reorganize.post.messages.loadingFiles",
         ),
       );
       const currentTranslations = await this.loadCurrentTranslations(logger);
@@ -127,10 +129,13 @@ export class TranslationReorganizeRepositoryImpl {
       const unusedKeys = allKeys.size - usedKeys;
 
       output.push(
-        t("app.api.v1.core.system.translations.reorganize.messages.foundKeys", {
-          used: usedKeys,
-          total: allKeys.size,
-        }),
+        t(
+          "app.api.v1.core.system.translations.reorganize.post.messages.foundKeys",
+          {
+            used: usedKeys,
+            total: allKeys.size,
+          },
+        ),
       );
       logger.debug(
         `Key scanning completed. usedKeys: ${usedKeys}, unusedKeys: ${unusedKeys}`,
@@ -143,7 +148,7 @@ export class TranslationReorganizeRepositoryImpl {
       if (request.removeUnused && unusedKeys > 0) {
         output.push(
           t(
-            "app.api.v1.core.system.translations.reorganize.messages.removingKeys",
+            "app.api.v1.core.system.translations.reorganize.post.messages.removingKeys",
             { count: unusedKeys },
           ),
         );
@@ -161,17 +166,17 @@ export class TranslationReorganizeRepositoryImpl {
       if (request.dryRun) {
         output.push(
           t(
-            "app.api.v1.core.system.translations.reorganize.messages.dryRunCompleted",
+            "app.api.v1.core.system.translations.reorganize.post.messages.dryRunCompleted",
           ),
         );
         if (request.removeUnused && unusedKeys > 0) {
           output.push(
             t(
-              "app.api.v1.core.system.translations.reorganize.messages.removedKeysFromLanguage",
+              "app.api.v1.core.system.translations.reorganize.post.messages.removedKeysFromLanguage",
               {
                 count: unusedKeys,
                 language: t(
-                  "app.api.v1.core.system.translations.reorganize.messages.unusedKeysLabel",
+                  "app.api.v1.core.system.translations.reorganize.post.messages.unusedKeysLabel",
                 ),
               },
             ),
@@ -204,7 +209,7 @@ export class TranslationReorganizeRepositoryImpl {
 
         output.push(
           t(
-            "app.api.v1.core.system.translations.reorganize.messages.regeneratingStructure",
+            "app.api.v1.core.system.translations.reorganize.post.messages.regeneratingStructure",
           ),
         );
 
@@ -212,7 +217,7 @@ export class TranslationReorganizeRepositoryImpl {
 
         output.push(
           t(
-            "app.api.v1.core.system.translations.reorganize.messages.analyzingFrequency",
+            "app.api.v1.core.system.translations.reorganize.post.messages.analyzingFrequency",
           ),
         );
         const keyUsageFrequency =
@@ -225,12 +230,12 @@ export class TranslationReorganizeRepositoryImpl {
         // Group translations by usage location
         output.push(
           t(
-            "app.api.v1.core.system.translations.reorganize.messages.groupingByLocation",
+            "app.api.v1.core.system.translations.reorganize.post.messages.groupingByLocation",
           ),
         );
 
         logger.debug("Calling groupTranslationsByUsage");
-        const { groups, originalKeys } = this.groupTranslationsByUsage(
+        const { groups } = this.groupTranslationsByUsage(
           filteredTranslations, // Use filtered translations (with unused keys removed if requested)
           keyUsageMap,
           keyUsageFrequency,
@@ -249,7 +254,7 @@ export class TranslationReorganizeRepositoryImpl {
         // Generate files for each language
         output.push(
           t(
-            "app.api.v1.core.system.translations.reorganize.messages.generatingFiles",
+            "app.api.v1.core.system.translations.reorganize.post.messages.generatingFiles",
           ),
         );
 
@@ -294,7 +299,7 @@ export class TranslationReorganizeRepositoryImpl {
                   type: "updated",
                   path: path.join(TRANSLATIONS_DIR, language, "index.ts"),
                   description:
-                    "app.api.v1.core.system.translations.reorganize.messages.regeneratedStructure",
+                    "app.api.v1.core.system.translations.reorganize.post.messages.regeneratedStructure",
                   descriptionParams: { language },
                 });
                 logger.debug(`Successfully generated files for ${language}`);
@@ -316,7 +321,7 @@ export class TranslationReorganizeRepositoryImpl {
 
           output.push(
             t(
-              "app.api.v1.core.system.translations.reorganize.messages.completed",
+              "app.api.v1.core.system.translations.reorganize.post.messages.completed",
             ),
           );
 
@@ -341,14 +346,16 @@ export class TranslationReorganizeRepositoryImpl {
         } else {
           output.push(
             t(
-              "app.api.v1.core.system.translations.reorganize.messages.noKeysInUse",
+              "app.api.v1.core.system.translations.reorganize.post.messages.noKeysInUse",
             ),
           );
         }
       }
 
       output.push(
-        t("app.api.v1.core.system.translations.reorganize.messages.completed"),
+        t(
+          "app.api.v1.core.system.translations.reorganize.post.messages.completed",
+        ),
       );
 
       return createSuccessResponse({
@@ -376,7 +383,7 @@ export class TranslationReorganizeRepositoryImpl {
       });
 
       return createErrorResponse(
-        "error.errorTypes.internal_error",
+        "error.errorTypes.internal_error" as TranslationKey,
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -534,7 +541,8 @@ export class TranslationReorganizeRepositoryImpl {
    */
   restoreFromBackup(backupPath: string, logger: EndpointLogger): void {
     if (!fs.existsSync(backupPath)) {
-      throw new Error(`Backup directory does not exist: ${backupPath}`);
+      logger.error(`Backup directory does not exist: ${backupPath}`);
+      return;
     }
 
     logger.debug(`Starting restore from backup: ${backupPath}`);
@@ -555,7 +563,7 @@ export class TranslationReorganizeRepositoryImpl {
    * @param logger - Logger instance for debugging
    * @returns Response containing restore results and statistics
    */
-  async restoreFromBackupEndpoint(
+  restoreFromBackupEndpoint(
     request: {
       backupPath: string;
       validateOnly?: boolean;
@@ -563,19 +571,17 @@ export class TranslationReorganizeRepositoryImpl {
     },
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<
-    ResponseType<{
-      success: boolean;
-      message: string;
-      backupInfo: {
-        backupPath: string;
-        backupDate: string;
-        filesRestored: number;
-        newBackupCreated?: string;
-      };
-      duration: number;
-    }>
-  > {
+  ): ResponseType<{
+    success: boolean;
+    message: string;
+    backupInfo: {
+      backupPath: string;
+      backupDate: string;
+      filesRestored: number;
+      newBackupCreated?: string;
+    };
+    duration: number;
+  }> {
     const startTime = Date.now();
     const { t } = simpleT(locale);
 
@@ -583,7 +589,7 @@ export class TranslationReorganizeRepositoryImpl {
       // Validate backup path exists
       if (!fs.existsSync(request.backupPath)) {
         return createErrorResponse(
-          "error.errorTypes.not_found",
+          "app.api.v1.core.system.translations.restoreBackup.post.messages.backupNotFound" as TranslationKey,
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -598,8 +604,9 @@ export class TranslationReorganizeRepositoryImpl {
       if (request.validateOnly) {
         return createSuccessResponse({
           success: true,
-          message:
-            "Backup validation successful - backup is valid and can be restored",
+          message: t(
+            "app.api.v1.core.system.translations.restoreBackup.post.messages.validationSuccessful" as TranslationKey,
+          ),
           backupInfo: {
             backupPath: request.backupPath,
             backupDate,
@@ -621,7 +628,9 @@ export class TranslationReorganizeRepositoryImpl {
 
       return createSuccessResponse({
         success: true,
-        message: "Backup restored successfully",
+        message: t(
+          "app.api.v1.core.system.translations.restoreBackup.post.messages.restoreSuccessful" as TranslationKey,
+        ),
         backupInfo: {
           backupPath: request.backupPath,
           backupDate,
@@ -638,7 +647,7 @@ export class TranslationReorganizeRepositoryImpl {
       });
 
       return createErrorResponse(
-        "error.errorTypes.internal_error",
+        "error.errorTypes.internal_error" as TranslationKey,
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -939,10 +948,16 @@ export class TranslationReorganizeRepositoryImpl {
     logger: EndpointLogger,
   ): {
     groups: Map<string, TranslationObject>;
-    originalKeys: Map<string, Array<{ key: string; value: any }>>;
+    originalKeys: Map<
+      string,
+      Array<{ key: string; value: string | number | boolean }>
+    >;
   } {
     const groups = new Map<string, TranslationObject>();
-    const originalKeys = new Map<string, Array<{ key: string; value: any }>>();
+    const originalKeys = new Map<
+      string,
+      Array<{ key: string; value: string | number | boolean }>
+    >();
 
     logger.debug("Grouping translations by location-based co-location");
     logger.debug(
@@ -995,7 +1010,10 @@ export class TranslationReorganizeRepositoryImpl {
     keyUsageMap: Map<string, string[]>,
     keyUsageFrequency: Map<string, number>,
     groups: Map<string, TranslationObject>,
-    originalKeys: Map<string, Array<{ key: string; value: any }>>,
+    originalKeys: Map<
+      string,
+      Array<{ key: string; value: string | number | boolean }>
+    >,
     logger: EndpointLogger,
   ): void {
     for (const [key, value] of Object.entries(obj)) {
@@ -1428,6 +1446,97 @@ export class TranslationReorganizeRepositoryImpl {
       .replace(/\//g, ".")
       .replace(/\[locale\]\.?/, "")
       .replace(/\.i18n.*$/, "");
+  }
+
+  /**
+   * Get translation statistics
+   * @param locale - The locale for translations
+   * @param logger - Logger instance for debugging
+   * @returns Response containing translation statistics
+   */
+  async getTranslationStats(
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      success: boolean;
+      stats: {
+        totalKeys: number;
+        usedKeys: number;
+        unusedKeys: number;
+        translationFiles: number;
+        languages: string[];
+        lastAnalyzedAt: string;
+      };
+    }>
+  > {
+    try {
+      logger.info("Getting translation statistics");
+
+      // Load current translations
+      const currentTranslations = await this.loadCurrentTranslations(logger);
+
+      // Analyze key usage
+      const allKeys =
+        this.keyUsageAnalyzer.extractAllTranslationKeys(currentTranslations);
+      const keyUsageMap = this.keyUsageAnalyzer.scanCodebaseForKeyUsage(
+        allKeys,
+        logger,
+      );
+
+      const usedKeys = Array.from(keyUsageMap.keys()).length;
+      const unusedKeys = allKeys.size - usedKeys;
+
+      // Count translation files
+      const translationFiles = this.countTranslationFiles();
+
+      // Get available languages
+      const languages: string[] = ["en", "de", "pl"];
+
+      return createSuccessResponse({
+        success: true,
+        stats: {
+          totalKeys: allKeys.size,
+          usedKeys,
+          unusedKeys,
+          translationFiles,
+          languages,
+          lastAnalyzedAt: new Date().toISOString(),
+        },
+      });
+    } catch (error) {
+      logger.error("Error getting translation stats", { error });
+      return createErrorResponse(
+        "error.errorTypes.internal_error" as TranslationKey,
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Count translation files in the i18n directory
+   */
+  private countTranslationFiles(): number {
+    let count = 0;
+    const TS_EXTENSION = ".ts";
+    const countFilesRecursive = (dir: string): void => {
+      if (!fs.existsSync(dir)) {
+        return;
+      }
+
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          countFilesRecursive(fullPath);
+        } else if (entry.isFile() && entry.name.endsWith(TS_EXTENSION)) {
+          count++;
+        }
+      }
+    };
+
+    countFilesRecursive(I18N_PATH);
+    return count;
   }
 }
 

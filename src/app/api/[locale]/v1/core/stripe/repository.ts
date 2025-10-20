@@ -177,7 +177,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
     } catch (error) {
       logger.error("Error checking Stripe CLI installation:", error);
       return createErrorResponse(
-        "error.errorTypes.internal_error",
+        "app.api.v1.core.stripe.errors.serverError.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -201,14 +201,14 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
         return createSuccessResponse(url);
       } else {
         return createErrorResponse(
-          "error.errorTypes.internal_error",
+          "app.api.v1.core.stripe.errors.serverError.title",
           ErrorResponseTypes.INTERNAL_ERROR,
           { error: "stripe.errors.listener_failed" },
         );
       }
     } catch (error) {
       return createErrorResponse(
-        "error.errorTypes.internal_error",
+        "app.api.v1.core.stripe.errors.serverError.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -224,7 +224,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       return createSuccessResponse(authenticated);
     } catch (error) {
       return createErrorResponse(
-        "error.errorTypes.internal_error",
+        "app.api.v1.core.stripe.errors.serverError.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );

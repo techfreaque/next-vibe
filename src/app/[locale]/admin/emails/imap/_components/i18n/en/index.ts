@@ -626,4 +626,4 @@ export const translations = {
       sync_cancelled: "Synchronization was cancelled",
     },
   },
-} as const;
+};

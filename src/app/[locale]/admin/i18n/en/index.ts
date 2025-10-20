@@ -12,4 +12,8 @@ export const translations = {
   emails: emailsTranslations,
   leads: leadsTranslations,
   users: usersTranslations,
-} as const;
+  dashboard: {
+    title: "Admin Dashboard",
+    subtitle: "Manage your application from here",
+  },
+};

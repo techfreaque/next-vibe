@@ -8,7 +8,7 @@
 import type { EndpointLogger } from "../../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { EndpointReturn } from "../../../unified-ui/react/hooks/endpoint";
 import { useEndpoint } from "../../../unified-ui/react/hooks/endpoint";
-import { endpoints as taskEndpoints } from "../task/[id]/definition";
+import taskEndpoints from "../task/[id]/definition";
 import { endpoints } from "./definition";
 
 /**
@@ -56,31 +56,43 @@ export function useCreateCronTask(
 }
 
 /**
- * Stub hook for deleting tasks
- * TODO: Implement when delete endpoint is available
+ * Hook for deleting tasks
+ * Uses the DELETE endpoint from taskEndpoints
  */
-export function useDeleteCronTask(_taskId: string): {
-  mutateAsync: () => Promise<void>;
-} {
-  return {
-    mutateAsync: (): Promise<void> => {
-      // No-op stub - endpoint not yet implemented
-      return Promise.resolve();
+export function useDeleteCronTask(
+  taskId: string,
+  logger: EndpointLogger,
+): EndpointReturn<typeof taskEndpoints> {
+  return useEndpoint(
+    taskEndpoints,
+    {
+      urlParams: { id: taskId },
+      queryOptions: {
+        enabled: false, // Don't auto-fetch for delete operations
+        refetchOnWindowFocus: false,
+      },
     },
-  };
+    logger,
+  );
 }
 
 /**
- * Stub hook for toggling task enabled status
- * TODO: Implement when toggle endpoint is available
+ * Hook for toggling task enabled status
+ * Uses the PUT endpoint from taskEndpoints to update the enabled field
  */
-export function useToggleCronTask(_taskId: string): {
-  mutateAsync: (_enabled: boolean) => Promise<void>;
-} {
-  return {
-    mutateAsync: (_enabled: boolean): Promise<void> => {
-      // No-op stub - endpoint not yet implemented
-      return Promise.resolve();
+export function useToggleCronTask(
+  taskId: string,
+  logger: EndpointLogger,
+): EndpointReturn<typeof taskEndpoints> {
+  return useEndpoint(
+    taskEndpoints,
+    {
+      urlParams: { id: taskId },
+      queryOptions: {
+        enabled: false, // Don't auto-fetch for update operations
+        refetchOnWindowFocus: false,
+      },
     },
-  };
+    logger,
+  );
 }

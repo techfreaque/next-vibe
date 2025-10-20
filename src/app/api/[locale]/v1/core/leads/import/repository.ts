@@ -210,7 +210,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
       } else {
         errors.push(
           createErrorResponse(
-            "app.api.v1.core.leads.admin.import.error.invalid_email_format",
+            "app.admin.leads.leadsErrors.leadsImport.post.error.validation.invalid_email_format",
             ErrorResponseTypes.BAD_REQUEST,
           ),
         );
@@ -218,7 +218,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
     } else {
       errors.push(
         createErrorResponse(
-          "app.api.v1.core.leads.admin.import.error.email_required",
+          "app.admin.leads.leadsErrors.leadsImport.post.error.validation.email_required",
           ErrorResponseTypes.BAD_REQUEST,
         ),
       );
@@ -362,7 +362,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
     } catch (error) {
       logger.error("Error creating/updating lead", error);
       return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.leadsImport.post.error.server.title",
+        "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -450,7 +450,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
     } catch (error) {
       logger.error("Error importing leads from CSV", error);
       return createErrorResponse(
-        "app.api.v1.core.leads.leadsErrors.leadsImport.post.error.server.title",
+        "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }

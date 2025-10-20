@@ -194,9 +194,7 @@ export function CronTasksTable({
     }
 
     return (
-      <Badge variant="outline">
-        {t("app.admin.cron.taskStatus.pending")}
-      </Badge>
+      <Badge variant="outline">{t("app.admin.cron.taskStatus.pending")}</Badge>
     );
   };
 
@@ -228,12 +226,8 @@ export function CronTasksTable({
             <TableHead>{t("app.admin.cron.table.name")}</TableHead>
             <TableHead>{t("app.admin.cron.table.schedule")}</TableHead>
             <TableHead>{t("app.admin.cron.table.status")}</TableHead>
-            <TableHead>
-              {t("app.admin.cron.table.lastExecuted")}
-            </TableHead>
-            <TableHead>
-              {t("app.admin.cron.table.nextExecution")}
-            </TableHead>
+            <TableHead>{t("app.admin.cron.table.lastExecuted")}</TableHead>
+            <TableHead>{t("app.admin.cron.table.nextExecution")}</TableHead>
             <TableHead>{t("app.admin.cron.table.enabled")}</TableHead>
             <TableHead>{t("app.admin.cron.table.actions")}</TableHead>
           </TableRow>
@@ -277,9 +271,7 @@ export function CronTasksTable({
                   <div className="text-sm">
                     {task.nextExecutionAt
                       ? new Date(task.nextExecutionAt).toLocaleString(locale)
-                      : t(
-                          "app.admin.cron.formatting.fallbacks.notScheduled",
-                        )}
+                      : t("app.admin.cron.formatting.fallbacks.notScheduled")}
                   </div>
                 </TableCell>
                 <TableCell>

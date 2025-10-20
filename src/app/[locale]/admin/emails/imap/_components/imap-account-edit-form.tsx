@@ -141,7 +141,8 @@ export function ImapAccountEditForm({
             config={{
               type: "password",
               label: "app.admin.emails.imap.account.fields.password",
-              placeholder: "app.admin.emails.imap.account.placeholders.password_update",
+              placeholder:
+                "app.admin.emails.imap.account.placeholders.password_update",
             }}
             control={form.control}
             theme={{
@@ -157,9 +158,18 @@ export function ImapAccountEditForm({
               label: "app.admin.emails.imap.account.fields.authMethod",
               placeholder: "app.admin.emails.imap.account.fields.authMethod",
               options: [
-                { value: ImapAuthMethod.PLAIN, label: "app.admin.emails.imap.auth.plain" },
-                { value: ImapAuthMethod.OAUTH2, label: "app.admin.emails.imap.auth.oauth2" },
-                { value: ImapAuthMethod.XOAUTH2, label: "app.admin.emails.imap.auth.xoauth2" },
+                {
+                  value: ImapAuthMethod.PLAIN,
+                  label: "app.admin.emails.imap.auth.plain",
+                },
+                {
+                  value: ImapAuthMethod.OAUTH2,
+                  label: "app.admin.emails.imap.auth.oauth2",
+                },
+                {
+                  value: ImapAuthMethod.XOAUTH2,
+                  label: "app.admin.emails.imap.auth.xoauth2",
+                },
               ],
             }}
             control={form.control}
@@ -196,7 +206,8 @@ export function ImapAccountEditForm({
             config={{
               type: "number",
               label: "app.admin.emails.imap.account.fields.connectionTimeout",
-              placeholder: "app.admin.emails.imap.account.fields.connectionTimeout",
+              placeholder:
+                "app.admin.emails.imap.account.fields.connectionTimeout",
             }}
             control={form.control}
             theme={{

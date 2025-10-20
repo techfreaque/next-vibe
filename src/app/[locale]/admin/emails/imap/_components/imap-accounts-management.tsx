@@ -46,7 +46,9 @@ export function ImapAccountsManagement(): JSX.Element {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>{t("app.admin.emails.imap.admin.accounts.management.title")}</CardTitle>
+            <CardTitle>
+              {t("app.admin.emails.imap.admin.accounts.management.title")}
+            </CardTitle>
             <Button
               onClick={() => setShowCreateDialog(true)}
               className="flex items-center gap-2"
@@ -66,7 +68,9 @@ export function ImapAccountsManagement(): JSX.Element {
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{t("app.admin.emails.imap.account.create")}</DialogTitle>
+            <DialogTitle>
+              {t("app.admin.emails.imap.account.create")}
+            </DialogTitle>
           </DialogHeader>
           <ImapAccountCreateForm
             onSuccess={handleCreateSuccess}

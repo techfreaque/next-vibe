@@ -151,7 +151,8 @@ export const translations: typeof enTranslations = {
         deliveredEmails: "Zugestellt",
         deliveryRate: "Zustellungsrate",
         averageDeliveryTime: "Durchschn. Zustellzeit",
-        deliveryTimeDescription: "Durchschnittliche Zeit zur Zustellung von E-Mails",
+        deliveryTimeDescription:
+          "Durchschnittliche Zeit zur Zustellung von E-Mails",
         averageProcessingTime: "Durchschn. Verarbeitungszeit",
         processingTimeDescription:
           "Durchschnittliche Zeit zur Verarbeitung von E-Mails",

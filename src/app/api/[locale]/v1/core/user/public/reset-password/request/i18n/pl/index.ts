@@ -4,6 +4,16 @@ export const translations: typeof enTranslations = {
   title: "Żądanie resetowania hasła",
   description: "Żądanie resetowania hasła",
   tag: "Reset hasła",
+  email: {
+    title: "Zresetuj swoje hasło",
+    subject: "Żądanie resetowania hasła",
+    previewText: "Zresetuj swoje hasło",
+    greeting: "Witaj,",
+    requestInfo: "Otrzymaliśmy prośbę o zresetowanie Twojego hasła.",
+    instructions: "Kliknij przycisk poniżej, aby zresetować hasło:",
+    buttonText: "Zresetuj hasło",
+    expirationInfo: "Ten link wygaśnie za 24 godziny.",
+  },
   groups: {
     emailInput: {
       title: "Wprowadzenie E-maila",
@@ -39,6 +49,7 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
+    title: "Błąd",
     validation: {
       title: "Błąd walidacji",
       description: "Podano nieprawidłowe dane",

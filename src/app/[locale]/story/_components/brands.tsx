@@ -32,44 +32,44 @@ export function Brands({ locale }: BrandsProps): JSX.Element {
   const { t } = simpleT(locale);
   const brands: Brand[] = [
     {
-      name: "app.site.home.brands.brand1.name",
-      className: "app.site.home.brands.brand1.className",
-      logo: "app.site.home.brands.brand1.logo",
-      link: "app.site.home.brands.brand1.link",
+      name: "app.story._components.home.brands.brand1.name",
+      className: "app.story._components.home.brands.brand1.className",
+      logo: "app.story._components.home.brands.brand1.logo",
+      link: "app.story._components.home.brands.brand1.link",
     },
     {
-      name: "app.site.home.brands.brand2.name",
-      className: "app.site.home.brands.brand2.className",
-      logo: "app.site.home.brands.brand2.logo",
-      link: "app.site.home.brands.brand2.link",
+      name: "app.story._components.home.brands.brand2.name",
+      className: "app.story._components.home.brands.brand2.className",
+      logo: "app.story._components.home.brands.brand2.logo",
+      link: "app.story._components.home.brands.brand2.link",
     },
     {
-      name: "app.site.home.brands.brand3.name",
-      logo: "app.site.home.brands.brand3.logo",
-      link: "app.site.home.brands.brand3.link",
+      name: "app.story._components.home.brands.brand3.name",
+      logo: "app.story._components.home.brands.brand3.logo",
+      link: "app.story._components.home.brands.brand3.link",
     },
     {
-      name: "app.site.home.brands.brand4.name",
-      className: "app.site.home.brands.brand4.className",
-      logo: "app.site.home.brands.brand4.logo",
-      link: "app.site.home.brands.brand4.link",
+      name: "app.story._components.home.brands.brand4.name",
+      className: "app.story._components.home.brands.brand4.className",
+      logo: "app.story._components.home.brands.brand4.logo",
+      link: "app.story._components.home.brands.brand4.link",
     },
     {
-      name: "app.site.home.brands.brand5.name",
-      className: "app.site.home.brands.brand5.className",
-      logo: "app.site.home.brands.brand5.logo",
-      link: "app.site.home.brands.brand5.link",
+      name: "app.story._components.home.brands.brand5.name",
+      className: "app.story._components.home.brands.brand5.className",
+      logo: "app.story._components.home.brands.brand5.logo",
+      link: "app.story._components.home.brands.brand5.link",
     },
     {
-      name: "app.site.home.brands.brand6.name",
-      className: "app.site.home.brands.brand6.className",
-      logo: "app.site.home.brands.brand6.logo",
-      link: "app.site.home.brands.brand6.link",
+      name: "app.story._components.home.brands.brand6.name",
+      className: "app.story._components.home.brands.brand6.className",
+      logo: "app.story._components.home.brands.brand6.logo",
+      link: "app.story._components.home.brands.brand6.link",
     },
     {
-      name: "app.site.home.brands.brand7.name",
-      logo: "app.site.home.brands.brand7.logo",
-      link: "app.site.home.brands.brand7.link",
+      name: "app.story._components.home.brands.brand7.name",
+      logo: "app.story._components.home.brands.brand7.logo",
+      link: "app.story._components.home.brands.brand7.link",
     },
   ];
 
@@ -77,7 +77,7 @@ export function Brands({ locale }: BrandsProps): JSX.Element {
     <div className="container px-4 md:px-6" id="brands">
       <div className="text-center mb-8">
         <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-          {t("app.site.home.brands.title")}
+          {t("app.story._components.home.brands.title")}
         </p>
       </div>
       <motion.div

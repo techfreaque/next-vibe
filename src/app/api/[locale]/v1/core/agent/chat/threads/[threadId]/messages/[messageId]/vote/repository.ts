@@ -12,13 +12,9 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
-import {
-  chatFolders,
-  chatMessages,
-  chatThreads,
-  type MessageMetadata,
-} from "../../../../../db";
+import { chatMessages, chatThreads } from "../../../../../db";
 import { canVoteMessage } from "../../../../../permissions/utils";
 import type {
   VotePostRequestOutput,
@@ -38,7 +34,7 @@ export const voteRepository = {
     urlVariables: VotePostUrlVariablesOutput,
     data: VotePostRequestOutput,
     user: JwtPayloadType,
-    _locale: CountryLanguage,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<VotePostResponseOutput>> {
     try {
@@ -53,16 +49,13 @@ export const voteRepository = {
       const userId = user.id;
 
       // Get the message with thread info
-      // Note: We only join with custom folders if the thread has a customFolderId
       const [messageWithThread] = await db
         .select({
           message: chatMessages,
           thread: chatThreads,
-          folder: chatFolders,
         })
         .from(chatMessages)
         .innerJoin(chatThreads, eq(chatMessages.threadId, chatThreads.id))
-        .leftJoin(chatFolders, eq(chatThreads.customFolderId, chatFolders.id))
         .where(
           and(
             eq(chatMessages.id, urlVariables.messageId),
@@ -78,61 +71,56 @@ export const voteRepository = {
         );
       }
 
-      const { message, thread, folder } = messageWithThread;
+      const { message, thread } = messageWithThread;
 
       // Reject incognito threads
       if (thread.rootFolderId === "incognito") {
         return createErrorResponse(
           "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.forbidden.title" as const,
           ErrorResponseTypes.FORBIDDEN,
-          { message: "Incognito threads cannot be accessed on the server" },
+          {
+            message: simpleT(locale).t(
+              "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.forbidden.incognitoNotAllowed",
+            ),
+          },
         );
       }
 
-      // Check voting permissions
-      // For threads in custom folders, check folder permissions
-      // For threads in root folders (folder is null), check based on root folder type
-      if (folder) {
-        // Custom folder - use folder permissions
-        if (!canVoteMessage(userId, null, message, folder)) {
-          return createErrorResponse(
-            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.forbidden.title",
-            ErrorResponseTypes.FORBIDDEN,
-          );
-        }
-      } else {
-        // Root folder - basic permission check
-        // Can't vote on your own messages
-        if (message.authorId === userId) {
-          return createErrorResponse(
-            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.forbidden.title",
-            ErrorResponseTypes.FORBIDDEN,
-          );
-        }
-        // For root folders, voting is allowed if you can access the thread
-        // (which we already verified by getting the message)
+      // Check voting permissions - simplified
+      if (!canVoteMessage(userId, null, message)) {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.forbidden.title",
+          ErrorResponseTypes.FORBIDDEN,
+        );
       }
 
       // Get current metadata
       const currentMetadata = message.metadata || {};
-      const voterIds: string[] = currentMetadata.voterIds || [];
+      const voterIds: string[] = Array.isArray(currentMetadata.voterIds)
+        ? currentMetadata.voterIds
+        : [];
       const voteDetails: Array<{
         userId: string;
         vote: "up" | "down";
         timestamp: number;
-      }> = currentMetadata.voteDetails || [];
+      }> = Array.isArray(currentMetadata.voteDetails)
+        ? (currentMetadata.voteDetails as Array<{
+            userId: string;
+            vote: "up" | "down";
+            timestamp: number;
+          }>)
+        : [];
 
       // Find existing vote by this user
       const existingVoteIndex = voteDetails.findIndex(
-        (v: { userId: string; vote: "up" | "down"; timestamp: number }) =>
-          v.userId === userId,
+        (v) => v.userId === userId,
       );
       const existingVote =
         existingVoteIndex >= 0 ? voteDetails[existingVoteIndex] : null;
 
       // Calculate new vote counts
-      let upvotes = message.upvotes || 0;
-      let downvotes = message.downvotes || 0;
+      let upvotes = message.upvotes;
+      let downvotes = message.downvotes;
 
       // Remove existing vote if any
       if (existingVote) {
@@ -145,17 +133,8 @@ export const voteRepository = {
 
       // Apply new vote
       let newVoteType: "up" | "down" | "none" = "none";
-      const newVoteDetails: Array<{
-        userId: string;
-        vote: "up" | "down";
-        timestamp: number;
-      }> = voteDetails.filter(
-        (v: { userId: string; vote: "up" | "down"; timestamp: number }) =>
-          v.userId !== userId,
-      );
-      const newVoterIds: string[] = voterIds.filter(
-        (id: string) => id !== userId,
-      );
+      const newVoteDetails = voteDetails.filter((v) => v.userId !== userId);
+      const newVoterIds = voterIds.filter((id) => id !== userId);
 
       if (data.vote === "up") {
         upvotes += 1;
@@ -183,7 +162,7 @@ export const voteRepository = {
         ...currentMetadata,
         voterIds: newVoterIds,
         voteDetails: newVoteDetails,
-      } as MessageMetadata;
+      };
 
       await db
         .update(chatMessages)

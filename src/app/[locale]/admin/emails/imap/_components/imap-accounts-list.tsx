@@ -80,11 +80,15 @@ export function ImapAccountsList(): JSX.Element {
         );
       case ImapSyncStatus.ERROR:
         return (
-          <Badge variant="destructive">{t("app.admin.emails.imap.account.status.error")}</Badge>
+          <Badge variant="destructive">
+            {t("app.admin.emails.imap.account.status.error")}
+          </Badge>
         );
       case ImapSyncStatus.PENDING:
         return (
-          <Badge variant="secondary">{t("app.admin.emails.imap.account.status.pending")}</Badge>
+          <Badge variant="secondary">
+            {t("app.admin.emails.imap.account.status.pending")}
+          </Badge>
         );
       default:
         return (
@@ -101,7 +105,11 @@ export function ImapAccountsList(): JSX.Element {
 
   if (queryError) {
     return (
-      <div>{t("app.admin.emails.imap.account.list_error", { error: queryError.message })}</div>
+      <div>
+        {t("app.admin.emails.imap.account.list_error", {
+          error: queryError.message,
+        })}
+      </div>
     );
   }
 
@@ -128,13 +136,27 @@ export function ImapAccountsList(): JSX.Element {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t("app.admin.emails.imap.account.table.name")}</TableHead>
-              <TableHead>{t("app.admin.emails.imap.account.table.email")}</TableHead>
-              <TableHead>{t("app.admin.emails.imap.account.table.host")}</TableHead>
-              <TableHead>{t("app.admin.emails.imap.account.table.status")}</TableHead>
-              <TableHead>{t("app.admin.emails.imap.account.table.last_sync")}</TableHead>
-              <TableHead>{t("app.admin.emails.imap.account.table.max_messages")}</TableHead>
-              <TableHead>{t("app.admin.emails.imap.account.table.actions")}</TableHead>
+              <TableHead>
+                {t("app.admin.emails.imap.account.table.name")}
+              </TableHead>
+              <TableHead>
+                {t("app.admin.emails.imap.account.table.email")}
+              </TableHead>
+              <TableHead>
+                {t("app.admin.emails.imap.account.table.host")}
+              </TableHead>
+              <TableHead>
+                {t("app.admin.emails.imap.account.table.status")}
+              </TableHead>
+              <TableHead>
+                {t("app.admin.emails.imap.account.table.last_sync")}
+              </TableHead>
+              <TableHead>
+                {t("app.admin.emails.imap.account.table.max_messages")}
+              </TableHead>
+              <TableHead>
+                {t("app.admin.emails.imap.account.table.actions")}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

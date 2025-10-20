@@ -53,7 +53,10 @@ export function ImapFoldersManagement(): JSX.Element {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle> {t("app.admin.emails.imap.admin.folders.title")}</CardTitle>
+          <CardTitle>
+            {" "}
+            {t("app.admin.emails.imap.admin.folders.title")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Form
@@ -79,7 +82,9 @@ export function ImapFoldersManagement(): JSX.Element {
                   >
                     <SelectTrigger className="w-[250px]">
                       <SelectValue
-                        placeholder={t("app.admin.emails.imap.common.selectAccount")}
+                        placeholder={t(
+                          "app.admin.emails.imap.common.selectAccount",
+                        )}
                       />
                     </SelectTrigger>
                     <SelectContent>
@@ -126,7 +131,10 @@ export function ImapFoldersManagement(): JSX.Element {
       {/* Folder Statistics */}
       <Card>
         <CardHeader>
-          <CardTitle> {t("app.admin.emails.imap.admin.folders.stats.title")}</CardTitle>
+          <CardTitle>
+            {" "}
+            {t("app.admin.emails.imap.admin.folders.stats.title")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

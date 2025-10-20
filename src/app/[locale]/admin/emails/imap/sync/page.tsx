@@ -28,7 +28,9 @@ export default async function ImapSyncPage({
   return (
     <div className="container mx-auto py-6 space-y-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">{t("app.admin.emails.imap.admin.sync.title")}</h1>
+        <h1 className="text-3xl font-bold">
+          {t("app.admin.emails.imap.admin.sync.title")}
+        </h1>
         <p className="text-muted-foreground">
           {t("app.admin.emails.imap.admin.sync.description")}
         </p>

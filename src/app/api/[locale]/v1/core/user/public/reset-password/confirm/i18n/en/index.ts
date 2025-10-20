@@ -2,6 +2,21 @@ export const translations = {
   title: "Confirm Password Reset",
   description: "Confirm your password reset with a new password",
   tag: "Password Reset",
+  email: {
+    title: "Password Reset Successful",
+    subject: "Your Password Has Been Reset",
+    previewText: "Your password has been reset successfully",
+    greeting: "Hello,",
+    confirmationMessage: "Your password has been successfully reset.",
+    successMessage: "Your password has been successfully reset.",
+    loginInstructions: "You can now log in with your new password.",
+    securityWarning:
+      "If you did not make this change, please contact support immediately.",
+    securityTip:
+      "For your security, we recommend using a strong, unique password.",
+    securityNote:
+      "If you did not make this change, please contact support immediately.",
+  },
   groups: {
     verification: {
       title: "Verification",
@@ -69,9 +84,11 @@ export const translations = {
     ],
   },
   errors: {
+    title: "Password Reset Error",
     validation: {
       title: "Validation Error",
       description: "Please check your input and try again",
+      passwordsDoNotMatch: "Passwords do not match",
     },
     unauthorized: {
       title: "Unauthorized",
@@ -110,5 +127,6 @@ export const translations = {
     title: "Password Reset Successful",
     description: "Your password has been successfully reset",
     message: "Password has been reset successfully",
+    password_reset: "Your password has been successfully reset",
   },
 };

@@ -6,13 +6,18 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { createSuccessResponse } from "next-vibe/shared/types/response.schema";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../user/auth/definition";
 import type { LeadResponseType } from "../definition";
+import { LeadSortField, SortOrder } from "../enum";
 import { leadsRepository } from "../repository";
 
 /**
@@ -72,16 +77,24 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
     // Use the existing listLeads method with search filter
     const searchResult = await leadsRepository.listLeads(
       {
-        search: data.search ?? undefined,
-        page: Math.floor(offset / limit) + 1,
-        limit: limit,
-        status: undefined, // Search all statuses
-        currentCampaignStage: undefined,
-        country: undefined,
-        language: undefined,
-        source: undefined,
-        sortBy: undefined,
-        sortOrder: undefined,
+        searchPagination: {
+          search: data.search ?? undefined,
+          page: Math.floor(offset / limit) + 1,
+          limit: limit,
+        },
+        statusFilters: {
+          status: undefined, // Search all statuses
+          currentCampaignStage: undefined,
+          source: undefined,
+        },
+        locationFilters: {
+          country: undefined,
+          language: undefined,
+        },
+        sortingOptions: {
+          sortBy: LeadSortField.CREATED_AT,
+          sortOrder: SortOrder.DESC,
+        },
       },
       user,
       locale,
@@ -89,7 +102,11 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
     );
 
     if (!searchResult.success || !searchResult.data) {
-      return searchResult;
+      logger.error("Failed to search leads", searchResult);
+      return createErrorResponse(
+        "app.api.v1.core.leads.list.get.errors.server.title",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
     }
 
     // Type-safe access to success response data

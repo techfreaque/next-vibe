@@ -2,6 +2,16 @@ export const translations = {
   title: "Reset Password Request",
   description: "Request password reset",
   tag: "Password Reset",
+  email: {
+    title: "Reset Your Password",
+    subject: "Password Reset Request",
+    previewText: "Reset your password",
+    greeting: "Hello,",
+    requestInfo: "We received a request to reset your password.",
+    instructions: "Click the button below to reset your password:",
+    buttonText: "Reset Password",
+    expirationInfo: "This link will expire in 24 hours.",
+  },
   groups: {
     emailInput: {
       title: "Email Input",
@@ -36,6 +46,7 @@ export const translations = {
     },
   },
   errors: {
+    title: "Error",
     validation: {
       title: "Validation Error",
       description: "Invalid input provided",

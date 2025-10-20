@@ -43,7 +43,9 @@ export function ImapConfigurationManagement(): JSX.Element {
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center">{t("app.admin.emails.imap.common.loading")}</div>
+          <div className="text-center">
+            {t("app.admin.emails.imap.common.loading")}
+          </div>
         </CardContent>
       </Card>
     );
@@ -66,7 +68,9 @@ export function ImapConfigurationManagement(): JSX.Element {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>{t("app.admin.emails.imap.admin.config.settings.title")}</CardTitle>
+            <CardTitle>
+              {t("app.admin.emails.imap.admin.config.settings.title")}
+            </CardTitle>
             <div className="space-x-2">
               <Button variant="outline" onClick={configEndpoint.read.refetch}>
                 {t("app.admin.emails.imap.common.refresh")}
@@ -90,8 +94,12 @@ export function ImapConfigurationManagement(): JSX.Element {
 
             <Tabs defaultValue="server">
               <TabsList className="grid w-full grid-cols-6">
-                <TabsTrigger value="server">{t("app.admin.emails.imap.nav.config")}</TabsTrigger>
-                <TabsTrigger value="sync">{t("app.admin.emails.imap.nav.sync")}</TabsTrigger>
+                <TabsTrigger value="server">
+                  {t("app.admin.emails.imap.nav.config")}
+                </TabsTrigger>
+                <TabsTrigger value="sync">
+                  {t("app.admin.emails.imap.nav.sync")}
+                </TabsTrigger>
                 <TabsTrigger value="performance">
                   {t("app.admin.emails.imap.common.performance")}
                 </TabsTrigger>
@@ -131,7 +139,8 @@ export function ImapConfigurationManagement(): JSX.Element {
                         name="maxRetries"
                         config={{
                           type: "number",
-                          label: "app.admin.emails.imap.config.resilience.maxRetries",
+                          label:
+                            "app.admin.emails.imap.config.resilience.maxRetries",
                         }}
                         control={configEndpoint.create.form.control}
                       />
@@ -139,7 +148,8 @@ export function ImapConfigurationManagement(): JSX.Element {
                         name="retryDelay"
                         config={{
                           type: "number",
-                          label: "app.admin.emails.imap.config.resilience.retryDelay",
+                          label:
+                            "app.admin.emails.imap.config.resilience.retryDelay",
                         }}
                         control={configEndpoint.create.form.control}
                       />
@@ -170,7 +180,8 @@ export function ImapConfigurationManagement(): JSX.Element {
                         name="healthCheckInterval"
                         config={{
                           type: "number",
-                          label: "app.admin.emails.imap.config.monitoring.healthCheckInterval",
+                          label:
+                            "app.admin.emails.imap.config.monitoring.healthCheckInterval",
                         }}
                         control={configEndpoint.create.form.control}
                       />
@@ -178,7 +189,8 @@ export function ImapConfigurationManagement(): JSX.Element {
                         name="metricsEnabled"
                         config={{
                           type: "switch",
-                          label: "app.admin.emails.imap.config.monitoring.metricsEnabled",
+                          label:
+                            "app.admin.emails.imap.config.monitoring.metricsEnabled",
                         }}
                         control={configEndpoint.create.form.control}
                       />
@@ -186,14 +198,25 @@ export function ImapConfigurationManagement(): JSX.Element {
                         name="loggingLevel"
                         config={{
                           type: "select",
-                          label: "app.admin.emails.imap.config.monitoring.loggingLevel",
+                          label:
+                            "app.admin.emails.imap.config.monitoring.loggingLevel",
                           options: [
-                            { value: "error", label: "app.admin.emails.imap.common.error" },
-                            { value: "warn", label: "app.admin.emails.imap.common.warning" },
-                            { value: "info", label: "app.admin.emails.imap.common.info" },
+                            {
+                              value: "error",
+                              label: "app.admin.emails.imap.common.error",
+                            },
+                            {
+                              value: "warn",
+                              label: "app.admin.emails.imap.common.warning",
+                            },
+                            {
+                              value: "info",
+                              label: "app.admin.emails.imap.common.info",
+                            },
                             {
                               value: "debug",
-                              label: "app.admin.emails.imap.config.development.debugMode",
+                              label:
+                                "app.admin.emails.imap.config.development.debugMode",
                             },
                           ],
                         }}
@@ -208,7 +231,9 @@ export function ImapConfigurationManagement(): JSX.Element {
                 <Card>
                   <CardHeader>
                     <CardTitle>
-                      {t("app.admin.emails.imap.admin.config.development.title")}
+                      {t(
+                        "app.admin.emails.imap.admin.config.development.title",
+                      )}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -217,7 +242,8 @@ export function ImapConfigurationManagement(): JSX.Element {
                         name="debugMode"
                         config={{
                           type: "switch",
-                          label: "app.admin.emails.imap.config.development.debugMode",
+                          label:
+                            "app.admin.emails.imap.config.development.debugMode",
                         }}
                         control={configEndpoint.create.form.control}
                       />
@@ -225,7 +251,8 @@ export function ImapConfigurationManagement(): JSX.Element {
                         name="testMode"
                         config={{
                           type: "switch",
-                          label: "app.admin.emails.imap.config.development.testMode",
+                          label:
+                            "app.admin.emails.imap.config.development.testMode",
                         }}
                         control={configEndpoint.create.form.control}
                       />
@@ -260,7 +287,10 @@ export function ImapConfigurationManagement(): JSX.Element {
       {/* Configuration Status */}
       <Card>
         <CardHeader>
-          <CardTitle> {t("app.admin.emails.imap.admin.config.status.title")}</CardTitle>
+          <CardTitle>
+            {" "}
+            {t("app.admin.emails.imap.admin.config.status.title")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -276,7 +306,9 @@ export function ImapConfigurationManagement(): JSX.Element {
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold">
-                {configData ? t("app.admin.emails.imap.common.justNow") : t("app.admin.emails.imap.common.never")}
+                {configData
+                  ? t("app.admin.emails.imap.common.justNow")
+                  : t("app.admin.emails.imap.common.never")}
               </div>
               <div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.common.updated")}
@@ -284,7 +316,9 @@ export function ImapConfigurationManagement(): JSX.Element {
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">
-                {configData ? t("app.admin.emails.imap.common.valid") : t("app.admin.emails.imap.common.invalid")}
+                {configData
+                  ? t("app.admin.emails.imap.common.valid")
+                  : t("app.admin.emails.imap.common.invalid")}
               </div>
               <div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.common.configuration")}

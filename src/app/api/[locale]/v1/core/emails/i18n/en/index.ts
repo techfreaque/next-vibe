@@ -309,6 +309,10 @@ export const translations = {
       reminder: "Reminder",
     },
   },
+  errors: {
+    no_email: "No email address provided",
+    email_generation_failed: "Failed to generate email",
+  },
   email: {
     errors: {
       send: {
@@ -604,5 +608,15 @@ export const translations = {
       title: "Email Sent Successfully",
       description: "Your email has been sent successfully",
     },
+  },
+  error: {
+    default: "An error occurred",
+  },
+  template: {
+    tagline: "Your AI-powered chat platform",
+  },
+  footer: {
+    visitWebsite: "Visit Website",
+    allRightsReserved: "All rights reserved",
   },
 };

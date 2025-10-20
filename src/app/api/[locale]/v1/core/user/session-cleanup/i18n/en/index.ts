@@ -7,6 +7,7 @@ export const translations = {
     rollback: "Rollback not applicable for cleanup operations",
   },
   errors: {
+    default: "An error occurred during session cleanup",
     execution_failed: {
       title: "Session Cleanup Failed",
       description: "Failed to clean up expired sessions",

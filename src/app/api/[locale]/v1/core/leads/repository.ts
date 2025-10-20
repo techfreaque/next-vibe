@@ -972,7 +972,8 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       return createSuccessResponse({
         success: true,
-        message: "app.api.v1.core.leads.leadsErrors.leadsUnsubscribe.post.success.description",
+        message:
+          "app.api.v1.core.leads.leadsErrors.leadsUnsubscribe.post.success.description",
         unsubscribedAt: updatedLead.unsubscribedAt || undefined,
       });
     } catch (error) {

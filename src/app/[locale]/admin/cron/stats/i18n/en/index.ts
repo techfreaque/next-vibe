@@ -11,11 +11,26 @@ export const translations = {
       description: "Stats response data",
     },
     errors: {
-      unauthorized: { title: "Unauthorized", description: "Authentication required" },
-      validation: { title: "Validation Error", description: "Invalid request parameters" },
-      server: { title: "Server Error", description: "Internal server error occurred" },
-      unknown: { title: "Unknown Error", description: "An unknown error occurred" },
-      network: { title: "Network Error", description: "Network error occurred" },
+      unauthorized: {
+        title: "Unauthorized",
+        description: "Authentication required",
+      },
+      validation: {
+        title: "Validation Error",
+        description: "Invalid request parameters",
+      },
+      server: {
+        title: "Server Error",
+        description: "Internal server error occurred",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unknown error occurred",
+      },
+      network: {
+        title: "Network Error",
+        description: "Network error occurred",
+      },
       forbidden: { title: "Forbidden", description: "Access forbidden" },
       notFound: { title: "Not Found", description: "Resource not found" },
       conflict: { title: "Conflict", description: "Data conflict occurred" },
@@ -100,7 +115,8 @@ export const translations = {
   pageDescription: "View and analyze cron task statistics",
   pageTitle: "Cron Statistics",
   performanceMetrics: "Performance Metrics",
-  priorityAndHealth: "{{priorityLabel}}: {{priority}}, {{healthLabel}}: {{health}}",
+  priorityAndHealth:
+    "{{priorityLabel}}: {{priority}}, {{healthLabel}}: {{health}}",
   priority: {
     low: "Low",
     high: "High",
@@ -145,4 +161,4 @@ export const translations = {
   totalExecutions: "Total Executions",
   uniqueTasks: "unique tasks",
   unknown: "Unknown",
-} as const;
+};

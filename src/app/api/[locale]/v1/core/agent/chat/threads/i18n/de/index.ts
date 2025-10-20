@@ -30,9 +30,14 @@ export const translations: typeof enTranslations = {
       label: "Limit",
       description: "Anzahl der Threads pro Seite",
     },
-    folderId: {
-      label: "Ordner",
-      description: "Nach Ordner-ID filtern",
+    rootFolderId: {
+      label: "Stammordner",
+      description:
+        "Nach Stammordner filtern (private, shared, public, incognito)",
+    },
+    subFolderId: {
+      label: "Unterordner",
+      description: "Nach Unterordner-ID filtern (optional)",
     },
     status: {
       label: "Status",
@@ -165,9 +170,13 @@ export const translations: typeof enTranslations = {
       placeholder: "Thread-Titel eingeben...",
       default: "Neuer Chat",
     },
-    folderId: {
-      label: "Ordner",
-      description: "Ordner für den Thread",
+    rootFolderId: {
+      label: "Stammordner",
+      description: "Stammordner (private, shared, public, incognito)",
+    },
+    subFolderId: {
+      label: "Unterordner",
+      description: "Unterordner für den Thread (optional)",
     },
     defaultModel: {
       label: "Standardmodell",
@@ -222,6 +231,8 @@ export const translations: typeof enTranslations = {
       forbidden: {
         title: "Verboten",
         description: "Sie haben keine Berechtigung, Threads zu erstellen",
+        incognitoNotAllowed:
+          "Inkognito-Threads können nicht auf dem Server erstellt werden",
       },
       notFound: {
         title: "Nicht gefunden",

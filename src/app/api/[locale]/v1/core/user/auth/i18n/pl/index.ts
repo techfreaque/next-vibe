@@ -1,52 +1,27 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  authClient: {
+    errors: {
+      status_save_failed: "Nie udało się zapisać statusu uwierzytelniania",
+      status_remove_failed: "Nie udało się usunąć statusu uwierzytelniania",
+      status_check_failed: "Nie udało się sprawdzić statusu uwierzytelniania",
+    },
+  },
   errors: {
-    token_generation_failed: {
-      title: "Generowanie tokenu nie powiodło się",
-      description: "Nie udało się wygenerować tokenu uwierzytelniania",
-    },
-    invalid_session: {
-      title: "Nieprawidłowa sesja",
-      description: "Sesja jest nieprawidłowa lub wygasła",
-    },
-    missing_request_context: {
-      title: "Brakujący kontekst żądania",
-      description: "Kontekst żądania jest brakujący",
-    },
-    unsupported_platform: {
-      title: "Nieobsługiwana platforma",
-      description: "Platforma nie jest obsługiwana",
-    },
-    session_retrieval_failed: {
-      title: "Pobieranie sesji nie powiodło się",
-      description: "Nie udało się pobrać sesji",
-    },
-    missing_token: {
-      title: "Brakujący token",
-      description: "Token uwierzytelniania jest brakujący",
-    },
-    invalid_token_signature: {
-      title: "Nieprawidłowy podpis tokenu",
-      description: "Podpis tokenu jest nieprawidłowy",
-    },
-    jwt_payload_missing_id: {
-      title: "JWT payload brakuje ID",
-      description: "JWT payload brakuje ID użytkownika",
-    },
-    cookie_set_failed: {
-      title: "Ustawienie cookie nie powiodło się",
-      description: "Nie udało się ustawić cookie uwierzytelniania",
-    },
-    cookie_clear_failed: {
-      title: "Usunięcie cookie nie powiodło się",
-      description: "Nie udało się usunąć cookie uwierzytelniania",
-    },
-    publicPayloadNotSupported: {
-      title: "Publiczny payload nie jest obsługiwany",
-      description:
-        "Publiczny payload JWT nie jest obsługiwany dla uwierzytelniania CLI",
-    },
+    token_generation_failed:
+      "Nie udało się wygenerować tokenu uwierzytelniania",
+    invalid_session: "Sesja jest nieprawidłowa lub wygasła",
+    missing_request_context: "Kontekst żądania jest brakujący",
+    unsupported_platform: "Platforma nie jest obsługiwana",
+    session_retrieval_failed: "Nie udało się pobrać sesji",
+    missing_token: "Token uwierzytelniania jest brakujący",
+    invalid_token_signature: "Podpis tokenu jest nieprawidłowy",
+    jwt_payload_missing_id: "JWT payload brakuje ID użytkownika",
+    cookie_set_failed: "Nie udało się ustawić cookie uwierzytelniania",
+    cookie_clear_failed: "Nie udało się usunąć cookie uwierzytelniania",
+    publicPayloadNotSupported:
+      "Publiczny payload JWT nie jest obsługiwany dla uwierzytelniania CLI",
     jwt_signing_failed: "Nie udało się podpisać tokenu JWT",
     validation_failed: "Walidacja nie powiodła się",
   },

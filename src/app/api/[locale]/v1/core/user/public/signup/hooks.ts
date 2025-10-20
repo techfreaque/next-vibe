@@ -75,22 +75,24 @@ export function useRegister(): InferApiFormReturn<
     {
       onSuccess: async () => {
         // Clear lead tracking data on successful signup
-        logger.info("app.api.v1.core.user.auth.signup.success.processing");
+        logger.info("app.api.v1.core.user.public.signup.success.processing");
 
         const setTokenResponse = authClientRepository.setAuthStatus(logger);
         if (!setTokenResponse.success) {
           toast({
-            title: t("app.api.v1.core.user.auth.signup.errors.title"),
-            description: t("authClient.errors.token_save_failed"),
+            title: t("app.api.v1.core.user.public.signup.errors.title"),
+            description: t(
+              "app.api.v1.core.user.public.login.errors.token_save_failed",
+            ),
             variant: "destructive",
           });
           return;
         }
 
         toast({
-          title: t("app.api.v1.core.user.auth.signup.success.title"),
+          title: t("app.api.v1.core.user.public.signup.success.title"),
           description: t(
-            "app.api.v1.core.user.auth.signup.success.description",
+            "app.api.v1.core.user.public.signup.success.description",
           ),
           variant: "default",
         });
@@ -111,7 +113,7 @@ export function useRegister(): InferApiFormReturn<
       },
       onError: ({ error }) => {
         toast({
-          title: t("app.api.v1.core.user.auth.signup.errors.title"),
+          title: t("app.api.v1.core.user.public.signup.errors.title"),
           description: t(error.message, error.messageParams),
           variant: "destructive",
         });
@@ -126,10 +128,10 @@ export function useRegister(): InferApiFormReturn<
       return {
         variant: "success",
         title: {
-          message: "app.api.v1.core.user.auth.signup.success.title",
+          message: "app.api.v1.core.user.public.signup.success.title",
         },
         message: {
-          message: "app.api.v1.core.user.auth.signup.success.description",
+          message: "app.api.v1.core.user.public.signup.success.description",
         },
       };
     }
@@ -139,7 +141,7 @@ export function useRegister(): InferApiFormReturn<
       return {
         variant: "destructive",
         title: {
-          message: "app.api.v1.core.user.auth.signup.errors.title",
+          message: "app.api.v1.core.user.public.signup.errors.title",
         },
         message: {
           message: formResult.response.message,
@@ -193,7 +195,7 @@ export function useEmailCheck(
       enabled: !!email && email.includes("@") && email.includes("."),
       onError: ({ error }) => {
         toast({
-          title: t("app.api.v1.core.user.auth.signup.errors.title"),
+          title: t("app.api.v1.core.user.public.signup.errors.title"),
           description: t(error.message),
           variant: "destructive",
         });

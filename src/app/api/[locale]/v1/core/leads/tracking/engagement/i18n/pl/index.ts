@@ -86,6 +86,10 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Wystąpił konflikt danych",
       },
+      network: {
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci",
+      },
       unsavedChanges: {
         title: "Niezapisane zmiany",
         description: "Masz niezapisane zmiany",
@@ -102,6 +106,81 @@ export const translations: typeof enTranslations = {
     form: {
       title: "Parametry śledzenia kliknięć",
       description: "Parametry śledzenia kliknięć i przekierowania",
+    },
+    id: {
+      label: "ID leada",
+      description: "Unikalny identyfikator leada",
+      placeholder: "Wprowadź ID leada",
+      helpText: "Unikalny identyfikator leada",
+    },
+    stage: {
+      label: "Etap kampanii",
+      description: "Aktualny etap w kampanii",
+      placeholder: "Wybierz etap",
+      helpText: "Aktualny etap leada w kampanii",
+    },
+    source: {
+      label: "Źródło",
+      description: "Źródło kliknięcia",
+      placeholder: "Wprowadź źródło",
+      helpText: "Źródło, z którego pochodzi kliknięcie",
+    },
+    url: {
+      label: "Docelowy URL",
+      description: "URL do przekierowania",
+      placeholder: "https://example.com",
+      helpText: "URL, do którego zostanie przekierowany lead",
+    },
+    response: {
+      success: "Sukces",
+      redirectUrl: "URL przekierowania",
+      leadId: "ID leada",
+      campaignId: "ID kampanii",
+      engagementRecorded: "Zaangażowanie zarejestrowane",
+      leadStatusUpdated: "Status leada zaktualizowany",
+      isLoggedIn: "Jest zalogowany",
+    },
+    errors: {
+      unauthorized: {
+        title: "Brak autoryzacji",
+        description: "Wymagana autoryzacja",
+      },
+      validation: {
+        title: "Błąd walidacji",
+        description: "Nieprawidłowe parametry żądania",
+      },
+      server: {
+        title: "Błąd serwera",
+        description: "Wystąpił wewnętrzny błąd serwera",
+      },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd",
+      },
+      forbidden: {
+        title: "Zabronione",
+        description: "Dostęp zabroniony",
+      },
+      notFound: {
+        title: "Nie znaleziono",
+        description: "Zasób nie został znaleziony",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Wystąpił konflikt danych",
+      },
+      network: {
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci",
+      },
+      unsavedChanges: {
+        title: "Niezapisane zmiany",
+        description: "Masz niezapisane zmiany",
+      },
+    },
+    success: {
+      title: "Kliknięcie zarejestrowane",
+      description: "Kliknięcie leada zostało pomyślnie zarejestrowane i przekierowane",
     },
   },
   enums: {

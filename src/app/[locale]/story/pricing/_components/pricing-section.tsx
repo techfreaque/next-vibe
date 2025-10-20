@@ -82,7 +82,7 @@ export default function PricingSection({
   // Use subscription hooks for mutations
   const { createCheckout } = useSubscriptionCheckout();
 
-  const currentPlanId = currentSubscription?.planId;
+  const currentPlanId = currentSubscription?.plan;
   const isActive = currentSubscription?.status === SubscriptionStatus.ACTIVE;
 
   // Plan hierarchy for upgrade/downgrade logic
@@ -94,7 +94,7 @@ export default function PricingSection({
   };
 
   const getButtonAction = (
-    planId: typeof SubscriptionPlanValue,
+    planId: SubscriptionPlanValue,
   ): "upgrade" | "downgrade" | "current" => {
     if (!currentPlanId || !isActive) {
       return "upgrade";
@@ -112,25 +112,25 @@ export default function PricingSection({
     return "current";
   };
 
-  const getButtonText = (planId: typeof SubscriptionPlanValue): string => {
+  const getButtonText = (planId: SubscriptionPlanValue): string => {
     const action = getButtonAction(planId);
 
     switch (action) {
       case "upgrade":
         return currentPlanId
-          ? t("app.site.pricing.buttons.upgrade")
+          ? t("app.story.pricing.creditPricing.buttons.upgrade")
           : getPlanCta(planId, t);
       case "downgrade":
-        return t("app.site.pricing.buttons.downgrade");
+        return t("app.story.pricing.creditPricing.buttons.downgrade");
       case "current":
-        return t("app.site.pricing.buttons.currentPlan");
+        return t("app.story.pricing.creditPricing.buttons.currentPlan");
       default:
         return getPlanCta(planId, t);
     }
   };
 
   // Helper function to determine if a button should show loading spinner
-  const shouldShowLoading = (planId: typeof SubscriptionPlanValue): boolean => {
+  const shouldShowLoading = (planId: SubscriptionPlanValue): boolean => {
     // Show loading if isProcessing is true (all buttons)
     if (isProcessing === true) {
       return true;
@@ -150,7 +150,7 @@ export default function PricingSection({
   };
 
   const handlePlanSelect = async (
-    planId: typeof SubscriptionPlanValue,
+    planId: SubscriptionPlanValue,
   ): Promise<void> => {
     const action = getButtonAction(planId);
     const billingInterval = annual
@@ -218,8 +218,8 @@ export default function PricingSection({
       if (action === "downgrade") {
         // For downgrades, show a message that it will take effect next cycle
         toast({
-          title: t("app.site.pricing.downgrade.title"),
-          description: t("app.site.pricing.downgrade.description"),
+          title: t("app.story.pricing.downgrade.title"),
+          description: t("app.story.pricing.downgrade.description"),
         });
         return;
       }
@@ -229,7 +229,7 @@ export default function PricingSection({
       if ((planId as string) === SubscriptionPlan.ENTERPRISE) {
         toast({
           title: t("app.common.info.title"),
-          description: t("app.site.pricing.plans.ENTERPRISE.cta"),
+          description: t("app.story.pricing.plans.ENTERPRISE.cta"),
         });
         return;
       }
@@ -237,10 +237,7 @@ export default function PricingSection({
       // TypeScript knows planId is not ENTERPRISE here due to the check above
       // Since we've already checked that planId !== SubscriptionPlan.ENTERPRISE,
       // we can safely cast it to the expected type
-      const result = await createCheckout(
-        planId as Parameters<typeof createCheckout>[0],
-        billingInterval,
-      );
+      const result = await createCheckout(planId, billingInterval);
 
       // Check if the result is successful
       if (!result.success) {
@@ -261,8 +258,8 @@ export default function PricingSection({
         title: t("app.common.success.title"),
         description:
           action === "upgrade"
-            ? t("app.site.pricing.upgrade.processing")
-            : t("app.site.pricing.subscribe.processing"),
+            ? t("app.story.pricing.upgrade.processing")
+            : t("app.story.pricing.subscribe.processing"),
       });
     } catch {
       toast({
@@ -322,7 +319,7 @@ export default function PricingSection({
           >
             <Sparkles className="h-3.5 w-3.5 mr-1" />
             <span className="font-medium">
-              {t("app.site.pricing.plans.badge")}
+              {t("app.story.pricing.plans.badge")}
             </span>
           </motion.div>
 
@@ -332,7 +329,7 @@ export default function PricingSection({
             animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            {t("app.site.pricing.plans.title")}
+            {t("app.story.pricing.plans.title")}
           </motion.h2>
 
           <motion.p
@@ -341,7 +338,7 @@ export default function PricingSection({
             animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            {t("app.site.pricing.plans.subtitle")}
+            {t("app.story.pricing.plans.subtitle")}
           </motion.p>
         </div>
       )}
@@ -360,7 +357,7 @@ export default function PricingSection({
               : "font-medium text-blue-600 dark:text-blue-400"
           } transition-colors`}
         >
-          {t("app.site.pricing.plans.monthly")}
+          {t("app.story.pricing.plans.monthly")}
         </Label>
         <Switch
           id="billing-toggle"
@@ -376,9 +373,9 @@ export default function PricingSection({
               : "text-gray-500 dark:text-gray-400"
           } transition-colors flex items-center`}
         >
-          {t("app.site.pricing.plans.annually")}{" "}
+          {t("app.story.pricing.plans.annually")}{" "}
           <span className="ml-1.5 text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 px-2 py-0.5 rounded-full">
-            {t("app.site.pricing.plans.savePercent", {
+            {t("app.story.pricing.plans.savePercent", {
               percent: calculateSavingsPercent(country),
             })}
           </span>
@@ -425,17 +422,17 @@ export default function PricingSection({
                 )}
                 {plan.id === SubscriptionPlan.PREMIUM && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-purple-600 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
-                    {t("app.site.pricing.plans.PREMIUM.featureBadge")}
+                    {t("app.story.pricing.plans.PREMIUM.featureBadge")}
                   </div>
                 )}
                 {plan.isEnterprise && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gray-700 bg-gradient-to-r from-gray-600 to-gray-800 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
-                    {t("app.site.pricing.plans.ENTERPRISE.featureBadge")}
+                    {t("app.story.pricing.plans.ENTERPRISE.featureBadge")}
                   </div>
                 )}
                 {isCurrent && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-600 bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
-                    {t("app.site.pricing.currentPlan.badge")}
+                    {t("app.story.pricing.currentPlan.badge")}
                   </div>
                 )}
                 <CardHeader
@@ -457,7 +454,7 @@ export default function PricingSection({
                     </span>
                     {plan.isEnterprise ? null : (
                       <span className="ml-1 text-gray-500 dark:text-gray-400">
-                        {t("app.site.pricing.plans.perMonth")}
+                        {t("app.story.pricing.plans.perMonth")}
                       </span>
                     )}
                   </div>
@@ -490,7 +487,7 @@ export default function PricingSection({
                               <div className="flex items-center justify-center my-2">
                                 <div className="flex-1 border-t border-gray-200 dark:border-gray-700" />
                                 <span className="px-3 text-xs text-gray-500 dark:text-gray-400 font-medium">
-                                  {t("app.site.pricing.plans.orSeparator")}
+                                  {t("app.story.pricing.plans.orSeparator")}
                                 </span>
                                 <div className="flex-1 border-t border-gray-200 dark:border-gray-700" />
                               </div>
@@ -548,10 +545,12 @@ export default function PricingSection({
                             {isLoading ? (
                               <div className="flex items-center">
                                 <Loader className="mr-2 h-4 w-4 animate-spin" />
-                                {t("app.site.pricing.buttons.processing")}
+                                {t(
+                                  "app.story.pricing.creditPricing.buttons.processing",
+                                )}
                               </div>
                             ) : (
-                              t("app.site.pricing.plans.ENTERPRISE.cta")
+                              t("app.story.pricing.plans.ENTERPRISE.cta")
                             )}
                           </Button>
                         ) : (
@@ -601,13 +600,15 @@ export default function PricingSection({
                             {isLoading ? (
                               <div className="flex items-center">
                                 <Loader className="mr-2 h-4 w-4 animate-spin" />
-                                {t("app.site.pricing.buttons.processing")}
+                                {t(
+                                  "app.story.pricing.creditPricing.buttons.processing",
+                                )}
                               </div>
                             ) : action === "downgrade" ? (
                               <div className="flex flex-col items-center">
                                 <span>{getButtonText(plan.id)}</span>
                                 <span className="text-xs opacity-75">
-                                  {t("app.site.pricing.downgrade.nextCycle")}
+                                  {t("app.story.pricing.downgrade.nextCycle")}
                                 </span>
                               </div>
                             ) : (
@@ -633,10 +634,12 @@ export default function PricingSection({
                               {isLoading ? (
                                 <div className="flex items-center">
                                   <Loader className="mr-2 h-4 w-4 animate-spin" />
-                                  {t("app.site.pricing.buttons.processing")}
+                                  {t(
+                                    "app.story.pricing.creditPricing.buttons.processing",
+                                  )}
                                 </div>
                               ) : (
-                                t("app.site.pricing.plans.ENTERPRISE.cta")
+                                t("app.story.pricing.plans.ENTERPRISE.cta")
                               )}
                             </Button>
                           ) : (
@@ -669,13 +672,15 @@ export default function PricingSection({
                               {isLoading ? (
                                 <div className="flex items-center">
                                   <Loader className="mr-2 h-4 w-4 animate-spin" />
-                                  {t("app.site.pricing.buttons.processing")}
+                                  {t(
+                                    "app.story.pricing.creditPricing.buttons.processing",
+                                  )}
                                 </div>
                               ) : action === "downgrade" ? (
                                 <div className="flex flex-col items-center">
                                   <span>{getButtonText(plan.id)}</span>
                                   <span className="text-xs opacity-75">
-                                    {t("app.site.pricing.downgrade.nextCycle")}
+                                    {t("app.story.pricing.downgrade.nextCycle")}
                                   </span>
                                 </div>
                               ) : (
@@ -722,7 +727,9 @@ export default function PricingSection({
                                 {isLoading ? (
                                   <div className="flex items-center">
                                     <Loader className="mr-2 h-4 w-4 animate-spin" />
-                                    {t("app.site.pricing.buttons.processing")}
+                                    {t(
+                                      "app.story.pricing.creditPricing.buttons.processing",
+                                    )}
                                   </div>
                                 ) : (
                                   getPlanCta(plan.id, t)
@@ -751,26 +758,26 @@ export default function PricingSection({
               className="py-1.5 px-4 flex items-center gap-2 text-sm bg-white dark:bg-gray-800 shadow-sm"
             >
               <Sparkles className="h-4 w-4 text-amber-500" />
-              <span>{t("app.site.pricing.plans.guaranteeBadge")}</span>
+              <span>{t("app.story.pricing.plans.guaranteeBadge")}</span>
             </Badge>
             <Badge
               variant="outline"
               className="py-1.5 px-4 flex items-center gap-2 text-sm bg-white dark:bg-gray-800 shadow-sm"
             >
               <Clock className="h-4 w-4 text-blue-500" />
-              <span>{t("app.site.pricing.plans.flexibleBadge")}</span>
+              <span>{t("app.story.pricing.plans.flexibleBadge")}</span>
             </Badge>
             <Badge
               variant="outline"
               className="py-1.5 px-4 flex items-center gap-2 text-sm bg-white dark:bg-gray-800 shadow-sm"
             >
               <Users className="h-4 w-4 text-purple-500" />
-              <span>{t("app.site.pricing.plans.supportBadge")}</span>
+              <span>{t("app.story.pricing.plans.supportBadge")}</span>
             </Badge>
           </div>
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 max-w-2xl mx-auto">
             <p className="text-gray-700 dark:text-gray-300">
-              {t("app.site.pricing.plans.customSolutionText")}{" "}
+              {t("app.story.pricing.plans.customSolutionText")}{" "}
               <Link
                 href={
                   useHomePageLink
@@ -779,9 +786,9 @@ export default function PricingSection({
                 }
                 className="text-blue-600 hover:underline dark:text-blue-400 font-medium"
               >
-                {t("app.site.pricing.plans.contactUsLink")}
+                {t("app.story.pricing.plans.contactUsLink")}
               </Link>{" "}
-              {t("app.site.pricing.plans.tailoredPackageText")}
+              {t("app.story.pricing.plans.tailoredPackageText")}
             </p>
           </div>
         </motion.div>
@@ -790,20 +797,17 @@ export default function PricingSection({
   );
 }
 
-function getPlanCta(
-  planId: typeof SubscriptionPlanValue,
-  t: TFunction,
-): string {
+function getPlanCta(planId: SubscriptionPlanValue, t: TFunction): string {
   switch (planId) {
     case SubscriptionPlan.STARTER:
-      return t("app.site.pricing.plans.STARTER.cta");
+      return t("app.story.pricing.plans.STARTER.cta");
     case SubscriptionPlan.PROFESSIONAL:
-      return t("app.site.pricing.plans.PROFESSIONAL.cta");
+      return t("app.story.pricing.plans.PROFESSIONAL.cta");
     case SubscriptionPlan.PREMIUM:
-      return t("app.site.pricing.plans.PREMIUM.cta");
+      return t("app.story.pricing.plans.PREMIUM.cta");
     case SubscriptionPlan.ENTERPRISE:
-      return t("app.site.pricing.plans.ENTERPRISE.cta");
+      return t("app.story.pricing.plans.ENTERPRISE.cta");
     default:
-      return t("app.site.pricing.plans.STARTER.cta");
+      return t("app.story.pricing.plans.STARTER.cta");
   }
 }

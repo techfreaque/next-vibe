@@ -35,6 +35,7 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
+    title: "Błąd",
     validation: {
       title: "Błąd Walidacji",
       description: "Walidacja tokenu nie powiodła się",

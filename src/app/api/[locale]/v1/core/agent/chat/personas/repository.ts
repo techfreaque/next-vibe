@@ -59,12 +59,13 @@ export async function getPersonaById(
     return null;
   }
 
-  const customPersona = await db.query.customPersonas.findFirst({
-    where: and(
-      eq(customPersonas.id, personaId),
-      eq(customPersonas.userId, userId),
-    ),
-  });
+  const [customPersona] = await db
+    .select()
+    .from(customPersonas)
+    .where(
+      and(eq(customPersonas.id, personaId), eq(customPersonas.userId, userId)),
+    )
+    .limit(1);
 
   if (!customPersona) {
     return null;

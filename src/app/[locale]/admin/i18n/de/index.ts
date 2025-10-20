@@ -11,4 +11,8 @@ export const translations: typeof enTranslations = {
   emails: emailsTranslations,
   leads: leadsTranslations,
   users: usersTranslations,
+  dashboard: {
+    title: "Admin-Dashboard",
+    subtitle: "Verwalten Sie Ihre Anwendung von hier aus",
+  },
 };

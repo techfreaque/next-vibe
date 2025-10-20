@@ -115,15 +115,21 @@ export function ImapOverviewDashboard(): JSX.Element {
         );
       case "error":
         return (
-          <Badge variant="destructive">{t("app.admin.emails.imap.account.status.error")}</Badge>
+          <Badge variant="destructive">
+            {t("app.admin.emails.imap.account.status.error")}
+          </Badge>
         );
       case "pending":
         return (
-          <Badge variant="secondary">{t("app.admin.emails.imap.account.status.pending")}</Badge>
+          <Badge variant="secondary">
+            {t("app.admin.emails.imap.account.status.pending")}
+          </Badge>
         );
       default:
         return (
-          <Badge variant="outline">{t("app.admin.emails.imap.account.status.pending")}</Badge>
+          <Badge variant="outline">
+            {t("app.admin.emails.imap.account.status.pending")}
+          </Badge>
         );
     }
   };
@@ -151,7 +157,9 @@ export function ImapOverviewDashboard(): JSX.Element {
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>{t("app.admin.emails.imap.admin.overview.title")}</CardTitle>
+            <CardTitle>
+              {t("app.admin.emails.imap.admin.overview.title")}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-center py-8">
@@ -185,7 +193,9 @@ export function ImapOverviewDashboard(): JSX.Element {
             <div className="text-2xl font-bold">{healthData.totalAccounts}</div>
             <p className="text-xs text-muted-foreground">
               {healthData.syncedAccounts}{" "}
-              {t("app.admin.emails.imap.dashboard.activeAccounts").toLowerCase()}
+              {t(
+                "app.admin.emails.imap.dashboard.activeAccounts",
+              ).toLowerCase()}
             </p>
           </CardContent>
         </Card>
@@ -214,10 +224,12 @@ export function ImapOverviewDashboard(): JSX.Element {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {healthData.syncStats.lastSyncTime || t("app.admin.emails.imap.dashboard.never")}
+              {healthData.syncStats.lastSyncTime ||
+                t("app.admin.emails.imap.dashboard.never")}
             </div>
             <p className="text-xs text-muted-foreground">
-              {t("app.admin.emails.imap.dashboard.syncStatus")}: {healthData.serverStatus}
+              {t("app.admin.emails.imap.dashboard.syncStatus")}:{" "}
+              {healthData.serverStatus}
             </p>
           </CardContent>
         </Card>
@@ -231,7 +243,8 @@ export function ImapOverviewDashboard(): JSX.Element {
           <CardContent>
             <div className="text-2xl font-bold">{healthData.uptime}</div>
             <p className="text-xs text-muted-foreground">
-              {t("app.admin.emails.imap.admin.health.serverStatus")}: {healthData.serverStatus}
+              {t("app.admin.emails.imap.admin.health.serverStatus")}:{" "}
+              {healthData.serverStatus}
             </p>
           </CardContent>
         </Card>
@@ -243,7 +256,9 @@ export function ImapOverviewDashboard(): JSX.Element {
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center space-x-2">
               {getStatusIcon(healthData.serverStatus)}
-              <span>{t("app.admin.emails.imap.admin.health.serverStatus")}</span>
+              <span>
+                {t("app.admin.emails.imap.admin.health.serverStatus")}
+              </span>
             </CardTitle>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-500">
@@ -385,18 +400,32 @@ export function ImapOverviewDashboard(): JSX.Element {
       {/* Account Status Details */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("app.admin.emails.imap.admin.status.accountStatusDetails")}</CardTitle>
+          <CardTitle>
+            {t("app.admin.emails.imap.admin.status.accountStatusDetails")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t("app.admin.emails.imap.common.account")}</TableHead>
-                <TableHead>{t("app.admin.emails.imap.common.connection")}</TableHead>
-                <TableHead>{t("app.admin.emails.imap.common.syncStatus")}</TableHead>
-                <TableHead>{t("app.admin.emails.imap.common.lastSync")}</TableHead>
-                <TableHead>{t("app.admin.emails.imap.common.errors")}</TableHead>
-                <TableHead>{t("app.admin.emails.imap.common.actions")}</TableHead>
+                <TableHead>
+                  {t("app.admin.emails.imap.common.account")}
+                </TableHead>
+                <TableHead>
+                  {t("app.admin.emails.imap.common.connection")}
+                </TableHead>
+                <TableHead>
+                  {t("app.admin.emails.imap.common.syncStatus")}
+                </TableHead>
+                <TableHead>
+                  {t("app.admin.emails.imap.common.lastSync")}
+                </TableHead>
+                <TableHead>
+                  {t("app.admin.emails.imap.common.errors")}
+                </TableHead>
+                <TableHead>
+                  {t("app.admin.emails.imap.common.actions")}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

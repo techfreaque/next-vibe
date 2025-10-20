@@ -101,7 +101,7 @@ export function useUser(logger: EndpointLogger): UseUserReturn {
           return;
         }
         toast({
-          title: t("common.error.title"),
+          title: t("app.common.error.title"),
           description: error.message,
           variant: "destructive",
         });
@@ -222,8 +222,8 @@ export function useDeleteAccount(
   return useApiMutation(meEndpoints.DELETE, logger, {
     onSuccess: () => {
       toast({
-        title: t("user.account.delete.success.title"),
-        description: t("user.account.delete.success.description"),
+        title: t("app.user.user.account.delete.success.title"),
+        description: t("app.user.user.account.delete.success.description"),
         variant: "default",
       });
 
@@ -231,7 +231,7 @@ export function useDeleteAccount(
     },
     onError: ({ error }) => {
       toast({
-        title: t("user.account.delete.error.title"),
+        title: t("app.user.user.account.delete.error.title"),
         description: error.message,
         variant: "destructive",
       });

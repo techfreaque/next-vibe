@@ -177,9 +177,7 @@ export function SelectorBase<T extends string = string>({
         if (option.utilities && option.utilities.length > 0) {
           option.utilities.forEach((utilityKey) => {
             // Convert utility key to translated name
-            const utilityName = t(
-              `app.chat.modelUtilities.${utilityKey}` ,
-            );
+            const utilityName = t(`app.chat.modelUtilities.${utilityKey}`);
             if (!grouped[utilityName]) {
               grouped[utilityName] = {
                 options: [],

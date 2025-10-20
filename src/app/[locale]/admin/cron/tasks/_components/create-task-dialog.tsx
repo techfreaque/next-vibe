@@ -113,23 +113,19 @@ export function CreateTaskDialog({
                     config={{
                       type: "select",
                       label: "app.admin.cron.createTask.form.priority",
-                      placeholder:
-                        "app.admin.cron.createTask.form.priority",
+                      placeholder: "app.admin.cron.createTask.form.priority",
                       options: [
                         {
                           value: CronTaskPriority.LOW,
-                          label:
-                            "app.admin.cron.createTask.priorities.low",
+                          label: "app.admin.cron.createTask.priorities.low",
                         },
                         {
                           value: CronTaskPriority.MEDIUM,
-                          label:
-                            "app.admin.cron.createTask.priorities.medium",
+                          label: "app.admin.cron.createTask.priorities.medium",
                         },
                         {
                           value: CronTaskPriority.HIGH,
-                          label:
-                            "app.admin.cron.createTask.priorities.high",
+                          label: "app.admin.cron.createTask.priorities.high",
                         },
                         {
                           value: CronTaskPriority.CRITICAL,

@@ -4,6 +4,21 @@ export const translations: typeof enTranslations = {
   title: "Potwierdź resetowanie hasła",
   description: "Potwierdź resetowanie hasła nowym hasłem",
   tag: "Resetowanie hasła",
+  email: {
+    title: "Hasło zostało pomyślnie zresetowane",
+    subject: "Twoje hasło zostało zresetowane",
+    previewText: "Twoje hasło zostało pomyślnie zresetowane",
+    greeting: "Witaj,",
+    confirmationMessage: "Twoje hasło zostało pomyślnie zresetowane.",
+    successMessage: "Twoje hasło zostało pomyślnie zresetowane.",
+    loginInstructions: "Możesz teraz zalogować się przy użyciu nowego hasła.",
+    securityWarning:
+      "Jeśli nie dokonałeś tej zmiany, skontaktuj się natychmiast z pomocą techniczną.",
+    securityTip:
+      "Dla Twojego bezpieczeństwa zalecamy używanie silnego, unikalnego hasła.",
+    securityNote:
+      "Jeśli nie dokonałeś tej zmiany, skontaktuj się natychmiast z pomocą techniczną.",
+  },
   groups: {
     verification: {
       title: "Weryfikacja",
@@ -71,9 +86,11 @@ export const translations: typeof enTranslations = {
     ],
   },
   errors: {
+    title: "Błąd resetowania hasła",
     validation: {
       title: "Błąd walidacji",
       description: "Sprawdź swoje dane i spróbuj ponownie",
+      passwordsDoNotMatch: "Hasła nie pasują do siebie",
     },
     unauthorized: {
       title: "Brak autoryzacji",
@@ -112,5 +129,6 @@ export const translations: typeof enTranslations = {
     title: "Resetowanie hasła pomyślne",
     description: "Twoje hasło zostało pomyślnie zresetowane",
     message: "Hasło zostało pomyślnie zresetowane",
+    password_reset: "Twoje hasło zostało pomyślnie zresetowane",
   },
 };

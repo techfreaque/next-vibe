@@ -12,6 +12,7 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import { chatMessages, chatThreads } from "../../../../db";
 import type {
@@ -71,7 +72,11 @@ export const pathRepository = {
         return createErrorResponse(
           "app.api.v1.core.agent.chat.threads.threadId.messages.path.get.errors.forbidden.title" as const,
           ErrorResponseTypes.FORBIDDEN,
-          { message: "Incognito threads cannot be accessed on the server" },
+          {
+            message: simpleT(locale).t(
+              "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.forbidden.incognitoNotAllowed",
+            ),
+          },
         );
       }
 

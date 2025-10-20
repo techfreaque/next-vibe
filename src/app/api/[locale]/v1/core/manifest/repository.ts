@@ -87,13 +87,13 @@ export class ManifestRepositoryImpl implements ManifestRepository {
       const manifestLang = countryInfo?.language || "en";
 
       // Get app name for interpolation
-      const appName = t("common.appName");
+      const appName = t("app.api.common.appName");
 
       // Create localized manifest
       const manifest = {
-        name: t("common.appName", { appName }),
-        short_name: t("common.appShortName"),
-        description: t("common.description"),
+        name: t("app.api.common.appName", { appName }),
+        short_name: t("app.api.common.appName"),
+        description: t("app.api.v1.core.manifest.description"),
         start_url: `/${locale}`,
         display: MANIFEST_CONSTANTS.DISPLAY,
         background_color: MANIFEST_CONSTANTS.BACKGROUND_COLOR,

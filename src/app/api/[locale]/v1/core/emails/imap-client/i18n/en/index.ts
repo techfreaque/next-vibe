@@ -161,14 +161,14 @@ export const translations = {
   imap: {
     "example.com": "imap.example.com",
     "gmail.com": "imap.gmail.com",
-    connection: {
+    "connection": {
       test: {
         success: "Connection test successful",
         failed: "Connection test failed",
         timeout: "Connection test timeout",
       },
     },
-    sync: {
+    "sync": {
       messages: {
         accounts: {
           success: "All accounts synced successfully",

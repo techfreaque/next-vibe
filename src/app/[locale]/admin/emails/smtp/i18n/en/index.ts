@@ -12,4 +12,4 @@ export const translations = {
     create: createTranslations,
     edit: editTranslations,
   },
-} as const;
+};

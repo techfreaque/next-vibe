@@ -10,7 +10,6 @@
  * - Generated at: 2025-10-16T21:08:48.953Z
  */
 
-/* eslint-disable prettier/prettier */
 /* eslint-disable simple-import-sort/imports */
 
 import type { Task, TaskRegistry } from "../types/repository";
@@ -34,9 +33,15 @@ const allTasks: Task[] = [
   ...runnerModule6,
 ];
 
-const cronTasks = allTasks.filter((task): task is Task & { type: 'cron' } => task.type === 'cron');
-const sideTasks = allTasks.filter((task): task is Task & { type: 'side' } => task.type === 'side');
-const taskRunners = allTasks.filter((task): task is Task & { type: 'task-runner' } => task.type === 'task-runner');
+const cronTasks = allTasks.filter(
+  (task): task is Task & { type: "cron" } => task.type === "cron",
+);
+const sideTasks = allTasks.filter(
+  (task): task is Task & { type: "side" } => task.type === "side",
+);
+const taskRunners = allTasks.filter(
+  (task): task is Task & { type: "task-runner" } => task.type === "task-runner",
+);
 
 const tasksByCategory: Record<string, Task[]> = allTasks.reduce((acc, task) => {
   const category = String(task.category);
@@ -65,5 +70,13 @@ export const taskRegistry: TaskRegistry = {
   taskRunner, // Single unified task runner instance
 };
 
-export { allTasks, cronTasks, sideTasks, taskRunners, tasksByCategory, tasksByName, taskRunner };
+export {
+  allTasks,
+  cronTasks,
+  sideTasks,
+  taskRunner,
+  taskRunners,
+  tasksByCategory,
+  tasksByName,
+};
 export default allTasks;

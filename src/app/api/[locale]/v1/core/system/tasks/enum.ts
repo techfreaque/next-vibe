@@ -162,10 +162,10 @@ export const {
   options: PulseHealthStatusOptions,
   Value: PulseHealthStatusValue,
 } = createEnumOptions({
-  HEALTHY: "tasks.pulse.health.healthy" as const,
-  WARNING: "tasks.pulse.health.warning" as const,
-  CRITICAL: "tasks.pulse.health.critical" as const,
-  UNKNOWN: "tasks.pulse.health.unknown" as const,
+  HEALTHY: "app.api.v1.core.system.tasks.pulse.health.healthy" as const,
+  WARNING: "app.api.v1.core.system.tasks.pulse.health.warning" as const,
+  CRITICAL: "app.api.v1.core.system.tasks.pulse.health.critical" as const,
+  UNKNOWN: "app.api.v1.core.system.tasks.pulse.health.unknown" as const,
 });
 export const PulseHealthStatusDB = [
   PulseHealthStatus.HEALTHY,
@@ -183,11 +183,11 @@ export const {
   options: PulseExecutionStatusOptions,
   Value: PulseExecutionStatusValue,
 } = createEnumOptions({
-  SUCCESS: "tasks.pulse.execution.success" as const,
-  FAILURE: "tasks.pulse.execution.failure" as const,
-  TIMEOUT: "tasks.pulse.execution.timeout" as const,
-  CANCELLED: "tasks.pulse.execution.cancelled" as const,
-  PENDING: "tasks.pulse.execution.pending" as const,
+  SUCCESS: "app.api.v1.core.system.tasks.pulse.execution.success" as const,
+  FAILURE: "app.api.v1.core.system.tasks.pulse.execution.failure" as const,
+  TIMEOUT: "app.api.v1.core.system.tasks.pulse.execution.timeout" as const,
+  CANCELLED: "app.api.v1.core.system.tasks.pulse.execution.cancelled" as const,
+  PENDING: "app.api.v1.core.system.tasks.pulse.execution.pending" as const,
 });
 export const PulseExecutionStatusDB = [
   PulseExecutionStatus.SUCCESS,

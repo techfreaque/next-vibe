@@ -13,13 +13,28 @@ export const translations: typeof enTranslations = {
       description: "Dane odpowiedzi statystyk",
     },
     errors: {
-      unauthorized: { title: "Brak autoryzacji", description: "Wymagane uwierzytelnienie" },
-      validation: { title: "Błąd walidacji", description: "Nieprawidłowe parametry żądania" },
-      server: { title: "Błąd serwera", description: "Wystąpił wewnętrzny błąd serwera" },
-      unknown: { title: "Nieznany błąd", description: "Wystąpił nieznany błąd" },
+      unauthorized: {
+        title: "Brak autoryzacji",
+        description: "Wymagane uwierzytelnienie",
+      },
+      validation: {
+        title: "Błąd walidacji",
+        description: "Nieprawidłowe parametry żądania",
+      },
+      server: {
+        title: "Błąd serwera",
+        description: "Wystąpił wewnętrzny błąd serwera",
+      },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd",
+      },
       network: { title: "Błąd sieci", description: "Wystąpił błąd sieci" },
       forbidden: { title: "Zabronione", description: "Dostęp zabroniony" },
-      notFound: { title: "Nie znaleziono", description: "Zasób nie znaleziony" },
+      notFound: {
+        title: "Nie znaleziono",
+        description: "Zasób nie znaleziony",
+      },
       conflict: { title: "Konflikt", description: "Wystąpił konflikt danych" },
     },
     success: {
@@ -102,7 +117,8 @@ export const translations: typeof enTranslations = {
   pageDescription: "Zobacz statystyki i metryki wydajności zadań cron",
   pageTitle: "Statystyki Cron",
   performanceMetrics: "Metryki wydajności",
-  priorityAndHealth: "{{priorityLabel}}: {{priority}}, {{healthLabel}}: {{health}}",
+  priorityAndHealth:
+    "{{priorityLabel}}: {{priority}}, {{healthLabel}}: {{health}}",
   priority: {
     low: "Niski",
     high: "Wysoki",

@@ -97,7 +97,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
           method: "POST",
           headers: {
             // eslint-disable-next-line i18next/no-literal-string
-            Authorization: `Bearer ${env.EDEN_AI_API_KEY}`,
+            "Authorization": `Bearer ${env.EDEN_AI_API_KEY}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({

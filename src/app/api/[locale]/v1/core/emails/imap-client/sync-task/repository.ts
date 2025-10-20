@@ -100,7 +100,7 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
           error: syncResult.message,
         });
         return createErrorResponse(
-          "error.default",
+          "app.api.v1.core.emails.error.default",
           ErrorResponseTypes.INTERNAL_ERROR,
         );
       }
@@ -113,7 +113,7 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
       });
 
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.emails.error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -136,7 +136,7 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
     } catch (error) {
       logger.error("IMAP sync validation failed", error);
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.emails.error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }

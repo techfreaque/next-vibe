@@ -330,12 +330,14 @@ export type EmailGetRequestInput = typeof GET.types.RequestInput;
 export type EmailGetRequestOutput = typeof GET.types.RequestOutput;
 export type EmailGetResponseInput = typeof GET.types.ResponseInput;
 export type EmailGetResponseOutput = typeof GET.types.ResponseOutput;
+export type EmailGetUrlVariablesOutput = typeof GET.types.UrlVariablesOutput;
 
 // Also export with legacy names for backward compatibility
 export type EmailGetGETRequestInput = typeof GET.types.RequestInput;
 export type EmailGetGETRequestOutput = typeof GET.types.RequestOutput;
 export type EmailGetGETResponseInput = typeof GET.types.ResponseInput;
 export type EmailGetGETResponseOutput = typeof GET.types.ResponseOutput;
+export type EmailGetGETUrlVariablesOutput = typeof GET.types.UrlVariablesOutput;
 
 // Export commonly expected type name
 export type EmailGetResponseType = typeof GET.types.ResponseOutput;

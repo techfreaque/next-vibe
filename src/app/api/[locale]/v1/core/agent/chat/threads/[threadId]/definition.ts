@@ -22,6 +22,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { ThreadStatus, ThreadStatusOptions } from "../../enum";
+import { ModelId } from "../../model-access/models";
 
 /**
  * Get Thread by ID Endpoint (GET)
@@ -392,7 +393,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.threadId.patch.defaultModel.description" as const,
               layout: { columns: 6 },
             },
-            z.string().optional(),
+            z.nativeEnum(ModelId).nullable().optional(),
           ),
           defaultTone: requestDataField(
             {
@@ -404,7 +405,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.threadId.patch.defaultTone.description" as const,
               layout: { columns: 6 },
             },
-            z.string().optional(),
+            z.string().nullable().optional(),
           ),
           systemPrompt: requestDataField(
             {
@@ -852,5 +853,5 @@ export type ThreadDeleteUrlParamsTypeOutput =
   typeof DELETE.types.UrlVariablesOutput;
 
 const definitions = { GET, PATCH, DELETE };
-export { DELETE, GET, PATCH };
 export default definitions;
+export { DELETE, GET, PATCH };

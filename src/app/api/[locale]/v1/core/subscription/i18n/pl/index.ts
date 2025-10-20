@@ -194,6 +194,7 @@ export const translations: typeof enTranslations = {
   email: {
     success: {
       title: "Subskrypcja pomyślna!",
+      subject: "Witamy w Twojej subskrypcji!",
       previewText: "Witamy w nowej subskrypcji",
       welcomeMessage: "Witamy w subskrypcji!",
       description: "Dziękujemy za subskrypcję {{appName}}",
@@ -205,7 +206,25 @@ export const translations: typeof enTranslations = {
       support: {
         title: "Potrzebujesz pomocy?",
         description: "Nasz zespół wsparcia jest tutaj, aby Ci pomóc",
+        cta: "Skontaktuj się z pomocą techniczną",
       },
+      footer: {
+        message: "Dziękujemy za wybór nas!",
+        signoff: "Z poważaniem, Zespół",
+      },
+    },
+    admin_notification: {
+      title: "Nowa subskrypcja",
+      subject: "Nowa subskrypcja - Powiadomienie administratora",
+      preview: "Utworzono nową subskrypcję",
+      message: "Utworzono nową subskrypcję",
+      details: "Szczegóły subskrypcji",
+      user_name: "Nazwa użytkownika",
+      user_email: "E-mail użytkownika",
+      plan: "Plan",
+      status: "Status",
+      contact_user: "Skontaktuj się z użytkownikiem",
+      footer: "To jest automatyczne powiadomienie",
     },
   },
 

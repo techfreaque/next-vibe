@@ -13,7 +13,8 @@ export const translations = {
   // Shared cron-level translations
   nav: {
     stats: "Statistics",
-    stats_description: "View cron task execution statistics and performance metrics",
+    stats_description:
+      "View cron task execution statistics and performance metrics",
     tasks: "Tasks",
     tasks_description: "Manage and configure cron tasks",
     history: "History",
@@ -49,4 +50,4 @@ export const translations = {
       },
     },
   },
-} as const;
+};

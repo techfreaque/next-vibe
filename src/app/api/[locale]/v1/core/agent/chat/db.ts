@@ -19,7 +19,16 @@ import type { z } from "zod";
 
 import { users } from "@/app/api/[locale]/v1/core/user/db";
 
+import type { DefaultFolderId } from "./config";
 import { ChatMessageRoleDB, ThreadStatusDB } from "./enum";
+import type { ModelId } from "./model-access/models";
+import type { PersonaId } from "./personas/config";
+import {
+  type CustomPersona,
+  customPersonas,
+  customPersonasRelations,
+  type NewCustomPersona,
+} from "./personas/db";
 
 /**
  * Folder metadata structure
@@ -61,6 +70,12 @@ interface MessageMetadata {
     type: string;
     url: string;
   }[];
+  voterIds?: string[];
+  voteDetails?: Array<{
+    userId: string;
+    vote: "up" | "down";
+    timestamp: number;
+  }>;
 }
 
 /**
@@ -127,7 +142,7 @@ export const chatThreads = pgTable(
     title: text("title").notNull(),
 
     // Root folder (constant: private, shared, public, incognito)
-    rootFolderId: text("root_folder_id").notNull().default("private"),
+    rootFolderId: text("root_folder_id").$type<DefaultFolderId>().notNull(),
 
     // Subfolder (UUID reference to chat_folders table, can be null for root-level threads)
     folderId: uuid("folder_id").references(() => chatFolders.id, {
@@ -140,8 +155,8 @@ export const chatThreads = pgTable(
       .default(ThreadStatusDB[0]),
 
     // Settings
-    defaultModel: text("default_model"), // ModelId
-    defaultTone: text("default_tone"), // Persona/tone
+    defaultModel: text("default_model").$type<ModelId | null>(), // ModelId
+    defaultTone: text("default_tone").$type<PersonaId | null>(), // Persona/tone
     systemPrompt: text("system_prompt"),
 
     // Metadata
@@ -221,6 +236,10 @@ export const chatMessages = pgTable(
     tokens: integer("tokens"),
     collapsed: boolean("collapsed").default(false).notNull(),
     metadata: jsonb("metadata").$type<MessageMetadata>().default({}),
+
+    // Voting
+    upvotes: integer("upvotes").default(0).notNull(),
+    downvotes: integer("downvotes").default(0).notNull(),
 
     // Timestamps
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -315,3 +334,12 @@ export type NewChatThread = z.infer<typeof insertChatThreadSchema>;
 
 export type ChatMessage = z.infer<typeof selectChatMessageSchema>;
 export type NewChatMessage = z.infer<typeof insertChatMessageSchema>;
+
+/**
+ * Re-export custom personas table, relations and types
+ * Note: Relations are also defined in personas/db.ts but re-exported here
+ * for Drizzle's query API to work properly
+ */
+export { customPersonas };
+export { customPersonasRelations };
+export type { CustomPersona, NewCustomPersona };

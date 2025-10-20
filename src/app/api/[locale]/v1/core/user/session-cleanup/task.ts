@@ -50,13 +50,16 @@ export async function executeTask(
       validationResult,
     );
     return createErrorResponse(
-      "error.default",
+      "app.api.v1.core.user.session-cleanup.errors.default",
       ErrorResponseTypes.VALIDATION_ERROR,
     );
   }
 
   // Execute session cleanup with system user context
-  const systemUser: JWTPublicPayloadType = { isPublic: true };
+  const systemUser: JWTPublicPayloadType = {
+    isPublic: true,
+    leadId: "00000000-0000-0000-0000-000000000000", // System task lead ID
+  };
 
   return await sessionCleanupRepository.executeSessionCleanup(
     defaultConfig,
@@ -95,7 +98,7 @@ const sessionCleanupTask: Task = {
 
     if (!result.success) {
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.user.session-cleanup.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }

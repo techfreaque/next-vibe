@@ -54,12 +54,12 @@ function renderWelcomeEmailContent(
     <EmailTemplate
       t={t}
       locale={locale}
-      title={t("app.api.v1.core.user.auth.signup.email.title", {
-        appName: t("common.appName"),
+      title={t("app.api.v1.core.user.public.signup.email.title", {
+        appName: t("app.api.common.appName"),
         privateName: user.privateName,
       })}
-      previewText={t("app.api.v1.core.user.auth.signup.email.previewText", {
-        appName: t("common.appName"),
+      previewText={t("app.api.v1.core.user.public.signup.email.previewText", {
+        appName: t("app.api.common.appName"),
       })}
       tracking={tracking}
     >
@@ -71,8 +71,8 @@ function renderWelcomeEmailContent(
           marginBottom: "16px",
         }}
       >
-        {t("app.api.v1.core.user.auth.signup.email.welcomeMessage", {
-          appName: t("common.appName"),
+        {t("app.api.v1.core.user.public.signup.email.welcomeMessage", {
+          appName: t("app.api.common.appName"),
         })}
       </Text>
 
@@ -97,7 +97,7 @@ function renderWelcomeEmailContent(
             textAlign: "center",
           }}
         >
-          {t("app.api.v1.core.user.auth.signup.email.primaryAction.title")}
+          {t("app.api.v1.core.user.public.signup.email.primaryAction.title")}
         </Text>
         <Text
           style={{
@@ -109,7 +109,7 @@ function renderWelcomeEmailContent(
           }}
         >
           {t(
-            "app.api.v1.core.user.auth.signup.email.primaryAction.description",
+            "app.api.v1.core.user.public.signup.email.primaryAction.description",
           )}
         </Text>
 
@@ -124,22 +124,22 @@ function renderWelcomeEmailContent(
         >
           <li style={{ margin: "8px 0", paddingLeft: "0" }}>
             {t(
-              "app.api.v1.core.user.auth.signup.email.primaryAction.benefits.strategy",
+              "app.api.v1.core.user.public.signup.email.primaryAction.benefits.strategy",
             )}
           </li>
           <li style={{ margin: "8px 0", paddingLeft: "0" }}>
             {t(
-              "app.api.v1.core.user.auth.signup.email.primaryAction.benefits.setup",
+              "app.api.v1.core.user.public.signup.email.primaryAction.benefits.setup",
             )}
           </li>
           <li style={{ margin: "8px 0", paddingLeft: "0" }}>
             {t(
-              "app.api.v1.core.user.auth.signup.email.primaryAction.benefits.questions",
+              "app.api.v1.core.user.public.signup.email.primaryAction.benefits.questions",
             )}
           </li>
           <li style={{ margin: "8px 0", paddingLeft: "0" }}>
             {t(
-              "app.api.v1.core.user.auth.signup.email.primaryAction.benefits.flexible",
+              "app.api.v1.core.user.public.signup.email.primaryAction.benefits.flexible",
             )}
           </li>
         </ul>
@@ -158,7 +158,7 @@ function renderWelcomeEmailContent(
               boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
             }}
           >
-            {t("app.api.v1.core.user.auth.signup.email.primaryAction.cta")}
+            {t("app.api.v1.core.user.public.signup.email.primaryAction.cta")}
           </Button>
         </div>
 
@@ -171,10 +171,13 @@ function renderWelcomeEmailContent(
             fontWeight: "600",
           }}
         >
-          {t("app.api.v1.core.user.auth.signup.email.primaryAction.timeframe", {
-            minDuration: CONSULTATION_DURATION.minDurationMinutes,
-            maxDuration: CONSULTATION_DURATION.maxDurationMinutes,
-          })}
+          {t(
+            "app.api.v1.core.user.public.signup.email.primaryAction.timeframe",
+            {
+              minDuration: CONSULTATION_DURATION.minDurationMinutes,
+              maxDuration: CONSULTATION_DURATION.maxDurationMinutes,
+            },
+          )}
         </Text>
       </Section>
 
@@ -197,7 +200,7 @@ function renderWelcomeEmailContent(
             marginBottom: "12px",
           }}
         >
-          {t("app.api.v1.core.user.auth.signup.email.firstStep.title")}
+          {t("app.api.v1.core.user.public.signup.email.firstStep.title")}
         </Text>
         <Text
           style={{
@@ -207,7 +210,7 @@ function renderWelcomeEmailContent(
             marginBottom: "16px",
           }}
         >
-          {t("app.api.v1.core.user.auth.signup.email.firstStep.description")}
+          {t("app.api.v1.core.user.public.signup.email.firstStep.description")}
         </Text>
         <Text
           style={{
@@ -222,7 +225,7 @@ function renderWelcomeEmailContent(
             border: "1px solid #dbeafe",
           }}
         >
-          {t("app.api.v1.core.user.auth.signup.email.firstStep.note")}
+          {t("app.api.v1.core.user.public.signup.email.firstStep.note")}
         </Text>
         <Text
           style={{
@@ -233,7 +236,7 @@ function renderWelcomeEmailContent(
             fontStyle: "italic",
           }}
         >
-          {t("app.api.v1.core.user.auth.signup.email.firstStep.timeframe", {
+          {t("app.api.v1.core.user.public.signup.email.firstStep.timeframe", {
             minutes: BUSINESS_FORM_TIME.completionTimeMinutes,
           })}
         </Text>
@@ -250,7 +253,7 @@ function renderWelcomeEmailContent(
             fontWeight: "600",
           }}
         >
-          {t("app.api.v1.core.user.auth.signup.email.firstStep.cta")}
+          {t("app.api.v1.core.user.public.signup.email.firstStep.cta")}
         </Button>
       </Section>
 
@@ -265,7 +268,7 @@ function renderWelcomeEmailContent(
           marginTop: "24px",
         }}
       >
-        {t("app.api.v1.core.user.auth.signup.email.ourService.title")}
+        {t("app.api.v1.core.user.public.signup.email.ourService.title")}
       </Text>
 
       <Text
@@ -276,7 +279,7 @@ function renderWelcomeEmailContent(
           marginBottom: "16px",
         }}
       >
-        {t("app.api.v1.core.user.auth.signup.email.ourService.description")}
+        {t("app.api.v1.core.user.public.signup.email.ourService.description")}
       </Text>
 
       <ul
@@ -287,21 +290,23 @@ function renderWelcomeEmailContent(
         }}
       >
         <li style={{ margin: "8px 0" }}>
-          {t("app.api.v1.core.user.auth.signup.email.ourService.customContent")}
-        </li>
-        <li style={{ margin: "8px 0" }}>
           {t(
-            "app.api.v1.core.user.auth.signup.email.ourService.strategicPlanning",
+            "app.api.v1.core.user.public.signup.email.ourService.customContent",
           )}
         </li>
         <li style={{ margin: "8px 0" }}>
           {t(
-            "app.api.v1.core.user.auth.signup.email.ourService.monthlyApproval",
+            "app.api.v1.core.user.public.signup.email.ourService.strategicPlanning",
           )}
         </li>
         <li style={{ margin: "8px 0" }}>
           {t(
-            "app.api.v1.core.user.auth.signup.email.ourService.professionalManagement",
+            "app.api.v1.core.user.public.signup.email.ourService.monthlyApproval",
+          )}
+        </li>
+        <li style={{ margin: "8px 0" }}>
+          {t(
+            "app.api.v1.core.user.public.signup.email.ourService.professionalManagement",
           )}
         </li>
       </ul>
@@ -317,7 +322,7 @@ function renderWelcomeEmailContent(
           marginTop: "24px",
         }}
       >
-        {t("app.api.v1.core.user.auth.signup.email.afterProfile.title")}
+        {t("app.api.v1.core.user.public.signup.email.afterProfile.title")}
       </Text>
 
       <Text
@@ -328,7 +333,7 @@ function renderWelcomeEmailContent(
           marginBottom: "24px",
         }}
       >
-        {t("app.api.v1.core.user.auth.signup.email.afterProfile.description")}
+        {t("app.api.v1.core.user.public.signup.email.afterProfile.description")}
       </Text>
 
       {/* Pricing Option */}
@@ -351,7 +356,7 @@ function renderWelcomeEmailContent(
           }}
         >
           {t(
-            "app.api.v1.core.user.auth.signup.email.afterProfile.payment.title",
+            "app.api.v1.core.user.public.signup.email.afterProfile.payment.title",
           )}
         </Text>
         <Text
@@ -363,7 +368,7 @@ function renderWelcomeEmailContent(
           }}
         >
           {t(
-            "app.api.v1.core.user.auth.signup.email.afterProfile.payment.description",
+            "app.api.v1.core.user.public.signup.email.afterProfile.payment.description",
           )}
         </Text>
         <ul
@@ -375,17 +380,17 @@ function renderWelcomeEmailContent(
         >
           <li style={{ margin: "8px 0" }}>
             {t(
-              "app.api.v1.core.user.auth.signup.email.afterProfile.payment.benefits.immediate",
+              "app.api.v1.core.user.public.signup.email.afterProfile.payment.benefits.immediate",
             )}
           </li>
           <li style={{ margin: "8px 0" }}>
             {t(
-              "app.api.v1.core.user.auth.signup.email.afterProfile.payment.benefits.strategy",
+              "app.api.v1.core.user.public.signup.email.afterProfile.payment.benefits.strategy",
             )}
           </li>
           <li style={{ margin: "8px 0" }}>
             {t(
-              "app.api.v1.core.user.auth.signup.email.afterProfile.payment.benefits.analytics",
+              "app.api.v1.core.user.public.signup.email.afterProfile.payment.benefits.analytics",
             )}
           </li>
         </ul>
@@ -405,7 +410,7 @@ function renderWelcomeEmailContent(
             }}
           >
             {t(
-              "app.api.v1.core.user.auth.signup.email.afterProfile.payment.cta",
+              "app.api.v1.core.user.public.signup.email.afterProfile.payment.cta",
             )}
           </Button>
         </Section>
@@ -419,7 +424,7 @@ function renderWelcomeEmailContent(
           }}
         >
           {t(
-            "app.api.v1.core.user.auth.signup.email.afterProfile.payment.timeframe",
+            "app.api.v1.core.user.public.signup.email.afterProfile.payment.timeframe",
           )}
         </Text>
       </Section>
@@ -434,7 +439,7 @@ function renderWelcomeEmailContent(
           fontStyle: "italic",
         }}
       >
-        {t("app.api.v1.core.user.auth.signup.email.afterProfile.flexibility")}
+        {t("app.api.v1.core.user.public.signup.email.afterProfile.flexibility")}
       </Text>
 
       {/* Support section */}
@@ -456,7 +461,7 @@ function renderWelcomeEmailContent(
             marginBottom: "12px",
           }}
         >
-          {t("app.api.v1.core.user.auth.signup.email.needHelp")}
+          {t("app.api.v1.core.user.public.signup.email.needHelp")}
         </Text>
         <Text
           style={{
@@ -466,7 +471,7 @@ function renderWelcomeEmailContent(
             marginBottom: "16px",
           }}
         >
-          {t("app.api.v1.core.user.auth.signup.email.supportMessage")}
+          {t("app.api.v1.core.user.public.signup.email.supportMessage")}
         </Text>
         <Button
           href={`${baseUrl}/${locale}/help`}
@@ -482,7 +487,7 @@ function renderWelcomeEmailContent(
             display: "inline-block",
           }}
         >
-          {t("app.api.v1.core.user.auth.signup.email.contactSupport")}
+          {t("app.api.v1.core.user.public.signup.email.contactSupport")}
         </Button>
       </Section>
 
@@ -497,7 +502,7 @@ function renderWelcomeEmailContent(
           textAlign: "center",
         }}
       >
-        {t("app.api.v1.core.user.auth.signup.email.excited")}
+        {t("app.api.v1.core.user.public.signup.email.excited")}
       </Text>
 
       <Text
@@ -509,8 +514,8 @@ function renderWelcomeEmailContent(
           whiteSpace: "pre-line",
         }}
       >
-        {t("app.api.v1.core.user.auth.signup.email.signoff", {
-          appName: t("common.appName"),
+        {t("app.api.v1.core.user.public.signup.email.signoff", {
+          appName: t("app.api.common.appName"),
         })}
       </Text>
     </EmailTemplate>
@@ -530,7 +535,7 @@ export const renderRegisterMail: EmailFunctionType<
   );
   if (!userResponse.success) {
     return createErrorResponse(
-      "user.errors.user_not_found",
+      "app.api.v1.core.user.errors.not_found",
       ErrorResponseTypes.NOT_FOUND,
       { email: requestData.personalInfo.email },
     );
@@ -540,8 +545,8 @@ export const renderRegisterMail: EmailFunctionType<
   return createSuccessResponse({
     toEmail: user.email,
     toName: user.privateName,
-    subject: t("app.api.v1.core.user.auth.signup.email.subject", {
-      appName: t("common.appName"),
+    subject: t("app.api.v1.core.user.public.signup.email.subject", {
+      appName: t("app.api.common.appName"),
     }),
     jsx: renderWelcomeEmailContent(
       t,
@@ -581,11 +586,11 @@ function renderAdminNotificationEmailContent(
     <EmailTemplate
       t={t}
       locale={locale}
-      title={t("app.api.v1.core.user.auth.signup.admin_notification.title")}
+      title={t("app.api.v1.core.user.public.signup.admin_notification.title")}
       previewText={t(
-        "app.api.v1.core.user.auth.signup.admin_notification.preview",
+        "app.api.v1.core.user.public.signup.admin_notification.preview",
         {
-          appName: t("common.appName"),
+          appName: t("app.api.common.appName"),
         },
       )}
       tracking={tracking}
@@ -600,7 +605,7 @@ function renderAdminNotificationEmailContent(
           fontWeight: "600",
         }}
       >
-        {t("app.api.v1.core.user.auth.signup.admin_notification.title")}
+        {t("app.api.v1.core.user.public.signup.admin_notification.title")}
       </Text>
 
       <Text
@@ -611,8 +616,8 @@ function renderAdminNotificationEmailContent(
           marginBottom: "24px",
         }}
       >
-        {t("app.api.v1.core.user.auth.signup.admin_notification.message", {
-          appName: t("common.appName"),
+        {t("app.api.v1.core.user.public.signup.admin_notification.message", {
+          appName: t("app.api.common.appName"),
         })}
       </Text>
 
@@ -638,7 +643,7 @@ function renderAdminNotificationEmailContent(
           }}
         >
           {t(
-            "app.api.v1.core.user.auth.signup.admin_notification.user_details",
+            "app.api.v1.core.user.public.signup.admin_notification.user_details",
           )}
         </Text>
 
@@ -653,7 +658,7 @@ function renderAdminNotificationEmailContent(
             }}
           >
             {t(
-              "app.api.v1.core.user.auth.signup.admin_notification.basic_information",
+              "app.api.v1.core.user.public.signup.admin_notification.basic_information",
             )}
           </Text>
 
@@ -701,7 +706,9 @@ function renderAdminNotificationEmailContent(
               }}
             >
               <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                {t("app.api.v1.core.user.auth.signup.admin_notification.email")}
+                {t(
+                  "app.api.v1.core.user.public.signup.admin_notification.email",
+                )}
                 :
               </Text>{" "}
               <a
@@ -741,7 +748,7 @@ function renderAdminNotificationEmailContent(
               >
                 <Text style={{ fontWeight: "700", color: "#1f2937" }}>
                   {t(
-                    "app.api.v1.core.user.auth.signup.admin_notification.signup_type",
+                    "app.api.v1.core.user.public.signup.admin_notification.signup_type",
                   )}
                   :
                 </Text>{" "}
@@ -764,10 +771,10 @@ function renderAdminNotificationEmailContent(
                 >
                   {requestData.signupType.includes(SignupType.MEETING)
                     ? t(
-                        "app.api.v1.core.user.auth.signup.admin_notification.consultation_first",
+                        "app.api.v1.core.user.public.signup.admin_notification.consultation_first",
                       )
                     : t(
-                        "app.api.v1.core.user.auth.signup.admin_notification.direct_signup",
+                        "app.api.v1.core.user.public.signup.admin_notification.direct_signup",
                       )}
                 </span>
               </Text>
@@ -784,7 +791,7 @@ function renderAdminNotificationEmailContent(
               >
                 <Text style={{ fontWeight: "700", color: "#1f2937" }}>
                   {t(
-                    "app.api.v1.core.user.auth.signup.admin_notification.newsletter",
+                    "app.api.v1.core.user.public.signup.admin_notification.newsletter",
                   )}
                   :
                 </Text>{" "}
@@ -804,10 +811,10 @@ function renderAdminNotificationEmailContent(
                 >
                   {requestData.subscribeToNewsletter
                     ? t(
-                        "app.api.v1.core.user.auth.signup.admin_notification.subscribed",
+                        "app.api.v1.core.user.public.signup.admin_notification.subscribed",
                       )
                     : t(
-                        "app.api.v1.core.user.auth.signup.admin_notification.not_subscribed",
+                        "app.api.v1.core.user.public.signup.admin_notification.not_subscribed",
                       )}
                 </span>
               </Text>
@@ -826,7 +833,7 @@ function renderAdminNotificationEmailContent(
             }}
           >
             {t(
-              "app.api.v1.core.user.auth.signup.admin_notification.signup_details",
+              "app.api.v1.core.user.public.signup.admin_notification.signup_details",
             )}
           </Text>
 
@@ -841,7 +848,7 @@ function renderAdminNotificationEmailContent(
             >
               <Text style={{ fontWeight: "700", color: "#1f2937" }}>
                 {t(
-                  "app.api.v1.core.user.auth.signup.admin_notification.signup_date",
+                  "app.api.v1.core.user.public.signup.admin_notification.signup_date",
                 )}
                 :
               </Text>{" "}
@@ -865,7 +872,7 @@ function renderAdminNotificationEmailContent(
             >
               <Text style={{ fontWeight: "700", color: "#1f2937" }}>
                 {t(
-                  "app.api.v1.core.user.auth.signup.admin_notification.user_id",
+                  "app.api.v1.core.user.public.signup.admin_notification.user_id",
                 )}
                 :
               </Text>{" "}
@@ -908,7 +915,7 @@ function renderAdminNotificationEmailContent(
           }}
         >
           {t(
-            "app.api.v1.core.user.auth.signup.admin_notification.recommended_next_steps",
+            "app.api.v1.core.user.public.signup.admin_notification.recommended_next_steps",
           )}
         </Text>
 
@@ -923,10 +930,10 @@ function renderAdminNotificationEmailContent(
         >
           {requestData.signupType.includes(SignupType.MEETING)
             ? t(
-                "app.api.v1.core.user.auth.signup.admin_notification.consultation_recommendation",
+                "app.api.v1.core.user.public.signup.admin_notification.consultation_recommendation",
               )
             : t(
-                "app.api.v1.core.user.auth.signup.admin_notification.direct_recommendation",
+                "app.api.v1.core.user.public.signup.admin_notification.direct_recommendation",
               )}
         </Text>
       </Section>
@@ -934,7 +941,7 @@ function renderAdminNotificationEmailContent(
       {/* Action Buttons */}
       <Section style={{ textAlign: "center", marginBottom: "32px" }}>
         <Button
-          href={`mailto:${user.email}?subject=Welcome to ${t("common.appName")} - Let's get started!`}
+          href={`mailto:${user.email}?subject=Welcome to ${t("app.api.common.appName")} - Let's get started!`}
           style={{
             backgroundColor: "#3b82f6",
             borderRadius: "8px",
@@ -947,7 +954,7 @@ function renderAdminNotificationEmailContent(
           }}
         >
           {t(
-            "app.api.v1.core.user.auth.signup.admin_notification.contact_user",
+            "app.api.v1.core.user.public.signup.admin_notification.contact_user",
           )}
         </Button>
       </Section>
@@ -964,8 +971,8 @@ function renderAdminNotificationEmailContent(
           paddingTop: "16px",
         }}
       >
-        {t("app.api.v1.core.user.auth.signup.admin_notification.footer", {
-          appName: t("common.appName"),
+        {t("app.api.v1.core.user.public.signup.admin_notification.footer", {
+          appName: t("app.api.common.appName"),
         })}
       </Text>
     </EmailTemplate>
@@ -988,7 +995,7 @@ export const renderAdminSignupNotification: EmailFunctionType<
   );
   if (!userResponse.success) {
     return createErrorResponse(
-      "user.errors.user_not_found",
+      "app.api.v1.core.user.errors.not_found",
       ErrorResponseTypes.NOT_FOUND,
       { email: requestData.personalInfo.email },
     );
@@ -997,10 +1004,13 @@ export const renderAdminSignupNotification: EmailFunctionType<
 
   return createSuccessResponse({
     toEmail: contactClientRepository.getSupportEmail(locale),
-    toName: t("common.appName"),
-    subject: t("app.api.v1.core.user.auth.signup.admin_notification.subject", {
-      userName: user.privateName,
-    }),
+    toName: t("app.api.common.appName"),
+    subject: t(
+      "app.api.v1.core.user.public.signup.admin_notification.subject",
+      {
+        userName: user.privateName,
+      },
+    ),
     jsx: renderAdminNotificationEmailContent(t, locale, user, {
       signupType: [requestData.preferences.signupType],
       subscribeToNewsletter: requestData.consent?.subscribeToNewsletter,

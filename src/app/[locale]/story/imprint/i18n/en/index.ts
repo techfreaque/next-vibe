@@ -1,4 +1,6 @@
 export const translations = {
+  printAriaLabel: "Print imprint",
+  printButton: "Print",
   post: {
     title: "Imprint",
     description: "Imprint endpoint",

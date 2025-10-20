@@ -100,7 +100,10 @@ export function ImapAdminLayoutClient({
 
             {/* Sub Navigation Tabs */}
             <div className="border-b border-gray-200 dark:border-gray-700">
-              <nav className="flex space-x-8" aria-label={t("app.admin.emails.imap.title")}>
+              <nav
+                className="flex space-x-8"
+                aria-label={t("app.admin.emails.imap.title")}
+              >
                 {subNavigationItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = currentSubSection?.key === item.key;

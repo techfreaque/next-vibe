@@ -2,15 +2,46 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   post: {
-    title: "Tytuł",
-    description: "Opis endpointu",
-    form: {
-      title: "Konfiguracja",
-      description: "Skonfiguruj parametry",
+    title: "Przywróć kopię zapasową tłumaczeń",
+    description: "Przywróć pliki tłumaczeń z kopii zapasowej",
+    container: {
+      title: "Przywróć kopię zapasową",
+      description: "Przywróć pliki tłumaczeń z określonej kopii zapasowej",
+    },
+    fields: {
+      backupPath: {
+        title: "Ścieżka kopii zapasowej",
+        description:
+          "Ścieżka do katalogu kopii zapasowej, z którego ma zostać przywrócona",
+      },
+      validateOnly: {
+        title: "Tylko walidacja",
+        description: "Tylko zwaliduj kopię zapasową bez przywracania",
+      },
+      createBackupBeforeRestore: {
+        title: "Utwórz kopię zapasową przed przywróceniem",
+        description:
+          "Utwórz kopię zapasową bieżącego stanu przed przywróceniem",
+      },
+    },
+    messages: {
+      validationSuccessful:
+        "Walidacja kopii zapasowej zakończona pomyślnie - kopia zapasowa jest prawidłowa i może zostać przywrócona",
+      restoreSuccessful: "Kopia zapasowa przywrócona pomyślnie",
+      backupNotFound: "Nie znaleziono kopii zapasowej w określonej ścieżce",
     },
     response: {
-      title: "Odpowiedź",
-      description: "Dane odpowiedzi",
+      title: "Wynik przywracania",
+      description: "Wyniki przywracania kopii zapasowej",
+      message: "Komunikat przywracania",
+      backupInfo: {
+        title: "Informacje o kopii zapasowej",
+        description: "Informacje o przywróconej kopii zapasowej",
+        backupPath: "Ścieżka kopii zapasowej",
+        backupDate: "Data kopii zapasowej",
+        filesRestored: "Przywrócone pliki",
+        newBackupCreated: "Utworzono nową kopię zapasową",
+      },
     },
     errors: {
       unauthorized: {
@@ -19,7 +50,7 @@ export const translations: typeof enTranslations = {
       },
       validation: {
         title: "Błąd walidacji",
-        description: "Nieprawidłowe parametry żądania",
+        description: "Nieprawidłowa ścieżka kopii zapasowej lub parametry",
       },
       server: {
         title: "Błąd serwera",
@@ -38,17 +69,17 @@ export const translations: typeof enTranslations = {
         description: "Dostęp zabroniony",
       },
       notFound: {
-        title: "Nie znaleziono",
-        description: "Zasób nie został znaleziony",
+        title: "Nie znaleziono kopii zapasowej",
+        description: "Określona kopia zapasowa nie istnieje",
       },
       conflict: {
         title: "Konflikt",
-        description: "Wystąpił konflikt danych",
+        description: "Wystąpił konflikt podczas przywracania kopii zapasowej",
       },
     },
     success: {
-      title: "Sukces",
-      description: "Operacja zakończona pomyślnie",
+      title: "Kopia zapasowa przywrócona",
+      description: "Kopia zapasowa tłumaczeń przywrócona pomyślnie",
     },
   },
 };

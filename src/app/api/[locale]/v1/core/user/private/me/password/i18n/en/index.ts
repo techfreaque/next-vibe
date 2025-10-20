@@ -2,13 +2,6 @@ export const translations = {
   title: "Change Password",
   description: "Update your account password securely",
   tag: "password-change",
-  errors: {
-    passwords_do_not_match: "Passwords do not match",
-    user_not_found: "User not found",
-    incorrect_password: "Incorrect password",
-    update_failed: "Failed to update password",
-    token_creation_failed: "Failed to create password token",
-  },
   debug: {
     errorUpdatingPassword: "Error updating password",
     errorSettingPassword: "Error setting password",
@@ -66,6 +59,11 @@ export const translations = {
     },
   },
   errors: {
+    passwords_do_not_match: "Passwords do not match",
+    user_not_found: "User not found",
+    incorrect_password: "Incorrect password",
+    update_failed: "Failed to update password",
+    token_creation_failed: "Failed to create password token",
     invalid_request: {
       title: "Invalid Request",
       description: "The password change request is invalid",

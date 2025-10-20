@@ -265,7 +265,9 @@ export function CreateSmtpAccountForm({
               {/* Selection Criteria */}
               <FormFieldGroup
                 title={"app.admin.emails.smtp.admin.form.selectionCriteria"}
-                description={"app.admin.emails.smtp.admin.form.selectionCriteriaDescription"}
+                description={
+                  "app.admin.emails.smtp.admin.form.selectionCriteriaDescription"
+                }
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <EndpointFormField
@@ -273,7 +275,8 @@ export function CreateSmtpAccountForm({
                     config={{
                       type: "multiselect",
                       label: "app.admin.emails.smtp.admin.fields.campaignTypes",
-                      placeholder: "app.admin.emails.smtp.admin.fields.campaignTypesPlaceholder",
+                      placeholder:
+                        "app.admin.emails.smtp.admin.fields.campaignTypesPlaceholder",
                       options: campaignTypeOptions,
                       maxSelections: 5,
                       searchable: true,
@@ -290,7 +293,8 @@ export function CreateSmtpAccountForm({
                     name="emailJourneyVariants"
                     config={{
                       type: "multiselect",
-                      label: "app.admin.emails.smtp.admin.fields.emailJourneyVariants",
+                      label:
+                        "app.admin.emails.smtp.admin.fields.emailJourneyVariants",
                       placeholder:
                         "app.admin.emails.smtp.admin.fields.emailJourneyVariantsPlaceholder",
                       options: emailJourneyVariantOptions,
@@ -309,7 +313,8 @@ export function CreateSmtpAccountForm({
                     name="emailCampaignStages"
                     config={{
                       type: "multiselect",
-                      label: "app.admin.emails.smtp.admin.fields.emailCampaignStages",
+                      label:
+                        "app.admin.emails.smtp.admin.fields.emailCampaignStages",
                       placeholder:
                         "app.admin.emails.smtp.admin.fields.emailCampaignStagesPlaceholder",
                       options: emailCampaignStageOptions,
@@ -329,7 +334,8 @@ export function CreateSmtpAccountForm({
                     config={{
                       type: "multiselect",
                       label: "app.admin.emails.smtp.admin.fields.countries",
-                      placeholder: "app.admin.emails.smtp.admin.fields.countriesPlaceholder",
+                      placeholder:
+                        "app.admin.emails.smtp.admin.fields.countriesPlaceholder",
                       options: countryOptions,
                       maxSelections: 3,
                       searchable: true,
@@ -347,7 +353,8 @@ export function CreateSmtpAccountForm({
                     config={{
                       type: "multiselect",
                       label: "app.admin.emails.smtp.admin.fields.languages",
-                      placeholder: "app.admin.emails.smtp.admin.fields.languagesPlaceholder",
+                      placeholder:
+                        "app.admin.emails.smtp.admin.fields.languagesPlaceholder",
                       options: languageOptions,
                       maxSelections: 3,
                       searchable: true,
@@ -600,7 +607,8 @@ export function CreateSmtpAccountForm({
                       name="weight"
                       config={{
                         type: "number",
-                        label: "app.admin.emails.smtp.admin.fields.weight" as const,
+                        label:
+                          "app.admin.emails.smtp.admin.fields.weight" as const,
                         placeholder:
                           "app.admin.emails.smtp.admin.fields.weightPlaceholder" as const,
                         min: 1,
@@ -618,7 +626,8 @@ export function CreateSmtpAccountForm({
                       name="failoverPriority"
                       config={{
                         type: "number",
-                        label: "app.admin.emails.smtp.admin.fields.failoverPriority" as const,
+                        label:
+                          "app.admin.emails.smtp.admin.fields.failoverPriority" as const,
                         placeholder:
                           "app.admin.emails.smtp.admin.fields.failoverPriorityPlaceholder" as const,
                         min: 0,
@@ -638,7 +647,8 @@ export function CreateSmtpAccountForm({
                       name="isExactMatch"
                       config={{
                         type: "switch",
-                        label: "app.admin.emails.smtp.admin.fields.isExactMatch" as const,
+                        label:
+                          "app.admin.emails.smtp.admin.fields.isExactMatch" as const,
                         description:
                           "app.admin.emails.smtp.admin.fields.isExactMatchDescription" as const,
                       }}
@@ -654,7 +664,8 @@ export function CreateSmtpAccountForm({
                       name="isFailover"
                       config={{
                         type: "switch",
-                        label: "app.admin.emails.smtp.admin.fields.isFailover" as const,
+                        label:
+                          "app.admin.emails.smtp.admin.fields.isFailover" as const,
                         description:
                           "app.admin.emails.smtp.admin.fields.isFailoverDescription" as const,
                       }}

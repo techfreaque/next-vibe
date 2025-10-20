@@ -20,7 +20,8 @@ function getImapSeedConfig(): NewImapAccount {
   // Required account-specific environment variables
   const name = env.IMAP_SEED_ACCOUNT_NAME || "Development IMAP Account";
   const email = env.IMAP_SEED_EMAIL || "test@example.com";
-  const host = env.IMAP_SEED_HOST || "app.api.v1.core.emails.imapClient.imap.gmail.com";
+  const host =
+    env.IMAP_SEED_HOST || "app.api.v1.core.emails.imapClient.imap.gmail.com";
   const username = env.IMAP_SEED_USERNAME || "";
   const password = env.IMAP_SEED_PASSWORD || "";
   const port = env.IMAP_SEED_PORT || 993;
@@ -40,7 +41,6 @@ function getImapSeedConfig(): NewImapAccount {
   ];
 
   return {
-    id: crypto.randomUUID(),
     name,
     email: email.toLowerCase().trim(),
     host: host.trim(),

@@ -86,6 +86,10 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Datenkonflikt aufgetreten",
       },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Netzwerkfehler aufgetreten",
+      },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",
         description: "Sie haben nicht gespeicherte Änderungen",
@@ -102,6 +106,81 @@ export const translations: typeof enTranslations = {
     form: {
       title: "Klick-Tracking-Parameter",
       description: "Parameter für Klick-Tracking und Weiterleitung",
+    },
+    id: {
+      label: "Lead-ID",
+      description: "Eindeutige Kennung für den Lead",
+      placeholder: "Lead-ID eingeben",
+      helpText: "Die eindeutige Kennung des Leads",
+    },
+    stage: {
+      label: "Kampagnenstufe",
+      description: "Aktuelle Stufe in der Kampagne",
+      placeholder: "Stufe auswählen",
+      helpText: "Die aktuelle Stufe des Leads in der Kampagne",
+    },
+    source: {
+      label: "Quelle",
+      description: "Quelle des Klicks",
+      placeholder: "Quelle eingeben",
+      helpText: "Die Quelle, von der der Klick kam",
+    },
+    url: {
+      label: "Ziel-URL",
+      description: "URL, zu der weitergeleitet werden soll",
+      placeholder: "https://example.com",
+      helpText: "Die URL, zu der der Lead weitergeleitet wird",
+    },
+    response: {
+      success: "Erfolg",
+      redirectUrl: "Weiterleitungs-URL",
+      leadId: "Lead-ID",
+      campaignId: "Kampagnen-ID",
+      engagementRecorded: "Engagement erfasst",
+      leadStatusUpdated: "Lead-Status aktualisiert",
+      isLoggedIn: "Ist angemeldet",
+    },
+    errors: {
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Authentifizierung erforderlich",
+      },
+      validation: {
+        title: "Validierungsfehler",
+        description: "Ungültige Anfrageparameter",
+      },
+      server: {
+        title: "Serverfehler",
+        description: "Interner Serverfehler",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unbekannter Fehler ist aufgetreten",
+      },
+      forbidden: {
+        title: "Verboten",
+        description: "Zugriff verboten",
+      },
+      notFound: {
+        title: "Nicht gefunden",
+        description: "Ressource nicht gefunden",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Datenkonflikt aufgetreten",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Netzwerkfehler aufgetreten",
+      },
+      unsavedChanges: {
+        title: "Nicht gespeicherte Änderungen",
+        description: "Sie haben nicht gespeicherte Änderungen",
+      },
+    },
+    success: {
+      title: "Klick erfasst",
+      description: "Lead-Klick erfolgreich erfasst und weitergeleitet",
     },
   },
   enums: {

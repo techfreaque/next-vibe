@@ -33,8 +33,9 @@ const { POST } = createEndpoint({
   path: ["v1", "core", "system", "translations", "restore-backup"],
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
 
-  title: "app.api.v1.core.system.translations.restoreBackup.title",
-  description: "app.api.v1.core.system.translations.restoreBackup.description",
+  title: "app.api.v1.core.system.translations.restoreBackup.post.title",
+  description:
+    "app.api.v1.core.system.translations.restoreBackup.post.description",
   category: "app.api.v1.core.system.translations.category",
   tags: [
     "app.api.v1.core.system.translations.tags.backup",
@@ -52,9 +53,9 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title:
-        "app.api.v1.core.system.translations.restoreBackup.container.title" as const,
+        "app.api.v1.core.system.translations.restoreBackup.post.container.title" as const,
       description:
-        "app.api.v1.core.system.translations.restoreBackup.container.description" as const,
+        "app.api.v1.core.system.translations.restoreBackup.post.container.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -65,9 +66,9 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.translations.restoreBackup.fields.backupPath.title" as const,
+            "app.api.v1.core.system.translations.restoreBackup.post.fields.backupPath.title" as const,
           description:
-            "app.api.v1.core.system.translations.restoreBackup.fields.backupPath.description" as const,
+            "app.api.v1.core.system.translations.restoreBackup.post.fields.backupPath.description" as const,
           layout: { columns: 12 },
           required: true,
         },
@@ -79,9 +80,9 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.translations.restoreBackup.fields.validateOnly.title" as const,
+            "app.api.v1.core.system.translations.restoreBackup.post.fields.validateOnly.title" as const,
           description:
-            "app.api.v1.core.system.translations.restoreBackup.fields.validateOnly.description" as const,
+            "app.api.v1.core.system.translations.restoreBackup.post.fields.validateOnly.description" as const,
           layout: { columns: 6 },
         },
         z.boolean().default(false),
@@ -92,9 +93,9 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.translations.restoreBackup.fields.createBackupBeforeRestore.title" as const,
+            "app.api.v1.core.system.translations.restoreBackup.post.fields.createBackupBeforeRestore.title" as const,
           description:
-            "app.api.v1.core.system.translations.restoreBackup.fields.createBackupBeforeRestore.description" as const,
+            "app.api.v1.core.system.translations.restoreBackup.post.fields.createBackupBeforeRestore.description" as const,
           layout: { columns: 6 },
         },
         z.boolean().default(true),
@@ -105,7 +106,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.translations.restoreBackup.success.description",
+            "app.api.v1.core.system.translations.restoreBackup.post.success.description",
         },
         z.boolean(),
       ),
@@ -114,7 +115,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.translations.restoreBackup.response.message",
+            "app.api.v1.core.system.translations.restoreBackup.post.response.message",
         },
         z.string(),
       ),
@@ -123,9 +124,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.STATS_GRID,
           title:
-            "app.api.v1.core.system.translations.restoreBackup.response.backupInfo.title",
+            "app.api.v1.core.system.translations.restoreBackup.post.response.backupInfo.title",
           description:
-            "app.api.v1.core.system.translations.restoreBackup.response.backupInfo.description",
+            "app.api.v1.core.system.translations.restoreBackup.post.response.backupInfo.description",
           layout: { type: LayoutType.GRID, columns: 12 },
         },
         { response: true },
@@ -134,7 +135,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.system.translations.restoreBackup.response.backupInfo.backupPath",
+                "app.api.v1.core.system.translations.restoreBackup.post.response.backupInfo.backupPath",
             },
             z.string(),
           ),
@@ -142,7 +143,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.system.translations.restoreBackup.response.backupInfo.backupDate",
+                "app.api.v1.core.system.translations.restoreBackup.post.response.backupInfo.backupDate",
             },
             z.string().datetime(),
           ),
@@ -150,7 +151,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.system.translations.restoreBackup.response.backupInfo.filesRestored",
+                "app.api.v1.core.system.translations.restoreBackup.post.response.backupInfo.filesRestored",
             },
             z.number(),
           ),
@@ -158,7 +159,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.system.translations.restoreBackup.response.backupInfo.newBackupCreated",
+                "app.api.v1.core.system.translations.restoreBackup.post.response.backupInfo.newBackupCreated",
             },
             z.string().optional(),
           ),
@@ -171,59 +172,66 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.system.translations.restoreBackup.errors.validation.title",
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.validation.title",
       description:
-        "app.api.v1.core.system.translations.restoreBackup.errors.validation.description",
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.system.translations.restoreBackup.errors.notFound.title",
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.notFound.title",
       description:
-        "app.api.v1.core.system.translations.restoreBackup.errors.notFound.description",
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.system.translations.restoreBackup.errors.unauthorized.title",
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.translations.restoreBackup.errors.unauthorized.description",
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.system.translations.restoreBackup.errors.forbidden.title",
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.translations.restoreBackup.errors.forbidden.description",
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.translations.restoreBackup.errors.server.title",
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.server.title",
       description:
-        "app.api.v1.core.system.translations.restoreBackup.errors.server.description",
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.server.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.system.translations.restoreBackup.errors.conflict.title",
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.conflict.title",
       description:
-        "app.api.v1.core.system.translations.restoreBackup.errors.conflict.description",
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "error.errorTypes.http_error",
-      description: "error.errorTypes.http_error",
+      title:
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.network.title",
+      description:
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "error.errorTypes.internal_error",
-      description: "error.errorTypes.internal_error",
+      title:
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.unknown.title",
+      description:
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "error.errorTypes.validation_error",
-      description: "error.errorTypes.validation_error",
+      title:
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.validation.title",
+      description:
+        "app.api.v1.core.system.translations.restoreBackup.post.errors.validation.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.system.translations.restoreBackup.success.title",
+    title:
+      "app.api.v1.core.system.translations.restoreBackup.post.success.title",
     description:
-      "app.api.v1.core.system.translations.restoreBackup.success.description",
+      "app.api.v1.core.system.translations.restoreBackup.post.success.description",
   },
 
   // === EXAMPLES ===

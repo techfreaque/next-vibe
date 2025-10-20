@@ -408,6 +408,244 @@ export function useChat(
     [logger, chatStore],
   );
 
+  const deleteMessage = useCallback(
+    async (messageId: string): Promise<void> => {
+      logger.debug("useChat", "Deleting message", { messageId });
+
+      const message = chatStore.messages[messageId];
+      if (!message) {
+        logger.error("useChat", "Message not found", { messageId });
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `/api/${locale}/v1/core/agent/chat/threads/${message.threadId}/messages/${messageId}`,
+          {
+            method: "DELETE",
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to delete message");
+        }
+
+        // Remove from store
+        chatStore.deleteMessage(messageId);
+      } catch (error) {
+        logger.error("useChat", "Failed to delete message", { error });
+        throw error;
+      }
+    },
+    [logger, chatStore, locale],
+  );
+
+  const voteMessage = useCallback(
+    async (messageId: string, vote: 1 | -1 | 0): Promise<void> => {
+      logger.debug("useChat", "Voting on message", { messageId, vote });
+
+      const message = chatStore.messages[messageId];
+      if (!message) {
+        logger.error("useChat", "Message not found", { messageId });
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `/api/${locale}/v1/core/agent/chat/threads/${message.threadId}/messages/${messageId}/vote`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ vote }),
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to vote on message");
+        }
+
+        // Update local state - optimistic update
+        chatStore.updateMessage(messageId, {
+          upvotes: vote === 1 ? (message.upvotes || 0) + 1 : message.upvotes,
+          downvotes:
+            vote === -1 ? (message.downvotes || 0) + 1 : message.downvotes,
+        });
+      } catch (error) {
+        logger.error("useChat", "Failed to vote on message", { error });
+        throw error;
+      }
+    },
+    [logger, chatStore, locale],
+  );
+
+  const deleteThread = useCallback(
+    async (threadId: string): Promise<void> => {
+      logger.debug("useChat", "Deleting thread", { threadId });
+
+      try {
+        const response = await fetch(
+          `/api/${locale}/v1/core/agent/chat/threads/${threadId}`,
+          {
+            method: "DELETE",
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to delete thread");
+        }
+
+        // Remove from store
+        chatStore.deleteThread(threadId);
+
+        // If this was the active thread, clear it
+        if (chatStore.activeThreadId === threadId) {
+          chatStore.setActiveThread(null);
+        }
+      } catch (error) {
+        logger.error("useChat", "Failed to delete thread", { error });
+        throw error;
+      }
+    },
+    [logger, chatStore, locale],
+  );
+
+  const updateThread = useCallback(
+    async (threadId: string, updates: ThreadUpdate): Promise<void> => {
+      logger.debug("useChat", "Updating thread", { threadId, updates });
+
+      try {
+        const response = await fetch(
+          `/api/${locale}/v1/core/agent/chat/threads/${threadId}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ updates }),
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to update thread");
+        }
+
+        // Update local store
+        chatStore.updateThread(threadId, updates);
+      } catch (error) {
+        logger.error("useChat", "Failed to update thread", { error });
+        throw error;
+      }
+    },
+    [logger, chatStore, locale],
+  );
+
+  const createFolder = useCallback(
+    async (
+      name: string,
+      rootFolderId: DefaultFolderId,
+      parentId: string | null,
+    ): Promise<string> => {
+      logger.debug("useChat", "Creating folder", {
+        name,
+        rootFolderId,
+        parentId,
+      });
+
+      try {
+        const response = await fetch(
+          `/api/${locale}/v1/core/agent/chat/folders`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              folder: {
+                name,
+                rootFolderId,
+                parentId,
+              },
+            }),
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to create folder");
+        }
+
+        const data = await response.json();
+        const folder = data.response.folder;
+
+        // Add to store
+        chatStore.addFolder(folder);
+
+        return folder.id;
+      } catch (error) {
+        logger.error("useChat", "Failed to create folder", { error });
+        throw error;
+      }
+    },
+    [logger, chatStore, locale],
+  );
+
+  const updateFolder = useCallback(
+    async (folderId: string, updates: FolderUpdate): Promise<void> => {
+      logger.debug("useChat", "Updating folder", { folderId, updates });
+
+      try {
+        const response = await fetch(
+          `/api/${locale}/v1/core/agent/chat/folders/${folderId}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ updates }),
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to update folder");
+        }
+
+        // Update local store
+        chatStore.updateFolder(folderId, updates);
+      } catch (error) {
+        logger.error("useChat", "Failed to update folder", { error });
+        throw error;
+      }
+    },
+    [logger, chatStore, locale],
+  );
+
+  const deleteFolder = useCallback(
+    async (folderId: string): Promise<void> => {
+      logger.debug("useChat", "Deleting folder", { folderId });
+
+      try {
+        const response = await fetch(
+          `/api/${locale}/v1/core/agent/chat/folders/${folderId}`,
+          {
+            method: "DELETE",
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to delete folder");
+        }
+
+        // Remove from store
+        chatStore.deleteFolder(folderId);
+      } catch (error) {
+        logger.error("useChat", "Failed to delete folder", { error });
+        throw error;
+      }
+    },
+    [logger, chatStore, locale],
+  );
+
   const setCurrentFolder = useCallback(
     (rootFolderId: DefaultFolderId, subFolderId: string | null): void => {
       logger.debug("useChat", "Setting current folder", {
@@ -454,11 +692,20 @@ export function useChat(
     retryMessage,
     editMessage,
     answerAsAI,
+    deleteMessage,
+    voteMessage,
     stopGeneration,
 
     // Thread operations
     createNewThread,
     setActiveThread: setActiveThreadCallback,
+    deleteThread,
+    updateThread,
+
+    // Folder operations
+    createFolder,
+    updateFolder,
+    deleteFolder,
 
     // Navigation
     setCurrentFolder,

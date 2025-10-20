@@ -310,6 +310,10 @@ export const translations: typeof enTranslations = {
       reminder: "Przypomnienie",
     },
   },
+  errors: {
+    no_email: "Nie podano adresu e-mail",
+    email_generation_failed: "Generowanie e-maila nie powiodło się",
+  },
   email: {
     errors: {
       send: {
@@ -605,5 +609,15 @@ export const translations: typeof enTranslations = {
       title: "E-mail wysłany pomyślnie",
       description: "Twój e-mail został wysłany pomyślnie",
     },
+  },
+  error: {
+    default: "Wystąpił błąd",
+  },
+  template: {
+    tagline: "Twoja platforma czatu zasilana AI",
+  },
+  footer: {
+    visitWebsite: "Odwiedź stronę",
+    allRightsReserved: "Wszelkie prawa zastrzeżone",
   },
 };

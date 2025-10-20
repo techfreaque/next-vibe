@@ -3,9 +3,13 @@ import { translations as statusTranslations } from "../../status/i18n/en";
 
 export const translations = {
   execute: {
+    category: executeTranslations.category,
+    tags: executeTranslations.tags,
     post: executeTranslations.post,
   },
   status: {
+    category: statusTranslations.category,
+    tags: statusTranslations.tags,
     get: statusTranslations.get,
   },
   success: {

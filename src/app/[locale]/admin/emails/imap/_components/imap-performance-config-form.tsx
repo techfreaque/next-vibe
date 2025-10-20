@@ -81,7 +81,8 @@ export function ImapPerformanceConfigForm(): JSX.Element {
         name="circuitBreakerThreshold"
         config={{
           type: "number",
-          label: "app.admin.emails.imap.config.resilience.circuitBreakerThreshold",
+          label:
+            "app.admin.emails.imap.config.resilience.circuitBreakerThreshold",
           placeholder: undefined,
         }}
         control={configEndpoint.create.form.control}
@@ -91,7 +92,8 @@ export function ImapPerformanceConfigForm(): JSX.Element {
         name="circuitBreakerTimeout"
         config={{
           type: "number",
-          label: "app.admin.emails.imap.config.resilience.circuitBreakerTimeout",
+          label:
+            "app.admin.emails.imap.config.resilience.circuitBreakerTimeout",
           placeholder: undefined,
         }}
         control={configEndpoint.create.form.control}

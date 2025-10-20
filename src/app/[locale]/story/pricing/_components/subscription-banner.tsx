@@ -75,7 +75,7 @@ export default function SubscriptionBanner({
   const getStatusMessage = (): string => {
     switch (subscription.status) {
       case SubscriptionStatus.ACTIVE:
-        return t("app.site.pricing.subscriptionBanner.status.active", {
+        return t("app.story.pricing.subscriptionBanner.status.active", {
           planName: subscription.planId
             ? subscription.planId.charAt(0).toUpperCase() +
               subscription.planId.slice(1)
@@ -83,11 +83,11 @@ export default function SubscriptionBanner({
               "Unknown",
         });
       case SubscriptionStatus.PAST_DUE:
-        return t("app.site.pricing.subscriptionBanner.status.pastDue");
+        return t("app.story.pricing.subscriptionBanner.status.pastDue");
       case SubscriptionStatus.CANCELED:
-        return t("app.site.pricing.subscriptionBanner.status.canceled");
+        return t("app.story.pricing.subscriptionBanner.status.canceled");
       default:
-        return t("app.site.pricing.subscriptionBanner.status.pending");
+        return t("app.story.pricing.subscriptionBanner.status.pending");
     }
   };
 
@@ -100,7 +100,7 @@ export default function SubscriptionBanner({
             size="sm"
             onClick={() => router.push(`/${locale}/account/subscription`)}
           >
-            {t("app.site.pricing.subscriptionBanner.actions.manage")}
+            {t("app.story.pricing.subscriptionBanner.actions.manage")}
           </Button>
         );
       case SubscriptionStatus.PAST_DUE:
@@ -110,7 +110,7 @@ export default function SubscriptionBanner({
             size="sm"
             onClick={() => router.push(`/${locale}/account/billing`)}
           >
-            {t("app.site.pricing.subscriptionBanner.actions.updatePayment")}
+            {t("app.story.pricing.subscriptionBanner.actions.updatePayment")}
           </Button>
         );
       case SubscriptionStatus.CANCELED:
@@ -120,7 +120,7 @@ export default function SubscriptionBanner({
             size="sm"
             onClick={() => router.push("/pricing")}
           >
-            {t("app.site.pricing.subscriptionBanner.actions.resubscribe")}
+            {t("app.story.pricing.subscriptionBanner.actions.resubscribe")}
           </Button>
         );
       default:
@@ -130,7 +130,7 @@ export default function SubscriptionBanner({
             size="sm"
             onClick={() => router.push(`/${locale}/account/subscription`)}
           >
-            {t("app.site.pricing.subscriptionBanner.actions.viewDetails")}
+            {t("app.story.pricing.subscriptionBanner.actions.viewDetails")}
           </Button>
         );
     }
@@ -146,10 +146,10 @@ export default function SubscriptionBanner({
             {subscription.currentPeriodEnd &&
               subscription.status === SubscriptionStatus.ACTIVE && (
                 <span className="ml-1">
-                  {t("app.site.pricing.subscriptionBanner.nextBillingDate", {
+                  {t("app.story.pricing.subscriptionBanner.nextBillingDate", {
                     date: format(
                       new Date(subscription.currentPeriodEnd),
-                      t("app.site.pricing.subscriptionBanner.dateFormat"),
+                      t("app.story.pricing.subscriptionBanner.dateFormat"),
                     ),
                   })}
                 </span>
@@ -159,7 +159,7 @@ export default function SubscriptionBanner({
         <div className="flex items-center space-x-2">
           {getActionButton()}
           <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
-            {t("app.site.pricing.subscriptionBanner.dismissButton")}
+            {t("app.story.pricing.subscriptionBanner.dismissButton")}
           </Button>
         </div>
       </div>

@@ -116,7 +116,7 @@ export function HumanEmailLayout({
                     letterSpacing: "-0.5px",
                   }}
                 >
-                  {t("common.logoPart1")}
+                  {t("app.common.logoPart1")}
                 </Text>
                 <Text
                   style={{
@@ -131,7 +131,7 @@ export function HumanEmailLayout({
                     letterSpacing: "-0.5px",
                   }}
                 >
-                  {t("common.logoPart2")}
+                  {t("app.common.logoPart2")}
                 </Text>
               </div>
               <Text
@@ -142,7 +142,7 @@ export function HumanEmailLayout({
                   fontStyle: "italic",
                 }}
               >
-                {t("email.template.tagline")}
+                {t("app.api.v1.core.emails.template.tagline")}
               </Text>
             </div>
 

@@ -43,9 +43,9 @@
     "vite": "7.1.6"
   },
   "devDependencies": {
-    "@types/node": "24.5.2",
-    "lint": "workspace:*",
+    "@types/node": "^24.8.1",
     "builder": "workspace:*",
+    "lint": "workspace:*",
     "release-tool": "workspace:*"
   }
 }

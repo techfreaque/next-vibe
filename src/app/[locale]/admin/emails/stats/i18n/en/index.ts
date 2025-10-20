@@ -78,8 +78,7 @@ export const translations = {
           asc: "Ascending",
         },
         includeComparison: "Include Comparison",
-        includeComparisonDescription:
-          "Compare with previous period",
+        includeComparisonDescription: "Compare with previous period",
         search: "Search",
         searchPlaceholder: "Search emails...",
       },
@@ -216,4 +215,4 @@ export const translations = {
       description: "Operation completed successfully",
     },
   },
-} as const;
+};

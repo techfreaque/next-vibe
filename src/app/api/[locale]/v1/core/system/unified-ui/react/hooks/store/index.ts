@@ -676,7 +676,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       let validatedRequestData = requestData;
 
       // Check if the schema expects undefined (no request fields)
-      const hasNoRequestFields = !endpoint.requestSchema ||
+      const hasNoRequestFields =
+        !endpoint.requestSchema ||
         endpoint.requestSchema instanceof z.ZodUndefined;
 
       if (hasNoRequestFields) {

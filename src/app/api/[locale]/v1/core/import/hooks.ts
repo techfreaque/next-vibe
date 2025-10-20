@@ -59,7 +59,7 @@ export async function useImportCsv(
     const validationResult = validateImportRequest(request, logger);
     if (!validationResult.isValid) {
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.import.error.default",
         ErrorResponseTypes.VALIDATION_ERROR,
       );
     }
@@ -84,7 +84,7 @@ export async function useImportCsv(
   } catch (error) {
     logger.error("Error in CSV import hook", error);
     return createErrorResponse(
-      "error.default",
+      "app.api.v1.core.import.error.default",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }
@@ -125,7 +125,7 @@ export async function useListImportJobs(
 
     if (!jobsResult.success) {
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.import.error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -142,7 +142,7 @@ export async function useListImportJobs(
   } catch (error) {
     logger.error("Error fetching import jobs", error);
     return createErrorResponse(
-      "error.default",
+      "app.api.v1.core.import.error.default",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }
@@ -175,7 +175,7 @@ export async function useCancelImportJob(
   } catch (error) {
     logger.error("Error cancelling import job", error);
     return createErrorResponse(
-      "error.default",
+      "app.api.v1.core.import.error.default",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }
@@ -208,7 +208,7 @@ export async function useRetryImportJob(
   } catch (error) {
     logger.error("Error retrying import job", error);
     return createErrorResponse(
-      "error.default",
+      "app.api.v1.core.import.error.default",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }
@@ -240,7 +240,7 @@ export async function useDeleteImportJob(
   } catch (error) {
     logger.error("Error deleting import job", error);
     return createErrorResponse(
-      "error.default",
+      "app.api.v1.core.import.error.default",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }
@@ -268,7 +268,7 @@ export async function useGetImportJobStatus(
   } catch (error) {
     logger.error("Error getting import job status", error);
     return createErrorResponse(
-      "error.default",
+      "app.api.v1.core.import.error.default",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }
@@ -441,7 +441,7 @@ async function routeImportToDomain(
 
     if (!result.success) {
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.import.error.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -483,7 +483,7 @@ async function routeImportToDomain(
       error,
     });
     return createErrorResponse(
-      "error.default",
+      "app.api.v1.core.import.error.default",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }

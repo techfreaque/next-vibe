@@ -89,16 +89,20 @@ export function useResetPasswordConfirm(
         setIsSuccess(true);
 
         toast({
-          title: t("app.api.v1.core.user.auth.resetPassword.success.title"),
+          title: t(
+            "app.api.v1.core.user.public.resetPassword.confirm.success.title",
+          ),
           description: t(
-            "app.api.v1.core.user.auth.resetPassword.success.password_reset",
+            "app.api.v1.core.user.public.resetPassword.confirm.success.password_reset",
           ),
           variant: "default",
         });
       },
       onError: ({ error }) => {
         toast({
-          title: t("app.api.v1.core.user.auth.resetPassword.errors.title"),
+          title: t(
+            "app.api.v1.core.user.public.resetPassword.confirm.errors.title",
+          ),
           description: t(error.message, error.messageParams),
           variant: "destructive",
         });
@@ -113,7 +117,8 @@ export function useResetPasswordConfirm(
       return {
         variant: "destructive",
         title: {
-          message: "app.api.v1.core.user.auth.resetPassword.errors.title",
+          message:
+            "app.api.v1.core.user.public.resetPassword.confirm.errors.title",
         },
         message: {
           message: tokenValidationResponse.message,
@@ -127,7 +132,8 @@ export function useResetPasswordConfirm(
       return {
         variant: "destructive",
         title: {
-          message: "app.api.v1.core.user.auth.resetPassword.errors.title",
+          message:
+            "app.api.v1.core.user.public.resetPassword.confirm.errors.title",
         },
         message: {
           message: formResult.submitError.message,
@@ -141,11 +147,12 @@ export function useResetPasswordConfirm(
       return {
         variant: "success",
         title: {
-          message: "app.api.v1.core.user.auth.resetPassword.success.title",
+          message:
+            "app.api.v1.core.user.public.resetPassword.confirm.success.title",
         },
         message: {
           message:
-            "app.api.v1.core.user.auth.resetPassword.success.password_reset",
+            "app.api.v1.core.user.public.resetPassword.confirm.success.password_reset",
         },
       };
     }

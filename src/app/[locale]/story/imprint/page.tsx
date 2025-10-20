@@ -62,31 +62,39 @@ export default async function ImprintPage({
             <Building className="h-8 w-8 text-blue-600 dark:text-blue-400" />
           </div>
           <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
-            {t("app.site.imprint.title")}
+            {t("app.story._components.home.imprint.title")}
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400">
-            {t("app.site.imprint.lastUpdated")}
+            {t("app.story._components.home.imprint.lastUpdated")}
           </p>
         </div>
 
         {/* Main content */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 mb-8">
           <div className="prose dark:prose-invert max-w-none">
-            <p className="lead text-lg">{t("app.site.imprint.introduction")}</p>
+            <p className="lead text-lg">
+              {t("app.story._components.home.imprint.introduction")}
+            </p>
 
             <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             {/* Partnerships Section */}
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.site.imprint.sections.partnerships.title")}
+              {t(
+                "app.story._components.home.imprint.sections.partnerships.title",
+              )}
             </h2>
             <p className="mt-2">
-              {t("app.site.imprint.sections.partnerships.description")}
+              {t(
+                "app.story._components.home.imprint.sections.partnerships.description",
+              )}
             </p>
             <Alert variant="default" className="mt-4">
               <Info className="h-4 w-4" />
               <AlertDescription>
-                {t("app.site.imprint.sections.partnerships.content")}
+                {t(
+                  "app.story._components.home.imprint.sections.partnerships.content",
+                )}
               </AlertDescription>
             </Alert>
 
@@ -95,10 +103,14 @@ export default async function ImprintPage({
             {/* Company Information Section */}
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
               <Building className="h-5 w-5 mr-2" />
-              {t("app.site.imprint.sections.companyInfo.title")}
+              {t(
+                "app.story._components.home.imprint.sections.companyInfo.title",
+              )}
             </h2>
             <p className="mt-2">
-              {t("app.site.imprint.sections.companyInfo.description")}
+              {t(
+                "app.story._components.home.imprint.sections.companyInfo.description",
+              )}
             </p>
             <ul className="space-y-2 mt-4">
               <li className="flex items-start">
@@ -127,10 +139,14 @@ export default async function ImprintPage({
 
             {/* Contact Information Section */}
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.site.imprint.sections.contactInfo.title")}
+              {t(
+                "app.story._components.home.imprint.sections.contactInfo.title",
+              )}
             </h2>
             <p className="mt-2">
-              {t("app.site.imprint.sections.contactInfo.description")}
+              {t(
+                "app.story._components.home.imprint.sections.contactInfo.description",
+              )}
             </p>
 
             <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mt-4">
@@ -141,21 +157,27 @@ export default async function ImprintPage({
               <p>{t("app.common.company.address.city")}</p>
               <p>{t("app.common.company.address.country")}</p>
               <p>{supportEmail}</p>
-              {/* <p>{t("app.site.imprint.sections.contactInfo.communication.phone")}</p> */}
+              {/* <p>{t("app.story._components.home.imprint.sections.contactInfo.communication.phone")}</p> */}
             </div>
 
             <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             {/* Responsible Person Section */}
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.site.imprint.sections.responsiblePerson.title")}
+              {t(
+                "app.story._components.home.imprint.sections.responsiblePerson.title",
+              )}
             </h2>
             <p className="mt-2">
-              {t("app.site.imprint.sections.responsiblePerson.description")}
+              {t(
+                "app.story._components.home.imprint.sections.responsiblePerson.description",
+              )}
             </p>
             <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mt-4">
               <p>
-                <strong>{t("app.common.company.responsiblePerson.name")}</strong>
+                <strong>
+                  {t("app.common.company.responsiblePerson.name")}
+                </strong>
               </p>
               <p>{t("app.common.company.address.addressIn1Line")}</p>
             </div>
@@ -164,13 +186,19 @@ export default async function ImprintPage({
 
             {/* Dispute Resolution Section */}
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.site.imprint.sections.disputeResolution.title")}
+              {t(
+                "app.story._components.home.imprint.sections.disputeResolution.title",
+              )}
             </h2>
             <p className="mt-2">
-              {t("app.site.imprint.sections.disputeResolution.description")}
+              {t(
+                "app.story._components.home.imprint.sections.disputeResolution.description",
+              )}
             </p>
             <p className="mt-4">
-              {t("app.site.imprint.sections.disputeResolution.content")}
+              {t(
+                "app.story._components.home.imprint.sections.disputeResolution.content",
+              )}
             </p>
 
             <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
@@ -178,28 +206,42 @@ export default async function ImprintPage({
             {/* Disclaimer Section */}
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
               <FileText className="h-5 w-5 mr-2" />
-              {t("app.site.imprint.sections.disclaimer.title")}
+              {t(
+                "app.story._components.home.imprint.sections.disclaimer.title",
+              )}
             </h2>
 
             <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("app.site.imprint.sections.disclaimer.liability.title")}
+              {t(
+                "app.story._components.home.imprint.sections.disclaimer.liability.title",
+              )}
             </h3>
             <p className="mt-2">
-              {t("app.site.imprint.sections.disclaimer.liability.content")}
+              {t(
+                "app.story._components.home.imprint.sections.disclaimer.liability.content",
+              )}
             </p>
 
             <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("app.site.imprint.sections.disclaimer.links.title")}
+              {t(
+                "app.story._components.home.imprint.sections.disclaimer.links.title",
+              )}
             </h3>
             <p className="mt-2">
-              {t("app.site.imprint.sections.disclaimer.links.content")}
+              {t(
+                "app.story._components.home.imprint.sections.disclaimer.links.content",
+              )}
             </p>
 
             <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("app.site.imprint.sections.disclaimer.copyright.title")}
+              {t(
+                "app.story._components.home.imprint.sections.disclaimer.copyright.title",
+              )}
             </h3>
             <p className="mt-2">
-              {t("app.site.imprint.sections.disclaimer.copyright.content")}
+              {t(
+                "app.story._components.home.imprint.sections.disclaimer.copyright.content",
+              )}
             </p>
           </div>
         </div>

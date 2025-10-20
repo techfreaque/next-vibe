@@ -268,4 +268,4 @@ export const translations = {
       description: "Search completed successfully.",
     },
   },
-} as const;
+};

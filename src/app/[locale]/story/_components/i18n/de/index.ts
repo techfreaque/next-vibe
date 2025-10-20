@@ -409,22 +409,57 @@ export const translations: typeof enTranslations = {
         "Dieses Impressum enthält gesetzlich vorgeschriebene Informationen über Unbottled.ai gemäß den geltenden Gesetzen.",
       printButton: "Drucken",
       printAriaLabel: "Diese Seite drucken",
-      companyInfo: {
-        title: "Unternehmensinformationen",
-        name: "Unbottled.ai",
-        address: "[Firmenadresse]",
-        email: "legal@unbottled.ai",
-        representative: "[Gesetzlicher Vertreter]",
-      },
-      contact: {
-        title: "Kontakt",
-        email: "E-Mail",
-        support: "Support",
-      },
-      disclaimer: {
-        title: "Haftungsausschluss",
-        content:
-          "Die auf dieser Website bereitgestellten Informationen dienen nur allgemeinen Informationszwecken. Obwohl wir uns bemühen, die Informationen aktuell und korrekt zu halten, geben wir keine Zusicherungen oder Garantien jeglicher Art hinsichtlich der Vollständigkeit, Genauigkeit, Zuverlässigkeit oder Verfügbarkeit der Website oder der auf der Website enthaltenen Informationen.",
+      sections: {
+        partnerships: {
+          title: "Partnerschaften & Zugehörigkeiten",
+          description:
+            "Informationen über unsere Geschäftspartnerschaften und Zugehörigkeiten.",
+          content:
+            "Unbottled.ai unterhält Partnerschaften mit führenden KI-Anbietern, um unseren Nutzern den bestmöglichen Service zu bieten.",
+        },
+        companyInfo: {
+          title: "Unternehmensinformationen",
+          description:
+            "Rechtliche Informationen über Unbottled.ai und unsere eingetragene Geschäftseinheit.",
+        },
+        responsiblePerson: {
+          title: "Verantwortliche Person",
+          description:
+            "Informationen über die für den Inhalt dieser Website verantwortliche Person.",
+        },
+        contactInfo: {
+          title: "Kontaktinformationen",
+          description:
+            "So erreichen Sie uns für rechtliche und geschäftliche Anfragen.",
+          communication: {
+            phone: "+1 (555) 123-4567",
+          },
+        },
+        disclaimer: {
+          title: "Haftungsausschluss",
+          copyright: {
+            title: "Urheberrecht",
+            content:
+              "Alle Inhalte dieser Website sind urheberrechtlich geschützt. Unbefugte Nutzung ist untersagt.",
+          },
+          liability: {
+            title: "Haftung",
+            content:
+              "Wir geben keine Zusicherungen oder Garantien hinsichtlich der Vollständigkeit, Genauigkeit oder Zuverlässigkeit der Informationen auf dieser Website.",
+          },
+          links: {
+            title: "Externe Links",
+            content:
+              "Unsere Website kann Links zu externen Websites enthalten. Wir sind nicht verantwortlich für den Inhalt externer Websites.",
+          },
+        },
+        disputeResolution: {
+          title: "Streitbeilegung",
+          description:
+            "Informationen darüber, wie Streitigkeiten behandelt und gelöst werden.",
+          content:
+            "Alle Streitigkeiten, die sich aus der Nutzung dieser Website ergeben, werden gemäß geltendem Recht beigelegt.",
+        },
       },
     },
     privacyPolicy: {
@@ -507,6 +542,46 @@ export const translations: typeof enTranslations = {
           title: "Datenspeicherung",
           description:
             "Wir speichern Ihre Daten nur so lange, wie es zur Bereitstellung unserer Dienste und zur Erfüllung gesetzlicher Verpflichtungen erforderlich ist. Sie können Ihr Konto und alle zugehörigen Daten jederzeit löschen.",
+        },
+        cookies: {
+          title: "Cookies und Tracking",
+          description:
+            "Wir verwenden Cookies und ähnliche Tracking-Technologien, um Ihre Erfahrung zu verbessern und Nutzungsmuster zu analysieren.",
+        },
+        derivativeData: {
+          title: "Abgeleitete Daten",
+          description:
+            "Wir können anonymisierte, aggregierte Daten aus Ihrer Nutzung erstellen, um unsere Dienste zu verbessern.",
+        },
+        disclosure: {
+          title: "Informationsoffenlegung",
+          description:
+            "Wir können Ihre Informationen offenlegen, wenn dies gesetzlich vorgeschrieben ist oder um unsere Rechte und Sicherheit zu schützen.",
+        },
+        gdpr: {
+          title: "DSGVO-Konformität",
+          description:
+            "Für Nutzer in der Europäischen Union erfüllen wir alle DSGVO-Anforderungen und respektieren Ihre Datenschutzrechte.",
+        },
+        ccpa: {
+          title: "CCPA-Konformität",
+          description:
+            "Für Einwohner Kaliforniens erfüllen wir den California Consumer Privacy Act und respektieren Ihre Datenschutzrechte.",
+        },
+        children: {
+          title: "Datenschutz für Kinder",
+          description:
+            "Unser Service ist nicht für Kinder unter 13 Jahren bestimmt. Wir sammeln wissentlich keine Daten von Kindern.",
+        },
+        businessTransfers: {
+          title: "Geschäftsübertragungen",
+          description:
+            "Im Falle einer Fusion, Übernahme oder eines Verkaufs von Vermögenswerten können Ihre Daten an die neue Einheit übertragen werden.",
+        },
+        changes: {
+          title: "Änderungen dieser Richtlinie",
+          description:
+            "Wir können diese Datenschutzerklärung von Zeit zu Zeit aktualisieren. Wir werden Sie über wesentliche Änderungen informieren.",
         },
         contact: {
           title: "Kontaktieren Sie uns",

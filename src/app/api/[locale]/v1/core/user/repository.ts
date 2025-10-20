@@ -162,13 +162,13 @@ export class BaseUserRepositoryImpl implements UserRepository {
       logger.debug("Getting user by auth", { roles, detailLevel });
 
       // Locale is required for authentication
-      const locale = options.locale || logger.locale;
-      if (!locale) {
+      if (!options.locale) {
         return createErrorResponse(
           "app.api.v1.core.user.errors.locale_required",
           ErrorResponseTypes.BAD_REQUEST,
         );
       }
+      const locale = options.locale;
 
       // Get the authenticated user
       const verifiedUser = await authRepository.getAuthMinimalUser(

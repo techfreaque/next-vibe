@@ -89,23 +89,31 @@ export default async function AboutUsPage({
   // Get values from translations
   const values = [
     {
-      title: t("app.site.aboutUs.values.excellence.title"),
-      description: t("app.site.aboutUs.values.excellence.description"),
+      title: t("app.story._components.home.aboutUs.values.excellence.title"),
+      description: t(
+        "app.story._components.home.aboutUs.values.excellence.description",
+      ),
       icon: <Award className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
     },
     {
-      title: t("app.site.aboutUs.values.innovation.title"),
-      description: t("app.site.aboutUs.values.innovation.description"),
+      title: t("app.story._components.home.aboutUs.values.innovation.title"),
+      description: t(
+        "app.story._components.home.aboutUs.values.innovation.description",
+      ),
       icon: <Lightbulb className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
     },
     {
-      title: t("app.site.aboutUs.values.integrity.title"),
-      description: t("app.site.aboutUs.values.integrity.description"),
+      title: t("app.story._components.home.aboutUs.values.integrity.title"),
+      description: t(
+        "app.story._components.home.aboutUs.values.integrity.description",
+      ),
       icon: <Heart className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
     },
     {
-      title: t("app.site.aboutUs.values.collaboration.title"),
-      description: t("app.site.aboutUs.values.collaboration.description"),
+      title: t("app.story._components.home.aboutUs.values.collaboration.title"),
+      description: t(
+        "app.story._components.home.aboutUs.values.collaboration.description",
+      ),
       icon: <Handshake className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
     },
   ];
@@ -121,18 +129,18 @@ export default async function AboutUsPage({
             className="inline-flex items-center text-sm text-white/80 hover:text-white mb-8 transition-colors"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("app.site.aboutUsUs.backToHome")}
+            {t("app.story._components.home.aboutUsUs.backToHome")}
           </Link>
 
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              {t("app.site.aboutUs.title")}
+              {t("app.story._components.home.aboutUs.title")}
             </h1>
             <p className="text-xl md:text-2xl opacity-90 mb-8">
-              {t("app.site.aboutUs.subtitle")}
+              {t("app.story._components.home.aboutUs.subtitle")}
             </p>
             <p className="text-lg opacity-80">
-              {t("app.site.aboutUs.description")}
+              {t("app.story._components.home.aboutUs.description")}
             </p>
           </div>
         </div>
@@ -143,13 +151,13 @@ export default async function AboutUsPage({
         <section className="mb-24">
           <div className="max-w-4xl mx-auto text-center mb-16">
             <h2 className="text-4xl font-bold mb-6">
-              {t("app.site.aboutUsUs.mission.title")}
+              {t("app.story._components.home.aboutUsUs.mission.title")}
             </h2>
             <p className="text-xl text-blue-600 dark:text-blue-400 font-semibold mb-8">
-              {t("app.site.aboutUsUs.mission.subtitle")}
+              {t("app.story._components.home.aboutUsUs.mission.subtitle")}
             </p>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              {t("app.site.aboutUsUs.mission.description")}
+              {t("app.story._components.home.aboutUsUs.mission.description")}
             </p>
           </div>
 
@@ -161,12 +169,16 @@ export default async function AboutUsPage({
                   <Lightbulb className="h-7 w-7 text-blue-600 dark:text-blue-400" />
                 </div>
                 <CardTitle className="text-xl">
-                  {t("app.site.aboutUsUs.mission.vision.title")}
+                  {t(
+                    "app.story._components.home.aboutUsUs.mission.vision.title",
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
-                  {t("app.site.aboutUsUs.mission.vision.description")}
+                  {t(
+                    "app.story._components.home.aboutUsUs.mission.vision.description",
+                  )}
                 </p>
               </CardContent>
             </Card>
@@ -177,12 +189,16 @@ export default async function AboutUsPage({
                   <Globe className="h-7 w-7 text-green-600 dark:text-green-400" />
                 </div>
                 <CardTitle className="text-xl">
-                  {t("app.site.aboutUsUs.mission.approach.title")}
+                  {t(
+                    "app.story._components.home.aboutUsUs.mission.approach.title",
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
-                  {t("app.site.aboutUsUs.mission.approach.description")}
+                  {t(
+                    "app.story._components.home.aboutUsUs.mission.approach.description",
+                  )}
                 </p>
               </CardContent>
             </Card>
@@ -193,12 +209,16 @@ export default async function AboutUsPage({
                   <Handshake className="h-7 w-7 text-purple-600 dark:text-purple-400" />
                 </div>
                 <CardTitle className="text-xl">
-                  {t("app.site.aboutUsUs.mission.commitment.title")}
+                  {t(
+                    "app.story._components.home.aboutUsUs.mission.commitment.title",
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
-                  {t("app.site.aboutUsUs.mission.commitment.description")}
+                  {t(
+                    "app.story._components.home.aboutUsUs.mission.commitment.description",
+                  )}
                 </p>
               </CardContent>
             </Card>
@@ -208,7 +228,7 @@ export default async function AboutUsPage({
           <div className="relative rounded-2xl overflow-hidden h-[400px] shadow-2xl">
             <Image
               src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070"
-              alt={t("app.site.aboutUsUs.mission.title")}
+              alt={t("app.story._components.home.aboutUsUs.mission.title")}
               fill
               className="object-cover"
             />
@@ -218,7 +238,7 @@ export default async function AboutUsPage({
                 {t("app.common.logoPart1")} {t("app.common.logoPart2")}
               </h3>
               <p className="text-lg opacity-90">
-                {t("app.site.home.hero.subtitle")}
+                {t("app.story.home.hero.subtitle")}
               </p>
             </div>
           </div>
@@ -228,10 +248,10 @@ export default async function AboutUsPage({
         <section className="mb-24">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">
-              {t("app.site.aboutUs.values.title")}
+              {t("app.story._components.home.aboutUs.values.title")}
             </h2>
             <p className="text-lg text-muted-foreground">
-              {t("app.site.aboutUsUs.values.list")}
+              {t("app.story._components.home.aboutUsUs.values.list")}
             </p>
           </div>
 
@@ -252,10 +272,10 @@ export default async function AboutUsPage({
 
         <div className="max-w-3xl mx-auto text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">
-            {t("app.site.aboutUsUs.contact.title")}
+            {t("app.story._components.home.aboutUsUs.contact.title")}
           </h2>
           <p className="text-lg text-muted-foreground">
-            {t("app.site.aboutUsUs.contact.description", {
+            {t("app.story._components.home.aboutUsUs.contact.description", {
               supportEmail: supportEmail,
             })}
           </p>
@@ -264,7 +284,7 @@ export default async function AboutUsPage({
         <div className="mt-12 text-center">
           <Button asChild size="lg">
             <Link href={`/${locale}/help`}>
-              {t("app.site.aboutUsUs.contact.button")}
+              {t("app.story._components.home.aboutUsUs.contact.button")}
             </Link>
           </Button>
         </div>

@@ -132,7 +132,8 @@ export function ImapMessagesManagement(): JSX.Element {
                       },
                       ...accounts.map((account) => ({
                         value: account.id,
-                        label: "app.admin.emails.imap.common.accountEmail" as const,
+                        label:
+                          "app.admin.emails.imap.common.accountEmail" as const,
                         labelParams: { email: account.email },
                       })),
                     ],
@@ -222,8 +223,14 @@ export function ImapMessagesManagement(): JSX.Element {
                     type: "select",
                     label: "app.admin.emails.imap.common.sortOrder",
                     options: [
-                      { value: SortOrder.DESC, label: "app.admin.emails.imap.common.newest" },
-                      { value: SortOrder.ASC, label: "app.admin.emails.imap.common.oldest" },
+                      {
+                        value: SortOrder.DESC,
+                        label: "app.admin.emails.imap.common.newest",
+                      },
+                      {
+                        value: SortOrder.ASC,
+                        label: "app.admin.emails.imap.common.oldest",
+                      },
                     ],
                   }}
                   control={messagesEndpoint.read?.form.control}
@@ -276,7 +283,8 @@ export function ImapMessagesManagement(): JSX.Element {
                     config={{
                       type: "text",
                       label: undefined,
-                      placeholder: "app.admin.emails.imap.messages.searchPlaceholder",
+                      placeholder:
+                        "app.admin.emails.imap.messages.searchPlaceholder",
                     }}
                     control={messagesEndpoint.read?.form.control}
                     schema={imapMessageQuerySchema}
@@ -296,11 +304,13 @@ export function ImapMessagesManagement(): JSX.Element {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>
-                {t("app.admin.emails.imap.admin.messages.title", { count: totalMessages })}
+                {t("app.admin.emails.imap.admin.messages.title", {
+                  count: totalMessages,
+                })}
               </span>
               <div className="text-sm text-muted-foreground">
-                {t("app.admin.emails.imap.common.page")} {currentPage} {t("app.admin.emails.imap.common.of")}{" "}
-                {totalPages}
+                {t("app.admin.emails.imap.common.page")} {currentPage}{" "}
+                {t("app.admin.emails.imap.common.of")} {totalPages}
               </div>
             </CardTitle>
           </CardHeader>
@@ -319,10 +329,14 @@ export function ImapMessagesManagement(): JSX.Element {
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-muted-foreground">
                     {t("app.admin.emails.imap.common.showing")}{" "}
-                    {(currentPage - 1) * currentLimit + 1} {t("app.admin.emails.imap.common.to")}{" "}
+                    {(currentPage - 1) * currentLimit + 1}{" "}
+                    {t("app.admin.emails.imap.common.to")}{" "}
                     {Math.min(currentPage * currentLimit, totalMessages)}{" "}
-                    {t("app.admin.emails.imap.common.of")} {totalMessages.toLocaleString()}{" "}
-                    {t("app.admin.emails.imap.admin.messages.title").toLowerCase()}
+                    {t("app.admin.emails.imap.common.of")}{" "}
+                    {totalMessages.toLocaleString()}{" "}
+                    {t(
+                      "app.admin.emails.imap.admin.messages.title",
+                    ).toLowerCase()}
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button
@@ -364,7 +378,9 @@ export function ImapMessagesManagement(): JSX.Element {
         {/* Message Statistics */}
         <Card>
           <CardHeader>
-            <CardTitle>{t("app.admin.emails.imap.admin.messages.statistics")}</CardTitle>
+            <CardTitle>
+              {t("app.admin.emails.imap.admin.messages.statistics")}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

@@ -173,7 +173,9 @@ export function ImapMessagesList({
   };
 
   if (isLoading) {
-    return <div className="p-4">{t("app.admin.emails.imap.common.loading")}</div>;
+    return (
+      <div className="p-4">{t("app.admin.emails.imap.common.loading")}</div>
+    );
   }
 
   return (
@@ -182,7 +184,9 @@ export function ImapMessagesList({
       {selectedMessages.length > 0 && (
         <div className="flex items-center space-x-2 p-3 bg-blue-50 rounded-lg">
           <span className="text-sm font-medium">
-            {t("app.admin.emails.imap.message.selected", { count: selectedMessages.length })}
+            {t("app.admin.emails.imap.message.selected", {
+              count: selectedMessages.length,
+            })}
           </span>
           <Button size="sm" variant="outline" onClick={handleMarkAsRead}>
             {t("app.admin.emails.imap.admin.messages.actions.markAsRead")}
@@ -208,12 +212,21 @@ export function ImapMessagesList({
                 />
               </TableHead>
               <TableHead className="w-12" />
-              <TableHead> {t("app.admin.emails.imap.common.subject")}</TableHead>
+              <TableHead>
+                {" "}
+                {t("app.admin.emails.imap.common.subject")}
+              </TableHead>
               <TableHead> {t("app.admin.emails.imap.common.from")} </TableHead>
               <TableHead> {t("app.admin.emails.imap.common.date")} </TableHead>
               <TableHead> {t("app.admin.emails.imap.common.size")} </TableHead>
-              <TableHead> {t("app.admin.emails.imap.common.status")} </TableHead>
-              <TableHead> {t("app.admin.emails.imap.common.actions")} </TableHead>
+              <TableHead>
+                {" "}
+                {t("app.admin.emails.imap.common.status")}{" "}
+              </TableHead>
+              <TableHead>
+                {" "}
+                {t("app.admin.emails.imap.common.actions")}{" "}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

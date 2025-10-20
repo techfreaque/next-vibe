@@ -153,7 +153,7 @@ export function useLogin(
     {
       onSuccess: async (data) => {
         try {
-          logger.debug("app.api.v1.core.user.auth.login.onSuccess.start", {
+          logger.debug("app.api.v1.core.user.public.login.onSuccess.start", {
             data,
           });
 
@@ -162,25 +162,25 @@ export function useLogin(
           const tokenResult = authClientRepository.setAuthStatus(logger);
           if (!tokenResult.success) {
             logger.error(
-              "app.api.v1.core.user.auth.login.token.save.failed",
+              "app.api.v1.core.user.public.login.token.save.failed",
               tokenResult,
             );
             toast({
-              title: t("app.api.v1.core.user.auth.login.errors.title"),
+              title: t("app.api.v1.core.user.public.login.errors.title"),
               description: t(
-                "app.api.v1.core.user.auth.login.errors.token_save_failed",
+                "app.api.v1.core.user.public.login.errors.token_save_failed",
               ),
               variant: "destructive",
             });
             return;
           }
-          logger.debug("app.api.v1.core.user.auth.login.token.save.success");
+          logger.debug("app.api.v1.core.user.public.login.token.save.success");
 
           // Show success message immediately
           toast({
-            title: t("app.api.v1.core.user.auth.login.success.title"),
+            title: t("app.api.v1.core.user.public.login.success.title"),
             description: t(
-              "app.api.v1.core.user.auth.login.success.description",
+              "app.api.v1.core.user.public.login.success.description",
             ),
             variant: "default",
           });
@@ -192,22 +192,27 @@ export function useLogin(
           const redirectTo: Route = (redirectParam ||
             `/${locale}/`) satisfies Route;
 
-          logger.debug("app.api.v1.core.user.auth.login.refetch.start");
+          logger.debug("app.api.v1.core.user.public.login.refetch.start");
           // Refetch user data after successful login
           await refetch();
-          logger.debug("app.api.v1.core.user.auth.login.refetch.success");
+          logger.debug("app.api.v1.core.user.public.login.refetch.success");
 
           // Navigate immediately - the new page will handle user data fetching
           // Remove router.refresh() to prevent re-render loop
-          logger.debug("app.api.v1.core.user.auth.login.redirect", {
+          logger.debug("app.api.v1.core.user.public.login.redirect", {
             redirectTo,
           });
           router.push(redirectTo);
         } catch (error) {
-          logger.error("app.api.v1.core.user.auth.login.process.failed", error);
+          logger.error(
+            "app.api.v1.core.user.public.login.process.failed",
+            error,
+          );
           toast({
-            title: t("app.api.v1.core.user.auth.login.errors.title"),
-            description: t("authErrors.login.form.error.unknown.description"),
+            title: t("app.api.v1.core.user.public.login.errors.title"),
+            description: t(
+              "app.api.v1.core.user.public.login.errors.auth_error",
+            ),
             variant: "destructive",
           });
         }
@@ -215,7 +220,7 @@ export function useLogin(
       onError: (data) => {
         setErrorMessage(data.error.message);
         toast({
-          title: t("app.api.v1.core.user.auth.login.errors.title"),
+          title: t("app.api.v1.core.user.public.login.errors.title"),
           description: t(data.error.message),
           variant: "destructive",
         });
@@ -228,7 +233,7 @@ export function useLogin(
   const hasError = responseSuccess === false;
 
   // Use type narrowing to extract error details
-  let responseMessage: TranslationKey | null = null;
+  let responseMessage: TranslationKey | null | undefined = null;
   let responseMessageParams: TParams | undefined;
   if (hasError && formResult.response) {
     responseMessage = formResult.response.message;
@@ -236,22 +241,17 @@ export function useLogin(
   }
 
   // Generate alert state from error/success states
-  // Use JSON.stringify for complex objects to avoid union type complexity issues
-  const responseMessageParamsKey = responseMessageParams
-    ? JSON.stringify(responseMessageParams)
-    : null;
-
   const alert = useMemo((): FormAlertState | null => {
     // Check for account locked state
     if (isAccountLocked) {
       return {
         variant: "destructive" as const,
         title: {
-          message: "app.api.v1.core.user.auth.login.errors.accountLocked",
+          message: "app.api.v1.core.user.public.login.errors.accountLocked",
         },
         message: {
           message:
-            "app.api.v1.core.user.auth.login.errors.accountLockedDescription",
+            "app.api.v1.core.user.public.login.errors.accountLockedDescription",
         },
       };
     }
@@ -261,7 +261,7 @@ export function useLogin(
       return {
         variant: "destructive" as const,
         title: {
-          message: "app.api.v1.core.user.auth.login.errors.title",
+          message: "app.api.v1.core.user.public.login.errors.title",
         },
         message: {
           message: responseMessage,
@@ -275,7 +275,7 @@ export function useLogin(
       return {
         variant: "destructive" as const,
         title: {
-          message: "app.api.v1.core.user.auth.login.errors.title",
+          message: "app.api.v1.core.user.public.login.errors.title",
         },
         message: {
           message: errorMessage,
@@ -288,8 +288,7 @@ export function useLogin(
     isAccountLocked,
     errorMessage,
     responseMessage,
-    responseMessageParams,
-    responseMessageParamsKey,
+    JSON.stringify(responseMessageParams),
     responseSuccess,
   ]);
 

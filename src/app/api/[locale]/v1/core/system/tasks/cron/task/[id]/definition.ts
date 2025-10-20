@@ -47,7 +47,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.system.tasks.cron.task.get.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: "url", response: true },
+    { request: "urlParams", response: true },
     {
       // URL parameter
       id: requestUrlParamsField(
@@ -144,6 +144,33 @@ const { GET } = createEndpoint({
     description:
       "app.api.v1.core.system.tasks.cron.task.get.success.retrieved.description",
   },
+  examples: {
+    urlPathVariables: {
+      default: {
+        id: "task-123",
+      },
+    },
+    requests: undefined,
+    responses: {
+      default: {
+        task: {
+          id: "task-123",
+          name: "Example Task",
+          description: "An example cron task",
+          schedule: "0 0 * * *",
+          enabled: true,
+          priority: "MEDIUM",
+          status: "PENDING",
+          category: "SYSTEM",
+          timeout: 3600,
+          retries: 3,
+          version: 1,
+          createdAt: "2024-01-01T00:00:00Z",
+          updatedAt: "2024-01-01T00:00:00Z",
+        },
+      },
+    },
+  },
 });
 
 /**
@@ -165,7 +192,7 @@ const { PUT } = createEndpoint({
         "app.api.v1.core.system.tasks.cron.task.put.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: "both", response: true },
+    { request: "data&urlParams", response: true },
     {
       // URL parameter
       id: requestUrlParamsField(
@@ -375,6 +402,44 @@ const { PUT } = createEndpoint({
     description:
       "app.api.v1.core.system.tasks.cron.task.put.success.updated.description",
   },
+  examples: {
+    urlPathVariables: {
+      default: {
+        id: "task-123",
+      },
+    },
+    requests: {
+      default: {
+        name: "Updated Task",
+        description: "An updated cron task",
+        schedule: "0 */2 * * *",
+        enabled: false,
+        priority: "HIGH",
+        timeout: 7200,
+        retries: 5,
+      },
+    },
+    responses: {
+      default: {
+        task: {
+          id: "task-123",
+          name: "Updated Task",
+          description: "An updated cron task",
+          schedule: "0 */2 * * *",
+          enabled: false,
+          priority: "HIGH",
+          status: "PENDING",
+          category: "SYSTEM",
+          timeout: 7200,
+          retries: 5,
+          version: 2,
+          createdAt: "2024-01-01T00:00:00Z",
+          updatedAt: "2024-01-02T00:00:00Z",
+        },
+        success: true,
+      },
+    },
+  },
 });
 
 /**
@@ -396,7 +461,7 @@ const { DELETE } = createEndpoint({
         "app.api.v1.core.system.tasks.cron.task.delete.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: "url", response: true },
+    { request: "urlParams", response: true },
     {
       // URL parameter
       id: requestUrlParamsField(
@@ -493,6 +558,20 @@ const { DELETE } = createEndpoint({
       "app.api.v1.core.system.tasks.cron.task.delete.success.deleted.title",
     description:
       "app.api.v1.core.system.tasks.cron.task.delete.success.deleted.description",
+  },
+  examples: {
+    urlPathVariables: {
+      default: {
+        id: "task-123",
+      },
+    },
+    requests: undefined,
+    responses: {
+      default: {
+        success: true,
+        message: "Task deleted successfully",
+      },
+    },
   },
 });
 

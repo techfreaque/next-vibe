@@ -269,7 +269,9 @@ export function ExecutionHistory({
                   )}
                 </div>
               ) : (
-                t("app.admin.cron.cronErrors.admin.interface.executionHistory.noHistory")
+                t(
+                  "app.admin.cron.cronErrors.admin.interface.executionHistory.noHistory",
+                )
               )}
             </div>
           ) : (
@@ -334,10 +336,8 @@ export function ExecutionHistory({
                         </div>
                         {execution.error.errorType && (
                           <div className="text-xs opacity-75">
-                            {t(
-                              "app.admin.cron.executionHistory.errorType",
-                            )}
-                            : {execution.error.errorType}
+                            {t("app.admin.cron.executionHistory.errorType")}:{" "}
+                            {execution.error.errorType}
                           </div>
                         )}
                       </div>

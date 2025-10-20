@@ -33,6 +33,7 @@ export const translations = {
     },
   },
   errors: {
+    title: "Error",
     validation: {
       title: "Validation Error",
       description: "Token validation failed",

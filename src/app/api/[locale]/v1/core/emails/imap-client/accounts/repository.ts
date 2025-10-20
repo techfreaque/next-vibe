@@ -563,7 +563,8 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
 
       return createSuccessResponse({
         success: true,
-        message: "app.api.v1.core.emails.imapClient.imapErrors.accounts.delete.success.title",
+        message:
+          "app.api.v1.core.emails.imapClient.imapErrors.accounts.delete.success.title",
       });
     } catch (error) {
       logger.error("Error deleting IMAP account", parseError(error));
@@ -707,7 +708,8 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
             resolveOnce(
               createSuccessResponse({
                 success: true,
-                message: "app.api.v1.core.emails.imapClient.imap.connection.test.success",
+                message:
+                  "app.api.v1.core.emails.imapClient.imap.connection.test.success",
                 connectionStatus: ImapConnectionStatus.CONNECTED,
                 details: {
                   host: account.host,

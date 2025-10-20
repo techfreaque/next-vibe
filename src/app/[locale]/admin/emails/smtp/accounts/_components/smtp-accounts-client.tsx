@@ -75,7 +75,9 @@ export function SmtpAccountsClient({
         <div className="flex justify-between items-center">
           <CardTitle className="flex items-center">
             <Users className="h-5 w-5 mr-2" />
-            {t("app.admin.emails.smtp.list.titleWithCount", { count: totalAccounts })}
+            {t("app.admin.emails.smtp.list.titleWithCount", {
+              count: totalAccounts,
+            })}
           </CardTitle>
           <div className="flex items-center space-x-2">
             {/* View Mode Toggle */}
@@ -158,7 +160,8 @@ export function SmtpAccountsClient({
                 config={{
                   type: "select",
                   label: undefined,
-                  placeholder: "app.admin.emails.smtp.admin.fields.campaignTypes" as const,
+                  placeholder:
+                    "app.admin.emails.smtp.admin.fields.campaignTypes" as const,
                   options: [
                     {
                       value: CampaignTypeFilter.ALL,
@@ -166,23 +169,28 @@ export function SmtpAccountsClient({
                     },
                     {
                       value: CampaignTypeFilter.LEAD_CAMPAIGN,
-                      label: "app.admin.emails.smtp.admin.campaignTypes.leadCampaign" as const,
+                      label:
+                        "app.admin.emails.smtp.admin.campaignTypes.leadCampaign" as const,
                     },
                     {
                       value: CampaignTypeFilter.NEWSLETTER,
-                      label: "app.admin.emails.smtp.admin.campaignTypes.newsletter" as const,
+                      label:
+                        "app.admin.emails.smtp.admin.campaignTypes.newsletter" as const,
                     },
                     {
                       value: CampaignTypeFilter.TRANSACTIONAL,
-                      label: "app.admin.emails.smtp.admin.campaignTypes.transactional" as const,
+                      label:
+                        "app.admin.emails.smtp.admin.campaignTypes.transactional" as const,
                     },
                     {
                       value: CampaignTypeFilter.NOTIFICATION,
-                      label: "app.admin.emails.smtp.admin.campaignTypes.notification" as const,
+                      label:
+                        "app.admin.emails.smtp.admin.campaignTypes.notification" as const,
                     },
                     {
                       value: CampaignTypeFilter.SYSTEM,
-                      label: "app.admin.emails.smtp.admin.campaignTypes.system" as const,
+                      label:
+                        "app.admin.emails.smtp.admin.campaignTypes.system" as const,
                     },
                   ],
                 }}
@@ -200,7 +208,8 @@ export function SmtpAccountsClient({
                 config={{
                   type: "select",
                   label: undefined,
-                  placeholder: "app.admin.emails.smtp.filter.status.placeholder",
+                  placeholder:
+                    "app.admin.emails.smtp.filter.status.placeholder",
                   options: [
                     {
                       value: SmtpAccountStatusFilter.ALL,
@@ -238,7 +247,8 @@ export function SmtpAccountsClient({
                 config={{
                   type: "select",
                   label: undefined,
-                  placeholder: "app.admin.emails.smtp.filter.health.placeholder",
+                  placeholder:
+                    "app.admin.emails.smtp.filter.health.placeholder",
                   options: [
                     {
                       value: SmtpHealthStatusFilter.ALL,

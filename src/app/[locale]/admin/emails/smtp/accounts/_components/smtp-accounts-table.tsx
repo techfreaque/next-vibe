@@ -110,7 +110,9 @@ export function SmtpAccountsTable({
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
-          <p className="text-gray-500">{t("app.admin.emails.smtp.list.loading")}</p>
+          <p className="text-gray-500">
+            {t("app.admin.emails.smtp.list.loading")}
+          </p>
         </div>
       </div>
     );
@@ -138,11 +140,21 @@ export function SmtpAccountsTable({
           <TableRow>
             <TableHead>{t("app.admin.emails.smtp.list.table.name")}</TableHead>
             <TableHead>{t("app.admin.emails.smtp.list.table.host")}</TableHead>
-            <TableHead>{t("app.admin.emails.smtp.admin.fields.campaignTypes")}</TableHead>
-            <TableHead>{t("app.admin.emails.smtp.list.table.status")}</TableHead>
-            <TableHead>{t("app.admin.emails.smtp.list.table.health")}</TableHead>
-            <TableHead>{t("app.admin.emails.smtp.list.table.fromEmail")}</TableHead>
-            <TableHead>{t("app.admin.emails.smtp.list.table.actions")}</TableHead>
+            <TableHead>
+              {t("app.admin.emails.smtp.admin.fields.campaignTypes")}
+            </TableHead>
+            <TableHead>
+              {t("app.admin.emails.smtp.list.table.status")}
+            </TableHead>
+            <TableHead>
+              {t("app.admin.emails.smtp.list.table.health")}
+            </TableHead>
+            <TableHead>
+              {t("app.admin.emails.smtp.list.table.fromEmail")}
+            </TableHead>
+            <TableHead>
+              {t("app.admin.emails.smtp.list.table.actions")}
+            </TableHead>
             <TableHead className="text-right">
               {t("app.admin.emails.smtp.list.table.actions")}
             </TableHead>
@@ -205,7 +217,8 @@ export function SmtpAccountsTable({
                 <div className="text-sm">
                   <div className="text-gray-900 dark:text-gray-100">
                     {account.emailsSentToday} /{" "}
-                    {account.rateLimitPerHour || t("app.admin.emails.smtp.list.table.unlimited")}
+                    {account.rateLimitPerHour ||
+                      t("app.admin.emails.smtp.list.table.unlimited")}
                   </div>
                   <div className="text-xs text-gray-500">
                     {t("app.admin.emails.smtp.list.table.todayLimit")}

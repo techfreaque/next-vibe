@@ -1,14 +1,43 @@
 export const translations = {
   post: {
-    title: "Restore Backup",
-    description: "Restore Backup endpoint",
-    form: {
-      title: "Restore Backup Configuration",
-      description: "Configure restore backup parameters",
+    title: "Restore Translation Backup",
+    description: "Restore translation files from a backup",
+    container: {
+      title: "Restore Backup",
+      description: "Restore translation files from a specified backup",
+    },
+    fields: {
+      backupPath: {
+        title: "Backup Path",
+        description: "Path to the backup directory to restore from",
+      },
+      validateOnly: {
+        title: "Validate Only",
+        description: "Only validate the backup without restoring",
+      },
+      createBackupBeforeRestore: {
+        title: "Create Backup Before Restore",
+        description: "Create a backup of current state before restoring",
+      },
+    },
+    messages: {
+      validationSuccessful:
+        "Backup validation successful - backup is valid and can be restored",
+      restoreSuccessful: "Backup restored successfully",
+      backupNotFound: "Backup not found at specified path",
     },
     response: {
-      title: "Response",
-      description: "Restore Backup response data",
+      title: "Restore Result",
+      description: "Backup restoration results",
+      message: "Restoration Message",
+      backupInfo: {
+        title: "Backup Information",
+        description: "Information about the restored backup",
+        backupPath: "Backup Path",
+        backupDate: "Backup Date",
+        filesRestored: "Files Restored",
+        newBackupCreated: "New Backup Created",
+      },
     },
     errors: {
       unauthorized: {
@@ -17,7 +46,7 @@ export const translations = {
       },
       validation: {
         title: "Validation Error",
-        description: "Invalid request parameters",
+        description: "Invalid backup path or parameters",
       },
       server: {
         title: "Server Error",
@@ -36,17 +65,17 @@ export const translations = {
         description: "Access forbidden",
       },
       notFound: {
-        title: "Not Found",
-        description: "Resource not found",
+        title: "Backup Not Found",
+        description: "The specified backup does not exist",
       },
       conflict: {
         title: "Conflict",
-        description: "Data conflict occurred",
+        description: "Backup restoration conflict occurred",
       },
     },
     success: {
-      title: "Success",
-      description: "Operation completed successfully",
+      title: "Backup Restored",
+      description: "Translation backup restored successfully",
     },
   },
 };

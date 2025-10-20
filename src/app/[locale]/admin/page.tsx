@@ -24,10 +24,10 @@ export default async function AdminDashboardPage({
     <div className="p-6 space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          {t("admin.dashboard.title")}
+          {t("app.admin.dashboard.title")}
         </h1>
         <p className="mt-2 text-gray-600 dark:text-gray-400">
-          {t("admin.dashboard.subtitle")}
+          {t("app.admin.dashboard.subtitle")}
         </p>
       </div>
     </div>

@@ -1,14 +1,18 @@
 export const translations = {
-  post: {
-    title: "Stats",
-    description: "Stats endpoint",
-    form: {
-      title: "Stats Configuration",
-      description: "Configure stats parameters",
+  get: {
+    title: "Translation Statistics",
+    description: "Get translation statistics and analytics",
+    container: {
+      title: "Translation Statistics",
+      description: "View translation file usage and key metrics",
     },
     response: {
-      title: "Response",
-      description: "Stats response data",
+      title: "Statistics",
+      description: "Translation statistics data",
+    },
+    success: {
+      title: "Statistics Retrieved",
+      description: "Translation statistics retrieved successfully",
     },
     errors: {
       unauthorized: {
@@ -43,10 +47,6 @@ export const translations = {
         title: "Conflict",
         description: "Data conflict occurred",
       },
-    },
-    success: {
-      title: "Success",
-      description: "Operation completed successfully",
     },
   },
 };

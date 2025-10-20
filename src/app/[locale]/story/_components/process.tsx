@@ -38,34 +38,44 @@ const Process: FC<ProcessProps> = ({ locale }) => {
   const steps: ProcessStep[] = [
     {
       number: "01",
-      title: t("app.site.home.process.steps.strategyDevelopment.title"),
+      title: t(
+        "app.story._components.home.process.steps.strategyDevelopment.title",
+      ),
       description: t(
-        "app.site.home.process.steps.strategyDevelopment.description",
+        "app.story._components.home.process.steps.strategyDevelopment.description",
       ),
       icon: <Lightbulb className="h-8 w-8 text-amber-500" />,
       image: "/images/process/strategy.png",
     },
     {
       number: "02",
-      title: t("app.site.home.process.steps.contentCreation.title"),
-      description: t("app.site.home.process.steps.contentCreation.description"),
+      title: t(
+        "app.story._components.home.process.steps.contentCreation.title",
+      ),
+      description: t(
+        "app.story._components.home.process.steps.contentCreation.description",
+      ),
       icon: <PenTool className="h-8 w-8 text-blue-500" />,
       image: "/images/process/content.png",
     },
     {
       number: "03",
-      title: t("app.site.home.process.steps.publishingManagement.title"),
+      title: t(
+        "app.story._components.home.process.steps.publishingManagement.title",
+      ),
       description: t(
-        "app.site.home.process.steps.publishingManagement.description",
+        "app.story._components.home.process.steps.publishingManagement.description",
       ),
       icon: <MessageSquare className="h-8 w-8 text-green-500" />,
       image: "/images/process/publishing.png",
     },
     {
       number: "04",
-      title: t("app.site.home.process.steps.analysisOptimization.title"),
+      title: t(
+        "app.story._components.home.process.steps.analysisOptimization.title",
+      ),
       description: t(
-        "app.site.home.process.steps.analysisOptimization.description",
+        "app.story._components.home.process.steps.analysisOptimization.description",
       ),
       icon: <BarChart3 className="h-8 w-8 text-purple-500" />,
       image: "/images/process/analysis.png",
@@ -87,7 +97,7 @@ const Process: FC<ProcessProps> = ({ locale }) => {
             transition={{ duration: 0.5 }}
           >
             <span className="font-medium">
-              {t("app.site.home.process.badge")}
+              {t("app.story._components.home.process.badge")}
             </span>
           </motion.div>
 
@@ -97,7 +107,7 @@ const Process: FC<ProcessProps> = ({ locale }) => {
             animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            {t("app.site.home.process.title")}{" "}
+            {t("app.story._components.home.process.title")}{" "}
           </motion.h2>
 
           <motion.p
@@ -106,7 +116,7 @@ const Process: FC<ProcessProps> = ({ locale }) => {
             animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            {t("app.site.home.process.subtitle")}
+            {t("app.story._components.home.process.subtitle")}
           </motion.p>
         </div>
 
@@ -146,12 +156,12 @@ const Process: FC<ProcessProps> = ({ locale }) => {
                       <>
                         <span className="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-sm font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
                           {t(
-                            "app.site.home.process.steps.strategyDevelopment.tags.audienceAnalysis",
+                            "app.story._components.home.process.steps.strategyDevelopment.tags.audienceAnalysis",
                           )}
                         </span>
                         <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
                           {t(
-                            "app.site.home.process.steps.strategyDevelopment.tags.competitorResearch",
+                            "app.story._components.home.process.steps.strategyDevelopment.tags.competitorResearch",
                           )}
                         </span>
                       </>
@@ -160,12 +170,12 @@ const Process: FC<ProcessProps> = ({ locale }) => {
                       <>
                         <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
                           {t(
-                            "app.site.home.process.steps.contentCreation.tags.brandAlignedContent",
+                            "app.story._components.home.process.steps.contentCreation.tags.brandAlignedContent",
                           )}
                         </span>
                         <span className="inline-flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm font-medium text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
                           {t(
-                            "app.site.home.process.steps.contentCreation.tags.engagingVisuals",
+                            "app.story._components.home.process.steps.contentCreation.tags.engagingVisuals",
                           )}
                         </span>
                       </>
@@ -174,12 +184,12 @@ const Process: FC<ProcessProps> = ({ locale }) => {
                       <>
                         <span className="inline-flex items-center rounded-full bg-cyan-100 px-3 py-1 text-sm font-medium text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400">
                           {t(
-                            "app.site.home.process.steps.publishingManagement.tags.optimalTiming",
+                            "app.story._components.home.process.steps.publishingManagement.tags.optimalTiming",
                           )}
                         </span>
                         <span className="inline-flex items-center rounded-full bg-pink-100 px-3 py-1 text-sm font-medium text-pink-800 dark:bg-pink-900/30 dark:text-pink-400">
                           {t(
-                            "app.site.home.process.steps.publishingManagement.tags.communityBuilding",
+                            "app.story._components.home.process.steps.publishingManagement.tags.communityBuilding",
                           )}
                         </span>
                       </>
@@ -188,12 +198,12 @@ const Process: FC<ProcessProps> = ({ locale }) => {
                       <>
                         <span className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400">
                           {t(
-                            "app.site.home.process.steps.analysisOptimization.tags.performanceMetrics",
+                            "app.story._components.home.process.steps.analysisOptimization.tags.performanceMetrics",
                           )}
                         </span>
                         <span className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-sm font-medium text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">
                           {t(
-                            "app.site.home.process.steps.analysisOptimization.tags.strategyRefinement",
+                            "app.story._components.home.process.steps.analysisOptimization.tags.strategyRefinement",
                           )}
                         </span>
                       </>
@@ -219,13 +229,13 @@ const Process: FC<ProcessProps> = ({ locale }) => {
                         <div className="h-2 w-2 rounded-full bg-green-500" />
                         <span className="text-sm font-medium">
                           {t(
-                            "app.site.home.process.steps.strategyDevelopment.insights.title",
+                            "app.story._components.home.process.steps.strategyDevelopment.insights.title",
                           )}
                         </span>
                       </div>
                       <p className="text-xs text-gray-600 dark:text-gray-300">
                         {t(
-                          "app.site.home.process.steps.strategyDevelopment.insights.description",
+                          "app.story._components.home.process.steps.strategyDevelopment.insights.description",
                         )}
                       </p>
                     </div>
@@ -237,13 +247,13 @@ const Process: FC<ProcessProps> = ({ locale }) => {
                         <div className="h-2 w-2 rounded-full bg-blue-500" />
                         <span className="text-sm font-medium">
                           {t(
-                            "app.site.home.process.steps.contentCreation.insights.title",
+                            "app.story._components.home.process.steps.contentCreation.insights.title",
                           )}
                         </span>
                       </div>
                       <p className="text-xs text-gray-600 dark:text-gray-300">
                         {t(
-                          "app.site.home.process.steps.contentCreation.insights.description",
+                          "app.story._components.home.process.steps.contentCreation.insights.description",
                         )}
                       </p>
                     </div>
@@ -267,16 +277,16 @@ const Process: FC<ProcessProps> = ({ locale }) => {
               </div>
             </div>
             <h3 className="text-xl font-bold mb-2">
-              {t("app.site.home.process.readyTransform")}
+              {t("app.story._components.home.process.readyTransform")}
             </h3>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              {t("app.site.home.process.handleSocial")}
+              {t("app.story._components.home.process.handleSocial")}
             </p>
             <a
               href={`/${locale}/#pricing`}
               className="inline-flex items-center justify-center rounded-md bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 shadow-md hover:shadow-lg transition-all"
             >
-              {t("app.site.home.process.getStarted")}
+              {t("app.story._components.home.process.getStarted")}
             </a>
           </div>
         </motion.div>

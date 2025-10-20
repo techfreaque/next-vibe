@@ -35,8 +35,9 @@ const { POST } = createEndpoint({
   path: ["v1", "core", "system", "translations", "reorganize"],
   allowedRoles: [UserRole.ADMIN],
 
-  title: "app.api.v1.core.system.translations.reorganize.title",
-  description: "app.api.v1.core.system.translations.reorganize.description",
+  title: "app.api.v1.core.system.translations.reorganize.post.title",
+  description:
+    "app.api.v1.core.system.translations.reorganize.post.description",
   category: "app.api.v1.core.system.translations.category",
   tags: [
     "app.api.v1.core.system.translations.tags.reorganize",
@@ -53,9 +54,10 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.system.translations.reorganize.container.title",
+      title:
+        "app.api.v1.core.system.translations.reorganize.post.container.title",
       description:
-        "app.api.v1.core.system.translations.reorganize.container.description",
+        "app.api.v1.core.system.translations.reorganize.post.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -66,9 +68,9 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.translations.reorganize.fields.removeUnused.title" as const,
+            "app.api.v1.core.system.translations.reorganize.post.fields.removeUnused.title" as const,
           description:
-            "app.api.v1.core.system.translations.reorganize.fields.removeUnused.description" as const,
+            "app.api.v1.core.system.translations.reorganize.post.fields.removeUnused.description" as const,
           layout: { columns: 6 },
         },
         z.boolean().default(false),
@@ -79,9 +81,9 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.translations.reorganize.fields.dryRun.title" as const,
+            "app.api.v1.core.system.translations.reorganize.post.fields.dryRun.title" as const,
           description:
-            "app.api.v1.core.system.translations.reorganize.fields.dryRun.description" as const,
+            "app.api.v1.core.system.translations.reorganize.post.fields.dryRun.description" as const,
           layout: { columns: 6 },
         },
         z.boolean().default(true),
@@ -92,9 +94,9 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.translations.reorganize.fields.backup.title" as const,
+            "app.api.v1.core.system.translations.reorganize.post.fields.backup.title" as const,
           description:
-            "app.api.v1.core.system.translations.reorganize.fields.backup.description" as const,
+            "app.api.v1.core.system.translations.reorganize.post.fields.backup.description" as const,
           layout: { columns: 6 },
         },
         z.boolean().default(true),
@@ -105,9 +107,9 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.translations.reorganize.fields.regenerateStructure.title" as const,
+            "app.api.v1.core.system.translations.reorganize.post.fields.regenerateStructure.title" as const,
           description:
-            "app.api.v1.core.system.translations.reorganize.fields.regenerateStructure.description" as const,
+            "app.api.v1.core.system.translations.reorganize.post.fields.regenerateStructure.description" as const,
           layout: { columns: 6 },
         },
         z.boolean().default(false),
@@ -118,9 +120,9 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.translations.reorganize.fields.regenerateKeys.title" as const,
+            "app.api.v1.core.system.translations.reorganize.post.fields.regenerateKeys.title" as const,
           description:
-            "app.api.v1.core.system.translations.reorganize.fields.regenerateKeys.description" as const,
+            "app.api.v1.core.system.translations.reorganize.post.fields.regenerateKeys.description" as const,
           layout: { columns: 6 },
         },
         z.boolean().default(false),
@@ -131,9 +133,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title:
-            "app.api.v1.core.system.translations.reorganize.success.title" as const,
+            "app.api.v1.core.system.translations.reorganize.post.success.title" as const,
           description:
-            "app.api.v1.core.system.translations.reorganize.success.description" as const,
+            "app.api.v1.core.system.translations.reorganize.post.success.description" as const,
           layout: { type: LayoutType.GRID, columns: 12 },
         },
         { response: true },
@@ -142,7 +144,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.system.translations.reorganize.fields.success.title",
+                "app.api.v1.core.system.translations.reorganize.post.fields.success.title",
             },
             z.boolean(),
           ),
@@ -151,9 +153,9 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.STATS_GRID,
               title:
-                "app.api.v1.core.system.translations.reorganize.fields.summary.title" as const,
+                "app.api.v1.core.system.translations.reorganize.post.fields.summary.title" as const,
               description:
-                "app.api.v1.core.system.translations.reorganize.description" as const,
+                "app.api.v1.core.system.translations.reorganize.post.description" as const,
               layout: { type: LayoutType.GRID, columns: 12 },
             },
             { response: true },
@@ -162,7 +164,7 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.system.translations.reorganize.messages.foundKeys",
+                    "app.api.v1.core.system.translations.reorganize.post.messages.foundKeys",
                 },
                 z.number(),
               ),
@@ -170,7 +172,7 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.system.translations.reorganize.messages.foundKeys",
+                    "app.api.v1.core.system.translations.reorganize.post.messages.foundKeys",
                 },
                 z.number(),
               ),
@@ -178,7 +180,7 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.system.translations.reorganize.messages.foundKeys",
+                    "app.api.v1.core.system.translations.reorganize.post.messages.foundKeys",
                 },
                 z.number(),
               ),
@@ -186,7 +188,7 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.system.translations.reorganize.messages.removingKeys",
+                    "app.api.v1.core.system.translations.reorganize.post.messages.removingKeys",
                 },
                 z.number(),
               ),
@@ -194,7 +196,7 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.system.translations.reorganize.messages.regeneratedStructure",
+                    "app.api.v1.core.system.translations.reorganize.post.messages.regeneratedStructure",
                 },
                 z.number(),
               ),
@@ -202,7 +204,7 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.system.translations.reorganize.messages.regeneratedStructure",
+                    "app.api.v1.core.system.translations.reorganize.post.messages.regeneratedStructure",
                 },
                 z.number(),
               ),
@@ -210,7 +212,7 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.v1.core.system.translations.reorganize.messages.backupCreated",
+                    "app.api.v1.core.system.translations.reorganize.post.messages.backupCreated",
                 },
                 z.boolean(),
               ),
@@ -221,7 +223,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.system.translations.reorganize.fields.output.title",
+                "app.api.v1.core.system.translations.reorganize.post.fields.output.title",
             },
             z.string(),
           ),
@@ -230,7 +232,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.system.translations.reorganize.fields.duration.title",
+                "app.api.v1.core.system.translations.reorganize.post.fields.duration.title",
             },
             z.number(),
           ),
@@ -239,7 +241,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.TEXT,
               content:
-                "app.api.v1.core.system.translations.reorganize.fields.backupPath.title",
+                "app.api.v1.core.system.translations.reorganize.post.fields.backupPath.title",
             },
             z.string().optional(),
           ),
@@ -253,9 +255,9 @@ const { POST } = createEndpoint({
               {
                 type: WidgetType.CONTAINER,
                 title:
-                  "app.api.v1.core.system.translations.reorganize.fields.changes.title" as const,
+                  "app.api.v1.core.system.translations.reorganize.post.fields.changes.title" as const,
                 description:
-                  "app.api.v1.core.system.translations.reorganize.description" as const,
+                  "app.api.v1.core.system.translations.reorganize.post.description" as const,
                 layout: { type: LayoutType.GRID, columns: 12 },
               },
               { response: true },
@@ -264,7 +266,7 @@ const { POST } = createEndpoint({
                   {
                     type: WidgetType.TEXT,
                     content:
-                      "app.api.v1.core.system.translations.reorganize.fields.changes.title",
+                      "app.api.v1.core.system.translations.reorganize.post.fields.changes.title",
                   },
                   z.enum(["removed", "updated", "created", "regenerated"]),
                 ),
@@ -272,7 +274,7 @@ const { POST } = createEndpoint({
                   {
                     type: WidgetType.TEXT,
                     content:
-                      "app.api.v1.core.system.translations.reorganize.fields.changes.title",
+                      "app.api.v1.core.system.translations.reorganize.post.fields.changes.title",
                   },
                   z.string(),
                 ),
@@ -280,7 +282,7 @@ const { POST } = createEndpoint({
                   {
                     type: WidgetType.TEXT,
                     content:
-                      "app.api.v1.core.system.translations.reorganize.description",
+                      "app.api.v1.core.system.translations.reorganize.post.description",
                   },
                   z.string(),
                 ),
@@ -296,65 +298,65 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.system.translations.reorganize.errors.validation.title",
+        "app.api.v1.core.system.translations.reorganize.post.errors.validation.title",
       description:
-        "app.api.v1.core.system.translations.reorganize.errors.validation.description",
+        "app.api.v1.core.system.translations.reorganize.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.system.translations.reorganize.errors.validation.title",
+        "app.api.v1.core.system.translations.reorganize.post.errors.validation.title",
       description:
-        "app.api.v1.core.system.translations.reorganize.errors.validation.description",
+        "app.api.v1.core.system.translations.reorganize.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.system.translations.reorganize.errors.unauthorized.title",
+        "app.api.v1.core.system.translations.reorganize.post.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.translations.reorganize.errors.unauthorized.description",
+        "app.api.v1.core.system.translations.reorganize.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.system.translations.reorganize.errors.forbidden.title",
+        "app.api.v1.core.system.translations.reorganize.post.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.translations.reorganize.errors.forbidden.description",
+        "app.api.v1.core.system.translations.reorganize.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.system.translations.reorganize.errors.validation.title",
+        "app.api.v1.core.system.translations.reorganize.post.errors.validation.title",
       description:
-        "app.api.v1.core.system.translations.reorganize.errors.validation.description",
+        "app.api.v1.core.system.translations.reorganize.post.errors.validation.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.translations.reorganize.errors.validation.title",
+        "app.api.v1.core.system.translations.reorganize.post.errors.validation.title",
       description:
-        "app.api.v1.core.system.translations.reorganize.errors.validation.description",
+        "app.api.v1.core.system.translations.reorganize.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.system.translations.reorganize.errors.validation.title",
+        "app.api.v1.core.system.translations.reorganize.post.errors.validation.title",
       description:
-        "app.api.v1.core.system.translations.reorganize.errors.validation.description",
+        "app.api.v1.core.system.translations.reorganize.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.system.translations.reorganize.errors.validation.title",
+        "app.api.v1.core.system.translations.reorganize.post.errors.validation.title",
       description:
-        "app.api.v1.core.system.translations.reorganize.errors.validation.description",
+        "app.api.v1.core.system.translations.reorganize.post.errors.validation.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.system.translations.reorganize.errors.validation.title",
+        "app.api.v1.core.system.translations.reorganize.post.errors.validation.title",
       description:
-        "app.api.v1.core.system.translations.reorganize.errors.validation.description",
+        "app.api.v1.core.system.translations.reorganize.post.errors.validation.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.system.translations.reorganize.success.title",
+    title: "app.api.v1.core.system.translations.reorganize.post.success.title",
     description:
-      "app.api.v1.core.system.translations.reorganize.success.description",
+      "app.api.v1.core.system.translations.reorganize.post.success.description",
   },
 
   // === EXAMPLES ===

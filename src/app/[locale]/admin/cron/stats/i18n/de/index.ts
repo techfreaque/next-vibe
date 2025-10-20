@@ -13,13 +13,28 @@ export const translations: typeof enTranslations = {
       description: "Statistik-Antwortdaten",
     },
     errors: {
-      unauthorized: { title: "Nicht autorisiert", description: "Authentifizierung erforderlich" },
-      validation: { title: "Validierungsfehler", description: "Ungültige Anfrageparameter" },
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Authentifizierung erforderlich",
+      },
+      validation: {
+        title: "Validierungsfehler",
+        description: "Ungültige Anfrageparameter",
+      },
       server: { title: "Serverfehler", description: "Interner Serverfehler" },
-      unknown: { title: "Unbekannter Fehler", description: "Ein unbekannter Fehler ist aufgetreten" },
-      network: { title: "Netzwerkfehler", description: "Netzwerkfehler aufgetreten" },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unbekannter Fehler ist aufgetreten",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Netzwerkfehler aufgetreten",
+      },
       forbidden: { title: "Verboten", description: "Zugriff verboten" },
-      notFound: { title: "Nicht gefunden", description: "Ressource nicht gefunden" },
+      notFound: {
+        title: "Nicht gefunden",
+        description: "Ressource nicht gefunden",
+      },
       conflict: { title: "Konflikt", description: "Datenkonflikt aufgetreten" },
     },
     success: {
@@ -99,10 +114,12 @@ export const translations: typeof enTranslations = {
   medianExecutionTime: "Median Ausführungszeit",
   minExecutionTime: "Min. Ausführungszeit",
   ofTotal: "von gesamt",
-  pageDescription: "Statistiken und Leistungsmetriken für Cron-Aufgaben anzeigen",
+  pageDescription:
+    "Statistiken und Leistungsmetriken für Cron-Aufgaben anzeigen",
   pageTitle: "Cron-Statistiken",
   performanceMetrics: "Leistungsmetriken",
-  priorityAndHealth: "{{priorityLabel}}: {{priority}}, {{healthLabel}}: {{health}}",
+  priorityAndHealth:
+    "{{priorityLabel}}: {{priority}}, {{healthLabel}}: {{health}}",
   priority: {
     low: "Niedrig",
     high: "Hoch",

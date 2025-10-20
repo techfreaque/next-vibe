@@ -18,6 +18,7 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import { chatThreads } from "../db";
 import { ThreadStatus } from "../enum";
@@ -146,23 +147,26 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
 
       // Get paginated threads
       const offset = (page - 1) * limit;
-      const threads = await db
-        .select({
-          id: chatThreads.id,
-          title: chatThreads.title,
-          rootFolderId: chatThreads.rootFolderId,
-          folderId: chatThreads.folderId,
-          status: chatThreads.status,
-          preview: chatThreads.preview,
-          pinned: chatThreads.pinned,
-          createdAt: chatThreads.createdAt,
-          updatedAt: chatThreads.updatedAt,
-        })
+      const dbThreads = await db
+        .select()
         .from(chatThreads)
         .where(whereClause)
         .orderBy(desc(chatThreads.pinned), desc(chatThreads.updatedAt))
         .limit(limit)
         .offset(offset);
+
+      // Map DB fields to API response format (DB has rootFolderId as DefaultFolderId, folderId as UUID)
+      const threads = dbThreads.map((thread) => ({
+        id: thread.id,
+        title: thread.title,
+        rootFolderId: thread.rootFolderId,
+        folderId: thread.folderId,
+        status: thread.status,
+        preview: thread.preview,
+        pinned: thread.pinned,
+        createdAt: thread.createdAt,
+        updatedAt: thread.updatedAt,
+      }));
 
       const pageCount = Math.ceil(total / limit);
 
@@ -215,7 +219,11 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         return createErrorResponse(
           "app.api.v1.core.agent.chat.threads.post.errors.forbidden.title",
           ErrorResponseTypes.FORBIDDEN,
-          { message: "Incognito threads cannot be created on the server" },
+          {
+            message: simpleT(locale).t(
+              "app.api.v1.core.agent.chat.threads.post.errors.forbidden.incognitoNotAllowed",
+            ),
+          },
         );
       }
 
@@ -232,33 +240,42 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         );
       }
 
-      const [thread] = await db
+      const threadData = {
+        userId: user.id,
+        title:
+          data.thread?.title ||
+          simpleT(locale).t(
+            "app.api.v1.core.agent.chat.threads.post.threadTitle.default",
+          ),
+        rootFolderId: data.thread?.rootFolderId,
+        folderId: data.thread?.subFolderId ?? null,
+        status: ThreadStatus.ACTIVE,
+        defaultModel: data.thread?.model ?? null,
+        defaultTone: (data.thread?.persona ??
+          null) as typeof chatThreads.$inferInsert.defaultTone,
+        systemPrompt: data.thread?.systemPrompt ?? null,
+        pinned: false,
+        archived: false,
+        tags: [],
+        preview: null,
+        metadata: {},
+      } satisfies typeof chatThreads.$inferInsert;
+
+      const [dbThread] = await db
         .insert(chatThreads)
-        .values({
-          userId: user.id,
-          // eslint-disable-next-line i18next/no-literal-string
-          title: data.thread?.title || "New Chat",
-          rootFolderId: data.thread?.rootFolderId,
-          folderId: data.thread?.subFolderId ?? null,
-          status: ThreadStatus.ACTIVE,
-          defaultModel: data.thread?.model ?? null,
-          defaultTone: data.thread?.persona ?? null,
-          systemPrompt: data.thread?.systemPrompt ?? null,
-          pinned: false,
-          archived: false,
-          tags: [],
-          preview: null,
-          metadata: {},
-        })
-        .returning({
-          id: chatThreads.id,
-          title: chatThreads.title,
-          rootFolderId: chatThreads.rootFolderId,
-          folderId: chatThreads.folderId,
-          status: chatThreads.status,
-          createdAt: chatThreads.createdAt,
-          updatedAt: chatThreads.updatedAt,
-        });
+        .values(threadData)
+        .returning();
+
+      // Map DB fields to API response format (DB has rootFolderId as DefaultFolderId, folderId as UUID)
+      const thread = {
+        id: dbThread.id,
+        title: dbThread.title,
+        rootFolderId: dbThread.rootFolderId, // Already typed as DefaultFolderId from DB schema
+        subFolderId: dbThread.folderId,
+        status: dbThread.status,
+        createdAt: dbThread.createdAt,
+        updatedAt: dbThread.updatedAt,
+      };
 
       logger.debug("Thread created successfully", { threadId: thread.id });
 

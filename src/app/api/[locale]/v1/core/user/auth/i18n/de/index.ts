@@ -1,8 +1,19 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  authClient: {
+    errors: {
+      status_save_failed:
+        "Authentifizierungsstatus konnte nicht gespeichert werden",
+      status_remove_failed:
+        "Authentifizierungsstatus konnte nicht entfernt werden",
+      status_check_failed:
+        "Authentifizierungsstatus konnte nicht überprüft werden",
+    },
+  },
   errors: {
-    token_generation_failed: "Authentifizierungs-Token konnte nicht generiert werden",
+    token_generation_failed:
+      "Authentifizierungs-Token konnte nicht generiert werden",
     invalid_session: "Die Sitzung ist ungültig oder abgelaufen",
     missing_request_context: "Request-Kontext fehlt",
     unsupported_platform: "Plattform wird nicht unterstützt",
@@ -11,7 +22,8 @@ export const translations: typeof enTranslations = {
     invalid_token_signature: "Token-Signatur ist ungültig",
     jwt_payload_missing_id: "JWT-Payload fehlt Benutzer-ID",
     cookie_set_failed: "Authentifizierungs-Cookie konnte nicht gesetzt werden",
-    cookie_clear_failed: "Authentifizierungs-Cookie konnte nicht gelöscht werden",
+    cookie_clear_failed:
+      "Authentifizierungs-Cookie konnte nicht gelöscht werden",
     publicPayloadNotSupported:
       "Öffentlicher JWT-Payload wird für CLI-Authentifizierung nicht unterstützt",
     jwt_signing_failed: "JWT-Token konnte nicht signiert werden",

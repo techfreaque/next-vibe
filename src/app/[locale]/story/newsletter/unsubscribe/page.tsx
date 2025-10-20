@@ -19,17 +19,17 @@ export async function generateMetadata({
   const { t } = simpleT(locale);
 
   return {
-    title: t("app.site.newsletter.unsubscribe.page.title"),
-    description: t("app.site.newsletter.unsubscribe.page.description"),
+    title: t("app.story.newsletter.unsubscribe.page.title"),
+    description: t("app.story.newsletter.unsubscribe.page.description"),
     openGraph: {
-      title: t("app.site.newsletter.unsubscribe.page.title"),
-      description: t("app.site.newsletter.unsubscribe.page.description"),
+      title: t("app.story.newsletter.unsubscribe.page.title"),
+      description: t("app.story.newsletter.unsubscribe.page.description"),
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: t("app.site.newsletter.unsubscribe.page.title"),
-      description: t("app.site.newsletter.unsubscribe.page.description"),
+      title: t("app.story.newsletter.unsubscribe.page.title"),
+      description: t("app.story.newsletter.unsubscribe.page.description"),
     },
   };
 }

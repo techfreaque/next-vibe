@@ -410,22 +410,57 @@ export const translations: typeof enTranslations = {
         "Ta nota prawna zawiera prawnie wymagane informacje o Unbottled.ai zgodnie z obowiązującymi przepisami.",
       printButton: "Drukuj",
       printAriaLabel: "Wydrukuj tę stronę",
-      companyInfo: {
-        title: "Informacje o firmie",
-        name: "Unbottled.ai",
-        address: "[Adres firmy]",
-        email: "legal@unbottled.ai",
-        representative: "[Przedstawiciel prawny]",
-      },
-      contact: {
-        title: "Kontakt",
-        email: "E-mail",
-        support: "Wsparcie",
-      },
-      disclaimer: {
-        title: "Zastrzeżenie",
-        content:
-          "Informacje zawarte na tej stronie służą wyłącznie celom informacyjnym. Chociaż staramy się utrzymywać informacje aktualne i poprawne, nie składamy żadnych oświadczeń ani gwarancji dotyczących kompletności, dokładności, niezawodności lub dostępności strony internetowej lub informacji zawartych na stronie.",
+      sections: {
+        partnerships: {
+          title: "Partnerstwa i powiązania",
+          description:
+            "Informacje o naszych partnerstwach biznesowych i powiązaniach.",
+          content:
+            "Unbottled.ai utrzymuje partnerstwa z wiodącymi dostawcami AI, aby zapewnić naszym użytkownikom najlepszą możliwą usługę.",
+        },
+        companyInfo: {
+          title: "Informacje o firmie",
+          description:
+            "Informacje prawne o Unbottled.ai i naszej zarejestrowanej jednostce biznesowej.",
+        },
+        responsiblePerson: {
+          title: "Osoba odpowiedzialna",
+          description:
+            "Informacje o osobie odpowiedzialnej za treść tej strony internetowej.",
+        },
+        contactInfo: {
+          title: "Informacje kontaktowe",
+          description:
+            "Jak się z nami skontaktować w sprawach prawnych i biznesowych.",
+          communication: {
+            phone: "+1 (555) 123-4567",
+          },
+        },
+        disclaimer: {
+          title: "Zastrzeżenie",
+          copyright: {
+            title: "Prawa autorskie",
+            content:
+              "Wszystkie treści na tej stronie są chronione prawami autorskimi. Nieautoryzowane użycie jest zabronione.",
+          },
+          liability: {
+            title: "Odpowiedzialność",
+            content:
+              "Nie składamy żadnych oświadczeń ani gwarancji dotyczących kompletności, dokładności lub niezawodności informacji na tej stronie.",
+          },
+          links: {
+            title: "Linki zewnętrzne",
+            content:
+              "Nasza strona może zawierać linki do zewnętrznych witryn. Nie ponosimy odpowiedzialności za treść zewnętrznych stron internetowych.",
+          },
+        },
+        disputeResolution: {
+          title: "Rozwiązywanie sporów",
+          description:
+            "Informacje o tym, jak spory są rozpatrywane i rozwiązywane.",
+          content:
+            "Wszelkie spory wynikające z korzystania z tej strony będą rozwiązywane zgodnie z obowiązującym prawem.",
+        },
       },
     },
     privacyPolicy: {
@@ -507,6 +542,46 @@ export const translations: typeof enTranslations = {
           title: "Przechowywanie danych",
           description:
             "Przechowujemy Twoje dane tylko tak długo, jak jest to konieczne do świadczenia naszych usług i przestrzegania zobowiązań prawnych. Możesz usunąć swoje konto i wszystkie powiązane dane w dowolnym momencie.",
+        },
+        cookies: {
+          title: "Pliki cookie i śledzenie",
+          description:
+            "Używamy plików cookie i podobnych technologii śledzenia, aby poprawić Twoje doświadczenie i analizować wzorce użytkowania.",
+        },
+        derivativeData: {
+          title: "Dane pochodne",
+          description:
+            "Możemy tworzyć zanonimizowane, zagregowane dane z Twojego użytkowania, aby ulepszyć nasze usługi.",
+        },
+        disclosure: {
+          title: "Ujawnianie informacji",
+          description:
+            "Możemy ujawnić Twoje informacje, gdy jest to wymagane przez prawo lub w celu ochrony naszych praw i bezpieczeństwa.",
+        },
+        gdpr: {
+          title: "Zgodność z RODO",
+          description:
+            "Dla użytkowników w Unii Europejskiej przestrzegamy wszystkich wymagań RODO i szanujemy Twoje prawa do ochrony danych.",
+        },
+        ccpa: {
+          title: "Zgodność z CCPA",
+          description:
+            "Dla mieszkańców Kalifornii przestrzegamy California Consumer Privacy Act i szanujemy Twoje prawa do prywatności.",
+        },
+        children: {
+          title: "Prywatność dzieci",
+          description:
+            "Nasza usługa nie jest przeznaczona dla dzieci poniżej 13 roku życia. Nie zbieramy świadomie danych od dzieci.",
+        },
+        businessTransfers: {
+          title: "Transfery biznesowe",
+          description:
+            "W przypadku fuzji, przejęcia lub sprzedaży aktywów, Twoje dane mogą zostać przekazane nowej jednostce.",
+        },
+        changes: {
+          title: "Zmiany w tej polityce",
+          description:
+            "Możemy od czasu do czasu aktualizować tę Politykę prywatności. Powiadomimy Cię o wszelkich istotnych zmianach.",
         },
         contact: {
           title: "Skontaktuj się z nami",

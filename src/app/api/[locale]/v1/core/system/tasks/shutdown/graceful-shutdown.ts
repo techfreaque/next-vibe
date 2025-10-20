@@ -4,10 +4,11 @@
  */
 
 /* eslint-disable no-console, i18next/no-literal-string */
+/// <reference types="node" />
 
 import "server-only";
 
-// import { parseError } from "next-vibe/shared/utils/parse-error";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 
 /**
  * Graceful Shutdown Manager
@@ -43,31 +44,31 @@ export class GracefulShutdownManager {
     // Handle SIGTERM (Docker, systemd, etc.)
     process.on("SIGTERM", () => {
       console.log("📡 Received SIGTERM signal");
-      this.initiateShutdown("SIGTERM");
+      void this.initiateShutdown("SIGTERM");
     });
 
     // Handle SIGINT (Ctrl+C)
     process.on("SIGINT", () => {
       console.log("📡 Received SIGINT signal (Ctrl+C)");
-      this.initiateShutdown("SIGINT");
+      void this.initiateShutdown("SIGINT");
     });
 
     // Handle SIGHUP (terminal closed)
     process.on("SIGHUP", () => {
       console.log("📡 Received SIGHUP signal");
-      this.initiateShutdown("SIGHUP");
+      void this.initiateShutdown("SIGHUP");
     });
 
     // Handle uncaught exceptions
     process.on("uncaughtException", (error) => {
       console.error("💥 Uncaught exception:", error.message || error);
-      this.initiateShutdown("UNCAUGHT_EXCEPTION");
+      void this.initiateShutdown("UNCAUGHT_EXCEPTION");
     });
 
     // Handle unhandled promise rejections
-    process.on("unhandledRejection", (reason, promise) => {
+    process.on("unhandledRejection", (reason) => {
       console.error("💥 Unhandled promise rejection:", reason);
-      this.initiateShutdown("UNHANDLED_REJECTION");
+      void this.initiateShutdown("UNHANDLED_REJECTION");
     });
   }
 
@@ -104,9 +105,10 @@ export class GracefulShutdownManager {
             await handler();
             console.log(`✅ Shutdown handler ${index + 1} completed`);
           } catch (error) {
+            const parsedError = parseError(error);
             console.error(
               `❌ Shutdown handler ${index + 1} failed:`,
-              error.message || error,
+              parsedError.message,
             );
           }
         },
@@ -123,7 +125,8 @@ export class GracefulShutdownManager {
       console.log("👋 Graceful shutdown complete");
       process.exit(0);
     } catch (error) {
-      console.error("❌ Error during shutdown:", error.message || error);
+      const parsedError = parseError(error);
+      console.error("❌ Error during shutdown:", parsedError.message);
       clearTimeout(forceExitTimeout);
       process.exit(1);
     }
@@ -172,7 +175,7 @@ export function initializeTaskRunnerShutdown(): void {
   console.log("🛡️  Graceful shutdown handler initialized");
 
   // Register a default handler that logs shutdown initiation
-  onShutdown(async () => {
+  onShutdown(() => {
     console.log("🛑 Task runner shutdown initiated");
   });
 }

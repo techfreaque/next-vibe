@@ -10,7 +10,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   ...componentsTranslations,
-  site: siteTranslations,
+  story: siteTranslations,
   notFound: notFoundTranslations,
   admin: adminTranslations,
   chat: chatTranslations,

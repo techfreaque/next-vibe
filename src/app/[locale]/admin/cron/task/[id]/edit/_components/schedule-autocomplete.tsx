@@ -190,9 +190,7 @@ export function ScheduleAutocomplete({
 
               {filteredOptions.length > 0 && (
                 <CommandGroup
-                  heading={t(
-                    "app.admin.cron.taskDetails.commonSchedules",
-                  )}
+                  heading={t("app.admin.cron.taskDetails.commonSchedules")}
                 >
                   {filteredOptions.map((option) => (
                     <CommandItem

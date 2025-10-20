@@ -61,10 +61,10 @@ export default async function PrivacyPolicyPage({
             <Shield className="h-8 w-8 text-blue-600 dark:text-blue-400" />
           </div>
           <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
-            {t("app.site.privacyPolicy.title")}
+            {t("app.story._components.home.privacyPolicy.title")}
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400">
-            {t("app.site.privacyPolicy.lastUpdated")}
+            {t("app.story._components.home.privacyPolicy.lastUpdated")}
           </p>
         </div>
 
@@ -72,7 +72,7 @@ export default async function PrivacyPolicyPage({
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 mb-8">
           <div className="prose dark:prose-invert max-w-none">
             <p className="lead text-lg">
-              {t("app.site.privacyPolicy.introduction", {
+              {t("app.story._components.home.privacyPolicy.introduction", {
                 appName: t("app.common.appName"),
               })}
             </p>
@@ -81,215 +81,305 @@ export default async function PrivacyPolicyPage({
 
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
               <Lock className="h-5 w-5 mr-2" />
-              {t("app.site.privacyPolicy.sections.informationCollect.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.informationCollect.title",
+              )}
             </h2>
             <p>
               {t(
-                "app.site.privacyPolicy.sections.informationCollect.description",
+                "app.story._components.home.privacyPolicy.sections.informationCollect.description",
               )}
             </p>
 
             <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("app.site.privacyPolicy.sections.personalData.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.personalData.title",
+              )}
             </h3>
-            <p>
-              {t("app.site.privacyPolicy.sections.personalData.description")}
-            </p>
-            <ul className="space-y-1">
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-500">•</span>
-                {t("app.site.privacyPolicy.sections.personalData.items.name")}
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-500">•</span>
-                {t("app.site.privacyPolicy.sections.personalData.items.email")}
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-500">•</span>
-                {t("app.site.privacyPolicy.sections.personalData.items.phone")}
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-500">•</span>
-                {t(
-                  "app.site.privacyPolicy.sections.personalData.items.company",
-                )}
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-500">•</span>
-                {t(
-                  "app.site.privacyPolicy.sections.personalData.items.billing",
-                )}
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-500">•</span>
-                {t(
-                  "app.site.privacyPolicy.sections.personalData.items.payment",
-                )}
-              </li>
-            </ul>
-
-            <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("app.site.privacyPolicy.sections.socialMediaData.title")}
-            </h3>
-            <p>
-              {t("app.site.privacyPolicy.sections.socialMediaData.description")}
-            </p>
-
-            <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("app.site.privacyPolicy.sections.derivativeData.title")}
-            </h3>
-            <p>
-              {t("app.site.privacyPolicy.sections.derivativeData.description")}
-            </p>
-
-            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.site.privacyPolicy.sections.useOfInformation.title")}
-            </h2>
             <p>
               {t(
-                "app.site.privacyPolicy.sections.useOfInformation.description",
+                "app.story._components.home.privacyPolicy.sections.personalData.description",
               )}
             </p>
             <ul className="space-y-1">
               <li className="flex items-start">
                 <span className="mr-2 text-blue-500">•</span>
                 {t(
-                  "app.site.privacyPolicy.sections.useOfInformation.items.provide",
+                  "app.story._components.home.privacyPolicy.sections.personalData.items.name",
                 )}
               </li>
               <li className="flex items-start">
                 <span className="mr-2 text-blue-500">•</span>
                 {t(
-                  "app.site.privacyPolicy.sections.useOfInformation.items.process",
+                  "app.story._components.home.privacyPolicy.sections.personalData.items.email",
                 )}
               </li>
               <li className="flex items-start">
                 <span className="mr-2 text-blue-500">•</span>
                 {t(
-                  "app.site.privacyPolicy.sections.useOfInformation.items.send",
+                  "app.story._components.home.privacyPolicy.sections.personalData.items.phone",
                 )}
               </li>
               <li className="flex items-start">
                 <span className="mr-2 text-blue-500">•</span>
                 {t(
-                  "app.site.privacyPolicy.sections.useOfInformation.items.respond",
+                  "app.story._components.home.privacyPolicy.sections.personalData.items.company",
                 )}
               </li>
               <li className="flex items-start">
                 <span className="mr-2 text-blue-500">•</span>
                 {t(
-                  "app.site.privacyPolicy.sections.useOfInformation.items.monitor",
+                  "app.story._components.home.privacyPolicy.sections.personalData.items.billing",
                 )}
               </li>
               <li className="flex items-start">
                 <span className="mr-2 text-blue-500">•</span>
                 {t(
-                  "app.site.privacyPolicy.sections.useOfInformation.items.personalize",
+                  "app.story._components.home.privacyPolicy.sections.personalData.items.payment",
                 )}
               </li>
             </ul>
 
-            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.site.privacyPolicy.sections.disclosure.title")}
-            </h2>
-            <p>{t("app.site.privacyPolicy.sections.disclosure.description")}</p>
-
             <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("app.site.privacyPolicy.sections.businessTransfers.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.socialMediaData.title",
+              )}
             </h3>
             <p>
               {t(
-                "app.site.privacyPolicy.sections.businessTransfers.description",
+                "app.story._components.home.privacyPolicy.sections.socialMediaData.description",
               )}
             </p>
 
             <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("app.site.privacyPolicy.sections.thirdParty.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.derivativeData.title",
+              )}
             </h3>
-            <p>{t("app.site.privacyPolicy.sections.thirdParty.description")}</p>
-
-            <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("app.site.privacyPolicy.sections.legal.title")}
-            </h3>
-            <p>{t("app.site.privacyPolicy.sections.legal.description")}</p>
+            <p>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.derivativeData.description",
+              )}
+            </p>
 
             <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.site.privacyPolicy.sections.security.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.useOfInformation.title",
+              )}
             </h2>
-            <p>{t("app.site.privacyPolicy.sections.security.description")}</p>
-
-            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.site.privacyPolicy.sections.rights.title")}
-            </h2>
-            <p>{t("app.site.privacyPolicy.sections.rights.description")}</p>
+            <p>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.useOfInformation.description",
+              )}
+            </p>
             <ul className="space-y-1">
               <li className="flex items-start">
                 <span className="mr-2 text-blue-500">•</span>
-                {t("app.site.privacyPolicy.sections.rights.items.access")}
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.useOfInformation.items.provide",
+                )}
               </li>
               <li className="flex items-start">
                 <span className="mr-2 text-blue-500">•</span>
-                {t("app.site.privacyPolicy.sections.rights.items.correction")}
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.useOfInformation.items.process",
+                )}
               </li>
               <li className="flex items-start">
                 <span className="mr-2 text-blue-500">•</span>
-                {t("app.site.privacyPolicy.sections.rights.items.deletion")}
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.useOfInformation.items.send",
+                )}
               </li>
               <li className="flex items-start">
                 <span className="mr-2 text-blue-500">•</span>
-                {t("app.site.privacyPolicy.sections.rights.items.objection")}
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.useOfInformation.items.respond",
+                )}
               </li>
               <li className="flex items-start">
                 <span className="mr-2 text-blue-500">•</span>
-                {t("app.site.privacyPolicy.sections.rights.items.portability")}
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.useOfInformation.items.monitor",
+                )}
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-500">•</span>
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.useOfInformation.items.personalize",
+                )}
               </li>
             </ul>
 
             <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.site.privacyPolicy.sections.cookies.title")}
-            </h2>
-            <p>{t("app.site.privacyPolicy.sections.cookies.description")}</p>
-
-            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.site.privacyPolicy.sections.thirdPartySites.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.disclosure.title",
+              )}
             </h2>
             <p>
-              {t("app.site.privacyPolicy.sections.thirdPartySites.description")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.disclosure.description",
+              )}
+            </p>
+
+            <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
+              {t(
+                "app.story._components.home.privacyPolicy.sections.businessTransfers.title",
+              )}
+            </h3>
+            <p>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.businessTransfers.description",
+              )}
+            </p>
+
+            <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
+              {t(
+                "app.story._components.home.privacyPolicy.sections.thirdParty.title",
+              )}
+            </h3>
+            <p>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.thirdParty.description",
+              )}
+            </p>
+
+            <h3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
+              {t(
+                "app.story._components.home.privacyPolicy.sections.legal.title",
+              )}
+            </h3>
+            <p>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.legal.description",
+              )}
             </p>
 
             <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.site.privacyPolicy.sections.children.title")}
-            </h2>
-            <p>{t("app.site.privacyPolicy.sections.children.description")}</p>
-
-            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.site.privacyPolicy.sections.changes.title")}
-            </h2>
-            <p>{t("app.site.privacyPolicy.sections.changes.description")}</p>
-
-            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.site.privacyPolicy.sections.contact.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.security.title",
+              )}
             </h2>
             <p>
-              {t("app.site.privacyPolicy.sections.contact.description")}{" "}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.security.description",
+              )}
+            </p>
+
+            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
+
+            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
+              {t(
+                "app.story._components.home.privacyPolicy.sections.rights.title",
+              )}
+            </h2>
+            <p>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.rights.description",
+              )}
+            </p>
+            <ul className="space-y-1">
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-500">•</span>
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.rights.items.access",
+                )}
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-500">•</span>
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.rights.items.correction",
+                )}
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-500">•</span>
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.rights.items.deletion",
+                )}
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-500">•</span>
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.rights.items.objection",
+                )}
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-500">•</span>
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.rights.items.portability",
+                )}
+              </li>
+            </ul>
+
+            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
+
+            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
+              {t(
+                "app.story._components.home.privacyPolicy.sections.cookies.title",
+              )}
+            </h2>
+            <p>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.cookies.description",
+              )}
+            </p>
+
+            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
+
+            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
+              {t(
+                "app.story._components.home.privacyPolicy.sections.thirdPartySites.title",
+              )}
+            </h2>
+            <p>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.thirdPartySites.description",
+              )}
+            </p>
+
+            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
+
+            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
+              {t(
+                "app.story._components.home.privacyPolicy.sections.children.title",
+              )}
+            </h2>
+            <p>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.children.description",
+              )}
+            </p>
+
+            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
+
+            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
+              {t(
+                "app.story._components.home.privacyPolicy.sections.changes.title",
+              )}
+            </h2>
+            <p>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.changes.description",
+              )}
+            </p>
+
+            <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
+
+            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
+              {t(
+                "app.story._components.home.privacyPolicy.sections.contact.title",
+              )}
+            </h2>
+            <p>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.contact.description",
+              )}{" "}
               <a
                 href={`mailto:${supportEmail}`}
                 className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
@@ -302,16 +392,28 @@ export default async function PrivacyPolicyPage({
             <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.site.privacyPolicy.sections.gdpr.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.gdpr.title",
+              )}
             </h2>
-            <p>{t("app.site.privacyPolicy.sections.gdpr.description")}</p>
+            <p>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.gdpr.description",
+              )}
+            </p>
 
             <div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.site.privacyPolicy.sections.ccpa.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.ccpa.title",
+              )}
             </h2>
-            <p>{t("app.site.privacyPolicy.sections.ccpa.description")}</p>
+            <p>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.ccpa.description",
+              )}
+            </p>
           </div>
         </div>
 

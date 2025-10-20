@@ -162,14 +162,14 @@ export const translations: typeof enTranslations = {
   imap: {
     "example.com": "imap.example.com",
     "gmail.com": "imap.gmail.com",
-    connection: {
+    "connection": {
       test: {
         success: "Test połączenia zakończony sukcesem",
         failed: "Test połączenia nie powiódł się",
         timeout: "Przekroczono limit czasu testu połączenia",
       },
     },
-    sync: {
+    "sync": {
       messages: {
         accounts: {
           success: "Wszystkie konta zsynchronizowane pomyślnie",

@@ -1,4 +1,4 @@
-import { translations as enTranslations } from "../en";
+import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   admin: {

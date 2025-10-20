@@ -30,9 +30,14 @@ export const translations: typeof enTranslations = {
       label: "Limit",
       description: "Liczba wątków na stronę",
     },
-    folderId: {
-      label: "Folder",
-      description: "Filtruj według ID folderu",
+    rootFolderId: {
+      label: "Folder główny",
+      description:
+        "Filtruj według folderu głównego (private, shared, public, incognito)",
+    },
+    subFolderId: {
+      label: "Podfolder",
+      description: "Filtruj według ID podfolderu (opcjonalnie)",
     },
     status: {
       label: "Status",
@@ -165,9 +170,13 @@ export const translations: typeof enTranslations = {
       placeholder: "Wprowadź tytuł wątku...",
       default: "Nowy czat",
     },
-    folderId: {
-      label: "Folder",
-      description: "Folder dla wątku",
+    rootFolderId: {
+      label: "Folder główny",
+      description: "Folder główny (private, shared, public, incognito)",
+    },
+    subFolderId: {
+      label: "Podfolder",
+      description: "Podfolder dla wątku (opcjonalnie)",
     },
     defaultModel: {
       label: "Domyślny model",
@@ -222,6 +231,8 @@ export const translations: typeof enTranslations = {
       forbidden: {
         title: "Zabronione",
         description: "Nie masz uprawnień do tworzenia wątków",
+        incognitoNotAllowed:
+          "Wątki incognito nie mogą być tworzone na serwerze",
       },
       notFound: {
         title: "Nie znaleziono",

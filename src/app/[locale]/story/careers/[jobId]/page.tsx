@@ -92,66 +92,84 @@ export default async function JobPostingPage({
   // Mock job data - in a real app, this would come from an API or database
   const jobs = {
     socialMediaManager: {
-      title: t("app.site.careers.jobs.socialMediaManager.title"),
+      title: t(
+        "app.story._components.home.careers.jobs.socialMediaManager.title",
+      ),
       shortDescription: t(
-        "app.site.careers.jobs.socialMediaManager.shortDescription",
+        "app.story._components.home.careers.jobs.socialMediaManager.shortDescription",
       ),
       longDescription: t(
-        "app.site.careers.jobs.socialMediaManager.longDescription",
+        "app.story._components.home.careers.jobs.socialMediaManager.longDescription",
       ),
       responsibilities: {
         item1: t(
-          "app.site.careers.jobs.socialMediaManager.responsibilities.item1",
+          "app.story._components.home.careers.jobs.socialMediaManager.responsibilities.item1",
         ),
         item2: t(
-          "app.site.careers.jobs.socialMediaManager.responsibilities.item2",
+          "app.story._components.home.careers.jobs.socialMediaManager.responsibilities.item2",
         ),
         item3: t(
-          "app.site.careers.jobs.socialMediaManager.responsibilities.item3",
+          "app.story._components.home.careers.jobs.socialMediaManager.responsibilities.item3",
         ),
         item4: t(
-          "app.site.careers.jobs.socialMediaManager.responsibilities.item4",
+          "app.story._components.home.careers.jobs.socialMediaManager.responsibilities.item4",
         ),
         item5: t(
-          "app.site.careers.jobs.socialMediaManager.responsibilities.item5",
+          "app.story._components.home.careers.jobs.socialMediaManager.responsibilities.item5",
         ),
       },
       requirements: {
-        item1: t("app.site.careers.jobs.socialMediaManager.requirements.item1"),
-        item2: t("app.site.careers.jobs.socialMediaManager.requirements.item2"),
-        item3: t("app.site.careers.jobs.socialMediaManager.requirements.item3"),
-        item4: t("app.site.careers.jobs.socialMediaManager.requirements.item4"),
-        item5: t("app.site.careers.jobs.socialMediaManager.requirements.item5"),
+        item1: t(
+          "app.story._components.home.careers.jobs.socialMediaManager.requirements.item1",
+        ),
+        item2: t(
+          "app.story._components.home.careers.jobs.socialMediaManager.requirements.item2",
+        ),
+        item3: t(
+          "app.story._components.home.careers.jobs.socialMediaManager.requirements.item3",
+        ),
+        item4: t(
+          "app.story._components.home.careers.jobs.socialMediaManager.requirements.item4",
+        ),
+        item5: t(
+          "app.story._components.home.careers.jobs.socialMediaManager.requirements.item5",
+        ),
       },
       qualifications: {
         required: {
           item1: t(
-            "app.site.careers.jobs.socialMediaManager.qualifications.required.item1",
+            "app.story._components.home.careers.jobs.socialMediaManager.qualifications.required.item1",
           ),
           item2: t(
-            "app.site.careers.jobs.socialMediaManager.qualifications.required.item2",
+            "app.story._components.home.careers.jobs.socialMediaManager.qualifications.required.item2",
           ),
           item3: t(
-            "app.site.careers.jobs.socialMediaManager.qualifications.required.item3",
+            "app.story._components.home.careers.jobs.socialMediaManager.qualifications.required.item3",
           ),
         },
         preferred: {
           item1: t(
-            "app.site.careers.jobs.socialMediaManager.qualifications.preferred.item1",
+            "app.story._components.home.careers.jobs.socialMediaManager.qualifications.preferred.item1",
           ),
           item2: t(
-            "app.site.careers.jobs.socialMediaManager.qualifications.preferred.item2",
+            "app.story._components.home.careers.jobs.socialMediaManager.qualifications.preferred.item2",
           ),
           item3: t(
-            "app.site.careers.jobs.socialMediaManager.qualifications.preferred.item3",
+            "app.story._components.home.careers.jobs.socialMediaManager.qualifications.preferred.item3",
           ),
         },
       },
-      location: t("app.site.careers.jobs.socialMediaManager.location"),
-      department: t("app.site.careers.jobs.socialMediaManager.department"),
-      type: t("app.site.careers.jobs.socialMediaManager.type"),
+      location: t(
+        "app.story._components.home.careers.jobs.socialMediaManager.location",
+      ),
+      department: t(
+        "app.story._components.home.careers.jobs.socialMediaManager.department",
+      ),
+      type: t(
+        "app.story._components.home.careers.jobs.socialMediaManager.type",
+      ),
       experienceLevel: t(
-        "app.site.careers.jobs.socialMediaManager.experienceLevel",
+        "app.story._components.home.careers.jobs.socialMediaManager.experienceLevel",
       ),
       // current date - 2.5 weeks
       postedDate: new Date(
@@ -163,60 +181,86 @@ export default async function JobPostingPage({
       ).toLocaleDateString(locale),
     },
     contentCreator: {
-      title: t("app.site.careers.jobs.contentCreator.title"),
+      title: t("app.story._components.home.careers.jobs.contentCreator.title"),
       shortDescription: t(
-        "app.site.careers.jobs.contentCreator.shortDescription",
+        "app.story._components.home.careers.jobs.contentCreator.shortDescription",
       ),
       longDescription: t(
-        "app.site.careers.jobs.contentCreator.longDescription",
+        "app.story._components.home.careers.jobs.contentCreator.longDescription",
       ),
       responsibilities: {
-        item1: t("app.site.careers.jobs.contentCreator.responsibilities.item1"),
-        item2: t("app.site.careers.jobs.contentCreator.responsibilities.item2"),
-        item3: t("app.site.careers.jobs.contentCreator.responsibilities.item3"),
-        item4: t("app.site.careers.jobs.contentCreator.responsibilities.item4"),
-        item5: t("app.site.careers.jobs.contentCreator.responsibilities.item5"),
+        item1: t(
+          "app.story._components.home.careers.jobs.contentCreator.responsibilities.item1",
+        ),
+        item2: t(
+          "app.story._components.home.careers.jobs.contentCreator.responsibilities.item2",
+        ),
+        item3: t(
+          "app.story._components.home.careers.jobs.contentCreator.responsibilities.item3",
+        ),
+        item4: t(
+          "app.story._components.home.careers.jobs.contentCreator.responsibilities.item4",
+        ),
+        item5: t(
+          "app.story._components.home.careers.jobs.contentCreator.responsibilities.item5",
+        ),
       },
       requirements: {
-        item1: t("app.site.careers.jobs.contentCreator.requirements.item1"),
-        item2: t("app.site.careers.jobs.contentCreator.requirements.item2"),
-        item3: t("app.site.careers.jobs.contentCreator.requirements.item3"),
-        item4: t("app.site.careers.jobs.contentCreator.requirements.item4"),
-        item5: t("app.site.careers.jobs.contentCreator.requirements.item5"),
+        item1: t(
+          "app.story._components.home.careers.jobs.contentCreator.requirements.item1",
+        ),
+        item2: t(
+          "app.story._components.home.careers.jobs.contentCreator.requirements.item2",
+        ),
+        item3: t(
+          "app.story._components.home.careers.jobs.contentCreator.requirements.item3",
+        ),
+        item4: t(
+          "app.story._components.home.careers.jobs.contentCreator.requirements.item4",
+        ),
+        item5: t(
+          "app.story._components.home.careers.jobs.contentCreator.requirements.item5",
+        ),
       },
       qualifications: {
         required: {
           item1: t(
-            "app.site.careers.jobs.contentCreator.qualifications.required.item1",
+            "app.story._components.home.careers.jobs.contentCreator.qualifications.required.item1",
           ),
           item2: t(
-            "app.site.careers.jobs.contentCreator.qualifications.required.item2",
+            "app.story._components.home.careers.jobs.contentCreator.qualifications.required.item2",
           ),
           item3: t(
-            "app.site.careers.jobs.contentCreator.qualifications.required.item3",
+            "app.story._components.home.careers.jobs.contentCreator.qualifications.required.item3",
           ),
         },
         preferred: {
           item1: t(
-            "app.site.careers.jobs.contentCreator.qualifications.preferred.item1",
+            "app.story._components.home.careers.jobs.contentCreator.qualifications.preferred.item1",
           ),
           item2: t(
-            "app.site.careers.jobs.contentCreator.qualifications.preferred.item2",
+            "app.story._components.home.careers.jobs.contentCreator.qualifications.preferred.item2",
           ),
           item3: t(
-            "app.site.careers.jobs.contentCreator.qualifications.preferred.item3",
+            "app.story._components.home.careers.jobs.contentCreator.qualifications.preferred.item3",
           ),
         },
       },
-      location: t("app.site.careers.jobs.contentCreator.location"),
-      department: t("app.site.careers.jobs.contentCreator.department"),
-      type: t("app.site.careers.jobs.contentCreator.type"),
-      experienceLevel: t(
-        "app.site.careers.jobs.contentCreator.experienceLevel",
+      location: t(
+        "app.story._components.home.careers.jobs.contentCreator.location",
       ),
-      postedDate: t("app.site.careers.jobs.contentCreator.postedDate"),
+      department: t(
+        "app.story._components.home.careers.jobs.contentCreator.department",
+      ),
+      type: t("app.story._components.home.careers.jobs.contentCreator.type"),
+      experienceLevel: t(
+        "app.story._components.home.careers.jobs.contentCreator.experienceLevel",
+      ),
+      postedDate: t(
+        "app.story._components.home.careers.jobs.contentCreator.postedDate",
+      ),
       applicationDeadline: t(
-        "app.site.careers.jobs.contentCreator.applicationDeadline",
+        "app.story._components.home.careers.jobs.contentCreator.applicationDeadline",
       ),
     },
   };
@@ -239,7 +283,9 @@ export default async function JobPostingPage({
           >
             <Link href={`/${locale}/careers`}>
               <ArrowLeft className="h-4 w-4" />
-              <span>{t("app.site.careers.openPositions")}</span>
+              <span>
+                {t("app.story._components.home.careers.openPositions")}
+              </span>
             </Link>
           </Button>
         </div>
@@ -256,7 +302,9 @@ export default async function JobPostingPage({
               <div className="space-y-8">
                 <section>
                   <h2 className="text-2xl font-bold mb-4">
-                    {t("app.site.careers.jobDetail.jobOverview")}
+                    {t(
+                      "app.story._components.home.careers.jobDetail.jobOverview",
+                    )}
                   </h2>
                   <p className="text-gray-700 dark:text-gray-300">
                     {job.longDescription}
@@ -265,7 +313,9 @@ export default async function JobPostingPage({
 
                 <section>
                   <h2 className="text-2xl font-bold mb-4">
-                    {t("app.site.careers.jobDetail.responsibilities")}
+                    {t(
+                      "app.story._components.home.careers.jobDetail.responsibilities",
+                    )}
                   </h2>
                   <ul className="list-disc pl-6 space-y-2">
                     {Object.values(job.responsibilities).map(
@@ -283,7 +333,9 @@ export default async function JobPostingPage({
 
                 <section>
                   <h2 className="text-2xl font-bold mb-4">
-                    {t("app.site.careers.jobDetail.requirements")}
+                    {t(
+                      "app.story._components.home.careers.jobDetail.requirements",
+                    )}
                   </h2>
                   <ul className="list-disc pl-6 space-y-2">
                     {Object.values(job.requirements).map(
@@ -301,11 +353,15 @@ export default async function JobPostingPage({
 
                 <section>
                   <h2 className="text-2xl font-bold mb-4">
-                    {t("app.site.careers.jobDetail.qualifications")}
+                    {t(
+                      "app.story._components.home.careers.jobDetail.qualifications",
+                    )}
                   </h2>
 
                   <h3 className="text-xl font-semibold mb-2">
-                    {t("app.site.careers.jobDetail.qualificationsRequired")}
+                    {t(
+                      "app.story._components.home.careers.jobDetail.qualificationsRequired",
+                    )}
                   </h3>
                   <ul className="list-disc pl-6 space-y-2 mb-4">
                     {Object.values(job.qualifications.required).map(
@@ -321,7 +377,9 @@ export default async function JobPostingPage({
                   </ul>
 
                   <h3 className="text-xl font-semibold mb-2">
-                    {t("app.site.careers.jobDetail.qualificationsPreferred")}
+                    {t(
+                      "app.story._components.home.careers.jobDetail.qualificationsPreferred",
+                    )}
                   </h3>
                   <ul className="list-disc pl-6 space-y-2">
                     {Object.values(job.qualifications.preferred).map(
@@ -339,46 +397,62 @@ export default async function JobPostingPage({
 
                 <section>
                   <h2 className="text-2xl font-bold mb-4">
-                    {t("app.site.careers.benefits.title")}
+                    {t("app.story._components.home.careers.benefits.title")}
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Card>
                       <CardContent className="p-4">
                         <h3 className="font-semibold mb-2">
-                          {t("app.site.careers.benefits.growthTitle")}
+                          {t(
+                            "app.story._components.home.careers.benefits.growthTitle",
+                          )}
                         </h3>
                         <p className="text-sm text-gray-700 dark:text-gray-300">
-                          {t("app.site.careers.benefits.growthDesc")}
+                          {t(
+                            "app.story._components.home.careers.benefits.growthDesc",
+                          )}
                         </p>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4">
                         <h3 className="font-semibold mb-2">
-                          {t("app.site.careers.benefits.meaningfulTitle")}
+                          {t(
+                            "app.story._components.home.careers.benefits.meaningfulTitle",
+                          )}
                         </h3>
                         <p className="text-sm text-gray-700 dark:text-gray-300">
-                          {t("app.site.careers.benefits.meaningfulDesc")}
+                          {t(
+                            "app.story._components.home.careers.benefits.meaningfulDesc",
+                          )}
                         </p>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4">
                         <h3 className="font-semibold mb-2">
-                          {t("app.site.careers.benefits.balanceTitle")}
+                          {t(
+                            "app.story._components.home.careers.benefits.balanceTitle",
+                          )}
                         </h3>
                         <p className="text-sm text-gray-700 dark:text-gray-300">
-                          {t("app.site.careers.benefits.balanceDesc")}
+                          {t(
+                            "app.story._components.home.careers.benefits.balanceDesc",
+                          )}
                         </p>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4">
                         <h3 className="font-semibold mb-2">
-                          {t("app.site.careers.benefits.compensationTitle")}
+                          {t(
+                            "app.story._components.home.careers.benefits.compensationTitle",
+                          )}
                         </h3>
                         <p className="text-sm text-gray-700 dark:text-gray-300">
-                          {t("app.site.careers.benefits.compensationDesc")}
+                          {t(
+                            "app.story._components.home.careers.benefits.compensationDesc",
+                          )}
                         </p>
                       </CardContent>
                     </Card>
@@ -392,37 +466,57 @@ export default async function JobPostingPage({
                 <Card>
                   <CardContent className="p-6">
                     <h3 className="text-xl font-bold mb-4">
-                      {t("app.site.careers.jobDetail.applyNow")}
+                      {t(
+                        "app.story._components.home.careers.jobDetail.applyNow",
+                      )}
                     </h3>
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div className="text-gray-500 dark:text-gray-400">
-                          {t("app.site.careers.jobDetail.location")}:
+                          {t(
+                            "app.story._components.home.careers.jobDetail.location",
+                          )}
+                          :
                         </div>
                         <div className="font-medium">{job.location}</div>
 
                         <div className="text-gray-500 dark:text-gray-400">
-                          {t("app.site.careers.jobDetail.department")}:
+                          {t(
+                            "app.story._components.home.careers.jobDetail.department",
+                          )}
+                          :
                         </div>
                         <div className="font-medium">{job.department}</div>
 
                         <div className="text-gray-500 dark:text-gray-400">
-                          {t("app.site.careers.jobDetail.employmentType")}:
+                          {t(
+                            "app.story._components.home.careers.jobDetail.employmentType",
+                          )}
+                          :
                         </div>
                         <div className="font-medium">{job.type}</div>
 
                         <div className="text-gray-500 dark:text-gray-400">
-                          {t("app.site.careers.jobDetail.experienceLevel")}:
+                          {t(
+                            "app.story._components.home.careers.jobDetail.experienceLevel",
+                          )}
+                          :
                         </div>
                         <div className="font-medium">{job.experienceLevel}</div>
 
                         <div className="text-gray-500 dark:text-gray-400">
-                          {t("app.site.careers.jobDetail.postedDate")}:
+                          {t(
+                            "app.story._components.home.careers.jobDetail.postedDate",
+                          )}
+                          :
                         </div>
                         <div className="font-medium">{job.postedDate}</div>
 
                         <div className="text-gray-500 dark:text-gray-400">
-                          {t("app.site.careers.jobDetail.applicationDeadline")}:
+                          {t(
+                            "app.story._components.home.careers.jobDetail.applicationDeadline",
+                          )}
+                          :
                         </div>
                         <div className="font-medium">
                           {job.applicationDeadline}
@@ -435,7 +529,7 @@ export default async function JobPostingPage({
                         <Link
                           href={`mailto:${contactClientRepository.getSupportEmail(locale)}?subject=Application for ${job.title}`}
                         >
-                          {t("app.site.careers.applyNow")}
+                          {t("app.story._components.home.careers.applyNow")}
                         </Link>
                       </Button>
                     </div>
@@ -445,7 +539,9 @@ export default async function JobPostingPage({
                 <Card>
                   <CardContent className="p-6">
                     <h3 className="text-lg font-bold mb-4">
-                      {t("app.site.careers.jobDetail.relatedPositions")}
+                      {t(
+                        "app.story._components.home.careers.jobDetail.relatedPositions",
+                      )}
                     </h3>
                     <div className="space-y-3">
                       {Object.entries(jobs)

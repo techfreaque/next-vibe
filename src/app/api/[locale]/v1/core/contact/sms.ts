@@ -28,14 +28,14 @@ import type { ContactRequestOutput } from "./definition";
 export interface ContactSmsService {
   sendAdminNotificationSms(
     contactData: ContactRequestOutput,
-    user: JwtPayloadType | null,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>>;
 
   sendConfirmationSms(
     contactData: ContactRequestOutput,
-    user: JwtPayloadType | null,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>>;
@@ -50,7 +50,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
    */
   async sendAdminNotificationSms(
     contactData: ContactRequestOutput,
-    user: JwtPayloadType | null,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>> {
@@ -120,7 +120,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
    */
   async sendConfirmationSms(
     contactData: ContactRequestOutput,
-    user: JwtPayloadType | null,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>> {
@@ -227,7 +227,7 @@ export const contactSmsService = new ContactSmsServiceImpl();
  */
 export const sendAdminNotificationSms = async (
   contactData: ContactRequestOutput,
-  user: JwtPayloadType | null,
+  user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {
@@ -241,7 +241,7 @@ export const sendAdminNotificationSms = async (
 
 export const sendConfirmationSms = async (
   contactData: ContactRequestOutput,
-  user: JwtPayloadType | null,
+  user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {

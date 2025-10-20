@@ -270,7 +270,9 @@ export function ImapFolderTree({
     return (
       <div className="border rounded-lg">
         <div className="bg-gray-50 px-4 py-3 border-b">
-          <h3 className="font-medium">{t("app.admin.emails.imap.admin.folders.title")}</h3>
+          <h3 className="font-medium">
+            {t("app.admin.emails.imap.admin.folders.title")}
+          </h3>
         </div>
         <div className="p-4 text-center text-gray-500">
           {t("app.admin.emails.imap.common.loading")}
@@ -282,7 +284,9 @@ export function ImapFolderTree({
   return (
     <div className="border rounded-lg">
       <div className="bg-gray-50 px-4 py-3 border-b">
-        <h3 className="font-medium">{t("app.admin.emails.imap.admin.folders.title")}</h3>
+        <h3 className="font-medium">
+          {t("app.admin.emails.imap.admin.folders.title")}
+        </h3>
       </div>
       <div className="max-h-96 overflow-y-auto">
         {folderTree.length === 0 ? (

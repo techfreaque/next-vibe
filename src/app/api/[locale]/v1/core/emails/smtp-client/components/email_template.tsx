@@ -99,7 +99,7 @@ export function EmailTemplate({
                     textAlign: "left",
                   }}
                 >
-                  {t("common.logoPart1")}
+                  {t("app.common.logoPart1")}
                 </Text>
                 <Text
                   style={{
@@ -115,7 +115,7 @@ export function EmailTemplate({
                     textAlign: "left",
                   }}
                 >
-                  {t("common.logoPart2")}
+                  {t("app.common.logoPart2")}
                 </Text>
               </div>
 
@@ -130,7 +130,7 @@ export function EmailTemplate({
                   margin: "0",
                 }}
               >
-                {t("email.template.tagline")}
+                {t("app.api.v1.core.emails.template.tagline")}
               </Text>
             </div>
           </Section>
@@ -206,7 +206,7 @@ export function EmailTemplate({
                   display: "inline-block",
                 }}
               >
-                {t("email.footer.visitWebsite")}
+                {t("app.api.v1.core.emails.footer.visitWebsite")}
               </TrackedLink>
             </div>
 
@@ -218,9 +218,9 @@ export function EmailTemplate({
                 margin: "0 0 8px 0",
               }}
             >
-              {t("email.footer.allRightsReserved", {
+              {t("app.api.v1.core.emails.footer.allRightsReserved", {
                 currentYear,
-                appName: `${t("common.logoPart1")} ${t("common.logoPart2")}`,
+                appName: `${t("app.common.logoPart1")} ${t("app.common.logoPart2")}`,
               })}
             </Text>
 
@@ -252,7 +252,7 @@ export function EmailTemplate({
             >
               {t("email.footer.copyright", {
                 currentYear,
-                appName: `${t("common.logoPart1")} ${t("common.logoPart2")}`,
+                appName: `${t("app.common.logoPart1")} ${t("app.common.logoPart2")}`,
               })}
             </Text>
           </Section>

@@ -122,6 +122,26 @@ export const translations = {
         label: "Konto aktiviert",
         description: "Dieses IMAP-Konto aktivieren oder deaktivieren",
       },
+      connectionTimeout: {
+        label: "Verbindungs-Timeout",
+        description: "Verbindungs-Timeout in Millisekunden",
+      },
+      keepAlive: {
+        label: "Verbindung aufrechterhalten",
+        description: "Verbindung zwischen Anfragen aufrechterhalten",
+      },
+      syncInterval: {
+        label: "Synchronisationsintervall",
+        description: "Synchronisationsintervall in Sekunden",
+      },
+      maxMessages: {
+        label: "Maximale Nachrichten",
+        description: "Maximale Anzahl der zu synchronisierenden Nachrichten",
+      },
+      syncFolders: {
+        label: "Synchronisierte Ordner",
+        description: "Zu synchronisierende Ordner (durch Kommas getrennt)",
+      },
     },
     response: {
       title: "Aktualisiertes Konto",
@@ -209,6 +229,28 @@ export const translations = {
       forbidden: {
         title: "Verboten",
         description: "Zugriff verboten",
+      },
+      conflict: {
+        title: "Konflikt",
+        description:
+          "Konto mit aktiven Verbindungen kann nicht gelöscht werden",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Netzwerkfehler beim Löschen des Kontos aufgetreten",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unbekannter Fehler ist beim Löschen aufgetreten",
+      },
+      unsavedChanges: {
+        title: "Nicht gespeicherte Änderungen",
+        description:
+          "Konto mit nicht gespeicherten Änderungen kann nicht gelöscht werden",
+      },
+      validation: {
+        title: "Validierungsfehler",
+        description: "Ungültige Konto-ID angegeben",
       },
     },
     success: {

@@ -376,12 +376,7 @@ export class FileGenerator {
       }
 
       const filePath = this.getHierarchicalFilePath(path, language);
-      const fileContent = this.generateHierarchicalFileContent(
-        path,
-        node,
-        language,
-        hierarchy,
-      );
+      const fileContent = this.generateHierarchicalFileContent(path, node);
 
       // Ensure directory exists
       const dir = filePath.substring(0, filePath.lastIndexOf("/"));
@@ -422,19 +417,13 @@ export class FileGenerator {
    * Generate content for hierarchical file
    */
   private generateHierarchicalFileContent(
-    currentPath: string,
+    _currentPath: string,
     node: { translations: TranslationObject; children: Set<string> },
-    language: string,
-    hierarchy: Map<
-      string,
-      { translations: TranslationObject; children: Set<string> }
-    >,
   ): string {
     const imports: string[] = [];
     const exports: string[] = [];
 
     // Import children
-    let importIndex = 0;
     for (const childPath of node.children) {
       const childName = childPath.split("/").pop() || "unknown";
       // eslint-disable-next-line i18next/no-literal-string
@@ -446,7 +435,6 @@ export class FileGenerator {
         `import { translations as ${importName} } from "${relativePath}";`,
       );
       exports.push(`  ${childName}: ${importName}`);
-      importIndex++;
     }
 
     // Add own translations if any
@@ -498,12 +486,14 @@ export class FileGenerator {
       fs.writeFileSync(filePath, content, "utf8");
       logger.debug(`Generated co-located file: ${filePath}`);
     } catch (error) {
+      const errorDetails = parseError(error);
       logger.error(`Failed to generate leaf translation file for ${location}`, {
-        error: parseError(error).message,
+        error: errorDetails.message,
         location,
         language,
       });
-      throw error;
+      logger.error("File generation failed", errorDetails);
+      return;
     }
   }
 
@@ -545,10 +535,20 @@ export class FileGenerator {
 
       // Find where the actual translation keys start (after the path structure)
       let startIndex = 0;
+      const COMMON_PATH_PARTS = [
+        "api",
+        "v1",
+        "core",
+        "system",
+        "app",
+        "locale",
+      ] as const;
       for (let i = 0; i < parts.length; i++) {
-        // Skip common path parts like "api", "v1", "core", "system", etc.
+        // Skip common path parts
         if (
-          ["api", "v1", "core", "system", "app", "locale"].includes(parts[i])
+          COMMON_PATH_PARTS.includes(
+            parts[i] as (typeof COMMON_PATH_PARTS)[number],
+          )
         ) {
           startIndex = i + 1;
         } else {
@@ -1023,7 +1023,6 @@ export class FileGenerator {
         currentPath,
         node,
         language,
-        hierarchy,
       );
 
       // Create directory
@@ -1068,7 +1067,6 @@ export class FileGenerator {
     currentPath: string,
     node: { children: Set<string>; colocatedFiles: string[] },
     language: string,
-    hierarchy: Map<string, { children: Set<string>; colocatedFiles: string[] }>,
   ): string {
     const imports: string[] = [];
     const exports: string[] = [];
@@ -1193,9 +1191,6 @@ export class FileGenerator {
     const imports: string[] = [];
     const exports: string[] = [];
     const usedImportNames = new Set<string>();
-
-    // TODO: Add support for mixed case (directories with both own translations and child imports)
-    // For now, we only handle pure import cases
 
     // Import from direct children
     for (const child of directChildren) {

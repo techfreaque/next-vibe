@@ -114,7 +114,7 @@ export const STRIPE_PRICE_IDS = {
 const getCountryFromLocale = (
   locale: CountryLanguage,
 ): keyof typeof STRIPE_PRICE_IDS => {
-  const countryPart = locale.split("-")[1];
+  const countryPart = locale.split("-")[1] as Countries;
   return countryPart;
 };
 
@@ -219,7 +219,7 @@ const ensureStripeCustomer = async (
 export interface SubscriptionCheckoutRepository {
   createCheckoutSession(
     data: CheckoutRequestOutput,
-    user: JwtPayloadType,
+    ,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CheckoutResponseOutput>>;
@@ -236,7 +236,7 @@ export class SubscriptionCheckoutRepositoryImpl
    */
   async createCheckoutSession(
     data: CheckoutRequestOutput,
-    user: JwtPayloadType,
+    ,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CheckoutResponseOutput>> {

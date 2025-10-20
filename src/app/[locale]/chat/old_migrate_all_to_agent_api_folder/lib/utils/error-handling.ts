@@ -57,7 +57,7 @@ function extractTranslationFromError(error: Error): {
     // eslint-disable-next-line i18next/no-literal-string -- Checking for translation key prefixes, not user-facing strings
     message.startsWith("api.")
   ) {
-    return { key: message  };
+    return { key: message };
   }
 
   // Check if it's an APIError with details containing translation info
@@ -75,7 +75,7 @@ function extractTranslationFromError(error: Error): {
         details.message.startsWith("api.")
       ) {
         return {
-          key: details.message ,
+          key: details.message,
           params: details.messageParams as TParams | undefined,
         };
       }

@@ -1,3 +1,4 @@
+/* eslint-disable i18next/no-literal-string */
 import { resolve } from "node:path";
 
 import { defineConfig } from "vite";
@@ -24,7 +25,6 @@ export default defineConfig({
     emptyOutDir: true,
   },
   resolve: {
-    // eslint-disable-next-line i18next/no-literal-string
     extensions: [".ts", ".js"],
   },
 });

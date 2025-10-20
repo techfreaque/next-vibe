@@ -36,7 +36,7 @@ export interface NewsletterUnsubscribeSmsService {
   sendConfirmationSms(
     unsubscribeData: UnsubscribeRequestOutput,
     responseData: UnsubscribeResponseOutput,
-    user: JwtPayloadType | null,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>>;
@@ -44,7 +44,7 @@ export interface NewsletterUnsubscribeSmsService {
   sendAdminNotificationSms(
     unsubscribeData: UnsubscribeRequestOutput,
     responseData: UnsubscribeResponseOutput,
-    user: JwtPayloadType | null,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>>;
@@ -62,7 +62,7 @@ export class NewsletterUnsubscribeSmsServiceImpl
   async sendConfirmationSms(
     unsubscribeData: UnsubscribeRequestOutput,
     responseData: UnsubscribeResponseOutput,
-    user: JwtPayloadType | null,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>> {
@@ -139,7 +139,7 @@ export class NewsletterUnsubscribeSmsServiceImpl
   async sendAdminNotificationSms(
     unsubscribeData: UnsubscribeRequestOutput,
     responseData: UnsubscribeResponseOutput,
-    user: JwtPayloadType | null,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>> {
@@ -224,7 +224,7 @@ export const newsletterUnsubscribeSmsService =
 export const sendConfirmationSms = (
   unsubscribeData: UnsubscribeRequestOutput,
   responseData: UnsubscribeResponseOutput,
-  user: JwtPayloadType | null,
+  user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {
@@ -243,7 +243,7 @@ export const sendConfirmationSms = (
 export const sendAdminNotificationSms = (
   unsubscribeData: UnsubscribeRequestOutput,
   responseData: UnsubscribeResponseOutput,
-  user: JwtPayloadType | null,
+  user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {

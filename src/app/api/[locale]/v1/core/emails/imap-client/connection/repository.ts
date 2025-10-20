@@ -285,7 +285,8 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
             resolveOnce(
               createSuccessResponse({
                 success: true,
-                message: "app.api.v1.core.emails.imapClient.imap.connection.test.success" as const,
+                message:
+                  "app.api.v1.core.emails.imapClient.imap.connection.test.success" as const,
                 connectionStatus: ImapConnectionStatus.CONNECTED,
                 details: {
                   host: config.host,
@@ -468,7 +469,8 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
 
       return createSuccessResponse({
         success: true,
-        message: "app.api.v1.core.emails.imapClient.imap.connection.test.success",
+        message:
+          "app.api.v1.core.emails.imapClient.imap.connection.test.success",
       });
     } catch (error) {
       logger.error("Error closing IMAP connection", error);
@@ -814,7 +816,8 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
 
       return createSuccessResponse({
         success: true,
-        message: "app.api.v1.core.emails.imapClient.imap.connection.test.success",
+        message:
+          "app.api.v1.core.emails.imapClient.imap.connection.test.success",
       });
     } catch (error) {
       logger.error("Error closing IMAP connections", error);

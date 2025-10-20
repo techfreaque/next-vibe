@@ -30,16 +30,19 @@ const { POST } = createEndpoint({
   path: ["v1", "core", "system", "tasks", "pulse", "execute"],
   allowedRoles: [UserRole.ADMIN],
 
-  title: "tasks.pulse.execution.success",
-  description: "tasks.runner.description",
-  category: "tasks.category.system",
-  tags: ["tasks.pulse.execution.success"],
+  title: "app.api.v1.core.system.tasks.pulseSystem.execute.post.title",
+  description:
+    "app.api.v1.core.system.tasks.pulseSystem.execute.post.description",
+  category: "app.api.v1.core.system.tasks.pulseSystem.execute.category",
+  tags: ["app.api.v1.core.system.tasks.pulseSystem.execute.tags.execute"],
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "tasks.runner.title",
-      description: "tasks.runner.description",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.container.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -49,8 +52,10 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "common.dryRun",
-          description: "common.dryRunDescription",
+          label:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.fields.dryRun.label",
+          description:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.fields.dryRun.description",
           layout: { columns: 6 },
         },
         z.boolean().optional().default(false),
@@ -60,9 +65,10 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
-          label: "common.taskNames",
-          description: "common.taskNamesDescription",
-          placeholder: "common.selectTasks",
+          label:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.fields.taskNames.label",
+          description:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.fields.taskNames.description",
           layout: { columns: 6 },
           options: [],
         },
@@ -73,8 +79,10 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "common.force",
-          description: "common.forceDescription",
+          label:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.fields.force.label",
+          description:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.fields.force.description",
           layout: { columns: 6 },
         },
         z.boolean().optional().default(false),
@@ -85,36 +93,37 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.success",
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.fields.success.title",
         },
         z.boolean(),
       ),
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content: "common.message",
+          content:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.fields.message.title",
         },
         z.string(),
       ),
       executedAt: responseField(
         {
           type: WidgetType.TEXT,
-          content: "common.executedAt",
+          content:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.executedAt",
         },
         z.string(),
       ),
       tasksExecuted: responseField(
         {
           type: WidgetType.TEXT,
-          content: "tasks.runner.messages.taskCompleted",
+          content:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.tasksExecuted",
         },
         z.number(),
       ),
       results: responseArrayField(
         {
           type: WidgetType.DATA_TABLE,
-          title:
-            "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.results",
           description:
             "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.resultsDescription",
         },
@@ -122,9 +131,9 @@ const { POST } = createEndpoint({
           {
             type: WidgetType.CONTAINER,
             title:
-              "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.resultItem",
+              "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.results",
             description:
-              "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.resultItemDescription",
+              "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.resultsDescription",
             layout: { type: LayoutType.GRID, columns: 4 },
           },
           { response: true },
@@ -132,7 +141,8 @@ const { POST } = createEndpoint({
             taskName: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "common.taskName",
+                content:
+                  "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.taskName",
               },
               z.string(),
             ),
@@ -140,21 +150,23 @@ const { POST } = createEndpoint({
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.taskSuccess",
+                  "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.success",
               },
               z.boolean(),
             ),
             duration: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "common.duration",
+                content:
+                  "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.duration",
               },
               z.number(),
             ),
             message: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "common.message",
+                content:
+                  "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.message",
               },
               z.string().optional(),
             ),
@@ -185,9 +197,9 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.server.title",
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.internal.title",
       description:
-        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.server.description",
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.internal.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:

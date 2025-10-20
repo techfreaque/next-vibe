@@ -29,60 +29,82 @@ import { UserRole } from "../../../user/user-roles/enum";
 const pulseExecuteEndpoint = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "tasks", "pulse", "execute"],
-  title: "common.pulseExecuteTitle",
-  description: "common.pulseExecuteDescription",
-  category: "common.sideTasksCategory",
+  title: "app.api.v1.core.system.tasks.pulseSystem.execute.post.title",
+  description:
+    "app.api.v1.core.system.tasks.pulseSystem.execute.post.description",
+  category: "app.api.v1.core.system.tasks.pulseSystem.execute.category",
   allowedRoles: [UserRole.ADMIN],
   aliases: ["pulse:execute"],
-  tags: ["common.pulseTaskType"],
+  tags: ["app.api.v1.core.system.tasks.pulseSystem.execute.tags.execute"],
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "common.pulseExecutePostValidationFailed",
-      description: "common.pulseExecutePostValidationFailed",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.validation.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "common.pulseExecutePostNetworkError",
-      description: "common.pulseExecutePostNetworkError",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.network.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "common.pulseExecutePostUnauthorized",
-      description: "common.pulseExecutePostUnauthorized",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "common.pulseExecutePostForbidden",
-      description: "common.pulseExecutePostForbidden",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.forbidden.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "common.pulseExecutePostNotFound",
-      description: "common.pulseExecutePostNotFound",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.notFound.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "common.pulseExecutePostServerError",
-      description: "common.pulseExecutePostServerError",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.internal.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "common.pulseExecutePostUnknownError",
-      description: "common.pulseExecutePostUnknownError",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.unknown.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "common.pulseExecutePostUnsavedChanges",
-      description: "common.pulseExecutePostUnsavedChanges",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.unsaved.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "common.pulseExecutePostConflict",
-      description: "common.pulseExecutePostConflict",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.conflict.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.v1.core.system.tasks.pulseSystem.success.title",
-    description: "app.api.v1.core.system.tasks.pulseSystem.success.description",
+    title:
+      "app.api.v1.core.system.tasks.pulseSystem.execute.post.success.title",
+    description:
+      "app.api.v1.core.system.tasks.pulseSystem.execute.post.success.description",
   },
 
   fields: objectField(
     {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
-      label: "app.api.v1.core.system.tasks.pulseSystem.container.title",
+      label:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.container.title",
       layout: { columns: 12 },
     },
     { request: "data", response: true },
@@ -92,8 +114,10 @@ const pulseExecuteEndpoint = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "common.dryRun",
-          description: "common.dryRunDescription",
+          label:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.fields.dryRun.label",
+          description:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.fields.dryRun.description",
           layout: { columns: 4 },
         },
         z.boolean().optional().default(false),
@@ -103,8 +127,10 @@ const pulseExecuteEndpoint = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "common.force",
-          description: "common.forceDescription",
+          label:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.fields.force.label",
+          description:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.fields.force.description",
           layout: { columns: 4 },
         },
         z.boolean().optional().default(false),
@@ -114,8 +140,10 @@ const pulseExecuteEndpoint = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXTAREA,
-          label: "common.taskNames",
-          description: "common.taskNamesDescription",
+          label:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.fields.taskNames.label",
+          description:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.fields.taskNames.description",
           layout: { columns: 4 },
         },
         z.array(z.string()).optional(),
@@ -125,7 +153,8 @@ const pulseExecuteEndpoint = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.system.tasks.pulseSystem.success.content",
+          content:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.fields.success.title",
         },
         z.boolean(),
       ),
@@ -133,7 +162,8 @@ const pulseExecuteEndpoint = createEndpoint({
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content: "common.message",
+          content:
+            "app.api.v1.core.system.tasks.pulseSystem.execute.post.fields.message.title",
         },
         z.string(),
       ),
@@ -172,12 +202,13 @@ const pulseExecuteEndpoint = createEndpoint({
 const pulseStatusEndpoint = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "system", "tasks", "pulse", "status"],
-  title: "common.pulseStatusTitle",
-  description: "common.pulseStatusDescription",
-  category: "common.sideTasksCategory",
+  title: "app.api.v1.core.system.tasks.pulseSystem.status.get.title",
+  description:
+    "app.api.v1.core.system.tasks.pulseSystem.status.get.description",
+  category: "app.api.v1.core.system.tasks.pulseSystem.status.category",
   allowedRoles: [],
   aliases: ["pulse:status"],
-  tags: ["app.api.v1.core.system.tasks.pulseSystem.status.get.title"],
+  tags: ["app.api.v1.core.system.tasks.pulseSystem.status.tags.status"],
 
   fields: objectField(
     {
@@ -248,46 +279,65 @@ const pulseStatusEndpoint = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "common.pulseStatusGetValidationFailed",
-      description: "common.pulseStatusGetValidationFailed",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.validation.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "common.pulseStatusGetNetworkError",
-      description: "common.pulseStatusGetNetworkError",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.network.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "common.pulseStatusGetUnauthorized",
-      description: "common.pulseStatusGetUnauthorized",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "common.pulseStatusGetForbidden",
-      description: "common.pulseStatusGetForbidden",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.forbidden.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "common.pulseStatusGetNotFound",
-      description: "common.pulseStatusGetNotFound",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.notFound.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "common.pulseStatusGetServerError",
-      description: "common.pulseStatusGetServerError",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.internal.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "common.pulseStatusGetUnknownError",
-      description: "common.pulseStatusGetUnknownError",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.unknown.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "common.pulseStatusGetUnsavedChanges",
-      description: "common.pulseStatusGetUnsavedChanges",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.unsaved.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "common.pulseStatusGetConflict",
-      description: "common.pulseStatusGetConflict",
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.conflict.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.status.get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.v1.core.system.tasks.pulseSystem.success.title",
-    description: "app.api.v1.core.system.tasks.pulseSystem.success.description",
+    title: "app.api.v1.core.system.tasks.pulseSystem.status.get.success.title",
+    description:
+      "app.api.v1.core.system.tasks.pulseSystem.status.get.success.description",
   },
 });
 

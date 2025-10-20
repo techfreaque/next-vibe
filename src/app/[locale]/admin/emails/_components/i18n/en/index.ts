@@ -14,4 +14,4 @@ export const translations = {
       title: "Email Statistics",
     },
   },
-} as const;
+};

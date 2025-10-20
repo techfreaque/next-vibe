@@ -16,4 +16,4 @@ export const translations = {
     overview: overviewApiTranslations,
     sync: syncApiTranslations,
   },
-} as const;
+};

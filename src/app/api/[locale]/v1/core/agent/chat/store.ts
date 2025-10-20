@@ -157,6 +157,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   deleteThread: (threadId: string): void =>
     set((state) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [threadId]: _deleted, ...remainingThreads } = state.threads;
       return {
         threads: remainingThreads,
@@ -200,6 +201,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   deleteMessage: (messageId: string): void =>
     set((state) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [messageId]: _deleted, ...remainingMessages } = state.messages;
       return {
         messages: remainingMessages,
@@ -243,6 +245,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   deleteFolder: (folderId: string): void =>
     set((state) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [folderId]: _deleted, ...remainingFolders } = state.folders;
       return {
         folders: remainingFolders,

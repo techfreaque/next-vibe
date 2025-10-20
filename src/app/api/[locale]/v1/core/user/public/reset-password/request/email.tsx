@@ -44,11 +44,14 @@ function renderPasswordResetRequestEmailContent(
     <EmailTemplate
       t={t}
       locale={locale}
-      title={t("app.api.v1.core.user.auth.resetPassword.email.title", {
-        appName: translatedAppName,
-      })}
+      title={t(
+        "app.api.v1.core.user.public.resetPassword.request.email.title",
+        {
+          appName: translatedAppName,
+        },
+      )}
       previewText={t(
-        "app.api.v1.core.user.auth.resetPassword.email.previewText",
+        "app.api.v1.core.user.public.resetPassword.request.email.previewText",
         {
           appName: translatedAppName,
         },
@@ -63,7 +66,7 @@ function renderPasswordResetRequestEmailContent(
           marginBottom: "16px",
         }}
       >
-        {t("app.api.v1.core.user.auth.resetPassword.email.greeting", {
+        {t("app.api.v1.core.user.public.resetPassword.request.email.greeting", {
           name: user.publicName,
         })}
       </Text>
@@ -76,9 +79,12 @@ function renderPasswordResetRequestEmailContent(
           marginBottom: "16px",
         }}
       >
-        {t("app.api.v1.core.user.auth.resetPassword.email.requestInfo", {
-          appName: translatedAppName,
-        })}
+        {t(
+          "app.api.v1.core.user.public.resetPassword.request.email.requestInfo",
+          {
+            appName: translatedAppName,
+          },
+        )}
       </Text>
 
       <Text
@@ -89,7 +95,9 @@ function renderPasswordResetRequestEmailContent(
           marginBottom: "16px",
         }}
       >
-        {t("app.api.v1.core.user.auth.resetPassword.email.instructions")}
+        {t(
+          "app.api.v1.core.user.public.resetPassword.request.email.instructions",
+        )}
       </Text>
 
       <Section style={{ textAlign: "center", marginTop: "32px" }}>
@@ -104,7 +112,9 @@ function renderPasswordResetRequestEmailContent(
             textDecoration: "none",
           }}
         >
-          {t("app.api.v1.core.user.auth.resetPassword.email.buttonText")}
+          {t(
+            "app.api.v1.core.user.public.resetPassword.request.email.buttonText",
+          )}
         </Button>
       </Section>
 
@@ -116,7 +126,9 @@ function renderPasswordResetRequestEmailContent(
           marginTop: "24px",
         }}
       >
-        {t("app.api.v1.core.user.auth.resetPassword.email.expirationInfo")}
+        {t(
+          "app.api.v1.core.user.public.resetPassword.request.email.expirationInfo",
+        )}
       </Text>
     </EmailTemplate>
   );
@@ -157,7 +169,7 @@ export const renderResetPasswordMail: EmailFunctionType<
     if (!userResponse.success) {
       // will not get sent to the user as ignoreError is true
       return createErrorResponse(
-        "email.error.no_email",
+        "app.api.v1.core.emails.errors.no_email",
         ErrorResponseTypes.NOT_FOUND,
         { email: requestData.emailInput.email },
       );
@@ -172,7 +184,7 @@ export const renderResetPasswordMail: EmailFunctionType<
     );
     if (!tokenResponse.success) {
       return createErrorResponse(
-        "email.error.email_generation_failed",
+        "app.api.v1.core.emails.errors.email_generation_failed",
         ErrorResponseTypes.INTERNAL_ERROR,
         { email: requestData.emailInput.email },
       );
@@ -181,14 +193,17 @@ export const renderResetPasswordMail: EmailFunctionType<
     const token = tokenResponse.data;
     const passwordResetUrl = `${env.NEXT_PUBLIC_APP_URL}/${locale}/user/reset-password/${token}`;
 
-    const translatedAppName = t("common.appName");
+    const translatedAppName = t("app.api.common.appName");
 
     return createSuccessResponse({
       toEmail: requestData.emailInput.email,
       toName: user.publicName,
-      subject: t("app.api.v1.core.user.auth.resetPassword.email.subject", {
-        appName: translatedAppName,
-      }),
+      subject: t(
+        "app.api.v1.core.user.public.resetPassword.request.email.subject",
+        {
+          appName: translatedAppName,
+        },
+      ),
       jsx: renderPasswordResetRequestEmailContent(
         t,
         locale,
@@ -202,7 +217,7 @@ export const renderResetPasswordMail: EmailFunctionType<
     logger.error("Error generating password reset email:", error);
     const parsedError = parseError(error);
     return createErrorResponse(
-      "email.error.email_generation_failed",
+      "app.api.v1.core.emails.errors.email_generation_failed",
       ErrorResponseTypes.INTERNAL_ERROR,
       {
         email: requestData.emailInput.email,

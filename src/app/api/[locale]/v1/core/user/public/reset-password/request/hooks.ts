@@ -64,7 +64,9 @@ export function useResetPasswordRequest(logger: EndpointLogger): ApiFormReturn<
         setIsSuccess(true);
 
         toast({
-          title: t("app.api.v1.core.user.auth.resetPassword.success.title"),
+          title: t(
+            "app.api.v1.core.user.public.resetPassword.request.success.title",
+          ),
           description: t(
             "app.api.v1.core.user.public.resetPassword.request.response.success.message",
           ),
@@ -73,7 +75,9 @@ export function useResetPasswordRequest(logger: EndpointLogger): ApiFormReturn<
       },
       onError: ({ error }) => {
         toast({
-          title: t("app.api.v1.core.user.auth.resetPassword.errors.title"),
+          title: t(
+            "app.api.v1.core.user.public.resetPassword.request.errors.title",
+          ),
           description: t(error.message),
           variant: "destructive",
         });
@@ -87,10 +91,12 @@ export function useResetPasswordRequest(logger: EndpointLogger): ApiFormReturn<
       return {
         variant: "success",
         title: {
-          message: "app.api.v1.core.user.auth.resetPassword.successTitle",
+          message:
+            "app.api.v1.core.user.public.resetPassword.request.success.title",
         },
         message: {
-          message: "app.api.v1.core.user.auth.resetPassword.successMessage",
+          message:
+            "app.api.v1.core.user.public.resetPassword.request.success.description",
         },
       };
     }
@@ -100,7 +106,8 @@ export function useResetPasswordRequest(logger: EndpointLogger): ApiFormReturn<
       return {
         variant: "destructive",
         title: {
-          message: "app.api.v1.core.user.auth.resetPassword.errors.title",
+          message:
+            "app.api.v1.core.user.public.resetPassword.request.errors.title",
         },
         message: {
           message: formResult.response.message,

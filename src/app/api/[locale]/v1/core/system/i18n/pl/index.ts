@@ -3,6 +3,7 @@ import { translations as checkTranslations } from "../../check/i18n/pl";
 import { translations as dbTranslations } from "../../db/i18n/pl";
 import { translations as generatorsTranslations } from "../../generators/i18n/pl";
 import { translations as guardTranslations } from "../../guard/i18n/pl";
+import { translations as launchpadTranslations } from "../../launchpad/i18n/pl";
 import { translations as serverTranslations } from "../../server/i18n/pl";
 import { translations as tasksTranslations } from "../../tasks/i18n/pl";
 import { translations as translationsTranslations } from "../../translations/i18n/pl";
@@ -16,6 +17,7 @@ export const translations: typeof enTranslations = {
   db: dbTranslations,
   generators: generatorsTranslations,
   guard: guardTranslations,
+  launchpad: launchpadTranslations,
   server: serverTranslations,
   tasks: tasksTranslations,
   translations: translationsTranslations,

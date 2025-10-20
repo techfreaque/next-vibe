@@ -140,8 +140,14 @@ export function ImapAccountCreateForm({
               label: "app.admin.emails.imap.account.fields.authMethod",
               placeholder: "app.admin.emails.imap.account.fields.authMethod",
               options: [
-                { value: ImapAuthMethod.PLAIN, label: "app.admin.emails.imap.auth.plain" },
-                { value: ImapAuthMethod.OAUTH2, label: "app.admin.emails.imap.auth.oauth2" },
+                {
+                  value: ImapAuthMethod.PLAIN,
+                  label: "app.admin.emails.imap.auth.plain",
+                },
+                {
+                  value: ImapAuthMethod.OAUTH2,
+                  label: "app.admin.emails.imap.auth.oauth2",
+                },
               ],
             }}
             control={endpoint.create.form.control}
@@ -178,7 +184,8 @@ export function ImapAccountCreateForm({
             config={{
               type: "number",
               label: "app.admin.emails.imap.account.fields.connectionTimeout",
-              placeholder: "app.admin.emails.imap.account.fields.connectionTimeout",
+              placeholder:
+                "app.admin.emails.imap.account.fields.connectionTimeout",
             }}
             control={endpoint.create.form.control}
             theme={{

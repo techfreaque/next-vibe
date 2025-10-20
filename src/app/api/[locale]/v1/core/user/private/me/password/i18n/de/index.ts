@@ -4,13 +4,6 @@ export const translations: typeof enTranslations = {
   title: "Passwort Ändern",
   description: "Ändern Sie Ihr Kontokennwort sicher",
   tag: "passwort-ändern",
-  errors: {
-    passwords_do_not_match: "Passwörter stimmen nicht überein",
-    user_not_found: "Benutzer nicht gefunden",
-    incorrect_password: "Falsches Passwort",
-    update_failed: "Passwort konnte nicht aktualisiert werden",
-    token_creation_failed: "Passwort-Token konnte nicht erstellt werden",
-  },
   debug: {
     errorUpdatingPassword: "Fehler beim Aktualisieren des Passworts",
     errorSettingPassword: "Fehler beim Setzen des Passworts",
@@ -68,6 +61,11 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
+    passwords_do_not_match: "Passwörter stimmen nicht überein",
+    user_not_found: "Benutzer nicht gefunden",
+    incorrect_password: "Falsches Passwort",
+    update_failed: "Passwort konnte nicht aktualisiert werden",
+    token_creation_failed: "Passwort-Token konnte nicht erstellt werden",
     invalid_request: {
       title: "Ungültige Anfrage",
       description: "Die Passwort-Änderungsanfrage ist ungültig",

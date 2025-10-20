@@ -7,7 +7,6 @@
 
 import { ArrowLeft, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTranslation } from "@/i18n/core/client";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
@@ -21,10 +20,11 @@ import {
   EmailCampaignStage,
   LeadStatus,
 } from "@/app/api/[locale]/v1/core/leads/enum";
-import { useLeadByIdEndpoint } from "@/app/api/[locale]/v1/core/leads/lead/[id]/hooks";
 import type { LeadUpdateInput } from "@/app/api/[locale]/v1/core/leads/lead/[id]/definition";
 import { leadUpdateSchema } from "@/app/api/[locale]/v1/core/leads/lead/[id]/definition";
+import { useLeadByIdEndpoint } from "@/app/api/[locale]/v1/core/leads/lead/[id]/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { Countries } from "@/i18n/core/config";
 

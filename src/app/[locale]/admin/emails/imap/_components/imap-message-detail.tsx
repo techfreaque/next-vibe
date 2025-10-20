@@ -60,7 +60,9 @@ export function ImapMessageDetail({
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
-          <p className="text-gray-600">{t("app.admin.emails.imap.common.loading")}</p>
+          <p className="text-gray-600">
+            {t("app.admin.emails.imap.common.loading")}
+          </p>
         </div>
       </div>
     );
@@ -72,7 +74,9 @@ export function ImapMessageDetail({
         <div className="text-center">
           <p className="text-red-600 mb-4">
             {readError?.message ||
-              t("app.admin.emails.imap.admin.messages.error.title", { error: "" })}
+              t("app.admin.emails.imap.admin.messages.error.title", {
+                error: "",
+              })}
           </p>
           <Button variant="outline" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -176,7 +180,9 @@ export function ImapMessageDetail({
       {isEditMode ? (
         <Card>
           <CardHeader>
-            <CardTitle>{t("app.admin.emails.imap.messages.edit.title")}</CardTitle>
+            <CardTitle>
+              {t("app.admin.emails.imap.messages.edit.title")}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Form
@@ -260,7 +266,9 @@ export function ImapMessageDetail({
                 <div className="flex items-center space-x-3">
                   <User className="h-5 w-5 text-gray-500" />
                   <div>
-                    <div className="font-medium">{t("app.admin.emails.imap.messages.from")}</div>
+                    <div className="font-medium">
+                      {t("app.admin.emails.imap.messages.from")}
+                    </div>
                     <div className="text-sm text-gray-600">
                       {messageData.senderName ? (
                         <>
@@ -276,7 +284,9 @@ export function ImapMessageDetail({
                 <div className="flex items-center space-x-3">
                   <Mail className="h-5 w-5 text-gray-500" />
                   <div>
-                    <div className="font-medium">{t("app.admin.emails.imap.messages.to")}</div>
+                    <div className="font-medium">
+                      {t("app.admin.emails.imap.messages.to")}
+                    </div>
                     <div className="text-sm text-gray-600">
                       {messageData.recipientName ? (
                         <>
@@ -295,7 +305,9 @@ export function ImapMessageDetail({
               <div className="flex items-center space-x-3">
                 <Calendar className="h-5 w-5 text-gray-500" />
                 <div>
-                  <div className="font-medium">{t("app.admin.emails.imap.messages.sentAt")}</div>
+                  <div className="font-medium">
+                    {t("app.admin.emails.imap.messages.sentAt")}
+                  </div>
                   <div className="text-sm text-gray-600">
                     {messageData.sentAt
                       ? formatDate(messageData.sentAt)
@@ -317,7 +329,9 @@ export function ImapMessageDetail({
           {/* Message Content */}
           <Card>
             <CardHeader>
-              <CardTitle>{t("app.admin.emails.imap.messages.content")}</CardTitle>
+              <CardTitle>
+                {t("app.admin.emails.imap.messages.content")}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="prose max-w-none">
@@ -328,7 +342,8 @@ export function ImapMessageDetail({
                   />
                 ) : (
                   <div className="whitespace-pre-wrap">
-                    {messageData.bodyText || t("app.admin.emails.imap.messages.noContent")}
+                    {messageData.bodyText ||
+                      t("app.admin.emails.imap.messages.noContent")}
                   </div>
                 )}
               </div>
@@ -338,7 +353,9 @@ export function ImapMessageDetail({
           {/* Technical Details */}
           <Card>
             <CardHeader>
-              <CardTitle>{t("app.admin.emails.imap.messages.technicalDetails")}</CardTitle>
+              <CardTitle>
+                {t("app.admin.emails.imap.messages.technicalDetails")}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">

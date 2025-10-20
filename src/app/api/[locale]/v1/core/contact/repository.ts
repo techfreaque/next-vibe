@@ -32,7 +32,7 @@ export interface ContactRepository {
    */
   submitContactForm(
     data: ContactRequestOutput,
-    user: JwtPayloadType | null,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ContactResponseOutput>>;
@@ -56,7 +56,7 @@ export class ContactRepositoryImpl implements ContactRepository {
    */
   async submitContactForm(
     data: ContactRequestOutput,
-    user: JwtPayloadType | null,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ContactResponseOutput>> {

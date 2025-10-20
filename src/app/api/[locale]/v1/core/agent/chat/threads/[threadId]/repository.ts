@@ -20,6 +20,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/defini
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chatThreads } from "../../db";
+import type { PersonaId } from "../../personas/config";
 import type {
   ThreadDeleteResponseOutput,
   ThreadGetResponseOutput,
@@ -178,7 +179,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
         updateData.defaultModel = data.updates.defaultModel;
       }
       if (data.updates?.defaultTone !== undefined) {
-        updateData.defaultTone = data.updates.defaultTone;
+        updateData.defaultTone = data.updates.defaultTone as PersonaId | null;
       }
       if (data.updates?.systemPrompt !== undefined) {
         updateData.systemPrompt = data.updates.systemPrompt;

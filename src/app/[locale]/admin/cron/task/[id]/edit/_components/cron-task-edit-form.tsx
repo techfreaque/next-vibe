@@ -12,8 +12,10 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import type React from "react";
 
-import { endpoints } from "@/app/api/[locale]/v1/core/system/tasks/cron/task/[id]/definition";
-import type { IndividualCronTaskType } from "@/app/api/[locale]/v1/core/system/tasks/cron/task/[id]/definition";
+import type {
+  endpoints,
+  IndividualCronTaskType,
+} from "@/app/api/[locale]/v1/core/system/tasks/cron/task/[id]/definition";
 import { formatCronSchedule } from "@/app/api/[locale]/v1/core/system/tasks/cron-formatter";
 import {
   CronTaskPriority,
@@ -107,9 +109,7 @@ export function CronTaskEditForm({
           >
             <FormFieldGroup
               title={"app.admin.cron.taskDetails.basicInfo"}
-              description={
-                "app.admin.cron.taskDetails.basicInfoDescription"
-              }
+              description={"app.admin.cron.taskDetails.basicInfoDescription"}
             >
               <div className="grid grid-cols-1 gap-4">
                 <EndpointFormField
@@ -117,8 +117,7 @@ export function CronTaskEditForm({
                   config={{
                     type: "text",
                     label: "app.admin.cron.taskDetails.name",
-                    placeholder:
-                      "app.admin.cron.taskDetails.namePlaceholder",
+                    placeholder: "app.admin.cron.taskDetails.namePlaceholder",
                   }}
                   control={endpoint.update?.form.control}
                   theme={{
@@ -147,9 +146,7 @@ export function CronTaskEditForm({
 
             <FormFieldGroup
               title={"app.admin.cron.taskDetails.scheduling"}
-              description={
-                "app.admin.cron.taskDetails.schedulingDescription"
-              }
+              description={"app.admin.cron.taskDetails.schedulingDescription"}
             >
               <ScheduleAutocomplete
                 value={endpoint.update?.form.watch("schedule")}

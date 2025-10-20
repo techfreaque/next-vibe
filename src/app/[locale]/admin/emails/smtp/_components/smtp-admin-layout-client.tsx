@@ -76,7 +76,10 @@ export function SmtpAdminLayoutClient({
 
             {/* Sub Navigation Tabs */}
             <div className="border-b border-gray-200 dark:border-gray-700">
-              <nav className="flex space-x-8" aria-label={t("app.admin.emails.smtp.list.title")}>
+              <nav
+                className="flex space-x-8"
+                aria-label={t("app.admin.emails.smtp.list.title")}
+              >
                 {subNavigationItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = currentSubSection?.key === item.key;

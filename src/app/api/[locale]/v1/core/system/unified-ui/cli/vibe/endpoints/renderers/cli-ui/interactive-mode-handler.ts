@@ -3,7 +3,7 @@
  * Provides file explorer-like navigation and form-based interface that respects data-driven UI
  */
 
-import { input, select, confirm } from "@inquirer/prompts";
+import { confirm, input, select } from "@inquirer/prompts";
 import type { z } from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -365,7 +365,7 @@ export class InteractiveModeHandler {
       pageSize: 15,
     });
 
-    return action as string;
+    return action;
   }
 
   /**
@@ -971,7 +971,7 @@ export class InteractiveModeHandler {
       return;
     }
 
-    await this.updateSetting(setting as string);
+    await this.updateSetting(setting);
   }
 
   /**
@@ -1018,7 +1018,7 @@ export class InteractiveModeHandler {
         });
         this.session.options = {
           ...this.session.options,
-          verbose: verbose as boolean,
+          verbose: verbose,
         };
         break;
       }

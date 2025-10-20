@@ -59,6 +59,8 @@ export const translations = {
         title: "Verboten",
         description:
           "Sie haben keine Berechtigung, diese Nachricht zu bewerten",
+        incognitoNotAllowed:
+          "Inkognito-Threads können nicht auf dem Server aufgerufen werden",
       },
       notFound: {
         title: "Nicht gefunden",

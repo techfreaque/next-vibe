@@ -6,10 +6,6 @@
 "use client";
 
 import { Mail, Send } from "lucide-react";
-import {
-  getCountryFromLocale,
-  getLanguageFromLocale,
-} from "@/i18n/core/language-utils";
 import { FormAlert } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
@@ -29,6 +25,10 @@ import {
 } from "@/app/api/[locale]/v1/core/leads/enum";
 import { useTranslation } from "@/i18n/core/client";
 import { Countries, Languages } from "@/i18n/core/config";
+import {
+  getCountryFromLocale,
+  getLanguageFromLocale,
+} from "@/i18n/core/language-utils";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 interface TestEmailFormProps {

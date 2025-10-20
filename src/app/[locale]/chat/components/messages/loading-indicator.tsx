@@ -3,7 +3,7 @@
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 
-import { chatAnimations } from "../../lib/design-tokens";
+import { chatAnimations } from "../../old_migrate_all_to_agent_api_folder/lib/design-tokens";
 
 export function LoadingIndicator(): JSX.Element {
   return (

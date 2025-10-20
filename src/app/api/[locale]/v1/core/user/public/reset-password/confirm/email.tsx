@@ -40,11 +40,14 @@ function renderPasswordResetConfirmEmailContent(
     <EmailTemplate
       t={t}
       locale={locale}
-      title={t("app.api.v1.core.user.auth.resetPassword.confirmEmail.title", {
-        appName,
-      })}
+      title={t(
+        "app.api.v1.core.user.public.resetPassword.confirm.email.title",
+        {
+          appName,
+        },
+      )}
       previewText={t(
-        "app.api.v1.core.user.auth.resetPassword.confirmEmail.previewText",
+        "app.api.v1.core.user.public.resetPassword.confirm.email.previewText",
         {
           appName,
         },
@@ -59,7 +62,7 @@ function renderPasswordResetConfirmEmailContent(
           marginBottom: "16px",
         }}
       >
-        {t("app.api.v1.core.user.auth.resetPassword.confirmEmail.greeting", {
+        {t("app.api.v1.core.user.public.resetPassword.confirm.email.greeting", {
           name: user.publicName,
         })}
       </Text>
@@ -73,7 +76,7 @@ function renderPasswordResetConfirmEmailContent(
         }}
       >
         {t(
-          "app.api.v1.core.user.auth.resetPassword.confirmEmail.successMessage",
+          "app.api.v1.core.user.public.resetPassword.confirm.email.successMessage",
           {
             appName,
           },
@@ -89,7 +92,7 @@ function renderPasswordResetConfirmEmailContent(
         }}
       >
         {t(
-          "app.api.v1.core.user.auth.resetPassword.confirmEmail.loginInstructions",
+          "app.api.v1.core.user.public.resetPassword.confirm.email.loginInstructions",
         )}
       </Text>
 
@@ -103,7 +106,7 @@ function renderPasswordResetConfirmEmailContent(
           }}
         >
           {t(
-            "app.api.v1.core.user.auth.resetPassword.confirmEmail.securityWarning",
+            "app.api.v1.core.user.public.resetPassword.confirm.email.securityWarning",
           )}
         </Text>
       </Section>
@@ -116,7 +119,9 @@ function renderPasswordResetConfirmEmailContent(
           marginTop: "24px",
         }}
       >
-        {t("app.api.v1.core.user.auth.resetPassword.confirmEmail.securityTip")}
+        {t(
+          "app.api.v1.core.user.public.resetPassword.confirm.email.securityTip",
+        )}
       </Text>
     </EmailTemplate>
   );
@@ -154,18 +159,21 @@ export const renderResetPasswordConfirmMail: EmailFunctionType<
   );
   if (!userResponse.success) {
     return createErrorResponse(
-      "error.errorTypes.not_found",
+      "app.api.v1.core.emails.errors.no_email",
       ErrorResponseTypes.NOT_FOUND,
     );
   }
   const user = userResponse.data;
-  const appName = t("common.appName");
+  const appName = t("app.api.common.appName");
   return createSuccessResponse({
     toEmail: requestData.verification.email,
     toName: user.publicName,
-    subject: t("app.api.v1.core.user.auth.resetPassword.confirmEmail.subject", {
-      appName,
-    }),
+    subject: t(
+      "app.api.v1.core.user.public.resetPassword.confirm.email.subject",
+      {
+        appName,
+      },
+    ),
     jsx: renderPasswordResetConfirmEmailContent(
       t,
       locale,

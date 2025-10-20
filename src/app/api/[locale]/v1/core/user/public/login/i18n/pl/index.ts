@@ -84,6 +84,17 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
+    title: "Błąd logowania",
+    account_locked: "Konto jest zablokowane",
+    accountLocked: "Konto jest zablokowane",
+    accountLockedDescription:
+      "Twoje konto zostało zablokowane. Skontaktuj się z pomocą techniczną.",
+    invalid_credentials: "Nieprawidłowy e-mail lub hasło",
+    two_factor_required: "Wymagana dwuskładnikowa autoryzacja",
+    auth_error: "Wystąpił błąd uwierzytelniania",
+    user_not_found: "Użytkownik nie znaleziony",
+    session_creation_failed: "Nie udało się utworzyć sesji",
+    token_save_failed: "Nie udało się zapisać tokenu uwierzytelniania",
     validation: {
       title: "Walidacja nie powiodła się",
       description: "Sprawdź swoje dane wejściowe",

@@ -165,7 +165,10 @@ function validateGetRequestData<TRequestInput, TRequestOutput>(
 ): ResponseType<TRequestOutput> {
   // Check if the schema is z.undefined() or z.never() (no request data expected)
   // This happens when an endpoint has no request fields
-  if (endpoint.requestSchema instanceof z.ZodUndefined || endpoint.requestSchema instanceof z.ZodNever) {
+  if (
+    endpoint.requestSchema instanceof z.ZodUndefined ||
+    endpoint.requestSchema instanceof z.ZodNever
+  ) {
     // Return success with undefined as the data (will be cast to TRequestOutput)
     return {
       success: true,
@@ -235,7 +238,10 @@ async function validatePostRequestData<TRequestInput, TRequestOutput>(
 ): Promise<ResponseType<TRequestOutput>> {
   // Check if the schema is z.undefined() or z.never() (no request data expected)
   // This happens when an endpoint has no request fields
-  if (endpoint.requestSchema instanceof z.ZodUndefined || endpoint.requestSchema instanceof z.ZodNever) {
+  if (
+    endpoint.requestSchema instanceof z.ZodUndefined ||
+    endpoint.requestSchema instanceof z.ZodNever
+  ) {
     // Return success with undefined as the data (will be cast to TRequestOutput)
     return {
       success: true,

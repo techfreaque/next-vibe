@@ -2,15 +2,47 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
-    form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
+    title: "Übersetzungssicherung wiederherstellen",
+    description: "Übersetzungsdateien aus einer Sicherung wiederherstellen",
+    container: {
+      title: "Sicherung wiederherstellen",
+      description:
+        "Übersetzungsdateien aus einer angegebenen Sicherung wiederherstellen",
+    },
+    fields: {
+      backupPath: {
+        title: "Sicherungspfad",
+        description:
+          "Pfad zum Sicherungsverzeichnis, aus dem wiederhergestellt werden soll",
+      },
+      validateOnly: {
+        title: "Nur validieren",
+        description: "Nur die Sicherung validieren ohne wiederherzustellen",
+      },
+      createBackupBeforeRestore: {
+        title: "Sicherung vor Wiederherstellung erstellen",
+        description:
+          "Sicherung des aktuellen Zustands vor der Wiederherstellung erstellen",
+      },
+    },
+    messages: {
+      validationSuccessful:
+        "Sicherungsvalidierung erfolgreich - Sicherung ist gültig und kann wiederhergestellt werden",
+      restoreSuccessful: "Sicherung erfolgreich wiederhergestellt",
+      backupNotFound: "Sicherung am angegebenen Pfad nicht gefunden",
     },
     response: {
-      title: "Antwort",
-      description: "Antwortdaten",
+      title: "Wiederherstellungsergebnis",
+      description: "Ergebnisse der Sicherungswiederherstellung",
+      message: "Wiederherstellungsnachricht",
+      backupInfo: {
+        title: "Sicherungsinformationen",
+        description: "Informationen über die wiederhergestellte Sicherung",
+        backupPath: "Sicherungspfad",
+        backupDate: "Sicherungsdatum",
+        filesRestored: "Wiederhergestellte Dateien",
+        newBackupCreated: "Neue Sicherung erstellt",
+      },
     },
     errors: {
       unauthorized: {
@@ -19,7 +51,7 @@ export const translations: typeof enTranslations = {
       },
       validation: {
         title: "Validierungsfehler",
-        description: "Ungültige Anfrageparameter",
+        description: "Ungültiger Sicherungspfad oder Parameter",
       },
       server: {
         title: "Serverfehler",
@@ -38,17 +70,17 @@ export const translations: typeof enTranslations = {
         description: "Zugriff verboten",
       },
       notFound: {
-        title: "Nicht gefunden",
-        description: "Ressource nicht gefunden",
+        title: "Sicherung nicht gefunden",
+        description: "Die angegebene Sicherung existiert nicht",
       },
       conflict: {
         title: "Konflikt",
-        description: "Datenkonflikt aufgetreten",
+        description: "Konflikt bei der Sicherungswiederherstellung aufgetreten",
       },
     },
     success: {
-      title: "Erfolg",
-      description: "Vorgang erfolgreich abgeschlossen",
+      title: "Sicherung wiederhergestellt",
+      description: "Übersetzungssicherung erfolgreich wiederhergestellt",
     },
   },
 };

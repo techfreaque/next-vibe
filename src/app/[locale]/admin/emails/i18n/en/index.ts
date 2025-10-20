@@ -12,4 +12,4 @@ export const translations = {
   smtp: smtpTranslations,
   list: listTranslations,
   stats: statsTranslations,
-} as const;
+};

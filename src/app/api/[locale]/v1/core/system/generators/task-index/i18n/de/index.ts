@@ -2,15 +2,33 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
-    form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
+    title: "Task-Index generieren",
+    description: "Task-Index-Dateien generieren",
+    container: {
+      title: "Task-Index-Generierung",
+      description: "Parameter für Task-Index-Generierung konfigurieren",
     },
-    response: {
-      title: "Antwort",
-      description: "Antwortdaten",
+    fields: {
+      outputDir: {
+        label: "Ausgabeverzeichnis",
+        description: "Verzeichnis für generierte Task-Index-Dateien",
+      },
+      verbose: {
+        label: "Ausführliche Ausgabe",
+        description: "Ausführliche Protokollierung aktivieren",
+      },
+      duration: {
+        title: "Dauer",
+      },
+      success: {
+        title: "Erfolg",
+      },
+      message: {
+        title: "Nachricht",
+      },
+      tasksFound: {
+        title: "Gefundene Tasks",
+      },
     },
     errors: {
       unauthorized: {
@@ -44,6 +62,14 @@ export const translations: typeof enTranslations = {
       conflict: {
         title: "Konflikt",
         description: "Datenkonflikt aufgetreten",
+      },
+      internal: {
+        title: "Interner Fehler",
+        description: "Interner Serverfehler aufgetreten",
+      },
+      unsaved: {
+        title: "Nicht gespeicherte Änderungen",
+        description: "Es gibt nicht gespeicherte Änderungen",
       },
     },
     success: {

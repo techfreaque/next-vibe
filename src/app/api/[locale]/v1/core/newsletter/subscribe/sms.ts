@@ -31,7 +31,7 @@ export interface NewsletterSubscribeSmsService {
   sendWelcomeSms(
     subscriptionData: NewsletterSubscriptionType,
     responseData: NewsletterSubscriptionResponseType,
-    user: JwtPayloadType | null,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>>;
@@ -39,7 +39,7 @@ export interface NewsletterSubscribeSmsService {
   sendAdminNotificationSms(
     subscriptionData: NewsletterSubscriptionType,
     responseData: NewsletterSubscriptionResponseType,
-    user: JwtPayloadType | null,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>>;
@@ -57,7 +57,7 @@ export class NewsletterSubscribeSmsServiceImpl
   async sendWelcomeSms(
     subscriptionData: NewsletterSubscriptionType,
     responseData: NewsletterSubscriptionResponseType,
-    user: JwtPayloadType | null,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>> {
@@ -121,7 +121,7 @@ export class NewsletterSubscribeSmsServiceImpl
   async sendAdminNotificationSms(
     subscriptionData: NewsletterSubscriptionType,
     responseData: NewsletterSubscriptionResponseType,
-    user: JwtPayloadType | null,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>> {
@@ -248,7 +248,7 @@ export const newsletterSubscribeSmsService =
 export const sendWelcomeSms = async (
   subscriptionData: NewsletterSubscriptionType,
   responseData: NewsletterSubscriptionResponseType,
-  user: JwtPayloadType | null,
+  user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {
@@ -264,7 +264,7 @@ export const sendWelcomeSms = async (
 export const sendAdminNotificationSms = async (
   subscriptionData: NewsletterSubscriptionType,
   responseData: NewsletterSubscriptionResponseType,
-  user: JwtPayloadType | null,
+  user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {

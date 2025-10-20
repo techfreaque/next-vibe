@@ -36,10 +36,10 @@ export function TermsClientInteraction({
       <button
         onClick={handlePrint}
         className="flex items-center gap-2 px-4 py-2 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 text-blue-700 dark:text-blue-300 rounded-md transition-colors"
-        aria-label={t("app.site.termsOfService.printAriaLabel")}
+        aria-label={t("app.story.termsOfService.printAriaLabel")}
       >
         <Printer className="h-4 w-4" />
-        {t("app.site.termsOfService.printButton")}
+        {t("app.story.termsOfService.printButton")}
       </button>
     </div>
   );

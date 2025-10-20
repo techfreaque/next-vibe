@@ -6,9 +6,10 @@ import { translations as taskIndexTranslations } from "../../task-index/i18n/pl"
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Generatory",
   endpoints: endpointsTranslations,
-  "generate-all": generateAllTranslations,
-  "generate-trpc-router": generateTrpcRouterTranslations,
+  generateAll: generateAllTranslations,
+  generateTrpcRouter: generateTrpcRouterTranslations,
   seeds: seedsTranslations,
-  "task-index": taskIndexTranslations,
+  taskIndex: taskIndexTranslations,
 };

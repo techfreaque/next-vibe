@@ -382,4 +382,7 @@ export const translations: typeof enTranslations = {
     statistics: "Statistiken",
     analytics: "Analysen",
   },
+  error: {
+    default: "Ein Fehler ist aufgetreten",
+  },
 };

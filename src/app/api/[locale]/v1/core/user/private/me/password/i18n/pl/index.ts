@@ -4,13 +4,6 @@ export const translations: typeof enTranslations = {
   title: "Zmień Hasło",
   description: "Bezpiecznie zaktualizuj hasło do swojego konta",
   tag: "zmiana-hasła",
-  errors: {
-    passwords_do_not_match: "Hasła nie pasują do siebie",
-    user_not_found: "Użytkownik nie znaleziony",
-    incorrect_password: "Nieprawidłowe hasło",
-    update_failed: "Nie udało się zaktualizować hasła",
-    token_creation_failed: "Nie udało się utworzyć tokenu hasła",
-  },
   debug: {
     errorUpdatingPassword: "Błąd podczas aktualizacji hasła",
     errorSettingPassword: "Błąd podczas ustawiania hasła",
@@ -68,6 +61,11 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
+    passwords_do_not_match: "Hasła nie pasują do siebie",
+    user_not_found: "Użytkownik nie znaleziony",
+    incorrect_password: "Nieprawidłowe hasło",
+    update_failed: "Nie udało się zaktualizować hasła",
+    token_creation_failed: "Nie udało się utworzyć tokenu hasła",
     invalid_request: {
       title: "Nieprawidłowe Żądanie",
       description: "Żądanie zmiany hasła jest nieprawidłowe",

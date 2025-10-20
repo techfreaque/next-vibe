@@ -1,4 +1,11 @@
 export const translations = {
+  authClient: {
+    errors: {
+      status_save_failed: "Failed to save authentication status",
+      status_remove_failed: "Failed to remove authentication status",
+      status_check_failed: "Failed to check authentication status",
+    },
+  },
   errors: {
     token_generation_failed: "Failed to generate authentication token",
     invalid_session: "The session is invalid or expired",

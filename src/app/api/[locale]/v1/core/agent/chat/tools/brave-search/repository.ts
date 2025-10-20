@@ -174,7 +174,7 @@ class BraveSearchService {
       const response = await fetch(url, {
         method: "GET",
         headers: {
-          Accept: "application/json",
+          "Accept": "application/json",
           "Accept-Encoding": "gzip",
           "X-Subscription-Token": env.BRAVE_SEARCH_API_KEY,
         },

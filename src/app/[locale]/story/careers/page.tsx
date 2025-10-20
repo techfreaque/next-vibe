@@ -57,13 +57,19 @@ export default async function CareersPage({
   const openPositions: readonly JobPosition[] = [
     {
       id: "socialMediaManager",
-      title: t("app.site.careers.jobs.socialMediaManager.title"),
+      title: t(
+        "app.story._components.home.careers.jobs.socialMediaManager.title",
+      ),
       description: t(
-        "app.site.careers.jobs.socialMediaManager.shortDescription",
+        "app.story._components.home.careers.jobs.socialMediaManager.shortDescription",
       ),
       type: "Full-time",
-      location: t("app.site.careers.jobs.socialMediaManager.location"),
-      department: t("app.site.careers.jobs.socialMediaManager.department"),
+      location: t(
+        "app.story._components.home.careers.jobs.socialMediaManager.location",
+      ),
+      department: t(
+        "app.story._components.home.careers.jobs.socialMediaManager.department",
+      ),
 
       // current date - 2.5 weeks
       postedDate: new Date(
@@ -76,11 +82,17 @@ export default async function CareersPage({
     },
     {
       id: "contentCreator",
-      title: t("app.site.careers.jobs.contentCreator.title"),
-      description: t("app.site.careers.jobs.contentCreator.shortDescription"),
+      title: t("app.story._components.home.careers.jobs.contentCreator.title"),
+      description: t(
+        "app.story._components.home.careers.jobs.contentCreator.shortDescription",
+      ),
       type: "Full-time",
-      location: t("app.site.careers.jobs.contentCreator.location"),
-      department: t("app.site.careers.jobs.contentCreator.department"),
+      location: t(
+        "app.story._components.home.careers.jobs.contentCreator.location",
+      ),
+      department: t(
+        "app.story._components.home.careers.jobs.contentCreator.department",
+      ),
       // current date - 2.5 weeks
       postedDate: new Date(
         Date.now() - 2.5 * 7 * 24 * 60 * 60 * 1000,
@@ -97,11 +109,11 @@ export default async function CareersPage({
       <div className="container max-w-6xl mx-auto py-8 px-4">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
-            {t("app.site.careers.title")}
+            {t("app.story._components.home.careers.title")}
           </h1>
 
           <p className="text-xl text-gray-700 dark:text-gray-300 mb-8">
-            {t("app.site.careers.description", {
+            {t("app.story._components.home.careers.description", {
               appName: t("app.common.appName"),
             })}
           </p>
@@ -112,68 +124,82 @@ export default async function CareersPage({
             <div className="absolute inset-0 bg-black/60 bg-gradient-to-t from-black/60 to-transparent z-10" />
             <div className="absolute bottom-0 left-0 p-8 z-20 text-white">
               <h2 className="text-3xl font-bold mb-2">
-                {t("app.site.careers.joinTeam")}
+                {t("app.story._components.home.careers.joinTeam")}
               </h2>
               <p className="text-lg max-w-lg">
-                {t("app.site.careers.subtitle")}
+                {t("app.story._components.home.careers.subtitle")}
               </p>
             </div>
           </div>
 
           <section className="mb-12">
             <h2 className="text-2xl font-semibold mb-4">
-              {t("app.site.careers.whyWorkWithUs")}
+              {t("app.story._components.home.careers.whyWorkWithUs")}
             </h2>
             <p className="text-gray-700 dark:text-gray-300 mb-6">
-              {t("app.site.careers.workplaceDescription")}
+              {t("app.story._components.home.careers.workplaceDescription")}
             </p>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <h3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("app.site.careers.benefits.growthTitle")}
+                  {t("app.story._components.home.careers.benefits.growthTitle")}
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300">
-                  {t("app.site.careers.benefits.growthDesc")}
+                  {t("app.story._components.home.careers.benefits.growthDesc")}
                 </p>
               </div>
               <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <h3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("app.site.careers.benefits.meaningfulTitle")}
+                  {t(
+                    "app.story._components.home.careers.benefits.meaningfulTitle",
+                  )}
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300">
-                  {t("app.site.careers.benefits.meaningfulDesc")}
+                  {t(
+                    "app.story._components.home.careers.benefits.meaningfulDesc",
+                  )}
                 </p>
               </div>
               <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <h3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("app.site.careers.benefits.balanceTitle")}
+                  {t(
+                    "app.story._components.home.careers.benefits.balanceTitle",
+                  )}
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300">
-                  {t("app.site.careers.benefits.balanceDesc")}
+                  {t("app.story._components.home.careers.benefits.balanceDesc")}
                 </p>
               </div>
               <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <h3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("app.site.careers.benefits.compensationTitle")}
+                  {t(
+                    "app.story._components.home.careers.benefits.compensationTitle",
+                  )}
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300">
-                  {t("app.site.careers.benefits.compensationDesc")}
+                  {t(
+                    "app.story._components.home.careers.benefits.compensationDesc",
+                  )}
                 </p>
               </div>
               <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <h3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("app.site.careers.benefits.innovationTitle")}
+                  {t(
+                    "app.story._components.home.careers.benefits.innovationTitle",
+                  )}
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300">
-                  {t("app.site.careers.benefits.innovationDesc")}
+                  {t(
+                    "app.story._components.home.careers.benefits.innovationDesc",
+                  )}
                 </p>
               </div>
               <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <h3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("app.site.careers.benefits.teamTitle")}
+                  {t("app.story._components.home.careers.benefits.teamTitle")}
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300">
-                  {t("app.site.careers.benefits.teamDesc")}
+                  {t("app.story._components.home.careers.benefits.teamDesc")}
                 </p>
               </div>
             </div>
@@ -181,7 +207,7 @@ export default async function CareersPage({
 
           <section className="mb-12">
             <h2 className="text-2xl font-semibold mb-6">
-              {t("app.site.careers.openPositions")}
+              {t("app.story._components.home.careers.openPositions")}
             </h2>
             <div className="grid md:grid-cols-2 gap-8">
               {openPositions.map((position) => (
@@ -196,7 +222,10 @@ export default async function CareersPage({
                   <div className="flex flex-col space-y-2 mb-4">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {t("app.site.careers.jobDetail.department")}:
+                        {t(
+                          "app.story._components.home.careers.jobDetail.department",
+                        )}
+                        :
                       </span>
                       <span className="text-sm font-medium">
                         {position.department}
@@ -204,7 +233,10 @@ export default async function CareersPage({
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {t("app.site.careers.jobDetail.employmentType")}:
+                        {t(
+                          "app.story._components.home.careers.jobDetail.employmentType",
+                        )}
+                        :
                       </span>
                       <span className="text-sm font-medium">
                         {position.type}
@@ -212,7 +244,10 @@ export default async function CareersPage({
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {t("app.site.careers.jobDetail.location")}:
+                        {t(
+                          "app.story._components.home.careers.jobDetail.location",
+                        )}
+                        :
                       </span>
                       <span className="text-sm font-medium">
                         {position.location}
@@ -220,7 +255,10 @@ export default async function CareersPage({
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {t("app.site.careers.jobDetail.applicationDeadline")}:
+                        {t(
+                          "app.story._components.home.careers.jobDetail.applicationDeadline",
+                        )}
+                        :
                       </span>
                       <span className="text-sm font-medium">
                         {position.applicationDeadline}
@@ -230,14 +268,16 @@ export default async function CareersPage({
                   <div className="flex space-x-3">
                     <Button className="flex-1" asChild>
                       <Link href={`/${locale}/careers/${position.id}`}>
-                        {t("app.site.careers.jobDetail.moreDetails")}
+                        {t(
+                          "app.story._components.home.careers.jobDetail.moreDetails",
+                        )}
                       </Link>
                     </Button>
                     <Button variant="outline" className="flex-1" asChild>
                       <Link
                         href={`mailto:${contactClientRepository.getSupportEmail(locale)}?subject=Application for ${position.title}`}
                       >
-                        {t("app.site.careers.applyNow")}
+                        {t("app.story._components.home.careers.applyNow")}
                       </Link>
                     </Button>
                   </div>
@@ -248,13 +288,15 @@ export default async function CareersPage({
 
           <section className="text-center bg-blue-50 bg-gradient-to-r from-blue-50 to-cyan-50 dark:bg-gray-800 dark:from-gray-800 dark:to-gray-700 p-8 rounded-xl">
             <h2 className="text-2xl font-semibold mb-4">
-              {t("app.site.careers.readyToJoin")}
+              {t("app.story._components.home.careers.readyToJoin")}
             </h2>
             <p className="text-gray-700 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
-              {t("app.site.careers.explorePositions")}
+              {t("app.story._components.home.careers.explorePositions")}
             </p>
             <Button size="lg" asChild>
-              <Link href={`/${locale}/help`}>{t("app.components.nav.contact")}</Link>
+              <Link href={`/${locale}/help`}>
+                {t("app.components.nav.contact")}
+              </Link>
             </Button>
           </section>
         </div>

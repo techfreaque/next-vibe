@@ -9,7 +9,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { useTouchDevice } from "../../../hooks/use-touch-device";
-import { chatTransitions } from "../../../lib/design-tokens";
+import { chatTransitions } from "../../../old_migrate_all_to_agent_api_folder/lib/design-tokens";
 import { CopyButton } from "../copy-button";
 import { MessageActionButton } from "../message-action-button";
 

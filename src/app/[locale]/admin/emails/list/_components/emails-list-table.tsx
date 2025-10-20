@@ -107,12 +107,22 @@ export function EmailsListTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t("app.admin.emails.list.admin.table.subject")}</TableHead>
-            <TableHead>{t("app.admin.emails.list.admin.table.recipient")}</TableHead>
-            <TableHead>{t("app.admin.emails.list.admin.table.status")}</TableHead>
+            <TableHead>
+              {t("app.admin.emails.list.admin.table.subject")}
+            </TableHead>
+            <TableHead>
+              {t("app.admin.emails.list.admin.table.recipient")}
+            </TableHead>
+            <TableHead>
+              {t("app.admin.emails.list.admin.table.status")}
+            </TableHead>
             <TableHead>{t("app.admin.emails.list.admin.table.type")}</TableHead>
-            <TableHead>{t("app.admin.emails.list.admin.table.sentAt")}</TableHead>
-            <TableHead>{t("app.admin.emails.list.admin.table.actions")}</TableHead>
+            <TableHead>
+              {t("app.admin.emails.list.admin.table.sentAt")}
+            </TableHead>
+            <TableHead>
+              {t("app.admin.emails.list.admin.table.actions")}
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

@@ -361,4 +361,7 @@ export const translations = {
     statistics: "Statistics",
     analytics: "Analytics",
   },
+  error: {
+    default: "An error occurred",
+  },
 };

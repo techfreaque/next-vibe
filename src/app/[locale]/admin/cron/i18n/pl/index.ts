@@ -4,8 +4,9 @@ import { translations as historyTranslations } from "../../history/i18n/pl";
 import { translations as statsTranslations } from "../../stats/i18n/pl";
 import { translations as taskTranslations } from "../../task/i18n/pl";
 import { translations as tasksTranslations } from "../../tasks/i18n/pl";
+import type { translations as enTranslations } from "../en";
 
-export const translations = {
+export const translations: typeof enTranslations = {
   history: historyTranslations,
   stats: statsTranslations,
   task: taskTranslations,
@@ -49,4 +50,4 @@ export const translations = {
       },
     },
   },
-} as const;
+};

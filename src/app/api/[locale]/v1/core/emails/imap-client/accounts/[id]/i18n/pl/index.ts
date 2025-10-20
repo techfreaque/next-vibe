@@ -120,6 +120,26 @@ export const translations = {
         label: "Konto włączone",
         description: "Włącz lub wyłącz to konto IMAP",
       },
+      connectionTimeout: {
+        label: "Limit czasu połączenia",
+        description: "Limit czasu połączenia w milisekundach",
+      },
+      keepAlive: {
+        label: "Utrzymuj połączenie",
+        description: "Utrzymuj połączenie między żądaniami",
+      },
+      syncInterval: {
+        label: "Interwał synchronizacji",
+        description: "Interwał synchronizacji w sekundach",
+      },
+      maxMessages: {
+        label: "Maksymalna liczba wiadomości",
+        description: "Maksymalna liczba wiadomości do synchronizacji",
+      },
+      syncFolders: {
+        label: "Synchronizowane foldery",
+        description: "Foldery do synchronizacji (oddzielone przecinkami)",
+      },
     },
     response: {
       title: "Zaktualizowane konto",
@@ -207,6 +227,26 @@ export const translations = {
       forbidden: {
         title: "Zabronione",
         description: "Dostęp zabroniony",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Nie można usunąć konta z aktywnymi połączeniami",
+      },
+      network: {
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas usuwania konta",
+      },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd podczas usuwania",
+      },
+      unsavedChanges: {
+        title: "Niezapisane zmiany",
+        description: "Nie można usunąć konta z niezapisanymi zmianami",
+      },
+      validation: {
+        title: "Błąd walidacji",
+        description: "Podano nieprawidłowy ID konta",
       },
     },
     success: {

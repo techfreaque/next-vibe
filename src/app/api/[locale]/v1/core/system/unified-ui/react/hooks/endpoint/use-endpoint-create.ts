@@ -115,11 +115,7 @@ export function useEndpointCreate<
 
   // If no URL parameters are needed, return the form result as-is
   if (!options.urlParams) {
-    return formResult as ApiFormReturn<
-      TEndpoint["TRequestOutput"],
-      TEndpoint["TResponseOutput"],
-      TEndpoint["TUrlVariablesOutput"]
-    >;
+    return formResult;
   }
 
   // If URL parameters are provided, wrap the submitForm function to automatically include them
