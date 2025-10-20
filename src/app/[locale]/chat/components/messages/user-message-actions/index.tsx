@@ -9,7 +9,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { useTouchDevice } from "../../../hooks/use-touch-device";
-import { chatTransitions } from "../../../old_migrate_all_to_agent_api_folder/lib/design-tokens";
 import { CopyButton } from "../copy-button";
 import { MessageActionButton } from "../message-action-button";
 
@@ -41,7 +40,7 @@ export function UserMessageActions({
     <div
       className={cn(
         "flex items-center gap-1",
-        chatTransitions.fast,
+        "transition-opacity duration-150",
         // Touch devices: always visible but slightly transparent
         // Pointer devices: hidden until hover
         isTouch

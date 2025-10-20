@@ -15,15 +15,14 @@ import {
   Label,
 } from "@/packages/next-vibe-ui/web/ui";
 
-import type { IconValue } from "../../lib/config/icons";
 import { IconSelector } from "../shared/icon-selector";
 
 interface RenameFolderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   folderName: string;
-  folderIcon: IconValue;
-  onSave: (name: string, icon: IconValue) => void;
+  folderIcon: string | null;
+  onSave: (name: string, icon: string | null) => void;
   locale: CountryLanguage;
 }
 
@@ -37,7 +36,7 @@ export function RenameFolderDialog({
 }: RenameFolderDialogProps): JSX.Element {
   const { t } = simpleT(locale);
   const [name, setName] = useState(folderName);
-  const [icon, setIcon] = useState<IconValue>(folderIcon);
+  const [icon, setIcon] = useState<string | null>(folderIcon);
 
   // Update local state when props change
   useEffect(() => {

@@ -6,7 +6,10 @@
 
 import { z } from "zod";
 
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import {
+  EndpointErrorTypes,
+  Methods,
+} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import {
   objectField,
@@ -39,17 +42,18 @@ const sideTaskActionSchema = z.enum([
 const sideTasksPostEndpoint = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "tasks", "side-tasks"],
-  title: "common.sideTasksTitle",
-  description: "common.sideTasksDescription",
-  category: "common.sideTasksCategory",
+  title: "app.api.v1.core.system.tasks.sideTasks.post.title",
+  description: "app.api.v1.core.system.tasks.sideTasks.post.description",
+  category: "app.api.v1.core.system.tasks.sideTasks.post.category",
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
   aliases: ["tasks:side", "side-tasks"],
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "common.sideTasksContainerTitle",
-      description: "common.sideTasksContainerDescription",
+      title: "app.api.v1.core.system.tasks.sideTasks.post.container.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.post.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -59,19 +63,50 @@ const sideTasksPostEndpoint = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "common.sideTasksActionLabel",
-          description: "common.sideTasksActionDescription",
+          label:
+            "app.api.v1.core.system.tasks.sideTasks.common.sideTasksActionLabel",
+          description:
+            "app.api.v1.core.system.tasks.sideTasks.common.sideTasksActionDescription",
           options: [
-            { value: "list", label: "common.sideTasksActionList" },
-            { value: "get", label: "common.sideTasksActionGet" },
-            { value: "create", label: "common.sideTasksActionCreate" },
-            { value: "update", label: "common.sideTasksActionUpdate" },
-            { value: "delete", label: "common.sideTasksActionDelete" },
-            { value: "stats", label: "common.sideTasksActionStats" },
-            { value: "executions", label: "common.sideTasksActionExecutions" },
+            {
+              value: "list",
+              label:
+                "app.api.v1.core.system.tasks.sideTasks.common.sideTasksActionList",
+            },
+            {
+              value: "get",
+              label:
+                "app.api.v1.core.system.tasks.sideTasks.common.sideTasksActionGet",
+            },
+            {
+              value: "create",
+              label:
+                "app.api.v1.core.system.tasks.sideTasks.common.sideTasksActionCreate",
+            },
+            {
+              value: "update",
+              label:
+                "app.api.v1.core.system.tasks.sideTasks.common.sideTasksActionUpdate",
+            },
+            {
+              value: "delete",
+              label:
+                "app.api.v1.core.system.tasks.sideTasks.common.sideTasksActionDelete",
+            },
+            {
+              value: "stats",
+              label:
+                "app.api.v1.core.system.tasks.sideTasks.common.sideTasksActionStats",
+            },
+            {
+              value: "executions",
+              label:
+                "app.api.v1.core.system.tasks.sideTasks.common.sideTasksActionExecutions",
+            },
             {
               value: "health-check",
-              label: "common.sideTasksActionHealthCheck",
+              label:
+                "app.api.v1.core.system.tasks.sideTasks.common.sideTasksActionHealthCheck",
             },
           ],
           layout: { columns: 3 },
@@ -84,8 +119,10 @@ const sideTasksPostEndpoint = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "common.sideTasksIdLabel",
-          description: "common.sideTasksIdDescription",
+          label:
+            "app.api.v1.core.system.tasks.sideTasks.common.sideTasksIdLabel",
+          description:
+            "app.api.v1.core.system.tasks.sideTasks.common.sideTasksIdDescription",
           layout: { columns: 3 },
         },
         z.string().optional(),
@@ -95,8 +132,10 @@ const sideTasksPostEndpoint = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "common.sideTasksNameLabel",
-          description: "common.sideTasksNameDescription",
+          label:
+            "app.api.v1.core.system.tasks.sideTasks.common.sideTasksNameLabel",
+          description:
+            "app.api.v1.core.system.tasks.sideTasks.common.sideTasksNameDescription",
           layout: { columns: 3 },
         },
         z.string().optional(),
@@ -106,19 +145,23 @@ const sideTasksPostEndpoint = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "common.sideTasksLimitLabel",
-          description: "common.sideTasksLimitDescription",
+          label:
+            "app.api.v1.core.system.tasks.sideTasks.common.sideTasksLimitLabel",
+          description:
+            "app.api.v1.core.system.tasks.sideTasks.common.sideTasksLimitDescription",
           layout: { columns: 3 },
         },
         z.number().optional().default(50),
       ),
 
-      data: requestDataField(
+      taskData: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXTAREA,
-          label: "common.sideTasksDataLabel",
-          description: "common.sideTasksDataDescription",
+          label:
+            "app.api.v1.core.system.tasks.sideTasks.common.sideTasksDataLabel",
+          description:
+            "app.api.v1.core.system.tasks.sideTasks.common.sideTasksDataDescription",
           layout: { columns: 12 },
         },
         z.record(z.unknown()).optional(),
@@ -128,7 +171,8 @@ const sideTasksPostEndpoint = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "tasks.side.response.success.title",
+          content:
+            "app.api.v1.core.system.tasks.sideTasks.tasks.side.response.success.title",
         },
         z.boolean(),
       ),
@@ -136,15 +180,17 @@ const sideTasksPostEndpoint = createEndpoint({
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content: "tasks.side.response.message.title",
+          content:
+            "app.api.v1.core.system.tasks.sideTasks.tasks.side.response.message.title",
         },
         z.string(),
       ),
 
       data: responseField(
         {
-          type: WidgetType.CODE_OUTPUT,
-          content: "tasks.side.response.data.title",
+          type: WidgetType.TEXT,
+          content:
+            "app.api.v1.core.system.tasks.sideTasks.tasks.side.response.data.title",
         },
         z.unknown().optional(),
       ),
@@ -152,7 +198,8 @@ const sideTasksPostEndpoint = createEndpoint({
       count: responseField(
         {
           type: WidgetType.TEXT,
-          content: "tasks.side.response.count.title",
+          content:
+            "app.api.v1.core.system.tasks.sideTasks.tasks.side.response.count.title",
         },
         z.number().optional(),
       ),
@@ -160,48 +207,56 @@ const sideTasksPostEndpoint = createEndpoint({
   ),
 
   examples: {
-    requests: [
-      {
-        title: "tasks.side.examples.list.title",
-        data: {
-          action: "list" as const,
-          limit: 10,
-        },
+    requests: {
+      list: {
+        action: "list" as const,
+        limit: 10,
       },
-      {
-        title: "tasks.side.examples.get.title",
-        data: {
-          action: "get" as const,
-          id: "task-12345",
-        },
+      get: {
+        action: "get" as const,
+        id: "task-12345",
       },
-      {
-        title: "tasks.side.examples.stats.title",
-        data: {
-          action: "stats" as const,
-        },
+      stats: {
+        action: "stats" as const,
       },
-    ],
-    responses: [
-      {
-        title: "tasks.side.examples.success.title",
-        data: {
-          success: true,
-          message: "Operation completed successfully",
-          data: {
-            tasks: [
-              {
-                id: "task-12345",
-                name: "example-task",
-                status: "running",
-              },
-            ],
-          },
-          count: 1,
-        },
+      success: {
+        action: "list" as const,
+        limit: 10,
       },
-    ],
-    urlPathVariables: [],
+    },
+    responses: {
+      list: {
+        success: true,
+        message: "Tasks listed successfully",
+        data: [],
+        count: 0,
+      },
+      get: {
+        success: true,
+        message: "Task retrieved successfully",
+        data: { id: "task-12345", name: "example-task" },
+      },
+      stats: {
+        success: true,
+        message: "Stats retrieved successfully",
+        data: { total: 5 },
+      },
+      success: {
+        success: true,
+        message: "Operation completed successfully",
+        data: {
+          tasks: [
+            {
+              id: "task-12345",
+              name: "example-task",
+              status: "running",
+            },
+          ],
+        },
+        count: 1,
+      },
+    },
+    urlPathVariables: {},
   },
 });
 
@@ -215,6 +270,7 @@ const sideTasksGetEndpoint = createEndpoint({
   title: "app.api.v1.core.system.tasks.sideTasks.get.title",
   description: "app.api.v1.core.system.tasks.sideTasks.get.description",
   category: "app.api.v1.core.system.tasks.category",
+  tags: ["app.api.v1.core.system.tasks.sideTasks.tags.sidetasks"],
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
   aliases: ["tasks:side:status"],
 
@@ -226,13 +282,14 @@ const sideTasksGetEndpoint = createEndpoint({
         "app.api.v1.core.system.tasks.sideTasks.get.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: false, response: true },
+    { response: true },
     {
       // === RESPONSE FIELDS ONLY ===
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "tasks.side.response.success.title",
+          content:
+            "app.api.v1.core.system.tasks.sideTasks.tasks.side.response.success.title",
         },
         z.boolean(),
       ),
@@ -241,7 +298,7 @@ const sideTasksGetEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.tasks.cron.stats.get.response.success.title",
+            "app.api.v1.core.system.tasks.sideTasks.tasks.side.response.message.title",
         },
         z.string(),
       ),
@@ -250,16 +307,93 @@ const sideTasksGetEndpoint = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.tasks.cron.stats.get.response.data.title",
+            "app.api.v1.core.system.tasks.sideTasks.tasks.side.response.data.title",
         },
         z.unknown().optional(),
       ),
     },
   ),
+
+  examples: {
+    responses: {
+      status: {
+        success: true,
+        message: "Side tasks status retrieved",
+        data: {
+          totalTasks: 5,
+          runningTasks: 2,
+          healthyTasks: 4,
+          unhealthyTasks: 1,
+        },
+      },
+    },
+  },
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title:
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.validation.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.validation.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "app.api.v1.core.system.tasks.sideTasks.get.errors.network.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.network.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title:
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "app.api.v1.core.system.tasks.sideTasks.get.errors.forbidden.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "app.api.v1.core.system.tasks.sideTasks.get.errors.notFound.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.notFound.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title:
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.serverError.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.serverError.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title:
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.unknownError.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.unknownError.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title:
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.unsavedChanges.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "app.api.v1.core.system.tasks.sideTasks.get.errors.conflict.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.conflict.description",
+    },
+  },
+
+  successTypes: {
+    title: "app.api.v1.core.system.tasks.sideTasks.get.success.title",
+    description:
+      "app.api.v1.core.system.tasks.sideTasks.get.success.description",
+  },
 });
 
 export { sideTasksGetEndpoint as GET, sideTasksPostEndpoint as POST };
 export { sideTasksGetEndpoint, sideTasksPostEndpoint };
+
+const endpoints = { GET: sideTasksGetEndpoint, POST: sideTasksPostEndpoint };
+export default endpoints;
 
 // Export types for repository
 export type SideTasksRequestInput =

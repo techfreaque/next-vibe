@@ -6,6 +6,7 @@
 
 "use client";
 
+import type { DefaultFolderId } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../store";
 
 /**
@@ -218,14 +219,14 @@ export function generateIncognitoId(prefix: string): string {
  */
 export function createIncognitoThread(
   title: string,
-  rootFolderId: string,
+  rootFolderId: DefaultFolderId,
   subFolderId: string | null,
 ): ChatThread {
   const thread: ChatThread = {
     id: generateIncognitoId("thread"),
     userId: "incognito", // Special user ID for incognito mode
     title,
-    rootFolderId: rootFolderId as "private" | "shared" | "public" | "incognito",
+    rootFolderId: rootFolderId,
     folderId: subFolderId,
     status: "active",
     defaultModel: null,
@@ -270,6 +271,8 @@ export function createIncognitoMessage(
     errorMessage: null,
     edited: false,
     tokens: null,
+    upvotes: null,
+    downvotes: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };

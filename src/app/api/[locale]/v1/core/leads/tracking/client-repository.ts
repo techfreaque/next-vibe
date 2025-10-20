@@ -122,7 +122,7 @@ export class LeadTrackingClientRepository {
     } catch (error) {
       logger.error("app.api.v1.core.leads.tracking.data.capture.error", error);
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -152,7 +152,7 @@ export class LeadTrackingClientRepository {
     } catch (error) {
       logger.error("app.api.v1.core.leads.tracking.data.retrieve.error", error);
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -213,7 +213,7 @@ export class LeadTrackingClientRepository {
     } catch (error) {
       logger.error("app.api.v1.core.leads.tracking.data.store.error", error);
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -237,7 +237,7 @@ export class LeadTrackingClientRepository {
     } catch (error) {
       logger.error("app.api.v1.core.leads.tracking.data.clear.error", error);
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -287,7 +287,7 @@ export class LeadTrackingClientRepository {
 
       if (errors.length > 0) {
         return createErrorResponse(
-          "error.default",
+          "app.api.v1.core.leads.tracking.errors.default",
           ErrorResponseTypes.VALIDATION_ERROR,
         );
       }
@@ -310,7 +310,7 @@ export class LeadTrackingClientRepository {
         error,
       );
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -339,7 +339,7 @@ export class LeadTrackingClientRepository {
     } catch (error) {
       logger.error("app.api.v1.core.leads.tracking.data.format.error", error);
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }

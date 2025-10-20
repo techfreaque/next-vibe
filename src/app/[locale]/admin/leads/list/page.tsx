@@ -23,7 +23,7 @@ export default async function LeadsListPage({
       {/* Page Description */}
       <div>
         <p className="text-gray-600 dark:text-gray-400">
-          {t("leads.list.description")}
+          {t("app.admin.leads.leads.list.description")}
         </p>
       </div>
 

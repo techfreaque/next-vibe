@@ -13,7 +13,32 @@ import { pulseHealthRepository } from "../repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: pulseStatusEndpoint,
   [Methods.GET]: {
-    handler: ({ user, locale, logger }) =>
-      pulseHealthRepository.getPulseStatus(user, locale, logger),
+    handler: async ({ logger }) => {
+      const healthResponse =
+        await pulseHealthRepository.getCurrentHealth(logger);
+
+      if (!healthResponse.success || !healthResponse.data) {
+        return {
+          success: true,
+          data: {
+            status: "UNKNOWN",
+            lastPulseAt: null,
+            successRate: null,
+            totalExecutions: 0,
+          },
+        };
+      }
+
+      const health = healthResponse.data;
+      return {
+        success: true,
+        data: {
+          status: health.status,
+          lastPulseAt: health.lastPulseAt?.toISOString() ?? null,
+          successRate: health.successRate,
+          totalExecutions: health.totalExecutions,
+        },
+      };
+    },
   },
 });

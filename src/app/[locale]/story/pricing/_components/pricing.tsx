@@ -1,12 +1,4 @@
-import {
-  Building2,
-  Crown,
-  Rocket,
-  Star,
-  Users,
-  Video,
-  Zap,
-} from "lucide-react";
+import { Star } from "lucide-react";
 import type { JSX } from "react";
 
 import type { SubscriptionPlanValue } from "@/app/api/[locale]/v1/core/subscription/enum";
@@ -18,24 +10,6 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 const StarterIcon = (): JSX.Element => (
   <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500 bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-blue-900/30">
     <Star className="h-6 w-6" />
-  </div>
-);
-
-const ProfessionalIcon = (): JSX.Element => (
-  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-cyan-500 bg-gradient-to-br from-cyan-400 to-cyan-600 text-white shadow-md shadow-cyan-200 dark:shadow-cyan-900/30">
-    <Zap className="h-6 w-6" />
-  </div>
-);
-
-const PremiumIcon = (): JSX.Element => (
-  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-purple-500 bg-gradient-to-br from-purple-400 to-purple-600 text-white shadow-md shadow-purple-200 dark:shadow-purple-900/30">
-    <Crown className="h-6 w-6" />
-  </div>
-);
-
-const EnterpriseIcon = (): JSX.Element => (
-  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-700 bg-gradient-to-br from-gray-600 to-gray-800 text-white shadow-md shadow-gray-200 dark:shadow-gray-900/30">
-    <Building2 className="h-6 w-6" />
   </div>
 );
 
@@ -61,10 +35,6 @@ export function calculateSavingsPercent(country: Countries): number {
 
   // Calculate average savings percentage across all non-enterprise plans
   for (const plan of plans) {
-    if (plan.isEnterprise) {
-      continue; // Skip enterprise plans as they have custom pricing
-    }
-
     const monthlyPrice = plan.priceByCountry[country].monthly;
     const annualMonthlyPrice = plan.priceByCountry[country].annual; // This is monthly price when billed annually
 
@@ -86,8 +56,8 @@ export function calculateSavingsPercent(country: Countries): number {
 }
 
 export const pricingPlans: Record<SubscriptionPlanValue, PricingPlan> = {
-  [SubscriptionPlan.STARTER]: {
-    id: SubscriptionPlan.STARTER,
+  [SubscriptionPlan.SUBSCRIPTION]: {
+    id: SubscriptionPlan.SUBSCRIPTION,
     name: "app.story.pricing.plans.STARTER.name",
     description: "app.story.pricing.plans.STARTER.description",
 
@@ -128,160 +98,6 @@ export const pricingPlans: Record<SubscriptionPlanValue, PricingPlan> = {
     highlighted: false,
     icon: <StarterIcon />,
   },
-  [SubscriptionPlan.PROFESSIONAL]: {
-    id: SubscriptionPlan.PROFESSIONAL,
-    name: "app.story.pricing.plans.PROFESSIONAL.name",
-    description: "app.story.pricing.plans.PROFESSIONAL.description",
-    premiumFeatures: [
-      {
-        feature: "app.story.pricing.plans.PROFESSIONAL.features.posts",
-        className: "bg-purple-100 dark:bg-purple-900/30",
-        icon: <Star className="h-5 w-5 text-purple-600 dark:text-purple-400" />,
-      },
-      {
-        feature: "app.story.pricing.plans.PROFESSIONAL.features.reels",
-        className: "bg-pink-100 dark:bg-pink-900/30",
-        icon: <Video className="h-5 w-5 text-pink-600 dark:text-pink-400" />,
-      },
-    ],
-    features: [
-      "app.story.pricing.plans.PROFESSIONAL.features.freeSocialSetup",
-      "app.story.pricing.plans.PROFESSIONAL.features.contentStrategy",
-      "app.story.pricing.plans.PROFESSIONAL.features.strategyCall",
-      "app.story.pricing.plans.PROFESSIONAL.features.analytics",
-      "app.story.pricing.plans.PROFESSIONAL.features.support",
-      "app.story.pricing.plans.PROFESSIONAL.features.calendar",
-    ],
-    priceByCountry: {
-      DE: {
-        monthly: 149,
-        annual: 119,
-        currency: "EUR",
-      },
-      PL: {
-        currency: "PLN",
-        monthly: 419,
-        annual: 349,
-      },
-      GLOBAL: {
-        currency: "USD",
-        monthly: 159,
-        annual: 129,
-      },
-    },
-    pricing: "app.story.pricing.plans.PROFESSIONAL.price",
-    cta: "app.story.pricing.plans.PROFESSIONAL.cta",
-    highlighted: true,
-    badge: "app.story.pricing.plans.PROFESSIONAL.badge",
-    icon: <ProfessionalIcon />,
-  },
-  [SubscriptionPlan.PREMIUM]: {
-    id: SubscriptionPlan.PREMIUM,
-    name: "app.story.pricing.plans.PREMIUM.name",
-    description: "app.story.pricing.plans.PREMIUM.description",
-    premiumFeatures: [
-      {
-        feature: "app.story.pricing.plans.PREMIUM.premiumFeatures.premiumPosts",
-        className: "bg-purple-100 dark:bg-purple-900/30",
-        icon: <Star className="h-5 w-5 text-purple-600 dark:text-purple-400" />,
-      },
-      {
-        feature: "app.story.pricing.plans.PREMIUM.premiumFeatures.premiumReels",
-        className: "bg-pink-100 dark:bg-pink-900/30",
-        icon: <Video className="h-5 w-5 text-pink-600 dark:text-pink-400" />,
-      },
-    ],
-    features: [
-      "app.story.pricing.plans.PREMIUM.features.freeSocialSetup",
-      "app.story.pricing.plans.PREMIUM.features.contentStrategy",
-      "app.story.pricing.plans.PREMIUM.features.strategyCalls",
-      "app.story.pricing.plans.PREMIUM.features.analytics",
-      "app.story.pricing.plans.PREMIUM.features.accountManager",
-      "app.story.pricing.plans.PREMIUM.features.support",
-    ],
-    priceByCountry: {
-      DE: {
-        currency: "EUR",
-        monthly: 279,
-        annual: 239,
-      },
-      PL: {
-        currency: "PLN",
-        monthly: 759,
-        annual: 699,
-      },
-      GLOBAL: {
-        currency: "USD",
-        monthly: 289,
-        annual: 249,
-      },
-    },
-    pricing: "app.story.pricing.plans.PREMIUM.price",
-    cta: "app.story.pricing.plans.PREMIUM.cta",
-    highlighted: false,
-    icon: <PremiumIcon />,
-  },
-  [SubscriptionPlan.ENTERPRISE]: {
-    id: SubscriptionPlan.ENTERPRISE,
-    name: "app.story.pricing.plans.ENTERPRISE.name",
-    priceByCountry: {
-      DE: {
-        monthly: 0,
-        annual: 0,
-        currency: "EUR",
-      },
-      PL: {
-        monthly: 0,
-        annual: 0,
-        currency: "PLN",
-      },
-      GLOBAL: {
-        currency: "USD",
-        monthly: 0,
-        annual: 0,
-      },
-    },
-    pricing: "app.story.pricing.plans.ENTERPRISE.price",
-    description: "app.story.pricing.plans.ENTERPRISE.description",
-    premiumFeatures: [
-      {
-        feature: "app.story.pricing.plans.ENTERPRISE.features.posts",
-        className: "bg-indigo-100 dark:bg-indigo-900/30",
-        icon: (
-          <Rocket className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-        ),
-      },
-      {
-        feature: "app.story.pricing.plans.ENTERPRISE.features.onSiteProduction",
-        className: "bg-purple-100 dark:bg-purple-900/30",
-        icon: (
-          <Building2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-        ),
-      },
-      {
-        feature: "app.story.pricing.plans.ENTERPRISE.features.creativeTeam",
-        className: "bg-pink-100 dark:bg-pink-900/30",
-        icon: <Users className="h-5 w-5 text-pink-600 dark:text-pink-400" />,
-      },
-    ],
-    features: [
-      "app.story.pricing.plans.ENTERPRISE.features.freeSocialSetup",
-      "app.story.pricing.plans.ENTERPRISE.features.bottomNote",
-      // "app.story.pricing.plans.ENTERPRISE.features.platforms",
-      // "app.story.pricing.plans.ENTERPRISE.features.contentStrategy",
-      // "app.story.pricing.plans.ENTERPRISE.features.creativeTeam",
-      // "app.story.pricing.plans.ENTERPRISE.features.onSiteProduction",
-      // "app.story.pricing.plans.ENTERPRISE.features.brandStrategy",
-      // "app.story.pricing.plans.ENTERPRISE.features.crisisManagement",
-      // "app.story.pricing.plans.ENTERPRISE.features.meetings",
-      // "app.story.pricing.plans.ENTERPRISE.features.reporting",
-      // "app.story.pricing.plans.ENTERPRISE.features.adManagement",
-    ],
-    cta: "app.story.pricing.plans.ENTERPRISE.cta",
-    highlighted: false,
-    icon: <EnterpriseIcon />,
-    isEnterprise: true,
-  },
 };
 
 /**
@@ -321,7 +137,6 @@ export interface PricingPlan {
   highlighted: boolean;
   icon: JSX.Element;
   badge?: TranslationKey;
-  isEnterprise?: boolean;
 }
 
 /**
@@ -329,10 +144,7 @@ export interface PricingPlan {
  */
 export interface PricingFeature {
   name: TranslationKey;
-  [SubscriptionPlan.STARTER]: boolean;
-  [SubscriptionPlan.PROFESSIONAL]: boolean;
-  [SubscriptionPlan.PREMIUM]: boolean;
-  [SubscriptionPlan.ENTERPRISE]: boolean;
+  [SubscriptionPlan.SUBSCRIPTION]: boolean;
 }
 
 /**
@@ -341,10 +153,7 @@ export interface PricingFeature {
 export interface PricingTextFeature {
   name: TranslationKey;
   type: "text";
-  [SubscriptionPlan.STARTER]: TranslationKey;
-  [SubscriptionPlan.PROFESSIONAL]: TranslationKey;
-  [SubscriptionPlan.PREMIUM]: TranslationKey;
-  [SubscriptionPlan.ENTERPRISE]: TranslationKey;
+  [SubscriptionPlan.SUBSCRIPTION]: TranslationKey;
 }
 
 /**
@@ -360,113 +169,66 @@ export const pricingComparisonFeatures: PricingComparisonFeature[] = [
   {
     name: "pricing.comparison.features.socialMediaPosts",
     type: "text",
-    [SubscriptionPlan.STARTER]: "app.story.pricing.plans.monthlyPosts.starter",
-    [SubscriptionPlan.PROFESSIONAL]:
-      "app.story.pricing.plans.monthlyPosts.professional",
-    [SubscriptionPlan.PREMIUM]: "app.story.pricing.plans.monthlyPosts.premium",
-    [SubscriptionPlan.ENTERPRISE]:
-      "app.story.pricing.plans.monthlyPosts.enterprise",
+    [SubscriptionPlan.SUBSCRIPTION]:
+      "app.story.pricing.plans.monthlyPosts.starter",
   },
   {
     name: "pricing.comparison.features.reelsVideos",
-    [SubscriptionPlan.STARTER]: false,
-    [SubscriptionPlan.PROFESSIONAL]: true,
-    [SubscriptionPlan.PREMIUM]: true,
-    [SubscriptionPlan.ENTERPRISE]: true,
+    [SubscriptionPlan.SUBSCRIPTION]: false,
   },
   {
     name: "pricing.comparison.features.strategyCalls",
     type: "text",
-    [SubscriptionPlan.STARTER]: "app.story.pricing.plans.strategyCalls.starter",
-    [SubscriptionPlan.PROFESSIONAL]:
-      "app.story.pricing.plans.strategyCalls.professional",
-    [SubscriptionPlan.PREMIUM]: "app.story.pricing.plans.strategyCalls.premium",
-    [SubscriptionPlan.ENTERPRISE]:
-      "app.story.pricing.plans.strategyCalls.enterprise",
+    [SubscriptionPlan.SUBSCRIPTION]:
+      "app.story.pricing.plans.strategyCalls.starter",
   },
   // Boolean features - ordered by importance and availability
   {
     name: "pricing.comparison.features.freeSocialAccountSetup",
-    [SubscriptionPlan.STARTER]: true,
-    [SubscriptionPlan.PROFESSIONAL]: true,
-    [SubscriptionPlan.PREMIUM]: true,
-    [SubscriptionPlan.ENTERPRISE]: true,
+    [SubscriptionPlan.SUBSCRIPTION]: true,
   },
   {
     name: "pricing.comparison.features.multiPlatformStrategy",
-    [SubscriptionPlan.STARTER]: true,
-    [SubscriptionPlan.PROFESSIONAL]: true,
-    [SubscriptionPlan.PREMIUM]: true,
-    [SubscriptionPlan.ENTERPRISE]: true,
+    [SubscriptionPlan.SUBSCRIPTION]: true,
   },
   {
     name: "pricing.comparison.features.customContentStrategy",
-    [SubscriptionPlan.STARTER]: false,
-    [SubscriptionPlan.PROFESSIONAL]: false,
-    [SubscriptionPlan.PREMIUM]: false,
-    [SubscriptionPlan.ENTERPRISE]: true,
+    [SubscriptionPlan.SUBSCRIPTION]: false,
   },
   {
     name: "pricing.comparison.features.contentCalendar",
-    [SubscriptionPlan.STARTER]: true,
-    [SubscriptionPlan.PROFESSIONAL]: true,
-    [SubscriptionPlan.PREMIUM]: true,
-    [SubscriptionPlan.ENTERPRISE]: true,
+    [SubscriptionPlan.SUBSCRIPTION]: true,
   },
   {
     name: "pricing.comparison.features.basicAnalytics",
-    [SubscriptionPlan.STARTER]: true,
-    [SubscriptionPlan.PROFESSIONAL]: true,
-    [SubscriptionPlan.PREMIUM]: true,
-    [SubscriptionPlan.ENTERPRISE]: true,
+    [SubscriptionPlan.SUBSCRIPTION]: true,
   },
   {
     name: "pricing.comparison.features.emailSupport",
-    [SubscriptionPlan.STARTER]: true,
-    [SubscriptionPlan.PROFESSIONAL]: true,
-    [SubscriptionPlan.PREMIUM]: true,
-    [SubscriptionPlan.ENTERPRISE]: true,
+    [SubscriptionPlan.SUBSCRIPTION]: true,
   },
   {
     name: "pricing.comparison.features.advancedAnalytics",
-    [SubscriptionPlan.STARTER]: false,
-    [SubscriptionPlan.PROFESSIONAL]: true,
-    [SubscriptionPlan.PREMIUM]: true,
-    [SubscriptionPlan.ENTERPRISE]: true,
+    [SubscriptionPlan.SUBSCRIPTION]: false,
   },
   {
     name: "pricing.comparison.features.prioritySupport",
-    [SubscriptionPlan.STARTER]: false,
-    [SubscriptionPlan.PROFESSIONAL]: true,
-    [SubscriptionPlan.PREMIUM]: true,
-    [SubscriptionPlan.ENTERPRISE]: true,
+    [SubscriptionPlan.SUBSCRIPTION]: false,
   },
   {
     name: "pricing.comparison.features.dedicatedAccountManager",
-    [SubscriptionPlan.STARTER]: false,
-    [SubscriptionPlan.PROFESSIONAL]: false,
-    [SubscriptionPlan.PREMIUM]: true,
-    [SubscriptionPlan.ENTERPRISE]: true,
+    [SubscriptionPlan.SUBSCRIPTION]: false,
   },
   {
     name: "pricing.comparison.features.customReportingDashboard",
-    [SubscriptionPlan.STARTER]: false,
-    [SubscriptionPlan.PROFESSIONAL]: false,
-    [SubscriptionPlan.PREMIUM]: true,
-    [SubscriptionPlan.ENTERPRISE]: true,
+    [SubscriptionPlan.SUBSCRIPTION]: false,
   },
   {
     name: "pricing.comparison.features.dedicatedCreativeTeam",
-    [SubscriptionPlan.STARTER]: false,
-    [SubscriptionPlan.PROFESSIONAL]: false,
-    [SubscriptionPlan.PREMIUM]: false,
-    [SubscriptionPlan.ENTERPRISE]: true,
+    [SubscriptionPlan.SUBSCRIPTION]: false,
   },
   {
     name: "pricing.comparison.features.onSiteProduction",
-    [SubscriptionPlan.STARTER]: false,
-    [SubscriptionPlan.PROFESSIONAL]: false,
-    [SubscriptionPlan.PREMIUM]: false,
-    [SubscriptionPlan.ENTERPRISE]: true,
+    [SubscriptionPlan.SUBSCRIPTION]: false,
   },
 ];

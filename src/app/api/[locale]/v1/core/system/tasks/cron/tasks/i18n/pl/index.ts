@@ -110,4 +110,102 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  post: {
+    title: "Utwórz zadanie Cron",
+    description: "Utwórz nowe zadanie cron",
+    container: {
+      title: "Utwórz zadanie",
+      description: "Skonfiguruj nowe zadanie cron",
+    },
+    fields: {
+      name: {
+        label: "Nazwa zadania",
+        description: "Unikalna nazwa zadania",
+        placeholder: "Wprowadź nazwę zadania...",
+      },
+      description: {
+        label: "Opis",
+        description: "Opis zadania",
+        placeholder: "Wprowadź opis...",
+      },
+      schedule: {
+        label: "Harmonogram",
+        description: "Wyrażenie harmonogramu Cron",
+        placeholder: "*/5 * * * *",
+      },
+      priority: {
+        label: "Priorytet",
+        description: "Poziom priorytetu zadania",
+      },
+      category: {
+        label: "Kategoria",
+        description: "Kategoria zadania",
+      },
+      enabled: {
+        label: "Włączone",
+        description: "Włącz lub wyłącz zadanie",
+      },
+      timeout: {
+        label: "Limit czasu (ms)",
+        description: "Maksymalny czas wykonania w milisekundach",
+      },
+      retries: {
+        label: "Ponowne próby",
+        description: "Liczba prób ponowienia",
+      },
+      retryDelay: {
+        label: "Opóźnienie ponowienia (ms)",
+        description: "Opóźnienie między ponownymi próbami w milisekundach",
+      },
+    },
+    response: {
+      task: {
+        title: "Utworzone zadanie",
+      },
+    },
+    errors: {
+      validation: {
+        title: "Walidacja nie powiodła się",
+        description: "Podane dane zadania są nieprawidłowe",
+      },
+      unauthorized: {
+        title: "Nieautoryzowany",
+        description: "Nie masz uprawnień do tworzenia zadań",
+      },
+      internal: {
+        title: "Błąd wewnętrzny",
+        description: "Wystąpił błąd podczas tworzenia zadania",
+      },
+      forbidden: {
+        title: "Zabronione",
+        description: "Dostęp do tego zasobu jest zabroniony",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Zadanie o tej nazwie już istnieje",
+      },
+      network: {
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci",
+      },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd",
+      },
+      notFound: {
+        title: "Nie znaleziono",
+        description: "Żądany zasób nie został znaleziony",
+      },
+      unsaved: {
+        title: "Niezapisane zmiany",
+        description: "Istnieją niezapisane zmiany",
+      },
+    },
+    success: {
+      created: {
+        title: "Zadanie utworzone",
+        description: "Zadanie zostało pomyślnie utworzone",
+      },
+    },
+  },
 };

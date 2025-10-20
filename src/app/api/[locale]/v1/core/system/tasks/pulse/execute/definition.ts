@@ -124,8 +124,6 @@ const { POST } = createEndpoint({
       results: responseArrayField(
         {
           type: WidgetType.DATA_TABLE,
-          description:
-            "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.resultsDescription",
         },
         objectField(
           {
@@ -212,6 +210,24 @@ const { POST } = createEndpoint({
         "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.unknown.title",
       description:
         "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.conflict.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.conflict.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.notFound.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.notFound.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.unsaved.title",
+      description:
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.unsaved.description",
     },
   },
 

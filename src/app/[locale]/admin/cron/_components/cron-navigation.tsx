@@ -32,26 +32,26 @@ export function CronNavigation({
   const navigationItems = [
     {
       key: "stats",
-      href: `/${locale}/admin/stats` as const,
+      href: `/${locale}/admin/stats`,
       icon: TrendingUp,
       label: t("app.admin.cron.nav.stats"),
       description: t("app.admin.cron.nav.stats_description"),
     },
     {
       key: "tasks",
-      href: `/${locale}/admin/cron/tasks` as const,
+      href: `/${locale}/admin/cron/tasks`,
       icon: List,
       label: t("app.admin.cron.nav.tasks"),
       description: t("app.admin.cron.nav.tasks_description"),
     },
     {
       key: "history",
-      href: `/${locale}/admin/cron/history` as const,
+      href: `/${locale}/admin/cron/history`,
       icon: History,
       label: t("app.admin.cron.nav.history"),
       description: t("app.admin.cron.nav.history_description"),
     },
-  ] as const;
+  ];
 
   return (
     <>

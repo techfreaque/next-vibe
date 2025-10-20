@@ -3,28 +3,20 @@
  * API routes for pulse health monitoring system
  */
 
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { CountryLanguage } from "@/i18n/core/config";
 
-import endpoints from "./definition";
-import { pulseHealthRepository } from "./repository";
+import type { EndpointLogger } from "../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { PulseExecuteRequestOutput } from "./execute/definition";
+import { pulseExecuteRepository } from "./execute/repository";
 
-export const { POST, GET, tools } = endpointsHandler({
-  endpoint: endpoints,
-  [Methods.POST]: {
-    handler: async ({ data, user, locale, logger }) => {
-      return await pulseHealthRepository.executePulse(
-        data,
-        user,
-        locale,
-        logger,
-      );
-    },
-  },
+export async function POST(
+  data: PulseExecuteRequestOutput,
+  user: JwtPayloadType,
+  locale: CountryLanguage,
+  logger: EndpointLogger,
+): Promise<ReturnType<typeof pulseExecuteRepository.executePulse>> {
+  return await pulseExecuteRepository.executePulse(data, user, locale, logger);
+}
 
-  [Methods.GET]: {
-    handler: async ({ user, locale, logger }) => {
-      return await pulseHealthRepository.getPulseStatus(user, locale, logger);
-    },
-  },
-});
+export const tools = {};

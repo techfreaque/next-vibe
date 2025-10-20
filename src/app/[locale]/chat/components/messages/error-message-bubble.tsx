@@ -3,8 +3,7 @@
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 
-import { chatColors } from "../../lib/design-tokens";
-import type { ChatMessage } from "../../lib/storage/types";
+import type { ChatMessage } from "../../types";
 
 interface ErrorMessageBubbleProps {
   message: ChatMessage;
@@ -19,7 +18,7 @@ export function ErrorMessageBubble({
         <div
           className={cn(
             "rounded-2xl px-4 py-3 border",
-            chatColors.message.error,
+            "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800",
           )}
         >
           <div className="text-sm text-red-900 dark:text-red-100">

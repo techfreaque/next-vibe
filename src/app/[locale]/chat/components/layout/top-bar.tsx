@@ -28,7 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "@/packages/next-vibe-ui/web/ui";
 
-import type { ChatMessage } from "../../lib/storage/types";
+import type { ChatMessage } from "../../types";
 import { LocaleSelectorContent } from "../locale-selector-content";
 
 interface TopBarProps {
@@ -43,7 +43,7 @@ interface TopBarProps {
   onNewChat: () => void;
   locale: CountryLanguage;
   onNavigateToThreads?: () => void;
-  messages: ChatMessage[];
+  messages: Record<string, ChatMessage>;
 }
 
 export function TopBar({
@@ -163,7 +163,7 @@ export function TopBar({
           </Button>
         </>
       )}
-      {(!sidebarCollapsed || messages.length === 0) && (
+      {(!sidebarCollapsed || Object.keys(messages).length === 0) && (
         <div className="flex-1 flex justify-center">
           <Logo
             locale={locale}

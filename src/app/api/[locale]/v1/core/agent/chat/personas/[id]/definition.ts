@@ -119,7 +119,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.agent.chat.personas.id.get.response.persona.category.content" as const,
             },
             z.enum(
-              DEFAULT_CATEGORIES.map((c) => c.id) as [string, ...string[]],
+              DEFAULT_CATEGORIES.map((c) => c.id),
             ),
           ),
           source: responseField(
@@ -349,7 +349,7 @@ const { PATCH } = createEndpoint({
           layout: { columns: 6 },
         },
         z
-          .enum(DEFAULT_CATEGORIES.map((c) => c.id) as [string, ...string[]])
+          .enum(DEFAULT_CATEGORIES.map((c) => c.id))
           .optional(),
       ),
       preferredModel: requestDataField(

@@ -60,13 +60,13 @@ export class GracefulShutdownManager {
     });
 
     // Handle uncaught exceptions
-    process.on("uncaughtException", (error) => {
+    process.on("uncaughtException", (error: Error) => {
       console.error("💥 Uncaught exception:", error.message || error);
       void this.initiateShutdown("UNCAUGHT_EXCEPTION");
     });
 
     // Handle unhandled promise rejections
-    process.on("unhandledRejection", (reason) => {
+    process.on("unhandledRejection", (reason: Error | string) => {
       console.error("💥 Unhandled promise rejection:", reason);
       void this.initiateShutdown("UNHANDLED_REJECTION");
     });
@@ -175,8 +175,9 @@ export function initializeTaskRunnerShutdown(): void {
   console.log("🛡️  Graceful shutdown handler initialized");
 
   // Register a default handler that logs shutdown initiation
-  onShutdown(() => {
+  onShutdown(async () => {
     console.log("🛑 Task runner shutdown initiated");
+    return await Promise.resolve();
   });
 }
 

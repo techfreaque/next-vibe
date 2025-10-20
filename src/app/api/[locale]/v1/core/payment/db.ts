@@ -35,7 +35,7 @@ import {
 } from "./enum";
 
 // Create currency enum from i18n config
-const CurrencyDB = Object.values(Currencies) as [string, ...string[]];
+const CurrencyDB = Object.values(Currencies);
 
 /**
  * Payment transactions table

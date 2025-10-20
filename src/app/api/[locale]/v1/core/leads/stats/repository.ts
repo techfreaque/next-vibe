@@ -24,9 +24,12 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
-import type { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
-import {
+import type {
+  ChartType,
   DateRangePreset,
+  TimePeriod as TimePeriodType,
+} from "next-vibe/shared/types/stats-filtering.schema";
+import {
   getDateRangeFromPreset,
   TimePeriod,
 } from "next-vibe/shared/types/stats-filtering.schema";
@@ -105,7 +108,9 @@ interface HistoricalMetricResult {
 }
 
 // Map LeadStatus to ActivityType for recent activity
-const mapLeadStatusToActivityType = (status: LeadStatus): ActivityType => {
+const mapLeadStatusToActivityType = (
+  status: (typeof LeadStatus)[keyof typeof LeadStatus],
+): (typeof ActivityType)[keyof typeof ActivityType] => {
   switch (status) {
     case LeadStatus.NEW:
       return ActivityType.LEAD_CREATED;
@@ -147,13 +152,22 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     try {
       logger.debug("Getting leads stats", { data, userId: user.id });
 
+      // Type assertion to help TypeScript - the type is correct but TS can't infer it
+      const requestData = data as Record<string, unknown>;
+
       // Get date range
-      const dateRange = getDateRangeFromPreset(data.dateRangePreset);
+      const dateRange = getDateRangeFromPreset(
+        requestData.dateRangePreset as DateRangePreset,
+      );
       dateFrom = dateRange.from;
       dateTo = dateRange.to;
 
       // Build where conditions
-      const whereConditions = this.buildWhereConditions(data, dateFrom, dateTo);
+      const whereConditions = this.buildWhereConditions(
+        requestData,
+        dateFrom,
+        dateTo,
+      );
 
       // Get all metrics in parallel
       const [
@@ -169,8 +183,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           whereConditions,
           dateFrom,
           dateTo,
-          data.timePeriod,
-          data,
+          requestData.timePeriod as TimePeriodType,
+          requestData,
           logger,
         ),
         this.generateGroupedStats(whereConditions, logger),
@@ -217,7 +231,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    * Build where conditions for database queries
    */
   private buildWhereConditions(
-    query: LeadsStatsRequestOutput,
+    query: Record<string, unknown>,
     dateFrom: Date,
     dateTo: Date,
   ): SQL | undefined {
@@ -228,16 +242,20 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     conditions.push(lte(leads.createdAt, dateTo));
 
     // Status filter
-    if (query.status !== LeadStatusFilter.ALL) {
-      const status = mapStatusFilter(query.status);
+    if (query.status && query.status !== LeadStatusFilter.ALL) {
+      const status = mapStatusFilter(
+        query.status as (typeof LeadStatusFilter)[keyof typeof LeadStatusFilter],
+      );
       if (status) {
         conditions.push(eq(leads.status, status));
       }
     }
 
     // Source filter
-    if (query.source !== LeadSourceFilter.ALL) {
-      const source = mapSourceFilter(query.source);
+    if (query.source && query.source !== LeadSourceFilter.ALL) {
+      const source = mapSourceFilter(
+        query.source as (typeof LeadSourceFilter)[keyof typeof LeadSourceFilter],
+      );
       if (source) {
         conditions.push(eq(leads.source, source));
       }
@@ -1213,7 +1231,9 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       const convertedLeads = Number(source.convertedLeads);
 
       return {
-        source: (source.source as LeadSource) || ("website" as LeadSource),
+        source:
+          (source.source as (typeof LeadSource)[keyof typeof LeadSource]) ||
+          ("website" as (typeof LeadSource)[keyof typeof LeadSource]),
         leadsGenerated: totalLeads,
         conversionRate: totalLeads > 0 ? convertedLeads / totalLeads : 0,
         qualityScore: totalLeads > 0 ? (convertedLeads / totalLeads) * 10 : 0, // Simple quality score based on conversion rate
@@ -1939,12 +1959,14 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    * This is needed when we use different timestamp fields for filtering
    * We need to rebuild the conditions without the date range filters
    */
-  private buildNonDateConditions(filters: LeadsStatsRequestOutput): SQL[] {
+  private buildNonDateConditions(filters: Record<string, unknown>): SQL[] {
     const conditions: SQL[] = [];
 
     // Add status filter if specified (single value, not array)
     if (filters.status && filters.status !== LeadStatusFilter.ALL) {
-      const mappedStatus = mapStatusFilter(filters.status);
+      const mappedStatus = mapStatusFilter(
+        filters.status as (typeof LeadStatusFilter)[keyof typeof LeadStatusFilter],
+      );
       if (mappedStatus) {
         conditions.push(eq(leads.status, mappedStatus));
       }
@@ -1952,7 +1974,9 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
 
     // Add source filter if specified (single value, not array)
     if (filters.source && filters.source !== LeadSourceFilter.ALL) {
-      const mappedSource = mapSourceFilter(filters.source);
+      const mappedSource = mapSourceFilter(
+        filters.source as (typeof LeadSourceFilter)[keyof typeof LeadSourceFilter],
+      );
       if (mappedSource) {
         conditions.push(eq(leads.source, mappedSource));
       }

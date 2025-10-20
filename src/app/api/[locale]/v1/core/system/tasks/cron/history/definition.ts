@@ -29,18 +29,20 @@ import { CronTaskPriority, CronTaskStatus } from "../../enum";
 export const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "system", "tasks", "cron", "history"],
-  title: "tasks.runner.title",
-  description: "tasks.runner.description",
-  category: "tasks.category.system",
+  title: "app.api.v1.core.system.tasks.cronSystem.history.get.title",
+  description:
+    "app.api.v1.core.system.tasks.cronSystem.history.get.description",
+  category: "app.api.v1.core.system.tasks.category",
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
-  tags: ["tasks.type.cron"],
+  tags: ["app.api.v1.core.system.tasks.type.cron"],
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.system.tasks.cron.history.get.request.title",
+      title:
+        "app.api.v1.core.system.tasks.cronSystem.history.get.request.title",
       description:
-        "app.api.v1.core.system.tasks.cron.history.get.request.description",
+        "app.api.v1.core.system.tasks.cronSystem.history.get.request.description",
       layout: { type: LayoutType.GRID, columns: 6 },
     },
     { request: "data", response: true },
@@ -51,11 +53,11 @@ export const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.taskId.label",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.taskId.label",
           description:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.taskId.description",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.taskId.description",
           placeholder:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.taskId.placeholder",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.taskId.placeholder",
         },
         z.string().optional(),
       ),
@@ -64,11 +66,11 @@ export const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.taskName.label",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.taskName.label",
           description:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.taskName.description",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.taskName.description",
           placeholder:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.taskName.placeholder",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.taskName.placeholder",
         },
         z.string().optional(),
       ),
@@ -77,11 +79,11 @@ export const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.status.label",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.status.label",
           description:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.status.description",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.status.description",
           placeholder:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.status.placeholder",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.status.placeholder",
           layout: { columns: 6 },
         },
         z.string().optional(),
@@ -91,11 +93,11 @@ export const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.priority.label",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.priority.label",
           description:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.priority.description",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.priority.description",
           placeholder:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.priority.placeholder",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.priority.placeholder",
           layout: { columns: 6 },
         },
         z.string().optional(),
@@ -105,9 +107,9 @@ export const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.DATE,
           label:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.startDate.label",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.startDate.label",
           description:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.startDate.description",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.startDate.description",
         },
         z.string().optional(),
       ),
@@ -116,9 +118,9 @@ export const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.DATE,
           label:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.endDate.label",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.endDate.label",
           description:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.endDate.description",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.endDate.description",
         },
         z.string().optional(),
       ),
@@ -127,11 +129,11 @@ export const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.limit.label",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.limit.label",
           description:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.limit.description",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.limit.description",
           placeholder:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.limit.placeholder",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.limit.placeholder",
         },
         z.string().optional(),
       ),
@@ -140,11 +142,11 @@ export const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.offset.label",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.offset.label",
           description:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.offset.description",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.offset.description",
           placeholder:
-            "app.api.v1.core.system.tasks.cron.history.get.fields.offset.placeholder",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.fields.offset.placeholder",
         },
         z.string().optional(),
       ),
@@ -154,7 +156,7 @@ export const { GET } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.tasks.cron.history.get.response.executions.title",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.response.executions.title",
         },
         z.array(
           z.object({
@@ -182,7 +184,7 @@ export const { GET } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.tasks.cron.history.get.response.totalCount.title",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.response.totalCount.title",
         },
         z.number(),
       ),
@@ -190,7 +192,7 @@ export const { GET } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.tasks.cron.history.get.response.hasMore.title",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.response.hasMore.title",
         },
         z.boolean(),
       ),
@@ -198,7 +200,7 @@ export const { GET } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.tasks.cron.history.get.response.summary.title",
+            "app.api.v1.core.system.tasks.cronSystem.history.get.response.summary.title",
         },
         z.object({
           totalExecutions: z.number(),
@@ -211,9 +213,9 @@ export const { GET } = createEndpoint({
     },
   ),
   successTypes: {
-    title: "app.api.v1.core.system.tasks.cron.history.get.success.title",
+    title: "app.api.v1.core.system.tasks.cronSystem.history.get.success.title",
     description:
-      "app.api.v1.core.system.tasks.cron.history.get.success.description",
+      "app.api.v1.core.system.tasks.cronSystem.history.get.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

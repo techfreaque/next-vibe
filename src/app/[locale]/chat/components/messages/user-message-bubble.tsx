@@ -11,7 +11,7 @@ import {
   chatShadows,
   chatTransitions,
 } from "../../lib/design-tokens";
-import type { ChatMessage } from "../../lib/storage/types";
+import type { ChatMessage } from "../../types";
 import { MessageAuthorInfo } from "./message-author";
 import { UserMessageActions } from "./user-message-actions";
 
@@ -43,12 +43,14 @@ export function UserMessageBubble({
     <div className="flex justify-end">
       <div className="max-w-[90%] sm:max-w-[85%] group/message">
         {/* Author info (for multi-user mode) */}
-        {showAuthor && message.author && (
+        {showAuthor && (
           <div className="mb-2 flex justify-end">
             <MessageAuthorInfo
-              author={message.author}
-              timestamp={message.timestamp}
-              edited={message.metadata?.edited}
+              authorName={message.authorName}
+              isAI={message.isAI}
+              model={message.model}
+              timestamp={message.createdAt}
+              edited={message.edited}
               tone={tone}
               locale={locale}
               compact

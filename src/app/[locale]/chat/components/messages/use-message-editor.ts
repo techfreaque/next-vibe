@@ -8,7 +8,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 import { TIMING } from "../../lib/config/constants";
-import type { ChatMessage } from "../../lib/storage/types";
+import type { ChatMessage } from "../../types";
 
 export type EditorActionType = "overwrite" | "branch" | null;
 

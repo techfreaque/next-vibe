@@ -73,7 +73,7 @@ export function useCreateSubscriptionCheckoutMutation(): InferEnhancedMutationRe
  */
 export function useSubscriptionCheckout(): {
   createCheckout: (
-    planId: Exclude<SubscriptionPlanValue, typeof SubscriptionPlan.ENTERPRISE>,
+    planId: SubscriptionPlanValue,
     billingInterval: BillingIntervalValue,
     metadata?: Record<string, string>,
   ) => Promise<ResponseType<CheckoutResponseOutput>>;
@@ -83,7 +83,7 @@ export function useSubscriptionCheckout(): {
   const createMutation = useCreateSubscriptionCheckoutMutation();
 
   const createCheckout = async (
-    planId: Exclude<SubscriptionPlanValue, typeof SubscriptionPlan.ENTERPRISE>,
+    planId: SubscriptionPlanValue,
     billingInterval: BillingIntervalValue,
     metadata?: Record<string, string>,
   ): Promise<ResponseType<CheckoutResponseOutput>> => {
@@ -94,7 +94,6 @@ export function useSubscriptionCheckout(): {
           billingInterval,
           metadata,
         },
-        urlParams: undefined,
       });
 
       if (!result.success) {

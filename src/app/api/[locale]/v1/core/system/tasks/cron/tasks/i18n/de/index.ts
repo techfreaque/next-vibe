@@ -115,4 +115,102 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  post: {
+    title: "Cron-Aufgabe erstellen",
+    description: "Neue Cron-Aufgabe erstellen",
+    container: {
+      title: "Aufgabe erstellen",
+      description: "Neue Cron-Aufgabe konfigurieren",
+    },
+    fields: {
+      name: {
+        label: "Aufgabenname",
+        description: "Eindeutiger Name für die Aufgabe",
+        placeholder: "Aufgabennamen eingeben...",
+      },
+      description: {
+        label: "Beschreibung",
+        description: "Aufgabenbeschreibung",
+        placeholder: "Beschreibung eingeben...",
+      },
+      schedule: {
+        label: "Zeitplan",
+        description: "Cron-Zeitplanausdruck",
+        placeholder: "*/5 * * * *",
+      },
+      priority: {
+        label: "Priorität",
+        description: "Aufgabenpriorität",
+      },
+      category: {
+        label: "Kategorie",
+        description: "Aufgabenkategorie",
+      },
+      enabled: {
+        label: "Aktiviert",
+        description: "Aufgabe aktivieren oder deaktivieren",
+      },
+      timeout: {
+        label: "Zeitüberschreitung (ms)",
+        description: "Maximale Ausführungszeit in Millisekunden",
+      },
+      retries: {
+        label: "Wiederholungen",
+        description: "Anzahl der Wiederholungsversuche",
+      },
+      retryDelay: {
+        label: "Wiederholungsverzögerung (ms)",
+        description: "Verzögerung zwischen Wiederholungen in Millisekunden",
+      },
+    },
+    response: {
+      task: {
+        title: "Erstellte Aufgabe",
+      },
+    },
+    errors: {
+      validation: {
+        title: "Validierung fehlgeschlagen",
+        description: "Die bereitgestellten Aufgabendaten sind ungültig",
+      },
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Sie haben keine Berechtigung, Aufgaben zu erstellen",
+      },
+      internal: {
+        title: "Interner Fehler",
+        description: "Beim Erstellen der Aufgabe ist ein Fehler aufgetreten",
+      },
+      forbidden: {
+        title: "Verboten",
+        description: "Zugriff auf diese Ressource ist verboten",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Eine Aufgabe mit diesem Namen existiert bereits",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Ein Netzwerkfehler ist aufgetreten",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unbekannter Fehler ist aufgetreten",
+      },
+      notFound: {
+        title: "Nicht gefunden",
+        description: "Die angeforderte Ressource wurde nicht gefunden",
+      },
+      unsaved: {
+        title: "Nicht gespeicherte Änderungen",
+        description: "Es gibt nicht gespeicherte Änderungen",
+      },
+    },
+    success: {
+      created: {
+        title: "Aufgabe erstellt",
+        description: "Die Aufgabe wurde erfolgreich erstellt",
+      },
+    },
+  },
 };

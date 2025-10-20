@@ -99,7 +99,6 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
             taskName,
             data.dryRun || false,
             data.force || false,
-            logger,
           );
 
           const duration = Date.now() - startTime;
@@ -125,7 +124,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
             success: false,
             duration,
             message: t(
-              "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.executionFailed" as TranslationKey,
+              "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.executionFailed",
             ),
           });
 
@@ -144,10 +143,10 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
         success: allSuccessful,
         message: data.dryRun
           ? t(
-              "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.dryRunSuccess" as TranslationKey,
+              "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.dryRunSuccess",
             )
           : t(
-              "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.executionSuccess" as TranslationKey,
+              "app.api.v1.core.system.tasks.pulseSystem.execute.post.response.executionSuccess",
             ),
         executedAt,
         tasksExecuted: totalTasks,
@@ -170,9 +169,8 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
       });
 
       return createErrorResponse(
-        "error.errorTypes.internal_error" as TranslationKey,
+        "error.errorTypes.internal_error",
         ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message, userId: _user.id },
       );
     }
   }

@@ -8,15 +8,7 @@
 
 import type React from "react";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
-interface ImportStatusAlertProps {
-  locale: CountryLanguage;
-}
-
-export function ImportStatusAlert({
-  locale,
-}: ImportStatusAlertProps): React.JSX.Element | null {
+export function ImportStatusAlert(): React.JSX.Element | null {
   // TODO: Implement import status monitoring
   return null;
 }

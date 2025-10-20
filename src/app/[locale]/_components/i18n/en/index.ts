@@ -3,6 +3,7 @@ import { translations as navTranslations } from "../../nav/i18n/en";
 export const translations = {
   nav: navTranslations,
   common: {
+    active: "Active",
     appName: "unbottled.ai",
     company: {
       name: "unbottled.ai",

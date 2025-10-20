@@ -1,33 +1,293 @@
 import type { translations as enTranslations } from "../en";
 
 /**
-*
-
-* Leads Stats subdomain translations for Polish
-*/
+ * Leads Stats subdomain translations for Polish
+ */
 
 export const translations: typeof enTranslations = {
   title: "Statystyki leadów",
-  description: "Kompleksowe statystyki i analizy leadów z danymi historycznymi",
+  description:
+    "Kompleksowe statystyki i analityka leadów z danymi historycznymi",
   category: "Zarządzanie leadami",
   tags: {
     leads: "Leady",
     statistics: "Statystyki",
-    analytics: "Analizy",
+    analytics: "Analityka",
+  },
+  container: {
+    title: "Filtry statystyk",
+    description: "Skonfiguruj filtry statystyk leadów i opcje widoku",
+  },
+  timePeriod: {
+    label: "Okres czasu",
+    description: "Wybierz okres czasu dla agregacji statystyk",
+    hour: "Godzina",
+    day: "Dzień",
+    week: "Tydzień",
+    month: "Miesiąc",
+    quarter: "Kwartał",
+    year: "Rok",
+  },
+  dateRangePreset: {
+    label: "Preset zakresu dat",
+    description: "Wybierz predefiniowany zakres dat",
+  },
+  dateRange: {
+    today: "Dzisiaj",
+    yesterday: "Wczoraj",
+    last7Days: "Ostatnie 7 dni",
+    last30Days: "Ostatnie 30 dni",
+    last90Days: "Ostatnie 90 dni",
+    thisWeek: "Ten tydzień",
+    lastWeek: "Ostatni tydzień",
+    thisMonth: "Ten miesiąc",
+    lastMonth: "Ostatni miesiąc",
+    thisQuarter: "Ten kwartał",
+    lastQuarter: "Ostatni kwartał",
+    thisYear: "Ten rok",
+    lastYear: "Ostatni rok",
+    custom: "Zakres niestandardowy",
+  },
+  dateFrom: {
+    label: "Data rozpoczęcia",
+    description: "Data początkowa dla statystyk",
+  },
+  dateTo: {
+    label: "Data zakończenia",
+    description: "Data końcowa dla statystyk",
+  },
+  chartType: {
+    label: "Typ wykresu",
+    description: "Wybierz typ wykresu do wizualizacji danych",
+    line: "Wykres liniowy",
+    bar: "Wykres słupkowy",
+    area: "Wykres obszarowy",
+    pie: "Wykres kołowy",
+    donut: "Wykres pierścieniowy",
+  },
+  includeComparison: {
+    label: "Uwzględnij porównanie",
+    description: "Porównaj z poprzednim okresem",
+  },
+  comparisonPeriod: {
+    label: "Okres porównania",
+    description: "Wybierz okres do porównania",
+  },
+  status: {
+    label: "Status leada",
+    description: "Filtruj według statusu leada",
+  },
+  source: {
+    label: "Źródło leada",
+    description: "Filtruj według źródła leada",
+  },
+  country: {
+    label: "Kraj",
+    description: "Filtruj według kraju",
+    all: "Wszystkie kraje",
+    de: "Niemcy",
+    pl: "Polska",
+    global: "Globalny",
+  },
+  language: {
+    label: "Język",
+    description: "Filtruj według preferencji językowych",
+    all: "Wszystkie języki",
+    en: "Angielski",
+    de: "Niemiecki",
+    pl: "Polski",
+  },
+  campaignStage: {
+    label: "Etap kampanii",
+    description: "Filtruj według etapu kampanii e-mailowej",
+  },
+  hasEngagement: {
+    label: "Ma zaangażowanie",
+    description: "Filtruj leady z zaangażowaniem e-mailowym",
+  },
+  minEmailsOpened: {
+    label: "Minimalna liczba otwartych e-maili",
+    description: "Minimalna liczba otwartych e-maili",
+  },
+  minEmailsClicked: {
+    label: "Minimalna liczba klikniętych e-maili",
+    description: "Minimalna liczba klikniętych e-maili",
+  },
+  isConverted: {
+    label: "Jest skonwertowany",
+    description: "Filtruj skonwertowane leady",
+  },
+  hasSignedUp: {
+    label: "Zarejestrował się",
+    description: "Filtruj leady, które się zarejestrowały",
+  },
+  hasBookedConsultation: {
+    label: "Zarezerwował konsultację",
+    description: "Filtruj leady, które zarezerwowały konsultację",
+  },
+  hasConfirmedSubscription: {
+    label: "Potwierdził subskrypcję",
+    description: "Filtruj leady z potwierdzoną subskrypcją",
+  },
+  hasBusinessName: {
+    label: "Ma nazwę firmy",
+    description: "Filtruj leady z nazwą firmy",
+  },
+  hasContactName: {
+    label: "Ma nazwisko kontaktowe",
+    description: "Filtruj leady z nazwiskiem kontaktowym",
+  },
+  hasPhone: {
+    label: "Ma telefon",
+    description: "Filtruj leady z numerem telefonu",
+  },
+  hasWebsite: {
+    label: "Ma stronę internetową",
+    description: "Filtruj leady ze stroną internetową",
+  },
+  hasNotes: {
+    label: "Ma notatki",
+    description: "Filtruj leady z notatkami",
+  },
+  sortBy: {
+    label: "Sortuj według",
+    description: "Pole do sortowania wyników",
+  },
+  sortOrder: {
+    label: "Kolejność sortowania",
+    description: "Rosnąco lub malejąco",
+  },
+  limit: {
+    label: "Limit wyników",
+    description: "Maksymalna liczba wyników",
+  },
+  hasUserId: {
+    label: "Ma ID użytkownika",
+    description: "Filtruj leady z przypisanym ID użytkownika",
+  },
+  emailVerified: {
+    label: "E-mail zweryfikowany",
+    description: "Filtruj według statusu weryfikacji e-maila",
+  },
+  journeyVariant: {
+    label: "Wariant ścieżki",
+    description: "Filtruj według wariantu ścieżki e-mailowej",
+  },
+  minEmailsSent: {
+    label: "Minimalna liczba wysłanych e-maili",
+    description: "Minimalna liczba e-maili wysłanych do leada",
+  },
+  createdAfter: {
+    label: "Utworzone po",
+    description: "Filtruj leady utworzone po tej dacie",
+  },
+  createdBefore: {
+    label: "Utworzone przed",
+    description: "Filtruj leady utworzone przed tą datą",
+  },
+  updatedAfter: {
+    label: "Zaktualizowane po",
+    description: "Filtruj leady zaktualizowane po tej dacie",
+  },
+  updatedBefore: {
+    label: "Zaktualizowane przed",
+    description: "Filtruj leady zaktualizowane przed tą datą",
+  },
+  search: {
+    label: "Szukaj",
+    description: "Szukaj leadów po e-mailu, nazwisku lub nazwie firmy",
+    placeholder: "Szukaj leadów...",
+  },
+  response: {
+    totalLeads: "Wszystkie leady",
+    newLeads: "Nowe leady",
+    activeLeads: "Aktywne leady",
+    inactiveLeads: "Nieaktywne leady",
+    leadsByStatus: "Leady według statusu",
+    leadsBySource: "Leady według źródła",
+    leadsByCountry: "Leady według kraju",
+    leadsByLanguage: "Leady według języka",
+    websiteUserLeads: "Użytkownicy strony",
+    newsletterSubscriberLeads: "Subskrybenci newslettera",
+    convertedLeads: "Skonwertowane leady",
+    signedUpLeads: "Zarejestrowani leady",
+    consultationBookedLeads: "Zarezerwowana konsultacja",
+    subscriptionConfirmedLeads: "Potwierdzona subskrypcja",
+    unsubscribedLeads: "Wypisani leady",
+    bounces: "Zwrócone",
+    qualifiedLeads: "Zakwalifikowane leady",
+    nonQualifiedLeads: "Niezakwalifikowane leady",
+    nurturingLeads: "Leady w nurturingu",
+    engagedLeads: "Zaangażowane leady",
+    leadsWithEmailEngagement: "Z zaangażowaniem e-mailowym",
+    leadsWithoutEmailEngagement: "Bez zaangażowania e-mailowego",
+    averageEmailEngagementScore: "Średnie zaangażowanie e-mailowe",
+    totalEmailEngagements: "Łączne zaangażowanie e-mailowe",
+    signupRate: "Wskaźnik rejestracji",
+    consultationBookingRate: "Wskaźnik rezerwacji konsultacji",
+    subscriptionConfirmationRate: "Wskaźnik potwierdzenia subskrypcji",
+    dataCompletenessRate: "Kompletność danych",
+    leadsWithBusinessName: "Z nazwą firmy",
+    leadsWithContactName: "Z nazwiskiem kontaktowym",
+    leadsWithPhone: "Z telefonem",
+    leadsWithWebsite: "Ze stroną internetową",
+    leadsWithNotes: "Z notatkami",
+    averageBusinessDataCompleteness: "Średnia kompletność danych biznesowych",
+    leadsByCampaignStage: "Leady według etapu kampanii",
+    leadsInActiveCampaigns: "W aktywnych kampaniach",
+    leadsNotInCampaigns: "Nie w kampaniach",
+    recentLeads: "Ostatnie leady",
+    topLeadsByEngagement: "Najlepsze leady wg zaangażowania",
+    mostActiveLeads: "Najbardziej aktywne leady",
+    recentConversions: "Ostatnie konwersje",
+    recentSignups: "Ostatnie rejestracje",
+    recentConsultations: "Ostatnie konsultacje",
+    timeSeriesData: "Dane szeregów czasowych",
+    comparisonData: "Dane porównawcze",
+    averageTimeToConversion: "Średni czas do konwersji",
+    averageTimeToSignup: "Średni czas do rejestracji",
+    averageTimeToConsultation: "Średni czas do konsultacji",
+    topPerformingCampaigns: "Najlepsze kampanie",
+    topPerformingSources: "Najlepsze źródła",
+    topPerformingCountries: "Najlepsze kraje",
+    conversionRate: "Wskaźnik konwersji",
+    averageOpenRate: "Średni współczynnik otwarć",
+    averageClickRate: "Średni współczynnik kliknięć",
+    campaignRunningLeads: "W trwających kampaniach",
+    bouncedLeads: "Zwrócone leady",
+    invalidLeads: "Nieprawidłowe leady",
+    totalEmailsSent: "Wysłanych e-maili łącznie",
+    totalEmailsOpened: "Otwartych e-maili łącznie",
+    totalEmailsClicked: "Klikniętych e-maili łącznie",
+    averageEmailsPerLead: "Średnio e-maili na leada",
+    leadVelocity: "Prędkość leadów",
+    leadsCreatedToday: "Utworzonych dzisiaj leadów",
+    leadsCreatedThisWeek: "Utworzonych w tym tygodniu leadów",
+    leadsCreatedThisMonth: "Utworzonych w tym miesiącu leadów",
+    leadsUpdatedToday: "Zaktualizowanych dzisiaj leadów",
+    leadsUpdatedThisWeek: "Zaktualizowanych w tym tygodniu leadów",
+    leadsUpdatedThisMonth: "Zaktualizowanych w tym miesiącu leadów",
+    leadsByJourneyVariant: "Leady według wariantu ścieżki",
+    historicalData: "Dane historyczne",
+    groupedStats: "Statystyki zgrupowane",
+    recentActivity: "Ostatnia aktywność",
+    generatedAt: "Wygenerowane o",
+    dataRange: "Zakres danych",
+    data: "Dane statystyk",
   },
   errors: {
     unauthorized: {
       title: "Nieautoryzowany dostęp",
-      description: "Autoryzacja wymagana do przeglądania statystyk leadów",
+      description: "Wymagane uwierzytelnienie aby wyświetlić statystyki leadów",
     },
     validation: {
       title: "Błąd walidacji",
-      description: "Nieprawidłowe parametry żądania statystyk",
+      description: "Nieprawidłowe parametry zapytania o statystyki",
     },
     server: {
       title: "Błąd serwera",
       description:
-        "Wystąpił wewnętrzny błąd serwera podczas pobierania statystyk leadów",
+        "Wewnętrzny błąd serwera podczas pobierania statystyk leadów",
     },
     unknown: {
       title: "Nieznany błąd",
@@ -35,10 +295,10 @@ export const translations: typeof enTranslations = {
     },
     network: {
       title: "Błąd sieci",
-      description: "Wystąpił błąd sieci podczas pobierania statystyk",
+      description: "Błąd sieci podczas pobierania statystyk",
     },
     forbidden: {
-      title: "Zabronione",
+      title: "Zabroniony",
       description: "Dostęp do statystyk leadów zabroniony",
     },
     notFound: {

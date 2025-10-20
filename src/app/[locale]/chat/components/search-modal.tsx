@@ -16,14 +16,14 @@ import {
   Input,
 } from "@/packages/next-vibe-ui/web/ui";
 
-import type { ChatThread } from "../lib/storage/types";
+import type { ChatThread } from "../types";
 
 interface SearchModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCreateThread: () => void;
   onSelectThread: (threadId: string) => void;
-  searchThreads: (query: string) => ChatThread[];
+  threads: Record<string, ChatThread>;
   locale: CountryLanguage;
 }
 
@@ -32,14 +32,19 @@ export function SearchModal({
   onOpenChange,
   onCreateThread,
   onSelectThread,
-  searchThreads,
+  threads,
   locale,
 }: SearchModalProps): JSX.Element {
   const { t } = simpleT(locale);
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Search threads by title
   const searchResults =
-    searchQuery.length > 0 ? searchThreads(searchQuery) : [];
+    searchQuery.length > 0
+      ? Object.values(threads).filter((thread) =>
+          thread.title.toLowerCase().includes(searchQuery.toLowerCase()),
+        )
+      : [];
 
   const handleSelectThread = (threadId: string): void => {
     onSelectThread(threadId);

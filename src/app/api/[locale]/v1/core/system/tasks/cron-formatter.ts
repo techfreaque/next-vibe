@@ -95,86 +95,94 @@ function generateDescription(
     month === "*" &&
     dayOfWeek === "*"
   ) {
-    return t("cron.frequency.everyMinute");
+    return t("app.api.v1.core.system.tasks.cron.frequency.everyMinute");
   }
 
   // Handle minute
   if (minute === "*") {
-    parts.push(t("cron.frequency.everyMinutes"));
+    parts.push(t("app.api.v1.core.system.tasks.cron.frequency.everyMinutes"));
   } else if (minute.includes("/")) {
     const [start, interval] = minute.split("/");
     if (start === "*") {
       parts.push(
-        t("cron.patterns.everyIntervalMinutes", {
+        t("app.api.v1.core.system.tasks.cron.patterns.everyIntervalMinutes", {
           interval,
         }),
       );
     } else {
       parts.push(
-        t("cron.patterns.everyIntervalMinutesStarting", {
-          interval,
-          start,
-        }),
+        t(
+          "app.api.v1.core.system.tasks.cron.patterns.everyIntervalMinutesStarting",
+          {
+            interval,
+            start,
+          },
+        ),
       );
     }
   } else if (minute.includes(",")) {
     const minutes = minute.split(",");
     parts.push(
-      t("cron.patterns.atMinutes", {
+      t("app.api.v1.core.system.tasks.cron.patterns.atMinutes", {
         minutes: minutes.join(", "),
       }),
     );
   } else if (minute.includes("-")) {
     const [start, end] = minute.split("-");
     parts.push(
-      t("cron.patterns.fromMinuteToMinute", {
+      t("app.api.v1.core.system.tasks.cron.patterns.fromMinuteToMinute", {
         start,
         end,
       }),
     );
   } else if (minute !== "0") {
-    parts.push(t("cron.patterns.atMinute", { minute }));
+    parts.push(
+      t("app.api.v1.core.system.tasks.cron.patterns.atMinute", { minute }),
+    );
   }
 
   // Handle hour
   if (hour === "*") {
     if (!parts.some((p) => p.includes("minute"))) {
-      parts.push(t("cron.frequency.everyHour"));
+      parts.push(t("app.api.v1.core.system.tasks.cron.frequency.everyHour"));
     }
   } else if (hour.includes("/")) {
     const [start, interval] = hour.split("/");
     if (start === "*") {
       parts.push(
-        t("cron.patterns.everyIntervalHours", {
+        t("app.api.v1.core.system.tasks.cron.patterns.everyIntervalHours", {
           interval,
         }),
       );
     } else {
       parts.push(
-        t("cron.patterns.everyIntervalHoursStarting", {
-          interval,
-          start: formatHour(start, locale),
-        }),
+        t(
+          "app.api.v1.core.system.tasks.cron.patterns.everyIntervalHoursStarting",
+          {
+            interval,
+            start: formatHour(start, locale),
+          },
+        ),
       );
     }
   } else if (hour.includes(",")) {
     const hours = hour.split(",").map((h) => formatHour(h, locale));
     parts.push(
-      t("cron.patterns.atHours", {
+      t("app.api.v1.core.system.tasks.cron.patterns.atHours", {
         hours: hours.join(", "),
       }),
     );
   } else if (hour.includes("-")) {
     const [start, end] = hour.split("-");
     parts.push(
-      t("cron.patterns.fromHourToHour", {
+      t("app.api.v1.core.system.tasks.cron.patterns.fromHourToHour", {
         start: formatHour(start, locale),
         end: formatHour(end, locale),
       }),
     );
   } else {
     parts.push(
-      t("cron.patterns.atHour", {
+      t("app.api.v1.core.system.tasks.cron.patterns.atHour", {
         hour: formatHour(hour, locale),
       }),
     );
@@ -184,12 +192,24 @@ function generateDescription(
   if (dayOfMonth !== "*") {
     if (dayOfMonth.includes("/")) {
       const [, interval] = dayOfMonth.split("/");
-      parts.push(t("cron.frequency.everyDays", { count: interval }));
+      parts.push(
+        t("app.api.v1.core.system.tasks.cron.frequency.everyDays", {
+          count: interval,
+        }),
+      );
     } else if (dayOfMonth.includes(",")) {
       const days = dayOfMonth.split(",");
-      parts.push(t("cron.calendar.onDays", { days: days.join(", ") }));
+      parts.push(
+        t("app.api.v1.core.system.tasks.cron.calendar.onDays", {
+          days: days.join(", "),
+        }),
+      );
     } else {
-      parts.push(t("cron.calendar.onDay", { day: dayOfMonth }));
+      parts.push(
+        t("app.api.v1.core.system.tasks.cron.calendar.onDay", {
+          day: dayOfMonth,
+        }),
+      );
     }
   }
 
@@ -197,10 +217,16 @@ function generateDescription(
   if (month !== "*") {
     if (month.includes(",")) {
       const months = month.split(",").map((m) => formatMonth(m, locale));
-      parts.push(t("cron.calendar.inMonths", { months: months.join(", ") }));
+      parts.push(
+        t("app.api.v1.core.system.tasks.cron.calendar.inMonths", {
+          months: months.join(", "),
+        }),
+      );
     } else {
       parts.push(
-        t("cron.calendar.inMonth", { month: formatMonth(month, locale) }),
+        t("app.api.v1.core.system.tasks.cron.calendar.inMonth", {
+          month: formatMonth(month, locale),
+        }),
       );
     }
   }
@@ -209,18 +235,22 @@ function generateDescription(
   if (dayOfWeek !== "*") {
     if (dayOfWeek.includes(",")) {
       const days = dayOfWeek.split(",").map((d) => formatDayOfWeek(d, locale));
-      parts.push(t("cron.calendar.onWeekdays", { days: days.join(", ") }));
+      parts.push(
+        t("app.api.v1.core.system.tasks.cron.calendar.onWeekdays", {
+          days: days.join(", "),
+        }),
+      );
     } else if (dayOfWeek.includes("-")) {
       const [start, end] = dayOfWeek.split("-");
       parts.push(
-        t("cron.calendar.fromWeekdayToWeekday", {
+        t("app.api.v1.core.system.tasks.cron.calendar.fromWeekdayToWeekday", {
           start: formatDayOfWeek(start, locale),
           end: formatDayOfWeek(end, locale),
         }),
       );
     } else {
       parts.push(
-        t("cron.calendar.onWeekday", {
+        t("app.api.v1.core.system.tasks.cron.calendar.onWeekday", {
           day: formatDayOfWeek(dayOfWeek, locale),
         }),
       );
@@ -229,7 +259,7 @@ function generateDescription(
 
   // Add timezone if not UTC
   if (timezone !== "UTC") {
-    parts.push(t("cron.timezone", { timezone }));
+    parts.push(t("app.api.v1.core.system.tasks.cron.timezone", { timezone }));
   }
 
   // Combine parts into a readable sentence
@@ -248,15 +278,15 @@ function formatHour(hour: string, locale: CountryLanguage): string {
   const { t } = simpleT(locale);
   const h = parseInt(hour, 10);
   if (h === 0) {
-    return t("cron.time.midnight");
+    return t("app.api.v1.core.system.tasks.cron.time.midnight");
   }
   if (h === 12) {
-    return t("cron.time.noon");
+    return t("app.api.v1.core.system.tasks.cron.time.noon");
   }
   if (h < 12) {
-    return t("cron.time.hourAm", { hour: h });
+    return t("app.api.v1.core.system.tasks.cron.time.hourAm", { hour: h });
   }
-  return t("cron.time.hourPm", { hour: h - 12 });
+  return t("app.api.v1.core.system.tasks.cron.time.hourPm", { hour: h - 12 });
 }
 
 /**
@@ -267,29 +297,29 @@ function formatMonth(month: string, locale: CountryLanguage): string {
   const m = parseInt(month, 10);
   switch (m) {
     case 1:
-      return t("cron.months.january");
+      return t("app.api.v1.core.system.tasks.cron.months.january");
     case 2:
-      return t("cron.months.february");
+      return t("app.api.v1.core.system.tasks.cron.months.february");
     case 3:
-      return t("cron.months.march");
+      return t("app.api.v1.core.system.tasks.cron.months.march");
     case 4:
-      return t("cron.months.april");
+      return t("app.api.v1.core.system.tasks.cron.months.april");
     case 5:
-      return t("cron.months.may");
+      return t("app.api.v1.core.system.tasks.cron.months.may");
     case 6:
-      return t("cron.months.june");
+      return t("app.api.v1.core.system.tasks.cron.months.june");
     case 7:
-      return t("cron.months.july");
+      return t("app.api.v1.core.system.tasks.cron.months.july");
     case 8:
-      return t("cron.months.august");
+      return t("app.api.v1.core.system.tasks.cron.months.august");
     case 9:
-      return t("cron.months.september");
+      return t("app.api.v1.core.system.tasks.cron.months.september");
     case 10:
-      return t("cron.months.october");
+      return t("app.api.v1.core.system.tasks.cron.months.october");
     case 11:
-      return t("cron.months.november");
+      return t("app.api.v1.core.system.tasks.cron.months.november");
     case 12:
-      return t("cron.months.december");
+      return t("app.api.v1.core.system.tasks.cron.months.december");
     default:
       return month;
   }
@@ -303,19 +333,19 @@ function formatDayOfWeek(day: string, locale: CountryLanguage): string {
   const d = parseInt(day, 10);
   switch (d) {
     case 0:
-      return t("cron.days.sunday");
+      return t("app.api.v1.core.system.tasks.cron.days.sunday");
     case 1:
-      return t("cron.days.monday");
+      return t("app.api.v1.core.system.tasks.cron.days.monday");
     case 2:
-      return t("cron.days.tuesday");
+      return t("app.api.v1.core.system.tasks.cron.days.tuesday");
     case 3:
-      return t("cron.days.wednesday");
+      return t("app.api.v1.core.system.tasks.cron.days.wednesday");
     case 4:
-      return t("cron.days.thursday");
+      return t("app.api.v1.core.system.tasks.cron.days.thursday");
     case 5:
-      return t("cron.days.friday");
+      return t("app.api.v1.core.system.tasks.cron.days.friday");
     case 6:
-      return t("cron.days.saturday");
+      return t("app.api.v1.core.system.tasks.cron.days.saturday");
     default:
       return day;
   }
@@ -374,37 +404,37 @@ export function formatCronScheduleShort(
 
     // Common patterns
     if (schedule === "0 0 * * *") {
-      return t("cron.common.dailyAtMidnight");
+      return t("app.api.v1.core.system.tasks.cron.common.dailyAtMidnight");
     }
     if (schedule === "0 12 * * *") {
-      return t("cron.common.dailyAtNoon");
+      return t("app.api.v1.core.system.tasks.cron.common.dailyAtNoon");
     }
     if (schedule === "0 0 * * 0") {
-      return t("cron.common.weeklyOnSunday");
+      return t("app.api.v1.core.system.tasks.cron.common.weeklyOnSunday");
     }
     if (schedule === "0 0 1 * *") {
-      return t("cron.common.monthlyOnFirst");
+      return t("app.api.v1.core.system.tasks.cron.common.monthlyOnFirst");
     }
     if (schedule === "*/5 * * * *") {
-      return t("cron.common.everyFiveMinutes");
+      return t("app.api.v1.core.system.tasks.cron.common.everyFiveMinutes");
     }
     if (schedule === "*/3 * * * *") {
-      return t("cron.common.everyThreeMinutes");
+      return t("app.api.v1.core.system.tasks.cron.common.everyThreeMinutes");
     }
     if (schedule === "*/1 * * * *") {
-      return t("cron.common.everyOneMinutes");
+      return t("app.api.v1.core.system.tasks.cron.common.everyOneMinutes");
     }
     if (schedule === "*/10 * * * *") {
-      return t("cron.common.everyTenMinutes");
+      return t("app.api.v1.core.system.tasks.cron.common.everyTenMinutes");
     }
     if (schedule === "*/15 * * * *") {
-      return t("cron.common.everyFifteenMinutes");
+      return t("app.api.v1.core.system.tasks.cron.common.everyFifteenMinutes");
     }
     if (schedule === "*/30 * * * *") {
-      return t("cron.common.everyThirtyMinutes");
+      return t("app.api.v1.core.system.tasks.cron.common.everyThirtyMinutes");
     }
     if (schedule === "0 * * * *") {
-      return t("cron.frequency.hourly");
+      return t("app.api.v1.core.system.tasks.cron.frequency.hourly");
     }
 
     // Try to generate a short description

@@ -5,12 +5,11 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
+import { useEdenAISpeech } from "@/app/api/[locale]/v1/core/agent/speech-to-text/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import { Button } from "@/packages/next-vibe-ui/web/ui";
-
-import { useEdenAISpeech } from "../../hooks/use-eden-ai-speech";
 
 interface SpeechInputButtonProps {
   onTranscript: (text: string) => void;
@@ -35,7 +34,7 @@ export function SpeechInputButton({
   const { isRecording, isProcessing, toggleRecording, error, transcript } =
     useEdenAISpeech({
       onTranscript,
-      onError: (err) => {
+      onError: (err: string) => {
         logger.error("app.chat.speech.error", err);
       },
       lang,

@@ -383,7 +383,7 @@ export class TranslationReorganizeRepositoryImpl {
       });
 
       return createErrorResponse(
-        "error.errorTypes.internal_error" as TranslationKey,
+        "error.errorTypes.internal_error",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -589,7 +589,7 @@ export class TranslationReorganizeRepositoryImpl {
       // Validate backup path exists
       if (!fs.existsSync(request.backupPath)) {
         return createErrorResponse(
-          "app.api.v1.core.system.translations.restoreBackup.post.messages.backupNotFound" as TranslationKey,
+          "app.api.v1.core.system.translations.restoreBackup.post.messages.backupNotFound",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -605,7 +605,7 @@ export class TranslationReorganizeRepositoryImpl {
         return createSuccessResponse({
           success: true,
           message: t(
-            "app.api.v1.core.system.translations.restoreBackup.post.messages.validationSuccessful" as TranslationKey,
+            "app.api.v1.core.system.translations.restoreBackup.post.messages.validationSuccessful",
           ),
           backupInfo: {
             backupPath: request.backupPath,
@@ -629,7 +629,7 @@ export class TranslationReorganizeRepositoryImpl {
       return createSuccessResponse({
         success: true,
         message: t(
-          "app.api.v1.core.system.translations.restoreBackup.post.messages.restoreSuccessful" as TranslationKey,
+          "app.api.v1.core.system.translations.restoreBackup.post.messages.restoreSuccessful",
         ),
         backupInfo: {
           backupPath: request.backupPath,
@@ -647,7 +647,7 @@ export class TranslationReorganizeRepositoryImpl {
       });
 
       return createErrorResponse(
-        "error.errorTypes.internal_error" as TranslationKey,
+        "error.errorTypes.internal_error",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -1507,7 +1507,7 @@ export class TranslationReorganizeRepositoryImpl {
     } catch (error) {
       logger.error("Error getting translation stats", { error });
       return createErrorResponse(
-        "error.errorTypes.internal_error" as TranslationKey,
+        "error.errorTypes.internal_error",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }

@@ -107,7 +107,7 @@ export function LeadsTable({
       default:
         return {
           variant: "secondary" as const,
-          label: "leads.admin.status.unknown",
+          label: "app.admin.leads.leads.admin.status.unknown",
         };
     }
   };
@@ -116,7 +116,7 @@ export function LeadsTable({
   const formatDate = useCallback(
     (date: Date | string | number | null): string => {
       if (!date) {
-        return t("leads.admin.formatting.fallbacks.never");
+        return t("app.admin.leads.leads.admin.formatting.fallbacks.never");
       }
       const dateObj =
         typeof date === "string" || typeof date === "number"
@@ -133,7 +133,7 @@ export function LeadsTable({
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100 mx-auto" />
           <p className="mt-2 text-gray-600 dark:text-gray-400">
-            {t("common.loading")}
+            {t("app.common.loading")}
           </p>
         </div>
       </div>
@@ -144,11 +144,11 @@ export function LeadsTable({
     return (
       <div className="text-center py-8">
         <p className="text-gray-500 dark:text-gray-400">
-          {t("leads.list.noResults")}
+          {t("app.admin.leads.leads.list.noResults")}
         </p>
         {onRefresh && (
           <Button onClick={onRefresh} variant="outline" className="mt-4">
-            {t("common.refresh")}
+            {t("app.common.refresh")}
           </Button>
         )}
       </div>
@@ -159,7 +159,7 @@ export function LeadsTable({
     <>
       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-sm text-blue-700">
-          {t("leads.admin.table.scroll_hint")}
+          {t("app.admin.leads.leads.admin.table.scroll_hint")}
         </p>
       </div>
       <div className="overflow-x-auto border rounded-lg">
@@ -167,58 +167,58 @@ export function LeadsTable({
           <TableHeader>
             <TableRow>
               <TableHead className="min-w-[200px]">
-                {t("leads.admin.table.business")}
+                {t("app.admin.leads.leads.admin.table.business")}
               </TableHead>
               <TableHead className="min-w-[200px]">
-                {t("leads.admin.table.email")}
+                {t("app.admin.leads.leads.admin.table.email")}
               </TableHead>
               <TableHead className="min-w-[120px]">
-                {t("leads.admin.table.status")}
+                {t("app.admin.leads.leads.admin.table.status")}
               </TableHead>
               <TableHead className="min-w-[150px]">
-                {t("leads.admin.table.campaign_stage")}
+                {t("app.admin.leads.leads.admin.table.campaign_stage")}
               </TableHead>
               <TableHead className="min-w-[80px]">
-                {t("leads.admin.table.country")}
+                {t("app.admin.leads.leads.admin.table.country")}
               </TableHead>
               <TableHead className="min-w-[80px]">
-                {t("leads.admin.table.language")}
+                {t("app.admin.leads.leads.admin.table.language")}
               </TableHead>
               <TableHead className="min-w-[100px]">
-                {t("leads.admin.table.source")}
+                {t("app.admin.leads.leads.admin.table.source")}
               </TableHead>
               <TableHead className="min-w-[120px]">
-                {t("leads.admin.table.phone")}
+                {t("app.admin.leads.leads.admin.table.phone")}
               </TableHead>
               <TableHead className="min-w-[100px]">
-                {t("leads.admin.table.website")}
+                {t("app.admin.leads.leads.admin.table.website")}
               </TableHead>
               <TableHead className="min-w-[80px] text-center">
-                {t("leads.admin.table.emails_sent")}
+                {t("app.admin.leads.leads.admin.table.emails_sent")}
               </TableHead>
               <TableHead className="min-w-[80px] text-center">
-                {t("leads.admin.table.emails_opened")}
+                {t("app.admin.leads.leads.admin.table.emails_opened")}
               </TableHead>
               <TableHead className="min-w-[80px] text-center">
-                {t("leads.admin.table.emails_clicked")}
+                {t("app.admin.leads.leads.admin.table.emails_clicked")}
               </TableHead>
               <TableHead className="min-w-[140px]">
-                {t("leads.admin.table.last_engagement")}
+                {t("app.admin.leads.leads.admin.table.last_engagement")}
               </TableHead>
               <TableHead className="min-w-[140px]">
-                {t("leads.admin.table.last_email_sent")}
+                {t("app.admin.leads.leads.admin.table.last_email_sent")}
               </TableHead>
               <TableHead className="min-w-[100px]">
-                {t("leads.admin.table.created")}
+                {t("app.admin.leads.leads.admin.table.created")}
               </TableHead>
               <TableHead className="min-w-[100px]">
-                {t("leads.admin.table.updated")}
+                {t("app.admin.leads.leads.admin.table.updated")}
               </TableHead>
               <TableHead className="min-w-[200px]">
-                {t("leads.admin.table.notes")}
+                {t("app.admin.leads.leads.admin.table.notes")}
               </TableHead>
               <TableHead className="text-right min-w-[100px]">
-                {t("leads.admin.table.actions")}
+                {t("app.admin.leads.leads.admin.table.actions")}
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -248,7 +248,7 @@ export function LeadsTable({
                       </Badge>
                     ) : (
                       <span className="text-gray-400">
-                        {t("leads.admin.formatting.fallbacks.notAvailable")}
+                        {t("app.admin.leads.leads.admin.formatting.fallbacks.notAvailable")}
                       </span>
                     )}
                   </TableCell>
@@ -269,7 +269,7 @@ export function LeadsTable({
                       </Badge>
                     ) : (
                       <span className="text-gray-400">
-                        {t("leads.admin.formatting.fallbacks.notAvailable")}
+                        {t("app.admin.leads.leads.admin.formatting.fallbacks.notAvailable")}
                       </span>
                     )}
                   </TableCell>
@@ -283,7 +283,7 @@ export function LeadsTable({
                       </a>
                     ) : (
                       <span className="text-gray-400">
-                        {t("leads.admin.formatting.fallbacks.notAvailable")}
+                        {t("app.admin.leads.leads.admin.formatting.fallbacks.notAvailable")}
                       </span>
                     )}
                   </TableCell>
@@ -296,11 +296,11 @@ export function LeadsTable({
                         className="text-blue-600 hover:underline text-sm flex items-center gap-1"
                       >
                         <ExternalLink className="h-3 w-3" />
-                        {t("leads.admin.table.website")}
+                        {t("app.admin.leads.leads.admin.table.website")}
                       </a>
                     ) : (
                       <span className="text-gray-400">
-                        {t("leads.admin.formatting.fallbacks.notAvailable")}
+                        {t("app.admin.leads.leads.admin.formatting.fallbacks.notAvailable")}
                       </span>
                     )}
                   </TableCell>
@@ -344,7 +344,7 @@ export function LeadsTable({
                       </div>
                     ) : (
                       <span className="text-gray-400">
-                        {t("leads.admin.formatting.fallbacks.never")}
+                        {t("app.admin.leads.leads.admin.formatting.fallbacks.never")}
                       </span>
                     )}
                   </TableCell>
@@ -364,7 +364,7 @@ export function LeadsTable({
                       </div>
                     ) : (
                       <span className="text-gray-400">
-                        {t("leads.admin.formatting.fallbacks.never")}
+                        {t("app.admin.leads.leads.admin.formatting.fallbacks.never")}
                       </span>
                     )}
                   </TableCell>
@@ -380,7 +380,7 @@ export function LeadsTable({
                       </div>
                     ) : (
                       <span className="text-gray-400">
-                        {t("leads.admin.formatting.fallbacks.notAvailable")}
+                        {t("app.admin.leads.leads.admin.formatting.fallbacks.notAvailable")}
                       </span>
                     )}
                   </TableCell>

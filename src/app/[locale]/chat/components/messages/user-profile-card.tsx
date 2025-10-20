@@ -11,8 +11,8 @@ import type { JSX } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { ChatMessage } from "../../lib/storage/types";
 import { formatRelativeTime } from "../../lib/utils/formatting";
+import type { ChatMessage } from "../../types";
 
 interface UserProfileCardProps {
   userId: string;
@@ -34,7 +34,7 @@ export function UserProfileCard({
   const { t } = simpleT(locale);
 
   // Get all messages from this user
-  const userMessages = messages.filter((m) => m.author?.id === userId);
+  const userMessages = messages.filter((m) => m.authorId === userId);
 
   const postCount = userMessages.length;
   const recentPosts = userMessages.slice(-5).reverse(); // Last 5 posts, newest first
@@ -76,7 +76,7 @@ export function UserProfileCard({
               className="w-full text-left p-2 rounded hover:bg-accent/50 transition-colors"
             >
               <div className="text-xs text-muted-foreground mb-1">
-                {formatRelativeTime(post.timestamp)}
+                {formatRelativeTime(post.createdAt.getTime())}
               </div>
               <div className="text-sm text-foreground/90 line-clamp-2">
                 {post.content.substring(0, 100)}

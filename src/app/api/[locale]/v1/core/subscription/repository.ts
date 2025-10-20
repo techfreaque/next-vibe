@@ -61,7 +61,7 @@ const getCountryFromLocale = (
  * Helper function to get Stripe price ID for a plan, billing interval, and region
  */
 const getStripePriceId = (
-  planId: Exclude<SubscriptionPlanValue, typeof SubscriptionPlan.ENTERPRISE>,
+  planId: SubscriptionPlanValue,
   billingInterval: BillingIntervalValue,
   country: keyof typeof STRIPE_PRICE_IDS,
 ): string | undefined => {
@@ -70,8 +70,8 @@ const getStripePriceId = (
   // Type-safe access to nested record structure
   if (billingInterval === BillingInterval.MONTHLY) {
     const monthlyPrices = regionPrices[BillingInterval.MONTHLY];
-    if (planId === SubscriptionPlan.STARTER) {
-      return monthlyPrices[SubscriptionPlan.STARTER];
+    if (planId === SubscriptionPlan.SUBSCRIPTION) {
+      return monthlyPrices[SubscriptionPlan.SUBSCRIPTION];
     }
     if (planId === SubscriptionPlan.PROFESSIONAL) {
       return monthlyPrices[SubscriptionPlan.PROFESSIONAL];
@@ -81,8 +81,8 @@ const getStripePriceId = (
     }
   } else if (billingInterval === BillingInterval.YEARLY) {
     const yearlyPrices = regionPrices[BillingInterval.YEARLY];
-    if (planId === SubscriptionPlan.STARTER) {
-      return yearlyPrices[SubscriptionPlan.STARTER];
+    if (planId === SubscriptionPlan.SUBSCRIPTION) {
+      return yearlyPrices[SubscriptionPlan.SUBSCRIPTION];
     }
     if (planId === SubscriptionPlan.PROFESSIONAL) {
       return yearlyPrices[SubscriptionPlan.PROFESSIONAL];
@@ -127,7 +127,7 @@ const ensureStripeCustomer = async (
     // Create new Stripe customer
     const customer = await stripe.customers.create({
       email: user[0].email,
-      name: `${user[0].firstName} ${user[0].lastName}`,
+      name: user[0].publicName,
       metadata: {
         userId: userId,
       },
@@ -163,8 +163,6 @@ const syncStripeSubscription = async (
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<ResponseType<SubscriptionPostResponseOutput>> => {
-  const { t } = simpleT(locale);
-
   try {
     // Extract plan from metadata with proper type checking
     const planFromMetadata = extractPlanFromMetadata(
@@ -172,12 +170,9 @@ const syncStripeSubscription = async (
     );
     const validatedPlanId =
       planFromMetadata &&
-      (planFromMetadata === SubscriptionPlan.STARTER ||
-        planFromMetadata === SubscriptionPlan.PROFESSIONAL ||
-        planFromMetadata === SubscriptionPlan.PREMIUM ||
-        planFromMetadata === SubscriptionPlan.ENTERPRISE)
+      (planFromMetadata === SubscriptionPlan.SUBSCRIPTION)
         ? planFromMetadata
-        : SubscriptionPlan.STARTER;
+        : SubscriptionPlan.SUBSCRIPTION;
 
     // Ensure stripeCustomerId is a string
     const customerId =
@@ -251,12 +246,16 @@ const syncStripeSubscription = async (
       plan: subscription.planId,
       billingInterval: subscription.billingInterval,
       status: subscription.status,
-      currentPeriodStart: subscription.currentPeriodStart.toISOString(),
-      currentPeriodEnd: subscription.currentPeriodEnd.toISOString(),
+      currentPeriodStart:
+        subscription.currentPeriodStart?.toISOString() ||
+        new Date().toISOString(),
+      currentPeriodEnd:
+        subscription.currentPeriodEnd?.toISOString() ||
+        new Date().toISOString(),
       cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
       createdAt: subscription.createdAt.toISOString(),
       updatedAt: subscription.updatedAt.toISOString(),
-      message: t("app.api.v1.core.subscription.sync.success"),
+      message: "app.api.v1.core.subscription.sync.success",
     });
   } catch (error) {
     logger.error("Failed to sync Stripe subscription", {
@@ -399,8 +398,12 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         plan: subscription.planId,
         billingInterval: subscription.billingInterval,
         status: subscription.status,
-        currentPeriodStart: subscription.currentPeriodStart.toISOString(),
-        currentPeriodEnd: subscription.currentPeriodEnd.toISOString(),
+        currentPeriodStart:
+          subscription.currentPeriodStart?.toISOString() ||
+          new Date().toISOString(),
+        currentPeriodEnd:
+          subscription.currentPeriodEnd?.toISOString() ||
+          new Date().toISOString(),
         cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
         createdAt: subscription.createdAt.toISOString(),
         updatedAt: subscription.updatedAt.toISOString(),
@@ -512,10 +515,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       ) {
         const country = getCountryFromLocale(locale);
         const newPriceId = getStripePriceId(
-          (data.plan || subscription.planId) as Exclude<
-            SubscriptionPlan,
-            SubscriptionPlan.ENTERPRISE
-          >,
+          (data.plan || subscription.planId),
           data.billingInterval || subscription.billingInterval,
           country,
         );
@@ -567,8 +567,6 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       }
 
       // Fallback to local update if no Stripe subscription
-      const { t } = simpleT(locale);
-
       const updateData: Partial<NewSubscription> = {
         updatedAt: new Date(),
       };
@@ -601,12 +599,15 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         responseBillingInterval: updatedSubscription.billingInterval,
         status: updatedSubscription.status,
         currentPeriodStart:
-          updatedSubscription.currentPeriodStart.toISOString(),
-        currentPeriodEnd: updatedSubscription.currentPeriodEnd.toISOString(),
+          updatedSubscription.currentPeriodStart?.toISOString() ||
+          new Date().toISOString(),
+        currentPeriodEnd:
+          updatedSubscription.currentPeriodEnd?.toISOString() ||
+          new Date().toISOString(),
         responseCancelAtPeriodEnd: updatedSubscription.cancelAtPeriodEnd,
         createdAt: updatedSubscription.createdAt.toISOString(),
         updatedAt: updatedSubscription.updatedAt.toISOString(),
-        message: t("app.api.v1.core.subscription.update.success"),
+        message: "app.api.v1.core.subscription.update.success",
       };
 
       return createSuccessResponse(subscriptionData);
@@ -798,7 +799,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       // Create new Stripe customer
       const customer = await stripe.customers.create({
         email: user[0].email,
-        name: `${user[0].firstName} ${user[0].lastName}`,
+        name: user[0].publicName,
         metadata: {
           userId: userId,
         },

@@ -11,6 +11,11 @@ export const translations = {
     initialized: "Lead tracking component initialized",
   },
   error: "Error in lead tracking",
+  errors: {
+    default: "An error occurred",
+    missingId: "Missing tracking ID",
+    invalidUrl: "Invalid URL",
+  },
   data: {
     captured: "Lead tracking data captured",
     capture: {

@@ -162,7 +162,7 @@ export function LeadsListClient({
         <div className="flex justify-between items-center">
           <CardTitle className="flex items-center">
             <Users className="h-5 w-5 mr-2" />
-            {t("leads.list.titleWithCount", { count: totalLeads })}
+            {t("app.admin.leads.leads.list.titleWithCount", { count: totalLeads })}
           </CardTitle>
 
           <div className="flex items-center space-x-2">
@@ -209,7 +209,7 @@ export function LeadsListClient({
           <div className="flex items-center space-x-2 mb-4">
             <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              {t("leads.list.filters.title")}:
+              {t("app.admin.leads.leads.list.filters.title")}:
             </span>
           </div>
 
@@ -225,7 +225,7 @@ export function LeadsListClient({
                 config={{
                   type: "text",
                   label: undefined,
-                  placeholder: "leads.search.placeholder",
+                  placeholder: "app.admin.leads.leads.search.placeholder",
                 }}
                 control={leadsEndpoint.read.form.control}
                 theme={{
@@ -608,10 +608,10 @@ export function LeadsListClient({
             {queryLoading ? (
               <div className="flex items-center justify-center">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 dark:border-gray-100 mr-2" />
-                {t("leads.list.loading")}
+                {t("app.admin.leads.leads.list.loading")}
               </div>
             ) : (
-              t("leads.list.noResults")
+              t("app.admin.leads.leads.list.noResults")
             )}
           </div>
         ) : viewMode === "table" ? (

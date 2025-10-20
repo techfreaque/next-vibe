@@ -38,7 +38,8 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Verboten",
-        description: "Sie haben keine Berechtigung, auf diese Aufgabe zuzugreifen",
+        description:
+          "Sie haben keine Berechtigung, auf diese Aufgabe zuzugreifen",
       },
       network: {
         title: "Netzwerkfehler",
@@ -139,19 +140,23 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description: "Sie sind nicht berechtigt, diese Aufgabe zu aktualisieren",
+        description:
+          "Sie sind nicht berechtigt, diese Aufgabe zu aktualisieren",
       },
       notFound: {
         title: "Aufgabe nicht gefunden",
-        description: "Die zu aktualisierende Aufgabe konnte nicht gefunden werden",
+        description:
+          "Die zu aktualisierende Aufgabe konnte nicht gefunden werden",
       },
       internal: {
         title: "Interner Serverfehler",
-        description: "Beim Aktualisieren der Aufgabe ist ein Fehler aufgetreten",
+        description:
+          "Beim Aktualisieren der Aufgabe ist ein Fehler aufgetreten",
       },
       forbidden: {
         title: "Verboten",
-        description: "Sie haben keine Berechtigung, diese Aufgabe zu aktualisieren",
+        description:
+          "Sie haben keine Berechtigung, diese Aufgabe zu aktualisieren",
       },
       network: {
         title: "Netzwerkfehler",
@@ -167,7 +172,8 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Konflikt",
-        description: "Beim Aktualisieren der Aufgabe ist ein Konflikt aufgetreten",
+        description:
+          "Beim Aktualisieren der Aufgabe ist ein Konflikt aufgetreten",
       },
     },
     success: {
@@ -233,7 +239,8 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Konflikt",
-        description: "Aufgabe kann aufgrund eines Konflikts nicht gelöscht werden",
+        description:
+          "Aufgabe kann aufgrund eines Konflikts nicht gelöscht werden",
       },
     },
     success: {
@@ -244,4 +251,3 @@ export const translations: typeof enTranslations = {
     },
   },
 };
-

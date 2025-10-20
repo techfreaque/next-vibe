@@ -27,7 +27,7 @@ export default async function AdminCampaignStarterPage({
       {/* Page Description */}
       <div>
         <p className="text-gray-600 dark:text-gray-400">
-          {t("leads.admin.campaignStarter.description")}
+          {t("app.admin.leads.leads.admin.campaignStarter.description")}
         </p>
       </div>
 

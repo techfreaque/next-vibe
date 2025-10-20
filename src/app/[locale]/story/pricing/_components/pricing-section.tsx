@@ -57,12 +57,12 @@ export default function PricingSection({
   currentUser: CompleteUserType | undefined;
   currentSubscription: SubscriptionGetResponseOutput | null;
   onPlanSelect?: (
-    planId: Exclude<SubscriptionPlanValue, typeof SubscriptionPlan.ENTERPRISE>,
+    planId: SubscriptionPlanValue,
     billingInterval: BillingIntervalValue,
     action: "upgrade" | "downgrade",
   ) => void;
   onDowngrade?: (
-    planId: Exclude<SubscriptionPlanValue, typeof SubscriptionPlan.ENTERPRISE>,
+    planId: SubscriptionPlanValue,
     billingInterval: BillingIntervalValue,
   ) => void;
   isProcessing: boolean | null;
@@ -87,10 +87,7 @@ export default function PricingSection({
 
   // Plan hierarchy for upgrade/downgrade logic
   const planHierarchy = {
-    [SubscriptionPlan.STARTER]: 0,
-    [SubscriptionPlan.PROFESSIONAL]: 1,
-    [SubscriptionPlan.PREMIUM]: 2,
-    [SubscriptionPlan.ENTERPRISE]: 3,
+    [SubscriptionPlan.SUBSCRIPTION]: 0,
   };
 
   const getButtonAction = (
@@ -166,13 +163,11 @@ export default function PricingSection({
     if (onPlanSelect) {
       if (
         action === "downgrade" &&
-        onDowngrade &&
-        planId !== SubscriptionPlan.ENTERPRISE
+        onDowngrade 
       ) {
         onDowngrade(planId, billingInterval);
       } else if (
-        action === "upgrade" &&
-        planId !== SubscriptionPlan.ENTERPRISE
+        action === "upgrade" 
       ) {
         onPlanSelect(planId, billingInterval, action);
       }
@@ -181,15 +176,6 @@ export default function PricingSection({
 
     // Handle different modes for direct interaction
     if (action === "current") {
-      return;
-    }
-
-    // Enterprise plan always goes to consultation
-    if (planId === SubscriptionPlan.ENTERPRISE) {
-      const consultationUrl = useHomePageLink
-        ? `/${locale}/user/signup?plan=${planId}`
-        : `/${locale}/app/consultation`;
-      window.location.href = consultationUrl;
       return;
     }
 
@@ -224,19 +210,6 @@ export default function PricingSection({
         return;
       }
 
-      // Handle upgrade or new subscription
-      // ENTERPRISE plans are handled differently (contact sales)
-      if ((planId as string) === SubscriptionPlan.ENTERPRISE) {
-        toast({
-          title: t("app.common.info.title"),
-          description: t("app.story.pricing.plans.ENTERPRISE.cta"),
-        });
-        return;
-      }
-
-      // TypeScript knows planId is not ENTERPRISE here due to the check above
-      // Since we've already checked that planId !== SubscriptionPlan.ENTERPRISE,
-      // we can safely cast it to the expected type
       const result = await createCheckout(planId, billingInterval);
 
       // Check if the result is successful
@@ -420,16 +393,6 @@ export default function PricingSection({
                     {t(plan.badge)}
                   </div>
                 )}
-                {plan.id === SubscriptionPlan.PREMIUM && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-purple-600 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
-                    {t("app.story.pricing.plans.PREMIUM.featureBadge")}
-                  </div>
-                )}
-                {plan.isEnterprise && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gray-700 bg-gradient-to-r from-gray-600 to-gray-800 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
-                    {t("app.story.pricing.plans.ENTERPRISE.featureBadge")}
-                  </div>
-                )}
                 {isCurrent && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-600 bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
                     {t("app.story.pricing.currentPlan.badge")}
@@ -535,25 +498,7 @@ export default function PricingSection({
                         const isCurrent = action === "current";
                         const isLoading = shouldShowLoading(plan.id);
 
-                        return plan.isEnterprise ? (
-                          <Button
-                            className="w-full bg-gray-700 bg-gradient-to-r from-gray-600 to-gray-800 hover:bg-gray-800 hover:from-gray-700 hover:to-gray-900 text-white"
-                            size="lg"
-                            onClick={() => handlePlanSelect(plan.id)}
-                            disabled={isLoading}
-                          >
-                            {isLoading ? (
-                              <div className="flex items-center">
-                                <Loader className="mr-2 h-4 w-4 animate-spin" />
-                                {t(
-                                  "app.story.pricing.creditPricing.buttons.processing",
-                                )}
-                              </div>
-                            ) : (
-                              t("app.story.pricing.plans.ENTERPRISE.cta")
-                            )}
-                          </Button>
-                        ) : (
+                        return  (
                           <Button
                             className={`w-full ${
                               isCurrent
@@ -584,13 +529,11 @@ export default function PricingSection({
 
                               if (
                                 action === "downgrade" &&
-                                onDowngrade &&
-                                plan.id !== SubscriptionPlan.ENTERPRISE
+                                onDowngrade
                               ) {
                                 onDowngrade(plan.id, billingInterval);
                               } else if (
-                                action === "upgrade" &&
-                                plan.id !== SubscriptionPlan.ENTERPRISE
+                                action === "upgrade" 
                               ) {
                                 onPlanSelect(plan.id, billingInterval, action);
                               }
@@ -624,25 +567,7 @@ export default function PricingSection({
                           const isCurrent = action === "current";
                           const isLoading = shouldShowLoading(plan.id);
 
-                          return plan.isEnterprise ? (
-                            <Button
-                              className="w-full bg-gray-700 bg-gradient-to-r from-gray-600 to-gray-800 hover:bg-gray-800 hover:from-gray-700 hover:to-gray-900 text-white"
-                              size="lg"
-                              onClick={() => handlePlanSelect(plan.id)}
-                              disabled={isLoading}
-                            >
-                              {isLoading ? (
-                                <div className="flex items-center">
-                                  <Loader className="mr-2 h-4 w-4 animate-spin" />
-                                  {t(
-                                    "app.story.pricing.creditPricing.buttons.processing",
-                                  )}
-                                </div>
-                              ) : (
-                                t("app.story.pricing.plans.ENTERPRISE.cta")
-                              )}
-                            </Button>
-                          ) : (
+                          return (
                             <Button
                               className={`w-full ${
                                 isCurrent
@@ -799,15 +724,7 @@ export default function PricingSection({
 
 function getPlanCta(planId: SubscriptionPlanValue, t: TFunction): string {
   switch (planId) {
-    case SubscriptionPlan.STARTER:
-      return t("app.story.pricing.plans.STARTER.cta");
-    case SubscriptionPlan.PROFESSIONAL:
-      return t("app.story.pricing.plans.PROFESSIONAL.cta");
-    case SubscriptionPlan.PREMIUM:
-      return t("app.story.pricing.plans.PREMIUM.cta");
-    case SubscriptionPlan.ENTERPRISE:
-      return t("app.story.pricing.plans.ENTERPRISE.cta");
-    default:
-      return t("app.story.pricing.plans.STARTER.cta");
+    case SubscriptionPlan.SUBSCRIPTION:
+      return t("app.story.pricing.plans.SUBSCRIPTION.cta");
   }
 }

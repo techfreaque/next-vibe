@@ -12,9 +12,12 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX, ReactNode } from "react";
 import React, { useMemo, useState } from "react";
 
+import {
+  getIconComponent,
+  type IconValue,
+} from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import type { TranslationKey } from "@/i18n/core/static-types";
 import {
   Button,
   Input,
@@ -24,7 +27,6 @@ import {
 } from "@/packages/next-vibe-ui/web/ui";
 
 import { useTouchDevice } from "../../hooks/use-touch-device";
-import { getIconComponent, type IconValue } from "../../lib/config/icons";
 
 export interface SelectorOption<T = string> {
   id: T;
@@ -176,8 +178,8 @@ export function SelectorBase<T extends string = string>({
       optionsToGroup.forEach((option) => {
         if (option.utilities && option.utilities.length > 0) {
           option.utilities.forEach((utilityKey) => {
-            // Convert utility key to translated name
-            const utilityName = t(`app.chat.modelUtilities.${utilityKey}`);
+            // Use utility key directly as name (no translation)
+            const utilityName = utilityKey;
             if (!grouped[utilityName]) {
               grouped[utilityName] = {
                 options: [],

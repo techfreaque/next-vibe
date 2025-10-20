@@ -2,15 +2,49 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
-    form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
+    title: "Alle generieren",
+    description: "Alle Code-Generatoren ausführen",
+    container: {
+      title: "Konfiguration für Alle generieren",
+      description: "Generierungsparameter konfigurieren",
     },
-    response: {
-      title: "Antwort",
-      description: "Antwortdaten",
+    fields: {
+      rootDir: {
+        label: "Stammverzeichnis",
+        description: "Stammverzeichnis für die Generierung",
+      },
+      outputDir: {
+        label: "Ausgabeverzeichnis",
+        description: "Ausgabeverzeichnis für generierte Dateien",
+      },
+      verbose: {
+        label: "Ausführliche Ausgabe",
+        description: "Ausführliche Protokollierung aktivieren",
+      },
+      skipEndpoints: {
+        label: "Endpunkte überspringen",
+        description: "Endpunktgenerierung überspringen",
+      },
+      skipSeeds: {
+        label: "Seeds überspringen",
+        description: "Seed-Generierung überspringen",
+      },
+      skipTaskIndex: {
+        label: "Task-Index überspringen",
+        description: "Task-Index-Generierung überspringen",
+      },
+      success: {
+        title: "Erfolg",
+      },
+      generationCompleted: {
+        title: "Generierung abgeschlossen",
+      },
+      output: {
+        title: "Ausgabe",
+      },
+      generationStats: {
+        title: "Generierungsstatistiken",
+      },
     },
     errors: {
       unauthorized: {
@@ -44,6 +78,10 @@ export const translations: typeof enTranslations = {
       conflict: {
         title: "Konflikt",
         description: "Datenkonflikt aufgetreten",
+      },
+      internal: {
+        title: "Interner Fehler",
+        description: "Interner Serverfehler aufgetreten",
       },
     },
     success: {

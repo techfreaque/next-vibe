@@ -12,6 +12,11 @@ export const translations: typeof enTranslations = {
     initialized: "Komponent śledzenia leadu zainicjowany",
   },
   error: "Błąd w śledzeniu leadu",
+  errors: {
+    default: "Wystąpił błąd",
+    missingId: "Brak identyfikatora śledzenia",
+    invalidUrl: "Nieprawidłowy URL",
+  },
   data: {
     captured: "Dane śledzenia leadu przechwycone",
     capture: {

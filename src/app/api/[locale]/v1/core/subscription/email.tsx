@@ -43,16 +43,9 @@ function getPlanName(
   t: TFunction,
 ): string {
   switch (planId) {
-    case SubscriptionPlan.STARTER:
+    case SubscriptionPlan.SUBSCRIPTION:
       return t("app.api.v1.core.subscription.plans.starter.title");
-    case SubscriptionPlan.PROFESSIONAL:
-      return t("app.api.v1.core.subscription.plans.professional.title");
-    case SubscriptionPlan.PREMIUM:
-      return t("app.api.v1.core.subscription.plans.premium.title");
-    case SubscriptionPlan.ENTERPRISE:
-      return t("app.api.v1.core.subscription.plans.enterprise.title");
-    default:
-      return t("app.api.v1.core.subscription.plans.starter.title");
+ 
   }
 }
 

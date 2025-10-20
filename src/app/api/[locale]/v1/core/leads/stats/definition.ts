@@ -306,7 +306,7 @@ const LanguageFilterOptions = [
  * Leads Stats Endpoint Definition
  * Using new field-based API
  */
-const { GET } = createEndpoint({
+const endpoint = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "leads", "stats"],
   title: "app.api.v1.core.leads.stats.title",
@@ -1298,11 +1298,13 @@ const { GET } = createEndpoint({
   },
 });
 
+const GET = endpoint.GET;
+
 // Type exports using the new pattern
-export type LeadsStatsRequestInput = typeof GET.types.RequestInput;
-export type LeadsStatsRequestOutput = typeof GET.types.RequestOutput;
-export type LeadsStatsResponseInput = typeof GET.types.ResponseInput;
-export type LeadsStatsResponseOutput = typeof GET.types.ResponseOutput;
+export type LeadsStatsRequestInput = z.input<typeof GET.requestSchema>;
+export type LeadsStatsRequestOutput = z.output<typeof GET.requestSchema>;
+export type LeadsStatsResponseInput = z.input<typeof GET.responseSchema>;
+export type LeadsStatsResponseOutput = z.output<typeof GET.responseSchema>;
 
 // Legacy type exports for backward compatibility
 export type LeadsStatsRequestType = LeadsStatsRequestOutput;

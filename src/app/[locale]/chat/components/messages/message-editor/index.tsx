@@ -7,12 +7,11 @@ import React from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { getLocaleString } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
 import { Button, Textarea } from "@/packages/next-vibe-ui/web/ui";
 
-import type { ModelId } from "../../../lib/config/models";
-import type { ChatMessage } from "../../../lib/storage/types";
-import { localeToSpeechLang } from "../../../lib/utils/speech-utils";
+import type { ChatMessage, ModelId } from "../../../types";
 import { ModelSelector } from "../../input/model-selector";
 import { PersonaSelector } from "../../input/persona-selector";
 import { SpeechInputButton } from "../../input/speech-input-button";
@@ -43,7 +42,7 @@ export function MessageEditor({
   locale,
   logger,
 }: MessageEditorProps): JSX.Element {
-  const speechLang = localeToSpeechLang(locale);
+  const speechLang = getLocaleString(locale);
   const { t } = simpleT(locale);
 
   // Use custom hook for editor logic

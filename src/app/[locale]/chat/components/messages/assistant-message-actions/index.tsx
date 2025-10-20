@@ -4,13 +4,12 @@ import { Bot, Loader2, Square, Trash2, Volume2 } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import type React from "react";
 
+import { useTTSAudio } from "@/app/api/[locale]/v1/core/agent/text-to-speech/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { useTouchDevice } from "../../../hooks/use-touch-device";
-import { useTTSAudio } from "../../../hooks/use-tts-audio";
-import { chatTransitions } from "../../../lib/design-tokens";
 import { CopyButton } from "../copy-button";
 import { MessageActionButton } from "../message-action-button";
 
@@ -49,7 +48,7 @@ export function AssistantMessageActions({
     <div
       className={cn(
         "flex items-center gap-1",
-        chatTransitions.fast,
+        "transition-opacity duration-150",
         // Touch devices: always visible but slightly transparent
         // Pointer devices: hidden until hover
         isTouch
@@ -63,7 +62,13 @@ export function AssistantMessageActions({
       {/* TTS Play/Stop Button */}
       <MessageActionButton
         icon={isLoading ? Loader2 : isPlaying ? Square : Volume2}
-        onClick={isPlaying ? stopAudio : (): void => void playAudio()}
+        onClick={
+          isPlaying
+            ? stopAudio
+            : (): void => {
+                void playAudio();
+              }
+        }
         title={
           isPlaying
             ? t("app.chat.common.assistantMessageActions.stopAudio")

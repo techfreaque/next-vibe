@@ -48,6 +48,8 @@ export interface ChatMessage {
   errorMessage: string | null;
   edited: boolean;
   tokens: number | null;
+  upvotes: number | null;
+  downvotes: number | null;
   createdAt: Date;
   updatedAt: Date;
 }

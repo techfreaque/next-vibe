@@ -128,28 +128,24 @@ export default function PricingComparison({
                   <div className="text-center">
                     <div className="font-bold text-lg">{t(plan.name)}</div>
                     <div className="text-2xl font-bold mt-2 mb-1">
-                      {plan.id === SubscriptionPlan.ENTERPRISE
-                        ? t(plan.pricing)
-                        : t(plan.pricing, {
-                            price: getPlanPriceForCountry(
-                              plan,
-                              currentCountry.code,
-                              annual,
-                            ),
-                            currency: currentCountry.symbol,
-                          })}
-                      {plan.isEnterprise ? null : (
+                      {t(plan.pricing, {
+                        price: getPlanPriceForCountry(
+                          plan,
+                          currentCountry.code,
+                          annual,
+                        ),
+                        currency: currentCountry.symbol,
+                      })}
+                      {
                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
                           {t("app.story.pricing.plans.perMonth")}
                         </span>
-                      )}
+                      }
                     </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                      {plan.id === SubscriptionPlan.ENTERPRISE
+                      {annual
                         ? t("app.story.pricing.comparison.annually")
-                        : annual
-                          ? t("app.story.pricing.comparison.annually")
-                          : t("app.story.pricing.comparison.monthly")}
+                        : t("app.story.pricing.comparison.monthly")}
                     </div>
                     <Link
                       href={{
@@ -158,13 +154,7 @@ export default function PricingComparison({
                       }}
                     >
                       <Button
-                        variant={
-                          plan.highlighted ||
-                          plan.id === SubscriptionPlan.PREMIUM ||
-                          plan.isEnterprise
-                            ? "default"
-                            : "outline"
-                        }
+                        variant={plan.highlighted}
                         className={`w-full ${
                           plan.highlighted
                             ? "bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 text-white"
@@ -178,19 +168,7 @@ export default function PricingComparison({
                       >
                         {((): string => {
                           switch (plan.id) {
-                            case SubscriptionPlan.STARTER:
-                              return t("app.story.pricing.plans.STARTER.cta");
-                            case SubscriptionPlan.PROFESSIONAL:
-                              return t(
-                                "app.story.pricing.plans.PROFESSIONAL.cta",
-                              );
-                            case SubscriptionPlan.PREMIUM:
-                              return t("app.story.pricing.plans.PREMIUM.cta");
-                            case SubscriptionPlan.ENTERPRISE:
-                              return t(
-                                "app.story.pricing.plans.ENTERPRISE.cta",
-                              );
-                            default:
+                            case SubscriptionPlan.SUBSCRIPTION:
                               return t("app.story.pricing.plans.STARTER.cta");
                           }
                         })()}

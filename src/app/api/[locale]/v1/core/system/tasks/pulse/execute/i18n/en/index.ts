@@ -42,6 +42,15 @@ export const translations = {
       totalExecutionTimeMs: "Total Execution Time (ms)",
       errors: "Errors",
       summary: "Execution Summary",
+      results: "Results",
+      resultsDescription: "Task execution results",
+      taskName: "Task Name",
+      success: "Success",
+      duration: "Duration",
+      message: "Message",
+      executionFailed: "Execution failed",
+      dryRunSuccess: "Dry run completed successfully",
+      executionSuccess: "Execution completed successfully",
     },
     examples: {
       basic: {

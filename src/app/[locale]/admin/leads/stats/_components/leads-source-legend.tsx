@@ -12,12 +12,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Switch } from "next-vibe-ui/ui/switch";
 import type { JSX } from "react";
 
-import type { LeadSourceValues } from "@/app/api/[locale]/v1/core/leads/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 interface SourceLegendItem {
-  source: typeof LeadSourceValues;
+  source: TranslationKey;
   name: string;
   color: string;
   visible: boolean;
@@ -28,7 +28,7 @@ interface SourceLegendItem {
 interface LeadsSourceLegendProps {
   locale: CountryLanguage;
   sources: SourceLegendItem[];
-  onToggleSource: (source: typeof LeadSourceValues) => void;
+  onToggleSource: (source: TranslationKey) => void;
   onToggleAll: () => void;
   onShowAll: () => void;
   onHideAll: () => void;
@@ -54,11 +54,12 @@ export function LeadsSourceLegend({
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold">
-            {title || t("leads.admin.stats.sources.legend.title")}
+            {title ||
+              t("app.admin.leads.leads.admin.stats.sources.legend.title")}
           </CardTitle>
           <Badge variant="outline">
             {visibleCount}/{totalCount}{" "}
-            {t("leads.admin.stats.sources.legend.visible")}
+            {t("app.admin.leads.leads.admin.stats.sources.legend.visible")}
           </Badge>
         </div>
       </CardHeader>
@@ -73,7 +74,7 @@ export function LeadsSourceLegend({
               className="flex items-center gap-2"
             >
               <Eye className="h-4 w-4" />
-              {t("leads.admin.stats.legend.showAll")}
+              {t("app.admin.leads.leads.admin.stats.legend.showAll")}
             </Button>
             <Button
               variant="outline"
@@ -82,7 +83,7 @@ export function LeadsSourceLegend({
               className="flex items-center gap-2"
             >
               <EyeOff className="h-4 w-4" />
-              {t("leads.admin.stats.legend.hideAll")}
+              {t("app.admin.leads.leads.admin.stats.legend.hideAll")}
             </Button>
           </div>
           <Button
@@ -94,12 +95,12 @@ export function LeadsSourceLegend({
             {visibleCount === totalCount ? (
               <>
                 <EyeOff className="h-4 w-4" />
-                {t("leads.admin.stats.legend.hideAll")}
+                {t("app.admin.leads.leads.admin.stats.legend.hideAll")}
               </>
             ) : (
               <>
                 <Eye className="h-4 w-4" />
-                {t("leads.admin.stats.legend.showAll")}
+                {t("app.admin.leads.leads.admin.stats.legend.showAll")}
               </>
             )}
           </Button>
@@ -130,10 +131,13 @@ export function LeadsSourceLegend({
                     {t(source.source)}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {t("leads.admin.stats.sources.legend.leads", {
-                      count: source.count,
-                      percentage: source.percentage.toFixed(1),
-                    })}
+                    {t(
+                      "app.admin.leads.leads.admin.stats.sources.legend.leads",
+                      {
+                        count: source.count,
+                        percentage: source.percentage.toFixed(1),
+                      },
+                    )}
                   </div>
                 </div>
               </div>
@@ -156,7 +160,7 @@ export function LeadsSourceLegend({
         {/* Summary */}
         <div className="pt-2 border-t">
           <div className="text-sm text-muted-foreground">
-            {t("leads.admin.stats.sources.legend.summary", {
+            {t("app.admin.leads.leads.admin.stats.sources.legend.summary", {
               visible: visibleCount,
               total: totalCount,
               percentage:

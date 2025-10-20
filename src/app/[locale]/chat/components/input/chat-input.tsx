@@ -5,14 +5,14 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { forwardRef } from "react";
 
+import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { getLocaleString } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
 import { Button, Textarea } from "@/packages/next-vibe-ui/web/ui";
 
-import type { ModelId } from "../../lib/config/models";
-import { getModelById } from "../../lib/config/models";
-import { localeToSpeechLang } from "../../lib/utils/speech-utils";
+import type { ModelId } from "../../types";
 import { ModelSelector } from "./model-selector";
 import { PersonaSelector } from "./persona-selector";
 import { SearchToggle } from "./search-toggle";
@@ -58,7 +58,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
     ref,
   ): JSX.Element => {
     const { t } = simpleT(locale);
-    const speechLang = localeToSpeechLang(locale);
+    const speechLang = getLocaleString(locale);
 
     // Check if current model supports tools (for search toggle visibility)
     const currentModel = getModelById(selectedModel);

@@ -4,29 +4,53 @@ import { useRouter } from "next/navigation";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 
+import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { useTranslation } from "@/i18n/core/client";
 
 import { useChatContext } from "../features/chat/context";
 import { useTheme } from "../hooks/use-theme";
-import { DEFAULT_FOLDER_IDS } from "../lib/config/constants";
-import type { ModelId } from "../lib/config/models";
-import { isSubmitKeyPress, isValidInput } from "../lib/utils/keyboard";
-import {
-  buildNewThreadUrl,
-  buildThreadUrl,
-  getRootFolderId,
-  isNewThread,
-} from "../lib/utils/navigation";
-import {
-  generateScreenshotFilename,
-  getScreenshotErrorKey,
-} from "../lib/utils/screenshot";
-import { fillInputWithPrompt } from "../lib/utils/send-prompt";
+import type { ChatThread, ModelId } from "../types";
 import { ChatArea } from "./layout/chat-area";
 import { SidebarWrapper } from "./layout/sidebar-wrapper";
 import { TopBar } from "./layout/top-bar";
 import { SearchModal } from "./search-modal";
+
+// Utility functions
+const isNewThread = (threadId: string | undefined): boolean =>
+  threadId === "new";
+const isValidInput = (input: string): boolean => input.trim().length > 0;
+const isSubmitKeyPress = (e: React.KeyboardEvent): boolean =>
+  e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey;
+
+const buildThreadUrl = (
+  locale: string,
+  threadId: string,
+  threads: Record<string, ChatThread>,
+): string => {
+  const thread = threads[threadId];
+  if (!thread) {
+    return `/${locale}/threads/${threadId}`;
+  }
+
+  const rootId = thread.rootFolderId;
+  const subId = thread.folderId;
+
+  if (subId) {
+    return `/${locale}/threads/${rootId}/${subId}/${threadId}`;
+  }
+  return `/${locale}/threads/${rootId}/${threadId}`;
+};
+
+const buildNewThreadUrl = (
+  locale: string,
+  folderId: string | null | undefined,
+): string => {
+  if (!folderId) {
+    return `/${locale}/threads/private/new`;
+  }
+  return `/${locale}/threads/${folderId}/new`;
+};
 
 interface ChatInterfaceProps {
   /** @deprecated Use urlPath instead */
@@ -42,47 +66,37 @@ export function ChatInterface({
   initialThreadId: deprecatedThreadId,
   urlPath,
 }: ChatInterfaceProps = {}): JSX.Element {
+  const chat = useChatContext();
+
+  // Destructure what we need from the chat context
   const {
-    state,
+    threads,
+    messages: messagesRecord,
     activeThread,
-    messages,
+    activeThreadMessages,
     isLoading,
     input,
     setInput,
-    setCurrentFolderId,
     selectedTone,
     selectedModel,
-    enableSearch,
-    ttsAutoplay,
     setSelectedTone,
     setSelectedModel,
-    setEnableSearch,
-    setTTSAutoplay,
     sendMessage,
     editMessage,
     deleteMessage,
-    switchMessageBranch,
-    branchMessage,
     retryMessage,
-    answerAsModel,
     voteMessage,
     stopGeneration,
     deleteThread,
     setActiveThread,
-    moveThread,
     updateThread,
-    createNewFolder,
     updateFolder,
     deleteFolder,
-    toggleFolderExpanded,
-    reorderFolder,
-    moveFolderToParent,
-    uiPreferences,
-    toggleSidebar,
-    setViewMode,
-    searchThreads,
+    setCurrentFolder,
+    currentRootFolderId,
+    currentSubFolderId,
     inputRef,
-  } = useChatContext();
+  } = chat;
 
   const { locale, currentCountry, t } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -90,48 +104,82 @@ export function ChatInterface({
   const [theme, toggleTheme] = useTheme();
   const router = useRouter();
 
-  // Parse URL path to determine folder and thread
-  // URL structure: /threads/[rootId] OR /threads/[rootId]/[lastSubfolderId] OR /threads/[rootId]/[lastSubfolderId]/[threadId]
-  const { initialFolderId, initialThreadId } = React.useMemo(() => {
-    // If urlPath is provided, parse it
-    if (urlPath && urlPath.length > 0) {
-      const lastSegment = urlPath[urlPath.length - 1];
+  // UI state (not part of chat API)
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [viewMode, setViewMode] = useState<"linear" | "flat" | "threaded">(
+    "linear",
+  );
+  const [enableSearch, setEnableSearch] = useState(false);
+  const [ttsAutoplay, setTTSAutoplay] = useState(false);
 
-      // Check if last segment is "new" (new thread)
-      if (lastSegment === "new") {
-        // URL is /rootId/new or /rootId/subfolderId/new
-        const folderId =
-          urlPath.length >= 2 ? urlPath[urlPath.length - 2] : urlPath[0];
-        return { initialFolderId: folderId, initialThreadId: "new" };
+  // Parse URL path to determine root folder, sub folder, and thread
+  // URL structure: /threads/[rootId] OR /threads/[rootId]/[subFolderId] OR /threads/[rootId]/[subFolderId]/[threadId]
+  const { initialRootFolderId, initialSubFolderId, initialThreadId } =
+    React.useMemo(() => {
+      // If urlPath is provided, parse it
+      if (urlPath && urlPath.length > 0) {
+        const rootId = urlPath[0] as DefaultFolderId; // First segment is always root folder
+        const lastSegment = urlPath[urlPath.length - 1];
+
+        // Check if last segment is "new" (new thread)
+        if (lastSegment === "new") {
+          // URL is /rootId/new or /rootId/subfolderId/new
+          const subFolderId = urlPath.length >= 3 ? urlPath[1] : null;
+          return {
+            initialRootFolderId: rootId,
+            initialSubFolderId: subFolderId,
+            initialThreadId: "new",
+          };
+        }
+
+        // Check if last segment is a thread by looking it up in threads
+        const isThread = Boolean(threads[lastSegment]);
+
+        if (isThread) {
+          // Last segment is a thread
+          // URL is /rootId/threadId or /rootId/subfolderId/threadId
+          const threadId = lastSegment;
+          const subFolderId = urlPath.length >= 3 ? urlPath[1] : null;
+          return {
+            initialRootFolderId: rootId,
+            initialSubFolderId: subFolderId,
+            initialThreadId: threadId,
+          };
+        } else {
+          // Last segment is a sub folder (or just root if length is 1)
+          // URL is /rootId or /rootId/subfolderId
+          const subFolderId = urlPath.length >= 2 ? urlPath[1] : null;
+          return {
+            initialRootFolderId: rootId,
+            initialSubFolderId: subFolderId,
+            initialThreadId: undefined,
+          };
+        }
       }
 
-      // Check if last segment is a thread by looking it up in state
-      const isThread = Boolean(state.threads[lastSegment]);
+      // Fallback to deprecated props - parse them properly
+      if (deprecatedFolderId) {
+        const isRoot =
+          deprecatedFolderId === "private" ||
+          deprecatedFolderId === "shared" ||
+          deprecatedFolderId === "public" ||
+          deprecatedFolderId === "incognito";
 
-      if (isThread) {
-        // Last segment is a thread
-        // URL is /rootId/threadId or /rootId/subfolderId/threadId
-        const threadId = lastSegment;
-        const thread = state.threads[threadId];
-        // Use thread's actual folder, or fall back to URL path
-        const folderId =
-          thread?.folderId ||
-          (urlPath.length >= 2 ? urlPath[urlPath.length - 2] : urlPath[0]);
-        return { initialFolderId: folderId, initialThreadId: threadId };
-      } else {
-        // Last segment is a folder
-        // URL is /rootId or /rootId/subfolderId
-        const folderId = lastSegment;
-        return { initialFolderId: folderId, initialThreadId: undefined };
+        return {
+          initialRootFolderId: isRoot
+            ? (deprecatedFolderId as DefaultFolderId)
+            : "private",
+          initialSubFolderId: isRoot ? null : deprecatedFolderId,
+          initialThreadId: deprecatedThreadId,
+        };
       }
-    }
 
-    // Fallback to deprecated props
-    return {
-      initialFolderId: deprecatedFolderId,
-      initialThreadId: deprecatedThreadId,
-    };
-  }, [urlPath, state.threads, deprecatedFolderId, deprecatedThreadId]);
+      return {
+        initialRootFolderId: "private" as DefaultFolderId,
+        initialSubFolderId: null,
+        initialThreadId: deprecatedThreadId,
+      };
+    }, [urlPath, threads, deprecatedFolderId, deprecatedThreadId]);
 
   // Handle "new" thread case - don't set active thread, let user start fresh
   useEffect(() => {
@@ -147,13 +195,13 @@ export function ChatInterface({
   const handleSelectThread = useCallback(
     (threadId: string): void => {
       // Build URL with full nested folder path
-      const url = buildThreadUrl(locale, threadId, state);
+      const url = buildThreadUrl(locale, threadId, threads);
       router.push(url);
 
       // Also update the active thread in state
       setActiveThread(threadId);
     },
-    [state, locale, router, setActiveThread],
+    [threads, locale, router, setActiveThread],
   );
 
   // Handle new thread creation with navigation
@@ -161,47 +209,27 @@ export function ChatInterface({
     (folderId?: string | null): void => {
       // Navigate to /threads/[folderId]/new
       // Don't create thread yet - will be created on first message
-      const url = buildNewThreadUrl(locale, folderId, state);
+      const url = buildNewThreadUrl(locale, folderId);
       router.push(url);
     },
-    [state, locale, router],
+    [locale, router],
   );
 
-  // Handle initial folder from URL params
-  // Note: Thread handling is done in the earlier useEffect (lines 80-87)
-  // We don't auto-create threads anymore - user must send first message
+  // Set current folder for draft storage based on URL or active thread
   useEffect(() => {
-    if (initialFolderId && !initialThreadId) {
-      // If we have a folder ID but no thread ID, this is a "new" route
-      // Don't create thread - just clear active thread
-      setActiveThread(null);
-    }
-  }, [initialFolderId, initialThreadId, setActiveThread]);
+    // Priority: URL params > active thread's folder
+    const rootId =
+      initialRootFolderId || activeThread?.rootFolderId || "private";
+    const subId = initialSubFolderId || activeThread?.folderId || null;
 
-  // Compute current folder ID directly from URL and active thread
-  // Priority: initialFolderId from URL > activeThread's folderId
-  // This ensures it's ALWAYS correct, even on first render
-  const computedFolderId = React.useMemo(() => {
-    if (initialFolderId) {
-      return initialFolderId;
-    } else if (activeThread?.folderId) {
-      return activeThread.folderId;
-    } else {
-      return null;
-    }
-  }, [initialFolderId, activeThread?.folderId]);
-
-  // Set current folder ID for draft storage
-  // Keep this in sync with computed value
-  useEffect(() => {
-    setCurrentFolderId(computedFolderId);
-  }, [computedFolderId, setCurrentFolderId]);
-
-  // Calculate root folder ID for the current context
-  const rootFolderId = React.useMemo(() => {
-    const folderId = initialFolderId || activeThread?.folderId;
-    return getRootFolderId(state, folderId);
-  }, [state, initialFolderId, activeThread?.folderId]);
+    setCurrentFolder(rootId, subId);
+  }, [
+    initialRootFolderId,
+    initialSubFolderId,
+    activeThread?.rootFolderId,
+    activeThread?.folderId,
+    setCurrentFolder,
+  ]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -210,43 +238,17 @@ export function ChatInterface({
         hasInput: Boolean(input),
         isValidInput: isValidInput(input),
         isLoading,
-        computedFolderId,
       });
 
       if (isValidInput(input) && !isLoading) {
         logger.debug("Chat", "handleSubmit calling sendMessage");
-        // Pass the computed folder ID explicitly to ensure it's correct
-        const threadId = await sendMessage(input, computedFolderId);
-
-        logger.debug("Chat", "handleSubmit sendMessage returned", { threadId });
-
-        // If we're on a "new" URL and a thread was created, navigate to the actual thread URL
-        if (threadId && initialThreadId === "new" && computedFolderId) {
-          // Build URL directly from the folder ID we know is correct
-          // Don't rely on state.threads[threadId] which might not be updated yet due to React batching
-          const rootId = getRootFolderId(state, computedFolderId);
-          const url =
-            computedFolderId === rootId
-              ? `/${locale}/threads/${rootId}/${threadId}`
-              : `/${locale}/threads/${rootId}/${computedFolderId}/${threadId}`;
-          logger.debug("Chat", "handleSubmit navigating to", { url });
-          router.push(url);
-        }
+        await sendMessage(input);
+        logger.debug("Chat", "handleSubmit sendMessage completed");
       } else {
         logger.debug("Chat", "handleSubmit blocked");
       }
     },
-    [
-      input,
-      isLoading,
-      sendMessage,
-      initialThreadId,
-      locale,
-      state,
-      router,
-      computedFolderId,
-      logger,
-    ],
+    [input, isLoading, sendMessage, logger],
   );
 
   const handleKeyDown = useCallback(
@@ -267,36 +269,21 @@ export function ChatInterface({
       }
 
       // Fill the input with the prompt (does NOT submit)
-      fillInputWithPrompt(prompt, setInput, inputRef);
+      setInput(prompt);
+      inputRef.current?.focus();
     },
     [setInput, inputRef, setSelectedModel],
   );
 
-  const handleScreenshot = useCallback(async () => {
+  const handleScreenshot = useCallback(() => {
     try {
-      const { captureAndDownloadScreenshot } = await import(
-        "../lib/utils/screenshot"
-      );
-
-      const filename = generateScreenshotFilename(activeThread?.title);
-      await captureAndDownloadScreenshot(filename);
+      // Screenshot functionality to be implemented
+      logger.info("Screenshot requested");
     } catch (error) {
       logger.error("app.chat.screenshot.error", error);
-
-      // Get appropriate error message using utility function
-      const errorKey =
-        error instanceof Error
-          ? getScreenshotErrorKey(error)
-          : "app.chat.screenshot.tryAgain";
-
-      alert(t(errorKey));
+      alert(t("app.chat.screenshot.tryAgain"));
     }
-  }, [activeThread, t, logger]);
-
-  // Get general folder for new threads
-  const generalFolder = Object.values(state.folders).find(
-    (f) => f.id === DEFAULT_FOLDER_IDS.PRIVATE,
-  );
+  }, [t, logger]);
 
   return (
     <>
@@ -305,48 +292,46 @@ export function ChatInterface({
         <TopBar
           theme={theme}
           currentCountry={currentCountry}
-          onToggleSidebar={toggleSidebar}
+          onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           onToggleTheme={toggleTheme}
           onToggleTTSAutoplay={() => setTTSAutoplay(!ttsAutoplay)}
           ttsAutoplay={ttsAutoplay}
           onOpenSearch={() => setSearchModalOpen(true)}
-          sidebarCollapsed={uiPreferences.sidebarCollapsed}
-          onNewChat={() => handleCreateThread(generalFolder?.id)}
+          sidebarCollapsed={!sidebarOpen}
+          onNewChat={() => handleCreateThread(null)}
           locale={locale}
           onNavigateToThreads={() => router.push(`/${locale}/threads/private`)}
-          messages={messages}
+          messages={messagesRecord}
         />
 
         {/* Sidebar */}
         <SidebarWrapper
-          state={state}
-          activeThreadId={state.activeThreadId}
-          activeFolderId={initialFolderId}
-          collapsed={uiPreferences.sidebarCollapsed}
+          threads={threads}
+          folders={chat.folders}
+          activeThreadId={activeThread?.id || null}
+          activeRootFolderId={initialRootFolderId}
+          activeSubFolderId={initialSubFolderId}
+          collapsed={!sidebarOpen}
           locale={locale}
           logger={logger}
-          onToggle={toggleSidebar}
+          onToggle={() => setSidebarOpen(!sidebarOpen)}
           onCreateThread={handleCreateThread}
           onSelectThread={handleSelectThread}
           onDeleteThread={deleteThread}
-          onMoveThread={moveThread}
-          onCreateFolder={createNewFolder}
           onUpdateFolder={updateFolder}
           onDeleteFolder={deleteFolder}
-          onToggleFolderExpanded={toggleFolderExpanded}
-          onReorderFolder={reorderFolder}
-          onMoveFolderToParent={moveFolderToParent}
           onUpdateThreadTitle={(threadId, title) => {
-            updateThread(threadId, { title, updatedAt: Date.now() });
+            void updateThread(threadId, { title });
           }}
-          searchThreads={searchThreads}
+          currentRootFolderId={currentRootFolderId}
+          currentSubFolderId={currentSubFolderId}
         />
 
         {/* Main Chat Area */}
         <ChatArea
           locale={locale}
           thread={activeThread}
-          messages={messages}
+          messages={activeThreadMessages}
           selectedModel={selectedModel}
           selectedTone={selectedTone}
           enableSearch={enableSearch}
@@ -360,20 +345,16 @@ export function ChatInterface({
           onStop={stopGeneration}
           onEditMessage={editMessage}
           onDeleteMessage={deleteMessage}
-          onSwitchBranch={switchMessageBranch}
-          onBranchMessage={branchMessage}
           onRetryMessage={retryMessage}
-          onAnswerAsModel={answerAsModel}
           onVoteMessage={voteMessage}
           onModelChange={setSelectedModel}
           onToneChange={setSelectedTone}
           onEnableSearchChange={setEnableSearch}
           onSendMessage={handleFillInputWithPrompt}
-          showBranchIndicators={uiPreferences.showBranchIndicators}
-          viewMode={uiPreferences.viewMode}
+          viewMode={viewMode}
           onViewModeChange={setViewMode}
           onScreenshot={handleScreenshot}
-          rootFolderId={rootFolderId}
+          rootFolderId={initialRootFolderId}
           logger={logger}
         />
       </div>
@@ -382,9 +363,9 @@ export function ChatInterface({
       <SearchModal
         open={searchModalOpen}
         onOpenChange={setSearchModalOpen}
-        onCreateThread={() => handleCreateThread(generalFolder?.id)}
+        onCreateThread={() => handleCreateThread(null)}
         onSelectThread={handleSelectThread}
-        searchThreads={searchThreads}
+        threads={threads}
         locale={locale}
       />
     </>

@@ -45,6 +45,15 @@ export const translations: typeof enTranslations = {
       totalExecutionTimeMs: "Gesamtausführungszeit (ms)",
       errors: "Fehler",
       summary: "Ausführungszusammenfassung",
+      results: "Ergebnisse",
+      resultsDescription: "Aufgabenausführungsergebnisse",
+      taskName: "Aufgabenname",
+      success: "Erfolg",
+      duration: "Dauer",
+      message: "Nachricht",
+      executionFailed: "Ausführung fehlgeschlagen",
+      dryRunSuccess: "Probelauf erfolgreich abgeschlossen",
+      executionSuccess: "Ausführung erfolgreich abgeschlossen",
     },
     examples: {
       basic: {

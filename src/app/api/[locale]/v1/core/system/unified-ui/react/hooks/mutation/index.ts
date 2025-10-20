@@ -28,7 +28,8 @@ import type { ApiMutationOptions } from "../types";
 /**
  * Type for mutation variables
  * When both TRequest and TUrlVariables are never (no request data needed),
- * the variables should be an empty object
+ * the variables should be an empty object.
+ * When TUrlVariables is never, urlParams is optional (can be omitted).
  */
 export type MutationVariables<TRequest, TUrlVariables> = [TRequest] extends [
   never,
@@ -36,7 +37,9 @@ export type MutationVariables<TRequest, TUrlVariables> = [TRequest] extends [
   ? [TUrlVariables] extends [never]
     ? Record<string, never> // Both are never - empty object
     : { requestData: TRequest; urlParams: TUrlVariables }
-  : { requestData: TRequest; urlParams: TUrlVariables };
+  : [TUrlVariables] extends [never]
+    ? { requestData: TRequest; urlParams?: never } // TRequest exists, TUrlVariables is never - urlParams is optional
+    : { requestData: TRequest; urlParams: TUrlVariables };
 
 /**
  * Mutation context type for tracking additional mutation state

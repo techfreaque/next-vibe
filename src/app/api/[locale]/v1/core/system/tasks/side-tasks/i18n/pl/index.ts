@@ -1,6 +1,81 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  common: {
+    sideTasksActionLabel: "Akcja",
+    sideTasksActionDescription: "Wybierz akcję do wykonania",
+    sideTasksActionList: "Lista zadań",
+    sideTasksActionGet: "Pobierz zadanie",
+    sideTasksActionCreate: "Utwórz zadanie",
+    sideTasksActionUpdate: "Aktualizuj zadanie",
+    sideTasksActionDelete: "Usuń zadanie",
+    sideTasksActionStats: "Statystyki zadań",
+    sideTasksActionExecutions: "Wykonania zadań",
+    sideTasksActionHealthCheck: "Sprawdzenie stanu",
+    sideTasksIdLabel: "ID zadania",
+    sideTasksIdDescription: "Unikalny identyfikator zadania",
+    sideTasksNameLabel: "Nazwa zadania",
+    sideTasksNameDescription: "Nazwa zadania",
+    sideTasksLimitLabel: "Limit",
+    sideTasksLimitDescription: "Maksymalna liczba wyników do zwrócenia",
+    sideTasksDataLabel: "Dane zadania",
+    sideTasksDataDescription: "Dodatkowe dane dla zadania",
+    sideTasksRepositoryFetchAllFailed:
+      "Nie udało się pobrać wszystkich zadań pobocznych",
+    sideTasksRepositoryFetchByIdFailed:
+      "Nie udało się pobrać zadania pobocznego według ID",
+    sideTasksRepositoryCreateFailed:
+      "Nie udało się utworzyć zadania pobocznego",
+  },
+  post: {
+    title: "Zarządzanie zadaniami pobocznymi",
+    description: "Zarządzaj operacjami zadań pobocznych",
+    category: "Zadania systemowe",
+    container: {
+      title: "Zadania poboczne",
+      description: "Konfiguruj operacje zadań pobocznych",
+    },
+  },
+  get: {
+    title: "Pobierz zadanie poboczne",
+    description: "Pobierz informacje o zadaniu pobocznym",
+    container: {
+      title: "Szczegóły zadania pobocznego",
+      description: "Wyświetl szczegóły zadania pobocznego",
+    },
+    errors: {
+      unauthorized: {
+        title: "Brak autoryzacji",
+        description: "Nie masz uprawnień do przeglądania zadań pobocznych",
+      },
+      internalError: {
+        title: "Błąd wewnętrzny",
+        description: "Wystąpił błąd podczas pobierania zadań pobocznych",
+      },
+    },
+    success: {
+      title: "Sukces",
+      description: "Zadania poboczne pobrane pomyślnie",
+    },
+  },
+  tasks: {
+    side: {
+      response: {
+        success: {
+          title: "Sukces",
+        },
+        message: {
+          title: "Wiadomość",
+        },
+        data: {
+          title: "Dane",
+        },
+        count: {
+          title: "Liczba",
+        },
+      },
+    },
+  },
   category: "Punkt końcowy API",
   tags: {
     sidetasks: "Sidetasks",

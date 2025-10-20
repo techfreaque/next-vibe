@@ -4,6 +4,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   nav: navTranslations,
   common: {
+    active: "Aktywny",
     appName: "unbottled.ai",
     company: {
       name: "unbottled.ai",
@@ -176,8 +177,7 @@ export const translations: typeof enTranslations = {
       description:
         "Dołącz do naszego zespołu i pomóż budować przyszłość niecenzurowanej AI",
       imageAlt: "Kariera w Unbottled.ai",
-      keywords:
-        "kariera, praca, praca AI, praca zdalna, kariera unbottled.ai",
+      keywords: "kariera, praca, praca AI, praca zdalna, kariera unbottled.ai",
     },
     notFound: {
       title: "404 - Strona nie znaleziona",

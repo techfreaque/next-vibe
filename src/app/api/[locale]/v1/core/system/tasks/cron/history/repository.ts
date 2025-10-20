@@ -163,9 +163,13 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
           : 0;
 
       logger.info(
-        t("app.api.v1.core.system.tasks.cron.history.get.log.fetchSuccess", {
-          count: executions.length,
-        }),
+        t(
+          "app.api.v1.core.system.tasks.cronSystem.history.get.log.fetchSuccess",
+          "en",
+          {
+            count: executions.length,
+          },
+        ),
       );
 
       // Zod schemas for runtime validation and type narrowing
@@ -186,7 +190,9 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
             taskId: exec.taskId,
             taskName:
               exec.taskName ??
-              t("app.api.v1.core.system.tasks.cron.history.get.unknownTask"),
+              t(
+                "app.api.v1.core.system.tasks.cronSystem.history.get.unknownTask",
+              ),
             status: statusSchema.parse(exec.status),
             priority: prioritySchema.parse(
               exec.priority ?? CronTaskPriority.MEDIUM,

@@ -2,6 +2,7 @@ import { translations as componentsTranslations } from "../../_components/i18n/p
 import { translations as notFoundTranslations } from "../../[...notFound]/i18n/pl";
 import { translations as adminTranslations } from "../../admin/i18n/pl";
 import { translations as chatTranslations } from "../../chat/i18n/pl";
+import { translations as helpTranslations } from "../../help/i18n/pl";
 import { translations as siteTranslations } from "../../story/i18n/pl";
 import { translations as subscriptionTranslations } from "../../subscription/i18n/pl";
 import { translations as trackTranslations } from "../../track/i18n/pl";
@@ -14,6 +15,7 @@ export const translations: typeof enTranslations = {
   notFound: notFoundTranslations,
   admin: adminTranslations,
   chat: chatTranslations,
+  help: helpTranslations,
   subscription: subscriptionTranslations,
   track: trackTranslations,
   user: userTranslations,

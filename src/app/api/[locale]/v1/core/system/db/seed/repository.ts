@@ -91,7 +91,12 @@ export class SeedRepositoryImpl implements SeedRepositoryInterface {
         logger.info("seedDatabase function completed");
       } catch (seedError) {
         logger.error("❌ seedDatabase function failed:", seedError);
-        throw seedError;
+        const error = parseError(seedError);
+        return createErrorResponse(
+          "app.api.v1.core.system.db.seed.post.errors.server.title",
+          ErrorResponseTypes.INTERNAL_ERROR,
+          { error: error.message },
+        );
       }
 
       const duration = Date.now() - startTime;

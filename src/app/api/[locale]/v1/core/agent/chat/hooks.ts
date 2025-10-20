@@ -92,11 +92,24 @@ export interface UseChatReturn {
   retryMessage: (messageId: string) => Promise<void>;
   editMessage: (messageId: string, newContent: string) => Promise<void>;
   answerAsAI: (messageId: string, content: string) => Promise<void>;
+  deleteMessage: (messageId: string) => Promise<void>;
+  voteMessage: (messageId: string, vote: 1 | -1 | 0) => Promise<void>;
   stopGeneration: () => void;
 
   // Thread operations
   createNewThread: () => string;
   setActiveThread: (threadId: string | null) => void;
+  deleteThread: (threadId: string) => Promise<void>;
+  updateThread: (threadId: string, updates: ThreadUpdate) => Promise<void>;
+
+  // Folder operations
+  createFolder: (
+    name: string,
+    rootFolderId: DefaultFolderId,
+    parentId: string | null,
+  ) => Promise<string>;
+  updateFolder: (folderId: string, updates: FolderUpdate) => Promise<void>;
+  deleteFolder: (folderId: string) => Promise<void>;
 
   // Navigation
   setCurrentFolder: (
@@ -172,6 +185,8 @@ export function useChat(
           errorMessage: streamMsg.error || null,
           edited: false,
           tokens: streamMsg.totalTokens || null,
+          upvotes: null,
+          downvotes: null,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
@@ -427,14 +442,16 @@ export function useChat(
         );
 
         if (!response.ok) {
-          throw new Error("Failed to delete message");
+          logger.error("useChat", "Failed to delete message", {
+            status: response.status,
+          });
+          return;
         }
 
         // Remove from store
         chatStore.deleteMessage(messageId);
       } catch (error) {
         logger.error("useChat", "Failed to delete message", { error });
-        throw error;
       }
     },
     [logger, chatStore, locale],
@@ -463,18 +480,22 @@ export function useChat(
         );
 
         if (!response.ok) {
-          throw new Error("Failed to vote on message");
+          logger.error("useChat", "Failed to vote on message", {
+            status: response.status,
+          });
+          return;
         }
 
         // Update local state - optimistic update
-        chatStore.updateMessage(messageId, {
-          upvotes: vote === 1 ? (message.upvotes || 0) + 1 : message.upvotes,
-          downvotes:
-            vote === -1 ? (message.downvotes || 0) + 1 : message.downvotes,
-        });
+        const updates: Partial<ChatMessage> = {};
+        if (vote === 1) {
+          updates.upvotes = (message.upvotes || 0) + 1;
+        } else if (vote === -1) {
+          updates.downvotes = (message.downvotes || 0) + 1;
+        }
+        chatStore.updateMessage(messageId, updates);
       } catch (error) {
         logger.error("useChat", "Failed to vote on message", { error });
-        throw error;
       }
     },
     [logger, chatStore, locale],
@@ -493,7 +514,10 @@ export function useChat(
         );
 
         if (!response.ok) {
-          throw new Error("Failed to delete thread");
+          logger.error("useChat", "Failed to delete thread", {
+            status: response.status,
+          });
+          return;
         }
 
         // Remove from store
@@ -505,7 +529,6 @@ export function useChat(
         }
       } catch (error) {
         logger.error("useChat", "Failed to delete thread", { error });
-        throw error;
       }
     },
     [logger, chatStore, locale],
@@ -528,14 +551,16 @@ export function useChat(
         );
 
         if (!response.ok) {
-          throw new Error("Failed to update thread");
+          logger.error("useChat", "Failed to update thread", {
+            status: response.status,
+          });
+          return;
         }
 
         // Update local store
         chatStore.updateThread(threadId, updates);
       } catch (error) {
         logger.error("useChat", "Failed to update thread", { error });
-        throw error;
       }
     },
     [logger, chatStore, locale],
@@ -572,10 +597,15 @@ export function useChat(
         );
 
         if (!response.ok) {
-          throw new Error("Failed to create folder");
+          logger.error("useChat", "Failed to create folder", {
+            status: response.status,
+          });
+          return "";
         }
 
-        const data = await response.json();
+        const data = (await response.json()) as {
+          response: { folder: ChatFolder };
+        };
         const folder = data.response.folder;
 
         // Add to store
@@ -584,7 +614,7 @@ export function useChat(
         return folder.id;
       } catch (error) {
         logger.error("useChat", "Failed to create folder", { error });
-        throw error;
+        return "";
       }
     },
     [logger, chatStore, locale],
@@ -607,14 +637,16 @@ export function useChat(
         );
 
         if (!response.ok) {
-          throw new Error("Failed to update folder");
+          logger.error("useChat", "Failed to update folder", {
+            status: response.status,
+          });
+          return;
         }
 
         // Update local store
         chatStore.updateFolder(folderId, updates);
       } catch (error) {
         logger.error("useChat", "Failed to update folder", { error });
-        throw error;
       }
     },
     [logger, chatStore, locale],
@@ -633,14 +665,16 @@ export function useChat(
         );
 
         if (!response.ok) {
-          throw new Error("Failed to delete folder");
+          logger.error("useChat", "Deleting folder", {
+            status: response.status,
+          });
+          return;
         }
 
         // Remove from store
         chatStore.deleteFolder(folderId);
       } catch (error) {
         logger.error("useChat", "Failed to delete folder", { error });
-        throw error;
       }
     },
     [logger, chatStore, locale],

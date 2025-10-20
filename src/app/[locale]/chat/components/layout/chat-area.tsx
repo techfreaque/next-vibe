@@ -11,12 +11,7 @@ import { Button } from "@/packages/next-vibe-ui/web/ui";
 
 import { Logo } from "../../../_components/nav/logo";
 import { DOM_IDS, LAYOUT } from "../../lib/config/constants";
-import type { ModelId } from "../../lib/config/models";
-import type {
-  ChatMessage,
-  ChatThread,
-  ViewMode,
-} from "../../lib/storage/types";
+import type { ChatMessage, ChatThread, ModelId, ViewMode } from "../../types";
 import { ChatInput } from "../input/chat-input";
 import { ChatMessages } from "../messages/chat-messages";
 import { SuggestedPrompts } from "../messages/suggested-prompts";

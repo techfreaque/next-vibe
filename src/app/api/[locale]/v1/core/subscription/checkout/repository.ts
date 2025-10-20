@@ -18,11 +18,11 @@ import Stripe from "stripe";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
-import type { CountryLanguage,Countries } from "@/i18n/core/config";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { JwtPayloadType } from "../../user/auth/definition";
+import type { JwtPrivatePayloadType } from "../../user/auth/definition";
 import { users } from "../../user/db";
 import type { BillingIntervalValue, SubscriptionPlanValue } from "../enum";
 import { BillingInterval, SubscriptionPlan } from "../enum";
@@ -33,7 +33,7 @@ import type {
 
 // Initialize Stripe
 export const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-07-30.basil",
+  apiVersion: "2025-09-30.clover",
 });
 
 // Production Stripe Price IDs from environment variables with regionalization
@@ -114,8 +114,16 @@ export const STRIPE_PRICE_IDS = {
 const getCountryFromLocale = (
   locale: CountryLanguage,
 ): keyof typeof STRIPE_PRICE_IDS => {
-  const countryPart = locale.split("-")[1] as Countries;
-  return countryPart;
+  // Extract country part from locale (e.g., "en-GLOBAL" -> "GLOBAL", "de-DE" -> "DE")
+  const countryPart = locale.split("-")[1];
+
+  // Validate that the country is supported
+  if (countryPart && countryPart in STRIPE_PRICE_IDS) {
+    return countryPart as keyof typeof STRIPE_PRICE_IDS;
+  }
+
+  // Default to GLOBAL if country is not found or not supported
+  return "GLOBAL";
 };
 
 /**
@@ -187,7 +195,7 @@ const ensureStripeCustomer = async (
     // Create new Stripe customer
     const customer = await stripe.customers.create({
       email: user[0].email,
-      name: `${user[0].firstName} ${user[0].lastName}`,
+      name: user[0].publicName,
       metadata: {
         userId: userId,
       },
@@ -219,7 +227,7 @@ const ensureStripeCustomer = async (
 export interface SubscriptionCheckoutRepository {
   createCheckoutSession(
     data: CheckoutRequestOutput,
-    ,
+    user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CheckoutResponseOutput>>;
@@ -236,7 +244,7 @@ export class SubscriptionCheckoutRepositoryImpl
    */
   async createCheckoutSession(
     data: CheckoutRequestOutput,
-    ,
+    user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CheckoutResponseOutput>> {
@@ -286,11 +294,37 @@ export class SubscriptionCheckoutRepositoryImpl
       }
 
       // Get the Stripe price ID for the plan, billing interval, and region
-      stripePriceId = getStripePriceId(
-        data.planId,
-        data.billingInterval,
-        country,
-      );
+      // Use explicit check to narrow type for TypeScript
+      if (
+        data.planId === SubscriptionPlan.STARTER ||
+        data.planId === SubscriptionPlan.PROFESSIONAL ||
+        data.planId === SubscriptionPlan.PREMIUM
+      ) {
+        // Validate billing interval
+        if (
+          data.billingInterval === BillingInterval.MONTHLY ||
+          data.billingInterval === BillingInterval.YEARLY
+        ) {
+          stripePriceId = getStripePriceId(
+            data.planId,
+            data.billingInterval,
+            country,
+          );
+        } else {
+          return createErrorResponse(
+            "app.api.v1.core.subscription.checkout.post.errors.validation.title",
+            ErrorResponseTypes.BAD_REQUEST,
+            { billingInterval: data.billingInterval },
+          );
+        }
+      } else {
+        // This should never happen due to the ENTERPRISE check above
+        return createErrorResponse(
+          "app.api.v1.core.subscription.checkout.post.errors.validation.title",
+          ErrorResponseTypes.BAD_REQUEST,
+          { planId: data.planId },
+        );
+      }
 
       logger.debug("Using Stripe price ID", {
         stripePriceId,
@@ -375,7 +409,7 @@ export class SubscriptionCheckoutRepositoryImpl
       });
       const parsedError = parseError(error);
       return createErrorResponse(
-        t("app.api.v1.core.subscription.checkout.errors.serverError.title"),
+        "app.api.v1.core.subscription.checkout.errors.serverError.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message, userId: user.id, planId: data.planId },
       );

@@ -9,7 +9,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import { Button } from "@/packages/next-vibe-ui/web/ui";
 
-import { TIMING } from "../../../old_migrate_all_to_agent_api_folder/lib/config/constants";
+const TIMING = {
+  COPY_FEEDBACK_DURATION: 2000,
+};
 
 interface CopyButtonProps {
   content: string;
@@ -35,10 +37,7 @@ export function CopyButton({
     try {
       await navigator.clipboard.writeText(content);
       setCopied(true);
-      setTimeout(
-        () => setCopied(false),
-        TIMING.COPY_FEEDBACK_DURATION as number,
-      );
+      setTimeout(() => setCopied(false), TIMING.COPY_FEEDBACK_DURATION);
     } catch (error) {
       logger.error("app.chat.actions.copyContent", error);
     }

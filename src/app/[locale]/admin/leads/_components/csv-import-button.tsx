@@ -39,7 +39,7 @@ export function CsvImportButton({
     <>
       <Button onClick={() => setIsOpen(true)} className="gap-2">
         <Upload className="h-4 w-4" />
-        {t("leads.admin.import.button")}
+        {t("app.admin.leads.leads.admin.import.button")}
       </Button>
       <CsvImportDialog
         open={isOpen}

@@ -58,7 +58,7 @@ export function NewFolderDialog({
         <DialogHeader>
           <DialogTitle>
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            {t((titleKey || "app.chat.newFolder.title") as any)}
+            {t((titleKey || "app.chat.newFolder.title"))}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">

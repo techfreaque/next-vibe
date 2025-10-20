@@ -64,8 +64,6 @@ export const translations: typeof enTranslations = {
       passwordPlaceholder: "Wprowadź hasło SMTP",
       fromEmail: "Od e-mail",
       fromEmailPlaceholder: "noreply@example.com",
-      fromName: "Od nazwa",
-      fromNamePlaceholder: "Twoja firma",
       replyToEmail: "Odpowiedz na e-mail",
       replyToEmailPlaceholder: "support@example.com",
       replyToName: "Odpowiedz na nazwa",

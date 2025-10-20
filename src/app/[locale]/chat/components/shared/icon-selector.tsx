@@ -4,6 +4,14 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
+import {
+  getIconComponent,
+  ICON_REGISTRY,
+  type IconKey,
+  type IconValue,
+  isIconComponent,
+  isIconKey,
+} from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import {
@@ -17,15 +25,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/packages/next-vibe-ui/web/ui";
-
-import {
-  getIconComponent,
-  ICON_REGISTRY,
-  type IconKey,
-  type IconValue,
-  isIconComponent,
-  isIconKey,
-} from "../../lib/config/icons";
 
 interface IconSelectorProps {
   value: IconValue;

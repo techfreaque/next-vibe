@@ -7,20 +7,25 @@
 "use client";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
+import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint";
+import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/use-endpoint";
 
 import { pulseExecuteEndpoint, pulseStatusEndpoint } from "./definition";
 
 /**
  * Hook for executing pulse cycles
  */
-export const usePulseExecute = (logger: EndpointLogger) => {
+export function usePulseExecute(
+  logger: EndpointLogger,
+): EndpointReturn<typeof pulseExecuteEndpoint> {
   return useEndpoint(pulseExecuteEndpoint, {}, logger);
-};
+}
 
 /**
  * Hook for fetching pulse health status
  */
-export const usePulseStatus = (logger: EndpointLogger) => {
+export function usePulseStatus(
+  logger: EndpointLogger,
+): EndpointReturn<typeof pulseStatusEndpoint> {
   return useEndpoint(pulseStatusEndpoint, {}, logger);
-};
+}

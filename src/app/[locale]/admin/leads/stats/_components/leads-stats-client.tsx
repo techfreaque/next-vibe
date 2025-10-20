@@ -18,6 +18,7 @@ import {
   UserCheck,
   Users,
 } from "lucide-react";
+import type { HistoricalDataSeriesType } from "next-vibe/shared/types/stats-filtering.schema";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
@@ -123,7 +124,7 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.totalLeads")}
+              {t("app.admin.leads.leads.admin.stats.totalLeads")}
             </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -133,7 +134,7 @@ export function LeadsStatsClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {formatNumber(stats?.newLeads || 0)}{" "}
-              {t("app.admin.leads.stats.newThisMonth")}
+              {t("app.admin.leads.leads.admin.stats.newThisMonth")}
             </p>
           </CardContent>
         </Card>
@@ -142,7 +143,7 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.activeLeads")}
+              {t("app.admin.leads.leads.admin.stats.activeLeads")}
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -154,7 +155,7 @@ export function LeadsStatsClient({
               {formatPercentage(
                 (stats?.activeLeads || 0) / (stats?.totalLeads || 1),
               )}{" "}
-              {t("app.admin.leads.stats.ofTotal")}
+              {t("app.admin.leads.leads.admin.stats.ofTotal")}
             </p>
           </CardContent>
         </Card>
@@ -163,7 +164,7 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.conversionRate")}
+              {t("app.admin.leads.leads.admin.stats.conversionRate")}
             </CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -173,7 +174,7 @@ export function LeadsStatsClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {formatNumber(stats?.convertedLeads || 0)}{" "}
-              {t("app.admin.leads.stats.convertedLeads")}
+              {t("app.admin.leads.leads.admin.stats.convertedLeads")}
             </p>
           </CardContent>
         </Card>
@@ -182,7 +183,7 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.emailEngagement")}
+              {t("app.admin.leads.leads.admin.stats.emailEngagement")}
             </CardTitle>
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -192,7 +193,7 @@ export function LeadsStatsClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {formatNumber(stats?.totalEmailsSent || 0)}{" "}
-              {t("app.admin.leads.stats.emailsSent")}
+              {t("app.admin.leads.leads.admin.stats.emailsSent")}
             </p>
           </CardContent>
         </Card>
@@ -204,7 +205,9 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.metrics.campaign_running_leads")}
+              {t(
+                "app.admin.leads.leads.admin.stats.metrics.campaign_running_leads",
+              )}
             </CardTitle>
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -216,7 +219,7 @@ export function LeadsStatsClient({
               {formatPercentage(
                 (stats?.campaignRunningLeads || 0) / (stats?.totalLeads || 1),
               )}{" "}
-              {t("app.admin.leads.stats.ofTotal")}
+              {t("app.admin.leads.leads.admin.stats.ofTotal")}
             </p>
           </CardContent>
         </Card>
@@ -225,7 +228,7 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.consultationBookings")}
+              {t("app.admin.leads.leads.admin.stats.consultationBookings")}
             </CardTitle>
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -235,7 +238,7 @@ export function LeadsStatsClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {formatPercentage(stats?.consultationBookingRate || 0)}{" "}
-              {t("app.admin.leads.stats.bookingRate")}
+              {t("app.admin.leads.leads.admin.stats.bookingRate")}
             </p>
           </CardContent>
         </Card>
@@ -244,7 +247,7 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.dataCompleteness")}
+              {t("app.admin.leads.leads.admin.stats.dataCompleteness")}
             </CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -253,7 +256,7 @@ export function LeadsStatsClient({
               {formatPercentage(stats?.dataCompletenessRate || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
-              {t("app.admin.leads.stats.profileCompleteness")}
+              {t("app.admin.leads.leads.admin.stats.profileCompleteness")}
             </p>
           </CardContent>
         </Card>
@@ -262,7 +265,7 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.leadVelocity")}
+              {t("app.admin.leads.leads.admin.stats.leadVelocity")}
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -271,7 +274,7 @@ export function LeadsStatsClient({
               {formatNumber(stats?.leadVelocity || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
-              {t("app.admin.leads.stats.leadsPerDay")}
+              {t("app.admin.leads.leads.admin.stats.leadsPerDay")}
             </p>
           </CardContent>
         </Card>
@@ -283,7 +286,7 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.convertedLeads")}
+              {t("app.admin.leads.leads.admin.stats.convertedLeads")}
             </CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -293,7 +296,7 @@ export function LeadsStatsClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {formatPercentage(stats?.conversionRate || 0)}{" "}
-              {t("app.admin.leads.stats.conversionRate")}
+              {t("app.admin.leads.leads.admin.stats.conversionRate")}
             </p>
           </CardContent>
         </Card>
@@ -302,7 +305,7 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.signedUpLeads")}
+              {t("app.admin.leads.leads.admin.stats.signedUpLeads")}
             </CardTitle>
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -312,7 +315,7 @@ export function LeadsStatsClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {formatPercentage(stats?.signupRate || 0)}{" "}
-              {t("app.admin.leads.stats.signupRate")}
+              {t("app.admin.leads.leads.admin.stats.signupRate")}
             </p>
           </CardContent>
         </Card>
@@ -321,7 +324,7 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.consultationBookedLeads")}
+              {t("app.admin.leads.leads.admin.stats.consultationBookedLeads")}
             </CardTitle>
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -331,7 +334,7 @@ export function LeadsStatsClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {formatPercentage(stats?.consultationBookingRate || 0)}{" "}
-              {t("app.admin.leads.stats.bookingRate")}
+              {t("app.admin.leads.leads.admin.stats.bookingRate")}
             </p>
           </CardContent>
         </Card>
@@ -340,7 +343,9 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.subscriptionConfirmedLeads")}
+              {t(
+                "app.admin.leads.leads.admin.stats.subscriptionConfirmedLeads",
+              )}
             </CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -350,7 +355,7 @@ export function LeadsStatsClient({
             </div>
             <p className="text-xs text-muted-foreground">
               {formatPercentage(stats?.subscriptionConfirmationRate || 0)}{" "}
-              {t("app.admin.leads.stats.confirmationRate")}
+              {t("app.admin.leads.leads.admin.stats.confirmationRate")}
             </p>
           </CardContent>
         </Card>
@@ -359,7 +364,9 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.metrics.website_user_leads")}
+              {t(
+                "app.admin.leads.leads.admin.stats.metrics.website_user_leads",
+              )}
             </CardTitle>
             <Monitor className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -371,7 +378,7 @@ export function LeadsStatsClient({
               {formatPercentage(
                 (stats?.websiteUserLeads || 0) / (stats?.totalLeads || 1),
               )}{" "}
-              {t("app.admin.leads.stats.ofTotal")}
+              {t("app.admin.leads.leads.admin.stats.ofTotal")}
             </p>
           </CardContent>
         </Card>
@@ -380,7 +387,9 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.metrics.newsletter_subscriber_leads")}
+              {t(
+                "app.admin.leads.leads.admin.stats.metrics.newsletter_subscriber_leads",
+              )}
             </CardTitle>
             <MailOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -393,7 +402,7 @@ export function LeadsStatsClient({
                 (stats?.newsletterSubscriberLeads || 0) /
                   (stats?.totalLeads || 1),
               )}{" "}
-              {t("app.admin.leads.stats.ofTotal")}
+              {t("app.admin.leads.leads.admin.stats.ofTotal")}
             </p>
           </CardContent>
         </Card>
@@ -405,7 +414,7 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.unsubscribedLeads")}
+              {t("app.admin.leads.leads.admin.stats.unsubscribedLeads")}
             </CardTitle>
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -417,7 +426,7 @@ export function LeadsStatsClient({
               {formatPercentage(
                 (stats?.unsubscribedLeads || 0) / (stats?.totalLeads || 1),
               )}{" "}
-              {t("app.admin.leads.stats.ofTotal")}
+              {t("app.admin.leads.leads.admin.stats.ofTotal")}
             </p>
           </CardContent>
         </Card>
@@ -426,7 +435,7 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.bouncedLeads")}
+              {t("app.admin.leads.leads.admin.stats.bouncedLeads")}
             </CardTitle>
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -438,7 +447,7 @@ export function LeadsStatsClient({
               {formatPercentage(
                 (stats?.bouncedLeads || 0) / (stats?.totalLeads || 1),
               )}{" "}
-              {t("app.admin.leads.stats.ofTotal")}
+              {t("app.admin.leads.leads.admin.stats.ofTotal")}
             </p>
           </CardContent>
         </Card>
@@ -447,7 +456,7 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.invalidLeads")}
+              {t("app.admin.leads.leads.admin.stats.invalidLeads")}
             </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -459,7 +468,7 @@ export function LeadsStatsClient({
               {formatPercentage(
                 (stats?.invalidLeads || 0) / (stats?.totalLeads || 1),
               )}{" "}
-              {t("app.admin.leads.stats.ofTotal")}
+              {t("app.admin.leads.leads.admin.stats.ofTotal")}
             </p>
           </CardContent>
         </Card>
@@ -471,7 +480,7 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.leadsWithEmailEngagement")}
+              {t("app.admin.leads.leads.admin.stats.leadsWithEmailEngagement")}
             </CardTitle>
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -484,7 +493,7 @@ export function LeadsStatsClient({
                 (stats?.leadsWithEmailEngagement || 0) /
                   (stats?.totalLeads || 1),
               )}{" "}
-              {t("app.admin.leads.stats.ofTotal")}
+              {t("app.admin.leads.leads.admin.stats.ofTotal")}
             </p>
           </CardContent>
         </Card>
@@ -493,7 +502,9 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.leadsWithoutEmailEngagement")}
+              {t(
+                "app.admin.leads.leads.admin.stats.leadsWithoutEmailEngagement",
+              )}
             </CardTitle>
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -506,7 +517,7 @@ export function LeadsStatsClient({
                 (stats?.leadsWithoutEmailEngagement || 0) /
                   (stats?.totalLeads || 1),
               )}{" "}
-              {t("app.admin.leads.stats.ofTotal")}
+              {t("app.admin.leads.leads.admin.stats.ofTotal")}
             </p>
           </CardContent>
         </Card>
@@ -515,7 +526,9 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.averageEmailEngagementScore")}
+              {t(
+                "app.admin.leads.leads.admin.stats.averageEmailEngagementScore",
+              )}
             </CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -524,7 +537,7 @@ export function LeadsStatsClient({
               {formatNumber(stats?.averageEmailEngagementScore || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
-              {t("app.admin.leads.stats.engagementScore")}
+              {t("app.admin.leads.leads.admin.stats.engagementScore")}
             </p>
           </CardContent>
         </Card>
@@ -533,7 +546,7 @@ export function LeadsStatsClient({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("app.admin.leads.stats.totalEmailEngagements")}
+              {t("app.admin.leads.leads.admin.stats.totalEmailEngagements")}
             </CardTitle>
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -542,7 +555,7 @@ export function LeadsStatsClient({
               {formatNumber(stats?.totalEmailEngagements || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
-              {t("app.admin.leads.stats.totalEngagements")}
+              {t("app.admin.leads.leads.admin.stats.totalEngagements")}
             </p>
           </CardContent>
         </Card>
@@ -555,13 +568,13 @@ export function LeadsStatsClient({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              {t("app.admin.leads.stats.todayActivity")}
+              {t("app.admin.leads.leads.admin.stats.todayActivity")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">
-                {t("app.admin.leads.stats.leadsCreatedToday")}
+                {t("app.admin.leads.leads.admin.stats.leadsCreatedToday")}
               </span>
               <span className="text-sm text-muted-foreground">
                 {formatNumber(stats?.leadsCreatedToday || 0)}
@@ -569,7 +582,7 @@ export function LeadsStatsClient({
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">
-                {t("app.admin.leads.stats.leadsUpdatedToday")}
+                {t("app.admin.leads.leads.admin.stats.leadsUpdatedToday")}
               </span>
               <span className="text-sm text-muted-foreground">
                 {formatNumber(stats?.leadsUpdatedToday || 0)}
@@ -583,13 +596,13 @@ export function LeadsStatsClient({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              {t("app.admin.leads.stats.weekActivity")}
+              {t("app.admin.leads.leads.admin.stats.weekActivity")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">
-                {t("app.admin.leads.stats.leadsCreatedThisWeek")}
+                {t("app.admin.leads.leads.admin.stats.leadsCreatedThisWeek")}
               </span>
               <span className="text-sm text-muted-foreground">
                 {formatNumber(stats?.leadsCreatedThisWeek || 0)}
@@ -597,7 +610,7 @@ export function LeadsStatsClient({
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">
-                {t("app.admin.leads.stats.leadsUpdatedThisWeek")}
+                {t("app.admin.leads.leads.admin.stats.leadsUpdatedThisWeek")}
               </span>
               <span className="text-sm text-muted-foreground">
                 {formatNumber(stats?.leadsUpdatedThisWeek || 0)}
@@ -611,13 +624,13 @@ export function LeadsStatsClient({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              {t("app.admin.leads.stats.monthActivity")}
+              {t("app.admin.leads.leads.admin.stats.monthActivity")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">
-                {t("app.admin.leads.stats.leadsCreatedThisMonth")}
+                {t("app.admin.leads.leads.admin.stats.leadsCreatedThisMonth")}
               </span>
               <span className="text-sm text-muted-foreground">
                 {formatNumber(stats?.leadsCreatedThisMonth || 0)}
@@ -625,7 +638,7 @@ export function LeadsStatsClient({
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">
-                {t("app.admin.leads.stats.leadsUpdatedThisMonth")}
+                {t("app.admin.leads.leads.admin.stats.leadsUpdatedThisMonth")}
               </span>
               <span className="text-sm text-muted-foreground">
                 {formatNumber(stats?.leadsUpdatedThisMonth || 0)}
@@ -641,7 +654,7 @@ export function LeadsStatsClient({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Send className="h-4 w-4" />
-              {t("app.admin.leads.stats.campaignStageDistribution")}
+              {t("app.admin.leads.leads.admin.stats.campaignStageDistribution")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -666,7 +679,9 @@ export function LeadsStatsClient({
               <div className="mt-4 pt-3 border-t">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">
-                    {t("app.admin.leads.stats.leadsInActiveCampaigns")}
+                    {t(
+                      "app.admin.leads.leads.admin.stats.leadsInActiveCampaigns",
+                    )}
                   </span>
                   <span className="text-sm text-muted-foreground">
                     {formatNumber(stats?.leadsInActiveCampaigns || 0)}
@@ -674,7 +689,7 @@ export function LeadsStatsClient({
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">
-                    {t("app.admin.leads.stats.leadsNotInCampaigns")}
+                    {t("app.admin.leads.leads.admin.stats.leadsNotInCampaigns")}
                   </span>
                   <span className="text-sm text-muted-foreground">
                     {formatNumber(stats?.leadsNotInCampaigns || 0)}
@@ -690,7 +705,9 @@ export function LeadsStatsClient({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-4 w-4" />
-              {t("app.admin.leads.stats.journeyVariantDistribution")}
+              {t(
+                "app.admin.leads.leads.admin.stats.journeyVariantDistribution",
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -704,12 +721,15 @@ export function LeadsStatsClient({
                           {variant.replace("_", " ")}
                         </span>
                         <span className="text-sm text-muted-foreground">
-                          {t("app.admin.leads.stats.countWithPercentage", {
-                            count: formatNumber(count),
-                            percentage: formatPercentage(
-                              count / (stats?.totalLeads || 1),
-                            ),
-                          })}
+                          {t(
+                            "app.admin.leads.leads.admin.stats.countWithPercentage",
+                            {
+                              count: formatNumber(count),
+                              percentage: formatPercentage(
+                                count / (stats?.totalLeads || 1),
+                              ),
+                            },
+                          )}
                         </span>
                       </div>
                       <Progress
@@ -728,22 +748,22 @@ export function LeadsStatsClient({
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="overview">
-            {t("app.admin.leads.stats.overview")}
+            {t("app.admin.leads.leads.admin.stats.overview")}
           </TabsTrigger>
           <TabsTrigger value="campaigns">
-            {t("app.admin.leads.stats.campaigns")}
+            {t("app.admin.leads.leads.admin.stats.campaigns")}
           </TabsTrigger>
           <TabsTrigger value="performance">
-            {t("app.admin.leads.stats.performance")}
+            {t("app.admin.leads.leads.admin.stats.performance")}
           </TabsTrigger>
           <TabsTrigger value="distribution">
-            {t("app.admin.leads.stats.distribution")}
+            {t("app.admin.leads.leads.admin.stats.distribution")}
           </TabsTrigger>
           <TabsTrigger value="activity">
-            {t("app.admin.leads.stats.activity")}
+            {t("app.admin.leads.leads.admin.stats.activity")}
           </TabsTrigger>
           <TabsTrigger value="topPerformers">
-            {t("app.admin.leads.stats.topPerformers")}
+            {t("app.admin.leads.leads.admin.stats.topPerformers")}
           </TabsTrigger>
         </TabsList>
 
@@ -754,15 +774,19 @@ export function LeadsStatsClient({
               locale={locale}
               data={{
                 series: Object.entries(stats.historicalData).map(
-                  ([, value]) => ({
-                    name: value.name,
-                    data: Array.isArray(value) ? value : value.data || [],
-                    type: value?.type,
-                    color: value?.color,
-                  }),
+                  ([, value]) =>
+                    ({
+                      name: value.name,
+                      nameParams: undefined,
+                      data: value.data,
+                      type: value.type,
+                      color: value.color,
+                    }) as HistoricalDataSeriesType,
                 ),
-                title: t("app.admin.leads.stats.chart.title"),
-                subtitle: t("app.admin.leads.stats.historicalSubtitle"),
+                title: t("app.admin.leads.leads.admin.stats.chart.title"),
+                subtitle: t(
+                  "app.admin.leads.leads.admin.stats.historicalSubtitle",
+                ),
               }}
               isLoading={isLoading}
               height={400}
@@ -777,14 +801,14 @@ export function LeadsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Send className="h-4 w-4" />
-                  {t("app.admin.leads.stats.campaignPerformance")}
+                  {t("app.admin.leads.leads.admin.stats.campaignPerformance")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <p className="text-sm font-medium">
-                      {t("app.admin.leads.stats.emailsSent")}
+                      {t("app.admin.leads.leads.admin.stats.emailsSent")}
                     </p>
                     <p className="text-2xl font-bold">
                       {formatNumber(stats?.totalEmailsSent || 0)}
@@ -792,7 +816,7 @@ export function LeadsStatsClient({
                   </div>
                   <div className="space-y-2">
                     <p className="text-sm font-medium">
-                      {t("app.admin.leads.stats.emailsOpened")}
+                      {t("app.admin.leads.leads.admin.stats.emailsOpened")}
                     </p>
                     <p className="text-2xl font-bold">
                       {formatNumber(stats?.totalEmailsOpened || 0)}
@@ -800,7 +824,7 @@ export function LeadsStatsClient({
                   </div>
                   <div className="space-y-2">
                     <p className="text-sm font-medium">
-                      {t("app.admin.leads.stats.open_rate")}
+                      {t("app.admin.leads.leads.admin.stats.open_rate")}
                     </p>
                     <p className="text-2xl font-bold">
                       {formatPercentage(stats?.averageOpenRate || 0)}
@@ -808,7 +832,7 @@ export function LeadsStatsClient({
                   </div>
                   <div className="space-y-2">
                     <p className="text-sm font-medium">
-                      {t("app.admin.leads.stats.click_rate")}
+                      {t("app.admin.leads.leads.admin.stats.click_rate")}
                     </p>
                     <p className="text-2xl font-bold">
                       {formatPercentage(stats?.averageClickRate || 0)}
@@ -823,7 +847,7 @@ export function LeadsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
-                  {t("app.admin.leads.stats.topCampaigns")}
+                  {t("app.admin.leads.leads.admin.stats.topCampaigns")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -841,7 +865,9 @@ export function LeadsStatsClient({
                           </p>
                           <p className="text-xs text-muted-foreground">
                             {formatNumber(campaign.leadsGenerated)}{" "}
-                            {t("app.admin.leads.stats.leadsGenerated")}
+                            {t(
+                              "app.admin.leads.leads.admin.stats.leadsGenerated",
+                            )}
                           </p>
                         </div>
                         <Badge variant="secondary">
@@ -862,14 +888,16 @@ export function LeadsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-4 w-4" />
-                  {t("app.admin.leads.stats.performanceMetrics")}
+                  {t("app.admin.leads.leads.admin.stats.performanceMetrics")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">
-                      {t("app.admin.leads.stats.avgTimeToConversion")}
+                      {t(
+                        "app.admin.leads.leads.admin.stats.avgTimeToConversion",
+                      )}
                     </span>
                     <span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.averageTimeToConversion || 0)} days
@@ -877,7 +905,7 @@ export function LeadsStatsClient({
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">
-                      {t("app.admin.leads.stats.avgTimeToSignup")}
+                      {t("app.admin.leads.leads.admin.stats.avgTimeToSignup")}
                     </span>
                     <span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.averageTimeToSignup || 0)} days
@@ -885,7 +913,9 @@ export function LeadsStatsClient({
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">
-                      {t("app.admin.leads.stats.avgTimeToConsultation")}
+                      {t(
+                        "app.admin.leads.leads.admin.stats.avgTimeToConsultation",
+                      )}
                     </span>
                     <span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.averageTimeToConsultation || 0)} days
@@ -900,7 +930,7 @@ export function LeadsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Globe className="h-4 w-4" />
-                  {t("app.admin.leads.stats.topSources")}
+                  {t("app.admin.leads.leads.admin.stats.topSources")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -916,7 +946,9 @@ export function LeadsStatsClient({
                           <p className="text-sm font-medium">{source.source}</p>
                           <p className="text-xs text-muted-foreground">
                             {formatNumber(source.leadsGenerated)}{" "}
-                            {t("app.admin.leads.stats.leadsGenerated")}
+                            {t(
+                              "app.admin.leads.leads.admin.stats.leadsGenerated",
+                            )}
                           </p>
                         </div>
                         <div className="text-right">
@@ -924,8 +956,10 @@ export function LeadsStatsClient({
                             {formatPercentage(source.conversionRate)}
                           </Badge>
                           <p className="text-xs text-muted-foreground mt-1">
-                            {t("app.admin.leads.stats.qualityScore")}:{" "}
-                            {formatNumber(source.qualityScore)}
+                            {t(
+                              "app.admin.leads.leads.admin.stats.qualityScore",
+                            )}
+                            : {formatNumber(source.qualityScore)}
                           </p>
                         </div>
                       </div>
@@ -943,7 +977,7 @@ export function LeadsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <PieChart className="h-4 w-4" />
-                  {t("app.admin.leads.stats.statusDistribution")}
+                  {t("app.admin.leads.leads.admin.stats.statusDistribution")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -952,15 +986,18 @@ export function LeadsStatsClient({
                     <div key={index} className="space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">
-                          {status.status}
+                          {status.label}
                         </span>
                         <span className="text-sm text-muted-foreground">
-                          {t("app.admin.leads.stats.countWithPercentage", {
-                            count: formatNumber(status.count),
-                            percentage: formatPercentage(
-                              status.percentage / 100,
-                            ),
-                          })}
+                          {t(
+                            "app.admin.leads.leads.admin.stats.countWithPercentage",
+                            {
+                              count: formatNumber(status.value),
+                              percentage: formatPercentage(
+                                status.percentage / 100,
+                              ),
+                            },
+                          )}
                         </span>
                       </div>
                       <Progress value={status.percentage} className="h-2" />
@@ -975,7 +1012,7 @@ export function LeadsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Globe className="h-4 w-4" />
-                  {t("app.admin.leads.stats.sourceDistribution")}
+                  {t("app.admin.leads.leads.admin.stats.sourceDistribution")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -984,15 +1021,18 @@ export function LeadsStatsClient({
                     <div key={index} className="space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">
-                          {source.source}
+                          {source.label}
                         </span>
                         <span className="text-sm text-muted-foreground">
-                          {t("app.admin.leads.stats.countWithPercentage", {
-                            count: formatNumber(source.count),
-                            percentage: formatPercentage(
-                              source.percentage / 100,
-                            ),
-                          })}
+                          {t(
+                            "app.admin.leads.leads.admin.stats.countWithPercentage",
+                            {
+                              count: formatNumber(source.value),
+                              percentage: formatPercentage(
+                                source.percentage / 100,
+                              ),
+                            },
+                          )}
                         </span>
                       </div>
                       <Progress value={source.percentage} className="h-2" />
@@ -1007,7 +1047,9 @@ export function LeadsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Globe className="h-4 w-4" />
-                  {t("app.admin.leads.stats.geographicDistribution")}
+                  {t(
+                    "app.admin.leads.leads.admin.stats.geographicDistribution",
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1016,15 +1058,18 @@ export function LeadsStatsClient({
                     <div key={index} className="space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">
-                          {country.country}
+                          {country.label}
                         </span>
                         <span className="text-sm text-muted-foreground">
-                          {t("app.admin.leads.stats.countWithPercentage", {
-                            count: formatNumber(country.count),
-                            percentage: formatPercentage(
-                              country.percentage / 100,
-                            ),
-                          })}
+                          {t(
+                            "app.admin.leads.leads.admin.stats.countWithPercentage",
+                            {
+                              count: formatNumber(country.value),
+                              percentage: formatPercentage(
+                                country.percentage / 100,
+                              ),
+                            },
+                          )}
                         </span>
                       </div>
                       <Progress value={country.percentage} className="h-2" />
@@ -1039,14 +1084,16 @@ export function LeadsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
-                  {t("app.admin.leads.stats.dataCompletenessBreakdown")}
+                  {t(
+                    "app.admin.leads.leads.admin.stats.dataCompletenessBreakdown",
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">
-                      {t("app.admin.leads.stats.withBusinessName")}
+                      {t("app.admin.leads.leads.admin.stats.withBusinessName")}
                     </span>
                     <span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.leadsWithBusinessName || 0)}
@@ -1054,7 +1101,7 @@ export function LeadsStatsClient({
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">
-                      {t("app.admin.leads.stats.withContactName")}
+                      {t("app.admin.leads.leads.admin.stats.withContactName")}
                     </span>
                     <span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.leadsWithContactName || 0)}
@@ -1062,7 +1109,7 @@ export function LeadsStatsClient({
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">
-                      {t("app.admin.leads.stats.withPhone")}
+                      {t("app.admin.leads.leads.admin.stats.withPhone")}
                     </span>
                     <span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.leadsWithPhone || 0)}
@@ -1070,7 +1117,7 @@ export function LeadsStatsClient({
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">
-                      {t("app.admin.leads.stats.withWebsite")}
+                      {t("app.admin.leads.leads.admin.stats.withWebsite")}
                     </span>
                     <span className="text-sm text-muted-foreground">
                       {formatNumber(stats?.leadsWithWebsite || 0)}
@@ -1089,7 +1136,7 @@ export function LeadsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
-                  {t("app.admin.leads.stats.recentActivity")}
+                  {t("app.admin.leads.leads.admin.stats.recentActivity")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1128,7 +1175,9 @@ export function LeadsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
-                  {t("app.admin.leads.stats.engagementLevelDistribution")}
+                  {t(
+                    "app.admin.leads.leads.admin.stats.engagementLevelDistribution",
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1138,15 +1187,18 @@ export function LeadsStatsClient({
                       <div key={index} className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">
-                            {engagement.level}
+                            {engagement.label}
                           </span>
                           <span className="text-sm text-muted-foreground">
-                            {t("app.admin.leads.stats.countWithPercentage", {
-                              count: formatNumber(engagement.count),
-                              percentage: formatPercentage(
-                                engagement.percentage / 100,
-                              ),
-                            })}
+                            {t(
+                              "app.admin.leads.leads.admin.stats.countWithPercentage",
+                              {
+                                count: formatNumber(engagement.value),
+                                percentage: formatPercentage(
+                                  engagement.percentage / 100,
+                                ),
+                              },
+                            )}
                           </span>
                         </div>
                         <Progress
@@ -1169,7 +1221,9 @@ export function LeadsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Send className="h-4 w-4" />
-                  {t("app.admin.leads.stats.topPerformingCampaigns")}
+                  {t(
+                    "app.admin.leads.leads.admin.stats.topPerformingCampaigns",
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1188,7 +1242,10 @@ export function LeadsStatsClient({
                       <div className="grid grid-cols-2 gap-4 text-xs">
                         <div>
                           <span className="text-muted-foreground">
-                            {t("app.admin.leads.stats.leadsGenerated")}:
+                            {t(
+                              "app.admin.leads.leads.admin.stats.leadsGenerated",
+                            )}
+                            :
                           </span>
                           <span className="ml-1 font-medium">
                             {formatNumber(campaign.leadsGenerated)}
@@ -1196,7 +1253,10 @@ export function LeadsStatsClient({
                         </div>
                         <div>
                           <span className="text-muted-foreground">
-                            {t("app.admin.leads.stats.conversionRate")}:
+                            {t(
+                              "app.admin.leads.leads.admin.stats.conversionRate",
+                            )}
+                            :
                           </span>
                           <span className="ml-1 font-medium">
                             {formatPercentage(campaign.conversionRate)}
@@ -1204,7 +1264,7 @@ export function LeadsStatsClient({
                         </div>
                         <div>
                           <span className="text-muted-foreground">
-                            {t("app.admin.leads.stats.openRate")}:
+                            {t("app.admin.leads.leads.admin.stats.openRate")}:
                           </span>
                           <span className="ml-1 font-medium">
                             {formatPercentage(campaign.openRate)}
@@ -1212,7 +1272,7 @@ export function LeadsStatsClient({
                         </div>
                         <div>
                           <span className="text-muted-foreground">
-                            {t("app.admin.leads.stats.clickRate")}:
+                            {t("app.admin.leads.leads.admin.stats.clickRate")}:
                           </span>
                           <span className="ml-1 font-medium">
                             {formatPercentage(campaign.clickRate)}
@@ -1230,7 +1290,7 @@ export function LeadsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Globe className="h-4 w-4" />
-                  {t("app.admin.leads.stats.topPerformingSources")}
+                  {t("app.admin.leads.leads.admin.stats.topPerformingSources")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1247,7 +1307,10 @@ export function LeadsStatsClient({
                       <div className="grid grid-cols-3 gap-4 text-xs">
                         <div>
                           <span className="text-muted-foreground">
-                            {t("app.admin.leads.stats.leadsGenerated")}:
+                            {t(
+                              "app.admin.leads.leads.admin.stats.leadsGenerated",
+                            )}
+                            :
                           </span>
                           <span className="ml-1 font-medium">
                             {formatNumber(source.leadsGenerated)}
@@ -1255,7 +1318,10 @@ export function LeadsStatsClient({
                         </div>
                         <div>
                           <span className="text-muted-foreground">
-                            {t("app.admin.leads.stats.conversionRate")}:
+                            {t(
+                              "app.admin.leads.leads.admin.stats.conversionRate",
+                            )}
+                            :
                           </span>
                           <span className="ml-1 font-medium">
                             {formatPercentage(source.conversionRate)}
@@ -1263,7 +1329,10 @@ export function LeadsStatsClient({
                         </div>
                         <div>
                           <span className="text-muted-foreground">
-                            {t("app.admin.leads.stats.qualityScore")}:
+                            {t(
+                              "app.admin.leads.leads.admin.stats.qualityScore",
+                            )}
+                            :
                           </span>
                           <span className="ml-1 font-medium">
                             {formatNumber(source.qualityScore)}

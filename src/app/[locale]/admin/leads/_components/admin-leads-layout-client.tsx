@@ -60,7 +60,7 @@ export function AdminLeadsLayoutClient({
       <div className="flex flex-col space-y-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {t("leads.admin.title")}
+            {t("app.admin.leads.leads.admin.title")}
           </h1>
         </div>
 
@@ -68,7 +68,7 @@ export function AdminLeadsLayoutClient({
       </div>
 
       {/* Import Status Alert */}
-      <ImportStatusAlert locale={locale} />
+      <ImportStatusAlert />
 
       {/* Page Content */}
       {children}

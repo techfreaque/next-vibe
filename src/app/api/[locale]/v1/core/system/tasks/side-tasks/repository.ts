@@ -157,7 +157,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "common.sideTasksRepositoryFetchAllFailed",
+        "app.api.v1.core.system.tasks.sideTasks.common.sideTasksRepositoryFetchAllFailed",
         ErrorResponseTypes.DATABASE_ERROR,
         { error: parsedError.message },
       );
@@ -186,7 +186,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "common.sideTasksRepositoryFetchByIdFailed",
+        "app.api.v1.core.system.tasks.sideTasks.common.sideTasksRepositoryFetchByIdFailed",
         ErrorResponseTypes.DATABASE_ERROR,
         { error: parsedError.message, taskId: id },
       );
@@ -232,7 +232,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "common.sideTasksRepositoryCreateFailed",
+        "app.api.v1.core.system.tasks.sideTasks.common.sideTasksRepositoryCreateFailed",
         ErrorResponseTypes.DATABASE_ERROR,
         { error: parsedError.message, taskName: task.name },
       );
@@ -489,7 +489,12 @@ export class SideTasksRepository implements ISideTasksRepository {
   }
 
   // Route handlers
-  async getStatus(): Promise<
+  async getStatus(
+    _data: Record<string, never>,
+    _user: JwtPayloadType,
+    _locale: CountryLanguage,
+    _logger: EndpointLogger,
+  ): Promise<
     ResponseType<{
       totalTasks: number;
       runningTasks: number;

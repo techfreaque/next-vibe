@@ -10,10 +10,7 @@ import { createEnumOptions } from "../system/unified-ui/cli/vibe/endpoints/endpo
  */
 export const { enum: SubscriptionPlan, options: SubscriptionPlanOptions } =
   createEnumOptions({
-    STARTER: "app.api.v1.core.subscription.enums.plan.starter",
-    PROFESSIONAL: "app.api.v1.core.subscription.enums.plan.professional",
-    PREMIUM: "app.api.v1.core.subscription.enums.plan.premium",
-    ENTERPRISE: "app.api.v1.core.subscription.enums.plan.enterprise",
+    SUBSCRIPTION: "app.api.v1.core.subscription.enums.plan.subscription",
   });
 
 /**
@@ -61,12 +58,7 @@ export const { enum: CancellationReason, options: CancellationReasonOptions } =
  * Database enum arrays for Drizzle ORM
  * Use the same const arrays everywhere - no separate Value types
  */
-export const SubscriptionPlanDB = [
-  SubscriptionPlan.STARTER,
-  SubscriptionPlan.PROFESSIONAL,
-  SubscriptionPlan.PREMIUM,
-  SubscriptionPlan.ENTERPRISE,
-] as const;
+export const SubscriptionPlanDB = [SubscriptionPlan.SUBSCRIPTION] as const;
 
 export const SubscriptionStatusDB = [
   SubscriptionStatus.INCOMPLETE,

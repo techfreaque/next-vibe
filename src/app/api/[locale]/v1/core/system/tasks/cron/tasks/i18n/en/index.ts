@@ -108,4 +108,102 @@ export const translations = {
       },
     },
   },
+  post: {
+    title: "Create Cron Task",
+    description: "Create a new cron task",
+    container: {
+      title: "Create Task",
+      description: "Configure a new cron task",
+    },
+    fields: {
+      name: {
+        label: "Task Name",
+        description: "Unique name for the task",
+        placeholder: "Enter task name...",
+      },
+      description: {
+        label: "Description",
+        description: "Task description",
+        placeholder: "Enter description...",
+      },
+      schedule: {
+        label: "Schedule",
+        description: "Cron schedule expression",
+        placeholder: "*/5 * * * *",
+      },
+      priority: {
+        label: "Priority",
+        description: "Task priority level",
+      },
+      category: {
+        label: "Category",
+        description: "Task category",
+      },
+      enabled: {
+        label: "Enabled",
+        description: "Enable or disable the task",
+      },
+      timeout: {
+        label: "Timeout (ms)",
+        description: "Maximum execution time in milliseconds",
+      },
+      retries: {
+        label: "Retries",
+        description: "Number of retry attempts",
+      },
+      retryDelay: {
+        label: "Retry Delay (ms)",
+        description: "Delay between retries in milliseconds",
+      },
+    },
+    response: {
+      task: {
+        title: "Created Task",
+      },
+    },
+    errors: {
+      validation: {
+        title: "Validation failed",
+        description: "The provided task data is invalid",
+      },
+      unauthorized: {
+        title: "Unauthorized",
+        description: "You do not have permission to create tasks",
+      },
+      internal: {
+        title: "Internal error",
+        description: "An error occurred while creating the task",
+      },
+      forbidden: {
+        title: "Forbidden",
+        description: "Access to this resource is forbidden",
+      },
+      conflict: {
+        title: "Conflict",
+        description: "A task with this name already exists",
+      },
+      network: {
+        title: "Network error",
+        description: "A network error occurred",
+      },
+      unknown: {
+        title: "Unknown error",
+        description: "An unknown error occurred",
+      },
+      notFound: {
+        title: "Not found",
+        description: "The requested resource was not found",
+      },
+      unsaved: {
+        title: "Unsaved changes",
+        description: "There are unsaved changes",
+      },
+    },
+    success: {
+      created: {
+        title: "Task created",
+        description: "The task has been created successfully",
+      },
+    },
+  },
 };

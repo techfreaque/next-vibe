@@ -12,6 +12,11 @@ export const translations: typeof enTranslations = {
     initialized: "Lead-Tracking-Komponente initialisiert",
   },
   error: "Fehler beim Lead-Tracking",
+  errors: {
+    default: "Ein Fehler ist aufgetreten",
+    missingId: "Fehlende Tracking-ID",
+    invalidUrl: "Ungültige URL",
+  },
   data: {
     captured: "Lead-Tracking-Daten erfasst",
     capture: {

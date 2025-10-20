@@ -30,7 +30,7 @@ async function getPlanIcon(
   const iconColor = "#ffffff";
 
   switch (planId) {
-    case SubscriptionPlan.STARTER: {
+    case SubscriptionPlan.SUBSCRIPTION: {
       const starIcon = await LucideEmailIcon("Star", {
         width: iconSize,
         height: iconSize,
@@ -54,96 +54,6 @@ async function getPlanIcon(
                 }}
               >
                 {starIcon}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      );
-    }
-    case SubscriptionPlan.PROFESSIONAL: {
-      const zapIcon = await LucideEmailIcon("Zap", {
-        width: iconSize,
-        height: iconSize,
-        color: iconColor,
-        // eslint-disable-next-line i18next/no-literal-string
-        alt: "⚡",
-      });
-      return (
-        <table style={{ margin: "0 auto", marginBottom: "8px" }}>
-          <tbody>
-            <tr>
-              <td
-                style={{
-                  width: "48px",
-                  height: "48px",
-                  borderRadius: "50%",
-                  background:
-                    "linear-gradient(135deg, #22d3ee 0%, #0891b2 100%)",
-                  textAlign: "center",
-                  verticalAlign: "middle",
-                }}
-              >
-                {zapIcon}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      );
-    }
-    case SubscriptionPlan.PREMIUM: {
-      const crownIcon = await LucideEmailIcon("Crown", {
-        width: iconSize,
-        height: iconSize,
-        color: iconColor,
-        // eslint-disable-next-line i18next/no-literal-string
-        alt: "👑",
-      });
-      return (
-        <table style={{ margin: "0 auto", marginBottom: "8px" }}>
-          <tbody>
-            <tr>
-              <td
-                style={{
-                  width: "48px",
-                  height: "48px",
-                  borderRadius: "50%",
-                  background:
-                    "linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)",
-                  textAlign: "center",
-                  verticalAlign: "middle",
-                }}
-              >
-                {crownIcon}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      );
-    }
-    case SubscriptionPlan.ENTERPRISE: {
-      const buildingIcon = await LucideEmailIcon("Building", {
-        width: iconSize,
-        height: iconSize,
-        color: iconColor,
-        // eslint-disable-next-line i18next/no-literal-string
-        alt: "🏢",
-      });
-      return (
-        <table style={{ margin: "0 auto", marginBottom: "8px" }}>
-          <tbody>
-            <tr>
-              <td
-                style={{
-                  width: "48px",
-                  height: "48px",
-                  borderRadius: "50%",
-                  background:
-                    "linear-gradient(135deg, #4b5563 0%, #1f2937 100%)",
-                  textAlign: "center",
-                  verticalAlign: "middle",
-                }}
-              >
-                {buildingIcon}
               </td>
             </tr>
           </tbody>
@@ -286,13 +196,8 @@ export async function EmailPricingSection({
           iconName = "Video";
           iconColor = "#ec4899"; // pink-600
         } else if (feature.feature.toLowerCase().includes("post")) {
-          if (planId === SubscriptionPlan.ENTERPRISE) {
-            iconName = "Rocket";
-            iconColor = "#6366f1"; // indigo-600
-          } else {
-            iconName = "Star";
-            iconColor = "#9333ea"; // purple-600
-          }
+          iconName = "Star";
+          iconColor = "#9333ea"; // purple-600
         } else if (feature.feature.toLowerCase().includes("production")) {
           iconName = "Building";
           iconColor = "#9333ea"; // purple-600
@@ -378,73 +283,71 @@ export async function EmailPricingSection({
                 </td>
               </tr>
               {/* Add "or" separator between features - exclude Enterprise plans */}
-              {i === 0 &&
-                premiumFeatures.length > 1 &&
-                planId !== SubscriptionPlan.ENTERPRISE && (
-                  <tr>
-                    <td style={{ padding: "4px 0" }}>
-                      <table style={{ width: "100%" }}>
-                        <tbody>
-                          <tr>
-                            <td
+              {i === 0 && premiumFeatures.length > 1 && (
+                <tr>
+                  <td style={{ padding: "4px 0" }}>
+                    <table style={{ width: "100%" }}>
+                      <tbody>
+                        <tr>
+                          <td
+                            style={{
+                              width: "40%",
+                              position: "relative",
+                            }}
+                          >
+                            <div
                               style={{
-                                width: "40%",
+                                borderBottom: "1px solid #e5e7eb",
+                                position: "absolute",
+                                top: "50%",
+                                left: "0",
+                                right: "0",
+                              }}
+                            />
+                          </td>
+                          <td
+                            style={{
+                              textAlign: "center",
+                              width: "20%",
+                            }}
+                          >
+                            <Text
+                              style={{
+                                fontSize: "12px",
+                                color: "#6b7280",
+                                margin: "0",
+                                padding: "0 8px",
+                                lineHeight: "1",
+                                backgroundColor: "#ffffff",
                                 position: "relative",
+                                zIndex: "1",
                               }}
                             >
-                              <div
-                                style={{
-                                  borderBottom: "1px solid #e5e7eb",
-                                  position: "absolute",
-                                  top: "50%",
-                                  left: "0",
-                                  right: "0",
-                                }}
-                              />
-                            </td>
-                            <td
+                              {t("pricing.plans.orSeparator")}
+                            </Text>
+                          </td>
+                          <td
+                            style={{
+                              width: "40%",
+                              position: "relative",
+                            }}
+                          >
+                            <div
                               style={{
-                                textAlign: "center",
-                                width: "20%",
+                                borderBottom: "1px solid #e5e7eb",
+                                position: "absolute",
+                                top: "50%",
+                                left: "0",
+                                right: "0",
                               }}
-                            >
-                              <Text
-                                style={{
-                                  fontSize: "12px",
-                                  color: "#6b7280",
-                                  margin: "0",
-                                  padding: "0 8px",
-                                  lineHeight: "1",
-                                  backgroundColor: "#ffffff",
-                                  position: "relative",
-                                  zIndex: "1",
-                                }}
-                              >
-                                {t("pricing.plans.orSeparator")}
-                              </Text>
-                            </td>
-                            <td
-                              style={{
-                                width: "40%",
-                                position: "relative",
-                              }}
-                            >
-                              <div
-                                style={{
-                                  borderBottom: "1px solid #e5e7eb",
-                                  position: "absolute",
-                                  top: "50%",
-                                  left: "0",
-                                  right: "0",
-                                }}
-                              />
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </td>
-                  </tr>
-                )}
+                            />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         );
@@ -546,9 +449,7 @@ export async function EmailPricingSection({
               >
                 {plan.highlighted && plan.badge
                   ? plan.badge
-                  : plan.id === SubscriptionPlan.PREMIUM
-                    ? t("pricing.plans.PREMIUM.featureBadge")
-                    : t("pricing.plans.ENTERPRISE.featureBadge")}
+                  :  t("pricing.plans.PREMIUM.featureBadge")}
               </div>
             </td>
           </tr>
@@ -594,14 +495,12 @@ export async function EmailPricingSection({
                         display: "inline",
                       }}
                     >
-                      {plan.isEnterprise
-                        ? t("pricing.plans.ENTERPRISE.price")
-                        : formatCurrencyNoDecimals(
+                      { formatCurrencyNoDecimals(
                             plan.price,
                             plan.currency,
                             locale,
                           )}
-                      {!plan.isEnterprise && (
+                      {  (
                         <span
                           style={{
                             fontSize: "16px",

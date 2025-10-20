@@ -808,7 +808,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     }>;
 
     try {
-      const results: EslintResult = JSON.parse(stdout);
+      const results: EslintResult = JSON.parse(stdout) as EslintResult;
 
       // If --fix was used, write the fixed content back to files in parallel
       if (shouldFix) {

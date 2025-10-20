@@ -37,11 +37,11 @@ import {
 // Create country and language enums from i18n config
 export const countryEnum = pgEnum(
   "country",
-  Object.values(Countries) as [string, ...string[]],
+  Object.values(Countries),
 );
 export const languageEnum = pgEnum(
   "language",
-  Object.values(Languages) as [string, ...string[]],
+  Object.values(Languages),
 );
 
 /**

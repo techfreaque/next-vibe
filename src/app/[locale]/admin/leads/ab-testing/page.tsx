@@ -27,7 +27,7 @@ export default async function ABTestingPage({
       {/* Page Description */}
       <div>
         <p className="text-gray-600 dark:text-gray-400">
-          {t("leads.admin.tabs.abTesting_description")}
+          {t("app.admin.leads.leads.admin.tabs.abTesting_description")}
         </p>
       </div>
 

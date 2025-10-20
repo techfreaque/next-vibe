@@ -11,7 +11,7 @@ import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 import { Button, Textarea } from "@/packages/next-vibe-ui/web/ui";
 
-import type { ModelId } from "../../../lib/config/models";
+import type { ModelId } from "../../../types";
 import { ModelSelector } from "../../input/model-selector";
 import { PersonaSelector } from "../../input/persona-selector";
 

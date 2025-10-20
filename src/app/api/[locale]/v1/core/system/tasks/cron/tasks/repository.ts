@@ -165,6 +165,9 @@ function formatTaskResponse(
       (task.enabled
         ? calculateNextExecutionTime(task.schedule || undefined)?.toISOString()
         : undefined),
+    version: parseInt(task.version.split(".")[0] || "1", 10),
+    createdAt: task.createdAt.toISOString(),
+    updatedAt: task.updatedAt.toISOString(),
   };
   return formatted;
 }
@@ -279,7 +282,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       logger.error("Failed to retrieve cron tasks", parsedError);
 
       return createErrorResponse(
-        "app.api.v1.core.system.tasks.cron.tasks.get.errors.internal.title",
+        "app.api.v1.core.system.tasks.cronSystem.tasks.get.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -307,7 +310,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
           name: data.name,
         });
         return createErrorResponse(
-          "app.api.v1.core.system.tasks.cron.tasks.post.errors.conflict.title",
+          "app.api.v1.core.system.tasks.cronSystem.tasks.post.errors.conflict.title",
           ErrorResponseTypes.CONFLICT,
         );
       }
@@ -346,7 +349,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       if (!createdTask) {
         logger.error("Failed to create task - no task returned");
         return createErrorResponse(
-          "app.api.v1.core.system.tasks.cron.tasks.post.errors.internal.title",
+          "app.api.v1.core.system.tasks.cronSystem.tasks.post.errors.internal.title",
           ErrorResponseTypes.INTERNAL_ERROR,
         );
       }
@@ -389,13 +392,13 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       // Check for unique constraint violation
       if (parsedError.message?.includes(UNIQUE_CONSTRAINT_ERROR)) {
         return createErrorResponse(
-          "app.api.v1.core.system.tasks.cron.tasks.post.errors.conflict.title",
+          "app.api.v1.core.system.tasks.cronSystem.tasks.post.errors.conflict.title",
           ErrorResponseTypes.CONFLICT,
         );
       }
 
       return createErrorResponse(
-        "app.api.v1.core.system.tasks.cron.tasks.post.errors.internal.title",
+        "app.api.v1.core.system.tasks.cronSystem.tasks.post.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
