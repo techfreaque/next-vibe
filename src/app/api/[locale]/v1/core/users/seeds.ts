@@ -48,7 +48,19 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     }
 
     const adminUser = adminUserResponse.data;
-    const adminJwtPayload = { id: adminUser.id, isPublic: false } as const;
+
+    if (!adminUser.leadId) {
+      logger.error(
+        "❌ Admin user has no leadId, skipping users management seeding",
+      );
+      return;
+    }
+
+    const adminJwtPayload = {
+      id: adminUser.id,
+      leadId: adminUser.leadId,
+      isPublic: false,
+    } as const;
 
     // Create sample users for testing user management functionality
     const sampleUsers = [
@@ -165,7 +177,19 @@ export async function test(logger: EndpointLogger): Promise<void> {
     }
 
     const adminUser = adminUserResponse.data;
-    const adminJwtPayload = { id: adminUser.id, isPublic: false } as const;
+
+    if (!adminUser.leadId) {
+      logger.error(
+        "❌ Admin user has no leadId, skipping test users management seeding",
+      );
+      return;
+    }
+
+    const adminJwtPayload = {
+      id: adminUser.id,
+      leadId: adminUser.leadId,
+      isPublic: false,
+    } as const;
 
     // Create minimal test user for user management testing
     const testUserData = createUserManagementSeed({

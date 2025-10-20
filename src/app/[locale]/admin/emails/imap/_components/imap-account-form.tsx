@@ -7,10 +7,13 @@
 
 import type { JSX } from "react";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import { ImapAccountCreateForm } from "./imap-account-create-form";
 import { ImapAccountEditForm } from "./imap-account-edit-form";
 
 interface ImapAccountFormProps {
+  locale: CountryLanguage;
   accountId?: string | null;
   onSuccess: () => void;
   onCancel: () => void;
@@ -21,6 +24,7 @@ interface ImapAccountFormProps {
  * Routes to appropriate create or edit form based on accountId
  */
 export function ImapAccountForm({
+  locale,
   accountId,
   onSuccess,
   onCancel,
@@ -28,6 +32,7 @@ export function ImapAccountForm({
   if (accountId) {
     return (
       <ImapAccountEditForm
+        locale={locale}
         accountId={accountId}
         onSuccess={onSuccess}
         onCancel={onCancel}
@@ -35,5 +40,11 @@ export function ImapAccountForm({
     );
   }
 
-  return <ImapAccountCreateForm onSuccess={onSuccess} onCancel={onCancel} />;
+  return (
+    <ImapAccountCreateForm
+      locale={locale}
+      onSuccess={onSuccess}
+      onCancel={onCancel}
+    />
+  );
 }

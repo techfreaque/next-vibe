@@ -12,10 +12,13 @@ import type { FormEvent, JSX } from "react";
 
 import { useImapAccountByIdEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/[id]/hooks";
 import { ImapAuthMethod } from "@/app/api/[locale]/v1/core/emails/imap-client/enum";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { useTranslation } from "@/i18n/core/client";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ImapAccountEditFormProps {
   accountId: string;
+  locale: CountryLanguage;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -26,14 +29,19 @@ interface ImapAccountEditFormProps {
  */
 export function ImapAccountEditForm({
   accountId,
+  locale,
   onSuccess,
   onCancel,
 }: ImapAccountEditFormProps): JSX.Element {
   const { t } = useTranslation();
-  const endpoint = useImapAccountByIdEndpoint({
-    id: accountId,
-    enabled: true,
-  });
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const endpoint = useImapAccountByIdEndpoint(
+    {
+      accountId,
+      enabled: true,
+    },
+    logger,
+  );
 
   // Handle form submission
   const handleSubmit = async (e: FormEvent): Promise<void> => {

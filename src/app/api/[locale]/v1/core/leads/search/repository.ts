@@ -16,27 +16,23 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../user/auth/definition";
-import type { LeadResponseType } from "../definition";
 import { LeadSortField, SortOrder } from "../enum";
 import { leadsRepository } from "../repository";
+import type { LeadSearchGetResponseOutput } from "./definition";
 
 /**
- * Search request interface - temporarily using simple types
+ * Search request interface - matches definition with defaults
  */
 interface SearchRequestType {
   search?: string;
-  limit?: number;
-  offset?: number;
+  limit: number;
+  offset: number;
 }
 
 /**
- * Search response interface
+ * Search response interface - derived from definition
  */
-interface SearchResponseType {
-  leads: LeadResponseType[];
-  total: number;
-  hasMore: boolean;
-}
+type SearchResponseType = LeadSearchGetResponseOutput;
 
 /**
  * Lead Search Repository Interface
@@ -115,10 +111,42 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
     // Calculate if there are more results
     const hasMore = responseData.leads.length === limit;
 
+    // Transform leads to match search definition schema
+    const transformedLeads = responseData.leads.map((lead) => ({
+      id: lead.id,
+      email: lead.email || "",
+      businessName: lead.businessName,
+      phone: lead.phone || undefined,
+      website: lead.website || undefined,
+      country: lead.country,
+      language: lead.language,
+      status: lead.status,
+      source: lead.source || undefined,
+      notes: lead.notes || undefined,
+      convertedUserId: lead.convertedUserId,
+      convertedAt: lead.convertedAt?.toISOString() ?? null,
+      signedUpAt: lead.signedUpAt?.toISOString() ?? null,
+      consultationBookedAt: lead.consultationBookedAt?.toISOString() ?? null,
+      subscriptionConfirmedAt:
+        lead.subscriptionConfirmedAt?.toISOString() ?? null,
+      currentCampaignStage: lead.currentCampaignStage,
+      emailsSent: lead.emailsSent,
+      lastEmailSentAt: lead.lastEmailSentAt?.toISOString() ?? null,
+      unsubscribedAt: lead.unsubscribedAt?.toISOString() ?? null,
+      emailsOpened: lead.emailsOpened,
+      emailsClicked: lead.emailsClicked,
+      lastEngagementAt: lead.lastEngagementAt?.toISOString() ?? null,
+      metadata: lead.metadata || undefined,
+      createdAt: lead.createdAt.toISOString(),
+      updatedAt: lead.updatedAt.toISOString(),
+    }));
+
     return createSuccessResponse({
-      leads: responseData.leads,
-      total: responseData.total,
-      hasMore,
+      response: {
+        leads: transformedLeads,
+        total: responseData.total,
+        hasMore,
+      },
     });
   }
 }

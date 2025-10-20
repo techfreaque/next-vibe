@@ -747,6 +747,57 @@ const { GET } = createEndpoint({
           totalPages: 5,
         },
       },
+      filtered: {
+        emails: [
+          {
+            emailCore: {
+              id: "123e4567-e89b-12d3-a456-426614174000",
+              subject: "Welcome to Our Amazing Service!",
+              status: EmailStatus.DELIVERED,
+            },
+            emailParties: {
+              recipient: {
+                recipientEmail: "john.doe@example.com",
+                recipientName: "John Doe",
+              },
+              sender: {
+                senderEmail: "welcome@company.com",
+                senderName: "Company Welcome Team",
+              },
+            },
+            emailMetadata: {
+              type: EmailType.TRANSACTIONAL,
+              templateName: "welcome_onboarding",
+              emailProvider: "resend",
+              externalId: "msg_7h8i9j0k1l2m3n4o",
+            },
+            emailEngagement: {
+              sentAt: "2024-01-07T10:00:00.000Z",
+              deliveredAt: "2024-01-07T10:01:30.000Z",
+              openedAt: "2024-01-07T10:15:45.000Z",
+              clickedAt: "2024-01-07T10:22:10.000Z",
+            },
+            technicalDetails: {
+              retryCount: 0,
+              error: null,
+              associatedIds: {
+                userId: "user_abc123def456",
+                leadId: "lead_789xyz012abc",
+              },
+              timestamps: {
+                createdAt: "2024-01-07T09:58:00.000Z",
+                updatedAt: "2024-01-07T10:22:10.000Z",
+              },
+            },
+          },
+        ],
+        pagination: {
+          page: 1,
+          limit: 20,
+          total: 1,
+          totalPages: 1,
+        },
+      },
     },
   },
 });

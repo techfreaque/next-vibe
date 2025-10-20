@@ -1,4 +1,6 @@
 export const translations = {
+  printAriaLabel: "Print terms of service",
+  printButton: "Print",
   post: {
     title: "Terms Of Service",
     description: "Terms Of Service endpoint",

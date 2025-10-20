@@ -27,7 +27,7 @@ function createLocalSubscriptionSeed(
   return {
     userId,
     status: SubscriptionStatus.ACTIVE,
-    planId: SubscriptionPlan.STARTER,
+    planId: SubscriptionPlan.SUBSCRIPTION,
     billingInterval: BillingInterval.MONTHLY,
     currentPeriodStart: now,
     currentPeriodEnd: oneMonthFromNow,
@@ -81,7 +81,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 
     // Create local subscription record for demo user (active professional plan)
     const demoSubscriptionData = createLocalSubscriptionSeed(demoUser.id, {
-      planId: SubscriptionPlan.PROFESSIONAL,
+      planId: SubscriptionPlan.SUBSCRIPTION,
       billingInterval: BillingInterval.MONTHLY,
       status: SubscriptionStatus.ACTIVE,
     });
@@ -118,7 +118,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
         const adminSubscriptionData = createLocalSubscriptionSeed(
           adminUser.id,
           {
-            planId: SubscriptionPlan.PREMIUM,
+            planId: SubscriptionPlan.SUBSCRIPTION,
             billingInterval: BillingInterval.YEARLY,
             status: SubscriptionStatus.ACTIVE,
           },
@@ -176,13 +176,13 @@ export async function test(logger: EndpointLogger): Promise<void> {
     const testSubscriptions = [
       // Active subscription for test user 1
       createLocalSubscriptionSeed(testUser1.id, {
-        planId: SubscriptionPlan.STARTER,
+        planId: SubscriptionPlan.SUBSCRIPTION,
         billingInterval: BillingInterval.MONTHLY,
         status: SubscriptionStatus.ACTIVE,
       }),
       // Canceled subscription for test user 2 (for testing edge cases)
       createLocalSubscriptionSeed(testUser2.id, {
-        planId: SubscriptionPlan.PROFESSIONAL,
+        planId: SubscriptionPlan.SUBSCRIPTION,
         billingInterval: BillingInterval.MONTHLY,
         status: SubscriptionStatus.CANCELED,
         cancelAtPeriodEnd: true,
@@ -266,7 +266,7 @@ export async function prod(logger: EndpointLogger): Promise<void> {
         const adminSubscriptionData = createLocalSubscriptionSeed(
           adminUser.id,
           {
-            planId: SubscriptionPlan.ENTERPRISE,
+            planId: SubscriptionPlan.SUBSCRIPTION,
             billingInterval: BillingInterval.YEARLY,
             status: SubscriptionStatus.ACTIVE,
           },

@@ -18,7 +18,7 @@ import Stripe from "stripe";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { Countries, CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
@@ -40,70 +40,28 @@ export const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
 export const STRIPE_PRICE_IDS = {
   DE: {
     [BillingInterval.MONTHLY]: {
-      [SubscriptionPlan.STARTER]:
-        env.STRIPE_STARTER_MONTHLY_DE_PRICE_ID ||
-        "price_starter_monthly_de_dev",
-      [SubscriptionPlan.PROFESSIONAL]:
-        env.STRIPE_PROFESSIONAL_MONTHLY_DE_PRICE_ID ||
-        "price_professional_monthly_de_dev",
-      [SubscriptionPlan.PREMIUM]:
-        env.STRIPE_PREMIUM_MONTHLY_DE_PRICE_ID ||
-        "price_premium_monthly_de_dev",
+      [SubscriptionPlan.SUBSCRIPTION]: env.STRIPE_STARTER_MONTHLY_DE_PRICE_ID,
     },
     [BillingInterval.YEARLY]: {
-      [SubscriptionPlan.STARTER]:
-        env.STRIPE_STARTER_YEARLY_DE_PRICE_ID || "price_starter_yearly_de_dev",
-      [SubscriptionPlan.PROFESSIONAL]:
-        env.STRIPE_PROFESSIONAL_YEARLY_DE_PRICE_ID ||
-        "price_professional_yearly_de_dev",
-      [SubscriptionPlan.PREMIUM]:
-        env.STRIPE_PREMIUM_YEARLY_DE_PRICE_ID || "price_premium_yearly_de_dev",
+      [SubscriptionPlan.SUBSCRIPTION]: env.STRIPE_STARTER_YEARLY_DE_PRICE_ID,
     },
   },
   PL: {
     [BillingInterval.MONTHLY]: {
-      [SubscriptionPlan.STARTER]:
-        env.STRIPE_STARTER_MONTHLY_PL_PRICE_ID ||
-        "price_starter_monthly_pl_dev",
-      [SubscriptionPlan.PROFESSIONAL]:
-        env.STRIPE_PROFESSIONAL_MONTHLY_PL_PRICE_ID ||
-        "price_professional_monthly_pl_dev",
-      [SubscriptionPlan.PREMIUM]:
-        env.STRIPE_PREMIUM_MONTHLY_PL_PRICE_ID ||
-        "price_premium_monthly_pl_dev",
+      [SubscriptionPlan.SUBSCRIPTION]: env.STRIPE_STARTER_MONTHLY_PL_PRICE_ID,
     },
     [BillingInterval.YEARLY]: {
-      [SubscriptionPlan.STARTER]:
-        env.STRIPE_STARTER_YEARLY_PL_PRICE_ID || "price_starter_yearly_pl_dev",
-      [SubscriptionPlan.PROFESSIONAL]:
-        env.STRIPE_PROFESSIONAL_YEARLY_PL_PRICE_ID ||
-        "price_professional_yearly_pl_dev",
-      [SubscriptionPlan.PREMIUM]:
-        env.STRIPE_PREMIUM_YEARLY_PL_PRICE_ID || "price_premium_yearly_pl_dev",
+      [SubscriptionPlan.SUBSCRIPTION]: env.STRIPE_STARTER_YEARLY_PL_PRICE_ID,
     },
   },
   GLOBAL: {
     [BillingInterval.MONTHLY]: {
-      [SubscriptionPlan.STARTER]:
-        env.STRIPE_STARTER_MONTHLY_GLOBAL_PRICE_ID ||
-        "price_starter_monthly_global_dev",
-      [SubscriptionPlan.PROFESSIONAL]:
-        env.STRIPE_PROFESSIONAL_MONTHLY_GLOBAL_PRICE_ID ||
-        "price_professional_monthly_global_dev",
-      [SubscriptionPlan.PREMIUM]:
-        env.STRIPE_PREMIUM_MONTHLY_GLOBAL_PRICE_ID ||
-        "price_premium_monthly_global_dev",
+      [SubscriptionPlan.SUBSCRIPTION]:
+        env.STRIPE_STARTER_MONTHLY_GLOBAL_PRICE_ID,
     },
     [BillingInterval.YEARLY]: {
-      [SubscriptionPlan.STARTER]:
-        env.STRIPE_STARTER_YEARLY_GLOBAL_PRICE_ID ||
-        "price_starter_yearly_global_dev",
-      [SubscriptionPlan.PROFESSIONAL]:
-        env.STRIPE_PROFESSIONAL_YEARLY_GLOBAL_PRICE_ID ||
-        "price_professional_yearly_global_dev",
-      [SubscriptionPlan.PREMIUM]:
-        env.STRIPE_PREMIUM_YEARLY_GLOBAL_PRICE_ID ||
-        "price_premium_yearly_global_dev",
+      [SubscriptionPlan.SUBSCRIPTION]:
+        env.STRIPE_STARTER_YEARLY_GLOBAL_PRICE_ID,
     },
   },
 };
@@ -114,15 +72,13 @@ export const STRIPE_PRICE_IDS = {
 const getCountryFromLocale = (
   locale: CountryLanguage,
 ): keyof typeof STRIPE_PRICE_IDS => {
-  // Extract country part from locale (e.g., "en-GLOBAL" -> "GLOBAL", "de-DE" -> "DE")
-  const countryPart = locale.split("-")[1];
-
-  // Validate that the country is supported
-  if (countryPart && countryPart in STRIPE_PRICE_IDS) {
-    return countryPart as keyof typeof STRIPE_PRICE_IDS;
+  const countryPart = locale.split("-")[1] as Countries;
+  if (countryPart === "DE") {
+    return "DE";
   }
-
-  // Default to GLOBAL if country is not found or not supported
+  if (countryPart === "PL") {
+    return "PL";
+  }
   return "GLOBAL";
 };
 
@@ -130,7 +86,7 @@ const getCountryFromLocale = (
  * Helper function to get Stripe price ID for a plan, billing interval, and region
  */
 const getStripePriceId = (
-  planId: Exclude<SubscriptionPlanValue, typeof SubscriptionPlan.ENTERPRISE>,
+  planId: SubscriptionPlanValue,
   billingInterval: BillingIntervalValue,
   country: keyof typeof STRIPE_PRICE_IDS,
 ): string | undefined => {
@@ -139,26 +95,10 @@ const getStripePriceId = (
   // Type-safe access to nested record structure
   if (billingInterval === BillingInterval.MONTHLY) {
     const monthlyPrices = regionPrices[BillingInterval.MONTHLY];
-    if (planId === SubscriptionPlan.STARTER) {
-      return monthlyPrices[SubscriptionPlan.STARTER];
-    }
-    if (planId === SubscriptionPlan.PROFESSIONAL) {
-      return monthlyPrices[SubscriptionPlan.PROFESSIONAL];
-    }
-    if (planId === SubscriptionPlan.PREMIUM) {
-      return monthlyPrices[SubscriptionPlan.PREMIUM];
-    }
+    return monthlyPrices[SubscriptionPlan.SUBSCRIPTION];
   } else if (billingInterval === BillingInterval.YEARLY) {
     const yearlyPrices = regionPrices[BillingInterval.YEARLY];
-    if (planId === SubscriptionPlan.STARTER) {
-      return yearlyPrices[SubscriptionPlan.STARTER];
-    }
-    if (planId === SubscriptionPlan.PROFESSIONAL) {
-      return yearlyPrices[SubscriptionPlan.PROFESSIONAL];
-    }
-    if (planId === SubscriptionPlan.PREMIUM) {
-      return yearlyPrices[SubscriptionPlan.PREMIUM];
-    }
+    return yearlyPrices[SubscriptionPlan.SUBSCRIPTION];
   }
 
   return undefined;
@@ -271,60 +211,12 @@ export class SubscriptionCheckoutRepositoryImpl
       // Get the country from locale for region-specific pricing
       country = getCountryFromLocale(locale);
 
-      // Validate that planId is not ENTERPRISE (ENTERPRISE requires custom pricing)
-      if (data.planId === SubscriptionPlan.ENTERPRISE) {
-        logger.error(
-          t(
-            "app.api.v1.core.subscription.checkout.post.errors.validation.reason.enterpriseCustomPricing",
-          ),
-          {
-            planId: data.planId,
-            userId: user.id,
-          },
-        );
-        return createErrorResponse(
-          "app.api.v1.core.subscription.checkout.post.errors.validation.title",
-          ErrorResponseTypes.BAD_REQUEST,
-          {
-            reason: t(
-              "app.api.v1.core.subscription.checkout.post.errors.validation.reason.enterpriseCustomPricing",
-            ),
-          },
-        );
-      }
-
       // Get the Stripe price ID for the plan, billing interval, and region
-      // Use explicit check to narrow type for TypeScript
-      if (
-        data.planId === SubscriptionPlan.STARTER ||
-        data.planId === SubscriptionPlan.PROFESSIONAL ||
-        data.planId === SubscriptionPlan.PREMIUM
-      ) {
-        // Validate billing interval
-        if (
-          data.billingInterval === BillingInterval.MONTHLY ||
-          data.billingInterval === BillingInterval.YEARLY
-        ) {
-          stripePriceId = getStripePriceId(
-            data.planId,
-            data.billingInterval,
-            country,
-          );
-        } else {
-          return createErrorResponse(
-            "app.api.v1.core.subscription.checkout.post.errors.validation.title",
-            ErrorResponseTypes.BAD_REQUEST,
-            { billingInterval: data.billingInterval },
-          );
-        }
-      } else {
-        // This should never happen due to the ENTERPRISE check above
-        return createErrorResponse(
-          "app.api.v1.core.subscription.checkout.post.errors.validation.title",
-          ErrorResponseTypes.BAD_REQUEST,
-          { planId: data.planId },
-        );
-      }
+      stripePriceId = getStripePriceId(
+        data.planId,
+        data.billingInterval,
+        country,
+      );
 
       logger.debug("Using Stripe price ID", {
         stripePriceId,

@@ -9,26 +9,22 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React from "react";
 
+import type { ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { ModelId } from "../../lib/config/models";
 import { chatAnimations } from "../../lib/design-tokens";
-import { getBranchInfo } from "../../lib/storage/message-tree";
-import type { ChatMessage, ChatThread } from "../../lib/storage/types";
+import type { ChatMessage } from "../../types";
 import { AssistantMessageBubble } from "./assistant-message-bubble";
-import { BranchNavigator } from "./branch-navigator";
 import { ErrorMessageBubble } from "./error-message-bubble";
 import { MessageEditor } from "./message-editor";
 import { ModelPersonaSelectorModal } from "./model-persona-selector-modal";
 import { UserMessageBubble } from "./user-message-bubble";
 
 interface LinearMessageViewProps {
-  thread: ChatThread;
   messages: ChatMessage[];
   selectedModel: ModelId;
   selectedTone: string;
-  showBranchIndicators: boolean;
   ttsAutoplay: boolean;
   locale: CountryLanguage;
 
@@ -40,7 +36,6 @@ interface LinearMessageViewProps {
   // Action handlers
   onEditMessage: (messageId: string, newContent: string) => Promise<void>;
   onDeleteMessage: (messageId: string) => void;
-  onSwitchBranch: (messageId: string, branchIndex: number) => void;
   onBranchMessage?: (messageId: string, newContent: string) => Promise<void>;
   onRetryMessage?: (messageId: string) => Promise<void>;
   onAnswerAsModel?: (messageId: string) => Promise<void>;
@@ -59,18 +54,15 @@ interface LinearMessageViewProps {
 }
 
 export function LinearMessageView({
-  thread,
   messages,
   selectedModel,
   selectedTone,
-  showBranchIndicators,
   ttsAutoplay,
   locale,
   editingMessageId,
   retryingMessageId,
   answeringMessageId,
   onDeleteMessage,
-  onSwitchBranch,
   onRetryMessage,
   onAnswerAsModel,
   onModelChange,
@@ -86,8 +78,6 @@ export function LinearMessageView({
   return (
     <>
       {messages.map((message) => {
-        const branchInfo = getBranchInfo(thread, message.id);
-        const showBranches = showBranchIndicators && branchInfo.hasBranches;
         const isEditing = editingMessageId === message.id;
         const isRetrying = retryingMessageId === message.id;
         const isAnswering = answeringMessageId === message.id;
@@ -199,19 +189,7 @@ export function LinearMessageView({
               </>
             )}
 
-            {showBranches && !isEditing && (
-              <div className="mt-3 ml-12">
-                <BranchNavigator
-                  currentBranchIndex={branchInfo.currentBranchIndex}
-                  totalBranches={branchInfo.branchCount}
-                  branches={branchInfo.branches}
-                  onSwitchBranch={(index): void =>
-                    onSwitchBranch(message.id, index)
-                  }
-                  locale={locale}
-                />
-              </div>
-            )}
+            {/* Branch navigation disabled in new architecture - branches are handled differently */}
           </div>
         );
       })}

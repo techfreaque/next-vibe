@@ -6,6 +6,8 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
+import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
+import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import {
@@ -25,9 +27,8 @@ import {
 } from "@/packages/next-vibe-ui/web/ui";
 
 import { useTouchDevice } from "../../hooks/use-touch-device";
-import { getIconComponent } from "../../lib/config/icons";
 import { chatColors, chatTransitions } from "../../lib/design-tokens";
-import type { ChatState, ChatThread } from "../../lib/storage/types";
+import type { ChatThread } from "../../types";
 
 interface ThreadListProps {
   threads: ChatThread[];
@@ -36,7 +37,7 @@ interface ThreadListProps {
   onDeleteThread: (threadId: string) => void;
   onUpdateTitle: (threadId: string, title: string) => void;
   onMoveThread?: (threadId: string, folderId: string | null) => void;
-  state?: ChatState;
+  chat?: UseChatReturn;
   compact?: boolean;
   locale: CountryLanguage;
 }
@@ -48,7 +49,7 @@ export function ThreadList({
   onDeleteThread,
   onUpdateTitle,
   onMoveThread,
-  state,
+  chat,
   compact = false,
   locale,
 }: ThreadListProps): JSX.Element {
@@ -63,7 +64,7 @@ export function ThreadList({
           onDelete={onDeleteThread}
           onUpdateTitle={onUpdateTitle}
           onMoveThread={onMoveThread}
-          state={state}
+          chat={chat}
           compact={compact}
           locale={locale}
         />
@@ -79,7 +80,7 @@ interface ThreadItemProps {
   onDelete: (threadId: string) => void;
   onUpdateTitle: (threadId: string, title: string) => void;
   onMoveThread?: (threadId: string, folderId: string | null) => void;
-  state?: ChatState;
+  chat?: UseChatReturn;
   compact?: boolean;
   locale: CountryLanguage;
 }
@@ -90,7 +91,7 @@ function ThreadItem({
   onDelete,
   onUpdateTitle,
   onMoveThread,
-  state,
+  chat,
   compact = false,
   locale,
 }: ThreadItemProps): JSX.Element {
@@ -148,7 +149,7 @@ function ThreadItem({
   };
 
   // Get all folders for the move menu
-  const allFolders = state ? Object.values(state.folders) : [];
+  const allFolders = chat ? Object.values(chat.folders) : [];
   const currentFolderId = thread.folderId;
 
   // Handle thread click to navigate
@@ -163,10 +164,11 @@ function ThreadItem({
       return;
     }
 
-    // Navigate to thread using folder ID and thread ID
-    if (thread.folderId) {
-      router.push(`/${locale}/threads/${thread.folderId}/${thread.id}`);
-    }
+    // Navigate to thread using root folder ID, subfolder ID, and thread ID
+    const url = thread.folderId
+      ? `/${locale}/threads/${thread.rootFolderId}/${thread.folderId}/${thread.id}`
+      : `/${locale}/threads/${thread.rootFolderId}/${thread.id}`;
+    router.push(url);
   };
 
   return (
@@ -220,18 +222,18 @@ function ThreadItem({
                   >
                     {thread.title}
                   </div>
-                  {!compact && thread.metadata?.preview && (
+                  {!compact && thread.preview && (
                     <div className="text-xs text-muted-foreground truncate">
-                      {thread.metadata.preview}
+                      {thread.preview}
                     </div>
                   )}
                 </div>
               </TooltipTrigger>
               <TooltipContent side="right" className="max-w-xs">
                 <p className="text-sm">{thread.title}</p>
-                {thread.metadata?.preview && (
+                {thread.preview && (
                   <p className="text-xs text-muted-foreground mt-1">
-                    {thread.metadata.preview}
+                    {thread.preview}
                   </p>
                 )}
               </TooltipContent>
@@ -279,7 +281,7 @@ function ThreadItem({
                 {t("app.chat.actions.rename")}
               </DropdownMenuItem>
 
-              {onMoveThread && state && (
+              {onMoveThread && chat && (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuSub>
@@ -309,7 +311,7 @@ function ThreadItem({
                       {allFolders.length > 0 ? (
                         allFolders.map((folder) => {
                           const FolderIcon = getIconComponent(
-                            folder.icon || "folder",
+                            folder.icon ?? "folder",
                           );
                           return (
                             <DropdownMenuItem
@@ -347,7 +349,7 @@ function ThreadItem({
         </div>
       )}
 
-      {thread.metadata?.pinned && (
+      {thread.pinned && (
         <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-primary rounded-full" />
       )}
     </div>

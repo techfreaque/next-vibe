@@ -33,7 +33,11 @@ import {
   type ImapSyncStatusValue,
   SortOrder,
 } from "../enum";
-import type { ImapAccountPutRequestOutput } from "./[id]/definition";
+import type {
+  ImapAccountGetResponseOutput,
+  ImapAccountPutRequestOutput,
+  ImapAccountPutResponseOutput,
+} from "./[id]/definition";
 import type {
   ImapAccountCreatePostRequestOutput,
   ImapAccountCreatePostResponseOutput,
@@ -46,8 +50,8 @@ import type { ImapAccountTestPostResponseOutput } from "./test/definition";
 
 // Type aliases for consistent naming across the repository
 export type ImapAccountCreateRequestOutput = ImapAccountCreatePostRequestOutput;
-export type ImapAccountResponseOutput =
-  ImapAccountCreatePostResponseOutput["account"];
+export type ImapAccountCreateResponseOutput =
+  ImapAccountCreatePostResponseOutput;
 export type ImapAccountListRequestOutput = ImapAccountsListRequestOutput;
 export type ImapAccountListResponseOutput = ImapAccountsListResponseOutput;
 export type ImapAccountUpdateRequestOutput = ImapAccountPutRequestOutput;
@@ -62,7 +66,7 @@ export interface ImapAccountsRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapAccountResponseOutput>>;
+  ): Promise<ResponseType<ImapAccountCreateResponseOutput>>;
 
   listAccounts(
     data: ImapAccountListRequestOutput,
@@ -76,14 +80,14 @@ export interface ImapAccountsRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapAccountResponseOutput>>;
+  ): Promise<ResponseType<ImapAccountGetResponseOutput>>;
 
   updateAccount(
     data: ImapAccountUpdateRequestOutput & { id: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapAccountResponseOutput>>;
+  ): Promise<ResponseType<ImapAccountPutResponseOutput>>;
 
   deleteAccount(
     data: { id: string },
@@ -105,11 +109,11 @@ export interface ImapAccountsRepository {
  */
 class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
   /**
-   * Format IMAP account for create/get/update response (nested structure)
+   * Format IMAP account for create response (nested structure)
    */
-  private formatAccountResponse(
+  private formatAccountForCreate(
     account: ImapAccount,
-  ): ImapAccountResponseOutput {
+  ): ImapAccountCreateResponseOutput["account"] {
     return {
       accountSummary: {
         id: account.id,
@@ -141,6 +145,60 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
         createdAt: account.createdAt.toISOString(),
         updatedAt: account.updatedAt.toISOString(),
       },
+    };
+  }
+
+  /**
+   * Format IMAP account for GET response (flat structure)
+   */
+  private formatAccountForGet(
+    account: ImapAccount,
+  ): ImapAccountGetResponseOutput["account"] {
+    return {
+      id: account.id,
+      name: account.name,
+      email: account.email,
+      host: account.host,
+      port: account.port,
+      secure: account.secure || false,
+      username: account.username,
+      authMethod:
+        (account.authMethod as typeof ImapAuthMethodValue) ||
+        ImapAuthMethod.PLAIN,
+      connectionTimeout: account.connectionTimeout || 30000,
+      keepAlive: account.keepAlive || false,
+      enabled: account.enabled || false,
+      syncInterval: account.syncInterval || 300,
+      maxMessages: account.maxMessages || 1000,
+      syncFolders: (account.syncFolders as string[]) || [],
+      lastSyncAt: account.lastSyncAt?.toISOString() || null,
+      syncStatus: account.syncStatus || ImapSyncStatus.PENDING,
+      syncError: account.syncError || null,
+      createdAt: account.createdAt.toISOString(),
+      updatedAt: account.updatedAt.toISOString(),
+    };
+  }
+
+  /**
+   * Format IMAP account for PUT response (flat structure)
+   */
+  private formatAccountForPut(
+    account: ImapAccount,
+  ): ImapAccountPutResponseOutput["account"] {
+    return {
+      id: account.id,
+      name: account.name,
+      email: account.email,
+      host: account.host,
+      port: account.port,
+      secure: account.secure || false,
+      username: account.username,
+      authMethod:
+        (account.authMethod as typeof ImapAuthMethodValue) ||
+        ImapAuthMethod.PLAIN,
+      enabled: account.enabled || false,
+      createdAt: account.createdAt.toISOString(),
+      updatedAt: account.updatedAt.toISOString(),
     };
   }
 
@@ -203,7 +261,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapAccountResponseOutput>> {
+  ): Promise<ResponseType<ImapAccountCreateResponseOutput>> {
     try {
       logger.debug("Creating IMAP account", {
         email: data.basicInfo?.email,
@@ -275,7 +333,9 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
         email: createdAccount.email,
       });
 
-      return createSuccessResponse(this.formatAccountResponse(createdAccount));
+      return createSuccessResponse({
+        account: this.formatAccountForCreate(createdAccount),
+      });
     } catch (error) {
       logger.error("Error creating IMAP account", parseError(error));
       return createErrorResponse(
@@ -405,7 +465,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapAccountResponseOutput>> {
+  ): Promise<ResponseType<ImapAccountGetResponseOutput>> {
     try {
       logger.debug("Getting IMAP account by ID", {
         id: data.id,
@@ -425,7 +485,9 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
         );
       }
 
-      return createSuccessResponse(this.formatAccountResponse(account));
+      return createSuccessResponse({
+        account: this.formatAccountForGet(account),
+      });
     } catch (error) {
       logger.error("Error getting IMAP account by ID", parseError(error));
       return createErrorResponse(
@@ -444,7 +506,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapAccountResponseOutput>> {
+  ): Promise<ResponseType<ImapAccountPutResponseOutput>> {
     try {
       logger.debug("Updating IMAP account", {
         id: data.id,
@@ -515,7 +577,9 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
         email: updatedAccount.email,
       });
 
-      return createSuccessResponse(this.formatAccountResponse(updatedAccount));
+      return createSuccessResponse({
+        account: this.formatAccountForPut(updatedAccount),
+      });
     } catch (error) {
       logger.error("Error updating IMAP account", parseError(error));
       return createErrorResponse(

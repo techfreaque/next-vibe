@@ -12,9 +12,11 @@ import type { FormEvent, JSX } from "react";
 
 import { useImapAccountCreateEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/create/hooks";
 import { ImapAuthMethod } from "@/app/api/[locale]/v1/core/emails/imap-client/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { useTranslation } from "@/i18n/core/client";
 
 interface ImapAccountCreateFormProps {
+  locale: CountryLanguage;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -24,6 +26,7 @@ interface ImapAccountCreateFormProps {
  * Uses useEndpoint for all form state management following leads/cron patterns
  */
 export function ImapAccountCreateForm({
+  locale,
   onSuccess,
   onCancel,
 }: ImapAccountCreateFormProps): JSX.Element {

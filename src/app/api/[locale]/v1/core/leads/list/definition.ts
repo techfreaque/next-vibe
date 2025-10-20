@@ -630,7 +630,7 @@ const { GET } = createEndpoint({
           currentCampaignStage: [EmailCampaignStageFilter.INITIAL],
         },
         locationFilters: {
-          country: [Countries.US, Countries.CA],
+          country: [Countries.DE, Countries.PL],
           language: [Languages.EN],
         },
         sortingOptions: {

@@ -20,7 +20,11 @@ import {
 import { LayoutType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { BillingInterval, SubscriptionPlan } from "../enum";
+import {
+  BillingInterval,
+  SubscriptionPlan,
+  SubscriptionPlanOptions,
+} from "../enum";
 
 /**
  * POST endpoint for creating subscription checkout sessions
@@ -66,24 +70,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.subscription.checkout.form.fields.planId.placeholder" as const,
           layout: { columns: 6 },
           validation: { required: true },
-          options: [
-            {
-              value: SubscriptionPlan.STARTER,
-              label: "app.api.v1.core.subscription.plans.starter" as const,
-            },
-            {
-              value: SubscriptionPlan.PROFESSIONAL,
-              label: "app.api.v1.core.subscription.plans.professional" as const,
-            },
-            {
-              value: SubscriptionPlan.PREMIUM,
-              label: "app.api.v1.core.subscription.plans.premium" as const,
-            },
-            {
-              value: SubscriptionPlan.ENTERPRISE,
-              label: "app.api.v1.core.subscription.plans.enterprise" as const,
-            },
-          ],
+          options: SubscriptionPlanOptions,
         },
         z.enum(SubscriptionPlan),
       ),
@@ -172,16 +159,16 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        planId: SubscriptionPlan.PROFESSIONAL,
+        planId: SubscriptionPlan.SUBSCRIPTION,
         billingInterval: BillingInterval.MONTHLY,
       },
       yearly: {
-        planId: SubscriptionPlan.PREMIUM,
+        planId: SubscriptionPlan.SUBSCRIPTION,
         billingInterval: BillingInterval.YEARLY,
         metadata: { source: "pricing_page" },
       },
       starter: {
-        planId: SubscriptionPlan.STARTER,
+        planId: SubscriptionPlan.SUBSCRIPTION,
         billingInterval: BillingInterval.MONTHLY,
         metadata: { trial: "true" },
       },

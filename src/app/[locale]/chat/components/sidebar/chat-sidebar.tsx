@@ -14,7 +14,9 @@ import { useRouter } from "next/navigation";
 import type { JSX } from "react";
 import React, { useEffect, useRef, useState } from "react";
 
+import { DEFAULT_FOLDER_IDS } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { useCredits } from "@/app/api/[locale]/v1/core/agent/chat/credits/hooks";
+import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -34,8 +36,6 @@ import {
 } from "@/packages/next-vibe-ui/web/ui";
 
 import { UI_CONFIG } from "../../lib/config/constants";
-import type { ChatFolder, ChatState } from "../../lib/storage/types";
-import { DEFAULT_FOLDERS, getFolderColor } from "../../lib/storage/types";
 import {
   buildFolderUrl,
   getCreateFolderTranslationKey,
@@ -43,13 +43,14 @@ import {
   getNewFolderTranslationKey,
   getRootFolderId,
 } from "../../lib/utils/navigation";
+import type { ChatFolder } from "../../types";
 import { FolderList } from "./folder-list";
 import { NewFolderDialog } from "./new-folder-dialog";
 import { RootFolderBar } from "./root-folder-bar";
 import { ThreadList } from "./thread-list";
 
 interface ChatSidebarProps {
-  state: ChatState;
+  chat: UseChatReturn;
   activeThreadId: string | null;
   activeFolderId?: string;
   locale: CountryLanguage;
@@ -70,7 +71,7 @@ interface ChatSidebarProps {
 }
 
 export function ChatSidebar({
-  state,
+  chat,
   activeThreadId,
   activeFolderId,
   locale,
@@ -101,11 +102,18 @@ export function ChatSidebar({
 
   // Get the root folder ID from the active folder (could be root or subfolder)
   const activeRootFolderId = activeFolderId
-    ? getRootFolderId(state, activeFolderId)
-    : state.rootFolderIds[0] || DEFAULT_FOLDERS.PRIVATE;
+    ? getRootFolderId(chat.folders, activeFolderId)
+    : chat.currentRootFolderId || DEFAULT_FOLDER_IDS.PRIVATE;
 
-  // Get color for the active root folder
-  const rootFolderColor = getFolderColor(activeRootFolderId);
+  // Get color for the active root folder - using simple color mapping
+  const rootFolderColor =
+    activeRootFolderId === DEFAULT_FOLDER_IDS.PRIVATE
+      ? "blue"
+      : activeRootFolderId === DEFAULT_FOLDER_IDS.SHARED
+        ? "green"
+        : activeRootFolderId === DEFAULT_FOLDER_IDS.PUBLIC
+          ? "purple"
+          : "gray";
 
   // Get button color classes based on root folder color
   const getButtonColorClasses = (color: string | null): string => {
@@ -127,7 +135,8 @@ export function ChatSidebar({
   };
 
   const handleSelectFolder = (folderId: string): void => {
-    const url = buildFolderUrl(locale, folderId, state);
+    const rootFolderId = getRootFolderId(chat.folders, folderId);
+    const url = buildFolderUrl(locale, rootFolderId, folderId);
     router.push(url);
   };
 
@@ -158,7 +167,7 @@ export function ChatSidebar({
 
       {/* Root Folder Navigation Bar */}
       <RootFolderBar
-        state={state}
+        chat={chat}
         activeFolderId={activeRootFolderId}
         locale={locale}
         onSelectFolder={handleSelectFolder}
@@ -234,14 +243,14 @@ export function ChatSidebar({
                 </div>
                 <ThreadList
                   threads={searchResults
-                    .map((result) => state.threads[result.id])
+                    .map((result) => chat.threads[result.id])
                     .filter(Boolean)}
                   activeThreadId={activeThreadId}
                   onSelectThread={onSelectThread}
                   onDeleteThread={onDeleteThread}
                   onUpdateTitle={onUpdateThreadTitle}
                   onMoveThread={onMoveThread}
-                  state={state}
+                  chat={chat}
                   locale={locale}
                   compact
                 />
@@ -253,7 +262,7 @@ export function ChatSidebar({
               </div>
             ) : (
               <FolderList
-                state={state}
+                chat={chat}
                 activeThreadId={activeThreadId}
                 activeRootFolderId={activeRootFolderId}
                 activeFolderId={activeFolderId}
@@ -411,7 +420,7 @@ export function ChatSidebar({
         titleKey={
           activeFolderId
             ? getCreateFolderTranslationKey(
-                getRootFolderId(state, activeFolderId),
+                getRootFolderId(chat.folders, activeFolderId),
               )
             : undefined
         }

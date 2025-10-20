@@ -3,6 +3,7 @@
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
+import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import {
@@ -14,15 +15,13 @@ import {
   ScrollArea,
 } from "@/packages/next-vibe-ui/web/ui";
 
-import { getIconComponent } from "../../lib/config/icons";
-import { getFolderDisplayName } from "../../lib/storage/thread-manager";
-import type { ChatFolder, ChatState } from "../../lib/storage/types";
+import type { ChatFolder } from "../../types";
 
 interface MoveFolderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   folder: ChatFolder;
-  state: ChatState;
+  folders: Record<string, ChatFolder>;
   onMove: (targetFolderId: string | null) => void;
   locale: CountryLanguage;
 }
@@ -31,7 +30,7 @@ export function MoveFolderDialog({
   open,
   onOpenChange,
   folder,
-  state,
+  folders,
   onMove,
   locale,
 }: MoveFolderDialogProps): JSX.Element {
@@ -42,22 +41,22 @@ export function MoveFolderDialog({
   const availableFolders = useMemo(() => {
     const getDescendantIds = (folderId: string): string[] => {
       const descendants: string[] = [folderId];
-      const folder = state.folders[folderId];
-      if (folder?.childrenIds) {
-        folder.childrenIds.forEach((childId) => {
-          descendants.push(...getDescendantIds(childId));
-        });
-      }
+      // Find all folders that have this folder as parent (direct or indirect)
+      Object.values(folders).forEach((f) => {
+        if (f.parentId && descendants.includes(f.parentId)) {
+          descendants.push(...getDescendantIds(f.id));
+        }
+      });
       return descendants;
     };
 
     const excludedIds = getDescendantIds(folder.id);
-    const validFolders = Object.values(state.folders).filter(
+    const validFolders = Object.values(folders).filter(
       (f) => !excludedIds.includes(f.id),
     );
 
     return validFolders;
-  }, [folder.id, state.folders]);
+  }, [folder.id, folders]);
 
   const handleMove = (): void => {
     onMove(selectedFolderId);
@@ -70,7 +69,12 @@ export function MoveFolderDialog({
   ): JSX.Element => {
     const Icon = getIconComponent(targetFolder.icon ?? "folder");
     const isSelected = selectedFolderId === targetFolder.id;
-    const displayName = getFolderDisplayName(targetFolder, locale);
+    const displayName = targetFolder.name;
+
+    // Get children of this folder
+    const children = availableFolders.filter(
+      (f) => f.parentId === targetFolder.id,
+    );
 
     return (
       <div key={targetFolder.id}>
@@ -84,13 +88,9 @@ export function MoveFolderDialog({
           <Icon className="h-4 w-4 flex-shrink-0" />
           <span className="text-sm truncate">{displayName}</span>
         </button>
-        {targetFolder.childrenIds.map((childId) => {
-          const childFolder = state.folders[childId];
-          if (!childFolder || !availableFolders.find((f) => f.id === childId)) {
-            return null;
-          }
-          return renderFolderOption(childFolder, depth + 1);
-        })}
+        {children.map((childFolder) =>
+          renderFolderOption(childFolder, depth + 1),
+        )}
       </div>
     );
   };

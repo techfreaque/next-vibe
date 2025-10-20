@@ -4,6 +4,20 @@
  */
 
 /**
+ * UI configuration constants
+ */
+export const UI_CONFIG = {
+  /** Sidebar width when expanded (in pixels) */
+  SIDEBAR_WIDTH: "w-[290px]",
+
+  /** Sidebar width when collapsed (in pixels) */
+  SIDEBAR_COLLAPSED_WIDTH: 0,
+
+  /** Transition duration for animations (in milliseconds) */
+  TRANSITION_DURATION: 200,
+} as const;
+
+/**
  * Timing constants (in milliseconds)
  */
 export const TIMING = {
@@ -68,4 +82,9 @@ export const LAYOUT = {
   /** Thread line margin offset (px) */
   THREAD_LINE_MARGIN_OFFSET: 8,
 } as const;
+
+/**
+ * Quote character for 4chan-style quoting
+ */
+export const QUOTE_CHARACTER = ">" as const;
 

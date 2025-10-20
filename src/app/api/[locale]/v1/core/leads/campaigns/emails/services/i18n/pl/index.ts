@@ -1,6 +1,13 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  scheduler: {
+    cancelledBySystem: "Anulowane przez system",
+  },
+  abTesting: {
+    invalidWeights: "Całkowita waga wariantów musi wynosić 100%",
+    negativeWeight: "Waga wariantu musi być dodatnia",
+  },
   post: {
     title: "Tytuł",
     description: "Opis endpointu",

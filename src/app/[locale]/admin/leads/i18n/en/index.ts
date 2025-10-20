@@ -536,6 +536,10 @@ export const translations = {
         reactivation: "Reactivation",
       },
       stats: {
+        // Page metadata
+        title: "Leads Statistics",
+        description: "View and analyze lead statistics and performance metrics",
+
         // UI Component translations
         totalLeads: "Total Leads",
         newThisMonth: "New This Month",

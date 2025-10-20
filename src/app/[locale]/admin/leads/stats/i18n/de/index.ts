@@ -1,6 +1,11 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  // Page metadata
+  title: "Leads-Statistiken",
+  description:
+    "Ansicht und Analyse von Lead-Statistiken und Leistungskennzahlen",
+
   // UI Component translations
   totalLeads: "Gesamt Leads",
   newThisMonth: "Neu diesen Monat",

@@ -10,6 +10,7 @@ const releaseConfig: ReleaseConfig = {
       test: false,
       updateDeps: true,
       release: {
+        // eslint-disable-next-line i18next/no-literal-string
         tagPrefix: "launchpad_",
       },
     },

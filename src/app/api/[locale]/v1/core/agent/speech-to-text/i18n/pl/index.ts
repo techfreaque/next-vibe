@@ -55,6 +55,10 @@ export const translations = {
       transcriptionFailed: "Transkrypcja nie powiodła się: {error}",
       noAudioFile: "Nie podano pliku audio",
       internalError: "Wewnętrzny błąd serwera",
+      noPublicId: "Nie otrzymano publicznego ID",
+      pollFailed: "Nie udało się pobrać wyników transkrypcji",
+      failed: "Transkrypcja nie powiodła się",
+      timeout: "Przekroczono limit czasu transkrypcji",
     },
     success: {
       title: "Sukces",
@@ -80,6 +84,6 @@ export const translations = {
     fr: "Francuski",
     it: "Włoski",
   },
-} as const;
+};
 
 export default translations;

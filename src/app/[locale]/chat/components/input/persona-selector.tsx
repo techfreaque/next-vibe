@@ -3,6 +3,18 @@
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
+import {
+  getIconComponent,
+  type IconValue,
+} from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
+import type { ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
+import {
+  DEFAULT_CATEGORIES,
+  DEFAULT_PERSONAS,
+  type Persona,
+  type PersonaCategory,
+  type PersonaCategoryId,
+} from "@/app/api/[locale]/v1/core/agent/chat/personas/config";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -23,14 +35,6 @@ import {
   Textarea,
 } from "@/packages/next-vibe-ui/web/ui";
 
-import { getIconComponent, type IconValue } from "../../lib/config/icons";
-import type { ModelId } from "../../lib/config/models";
-import {
-  DEFAULT_CATEGORIES,
-  DEFAULT_PERSONAS,
-  type Persona,
-  type PersonaCategory,
-} from "../../lib/config/personas";
 import { SelectorBase, type SelectorOption } from "./selector-base";
 import { useFavorites } from "./use-favorites";
 
@@ -57,9 +61,10 @@ export function PersonaSelector({
 }: PersonaSelectorProps): JSX.Element {
   const { t } = simpleT(locale);
   const defaultIcon = t("app.chat.personaSelector.defaultIcon");
-  const [personas, setPersonas] = useState<Persona[]>(DEFAULT_PERSONAS);
-  const [categories, setCategories] =
-    useState<PersonaCategory[]>(DEFAULT_CATEGORIES);
+  const [personas, setPersonas] = useState<Persona[]>([...DEFAULT_PERSONAS]);
+  const [categories, setCategories] = useState<PersonaCategory[]>([
+    ...DEFAULT_CATEGORIES,
+  ]);
   const [favorites, toggleFavorite, setFavorites] = useFavorites(
     STORAGE_KEY_FAVORITES,
     DEFAULT_FAVORITES,
@@ -67,7 +72,14 @@ export function PersonaSelector({
   );
   const [addPersonaOpen, setAddPersonaOpen] = useState(false);
   const [addCategoryOpen, setAddCategoryOpen] = useState(false);
-  const [newPersona, setNewPersona] = useState({
+  const [newPersona, setNewPersona] = useState<{
+    name: string;
+    description: string;
+    icon: string;
+    systemPrompt: string;
+    category: PersonaCategoryId;
+    suggestedPrompts: string[];
+  }>({
     name: "",
     description: "",
     icon: defaultIcon,
@@ -364,7 +376,10 @@ export function PersonaSelector({
                 <Select
                   value={newPersona.category}
                   onValueChange={(value) =>
-                    setNewPersona({ ...newPersona, category: value })
+                    setNewPersona({
+                      ...newPersona,
+                      category: value as PersonaCategoryId,
+                    })
                   }
                 >
                   <SelectTrigger id="persona-category">

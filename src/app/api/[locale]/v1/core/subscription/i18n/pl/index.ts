@@ -124,6 +124,8 @@ export const translations: typeof enTranslations = {
     updatedFields: "Zaktualizowane pola",
     canceledAt: "Anulowano o",
     endsAt: "Kończy się o",
+    createdAt: "Utworzono o",
+    updatedAt: "Zaktualizowano o",
   },
 
   // Error types
@@ -148,6 +150,7 @@ export const translations: typeof enTranslations = {
       title: "Nie znaleziono",
       description: "Subskrypcja nie została znaleziona",
     },
+    not_found: "Subskrypcja nie została znaleziona",
     server: {
       title: "Błąd serwera",
       description: "Wystąpił wewnętrzny błąd serwera",
@@ -168,8 +171,17 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Wystąpił konflikt danych",
     },
+    sync_failed: "Nie udało się zsynchronizować subskrypcji z bazą danych",
+    database_error: "Wystąpił błąd bazy danych",
+    create_crashed: "Utworzenie subskrypcji nie powiodło się",
+    cancel_failed: "Nie udało się anulować subskrypcji",
     user_not_found: "Nie znaleziono użytkownika",
     stripe_customer_creation_failed: "Nie udało się utworzyć klienta Stripe",
+  },
+
+  // Cancel operation
+  cancel: {
+    success: "Subskrypcja została pomyślnie anulowana",
   },
 
   // Success types

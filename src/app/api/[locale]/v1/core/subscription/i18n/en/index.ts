@@ -123,6 +123,8 @@ export const translations = {
     updatedFields: "Updated Fields",
     canceledAt: "Canceled At",
     endsAt: "Ends At",
+    createdAt: "Created At",
+    updatedAt: "Updated At",
   },
 
   // Error types
@@ -147,6 +149,7 @@ export const translations = {
       title: "Not Found",
       description: "Subscription not found",
     },
+    not_found: "Subscription not found",
     server: {
       title: "Server Error",
       description: "Internal server error occurred",
@@ -167,8 +170,17 @@ export const translations = {
       title: "Conflict",
       description: "Data conflict occurred",
     },
+    sync_failed: "Failed to sync subscription with database",
+    database_error: "Database error occurred",
+    create_crashed: "Subscription creation failed",
+    cancel_failed: "Failed to cancel subscription",
     user_not_found: "User not found",
     stripe_customer_creation_failed: "Failed to create Stripe customer",
+  },
+
+  // Cancel operation
+  cancel: {
+    success: "Subscription canceled successfully",
   },
 
   // Success types

@@ -405,7 +405,10 @@ export class CampaignSchedulerService {
           status: EmailStatus.FAILED,
           metadata: {
             cancelReason:
-              reason || t("email.leads.scheduler.cancelledBySystem"),
+              reason ||
+              t(
+                "app.api.v1.core.leads.campaigns.emails.services.scheduler.cancelledBySystem",
+              ),
           },
         })
         .where(

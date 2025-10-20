@@ -4,6 +4,12 @@ import { MoreHorizontal } from "lucide-react";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
+import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
+import type { ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
+import {
+  DEFAULT_PERSONAS,
+  type Persona,
+} from "@/app/api/[locale]/v1/core/agent/chat/personas/config";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -15,10 +21,6 @@ import {
   DialogTrigger,
   ScrollArea,
 } from "@/packages/next-vibe-ui/web/ui";
-
-import { getIconComponent } from "../../lib/config/icons";
-import type { ModelId } from "../../lib/config/models";
-import { DEFAULT_PERSONAS, type Persona } from "../../lib/config/personas";
 
 interface SuggestedPromptsProps {
   onSelectPrompt: (

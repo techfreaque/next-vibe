@@ -251,6 +251,59 @@ export const translations = {
           },
         },
       },
+      post: {
+        error: {
+          duplicate: {
+            title: "Lead with this email already exists",
+          },
+          server: {
+            title: "Server error creating lead",
+          },
+        },
+      },
+      patch: {
+        error: {
+          not_found: {
+            title: "Lead not found",
+          },
+          server: {
+            title: "Server error updating lead",
+          },
+        },
+      },
+    },
+    leadsUnsubscribe: {
+      post: {
+        error: {
+          validation: {
+            title: "Invalid unsubscribe request",
+          },
+          server: {
+            title: "Server error processing unsubscribe",
+          },
+        },
+      },
+    },
+    leadsEngagement: {
+      post: {
+        error: {
+          validation: {
+            title: "Invalid engagement data",
+          },
+          server: {
+            title: "Server error recording engagement",
+          },
+        },
+      },
+    },
+    leadsExport: {
+      get: {
+        error: {
+          server: {
+            title: "Server error exporting leads",
+          },
+        },
+      },
     },
   },
 };

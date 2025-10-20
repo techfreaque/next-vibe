@@ -515,7 +515,7 @@ const { PATCH } = createEndpoint({
       description: "app.api.v1.core.leads.lead.id.patch.form.description",
       layout: { type: LayoutType.STACKED },
     },
-    { request: "data", response: true },
+    { request: "data&urlParams", response: true },
     {
       // === URL PARAMETERS ===
       id: requestUrlParamsField(

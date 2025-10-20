@@ -306,7 +306,7 @@ const LanguageFilterOptions = [
  * Leads Stats Endpoint Definition
  * Using new field-based API
  */
-const endpoint = createEndpoint({
+const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "leads", "stats"],
   title: "app.api.v1.core.leads.stats.title",
@@ -326,9 +326,7 @@ const endpoint = createEndpoint({
       description: "app.api.v1.core.leads.stats.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    {
-      [Methods.GET]: { request: "data", response: true },
-    },
+    { request: "data", response: true },
     {
       // === REQUEST FIELDS (Filters) ===
 
@@ -1248,7 +1246,243 @@ const endpoint = createEndpoint({
   ),
 
   examples: {
-    responses: {},
+    requests: {
+      default: {
+        timePeriod: TimePeriod.DAY,
+        dateRangePreset: DateRangePreset.LAST_30_DAYS,
+        chartType: ChartType.LINE,
+        includeComparison: false,
+        status: LeadStatusFilter.ALL,
+        campaignStage: EmailCampaignStageFilter.ALL,
+        sortBy: "CREATED_AT",
+        sortOrder: SortOrder.DESC,
+      },
+    },
+    responses: {
+      default: {
+        totalLeads: 0,
+        newLeads: 0,
+        activeLeads: 0,
+        conversionRate: 0,
+        averageOpenRate: 0,
+        averageClickRate: 0,
+        campaignRunningLeads: 0,
+        websiteUserLeads: 0,
+        newsletterSubscriberLeads: 0,
+        convertedLeads: 0,
+        leadsByCampaignStage: {},
+        leadsByJourneyVariant: {},
+        leadsByCountry: {},
+        leadsByLanguage: {},
+        leadsBySource: {},
+        leadsByStatus: {},
+        signedUpLeads: 0,
+        consultationBookedLeads: 0,
+        subscriptionConfirmedLeads: 0,
+        unsubscribedLeads: 0,
+        bouncedLeads: 0,
+        invalidLeads: 0,
+        leadsWithEmailEngagement: 0,
+        leadsWithoutEmailEngagement: 0,
+        averageEmailEngagementScore: 0,
+        totalEmailEngagements: 0,
+        signupRate: 0,
+        consultationBookingRate: 0,
+        subscriptionConfirmationRate: 0,
+        dataCompletenessRate: 0,
+        leadsWithBusinessName: 0,
+        leadsWithContactName: 0,
+        leadsWithPhone: 0,
+        leadsWithWebsite: 0,
+        leadsWithNotes: 0,
+        leadsInActiveCampaigns: 0,
+        leadsNotInCampaigns: 0,
+        averageTimeToConversion: 0,
+        averageTimeToSignup: 0,
+        averageTimeToConsultation: 0,
+        totalEmailsSent: 0,
+        totalEmailsOpened: 0,
+        totalEmailsClicked: 0,
+        averageEmailsPerLead: 0,
+        leadVelocity: 0,
+        leadsCreatedToday: 0,
+        leadsCreatedThisWeek: 0,
+        leadsCreatedThisMonth: 0,
+        leadsUpdatedToday: 0,
+        leadsUpdatedThisWeek: 0,
+        leadsUpdatedThisMonth: 0,
+        historicalData: {
+          totalLeads: {
+            name: "Total Leads",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          newLeads: {
+            name: "New Leads",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          activeLeads: {
+            name: "Active Leads",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          campaignRunningLeads: {
+            name: "Campaign Running",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          websiteUserLeads: {
+            name: "Website Users",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          newsletterSubscriberLeads: {
+            name: "Newsletter Subscribers",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          convertedLeads: {
+            name: "Converted",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          signedUpLeads: {
+            name: "Signed Up",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          consultationBookedLeads: {
+            name: "Consultation Booked",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          subscriptionConfirmedLeads: {
+            name: "Subscription Confirmed",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          unsubscribedLeads: {
+            name: "Unsubscribed",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          bouncedLeads: {
+            name: "Bounced",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          invalidLeads: {
+            name: "Invalid",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          emailsSent: {
+            name: "Emails Sent",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          emailsOpened: {
+            name: "Emails Opened",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          emailsClicked: {
+            name: "Emails Clicked",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          openRate: {
+            name: "Open Rate",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          clickRate: {
+            name: "Click Rate",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          conversionRate: {
+            name: "Conversion Rate",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          signupRate: {
+            name: "Signup Rate",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          consultationBookingRate: {
+            name: "Consultation Booking Rate",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          subscriptionConfirmationRate: {
+            name: "Subscription Confirmation Rate",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          averageEmailEngagementScore: {
+            name: "Avg Email Engagement",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          leadVelocity: {
+            name: "Lead Velocity",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+          dataCompletenessRate: {
+            name: "Data Completeness",
+            type: ChartType.LINE,
+            data: [],
+            color: "#000000",
+          },
+        },
+        groupedStats: {
+          byStatus: [],
+          bySource: [],
+          byCountry: [],
+          byLanguage: [],
+          byCampaignStage: [],
+          byJourneyVariant: [],
+          byEngagementLevel: [],
+          byConversionFunnel: [],
+        },
+        recentActivity: [],
+        topPerformingCampaigns: [],
+        topPerformingSources: [],
+        generatedAt: new Date().toISOString(),
+        dataRange: {
+          from: new Date().toISOString(),
+          to: new Date().toISOString(),
+        },
+      },
+    },
   },
 
   errorTypes: {
@@ -1298,17 +1532,10 @@ const endpoint = createEndpoint({
   },
 });
 
-const GET = endpoint.GET;
-
-// Type exports using the new pattern
-export type LeadsStatsRequestInput = z.input<typeof GET.requestSchema>;
-export type LeadsStatsRequestOutput = z.output<typeof GET.requestSchema>;
-export type LeadsStatsResponseInput = z.input<typeof GET.responseSchema>;
-export type LeadsStatsResponseOutput = z.output<typeof GET.responseSchema>;
-
-// Legacy type exports for backward compatibility
-export type LeadsStatsRequestType = LeadsStatsRequestOutput;
-export type LeadsStatsResponseType = LeadsStatsResponseOutput;
+export type LeadsStatsRequestInput = typeof GET.types.RequestInput;
+export type LeadsStatsRequestOutput = typeof GET.types.RequestOutput;
+export type LeadsStatsResponseInput = typeof GET.types.ResponseInput;
+export type LeadsStatsResponseOutput = typeof GET.types.ResponseOutput;
 
 /**
  * Export definitions

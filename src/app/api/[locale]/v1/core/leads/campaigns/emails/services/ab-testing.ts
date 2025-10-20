@@ -244,7 +244,7 @@ export function validateABTestConfig(config: ABTestConfig): {
   if (Math.abs(totalWeight - 100) > 0.01) {
     errors.push(
       createErrorResponse(
-        "error.errorTypes.validation_error",
+        "app.api.v1.core.leads.campaigns.emails.services.abTesting.invalidWeights",
         ErrorResponseTypes.VALIDATION_ERROR,
         { totalWeight },
       ),
@@ -256,7 +256,7 @@ export function validateABTestConfig(config: ABTestConfig): {
     if (variantConfig.weight <= 0) {
       errors.push(
         createErrorResponse(
-          "error.errorTypes.validation_error",
+          "app.api.v1.core.leads.campaigns.emails.services.abTesting.negativeWeight",
           ErrorResponseTypes.VALIDATION_ERROR,
           { variant, weight: variantConfig.weight },
         ),

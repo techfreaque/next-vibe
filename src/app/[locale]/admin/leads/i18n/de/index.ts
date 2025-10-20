@@ -554,6 +554,11 @@ export const translations: typeof enTranslations = {
         reactivation: "Reaktivierung",
       },
       stats: {
+        // Page metadata
+        title: "Leads-Statistiken",
+        description:
+          "Ansicht und Analyse von Lead-Statistiken und Leistungskennzahlen",
+
         // UI Component translations
         totalLeads: "Gesamt Leads",
         newThisMonth: "Neu Diesen Monat",

@@ -1,9 +1,9 @@
 import type { JSX } from "react";
 
+import { ChatProvider } from "@/app/[locale]/chat/features/chat/context";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { ChatInterface } from "./chat/components/chat-interface";
-import { ChatProvider } from "./chat/features/chat/context";
 
 interface ChatPageProps {
   params: Promise<{

@@ -16,9 +16,9 @@ import definitions from "./definition";
  */
 export function useImapFoldersSync(
   logger: EndpointLogger,
-): EndpointReturn<typeof definitions.POST> {
+): EndpointReturn<typeof definitions> {
   return useEndpoint(
-    definitions.POST,
+    definitions,
     {
       persistForm: false,
     },
@@ -26,6 +26,4 @@ export function useImapFoldersSync(
   );
 }
 
-export type ImapFoldersSyncEndpointReturn = EndpointReturn<
-  typeof definitions.POST
->;
+export type ImapFoldersSyncEndpointReturn = EndpointReturn<typeof definitions>;

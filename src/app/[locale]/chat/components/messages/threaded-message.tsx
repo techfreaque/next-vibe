@@ -17,21 +17,20 @@ import type { JSX } from "react";
 import React, { useState } from "react";
 
 import { Logo } from "@/app/[locale]/_components/nav/logo";
+import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
+import { getPersonaName } from "@/app/api/[locale]/v1/core/agent/chat/personas/config";
+import { useTTSAudio } from "@/app/api/[locale]/v1/core/agent/text-to-speech/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import { Markdown } from "@/packages/next-vibe-ui/web/ui/markdown";
 
 import { useTouchDevice } from "../../hooks/use-touch-device";
-import { useTTSAudio } from "../../hooks/use-tts-audio";
 import { LAYOUT } from "../../lib/config/constants";
-import type { ModelId } from "../../lib/config/models";
-import { getModelById } from "../../lib/config/models";
-import { getPersonaName } from "../../lib/config/personas";
 import { chatAnimations } from "../../lib/design-tokens";
-import type { ChatMessage } from "../../lib/storage/types";
 import { getVoteStatus } from "../../lib/utils/message-votes";
 import { getDirectReplies } from "../../lib/utils/thread-builder";
+import type { ChatMessage, ModelId } from "../../types";
 import { ErrorMessageBubble } from "./error-message-bubble";
 import { MessageEditor } from "./message-editor";
 import { ModelPersonaSelectorModal } from "./model-persona-selector-modal";
@@ -267,9 +266,9 @@ export function ThreadedMessage({
                         : "text-blue-400",
                     )}
                     onMouseEnter={(e): void => {
-                      if (message.author?.id) {
+                      if (message.authorId) {
                         const rect = e.currentTarget.getBoundingClientRect();
-                        setHoveredUserId(message.author.id);
+                        setHoveredUserId(message.authorId);
                         setUserCardPosition({
                           x: rect.left + rect.width / 2,
                           y: rect.bottom,
@@ -313,7 +312,7 @@ export function ThreadedMessage({
                   )}
 
                   <span>•</span>
-                  <span>{new Date(message.timestamp).toLocaleString()}</span>
+                  <span>{message.createdAt.toLocaleString()}</span>
                 </div>
 
                 {/* Message content */}
@@ -362,11 +361,11 @@ export function ThreadedMessage({
                 <div className="flex items-center gap-0.5">
                   <button
                     onClick={() =>
-                      onVoteMessage(message.id, userVote === 1 ? 0 : 1)
+                      onVoteMessage(message.id, userVote === "up" ? 0 : 1)
                     }
                     className={cn(
                       "flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 transition-all",
-                      userVote === 1
+                      userVote === "up"
                         ? "text-blue-400"
                         : "text-muted-foreground hover:text-blue-400",
                     )}
@@ -375,7 +374,7 @@ export function ThreadedMessage({
                     <ArrowBigUp
                       className={cn(
                         "h-4 w-4",
-                        userVote === 1 && "fill-current",
+                        userVote === "up" && "fill-current",
                       )}
                     />
                   </button>
@@ -392,11 +391,11 @@ export function ThreadedMessage({
                   )}
                   <button
                     onClick={() =>
-                      onVoteMessage(message.id, userVote === -1 ? 0 : -1)
+                      onVoteMessage(message.id, userVote === "down" ? 0 : -1)
                     }
                     className={cn(
                       "flex items-center gap-1 px-2 py-1 rounded hover:bg-red-500/10 transition-all",
-                      userVote === -1
+                      userVote === "down"
                         ? "text-red-400"
                         : "text-muted-foreground hover:text-red-400",
                     )}
@@ -405,7 +404,7 @@ export function ThreadedMessage({
                     <ArrowBigDown
                       className={cn(
                         "h-4 w-4",
-                        userVote === -1 && "fill-current",
+                        userVote === "down" && "fill-current",
                       )}
                     />
                   </button>
@@ -611,7 +610,7 @@ export function ThreadedMessage({
         <UserProfileCard
           userId={hoveredUserId}
           userName={
-            message.author?.name || t("app.chat.threadedView.userFallback")
+            message.authorName || t("app.chat.threadedView.userFallback")
           }
           messages={allMessages}
           position={userCardPosition}

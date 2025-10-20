@@ -16,9 +16,9 @@ import definitions from "./definition";
  */
 export function useImapMessageById(
   logger: EndpointLogger,
-): EndpointReturn<typeof definitions.GET> {
+): EndpointReturn<typeof definitions> {
   return useEndpoint(
-    definitions.GET,
+    definitions,
     {
       persistForm: false,
     },
@@ -26,6 +26,4 @@ export function useImapMessageById(
   );
 }
 
-export type ImapMessageByIdEndpointReturn = EndpointReturn<
-  typeof definitions.GET
->;
+export type ImapMessageByIdEndpointReturn = EndpointReturn<typeof definitions>;

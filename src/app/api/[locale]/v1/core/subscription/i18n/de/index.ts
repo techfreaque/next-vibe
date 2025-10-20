@@ -125,6 +125,8 @@ export const translations: typeof enTranslations = {
     updatedFields: "Aktualisierte Felder",
     canceledAt: "Gekündigt am",
     endsAt: "Endet am",
+    createdAt: "Erstellt am",
+    updatedAt: "Aktualisiert am",
   },
 
   // Error types
@@ -149,6 +151,7 @@ export const translations: typeof enTranslations = {
       title: "Nicht gefunden",
       description: "Abonnement nicht gefunden",
     },
+    not_found: "Abonnement nicht gefunden",
     server: {
       title: "Serverfehler",
       description: "Interner Serverfehler aufgetreten",
@@ -169,9 +172,19 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Datenkonflikt aufgetreten",
     },
+    sync_failed:
+      "Synchronisierung des Abonnements mit Datenbank fehlgeschlagen",
+    database_error: "Datenbankfehler aufgetreten",
+    create_crashed: "Erstellung des Abonnements fehlgeschlagen",
+    cancel_failed: "Kündigung des Abonnements fehlgeschlagen",
     user_not_found: "Benutzer nicht gefunden",
     stripe_customer_creation_failed:
       "Stripe-Kunde konnte nicht erstellt werden",
+  },
+
+  // Cancel operation
+  cancel: {
+    success: "Abonnement erfolgreich gekündigt",
   },
 
   // Success types

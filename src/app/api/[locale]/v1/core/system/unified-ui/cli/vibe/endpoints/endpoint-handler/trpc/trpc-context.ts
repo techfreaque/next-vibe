@@ -99,22 +99,24 @@ export async function createTRPCContext<
   });
 
   // Authenticate user using the existing auth system
-  // The authRepository.getCurrentUser() method handles server-only cookies properly
+  // Use getAuthMinimalUser which properly handles PUBLIC role with leadId creation
   let user: JwtPayloadType;
   let userRoles: (typeof UserRoleValue)[] = [];
 
   try {
-    // Use existing auth system to get user - this handles cookies, JWT verification, and session validation
+    // Try to get authenticated user first
     const authResult = await authRepository.getCurrentUser(
       { platform: "trpc", request: req, locale: opts.locale },
       opts.logger,
     );
+
     if (authResult.success && authResult.data) {
+      // User is authenticated
       user = authResult.data;
 
-      // Get user roles if authenticated (using the same logic as apiHandler)
+      // Get user roles if authenticated
       if (!user.isPublic && user.id) {
-        // Use the existing role checking system from authRepository
+        // Check for customer role
         const authenticatedUser = await authRepository.getAuthMinimalUser(
           [UserRole.CUSTOMER],
           { platform: "trpc", request: req, locale: opts.locale },
@@ -134,10 +136,24 @@ export async function createTRPCContext<
           }
         }
       }
+    } else {
+      // Authentication failed - get public user with proper leadId
+      user = await authRepository.getAuthMinimalUser(
+        [UserRole.PUBLIC],
+        { platform: "trpc", request: req, locale: opts.locale },
+        opts.logger,
+      );
+      userRoles = [UserRole.PUBLIC];
     }
   } catch (error) {
-    // Authentication failed - user remains null
+    // Authentication failed - get public user with proper leadId
     opts.logger.error("tRPC context: Authentication failed", { error });
+    user = await authRepository.getAuthMinimalUser(
+      [UserRole.PUBLIC],
+      { platform: "trpc", request: req, locale: opts.locale },
+      opts.logger,
+    );
+    userRoles = [UserRole.PUBLIC];
   }
 
   return {

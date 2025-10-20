@@ -11,7 +11,7 @@ import type {
   CsvImportConfig,
   DomainImportRepository,
   ImportJobsListResponseType,
-  LeadsImportResponseType,
+  LeadsImportResponseOutput,
 } from "../leads/import/definition";
 
 /**
@@ -35,7 +35,7 @@ export interface ImportRepository {
     config: CsvImportConfig,
     uploadedBy: DbId,
     domainRepository: DomainImportRepository<T>,
-  ): Promise<ResponseType<LeadsImportResponseType>>;
+  ): Promise<ResponseType<LeadsImportResponseOutput>>;
 
   /**
    * Create a chunked import job
@@ -44,7 +44,7 @@ export interface ImportRepository {
     config: CsvImportConfig,
     uploadedBy: DbId,
     domainName: string,
-  ): Promise<ResponseType<LeadsImportResponseType>>;
+  ): Promise<ResponseType<LeadsImportResponseOutput>>;
 
   /**
    * Get CSV import job status

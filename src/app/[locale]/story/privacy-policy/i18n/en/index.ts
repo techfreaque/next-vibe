@@ -1,4 +1,6 @@
 export const translations = {
+  printAriaLabel: "Print privacy policy",
+  printButton: "Print",
   post: {
     title: "Privacy Policy",
     description: "Privacy Policy endpoint",

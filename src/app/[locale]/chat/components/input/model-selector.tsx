@@ -3,6 +3,13 @@
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
+import type { IconValue } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
+import { MODEL_UTILITIES } from "@/app/api/[locale]/v1/core/agent/chat/model-access/model-utilities";
+import {
+  ModelId,
+  modelOptions,
+  modelProviders,
+} from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -16,9 +23,6 @@ import {
   Label,
 } from "@/packages/next-vibe-ui/web/ui";
 
-import type { IconValue } from "../../lib/config/icons";
-import { MODEL_UTILITIES } from "../../lib/config/model-utilities";
-import { ModelId, modelOptions, modelProviders } from "../../lib/config/models";
 import { SelectorBase, type SelectorOption } from "./selector-base";
 import { useFavorites } from "./use-favorites";
 

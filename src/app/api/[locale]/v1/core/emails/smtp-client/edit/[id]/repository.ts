@@ -193,6 +193,7 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
       }
 
       // Update the account - prepare update data excluding id field
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id: _id, ...updateFields } = data;
       const updateData: Partial<typeof smtpAccounts.$inferInsert> = {
         ...updateFields,

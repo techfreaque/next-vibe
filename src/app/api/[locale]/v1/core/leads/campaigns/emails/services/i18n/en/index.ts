@@ -1,4 +1,11 @@
 export const translations = {
+  scheduler: {
+    cancelledBySystem: "Cancelled by system",
+  },
+  abTesting: {
+    invalidWeights: "Total variant weights must equal 100%",
+    negativeWeight: "Variant weight must be positive",
+  },
   post: {
     title: "Services",
     description: "Services endpoint",

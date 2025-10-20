@@ -3,6 +3,11 @@
 import type { JSX } from "react";
 import React from "react";
 
+import {
+  DEFAULT_FOLDER_CONFIGS,
+  type DefaultFolderId,
+} from "@/app/api/[locale]/v1/core/agent/chat/config";
+import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import {
@@ -13,17 +18,7 @@ import {
   TooltipTrigger,
 } from "@/packages/next-vibe-ui/web/ui";
 
-import { getIconComponent } from "../../lib/config/icons";
-import { getFolderDisplayName } from "../../lib/storage/thread-manager";
-import type { ChatFolder, ChatState } from "../../lib/storage/types";
-import {
-  DEFAULT_FOLDER_CONFIGS,
-  getFolderColor,
-  getFolderIcon,
-} from "../../lib/storage/types";
-
 interface RootFolderBarProps {
-  state: ChatState;
   activeFolderId: string | null;
   locale: CountryLanguage;
   onSelectFolder: (folderId: string) => void;
@@ -90,19 +85,16 @@ function getTooltipColorClasses(color: string | null): string {
 /* eslint-enable i18next/no-literal-string */
 
 export function RootFolderBar({
-  state,
   activeFolderId,
   locale,
   onSelectFolder,
 }: RootFolderBarProps): JSX.Element {
   const { t } = simpleT(locale);
 
-  // Get root folders in the order specified by state.rootFolderIds (user's custom order)
-  const rootFolders = state.rootFolderIds
-    .map((id) => state.folders[id])
-    .filter((folder): folder is ChatFolder => folder !== undefined);
+  // Get root folders from DEFAULT_FOLDER_CONFIGS
+  const rootFolders = DEFAULT_FOLDER_CONFIGS;
 
-  const handleFolderClick = (folderId: string): void => {
+  const handleFolderClick = (folderId: DefaultFolderId): void => {
     onSelectFolder(folderId);
   };
 
@@ -110,32 +102,25 @@ export function RootFolderBar({
     <div className="overflow-x-auto bg-background/50">
       <div className="flex items-center gap-1 px-3 py-2 min-w-max">
         <TooltipProvider delayDuration={300}>
-          {rootFolders.map((folder) => {
-            const folderIcon = getFolderIcon(folder);
-            const FolderIcon = getIconComponent(folderIcon);
-            const folderDisplayName = getFolderDisplayName(folder, locale);
-            const isActive = folder.id === activeFolderId;
-            const folderColor = getFolderColor(folder.id);
+          {rootFolders.map((folderConfig) => {
+            const FolderIcon = getIconComponent(folderConfig.icon);
+            const folderDisplayName = t(folderConfig.translationKey);
+            const isActive = folderConfig.id === activeFolderId;
+            const folderColor = folderConfig.color;
             const colorClasses = getColorClasses(folderColor, isActive);
 
             const tooltipColorClasses = getTooltipColorClasses(folderColor);
 
-            // Get description for default folders
-            const folderConfig = DEFAULT_FOLDER_CONFIGS.find(
-              (c) => c.id === folder.id,
-            );
-            const folderDescription = folderConfig
-              ? t(folderConfig.descriptionKey)
-              : null;
+            const folderDescription = t(folderConfig.descriptionKey);
 
             return (
-              <Tooltip key={folder.id}>
+              <Tooltip key={folderConfig.id}>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
                     className={`h-11 w-11 ${colorClasses}`}
-                    onClick={() => handleFolderClick(folder.id)}
+                    onClick={() => handleFolderClick(folderConfig.id)}
                     suppressHydrationWarning
                   >
                     <FolderIcon className="h-6 w-6 flex items-center justify-center" />
@@ -147,11 +132,9 @@ export function RootFolderBar({
                 >
                   <div className="text-center">
                     <p className="font-medium">{folderDisplayName}</p>
-                    {folderDescription && (
-                      <p className="text-xs opacity-90 mt-0.5">
-                        {folderDescription}
-                      </p>
-                    )}
+                    <p className="text-xs opacity-90 mt-0.5">
+                      {folderDescription}
+                    </p>
                   </div>
                 </TooltipContent>
               </Tooltip>

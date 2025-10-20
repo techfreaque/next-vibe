@@ -186,7 +186,7 @@ const { GET } = createEndpoint({
       description: "app.api.v1.core.emails.messages.stats.get.form.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { [Methods.GET]: { request: "data", response: true } },
+    { request: "data", response: true },
     {
       // === REQUEST FIELDS (Filters) ===
 
@@ -692,6 +692,13 @@ const { GET } = createEndpoint({
   },
 
   examples: {
+    requests: {
+      default: {
+        timePeriod: TimePeriod.DAY,
+        dateRangePreset: DateRangePreset.LAST_30_DAYS,
+        chartType: ChartType.LINE,
+      },
+    },
     responses: {},
   },
 });

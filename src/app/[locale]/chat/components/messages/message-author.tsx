@@ -12,7 +12,6 @@ import { formatRelativeTime } from "../../lib/utils/formatting";
 import type { ModelId } from "../../types";
 
 interface MessageAuthorProps {
-  authorId: string | null;
   authorName: string | null;
   isAI: boolean;
   model: ModelId | null;
@@ -20,7 +19,8 @@ interface MessageAuthorProps {
   edited?: boolean;
   compact?: boolean;
   className?: string;
-  persona: string;
+  /** Persona/tone used for this message */
+  tone?: string | null;
   locale: CountryLanguage;
 }
 
@@ -32,7 +32,7 @@ export function MessageAuthorInfo({
   edited = false,
   compact = false,
   className,
-  persona,
+  tone,
   locale,
 }: MessageAuthorProps): JSX.Element {
   const { t } = simpleT(locale);
@@ -41,7 +41,7 @@ export function MessageAuthorInfo({
   const displayName = authorName ?? t("app.chat.messages.you");
 
   // Get persona name if tone is provided
-  const personaName = persona ? getPersonaById(persona)?.name : null;
+  const personaName = tone ? getPersonaById(tone)?.name : null;
 
   return (
     <div className={cn("flex items-center gap-2", className)}>

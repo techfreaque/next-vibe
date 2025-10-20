@@ -10,7 +10,7 @@ import { createEnumOptions } from "../system/unified-ui/cli/vibe/endpoints/endpo
  */
 export const { enum: SubscriptionPlan, options: SubscriptionPlanOptions } =
   createEnumOptions({
-    SUBSCRIPTION: "app.api.v1.core.subscription.enums.plan.subscription",
+    SUBSCRIPTION: "app.story.pricing.creditPricing.subscription.title",
   });
 
 /**

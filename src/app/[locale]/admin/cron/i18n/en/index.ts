@@ -11,6 +11,10 @@ export const translations = {
   task: taskTranslations,
   tasks: tasksTranslations,
   // Shared cron-level translations
+  taskDetails: {
+    edit: "Edit Task",
+    back: "Back",
+  },
   nav: {
     stats: "Statistics",
     stats_description:

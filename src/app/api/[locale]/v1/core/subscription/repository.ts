@@ -70,26 +70,10 @@ const getStripePriceId = (
   // Type-safe access to nested record structure
   if (billingInterval === BillingInterval.MONTHLY) {
     const monthlyPrices = regionPrices[BillingInterval.MONTHLY];
-    if (planId === SubscriptionPlan.SUBSCRIPTION) {
-      return monthlyPrices[SubscriptionPlan.SUBSCRIPTION];
-    }
-    if (planId === SubscriptionPlan.PROFESSIONAL) {
-      return monthlyPrices[SubscriptionPlan.PROFESSIONAL];
-    }
-    if (planId === SubscriptionPlan.PREMIUM) {
-      return monthlyPrices[SubscriptionPlan.PREMIUM];
-    }
+    return monthlyPrices[planId as keyof typeof monthlyPrices];
   } else if (billingInterval === BillingInterval.YEARLY) {
     const yearlyPrices = regionPrices[BillingInterval.YEARLY];
-    if (planId === SubscriptionPlan.SUBSCRIPTION) {
-      return yearlyPrices[SubscriptionPlan.SUBSCRIPTION];
-    }
-    if (planId === SubscriptionPlan.PROFESSIONAL) {
-      return yearlyPrices[SubscriptionPlan.PROFESSIONAL];
-    }
-    if (planId === SubscriptionPlan.PREMIUM) {
-      return yearlyPrices[SubscriptionPlan.PREMIUM];
-    }
+    return yearlyPrices[planId as keyof typeof yearlyPrices];
   }
 
   return undefined;
@@ -161,7 +145,6 @@ const syncStripeSubscription = async (
   stripeSubscription: Stripe.Subscription,
   userId: string,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<ResponseType<SubscriptionPostResponseOutput>> => {
   try {
     // Extract plan from metadata with proper type checking
@@ -170,8 +153,10 @@ const syncStripeSubscription = async (
     );
     const validatedPlanId =
       planFromMetadata &&
-      (planFromMetadata === SubscriptionPlan.SUBSCRIPTION)
-        ? planFromMetadata
+      Object.values(SubscriptionPlan).includes(
+        planFromMetadata as SubscriptionPlanValue,
+      )
+        ? (planFromMetadata as SubscriptionPlanValue)
         : SubscriptionPlan.SUBSCRIPTION;
 
     // Ensure stripeCustomerId is a string
@@ -407,7 +392,6 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
         createdAt: subscription.createdAt.toISOString(),
         updatedAt: subscription.updatedAt.toISOString(),
-        message: "",
       };
 
       return createSuccessResponse(subscriptionData);
@@ -462,14 +446,14 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         stripeSubscription,
         userId,
         logger,
-        locale,
       );
 
       if (!syncResult.success) {
         return syncResult;
       }
 
-      return createSuccessResponse(syncResult.data);
+      // Return full subscription data from syncResult
+      return syncResult;
     } catch (error) {
       logger.error("Error creating subscription:", error);
       const parsedError = parseError(error);
@@ -515,7 +499,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       ) {
         const country = getCountryFromLocale(locale);
         const newPriceId = getStripePriceId(
-          (data.plan || subscription.planId),
+          data.plan || subscription.planId,
           data.billingInterval || subscription.billingInterval,
           country,
         );
@@ -542,7 +526,6 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
           stripeSubscription,
           userId,
           logger,
-          locale,
         );
         if (!syncResult.success) {
           return syncResult;
@@ -631,6 +614,10 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean; message: string }>> {
     try {
+      // Use default locale for cancel operations since they don't have locale context
+      const defaultLocale: CountryLanguage = "en-GLOBAL" as CountryLanguage;
+      const { t } = simpleT(defaultLocale);
+
       // Get current subscription
       const currentSubscription: (typeof subscriptions.$inferSelect)[] =
         await db
@@ -650,9 +637,6 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
       // If we have a Stripe subscription ID, cancel it in Stripe
       if (subscription.stripeSubscriptionId) {
-        // Note: Cancel operations don't have locale context, use default
-        const defaultLocale: CountryLanguage = "en-GLOBAL" as CountryLanguage;
-
         if (data.cancelAtPeriodEnd) {
           // Cancel at period end
           const stripeSubscription = await stripe.subscriptions.update(
@@ -667,13 +651,11 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
             stripeSubscription,
             userId,
             logger,
-            defaultLocale,
           );
           if (!syncResult.success) {
             return syncResult;
           }
 
-          const { t } = simpleT(defaultLocale);
           return createSuccessResponse({
             success: true,
             message: t("app.api.v1.core.subscription.cancel.success"),
@@ -689,13 +671,11 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
             stripeSubscription,
             userId,
             logger,
-            defaultLocale,
           );
           if (!syncResult.success) {
             return syncResult;
           }
 
-          const { t } = simpleT(defaultLocale);
           return createSuccessResponse({
             success: true,
             message: t("app.api.v1.core.subscription.cancel.success"),
@@ -730,10 +710,6 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         );
       }
 
-      // Use default locale for cancel operations since they don't have locale context
-      const defaultLocale: CountryLanguage = "en-GLOBAL" as CountryLanguage;
-      const { t } = simpleT(defaultLocale);
-
       return createSuccessResponse({
         success: true,
         message: t("app.api.v1.core.subscription.cancel.success"),
@@ -758,14 +734,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
     userId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<SubscriptionPostResponseOutput>> {
-    // Webhooks don't have locale context, use default
-    const defaultLocale: CountryLanguage = "en-GLOBAL" as CountryLanguage;
-    return await syncStripeSubscription(
-      stripeSubscription,
-      userId,
-      logger,
-      defaultLocale,
-    );
+    return await syncStripeSubscription(stripeSubscription, userId, logger);
   }
 
   /**

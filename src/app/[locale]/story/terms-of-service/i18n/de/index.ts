@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  printAriaLabel: "Nutzungsbedingungen drucken",
+  printButton: "Drucken",
   post: {
     title: "Titel",
     description: "Endpunkt-Beschreibung",

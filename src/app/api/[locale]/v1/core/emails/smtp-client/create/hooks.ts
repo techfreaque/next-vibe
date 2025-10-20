@@ -16,9 +16,9 @@ import definitions from "./definition";
  */
 export function useSmtpAccountCreate(
   logger: EndpointLogger,
-): EndpointReturn<typeof definitions.POST> {
+): EndpointReturn<typeof definitions> {
   return useEndpoint(
-    definitions.POST,
+    definitions,
     {
       persistForm: false,
     },
@@ -30,5 +30,5 @@ export function useSmtpAccountCreate(
 export const useSmtpAccountCreateEndpoint = useSmtpAccountCreate;
 
 export type SmtpAccountCreateEndpointReturn = EndpointReturn<
-  typeof definitions.POST
+  typeof definitions
 >;

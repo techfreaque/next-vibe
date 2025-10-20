@@ -16,9 +16,9 @@ import definitions from "./definition";
  */
 export function useImapHealth(
   logger: EndpointLogger,
-): EndpointReturn<typeof definitions.GET> {
+): EndpointReturn<typeof definitions> {
   return useEndpoint(
-    definitions.GET,
+    definitions,
     {
       persistForm: false,
     },
@@ -26,4 +26,4 @@ export function useImapHealth(
   );
 }
 
-export type ImapHealthEndpointReturn = EndpointReturn<typeof definitions.GET>;
+export type ImapHealthEndpointReturn = EndpointReturn<typeof definitions>;

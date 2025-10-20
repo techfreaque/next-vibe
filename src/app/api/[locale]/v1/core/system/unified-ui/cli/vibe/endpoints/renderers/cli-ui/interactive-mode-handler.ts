@@ -3,7 +3,7 @@
  * Provides file explorer-like navigation and form-based interface that respects data-driven UI
  */
 
-import { confirm, input, select } from "@inquirer/prompts";
+import { confirm, select } from "@inquirer/prompts";
 import type { z } from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";

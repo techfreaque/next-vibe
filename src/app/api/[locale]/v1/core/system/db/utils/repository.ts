@@ -269,7 +269,6 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
             skipSeeds: false,
             dryRun: false,
           },
-          { id: "system", isPublic: false },
           "en-GLOBAL",
           logger,
         );

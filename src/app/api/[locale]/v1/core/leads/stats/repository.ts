@@ -24,11 +24,7 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
-import type {
-  ChartType,
-  DateRangePreset,
-  TimePeriod as TimePeriodType,
-} from "next-vibe/shared/types/stats-filtering.schema";
+import type { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
 import {
   getDateRangeFromPreset,
   TimePeriod,
@@ -58,7 +54,6 @@ import {
   mapSourceFilter,
   mapStatusFilter,
 } from "../enum";
-import type { EngagementLevel } from "../tracking/engagement/enum";
 import type {
   LeadsStatsRequestOutput,
   LeadsStatsResponseOutput,
@@ -152,22 +147,13 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     try {
       logger.debug("Getting leads stats", { data, userId: user.id });
 
-      // Type assertion to help TypeScript - the type is correct but TS can't infer it
-      const requestData = data as Record<string, unknown>;
-
-      // Get date range
-      const dateRange = getDateRangeFromPreset(
-        requestData.dateRangePreset as DateRangePreset,
-      );
+      // Get date range from preset
+      const dateRange = getDateRangeFromPreset(data.dateRangePreset);
       dateFrom = dateRange.from;
       dateTo = dateRange.to;
 
       // Build where conditions
-      const whereConditions = this.buildWhereConditions(
-        requestData,
-        dateFrom,
-        dateTo,
-      );
+      const whereConditions = this.buildWhereConditions(data, dateFrom, dateTo);
 
       // Get all metrics in parallel
       const [
@@ -183,11 +169,11 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           whereConditions,
           dateFrom,
           dateTo,
-          requestData.timePeriod as TimePeriodType,
-          requestData,
+          data.timePeriod,
+          data,
           logger,
         ),
-        this.generateGroupedStats(whereConditions, logger),
+        this.generateGroupedStats(whereConditions),
         this.generateRecentActivity(whereConditions),
         this.generateTopPerformingCampaigns(whereConditions),
         this.generateTopPerformingSources(whereConditions),
@@ -221,7 +207,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
         },
       });
       return createErrorResponse(
-        "app.api.v1.core.leads.admin.stats.error",
+        "app.api.v1.core.leads.stats.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -231,7 +217,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    * Build where conditions for database queries
    */
   private buildWhereConditions(
-    query: Record<string, unknown>,
+    query: LeadsStatsRequestOutput,
     dateFrom: Date,
     dateTo: Date,
   ): SQL | undefined {
@@ -243,9 +229,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
 
     // Status filter
     if (query.status && query.status !== LeadStatusFilter.ALL) {
-      const status = mapStatusFilter(
-        query.status as (typeof LeadStatusFilter)[keyof typeof LeadStatusFilter],
-      );
+      const status = mapStatusFilter(query.status);
       if (status) {
         conditions.push(eq(leads.status, status));
       }
@@ -253,9 +237,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
 
     // Source filter
     if (query.source && query.source !== LeadSourceFilter.ALL) {
-      const source = mapSourceFilter(
-        query.source as (typeof LeadSourceFilter)[keyof typeof LeadSourceFilter],
-      );
+      const source = mapSourceFilter(query.source);
       if (source) {
         conditions.push(eq(leads.source, source));
       }
@@ -1076,7 +1058,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   private async generateGroupedStats(
     whereConditions: SQL | undefined,
-    logger: EndpointLogger,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]> {
     // Get grouped statistics from database
     const [
@@ -1089,7 +1070,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       byEngagementLevelData,
       byConversionFunnelData,
     ] = await Promise.all([
-      this.getGroupedByStatus(whereConditions, logger),
+      this.getGroupedByStatus(whereConditions),
       this.getGroupedBySource(whereConditions),
       this.getGroupedByCountry(whereConditions),
       this.getGroupedByLanguage(whereConditions),
@@ -1140,7 +1121,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
 
     return recentLeads.map((lead) => ({
       id: lead.id,
-      leadEmail: lead.email,
+      leadEmail: lead.email || "",
       leadBusinessName: lead.businessName || "",
       timestamp: lead.timestamp.toISOString(),
       type: mapLeadStatusToActivityType(lead.status),
@@ -1959,7 +1940,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    * This is needed when we use different timestamp fields for filtering
    * We need to rebuild the conditions without the date range filters
    */
-  private buildNonDateConditions(filters: Record<string, unknown>): SQL[] {
+  private buildNonDateConditions(filters: LeadsStatsRequestOutput): SQL[] {
     const conditions: SQL[] = [];
 
     // Add status filter if specified (single value, not array)
@@ -2004,7 +1985,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     }
 
     // Add search filter if specified
-    if (filters.search) {
+    if (filters.search && typeof filters.search === "string") {
       const searchPattern = `%${filters.search}%`;
       conditions.push(
         sql`(
@@ -2151,7 +2132,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   private async getHistoricalMetricForStatus(
     intervals: Array<{ start: Date; end: Date; label: string }>,
     whereConditions: SQL | undefined,
-    status: LeadStatus,
+    status: (typeof LeadStatus)[keyof typeof LeadStatus],
     timePeriod: TimePeriod,
   ): Promise<Array<{ date: string; value: number }>> {
     if (intervals.length === 0) {
@@ -2202,7 +2183,9 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get color for lead status
    */
-  private getStatusColor(status: LeadStatus): string {
+  private getStatusColor(
+    status: (typeof LeadStatus)[keyof typeof LeadStatus],
+  ): string {
     switch (status) {
       case LeadStatus.NEW:
         return "#3b82f6";
@@ -2236,7 +2219,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   private async getGroupedByStatus(
     whereConditions: SQL | undefined,
-    logger: EndpointLogger,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]["byStatus"]> {
     // Get total count for percentage calculation
     const totalCountResult = await db
@@ -2255,41 +2237,13 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       .where(whereConditions)
       .groupBy(leads.status);
 
-    // Generate historical data for each status
-    const results = await Promise.all(
-      statusGroups.map(async (group) => {
-        // Generate 30-day historical data for this specific status
-        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-        const now = new Date();
-        const intervals = this.generateDateIntervals(
-          thirtyDaysAgo,
-          now,
-          TimePeriod.DAY,
-          logger,
-        );
-
-        const statusHistoricalData = await this.getHistoricalMetricForStatus(
-          intervals,
-          whereConditions,
-          group.status,
-          TimePeriod.DAY,
-        );
-
-        return {
-          status: group.status,
-          count: Number(group.count),
-          percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
-          historicalData: {
-            name: "app.api.v1.core.leads.admin.stats.total_leads" as const,
-            type: "line" as ChartType,
-            data: statusHistoricalData,
-            color: this.getStatusColor(group.status),
-          },
-        };
-      }),
-    );
-
-    return results;
+    // Map to schema-compliant format
+    return statusGroups.map((group) => ({
+      label: group.status,
+      value: Number(group.count),
+      percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
+      color: this.getStatusColor(group.status),
+    }));
   }
 
   /**
@@ -2318,15 +2272,10 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     return sourceGroups
       .filter((group) => group.source !== null)
       .map((group) => ({
-        source: group.source!,
-        count: Number(group.count),
+        label: group.source!,
+        value: Number(group.count),
         percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
-        historicalData: {
-          name: "app.api.v1.core.leads.admin.stats.total_leads" as const,
-          type: "line" as ChartType,
-          data: [],
-          color: "#10b981",
-        },
+        color: "#10b981",
       }));
   }
 
@@ -2356,15 +2305,10 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     return countryGroups
       .filter((group) => group.country !== null)
       .map((group) => ({
-        country: group.country,
-        count: Number(group.count),
+        label: group.country,
+        value: Number(group.count),
         percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
-        historicalData: {
-          name: "app.api.v1.core.leads.admin.stats.total_leads" as const,
-          type: "line" as ChartType,
-          data: [],
-          color: "#f59e0b",
-        },
+        color: "#f59e0b",
       }));
   }
 
@@ -2394,15 +2338,10 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     return languageGroups
       .filter((group) => group.language !== null)
       .map((group) => ({
-        language: group.language,
-        count: Number(group.count),
+        label: group.language,
+        value: Number(group.count),
         percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
-        historicalData: {
-          name: "app.api.v1.core.leads.admin.stats.total_leads" as const,
-          type: "line" as ChartType,
-          data: [],
-          color: "#8b5cf6",
-        },
+        color: "#8b5cf6",
       }));
   }
 
@@ -2432,15 +2371,10 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     return stageGroups
       .filter((group) => group.stage !== null)
       .map((group) => ({
-        stage: group.stage!,
-        count: Number(group.count),
+        label: group.stage!,
+        value: Number(group.count),
         percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
-        historicalData: {
-          name: "app.api.v1.core.leads.admin.stats.total_leads" as const,
-          type: "line" as ChartType,
-          data: [],
-          color: "#06b6d4",
-        },
+        color: "#06b6d4",
       }));
   }
 
@@ -3144,15 +3078,10 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     return variantGroups
       .filter((group) => group.variant !== null)
       .map((group) => ({
-        variant: group.variant!,
-        count: Number(group.count),
+        label: group.variant!,
+        value: Number(group.count),
         percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
-        historicalData: {
-          name: "app.api.v1.core.leads.admin.stats.total_leads" as const,
-          type: "line" as ChartType,
-          data: [],
-          color: "#f59e0b",
-        },
+        color: "#f59e0b",
       }));
   }
 
@@ -3194,15 +3123,10 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       `);
 
     return engagementGroups.map((group) => ({
-      level: group.level as EngagementLevel,
-      count: Number(group.count),
+      label: group.level,
+      value: Number(group.count),
       percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
-      historicalData: {
-        name: "app.api.v1.core.leads.admin.stats.total_leads" as const,
-        type: "line" as ChartType,
-        data: [],
-        color: "#8b5cf6",
-      },
+      color: "#8b5cf6",
     }));
   }
 
@@ -3231,7 +3155,10 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       .groupBy(leads.status);
 
     // Create a map for quick lookup
-    const statusCounts = new Map<LeadStatus, number>();
+    const statusCounts = new Map<
+      (typeof LeadStatus)[keyof typeof LeadStatus],
+      number
+    >();
     for (const group of statusGroups) {
       statusCounts.set(group.status, Number(group.count));
     }
@@ -3243,18 +3170,13 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       .map((status) => {
         const count = statusCounts.get(status) || 0;
         return {
-          stage: status,
-          count,
+          label: status,
+          value: count,
           percentage: totalCount > 0 ? count / totalCount : 0,
-          historicalData: {
-            name: "app.api.v1.core.leads.admin.stats.total_leads" as const,
-            type: "line" as ChartType,
-            data: [],
-            color: "#06b6d4",
-          },
+          color: this.getStatusColor(status),
         };
       })
-      .filter((stage) => stage.count > 0); // Only return stages with actual data
+      .filter((stage) => stage.value > 0); // Only return stages with actual data
   }
 
   /**

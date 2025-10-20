@@ -13,25 +13,16 @@ import definitions from "./definition";
 
 /**
  * Hook for retrying import jobs
- * Uses the simplified interface with URL parameters as top-level option
  */
 export function useRetryImportJobEndpoint(
-  params: {
-    jobId: string;
-    enabled?: boolean;
-  },
   logger: EndpointLogger,
 ): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {
-      enabled: params.enabled,
       staleTime: 0, // Always fresh for actions
       refetchOnWindowFocus: false,
       persistForm: false,
-      urlPathVariables: {
-        jobId: params.jobId,
-      },
     },
     logger,
   );

@@ -180,7 +180,8 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Kliknięcie zarejestrowane",
-      description: "Kliknięcie leada zostało pomyślnie zarejestrowane i przekierowane",
+      description:
+        "Kliknięcie leada zostało pomyślnie zarejestrowane i przekierowane",
     },
   },
   enums: {

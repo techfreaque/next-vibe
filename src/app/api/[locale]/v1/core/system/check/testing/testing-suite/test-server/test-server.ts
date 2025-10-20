@@ -57,6 +57,7 @@ export async function startServer(logger: EndpointLogger): Promise<void> {
           return;
         }
 
+        // eslint-disable-next-line i18next/no-literal-string
         reject(new Error(`Failed to start server: ${err.message}`));
       });
       const port = env.NEXT_PUBLIC_TEST_SERVER_URL.split(":")[1];

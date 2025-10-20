@@ -5,51 +5,30 @@
 
 "use client";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import { useApiQuery } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/query";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/use-endpoint";
+import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/use-endpoint";
 
 import definitions from "./definition";
 
-/****************************
- * QUERY HOOKS
- ****************************/
-
 /**
- * Hook for fetching current user's subscription
+ * Hook for subscription management
+ * Provides both query (GET) and mutation (POST/PUT/DELETE) operations
  */
-export function useSubscription(params: {
-  enabled?: boolean;
-  logger: EndpointLogger;
-}): ReturnType<typeof useApiQuery<typeof definitions.GET>> {
-  return useApiQuery({
-    endpoint: definitions.GET,
-    logger: params.logger,
-    options: {
-      enabled: params.enabled !== false,
+export function useSubscription(
+  logger: EndpointLogger,
+): EndpointReturn<typeof definitions> {
+  return useEndpoint(
+    definitions,
+    {
+      queryOptions: {
+        enabled: true,
+        refetchOnWindowFocus: true,
+        staleTime: 60 * 1000, // 60 seconds
+      },
     },
-  });
+    logger,
+  );
 }
 
-/**
- * Hook for fetching subscription by user ID (admin only)
- */
-export function useSubscriptionByUserId(params: {
-  userId: string;
-  enabled?: boolean;
-  logger: EndpointLogger;
-}): ReturnType<typeof useApiQuery<typeof definitions.GET>> {
-  return useApiQuery({
-    endpoint: definitions.GET,
-    requestData: { userId: params.userId },
-    logger: params.logger,
-    options: {
-      enabled: params.enabled !== false && Boolean(params.userId),
-    },
-  });
-}
-
-/**
- * Note: Form and mutation hooks for subscription operations
- * would need to be implemented with the proper API structure
- * Currently only query hooks are supported in this simplified version
- */
+export type SubscriptionEndpointReturn = EndpointReturn<typeof definitions>;

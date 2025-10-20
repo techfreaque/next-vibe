@@ -194,8 +194,7 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: undefined,
-    requests: {
+    urlPathVariables: {
       default: {
         search: "acme",
         limit: 10,

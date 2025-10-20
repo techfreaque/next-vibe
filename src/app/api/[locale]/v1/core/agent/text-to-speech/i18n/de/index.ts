@@ -108,6 +108,6 @@ export const translations = {
     fr: "Französisch",
     it: "Italienisch",
   },
-} as const;
+};
 
 export default translations;

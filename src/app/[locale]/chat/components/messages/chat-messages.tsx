@@ -4,21 +4,17 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
+import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
+import type { ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { useChatContext } from "../../features/chat/context";
 import { DOM_IDS, LAYOUT, QUOTE_CHARACTER } from "../../lib/config/constants";
-import type { ModelId } from "../../lib/config/models";
-import type {
-  ChatMessage,
-  ChatThread,
-  ViewMode,
-} from "../../lib/storage/types";
 import {
   getDirectReplies,
   getRootMessages,
 } from "../../lib/utils/thread-builder";
+import type { ChatMessage, ChatThread, ViewMode } from "../../types";
 import { FlatMessageView } from "./flat-message-view";
 import { LinearMessageView } from "./linear-message-view";
 import { LoadingIndicator } from "./loading-indicator";
@@ -53,6 +49,7 @@ interface ChatMessagesProps {
   rootFolderId?: string;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  chat: UseChatReturn;
 }
 
 export function ChatMessages({
@@ -78,6 +75,7 @@ export function ChatMessages({
   rootFolderId = "general",
   locale,
   logger,
+  chat,
 }: ChatMessagesProps): JSX.Element {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -86,9 +84,6 @@ export function ChatMessages({
 
   // Use custom hook for message action state management
   const messageActions = useMessageActions(logger);
-
-  // Get context for inserting text into input
-  const { insertTextAtCursor } = useChatContext();
 
   // Check if user is at bottom of scroll
   const isAtBottom = useCallback((): boolean => {
@@ -128,7 +123,8 @@ export function ChatMessages({
     }
 
     // Get the last message
-    const lastMessage = messages[messages.length - 1];
+    const allMessages = Object.values(messages);
+    const lastMessage = allMessages[allMessages.length - 1];
     if (!lastMessage) {
       return;
     }
@@ -140,7 +136,7 @@ export function ChatMessages({
     lastMessageContentRef.current = lastMessage.content;
 
     // Only auto-scroll during streaming or when new message arrives
-    if (isStreaming || messages.length > 0) {
+    if (isStreaming || allMessages.length > 0) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isLoading, userScrolledUp]);
@@ -162,9 +158,7 @@ export function ChatMessages({
           paddingBottom: `${inputHeight + LAYOUT.MESSAGES_BOTTOM_PADDING}px`,
         }}
       >
-        {Object.keys(thread.messages).length === 0 &&
-        !isLoading &&
-        onSendMessage ? (
+        {Object.keys(messages).length === 0 && !isLoading && onSendMessage ? (
           <div
             className="flex items-center justify-center"
             style={{ minHeight: `${LAYOUT.SUGGESTIONS_MIN_HEIGHT}vh` }}
@@ -179,8 +173,8 @@ export function ChatMessages({
           // Flat view (4chan style) - ALL messages in chronological order
           ((): JSX.Element => {
             // Get ALL messages from thread, sorted by timestamp
-            const allMessages = Object.values(thread.messages).sort(
-              (a, b) => a.timestamp - b.timestamp,
+            const allMessages = Object.values(messages).sort(
+              (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
             );
             return (
               <FlatMessageView
@@ -209,7 +203,8 @@ export function ChatMessages({
                 onModelChange={onModelChange}
                 onToneChange={onToneChange}
                 onInsertQuote={() => {
-                  insertTextAtCursor(QUOTE_CHARACTER);
+                  chat.setInput(chat.input + QUOTE_CHARACTER);
+                  chat.inputRef.current?.focus();
                 }}
               />
             );
@@ -217,11 +212,8 @@ export function ChatMessages({
         ) : viewMode === "threaded" ? (
           // Threaded view (Reddit style) - Show ALL messages, not just current path
           ((): JSX.Element[] => {
-            const allMessages = Object.values(thread.messages);
-            const rootMessages = getRootMessages(
-              allMessages,
-              thread.rootMessageId,
-            );
+            const allMessages = Object.values(messages);
+            const rootMessages = getRootMessages(allMessages, null);
             return rootMessages.map((rootMessage) => (
               <ThreadedMessage
                 key={rootMessage.id}

@@ -16,9 +16,9 @@ import definitions from "./definition";
  */
 export function useEmailMessagesStats(
   logger: EndpointLogger,
-): EndpointReturn<typeof definitions.GET> {
+): EndpointReturn<typeof definitions> {
   return useEndpoint(
-    definitions.GET,
+    definitions,
     {
       persistForm: false,
     },
@@ -27,5 +27,5 @@ export function useEmailMessagesStats(
 }
 
 export type EmailMessagesStatsEndpointReturn = EndpointReturn<
-  typeof definitions.GET
+  typeof definitions
 >;

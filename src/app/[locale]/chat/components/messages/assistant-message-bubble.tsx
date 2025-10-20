@@ -3,14 +3,14 @@
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 
+import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import { Markdown } from "@/packages/next-vibe-ui/web/ui/markdown";
 
-import { getModelById } from "../../lib/config/models";
 import { chatProse } from "../../lib/design-tokens";
-import type { ChatMessage } from "../../lib/storage/types";
+import type { ChatMessage } from "../../types";
 import { AssistantMessageActions } from "./assistant-message-actions";
 import { MessageAuthorInfo } from "./message-author";
 
@@ -35,21 +35,16 @@ export function AssistantMessageBubble({
 }: AssistantMessageBubbleProps): JSX.Element {
   const { t } = simpleT(locale);
 
-  // Create author object from model and tone if not already present
-  const modelId = message.role === "assistant" ? message.model : undefined;
+  // Get tone for assistant/user messages
   const tone =
     message.role === "assistant" || message.role === "user"
       ? message.tone
-      : undefined;
+      : null;
 
-  const author = message.author || {
-    id: modelId || "assistant",
-    name: modelId
-      ? getModelById(modelId).name
-      : t("app.chat.messages.assistant"),
-    isAI: true,
-    modelId,
-  };
+  // Get display name for assistant
+  const displayName = message.model
+    ? getModelById(message.model).name
+    : t("app.chat.messages.assistant");
 
   return (
     <div className="flex items-start gap-3">
@@ -58,9 +53,11 @@ export function AssistantMessageBubble({
         {showAuthor && (
           <div className="mb-2">
             <MessageAuthorInfo
-              author={author}
-              timestamp={message.timestamp}
-              edited={message.metadata?.edited}
+              authorName={displayName}
+              isAI={message.isAI}
+              model={message.model}
+              timestamp={message.createdAt}
+              edited={message.edited}
               tone={tone}
               locale={locale}
               compact

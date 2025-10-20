@@ -12,6 +12,10 @@ export const translations: typeof enTranslations = {
   task: taskTranslations,
   tasks: tasksTranslations,
   // Shared cron-level translations (German)
+  taskDetails: {
+    edit: "Aufgabe bearbeiten",
+    back: "Zurück",
+  },
   nav: {
     stats: "Statistiken",
     stats_description:

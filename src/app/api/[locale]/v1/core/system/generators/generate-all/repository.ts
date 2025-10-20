@@ -239,7 +239,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       outputLines.push(`❌ Generation failed: ${errorMessage}`);
 
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.system.generators.generateAll.post.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: errorMessage.message },
       );

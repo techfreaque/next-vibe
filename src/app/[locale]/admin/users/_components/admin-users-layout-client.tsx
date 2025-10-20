@@ -51,7 +51,7 @@ export function AdminUsersLayoutClient({
       <div className="flex flex-col space-y-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {t("users.admin.title")}
+            {t("app.admin.users.users.admin.overview.title")}
           </h1>
         </div>
 

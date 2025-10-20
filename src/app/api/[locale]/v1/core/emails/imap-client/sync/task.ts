@@ -85,6 +85,7 @@ async function executeImapSync(
     // System user context for CRON execution
     const systemUser: JwtPrivatePayloadType = {
       id: "system",
+      leadId: "system",
       isPublic: false,
     };
 
