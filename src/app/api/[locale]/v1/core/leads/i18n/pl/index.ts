@@ -252,6 +252,59 @@ export const translations: typeof enTranslations = {
           },
         },
       },
+      post: {
+        error: {
+          duplicate: {
+            title: "Lead z tym adresem e-mail już istnieje",
+          },
+          server: {
+            title: "Błąd serwera podczas tworzenia leada",
+          },
+        },
+      },
+      patch: {
+        error: {
+          not_found: {
+            title: "Lead nie znaleziony",
+          },
+          server: {
+            title: "Błąd serwera podczas aktualizacji leada",
+          },
+        },
+      },
+    },
+    leadsUnsubscribe: {
+      post: {
+        error: {
+          validation: {
+            title: "Nieprawidłowe żądanie rezygnacji",
+          },
+          server: {
+            title: "Błąd serwera podczas przetwarzania rezygnacji",
+          },
+        },
+      },
+    },
+    leadsEngagement: {
+      post: {
+        error: {
+          validation: {
+            title: "Nieprawidłowe dane zaangażowania",
+          },
+          server: {
+            title: "Błąd serwera podczas rejestrowania zaangażowania",
+          },
+        },
+      },
+    },
+    leadsExport: {
+      get: {
+        error: {
+          server: {
+            title: "Błąd serwera podczas eksportowania leadów",
+          },
+        },
+      },
     },
   },
 };

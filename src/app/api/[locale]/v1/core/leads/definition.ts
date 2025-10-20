@@ -36,8 +36,9 @@ export type LeadResponseType = LeadArrayType;
 // LeadDetailResponseType represents the full nested detail response
 export type LeadDetailResponse = LeadGetResponseOutput;
 
-// Placeholder interfaces for types that need to be implemented when needed
+// LeadUpdateType for repository (flat structure)
 export interface LeadUpdateType {
+  email?: string;
   status?: (typeof LeadStatus)[keyof typeof LeadStatus];
   currentCampaignStage?: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
   source?: (typeof LeadSource)[keyof typeof LeadSource];
@@ -48,8 +49,8 @@ export interface LeadUpdateType {
   website?: string | null;
   country?: string;
   language?: string;
-  consultationBookedAt?: Date;
-  subscriptionConfirmedAt?: Date;
+  consultationBookedAt?: Date | null;
+  subscriptionConfirmedAt?: Date | null;
   metadata?: Record<string, string | number | boolean | null>;
 }
 

@@ -76,9 +76,9 @@ export default function SubscriptionBanner({
     switch (subscription.status) {
       case SubscriptionStatus.ACTIVE:
         return t("app.story.pricing.subscriptionBanner.status.active", {
-          planName: subscription.planId
-            ? subscription.planId.charAt(0).toUpperCase() +
-              subscription.planId.slice(1)
+          planName: subscription.plan
+            ? subscription.plan.charAt(0).toUpperCase() +
+              subscription.plan.slice(1)
             : // eslint-disable-next-line i18next/no-literal-string
               "Unknown",
         });

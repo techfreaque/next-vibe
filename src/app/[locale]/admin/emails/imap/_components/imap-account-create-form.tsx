@@ -12,8 +12,8 @@ import type { FormEvent, JSX } from "react";
 
 import { useImapAccountCreateEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/create/hooks";
 import { ImapAuthMethod } from "@/app/api/[locale]/v1/core/emails/imap-client/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { useTranslation } from "@/i18n/core/client";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ImapAccountCreateFormProps {
   locale: CountryLanguage;

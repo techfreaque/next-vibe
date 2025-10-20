@@ -98,7 +98,7 @@ export function ChatInterface({
     inputRef,
   } = chat;
 
-  const { locale, currentCountry, t } = useTranslation();
+  const { locale, currentCountry } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [theme, toggleTheme] = useTheme();
@@ -276,14 +276,10 @@ export function ChatInterface({
   );
 
   const handleScreenshot = useCallback(() => {
-    try {
-      // Screenshot functionality to be implemented
-      logger.info("Screenshot requested");
-    } catch (error) {
-      logger.error("app.chat.screenshot.error", error);
-      alert(t("app.chat.screenshot.tryAgain"));
-    }
-  }, [t, logger]);
+    // Screenshot functionality to be implemented
+    logger.info("Screenshot requested");
+    return Promise.resolve();
+  }, [logger]);
 
   return (
     <>
@@ -325,6 +321,7 @@ export function ChatInterface({
           }}
           currentRootFolderId={currentRootFolderId}
           currentSubFolderId={currentSubFolderId}
+          chat={chat}
         />
 
         {/* Main Chat Area */}
@@ -345,17 +342,20 @@ export function ChatInterface({
           onStop={stopGeneration}
           onEditMessage={editMessage}
           onDeleteMessage={deleteMessage}
+          onSwitchBranch={() => {}}
           onRetryMessage={retryMessage}
           onVoteMessage={voteMessage}
           onModelChange={setSelectedModel}
           onToneChange={setSelectedTone}
           onEnableSearchChange={setEnableSearch}
           onSendMessage={handleFillInputWithPrompt}
+          showBranchIndicators={true}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           onScreenshot={handleScreenshot}
           rootFolderId={initialRootFolderId}
           logger={logger}
+          chat={chat}
         />
       </div>
 

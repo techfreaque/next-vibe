@@ -690,6 +690,16 @@ export const translations: typeof enTranslations = {
             "Wenn Sie Fragen zu diesen Nutzungsbedingungen haben, kontaktieren Sie uns unter:",
           email: "legal@unbottled.ai",
         },
+        indemnification: {
+          title: "Schadloshaltung",
+          content:
+            "Sie verpflichten sich, Unbottled.ai und seine verbundenen Unternehmen von allen Ansprüchen, Schäden oder Aufwendungen freizustellen, die sich aus Ihrer Nutzung des Dienstes oder Verletzung dieser Bedingungen ergeben.",
+        },
+        governingLaw: {
+          title: "Anwendbares Recht",
+          content:
+            "Diese Nutzungsbedingungen unterliegen den Gesetzen der Schweiz. Alle Streitigkeiten werden vor den Gerichten in Zürich, Schweiz, beigelegt.",
+        },
       },
     },
   },

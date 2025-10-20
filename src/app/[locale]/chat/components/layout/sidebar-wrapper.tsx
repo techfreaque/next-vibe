@@ -4,6 +4,10 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React from "react";
 
+import type {
+  FolderUpdate,
+  UseChatReturn,
+} from "@/app/api/[locale]/v1/core/agent/chat/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -26,14 +30,12 @@ interface SidebarWrapperProps {
   onCreateThread: (folderId?: string | null) => void;
   onSelectThread: (threadId: string) => void;
   onDeleteThread: (threadId: string) => Promise<void>;
-  onUpdateFolder: (
-    folderId: string,
-    updates: Partial<ChatFolder>,
-  ) => Promise<void>;
+  onUpdateFolder: (folderId: string, updates: FolderUpdate) => Promise<void>;
   onDeleteFolder: (folderId: string) => Promise<void>;
   onUpdateThreadTitle: (threadId: string, title: string) => void;
   currentRootFolderId: string;
   currentSubFolderId: string | null;
+  chat: UseChatReturn;
 }
 
 export function SidebarWrapper({
@@ -54,6 +56,7 @@ export function SidebarWrapper({
   onUpdateThreadTitle,
   currentRootFolderId,
   currentSubFolderId,
+  chat,
 }: SidebarWrapperProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -129,6 +132,7 @@ export function SidebarWrapper({
             onUpdateThreadTitle={onUpdateThreadTitle}
             currentRootFolderId={currentRootFolderId}
             currentSubFolderId={currentSubFolderId}
+            chat={chat}
           />
         </div>
       </div>

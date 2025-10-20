@@ -1,7 +1,43 @@
 export const translations = {
   post: {
-    title: "Status",
-    description: "Status endpoint",
+    title: "Guard Status",
+    description: "Check guard environment status",
+    tag: "Status",
+    container: {
+      title: "Guard Status Configuration",
+      description: "Configure status check parameters",
+    },
+    fields: {
+      projectPath: {
+        title: "Project Path",
+        description: "Path to the guard project",
+        placeholder: "/path/to/project",
+      },
+      guardId: {
+        title: "Guard ID",
+        description: "Unique identifier for the guard",
+        placeholder: "guard-123",
+      },
+      listAll: {
+        title: "List All Guards",
+        description: "List all guard environments",
+      },
+      success: {
+        title: "Success",
+      },
+      output: {
+        title: "Output",
+      },
+      guards: {
+        title: "Guards",
+      },
+      totalGuards: {
+        title: "Total Guards",
+      },
+      activeGuards: {
+        title: "Active Guards",
+      },
+    },
     form: {
       title: "Status Configuration",
       description: "Configure status parameters",
@@ -42,6 +78,10 @@ export const translations = {
       conflict: {
         title: "Conflict",
         description: "Data conflict occurred",
+      },
+      internal: {
+        title: "Internal Error",
+        description: "Internal server error occurred",
       },
     },
     success: {

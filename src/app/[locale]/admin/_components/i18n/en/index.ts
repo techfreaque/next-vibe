@@ -1,4 +1,17 @@
 export const translations = {
+  navigation: {
+    dashboard: "Dashboard",
+    leadManagement: "Lead Management",
+    users: "Users",
+    consultations: "Consultations",
+    emails: "Emails",
+    cronTasks: "Cron Tasks",
+    admin: "Admin",
+    adminPanel: "Admin Panel",
+    administrator: "Administrator",
+    adminDashboard: "Admin Dashboard",
+    backToApp: "Back to App",
+  },
   post: {
     title: "_components",
     description: "_components endpoint",

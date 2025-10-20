@@ -6,6 +6,7 @@
 import { create } from "zustand";
 
 import type { DefaultFolderId } from "./config";
+import type { IconValue } from "./model-access/icons";
 import type { ModelId } from "./model-access/models";
 
 /**
@@ -62,7 +63,7 @@ export interface ChatFolder {
   userId: string;
   rootFolderId: DefaultFolderId;
   name: string;
-  icon: string | null;
+  icon: IconValue | null;
   color: string | null;
   parentId: string | null;
   expanded: boolean;

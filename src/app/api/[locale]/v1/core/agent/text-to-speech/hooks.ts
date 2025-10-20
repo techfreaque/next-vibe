@@ -86,7 +86,9 @@ export function useTTSAudio({
     setError(null);
 
     try {
-      logger.debug("TTS", "Starting TTS conversion", { textLength: text.length });
+      logger.debug("TTS", "Starting TTS conversion", {
+        textLength: text.length,
+      });
 
       // If we already have audio URL, just play it
       if (audioUrl && audioRef.current) {
@@ -187,4 +189,3 @@ export function useTTSAudio({
     error,
   };
 }
-

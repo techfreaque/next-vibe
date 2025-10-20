@@ -98,21 +98,11 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
       const response: CronStatsGetResponseInput = {
         success: true,
         data: {
-          period: data.period || "day",
-          stats: [
-            {
-              timestamp: new Date().toISOString(),
-              executions: mockStats.executedTasks,
-              successes: mockStats.successfulTasks,
-              failures: mockStats.failedTasks,
-              averageDuration: mockStats.averageExecutionTime,
-            },
-          ],
-          summary: {
-            totalExecutions: mockStats.executedTasks,
-            successRate: mockStats.successfulTasks / mockStats.executedTasks,
-            averageDuration: mockStats.averageExecutionTime,
-          },
+          totalTasks: mockStats.totalTasks,
+          executedTasks: mockStats.executedTasks,
+          successfulTasks: mockStats.successfulTasks,
+          failedTasks: mockStats.failedTasks,
+          averageExecutionTime: mockStats.averageExecutionTime,
         },
       };
 
@@ -130,7 +120,7 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
         error: errorDetails.message,
       });
       return createErrorResponse(
-        "common.cronRepositoryStatisticsFetchFailed",
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         {
           error: errorDetails.message,

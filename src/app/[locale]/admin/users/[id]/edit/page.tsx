@@ -52,10 +52,10 @@ export default async function UserEditPage({
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">
-          {t("users.admin.actions.editUser")}
+          {t("app.admin.users.users.admin.actions.editUser")}
         </h1>
         <p className="text-muted-foreground mt-2">
-          {t("users.admin.description")}
+          {t("app.admin.users.users.admin.overview.description")}
         </p>
       </div>
 

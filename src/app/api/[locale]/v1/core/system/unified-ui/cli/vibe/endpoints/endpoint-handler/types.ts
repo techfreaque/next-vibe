@@ -39,7 +39,6 @@ import type {
   ResponseType,
   StreamingResponse,
 } from "next-vibe/shared/types/response.schema";
-import type { z } from "zod";
 
 import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
 import type {
@@ -55,7 +54,6 @@ import type {
   JWTPublicPayloadType,
 } from "../../../../../../user/auth/definition";
 import type { Methods } from "../endpoint-types/core/enums";
-import type { UnifiedField } from "../endpoint-types/core/types";
 import type { CreateApiEndpoint } from "../endpoint-types/endpoint/create";
 import type { CliHandlerReturnType } from "./cli/types";
 import type { EndpointLogger } from "./logger";

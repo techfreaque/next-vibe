@@ -81,4 +81,3 @@ export const chatProse = {
   links: "prose-a:text-blue-600 dark:prose-a:text-blue-400",
   all: "prose prose-sm dark:prose-invert max-w-none prose-headings:text-slate-900 dark:prose-headings:text-slate-100 prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-code:text-blue-600 dark:prose-code:text-blue-400",
 } as const;
-

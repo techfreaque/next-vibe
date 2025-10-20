@@ -28,7 +28,7 @@ import { ImapAccountsList } from "./imap-accounts-list";
  * Uses useEndpoint for all state management following leads/cron patterns
  */
 export function ImapAccountsManagement(): JSX.Element {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   const handleCreateSuccess = (): void => {
@@ -73,6 +73,7 @@ export function ImapAccountsManagement(): JSX.Element {
             </DialogTitle>
           </DialogHeader>
           <ImapAccountCreateForm
+            locale={locale}
             onSuccess={handleCreateSuccess}
             onCancel={handleCreateCancel}
           />

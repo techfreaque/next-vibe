@@ -690,6 +690,16 @@ export const translations: typeof enTranslations = {
             "Jeśli masz pytania dotyczące tych Warunków korzystania z usługi, skontaktuj się z nami pod adresem:",
           email: "legal@unbottled.ai",
         },
+        indemnification: {
+          title: "Odszkodowanie",
+          content:
+            "Zgadzasz się zabezpieczyć i zwolnić Unbottled.ai i jego podmioty stowarzyszone z wszelkich roszczeń, szkód lub wydatków wynikających z korzystania z usługi lub naruszenia tych warunków.",
+        },
+        governingLaw: {
+          title: "Prawo właściwe",
+          content:
+            "Niniejsze Warunki korzystania z usługi podlegają prawu szwajcarskiemu. Wszelkie spory będą rozstrzygane w sądach w Zurychu, Szwajcaria.",
+        },
       },
     },
   },

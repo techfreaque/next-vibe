@@ -791,8 +791,8 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         "Content-Length": pixel.length.toString(),
         // eslint-disable-next-line i18next/no-literal-string
         "Cache-Control": "no-cache, no-store, must-revalidate",
-        Pragma: "no-cache",
-        Expires: "0",
+        "Pragma": "no-cache",
+        "Expires": "0",
       },
     });
   }

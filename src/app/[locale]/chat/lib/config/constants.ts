@@ -87,4 +87,3 @@ export const LAYOUT = {
  * Quote character for 4chan-style quoting
  */
 export const QUOTE_CHARACTER = ">" as const;
-

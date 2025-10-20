@@ -18,6 +18,7 @@ import {
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { LayoutType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
+import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 const { POST } = createEndpoint({
   method: Methods.POST,

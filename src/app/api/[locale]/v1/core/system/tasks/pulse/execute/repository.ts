@@ -168,7 +168,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
       });
 
       return createErrorResponse(
-        "error.errorTypes.internal_error",
+        "app.api.v1.core.system.tasks.pulseSystem.execute.post.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }

@@ -550,7 +550,6 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             {/* Task Priority Distribution */}
             {stats?.tasksByPriority && (
               <CronStatsDistributionChart
-                locale={locale}
                 data={objectEntries(stats.tasksByPriority).map(
                   ([priority, count]: [
                     (typeof CronTaskPriority)[keyof typeof CronTaskPriority],
@@ -569,7 +568,6 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             {/* Task Status Distribution */}
             {stats?.tasksByStatus && (
               <CronStatsDistributionChart
-                locale={locale}
                 data={objectEntries(stats.tasksByStatus).map(
                   ([status, count]: [
                     (typeof CronTaskStatus)[keyof typeof CronTaskStatus],
@@ -591,7 +589,6 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             {/* Executions by Hour */}
             {stats?.executionsByHour && (
               <CronStatsDistributionChart
-                locale={locale}
                 data={objectEntries(stats.executionsByHour).map(
                   ([hour, count]: [string, number]) => ({
                     name: t("cron.patterns.atHour", { hour }),
@@ -607,7 +604,6 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             {/* Executions by Day */}
             {stats?.executionsByDay && (
               <CronStatsDistributionChart
-                locale={locale}
                 data={objectEntriesNumericEnum(stats.executionsByDay).map(
                   ([day, count]: [JSWeekday, number]) => ({
                     name: t(getWeekdayTranslation(day)),

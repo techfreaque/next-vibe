@@ -7,6 +7,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import type { JSX } from "react";
+import type { PieLabelRenderProps } from "recharts";
 import {
   Area,
   AreaChart,
@@ -60,18 +61,19 @@ function getSeriesColor(series: { color?: string }, index: number): string {
 
 interface CronStatsChartProps {
   locale: CountryLanguage;
-  data: Partial<CronStatsResponseType["historicalData"]>;
+  data: Partial<NonNullable<CronStatsResponseType["data"]["historicalData"]>>;
   title: string;
   type?: "line" | "area" | "bar";
   height?: number;
 }
 
-interface CronStatsDistributionChartProps {
-  locale: CountryLanguage;
-  data: Array<{ name: string; value: number; color?: string }>;
-  title: string;
-  type?: "pie" | "bar";
-  height?: number;
+/**
+ * Render label for pie chart segments
+ */
+function renderPieLabel(props: PieLabelRenderProps): string {
+  const name = typeof props.name === "string" ? props.name : "";
+  const percent = typeof props.percent === "number" ? props.percent : 0;
+  return `${name} ${(percent * 100).toFixed(0)}%`;
 }
 
 /**
@@ -252,12 +254,16 @@ export function CronStatsChart({
  * Distribution chart component for categorical data
  */
 export function CronStatsDistributionChart({
-  locale,
   data,
   title,
   type = "pie",
   height = 300,
-}: CronStatsDistributionChartProps): JSX.Element {
+}: {
+  data: Array<{ name: string; value: number; color?: string }>;
+  title: string;
+  type?: "pie" | "bar";
+  height?: number;
+}): JSX.Element {
   const COLORS = [
     "hsl(var(--chart-1))",
     "hsl(var(--chart-2))",
@@ -317,9 +323,7 @@ export function CronStatsDistributionChart({
           cx={CHART_CONSTANTS.PIE_CENTER_X}
           cy={CHART_CONSTANTS.PIE_CENTER_Y}
           labelLine={false}
-          label={({ name, percent }: { name: string; percent?: number }) =>
-            `${name} ${((percent || 0) * 100).toFixed(0)}%`
-          }
+          label={renderPieLabel}
           outerRadius={80}
           fill="#8884d8"
           dataKey="value"

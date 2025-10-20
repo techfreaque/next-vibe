@@ -35,19 +35,19 @@ export function EmailsListPagination({
 
   const handlePreviousPage = (): void => {
     if (currentPage > 1) {
-      form.setValue("page", currentPage - 1);
+      form.setValue("displayOptions.page", currentPage - 1);
     }
   };
 
   const handleNextPage = (): void => {
     if (currentPage < totalPages) {
-      form.setValue("page", currentPage + 1);
+      form.setValue("displayOptions.page", currentPage + 1);
     }
   };
 
   const handlePageJump = (page: number): void => {
     if (page >= 1 && page <= totalPages) {
-      form.setValue("page", page);
+      form.setValue("displayOptions.page", page);
     }
   };
 

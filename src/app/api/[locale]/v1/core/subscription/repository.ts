@@ -302,7 +302,7 @@ export interface SubscriptionRepository {
   getSubscription(
     userId: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionGetResponseOutput | null>>;
+  ): Promise<ResponseType<SubscriptionGetResponseOutput>>;
 
   /**
    * Create a new subscription with Stripe integration
@@ -363,7 +363,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
   async getSubscription(
     userId: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionGetResponseOutput | null>> {
+  ): Promise<ResponseType<SubscriptionGetResponseOutput>> {
     try {
       const results: (typeof subscriptions.$inferSelect)[] = await db
         .select()
@@ -373,7 +373,10 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         .limit(1);
 
       if (results.length === 0) {
-        return createSuccessResponse(null);
+        return createErrorResponse(
+          "app.api.v1.core.subscription.errors.not_found",
+          ErrorResponseTypes.NOT_FOUND,
+        );
       }
 
       const subscription = results[0];

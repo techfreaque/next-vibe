@@ -83,31 +83,14 @@ export class NewsletterSubscribeRepositoryImpl
               },
             );
 
-            // TypeScript narrowing doesn't work well in nested scopes, use type assertion
-            // We've already checked leadResult.success above
-            const lead = leadResult.data as {
-              status:
-                | "BOUNCED"
-                | "CAMPAIGN_RUNNING"
-                | "CONSULTATION_BOOKED"
-                | "INVALID"
-                | "IN_CONTACT"
-                | "NEW"
-                | "NEWSLETTER_SUBSCRIBER"
-                | "PENDING"
-                | "SIGNED_UP"
-                | "SUBSCRIPTION_CONFIRMED"
-                | "UNSUBSCRIBED"
-                | "WEBSITE_USER";
-              metadata?: Record<string, string | number | boolean>;
-            };
-            const currentStatus = lead.status;
+            // Access nested data structure properly
+            const currentStatus = leadResult.data.lead.basicInfo.status;
             const newStatus = getNewsletterSubscriptionStatus(currentStatus);
 
             const updateData = {
               status: newStatus,
               metadata: {
-                ...(lead.metadata || {}),
+                ...(leadResult.data.lead.metadata.metadata || {}),
                 newsletterSubscribed: true,
                 newsletterSubscriptionDate: new Date().toISOString(),
                 subscribedEmail: data.email,

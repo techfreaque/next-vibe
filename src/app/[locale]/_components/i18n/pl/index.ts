@@ -5,7 +5,18 @@ export const translations: typeof enTranslations = {
   nav: navTranslations,
   common: {
     active: "Aktywny",
+    filter: "Filtruj",
+    refresh: "Odśwież",
     appName: "unbottled.ai",
+    weekday: {
+      monday: "Poniedziałek",
+      tuesday: "Wtorek",
+      wednesday: "Środa",
+      thursday: "Czwartek",
+      friday: "Piątek",
+      saturday: "Sobota",
+      sunday: "Niedziela",
+    },
     company: {
       name: "unbottled.ai",
       legalForm: "GmbH (Spółka z ograniczoną odpowiedzialnością)",

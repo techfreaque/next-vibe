@@ -1,6 +1,19 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  navigation: {
+    dashboard: "Panel główny",
+    leadManagement: "Zarządzanie leadami",
+    users: "Użytkownicy",
+    consultations: "Konsultacje",
+    emails: "E-maile",
+    cronTasks: "Zadania Cron",
+    admin: "Admin",
+    adminPanel: "Panel admina",
+    administrator: "Administrator",
+    adminDashboard: "Panel administracyjny",
+    backToApp: "Powrót do aplikacji",
+  },
   post: {
     title: "Tytuł",
     description: "Opis endpointu",

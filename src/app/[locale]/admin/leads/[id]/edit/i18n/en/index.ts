@@ -1,4 +1,6 @@
 export const translations = {
+  title: "Edit Lead",
+  description: "Edit lead information and details",
   post: {
     title: "Edit",
     description: "Edit endpoint",

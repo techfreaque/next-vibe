@@ -43,13 +43,41 @@ export const translations: typeof enTranslations = {
       description: "Side Task Details anzeigen",
     },
     errors: {
+      validation: {
+        title: "Validierungsfehler",
+        description: "Ungültige Anfrageparameter",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Netzwerkfehler aufgetreten",
+      },
       unauthorized: {
         title: "Nicht autorisiert",
         description: "Sie sind nicht berechtigt, Side Tasks anzuzeigen",
       },
-      internalError: {
-        title: "Interner Fehler",
+      forbidden: {
+        title: "Verboten",
+        description: "Zugriff verboten",
+      },
+      notFound: {
+        title: "Nicht gefunden",
+        description: "Ressource nicht gefunden",
+      },
+      serverError: {
+        title: "Serverfehler",
         description: "Beim Abrufen der Side Tasks ist ein Fehler aufgetreten",
+      },
+      unknownError: {
+        title: "Unbekannter Fehler",
+        description: "Ein unbekannter Fehler ist aufgetreten",
+      },
+      unsavedChanges: {
+        title: "Ungespeicherte Änderungen",
+        description: "Sie haben ungespeicherte Änderungen",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Ein Konflikt ist aufgetreten",
       },
     },
     success: {

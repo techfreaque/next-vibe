@@ -17,7 +17,7 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import { Countries, Languages } from "@/i18n/core/config";
+import { CountriesArr, LanguagesArr } from "@/i18n/core/config";
 
 import { users } from "../user/db";
 import {
@@ -35,14 +35,8 @@ import {
 } from "./enum";
 
 // Create country and language enums from i18n config
-export const countryEnum = pgEnum(
-  "country",
-  Object.values(Countries),
-);
-export const languageEnum = pgEnum(
-  "language",
-  Object.values(Languages),
-);
+export const countryEnum = pgEnum("country", CountriesArr);
+export const languageEnum = pgEnum("language", LanguagesArr);
 
 /**
  * Leads Table

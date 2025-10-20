@@ -28,4 +28,3 @@ export function sortMessagesByTime(messages: ChatMessage[]): ChatMessage[] {
     (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
   );
 }
-

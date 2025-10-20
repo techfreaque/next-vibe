@@ -32,4 +32,3 @@ export function formatRelativeTime(timestamp: number): string {
   // eslint-disable-next-line i18next/no-literal-string -- Technical time format, not user-facing
   return "just now";
 }
-

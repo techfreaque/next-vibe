@@ -26,8 +26,8 @@ export async function generateMetadata({
   const { t } = simpleT(locale);
 
   return {
-    title: t("users.admin.stats.title"),
-    description: t("users.admin.stats.description"),
+    title: t("app.admin.users.users.admin.stats.title"),
+    description: t("app.admin.users.users.admin.stats.description"),
   };
 }
 
@@ -44,7 +44,7 @@ export default async function UsersStatsPage({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
-            {t("users.admin.stats.title")}
+            {t("app.admin.users.users.admin.stats.title")}
           </CardTitle>
         </CardHeader>
         <CardContent>

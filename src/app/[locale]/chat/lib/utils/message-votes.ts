@@ -28,4 +28,3 @@ export function getVoteStatus(message: ChatMessage): VoteStatus {
     voteScore,
   };
 }
-

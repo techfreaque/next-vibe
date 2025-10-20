@@ -153,7 +153,7 @@ const { GET } = createEndpoint({
             "<p>Please join us for the important meeting tomorrow...</p>",
           headers: {
             "Message-ID": "<message-id@example.com>",
-            Date: "Mon, 1 Jan 2023 10:00:00 +0000",
+            "Date": "Mon, 1 Jan 2023 10:00:00 +0000",
           },
           isRead: false,
           isFlagged: true,
@@ -353,7 +353,7 @@ const { PATCH } = createEndpoint({
             "<p>Please join us for the important meeting tomorrow...</p>",
           headers: {
             "Message-ID": "<message-id@example.com>",
-            Date: "Mon, 1 Jan 2023 10:00:00 +0000",
+            "Date": "Mon, 1 Jan 2023 10:00:00 +0000",
           },
           isRead: true,
           isFlagged: false,

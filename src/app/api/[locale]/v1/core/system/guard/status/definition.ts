@@ -11,6 +11,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import {
   objectField,
@@ -22,18 +23,19 @@ import { LayoutType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vib
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "guard", "status"],
-  title: "app.api.v1.core.system.guard.status.title",
-  description: "app.api.v1.core.system.guard.status.description",
+  title: "app.api.v1.core.system.guard.status.post.title",
+  description: "app.api.v1.core.system.guard.status.post.description",
   category: "app.api.v1.core.system.guard.category",
-  tags: ["app.api.v1.core.system.guard.status.tag"],
+  tags: ["app.api.v1.core.system.guard.status.post.tag"],
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
   aliases: ["guard:status", "guard-status"],
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.system.guard.status.container.title",
-      description: "app.api.v1.core.system.guard.status.container.description",
+      title: "app.api.v1.core.system.guard.status.post.container.title",
+      description:
+        "app.api.v1.core.system.guard.status.post.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -43,11 +45,12 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.v1.core.system.guard.status.fields.projectPath.title",
+          label:
+            "app.api.v1.core.system.guard.status.post.fields.projectPath.title",
           description:
-            "app.api.v1.core.system.guard.status.fields.projectPath.description",
+            "app.api.v1.core.system.guard.status.post.fields.projectPath.description",
           placeholder:
-            "app.api.v1.core.system.guard.status.fields.projectPath.placeholder",
+            "app.api.v1.core.system.guard.status.post.fields.projectPath.placeholder",
           layout: { columns: 6 },
         },
         z.string().optional(),
@@ -57,11 +60,12 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.v1.core.system.guard.status.fields.guardId.title",
+          label:
+            "app.api.v1.core.system.guard.status.post.fields.guardId.title",
           description:
-            "app.api.v1.core.system.guard.status.fields.guardId.description",
+            "app.api.v1.core.system.guard.status.post.fields.guardId.description",
           placeholder:
-            "app.api.v1.core.system.guard.status.fields.guardId.placeholder",
+            "app.api.v1.core.system.guard.status.post.fields.guardId.placeholder",
           layout: { columns: 6 },
         },
         z.string().optional(),
@@ -71,9 +75,10 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.v1.core.system.guard.status.fields.listAll.title",
+          label:
+            "app.api.v1.core.system.guard.status.post.fields.listAll.title",
           description:
-            "app.api.v1.core.system.guard.status.fields.listAll.description",
+            "app.api.v1.core.system.guard.status.post.fields.listAll.description",
           layout: { columns: 12 },
         },
         z.boolean().optional().default(false),
@@ -83,7 +88,8 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.system.guard.status.fields.success.title",
+          content:
+            "app.api.v1.core.system.guard.status.post.fields.success.title",
         },
         z.boolean(),
       ),
@@ -91,7 +97,8 @@ const { POST } = createEndpoint({
       output: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.system.guard.status.fields.output.title",
+          content:
+            "app.api.v1.core.system.guard.status.post.fields.output.title",
         },
         z.string(),
       ),
@@ -99,7 +106,8 @@ const { POST } = createEndpoint({
       guards: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.system.guard.status.fields.guards.title",
+          content:
+            "app.api.v1.core.system.guard.status.post.fields.guards.title",
         },
         z
           .array(
@@ -122,7 +130,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.guard.status.fields.totalGuards.title",
+            "app.api.v1.core.system.guard.status.post.fields.totalGuards.title",
         },
         z.number().optional(),
       ),
@@ -131,7 +139,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.guard.status.fields.activeGuards.title",
+            "app.api.v1.core.system.guard.status.post.fields.activeGuards.title",
         },
         z.number().optional(),
       ),
@@ -141,56 +149,58 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.v1.core.system.guard.status.errors.validation.title",
+      title: "app.api.v1.core.system.guard.status.post.errors.validation.title",
       description:
-        "app.api.v1.core.system.guard.status.errors.validation.description",
+        "app.api.v1.core.system.guard.status.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.v1.core.system.guard.status.errors.internal.title",
+      title: "app.api.v1.core.system.guard.status.post.errors.internal.title",
       description:
-        "app.api.v1.core.system.guard.status.errors.internal.description",
+        "app.api.v1.core.system.guard.status.post.errors.internal.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.v1.core.system.guard.status.errors.unauthorized.title",
+      title:
+        "app.api.v1.core.system.guard.status.post.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.guard.status.errors.unauthorized.description",
+        "app.api.v1.core.system.guard.status.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.v1.core.system.guard.status.errors.unauthorized.title",
+      title:
+        "app.api.v1.core.system.guard.status.post.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.guard.status.errors.unauthorized.description",
+        "app.api.v1.core.system.guard.status.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.v1.core.system.guard.status.errors.notFound.title",
+      title: "app.api.v1.core.system.guard.status.post.errors.notFound.title",
       description:
-        "app.api.v1.core.system.guard.status.errors.notFound.description",
+        "app.api.v1.core.system.guard.status.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.v1.core.system.guard.status.errors.internal.title",
+      title: "app.api.v1.core.system.guard.status.post.errors.internal.title",
       description:
-        "app.api.v1.core.system.guard.status.errors.internal.description",
+        "app.api.v1.core.system.guard.status.post.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.v1.core.system.guard.status.errors.internal.title",
+      title: "app.api.v1.core.system.guard.status.post.errors.internal.title",
       description:
-        "app.api.v1.core.system.guard.status.errors.internal.description",
+        "app.api.v1.core.system.guard.status.post.errors.internal.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.v1.core.system.guard.status.errors.internal.title",
+      title: "app.api.v1.core.system.guard.status.post.errors.internal.title",
       description:
-        "app.api.v1.core.system.guard.status.errors.internal.description",
+        "app.api.v1.core.system.guard.status.post.errors.internal.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.v1.core.system.guard.status.errors.internal.title",
+      title: "app.api.v1.core.system.guard.status.post.errors.internal.title",
       description:
-        "app.api.v1.core.system.guard.status.errors.internal.description",
+        "app.api.v1.core.system.guard.status.post.errors.internal.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.system.guard.status.success.title",
-    description: "app.api.v1.core.system.guard.status.success.description",
+    title: "app.api.v1.core.system.guard.status.post.success.title",
+    description: "app.api.v1.core.system.guard.status.post.success.description",
   },
 
   // === EXAMPLES ===
@@ -280,11 +290,7 @@ const { POST } = createEndpoint({
         activeGuards: 1,
       },
     },
-    urlPathVariables: {
-      default: {},
-      byProject: {},
-      byGuardId: {},
-    },
+    urlPathVariables: undefined,
   },
 });
 

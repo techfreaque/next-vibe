@@ -14,6 +14,7 @@ import { guardStatusRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: guardStatusEndpoints,
   [Methods.POST]: {
+    email: undefined,
     handler: ({ data, user, locale, logger }) => {
       return guardStatusRepository.getStatus(data, user, locale, logger);
     },

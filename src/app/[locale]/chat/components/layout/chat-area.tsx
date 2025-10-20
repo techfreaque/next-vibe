@@ -4,6 +4,7 @@ import { Camera, Loader2 } from "lucide-react";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
+import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -49,6 +50,7 @@ interface ChatAreaProps {
   onScreenshot?: () => Promise<void>;
   rootFolderId?: string;
   logger: EndpointLogger;
+  chat: UseChatReturn;
 }
 
 export function ChatArea({
@@ -78,6 +80,7 @@ export function ChatArea({
   onAnswerAsModel,
   onVoteMessage,
   showBranchIndicators,
+  chat,
   viewMode = "linear",
   onViewModeChange,
   onScreenshot,
@@ -218,6 +221,7 @@ export function ChatArea({
             onAnswerAsModel={onAnswerAsModel}
             onVoteMessage={onVoteMessage}
             isLoading={isLoading}
+            chat={chat}
             showBranchIndicators={showBranchIndicators}
             onSendMessage={onSendMessage}
             inputHeight={inputHeight}

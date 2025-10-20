@@ -45,6 +45,10 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Datenkonflikt aufgetreten",
       },
+      internal: {
+        title: "Interner Fehler",
+        description: "Interner Serverfehler ist aufgetreten",
+      },
     },
     success: {
       title: "Erfolg",

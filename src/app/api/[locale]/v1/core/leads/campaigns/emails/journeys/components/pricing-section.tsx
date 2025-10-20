@@ -449,7 +449,7 @@ export async function EmailPricingSection({
               >
                 {plan.highlighted && plan.badge
                   ? plan.badge
-                  :  t("pricing.plans.PREMIUM.featureBadge")}
+                  : t("pricing.plans.PREMIUM.featureBadge")}
               </div>
             </td>
           </tr>
@@ -495,12 +495,12 @@ export async function EmailPricingSection({
                         display: "inline",
                       }}
                     >
-                      { formatCurrencyNoDecimals(
-                            plan.price,
-                            plan.currency,
-                            locale,
-                          )}
-                      {  (
+                      {formatCurrencyNoDecimals(
+                        plan.price,
+                        plan.currency,
+                        locale,
+                      )}
+                      {
                         <span
                           style={{
                             fontSize: "16px",
@@ -511,7 +511,7 @@ export async function EmailPricingSection({
                         >
                           {t("pricing.plans.perMonth")}
                         </span>
-                      )}
+                      }
                     </Text>
                   </td>
                 </tr>

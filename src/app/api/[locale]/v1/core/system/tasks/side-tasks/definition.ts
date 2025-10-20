@@ -45,6 +45,7 @@ const sideTasksPostEndpoint = createEndpoint({
   title: "app.api.v1.core.system.tasks.sideTasks.post.title",
   description: "app.api.v1.core.system.tasks.sideTasks.post.description",
   category: "app.api.v1.core.system.tasks.sideTasks.post.category",
+  tags: ["app.api.v1.core.system.tasks.sideTasks.tags.sidetasks"],
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
   aliases: ["tasks:side", "side-tasks"],
 
@@ -164,7 +165,7 @@ const sideTasksPostEndpoint = createEndpoint({
             "app.api.v1.core.system.tasks.sideTasks.common.sideTasksDataDescription",
           layout: { columns: 12 },
         },
-        z.record(z.unknown()).optional(),
+        z.record(z.string(), z.unknown()).optional(),
       ),
 
       // === RESPONSE FIELDS ===
@@ -256,7 +257,66 @@ const sideTasksPostEndpoint = createEndpoint({
         count: 1,
       },
     },
-    urlPathVariables: {},
+  },
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title:
+        "app.api.v1.core.system.tasks.sideTasks.post.errors.validation.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.post.errors.validation.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "app.api.v1.core.system.tasks.sideTasks.post.errors.network.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.post.errors.network.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title:
+        "app.api.v1.core.system.tasks.sideTasks.post.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.post.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title:
+        "app.api.v1.core.system.tasks.sideTasks.post.errors.forbidden.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.post.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "app.api.v1.core.system.tasks.sideTasks.post.errors.notFound.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.post.errors.notFound.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title:
+        "app.api.v1.core.system.tasks.sideTasks.post.errors.serverError.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.post.errors.serverError.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title:
+        "app.api.v1.core.system.tasks.sideTasks.post.errors.unknownError.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.post.errors.unknownError.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title:
+        "app.api.v1.core.system.tasks.sideTasks.post.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.post.errors.unsavedChanges.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "app.api.v1.core.system.tasks.sideTasks.post.errors.conflict.title",
+      description:
+        "app.api.v1.core.system.tasks.sideTasks.post.errors.conflict.description",
+    },
+  },
+
+  successTypes: {
+    title: "app.api.v1.core.system.tasks.sideTasks.post.success.title",
+    description:
+      "app.api.v1.core.system.tasks.sideTasks.post.success.description",
   },
 });
 
@@ -348,7 +408,8 @@ const sideTasksGetEndpoint = createEndpoint({
         "app.api.v1.core.system.tasks.sideTasks.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.v1.core.system.tasks.sideTasks.get.errors.forbidden.title",
+      title:
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.forbidden.title",
       description:
         "app.api.v1.core.system.tasks.sideTasks.get.errors.forbidden.description",
     },

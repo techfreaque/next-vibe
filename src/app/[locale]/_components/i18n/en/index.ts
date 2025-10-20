@@ -4,7 +4,18 @@ export const translations = {
   nav: navTranslations,
   common: {
     active: "Active",
+    filter: "Filter",
+    refresh: "Refresh",
     appName: "unbottled.ai",
+    weekday: {
+      monday: "Monday",
+      tuesday: "Tuesday",
+      wednesday: "Wednesday",
+      thursday: "Thursday",
+      friday: "Friday",
+      saturday: "Saturday",
+      sunday: "Sunday",
+    },
     company: {
       name: "unbottled.ai",
       legalForm: "GmbH (Limited Liability Company)",

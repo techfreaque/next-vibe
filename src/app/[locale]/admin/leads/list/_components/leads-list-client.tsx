@@ -162,7 +162,9 @@ export function LeadsListClient({
         <div className="flex justify-between items-center">
           <CardTitle className="flex items-center">
             <Users className="h-5 w-5 mr-2" />
-            {t("app.admin.leads.leads.list.titleWithCount", { count: totalLeads })}
+            {t("app.admin.leads.leads.list.titleWithCount", {
+              count: totalLeads,
+            })}
           </CardTitle>
 
           <div className="flex items-center space-x-2">

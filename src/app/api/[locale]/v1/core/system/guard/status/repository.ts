@@ -20,9 +20,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type guardStatusEndpoints from "./definition";
 
 type GuardStatusRequestType =
-  typeof guardStatusEndpoints.GET.types.RequestOutput;
+  typeof guardStatusEndpoints.POST.types.RequestOutput;
 type GuardStatusResponseType =
-  typeof guardStatusEndpoints.GET.types.ResponseOutput;
+  typeof guardStatusEndpoints.POST.types.ResponseOutput;
 
 /**
  * Guard Status Repository Interface
@@ -70,7 +70,7 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
         error instanceof Error ? error : new Error(String(error));
 
       return createErrorResponse(
-        "app.api.v1.core.system.guard.status.errors.internal.title",
+        "app.api.v1.core.system.guard.status.post.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message },
       );

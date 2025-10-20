@@ -7,6 +7,8 @@ import { notFound } from "next/navigation";
 import type { JSX } from "react";
 
 import { imapMessagesRepository } from "@/app/api/[locale]/v1/core/emails/imap-client/messages/repository";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { requireAdminUser } from "@/app/api/[locale]/v1/core/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -28,7 +30,27 @@ export default async function ImapMessageDetailPage({
   const { locale, id } = await params;
   const { t } = simpleT(locale);
 
-  const messageResponse = await imapMessagesRepository.getMessageById(id);
+  // Require admin user authentication
+  const user = await requireAdminUser(
+    locale,
+    `/${locale}/admin/emails/imap/messages/${id}`,
+  );
+
+  // Extract JWT payload for repository call
+  const jwtUser = {
+    id: user.id,
+    leadId: user.leadId ?? user.id,
+    isPublic: false as const,
+  };
+
+  // Fetch message data
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const messageResponse = await imapMessagesRepository.getMessageById(
+    { id },
+    jwtUser,
+    locale,
+    logger,
+  );
 
   if (!messageResponse.success) {
     notFound();

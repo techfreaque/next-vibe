@@ -85,9 +85,7 @@ export function currencyField(
   multiple = false,
 ): ReturnType<typeof requestDataField> {
   const schema = multiple
-    ? z.array(
-        z.enum(CURRENCY_OPTIONS.map((c) => c.value)),
-      )
+    ? z.array(z.enum(CURRENCY_OPTIONS.map((c) => c.value)))
     : z.enum(CURRENCY_OPTIONS.map((c) => c.value));
 
   return requestDataField(
@@ -140,9 +138,7 @@ export function languageField(
   multiple = false,
 ): ReturnType<typeof requestDataField> {
   const schema = multiple
-    ? z.array(
-        z.enum(LANGUAGE_OPTIONS.map((l) => l.value)),
-      )
+    ? z.array(z.enum(LANGUAGE_OPTIONS.map((l) => l.value)))
     : z.enum(LANGUAGE_OPTIONS.map((l) => l.value));
 
   return requestDataField(
@@ -209,9 +205,7 @@ export function countryField(
   multiple = false,
 ): ReturnType<typeof requestDataField> {
   const schema = multiple
-    ? z.array(
-        z.enum(COUNTRY_OPTIONS.map((c) => c.value)),
-      )
+    ? z.array(z.enum(COUNTRY_OPTIONS.map((c) => c.value)))
     : z.enum(COUNTRY_OPTIONS.map((c) => c.value));
 
   return requestDataField(
@@ -320,9 +314,7 @@ export function timezoneField(
   multiple = false,
 ): ReturnType<typeof requestDataField> {
   const schema = multiple
-    ? z.array(
-        z.enum(TIMEZONE_OPTIONS.map((t) => t.value)),
-      )
+    ? z.array(z.enum(TIMEZONE_OPTIONS.map((t) => t.value)))
     : z.enum(TIMEZONE_OPTIONS.map((t) => t.value));
 
   return requestDataField(

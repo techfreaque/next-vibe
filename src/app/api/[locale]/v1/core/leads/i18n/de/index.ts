@@ -252,6 +252,59 @@ export const translations: typeof enTranslations = {
           },
         },
       },
+      post: {
+        error: {
+          duplicate: {
+            title: "Lead mit dieser E-Mail existiert bereits",
+          },
+          server: {
+            title: "Serverfehler beim Erstellen des Leads",
+          },
+        },
+      },
+      patch: {
+        error: {
+          not_found: {
+            title: "Lead nicht gefunden",
+          },
+          server: {
+            title: "Serverfehler beim Aktualisieren des Leads",
+          },
+        },
+      },
+    },
+    leadsUnsubscribe: {
+      post: {
+        error: {
+          validation: {
+            title: "Ungültige Abmeldeanfrage",
+          },
+          server: {
+            title: "Serverfehler bei der Verarbeitung der Abmeldung",
+          },
+        },
+      },
+    },
+    leadsEngagement: {
+      post: {
+        error: {
+          validation: {
+            title: "Ungültige Engagement-Daten",
+          },
+          server: {
+            title: "Serverfehler bei der Aufzeichnung des Engagements",
+          },
+        },
+      },
+    },
+    leadsExport: {
+      get: {
+        error: {
+          server: {
+            title: "Serverfehler beim Exportieren der Leads",
+          },
+        },
+      },
     },
   },
 };

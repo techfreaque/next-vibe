@@ -215,7 +215,6 @@ export class PulseHealthRepository implements IPulseHealthRepository {
   }
 
   async getRecentExecutions(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _logger: EndpointLogger,
     limit = 50,
   ): Promise<ResponseType<PulseExecution[]>> {
@@ -333,10 +332,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
     }
   }
 
-  async getHealthStatistics(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _logger: EndpointLogger,
-  ): Promise<
+  async getHealthStatistics(_logger: EndpointLogger): Promise<
     ResponseType<{
       currentStatus: string;
       totalExecutions: number;
@@ -519,10 +515,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
   /**
    * Get the current pulse health status
    */
-  async getHealthStatus(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _logger: EndpointLogger,
-  ): Promise<
+  async getHealthStatus(_logger: EndpointLogger): Promise<
     ResponseType<{
       status: string;
       lastPulseAt: string | null;

@@ -17,6 +17,14 @@ import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useMemo } from "react";
 
+import type {
+  FolderUpdate,
+  UseChatReturn,
+} from "@/app/api/[locale]/v1/core/agent/chat/hooks";
+import {
+  getIconComponent,
+  type IconValue,
+} from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import {
@@ -28,20 +36,15 @@ import {
 } from "@/packages/next-vibe-ui/web/ui";
 
 import { useTouchDevice } from "../../hooks/use-touch-device";
-import { getIconComponent, type IconValue } from "../../lib/config/icons";
-import { getFolderDisplayName } from "../../lib/storage/thread-manager";
-import type {
-  ChatFolder,
-  ChatState,
-  ChatThread,
-} from "../../lib/storage/types";
 import {
   getDirectChildrenCount,
   getFolderColor,
+  getFolderDisplayName,
   getFolderIcon,
   isDefaultFolder,
-} from "../../lib/storage/types";
+} from "../../lib/utils/folder-utils";
 import { buildFolderUrl, getRootFolderId } from "../../lib/utils/navigation";
+import type { ChatFolder, ChatThread } from "../../types";
 import { MoveFolderDialog } from "./move-folder-dialog";
 import { RenameFolderDialog } from "./rename-folder-dialog";
 import { ThreadList } from "./thread-list";
@@ -104,7 +107,7 @@ function groupThreadsByTime(threads: ChatThread[]): {
   const lastMonth: ChatThread[] = [];
 
   threads.forEach((thread) => {
-    const age = now - thread.updatedAt;
+    const age = now - thread.updatedAt.getTime();
     if (age < DAY_MS) {
       today.push(thread);
     } else if (age < WEEK_MS) {
@@ -118,7 +121,7 @@ function groupThreadsByTime(threads: ChatThread[]): {
 }
 
 interface FolderListProps {
-  state: ChatState;
+  chat: UseChatReturn;
   activeThreadId: string | null;
   activeRootFolderId: string | null;
   activeFolderId?: string;
@@ -128,7 +131,7 @@ interface FolderListProps {
   onDeleteThread: (threadId: string) => void;
   onMoveThread: (threadId: string, folderId: string | null) => void;
   onCreateFolder: (name: string, parentId: string, icon?: string) => void;
-  onUpdateFolder: (folderId: string, updates: Partial<ChatFolder>) => void;
+  onUpdateFolder: (folderId: string, updates: FolderUpdate) => void;
   onDeleteFolder: (folderId: string, deleteThreads: boolean) => void;
   onToggleFolderExpanded: (folderId: string) => void;
   onReorderFolder: (folderId: string, direction: "up" | "down") => void;
@@ -137,7 +140,7 @@ interface FolderListProps {
 }
 
 export function FolderList({
-  state,
+  chat,
   activeThreadId,
   activeRootFolderId,
   activeFolderId,
@@ -156,59 +159,18 @@ export function FolderList({
 }: FolderListProps): JSX.Element {
   const { t } = simpleT(locale);
 
-  // If no active root folder, show all root folders (fallback)
-  if (!activeRootFolderId) {
-    return (
-      <div className="space-y-1 py-2">
-        {state.rootFolderIds.map((folderId) => {
-          const folder = state.folders[folderId];
-          if (!folder) {
-            return null;
-          }
+  // If no active root folder, show message (shouldn't happen in normal flow)
+  // Get direct children (subfolders) of the active root folder
+  // Filter folders where parentId is null (direct children of root folder)
+  const childFolders = Object.values(chat.folders).filter(
+    (folder) =>
+      folder.rootFolderId === activeRootFolderId && folder.parentId === null,
+  );
 
-          return (
-            <FolderItem
-              key={folder.id}
-              folder={folder}
-              state={state}
-              activeThreadId={activeThreadId}
-              activeFolderId={activeFolderId}
-              locale={locale}
-              onCreateThread={onCreateThread}
-              onSelectThread={onSelectThread}
-              onDeleteThread={onDeleteThread}
-              onMoveThread={onMoveThread}
-              onCreateFolder={onCreateFolder}
-              onUpdateFolder={onUpdateFolder}
-              onDeleteFolder={onDeleteFolder}
-              onToggleFolderExpanded={onToggleFolderExpanded}
-              onReorderFolder={onReorderFolder}
-              onMoveFolderToParent={onMoveFolderToParent}
-              onUpdateThreadTitle={onUpdateThreadTitle}
-            />
-          );
-        })}
-      </div>
-    );
-  }
-
-  // Get the active root folder
-  const activeRootFolder = state.folders[activeRootFolderId];
-  if (!activeRootFolder) {
-    return (
-      <div className="px-4 py-8 text-center text-sm text-muted-foreground">
-        {t("app.chat.folderList.folderNotFound")}
-      </div>
-    );
-  }
-
-  // Get direct children (subfolders) of the active root folder in the correct order
-  const childFolders = activeRootFolder.childrenIds
-    .map((id) => state.folders[id])
-    .filter((folder): folder is ChatFolder => folder !== undefined);
-
-  const childThreads = Object.values(state.threads).filter(
-    (thread) => thread.folderId === activeRootFolderId,
+  // Get threads in the active root folder (not in any subfolder)
+  const childThreads = Object.values(chat.threads).filter(
+    (thread) =>
+      thread.rootFolderId === activeRootFolderId && thread.folderId === null,
   );
 
   // Group threads by time
@@ -221,7 +183,7 @@ export function FolderList({
         <FolderItem
           key={folder.id}
           folder={folder}
-          state={state}
+          chat={chat}
           activeThreadId={activeThreadId}
           activeFolderId={activeFolderId}
           locale={locale}
@@ -254,7 +216,7 @@ export function FolderList({
                 onDeleteThread={onDeleteThread}
                 onUpdateTitle={onUpdateThreadTitle}
                 onMoveThread={onMoveThread}
-                state={state}
+                chat={chat}
                 locale={locale}
               />
             </div>
@@ -272,7 +234,7 @@ export function FolderList({
                 onDeleteThread={onDeleteThread}
                 onUpdateTitle={onUpdateThreadTitle}
                 onMoveThread={onMoveThread}
-                state={state}
+                chat={chat}
                 locale={locale}
               />
             </div>
@@ -290,7 +252,7 @@ export function FolderList({
                 onDeleteThread={onDeleteThread}
                 onUpdateTitle={onUpdateThreadTitle}
                 onMoveThread={onMoveThread}
-                state={state}
+                chat={chat}
                 locale={locale}
               />
             </div>
@@ -310,7 +272,7 @@ export function FolderList({
 
 interface FolderItemProps {
   folder: ChatFolder;
-  state: ChatState;
+  chat: UseChatReturn;
   activeThreadId: string | null;
   activeFolderId?: string;
   locale: CountryLanguage;
@@ -330,7 +292,7 @@ interface FolderItemProps {
 
 function FolderItem({
   folder,
-  state,
+  chat,
   activeThreadId,
   activeFolderId,
   locale,
@@ -355,10 +317,10 @@ function FolderItem({
   const [moveDialogOpen, setMoveDialogOpen] = React.useState(false);
 
   const threadsInFolder = useMemo(() => {
-    return Object.values(state.threads)
+    return Object.values(chat.threads)
       .filter((t) => t.folderId === folder.id)
-      .sort((a, b) => b.updatedAt - a.updatedAt);
-  }, [state.threads, folder.id]);
+      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+  }, [chat.threads, folder.id]);
 
   const groupedThreads = useMemo(() => {
     return groupThreadsByTime(threadsInFolder);
@@ -367,11 +329,14 @@ function FolderItem({
   const { t } = simpleT(locale);
   const folderDisplayName = getFolderDisplayName(folder, locale);
   const isDefault = isDefaultFolder(folder.id);
-  const directChildrenCount = getDirectChildrenCount(state, folder.id);
+  const directChildrenCount = getDirectChildrenCount(folder.id, chat.folders);
 
   // Get root folder ID and color for styling
-  const rootFolderId = getRootFolderId(state, folder.id);
-  const rootFolderColor = getFolderColor(rootFolderId);
+  const rootFolderId = getRootFolderId(chat.folders, folder.id);
+  const rootFolderColor = getFolderColor(
+    rootFolderId,
+    folder.color || undefined,
+  );
   const colorClasses = getFolderColorClasses(rootFolderColor);
 
   const handleDeleteFolder = (): void => {
@@ -419,7 +384,7 @@ function FolderItem({
     setRenameDialogOpen(true);
   };
 
-  const handleSaveRename = (name: string, icon: IconValue): void => {
+  const handleSaveRename = (name: string, icon: IconValue | null): void => {
     onUpdateFolder(folder.id, { name, icon });
   };
 
@@ -443,15 +408,19 @@ function FolderItem({
   };
 
   // Determine if move up/down should be disabled
-  const isRoot = folder.parentId === null;
-  const folderList = isRoot
-    ? state.rootFolderIds
-    : (folder.parentId && state.folders[folder.parentId]?.childrenIds) || [];
-  const currentIndex = folderList.indexOf(folder.id);
+  // Get sibling folders (folders with same parent)
+  const siblingFolders = Object.values(chat.folders)
+    .filter(
+      (f) =>
+        f.parentId === folder.parentId &&
+        f.rootFolderId === folder.rootFolderId,
+    )
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+  const currentIndex = siblingFolders.findIndex((f) => f.id === folder.id);
   const canMoveUp = currentIndex > 0;
-  const canMoveDown = currentIndex < folderList.length - 1;
+  const canMoveDown = currentIndex < siblingFolders.length - 1;
 
-  const folderIcon = getFolderIcon(folder);
+  const folderIcon = getFolderIcon(folder.id, folder.icon);
   const FolderIcon = getIconComponent(folderIcon);
   const isActive = activeFolderId === folder.id;
 
@@ -463,7 +432,7 @@ function FolderItem({
       return;
     }
 
-    const url = buildFolderUrl(locale, folder.id, state);
+    const url = buildFolderUrl(locale, rootFolderId, folder.id);
     router.push(url);
   };
 
@@ -603,17 +572,14 @@ function FolderItem({
       {folder.expanded && (
         <div>
           {/* Child folders */}
-          {folder.childrenIds.map((childId) => {
-            const childFolder = state.folders[childId];
-            if (!childFolder) {
-              return null;
-            }
-
-            return (
+          {Object.values(chat.folders)
+            .filter((f) => f.parentId === folder.id)
+            .sort((a, b) => a.sortOrder - b.sortOrder)
+            .map((childFolder) => (
               <FolderItem
-                key={childId}
+                key={childFolder.id}
                 folder={childFolder}
-                state={state}
+                chat={chat}
                 activeThreadId={activeThreadId}
                 activeFolderId={activeFolderId}
                 locale={locale}
@@ -630,8 +596,7 @@ function FolderItem({
                 onUpdateThreadTitle={onUpdateThreadTitle}
                 depth={depth + 1}
               />
-            );
-          })}
+            ))}
 
           {/* Threads in folder - grouped by time */}
           {threadsInFolder.length > 0 && (
@@ -648,7 +613,7 @@ function FolderItem({
                     onDeleteThread={onDeleteThread}
                     onUpdateTitle={onUpdateThreadTitle}
                     onMoveThread={onMoveThread}
-                    state={state}
+                    chat={chat}
                     locale={locale}
                   />
                 </div>
@@ -666,7 +631,7 @@ function FolderItem({
                     onDeleteThread={onDeleteThread}
                     onUpdateTitle={onUpdateThreadTitle}
                     onMoveThread={onMoveThread}
-                    state={state}
+                    chat={chat}
                     locale={locale}
                   />
                 </div>
@@ -684,7 +649,7 @@ function FolderItem({
                     onDeleteThread={onDeleteThread}
                     onUpdateTitle={onUpdateThreadTitle}
                     onMoveThread={onMoveThread}
-                    state={state}
+                    chat={chat}
                     locale={locale}
                   />
                 </div>
@@ -707,7 +672,7 @@ function FolderItem({
         open={moveDialogOpen}
         onOpenChange={setMoveDialogOpen}
         folder={folder}
-        state={state}
+        folders={chat.folders}
         onMove={handleSaveMove}
         locale={locale}
       />

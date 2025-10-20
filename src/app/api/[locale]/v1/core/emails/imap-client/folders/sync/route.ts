@@ -7,7 +7,6 @@ import "server-only";
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import type { Countries } from "@/i18n/core/config";
 
 import { imapFoldersRepository } from "../repository";
 import definitions from "./definition";
@@ -19,16 +18,17 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, locale, logger }) =>
-      imapFoldersRepository.syncFolders(
+    handler: async ({ data, user, locale, logger }) => {
+      return await imapFoldersRepository.syncFolders(
         {
           accountId: data.accountId,
           force: data.force ?? false,
           folderId: data.folderId,
         },
         user,
-        (locale.split("-")[1]?.toUpperCase() as Countries) || "GLOBAL",
+        locale,
         logger,
-      ),
+      );
+    },
   },
 });

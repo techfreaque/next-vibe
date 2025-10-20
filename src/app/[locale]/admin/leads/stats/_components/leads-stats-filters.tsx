@@ -73,7 +73,8 @@ export function LeadsStatsFilters({
               },
               {
                 value: TimePeriod.QUARTER,
-                label: "app.admin.leads.leads.admin.filters.timePeriods.quarter",
+                label:
+                  "app.admin.leads.leads.admin.filters.timePeriods.quarter",
               },
               {
                 value: TimePeriod.YEAR,
@@ -97,43 +98,53 @@ export function LeadsStatsFilters({
               },
               {
                 value: DateRangePreset.YESTERDAY,
-                label: "app.admin.leads.leads.admin.filters.dateRanges.yesterday",
+                label:
+                  "app.admin.leads.leads.admin.filters.dateRanges.yesterday",
               },
               {
                 value: DateRangePreset.LAST_7_DAYS,
-                label: "app.admin.leads.leads.admin.filters.dateRanges.last7Days",
+                label:
+                  "app.admin.leads.leads.admin.filters.dateRanges.last7Days",
               },
               {
                 value: DateRangePreset.LAST_30_DAYS,
-                label: "app.admin.leads.leads.admin.filters.dateRanges.last30Days",
+                label:
+                  "app.admin.leads.leads.admin.filters.dateRanges.last30Days",
               },
               {
                 value: DateRangePreset.LAST_90_DAYS,
-                label: "app.admin.leads.leads.admin.filters.dateRanges.last90Days",
+                label:
+                  "app.admin.leads.leads.admin.filters.dateRanges.last90Days",
               },
               {
                 value: DateRangePreset.THIS_MONTH,
-                label: "app.admin.leads.leads.admin.filters.dateRanges.thisMonth",
+                label:
+                  "app.admin.leads.leads.admin.filters.dateRanges.thisMonth",
               },
               {
                 value: DateRangePreset.LAST_MONTH,
-                label: "app.admin.leads.leads.admin.filters.dateRanges.lastMonth",
+                label:
+                  "app.admin.leads.leads.admin.filters.dateRanges.lastMonth",
               },
               {
                 value: DateRangePreset.THIS_QUARTER,
-                label: "app.admin.leads.leads.admin.filters.dateRanges.thisQuarter",
+                label:
+                  "app.admin.leads.leads.admin.filters.dateRanges.thisQuarter",
               },
               {
                 value: DateRangePreset.LAST_QUARTER,
-                label: "app.admin.leads.leads.admin.filters.dateRanges.lastQuarter",
+                label:
+                  "app.admin.leads.leads.admin.filters.dateRanges.lastQuarter",
               },
               {
                 value: DateRangePreset.THIS_YEAR,
-                label: "app.admin.leads.leads.admin.filters.dateRanges.thisYear",
+                label:
+                  "app.admin.leads.leads.admin.filters.dateRanges.thisYear",
               },
               {
                 value: DateRangePreset.LAST_YEAR,
-                label: "app.admin.leads.leads.admin.filters.dateRanges.lastYear",
+                label:
+                  "app.admin.leads.leads.admin.filters.dateRanges.lastYear",
               },
             ],
           }}
@@ -185,15 +196,18 @@ export function LeadsStatsFilters({
               },
               {
                 value: LeadStatusFilter.CAMPAIGN_RUNNING,
-                label: "app.admin.leads.leads.admin.filters.statuses.campaign_running",
+                label:
+                  "app.admin.leads.leads.admin.filters.statuses.campaign_running",
               },
               {
                 value: LeadStatusFilter.WEBSITE_USER,
-                label: "app.admin.leads.leads.admin.filters.statuses.website_user",
+                label:
+                  "app.admin.leads.leads.admin.filters.statuses.website_user",
               },
               {
                 value: LeadStatusFilter.NEWSLETTER_SUBSCRIBER,
-                label: "app.admin.leads.leads.admin.filters.statuses.newsletter_subscriber",
+                label:
+                  "app.admin.leads.leads.admin.filters.statuses.newsletter_subscriber",
               },
               {
                 value: LeadStatusFilter.SIGNED_UP,
@@ -201,15 +215,18 @@ export function LeadsStatsFilters({
               },
               {
                 value: LeadStatusFilter.CONSULTATION_BOOKED,
-                label: "app.admin.leads.leads.admin.filters.statuses.consultation_booked",
+                label:
+                  "app.admin.leads.leads.admin.filters.statuses.consultation_booked",
               },
               {
                 value: LeadStatusFilter.SUBSCRIPTION_CONFIRMED,
-                label: "app.admin.leads.leads.admin.filters.statuses.subscription_confirmed",
+                label:
+                  "app.admin.leads.leads.admin.filters.statuses.subscription_confirmed",
               },
               {
                 value: LeadStatusFilter.UNSUBSCRIBED,
-                label: "app.admin.leads.leads.admin.filters.statuses.unsubscribed",
+                label:
+                  "app.admin.leads.leads.admin.filters.statuses.unsubscribed",
               },
               {
                 value: LeadStatusFilter.BOUNCED,
@@ -265,11 +282,13 @@ export function LeadsStatsFilters({
               },
               {
                 value: LeadSourceFilter.SOCIAL_MEDIA,
-                label: "app.admin.leads.leads.admin.filters.sources.socialMedia",
+                label:
+                  "app.admin.leads.leads.admin.filters.sources.socialMedia",
               },
               {
                 value: LeadSourceFilter.EMAIL_CAMPAIGN,
-                label: "app.admin.leads.leads.admin.filters.sources.emailCampaign",
+                label:
+                  "app.admin.leads.leads.admin.filters.sources.emailCampaign",
               },
               {
                 value: LeadSourceFilter.REFERRAL,

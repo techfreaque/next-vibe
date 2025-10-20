@@ -5,14 +5,12 @@
 
 import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import type z from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { Methods } from "../../endpoint-types/core/enums";
-import type { UnifiedField } from "../../endpoint-types/core/types";
 import { authenticateUser, executeHandler } from "../core/handler-core";
 import { createEndpointLogger } from "../logger/endpoint-logger";
 import type { ApiHandlerOptions, InferJwtPayloadTypeFromRoles } from "../types";

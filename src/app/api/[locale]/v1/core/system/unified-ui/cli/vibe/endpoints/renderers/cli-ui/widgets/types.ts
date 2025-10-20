@@ -156,7 +156,10 @@ export interface DataFormatter {
     value: RenderableValue[],
     options?: { separator?: string; maxItems?: number },
   ): string;
-  formatObject(value: object, options?: { maxDepth?: number }): string;
+  formatObject(
+    value: { [key: string]: RenderableValue },
+    options?: { maxDepth?: number },
+  ): string;
   formatDuration(milliseconds: number): string;
 }
 

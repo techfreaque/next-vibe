@@ -44,13 +44,41 @@ export const translations: typeof enTranslations = {
       description: "Wyświetl szczegóły zadania pobocznego",
     },
     errors: {
+      validation: {
+        title: "Błąd walidacji",
+        description: "Nieprawidłowe parametry żądania",
+      },
+      network: {
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci",
+      },
       unauthorized: {
         title: "Brak autoryzacji",
         description: "Nie masz uprawnień do przeglądania zadań pobocznych",
       },
-      internalError: {
-        title: "Błąd wewnętrzny",
+      forbidden: {
+        title: "Zabronione",
+        description: "Dostęp zabroniony",
+      },
+      notFound: {
+        title: "Nie znaleziono",
+        description: "Zasób nie został znaleziony",
+      },
+      serverError: {
+        title: "Błąd serwera",
         description: "Wystąpił błąd podczas pobierania zadań pobocznych",
+      },
+      unknownError: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd",
+      },
+      unsavedChanges: {
+        title: "Niezapisane zmiany",
+        description: "Masz niezapisane zmiany",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Wystąpił konflikt",
       },
     },
     success: {

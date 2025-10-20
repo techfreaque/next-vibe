@@ -248,7 +248,9 @@ export function LeadsTable({
                       </Badge>
                     ) : (
                       <span className="text-gray-400">
-                        {t("app.admin.leads.leads.admin.formatting.fallbacks.notAvailable")}
+                        {t(
+                          "app.admin.leads.leads.admin.formatting.fallbacks.notAvailable",
+                        )}
                       </span>
                     )}
                   </TableCell>
@@ -269,7 +271,9 @@ export function LeadsTable({
                       </Badge>
                     ) : (
                       <span className="text-gray-400">
-                        {t("app.admin.leads.leads.admin.formatting.fallbacks.notAvailable")}
+                        {t(
+                          "app.admin.leads.leads.admin.formatting.fallbacks.notAvailable",
+                        )}
                       </span>
                     )}
                   </TableCell>
@@ -283,7 +287,9 @@ export function LeadsTable({
                       </a>
                     ) : (
                       <span className="text-gray-400">
-                        {t("app.admin.leads.leads.admin.formatting.fallbacks.notAvailable")}
+                        {t(
+                          "app.admin.leads.leads.admin.formatting.fallbacks.notAvailable",
+                        )}
                       </span>
                     )}
                   </TableCell>
@@ -300,7 +306,9 @@ export function LeadsTable({
                       </a>
                     ) : (
                       <span className="text-gray-400">
-                        {t("app.admin.leads.leads.admin.formatting.fallbacks.notAvailable")}
+                        {t(
+                          "app.admin.leads.leads.admin.formatting.fallbacks.notAvailable",
+                        )}
                       </span>
                     )}
                   </TableCell>
@@ -344,7 +352,9 @@ export function LeadsTable({
                       </div>
                     ) : (
                       <span className="text-gray-400">
-                        {t("app.admin.leads.leads.admin.formatting.fallbacks.never")}
+                        {t(
+                          "app.admin.leads.leads.admin.formatting.fallbacks.never",
+                        )}
                       </span>
                     )}
                   </TableCell>
@@ -364,7 +374,9 @@ export function LeadsTable({
                       </div>
                     ) : (
                       <span className="text-gray-400">
-                        {t("app.admin.leads.leads.admin.formatting.fallbacks.never")}
+                        {t(
+                          "app.admin.leads.leads.admin.formatting.fallbacks.never",
+                        )}
                       </span>
                     )}
                   </TableCell>
@@ -380,7 +392,9 @@ export function LeadsTable({
                       </div>
                     ) : (
                       <span className="text-gray-400">
-                        {t("app.admin.leads.leads.admin.formatting.fallbacks.notAvailable")}
+                        {t(
+                          "app.admin.leads.leads.admin.formatting.fallbacks.notAvailable",
+                        )}
                       </span>
                     )}
                   </TableCell>

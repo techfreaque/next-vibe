@@ -27,6 +27,7 @@ import { imapAccounts, imapFolders } from "../../messages/db";
 // Note: Removed problematic type imports from definition.ts
 // These types should be defined locally or imported from proper sources
 import { ImapSyncStatus, ImapSyncStatusFilter } from "../enum";
+import type { FoldersSyncResponseOutput } from "./sync/definition";
 
 /**
  * Local type definitions for folders repository
@@ -78,25 +79,8 @@ interface ImapFolderSyncType {
   force?: boolean;
 }
 
-// Removed unused SyncAccountFoldersResult interface
-// Using SyncResults type directly instead
-
-/**
- * Sync Results Interface
- */
-interface SyncResults {
-  accountsProcessed: number;
-  foldersProcessed: number;
-  messagesProcessed: number;
-  foldersAdded: number;
-  foldersUpdated: number;
-  foldersDeleted: number;
-  messagesAdded: number;
-  messagesUpdated: number;
-  messagesDeleted: number;
-  duration: number;
-  errors: ErrorResponseType[];
-}
+// Removed unused SyncAccountFoldersResult and SyncResults interfaces
+// Using FoldersSyncResponseOutput from definition instead
 
 /**
  * Sync Service Result Interface (partial result from sync service)
@@ -129,7 +113,7 @@ export interface ImapFoldersRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SyncResults>>;
+  ): Promise<ResponseType<FoldersSyncResponseOutput>>;
 
   getFoldersByAccountId(
     data: { accountId: string },
@@ -330,7 +314,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SyncResults>> {
+  ): Promise<ResponseType<FoldersSyncResponseOutput>> {
     try {
       logger.debug(
         "app.api.v1.core.emails.imapClient.folders.sync.info.start",
@@ -370,13 +354,11 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
           // Extract sync result data - the sync service returns a SyncServiceResult type
           const result = syncResult.data.result as SyncServiceResult;
 
-          const syncResults: SyncResults = {
-            accountsProcessed: 1,
+          const syncResults: FoldersSyncResponseOutput = {
             foldersProcessed:
               typeof result.foldersProcessed === "number"
                 ? result.foldersProcessed
                 : 0,
-            messagesProcessed: 0,
             foldersAdded:
               typeof result.foldersAdded === "number" ? result.foldersAdded : 0,
             foldersUpdated:
@@ -387,11 +369,8 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
               typeof result.foldersDeleted === "number"
                 ? result.foldersDeleted
                 : 0,
-            messagesAdded: 0,
-            messagesUpdated: 0,
-            messagesDeleted: 0,
             duration: typeof result.duration === "number" ? result.duration : 0,
-            errors: [],
+            success: true,
           };
           return createSuccessResponse(syncResults);
         } else {

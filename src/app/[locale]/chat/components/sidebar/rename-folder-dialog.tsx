@@ -3,6 +3,7 @@
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
+import type { IconValue } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import {
@@ -21,8 +22,8 @@ interface RenameFolderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   folderName: string;
-  folderIcon: string | null;
-  onSave: (name: string, icon: string | null) => void;
+  folderIcon: IconValue | null;
+  onSave: (name: string, icon: IconValue | null) => void;
   locale: CountryLanguage;
 }
 
@@ -36,7 +37,7 @@ export function RenameFolderDialog({
 }: RenameFolderDialogProps): JSX.Element {
   const { t } = simpleT(locale);
   const [name, setName] = useState(folderName);
-  const [icon, setIcon] = useState<string | null>(folderIcon);
+  const [icon, setIcon] = useState<IconValue | null>(folderIcon);
 
   // Update local state when props change
   useEffect(() => {

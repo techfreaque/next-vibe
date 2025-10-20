@@ -161,14 +161,9 @@ export default function PricingSection({
 
     // If we have onPlanSelect callback (subscription page mode), use it
     if (onPlanSelect) {
-      if (
-        action === "downgrade" &&
-        onDowngrade 
-      ) {
+      if (action === "downgrade" && onDowngrade) {
         onDowngrade(planId, billingInterval);
-      } else if (
-        action === "upgrade" 
-      ) {
+      } else if (action === "upgrade") {
         onPlanSelect(planId, billingInterval, action);
       }
       return;
@@ -498,7 +493,7 @@ export default function PricingSection({
                         const isCurrent = action === "current";
                         const isLoading = shouldShowLoading(plan.id);
 
-                        return  (
+                        return (
                           <Button
                             className={`w-full ${
                               isCurrent
@@ -527,14 +522,9 @@ export default function PricingSection({
                                 ? BillingInterval.YEARLY
                                 : BillingInterval.MONTHLY;
 
-                              if (
-                                action === "downgrade" &&
-                                onDowngrade
-                              ) {
+                              if (action === "downgrade" && onDowngrade) {
                                 onDowngrade(plan.id, billingInterval);
-                              } else if (
-                                action === "upgrade" 
-                              ) {
+                              } else if (action === "upgrade") {
                                 onPlanSelect(plan.id, billingInterval, action);
                               }
                             }}

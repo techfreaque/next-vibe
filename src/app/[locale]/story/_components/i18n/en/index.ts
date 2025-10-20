@@ -682,6 +682,16 @@ export const translations = {
             "If you have questions about these Terms of Service, contact us at:",
           email: "legal@unbottled.ai",
         },
+        indemnification: {
+          title: "Indemnification",
+          content:
+            "You agree to indemnify and hold harmless Unbottled.ai and its affiliates from any claims, damages, or expenses arising from your use of the service or violation of these terms.",
+        },
+        governingLaw: {
+          title: "Governing Law",
+          content:
+            "These Terms of Service shall be governed by and construed in accordance with the laws of Switzerland. Any disputes shall be resolved in the courts of Zurich, Switzerland.",
+        },
       },
     },
   },

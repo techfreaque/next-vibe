@@ -53,37 +53,37 @@ export function AdminLayoutClient({
 
   const navigation = [
     {
-      name: t("admin.dashboard.navigation.dashboard"),
+      name: t("app.admin.components.navigation.dashboard"),
       href: `/${locale}/admin`,
       icon: Home,
       current: pathname === `/${locale}/admin`,
     },
     {
-      name: t("admin.dashboard.navigation.leadManagement"),
+      name: t("app.admin.components.navigation.leadManagement"),
       href: `/${locale}/admin/leads` as const,
       icon: Users,
       current: pathname.startsWith(`/${locale}/admin/leads`),
     },
     {
-      name: t("admin.dashboard.navigation.users"),
+      name: t("app.admin.components.navigation.users"),
       href: `/${locale}/admin/users` as const,
       icon: Users,
       current: pathname.startsWith(`/${locale}/admin/users`),
     },
     {
-      name: t("admin.dashboard.navigation.consultations"),
+      name: t("app.admin.components.navigation.consultations"),
       href: `/${locale}/admin/consultations` as const,
       icon: Calendar,
       current: pathname.startsWith(`/${locale}/admin/consultations`),
     },
     {
-      name: t("admin.dashboard.navigation.emails"),
+      name: t("app.admin.components.navigation.emails"),
       href: `/${locale}/admin/emails` as const,
       icon: Mail,
       current: pathname.startsWith(`/${locale}/admin/emails`),
     },
     {
-      name: t("admin.dashboard.navigation.cronTasks"),
+      name: t("app.admin.components.navigation.cronTasks"),
       href: `/${locale}/admin/cron` as const,
       icon: Clock,
       current: pathname.startsWith(`/${locale}/admin/cron`),
@@ -108,7 +108,7 @@ export function AdminLayoutClient({
             <div className="flex items-center">
               <Shield className="h-8 w-8 text-blue-600" />
               <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
-                {t("admin.dashboard.navigation.admin")}
+                {t("app.admin.components.navigation.admin")}
               </span>
             </div>
             <Button
@@ -153,7 +153,7 @@ export function AdminLayoutClient({
           <div className="flex h-16 items-center px-4">
             <Shield className="h-8 w-8 text-blue-600" />
             <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
-              {t("admin.dashboard.navigation.adminPanel")}
+              {t("app.admin.components.navigation.adminPanel")}
             </span>
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
@@ -194,7 +194,7 @@ export function AdminLayoutClient({
                   {user.privateName}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {t("admin.dashboard.navigation.administrator")}
+                  {t("app.admin.components.navigation.administrator")}
                 </p>
               </div>
             </div>
@@ -218,7 +218,7 @@ export function AdminLayoutClient({
           <div className="flex flex-1 justify-between px-4 lg:px-6">
             <div className="flex items-center">
               <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {t("admin.dashboard.navigation.adminDashboard")}
+                {t("app.admin.components.navigation.adminDashboard")}
               </h1>
             </div>
 
@@ -233,7 +233,7 @@ export function AdminLayoutClient({
                 href={`/${locale}/`}
                 className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
-                {t("admin.dashboard.navigation.backToApp")}
+                {t("app.admin.components.navigation.backToApp")}
               </Link>
             </div>
           </div>

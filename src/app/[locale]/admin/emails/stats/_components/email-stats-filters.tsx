@@ -23,7 +23,7 @@ import {
   EmailStatusFilter,
   EmailTypeFilter,
 } from "@/app/api/[locale]/v1/core/emails/messages/enum";
-import type { EmailStatsRequestType } from "@/app/api/[locale]/v1/core/emails/messages/stats/definition";
+import type { EmailStatsGetRequestTypeOutput } from "@/app/api/[locale]/v1/core/emails/messages/stats/definition";
 import type emailStatsEndpoint from "@/app/api/[locale]/v1/core/emails/messages/stats/definition";
 import { SortOrder } from "@/app/api/[locale]/v1/core/leads/enum";
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
@@ -39,7 +39,7 @@ interface EmailStatsFiltersContainerProps {
 }
 
 interface EmailStatsFiltersProps {
-  control: Control<Partial<EmailStatsRequestType>>;
+  control: Control<Partial<EmailStatsGetRequestTypeOutput>>;
 }
 
 /**

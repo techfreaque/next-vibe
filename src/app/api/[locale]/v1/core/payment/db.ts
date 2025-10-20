@@ -16,7 +16,7 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import { Currencies } from "@/i18n/core/config";
+import { CurrenciesArr } from "@/i18n/core/config";
 
 import { users } from "../user/db";
 import {
@@ -35,7 +35,7 @@ import {
 } from "./enum";
 
 // Create currency enum from i18n config
-const CurrencyDB = Object.values(Currencies);
+const CurrencyDB = CurrenciesArr;
 
 /**
  * Payment transactions table

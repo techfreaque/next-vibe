@@ -16,7 +16,10 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { DEFAULT_FOLDER_IDS } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { useCredits } from "@/app/api/[locale]/v1/core/agent/chat/credits/hooks";
-import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
+import type {
+  FolderUpdate,
+  UseChatReturn,
+} from "@/app/api/[locale]/v1/core/agent/chat/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -38,12 +41,10 @@ import {
 import { UI_CONFIG } from "../../lib/config/constants";
 import {
   buildFolderUrl,
-  getCreateFolderTranslationKey,
   getNewChatTranslationKey,
   getNewFolderTranslationKey,
   getRootFolderId,
 } from "../../lib/utils/navigation";
-import type { ChatFolder } from "../../types";
 import { FolderList } from "./folder-list";
 import { NewFolderDialog } from "./new-folder-dialog";
 import { RootFolderBar } from "./root-folder-bar";
@@ -60,7 +61,7 @@ interface ChatSidebarProps {
   onDeleteThread: (threadId: string) => void;
   onMoveThread: (threadId: string, folderId: string | null) => void;
   onCreateFolder: (name: string, parentId: string, icon?: string) => string;
-  onUpdateFolder: (folderId: string, updates: Partial<ChatFolder>) => void;
+  onUpdateFolder: (folderId: string, updates: FolderUpdate) => void;
   onDeleteFolder: (folderId: string, deleteThreads: boolean) => void;
   onToggleFolderExpanded: (folderId: string) => void;
   onReorderFolder: (folderId: string, direction: "up" | "down") => void;
@@ -167,7 +168,6 @@ export function ChatSidebar({
 
       {/* Root Folder Navigation Bar */}
       <RootFolderBar
-        chat={chat}
         activeFolderId={activeRootFolderId}
         locale={locale}
         onSelectFolder={handleSelectFolder}
@@ -417,13 +417,6 @@ export function ChatSidebar({
         onOpenChange={setNewFolderDialogOpen}
         onSave={handleCreateFolder}
         locale={locale}
-        titleKey={
-          activeFolderId
-            ? getCreateFolderTranslationKey(
-                getRootFolderId(chat.folders, activeFolderId),
-              )
-            : undefined
-        }
       />
     </div>
   );

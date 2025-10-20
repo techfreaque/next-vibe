@@ -65,7 +65,7 @@ export function UsersPagination({
     <div className={`flex items-center justify-between ${className}`}>
       <div className="flex items-center space-x-2">
         <p className="text-sm text-gray-700 dark:text-gray-300">
-          {t("users.list.pagination.showing", {
+          {t("app.admin.users.users.list.pagination.showing", {
             start: startItem,
             end: endItem,
             total: totalItems,
@@ -77,7 +77,7 @@ export function UsersPagination({
         {/* Items per page */}
         <div className="flex items-center space-x-2">
           <p className="text-sm text-gray-700 dark:text-gray-300">
-            {t("users.list.pagination.per_page")}
+            {t("app.admin.users.users.list.pagination.per_page")}
           </p>
           <Select
             value={currentLimit.toString()}
@@ -116,7 +116,7 @@ export function UsersPagination({
 
           <div className="flex items-center space-x-1">
             <span className="text-sm text-gray-700 dark:text-gray-300">
-              {t("users.list.pagination.page", {
+              {t("app.admin.users.users.list.pagination.page", {
                 current: currentPage,
                 total: totalPages,
               })}
