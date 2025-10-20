@@ -53,7 +53,7 @@ export function CronTasksClient({
                 disabled={tasksEndpoint.read.isLoading}
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
-                {t("app.common.refresh")}
+                {t("app.admin.common.refresh")}
               </Button>
               <Button size="sm" onClick={() => setCreateDialogOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />

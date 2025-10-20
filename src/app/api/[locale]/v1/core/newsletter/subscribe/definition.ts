@@ -105,23 +105,9 @@ const { POST } = createEndpoint({
         },
         z.array(z.enum(NewsletterPreference)).optional(),
       ),
-      inputLeadId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
-          label: "app.api.v1.core.newsletter.subscribe.leadId.label" as const,
-          description:
-            "app.api.v1.core.newsletter.subscribe.leadId.description" as const,
-          placeholder:
-            "app.api.v1.core.newsletter.subscribe.leadId.placeholder" as const,
-          helpText:
-            "app.api.v1.core.newsletter.subscribe.leadId.helpText" as const,
-          layout: { columns: 12 },
-        },
-        z.uuid().optional(),
-      ),
 
       // === RESPONSE FIELDS ===
+      // Note: leadId comes from JWT payload (user.leadId) on server-side
       success: responseField(
         {
           type: WidgetType.TEXT,

@@ -8,7 +8,6 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type z from "zod";
 
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { authClientRepository } from "../../../../user/auth/repository-client";
 import type { EndpointLogger } from "../../cli/vibe/endpoints/endpoint-handler/logger";
@@ -126,7 +125,7 @@ export async function callApi<
       if (!tokenResponse.success || !tokenResponse.data) {
         // Return error - server should provide proper translation key
         return createErrorResponse(
-          "app.user.auth.errors.auth_required",
+          "app.api.v1.core.system.unifiedUi.react.hooks.apiUtils.errors.auth_required",
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
@@ -161,7 +160,7 @@ export async function callApi<
 
       // Fallback error when server doesn't return proper error format
       return createErrorResponse(
-        "error.api.http_error",
+        "app.api.v1.core.system.unifiedUi.react.hooks.apiUtils.errors.http_error",
         ErrorResponseTypes.HTTP_ERROR,
         {
           statusCode: response.status,
@@ -181,7 +180,7 @@ export async function callApi<
       if (!validationResponse.success) {
         // Fallback error when response validation fails
         return createErrorResponse(
-          "error.api.validation_error",
+          "app.api.v1.core.system.unifiedUi.react.hooks.apiUtils.errors.validation_error",
           ErrorResponseTypes.VALIDATION_ERROR,
           {
             message: validationResponse.message,
@@ -202,7 +201,7 @@ export async function callApi<
 
     // Fallback error when server returns success but no data
     return createErrorResponse(
-      "error.api.internal_error",
+      "app.api.v1.core.system.unifiedUi.react.hooks.apiUtils.errors.internal_error",
       ErrorResponseTypes.INTERNAL_ERROR,
       {
         url: endpointUrl,
@@ -211,7 +210,7 @@ export async function callApi<
   } catch (error) {
     // Fallback error when request fails completely
     return createErrorResponse(
-      "error.api.internal_error",
+      "app.api.v1.core.system.unifiedUi.react.hooks.apiUtils.errors.internal_error",
       ErrorResponseTypes.INTERNAL_ERROR,
       { error: parseError(error).message, endpoint: endpoint.path.join("/") },
     );

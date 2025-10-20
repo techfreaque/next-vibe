@@ -12,17 +12,16 @@ import type {
   UseFormReturn,
 } from "react-hook-form";
 import { Controller, FormProvider, useFormContext } from "react-hook-form";
-import type { ZodType, ZodTypeDef } from "zod";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { Label } from "../label";
 
-function Form<TRequest>(props: {
+function Form<TRequest extends FieldValues>(props: {
   className?: string;
   children: React.ReactNode;
-  form: UseFormReturn<TRequest, ZodType<TRequest, ZodTypeDef, TRequest>>;
+  form: UseFormReturn<TRequest>;
   onSubmit:
     | ((e: React.FormEvent<HTMLFormElement>) => void | Promise<void>)
     | undefined;

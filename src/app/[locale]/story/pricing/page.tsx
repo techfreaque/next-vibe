@@ -26,23 +26,23 @@ export const generateMetadata = async ({
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "pricing",
-    title: "meta.pricing.title",
-    category: "meta.billing.category",
-    description: "meta.pricing.description",
+    title: "app.meta.pricing.title",
+    category: "app.meta.billing.category",
+    description: "app.meta.pricing.description",
     image: "https://unbottled.ai/images/pricing-hero.jpg",
-    imageAlt: "meta.pricing.imageAlt",
-    keywords: ["meta.pricing.keywords"],
+    imageAlt: "app.meta.pricing.imageAlt",
+    keywords: ["app.meta.pricing.keywords"],
     additionalMetadata: {
       openGraph: {
-        title: "meta.pricing.ogTitle",
-        description: "meta.pricing.ogDescription",
+        title: "app.meta.pricing.ogTitle",
+        description: "app.meta.pricing.ogDescription",
         url: "https://unbottled.ai/pricing",
         type: "website",
       },
       twitter: {
         card: "summary_large_image",
-        title: "meta.pricing.twitterTitle",
-        description: "meta.pricing.twitterDescription",
+        title: "app.meta.pricing.twitterTitle",
+        description: "app.meta.pricing.twitterDescription",
       },
     },
   });
@@ -51,13 +51,13 @@ export const generateMetadata = async ({
 export default async function PricingPage({
   params,
 }: Props): Promise<JSX.Element> {
-  const logger = createEndpointLogger(false, Date.now(), locale);
   const { locale } = await params;
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Fetch user data
   const userResponse = await userRepository.getUserByAuth(
     {
-      detailLevel: UserDetailLevel.STANDARD,
+      detailLevel: UserDetailLevel.COMPLETE,
     },
     logger,
   );

@@ -105,17 +105,38 @@ export function useTTSAudio({
 
       // Call TTS API
       logger.debug("TTS", "Calling TTS API");
-      const result = await endpoint.POST.mutateAsync({
-        text,
-        provider: "openai",
-        voice: "MALE",
-        language: "EN",
-      });
 
-      if (!result.success || !result.data) {
-        logger.error("TTS", "TTS API returned error", result.error);
+      if (!endpoint.create) {
+        const errorMsg = t("app.chat.hooks.tts.endpoint-not-available");
+        logger.error("TTS", errorMsg);
+        setError(errorMsg);
+        onError?.(errorMsg);
+        setIsLoading(false);
+        isProcessingRef.current = false;
+        return;
+      }
+
+      // Set form values
+      endpoint.create.form.setValue("text", text);
+      endpoint.create.form.setValue("provider", "openai");
+      endpoint.create.form.setValue("voice", "MALE");
+      endpoint.create.form.setValue("language", "EN");
+
+      // Submit form
+      await endpoint.create.form.handleSubmit(async () => {
+        // Form submission is handled by the endpoint
+      })();
+
+      // Wait a bit for the response to be available
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      const result = endpoint.create.response;
+
+      if (!result?.success || !result.data) {
+        logger.error("TTS", "TTS API returned error", endpoint.create.error);
         const errorMsg =
-          result.error?.message || t("app.chat.hooks.tts.failed-to-generate");
+          endpoint.create.error?.message ||
+          t("app.chat.hooks.tts.failed-to-generate");
         setError(errorMsg);
         onError?.(errorMsg);
         setIsLoading(false);
@@ -173,7 +194,7 @@ export function useTTSAudio({
 
   // Cleanup on unmount
   useEffect(() => {
-    return () => {
+    return (): void => {
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;

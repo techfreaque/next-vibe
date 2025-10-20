@@ -61,20 +61,11 @@ export const pricingPlans: Record<SubscriptionPlanValue, PricingPlan> = {
     name: "app.story.pricing.plans.STARTER.name",
     description: "app.story.pricing.plans.STARTER.description",
 
-    premiumFeatures: [
-      {
-        feature: "app.story.pricing.plans.STARTER.features.posts",
-        className: "bg-purple-100 dark:bg-purple-900/30",
-        icon: <Star className="h-5 w-5 text-purple-600 dark:text-purple-400" />,
-      },
-    ],
     features: [
-      "app.story.pricing.plans.STARTER.features.freeSocialSetup",
-      "app.story.pricing.plans.STARTER.features.contentStrategy",
-      "app.story.pricing.plans.STARTER.features.strategyCall",
-      "app.story.pricing.plans.STARTER.features.analytics",
-      "app.story.pricing.plans.STARTER.features.support",
-      "app.story.pricing.plans.STARTER.features.calendar",
+      "app.story.pricing.plans.STARTER.features.messages",
+      "app.story.pricing.plans.STARTER.features.models",
+      "app.story.pricing.plans.STARTER.features.folders",
+      "app.story.pricing.plans.STARTER.features.personas",
     ],
     priceByCountry: {
       DE: {
@@ -164,71 +155,5 @@ export type PricingComparisonFeature = PricingFeature | PricingTextFeature;
 /**
  * Data for the pricing comparison table
  */
-export const pricingComparisonFeatures: PricingComparisonFeature[] = [
-  // Special text features with translation keys for values - these should be first
-  {
-    name: "pricing.comparison.features.socialMediaPosts",
-    type: "text",
-    [SubscriptionPlan.SUBSCRIPTION]:
-      "app.story.pricing.plans.monthlyPosts.starter",
-  },
-  {
-    name: "pricing.comparison.features.reelsVideos",
-    [SubscriptionPlan.SUBSCRIPTION]: false,
-  },
-  {
-    name: "pricing.comparison.features.strategyCalls",
-    type: "text",
-    [SubscriptionPlan.SUBSCRIPTION]:
-      "app.story.pricing.plans.strategyCalls.starter",
-  },
-  // Boolean features - ordered by importance and availability
-  {
-    name: "pricing.comparison.features.freeSocialAccountSetup",
-    [SubscriptionPlan.SUBSCRIPTION]: true,
-  },
-  {
-    name: "pricing.comparison.features.multiPlatformStrategy",
-    [SubscriptionPlan.SUBSCRIPTION]: true,
-  },
-  {
-    name: "pricing.comparison.features.customContentStrategy",
-    [SubscriptionPlan.SUBSCRIPTION]: false,
-  },
-  {
-    name: "pricing.comparison.features.contentCalendar",
-    [SubscriptionPlan.SUBSCRIPTION]: true,
-  },
-  {
-    name: "pricing.comparison.features.basicAnalytics",
-    [SubscriptionPlan.SUBSCRIPTION]: true,
-  },
-  {
-    name: "pricing.comparison.features.emailSupport",
-    [SubscriptionPlan.SUBSCRIPTION]: true,
-  },
-  {
-    name: "pricing.comparison.features.advancedAnalytics",
-    [SubscriptionPlan.SUBSCRIPTION]: false,
-  },
-  {
-    name: "pricing.comparison.features.prioritySupport",
-    [SubscriptionPlan.SUBSCRIPTION]: false,
-  },
-  {
-    name: "pricing.comparison.features.dedicatedAccountManager",
-    [SubscriptionPlan.SUBSCRIPTION]: false,
-  },
-  {
-    name: "pricing.comparison.features.customReportingDashboard",
-    [SubscriptionPlan.SUBSCRIPTION]: false,
-  },
-  {
-    name: "pricing.comparison.features.dedicatedCreativeTeam",
-    [SubscriptionPlan.SUBSCRIPTION]: false,
-  },
-  {
-    name: "pricing.comparison.features.onSiteProduction",
-    [SubscriptionPlan.SUBSCRIPTION]: false,
-  },
-];
+// TODO: Define proper comparison features for AI chat app
+export const pricingComparisonFeatures: PricingComparisonFeature[] = [];

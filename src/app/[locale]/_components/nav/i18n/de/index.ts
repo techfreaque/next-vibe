@@ -23,6 +23,7 @@ export const translations: typeof enTranslations = {
   },
   home: "Startseite",
   pricing: "Preise",
+  contact: "Kontakt",
   services: {
     title: "Dienstleistungen",
     features: {

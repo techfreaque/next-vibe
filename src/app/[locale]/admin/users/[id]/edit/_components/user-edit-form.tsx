@@ -53,7 +53,7 @@ export function UserEditForm({
   };
 
   if (isLoading) {
-    return <div>{t("common.loading")}</div>;
+    return <div>{t("app.admin.common.loading")}</div>;
   }
 
   return (
@@ -66,7 +66,7 @@ export function UserEditForm({
           className="flex items-center space-x-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>{t("common.actions.back")}</span>
+          <span>{t("app.admin.common.actions.back")}</span>
         </Button>
       </div>
 
@@ -74,7 +74,7 @@ export function UserEditForm({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <span>{t("users.admin.actions.editUser")}</span>
+            <span>{t("app.admin.users.admin.actions.editUser")}</span>
             <span className="text-lg font-normal text-gray-500">
               - {user.email}
             </span>
@@ -193,13 +193,13 @@ export function UserEditForm({
                 onClick={handleBack}
                 disabled={isSaving}
               >
-                {t("users.form.buttons.cancel")}
+                {t("app.admin.users.form.buttons.cancel")}
               </Button>
               <Button type="submit" disabled={isSaving}>
                 <Save className="h-4 w-4 mr-2" />
                 {isSaving
-                  ? t("users.form.buttons.saving")
-                  : t("users.form.buttons.update")}
+                  ? t("app.admin.users.form.buttons.saving")
+                  : t("app.admin.users.form.buttons.update")}
               </Button>
             </div>
           </Form>

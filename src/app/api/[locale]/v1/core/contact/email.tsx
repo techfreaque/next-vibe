@@ -272,7 +272,7 @@ export const renderPartnerMail: EmailFunctionType<
         locale: locale,
         isForCompany: false,
         userId: user?.id, // Pass user ID if available
-        leadId: requestData.leadId, // Pass lead ID from form submission
+        leadId: user.leadId, // Pass lead ID from JWT payload
       }),
     });
   } catch {

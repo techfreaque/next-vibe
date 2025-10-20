@@ -432,7 +432,9 @@ function FolderItem({
       return;
     }
 
-    const url = buildFolderUrl(locale, rootFolderId, folder.id);
+    // If this folder IS the root folder, don't pass it as subfolder
+    const subFolderId = folder.id === rootFolderId ? null : folder.id;
+    const url = buildFolderUrl(locale, rootFolderId, subFolderId);
     router.push(url);
   };
 

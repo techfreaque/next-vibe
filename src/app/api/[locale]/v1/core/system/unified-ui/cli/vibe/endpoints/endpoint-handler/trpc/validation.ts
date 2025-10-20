@@ -43,10 +43,23 @@ export function validateTrpcRequestData<
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
+  TRequestInput,
   TRequestOutput,
+  TResponseInput,
+  TUrlVariablesInput,
   TUrlVariablesOutput,
 >(
-  endpoint: CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
+  endpoint: CreateApiEndpoint<
+    TExampleKey,
+    TMethod,
+    TUserRoleValue,
+    TFields,
+    TRequestInput,
+    TRequestOutput,
+    TResponseInput,
+    TUrlVariablesInput,
+    TUrlVariablesOutput
+  >,
   context: TrpcValidationContext<TRequestOutput, TUrlVariablesOutput>,
   logger: EndpointLogger,
 ): ResponseType<ValidatedRequestData<TRequestOutput, TUrlVariablesOutput>> {

@@ -6,9 +6,10 @@
 import type { ReactNode } from "react";
 import type { Control, FieldPath, FieldValues } from "react-hook-form";
 
-import type { FormFieldCategory } from "@/app/[locale]/app/business-info/_constants/enums";
 import type { Countries } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
+
+import type { FormFieldCategory } from "../autocomplete-field";
 
 // Base field configuration
 export interface BaseFieldConfig {
@@ -83,7 +84,7 @@ export interface AutocompleteFieldConfig extends BaseFieldConfig {
   options: Array<{
     value: string;
     label: TranslationKey;
-    category?: FormFieldCategory;
+    category?: string;
   }>;
   allowCustom?: boolean;
   searchPlaceholder?: TranslationKey;
@@ -94,7 +95,7 @@ export interface TagsFieldConfig extends BaseFieldConfig {
   suggestions?: Array<{
     value: string;
     label: TranslationKey;
-    category?: FormFieldCategory;
+    category?: string;
   }>;
   maxTags?: number;
   allowCustom?: boolean;
@@ -230,7 +231,7 @@ export interface EndpointFormFieldProps<
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > {
   name: TName;
-  config: TypeSafeFieldConfig<TFieldValues, TName>;
+  config: FieldConfig;
   control: Control<TFieldValues>; // Properly typed form control from useEndpoint
   requiredFields?: string[]; // List of required field names
   theme?: RequiredFieldTheme;

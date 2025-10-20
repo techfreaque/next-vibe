@@ -1,3 +1,5 @@
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+
 import { DEFAULT_CONFIG_PATH } from "../utils/release-config.js";
 import { ciRelease } from "./ci-release.js";
 import { localRelease } from "./local-release.js";

@@ -83,10 +83,10 @@ export function useEdenAISpeech({
 
   const processRecording = useCallback(async (): Promise<void> => {
     logger.debug("STT", "Processing recording", {
-      hasEndpointCreate: !!endpoint.POST,
+      hasEndpointCreate: !!endpoint.create,
     });
 
-    if (!endpoint.POST) {
+    if (!endpoint.create) {
       const errorMsg = t("app.chat.hooks.stt.endpoint-not-available");
       logger.error("STT", errorMsg);
       setError(errorMsg);
@@ -112,25 +112,31 @@ export function useEdenAISpeech({
         type: audioBlob.type,
       });
 
-      // Submit using mutateAsync
+      // Set form values and submit
       logger.debug("STT", "Submitting audio", {
         fileSize: audioFile.size,
         provider: "openai",
         languageCode,
       });
 
-      const result = await endpoint.POST.mutateAsync({
-        fileUpload: {
-          file: audioFile,
-        },
-        provider: "openai",
-        language: languageCode,
-      });
+      // Set form values
+      endpoint.create.form.setValue("fileUpload", { file: audioFile });
+      endpoint.create.form.setValue("provider", "openai");
+      endpoint.create.form.setValue("language", languageCode);
 
-      logger.debug("STT", "Got response", { success: result.success });
+      // Submit form
+      await endpoint.create.form.handleSubmit(async () => {
+        // Form submission is handled by the endpoint
+      })();
+
+      // Wait a bit for the response to be available
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      const result = endpoint.create.response;
+      logger.debug("STT", "Got response", { success: result?.success });
 
       // Check response
-      if (result.success && result.data) {
+      if (result?.success && result.data) {
         const transcribedText = result.data.response.text || "";
         logger.debug("STT", "Success! Transcription received", {
           textLength: transcribedText.length,
@@ -139,7 +145,8 @@ export function useEdenAISpeech({
         onTranscript?.(transcribedText);
       } else {
         const errorMessage =
-          result.error?.message || t("app.chat.hooks.stt.transcription-failed");
+          endpoint.create.error?.message ||
+          t("app.chat.hooks.stt.transcription-failed");
         logger.error("STT", errorMessage, { error: errorMessage });
         setError(errorMessage);
         onError?.(errorMessage);

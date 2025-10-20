@@ -14,6 +14,7 @@ import type { UserRoleDB } from "@/app/api/[locale]/v1/core/user/user-roles/enum
 
 import type {
   ExtractOutput,
+  FieldUsageConfig,
   ObjectField,
   UnifiedField,
 } from "../../endpoint-types/core/types";
@@ -88,7 +89,10 @@ function hasResponseTrue(value: ExtractOutput<z.ZodTypeAny>): boolean {
  */
 function isObjectField<TSchema extends z.ZodTypeAny>(
   field: UnifiedField<TSchema>,
-): field is ObjectField<Record<string, any>> {
+): field is ObjectField<
+  Record<string, UnifiedField<z.ZodTypeAny>>,
+  FieldUsageConfig
+> {
   return (
     typeof field === "object" &&
     field !== null &&
@@ -111,7 +115,7 @@ export class ResponseMetadataExtractor {
       string,
       Methods,
       readonly (typeof UserRoleDB)[number][],
-      any
+      UnifiedField<z.ZodTypeAny>
     >,
   >(
     definition: TEndpoint,
@@ -141,8 +145,8 @@ export class ResponseMetadataExtractor {
   /**
    * Extract metadata from fields definition (new endpoint format)
    */
-  private extractFromFieldsDefinition<TFields>(
-    fieldsDefinition: TFields,
+  private extractFromFieldsDefinition(
+    fieldsDefinition: UnifiedField<z.ZodTypeAny>,
     responseData?: ExtractOutput<z.ZodTypeAny>,
   ): ResponseContainerMetadata | null {
     if (!fieldsDefinition || typeof fieldsDefinition !== "object") {
@@ -152,10 +156,12 @@ export class ResponseMetadataExtractor {
     // Handle the real createEndpoint structure
     if ("children" in fieldsDefinition && "ui" in fieldsDefinition) {
       // Type narrowing: if it has children and ui, it's an ObjectField
-      return this.extractFromCreateEndpointStructure(
-        fieldsDefinition,
-        responseData,
-      );
+      if (isObjectField(fieldsDefinition)) {
+        return this.extractFromCreateEndpointStructure(
+          fieldsDefinition,
+          responseData,
+        );
+      }
     }
 
     // Legacy: Check if this is a field object with usage and schema
@@ -187,9 +193,9 @@ export class ResponseMetadataExtractor {
    * Extract metadata from the real createEndpoint structure
    */
   private extractFromCreateEndpointStructure<
-    TChildren extends Record<string, any>,
+    TChildren extends Record<string, UnifiedField<z.ZodTypeAny>>,
   >(
-    fieldsDefinition: ObjectField<TChildren>,
+    fieldsDefinition: ObjectField<TChildren, FieldUsageConfig>,
     responseData?: ExtractOutput<z.ZodTypeAny>,
   ): ResponseContainerMetadata | null {
     const ui = fieldsDefinition.ui;
@@ -254,9 +260,9 @@ export class ResponseMetadataExtractor {
   /**
    * Extract field metadata from createEndpoint field structure
    */
-  private extractFieldFromCreateEndpointField<TField>(
+  private extractFieldFromCreateEndpointField(
     fieldName: string,
-    field: TField,
+    field: UnifiedField<z.ZodTypeAny>,
     responseData?: ExtractOutput<z.ZodTypeAny>,
   ): ResponseFieldMetadata | null {
     const ui = field.ui;
@@ -422,8 +428,11 @@ export class ResponseMetadataExtractor {
   /**
    * Extract container metadata from definition (legacy support)
    */
-  private extractContainerFromDefinition<TFields>(
-    definition: TFields,
+  private extractContainerFromDefinition(
+    definition: ObjectField<
+      Record<string, UnifiedField<z.ZodTypeAny>>,
+      FieldUsageConfig
+    >,
     responseData?: ExtractOutput<z.ZodTypeAny>,
   ): ResponseContainerMetadata {
     // Extract UI config if present
@@ -447,8 +456,12 @@ export class ResponseMetadataExtractor {
         ? ui.description
         : undefined;
     const layout =
-      ui && "layout" in ui && typeof ui.layout === "object"
-        ? ui.layout
+      ui &&
+      "layout" in ui &&
+      typeof ui.layout === "object" &&
+      ui.layout !== null &&
+      ("columns" in ui.layout || "spacing" in ui.layout)
+        ? (ui.layout as { columns?: number; spacing?: string } | undefined)
         : undefined;
 
     // Extract fields from nested structure
@@ -585,9 +598,9 @@ export class ResponseMetadataExtractor {
   /**
    * Extract field metadata from definition
    */
-  private extractFieldFromDefinition<TField>(
+  private extractFieldFromDefinition(
     fieldName: string,
-    definition: TField,
+    definition: UnifiedField<z.ZodTypeAny>,
     responseData?: ExtractOutput<z.ZodTypeAny>,
   ): ResponseFieldMetadata | null {
     if (!definition) {

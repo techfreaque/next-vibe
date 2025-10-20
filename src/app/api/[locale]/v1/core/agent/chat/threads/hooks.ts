@@ -30,6 +30,15 @@ export function useThreadsList(
         refetchOnWindowFocus: true,
         staleTime: 5 * 1000, // 5 seconds
       },
+      formOptions: {
+        initialValues: {
+          pagination: {
+            page: 1,
+            limit: 100,
+          },
+          filters: {},
+        },
+      },
     },
     logger,
   );

@@ -9,7 +9,12 @@
 import { AlertCircle, Calendar } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
-import type { Control, FieldValues, Path } from "react-hook-form";
+import type {
+  Control,
+  ControllerRenderProps,
+  FieldValues,
+  Path,
+} from "react-hook-form";
 import type { z } from "zod";
 
 import { useTranslation } from "@/i18n/core/client";
@@ -282,7 +287,7 @@ function renderLabel(
           variant="secondary"
           className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
         >
-          {t("common.required")}
+          {t("app.packages.nextVibeUi.web.common.required")}
         </Badge>
       )}
     </div>
@@ -292,9 +297,12 @@ function renderLabel(
 /**
  * Render field input based on type
  */
-function renderFieldInput(
+function renderFieldInput<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends Path<TFieldValues> = Path<TFieldValues>,
+>(
   config: FieldConfig,
-  field: FormField,
+  field: ControllerRenderProps<TFieldValues, TName>,
   inputClassName: string,
   t: TFunction,
   disabled?: boolean,
@@ -490,7 +498,7 @@ function renderFieldInput(
                 <span>
                   {config.placeholder
                     ? t(config.placeholder)
-                    : t("common.selectDate")}
+                    : t("app.packages.nextVibeUi.web.common.selectDate")}
                 </span>
               )}
             </Button>
@@ -556,7 +564,10 @@ function renderFieldInput(
           value={String(field.value || "")}
           onChange={(value) => field.onChange(value)}
           onBlur={field.onBlur}
-          placeholder={config.placeholder || "common.enterPhoneNumber"}
+          placeholder={
+            config.placeholder ||
+            "app.packages.nextVibeUi.web.common.enterPhoneNumber"
+          }
           defaultCountry={config.defaultCountry || "DE"}
           preferredCountries={
             config.preferredCountries || ["DE", "PL", "GLOBAL"]
@@ -568,7 +579,9 @@ function renderFieldInput(
       );
 
     case "multiselect": {
-      const multiselectValue = Array.isArray(field.value) ? field.value : [];
+      const multiselectValue: string[] = Array.isArray(field.value)
+        ? field.value
+        : [];
 
       return (
         <div className="space-y-2">
@@ -626,7 +639,7 @@ function renderFieldInput(
           onBlur={field.onBlur}
           disabled={disabled || false}
           className={cn(inputClassName, "h-10")}
-          placeholder={t("common.unknownFieldType")}
+          placeholder={t("app.packages.nextVibeUi.web.common.unknownFieldType")}
         />
       );
     }
@@ -739,10 +752,7 @@ export interface EndpointFormFieldsProps<TFieldValues extends FieldValues> {
   fieldClassName?: string;
 }
 
-export function EndpointFormFields<
-  TFieldValues extends FieldValues,
-  TName extends Path<TFieldValues>,
->({
+export function EndpointFormFields<TFieldValues extends FieldValues>({
   fields,
   control,
   schema,
@@ -753,7 +763,7 @@ export function EndpointFormFields<
   return (
     <div className={cn("space-y-6", className)}>
       {fields.map((fieldDef) => (
-        <EndpointFormField<TFieldValues, TName>
+        <EndpointFormField
           key={fieldDef.name}
           name={fieldDef.name}
           config={fieldDef.config}

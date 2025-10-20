@@ -19,4 +19,107 @@ export const translations: typeof enTranslations = {
   subscription: subscriptionTranslations,
   track: trackTranslations,
   user: userTranslations,
+  common: {
+    logoPart1: "Unbottled",
+    logoPart2: ".ai",
+    appName: "Unbottled.ai",
+    active: "Aktywny",
+    filter: "Filtruj",
+    refresh: "Odśwież",
+    weekday: {
+      monday: "Poniedziałek",
+      tuesday: "Wtorek",
+      wednesday: "Środa",
+      thursday: "Czwartek",
+      friday: "Piątek",
+      saturday: "Sobota",
+      sunday: "Niedziela",
+    },
+    company: {
+      name: "Unbottled.ai",
+      legalForm: "Spółka z ograniczoną odpowiedzialnością (Sp. z o.o.)",
+      registrationNumber: "REG-2024-UNBOTTLED-AI",
+      address: {
+        title: "Adres",
+        street: "123 AI Innovation Drive",
+        city: "San Francisco, CA 94105",
+        country: "Stany Zjednoczone",
+        addressIn1Line:
+          "123 AI Innovation Drive, San Francisco, CA 94105, Stany Zjednoczone",
+      },
+      responsiblePerson: {
+        name: "Dyrektor Generalny",
+      },
+    },
+    selector: {
+      country: "Kraj",
+      language: "Język",
+    },
+    accessibility: {
+      srOnly: {
+        enableLightMode: "Włącz tryb jasny",
+        enableDarkMode: "Włącz tryb ciemny",
+        toggleMenu: "Przełącz menu",
+      },
+    },
+    error: {
+      title: "Błąd",
+      message: "Coś poszło nie tak",
+      description: "Wystąpił błąd. Spróbuj ponownie.",
+      tryAgain: "Spróbuj ponownie",
+      sending_sms: "Nie udało się wysłać SMS-a",
+    },
+    errors: {
+      unknown: "Wystąpił nieznany błąd",
+    },
+    success: {
+      title: "Sukces",
+      message: "Operacja zakończona pomyślnie",
+      description: "Twoja akcja została pomyślnie zakończona.",
+    },
+    info: {
+      title: "Informacja",
+      message: "Proszę zauważyć",
+      description: "Oto kilka informacji dla Ciebie.",
+    },
+    api: {
+      notifications: {
+        welcome: {
+          title: "Witamy!",
+          description: "Dziękujemy za dołączenie do nas. Zaczynajmy!",
+        },
+      },
+    },
+    footer: {
+      description:
+        "Przekształć swoją obecność w mediach społecznościowych dzięki profesjonalnemu tworzeniu treści i strategicznemu zarządzaniu.",
+      copyright: "© {{year}} {{appName}}. Wszelkie prawa zastrzeżone.",
+      tagline: "Podnieś poziom swojej gry w mediach społecznościowych",
+      social: {
+        facebook: "Facebook",
+        instagram: "Instagram",
+        twitter: "Twitter",
+        linkedin: "LinkedIn",
+      },
+      services: {
+        title: "Usługi",
+        socialAccountSetup: "Konfiguracja konta społecznościowego",
+        contentCreation: "Tworzenie treści",
+        strategyDevelopment: "Rozwój strategii",
+        performanceAnalytics: "Analiza wydajności",
+        communityManagement: "Zarządzanie społecznością",
+        audienceBuilding: "Budowanie publiczności",
+        adCampaigns: "Kampanie reklamowe",
+      },
+      company: {
+        title: "Firma",
+        aboutUs: "O nas",
+        contactUs: "Kontakt",
+        careers: "Kariera",
+        privacyPolicy: "Polityka prywatności",
+        termsOfService: "Warunki korzystania z usługi",
+        imprint: "Stopka redakcyjna",
+      },
+    },
+  },
 };

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/schema";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 

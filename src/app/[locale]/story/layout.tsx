@@ -1,11 +1,9 @@
 import "server-only";
 
 import type { JSX, ReactNode } from "react";
-import { Suspense } from "react";
 
 import Footer from "@/app/[locale]/_components/footer";
 import { Navbar } from "@/app/[locale]/_components/nav/navbar";
-import { LeadTracking } from "@/app/api/[locale]/v1/core/leads/tracking/lead-tracking";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
@@ -34,25 +32,13 @@ export default async function SiteLayoutServer({
     logger,
   );
 
-  // Get onboarding status if user is authenticated
-  let isOnboardingComplete = false;
-  if (userResponse.success) {
-    const onboardingResponse = await onboardingRepository.getOnboardingStatus(
-      userResponse.data.id,
-      logger,
-    );
-    isOnboardingComplete = onboardingResponse.success
-      ? onboardingResponse.data.isCompleted
-      : false;
-  }
+  // TODO: Get onboarding status when onboarding module is implemented
+  // For now, set to false as onboarding repository doesn't exist yet
+  const isOnboardingComplete = false;
 
   return (
     <main className="min-h-screen ">
-      <Suspense fallback={null}>
-        <LeadTracking locale={locale} />
-      </Suspense>
       <Navbar
-        homePathName={""}
         user={userResponse.success ? userResponse.data : undefined}
         locale={locale}
         isOnboardingComplete={isOnboardingComplete}

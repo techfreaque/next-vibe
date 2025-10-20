@@ -31,6 +31,9 @@ export function useFoldersList(
         refetchOnWindowFocus: true,
         staleTime: 10 * 1000, // 10 seconds
       },
+      formOptions: {
+        initialValues: {},
+      },
     },
     logger,
   );

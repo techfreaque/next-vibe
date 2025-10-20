@@ -28,6 +28,7 @@ import {
   useToggleCronTask,
 } from "@/app/api/[locale]/v1/core/system/tasks/cron/tasks/hooks";
 import { formatCronSchedule } from "@/app/api/[locale]/v1/core/system/tasks/cron-formatter";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
@@ -37,17 +38,20 @@ import { CronTaskEditForm } from "../../task/[id]/edit/_components/cron-task-edi
 interface TaskToggleSwitchProps {
   task: CronTaskResponseType;
   onTaskUpdated: () => void;
+  locale: CountryLanguage;
 }
 
 function TaskToggleSwitch({
   task,
   onTaskUpdated,
+  locale,
 }: TaskToggleSwitchProps): React.JSX.Element {
-  const toggleHook = useToggleCronTask(task.id);
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const toggleHook = useToggleCronTask(task.id, logger);
 
-  const handleToggle = async (enabled: boolean): Promise<void> => {
+  const handleToggle = async (): Promise<void> => {
     try {
-      await toggleHook.mutateAsync(enabled);
+      await toggleHook.delete?.submit();
       onTaskUpdated();
     } catch {
       // Error handling is managed by the hook
@@ -57,8 +61,8 @@ function TaskToggleSwitch({
   return (
     <Switch
       checked={task.enabled}
-      onCheckedChange={handleToggle}
-      disabled={toggleHook.isPending}
+      onCheckedChange={() => void handleToggle()}
+      disabled={toggleHook.delete?.isSubmitting ?? false}
     />
   );
 }
@@ -75,15 +79,16 @@ function TaskDeleteButton({
   locale,
 }: TaskDeleteButtonProps): React.JSX.Element {
   const { t } = simpleT(locale);
-  const deleteHook = useDeleteCronTask(taskId);
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const deleteHook = useDeleteCronTask(taskId, logger);
 
   const handleDelete = async (): Promise<void> => {
-    if (!window.confirm(t("app.common.confirmDelete"))) {
+    if (!window.confirm(t("app.admin.cron.buttons.confirmDelete"))) {
       return;
     }
 
     try {
-      await deleteHook.mutateAsync();
+      await deleteHook.delete?.submit();
       onTaskUpdated();
     } catch {
       // Error handling is managed by the hook
@@ -95,7 +100,7 @@ function TaskDeleteButton({
       variant="ghost"
       size="sm"
       onClick={handleDelete}
-      disabled={deleteHook.isPending}
+      disabled={deleteHook.delete?.isSubmitting ?? false}
     >
       <Trash2 className="h-4 w-4" />
     </Button>
@@ -116,10 +121,14 @@ function InlineEditForm({
   onSuccess,
 }: InlineEditFormProps): React.JSX.Element {
   const { t } = simpleT(locale);
-  const endpoint = useCronTaskEndpoint({
-    taskId: task.id,
-    enabled: true,
-  });
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const endpoint = useCronTaskEndpoint(
+    {
+      taskId: task.id,
+      enabled: true,
+    },
+    logger,
+  );
 
   // Watch for successful form submission
   React.useEffect(() => {
@@ -159,43 +168,67 @@ export function CronTasksTable({
   const { t } = simpleT(locale);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const userTimezone = getDefaultTimezone(locale);
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   const getStatusBadge = (task: CronTaskResponseType): React.JSX.Element => {
     if (!task.enabled) {
       return (
         <Badge variant="secondary">
-          {t("app.admin.cron.taskStatus.disabled")}
+          {t("app.admin.cron.table.statusBadge.disabled")}
         </Badge>
       );
     }
 
-    if (task.isRunning) {
-      return (
-        <Badge variant="default" className="bg-blue-500">
-          {t("app.admin.cron.taskStatus.running")}
-        </Badge>
-      );
+    // Use the status field from the task
+    switch (task.status) {
+      case "RUNNING":
+        return (
+          <Badge variant="default" className="bg-blue-500">
+            {t("app.admin.cron.table.statusBadge.running")}
+          </Badge>
+        );
+      case "COMPLETED":
+        return (
+          <Badge variant="default" className="bg-green-500">
+            {t("app.admin.cron.table.statusBadge.completed")}
+          </Badge>
+        );
+      case "FAILED":
+      case "ERROR":
+      case "TIMEOUT":
+        return (
+          <Badge variant="destructive">
+            {t("app.admin.cron.table.statusBadge.failed")}
+          </Badge>
+        );
+      case "PENDING":
+      case "SCHEDULED":
+        return (
+          <Badge variant="outline">
+            {t("app.admin.cron.table.statusBadge.pending")}
+          </Badge>
+        );
+      case "CANCELLED":
+      case "STOPPED":
+      case "SKIPPED":
+        return (
+          <Badge variant="secondary">
+            {t("app.admin.cron.table.statusBadge.cancelled")}
+          </Badge>
+        );
+      case "BLOCKED":
+        return (
+          <Badge variant="outline" className="bg-yellow-100">
+            {t("app.admin.cron.table.statusBadge.blocked")}
+          </Badge>
+        );
+      default:
+        return (
+          <Badge variant="outline">
+            {t("app.admin.cron.table.statusBadge.unknown")}
+          </Badge>
+        );
     }
-
-    if (task.lastExecutionStatus === "completed") {
-      return (
-        <Badge variant="default" className="bg-green-500">
-          {t("app.admin.cron.taskStatus.completed")}
-        </Badge>
-      );
-    }
-
-    if (task.lastExecutionStatus === "failed") {
-      return (
-        <Badge variant="destructive">
-          {t("app.admin.cron.taskStatus.failed")}
-        </Badge>
-      );
-    }
-
-    return (
-      <Badge variant="outline">{t("app.admin.cron.taskStatus.pending")}</Badge>
-    );
   };
 
   if (loading) {
@@ -256,26 +289,35 @@ export function CronTasksTable({
                 </TableCell>
                 <TableCell>
                   <div className="text-sm">
-                    {formatCronSchedule(task.schedule, userTimezone, locale)}
+                    {formatCronSchedule(
+                      task.schedule,
+                      userTimezone,
+                      locale,
+                      logger,
+                    )}
                   </div>
                 </TableCell>
                 <TableCell>{getStatusBadge(task)}</TableCell>
                 <TableCell>
                   <div className="text-sm">
-                    {task.lastExecutedAt
-                      ? new Date(task.lastExecutedAt).toLocaleString(locale)
-                      : t("app.admin.cron.taskStatus.never")}
+                    {task.lastRun
+                      ? new Date(task.lastRun).toLocaleString(locale)
+                      : t("app.admin.cron.table.statusBadge.never")}
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="text-sm">
-                    {task.nextExecutionAt
-                      ? new Date(task.nextExecutionAt).toLocaleString(locale)
-                      : t("app.admin.cron.formatting.fallbacks.notScheduled")}
+                    {task.nextRun
+                      ? new Date(task.nextRun).toLocaleString(locale)
+                      : t("app.admin.cron.table.statusBadge.notScheduled")}
                   </div>
                 </TableCell>
                 <TableCell>
-                  <TaskToggleSwitch task={task} onTaskUpdated={onTaskUpdated} />
+                  <TaskToggleSwitch
+                    task={task}
+                    onTaskUpdated={onTaskUpdated}
+                    locale={locale}
+                  />
                 </TableCell>
                 <TableCell>
                   <div className="flex space-x-1">

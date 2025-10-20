@@ -118,11 +118,7 @@ export default function PricingComparison({
                   className={`p-4 border-b border-gray-200 dark:border-gray-800 ${
                     plan.highlighted
                       ? "bg-blue-50 dark:bg-blue-900/20 border-t-2 border-t-cyan-500 border-x-2 border-x-cyan-500"
-                      : plan.id === SubscriptionPlan.PREMIUM
-                        ? "bg-purple-50 dark:bg-purple-900/20 border-t-2 border-t-purple-500 border-x-2 border-x-purple-500"
-                        : plan.isEnterprise
-                          ? "bg-gray-50 dark:bg-gray-900/20 border-t-2 border-t-gray-500 border-x-2 border-x-gray-500"
-                          : ""
+                      : ""
                   }`}
                 >
                   <div className="text-center">
@@ -154,15 +150,11 @@ export default function PricingComparison({
                       }}
                     >
                       <Button
-                        variant={plan.highlighted}
+                        variant={plan.highlighted ? "default" : "outline"}
                         className={`w-full ${
                           plan.highlighted
                             ? "bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 text-white"
-                            : plan.id === SubscriptionPlan.PREMIUM
-                              ? "bg-purple-600 bg-gradient-to-r from-purple-500 to-pink-600 hover:bg-purple-700 hover:from-purple-600 hover:to-pink-700 text-white"
-                              : plan.isEnterprise
-                                ? "bg-gray-700 bg-gradient-to-r from-gray-600 to-gray-800 hover:bg-gray-800 hover:from-gray-700 hover:to-gray-900 text-white"
-                                : "bg-white hover:bg-gray-50 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-700"
+                            : "bg-white hover:bg-gray-50 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-700"
                         }`}
                         size="sm"
                       >
@@ -205,20 +197,7 @@ export default function PricingComparison({
                                   ? " border-b-2 border-b-cyan-500"
                                   : ""
                               }`
-                            : plan.id === SubscriptionPlan.PREMIUM
-                              ? `bg-purple-50 dark:bg-purple-900/20 border-x-2 border-x-purple-500${
-                                  index === pricingComparisonFeatures.length - 1
-                                    ? " border-b-2 border-b-purple-500"
-                                    : ""
-                                }`
-                              : plan.isEnterprise
-                                ? `bg-gray-50 dark:bg-gray-900/20 border-x-2 border-x-gray-500${
-                                    index ===
-                                    pricingComparisonFeatures.length - 1
-                                      ? " border-b-2 border-b-gray-500"
-                                      : ""
-                                  }`
-                                : ""
+                            : ""
                         }`}
                       >
                         {t(feature[plan.id])}
@@ -251,34 +230,11 @@ export default function PricingComparison({
                                 ? " border-b-2 border-b-cyan-500"
                                 : ""
                             }`
-                          : plan.id === SubscriptionPlan.PREMIUM
-                            ? `bg-purple-50 dark:bg-purple-900/20 border-x-2 border-x-purple-500${
-                                index === pricingComparisonFeatures.length - 1
-                                  ? " border-b-2 border-b-purple-500"
-                                  : ""
-                              }`
-                            : plan.isEnterprise
-                              ? `bg-gray-50 dark:bg-gray-900/20 border-x-2 border-x-gray-500${
-                                  index === pricingComparisonFeatures.length - 1
-                                    ? " border-b-2 border-b-gray-500"
-                                    : ""
-                                }`
-                              : ""
+                          : ""
                       }`}
                     >
                       {boolFeature[plan.id] ? (
-                        <Check
-                          className={`h-5 w-5 mx-auto ${
-                            feature.name.includes("premium") ||
-                            feature.name.includes("dedicated") ||
-                            feature.name.includes("custom")
-                              ? plan.id === SubscriptionPlan.PREMIUM ||
-                                plan.isEnterprise
-                                ? "text-purple-500"
-                                : "text-green-500"
-                              : "text-green-500"
-                          }`}
-                        />
+                        <Check className="h-5 w-5 mx-auto text-green-500" />
                       ) : (
                         <X className="h-5 w-5 text-gray-300 dark:text-gray-600 mx-auto" />
                       )}

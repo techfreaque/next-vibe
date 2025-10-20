@@ -19,4 +19,108 @@ export const translations: typeof enTranslations = {
   subscription: subscriptionTranslations,
   track: trackTranslations,
   user: userTranslations,
+  common: {
+    logoPart1: "Unbottled",
+    logoPart2: ".ai",
+    appName: "Unbottled.ai",
+    active: "Aktiv",
+    filter: "Filtern",
+    refresh: "Aktualisieren",
+    weekday: {
+      monday: "Montag",
+      tuesday: "Dienstag",
+      wednesday: "Mittwoch",
+      thursday: "Donnerstag",
+      friday: "Freitag",
+      saturday: "Samstag",
+      sunday: "Sonntag",
+    },
+    company: {
+      name: "Unbottled.ai",
+      legalForm: "Gesellschaft mit beschränkter Haftung (GmbH)",
+      registrationNumber: "REG-2024-UNBOTTLED-AI",
+      address: {
+        title: "Adresse",
+        street: "123 AI Innovation Drive",
+        city: "San Francisco, CA 94105",
+        country: "Vereinigte Staaten",
+        addressIn1Line:
+          "123 AI Innovation Drive, San Francisco, CA 94105, Vereinigte Staaten",
+      },
+      responsiblePerson: {
+        name: "Geschäftsführer",
+      },
+    },
+    selector: {
+      country: "Land",
+      language: "Sprache",
+    },
+    accessibility: {
+      srOnly: {
+        enableLightMode: "Hellen Modus aktivieren",
+        enableDarkMode: "Dunklen Modus aktivieren",
+        toggleMenu: "Menü umschalten",
+      },
+    },
+    error: {
+      title: "Fehler",
+      message: "Etwas ist schief gelaufen",
+      description: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      tryAgain: "Erneut versuchen",
+      sending_sms: "SMS konnte nicht gesendet werden",
+    },
+    errors: {
+      unknown: "Ein unbekannter Fehler ist aufgetreten",
+    },
+    success: {
+      title: "Erfolg",
+      message: "Vorgang erfolgreich abgeschlossen",
+      description: "Ihre Aktion wurde erfolgreich abgeschlossen.",
+    },
+    info: {
+      title: "Information",
+      message: "Bitte beachten",
+      description: "Hier sind einige Informationen für Sie.",
+    },
+    api: {
+      notifications: {
+        welcome: {
+          title: "Willkommen!",
+          description:
+            "Danke, dass Sie sich uns angeschlossen haben. Lassen Sie uns beginnen!",
+        },
+      },
+    },
+    footer: {
+      description:
+        "Verwandeln Sie Ihre Social-Media-Präsenz mit professioneller Content-Erstellung und strategischem Management.",
+      copyright: "© {{year}} {{appName}}. Alle Rechte vorbehalten.",
+      tagline: "Verbessern Sie Ihr Social-Media-Spiel",
+      social: {
+        facebook: "Facebook",
+        instagram: "Instagram",
+        twitter: "Twitter",
+        linkedin: "LinkedIn",
+      },
+      services: {
+        title: "Dienstleistungen",
+        socialAccountSetup: "Social-Media-Konto-Einrichtung",
+        contentCreation: "Content-Erstellung",
+        strategyDevelopment: "Strategieentwicklung",
+        performanceAnalytics: "Leistungsanalyse",
+        communityManagement: "Community-Management",
+        audienceBuilding: "Publikumsaufbau",
+        adCampaigns: "Werbekampagnen",
+      },
+      company: {
+        title: "Unternehmen",
+        aboutUs: "Über uns",
+        contactUs: "Kontakt",
+        careers: "Karriere",
+        privacyPolicy: "Datenschutz",
+        termsOfService: "Nutzungsbedingungen",
+        imprint: "Impressum",
+      },
+    },
+  },
 };

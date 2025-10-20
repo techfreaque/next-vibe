@@ -1,4 +1,8 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+import { translations as validationTranslations } from "../../validation/i18n/de";
+
+export const translations: typeof enTranslations = {
+  validation: validationTranslations,
   trpcValidator: {
     apiDirectoryNotFound: "API-Verzeichnis nicht gefunden: {{resolvedApiDir}}",
     foundRouteFiles: "{{count}} Route-Dateien zur Validierung gefunden",

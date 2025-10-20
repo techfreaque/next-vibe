@@ -131,12 +131,14 @@ const { GET } = createEndpoint({
                 },
               ],
             },
-            z.enum([
-              DEFAULT_FOLDER_IDS.PRIVATE,
-              DEFAULT_FOLDER_IDS.SHARED,
-              DEFAULT_FOLDER_IDS.PUBLIC,
-              DEFAULT_FOLDER_IDS.INCOGNITO,
-            ]),
+            z
+              .enum([
+                DEFAULT_FOLDER_IDS.PRIVATE,
+                DEFAULT_FOLDER_IDS.SHARED,
+                DEFAULT_FOLDER_IDS.PUBLIC,
+                DEFAULT_FOLDER_IDS.INCOGNITO,
+              ])
+              .optional(),
           ),
           subFolderId: requestDataField(
             {

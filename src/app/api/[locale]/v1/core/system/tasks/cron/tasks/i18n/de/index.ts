@@ -5,6 +5,12 @@ export const translations: typeof enTranslations = {
   tags: {
     tasks: "Tasks",
   },
+  list: {
+    columns: {
+      createdAt: "Erstellt am",
+      updatedAt: "Aktualisiert am",
+    },
+  },
   get: {
     title: "Cron-Aufgaben auflisten",
     description: "Liste der Cron-Aufgaben mit optionaler Filterung abrufen",

@@ -57,7 +57,7 @@ class LanguageMapper {
   private getLanguageGroupMap(): LanguageGroupMap {
     if (this._languageGroupMap === null) {
       this._languageGroupMap = availableCountries.reduce((acc, curr) => {
-        const language = curr.language as Languages;
+        const language = curr.language;
 
         if (!acc[language]) {
           acc[language] = {

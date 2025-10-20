@@ -247,11 +247,13 @@ export function getDefaultTimezone(locale: CountryLanguage): string {
   // Use country-specific timezone mapping, same logic as consultation calendar
   const timezone =
     country === "PL"
-      ? t("common.calendar.timezone.zones.PL")
+      ? t("app.i18n.common.calendar.timezone.zones.PL")
       : country === "DE"
-        ? t("common.calendar.timezone.zones.DE")
+        ? t("app.i18n.common.calendar.timezone.zones.DE")
         : ((): string => {
-            const globalTimezone = t("common.calendar.timezone.zones.global");
+            const globalTimezone = t(
+              "app.i18n.common.calendar.timezone.zones.global",
+            );
             // Handle UTC special case - convert to proper IANA timezone identifier
             return globalTimezone === "UTC" ? "Etc/UTC" : globalTimezone;
           })();

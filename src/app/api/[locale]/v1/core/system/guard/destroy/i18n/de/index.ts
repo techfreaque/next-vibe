@@ -93,6 +93,14 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Datenkonflikt aufgetreten",
     },
+    destruction_failed: {
+      title: "Guard-Zerstörung fehlgeschlagen",
+      description: "Guard-Umgebung konnte nicht zerstört werden",
+    },
+    guard_not_found: {
+      title: "Guard nicht gefunden",
+      description: "Keine Guard-Umgebung für das angegebene Projekt gefunden",
+    },
   },
   success: {
     title: "Erfolg",

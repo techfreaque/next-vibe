@@ -4,7 +4,6 @@
  */
 
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
-import type z from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
@@ -12,7 +11,6 @@ import type { FieldUsage, Methods } from "../../endpoint-types/core/enums";
 import type {
   ExtractInput,
   InferSchemaFromField,
-  UnifiedField,
 } from "../../endpoint-types/core/types";
 import type { CreateApiEndpoint } from "../../endpoint-types/endpoint/create";
 import { authenticateUser, executeHandler } from "../core/handler-core";
@@ -105,7 +103,7 @@ export function createTRPCHandler<
         // eslint-disable-next-line no-restricted-syntax
         throw convertToTRPCError(
           ErrorResponseTypes.UNAUTHORIZED,
-          ctx.t("error.unauthorized"),
+          ctx.t("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.unauthorized"),
         );
       }
 
@@ -129,7 +127,7 @@ export function createTRPCHandler<
         // eslint-disable-next-line no-restricted-syntax
         throw convertToTRPCError(
           ErrorResponseTypes.INVALID_REQUEST_ERROR,
-          ctx.t("error.errors.invalid_request_data"),
+          ctx.t("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data"),
         );
       }
 
@@ -160,7 +158,7 @@ export function createTRPCHandler<
       // eslint-disable-next-line no-restricted-syntax
       throw convertToTRPCError(
         ErrorResponseTypes.INTERNAL_ERROR,
-        ctx.t("error.general.internal_server_error"),
+        ctx.t("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error"),
       );
     }
   };

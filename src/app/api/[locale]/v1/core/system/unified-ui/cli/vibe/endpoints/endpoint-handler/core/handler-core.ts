@@ -16,7 +16,6 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import type z from "zod";
 
 import {
   type AuthContext,
@@ -131,7 +130,7 @@ export async function executeHandler<
 
     // Return a standardized error response
     return createErrorResponse(
-      "error.general.internal_server_error",
+      "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
       ErrorResponseTypes.INTERNAL_ERROR,
       {
         error: parseError(error).message,
@@ -163,11 +162,12 @@ export async function authenticateUser<
 
     if (!user) {
       return createErrorResponse(
-        "error.unauthorized",
+        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.unauthorized",
         ErrorResponseTypes.UNAUTHORIZED,
       );
     }
 
+    // @ts-ignore - TypeScript cannot infer that getTypedAuthMinimalUser returns the minimal JWT payload type
     return {
       success: true,
       data: user,
@@ -185,7 +185,7 @@ export async function authenticateUser<
     );
 
     return createErrorResponse(
-      "error.unauthorized",
+      "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.unauthorized",
       ErrorResponseTypes.UNAUTHORIZED,
     );
   }
@@ -213,11 +213,12 @@ export async function authenticateTypedUser<
 
     if (!user) {
       return createErrorResponse(
-        "error.unauthorized",
+        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.unauthorized",
         ErrorResponseTypes.UNAUTHORIZED,
       );
     }
 
+    // @ts-ignore - TypeScript cannot infer that getTypedAuthMinimalUser returns the minimal JWT payload type
     return {
       success: true,
       data: user,
@@ -231,7 +232,7 @@ export async function authenticateTypedUser<
     });
 
     return createErrorResponse(
-      "error.unauthorized",
+      "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.unauthorized",
       ErrorResponseTypes.UNAUTHORIZED,
     );
   }

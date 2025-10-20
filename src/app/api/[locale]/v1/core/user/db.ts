@@ -12,10 +12,10 @@ import { UserRoleDB } from "./user-roles/enum";
 
 /**
  * Users table schema
+ * NOTE: Users do NOT have a direct leadId - they can have multiple leads via user_leads table
  */
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
-  leadId: uuid("lead_id").unique(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   privateName: text("private_name").notNull(),

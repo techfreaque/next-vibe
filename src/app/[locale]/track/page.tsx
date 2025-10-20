@@ -5,14 +5,14 @@ import { debugLogger, errorLogger } from "next-vibe/shared/utils";
 import type React from "react";
 import { useEffect } from "react";
 
-import { LeadTrackingClientRepository } from "@/app/api/[locale]/v1/core/leads/tracking/client-repository";
 import { generateEngagementTrackingApiUrl } from "@/app/api/[locale]/v1/core/leads/tracking/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 /**
  * Tracking Page Component
- * Captures tracking data, records engagement, and redirects to destination
+ * Records click engagement and redirects to destination
+ * Server handles leadid via JWT - no client-side tracking needed
  */
 export default function TrackPage(): React.ReactElement {
   const router = useRouter();
@@ -26,62 +26,55 @@ export default function TrackPage(): React.ReactElement {
 
     const handleTracking = async (): Promise<void> => {
       try {
-        // Create logger for tracking operations
-        const logger = LeadTrackingClientRepository.createLogger(locale);
+        // Get tracking parameters from URL
+        const id = searchParams.get("id");
+        const campaignId = searchParams.get("campaignId");
+        const stage = searchParams.get("stage");
+        const source = searchParams.get("source") || "email";
+        const url = searchParams.get("url");
 
-        // Process tracking parameters using client repository
-        const validationResult =
-          LeadTrackingClientRepository.validateTrackingParams(
-            searchParams,
-            logger,
-          );
-
-        if (!validationResult.success) {
+        // Validate required id parameter
+        if (!id) {
           // eslint-disable-next-line i18next/no-literal-string
-          errorLogger("Invalid tracking parameters", {
+          errorLogger("Missing tracking ID", {
             url: window.location.href,
-            searchParams: Object.fromEntries(searchParams),
           });
           router.push(`/${locale}`);
           return;
         }
 
-        const { validatedParams } = validationResult.data;
-        if (!validatedParams) {
-          // eslint-disable-next-line i18next/no-literal-string
-          errorLogger("No validated parameters found", {
-            url: window.location.href,
-          });
-          router.push(`/${locale}`);
-          return;
+        // Validate URL if provided
+        if (url) {
+          try {
+            new URL(url);
+          } catch {
+            // eslint-disable-next-line i18next/no-literal-string
+            errorLogger("Invalid tracking URL", { url });
+            router.push(`/${locale}`);
+            return;
+          }
         }
 
         // eslint-disable-next-line i18next/no-literal-string
         debugLogger("Processing tracking click", {
-          id: validatedParams.id,
-          campaignId: validatedParams.campaignId,
-          stage: validatedParams.stage,
-          source: validatedParams.source,
-          url: validatedParams.url,
+          id,
+          campaignId,
+          stage,
+          source,
+          url,
         });
 
         if (isMounted) {
-          // Store tracking data for signup form
-          await LeadTrackingClientRepository.captureTrackingData(
-            searchParams,
-            logger,
-          );
-
-          // Make a direct request to the consolidated engagement endpoint for click tracking
+          // Make tracking API call - server handles leadid via JWT
           const trackingUrl = generateEngagementTrackingApiUrl(
             window.location.origin,
             locale,
             {
-              id: validatedParams.id,
-              campaignId: validatedParams.campaignId,
-              stage: validatedParams.stage,
-              source: validatedParams.source,
-              url: validatedParams.url || `/${locale}`,
+              id,
+              campaignId: campaignId || undefined,
+              stage: stage || undefined,
+              source,
+              url: url || `/${locale}`,
             },
           );
 
@@ -100,14 +93,14 @@ export default function TrackPage(): React.ReactElement {
           // eslint-disable-next-line i18next/no-literal-string
           debugLogger("Tracking API response", {
             success: result.success,
-            leadId: validatedParams.id,
+            leadId: id,
           });
 
           // Redirect to destination URL regardless of tracking success
           const redirectUrl =
             result.success && result.data?.redirectUrl
               ? result.data.redirectUrl
-              : validatedParams.url || `/${locale}`;
+              : url || `/${locale}`;
 
           window.location.assign(redirectUrl);
         }

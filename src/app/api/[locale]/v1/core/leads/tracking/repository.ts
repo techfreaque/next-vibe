@@ -1022,21 +1022,24 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
     data: LeadEngagementRequestOutput,
     clientInfo: ClientInfo,
     locale: CountryLanguage,
-    user: { id?: string; isPublic: boolean; email?: string },
+    user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadEngagementResponseOutput>> {
     try {
+      // Get leadId from user prop (JWT payload) - always present
+      // Fallback to data.leadId for backward compatibility (tracking links)
+      let leadId = data.leadId || user.leadId;
+
       logger.debug(
         "app.api.v1.core.leads.tracking.engagement.relationship.handling",
         {
-          leadId: data.leadId,
+          leadId,
           engagementType: data.engagementType,
           userId: data.userId || user.id,
           isLoggedIn: !user.isPublic,
         },
       );
 
-      let leadId = data.leadId;
       let leadCreated = false;
       let relationshipEstablished = false;
 
@@ -1058,6 +1061,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       }
 
       // Create anonymous lead if leadId is missing or invalid
+      // This should rarely happen since leadAuthService ensures leadId in JWT
       if (!leadId) {
         const anonymousLeadResult =
           await LeadTrackingRepository.createAnonymousLead(

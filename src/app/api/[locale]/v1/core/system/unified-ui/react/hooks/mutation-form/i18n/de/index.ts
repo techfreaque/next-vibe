@@ -13,6 +13,18 @@ export const translations: typeof enTranslations = {
       description: "Antwortdaten",
     },
     errors: {
+      mutation_failed: {
+        title: "Mutation fehlgeschlagen",
+        description: "Die Mutation-Operation ist fehlgeschlagen",
+      },
+      validation_error: {
+        title: "Validierungsfehler",
+        description: "Formularvalidierung fehlgeschlagen",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unbekannter Fehler ist aufgetreten",
+      },
       unauthorized: {
         title: "Nicht autorisiert",
         description: "Authentifizierung erforderlich",
@@ -24,10 +36,6 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Serverfehler",
         description: "Interner Serverfehler",
-      },
-      unknown: {
-        title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist aufgetreten",
       },
       network: {
         title: "Netzwerkfehler",

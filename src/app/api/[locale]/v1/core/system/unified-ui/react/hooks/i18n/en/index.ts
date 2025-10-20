@@ -10,4 +10,24 @@ export const translations = {
   queryForm: queryFormTranslations,
   query: queryTranslations,
   store: storeTranslations,
+  apiUtils: {
+    errors: {
+      http_error: {
+        title: "HTTP Error",
+        description: "Failed to communicate with the server",
+      },
+      validation_error: {
+        title: "Validation Error",
+        description: "The server response could not be validated",
+      },
+      internal_error: {
+        title: "Internal Error",
+        description: "An unexpected error occurred",
+      },
+      auth_required: {
+        title: "Authentication Required",
+        description: "You must be logged in to perform this action",
+      },
+    },
+  },
 };

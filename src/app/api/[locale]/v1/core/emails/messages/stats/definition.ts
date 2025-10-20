@@ -4,6 +4,7 @@
  */
 
 import {
+  chartDataSchema,
   ChartType,
   DateRangePreset,
   TimePeriod,
@@ -571,7 +572,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.v1.core.emails.messages.stats.get.response.historicalData",
         },
-        z.any(),
+        chartDataSchema,
       ),
 
       // Grouped stats - complex nested structure

@@ -122,9 +122,11 @@ export const translations = allTranslations;
 export const defaultLocaleConfig = languageDefaults;
 export const defaultLocale: CountryLanguage = `${languageDefaults.language}-${languageDefaults.country}`;
 export const globalCountryInfo = languageConfig.countryInfo.GLOBAL;
-export const availableCountries: readonly CountryInfo[] = Object.values(
-  languageConfig.countryInfo,
-);
+export const availableCountries = [
+  languageConfig.countryInfo.DE,
+  languageConfig.countryInfo.PL,
+  languageConfig.countryInfo.GLOBAL,
+] as const;
 export const availableLanguages = Object.values(languageConfig.languages);
 
 export interface TranslationsConfig<TTranslationSchema> {

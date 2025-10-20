@@ -5,5 +5,9 @@ export const translations: typeof enTranslations = {
   tags: {
     validation: "Validation",
   },
-  // Add endpoint-specific translations here
+  errors: {
+    executionFailed: {
+      title: "TRPC-Validierung fehlgeschlagen",
+    },
+  },
 };

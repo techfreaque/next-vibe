@@ -131,12 +131,12 @@ export const translations = {
       price: "€0",
       description: "Perfect for trying out Unbottled.ai",
       cta: "Get Started",
-      features: [
-        "10 messages per day",
-        "Access to all 40+ AI models",
-        "Basic folder management",
-        "Community personas",
-      ],
+      features: {
+        messages: "10 messages per day",
+        models: "Access to all 40+ AI models",
+        folders: "Basic folder management",
+        personas: "Community personas",
+      },
     },
     PROFESSIONAL: {
       title: "Professional",
@@ -192,5 +192,22 @@ export const translations = {
     description: "Are you sure you want to downgrade your plan?",
     nextCycle:
       "Changes will take effect at the end of your current billing cycle",
+  },
+  subscriptionBanner: {
+    status: {
+      active: "Your subscription is active",
+      pastDue: "Payment past due",
+      canceled: "Subscription canceled",
+      pending: "Subscription pending",
+    },
+    actions: {
+      manage: "Manage Subscription",
+      updatePayment: "Update Payment",
+      resubscribe: "Resubscribe",
+      viewDetails: "View Details",
+    },
+    nextBillingDate: "Next billing date",
+    dateFormat: "{{date, datetime}}",
+    dismissButton: "Dismiss",
   },
 };

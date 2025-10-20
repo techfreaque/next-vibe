@@ -9,7 +9,6 @@ import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-
 import { useTranslation } from "@/i18n/core/client";
 
 import { useChatContext } from "../features/chat/context";
-import { useTheme } from "../hooks/use-theme";
 import type { ChatThread, ModelId } from "../types";
 import { ChatArea } from "./layout/chat-area";
 import { SidebarWrapper } from "./layout/sidebar-wrapper";
@@ -46,9 +45,24 @@ const buildNewThreadUrl = (
   locale: string,
   folderId: string | null | undefined,
 ): string => {
+  // If no folder specified, default to private
   if (!folderId) {
     return `/${locale}/threads/private/new`;
   }
+
+  // Check if folderId is a root folder ID
+  const isRootFolder =
+    folderId === "private" ||
+    folderId === "shared" ||
+    folderId === "public" ||
+    folderId === "incognito";
+
+  if (isRootFolder) {
+    // Root folder: /threads/rootId/new
+    return `/${locale}/threads/${folderId}/new`;
+  }
+
+  // Subfolder: use the folderId directly (subfolders are accessed via their UUID)
   return `/${locale}/threads/${folderId}/new`;
 };
 
@@ -77,9 +91,9 @@ export function ChatInterface({
     isLoading,
     input,
     setInput,
-    selectedTone,
+    selectedPersona,
     selectedModel,
-    setSelectedTone,
+    setSelectedPersona,
     setSelectedModel,
     sendMessage,
     editMessage,
@@ -96,21 +110,23 @@ export function ChatInterface({
     currentRootFolderId,
     currentSubFolderId,
     inputRef,
+    // UI settings (persisted)
+    ttsAutoplay,
+    sidebarCollapsed,
+    theme,
+    viewMode,
+    enableSearch,
+    setTTSAutoplay,
+    setSidebarCollapsed,
+    setTheme,
+    setViewMode,
+    setEnableSearch,
   } = chat;
 
   const { locale, currentCountry } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
-  const [theme, toggleTheme] = useTheme();
   const router = useRouter();
-
-  // UI state (not part of chat API)
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [viewMode, setViewMode] = useState<"linear" | "flat" | "threaded">(
-    "linear",
-  );
-  const [enableSearch, setEnableSearch] = useState(false);
-  const [ttsAutoplay, setTTSAutoplay] = useState(false);
 
   // Parse URL path to determine root folder, sub folder, and thread
   // URL structure: /threads/[rootId] OR /threads/[rootId]/[subFolderId] OR /threads/[rootId]/[subFolderId]/[threadId]
@@ -132,11 +148,15 @@ export function ChatInterface({
           };
         }
 
-        // Check if last segment is a thread by looking it up in threads
-        const isThread = Boolean(threads[lastSegment]);
+        // Check if last segment is a thread by checking UUID format
+        // UUIDs are 36 characters with dashes: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        const isUUID =
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+            lastSegment,
+          );
 
-        if (isThread) {
-          // Last segment is a thread
+        if (isUUID) {
+          // Last segment is a thread (UUID format)
           // URL is /rootId/threadId or /rootId/subfolderId/threadId
           const threadId = lastSegment;
           const subFolderId = urlPath.length >= 3 ? urlPath[1] : null;
@@ -148,7 +168,17 @@ export function ChatInterface({
         } else {
           // Last segment is a sub folder (or just root if length is 1)
           // URL is /rootId or /rootId/subfolderId
-          const subFolderId = urlPath.length >= 2 ? urlPath[1] : null;
+          // IMPORTANT: Check if urlPath[1] is a root folder ID - if so, it's NOT a subfolder
+          const secondSegment = urlPath.length >= 2 ? urlPath[1] : null;
+          const isSecondSegmentRootFolder =
+            secondSegment === "private" ||
+            secondSegment === "shared" ||
+            secondSegment === "public" ||
+            secondSegment === "incognito";
+
+          const subFolderId =
+            secondSegment && !isSecondSegmentRootFolder ? secondSegment : null;
+
           return {
             initialRootFolderId: rootId,
             initialSubFolderId: subFolderId,
@@ -179,7 +209,7 @@ export function ChatInterface({
         initialSubFolderId: null,
         initialThreadId: deprecatedThreadId,
       };
-    }, [urlPath, threads, deprecatedFolderId, deprecatedThreadId]);
+    }, [urlPath, deprecatedFolderId, deprecatedThreadId]);
 
   // Handle "new" thread case - don't set active thread, let user start fresh
   useEffect(() => {
@@ -189,7 +219,40 @@ export function ChatInterface({
       // Clear active thread for new chat
       setActiveThread(null);
     }
-  }, [initialThreadId, setActiveThread]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialThreadId]);
+
+  // Navigate to thread URL when a new thread is created (after sending first message)
+  const prevThreadCountRef = React.useRef(Object.keys(threads).length);
+  useEffect(() => {
+    const currentThreadCount = Object.keys(threads).length;
+    const prevThreadCount = prevThreadCountRef.current;
+
+    // If thread count increased and we're on "new" page, navigate to the new thread
+    if (
+      currentThreadCount > prevThreadCount &&
+      initialThreadId &&
+      isNewThread(initialThreadId)
+    ) {
+      // Find the newest thread (highest createdAt)
+      const newestThread = Object.values(threads).reduce(
+        (newest, thread) =>
+          !newest || thread.createdAt > newest.createdAt ? thread : newest,
+        null as ChatThread | null,
+      );
+
+      if (newestThread) {
+        logger.debug("Chat", "New thread created, navigating", {
+          threadId: newestThread.id,
+        });
+        const url = buildThreadUrl(locale, newestThread.id, threads);
+        router.push(url);
+        setActiveThread(newestThread.id);
+      }
+    }
+
+    prevThreadCountRef.current = currentThreadCount;
+  }, [threads, initialThreadId, locale, router, setActiveThread, logger]);
 
   // Handle thread selection with navigation
   const handleSelectThread = useCallback(
@@ -223,12 +286,13 @@ export function ChatInterface({
     const subId = initialSubFolderId || activeThread?.folderId || null;
 
     setCurrentFolder(rootId, subId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     initialRootFolderId,
     initialSubFolderId,
     activeThread?.rootFolderId,
     activeThread?.folderId,
-    setCurrentFolder,
+    // setCurrentFolder is stable, don't include to prevent infinite loops
   ]);
 
   const handleSubmit = useCallback(
@@ -288,12 +352,12 @@ export function ChatInterface({
         <TopBar
           theme={theme}
           currentCountry={currentCountry}
-          onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-          onToggleTheme={toggleTheme}
+          onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
+          onToggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
           onToggleTTSAutoplay={() => setTTSAutoplay(!ttsAutoplay)}
           ttsAutoplay={ttsAutoplay}
           onOpenSearch={() => setSearchModalOpen(true)}
-          sidebarCollapsed={!sidebarOpen}
+          sidebarCollapsed={sidebarCollapsed}
           onNewChat={() => handleCreateThread(null)}
           locale={locale}
           onNavigateToThreads={() => router.push(`/${locale}/threads/private`)}
@@ -307,10 +371,10 @@ export function ChatInterface({
           activeThreadId={activeThread?.id || null}
           activeRootFolderId={initialRootFolderId}
           activeSubFolderId={initialSubFolderId}
-          collapsed={!sidebarOpen}
+          collapsed={sidebarCollapsed}
           locale={locale}
           logger={logger}
-          onToggle={() => setSidebarOpen(!sidebarOpen)}
+          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
           onCreateThread={handleCreateThread}
           onSelectThread={handleSelectThread}
           onDeleteThread={deleteThread}
@@ -330,7 +394,7 @@ export function ChatInterface({
           thread={activeThread}
           messages={activeThreadMessages}
           selectedModel={selectedModel}
-          selectedTone={selectedTone}
+          selectedPersona={selectedPersona}
           enableSearch={enableSearch}
           ttsAutoplay={ttsAutoplay}
           input={input}
@@ -346,7 +410,7 @@ export function ChatInterface({
           onRetryMessage={retryMessage}
           onVoteMessage={voteMessage}
           onModelChange={setSelectedModel}
-          onToneChange={setSelectedTone}
+          onPersonaChange={setSelectedPersona}
           onEnableSearchChange={setEnableSearch}
           onSendMessage={handleFillInputWithPrompt}
           showBranchIndicators={true}

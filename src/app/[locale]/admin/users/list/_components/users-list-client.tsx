@@ -85,7 +85,7 @@ export function UsersListClient({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center space-x-2">
-            <span>{t("users.list.title")}</span>
+            <span>{t("app.admin.users.list.title")}</span>
             {queryLoading && (
               <RefreshCw className="h-4 w-4 animate-spin text-gray-500" />
             )}
@@ -115,7 +115,7 @@ export function UsersListClient({
             {/* Add User */}
             <Button asChild size="sm">
               <Link href={`/${locale}/admin/users/create`}>
-                {t("users.admin.actions.add")}
+                {t("app.admin.users.admin.actions.add")}
               </Link>
             </Button>
 
@@ -139,7 +139,7 @@ export function UsersListClient({
           <div className="flex items-center space-x-2 mb-4">
             <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              {t("users.list.filters.title")}:
+              {t("app.admin.users.list.filters.title")}:
             </span>
           </div>
 
@@ -155,7 +155,7 @@ export function UsersListClient({
                 config={{
                   type: "text",
                   label: undefined,
-                  placeholder: "users.search.placeholder",
+                  placeholder: "app.admin.users.search.placeholder",
                 }}
                 control={usersEndpoint.read.form.control}
                 theme={{
@@ -170,27 +170,27 @@ export function UsersListClient({
                 config={{
                   type: "select",
                   label: undefined,
-                  placeholder: "users.status.placeholder",
+                  placeholder: "app.admin.users.status.placeholder",
                   options: [
                     {
                       value: UserStatusFilter.ALL,
-                      label: "users.admin.status.all",
+                      label: "app.admin.users.admin.status.all",
                     },
                     {
                       value: UserStatusFilter.ACTIVE,
-                      label: "users.admin.status.active",
+                      label: "app.admin.users.admin.status.active",
                     },
                     {
                       value: UserStatusFilter.INACTIVE,
-                      label: "users.admin.status.inactive",
+                      label: "app.admin.users.admin.status.inactive",
                     },
                     {
                       value: UserStatusFilter.EMAIL_VERIFIED,
-                      label: "users.admin.status.email_verified",
+                      label: "app.admin.users.admin.status.email_verified",
                     },
                     {
                       value: UserStatusFilter.EMAIL_UNVERIFIED,
-                      label: "users.admin.status.email_unverified",
+                      label: "app.admin.users.admin.status.email_unverified",
                     },
                   ],
                 }}
@@ -207,31 +207,31 @@ export function UsersListClient({
                 config={{
                   type: "select",
                   label: undefined,
-                  placeholder: "users.role.placeholder",
+                  placeholder: "app.admin.users.role.placeholder",
                   options: [
                     {
                       value: UserRoleFilter.ALL,
-                      label: "users.admin.role.all",
+                      label: "app.admin.users.admin.role.all",
                     },
                     {
                       value: UserRoleFilter.PUBLIC,
-                      label: "users.admin.role.public",
+                      label: "app.admin.users.admin.role.public",
                     },
                     {
                       value: UserRoleFilter.CUSTOMER,
-                      label: "users.admin.role.customer",
+                      label: "app.admin.users.admin.role.customer",
                     },
                     {
                       value: UserRoleFilter.PARTNER_ADMIN,
-                      label: "users.admin.role.partner_admin",
+                      label: "app.admin.users.admin.role.partner_admin",
                     },
                     {
                       value: UserRoleFilter.PARTNER_EMPLOYEE,
-                      label: "users.admin.role.partner_employee",
+                      label: "app.admin.users.admin.role.partner_employee",
                     },
                     {
                       value: UserRoleFilter.ADMIN,
-                      label: "users.admin.role.admin",
+                      label: "app.admin.users.admin.role.admin",
                     },
                   ],
                 }}
@@ -248,27 +248,27 @@ export function UsersListClient({
                 config={{
                   type: "select",
                   label: undefined,
-                  placeholder: "users.sort.placeholder",
+                  placeholder: "app.admin.users.sort.placeholder",
                   options: [
                     {
                       value: UserSortField.CREATED_AT,
-                      label: "users.sort.created",
+                      label: "app.admin.users.sort.created",
                     },
                     {
                       value: UserSortField.UPDATED_AT,
-                      label: "users.sort.updated",
+                      label: "app.admin.users.sort.updated",
                     },
                     {
                       value: UserSortField.EMAIL,
-                      label: "users.sort.email",
+                      label: "app.admin.users.sort.email",
                     },
                     {
                       value: UserSortField.PRIVATE_NAME,
-                      label: "users.sort.privateName",
+                      label: "app.admin.users.sort.privateName",
                     },
                     {
                       value: UserSortField.PUBLIC_NAME,
-                      label: "users.sort.publicName",
+                      label: "app.admin.users.sort.publicName",
                     },
                   ],
                 }}
@@ -288,15 +288,15 @@ export function UsersListClient({
                   config={{
                     type: "select",
                     label: undefined,
-                    placeholder: "users.sort_order.placeholder",
+                    placeholder: "app.admin.users.sort_order.placeholder",
                     options: [
                       {
                         value: SortOrder.ASC,
-                        label: "users.sort_order.asc",
+                        label: "app.admin.users.sort_order.asc",
                       },
                       {
                         value: SortOrder.DESC,
-                        label: "users.sort_order.desc",
+                        label: "app.admin.users.sort_order.desc",
                       },
                     ],
                   }}
@@ -314,7 +314,7 @@ export function UsersListClient({
                 size="sm"
                 onClick={handleClearFilters}
               >
-                {t("users.list.filters.clear")}
+                {t("app.admin.users.list.filters.clear")}
               </Button>
             </div>
           </Form>
@@ -323,7 +323,7 @@ export function UsersListClient({
         {/* Results Summary */}
         <div className="mb-4 flex items-center justify-between">
           <div className="text-sm text-gray-700 dark:text-gray-300">
-            {t("users.list.results.showing", {
+            {t("app.admin.users.list.results.showing", {
               start:
                 totalUsers === 0 ? 0 : (currentPage - 1) * currentLimit + 1,
               end: Math.min(currentPage * currentLimit, totalUsers),
@@ -337,18 +337,18 @@ export function UsersListClient({
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <RefreshCw className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">{t("common.loading")}...</p>
+              <p className="text-gray-500">{t("app.admin.common.loading")}...</p>
             </div>
           </div>
         ) : users.length === 0 ? (
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <p className="text-gray-500 mb-4">
-                {t("users.list.empty.message")}
+                {t("app.admin.users.list.empty.message")}
               </p>
               <Button asChild>
                 <Link href={`/${locale}/admin/users/create`}>
-                  {t("users.admin.actions.add")}
+                  {t("app.admin.users.admin.actions.add")}
                 </Link>
               </Button>
             </div>

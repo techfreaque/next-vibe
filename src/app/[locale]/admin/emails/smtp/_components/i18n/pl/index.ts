@@ -239,7 +239,9 @@ export const translations: typeof enTranslations = {
       showFilters: "Pokaż filtry",
       hideFilters: "Ukryj filtry",
       back: "Powrót do kont SMTP",
+      cancel: "Anuluj",
       delete: "Usuń konto",
+      creating: "Tworzenie...",
     },
     pagination: {
       showing: "Pokazuje {{start}}-{{end}} z {{total}} kont",

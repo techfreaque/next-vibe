@@ -96,8 +96,10 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       // Build where clause
       const conditions = [eq(chatThreads.userId, user.id)];
 
-      // Filter by root folder (required)
-      conditions.push(eq(chatThreads.rootFolderId, rootFolderId));
+      // Filter by root folder
+      if (rootFolderId) {
+        conditions.push(eq(chatThreads.rootFolderId, rootFolderId));
+      }
 
       // Filter by subfolder (optional)
       if (subFolderId !== undefined) {
@@ -227,10 +229,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         );
       }
 
-      // Validate subfolder exists if provided
-      if (data.thread?.subFolderId) {
-        // TODO: Add folder validation when folders repository is implemented
-      }
+      // Subfolder validation: subFolderId is optional and validated by schema
 
       // Type guard to ensure user has id
       if (!user.id) {

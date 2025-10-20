@@ -11,7 +11,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint";
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
 
-import { useLeadId } from "../leads/tracking/engagement/hooks";
 import type { StandardUserType } from "../user/definition";
 import definitions from "./definition";
 import { ContactSubject } from "./enum";
@@ -43,7 +42,8 @@ export function useContactEndpoint(
 }
 
 /**
- * Hook for contact form with lead ID tracking
+ * Hook for contact form with user data pre-fill
+ * Server gets leadId from JWT payload (user.leadId)
  */
 export function useContactWithEngagement(
   logger: EndpointLogger,
@@ -51,13 +51,6 @@ export function useContactWithEngagement(
 ): EndpointReturn<typeof definitions> {
   // Get the base endpoint
   const formResult = useContactEndpoint(logger);
-
-  // Use lead ID hook with callback to set lead ID in form
-  useLeadId((leadId: string) => {
-    if (formResult.create?.form) {
-      formResult.create.form.setValue("leadId", leadId);
-    }
-  });
 
   // Set default values based on user data
   useEffect(() => {

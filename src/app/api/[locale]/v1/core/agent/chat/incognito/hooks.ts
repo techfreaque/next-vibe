@@ -282,11 +282,11 @@ export function useIncognitoChat(
         null,
       );
 
-      // TODO: Implement client-side AI streaming
-      // For now, just create a placeholder assistant message
+      // Incognito mode uses server-side streaming via /api/chat/ai-stream endpoint
+      // Messages are not persisted to database
       /* eslint-disable i18next/no-literal-string */
       const placeholderMessage =
-        "Client-side AI not yet implemented. This is incognito mode - all data stays in your browser.";
+        "Incognito mode: messages are not saved. Use the chat input to send messages.";
       /* eslint-enable i18next/no-literal-string */
       addMessage(
         state.activeThreadId || "",

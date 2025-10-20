@@ -190,6 +190,22 @@ export const translations: typeof enTranslations = {
       imageAlt: "Kariera w Unbottled.ai",
       keywords: "kariera, praca, praca AI, praca zdalna, kariera unbottled.ai",
     },
+    pricing: {
+      title: "Cennik - Unbottled.ai",
+      category: "Cennik",
+      description:
+        "Przystępne plany czatu AI dla wszystkich. Zacznij za darmo z 10 dziennymi wiadomościami.",
+      imageAlt: "Plany cenowe",
+      keywords:
+        "cennik, plany, subskrypcja, cennik czatu AI, cennik unbottled.ai",
+      ogTitle: "Plany cenowe - Unbottled.ai",
+      ogDescription: "Proste, przejrzyste ceny dla niecenzurowanego czatu AI",
+      twitterTitle: "Cennik - Unbottled.ai",
+      twitterDescription: "Zacznij za darmo z 10 dziennymi wiadomościami",
+    },
+    billing: {
+      category: "Rozliczenia",
+    },
     notFound: {
       title: "404 - Strona nie znaleziona",
       category: "Błąd",

@@ -95,6 +95,29 @@ export function SidebarWrapper({
     [onSelectThread, isMobile, collapsed, onToggle],
   );
 
+  // Wrap createFolder to match expected signature
+  const handleCreateFolder = React.useCallback(
+    (name: string, parentId: string): string => {
+      // Determine rootFolderId from parentId
+      const isRootFolder =
+        parentId === "private" ||
+        parentId === "shared" ||
+        parentId === "public" ||
+        parentId === "incognito";
+
+      const rootFolderId = isRootFolder
+        ? (parentId as DefaultFolderId)
+        : chat.folders[parentId]?.rootFolderId || "private";
+
+      const actualParentId = isRootFolder ? null : parentId;
+
+      // Call async function but return empty string immediately
+      void chat.createFolder(name, rootFolderId, actualParentId);
+      return "";
+    },
+    [chat],
+  );
+
   return (
     <>
       {/* Sidebar Container */}
@@ -120,9 +143,9 @@ export function SidebarWrapper({
             onSelectThread={handleSelectThread}
             onDeleteThread={onDeleteThread}
             onMoveThread={() => {}}
-            onCreateFolder={() => ""}
+            onCreateFolder={handleCreateFolder}
             onUpdateFolder={onUpdateFolder}
-            onDeleteFolder={() => {}}
+            onDeleteFolder={chat.deleteFolder}
             onToggleFolderExpanded={() => {}}
             onReorderFolder={() => {}}
             onMoveFolderToParent={() => {}}

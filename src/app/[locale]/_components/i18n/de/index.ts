@@ -193,6 +193,22 @@ export const translations: typeof enTranslations = {
       imageAlt: "Karriere bei Unbottled.ai",
       keywords: "karriere, jobs, KI-Jobs, remote-arbeit, unbottled.ai karriere",
     },
+    pricing: {
+      title: "Preise - Unbottled.ai",
+      category: "Preise",
+      description:
+        "Erschwingliche KI-Chat-Pläne für jeden. Starten Sie kostenlos mit 10 täglichen Nachrichten.",
+      imageAlt: "Preispläne",
+      keywords:
+        "preise, pläne, abonnement, KI-chat-preise, unbottled.ai preise",
+      ogTitle: "Preispläne - Unbottled.ai",
+      ogDescription: "Einfache, transparente Preise für unzensierten KI-Chat",
+      twitterTitle: "Preise - Unbottled.ai",
+      twitterDescription: "Kostenlos starten mit 10 täglichen Nachrichten",
+    },
+    billing: {
+      category: "Abrechnung",
+    },
     notFound: {
       title: "404 - Seite nicht gefunden",
       category: "Fehler",

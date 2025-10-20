@@ -7,8 +7,6 @@
 
 import { type ChangeEvent, useCallback, useMemo } from "react";
 
-import { LeadTrackingClientRepository } from "@/app/api/[locale]/v1/core/leads/tracking/client-repository";
-import { useLeadId } from "@/app/api/[locale]/v1/core/leads/tracking/engagement/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { EnhancedMutationResult } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation";
 import { useApiMutation } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation";
@@ -87,6 +85,7 @@ export function useNewsletterStatus(params: {
 
 /**
  * Hook for newsletter subscription with form validation
+ * Server gets leadId from JWT payload (user.leadId)
  */
 export function useNewsletterSubscription(): ApiFormReturn<
   SubscribePostRequestOutput,
@@ -104,13 +103,8 @@ export function useNewsletterSubscription(): ApiFormReturn<
       email: "",
       name: "",
       preferences: [],
-      inputLeadId: LeadTrackingClientRepository.LOADING_LEAD_ID, // Will be set by useEffect
+      // Note: leadId removed - server gets it from JWT
     },
-  });
-
-  // Use lead ID hook with callback to set lead ID in form
-  useLeadId((leadId: string) => {
-    formResult.form.setValue("inputLeadId", leadId);
   });
 
   return formResult;
@@ -221,9 +215,6 @@ export function useNewsletterManager(): NewsletterManagerResult {
   );
   // Fetch current user data to get email
   const { user, isLoggedIn } = useUser(logger);
-
-  // Get lead tracking functionality
-  const { leadId } = useLeadId();
 
   // Use typed custom state for newsletter-related state
   const [manualEmail, setManualEmail] = useCustomState(manualEmailKey, "");
@@ -375,38 +366,14 @@ export function useNewsletterManager(): NewsletterManagerResult {
         // Reset confirmation state
         setShowConfirmUnsubscribe(false);
 
-        // Get leadId from client tracking if available, server will create anonymous lead if needed
-        const handleSubscription = (): void => {
-          // Ensure we have valid leadId before proceeding
-          const finalLeadId = typeof leadId === "string" ? leadId : "";
-          if (!finalLeadId) {
-            logger.error(
-              "app.api.v1.core.newsletter.hooks.errors.missing_lead_id",
-            );
-            return;
-          }
-
-          try {
-            subscriptionMutation.mutate({
-              requestData: {
-                email: emailToUse,
-                inputLeadId: finalLeadId,
-              },
-              urlParams: undefined,
-            });
-          } catch {
-            // If tracking fails, let server handle lead creation
-            subscriptionMutation.mutate({
-              requestData: {
-                email: emailToUse,
-                inputLeadId: finalLeadId,
-              },
-              urlParams: undefined,
-            });
-          }
-        };
-
-        void handleSubscription();
+        // Server gets leadId from JWT payload (user.leadId)
+        subscriptionMutation.mutate({
+          requestData: {
+            email: emailToUse,
+            // Note: leadId removed - server gets it from JWT
+          },
+          urlParams: undefined,
+        });
       }
     },
     [
@@ -416,13 +383,11 @@ export function useNewsletterManager(): NewsletterManagerResult {
       unsubscribeMutation,
       subscriptionMutation,
       setShowConfirmUnsubscribe,
-      leadId,
-      logger,
     ],
   );
 
   const unsubscribe = useCallback(
-    (emailParam?: string, leadIdParam?: string): void => {
+    (emailParam?: string): void => {
       const emailToUse = emailParam || email;
       const isEmailValid = emailParam
         ? isValidEmail(emailParam)
@@ -440,13 +405,7 @@ export function useNewsletterManager(): NewsletterManagerResult {
         // Reset subscription mutation to clear any previous subscription success/error
         subscriptionMutation.reset();
 
-        // Lead ID is required - use from hook if not provided as param
-        const finalLeadId = leadIdParam || leadId;
-
-        if (!finalLeadId) {
-          return;
-        }
-
+        // Server gets leadId from JWT payload (user.leadId)
         const requestData = {
           email: emailToUse,
         };
@@ -465,7 +424,6 @@ export function useNewsletterManager(): NewsletterManagerResult {
       subscriptionMutation,
       unsubscribeMutation,
       setShowConfirmUnsubscribe,
-      leadId,
     ],
   );
 

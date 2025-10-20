@@ -61,42 +61,43 @@ export class ContactRepositoryImpl implements ContactRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ContactResponseOutput>> {
     try {
+      // Get leadId from user prop (JWT payload) - always present
+      const leadId = user.leadId;
+
       logger.debug("app.api.v1.core.contact.repository.create.start", {
         email: data.email,
         subject: data.subject,
         userId: user && !user.isPublic ? user.id : null,
-        leadId: data.leadId,
+        leadId,
       });
 
-      // Handle lead conversion if leadId provided
-      if (data.leadId) {
-        try {
-          logger.debug(
-            "app.api.v1.core.contact.repository.lead.conversion.start",
-            {
-              leadId: data.leadId,
-              email: data.email,
-              name: data.name,
-              company: data.company,
-            },
-          );
+      // Handle lead conversion using leadId from JWT
+      try {
+        logger.debug(
+          "app.api.v1.core.contact.repository.lead.conversion.start",
+          {
+            leadId,
+            email: data.email,
+            name: data.name,
+            company: data.company,
+          },
+        );
 
-          // Note: Lead conversion logic would go here if needed
-          // For now, we'll just log that we have a lead ID
-          logger.debug("app.api.v1.core.contact.repository.lead.provided", {
-            leadId: data.leadId,
-          });
-        } catch (error) {
-          // Log error but don't fail the contact form submission
-          logger.error(
-            "app.api.v1.core.contact.repository.lead.conversion.error",
-            {
-              error,
-              leadId: data.leadId,
-              email: data.email,
-            },
-          );
-        }
+        // Note: Lead conversion logic would go here if needed
+        // For now, we'll just log that we have a lead ID
+        logger.debug("app.api.v1.core.contact.repository.lead.provided", {
+          leadId,
+        });
+      } catch (error) {
+        // Log error but don't fail the contact form submission
+        logger.error(
+          "app.api.v1.core.contact.repository.lead.conversion.error",
+          {
+            error,
+            leadId,
+            email: data.email,
+          },
+        );
       }
 
       // Create contact record

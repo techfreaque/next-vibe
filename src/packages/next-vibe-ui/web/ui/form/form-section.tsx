@@ -5,7 +5,6 @@
 
 "use client";
 
-import { AlertCircle } from "lucide-react";
 import type { JSX, ReactNode } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
@@ -94,13 +93,6 @@ export function FormSection({
         </div>
         {description && (
           <p className="text-muted-foreground">{t(description)}</p>
-        )}
-        {(completionStatus?.missingRequiredFields?.length ?? 0) > 0 && (
-          <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
-            <AlertCircle className="h-4 w-4" />
-            {t("businessInfo.form.requiredFields")}:{" "}
-            {completionStatus?.missingRequiredFields?.join(", ")}
-          </div>
         )}
       </div>
       {children}

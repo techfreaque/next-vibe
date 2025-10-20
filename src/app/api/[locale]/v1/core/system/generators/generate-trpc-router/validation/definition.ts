@@ -258,10 +258,43 @@ const { POST } = createEndpoint({
 /**
  * Export types for repository to use
  */
-export type TRPCValidationRequestInput = typeof POST.types.RequestInput;
-export type TRPCValidationRequestOutput = typeof POST.types.RequestOutput;
-export type TRPCValidationResponseInput = typeof POST.types.ResponseInput;
-export type TRPCValidationResponseOutput = typeof POST.types.ResponseOutput;
+export type TRPCValidationRequestInput = {
+  operation: string[];
+  filePath?: string;
+  options?: {
+    apiDir?: string;
+    fix?: boolean;
+    verbose?: boolean;
+    generateReport?: boolean;
+  };
+};
+
+export type TRPCValidationRequestOutput = TRPCValidationRequestInput;
+
+export type TRPCValidationResponseInput = {
+  success: boolean;
+  operation: string;
+  result: {
+    success: boolean;
+    errors: string[];
+    warnings: string[];
+    routeFiles?: Array<{
+      filePath: string;
+      hasDefinition: boolean;
+      hasEnhancedHandler: boolean;
+      hasTRPCExport: boolean;
+      hasNextExport: boolean;
+      errors: string[];
+      warnings: string[];
+    }>;
+    report?: string;
+    totalFiles?: number;
+    validFiles?: number;
+    filesWithIssues?: number;
+  };
+};
+
+export type TRPCValidationResponseOutput = TRPCValidationResponseInput;
 
 const endpoints = { POST };
 export default endpoints;

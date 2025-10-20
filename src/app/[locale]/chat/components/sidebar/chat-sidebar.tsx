@@ -137,7 +137,9 @@ export function ChatSidebar({
 
   const handleSelectFolder = (folderId: string): void => {
     const rootFolderId = getRootFolderId(chat.folders, folderId);
-    const url = buildFolderUrl(locale, rootFolderId, folderId);
+    // If folderId IS the root folder, don't pass it as subfolder
+    const subFolderId = folderId === rootFolderId ? null : folderId;
+    const url = buildFolderUrl(locale, rootFolderId, subFolderId);
     router.push(url);
   };
 
@@ -189,11 +191,7 @@ export function ChatSidebar({
                 variant="ghost"
                 size="icon"
                 className="h-11 w-11 hover:bg-accent"
-                onClick={() => {
-                  if (activeFolderId) {
-                    setNewFolderDialogOpen(true);
-                  }
-                }}
+                onClick={() => setNewFolderDialogOpen(true)}
                 title={t(getNewFolderTranslationKey(activeRootFolderId))}
               >
                 <FolderPlus className="h-5 w-5" />

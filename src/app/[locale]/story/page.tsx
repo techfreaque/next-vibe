@@ -9,14 +9,9 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
-import CallToAction from "./_components/call-to-action";
-import Features from "./_components/features";
 import Hero from "./_components/hero";
-import Process from "./_components/process";
-import Stats from "./_components/stats";
 import PricingComparison from "./pricing/_components/pricing-comparison-table";
 import PricingSection from "./pricing/_components/pricing-section";
-import Testimonials from "./testimonials/_components/testimonials";
 
 interface HomePageProps {
   params: Promise<{ locale: CountryLanguage }>;
@@ -74,7 +69,7 @@ export default async function HomePage({
   const userResponse = await userRepository.getUserByAuth(
     {
       roles: [UserRole.CUSTOMER],
-      detailLevel: UserDetailLevel.STANDARD,
+      detailLevel: UserDetailLevel.COMPLETE,
     },
     logger,
   );

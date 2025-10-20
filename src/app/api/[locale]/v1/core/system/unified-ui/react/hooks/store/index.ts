@@ -671,75 +671,65 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
     // Create the fetch promise
     const fetchPromise = (async (): Promise<TEndpoint["TResponseOutput"]> => {
-      // For endpoints with no request body, ensure requestData is undefined
-      // The schema will be z.undefined() for these endpoints
-      let validatedRequestData = requestData;
-
-      // Check if the schema expects undefined (no request fields)
-      const hasNoRequestFields =
-        !endpoint.requestSchema ||
-        endpoint.requestSchema instanceof z.ZodUndefined;
-
-      if (hasNoRequestFields) {
-        // For endpoints with no request body, always use undefined
-        validatedRequestData = undefined as TRequestOutput;
-      }
-
       // Validate request data using the endpoint's schema
-      const requestValidation =
-        endpoint.requestSchema.safeParse(validatedRequestData);
+      // Skip validation for z.never() schemas (GET endpoints with no request data)
+      const isNeverSchema = endpoint.requestSchema instanceof z.ZodNever;
 
-      if (!requestValidation.success) {
-        logger.error("executeQuery: request validation failed", {
-          endpointPath: endpoint.path,
-          error: requestValidation.error.message,
-        });
-        await removeStorageItem(queryId);
+      if (!isNeverSchema) {
+        const requestValidation = endpoint.requestSchema.safeParse(requestData);
 
-        // Create a proper error response
-        const errorResponse = createErrorResponse(
-          "error.api.store.errors.validation_failed",
-          ErrorResponseTypes.VALIDATION_ERROR,
-          { endpoint: endpoint.path.join("/") },
-        );
-
-        // Update state with error
-        set((state) => ({
-          queries: {
-            ...state.queries,
-            [queryId]: {
-              ...((state.queries[queryId] as
-                | QueryStoreType<AnyData>
-                | undefined) ?? {}),
-              response: errorResponse,
-              data: (
-                state.queries[queryId] as QueryStoreType<AnyData> | undefined
-              )?.data,
-              error: errorResponse,
-              isLoading: false,
-              isFetching: false,
-              isError: true,
-              isSuccess: false,
-              isLoadingFresh: false,
-              isCachedData: state.queries[queryId]?.isCachedData ?? false,
-              statusMessage:
-                "error.api.store.errors.validation_failed" as const,
-              lastFetchTime: Date.now(),
-            },
-          },
-        }));
-
-        // Call onError callback if provided
-        if (options.onError) {
-          options.onError({
-            error: errorResponse,
-            requestData,
-            urlParams: pathParams,
+        if (!requestValidation.success) {
+          logger.error("executeQuery: request validation failed", {
+            endpointPath: endpoint.path,
+            error: requestValidation.error.message,
           });
-        }
+          await removeStorageItem(queryId);
 
-        // Return undefined since we can't throw - the error is already handled in state
-        return undefined as TEndpoint["TResponseOutput"];
+          // Create a proper error response
+          const errorResponse = createErrorResponse(
+            "error.api.store.errors.validation_failed",
+            ErrorResponseTypes.VALIDATION_ERROR,
+            { endpoint: endpoint.path.join("/") },
+          );
+
+          // Update state with error
+          set((state) => ({
+            queries: {
+              ...state.queries,
+              [queryId]: {
+                ...((state.queries[queryId] as
+                  | QueryStoreType<AnyData>
+                  | undefined) ?? {}),
+                response: errorResponse,
+                data: (
+                  state.queries[queryId] as QueryStoreType<AnyData> | undefined
+                )?.data,
+                error: errorResponse,
+                isLoading: false,
+                isFetching: false,
+                isError: true,
+                isSuccess: false,
+                isLoadingFresh: false,
+                isCachedData: state.queries[queryId]?.isCachedData ?? false,
+                statusMessage:
+                  "error.api.store.errors.validation_failed" as const,
+                lastFetchTime: Date.now(),
+              },
+            },
+          }));
+
+          // Call onError callback if provided
+          if (options.onError) {
+            options.onError({
+              error: errorResponse,
+              requestData,
+              urlParams: pathParams,
+            });
+          }
+
+          // Return undefined since we can't throw - the error is already handled in state
+          return undefined as TEndpoint["TResponseOutput"];
+        }
       }
 
       try {

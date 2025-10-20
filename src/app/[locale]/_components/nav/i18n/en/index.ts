@@ -21,6 +21,7 @@ export const translations = {
   },
   home: "Home",
   pricing: "Pricing",
+  contact: "Contact",
   services: {
     title: "Services",
     features: {

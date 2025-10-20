@@ -1,4 +1,6 @@
+// @ts-expect-error - Node.js built-in modules for CLI tool
 import { execSync } from "child_process";
+// @ts-expect-error - Node.js built-in modules for CLI tool
 import { join } from "path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
@@ -57,6 +59,8 @@ const CLI_MESSAGES = {
  */
 // Helper to get environment variable safely
 function getEnvVar(key: string): string | undefined {
+  // @ts-expect-error - Node.js process for CLI tool
+  // eslint-disable-next-line node/no-process-env
   return process.env[key];
 }
 
@@ -70,6 +74,7 @@ export async function ciRelease(
 
   let overallError = false;
   const affectedPackages: string[] = [];
+  // @ts-expect-error - Node.js process for CLI tool
   const originalCwd = process.cwd();
 
   for (const pkg of config.packages) {
@@ -100,6 +105,7 @@ export async function ciRelease(
     }
 
     try {
+      // @ts-expect-error - Node.js process for CLI tool
       process.chdir(originalCwd);
     } catch {
       // ignore
@@ -109,6 +115,7 @@ export async function ciRelease(
   if (overallError) {
     const packagesStr = affectedPackages.join(", ");
     logger.error(CLI_MESSAGES.ciErrorsSummary, packagesStr);
+    // @ts-expect-error - Node.js process for CLI tool
     process.exit(1);
   }
 }
@@ -159,6 +166,7 @@ function runCiReleaseCommand(
   if (!releaseConfig.ciReleaseCommand) {
     const errorMsg = CLI_MESSAGES.ciReleaseRequired(packageName);
     logger.error(errorMsg);
+    // eslint-disable-next-line no-restricted-syntax
     throw new Error(errorMsg);
   }
 
@@ -171,6 +179,8 @@ function runCiReleaseCommand(
   const ciEnv: Record<string, string> = {};
 
   // Copy all environment variables
+  // @ts-expect-error - Node.js process for CLI tool
+  // eslint-disable-next-line node/no-process-env
   for (const key in process.env) {
     const value = getEnvVar(key);
     if (value !== undefined) {
@@ -183,12 +193,14 @@ function runCiReleaseCommand(
       if (typeof value !== "string") {
         const errorMsg = CLI_MESSAGES.envVarNotString(packageName);
         logger.error(errorMsg);
+        // eslint-disable-next-line no-restricted-syntax
         throw new Error(errorMsg);
       }
       const envValue = getEnvVar(value);
       if (!envValue) {
         const errorMsg = CLI_MESSAGES.envVarNotSet(value, packageName);
         logger.error(errorMsg);
+        // eslint-disable-next-line no-restricted-syntax
         throw new Error(errorMsg);
       }
       ciEnv[key] = envValue;
@@ -205,6 +217,7 @@ function runCiReleaseCommand(
     const msg = error instanceof Error ? error.message : String(error);
     const errorMsg = CLI_MESSAGES.ciCommandFailed(packageName, msg);
     logger.error(errorMsg);
+    // eslint-disable-next-line no-restricted-syntax
     throw new Error(errorMsg);
   }
 }

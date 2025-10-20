@@ -20,6 +20,7 @@ export function endpointsHandler<T>(
 
   // Extract available methods from definitions
   const availableMethods = Object.keys(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     definitions as Record<
       string,
       CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>

@@ -39,7 +39,7 @@ interface EmailStatsFiltersContainerProps {
 }
 
 interface EmailStatsFiltersProps {
-  control: Control<Partial<EmailStatsGetRequestTypeOutput>>;
+  control: Control<EmailStatsGetRequestTypeOutput>;
 }
 
 /**

@@ -25,7 +25,7 @@ export function validateEnv<TSchema extends z.ZodType>(
       }`,
     );
   }
-  return validationResult.data as TSchema;
+  return validationResult.data as z.infer<TSchema>;
 }
 
 export enum Environment {

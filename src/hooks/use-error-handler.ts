@@ -1,7 +1,9 @@
 "use client";
 
-import { errorLogger } from "next-vibe/shared/utils";
 import { useEffect } from "react";
+
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { defaultLocale } from "@/i18n/core/config";
 
 type ErrorWithDigest = Error & { digest?: string };
 
@@ -23,7 +25,8 @@ export default function useErrorHandler(
   const { onError } = options;
 
   useEffect(() => {
-    errorLogger("Application error:", error);
+    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+    logger.error("errors.application.generic", error);
     // Call custom error handler if provided
     if (onError) {
       onError(error);

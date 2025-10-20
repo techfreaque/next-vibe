@@ -6,10 +6,7 @@
 import "server-only";
 
 import { and, asc, count, desc, eq, gte, ilike, lte, or } from "drizzle-orm";
-import type {
-  ErrorResponseType,
-  ResponseType,
-} from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -43,20 +40,13 @@ interface ImapMessageResponseType {
   recipientEmail: string;
   isRead: boolean;
   isFlagged: boolean;
+  hasAttachments: boolean;
   messageSize: number | null;
   sentAt: string | null;
   accountId: string;
   folderId: string | null;
   createdAt: string;
   updatedAt: string;
-}
-
-interface ImapMessageListResponseType {
-  messages: ImapMessageResponseType[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
 }
 
 interface ImapMessageQueryType {
@@ -76,23 +66,6 @@ interface ImapMessageSyncType {
   accountId: string;
   folderId?: string;
   force?: boolean;
-}
-
-/**
- * Sync Results Interface
- */
-interface SyncResults {
-  accountsProcessed: number;
-  foldersProcessed: number;
-  messagesProcessed: number;
-  foldersAdded: number;
-  foldersUpdated: number;
-  foldersDeleted: number;
-  messagesAdded: number;
-  messagesUpdated: number;
-  messagesDeleted: number;
-  duration: number;
-  errors: ErrorResponseType[];
 }
 
 export interface ImapMessagesRepository {
@@ -156,6 +129,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
       recipientEmail: message.recipientEmail,
       isRead: message.isRead || false,
       isFlagged: message.isFlagged || false,
+      hasAttachments: message.hasAttachments || false,
       messageSize: message.messageSize || null,
       sentAt: message.sentAt?.toISOString() || null,
       accountId: message.imapAccountId || "",
@@ -538,26 +512,27 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         );
 
         if (syncResult.success) {
-          const syncResults: SyncResults = {
-            accountsProcessed: 1,
-            foldersProcessed:
-              syncResult.data.result?.results?.foldersProcessed ?? 0,
-            messagesProcessed:
-              syncResult.data.result?.results?.messagesProcessed ?? 0,
-            foldersAdded: syncResult.data.result?.results?.foldersAdded ?? 0,
-            foldersUpdated:
-              syncResult.data.result?.results?.foldersUpdated ?? 0,
-            foldersDeleted:
-              syncResult.data.result?.results?.foldersDeleted ?? 0,
-            messagesAdded: syncResult.data.result?.results?.messagesAdded ?? 0,
-            messagesUpdated:
-              syncResult.data.result?.results?.messagesUpdated ?? 0,
-            messagesDeleted:
-              syncResult.data.result?.results?.messagesDeleted ?? 0,
-            duration: syncResult.data.result?.results?.duration ?? 0,
-            errors: syncResult.data.result?.results?.errors ?? [],
-          };
-          return createSuccessResponse(syncResults);
+          const rawErrors = syncResult.data.result?.results?.errors ?? [];
+          return createSuccessResponse({
+            success: true,
+            message:
+              "app.api.v1.core.emails.imapClient.messages.sync.response.success.message",
+            results: {
+              messagesProcessed:
+                syncResult.data.result?.results?.messagesProcessed ?? 0,
+              messagesAdded:
+                syncResult.data.result?.results?.messagesAdded ?? 0,
+              messagesUpdated:
+                syncResult.data.result?.results?.messagesUpdated ?? 0,
+              messagesDeleted:
+                syncResult.data.result?.results?.messagesDeleted ?? 0,
+              duration: syncResult.data.result?.results?.duration ?? 0,
+            },
+            errors: rawErrors.map((err) => ({
+              code: err.errorType?.errorKey ?? "UNKNOWN_ERROR",
+              message: err.message,
+            })),
+          });
         } else {
           return createErrorResponse(
             "app.api.v1.core.emails.imapClient.imapErrors.sync.message.failed",
@@ -577,9 +552,11 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         );
 
         if (syncResult.success) {
+          const rawErrors = syncResult.data.result?.results?.errors ?? [];
           return createSuccessResponse({
             success: true,
-            message: "Messages synchronized successfully",
+            message:
+              "app.api.v1.core.emails.imapClient.messages.sync.response.success.message",
             results: {
               messagesProcessed:
                 syncResult.data.result?.results?.messagesProcessed ?? 0,
@@ -591,7 +568,10 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
                 syncResult.data.result?.results?.messagesDeleted ?? 0,
               duration: syncResult.data.result?.results?.duration ?? 0,
             },
-            errors: syncResult.data.result?.results?.errors ?? [],
+            errors: rawErrors.map((err) => ({
+              code: err.errorType?.errorKey ?? "UNKNOWN_ERROR",
+              message: err.message,
+            })),
           });
         } else {
           return createErrorResponse(

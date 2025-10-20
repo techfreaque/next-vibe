@@ -233,7 +233,9 @@ export const translations = {
       showFilters: "Show Filters",
       hideFilters: "Hide Filters",
       back: "Back to SMTP Accounts",
+      cancel: "Cancel",
       delete: "Delete Account",
+      creating: "Creating...",
     },
     pagination: {
       showing: "Showing {{start}}-{{end}} of {{total}} accounts",

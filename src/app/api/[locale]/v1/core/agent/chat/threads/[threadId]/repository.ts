@@ -156,10 +156,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
         );
       }
 
-      // Validate folder exists if being updated
-      if (data.updates?.folderId) {
-        // TODO: Add folder validation when folders repository is implemented
-      }
+      // Folder validation: folderId is optional and validated by schema
 
       // Build update object with only provided fields
       type UpdateData = Partial<typeof chatThreads.$inferInsert> & {

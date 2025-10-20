@@ -193,21 +193,45 @@ export const translations = {
           title: "Sign Up Free",
           description:
             "Create your account in seconds. No credit card required. Start with 10 free messages per day.",
+          tags: {
+            audienceAnalysis: "Quick Setup",
+            competitorResearch: "No Credit Card",
+          },
+          insights: {
+            title: "Free Forever",
+            description: "10 messages daily, access to all models",
+          },
         },
         contentCreation: {
           title: "Choose Your AI Model",
           description:
             "Select from 40+ uncensored AI models including GPT-4, Claude, Gemini, and more.",
+          tags: {
+            brandAlignedContent: "40+ Models",
+            engagingVisuals: "No Censorship",
+          },
+          insights: {
+            title: "Unrestricted Access",
+            description: "Honest AI responses without filters",
+          },
         },
         publishingManagement: {
           title: "Start Chatting",
           description:
             "Have honest, unrestricted conversations. Create personas, organize in folders, or go incognito.",
+          tags: {
+            optimalTiming: "Custom Personas",
+            communityBuilding: "Folder Management",
+          },
         },
         analysisOptimization: {
           title: "Upgrade When Ready",
           description:
             "Get unlimited access for €10/month or buy credit packs for €5. Pay with card or crypto.",
+          tags: {
+            performanceMetrics: "Unlimited Plan",
+            strategyRefinement: "Credit Packs",
+          },
         },
       },
     },
@@ -279,6 +303,7 @@ export const translations = {
       workplaceDescription:
         "We're a remote-first company that values autonomy, creativity, and impact. Join a team that's changing how people interact with AI.",
       benefits: {
+        title: "What We Offer",
         growthTitle: "Growth & Learning",
         growthDesc:
           "Work with cutting-edge AI technology and learn from industry experts.",
@@ -288,6 +313,15 @@ export const translations = {
         balanceTitle: "Work-Life Balance",
         balanceDesc:
           "Flexible hours, remote work, and unlimited PTO. We trust you to do great work.",
+        compensationTitle: "Competitive Compensation",
+        compensationDesc:
+          "Industry-leading salary, equity, and benefits package.",
+        innovationTitle: "Innovation & Impact",
+        innovationDesc:
+          "Work on cutting-edge AI technology that makes a real difference.",
+        teamTitle: "Great Team",
+        teamDesc:
+          "Work with talented, passionate people who care about AI ethics.",
       },
       openPositions: "Open Positions",
       noOpenings: "No open positions at the moment",
@@ -316,6 +350,19 @@ export const translations = {
             item4: "Excellent problem-solving abilities",
             item5: "Passion for AI and user privacy",
           },
+          qualifications: {
+            required: {
+              item1: "3+ years of experience with AI/ML technologies",
+              item2: "Strong programming skills in Python and TypeScript",
+              item3: "Experience with LLM APIs and integration",
+            },
+            preferred: {
+              item1: "Excellent problem-solving abilities",
+              item2: "Passion for AI and user privacy",
+              item3: "Experience with distributed systems",
+            },
+          },
+          experienceLevel: "Mid to Senior Level",
         },
         contentCreator: {
           title: "Community Manager",
@@ -340,7 +387,39 @@ export const translations = {
             item4: "Experience with social media platforms",
             item5: "Ability to work independently",
           },
+          qualifications: {
+            required: {
+              item1: "2+ years of community management experience",
+              item2: "Excellent communication and writing skills",
+              item3: "Passion for AI and technology",
+            },
+            preferred: {
+              item1: "Experience with social media platforms",
+              item2: "Ability to work independently",
+              item3: "Background in AI or technology",
+            },
+          },
+          experienceLevel: "Mid Level",
+          postedDate: "January 15, 2025",
+          applicationDeadline: "February 15, 2025",
         },
+      },
+      jobDetail: {
+        jobOverview: "Job Overview",
+        responsibilities: "Responsibilities",
+        requirements: "Requirements",
+        qualifications: "Qualifications",
+        qualificationsRequired: "Required Qualifications",
+        qualificationsPreferred: "Preferred Qualifications",
+        applyNow: "Apply Now",
+        location: "Location",
+        department: "Department",
+        employmentType: "Employment Type",
+        experienceLevel: "Experience Level",
+        postedDate: "Posted Date",
+        applicationDeadline: "Application Deadline",
+        relatedPositions: "Related Positions",
+        moreDetails: "More Details",
       },
       applyNow: "Apply Now",
       readyToJoin: "Ready to Join?",
@@ -353,6 +432,9 @@ export const translations = {
       description:
         "We're on a mission to democratize access to uncensored AI. Founded in 2024, Unbottled.ai provides a platform where users can have honest, unfiltered conversations with the world's most advanced AI models.",
       values: {
+        title: "Our Values",
+        description:
+          "The principles that guide everything we do at Unbottled.ai",
         excellence: {
           title: "Excellence",
           description:
@@ -394,6 +476,11 @@ export const translations = {
           description:
             "We're committed to maintaining a platform that respects user privacy, provides transparent pricing, and delivers exceptional AI experiences.",
         },
+      },
+      contact: {
+        title: "Get in Touch",
+        description: "Have questions or feedback? We'd love to hear from you.",
+        cta: "Contact Us",
       },
     },
     imprint: {
@@ -477,8 +564,14 @@ export const translations = {
             phone: "Phone number (optional)",
             company: "Company name (optional)",
             billing: "Billing and payment information",
+            payment: "Payment method and transaction details",
             usage: "Usage data and chat history (encrypted)",
           },
+        },
+        socialMediaData: {
+          title: "Social Media Data",
+          description:
+            "If you connect social media accounts, we may collect profile information and related data as permitted by those platforms.",
         },
         howWeUse: {
           title: "How We Use Your Information",
@@ -545,6 +638,22 @@ export const translations = {
           description:
             "We may create anonymized, aggregated data from your usage to improve our services.",
         },
+        useOfInformation: {
+          title: "Use of Your Information",
+          description:
+            "We use the information we collect for various purposes, including:",
+          items: {
+            provide: "To provide and maintain our AI chat services",
+            process: "To process your transactions and manage your account",
+            send: "To send you updates, newsletters, and marketing communications",
+            respond:
+              "To respond to your inquiries and provide customer support",
+            monitor:
+              "To monitor and analyze usage patterns to improve our platform",
+            personalize:
+              "To personalize your experience and deliver relevant content",
+          },
+        },
         disclosure: {
           title: "Information Disclosure",
           description:
@@ -574,6 +683,34 @@ export const translations = {
           title: "Changes to This Policy",
           description:
             "We may update this Privacy Policy from time to time. We will notify you of any significant changes.",
+        },
+        legal: {
+          title: "Legal Basis for Processing",
+          description:
+            "We process your personal data based on your consent, contractual necessity, legal obligations, and our legitimate interests in providing and improving our services.",
+        },
+        security: {
+          title: "Security Measures",
+          description:
+            "We implement appropriate technical and organizational security measures to protect your personal data from unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure.",
+        },
+        rights: {
+          title: "Your Data Protection Rights",
+          description:
+            "Under data protection laws, you have certain rights regarding your personal information:",
+          items: {
+            access: "Right to access your personal data",
+            correction: "Right to correct inaccurate or incomplete data",
+            deletion:
+              "Right to request deletion of your data (right to be forgotten)",
+            objection: "Right to object to processing of your data",
+            portability: "Right to data portability and transfer",
+          },
+        },
+        thirdPartySites: {
+          title: "Third-Party Websites",
+          description:
+            "Our service may contain links to third-party websites. We are not responsible for the privacy practices of these external sites. We encourage you to review their privacy policies.",
         },
         contact: {
           title: "Contact Us",

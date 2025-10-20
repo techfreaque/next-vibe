@@ -55,7 +55,7 @@ export function CronStatsFiltersContainer({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-lg font-semibold">
-            {title || t("app.common.filter")}
+            {title || t("app.admin.common.filter")}
           </CardTitle>
           {onRefresh && (
             <Button
@@ -65,7 +65,7 @@ export function CronStatsFiltersContainer({
               className="flex items-center gap-2"
             >
               <RefreshCw className="h-4 w-4" />
-              {t("app.common.refresh")}
+              {t("app.admin.common.refresh")}
             </Button>
           )}
         </CardHeader>

@@ -11,6 +11,18 @@ export const translations = {
       description: "Mutation Form response data",
     },
     errors: {
+      mutation_failed: {
+        title: "Mutation Failed",
+        description: "The mutation operation failed",
+      },
+      validation_error: {
+        title: "Validation Error",
+        description: "Form validation failed",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unknown error occurred",
+      },
       unauthorized: {
         title: "Unauthorized",
         description: "Authentication required",
@@ -22,10 +34,6 @@ export const translations = {
       server: {
         title: "Server Error",
         description: "Internal server error occurred",
-      },
-      unknown: {
-        title: "Unknown Error",
-        description: "An unknown error occurred",
       },
       network: {
         title: "Network Error",

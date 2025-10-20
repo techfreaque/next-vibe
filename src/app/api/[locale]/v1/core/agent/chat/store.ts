@@ -82,6 +82,9 @@ export interface ChatSettings {
   maxTokens: number;
   ttsAutoplay: boolean;
   sidebarCollapsed: boolean;
+  theme: "light" | "dark";
+  viewMode: "linear" | "flat" | "threaded";
+  enableSearch: boolean;
 }
 
 /**
@@ -115,6 +118,7 @@ interface ChatState {
   getThreadMessages: (threadId: string) => ChatMessage[];
 
   // Settings actions
+  hydrateSettings: () => void;
   updateSettings: (updates: Partial<ChatSettings>) => void;
 
   // Folder actions
@@ -135,36 +139,39 @@ interface ChatState {
   reset: () => void;
 }
 
-// Helper to load settings from localStorage
+// Default settings (used for both server and initial client render)
+const getDefaultSettings = (): ChatSettings => ({
+  selectedModel: ModelId.GPT_5_MINI,
+  selectedPersona: "default",
+  temperature: 0.7,
+  maxTokens: 2000,
+  ttsAutoplay: false,
+  sidebarCollapsed: false,
+  theme: "dark",
+  viewMode: "linear",
+  enableSearch: false,
+});
+
+// Helper to load settings from localStorage (client-only, called after mount)
 const loadSettings = (): ChatSettings => {
+  const defaults = getDefaultSettings();
+
   if (typeof window === "undefined") {
-    return {
-      selectedModel: ModelId.GPT_5_MINI,
-      selectedPersona: "default",
-      temperature: 0.7,
-      maxTokens: 2000,
-      ttsAutoplay: false,
-      sidebarCollapsed: false,
-    };
+    return defaults;
   }
 
   try {
     const stored = localStorage.getItem("chat-settings");
     if (stored) {
-      return JSON.parse(stored) as ChatSettings;
+      const parsed = JSON.parse(stored) as Partial<ChatSettings>;
+      // Merge with defaults to handle missing fields from old versions
+      return { ...defaults, ...parsed };
     }
   } catch {
     // Silently fail and return defaults
   }
 
-  return {
-    selectedModel: ModelId.GPT_5_MINI,
-    selectedPersona: "default",
-    temperature: 0.7,
-    maxTokens: 2000,
-    ttsAutoplay: false,
-    sidebarCollapsed: false,
-  };
+  return defaults;
 };
 
 // Helper to save settings to localStorage
@@ -193,8 +200,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
   currentSubFolderId: null,
   isLoading: false,
 
-  // Load settings from localStorage
-  settings: loadSettings(),
+  // Use default settings for SSR - will be hydrated from localStorage after mount
+  settings: getDefaultSettings(),
 
   // Thread actions
   addThread: (thread: ChatThread): void =>
@@ -322,6 +329,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }),
 
   // Settings actions
+  hydrateSettings: (): void => {
+    const settings = loadSettings();
+    set({ settings });
+  },
+
   updateSettings: (updates: Partial<ChatSettings>): void =>
     set((state) => {
       const newSettings = {

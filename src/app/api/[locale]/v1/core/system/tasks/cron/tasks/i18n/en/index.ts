@@ -3,6 +3,12 @@ export const translations = {
   tags: {
     tasks: "Tasks",
   },
+  list: {
+    columns: {
+      createdAt: "Created At",
+      updatedAt: "Updated At",
+    },
+  },
   get: {
     title: "List Cron Tasks",
     description: "Retrieve a list of cron tasks with optional filtering",

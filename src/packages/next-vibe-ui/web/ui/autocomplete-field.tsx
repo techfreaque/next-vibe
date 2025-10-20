@@ -32,7 +32,7 @@ export enum FormFieldCategory {
 export interface AutocompleteOption {
   value: string;
   label: TranslationKey;
-  category?: FormFieldCategory;
+  category?: string;
 }
 
 export interface AutocompleteFieldProps {

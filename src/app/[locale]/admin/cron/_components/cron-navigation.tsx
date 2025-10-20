@@ -78,7 +78,7 @@ export function CronNavigation({
                       <span className="font-medium">{item.label}</span>
                       {isActive && (
                         <Badge variant="secondary" className="ml-auto">
-                          {t("app.common.active")}
+                          {t("app.admin.common.active")}
                         </Badge>
                       )}
                     </div>

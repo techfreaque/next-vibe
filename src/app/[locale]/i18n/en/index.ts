@@ -18,4 +18,107 @@ export const translations = {
   subscription: subscriptionTranslations,
   track: trackTranslations,
   user: userTranslations,
+  common: {
+    logoPart1: "Unbottled",
+    logoPart2: ".ai",
+    appName: "Unbottled.ai",
+    active: "Active",
+    filter: "Filter",
+    refresh: "Refresh",
+    weekday: {
+      monday: "Monday",
+      tuesday: "Tuesday",
+      wednesday: "Wednesday",
+      thursday: "Thursday",
+      friday: "Friday",
+      saturday: "Saturday",
+      sunday: "Sunday",
+    },
+    company: {
+      name: "Unbottled.ai",
+      legalForm: "Limited Liability Company (LLC)",
+      registrationNumber: "REG-2024-UNBOTTLED-AI",
+      address: {
+        title: "Address",
+        street: "123 AI Innovation Drive",
+        city: "San Francisco, CA 94105",
+        country: "United States",
+        addressIn1Line:
+          "123 AI Innovation Drive, San Francisco, CA 94105, United States",
+      },
+      responsiblePerson: {
+        name: "Chief Executive Officer",
+      },
+    },
+    selector: {
+      country: "Country",
+      language: "Language",
+    },
+    accessibility: {
+      srOnly: {
+        enableLightMode: "Enable light mode",
+        enableDarkMode: "Enable dark mode",
+        toggleMenu: "Toggle menu",
+      },
+    },
+    error: {
+      title: "Error",
+      message: "Something went wrong",
+      description: "An error occurred. Please try again.",
+      tryAgain: "Try Again",
+      sending_sms: "Failed to send SMS",
+    },
+    errors: {
+      unknown: "An unknown error occurred",
+    },
+    success: {
+      title: "Success",
+      message: "Operation completed successfully",
+      description: "Your action was completed successfully.",
+    },
+    info: {
+      title: "Information",
+      message: "Please note",
+      description: "Here's some information for you.",
+    },
+    api: {
+      notifications: {
+        welcome: {
+          title: "Welcome!",
+          description: "Thanks for joining us. Let's get started!",
+        },
+      },
+    },
+    footer: {
+      description:
+        "Transform your social media presence with professional content creation and strategic management.",
+      copyright: "© {{year}} {{appName}}. All rights reserved.",
+      tagline: "Elevate your social media game",
+      social: {
+        facebook: "Facebook",
+        instagram: "Instagram",
+        twitter: "Twitter",
+        linkedin: "LinkedIn",
+      },
+      services: {
+        title: "Services",
+        socialAccountSetup: "Social Account Setup",
+        contentCreation: "Content Creation",
+        strategyDevelopment: "Strategy Development",
+        performanceAnalytics: "Performance Analytics",
+        communityManagement: "Community Management",
+        audienceBuilding: "Audience Building",
+        adCampaigns: "Ad Campaigns",
+      },
+      company: {
+        title: "Company",
+        aboutUs: "About Us",
+        contactUs: "Contact Us",
+        careers: "Careers",
+        privacyPolicy: "Privacy Policy",
+        termsOfService: "Terms of Service",
+        imprint: "Imprint",
+      },
+    },
+  },
 };

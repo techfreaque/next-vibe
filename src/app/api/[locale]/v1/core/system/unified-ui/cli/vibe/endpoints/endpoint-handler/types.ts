@@ -326,9 +326,22 @@ export interface ApiHandlerOptions<
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
+  TRequestInput = TRequestOutput,
+  TResponseInput = TResponseOutput,
+  TUrlVariablesInput = TUrlVariablesOutput,
 > {
   /** API endpoint definition */
-  endpoint: CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>;
+  endpoint: CreateApiEndpoint<
+    TExampleKey,
+    TMethod,
+    TUserRoleValue,
+    TFields,
+    TRequestInput,
+    TRequestOutput,
+    TResponseInput,
+    TUrlVariablesInput,
+    TUrlVariablesOutput
+  >;
 
   /** Handler function - receives OUTPUT types, returns OUTPUT types */
   handler: ApiHandlerFunction<

@@ -11,4 +11,24 @@ export const translations: typeof enTranslations = {
   queryForm: queryFormTranslations,
   query: queryTranslations,
   store: storeTranslations,
+  apiUtils: {
+    errors: {
+      http_error: {
+        title: "HTTP-Fehler",
+        description: "Kommunikation mit dem Server fehlgeschlagen",
+      },
+      validation_error: {
+        title: "Validierungsfehler",
+        description: "Die Serverantwort konnte nicht validiert werden",
+      },
+      internal_error: {
+        title: "Interner Fehler",
+        description: "Ein unerwarteter Fehler ist aufgetreten",
+      },
+      auth_required: {
+        title: "Authentifizierung erforderlich",
+        description: "Sie müssen angemeldet sein, um diese Aktion auszuführen",
+      },
+    },
+  },
 };

@@ -1,4 +1,7 @@
+import { translations as validationTranslations } from "../../validation/i18n/en";
+
 export const translations = {
+  validation: validationTranslations,
   trpcValidator: {
     apiDirectoryNotFound: "API directory not found: {{resolvedApiDir}}",
     foundRouteFiles: "Found {{count}} route files to validate",

@@ -27,9 +27,12 @@ import { Progress } from "next-vibe-ui/ui/progress";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { JSX } from "react";
+import { useEffect } from "react";
 
-import { useEmailStats } from "@/app/api/[locale]/v1/core/emails/messages/stats/hooks";
+import type { EmailStatsGetResponseTypeOutput } from "@/app/api/[locale]/v1/core/emails/messages/stats/definition";
+import { useEmailMessagesStats } from "@/app/api/[locale]/v1/core/emails/messages/stats/hooks";
 import { ActivityType } from "@/app/api/[locale]/v1/core/leads/enum";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -43,19 +46,36 @@ interface EmailsStatsClientProps {
   locale: CountryLanguage;
 }
 
+// Format percentage with 2 decimal places
+function formatPercentage(value: number): string {
+  return `${(value * 100).toFixed(2)}%`;
+}
+
+// Format number with commas
+function formatNumber(value: number): string {
+  return new Intl.NumberFormat("en-US").format(value);
+}
+
 export function EmailsStatsClient({
   locale,
 }: EmailsStatsClientProps): JSX.Element {
   const { t } = simpleT(locale);
-  const {
-    stats,
-    isLoading,
-    refreshStats,
-    formatPercentage,
-    formatNumber,
-    form,
-    alert,
-  } = useEmailStats(locale);
+
+  // Create logger and endpoint
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const endpoint = useEmailMessagesStats(logger);
+
+  // Auto-fetch on mount
+  useEffect(() => {
+    void endpoint.read.refetch();
+  }, [endpoint.read]);
+
+  const stats = endpoint.read.response as
+    | EmailStatsGetResponseTypeOutput
+    | undefined;
+  const isLoading = endpoint.read.isLoading;
+  const form = endpoint.read.form;
+  const alert = endpoint.alert;
 
   // Loading state
   if (isLoading) {
@@ -114,7 +134,9 @@ export function EmailsStatsClient({
       {/* Filters */}
       <EmailStatsFiltersContainer
         locale={locale}
-        onRefresh={refreshStats}
+        onRefresh={() => {
+          void endpoint.read.refetch();
+        }}
         form={form}
       >
         <FormAlert alert={alert} />
@@ -412,20 +434,7 @@ export function EmailsStatsClient({
           {stats?.historicalData && (
             <EmailStatsChart
               locale={locale}
-              data={{
-                series: Object.entries(stats.historicalData).map(
-                  ([, value]) => ({
-                    name: value.name,
-                    data: Array.isArray(value) ? value : value.data || [],
-                    type: value?.type,
-                    color: value?.color,
-                  }),
-                ),
-                title: t("app.admin.emails.stats.admin.stats.chart.title"),
-                subtitle: t(
-                  "app.admin.emails.stats.admin.stats.chart.subtitle",
-                ),
-              }}
+              data={stats.historicalData}
               isLoading={isLoading}
               height={400}
             />
@@ -500,33 +509,49 @@ export function EmailsStatsClient({
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {stats?.topPerformingTemplates?.map((template, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">
-                          {template.templateName}
-                        </span>
-                        <Badge variant="secondary">
-                          {formatNumber(template.emailsSent)}{" "}
-                          {t("app.admin.emails.stats.admin.stats.sent")}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>
-                          {t("app.admin.emails.stats.admin.stats.openRate")}:{" "}
-                          {formatPercentage(template.openRate)}
-                        </span>
-                        <span>
-                          {t("app.admin.emails.stats.admin.stats.clickRate")}:{" "}
-                          {formatPercentage(template.clickRate)}
-                        </span>
-                      </div>
-                      <Progress
-                        value={template.openRate * 100}
-                        className="h-1"
-                      />
-                    </div>
-                  )) || (
+                  {stats?.topPerformingTemplates &&
+                  Array.isArray(stats.topPerformingTemplates) &&
+                  stats.topPerformingTemplates.length > 0 ? (
+                    stats.topPerformingTemplates.map(
+                      (
+                        template: {
+                          templateName: string;
+                          emailsSent: number;
+                          openRate: number;
+                          clickRate: number;
+                        },
+                        index: number,
+                      ) => (
+                        <div key={index} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium">
+                              {template.templateName}
+                            </span>
+                            <Badge variant="secondary">
+                              {formatNumber(template.emailsSent)}{" "}
+                              {t("app.admin.emails.stats.admin.stats.sent")}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>
+                              {t("app.admin.emails.stats.admin.stats.openRate")}
+                              : {formatPercentage(template.openRate)}
+                            </span>
+                            <span>
+                              {t(
+                                "app.admin.emails.stats.admin.stats.clickRate",
+                              )}
+                              : {formatPercentage(template.clickRate)}
+                            </span>
+                          </div>
+                          <Progress
+                            value={template.openRate * 100}
+                            className="h-1"
+                          />
+                        </div>
+                      ),
+                    )
+                  ) : (
                     <p className="text-sm text-muted-foreground">
                       {t("app.admin.emails.stats.admin.stats.noTemplateData")}
                     </p>
@@ -549,7 +574,9 @@ export function EmailsStatsClient({
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {(stats?.emailsByStatus &&
+                  {stats?.emailsByStatus &&
+                  typeof stats.emailsByStatus === "object" &&
+                  Object.keys(stats.emailsByStatus).length > 0 ? (
                     Object.entries(stats.emailsByStatus).map(
                       ([status, count], index) => (
                         <div key={index} className="space-y-2">
@@ -616,7 +643,8 @@ export function EmailsStatsClient({
                           />
                         </div>
                       ),
-                    )) || (
+                    )
+                  ) : (
                     <p className="text-sm text-muted-foreground">
                       {t("app.admin.emails.stats.admin.stats.noStatusData")}
                     </p>
@@ -635,7 +663,9 @@ export function EmailsStatsClient({
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {(stats?.emailsByType &&
+                  {stats?.emailsByType &&
+                  typeof stats.emailsByType === "object" &&
+                  Object.keys(stats.emailsByType).length > 0 ? (
                     Object.entries(stats.emailsByType).map(
                       ([type, count], index) => (
                         <div key={index} className="space-y-2">
@@ -684,7 +714,8 @@ export function EmailsStatsClient({
                           />
                         </div>
                       ),
-                    )) || (
+                    )
+                  ) : (
                     <p className="text-sm text-muted-foreground">
                       {t("app.admin.emails.stats.admin.stats.noTypeData")}
                     </p>
@@ -707,37 +738,53 @@ export function EmailsStatsClient({
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {stats?.topPerformingProviders?.map((provider, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium capitalize">
-                          {provider.provider}
-                        </span>
-                        <Badge variant="outline">
-                          {formatNumber(provider.emailsSent)}{" "}
-                          {t("app.admin.emails.stats.admin.stats.sent")}
-                        </Badge>
-                      </div>
-                      <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
-                        <span>
-                          {t("app.admin.emails.stats.admin.stats.delivery")}:{" "}
-                          {formatPercentage(provider.deliveryRate)}
-                        </span>
-                        <span>
-                          {t("app.admin.emails.stats.admin.stats.open")}:{" "}
-                          {formatPercentage(provider.openRate)}
-                        </span>
-                        <span>
-                          {t("app.admin.emails.stats.admin.stats.click")}:{" "}
-                          {formatPercentage(provider.clickRate)}
-                        </span>
-                      </div>
-                      <Progress
-                        value={provider.reliability * 100}
-                        className="h-1"
-                      />
-                    </div>
-                  )) || (
+                  {stats?.topPerformingProviders &&
+                  Array.isArray(stats.topPerformingProviders) &&
+                  stats.topPerformingProviders.length > 0 ? (
+                    stats.topPerformingProviders.map(
+                      (
+                        provider: {
+                          provider: string;
+                          emailsSent: number;
+                          deliveryRate: number;
+                          openRate: number;
+                          clickRate: number;
+                          reliability: number;
+                        },
+                        index: number,
+                      ) => (
+                        <div key={index} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium capitalize">
+                              {provider.provider}
+                            </span>
+                            <Badge variant="outline">
+                              {formatNumber(provider.emailsSent)}{" "}
+                              {t("app.admin.emails.stats.admin.stats.sent")}
+                            </Badge>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
+                            <span>
+                              {t("app.admin.emails.stats.admin.stats.delivery")}
+                              : {formatPercentage(provider.deliveryRate)}
+                            </span>
+                            <span>
+                              {t("app.admin.emails.stats.admin.stats.open")}:{" "}
+                              {formatPercentage(provider.openRate)}
+                            </span>
+                            <span>
+                              {t("app.admin.emails.stats.admin.stats.click")}:{" "}
+                              {formatPercentage(provider.clickRate)}
+                            </span>
+                          </div>
+                          <Progress
+                            value={provider.reliability * 100}
+                            className="h-1"
+                          />
+                        </div>
+                      ),
+                    )
+                  ) : (
                     <p className="text-sm text-muted-foreground">
                       {t("app.admin.emails.stats.admin.stats.noProviderData")}
                     </p>
@@ -756,64 +803,80 @@ export function EmailsStatsClient({
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {stats?.recentActivity?.map((activity, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium">
-                          {(activity.details?.subject as string) ||
-                            activity.templateName ||
-                            t("app.admin.emails.stats.admin.stats.noSubject")}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {activity.recipientEmail} • {activity.type}
-                        </p>
-                      </div>
-                      <Badge
-                        variant={
-                          activity.type === ActivityType.EMAIL_SENT ||
-                          activity.type === ActivityType.EMAIL_OPENED ||
-                          activity.type === ActivityType.LEAD_CONVERTED
-                            ? "default"
-                            : "secondary"
-                        }
-                      >
-                        {((): string => {
-                          const typeKey = activity.type.toLowerCase();
-                          const activityTranslations = {
-                            lead_created: t(
-                              "app.admin.emails.stats.admin.stats.statuses.pending",
-                            ),
-                            lead_updated: t(
-                              "app.admin.emails.stats.admin.stats.statuses.pending",
-                            ),
-                            email_sent: t(
-                              "app.admin.emails.stats.admin.stats.statuses.sent",
-                            ),
-                            email_opened: t(
-                              "app.admin.emails.stats.admin.stats.statuses.opened",
-                            ),
-                            email_clicked: t(
-                              "app.admin.emails.stats.admin.stats.statuses.clicked",
-                            ),
-                            lead_converted: t(
-                              "app.admin.emails.stats.admin.stats.statuses.delivered",
-                            ),
-                            lead_unsubscribed: t(
-                              "app.admin.emails.stats.admin.stats.statuses.unsubscribed",
-                            ),
-                          };
-                          return (
-                            activityTranslations[
-                              typeKey as keyof typeof activityTranslations
-                            ] || activity.type
-                          );
-                        })()}
-                      </Badge>
-                    </div>
-                  )) || (
+                  {stats?.recentActivity &&
+                  Array.isArray(stats.recentActivity) &&
+                  stats.recentActivity.length > 0 ? (
+                    stats.recentActivity.map(
+                      (
+                        activity: {
+                          details?: { subject?: string };
+                          templateName?: string;
+                          recipientEmail: string;
+                          type: string;
+                        },
+                        index: number,
+                      ) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="space-y-1">
+                            <p className="text-sm font-medium">
+                              {(activity.details?.subject as string) ||
+                                activity.templateName ||
+                                t(
+                                  "app.admin.emails.stats.admin.stats.noSubject",
+                                )}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {activity.recipientEmail} • {activity.type}
+                            </p>
+                          </div>
+                          <Badge
+                            variant={
+                              activity.type === ActivityType.EMAIL_SENT ||
+                              activity.type === ActivityType.EMAIL_OPENED ||
+                              activity.type === ActivityType.LEAD_CONVERTED
+                                ? "default"
+                                : "secondary"
+                            }
+                          >
+                            {((): string => {
+                              const typeKey = activity.type.toLowerCase();
+                              const activityTranslations = {
+                                lead_created: t(
+                                  "app.admin.emails.stats.admin.stats.statuses.pending",
+                                ),
+                                lead_updated: t(
+                                  "app.admin.emails.stats.admin.stats.statuses.pending",
+                                ),
+                                email_sent: t(
+                                  "app.admin.emails.stats.admin.stats.statuses.sent",
+                                ),
+                                email_opened: t(
+                                  "app.admin.emails.stats.admin.stats.statuses.opened",
+                                ),
+                                email_clicked: t(
+                                  "app.admin.emails.stats.admin.stats.statuses.clicked",
+                                ),
+                                lead_converted: t(
+                                  "app.admin.emails.stats.admin.stats.statuses.delivered",
+                                ),
+                                lead_unsubscribed: t(
+                                  "app.admin.emails.stats.admin.stats.statuses.unsubscribed",
+                                ),
+                              };
+                              return (
+                                activityTranslations[
+                                  typeKey as keyof typeof activityTranslations
+                                ] || activity.type
+                              );
+                            })()}
+                          </Badge>
+                        </div>
+                      ),
+                    )
+                  ) : (
                     <p className="text-sm text-muted-foreground">
                       {t("app.admin.emails.stats.admin.stats.noRecentActivity")}
                     </p>

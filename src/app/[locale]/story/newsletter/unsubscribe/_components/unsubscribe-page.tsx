@@ -20,9 +20,6 @@ export function UnsubscribePage({
   locale,
   prefilledEmail,
 }: UnsubscribePageProps): JSX.Element {
-  const searchParams = useSearchParams();
-  const prefilledLeadId = searchParams.get("leadId") || undefined;
-
   const { t } = simpleT(locale);
 
   const {
@@ -38,16 +35,12 @@ export function UnsubscribePage({
     // isSubmitting and isSubscribed are not used in unsubscribe page
   } = useNewsletterManager();
 
-  // Track if we've already set the prefilled email and leadId to prevent infinite loops
+  // Track if we've already set the prefilled email to prevent infinite loops
   const hasSetPrefilledEmail = useRef(false);
   const lastPrefilledEmail = useRef<string | undefined>(undefined);
-  const hasSetPrefilledLeadId = useRef(false);
-  const lastPrefilledLeadId = useRef<string | undefined>(undefined);
-  const [leadId, setLeadId] = React.useState<string | undefined>(
-    prefilledLeadId,
-  );
 
-  // Set prefilled email and leadId when component mounts
+  // Set prefilled email when component mounts
+  // Note: leadId is now handled server-side via JWT, no need to manage it client-side
   useEffect(() => {
     if (
       prefilledEmail &&
@@ -59,16 +52,7 @@ export function UnsubscribePage({
       hasSetPrefilledEmail.current = true;
       lastPrefilledEmail.current = prefilledEmail;
     }
-    if (
-      prefilledLeadId &&
-      !hasSetPrefilledLeadId.current &&
-      lastPrefilledLeadId.current !== prefilledLeadId
-    ) {
-      setLeadId(prefilledLeadId);
-      hasSetPrefilledLeadId.current = true;
-      lastPrefilledLeadId.current = prefilledLeadId;
-    }
-  }, [prefilledEmail, prefilledLeadId, isLoggedIn, setEmail]);
+  }, [prefilledEmail, isLoggedIn, setEmail]);
 
   return (
     <div className="min-h-screen bg-red-50 bg-gradient-to-br from-red-50 via-white to-orange-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -98,7 +82,8 @@ export function UnsubscribePage({
                 if (!email?.includes("@")) {
                   return;
                 }
-                unsubscribe(email, leadId);
+                // Server gets leadId from JWT - no need to pass it
+                unsubscribe(email);
               }}
               className="space-y-4"
             >

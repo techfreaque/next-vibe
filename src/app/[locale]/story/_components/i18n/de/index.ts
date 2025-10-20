@@ -195,21 +195,45 @@ export const translations: typeof enTranslations = {
           title: "Kostenlos anmelden",
           description:
             "Erstellen Sie Ihr Konto in Sekunden. Keine Kreditkarte erforderlich. Starten Sie mit 10 kostenlosen Nachrichten pro Tag.",
+          tags: {
+            audienceAnalysis: "Schnelle Einrichtung",
+            competitorResearch: "Keine Kreditkarte",
+          },
+          insights: {
+            title: "Für immer kostenlos",
+            description: "10 Nachrichten täglich, Zugriff auf alle Modelle",
+          },
         },
         contentCreation: {
           title: "Wählen Sie Ihr KI-Modell",
           description:
             "Wählen Sie aus über 40 unzensierten KI-Modellen einschließlich GPT-4, Claude, Gemini und mehr.",
+          tags: {
+            brandAlignedContent: "40+ Modelle",
+            engagingVisuals: "Keine Zensur",
+          },
+          insights: {
+            title: "Uneingeschränkter Zugang",
+            description: "Ehrliche KI-Antworten ohne Filter",
+          },
         },
         publishingManagement: {
           title: "Beginnen Sie zu chatten",
           description:
             "Führen Sie ehrliche, uneingeschränkte Gespräche. Erstellen Sie Personas, organisieren Sie in Ordnern oder gehen Sie inkognito.",
+          tags: {
+            optimalTiming: "Benutzerdefinierte Personas",
+            communityBuilding: "Ordnerverwaltung",
+          },
         },
         analysisOptimization: {
           title: "Upgraden Sie, wenn Sie bereit sind",
           description:
             "Erhalten Sie unbegrenzten Zugang für €10/Monat oder kaufen Sie Guthaben-Pakete für €5. Bezahlen Sie mit Karte oder Krypto.",
+          tags: {
+            performanceMetrics: "Unbegrenzter Plan",
+            strategyRefinement: "Guthaben-Pakete",
+          },
         },
       },
     },
@@ -284,6 +308,7 @@ export const translations: typeof enTranslations = {
       workplaceDescription:
         "Wir sind ein Remote-First-Unternehmen, das Autonomie, Kreativität und Wirkung schätzt. Werden Sie Teil eines Teams, das verändert, wie Menschen mit KI interagieren.",
       benefits: {
+        title: "Was wir bieten",
         growthTitle: "Wachstum & Lernen",
         growthDesc:
           "Arbeiten Sie mit modernster KI-Technologie und lernen Sie von Branchenexperten.",
@@ -293,6 +318,15 @@ export const translations: typeof enTranslations = {
         balanceTitle: "Work-Life-Balance",
         balanceDesc:
           "Flexible Arbeitszeiten, Remote-Arbeit und unbegrenzter Urlaub. Wir vertrauen darauf, dass Sie großartige Arbeit leisten.",
+        compensationTitle: "Wettbewerbsfähige Vergütung",
+        compensationDesc:
+          "Branchenführendes Gehalt, Eigenkapital und Leistungspaket.",
+        innovationTitle: "Innovation & Wirkung",
+        innovationDesc:
+          "Arbeiten Sie an modernster KI-Technologie, die einen echten Unterschied macht.",
+        teamTitle: "Tolles Team",
+        teamDesc:
+          "Arbeiten Sie mit talentierten, leidenschaftlichen Menschen, denen KI-Ethik am Herzen liegt.",
       },
       openPositions: "Offene Stellen",
       noOpenings: "Derzeit keine offenen Stellen",
@@ -322,6 +356,19 @@ export const translations: typeof enTranslations = {
             item4: "Ausgezeichnete Problemlösungsfähigkeiten",
             item5: "Leidenschaft für KI und Datenschutz",
           },
+          qualifications: {
+            required: {
+              item1: "3+ Jahre Erfahrung mit KI/ML-Technologien",
+              item2: "Starke Programmierkenntnisse in Python und TypeScript",
+              item3: "Erfahrung mit LLM-APIs und Integration",
+            },
+            preferred: {
+              item1: "Ausgezeichnete Problemlösungsfähigkeiten",
+              item2: "Leidenschaft für KI und Datenschutz",
+              item3: "Erfahrung mit verteilten Systemen",
+            },
+          },
+          experienceLevel: "Mittleres bis Senior-Niveau",
         },
         contentCreator: {
           title: "Community-Manager",
@@ -346,7 +393,39 @@ export const translations: typeof enTranslations = {
             item4: "Erfahrung mit Social-Media-Plattformen",
             item5: "Fähigkeit, selbstständig zu arbeiten",
           },
+          qualifications: {
+            required: {
+              item1: "2+ Jahre Erfahrung im Community-Management",
+              item2: "Ausgezeichnete Kommunikations- und Schreibfähigkeiten",
+              item3: "Leidenschaft für KI und Technologie",
+            },
+            preferred: {
+              item1: "Erfahrung mit Social-Media-Plattformen",
+              item2: "Fähigkeit, selbstständig zu arbeiten",
+              item3: "Hintergrund in KI oder Technologie",
+            },
+          },
+          experienceLevel: "Mittleres Niveau",
+          postedDate: "15. Januar 2025",
+          applicationDeadline: "15. Februar 2025",
         },
+      },
+      jobDetail: {
+        jobOverview: "Stellenübersicht",
+        responsibilities: "Verantwortlichkeiten",
+        requirements: "Anforderungen",
+        qualifications: "Qualifikationen",
+        qualificationsRequired: "Erforderliche Qualifikationen",
+        qualificationsPreferred: "Bevorzugte Qualifikationen",
+        applyNow: "Jetzt bewerben",
+        location: "Standort",
+        department: "Abteilung",
+        employmentType: "Beschäftigungsart",
+        experienceLevel: "Erfahrungsstufe",
+        postedDate: "Veröffentlichungsdatum",
+        applicationDeadline: "Bewerbungsfrist",
+        relatedPositions: "Verwandte Positionen",
+        moreDetails: "Weitere Details",
       },
       applyNow: "Jetzt bewerben",
       readyToJoin: "Bereit beizutreten?",
@@ -359,6 +438,9 @@ export const translations: typeof enTranslations = {
       description:
         "Wir haben die Mission, den Zugang zu unzensierter KI zu demokratisieren. Gegründet im Jahr 2024, bietet Unbottled.ai eine Plattform, auf der Benutzer ehrliche, ungefilterte Gespräche mit den fortschrittlichsten KI-Modellen der Welt führen können.",
       values: {
+        title: "Unsere Werte",
+        description:
+          "Die Prinzipien, die alles leiten, was wir bei Unbottled.ai tun",
         excellence: {
           title: "Exzellenz",
           description:
@@ -400,6 +482,12 @@ export const translations: typeof enTranslations = {
           description:
             "Wir verpflichten uns, eine Plattform zu unterhalten, die die Privatsphäre der Benutzer respektiert, transparente Preise bietet und außergewöhnliche KI-Erlebnisse liefert.",
         },
+      },
+      contact: {
+        title: "Kontaktieren Sie uns",
+        description:
+          "Haben Sie Fragen oder Feedback? Wir würden gerne von Ihnen hören.",
+        cta: "Kontaktieren Sie uns",
       },
     },
     imprint: {
@@ -484,8 +572,14 @@ export const translations: typeof enTranslations = {
             phone: "Telefonnummer (optional)",
             company: "Firmenname (optional)",
             billing: "Abrechnungs- und Zahlungsinformationen",
+            payment: "Zahlungsmethode und Transaktionsdetails",
             usage: "Nutzungsdaten und Chat-Verlauf (verschlüsselt)",
           },
+        },
+        socialMediaData: {
+          title: "Social-Media-Daten",
+          description:
+            "Wenn Sie Social-Media-Konten verbinden, können wir Profilinformationen und zugehörige Daten sammeln, wie von diesen Plattformen erlaubt.",
         },
         howWeUse: {
           title: "Wie wir Ihre Informationen verwenden",
@@ -553,6 +647,23 @@ export const translations: typeof enTranslations = {
           description:
             "Wir können anonymisierte, aggregierte Daten aus Ihrer Nutzung erstellen, um unsere Dienste zu verbessern.",
         },
+        useOfInformation: {
+          title: "Verwendung Ihrer Informationen",
+          description:
+            "Wir verwenden die gesammelten Informationen für verschiedene Zwecke, einschließlich:",
+          items: {
+            provide: "Bereitstellung und Wartung unserer KI-Chat-Dienste",
+            process:
+              "Verarbeitung Ihrer Transaktionen und Verwaltung Ihres Kontos",
+            send: "Versand von Updates, Newslettern und Marketingmitteilungen",
+            respond:
+              "Beantwortung Ihrer Anfragen und Bereitstellung von Kundensupport",
+            monitor:
+              "Überwachung und Analyse von Nutzungsmustern zur Verbesserung unserer Plattform",
+            personalize:
+              "Personalisierung Ihrer Erfahrung und Bereitstellung relevanter Inhalte",
+          },
+        },
         disclosure: {
           title: "Informationsoffenlegung",
           description:
@@ -582,6 +693,36 @@ export const translations: typeof enTranslations = {
           title: "Änderungen dieser Richtlinie",
           description:
             "Wir können diese Datenschutzerklärung von Zeit zu Zeit aktualisieren. Wir werden Sie über wesentliche Änderungen informieren.",
+        },
+        legal: {
+          title: "Rechtsgrundlage für die Verarbeitung",
+          description:
+            "Wir verarbeiten Ihre personenbezogenen Daten auf Grundlage Ihrer Einwilligung, vertraglicher Notwendigkeit, gesetzlicher Verpflichtungen und unserer berechtigten Interessen bei der Bereitstellung und Verbesserung unserer Dienste.",
+        },
+        security: {
+          title: "Sicherheitsmaßnahmen",
+          description:
+            "Wir implementieren angemessene technische und organisatorische Sicherheitsmaßnahmen zum Schutz Ihrer personenbezogenen Daten vor unbefugtem Zugriff, Änderung, Offenlegung oder Zerstörung. Jedoch ist keine Übertragungsmethode über das Internet zu 100% sicher.",
+        },
+        rights: {
+          title: "Ihre Datenschutzrechte",
+          description:
+            "Gemäß den Datenschutzgesetzen haben Sie bestimmte Rechte in Bezug auf Ihre persönlichen Informationen:",
+          items: {
+            access: "Recht auf Zugang zu Ihren personenbezogenen Daten",
+            correction:
+              "Recht auf Berichtigung ungenauer oder unvollständiger Daten",
+            deletion:
+              "Recht auf Löschung Ihrer Daten (Recht auf Vergessenwerden)",
+            objection:
+              "Recht auf Widerspruch gegen die Verarbeitung Ihrer Daten",
+            portability: "Recht auf Datenübertragbarkeit und -transfer",
+          },
+        },
+        thirdPartySites: {
+          title: "Websites Dritter",
+          description:
+            "Unser Service kann Links zu Websites Dritter enthalten. Wir sind nicht verantwortlich für die Datenschutzpraktiken dieser externen Websites. Wir empfehlen Ihnen, deren Datenschutzerklärungen zu überprüfen.",
         },
         contact: {
           title: "Kontaktieren Sie uns",

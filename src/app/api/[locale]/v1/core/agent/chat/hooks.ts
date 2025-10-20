@@ -15,8 +15,9 @@ import { simpleT } from "@/i18n/core/shared";
 import { useAIStream } from "./ai-stream/hooks";
 import { useAIStreamStore } from "./ai-stream/store";
 import type { DefaultFolderId } from "./config";
+import { useFoldersList } from "./folders/hooks";
 import type { IconValue } from "./model-access/icons";
-import { ModelId, type ModelId as ModelIdType } from "./model-access/models";
+import type { ModelId } from "./model-access/models";
 import type { PersonaListResponseOutput } from "./personas/definition";
 import { usePersonasList } from "./personas/hooks";
 import {
@@ -25,6 +26,7 @@ import {
   type ChatThread,
   useChatStore,
 } from "./store";
+import { useThreadsList } from "./threads/hooks";
 
 // Re-export types for convenience
 export type { ChatFolder, ChatMessage, ChatThread };
@@ -81,13 +83,23 @@ export interface UseChatReturn {
 
   // Settings
   selectedPersona: string;
-  selectedModel: ModelIdType;
+  selectedModel: ModelId;
   temperature: number;
   maxTokens: number;
+  ttsAutoplay: boolean;
+  sidebarCollapsed: boolean;
+  theme: "light" | "dark";
+  viewMode: "linear" | "flat" | "threaded";
+  enableSearch: boolean;
   setSelectedPersona: (persona: string) => void;
-  setSelectedModel: (model: ModelIdType) => void;
+  setSelectedModel: (model: ModelId) => void;
   setTemperature: (temp: number) => void;
   setMaxTokens: (tokens: number) => void;
+  setTTSAutoplay: (autoplay: boolean) => void;
+  setSidebarCollapsed: (collapsed: boolean) => void;
+  setTheme: (theme: "light" | "dark") => void;
+  setViewMode: (mode: "linear" | "flat" | "threaded") => void;
+  setEnableSearch: (enabled: boolean) => void;
 
   // Message operations
   sendMessage: (content: string) => Promise<void>;
@@ -139,14 +151,170 @@ export function useChat(
   const chatStore = useChatStore();
   const streamStore = useAIStreamStore();
 
+  // Hydrate settings from localStorage after mount (avoid hydration mismatch)
+  useEffect(() => {
+    chatStore.hydrateSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run only once on mount
+
   // Get translations
   const { t } = simpleT(locale);
 
   // Get AI stream hook with proper translation
   const aiStream = useAIStream(locale, logger, t);
 
-  // Fetch personas from server
+  // Fetch data from server
   const personasEndpoint = usePersonasList(logger);
+
+  // Load all threads and folders on mount
+  useEffect(() => {
+    const loadData = async (): Promise<void> => {
+      // Load ALL threads (no rootFolderId filter)
+      try {
+        // Build query params for GET request - use dot notation for nested objects
+        // Note: pagination and filters objects are required, but their fields are optional
+        const params = new URLSearchParams({
+          "pagination.page": "1",
+          "pagination.limit": "1000",
+          // filters object is required but all fields are optional - send empty placeholder
+          "filters._placeholder": "",
+        });
+
+        const threadsResponse = await fetch(
+          `/api/${locale}/v1/core/agent/chat/threads?${params.toString()}`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+
+        if (threadsResponse.ok) {
+          const threadsData = await threadsResponse.json();
+          logger.debug("useChat", "Loaded threads", { threadsData });
+
+          if (threadsData.success && threadsData.data?.response?.threads) {
+            threadsData.data.response.threads.forEach(
+              (thread: {
+                id: string;
+                title: string;
+                rootFolderId: string;
+                folderId: string | null;
+                status: string;
+                pinned: boolean;
+                preview: string | null;
+                createdAt: string;
+                updatedAt: string;
+              }) => {
+                chatStore.addThread({
+                  id: thread.id,
+                  userId: "",
+                  title: thread.title,
+                  rootFolderId: thread.rootFolderId,
+                  folderId: thread.folderId,
+                  status: thread.status,
+                  defaultModel: null,
+                  defaultPersona: null,
+                  systemPrompt: null,
+                  pinned: thread.pinned || false,
+                  archived: false,
+                  tags: [],
+                  preview: thread.preview || null,
+                  createdAt: new Date(thread.createdAt),
+                  updatedAt: new Date(thread.updatedAt),
+                });
+              },
+            );
+            logger.debug("useChat", "Threads loaded successfully", {
+              count: threadsData.data.response.threads.length,
+            });
+          }
+        } else {
+          logger.error("useChat", "Failed to load threads", {
+            status: threadsResponse.status,
+            statusText: threadsResponse.statusText,
+          });
+        }
+      } catch (error) {
+        logger.error("useChat", "Failed to load threads", { error });
+      }
+
+      // Load folders for each root folder (skip incognito - no server folders)
+      const rootFolders: DefaultFolderId[] = ["private", "shared", "public"];
+      for (const rootFolderId of rootFolders) {
+        try {
+          const params = new URLSearchParams({
+            rootFolderId,
+          });
+
+          const foldersResponse = await fetch(
+            `/api/${locale}/v1/core/agent/chat/folders?${params.toString()}`,
+            {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+            },
+          );
+
+          if (foldersResponse.ok) {
+            const foldersData = await foldersResponse.json();
+            logger.debug("useChat", "Loaded folders", {
+              rootFolderId,
+              foldersData,
+            });
+
+            if (foldersData.success && foldersData.data?.folders) {
+              foldersData.data.folders.forEach(
+                (folder: {
+                  id: string;
+                  userId: string;
+                  name: string;
+                  icon: string | null;
+                  color: string | null;
+                  rootFolderId: string;
+                  parentId: string | null;
+                  expanded: boolean;
+                  sortOrder: number;
+                  createdAt: string;
+                  updatedAt: string;
+                }) => {
+                  chatStore.addFolder({
+                    id: folder.id,
+                    userId: folder.userId,
+                    name: folder.name,
+                    icon: folder.icon,
+                    color: folder.color,
+                    rootFolderId: folder.rootFolderId,
+                    parentId: folder.parentId,
+                    expanded: folder.expanded,
+                    sortOrder: folder.sortOrder,
+                    createdAt: new Date(folder.createdAt),
+                    updatedAt: new Date(folder.updatedAt),
+                  });
+                },
+              );
+              logger.debug("useChat", "Folders loaded successfully", {
+                rootFolderId,
+                count: foldersData.data.folders.length,
+              });
+            }
+          } else {
+            logger.error("useChat", "Failed to load folders", {
+              rootFolderId,
+              status: foldersResponse.status,
+              statusText: foldersResponse.statusText,
+            });
+          }
+        } catch (error) {
+          logger.error("useChat", "Failed to load folders", {
+            rootFolderId,
+            error,
+          });
+        }
+      }
+    };
+
+    void loadData();
+  }, [locale, chatStore, logger]);
+
   const personas = useMemo(() => {
     const response = personasEndpoint.read?.response as
       | PersonaListResponseOutput
@@ -180,6 +348,11 @@ export function useChat(
   const selectedModel = settings.selectedModel;
   const temperature = settings.temperature;
   const maxTokens = settings.maxTokens;
+  const ttsAutoplay = settings.ttsAutoplay;
+  const sidebarCollapsed = settings.sidebarCollapsed;
+  const theme = settings.theme;
+  const viewMode = settings.viewMode;
+  const enableSearch = settings.enableSearch;
 
   // Settings setters that update the store
   const setSelectedPersona = useCallback(
@@ -190,7 +363,7 @@ export function useChat(
   );
 
   const setSelectedModel = useCallback(
-    (model: ModelIdType) => {
+    (model: ModelId) => {
       chatStore.updateSettings({ selectedModel: model });
     },
     [chatStore],
@@ -206,6 +379,41 @@ export function useChat(
   const setMaxTokens = useCallback(
     (tokens: number) => {
       chatStore.updateSettings({ maxTokens: tokens });
+    },
+    [chatStore],
+  );
+
+  const setTTSAutoplay = useCallback(
+    (autoplay: boolean) => {
+      chatStore.updateSettings({ ttsAutoplay: autoplay });
+    },
+    [chatStore],
+  );
+
+  const setSidebarCollapsed = useCallback(
+    (collapsed: boolean) => {
+      chatStore.updateSettings({ sidebarCollapsed: collapsed });
+    },
+    [chatStore],
+  );
+
+  const setTheme = useCallback(
+    (newTheme: "light" | "dark") => {
+      chatStore.updateSettings({ theme: newTheme });
+    },
+    [chatStore],
+  );
+
+  const setViewMode = useCallback(
+    (mode: "linear" | "flat" | "threaded") => {
+      chatStore.updateSettings({ viewMode: mode });
+    },
+    [chatStore],
+  );
+
+  const setEnableSearch = useCallback(
+    (enabled: boolean) => {
+      chatStore.updateSettings({ enableSearch: enabled });
     },
     [chatStore],
   );
@@ -660,9 +868,10 @@ export function useChat(
         }
 
         const data = (await response.json()) as {
-          response: { folder: ChatFolder };
+          success: boolean;
+          data: { response: { folder: ChatFolder } };
         };
-        const folder = data.response.folder;
+        const folder = data.data.response.folder;
 
         // Add to store
         chatStore.addFolder(folder);
@@ -771,10 +980,20 @@ export function useChat(
     selectedModel,
     temperature,
     maxTokens,
+    ttsAutoplay,
+    sidebarCollapsed,
+    theme,
+    viewMode,
+    enableSearch,
     setSelectedPersona,
     setSelectedModel,
     setTemperature,
     setMaxTokens,
+    setTTSAutoplay,
+    setSidebarCollapsed,
+    setTheme,
+    setViewMode,
+    setEnableSearch,
 
     // Message operations
     sendMessage,

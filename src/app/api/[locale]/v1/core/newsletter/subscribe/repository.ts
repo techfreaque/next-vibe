@@ -50,112 +50,99 @@ export class NewsletterSubscribeRepositoryImpl
     const { t } = simpleT(locale);
 
     try {
+      // Get leadId from user prop (JWT payload) - always present
+      const leadId = user.leadId;
+
       logger.debug("app.api.v1.core.newsletter.subscribe.repository.starting", {
         email: data.email,
         hasName: !!data.name,
         hasPreferences: !!data.preferences?.length,
-        hasLeadId: !!data.inputLeadId,
+        leadId,
       });
 
-      // Handle lead linking if leadId is provided
-      if (data.inputLeadId) {
-        try {
+      // Handle lead linking using leadId from JWT
+      try {
+        logger.debug(
+          "app.api.v1.core.newsletter.subscribe.repository.linking_to_lead",
+          {
+            leadId,
+            email: data.email,
+          },
+        );
+
+        const leadResult = await leadsRepository.getLeadById(
+          leadId,
+          user,
+          locale,
+          logger,
+        );
+        if (leadResult.success) {
           logger.debug(
-            "app.api.v1.core.newsletter.subscribe.repository.linking_to_lead",
+            "app.api.v1.core.newsletter.subscribe.repository.lead_found",
             {
-              leadId: data.inputLeadId,
+              leadId,
               email: data.email,
             },
           );
 
-          const leadResult = await leadsRepository.getLeadById(
-            data.inputLeadId,
+          // Access nested data structure properly
+          const currentStatus = leadResult.data.lead.basicInfo.status;
+          const newStatus = getNewsletterSubscriptionStatus(currentStatus);
+
+          const updateData = {
+            status: newStatus,
+            metadata: {
+              ...(leadResult.data.lead.metadata.metadata || {}),
+              newsletterSubscribed: true,
+              newsletterSubscriptionDate: new Date().toISOString(),
+              subscribedEmail: data.email,
+              subscribedName: data.name || "",
+            },
+          };
+
+          const updateResult = await leadsRepository.updateLead(
+            leadId,
+            updateData,
             user,
             locale,
             logger,
           );
-          if (leadResult.success) {
+
+          if (updateResult.success) {
             logger.debug(
-              "app.api.v1.core.newsletter.subscribe.repository.lead_found",
+              "app.api.v1.core.newsletter.subscribe.repository.lead_updated",
               {
-                leadId: data.inputLeadId,
+                leadId,
                 email: data.email,
               },
             );
-
-            // Access nested data structure properly
-            const currentStatus = leadResult.data.lead.basicInfo.status;
-            const newStatus = getNewsletterSubscriptionStatus(currentStatus);
-
-            const updateData = {
-              status: newStatus,
-              metadata: {
-                ...(leadResult.data.lead.metadata.metadata || {}),
-                newsletterSubscribed: true,
-                newsletterSubscriptionDate: new Date().toISOString(),
-                subscribedEmail: data.email,
-                subscribedName: data.name || "",
-              },
-            };
-
-            const updateResult = await leadsRepository.updateLead(
-              data.inputLeadId,
-              updateData,
-              user,
-              locale,
-              logger,
-            );
-
-            if (updateResult.success) {
-              logger.debug(
-                "app.api.v1.core.newsletter.subscribe.repository.lead_updated",
-                {
-                  leadId: data.inputLeadId,
-                  email: data.email,
-                },
-              );
-            } else {
-              logger.error(
-                "app.api.v1.core.newsletter.subscribe.repository.lead_update_failed",
-                {
-                  leadId: data.inputLeadId,
-                  email: data.email,
-                  error: updateResult.message,
-                },
-              );
-            }
           } else {
-            logger.debug(
-              "app.api.v1.core.newsletter.subscribe.repository.lead_not_found",
+            logger.error(
+              "app.api.v1.core.newsletter.subscribe.repository.lead_update_failed",
               {
-                leadId: data.inputLeadId,
+                leadId,
                 email: data.email,
+                error: updateResult.message,
               },
             );
           }
-        } catch (error) {
-          logger.error(
-            "app.api.v1.core.newsletter.subscribe.repository.lead_linking_error",
+        } else {
+          logger.debug(
+            "app.api.v1.core.newsletter.subscribe.repository.lead_not_found",
             {
-              error: parseError(error).message,
-              leadId: data.inputLeadId,
+              leadId,
               email: data.email,
             },
           );
         }
-      }
-
-      if (!data.inputLeadId) {
+      } catch (error) {
         logger.error(
-          "app.api.v1.core.newsletter.subscribe.repository.missing_lead_id",
+          "app.api.v1.core.newsletter.subscribe.repository.lead_linking_error",
           {
+            error: parseError(error).message,
+            leadId,
             email: data.email,
-            name: data.name,
           },
-        );
-        return createErrorResponse(
-          "app.api.v1.core.newsletter.subscribe.errors.badRequest.title",
-          ErrorResponseTypes.BAD_REQUEST,
         );
       }
 
@@ -183,7 +170,7 @@ export class NewsletterSubscribeRepositoryImpl
             message: t(
               "app.api.v1.core.newsletter.subscribe.response.alreadySubscribed",
             ),
-            leadId: data.inputLeadId || "",
+            leadId,
             subscriptionId: existingSubscription.id,
             userId: existingSubscription.userId || undefined,
           });
@@ -211,7 +198,7 @@ export class NewsletterSubscribeRepositoryImpl
         return createSuccessResponse({
           success: true,
           message: t("app.api.v1.core.newsletter.subscribe.response.success"),
-          leadId: data.inputLeadId || "",
+          leadId,
           subscriptionId: existingSubscription.id,
           userId: existingSubscription.userId || undefined,
         });
@@ -248,7 +235,7 @@ export class NewsletterSubscribeRepositoryImpl
       return createSuccessResponse({
         success: true,
         message: t("app.api.v1.core.newsletter.subscribe.response.success"),
-        leadId: data.inputLeadId || "",
+        leadId,
         subscriptionId: newSubscription[0].id,
         userId: newSubscription[0].userId || undefined,
       });

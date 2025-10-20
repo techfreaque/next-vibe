@@ -135,12 +135,12 @@ export const translations: typeof enTranslations = {
       price: "€0",
       description: "Idealny do wypróbowania Unbottled.ai",
       cta: "Zacznij teraz",
-      features: [
-        "10 wiadomości dziennie",
-        "Dostęp do wszystkich 40+ modeli AI",
-        "Podstawowe zarządzanie folderami",
-        "Persony społeczności",
-      ],
+      features: {
+        messages: "10 wiadomości dziennie",
+        models: "Dostęp do wszystkich 40+ modeli AI",
+        folders: "Podstawowe zarządzanie folderami",
+        personas: "Persony społeczności",
+      },
     },
     PROFESSIONAL: {
       title: "Professional",
@@ -197,5 +197,22 @@ export const translations: typeof enTranslations = {
     description: "Czy na pewno chcesz obniżyć swój plan?",
     nextCycle:
       "Zmiany wejdą w życie na koniec bieżącego okresu rozliczeniowego",
+  },
+  subscriptionBanner: {
+    status: {
+      active: "Twoja subskrypcja jest aktywna",
+      pastDue: "Płatność zaległa",
+      canceled: "Subskrypcja anulowana",
+      pending: "Subskrypcja oczekująca",
+    },
+    actions: {
+      manage: "Zarządzaj subskrypcją",
+      updatePayment: "Zaktualizuj płatność",
+      resubscribe: "Subskrybuj ponownie",
+      viewDetails: "Zobacz szczegóły",
+    },
+    nextBillingDate: "Następna data rozliczenia",
+    dateFormat: "{{date, datetime}}",
+    dismissButton: "Zamknij",
   },
 };

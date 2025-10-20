@@ -17,7 +17,7 @@ export const METADATA_CONFIG: MetadataConfig = {
   baseUrl: envClient.NEXT_PUBLIC_APP_URL,
   twitterHandle: "@socialmediaservice",
   defaultImage: "https://socialmediaservice.center/images/social-share.jpg",
-  defaultImageAlt: "meta.default.ogImageAlt",
+  defaultImageAlt: "app.common.appName",
 
   // Authors and publisher
   authors: [{ name: "nextVibe Team" }],

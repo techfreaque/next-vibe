@@ -5,7 +5,6 @@
 
 "use client";
 
-import { Loader2, Square, Volume2 } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useState } from "react";
@@ -369,12 +368,7 @@ function FlatMessage({
 }: FlatMessageProps): JSX.Element {
   const { t } = simpleT(locale);
 
-  // TTS support for assistant messages
-  // TODO: Implement useTTSAudio hook
-  const isTTSLoading = false;
-  const isPlaying = false;
-  const playAudio = async (): Promise<void> => {};
-  const stopAudio = (): void => {};
+  // TTS support for assistant messages is handled by the message action buttons
 
   // User ID logic
   const userId =
@@ -747,40 +741,6 @@ function FlatMessage({
                 : "opacity-0 group-hover/post:opacity-100 focus-within:opacity-100",
             )}
           >
-            {/* TTS Play/Stop - For assistant messages */}
-            {isAssistant && (
-              <button
-                onClick={isPlaying ? stopAudio : (): void => void playAudio()}
-                disabled={isTTSLoading}
-                className={cn(
-                  "text-blue-400 hover:text-blue-300 hover:underline transition-colors flex items-center gap-1",
-                  isTTSLoading && "opacity-50 cursor-not-allowed",
-                )}
-                title={
-                  isTTSLoading
-                    ? t("app.chat.flatView.actions.loadingAudio")
-                    : isPlaying
-                      ? t("app.chat.flatView.actions.stopAudio")
-                      : t("app.chat.flatView.actions.playAudio")
-                }
-              >
-                {isTTSLoading ? (
-                  <Loader2 className="h-3 w-3 animate-spin inline" />
-                ) : isPlaying ? (
-                  <Square className="h-3 w-3 inline" />
-                ) : (
-                  <Volume2 className="h-3 w-3 inline" />
-                )}
-                <span>
-                  [
-                  {isPlaying
-                    ? t("app.chat.flatView.actions.stop")
-                    : t("app.chat.flatView.actions.play")}
-                  ]
-                </span>
-              </button>
-            )}
-
             {/* Reply */}
             {onBranchMessage && (
               <button

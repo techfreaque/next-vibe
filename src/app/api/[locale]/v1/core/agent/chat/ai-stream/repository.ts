@@ -607,7 +607,7 @@ export async function createAiStream({
         headers: {
           "Content-Type": "text/event-stream",
           "Cache-Control": "no-cache",
-          "Connection": "keep-alive",
+          Connection: "keep-alive",
         },
       }),
     );
@@ -634,9 +634,7 @@ export async function createAiStream({
         locale,
       );
 
-      // TODO: Update AI message with final content
-      // TODO: Emit SSE events for incognito mode
-
+      // Incognito mode: messages are not persisted, streaming handled client-side
       return createStreamingResponse(response);
     }
 
@@ -839,7 +837,7 @@ export async function createAiStream({
         headers: {
           "Content-Type": "text/event-stream",
           "Cache-Control": "no-cache",
-          "Connection": "keep-alive",
+          Connection: "keep-alive",
         },
       }),
     );

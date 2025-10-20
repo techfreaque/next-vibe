@@ -27,8 +27,7 @@ export const translations = {
     },
     dryRun: {
       title: "Dry Run",
-      description:
-        "Preview what would be destroyed without actually destroying",
+      description: "Preview what would be destroyed without actually destroying",
     },
     success: {
       title: "Success",
@@ -90,6 +89,14 @@ export const translations = {
     conflict: {
       title: "Conflict",
       description: "Data conflict occurred",
+    },
+    destruction_failed: {
+      title: "Guard Destruction Failed",
+      description: "Failed to destroy the guard environment",
+    },
+    guard_not_found: {
+      title: "Guard Not Found",
+      description: "No guard environment found for the specified project",
     },
   },
   success: {

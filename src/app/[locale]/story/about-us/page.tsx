@@ -14,7 +14,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Separator } from "next-vibe-ui/ui/separator";
 import type { JSX } from "react";
 
-import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
@@ -84,7 +83,6 @@ export default async function AboutUsPage({
 }: Props): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
-  const supportEmail = contactClientRepository.getSupportEmail(locale);
 
   // Get values from translations
   const values = [
@@ -129,7 +127,7 @@ export default async function AboutUsPage({
             className="inline-flex items-center text-sm text-white/80 hover:text-white mb-8 transition-colors"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("app.story._components.home.aboutUsUs.backToHome")}
+            {t("app.story._components.home.aboutUs.backToHome")}
           </Link>
 
           <div className="max-w-3xl">
@@ -151,13 +149,13 @@ export default async function AboutUsPage({
         <section className="mb-24">
           <div className="max-w-4xl mx-auto text-center mb-16">
             <h2 className="text-4xl font-bold mb-6">
-              {t("app.story._components.home.aboutUsUs.mission.title")}
+              {t("app.story._components.home.aboutUs.mission.title")}
             </h2>
             <p className="text-xl text-blue-600 dark:text-blue-400 font-semibold mb-8">
-              {t("app.story._components.home.aboutUsUs.mission.subtitle")}
+              {t("app.story._components.home.aboutUs.mission.subtitle")}
             </p>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              {t("app.story._components.home.aboutUsUs.mission.description")}
+              {t("app.story._components.home.aboutUs.mission.description")}
             </p>
           </div>
 
@@ -169,15 +167,13 @@ export default async function AboutUsPage({
                   <Lightbulb className="h-7 w-7 text-blue-600 dark:text-blue-400" />
                 </div>
                 <CardTitle className="text-xl">
-                  {t(
-                    "app.story._components.home.aboutUsUs.mission.vision.title",
-                  )}
+                  {t("app.story._components.home.aboutUs.mission.vision.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
                   {t(
-                    "app.story._components.home.aboutUsUs.mission.vision.description",
+                    "app.story._components.home.aboutUs.mission.vision.description",
                   )}
                 </p>
               </CardContent>
@@ -190,14 +186,14 @@ export default async function AboutUsPage({
                 </div>
                 <CardTitle className="text-xl">
                   {t(
-                    "app.story._components.home.aboutUsUs.mission.approach.title",
+                    "app.story._components.home.aboutUs.mission.approach.title",
                   )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
                   {t(
-                    "app.story._components.home.aboutUsUs.mission.approach.description",
+                    "app.story._components.home.aboutUs.mission.approach.description",
                   )}
                 </p>
               </CardContent>
@@ -210,14 +206,14 @@ export default async function AboutUsPage({
                 </div>
                 <CardTitle className="text-xl">
                   {t(
-                    "app.story._components.home.aboutUsUs.mission.commitment.title",
+                    "app.story._components.home.aboutUs.mission.commitment.title",
                   )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
                   {t(
-                    "app.story._components.home.aboutUsUs.mission.commitment.description",
+                    "app.story._components.home.aboutUs.mission.commitment.description",
                   )}
                 </p>
               </CardContent>
@@ -228,7 +224,7 @@ export default async function AboutUsPage({
           <div className="relative rounded-2xl overflow-hidden h-[400px] shadow-2xl">
             <Image
               src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070"
-              alt={t("app.story._components.home.aboutUsUs.mission.title")}
+              alt={t("app.story._components.home.aboutUs.mission.title")}
               fill
               className="object-cover"
             />
@@ -238,7 +234,7 @@ export default async function AboutUsPage({
                 {t("app.common.logoPart1")} {t("app.common.logoPart2")}
               </h3>
               <p className="text-lg opacity-90">
-                {t("app.story.home.hero.subtitle")}
+                {t("app.story._components.home.hero.subtitle")}
               </p>
             </div>
           </div>
@@ -251,7 +247,7 @@ export default async function AboutUsPage({
               {t("app.story._components.home.aboutUs.values.title")}
             </h2>
             <p className="text-lg text-muted-foreground">
-              {t("app.story._components.home.aboutUsUs.values.list")}
+              {t("app.story._components.home.aboutUs.values.description")}
             </p>
           </div>
 
@@ -272,19 +268,17 @@ export default async function AboutUsPage({
 
         <div className="max-w-3xl mx-auto text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">
-            {t("app.story._components.home.aboutUsUs.contact.title")}
+            {t("app.story._components.home.aboutUs.contact.title")}
           </h2>
           <p className="text-lg text-muted-foreground">
-            {t("app.story._components.home.aboutUsUs.contact.description", {
-              supportEmail: supportEmail,
-            })}
+            {t("app.story._components.home.aboutUs.contact.description")}
           </p>
         </div>
 
         <div className="mt-12 text-center">
           <Button asChild size="lg">
             <Link href={`/${locale}/help`}>
-              {t("app.story._components.home.aboutUsUs.contact.button")}
+              {t("app.story._components.home.aboutUs.contact.cta")}
             </Link>
           </Button>
         </div>

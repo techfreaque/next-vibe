@@ -366,17 +366,13 @@ export default function PricingSection({
               // eslint-disable-next-line i18next/no-literal-string
               key={`plan_${index}_${plan.id}`}
               variants={item}
-              className={`${plan.highlighted ? "lg:-mt-8 z-10" : plan.id === SubscriptionPlan.PREMIUM ? "z-10" : ""}`}
+              className={`${plan.highlighted ? "lg:-mt-8 z-10" : ""}`}
             >
               <Card
                 className={`flex flex-col h-full transition-all duration-300 ${
                   plan.highlighted
                     ? "border-2 border-cyan-500 shadow-xl relative hover:shadow-2xl hover:-translate-y-1"
-                    : plan.id === SubscriptionPlan.PREMIUM
-                      ? "border-2 border-purple-500 shadow-xl relative hover:shadow-2xl hover:-translate-y-1"
-                      : plan.isEnterprise
-                        ? "border-2 border-gray-500 shadow-xl relative hover:shadow-2xl hover:-translate-y-1"
-                        : "border border-gray-200 dark:border-gray-800 shadow-md hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-lg"
+                    : "border border-gray-200 dark:border-gray-800 shadow-md hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-lg"
                 } ${
                   isCurrent
                     ? "border-green-500 bg-green-50 dark:bg-green-950/20"
@@ -394,7 +390,7 @@ export default function PricingSection({
                   </div>
                 )}
                 <CardHeader
-                  className={`${plan.highlighted || plan.id === SubscriptionPlan.PREMIUM || plan.isEnterprise || isCurrent ? "pt-8" : ""} pb-4`}
+                  className={`${plan.highlighted || isCurrent ? "pt-8" : ""} pb-4`}
                 >
                   <div className="mb-6">
                     <div className="flex justify-center mb-3">{plan.icon}</div>
@@ -410,11 +406,9 @@ export default function PricingSection({
                         currency: currentCountry.symbol,
                       })}
                     </span>
-                    {plan.isEnterprise ? null : (
-                      <span className="ml-1 text-gray-500 dark:text-gray-400">
-                        {t("app.story.pricing.plans.perMonth")}
-                      </span>
-                    )}
+                    <span className="ml-1 text-gray-500 dark:text-gray-400">
+                      {t("app.story.pricing.plans.perMonth")}
+                    </span>
                   </div>
                   <CardDescription className="mt-4 text-center">
                     {t(plan.description)}
@@ -464,18 +458,14 @@ export default function PricingSection({
                           className={`flex-shrink-0 rounded-full p-1 mt-0.5 ${
                             plan.highlighted
                               ? "bg-cyan-100 dark:bg-cyan-900/30"
-                              : plan.id === SubscriptionPlan.PREMIUM
-                                ? "bg-purple-100 dark:bg-purple-900/30"
-                                : "bg-gray-100 dark:bg-gray-800"
+                              : "bg-gray-100 dark:bg-gray-800"
                           }`}
                         >
                           <Check
                             className={`h-3 w-3 ${
                               plan.highlighted
                                 ? "text-cyan-600 dark:text-cyan-400"
-                                : plan.id === SubscriptionPlan.PREMIUM
-                                  ? "text-purple-600 dark:text-purple-400"
-                                  : "text-gray-600 dark:text-gray-400"
+                                : "text-gray-600 dark:text-gray-400"
                             }`}
                           />
                         </div>
@@ -500,17 +490,14 @@ export default function PricingSection({
                                   ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/50"
                                   : plan.highlighted
                                     ? "bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 text-white"
-                                    : plan.id === SubscriptionPlan.PREMIUM
-                                      ? "bg-purple-600 bg-gradient-to-r from-purple-500 to-pink-600 hover:bg-purple-700 hover:from-purple-600 hover:to-pink-700 text-white"
-                                      : "bg-white hover:bg-gray-50 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-700"
+                                    : "bg-white hover:bg-gray-50 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-700"
                             }`}
                             variant={
                               isCurrent
                                 ? "secondary"
                                 : action === "downgrade"
                                   ? "outline"
-                                  : plan.highlighted ||
-                                      plan.id === SubscriptionPlan.PREMIUM
+                                  : plan.highlighted
                                     ? "default"
                                     : "outline"
                             }
@@ -564,17 +551,14 @@ export default function PricingSection({
                                     ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/50"
                                     : plan.highlighted
                                       ? "bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 text-white"
-                                      : plan.id === SubscriptionPlan.PREMIUM
-                                        ? "bg-purple-600 bg-gradient-to-r from-purple-500 to-pink-600 hover:bg-purple-700 hover:from-purple-600 hover:to-pink-700 text-white"
-                                        : "bg-white hover:bg-gray-50 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-700"
+                                      : "bg-white hover:bg-gray-50 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-700"
                               }`}
                               variant={
                                 isCurrent
                                   ? "secondary"
                                   : action === "downgrade"
                                     ? "outline"
-                                    : plan.highlighted ||
-                                        plan.id === SubscriptionPlan.PREMIUM
+                                    : plan.highlighted
                                       ? "default"
                                       : "outline"
                               }
@@ -621,18 +605,10 @@ export default function PricingSection({
                                 className={`w-full ${
                                   plan.highlighted
                                     ? "bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 text-white"
-                                    : plan.id === SubscriptionPlan.PREMIUM
-                                      ? "bg-purple-600 bg-gradient-to-r from-purple-500 to-pink-600 hover:bg-purple-700 hover:from-purple-600 hover:to-pink-700 text-white"
-                                      : plan.isEnterprise
-                                        ? "bg-gray-700 bg-gradient-to-r from-gray-600 to-gray-800 hover:bg-gray-800 hover:from-gray-700 hover:to-gray-900 text-white"
-                                        : "bg-white hover:bg-gray-50 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-700"
+                                    : "bg-white hover:bg-gray-50 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-700"
                                 }`}
                                 variant={
-                                  plan.highlighted ||
-                                  plan.id === SubscriptionPlan.PREMIUM ||
-                                  plan.isEnterprise
-                                    ? "default"
-                                    : "outline"
+                                  plan.highlighted ? "default" : "outline"
                                 }
                                 size="lg"
                                 disabled={isLoading}
@@ -713,6 +689,6 @@ export default function PricingSection({
 function getPlanCta(planId: SubscriptionPlanValue, t: TFunction): string {
   switch (planId) {
     case SubscriptionPlan.SUBSCRIPTION:
-      return t("app.story.pricing.plans.SUBSCRIPTION.cta");
+      return t("app.story.pricing.plans.STARTER.cta");
   }
 }

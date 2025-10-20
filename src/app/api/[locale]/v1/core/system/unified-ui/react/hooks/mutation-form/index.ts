@@ -14,14 +14,12 @@ import { isErrorResponseType } from "next-vibe/shared/utils/parse-error";
 import type { FormEvent } from "react";
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import type { z } from "zod";
 
 import { useTranslation } from "@/i18n/core/client";
 
 import type { UserRoleValue } from "../../../../../user/user-roles/enum";
 import type { EndpointLogger } from "../../../cli/vibe/endpoints/endpoint-handler/logger";
 import type { Methods } from "../../../cli/vibe/endpoints/endpoint-types/core/enums";
-import type { UnifiedField } from "../../../cli/vibe/endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "../../../cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { ApiStore, FormQueryParams } from "../store";
 import { useApiStore } from "../store";
@@ -53,6 +51,7 @@ export function useApiForm<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >,
 >(
@@ -311,7 +310,7 @@ export function useApiForm<
         const errorResponse = isErrorResponseType(error)
           ? error
           : createErrorResponse(
-              "error.api.store.errors.mutation_failed",
+              "app.api.v1.core.system.unifiedUi.react.hooks.mutationForm.post.errors.mutation_failed",
               ErrorResponseTypes.INTERNAL_ERROR,
             );
 
@@ -327,7 +326,7 @@ export function useApiForm<
     void formMethods.handleSubmit(_submitForm, (errors) => {
       // Create an error response for form validation errors
       const errorResponse = createErrorResponse(
-        "error.errorTypes.validation_error",
+        "app.api.v1.core.system.unifiedUi.react.hooks.mutationForm.post.errors.validation_error",
         ErrorResponseTypes.VALIDATION_ERROR,
         { formErrors: JSON.stringify(errors) },
       );
@@ -366,7 +365,7 @@ export function useApiForm<
         ? createErrorResponse(
             mutationState.error?.message ||
               formState.formError?.message ||
-              "error.unknown",
+              "app.api.v1.core.system.unifiedUi.react.hooks.mutationForm.post.errors.unknown",
             ErrorResponseTypes.INTERNAL_ERROR,
             mutationState.error?.messageParams ||
               formState.formError?.messageParams,

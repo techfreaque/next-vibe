@@ -13,6 +13,18 @@ export const translations: typeof enTranslations = {
       description: "Dane odpowiedzi",
     },
     errors: {
+      mutation_failed: {
+        title: "Mutacja nie powiodła się",
+        description: "Operacja mutacji nie powiodła się",
+      },
+      validation_error: {
+        title: "Błąd walidacji",
+        description: "Walidacja formularza nie powiodła się",
+      },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd",
+      },
       unauthorized: {
         title: "Brak autoryzacji",
         description: "Wymagana autoryzacja",
@@ -24,10 +36,6 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Błąd serwera",
         description: "Wystąpił wewnętrzny błąd serwera",
-      },
-      unknown: {
-        title: "Nieznany błąd",
-        description: "Wystąpił nieznany błąd",
       },
       network: {
         title: "Błąd sieci",

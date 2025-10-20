@@ -41,8 +41,8 @@ export interface MetadataConfig {
     index?: boolean;
     follow?: boolean;
     googleBot?: {
-      index?: boolean;
-      follow?: boolean;
+      "index"?: boolean;
+      "follow"?: boolean;
       "max-image-preview"?: "none" | "standard" | "large";
       "max-snippet"?: number;
     };
@@ -180,7 +180,7 @@ export function metadataGenerator(
       });
     });
   }
-  const appName = t("common.appName");
+  const appName = t("app.common.appName");
 
   // Get translated values using the provided translation keys
   const translatedTitle = t(options.title, { appName });

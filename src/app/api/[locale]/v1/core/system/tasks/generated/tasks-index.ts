@@ -7,17 +7,18 @@
  * - Task files: 5
  * - Task runner files: 2
  * - Side task config files: 0
- * - Generated at: 2025-10-16T21:08:48.953Z
+ * - Generated at: 2025-10-20T22:15:12.968Z
  */
 
+/* eslint-disable prettier/prettier */
 /* eslint-disable simple-import-sort/imports */
 
 import type { Task, TaskRegistry } from "../types/repository";
 import { UnifiedTaskRunnerRepositoryImpl } from "../unified-runner/repository";
 
-import { tasks as taskModule0 } from "../../../user/session-cleanup/task";
-import { tasks as taskModule1 } from "../../../leads/import/task";
-import { tasks as taskModule2 } from "../../../newsletter/unsubscribe/task";
+import { tasks as taskModule0 } from "../../../newsletter/unsubscribe/task";
+import { tasks as taskModule1 } from "../../../user/session-cleanup/task";
+import { tasks as taskModule2 } from "../../../leads/import/task";
 import { tasks as taskModule3 } from "../../../emails/imap-client/sync/task";
 import { tasks as taskModule4 } from "../../../agent/chat/credits/expire/task";
 import { taskRunners as runnerModule5 } from "../pulse-runner/task-runner";
@@ -33,15 +34,9 @@ const allTasks: Task[] = [
   ...runnerModule6,
 ];
 
-const cronTasks = allTasks.filter(
-  (task): task is Task & { type: "cron" } => task.type === "cron",
-);
-const sideTasks = allTasks.filter(
-  (task): task is Task & { type: "side" } => task.type === "side",
-);
-const taskRunners = allTasks.filter(
-  (task): task is Task & { type: "task-runner" } => task.type === "task-runner",
-);
+const cronTasks = allTasks.filter((task): task is Task & { type: 'cron' } => task.type === 'cron');
+const sideTasks = allTasks.filter((task): task is Task & { type: 'side' } => task.type === 'side');
+const taskRunners = allTasks.filter((task): task is Task & { type: 'task-runner' } => task.type === 'task-runner');
 
 const tasksByCategory: Record<string, Task[]> = allTasks.reduce((acc, task) => {
   const category = String(task.category);
@@ -70,13 +65,5 @@ export const taskRegistry: TaskRegistry = {
   taskRunner, // Single unified task runner instance
 };
 
-export {
-  allTasks,
-  cronTasks,
-  sideTasks,
-  taskRunner,
-  taskRunners,
-  tasksByCategory,
-  tasksByName,
-};
+export { allTasks, cronTasks, sideTasks, taskRunners, tasksByCategory, tasksByName, taskRunner };
 export default allTasks;

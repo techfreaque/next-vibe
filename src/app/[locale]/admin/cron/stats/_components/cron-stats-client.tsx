@@ -114,21 +114,21 @@ function getStatusTranslation(
 function getWeekdayTranslation(day: JSWeekday): TranslationKey {
   switch (day) {
     case JSWeekday.MONDAY:
-      return "app.common.weekday.monday";
+      return "app.admin.common.weekday.monday";
     case JSWeekday.TUESDAY:
-      return "app.common.weekday.tuesday";
+      return "app.admin.common.weekday.tuesday";
     case JSWeekday.WEDNESDAY:
-      return "app.common.weekday.wednesday";
+      return "app.admin.common.weekday.wednesday";
     case JSWeekday.THURSDAY:
-      return "app.common.weekday.thursday";
+      return "app.admin.common.weekday.thursday";
     case JSWeekday.FRIDAY:
-      return "app.common.weekday.friday";
+      return "app.admin.common.weekday.friday";
     case JSWeekday.SATURDAY:
-      return "app.common.weekday.saturday";
+      return "app.admin.common.weekday.saturday";
     case JSWeekday.SUNDAY:
-      return "app.common.weekday.sunday";
+      return "app.admin.common.weekday.sunday";
     default:
-      return "app.common.weekday.monday";
+      return "app.admin.common.weekday.monday";
   }
 }
 

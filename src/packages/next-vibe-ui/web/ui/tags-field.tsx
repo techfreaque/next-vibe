@@ -42,7 +42,7 @@ export function TagsField({
   onChange,
   onBlur,
   suggestions = [],
-  placeholder = "common.addTags",
+  placeholder = "app.packages.nextVibeUi.web.common.addTags",
   maxTags,
   allowCustom = true,
   disabled = false,
@@ -227,9 +227,12 @@ export function TagsField({
                           onClick={() => addTag(inputValue)}
                         >
                           <Plus className="h-3 w-3 mr-2" />
-                          {t("common.addCustomValue", {
-                            value: inputValue.trim(),
-                          })}
+                          {t(
+                            "app.packages.nextVibeUi.web.common.addCustomValue",
+                            {
+                              value: inputValue.trim(),
+                            },
+                          )}
                         </Button>
                       </div>
                     )}

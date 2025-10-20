@@ -43,9 +43,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.agent.chat.credits.get.response.description",
       layout: { type: LayoutType.STACKED },
     },
-    {
-      [Methods.GET]: { response: true },
-    },
+    { response: true },
     {
       // Total credits available
       total: responseField(

@@ -11,4 +11,24 @@ export const translations: typeof enTranslations = {
   queryForm: queryFormTranslations,
   query: queryTranslations,
   store: storeTranslations,
+  apiUtils: {
+    errors: {
+      http_error: {
+        title: "Błąd HTTP",
+        description: "Nie udało się skomunikować z serwerem",
+      },
+      validation_error: {
+        title: "Błąd walidacji",
+        description: "Odpowiedź serwera nie mogła zostać zwalidowana",
+      },
+      internal_error: {
+        title: "Błąd wewnętrzny",
+        description: "Wystąpił nieoczekiwany błąd",
+      },
+      auth_required: {
+        title: "Wymagana autentykacja",
+        description: "Musisz być zalogowany, aby wykonać tę akcję",
+      },
+    },
+  },
 };

@@ -131,26 +131,15 @@ const { POST } = createEndpoint({
           placeholder:
             "app.api.v1.core.contact.form.fields.priority.placeholder",
           options: ContactPriorityOptions,
-          layout: { columns: 6 },
+          layout: { columns: 12 },
           validation: { required: false },
           behavior: { searchable: false, clearable: true },
         },
         z.enum(ContactPriority).optional(),
       ),
-      leadId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.v1.core.contact.form.fields.leadId.label",
-          description: "app.api.v1.core.contact.form.fields.leadId.description",
-          placeholder: "app.api.v1.core.contact.form.fields.leadId.placeholder",
-          layout: { columns: 6 },
-          validation: { required: false },
-        },
-        z.string().optional(),
-      ),
 
       // === RESPONSE FIELDS ===
+      // Note: leadId comes from JWT payload (user.leadId) on server-side
       success: responseField(
         {
           type: WidgetType.TEXT,
@@ -184,7 +173,6 @@ const { POST } = createEndpoint({
         message:
           "I would like to learn more about your social media management services.",
         priority: ContactPriority.MEDIUM,
-        leadId: "lead_123",
       },
       success: {
         name: "Jane Smith",
@@ -193,7 +181,6 @@ const { POST } = createEndpoint({
         subject: "Partnership inquiry",
         message: "We are interested in discussing a potential partnership.",
         priority: ContactPriority.HIGH,
-        leadId: "lead_456",
       },
       general: {
         name: "Bob Wilson",

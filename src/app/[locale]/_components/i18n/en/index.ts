@@ -189,6 +189,22 @@ export const translations = {
       imageAlt: "Careers at Unbottled.ai",
       keywords: "careers, jobs, AI jobs, remote work, unbottled.ai careers",
     },
+    pricing: {
+      title: "Pricing - Unbottled.ai",
+      category: "Pricing",
+      description:
+        "Affordable AI chat plans for everyone. Start free with 10 daily messages.",
+      imageAlt: "Pricing Plans",
+      keywords:
+        "pricing, plans, subscription, AI chat pricing, unbottled.ai pricing",
+      ogTitle: "Pricing Plans - Unbottled.ai",
+      ogDescription: "Simple, transparent pricing for uncensored AI chat",
+      twitterTitle: "Pricing - Unbottled.ai",
+      twitterDescription: "Start free with 10 daily messages",
+    },
+    billing: {
+      category: "Billing",
+    },
     notFound: {
       title: "404 - Page Not Found",
       category: "Error",

@@ -260,7 +260,7 @@ async function processRouteFile(
     const importPath = relativeToCurrentFile.startsWith(".")
       ? relativeToCurrentFile
       : `./${relativeToCurrentFile}`;
-    const routeModule = await import(importPath);
+    const routeModule = (await import(importPath)) as RouteFileStructure;
 
     // Extract available HTTP methods
     methods = ["GET", "POST", "PUT", "PATCH", "DELETE"].filter(

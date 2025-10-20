@@ -197,21 +197,45 @@ export const translations: typeof enTranslations = {
           title: "Zarejestruj się za darmo",
           description:
             "Utwórz swoje konto w kilka sekund. Nie wymagana karta kredytowa. Zacznij z 10 darmowymi wiadomościami dziennie.",
+          tags: {
+            audienceAnalysis: "Szybka konfiguracja",
+            competitorResearch: "Bez karty kredytowej",
+          },
+          insights: {
+            title: "Na zawsze darmowe",
+            description: "10 wiadomości dziennie, dostęp do wszystkich modeli",
+          },
         },
         contentCreation: {
           title: "Wybierz swój model AI",
           description:
             "Wybierz spośród ponad 40 niecenzurowanych modeli AI, w tym GPT-4, Claude, Gemini i więcej.",
+          tags: {
+            brandAlignedContent: "40+ modeli",
+            engagingVisuals: "Bez cenzury",
+          },
+          insights: {
+            title: "Nieograniczony dostęp",
+            description: "Szczere odpowiedzi AI bez filtrów",
+          },
         },
         publishingManagement: {
           title: "Zacznij czatować",
           description:
             "Prowadź szczere, nieograniczone rozmowy. Twórz persony, organizuj w folderach lub przejdź w tryb incognito.",
+          tags: {
+            optimalTiming: "Niestandardowe persony",
+            communityBuilding: "Zarządzanie folderami",
+          },
         },
         analysisOptimization: {
           title: "Uaktualnij, gdy będziesz gotowy",
           description:
             "Uzyskaj nieograniczony dostęp za €10/miesiąc lub kup pakiety kredytowe za €5. Płać kartą lub kryptowalutą.",
+          tags: {
+            performanceMetrics: "Plan nielimitowany",
+            strategyRefinement: "Pakiety kredytowe",
+          },
         },
       },
     },
@@ -285,6 +309,7 @@ export const translations: typeof enTranslations = {
       workplaceDescription:
         "Jesteśmy firmą zdalną, która ceni autonomię, kreatywność i wpływ. Dołącz do zespołu, który zmienia sposób, w jaki ludzie wchodzą w interakcje z AI.",
       benefits: {
+        title: "Co oferujemy",
         growthTitle: "Rozwój i nauka",
         growthDesc:
           "Pracuj z najnowocześniejszą technologią AI i ucz się od ekspertów branżowych.",
@@ -294,6 +319,15 @@ export const translations: typeof enTranslations = {
         balanceTitle: "Równowaga między pracą a życiem",
         balanceDesc:
           "Elastyczne godziny, praca zdalna i nieograniczony urlop. Ufamy, że wykonasz świetną pracę.",
+        compensationTitle: "Konkurencyjne wynagrodzenie",
+        compensationDesc:
+          "Wiodące w branży wynagrodzenie, kapitał własny i pakiet świadczeń.",
+        innovationTitle: "Innowacja i wpływ",
+        innovationDesc:
+          "Pracuj nad najnowocześniejszą technologią AI, która ma rzeczywisty wpływ.",
+        teamTitle: "Świetny zespół",
+        teamDesc:
+          "Pracuj z utalentowanymi, pasyjonatami, którym zależy na etyce AI.",
       },
       openPositions: "Otwarte stanowiska",
       noOpenings: "Obecnie brak otwartych stanowisk",
@@ -322,6 +356,19 @@ export const translations: typeof enTranslations = {
             item4: "Doskonałe umiejętności rozwiązywania problemów",
             item5: "Pasja do AI i prywatności użytkowników",
           },
+          qualifications: {
+            required: {
+              item1: "3+ lata doświadczenia z technologiami AI/ML",
+              item2: "Silne umiejętności programowania w Python i TypeScript",
+              item3: "Doświadczenie z API LLM i integracją",
+            },
+            preferred: {
+              item1: "Doskonałe umiejętności rozwiązywania problemów",
+              item2: "Pasja do AI i prywatności użytkowników",
+              item3: "Doświadczenie z systemami rozproszonymi",
+            },
+          },
+          experienceLevel: "Poziom średniozaawansowany do senior",
         },
         contentCreator: {
           title: "Menedżer społeczności",
@@ -347,7 +394,39 @@ export const translations: typeof enTranslations = {
             item4: "Doświadczenie z platformami mediów społecznościowych",
             item5: "Umiejętność samodzielnej pracy",
           },
+          qualifications: {
+            required: {
+              item1: "2+ lata doświadczenia w zarządzaniu społecznością",
+              item2: "Doskonałe umiejętności komunikacji i pisania",
+              item3: "Pasja do AI i technologii",
+            },
+            preferred: {
+              item1: "Doświadczenie z platformami mediów społecznościowych",
+              item2: "Umiejętność samodzielnej pracy",
+              item3: "Doświadczenie w AI lub technologii",
+            },
+          },
+          experienceLevel: "Poziom średniozaawansowany",
+          postedDate: "15 stycznia 2025",
+          applicationDeadline: "15 lutego 2025",
         },
+      },
+      jobDetail: {
+        jobOverview: "Przegląd stanowiska",
+        responsibilities: "Obowiązki",
+        requirements: "Wymagania",
+        qualifications: "Kwalifikacje",
+        qualificationsRequired: "Wymagane kwalifikacje",
+        qualificationsPreferred: "Preferowane kwalifikacje",
+        applyNow: "Aplikuj teraz",
+        location: "Lokalizacja",
+        department: "Dział",
+        employmentType: "Rodzaj zatrudnienia",
+        experienceLevel: "Poziom doświadczenia",
+        postedDate: "Data publikacji",
+        applicationDeadline: "Termin aplikacji",
+        relatedPositions: "Powiązane stanowiska",
+        moreDetails: "Więcej szczegółów",
       },
       applyNow: "Aplikuj teraz",
       readyToJoin: "Gotowy dołączyć?",
@@ -360,6 +439,9 @@ export const translations: typeof enTranslations = {
       description:
         "Naszą misją jest demokratyzacja dostępu do niecenzurowanej AI. Założona w 2024 roku, Unbottled.ai zapewnia platformę, na której użytkownicy mogą prowadzić szczere, niefiltrowane rozmowy z najbardziej zaawansowanymi modelami AI na świecie.",
       values: {
+        title: "Nasze wartości",
+        description:
+          "Zasady, które kierują wszystkim, co robimy w Unbottled.ai",
         excellence: {
           title: "Doskonałość",
           description:
@@ -401,6 +483,11 @@ export const translations: typeof enTranslations = {
           description:
             "Zobowiązujemy się do utrzymania platformy, która szanuje prywatność użytkowników, zapewnia przejrzyste ceny i dostarcza wyjątkowe doświadczenia AI.",
         },
+      },
+      contact: {
+        title: "Skontaktuj się z nami",
+        description: "Masz pytania lub opinie? Chętnie od Ciebie usłyszymy.",
+        cta: "Skontaktuj się z nami",
       },
     },
     imprint: {
@@ -485,8 +572,14 @@ export const translations: typeof enTranslations = {
             phone: "Numer telefonu (opcjonalnie)",
             company: "Nazwa firmy (opcjonalnie)",
             billing: "Informacje rozliczeniowe i płatnicze",
+            payment: "Metoda płatności i szczegóły transakcji",
             usage: "Dane użytkowania i historia czatu (zaszyfrowane)",
           },
+        },
+        socialMediaData: {
+          title: "Dane z mediów społecznościowych",
+          description:
+            "Jeśli połączysz konta mediów społecznościowych, możemy zbierać informacje profilowe i powiązane dane zgodnie z uprawnieniami tych platform.",
         },
         howWeUse: {
           title: "Jak wykorzystujemy Twoje informacje",
@@ -553,6 +646,22 @@ export const translations: typeof enTranslations = {
           description:
             "Możemy tworzyć zanonimizowane, zagregowane dane z Twojego użytkowania, aby ulepszyć nasze usługi.",
         },
+        useOfInformation: {
+          title: "Wykorzystanie Twoich informacji",
+          description:
+            "Wykorzystujemy zebrane informacje do różnych celów, w tym:",
+          items: {
+            provide: "Świadczenie i utrzymywanie naszych usług czatu AI",
+            process: "Przetwarzanie Twoich transakcji i zarządzanie kontem",
+            send: "Wysyłanie aktualizacji, newsletterów i komunikatów marketingowych",
+            respond:
+              "Odpowiadanie na Twoje zapytania i zapewnianie obsługi klienta",
+            monitor:
+              "Monitorowanie i analiza wzorców użytkowania w celu ulepszenia naszej platformy",
+            personalize:
+              "Personalizacja Twojego doświadczenia i dostarczanie odpowiednich treści",
+          },
+        },
         disclosure: {
           title: "Ujawnianie informacji",
           description:
@@ -582,6 +691,35 @@ export const translations: typeof enTranslations = {
           title: "Zmiany w tej polityce",
           description:
             "Możemy od czasu do czasu aktualizować tę Politykę prywatności. Powiadomimy Cię o wszelkich istotnych zmianach.",
+        },
+        legal: {
+          title: "Podstawa prawna przetwarzania",
+          description:
+            "Przetwarzamy Twoje dane osobowe na podstawie Twojej zgody, konieczności umownej, obowiązków prawnych oraz naszych uzasadnionych interesów w świadczeniu i ulepszaniu naszych usług.",
+        },
+        security: {
+          title: "Środki bezpieczeństwa",
+          description:
+            "Wdrażamy odpowiednie techniczne i organizacyjne środki bezpieczeństwa w celu ochrony Twoich danych osobowych przed nieautoryzowanym dostępem, zmianą, ujawnieniem lub zniszczeniem. Jednak żadna metoda transmisji przez Internet nie jest w 100% bezpieczna.",
+        },
+        rights: {
+          title: "Twoje prawa do ochrony danych",
+          description:
+            "Zgodnie z przepisami o ochronie danych masz określone prawa dotyczące Twoich danych osobowych:",
+          items: {
+            access: "Prawo dostępu do Twoich danych osobowych",
+            correction:
+              "Prawo do poprawiania niedokładnych lub niekompletnych danych",
+            deletion:
+              "Prawo do żądania usunięcia Twoich danych (prawo do bycia zapomnianym)",
+            objection: "Prawo do sprzeciwu wobec przetwarzania Twoich danych",
+            portability: "Prawo do przenoszenia i transferu danych",
+          },
+        },
+        thirdPartySites: {
+          title: "Strony trzecie",
+          description:
+            "Nasza usługa może zawierać linki do stron trzecich. Nie ponosimy odpowiedzialności za praktyki ochrony prywatności tych zewnętrznych stron. Zachęcamy do zapoznania się z ich politykami prywatności.",
         },
         contact: {
           title: "Skontaktuj się z nami",

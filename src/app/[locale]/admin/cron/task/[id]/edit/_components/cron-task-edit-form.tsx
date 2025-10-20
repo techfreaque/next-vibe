@@ -17,10 +17,8 @@ import type {
   IndividualCronTaskType,
 } from "@/app/api/[locale]/v1/core/system/tasks/cron/task/[id]/definition";
 import { formatCronSchedule } from "@/app/api/[locale]/v1/core/system/tasks/cron-formatter";
-import {
-  CronTaskPriority,
-  CronTaskPriorityOptions,
-} from "@/app/api/[locale]/v1/core/system/tasks/enum";
+import { CronTaskPriorityOptions } from "@/app/api/[locale]/v1/core/system/tasks/enum";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
@@ -41,34 +39,44 @@ export function CronTaskEditForm({
 }: CronTaskEditFormProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const userTimezone = getDefaultTimezone(locale);
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
-  const handleSubmit = endpoint.update?.onSubmit;
-  const isLoading = endpoint.read?.isLoading;
-  const isSaving = endpoint.update?.isSubmitting;
+  // Use PUT endpoint (mapped to endpoint.create) for form mutations
+  const isLoading = endpoint.create?.isSubmitting ?? false;
 
   return (
     <div className="space-y-6">
       {/* Task Information (Read-only) */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("app.admin.cron.taskDetails.info")}</CardTitle>
+          <CardTitle>
+            {t(
+              "app.api.v1.core.system.tasks.cronSystem.task.get.container.title",
+            )}
+          </CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="text-sm font-medium text-muted-foreground">
-              {t("app.admin.cron.taskDetails.id")}
+              {t(
+                "app.api.v1.core.system.tasks.cronSystem.task.get.fields.id.label",
+              )}
             </label>
             <p className="text-sm font-mono">{task.id}</p>
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">
-              {t("app.admin.cron.taskDetails.version")}
+              {t(
+                "app.api.v1.core.system.tasks.cronSystem.task.put.fields.name.label",
+              )}
             </label>
             <p className="text-sm">{task.version}</p>
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">
-              {t("app.admin.cron.taskDetails.createdAt")}
+              {t(
+                "app.api.v1.core.system.tasks.cronSystem.tasks.list.columns.createdAt",
+              )}
             </label>
             <p className="text-sm">
               {new Date(task.createdAt).toLocaleString()}
@@ -76,7 +84,9 @@ export function CronTaskEditForm({
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">
-              {t("app.admin.cron.taskDetails.updatedAt")}
+              {t(
+                "app.api.v1.core.system.tasks.cronSystem.tasks.list.columns.updatedAt",
+              )}
             </label>
             <p className="text-sm">
               {new Date(task.updatedAt).toLocaleString()}
@@ -84,10 +94,12 @@ export function CronTaskEditForm({
           </div>
           <div className="md:col-span-2">
             <label className="text-sm font-medium text-muted-foreground">
-              {t("app.admin.cron.taskDetails.scheduling")}
+              {t(
+                "app.api.v1.core.system.tasks.cronSystem.task.put.fields.schedule.label",
+              )}
             </label>
             <p className="text-sm">
-              {formatCronSchedule(task.schedule, userTimezone, locale)}
+              {formatCronSchedule(task.schedule, userTimezone, locale, logger)}
             </p>
             <p className="text-xs text-muted-foreground font-mono">
               {task.schedule}
@@ -99,27 +111,37 @@ export function CronTaskEditForm({
       {/* Edit Form */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("app.admin.cron.taskDetails.edit")}</CardTitle>
+          <CardTitle>
+            {t(
+              "app.api.v1.core.system.tasks.cronSystem.task.put.container.title",
+            )}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Form
-            form={endpoint.update?.form}
-            onSubmit={handleSubmit}
+            form={endpoint.create?.form}
+            onSubmit={endpoint.create?.onSubmit}
             className="space-y-6"
           >
             <FormFieldGroup
-              title={"app.admin.cron.taskDetails.basicInfo"}
-              description={"app.admin.cron.taskDetails.basicInfoDescription"}
+              title={
+                "app.api.v1.core.system.tasks.cronSystem.task.put.container.title"
+              }
+              description={
+                "app.api.v1.core.system.tasks.cronSystem.task.put.container.description"
+              }
             >
               <div className="grid grid-cols-1 gap-4">
                 <EndpointFormField
                   name="name"
                   config={{
                     type: "text",
-                    label: "app.admin.cron.taskDetails.name",
-                    placeholder: "app.admin.cron.taskDetails.namePlaceholder",
+                    label:
+                      "app.api.v1.core.system.tasks.cronSystem.task.put.fields.name.label",
+                    placeholder:
+                      "app.api.v1.core.system.tasks.cronSystem.task.put.fields.name.placeholder",
                   }}
-                  control={endpoint.update?.form.control}
+                  control={endpoint.create?.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -130,12 +152,13 @@ export function CronTaskEditForm({
                   name="description"
                   config={{
                     type: "textarea",
-                    label: "app.admin.cron.taskDetails.description",
+                    label:
+                      "app.api.v1.core.system.tasks.cronSystem.task.put.fields.description.label",
                     placeholder:
-                      "app.admin.cron.taskDetails.descriptionPlaceholder",
+                      "app.api.v1.core.system.tasks.cronSystem.task.put.fields.description.placeholder",
                     rows: 3,
                   }}
-                  control={endpoint.update?.form.control}
+                  control={endpoint.create?.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -145,20 +168,26 @@ export function CronTaskEditForm({
             </FormFieldGroup>
 
             <FormFieldGroup
-              title={"app.admin.cron.taskDetails.scheduling"}
-              description={"app.admin.cron.taskDetails.schedulingDescription"}
+              title={
+                "app.api.v1.core.system.tasks.cronSystem.task.put.fields.schedule.label"
+              }
+              description={
+                "app.api.v1.core.system.tasks.cronSystem.task.put.fields.schedule.description"
+              }
             >
               <ScheduleAutocomplete
-                value={endpoint.update?.form.watch("schedule")}
-                onChange={(value) =>
-                  endpoint.update?.form.setValue("schedule", value)
+                value={endpoint.create?.form.watch("schedule") ?? ""}
+                onChange={(value): void =>
+                  endpoint.create?.form.setValue("schedule", value)
                 }
-                onBlur={() => endpoint.update?.form.trigger("schedule")}
+                onBlur={(): void => {
+                  void endpoint.create?.form.trigger("schedule");
+                }}
                 placeholder={t(
-                  "app.admin.cron.taskDetails.schedulePlaceholder",
+                  "app.api.v1.core.system.tasks.cronSystem.task.put.fields.schedule.placeholder",
                 )}
                 searchPlaceholder={t(
-                  "app.admin.cron.taskDetails.searchSchedule",
+                  "app.api.v1.core.system.tasks.cronSystem.task.put.fields.schedule.placeholder",
                 )}
                 allowCustom={true}
                 locale={locale}
@@ -166,9 +195,11 @@ export function CronTaskEditForm({
             </FormFieldGroup>
 
             <FormFieldGroup
-              title={"app.admin.cron.taskDetails.configuration"}
+              title={
+                "app.api.v1.core.system.tasks.cronSystem.task.put.container.title"
+              }
               description={
-                "app.admin.cron.taskDetails.configurationDescription"
+                "app.api.v1.core.system.tasks.cronSystem.task.put.container.description"
               }
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -176,11 +207,12 @@ export function CronTaskEditForm({
                   name="enabled"
                   config={{
                     type: "switch",
-                    label: "app.admin.cron.taskDetails.enabled",
+                    label:
+                      "app.api.v1.core.system.tasks.cronSystem.task.put.fields.enabled.label",
                     description:
-                      "app.admin.cron.taskDetails.enabledDescription",
+                      "app.api.v1.core.system.tasks.cronSystem.task.put.fields.enabled.description",
                   }}
-                  control={endpoint.update?.form.control}
+                  control={endpoint.create?.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -191,12 +223,13 @@ export function CronTaskEditForm({
                   name="priority"
                   config={{
                     type: "select",
-                    label: "app.admin.cron.taskDetails.priority",
+                    label:
+                      "app.api.v1.core.system.tasks.cronSystem.task.put.fields.priority.label",
                     placeholder:
-                      "app.admin.cron.taskDetails.priorityPlaceholder",
+                      "app.api.v1.core.system.tasks.cronSystem.task.put.fields.priority.placeholder",
                     options: CronTaskPriorityOptions,
                   }}
-                  control={endpoint.update?.form.control}
+                  control={endpoint.create?.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -207,11 +240,12 @@ export function CronTaskEditForm({
                   name="timeout"
                   config={{
                     type: "text",
-                    label: "app.admin.cron.taskDetails.timeout",
+                    label:
+                      "app.api.v1.core.system.tasks.cronSystem.task.put.fields.timeout.label",
                     placeholder:
-                      "app.admin.cron.taskDetails.timeoutPlaceholder",
+                      "app.api.v1.core.system.tasks.cronSystem.task.put.fields.timeout.placeholder",
                   }}
-                  control={endpoint.update?.form.control}
+                  control={endpoint.create?.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -222,11 +256,12 @@ export function CronTaskEditForm({
                   name="retries"
                   config={{
                     type: "text",
-                    label: "app.admin.cron.taskDetails.retries",
+                    label:
+                      "app.api.v1.core.system.tasks.cronSystem.task.put.fields.retries.label",
                     placeholder:
-                      "app.admin.cron.taskDetails.retriesPlaceholder",
+                      "app.api.v1.core.system.tasks.cronSystem.task.put.fields.retries.placeholder",
                   }}
-                  control={endpoint.update?.form.control}
+                  control={endpoint.create?.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -236,17 +271,19 @@ export function CronTaskEditForm({
             </FormFieldGroup>
 
             {/* Form Alert for errors and success */}
-            <FormAlert alert={endpoint.update?.alert} />
+            <FormAlert alert={endpoint.alert} />
 
             {/* Submit Button */}
-            <Button type="submit" disabled={isSaving} className="w-full">
+            <Button type="submit" disabled={isLoading} className="w-full">
               {isLoading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  {t("app.admin.cron.taskDetails.saving")}
+                  {t(
+                    "app.api.v1.core.system.tasks.cronSystem.task.put.success.updated.title",
+                  )}
                 </>
               ) : (
-                t("app.admin.cron.taskDetails.save")
+                t("app.api.v1.core.system.tasks.cronSystem.task.put.title")
               )}
             </Button>
           </Form>

@@ -26,6 +26,7 @@ import React, { useMemo, useState } from "react";
 
 import { CRON_SCHEDULES } from "@/app/api/[locale]/v1/core/system/tasks/constants";
 import { formatCronScheduleShort } from "@/app/api/[locale]/v1/core/system/tasks/cron-formatter";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
@@ -61,13 +62,11 @@ export function ScheduleAutocomplete({
   const [isCustomValue, setIsCustomValue] = useState(false);
 
   const timezone = getDefaultTimezone(locale);
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   const options = Object.values(CRON_SCHEDULES).map((schedule) => ({
-    value: schedule.schedule,
-    label: t("cron.formatting.scheduleLabel", {
-      description: formatCronScheduleShort(schedule.schedule, timezone, locale),
-      expression: schedule.schedule,
-    }),
+    value: schedule,
+    label: formatCronScheduleShort(schedule, timezone, locale, logger),
   }));
 
   // Filter options based on search

@@ -15,16 +15,14 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import React, { useCallback, useState } from "react";
 
 import { useBatchOperations } from "@/app/api/[locale]/v1/core/leads/batch/hooks";
-import type {
+import {
   BatchOperationScope,
   EmailCampaignStage,
-  LeadSource,
-  LeadStatus,
-} from "@/app/api/[locale]/v1/core/leads/enum";
-import {
   EmailCampaignStageFilter,
   LeadSortField,
+  LeadSource,
   LeadSourceFilter,
+  LeadStatus,
   LeadStatusFilter,
   SortOrder,
 } from "@/app/api/[locale]/v1/core/leads/enum";
