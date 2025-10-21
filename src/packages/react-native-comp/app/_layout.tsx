@@ -1,8 +1,10 @@
-import { Slot } from 'expo-router';
+import "../global.css";
+
+import { Slot } from "expo-router";
 
 /**
- * Ultra-minimal root layout
+ * Root layout with NativeWind global styles
  */
-export default function RootLayout() {
+export default function RootLayout(): React.ReactElement {
   return <Slot />;
 }

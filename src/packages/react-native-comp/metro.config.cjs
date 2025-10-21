@@ -1,4 +1,5 @@
 const { getDefaultConfig } = require('expo/metro-config');
+const { withNativeWind } = require('nativewind/metro');
 const path = require('path');
 
 const projectRoot = __dirname;
@@ -23,11 +24,8 @@ config.resolver.sourceExts = [
   'mjs',
 ];
 
-// Platform-specific extensions for asset and style files
-config.resolver.assetExts = [
-  ...config.resolver.assetExts,
-  'css',
-];
+// Remove CSS from asset extensions (it's in sourceExts for NativeWind)
+config.resolver.assetExts = config.resolver.assetExts.filter(ext => ext !== 'css');
 
 // Configure path aliases to match tsconfig.json
 config.resolver.extraNodeModules = {
@@ -53,4 +51,4 @@ config.resolver.blockList = [
   /.*\/middleware\.ts$/,
 ];
 
-module.exports = config;
+module.exports = withNativeWind(config);
