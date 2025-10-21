@@ -1,7 +1,11 @@
+/// <reference types="node" />
 import { join } from "node:path";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { defaultLocale } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
 import type { LaunchpadConfig } from "../types/types.js";
-import { logger } from "../utils/logger.js";
 import {
   cloneRepo,
   closePrompt,
@@ -11,12 +15,15 @@ import {
   updateRootRepo,
 } from "../utils/repo-utils.js";
 
+const { t } = simpleT(defaultLocale);
+
 export async function updateAllRepos(
-  force = false,
+  logger: EndpointLogger,
+  force: boolean,
   rootDir: string,
   config: LaunchpadConfig,
 ): Promise<void> {
-  logger("Updating all repositories...");
+  logger.info(t("app.api.v1.core.system.launchpad.updateAll.updating"));
   const repos = getAllRepos(config);
 
   let clonedCount = 0;
@@ -42,8 +49,10 @@ export async function updateAllRepos(
         failedCloneCount++;
         const repoPath = join(...repo.path);
         failedCloneRepos.push(repoPath);
-        logger(
-          `⚠️  Failed to clone ${repoPath}, continuing with other repositories...`,
+        logger.info(
+          t("app.api.v1.core.system.launchpad.updateAll.failedClone", {
+            repoPath,
+          }),
         );
       }
     } else if (repoExists(repo.path, rootDir)) {
@@ -55,8 +64,10 @@ export async function updateAllRepos(
         failedUpdateCount++;
         const repoPath = join(...repo.path);
         failedUpdateRepos.push(repoPath);
-        logger(
-          `⚠️  Failed to update ${repoPath}, continuing with other repositories...`,
+        logger.info(
+          t("app.api.v1.core.system.launchpad.updateAll.failedUpdate", {
+            repoPath,
+          }),
         );
       }
     }
@@ -64,18 +75,42 @@ export async function updateAllRepos(
 
   // Report results
   if (clonedCount > 0) {
-    logger(`✅ Successfully cloned ${clonedCount} missing repositories.`);
+    logger.info(
+      t("app.api.v1.core.system.launchpad.updateAll.clonedSuccess", {
+        count: clonedCount.toString(),
+      }),
+    );
   }
   if (updatedCount > 0) {
-    logger(`✅ Successfully updated ${updatedCount} existing repositories.`);
+    logger.info(
+      t("app.api.v1.core.system.launchpad.updateAll.updatedSuccess", {
+        count: updatedCount.toString(),
+      }),
+    );
   }
   if (failedCloneCount > 0) {
-    logger(`❌ Failed to clone ${failedCloneCount} repositories:`);
-    failedCloneRepos.forEach((repo) => logger(`   - ${repo}`));
+    logger.info(
+      t("app.api.v1.core.system.launchpad.updateAll.cloneFailed", {
+        count: failedCloneCount.toString(),
+      }),
+    );
+    failedCloneRepos.forEach((repo) =>
+      logger.info(
+        t("app.api.v1.core.system.launchpad.updateAll.failedRepo", { repo }),
+      ),
+    );
   }
   if (failedUpdateCount > 0) {
-    logger(`❌ Failed to update ${failedUpdateCount} repositories:`);
-    failedUpdateRepos.forEach((repo) => logger(`   - ${repo}`));
+    logger.info(
+      t("app.api.v1.core.system.launchpad.updateAll.updateFailed", {
+        count: failedUpdateCount.toString(),
+      }),
+    );
+    failedUpdateRepos.forEach((repo) =>
+      logger.info(
+        t("app.api.v1.core.system.launchpad.updateAll.failedRepo", { repo }),
+      ),
+    );
   }
 
   // Also update the root repository

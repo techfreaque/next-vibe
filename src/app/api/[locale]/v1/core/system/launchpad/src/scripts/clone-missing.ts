@@ -1,11 +1,11 @@
 /// <reference types="node" />
-
 import { join } from "node:path";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { defaultLocale } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { LaunchpadConfig } from "../types/types.js";
-import { logger } from "../utils/logger.js";
 import {
   cloneRepo,
   closePrompt,
@@ -13,15 +13,14 @@ import {
   repoExists,
 } from "../utils/repo-utils.js";
 
-const { t } = simpleT("en-GLOBAL");
+const { t } = simpleT(defaultLocale);
 
 export async function cloneMissingRepos(
+  logger: EndpointLogger,
   rootDir: string,
   config: LaunchpadConfig,
 ): Promise<void> {
-  // await updateRootRepo(false, rootDir);
-
-  logger(t("app.api.v1.core.system.launchpad.cloneMissing.checking"));
+  logger.info(t("app.api.v1.core.system.launchpad.cloneMissing.checking"));
   const repos = getAllRepos(config);
   let clonedCount = 0;
   let failedCount = 0;
@@ -42,8 +41,8 @@ export async function cloneMissingRepos(
         failedCount++;
         const repoPath = join(...repo.path);
         failedRepos.push(repoPath);
-        logger(
-          t("app.api.v1.core.system.launchpad.cloneMissing.failedToCone", {
+        logger.info(
+          t("app.api.v1.core.system.launchpad.cloneMissing.failedToClone", {
             repoPath,
           }),
         );
@@ -52,23 +51,23 @@ export async function cloneMissingRepos(
   }
 
   if (clonedCount === 0 && failedCount === 0) {
-    logger(t("app.api.v1.core.system.launchpad.cloneMissing.noMissing"));
+    logger.info(t("app.api.v1.core.system.launchpad.cloneMissing.noMissing"));
   } else {
     if (clonedCount > 0) {
-      logger(
+      logger.info(
         t("app.api.v1.core.system.launchpad.cloneMissing.success", {
           count: clonedCount.toString(),
         }),
       );
     }
     if (failedCount > 0) {
-      logger(
+      logger.info(
         t("app.api.v1.core.system.launchpad.cloneMissing.failed", {
           count: failedCount.toString(),
         }),
       );
       failedRepos.forEach((repo) =>
-        logger(
+        logger.info(
           t("app.api.v1.core.system.launchpad.cloneMissing.failedRepo", {
             repo,
           }),
@@ -76,8 +75,6 @@ export async function cloneMissingRepos(
       );
     }
   }
-
-  // Update root repository
 
   closePrompt();
 }

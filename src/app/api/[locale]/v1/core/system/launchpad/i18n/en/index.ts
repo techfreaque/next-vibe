@@ -88,4 +88,26 @@ export const translations = {
         'find . -name "package.json" -not -path "*/node_modules/*" -not -path "*/.git/*"',
     },
   },
+
+  cloneMissing: {
+    checking: "🔍 Checking for missing repositories...",
+    failedToClone: "❌ Failed to clone {{repoPath}}",
+    noMissing: "✅ No missing repositories found",
+    success: "✅ Successfully cloned {{count}} repositories",
+    failed: "❌ Failed to clone {{count}} repositories:",
+    failedRepo: "  - {{repo}}",
+  },
+
+  updateAll: {
+    updating: "🔄 Updating all repositories...",
+    failedClone:
+      "⚠️  Failed to clone {{repoPath}}, continuing with other repositories...",
+    failedUpdate:
+      "⚠️  Failed to update {{repoPath}}, continuing with other repositories...",
+    clonedSuccess: "✅ Successfully cloned {{count}} missing repositories.",
+    updatedSuccess: "✅ Successfully updated {{count}} existing repositories.",
+    cloneFailed: "❌ Failed to clone {{count}} repositories:",
+    updateFailed: "❌ Failed to update {{count}} repositories:",
+    failedRepo: "   - {{repo}}",
+  },
 };

@@ -13,6 +13,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { creditRepository } from "@/app/api/[locale]/v1/core/agent/chat/credits/repository";
 import { leadsRepository } from "@/app/api/[locale]/v1/core/leads/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -258,8 +259,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       const publicName = userInput.personalInfo.publicName;
       const confirmPassword = userInput.security.confirmPassword;
       const subscribeToNewsletter =
-        (userInput.preferences as { subscribeToNewsletter?: boolean })
-          ?.subscribeToNewsletter || false;
+        userInput.consent.subscribeToNewsletter || false;
 
       // Check if email is already registered
       const emailCheckResult = await this.checkEmailAvailabilityInternal(
@@ -320,9 +320,6 @@ export class SignupRepositoryImpl implements SignupRepository {
       );
 
       // Add 20 free credits for new users
-      const { creditRepository } = await import(
-        "../../agent/chat/credits/repository"
-      );
       const creditsResult = await creditRepository.addCredits(
         userResponse.data.id,
         20,

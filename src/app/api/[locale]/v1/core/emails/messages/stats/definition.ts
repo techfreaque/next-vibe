@@ -729,7 +729,9 @@ const { GET } = createEndpoint({
         maxRetryCount: 3,
         averageProcessingTime: 150,
         averageDeliveryTime: 2000,
-        historicalData: {},
+        historicalData: {
+          series: [],
+        },
         groupedStats: {
           byStatus: [],
           byType: [],

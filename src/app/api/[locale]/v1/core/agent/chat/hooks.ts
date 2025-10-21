@@ -744,15 +744,16 @@ export function useChat(
 
       try {
         // Use "retry" operation which creates a branch with the same user message content
-        // The backend will fetch the original message content and create a new branch
+        // For incognito mode, we need to provide the content since there's no database
+        // For authenticated mode, the backend will fetch it from the database
         await aiStream.startStream({
           operation: "retry",
           rootFolderId: chatStore.currentRootFolderId,
           subFolderId: chatStore.currentSubFolderId,
           threadId: message.threadId,
           parentMessageId: messageId,
-          content: "", // Backend fetches original content
-          role: "user", // Backend fetches original role
+          content: message.content, // Provide content for incognito mode
+          role: message.role.toLowerCase() as "user" | "assistant" | "system",
           model: selectedModel,
           persona: selectedPersona,
           temperature,
@@ -896,6 +897,24 @@ export function useChat(
         return;
       }
 
+      // Check if user is authenticated
+      const authStatusCookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("auth_status="));
+      const isAuthenticated = authStatusCookie !== undefined;
+
+      // For incognito mode, just delete from store (no API call)
+      if (!isAuthenticated || message.rootFolderId === "incognito") {
+        logger.debug("useChat", "Deleting incognito message (client-side only)", {
+          messageId,
+          isAuthenticated,
+          rootFolderId: message.rootFolderId,
+        });
+        chatStore.deleteMessage(messageId);
+        return;
+      }
+
+      // For authenticated users, delete from server
       try {
         const response = await fetch(
           `/api/${locale}/v1/core/agent/chat/threads/${message.threadId}/messages/${messageId}`,
@@ -930,6 +949,26 @@ export function useChat(
         return;
       }
 
+      // Check if user is authenticated
+      const authStatusCookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("auth_status="));
+      const isAuthenticated = authStatusCookie !== undefined;
+
+      // Incognito mode doesn't support voting
+      if (!isAuthenticated || message.rootFolderId === "incognito") {
+        logger.debug("useChat", "Voting not supported in incognito mode", {
+          messageId,
+          isAuthenticated,
+          rootFolderId: message.rootFolderId,
+        });
+        return;
+      }
+
+      // Convert number vote to string format expected by backend
+      const voteString = vote === 1 ? "up" : vote === -1 ? "down" : "remove";
+
+      // For authenticated users, vote on server
       try {
         const response = await fetch(
           `/api/${locale}/v1/core/agent/chat/threads/${message.threadId}/messages/${messageId}/vote`,
@@ -938,7 +977,7 @@ export function useChat(
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ vote }),
+            body: JSON.stringify({ vote: voteString }),
           },
         );
 

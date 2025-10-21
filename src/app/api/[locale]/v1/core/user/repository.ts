@@ -264,7 +264,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       // Standard user data
       const standardUser: StandardUserType = {
         id: user.id,
-        leadId: user.leadId,
+        leadId: null,
         isPublic: false,
         privateName: user.privateName,
         publicName: user.publicName,
@@ -479,7 +479,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
         const standardUser: StandardUserType = {
           id: user.id,
-          leadId: user.leadId,
+          leadId: null,
           isPublic: false,
           privateName: user.privateName,
           publicName: user.publicName,
@@ -543,7 +543,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
         const standardUser: StandardUserType = {
           id: user.id,
-          leadId: user.leadId,
+          leadId: null,
           privateName: user.privateName,
           publicName: user.publicName,
           email: user.email,

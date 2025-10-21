@@ -61,7 +61,6 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
 
       // Prepare user data using actual schema fields
       const newUser: NewUser = {
-        leadId: data.adminSettings?.leadId || null,
         email: data.basicInfo.email,
         password: hashedPassword,
         privateName: data.basicInfo.privateName,
@@ -121,7 +120,7 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
           createdAt: createdUser.createdAt.toISOString(),
         },
         responseId: createdUser.id,
-        responseLeadId: createdUser.leadId,
+        responseLeadId: null,
         responseEmail: createdUser.email,
         responsePrivateName: createdUser.privateName,
         responsePublicName: createdUser.publicName,

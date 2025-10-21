@@ -1,3 +1,7 @@
+/// <reference types="node" />
+/* eslint-disable node/no-process-env */
+/* eslint-disable i18next/no-literal-string */
+/* eslint-disable no-restricted-syntax */
 import inquirer from "inquirer";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
@@ -72,7 +76,7 @@ export async function ciReleaseCommand(
     ciMode: true,
   };
 
-  const success = await executor.executeReleaseTarget(targetToRelease, options);
+  const success = executor.executeReleaseTarget(targetToRelease, options);
   if (!success) {
     throw new Error(`Release failed for: ${targetToRelease.directory}`);
   }
@@ -83,7 +87,10 @@ export async function ciReleaseCommand(
 /**
  * Force Update All Command - updates dependencies for all packages
  */
-export async function forceUpdateAllCommand(logger: EndpointLogger, rootDir: string): Promise<void> {
+export function forceUpdateAllCommand(
+  logger: EndpointLogger,
+  rootDir: string,
+): void {
   logger.info("🔄 Force Update All Packages");
 
   const targets = discoverReleaseTargets(rootDir);
@@ -101,13 +108,16 @@ export async function forceUpdateAllCommand(logger: EndpointLogger, rootDir: str
   }
 
   const executor = new ReleaseExecutor(logger, rootDir);
-  await executor.executeForceUpdateAll(validTargets);
+  executor.executeForceUpdateAll(validTargets);
 }
 
 /**
  * Release All Command - releases all packages sequentially
  */
-export async function releaseAllCommand(logger: EndpointLogger, rootDir: string): Promise<void> {
+export async function releaseAllCommand(
+  logger: EndpointLogger,
+  rootDir: string,
+): Promise<void> {
   logger.info("🚀 Release All Packages");
 
   const targets = discoverReleaseTargets(rootDir);
@@ -171,28 +181,28 @@ export async function forceReleaseCommand(
       { name: "Initialize (-> 1.0.0)", value: "init" },
     ];
 
-    const { versionBumpChoice } = await inquirer.prompt([
+    const result = (await inquirer.prompt([
       {
         type: "list",
         name: "versionBumpChoice",
         message: "Select version bump type:",
         choices: versionBumpChoices,
       },
-    ]);
-    selectedVersionBump = versionBumpChoice;
+    ])) as { versionBumpChoice: VersionBumpType };
+    selectedVersionBump = result.versionBumpChoice;
   }
 
   // Confirm the action
-  const { confirm } = await inquirer.prompt([
+  const confirmResult = (await inquirer.prompt([
     {
       type: "confirm",
       name: "confirm",
       message: `Are you sure you want to force release ${validTargets.length} packages with ${selectedVersionBump} version bump?`,
       default: false,
     },
-  ]);
+  ])) as { confirm: boolean };
 
-  if (!confirm) {
+  if (!confirmResult.confirm) {
     logger.info("Operation cancelled");
     return;
   }
@@ -204,11 +214,14 @@ export async function forceReleaseCommand(
 /**
  * Continue Release Command - continues from previous state
  */
-export async function continueReleaseCommand(logger: EndpointLogger, rootDir: string): Promise<void> {
+export async function continueReleaseCommand(
+  logger: EndpointLogger,
+  rootDir: string,
+): Promise<void> {
   logger.info("🔄 Continue Release from Previous State");
 
   const stateManager = new StateManager(rootDir);
-  const existingState = stateManager.loadState();
+  const existingState = stateManager.loadState(logger);
 
   if (!existingState) {
     logger.info("No previous state found. Nothing to continue.");
@@ -218,7 +231,7 @@ export async function continueReleaseCommand(logger: EndpointLogger, rootDir: st
   logger.info("Previous state found:");
   logger.info(stateManager.getStateSummary(existingState));
 
-  const { action } = await inquirer.prompt([
+  const actionResult = (await inquirer.prompt([
     {
       type: "list",
       name: "action",
@@ -230,15 +243,15 @@ export async function continueReleaseCommand(logger: EndpointLogger, rootDir: st
         { name: "Cancel", value: "cancel" },
       ],
     },
-  ]);
+  ])) as { action: string };
 
-  if (action === "cancel") {
+  if (actionResult.action === "cancel") {
     logger.info("Operation cancelled");
     return;
   }
 
-  if (action === "clear") {
-    stateManager.clearState();
+  if (actionResult.action === "clear") {
+    stateManager.clearState(logger);
     logger.info("State cleared");
     return;
   }
@@ -246,7 +259,7 @@ export async function continueReleaseCommand(logger: EndpointLogger, rootDir: st
   const options: ReleaseOrchestrationOptions = {
     continueFromState: true,
     allowSkip: true,
-    allowRetry: action === "retry",
+    allowRetry: actionResult.action === "retry",
   };
 
   const executor = new ReleaseExecutor(logger, rootDir);
@@ -256,11 +269,14 @@ export async function continueReleaseCommand(logger: EndpointLogger, rootDir: st
 /**
  * Show Release Status Command - displays current state
  */
-export async function showReleaseStatusCommand(logger: EndpointLogger, rootDir: string): Promise<void> {
+export function showReleaseStatusCommand(
+  logger: EndpointLogger,
+  rootDir: string,
+): void {
   logger.info("📊 Release Status");
 
   const stateManager = new StateManager(rootDir);
-  const existingState = stateManager.loadState();
+  const existingState = stateManager.loadState(logger);
 
   if (!existingState) {
     logger.info("No active release state found");

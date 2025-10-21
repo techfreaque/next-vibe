@@ -232,7 +232,9 @@ export function EmailTemplate({
                 margin: "8px 0 0 0",
               }}
             >
-              {t("email.footer.needHelp")}{" "}
+              {t(
+                "app.api.v1.core.emails.smtpClient.components.email.footer.needHelp",
+              )}{" "}
               <TrackedLink
                 href={`mailto:${contactClientRepository.getSupportEmail(locale)}`}
                 tracking={tracking}
@@ -250,10 +252,13 @@ export function EmailTemplate({
                 margin: "16px 0 0 0",
               }}
             >
-              {t("email.footer.copyright", {
-                currentYear,
-                appName: `${t("app.common.logoPart1")} ${t("app.common.logoPart2")}`,
-              })}
+              {t(
+                "app.api.v1.core.emails.smtpClient.components.email.footer.copyright",
+                {
+                  currentYear,
+                  appName: `${t("app.common.logoPart1")} ${t("app.common.logoPart2")}`,
+                },
+              )}
             </Text>
           </Section>
         </Container>

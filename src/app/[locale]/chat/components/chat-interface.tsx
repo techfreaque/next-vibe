@@ -101,6 +101,7 @@ export function ChatInterface({
     branchMessage,
     deleteMessage,
     retryMessage,
+    answerAsAI,
     voteMessage,
     stopGeneration,
     deleteThread,
@@ -506,7 +507,12 @@ export function ChatInterface({
           onDeleteMessage={deleteMessage}
           onSwitchBranch={handleSwitchBranch}
           onRetryMessage={retryMessage}
-          onVoteMessage={voteMessage}
+          onAnswerAsModel={async (messageId: string): Promise<void> => {
+            // Answer as AI: Generate an AI response to this message
+            // For now, use empty content - the AI will generate its own response
+            await answerAsAI(messageId, "Generate a helpful response to the above message.");
+          }}
+          onVoteMessage={currentRootFolderId === "incognito" ? undefined : voteMessage}
           onModelChange={setSelectedModel}
           onPersonaChange={setSelectedPersona}
           onEnableSearchChange={setEnableSearch}

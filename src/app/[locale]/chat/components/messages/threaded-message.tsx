@@ -55,6 +55,7 @@ interface ThreadedMessageProps {
   onModelChange?: (model: ModelId) => void;
   onPersonaChange?: (persona: string) => void;
   maxDepth?: number;
+  rootFolderId?: string;
 }
 
 export function ThreadedMessage({
@@ -75,6 +76,7 @@ export function ThreadedMessage({
   onModelChange,
   onPersonaChange,
   maxDepth = LAYOUT.MAX_THREAD_DEPTH,
+  rootFolderId = "general",
 }: ThreadedMessageProps): JSX.Element {
   const { t } = simpleT(locale);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -290,7 +292,9 @@ export function ThreadedMessage({
                         );
                       })()}
                     {message.role === "user"
-                      ? t("app.chat.threadedView.youLabel")
+                      ? rootFolderId === "general" || rootFolderId === "shared" || rootFolderId === "public"
+                        ? t("app.chat.threadedView.youLabel")
+                        : t("app.chat.threadedView.userFallback")
                       : message.role === "assistant" && message.model
                         ? getModelById(message.model).name
                         : t("app.chat.threadedView.assistantFallback")}
@@ -573,6 +577,7 @@ export function ThreadedMessage({
                   onModelChange={onModelChange}
                   onPersonaChange={onPersonaChange}
                   maxDepth={maxDepth}
+                  rootFolderId={rootFolderId}
                 />
               ))}
             </div>

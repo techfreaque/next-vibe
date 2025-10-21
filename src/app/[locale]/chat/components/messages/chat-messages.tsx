@@ -206,6 +206,7 @@ export function ChatMessages({
                   chat.setInput(chat.input + QUOTE_CHARACTER);
                   chat.inputRef.current?.focus();
                 }}
+                rootFolderId={rootFolderId}
               />
             );
           })()
@@ -233,6 +234,7 @@ export function ChatMessages({
                 onVoteMessage={onVoteMessage}
                 onModelChange={onModelChange}
                 onPersonaChange={onPersonaChange}
+                rootFolderId={rootFolderId}
               />
             ));
           })()

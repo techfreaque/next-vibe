@@ -129,7 +129,7 @@ export class ContactRepositoryImpl implements ContactRepository {
       logger.debug("app.api.v1.core.contact.repository.create.success", {
         contactId: contact.id,
         email: data.email,
-        leadId: data.leadId,
+        leadId,
       });
 
       return createSuccessResponse({

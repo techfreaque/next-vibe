@@ -22,6 +22,7 @@ interface MessageAuthorProps {
   /** Persona/tone used for this message */
   tone?: string | null;
   locale: CountryLanguage;
+  rootFolderId?: string;
 }
 
 export function MessageAuthorInfo({
@@ -34,11 +35,17 @@ export function MessageAuthorInfo({
   className,
   tone,
   locale,
+  rootFolderId = "general",
 }: MessageAuthorProps): JSX.Element {
   const { t } = simpleT(locale);
 
   const authorColor = isAI ? "text-blue-500" : "text-foreground";
-  const displayName = authorName ?? t("app.chat.messages.you");
+
+  // For private and incognito folders, show "User" instead of "You"
+  const displayName = authorName ??
+    (rootFolderId === "general" || rootFolderId === "shared" || rootFolderId === "public"
+      ? t("app.chat.messages.you")
+      : t("app.chat.messages.user"));
 
   // Get persona name if tone is provided
   const personaName = tone ? getPersonaById(tone)?.name : null;

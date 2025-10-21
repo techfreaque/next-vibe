@@ -1,3 +1,5 @@
+/// <reference types="node" />
+/* eslint-disable i18next/no-literal-string */
 import { exec } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
@@ -11,7 +13,6 @@ import type {
   LaunchpadFolder,
   LaunchpadPackage,
 } from "../types/types.js";
-import { logger, loggerError } from "./logger.js";
 
 const execAsync = promisify(exec);
 const git = simpleGit;
@@ -85,34 +86,25 @@ export async function cloneRepo(
   branch = "main",
   rootDir: string,
 ): Promise<void> {
-  try {
-    // Ensure we use rootDir when determining the full path
-    const fullPath = path.isAbsolute(repoPath)
-      ? repoPath
-      : path.join(rootDir, repoPath);
+  // Ensure we use rootDir when determining the full path
+  const fullPath = path.isAbsolute(repoPath)
+    ? repoPath
+    : path.join(rootDir, repoPath);
 
-    // Create parent directories if they don't exist
-    const parentDir = path.dirname(fullPath);
-    if (!fs.existsSync(parentDir)) {
-      fs.mkdirSync(parentDir, { recursive: true });
-    }
-
-    logger(`Cloning ${repoUrl} into ${fullPath}...`);
-
-    // Use simple-git to clone the repo with the full path
-    await git().clone(repoUrl, fullPath);
-
-    // Change directory to the cloned repo
-    const repo = git(fullPath);
-
-    // Check out the specified branch
-    await repo.checkout(branch);
-
-    logger(`Repository cloned and checked out branch: ${branch}`);
-  } catch (error) {
-    loggerError(`Failed to clone repository:`, error);
-    throw error;
+  // Create parent directories if they don't exist
+  const parentDir = path.dirname(fullPath);
+  if (!fs.existsSync(parentDir)) {
+    fs.mkdirSync(parentDir, { recursive: true });
   }
+
+  // Use simple-git to clone the repo with the full path
+  await git().clone(repoUrl, fullPath);
+
+  // Change directory to the cloned repo
+  const repo = git(fullPath);
+
+  // Check out the specified branch
+  await repo.checkout(branch);
 }
 
 // Update a repository (stash, pull, pop stash)
@@ -124,39 +116,29 @@ export async function updateRepo(
 ): Promise<void> {
   const folderPath = path.join(rootDir || process.cwd(), ...repoPath);
 
-  try {
-    // Check for local changes
-    const { stdout: statusOutput } = await execAsync("git status --porcelain", {
-      cwd: folderPath,
-    });
-    const hasChanges = statusOutput.trim() !== "";
+  // Check for local changes
+  const { stdout: statusOutput } = await execAsync("git status --porcelain", {
+    cwd: folderPath,
+  });
+  const hasChanges = statusOutput.trim() !== "";
 
-    if (hasChanges && !force) {
-      const answer = await prompt(
-        `Repository ${repoPath.join("/")} has local changes. Stash them before pulling? (y/n): `,
-      );
-      if (answer.toLowerCase() !== "y") {
-        logger(`Skipping ${repoPath.join("/")}`);
-        return;
-      }
+  if (hasChanges && !force) {
+    const answer = await prompt(
+      `Repository ${repoPath.join("/")} has local changes. Stash them before pulling? (y/n): `,
+    );
+    if (answer.toLowerCase() !== "y") {
+      return;
     }
+  }
 
-    if (hasChanges) {
-      logger(`Stashing changes in ${repoPath.join("/")}...`);
-      await execAsync("git stash", { cwd: folderPath });
-    }
+  if (hasChanges) {
+    await execAsync("git stash", { cwd: folderPath });
+  }
 
-    logger(`Pulling latest changes for ${repoPath.join("/")}...`);
-    await execAsync(`git checkout ${branch} && git pull`, { cwd: folderPath });
+  await execAsync(`git checkout ${branch} && git pull`, { cwd: folderPath });
 
-    if (hasChanges) {
-      logger(`Popping stashed changes in ${repoPath.join("/")}...`);
-      await execAsync("git stash pop", { cwd: folderPath });
-    }
-
-    logger(`Successfully updated ${repoPath.join("/")}`);
-  } catch (error) {
-    loggerError(`Failed to update ${repoPath.join("/")}:`, error);
+  if (hasChanges) {
+    await execAsync("git stash pop", { cwd: folderPath });
   }
 }
 
@@ -165,39 +147,29 @@ export async function updateRootRepo(
   force = false,
   rootPath: string,
 ): Promise<void> {
-  try {
-    // Check for local changes
-    const { stdout: statusOutput } = await execAsync("git status --porcelain", {
-      cwd: rootPath,
-    });
-    const hasChanges = statusOutput.trim() !== "";
+  // Check for local changes
+  const { stdout: statusOutput } = await execAsync("git status --porcelain", {
+    cwd: rootPath,
+  });
+  const hasChanges = statusOutput.trim() !== "";
 
-    if (hasChanges && !force) {
-      const answer = await prompt(
-        "Root repository has local changes. Stash them before pulling? (y/n): ",
-      );
-      if (answer.toLowerCase() !== "y") {
-        logger("Skipping root repository update");
-        return;
-      }
+  if (hasChanges && !force) {
+    const answer = await prompt(
+      "Root repository has local changes. Stash them before pulling? (y/n): ",
+    );
+    if (answer.toLowerCase() !== "y") {
+      return;
     }
+  }
 
-    if (hasChanges) {
-      logger("Stashing changes in root repository...");
-      await execAsync("git stash", { cwd: rootPath });
-    }
+  if (hasChanges) {
+    await execAsync("git stash", { cwd: rootPath });
+  }
 
-    logger("Pulling latest changes for root repository...");
-    await execAsync("git pull", { cwd: rootPath });
+  await execAsync("git pull", { cwd: rootPath });
 
-    if (hasChanges) {
-      logger("Popping stashed changes in root repository...");
-      await execAsync("git stash pop", { cwd: rootPath });
-    }
-
-    logger("Successfully updated root repository");
-  } catch (error) {
-    loggerError(`Failed to update root repository:`, error);
+  if (hasChanges) {
+    await execAsync("git stash pop", { cwd: rootPath });
   }
 }
 

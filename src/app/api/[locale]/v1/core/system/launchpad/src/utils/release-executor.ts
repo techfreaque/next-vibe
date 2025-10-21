@@ -1,29 +1,36 @@
+/// <reference types="node" />
 /* eslint-disable node/no-process-env */
 /* eslint-disable i18next/no-literal-string */
 /* eslint-disable no-restricted-syntax */
-// @ts-expect-error - Node.js built-in module
-import { execSync, spawn } from "child_process";
-// @ts-expect-error - Node.js built-in module
-import { readFileSync } from "fs";
-// @ts-expect-error - Node.js built-in module
-import { dirname, join } from "path";
+import { execSync, spawn } from "node:child_process";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 
 import inquirer from "inquirer";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { defaultLocale } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type {
   ReleaseOrchestrationOptions,
   ReleaseState,
   ReleaseTarget,
   VersionBumpType,
-} from "../types/types.js";
-import { discoverReleaseTargets } from "./release-discovery.js";
-import { StateManager } from "./state-manager.js";
+} from "../types/types";
+import { discoverReleaseTargets } from "./release-discovery";
+import { StateManager } from "./state-manager";
 
 const { t } = simpleT(defaultLocale);
+
+// Inquirer response types
+interface TargetActionResponse {
+  action: "process" | "skip" | "abort";
+}
+
+interface ContinueAfterFailureResponse {
+  continue: boolean;
+}
 
 export class ReleaseExecutor {
   private logger: EndpointLogger;
@@ -39,10 +46,10 @@ export class ReleaseExecutor {
   /**
    * Execute release for a single target
    */
-  async executeReleaseTarget(
+  executeReleaseTarget(
     target: ReleaseTarget,
     options: ReleaseOrchestrationOptions,
-  ): Promise<boolean> {
+  ): boolean {
     const fullPath = join(this.rootDir, target.directory);
     this.logger.info(
       t("app.api.v1.core.system.launchpad.releaseExecutor.processing", {
@@ -63,7 +70,6 @@ export class ReleaseExecutor {
       execSync(command, {
         cwd: fullPath,
         stdio: "inherit",
-        // @ts-expect-error - Node.js global
         env: { ...process.env },
       });
 
@@ -119,7 +125,7 @@ export class ReleaseExecutor {
 
     // Load or initialize state
     if (options.continueFromState) {
-      const existingState = this.stateManager.loadState();
+      const existingState = this.stateManager.loadState(this.logger);
       if (existingState) {
         state = existingState;
         this.logger.info(
@@ -136,7 +142,7 @@ export class ReleaseExecutor {
       }
     } else {
       // Clear any existing state and start fresh
-      this.stateManager.clearState();
+      this.stateManager.clearState(this.logger);
       state = this.stateManager.initializeState(targets);
     }
 
@@ -150,13 +156,13 @@ export class ReleaseExecutor {
           "app.api.v1.core.system.launchpad.releaseExecutor.state.allCompleted",
         ),
       );
-      this.stateManager.clearState();
+      this.stateManager.clearState(this.logger);
       return;
     }
 
     // Handle retry logic
     if (failedTargets.length > 0 && options.allowRetry) {
-      const { retryFailed } = await inquirer.prompt([
+      const { retryFailed } = (await inquirer.prompt([
         {
           type: "confirm",
           name: "retryFailed",
@@ -166,7 +172,7 @@ export class ReleaseExecutor {
           ),
           default: true,
         },
-      ]);
+      ])) as { retryFailed: boolean };
 
       if (retryFailed) {
         this.stateManager.resetFailedTargets(state);
@@ -186,36 +192,38 @@ export class ReleaseExecutor {
 
       // Handle skip option
       if (options.allowSkip && !options.ciMode) {
-        const { action } = await inquirer.prompt([
-          {
-            type: "list",
-            name: "action",
-            message: t(
-              "app.api.v1.core.system.launchpad.releaseExecutor.prompts.targetAction",
-              { directory: target.directory },
-            ),
-            choices: [
-              {
-                name: t(
-                  "app.api.v1.core.system.launchpad.releaseExecutor.prompts.processTarget",
-                ),
-                value: "process",
-              },
-              {
-                name: t(
-                  "app.api.v1.core.system.launchpad.releaseExecutor.prompts.skipTarget",
-                ),
-                value: "skip",
-              },
-              {
-                name: t(
-                  "app.api.v1.core.system.launchpad.releaseExecutor.prompts.abortOperation",
-                ),
-                value: "abort",
-              },
-            ],
-          },
-        ]);
+        const response: TargetActionResponse =
+          await inquirer.prompt<TargetActionResponse>([
+            {
+              type: "list",
+              name: "action",
+              message: t(
+                "app.api.v1.core.system.launchpad.releaseExecutor.prompts.targetAction",
+                { directory: target.directory },
+              ),
+              choices: [
+                {
+                  name: t(
+                    "app.api.v1.core.system.launchpad.releaseExecutor.prompts.processTarget",
+                  ),
+                  value: "process",
+                },
+                {
+                  name: t(
+                    "app.api.v1.core.system.launchpad.releaseExecutor.prompts.skipTarget",
+                  ),
+                  value: "skip",
+                },
+                {
+                  name: t(
+                    "app.api.v1.core.system.launchpad.releaseExecutor.prompts.abortOperation",
+                  ),
+                  value: "abort",
+                },
+              ],
+            },
+          ]);
+        const { action } = response;
 
         if (action === "skip") {
           this.stateManager.markSkipped(state, target.directory);
@@ -241,7 +249,7 @@ export class ReleaseExecutor {
       }
 
       // Execute the release
-      const success = await this.executeReleaseTarget(target, options);
+      const success = this.executeReleaseTarget(target, options);
 
       if (success) {
         this.stateManager.markCompleted(state, target.directory);
@@ -249,16 +257,18 @@ export class ReleaseExecutor {
         this.stateManager.markFailed(state, target.directory);
 
         if (!options.ciMode) {
-          const { continueAfterFailure } = await inquirer.prompt([
-            {
-              type: "confirm",
-              name: "continueAfterFailure",
-              message: t(
-                "app.api.v1.core.system.launchpad.releaseExecutor.prompts.continueAfterFailure",
-              ),
-              default: true,
-            },
-          ]);
+          const failureResponse: ContinueAfterFailureResponse =
+            await inquirer.prompt<ContinueAfterFailureResponse>([
+              {
+                type: "confirm",
+                name: "continue",
+                message: t(
+                  "app.api.v1.core.system.launchpad.releaseExecutor.prompts.continueAfterFailure",
+                ),
+                default: true,
+              },
+            ]);
+          const continueAfterFailure = failureResponse.continue;
 
           if (!continueAfterFailure) {
             this.logger.info(
@@ -280,7 +290,7 @@ export class ReleaseExecutor {
     }
 
     // Final summary
-    const finalState = this.stateManager.loadState();
+    const finalState = this.stateManager.loadState(this.logger);
     if (finalState) {
       this.logger.info(
         `\n📊 ${t("app.api.v1.core.system.launchpad.releaseExecutor.summary.title")}`,
@@ -293,7 +303,7 @@ export class ReleaseExecutor {
             "app.api.v1.core.system.launchpad.releaseExecutor.summary.allSuccess",
           ),
         );
-        this.stateManager.clearState();
+        this.stateManager.clearState(this.logger);
       } else {
         this.logger.info(
           t(
@@ -308,7 +318,7 @@ export class ReleaseExecutor {
   /**
    * Execute force update for all targets
    */
-  async executeForceUpdateAll(targets: ReleaseTarget[]): Promise<void> {
+  executeForceUpdateAll(targets: ReleaseTarget[]): void {
     this.logger.info(
       `🔄 ${t("app.api.v1.core.system.launchpad.releaseExecutor.forceUpdate.starting")}`,
     );
@@ -328,7 +338,6 @@ export class ReleaseExecutor {
           {
             cwd: fullPath,
             stdio: "inherit",
-            // @ts-expect-error - Node.js global
             env: { ...process.env },
           },
         );
@@ -412,13 +421,13 @@ export class ReleaseExecutor {
         `🔄 ${t("app.api.v1.core.system.launchpad.releaseExecutor.weeklyUpdate.updatingPackages")}`,
       );
       const targets = this.discoverTargets();
-      await this.executeForceUpdateAll(targets);
+      this.executeForceUpdateAll(targets);
 
       // 3. Run Snyk monitoring for all packages
       this.logger.info(
         `🔍 ${t("app.api.v1.core.system.launchpad.releaseExecutor.weeklyUpdate.runningSnyk")}`,
       );
-      await this.runSnykMonitoring(branchName);
+      this.runSnykMonitoring(branchName);
 
       // 4. Check for changes
       const hasChanges = this.checkForGitChanges();
@@ -479,7 +488,7 @@ export class ReleaseExecutor {
     return discoverReleaseTargets(this.rootDir);
   }
 
-  private async runSnykMonitoring(branchName: string): Promise<void> {
+  private runSnykMonitoring(branchName: string): void {
     const snykToken = process.env.SNYK_TOKEN;
     const snykOrgKey = process.env.SNYK_ORG_KEY;
 
@@ -522,7 +531,7 @@ export class ReleaseExecutor {
             env: { ...process.env, SNYK_TOKEN: snykToken },
           },
         );
-      } catch (error) {
+      } catch {
         this.logger.info(
           `⚠️  ${t("app.api.v1.core.system.launchpad.releaseExecutor.snyk.failed", { packageFile })}`,
         );

@@ -1,4 +1,10 @@
 export const translations = {
+  email: {
+    footer: {
+      needHelp: "Need help?",
+      copyright: "© {{currentYear}} {{appName}}. All rights reserved.",
+    },
+  },
   post: {
     title: "Components",
     description: "Components endpoint",

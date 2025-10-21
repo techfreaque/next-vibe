@@ -406,6 +406,7 @@ export const translations = {
   messages: {
     assistant: "Assistant",
     you: "You",
+    user: "User",
     anonymous: "Anonymous",
     edited: "edited",
     postNumber: "No.{{number}}",

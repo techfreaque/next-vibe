@@ -1,9 +1,14 @@
 #!/usr/bin/env node
+/// <reference types="node" />
+/* eslint-disable node/no-process-env */
+/* eslint-disable i18next/no-literal-string */
+/* eslint-disable no-restricted-syntax */
 import { Command } from "commander";
 import inquirer from "inquirer";
 
-import { defaultLocale } from "../../../../../../../i18n/core/config";
-import { createEndpointLogger } from "../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { defaultLocale } from "@/i18n/core/config";
 
 import type { VersionBumpType } from "../types/types.js";
 import { getRootDirectory, loadConfig } from "../utils/config.js";
@@ -19,6 +24,19 @@ import {
   weeklyUpdateCommand,
 } from "./release-orchestration.js";
 import { updateAllRepos } from "./update-all.js";
+
+interface CIReleaseOptions {
+  target?: string;
+  tag?: string;
+}
+
+interface WeeklyUpdateOptions {
+  branch: string;
+}
+
+interface ForceReleaseOptions {
+  versionBump?: string;
+}
 
 const program = new Command();
 
@@ -46,14 +64,13 @@ program
     "--tag <tag>",
     "Git tag to determine target (overrides auto-detection)",
   )
-  .action(async (options) => {
+  .action(async (options: CIReleaseOptions) => {
     const logger = createEndpointLogger(true, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
       await ciReleaseCommand(logger, rootDir, options.target, options.tag);
     } catch (error) {
-      logger.error("CI release failed:", error);
-      process.exit(1);
+      handleError(logger, "CI release failed:", error);
     }
   });
 
@@ -66,8 +83,7 @@ program
       const rootDir = process.cwd();
       await forceUpdateAllCommand(logger, rootDir);
     } catch (error) {
-      logger.error("Force update failed:", error);
-      process.exit(1);
+      handleError(logger, "Force update failed:", error);
     }
   });
 
@@ -80,8 +96,7 @@ program
       const rootDir = process.cwd();
       await releaseAllCommand(logger, rootDir);
     } catch (error) {
-      logger.error("Release all failed:", error);
-      process.exit(1);
+      handleError(logger, "Release all failed:", error);
     }
   });
 
@@ -92,7 +107,7 @@ program
     "-v, --version-bump <type>",
     "Version bump type (patch|minor|major|init)",
   )
-  .action(async (options: { versionBump?: string }) => {
+  .action(async (options: ForceReleaseOptions) => {
     const logger = createEndpointLogger(true, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
@@ -118,8 +133,7 @@ program
 
       await forceReleaseCommand(logger, rootDir, versionBump);
     } catch (error) {
-      logger.error("Force release failed:", error);
-      process.exit(1);
+      handleError(logger, "Force release failed:", error);
     }
   });
 
@@ -132,8 +146,7 @@ program
       const rootDir = process.cwd();
       await continueReleaseCommand(logger, rootDir);
     } catch (error) {
-      logger.error("Continue release failed:", error);
-      process.exit(1);
+      handleError(logger, "Continue release failed:", error);
     }
   });
 
@@ -146,8 +159,7 @@ program
       const rootDir = process.cwd();
       await showReleaseStatusCommand(logger, rootDir);
     } catch (error) {
-      logger.error("Show status failed:", error);
-      process.exit(1);
+      handleError(logger, "Show status failed:", error);
     }
   });
 
@@ -155,22 +167,26 @@ program
   .command("weekly-update")
   .description("Weekly dependency update with branch creation and PR")
   .option("--branch <branch>", "Target branch name", "next_version_candidates")
-  .action(async (options) => {
+  .action(async (options: WeeklyUpdateOptions) => {
     const logger = createEndpointLogger(true, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
       await weeklyUpdateCommand(logger, rootDir, options.branch);
     } catch (error) {
-      logger.error("Weekly update failed:", error);
-      process.exit(1);
+      handleError(logger, "Weekly update failed:", error);
     }
   });
+
+function handleError(logger: EndpointLogger, message: string, error: unknown): never {
+  logger.error(message, error);
+  process.exit(1);
+}
 
 async function runInteractiveMode(): Promise<void> {
   const logger = createEndpointLogger(true, Date.now(), defaultLocale);
   logger.info("🚀 PWE Launchpad");
 
-  const { action } = await inquirer.prompt([
+  const { action } = (await inquirer.prompt([
     {
       type: "list",
       name: "action",
@@ -196,7 +212,7 @@ async function runInteractiveMode(): Promise<void> {
         { name: "Exit", value: "exit" },
       ],
     },
-  ]);
+  ])) as { action: string };
 
   if (action === "exit") {
     logger.info("Goodbye! 👋");
@@ -219,16 +235,16 @@ async function runInteractiveMode(): Promise<void> {
 
         switch (action) {
           case "clone-missing":
-            await cloneMissingRepos(configRootDir, config);
+            await cloneMissingRepos(logger, configRootDir, config);
             break;
           case "update-all":
-            await updateAllRepos(false, configRootDir, config);
+            await updateAllRepos(logger, false, configRootDir, config);
             break;
           case "update-all-force":
-            await updateAllRepos(true, configRootDir, config);
+            await updateAllRepos(logger, true, configRootDir, config);
             break;
           case "navigate-folders":
-            await navigateFolders(configRootDir, config);
+            await navigateFolders(logger, configRootDir, config);
             break;
         }
         break;
@@ -254,8 +270,7 @@ async function runInteractiveMode(): Promise<void> {
 
     logger.info("Command completed successfully! ✅");
   } catch (error) {
-    logger.error("Error executing command:", error);
-    process.exit(1);
+    handleError(logger, "Error executing command:", error);
   }
 }
 
@@ -266,7 +281,6 @@ program.parse();
 if (!process.argv.slice(2).length) {
   const logger = createEndpointLogger(true, Date.now(), defaultLocale);
   runInteractiveMode().catch((error) => {
-    logger.error("An unexpected error occurred:", error);
-    process.exit(1);
+    handleError(logger, "An unexpected error occurred:", error);
   });
 }

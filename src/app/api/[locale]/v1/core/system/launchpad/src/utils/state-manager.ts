@@ -1,27 +1,37 @@
+/// <reference types="node" />
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+
 import type { ReleaseState, ReleaseTarget } from "../types/types.js";
-import { logger, loggerError } from "./logger.js";
+
+interface ParsedState {
+  targets?: Array<ReleaseTarget>;
+  completed?: Array<string>;
+  failed?: Array<string>;
+  skipped?: Array<string>;
+  currentIndex?: number;
+  startTime?: string;
+  lastUpdated?: string;
+}
 
 /**
  * Type guard to validate if parsed JSON matches ReleaseState structure
  */
-function isReleaseState(value: unknown): value is ReleaseState {
-  if (typeof value !== "object" || value === null) {
+function isReleaseState(value: ParsedState | null): value is ReleaseState {
+  if (value === null || typeof value !== "object") {
     return false;
   }
 
-  const obj = value as Record<string, unknown>;
-
   return (
-    Array.isArray(obj.targets) &&
-    Array.isArray(obj.completed) &&
-    Array.isArray(obj.failed) &&
-    Array.isArray(obj.skipped) &&
-    typeof obj.currentIndex === "number" &&
-    typeof obj.startTime === "string" &&
-    typeof obj.lastUpdated === "string"
+    Array.isArray(value.targets) &&
+    Array.isArray(value.completed) &&
+    Array.isArray(value.failed) &&
+    Array.isArray(value.skipped) &&
+    typeof value.currentIndex === "number" &&
+    typeof value.startTime === "string" &&
+    typeof value.lastUpdated === "string"
   );
 }
 
@@ -56,27 +66,26 @@ export class StateManager {
   /**
    * Load existing state from file
    */
-  loadState(): ReleaseState | null {
+  loadState(logger: EndpointLogger): ReleaseState | null {
     if (!existsSync(this.stateFilePath)) {
       return null;
     }
 
     try {
       const stateData = readFileSync(this.stateFilePath, "utf-8");
-      const parsedData: unknown = JSON.parse(stateData);
+      const parsedData = JSON.parse(stateData) as ParsedState | null;
 
       if (!isReleaseState(parsedData)) {
-        loggerError(
-          "Invalid state file format",
-          new Error("State file does not match expected structure"),
+        logger.error(
+          "Invalid state file format - does not match expected structure",
         );
         return null;
       }
 
-      logger(`Loaded existing state from ${this.stateFilePath}`);
+      logger.info(`Loaded existing state from ${this.stateFilePath}`);
       return parsedData;
     } catch (error) {
-      loggerError("Failed to load state file:", error);
+      logger.error("Failed to load state file", error);
       return null;
     }
   }
@@ -84,12 +93,14 @@ export class StateManager {
   /**
    * Save current state to file
    */
-  saveState(state: ReleaseState): void {
+  saveState(state: ReleaseState, logger?: EndpointLogger): void {
     try {
       state.lastUpdated = new Date().toISOString();
       writeFileSync(this.stateFilePath, JSON.stringify(state, null, 2));
     } catch (error) {
-      loggerError("Failed to save state file:", error);
+      if (logger) {
+        logger.error("Failed to save state file", error);
+      }
     }
   }
 
@@ -136,13 +147,13 @@ export class StateManager {
   /**
    * Clear state file
    */
-  clearState(): void {
+  clearState(logger: EndpointLogger): void {
     if (existsSync(this.stateFilePath)) {
       try {
         unlinkSync(this.stateFilePath);
-        logger("State file cleared");
+        logger.info("State file cleared");
       } catch (error) {
-        loggerError("Failed to clear state file:", error);
+        logger.error("Failed to clear state file", error);
       }
     }
   }
@@ -181,6 +192,7 @@ export class StateManager {
   /**
    * Get state summary for display
    */
+  /* eslint-disable i18next/no-literal-string */
   getStateSummary(state: ReleaseState): string {
     const total = state.targets.length;
     const completed = state.completed.length;
@@ -197,4 +209,5 @@ export class StateManager {
   Started: ${state.startTime}
   Last updated: ${state.lastUpdated}`;
   }
+  /* eslint-enable i18next/no-literal-string */
 }

@@ -343,7 +343,6 @@ export class UnifiedTaskRunnerRepositoryImpl
   /**
    * Start tasks in background (async)
    */
-  // eslint-disable-next-line @typescript-eslint/require-await
   private async startTasksInBackground(
     tasks: Task[],
     signal: AbortSignal,

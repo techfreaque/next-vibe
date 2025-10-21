@@ -46,6 +46,7 @@ interface FlatMessageViewProps {
   onModelChange?: (model: ModelId) => void;
   onPersonaChange?: (persona: string) => void;
   onInsertQuote?: () => void; // Only inserts '>' character
+  rootFolderId?: string;
 }
 
 /**
@@ -162,11 +163,13 @@ function MessagePreview({
   shortId,
   position,
   locale,
+  rootFolderId = "general",
 }: {
   message: ChatMessage;
   shortId: string;
   position: { x: number; y: number };
   locale: CountryLanguage;
+  rootFolderId?: string;
 }): JSX.Element {
   const { t } = simpleT(locale);
   const idColor = getIdColor(shortId);
@@ -196,7 +199,9 @@ function MessagePreview({
           )}
         >
           {isUser
-            ? t("app.chat.flatView.youLabel")
+            ? rootFolderId === "general" || rootFolderId === "shared" || rootFolderId === "public"
+              ? t("app.chat.flatView.youLabel")
+              : t("app.chat.flatView.anonymous")
             : message.authorName || t("app.chat.flatView.assistantFallback")}
         </span>
         <span
@@ -334,10 +339,10 @@ interface FlatMessageProps {
   onRetryMessage?: (messageId: string) => Promise<void>;
   onAnswerAsModel?: (messageId: string) => Promise<void>;
   onDeleteMessage?: (messageId: string) => void;
-  onEditMessage?: (messageId: string, newContent: string) => Promise<void>;
   onModelChange?: (model: ModelId) => void;
   onPersonaChange?: (persona: string) => void;
   onInsertQuote?: () => void;
+  rootFolderId?: string;
 }
 
 function FlatMessage({
@@ -360,10 +365,10 @@ function FlatMessage({
   onRetryMessage,
   onAnswerAsModel,
   onDeleteMessage,
-  onEditMessage,
   onModelChange,
   onPersonaChange,
   onInsertQuote,
+  rootFolderId = "general",
 }: FlatMessageProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -395,7 +400,9 @@ function FlatMessage({
       : t("app.chat.flatView.anonymous");
 
   const displayName = isUser
-    ? t("app.chat.flatView.anonymous")
+    ? rootFolderId === "general" || rootFolderId === "shared" || rootFolderId === "public"
+      ? t("app.chat.flatView.youLabel")
+      : t("app.chat.flatView.anonymous")
     : modelDisplayName;
 
   const references = extractReferences(message.content);
@@ -845,6 +852,7 @@ export function FlatMessageView({
   onModelChange,
   onPersonaChange,
   onInsertQuote: _onInsertQuote,
+  rootFolderId = "general",
 }: FlatMessageViewProps): JSX.Element {
   const [hoveredRef, setHoveredRef] = useState<string | null>(null);
   const [previewPosition, setPreviewPosition] = useState<{
@@ -888,6 +896,7 @@ export function FlatMessageView({
           shortId={hoveredRef}
           position={previewPosition}
           locale={locale}
+          rootFolderId={rootFolderId}
         />
       )}
 
@@ -936,10 +945,10 @@ export function FlatMessageView({
           onRetryMessage={onRetryMessage}
           onAnswerAsModel={onAnswerAsModel}
           onDeleteMessage={onDeleteMessage}
-          onEditMessage={onEditMessage}
           onModelChange={onModelChange}
           onPersonaChange={onPersonaChange}
           onInsertQuote={_onInsertQuote}
+          rootFolderId={rootFolderId}
         />
       ))}
     </div>

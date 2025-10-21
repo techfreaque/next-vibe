@@ -1,6 +1,12 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  email: {
+    footer: {
+      needHelp: "Potrzebujesz pomocy?",
+      copyright: "© {{currentYear}} {{appName}}. Wszelkie prawa zastrzeżone.",
+    },
+  },
   post: {
     title: "Tytuł",
     description: "Opis endpointu",
