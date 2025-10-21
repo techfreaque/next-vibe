@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Next Vibe",
+    "slug": "next-vibe",
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "scheme": "nextvibe",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.nextvibe.app"
+    },
+    "android": {
+      "package": "com.nextvibe.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "plugins": ["expo-router"]
+  }
+}
+
