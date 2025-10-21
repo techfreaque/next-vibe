@@ -5,8 +5,14 @@ export const translations = {
         more: "More",
         previousSlide: "Previous slide",
         nextSlide: "Next slide",
+        previousPage: "Previous page",
+        nextPage: "Next page",
         close: "Close",
       },
+    },
+    actions: {
+      previous: "Previous",
+      next: "Next",
     },
     addTags: "Add tags",
     addCustomValue: "Add '{{value}}'",
@@ -14,5 +20,14 @@ export const translations = {
     enterPhoneNumber: "Enter phone number",
     unknownFieldType: "Unknown field type",
     selectDate: "Select date",
+  },
+  ui: {
+    markdown: {
+      reasoningProcess: "Reasoning Process",
+      streaming: "(streaming...)",
+      copied: "Copied!",
+      copy: "Copy",
+      copyCode: "Copy code",
+    },
   },
 };

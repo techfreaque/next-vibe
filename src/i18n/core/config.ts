@@ -121,12 +121,12 @@ export const currencyByCountry = languageConfig.mappings.currencyByCountry;
 export const translations = allTranslations;
 export const defaultLocaleConfig = languageDefaults;
 export const defaultLocale: CountryLanguage = `${languageDefaults.language}-${languageDefaults.country}`;
-export const globalCountryInfo = languageConfig.countryInfo.GLOBAL;
-export const availableCountries = [
+export const globalCountryInfo: CountryInfo = languageConfig.countryInfo.GLOBAL;
+export const availableCountries: readonly CountryInfo[] = [
   languageConfig.countryInfo.DE,
   languageConfig.countryInfo.PL,
   languageConfig.countryInfo.GLOBAL,
-] as const;
+];
 export const availableLanguages = Object.values(languageConfig.languages);
 
 export interface TranslationsConfig<TTranslationSchema> {

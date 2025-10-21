@@ -45,6 +45,8 @@ export const translations: typeof enTranslations = {
       reset: "Resetuj",
       submit: "Wyślij",
       close: "Zamknij",
+      previous: "Poprzedni",
+      next: "Następny",
     },
   },
 };

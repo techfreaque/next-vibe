@@ -160,6 +160,14 @@ export async function authenticateUser<
       logger,
     );
 
+    logger.info("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.debug.authenticatedUser", {
+      isPublic: user?.isPublic,
+      hasId: user && "id" in user,
+      id: user && "id" in user ? user.id : undefined,
+      hasLeadId: user && "leadId" in user,
+      leadId: user && "leadId" in user ? user.leadId : undefined,
+    });
+
     if (!user) {
       return createErrorResponse(
         "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.unauthorized",

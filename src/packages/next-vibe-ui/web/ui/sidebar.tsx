@@ -287,7 +287,7 @@ const SidebarTrigger = React.forwardRef<
       <>
         <PanelLeft />
         <span className="sr-only">
-          {t("common.accessibility.srOnly.toggleSidebar")}
+          {t("app.common.accessibility.srOnly.toggleMenu")}
         </span>
       </>
     </Button>
@@ -306,10 +306,10 @@ const SidebarRail = React.forwardRef<
     <button
       ref={ref}
       data-sidebar="rail"
-      aria-label={t("common.accessibility.srOnly.toggleSidebar")}
+      aria-label={t("app.common.accessibility.srOnly.toggleMenu")}
       tabIndex={-1}
       onClick={toggleSidebar}
-      title={t("common.accessibility.srOnly.toggleSidebar")}
+      title={t("app.common.accessibility.srOnly.toggleMenu")}
       className={cn(
         "absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex",
         "[[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize",

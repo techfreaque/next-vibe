@@ -1,4 +1,10 @@
 export const translations = {
+  route: {
+    debug: {
+      userObject: "AI Stream Route: User object",
+      extracted: "AI Stream Route: Extracted values",
+    },
+  },
   post: {
     title: "AI Stream Chat",
     description: "Stream AI-powered chat responses using OpenAI GPT-4o",
@@ -157,6 +163,7 @@ export const translations = {
       noIdentifier: "No user or lead identifier provided",
       insufficientCredits: "Insufficient credits to complete this request",
       noResponseBody: "No response body received from stream",
+      authenticationRequired: "Please log in to use persistent folders. Use incognito mode for anonymous chats.",
     },
   },
   errorTypes: {

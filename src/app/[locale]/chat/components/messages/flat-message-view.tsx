@@ -43,7 +43,6 @@ interface FlatMessageViewProps {
   onRetryMessage?: (messageId: string) => Promise<void>;
   onAnswerAsModel?: (messageId: string) => Promise<void>;
   onDeleteMessage?: (messageId: string) => void;
-  onEditMessage?: (messageId: string, newContent: string) => Promise<void>;
   onModelChange?: (model: ModelId) => void;
   onPersonaChange?: (persona: string) => void;
   onInsertQuote?: () => void; // Only inserts '>' character
@@ -554,15 +553,6 @@ function FlatMessage({
             message={message}
             selectedModel={selectedModel}
             selectedPersona={selectedPersona}
-            onSave={
-              onEditMessage
-                ? (id, content): Promise<void> =>
-                    messageActions.handleSaveEdit(id, content, onEditMessage)
-                : async (): Promise<void> => {}
-            }
-            onCancel={messageActions.cancelAction}
-            onModelChange={onModelChange}
-            onPersonaChange={onPersonaChange}
             onBranch={
               onBranchMessage
                 ? (id, content): Promise<void> =>
@@ -571,8 +561,11 @@ function FlatMessage({
                       content,
                       onBranchMessage,
                     )
-                : undefined
+                : async (): Promise<void> => {}
             }
+            onCancel={messageActions.cancelAction}
+            onModelChange={onModelChange}
+            onPersonaChange={onPersonaChange}
             locale={locale}
             logger={logger}
           />
@@ -849,7 +842,6 @@ export function FlatMessageView({
   onRetryMessage,
   onAnswerAsModel,
   onDeleteMessage,
-  onEditMessage,
   onModelChange,
   onPersonaChange,
   onInsertQuote: _onInsertQuote,

@@ -26,9 +26,9 @@ import type {
 } from "@/app/api/[locale]/v1/core/leads/enum";
 import {
   BatchOperationScope,
-  EmailCampaignStage,
-  LeadSource,
-  LeadStatus,
+  EmailCampaignStageOptions,
+  LeadSourceOptions,
+  LeadStatusOptions,
 } from "@/app/api/[locale]/v1/core/leads/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -124,20 +124,11 @@ export function BatchOperationsToolbar({
   const getActionOptions = (): Array<{ value: string; label: string }> => {
     switch (selectedAction) {
       case "status":
-        return Object.values(LeadStatus).map((status) => ({
-          value: status,
-          label: t(status),
-        }));
+        return LeadStatusOptions;
       case "currentCampaignStage":
-        return Object.values(EmailCampaignStage).map((stage) => ({
-          value: stage,
-          label: t(stage),
-        }));
+        return EmailCampaignStageOptions;
       case "source":
-        return Object.values(LeadSource).map((source) => ({
-          value: source,
-          label: t(source),
-        }));
+        return LeadSourceOptions;
       default:
         return [];
     }
@@ -156,11 +147,11 @@ export function BatchOperationsToolbar({
                 className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
               >
                 {operationScope === BatchOperationScope.CURRENT_PAGE
-                  ? t("leads.admin.batch.current_page_count", {
+                  ? t("app.admin.leads.leads.admin.batch.current_page_count", {
                       count: Math.min(pageSize, totalCount),
                       page: currentPage,
                     })
-                  : t("leads.admin.batch.filter_count", {
+                  : t("app.admin.leads.leads.admin.batch.filter_count", {
                       total: totalCount,
                     })}
               </Badge>
@@ -179,10 +170,10 @@ export function BatchOperationsToolbar({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={BatchOperationScope.CURRENT_PAGE}>
-                    {t("leads.admin.batch.scope_current_page")}
+                    {t("app.admin.leads.leads.admin.batch.scope_current_page")}
                   </SelectItem>
                   <SelectItem value={BatchOperationScope.ALL_PAGES}>
-                    {t("leads.admin.batch.scope_all_pages")}
+                    {t("app.admin.leads.leads.admin.batch.scope_all_pages")}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -198,21 +189,23 @@ export function BatchOperationsToolbar({
             >
               <SelectTrigger className="w-40">
                 <SelectValue
-                  placeholder={t("leads.admin.batch.select_action")}
+                  placeholder={t(
+                    "app.admin.leads.leads.admin.batch.select_action",
+                  )}
                 />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="status">
-                  {t("leads.admin.batch.actions.update_status")}
+                  {t("app.admin.leads.leads.admin.batch.actions.update_status")}
                 </SelectItem>
                 <SelectItem value="currentCampaignStage">
-                  {t("leads.admin.batch.actions.update_stage")}
+                  {t("app.admin.leads.leads.admin.batch.actions.update_stage")}
                 </SelectItem>
                 <SelectItem value="source">
-                  {t("leads.admin.batch.actions.update_source")}
+                  {t("app.admin.leads.leads.admin.batch.actions.update_source")}
                 </SelectItem>
                 <SelectItem value="delete">
-                  {t("leads.admin.batch.actions.delete")}
+                  {t("app.admin.leads.leads.admin.batch.actions.delete")}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -225,7 +218,9 @@ export function BatchOperationsToolbar({
               >
                 <SelectTrigger className="w-40">
                   <SelectValue
-                    placeholder={t("leads.admin.batch.select_value")}
+                    placeholder={t(
+                      "app.admin.leads.leads.admin.batch.select_value",
+                    )}
                   />
                 </SelectTrigger>
                 <SelectContent>
@@ -249,8 +244,8 @@ export function BatchOperationsToolbar({
               variant={selectedAction === "delete" ? "destructive" : "default"}
             >
               {selectedAction === "delete"
-                ? t("leads.admin.batch.delete")
-                : t("leads.admin.batch.apply")}
+                ? t("app.admin.leads.leads.admin.batch.delete")
+                : t("app.admin.leads.leads.admin.batch.apply")}
             </Button>
           </div>
         </div>

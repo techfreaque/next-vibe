@@ -1,6 +1,18 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  admin: {
+    tabs: {
+      overview: "Przegląd",
+      stats: "Statystyki",
+      stats_description:
+        "Wyświetl szczegółowe statystyki i analizy użytkowników",
+      list: "Wszyscy użytkownicy",
+      list_description: "Przeglądaj i zarządzaj wszystkimi użytkownikami",
+      add: "Dodaj użytkownika",
+      add_description: "Utwórz nowe konto użytkownika",
+    },
+  },
   userRoles: {
     errors: {
       role_not_found: "Rola nie została znaleziona",
@@ -356,6 +368,7 @@ export const translations: typeof enTranslations = {
         jobTitle: "Programista",
       },
       buttons: {
+        back: "Wstecz",
         save: "Zapisz użytkownika",
         cancel: "Anuluj",
         create: "Utwórz użytkownika",

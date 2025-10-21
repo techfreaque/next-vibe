@@ -74,27 +74,68 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       logger,
     );
 
+    let subscription = existingSubscription.data;
+
     if (existingSubscription.success && existingSubscription.data) {
       logger.debug("Demo user already has a subscription, skipping creation");
-      return;
+    } else {
+      // Create local subscription record for demo user (active professional plan)
+      const demoSubscriptionData = createLocalSubscriptionSeed(demoUser.id, {
+        planId: SubscriptionPlan.SUBSCRIPTION,
+        billingInterval: BillingInterval.MONTHLY,
+        status: SubscriptionStatus.ACTIVE,
+      });
+
+      const [createdSubscription] = await db
+        .insert(subscriptions)
+        .values(demoSubscriptionData)
+        .returning();
+
+      if (createdSubscription) {
+        logger.debug(
+          `✅ Created development subscription for demo user: ${createdSubscription.id}`,
+        );
+        subscription = createdSubscription;
+      }
     }
 
-    // Create local subscription record for demo user (active professional plan)
-    const demoSubscriptionData = createLocalSubscriptionSeed(demoUser.id, {
-      planId: SubscriptionPlan.SUBSCRIPTION,
-      billingInterval: BillingInterval.MONTHLY,
-      status: SubscriptionStatus.ACTIVE,
-    });
-
-    const [createdSubscription] = await db
-      .insert(subscriptions)
-      .values(demoSubscriptionData)
-      .returning();
-
-    if (createdSubscription) {
-      logger.debug(
-        `✅ Created development subscription for demo user: ${createdSubscription.id}`,
+    // Always ensure subscription credits exist (even if subscription already existed)
+    if (subscription) {
+      const { creditRepository } = await import(
+        "../agent/chat/credits/repository"
       );
+
+      // Check if user already has subscription credits
+      const balanceResult = await creditRepository.getBalance(demoUser.id);
+      const hasCredits =
+        balanceResult.success && balanceResult.data.total > 0;
+
+      if (!hasCredits) {
+        // Convert currentPeriodEnd to Date if it's a string (from database)
+        const expiresAt = subscription.currentPeriodEnd
+          ? new Date(subscription.currentPeriodEnd)
+          : undefined;
+
+        const creditsResult = await creditRepository.addCredits(
+          demoUser.id,
+          1000,
+          "subscription",
+          expiresAt,
+        );
+
+        if (creditsResult.success) {
+          logger.debug("Added 1000 subscription credits to demo user", {
+            userId: demoUser.id,
+          });
+        } else {
+          logger.error("Failed to add subscription credits to demo user", {
+            userId: demoUser.id,
+            error: creditsResult.message,
+          });
+        }
+      } else {
+        logger.debug("Demo user already has credits, skipping credit creation");
+      }
     }
 
     // Get admin user for subscription testing
@@ -113,9 +154,11 @@ export async function dev(logger: EndpointLogger): Promise<void> {
         logger,
       );
 
+      let adminSubscriptionData = adminSubscription.data;
+
       if (!adminSubscription.success || !adminSubscription.data) {
         // Create premium subscription for admin user
-        const adminSubscriptionData = createLocalSubscriptionSeed(
+        const adminSubscriptionSeed = createLocalSubscriptionSeed(
           adminUser.id,
           {
             planId: SubscriptionPlan.SUBSCRIPTION,
@@ -126,13 +169,55 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 
         const [adminCreatedSubscription] = await db
           .insert(subscriptions)
-          .values(adminSubscriptionData)
+          .values(adminSubscriptionSeed)
           .returning();
 
         if (adminCreatedSubscription) {
           logger.debug(
             `✅ Created premium subscription for admin user: ${adminCreatedSubscription.id}`,
           );
+          adminSubscriptionData = adminCreatedSubscription;
+        }
+      } else {
+        logger.debug("Admin user already has a subscription, skipping creation");
+      }
+
+      // Always ensure subscription credits exist (even if subscription already existed)
+      if (adminSubscriptionData) {
+        const { creditRepository } = await import(
+          "../agent/chat/credits/repository"
+        );
+
+        // Check if user already has subscription credits
+        const balanceResult = await creditRepository.getBalance(adminUser.id);
+        const hasCredits =
+          balanceResult.success && balanceResult.data.total > 0;
+
+        if (!hasCredits) {
+          // Convert currentPeriodEnd to Date if it's a string (from database)
+          const expiresAt = adminSubscriptionData.currentPeriodEnd
+            ? new Date(adminSubscriptionData.currentPeriodEnd)
+            : undefined;
+
+          const creditsResult = await creditRepository.addCredits(
+            adminUser.id,
+            1000,
+            "subscription",
+            expiresAt,
+          );
+
+          if (creditsResult.success) {
+            logger.debug("Added 1000 subscription credits to admin user", {
+              userId: adminUser.id,
+            });
+          } else {
+            logger.error("Failed to add subscription credits to admin user", {
+              userId: adminUser.id,
+              error: creditsResult.message,
+            });
+          }
+        } else {
+          logger.debug("Admin user already has credits, skipping credit creation");
         }
       }
     }

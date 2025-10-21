@@ -15,7 +15,7 @@ import {
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import {
   objectField,
-  requestUrlParamsField,
+  requestDataField,
   responseArrayField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
@@ -54,10 +54,10 @@ const { GET } = createEndpoint({
         "app.api.v1.core.emails.imapClient.messages.list.get.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: "urlParams", response: true },
+    { request: "data", response: true },
     {
       // === REQUEST QUERY FIELDS ===
-      page: requestUrlParamsField(
+      page: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
@@ -70,7 +70,7 @@ const { GET } = createEndpoint({
         z.number().int().positive().default(1),
       ),
 
-      limit: requestUrlParamsField(
+      limit: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
@@ -83,7 +83,7 @@ const { GET } = createEndpoint({
         z.number().int().positive().max(100).default(20),
       ),
 
-      accountId: requestUrlParamsField(
+      accountId: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -98,7 +98,7 @@ const { GET } = createEndpoint({
         z.uuid(),
       ),
 
-      folderId: requestUrlParamsField(
+      folderId: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -113,7 +113,7 @@ const { GET } = createEndpoint({
         z.uuid().optional(),
       ),
 
-      search: requestUrlParamsField(
+      search: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -128,7 +128,7 @@ const { GET } = createEndpoint({
         z.string().optional(),
       ),
 
-      status: requestUrlParamsField(
+      status: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
@@ -139,10 +139,10 @@ const { GET } = createEndpoint({
           options: ImapMessageStatusFilterOptions,
           layout: { columns: 4 },
         },
-        z.enum(ImapMessageStatusFilter).optional(),
+        z.nativeEnum(ImapMessageStatusFilter).optional(),
       ),
 
-      sortBy: requestUrlParamsField(
+      sortBy: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
@@ -158,7 +158,7 @@ const { GET } = createEndpoint({
           .default(ImapMessageSortField.SENT_AT),
       ),
 
-      sortOrder: requestUrlParamsField(
+      sortOrder: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
@@ -169,10 +169,10 @@ const { GET } = createEndpoint({
           options: SortOrderOptions,
           layout: { columns: 4 },
         },
-        z.enum(SortOrder).default(SortOrder.DESC),
+        z.nativeEnum(SortOrder).default(SortOrder.DESC),
       ),
 
-      dateFrom: requestUrlParamsField(
+      dateFrom: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.DATE,
@@ -185,7 +185,7 @@ const { GET } = createEndpoint({
         z.string().optional(),
       ),
 
-      dateTo: requestUrlParamsField(
+      dateTo: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.DATE,
@@ -275,6 +275,14 @@ const { GET } = createEndpoint({
                   "app.api.v1.core.emails.imapClient.messages.list.get.response.message.sentAt",
               },
               z.string().nullable(),
+            ),
+            headers: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.emails.imapClient.messages.list.get.response.message.headers",
+              },
+              z.record(z.string(), z.string()).optional(),
             ),
           },
         ),
@@ -376,7 +384,7 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
+    requests: {
       default: {
         page: 1,
         limit: 20,
@@ -423,8 +431,12 @@ export type ImapMessagesListGetRequestOutput = typeof GET.types.RequestOutput;
 export type ImapMessagesListGetResponseInput = typeof GET.types.ResponseInput;
 export type ImapMessagesListGetResponseOutput = typeof GET.types.ResponseOutput;
 
-const imapMessagesEndpoints = {
+/**
+ * Export definitions
+ */
+const definitions = {
   GET,
 };
 
-export default imapMessagesEndpoints;
+export { GET };
+export default definitions;

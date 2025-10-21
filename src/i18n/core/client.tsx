@@ -34,7 +34,7 @@ interface TranslationContextType {
   setCountry: (country: Countries) => void;
   t: TFunction;
   isRTL: boolean;
-  countries: CountryInfo[];
+  countries: readonly CountryInfo[];
   currentCountry: CountryInfo;
   changeLocale: (country: Countries) => void;
 }
@@ -146,7 +146,7 @@ export function TranslationProvider({
   const changeLocale = (newCountry: Countries): void => {
     setCountry(newCountry);
     const countryInfo = languageConfig.countryInfo[newCountry];
-    setLanguage(countryInfo.language);
+    setLanguage(countryInfo.language as Languages);
     const newLocale = `${countryInfo.language}-${newCountry}`;
     setCookie(LOCALE_COOKIE_NAME, newLocale);
     localStorage.setItem(LOCALE_COOKIE_NAME, newLocale);

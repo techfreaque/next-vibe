@@ -233,6 +233,20 @@ export const translations: typeof enTranslations = {
         },
       },
       emails: {
+        title: "Szablony E-mail",
+        description:
+          "Podgląd i zarządzanie szablonami e-maili dla kampanii leadowych",
+        subtitle: "Zorganizowane według podróży klienta i etapu kampanii",
+        journey: "Podróż",
+        stage: "Etap",
+        view_preview: "Zobacz Podgląd",
+        total_templates: "Łącznie Szablonów",
+        templates: "szablonów",
+        from: "Od",
+        recipient: "Do",
+        subject: "Temat",
+        email_preview: "Podgląd E-maila",
+        preview_title: "Podgląd E-maila",
         preview: {
           actions: {
             title: "Akcje E-mailowe",

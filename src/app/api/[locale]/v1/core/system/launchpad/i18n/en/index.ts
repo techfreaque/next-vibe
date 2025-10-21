@@ -1,5 +1,8 @@
+import { translations as srcTranslations } from "../../src/i18n/en";
+
 export const translations = {
   category: "Release Executor",
+  src: srcTranslations,
   releaseExecutor: {
     processing: "\n🚀 Processing: {{directory}}",
     executing: "Executing: {{command}}",

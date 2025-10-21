@@ -104,7 +104,7 @@ const BreadcrumbEllipsis = ({
     >
       <DotsHorizontalIcon className="h-4 w-4" />
       <span className="sr-only">
-        {t("common.accessibility.srOnly.more")}
+        {t("app.common.accessibility.srOnly.more")}
       </span>
     </span>
   );

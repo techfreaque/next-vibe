@@ -63,6 +63,7 @@ export const translations = {
         isFlagged: "Flagged Status",
         hasAttachments: "Has Attachments",
         sentAt: "Sent At",
+        headers: "Email Headers",
       },
       total: "Total Messages",
       page: "Current Page",

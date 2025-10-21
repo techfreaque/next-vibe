@@ -31,36 +31,38 @@ export function LeadsNavigation({
       key: CurrentPageType.stats,
       href: `/${locale}/admin/leads` as const,
       icon: BarChart3,
-      label: t("leads.admin.tabs.stats"),
-      description: t("leads.admin.tabs.stats_description"),
+      label: t("app.admin.leads.leads.admin.tabs.stats"),
+      description: t("app.admin.leads.leads.admin.tabs.stats_description"),
     },
     {
       key: CurrentPageType.list,
       href: `/${locale}/admin/leads/list` as const,
       icon: List,
-      label: t("leads.admin.tabs.leads"),
-      description: t("leads.admin.tabs.leads_description"),
+      label: t("app.admin.leads.leads.admin.tabs.leads"),
+      description: t("app.admin.leads.leads.admin.tabs.leads_description"),
     },
     {
       key: CurrentPageType.emails,
       href: `/${locale}/admin/leads/emails` as const,
       icon: Mail,
-      label: t("leads.admin.tabs.emails"),
-      description: t("leads.admin.tabs.emails_description"),
+      label: t("app.admin.leads.leads.admin.tabs.emails"),
+      description: t("app.admin.leads.leads.admin.tabs.emails_description"),
     },
     {
       key: CurrentPageType.abTesting,
       href: `/${locale}/admin/leads/ab-testing` as const,
       icon: TestTube,
-      label: t("leads.admin.tabs.abTesting"),
-      description: t("leads.admin.tabs.abTesting_description"),
+      label: t("app.admin.leads.leads.admin.tabs.abTesting"),
+      description: t("app.admin.leads.leads.admin.tabs.abTesting_description"),
     },
     {
       key: CurrentPageType.campaignStarter,
       href: `/${locale}/admin/leads/campaign-starter` as const,
       icon: Settings,
-      label: t("leads.admin.tabs.campaignStarter"),
-      description: t("leads.admin.tabs.campaignStarter_description"),
+      label: t("app.admin.leads.leads.admin.tabs.campaignStarter"),
+      description: t(
+        "app.admin.leads.leads.admin.tabs.campaignStarter_description",
+      ),
     },
   ] as const;
 
@@ -68,7 +70,7 @@ export function LeadsNavigation({
     <div className="border-b border-gray-200 dark:border-gray-700">
       <nav
         className="flex space-x-8"
-        aria-label={t("leads.admin.tabs.overview")}
+        aria-label={t("app.admin.leads.leads.admin.tabs.overview")}
       >
         {navigationItems.map((item) => {
           const Icon = item.icon;

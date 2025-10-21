@@ -48,14 +48,14 @@ export function LeadsPagination({
 
   const handlePageChange = (newPage: number): void => {
     if (newPage >= 1 && newPage <= totalPages) {
-      leadsEndpoint.read.form?.setValue("page", newPage);
+      leadsEndpoint.read.form?.setValue("searchPagination.page", newPage);
     }
   };
 
   const handleLimitChange = (newLimit: string): void => {
     const limit = parseInt(newLimit, 10);
-    leadsEndpoint.read.form?.setValue("limit", limit);
-    leadsEndpoint.read.form?.setValue("page", 1); // Reset to first page when changing limit
+    leadsEndpoint.read.form?.setValue("searchPagination.limit", limit);
+    leadsEndpoint.read.form?.setValue("searchPagination.page", 1); // Reset to first page when changing limit
   };
 
   const startItem = (currentPage - 1) * currentLimit + 1;
@@ -72,7 +72,7 @@ export function LeadsPagination({
       {/* Results info */}
       <div className="flex items-center gap-4 text-sm text-muted-foreground">
         <span>
-          {t("leads.list.results.showing", {
+          {t("app.admin.leads.leads.list.results.showing", {
             start: startItem,
             end: endItem,
             total: totalItems,
@@ -81,7 +81,7 @@ export function LeadsPagination({
 
         {/* Page size selector */}
         <div className="flex items-center gap-2">
-          <span>{t("leads.pagination.page_size")}:</span>
+          <span>{t("app.admin.leads.leads.pagination.page_size")}:</span>
           <Select
             value={currentLimit.toString()}
             onValueChange={handleLimitChange}
@@ -102,7 +102,7 @@ export function LeadsPagination({
       {/* Pagination controls */}
       <div className="flex items-center gap-2">
         <span className="text-sm text-muted-foreground">
-          {t("leads.pagination.page_info", {
+          {t("app.admin.leads.leads.pagination.page_info", {
             current: currentPage,
             total: totalPages,
           })}
@@ -118,7 +118,9 @@ export function LeadsPagination({
             className="h-8 w-8 p-0"
           >
             <ChevronsLeft className="h-4 w-4" />
-            <span className="sr-only">{t("leads.pagination.first")}</span>
+            <span className="sr-only">
+              {t("app.admin.leads.leads.pagination.first")}
+            </span>
           </Button>
 
           {/* Previous page */}
@@ -130,7 +132,9 @@ export function LeadsPagination({
             className="h-8 w-8 p-0"
           >
             <ChevronLeft className="h-4 w-4" />
-            <span className="sr-only">{t("leads.pagination.previous")}</span>
+            <span className="sr-only">
+              {t("app.admin.leads.leads.pagination.previous")}
+            </span>
           </Button>
 
           {/* Page numbers */}
@@ -210,7 +214,9 @@ export function LeadsPagination({
             className="h-8 w-8 p-0"
           >
             <ChevronRight className="h-4 w-4" />
-            <span className="sr-only">{t("leads.pagination.next")}</span>
+            <span className="sr-only">
+              {t("app.admin.leads.leads.pagination.next")}
+            </span>
           </Button>
 
           {/* Last page */}
@@ -222,7 +228,9 @@ export function LeadsPagination({
             className="h-8 w-8 p-0"
           >
             <ChevronsRight className="h-4 w-4" />
-            <span className="sr-only">{t("leads.pagination.last")}</span>
+            <span className="sr-only">
+              {t("app.admin.leads.leads.pagination.last")}
+            </span>
           </Button>
         </div>
       </div>

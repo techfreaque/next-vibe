@@ -47,7 +47,6 @@ interface ThreadedMessageProps {
   ttsAutoplay: boolean;
   locale: CountryLanguage;
   logger: EndpointLogger;
-  onEditMessage: (messageId: string, newContent: string) => Promise<void>;
   onDeleteMessage: (messageId: string) => void;
   onBranchMessage?: (messageId: string, newContent: string) => Promise<void>;
   onRetryMessage?: (messageId: string) => Promise<void>;
@@ -68,7 +67,6 @@ export function ThreadedMessage({
   ttsAutoplay,
   locale,
   logger,
-  onEditMessage,
   onDeleteMessage,
   onBranchMessage,
   onRetryMessage,
@@ -186,15 +184,12 @@ export function ThreadedMessage({
                 message={message}
                 selectedModel={selectedModel}
                 selectedPersona={selectedPersona}
-                onSave={(id, content) =>
-                  messageActions.handleSaveEdit(id, content, onEditMessage)
+                onBranch={(id, content) =>
+                  messageActions.handleBranchEdit(id, content, onBranchMessage)
                 }
                 onCancel={messageActions.cancelAction}
                 onModelChange={onModelChange}
                 onPersonaChange={onPersonaChange}
-                onBranch={(id, content) =>
-                  messageActions.handleBranchEdit(id, content, onBranchMessage)
-                }
                 locale={locale}
                 logger={logger}
               />
@@ -570,7 +565,6 @@ export function ThreadedMessage({
                   ttsAutoplay={ttsAutoplay}
                   locale={locale}
                   logger={logger}
-                  onEditMessage={onEditMessage}
                   onDeleteMessage={onDeleteMessage}
                   onBranchMessage={onBranchMessage}
                   onRetryMessage={onRetryMessage}

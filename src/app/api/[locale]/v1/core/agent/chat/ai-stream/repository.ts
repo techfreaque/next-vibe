@@ -237,6 +237,18 @@ export async function createAiStream({
     leadId,
   });
 
+  // Step 0: Validate that non-logged-in users can only use incognito mode
+  if (!userId && !isIncognito) {
+    logger.error("Non-logged-in user attempted to use non-incognito folder", {
+      rootFolderId: data.rootFolderId,
+      leadId,
+    });
+    return createErrorResponse(
+      "app.api.v1.core.agent.chat.aiStream.route.errors.authenticationRequired",
+      ErrorResponseTypes.AUTHENTICATION_ERROR,
+    );
+  }
+
   // Step 1: Validate credits
   const modelCost = getModelCost(data.model);
   let validationResult;
@@ -768,11 +780,31 @@ export async function createAiStream({
                 leadId: effectiveLeadId,
               });
 
+              // Determine correct credit identifier for search deductions
+              let searchCreditIdentifier: { userId?: string; leadId?: string };
+              if (userId) {
+                const identifierResult = await creditRepository.getCreditIdentifier(
+                  userId,
+                  effectiveLeadId,
+                  logger,
+                );
+                if (!identifierResult.success) {
+                  searchCreditIdentifier = { leadId: effectiveLeadId };
+                } else {
+                  searchCreditIdentifier = {
+                    userId: identifierResult.data.userId,
+                    leadId: identifierResult.data.leadId,
+                  };
+                }
+              } else {
+                searchCreditIdentifier = { leadId: effectiveLeadId };
+              }
+
               // Deduct credits for all search calls
               for (let i = 0; i < searchCalls.length; i++) {
                 const messageId = crypto.randomUUID();
                 const deductResult = await creditRepository.deductCredits(
-                  userId ? { userId } : { leadId: effectiveLeadId },
+                  searchCreditIdentifier,
                   1, // 1 credit per search
                   data.model,
                   messageId,
@@ -808,8 +840,37 @@ export async function createAiStream({
     // Deduct credits (optimistic - deduct before stream completes)
     if (modelCost > 0) {
       const messageId = crypto.randomUUID();
+
+      // Determine correct credit identifier based on subscription status
+      let creditIdentifier: { userId?: string; leadId?: string };
+      if (userId) {
+        const identifierResult = await creditRepository.getCreditIdentifier(
+          userId,
+          effectiveLeadId,
+          logger,
+        );
+        if (!identifierResult.success) {
+          logger.error("Failed to get credit identifier", {
+            userId,
+            leadId: effectiveLeadId,
+          });
+          creditIdentifier = { leadId: effectiveLeadId }; // Fallback to lead credits
+        } else {
+          creditIdentifier = {
+            userId: identifierResult.data.userId,
+            leadId: identifierResult.data.leadId,
+          };
+          logger.debug("Using credit identifier", {
+            creditType: identifierResult.data.creditType,
+            identifier: creditIdentifier,
+          });
+        }
+      } else {
+        creditIdentifier = { leadId: effectiveLeadId };
+      }
+
       const deductResult = await creditRepository.deductCredits(
-        userId ? { userId } : { leadId: effectiveLeadId },
+        creditIdentifier,
         modelCost,
         data.model,
         messageId,
@@ -828,6 +889,7 @@ export async function createAiStream({
           leadId: effectiveLeadId,
           cost: modelCost,
           messageId,
+          creditIdentifier,
         });
       }
     }

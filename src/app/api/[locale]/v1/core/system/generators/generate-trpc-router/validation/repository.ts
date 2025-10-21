@@ -72,16 +72,11 @@ export interface TRPCValidationRepository {
     logger: EndpointLogger,
   ): ValidationResult;
 
-  validateRouteFile(
-    filePath: string,
-    fix: boolean,
-  ): RouteFileValidation;
+  validateRouteFile(filePath: string, fix: boolean): RouteFileValidation;
 
-  generateValidationReport(
-    result: ValidationResult,
-  ): string;
+  generateValidationReport(result: ValidationResult): string;
 
-  checkRouterExists(apiDir: string, logger: EndpointLogger): boolean;
+  checkRouterExists(apiDir: string): boolean;
 
   fixRoutes(apiDir: string, logger: EndpointLogger): Promise<ValidationResult>;
 }
@@ -161,7 +156,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
           );
           result = {
             ...validationResult,
-            report: this.generateValidationReport(validationResult, logger),
+            report: this.generateValidationReport(validationResult),
           };
           break;
         }
@@ -177,7 +172,6 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
         case "CHECK_ROUTER_EXISTS": {
           const routerExists = this.checkRouterExists(
             options.apiDir || "src/app/api",
-            logger,
           );
           result = {
             success: routerExists,
@@ -321,10 +315,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
   /**
    * Validate a single route file
    */
-  validateRouteFile(
-    filePath: string,
-    fix: boolean,
-  ): RouteFileValidation {
+  validateRouteFile(filePath: string, fix: boolean): RouteFileValidation {
     const validation: RouteFileValidation = {
       filePath,
       hasDefinition: false,
@@ -423,11 +414,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
   /**
    * Generate validation report
    */
-  generateValidationReport(
-    result: ValidationResult,
-    _logger?: EndpointLogger,
-  ): string {
-    void _logger; // Mark as intentionally unused
+  generateValidationReport(result: ValidationResult): string {
     /* eslint-disable i18next/no-literal-string */
     const lines: string[] = [];
 
@@ -485,8 +472,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
   /**
    * Check if TRPC router file exists
    */
-  checkRouterExists(apiDir: string, _logger?: EndpointLogger): boolean {
-    void _logger; // Mark as intentionally unused
+  checkRouterExists(apiDir: string): boolean {
     /* eslint-disable i18next/no-literal-string */
     try {
       const resolvedApiDir = path.resolve(process.cwd(), apiDir);

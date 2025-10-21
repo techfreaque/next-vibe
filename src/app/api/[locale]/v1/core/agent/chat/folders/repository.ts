@@ -10,7 +10,7 @@ import {
 
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -22,13 +22,17 @@ import type {
 } from "./definition";
 
 /**
- * Get all folders for the authenticated user
+ * Get all folders for the authenticated user or anonymous user (lead)
  */
 export async function getFolders(
-  user: JwtPrivatePayloadType,
+  user: JwtPayloadType,
   data: FolderListRequestOutput,
 ): Promise<ResponseType<FolderListResponseOutput>> {
-  if (!user.id) {
+  // For anonymous users (public), use leadId instead of userId
+  // For authenticated users, use userId
+  const userIdentifier = user.isPublic ? user.leadId : user.id;
+
+  if (!userIdentifier) {
     return createErrorResponse(
       "app.api.v1.core.agent.chat.folders.get.errors.unauthorized.title",
       ErrorResponseTypes.UNAUTHORIZED,
@@ -43,7 +47,7 @@ export async function getFolders(
       .from(chatFolders)
       .where(
         and(
-          eq(chatFolders.userId, user.id),
+          eq(chatFolders.userId, userIdentifier),
           eq(chatFolders.rootFolderId, rootFolderId),
         ),
       )
@@ -68,11 +72,15 @@ export async function getFolders(
  * Create a new folder
  */
 export async function createFolder(
-  user: JwtPrivatePayloadType,
+  user: JwtPayloadType,
   data: FolderCreateRequestOutput,
   locale: CountryLanguage,
 ): Promise<ResponseType<FolderCreateResponseOutput>> {
-  if (!user.id) {
+  // For anonymous users (public), use leadId instead of userId
+  // For authenticated users, use userId
+  const userIdentifier = user.isPublic ? user.leadId : user.id;
+
+  if (!userIdentifier) {
     return createErrorResponse(
       "app.api.v1.core.agent.chat.folders.post.errors.unauthorized.title",
       ErrorResponseTypes.UNAUTHORIZED,
@@ -101,7 +109,7 @@ export async function createFolder(
       .from(chatFolders)
       .where(
         and(
-          eq(chatFolders.userId, user.id),
+          eq(chatFolders.userId, userIdentifier),
           eq(chatFolders.rootFolderId, folderData.rootFolderId),
           folderData.parentId
             ? eq(chatFolders.parentId, folderData.parentId)
@@ -114,7 +122,7 @@ export async function createFolder(
     const [newFolder] = await db
       .insert(chatFolders)
       .values({
-        userId: user.id,
+        userId: userIdentifier,
         rootFolderId: folderData.rootFolderId,
         name: folderData.name,
         icon: folderData.icon || null,

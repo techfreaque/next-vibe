@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 
 import { cn } from "@/packages/next-vibe/shared/utils";
 
@@ -32,6 +32,7 @@ export function Title({
   );
 }
 
+/* eslint-disable i18next/no-literal-string -- CSS classNames */
 const sizeClasses = {
   1: "text-4xl sm:text-5xl lg:text-6xl font-bold",
   2: "text-3xl sm:text-4xl lg:text-4xl font-bold",
@@ -40,3 +41,4 @@ const sizeClasses = {
   5: "text-base sm:text-lg lg:text-xl font-medium",
   6: "text-sm sm:text-base lg:text-lg font-medium",
 };
+/* eslint-enable i18next/no-literal-string */

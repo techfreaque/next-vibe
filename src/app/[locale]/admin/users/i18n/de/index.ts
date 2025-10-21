@@ -1,6 +1,18 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  admin: {
+    tabs: {
+      overview: "Übersicht",
+      stats: "Statistiken",
+      stats_description:
+        "Detaillierte Benutzerstatistiken und Analysen anzeigen",
+      list: "Alle Benutzer",
+      list_description: "Alle Benutzer durchsuchen und verwalten",
+      add: "Benutzer hinzufügen",
+      add_description: "Neues Benutzerkonto erstellen",
+    },
+  },
   userRoles: {
     errors: {
       role_not_found: "Rolle nicht gefunden",
@@ -359,6 +371,7 @@ export const translations: typeof enTranslations = {
         jobTitle: "Software-Entwickler",
       },
       buttons: {
+        back: "Zurück",
         save: "Benutzer speichern",
         cancel: "Abbrechen",
         create: "Benutzer erstellen",

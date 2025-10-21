@@ -1,6 +1,6 @@
 "use client";
 
-import { GitBranch, RotateCcw, X } from "lucide-react";
+import { GitBranch, X } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React from "react";
@@ -21,11 +21,10 @@ interface MessageEditorProps {
   message: ChatMessage;
   selectedModel: ModelId;
   selectedPersona: string;
-  onSave: (messageId: string, newContent: string) => Promise<void>;
+  onBranch: (messageId: string, content: string) => Promise<void>;
   onCancel: () => void;
   onModelChange?: (model: ModelId) => void;
   onPersonaChange?: (persona: string) => void;
-  onBranch?: (messageId: string, content: string) => Promise<void>;
   locale: CountryLanguage;
   logger: EndpointLogger;
 }
@@ -34,11 +33,10 @@ export function MessageEditor({
   message,
   selectedModel,
   selectedPersona,
-  onSave,
+  onBranch,
   onCancel,
   onModelChange,
   onPersonaChange,
-  onBranch,
   locale,
   logger,
 }: MessageEditorProps): JSX.Element {
@@ -48,7 +46,6 @@ export function MessageEditor({
   // Use custom hook for editor logic
   const editor = useMessageEditor({
     message,
-    onSave,
     onBranch,
     onCancel,
     logger,
@@ -59,7 +56,7 @@ export function MessageEditor({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          void editor.handleOverwrite();
+          void editor.handleBranch();
         }}
         className={cn(
           "p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
@@ -87,7 +84,7 @@ export function MessageEditor({
               <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
                 ⌘/Ctrl+Enter
               </kbd>{" "}
-              {t("app.chat.messageEditor.hint.overwrite")}{" "}
+              {t("app.chat.messageEditor.hint.branch")}{" "}
               {/* eslint-disable-next-line i18next/no-literal-string -- Keyboard shortcuts are technical UI elements */}
               <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Esc</kbd>{" "}
               {t("app.chat.messageEditor.hint.cancel")}
@@ -134,38 +131,20 @@ export function MessageEditor({
               logger={logger}
             />
 
-            {/* Overwrite Button */}
+            {/* Branch Button - Now the primary action */}
             <Button
               type="submit"
               disabled={!editor.content.trim() || editor.isLoading}
               size="sm"
               variant="default"
               className="flex-1 sm:flex-none h-9"
-              title={t("app.chat.messageEditor.titles.overwrite")}
+              title={t("app.chat.messageEditor.titles.branch")}
             >
-              <RotateCcw className="h-3.5 w-3.5 mr-2" />
-              {editor.isLoading && editor.actionType === "overwrite"
-                ? t("app.chat.messageEditor.buttons.overwriting")
-                : t("app.chat.messageEditor.buttons.overwrite")}
+              <GitBranch className="h-3.5 w-3.5 mr-2" />
+              {editor.isLoading && editor.actionType === "branch"
+                ? t("app.chat.messageEditor.buttons.branching")
+                : t("app.chat.messageEditor.buttons.branch")}
             </Button>
-
-            {/* Branch Button */}
-            {onBranch && (
-              <Button
-                type="button"
-                onClick={editor.handleBranch}
-                disabled={!editor.content.trim() || editor.isLoading}
-                size="sm"
-                variant="outline"
-                className="flex-1 sm:flex-none h-9"
-                title={t("app.chat.messageEditor.titles.branch")}
-              >
-                <GitBranch className="h-3.5 w-3.5 mr-2" />
-                {editor.isLoading && editor.actionType === "branch"
-                  ? t("app.chat.messageEditor.buttons.branching")
-                  : t("app.chat.messageEditor.buttons.branch")}
-              </Button>
-            )}
 
             {/* Cancel Button */}
             <Button

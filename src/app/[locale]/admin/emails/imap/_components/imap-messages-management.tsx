@@ -21,7 +21,7 @@ import {
   SortOrder,
 } from "@/app/api/[locale]/v1/core/emails/imap-client/enum";
 import { useImapMessagesListEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/messages/list/hooks";
-import { imapMessageQuerySchema } from "@/app/api/[locale]/v1/core/emails/imap-client/schema";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { useTranslation } from "@/i18n/core/client";
 
 import { ImapMessagesTable } from "./imap-messages-table";
@@ -31,31 +31,33 @@ import { ImapMessagesTable } from "./imap-messages-table";
  * Uses useEndpoint for all state management following leads/cron patterns
  */
 export function ImapMessagesManagement(): JSX.Element {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Use endpoints for data management - no local useState
-  const messagesEndpoint = useImapMessagesListEndpoint();
-  const accountsEndpoint = useImapAccountsListEndpoint();
+  const messagesEndpoint = useImapMessagesListEndpoint(logger);
+  const accountsEndpoint = useImapAccountsListEndpoint(logger);
 
   // Get data from endpoints
-  const apiResponse = messagesEndpoint.read?.response;
+  const apiResponse = messagesEndpoint.read.response;
   const messages = apiResponse?.success ? apiResponse.data.messages : [];
   const totalMessages = apiResponse?.success ? apiResponse.data.total : 0;
   const totalPages = apiResponse?.success ? apiResponse.data.totalPages : 0;
-  const queryLoading = messagesEndpoint.read?.isLoading || false;
+  const queryLoading = messagesEndpoint.read.isLoading || false;
 
   // Get accounts data for the dropdown
-  const accountsResponse = accountsEndpoint.read?.response;
+  const accountsResponse = accountsEndpoint.read.response;
   const accounts = accountsResponse?.success
     ? accountsResponse.data.accounts
     : [];
 
   // Get current form values for pagination display
-  const currentPage = messagesEndpoint.read?.form.getValues("page") || 1;
-  const currentLimit = messagesEndpoint.read?.form.getValues("limit") || 20;
+  const currentPage: number = messagesEndpoint.read.form.getValues("page") || 1;
+  const currentLimit: number =
+    messagesEndpoint.read.form.getValues("limit") || 20;
 
   const handleClearFilters = (): void => {
-    messagesEndpoint.read?.form.reset({
+    messagesEndpoint.read.form.reset({
       search: undefined,
       status: ImapMessageStatusFilter.ALL,
       accountId: undefined,
@@ -110,7 +112,7 @@ export function ImapMessagesManagement(): JSX.Element {
           </CardHeader>
           <CardContent>
             <Form
-              form={messagesEndpoint.read?.form}
+              form={messagesEndpoint.read.form}
               onSubmit={() => {}}
               className="space-y-6"
             >
@@ -138,8 +140,7 @@ export function ImapMessagesManagement(): JSX.Element {
                       })),
                     ],
                   }}
-                  control={messagesEndpoint.read?.form.control}
-                  schema={imapMessageQuerySchema}
+                  control={messagesEndpoint.read.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -175,8 +176,7 @@ export function ImapMessagesManagement(): JSX.Element {
                       },
                     ],
                   }}
-                  control={messagesEndpoint.read?.form.control}
-                  schema={imapMessageQuerySchema}
+                  control={messagesEndpoint.read.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -208,8 +208,7 @@ export function ImapMessagesManagement(): JSX.Element {
                       },
                     ],
                   }}
-                  control={messagesEndpoint.read?.form.control}
-                  schema={imapMessageQuerySchema}
+                  control={messagesEndpoint.read.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -233,8 +232,7 @@ export function ImapMessagesManagement(): JSX.Element {
                       },
                     ],
                   }}
-                  control={messagesEndpoint.read?.form.control}
-                  schema={imapMessageQuerySchema}
+                  control={messagesEndpoint.read.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -249,10 +247,9 @@ export function ImapMessagesManagement(): JSX.Element {
                   config={{
                     type: "date",
                     label: "app.admin.emails.imap.common.dateFrom",
-                    placeholder: "common.selectDate",
+                    placeholder: "app.common.selectDate",
                   }}
-                  control={messagesEndpoint.read?.form.control}
-                  schema={imapMessageQuerySchema}
+                  control={messagesEndpoint.read.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -264,10 +261,9 @@ export function ImapMessagesManagement(): JSX.Element {
                   config={{
                     type: "date",
                     label: "app.admin.emails.imap.common.dateTo",
-                    placeholder: "common.selectDate",
+                    placeholder: "app.common.selectDate",
                   }}
-                  control={messagesEndpoint.read?.form.control}
-                  schema={imapMessageQuerySchema}
+                  control={messagesEndpoint.read.form.control}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -286,8 +282,7 @@ export function ImapMessagesManagement(): JSX.Element {
                       placeholder:
                         "app.admin.emails.imap.messages.searchPlaceholder",
                     }}
-                    control={messagesEndpoint.read?.form.control}
-                    schema={imapMessageQuerySchema}
+                    control={messagesEndpoint.read.form.control}
                     theme={{
                       style: "none",
                       showAllRequired: false,
@@ -344,7 +339,7 @@ export function ImapMessagesManagement(): JSX.Element {
                       size="sm"
                       disabled={currentPage <= 1 || queryLoading}
                       onClick={() => {
-                        messagesEndpoint.read?.form.setValue(
+                        messagesEndpoint.read.form.setValue(
                           "page",
                           currentPage - 1,
                         );
@@ -360,7 +355,7 @@ export function ImapMessagesManagement(): JSX.Element {
                       size="sm"
                       disabled={currentPage >= totalPages || queryLoading}
                       onClick={() => {
-                        messagesEndpoint.read?.form.setValue(
+                        messagesEndpoint.read.form.setValue(
                           "page",
                           currentPage + 1,
                         );

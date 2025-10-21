@@ -143,8 +143,8 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
       groups.get(groupKey)!.push(item);
     }
 
-    // Sort groups by key
-    return new Map([...groups.entries()].sort());
+    // Sort groups by filename (alphabetically)
+    return new Map([...groups.entries()].sort((a, b) => a[0].localeCompare(b[0])));
   }
 
   /**
@@ -479,9 +479,9 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
     const separator = String.fromCharCode(9472).repeat(50);
     output += `${this.styleText(separator, "dim", context)}${String.fromCharCode(10)}`;
 
-    // Sort files by error count (descending)
+    // Sort files by filename (alphabetically)
     const sortedFiles = Array.from(groups.entries()).sort(
-      ([, a], [, b]) => b.length - a.length,
+      ([aKey], [bKey]) => aKey.localeCompare(bKey),
     );
 
     // List each file with its error count
@@ -495,14 +495,10 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
 
       let countText = "";
       if (errorCount > 0 && warningCount > 0) {
+        const errorText = `${errorCount} ${t(`app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.${errorCount === 1 ? "error" : "errors"}`)}`;
+        const warningText = `${warningCount} ${t(`app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.${warningCount === 1 ? "warning" : "warnings"}`)}`;
         countText = this.styleText(
-          t(
-            "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.errorsAndWarnings",
-            {
-              errorCount: errorCount.toString(),
-              warningCount: warningCount.toString(),
-            },
-          ),
+          `${errorText}, ${warningText}`,
           "red",
           context,
         );

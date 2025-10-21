@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Brain,
-  Check,
-  ChevronDown,
-  ChevronRight,
-  Copy,
-  ExternalLink,
-} from "lucide-react";
+import { Brain, Check, ChevronDown, Copy, ExternalLink } from "lucide-react";
 import type { JSX } from "react";
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -16,7 +9,12 @@ import { atomDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
+import { useTranslation } from "@/i18n/core/client";
 import { cn } from "@/packages/next-vibe/shared/utils";
+
+// Constants for non-translatable values
+const DECORATIVE_QUOTE = String.fromCharCode(0x201c); // Left double quotation mark
+const CODE_BLOCK_BG_COLOR = `rgb(${30} ${41} ${59})`; // Slate-800 background
 
 interface MarkdownProps {
   content: string;
@@ -66,6 +64,7 @@ function extractThinkingSections(content: string): {
 }
 
 export function Markdown({ content, className }: MarkdownProps): JSX.Element {
+  const { t } = useTranslation();
   const { thinkingSections, contentWithoutThinking, incompleteThinking } =
     extractThinkingSections(content);
 
@@ -85,7 +84,7 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
     return new Set();
   });
 
-  const toggleThinking = (index: number) => {
+  const toggleThinking = (index: number): void => {
     setExpandedThinking((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(index)) {
@@ -129,10 +128,12 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
                 >
                   <Brain className="h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110" />
                   <span className="flex-1 text-left font-semibold">
-                    Reasoning Process
+                    {t(
+                      "app.packages.nextVibeUi.web.ui.markdown.reasoningProcess",
+                    )}
                     {isIncomplete && (
                       <span className="ml-2 text-xs font-normal text-purple-500 dark:text-purple-400">
-                        (streaming...)
+                        {t("app.packages.nextVibeUi.web.ui.markdown.streaming")}
                       </span>
                     )}
                   </span>
@@ -298,8 +299,11 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
 
           blockquote: ({ children }) => (
             <blockquote className="relative border-l-4 border-blue-500 dark:border-blue-400 pl-6 pr-4 py-4 my-4 bg-gradient-to-r from-blue-50 via-indigo-50/50 to-transparent dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-transparent rounded-r-xl text-base text-slate-700 dark:text-slate-300 shadow-sm">
-              <div className="absolute left-2 top-4 text-blue-500/20 dark:text-blue-400/20 text-6xl leading-none font-serif">
-                &ldquo;
+              <div
+                className="absolute left-2 top-4 text-blue-500/20 dark:text-blue-400/20 text-6xl leading-none font-serif"
+                aria-hidden="true"
+              >
+                {DECORATIVE_QUOTE}
               </div>
               {children}
             </blockquote>
@@ -317,7 +321,12 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
             </a>
           ),
 
-          img: ({ src, alt }) => <MarkdownImage src={src} alt={alt} />,
+          img: ({ src, alt }) => (
+            <MarkdownImage
+              src={typeof src === "string" ? src : undefined}
+              alt={alt}
+            />
+          ),
 
           table: ({ children }) => (
             <div className="overflow-x-auto mb-6 mt-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
@@ -361,16 +370,17 @@ function CodeBlock({
   code: string;
   language: string;
 }): JSX.Element {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async () => {
+  const handleCopy = async (): Promise<void> => {
     try {
       await navigator.clipboard.writeText(code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("Failed to copy code:", err);
+    } catch {
+      // Silently fail - copying is a nice-to-have feature
+      // The UI won't show copied state, which indicates failure to the user
     }
   };
 
@@ -390,17 +400,21 @@ function CodeBlock({
               ? "bg-green-500/20 text-green-400 border border-green-500/30"
               : "bg-slate-700 hover:bg-slate-600 text-slate-300 border border-slate-600",
           )}
-          title={copied ? "Copied!" : "Copy code"}
+          title={
+            copied
+              ? t("app.packages.nextVibeUi.web.ui.markdown.copied")
+              : t("app.packages.nextVibeUi.web.ui.markdown.copyCode")
+          }
         >
           {copied ? (
             <>
               <Check className="h-3.5 w-3.5" />
-              Copied!
+              {t("app.packages.nextVibeUi.web.ui.markdown.copied")}
             </>
           ) : (
             <>
               <Copy className="h-3.5 w-3.5" />
-              Copy
+              {t("app.packages.nextVibeUi.web.ui.markdown.copy")}
             </>
           )}
         </button>
@@ -412,7 +426,7 @@ function CodeBlock({
           margin: 0,
           padding: "1.25rem",
           fontSize: "0.875rem",
-          background: "rgb(30 41 59)",
+          background: CODE_BLOCK_BG_COLOR,
           lineHeight: "1.6",
         }}
         showLineNumbers

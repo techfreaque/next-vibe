@@ -9,8 +9,6 @@ import type { Control, FieldPath, FieldValues } from "react-hook-form";
 import type { Countries } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { FormFieldCategory } from "../autocomplete-field";
-
 // Base field configuration
 export interface BaseFieldConfig {
   label: TranslationKey | undefined;

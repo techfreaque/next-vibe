@@ -44,6 +44,7 @@ export const translations: typeof enTranslations = {
     viewAllThreads: "Alle Threads anzeigen",
     backToChat: "Zurück zum Chat",
     language: "Sprache",
+    loginRequired: "Bitte melden Sie sich an, um persistente Ordner zu verwenden. Verwenden Sie den Inkognito-Modus für anonyme Chats.",
 
     // Copy Button
     copyButton: {
@@ -592,17 +593,14 @@ export const translations: typeof enTranslations = {
   messageEditor: {
     placeholder: "Bearbeiten Sie Ihre Nachricht...",
     hint: {
-      overwrite: "zum Überschreiben",
+      branch: "zum Verzweigen",
       cancel: "zum Abbrechen",
     },
     titles: {
-      overwrite: "Nachricht überschreiben",
       branch: "Konversation verzweigen",
       cancel: "Bearbeitung abbrechen",
     },
     buttons: {
-      overwrite: "Überschreiben",
-      overwriting: "Überschreibe...",
       branch: "Verzweigen",
       branching: "Verzweige...",
       cancel: "Abbrechen",

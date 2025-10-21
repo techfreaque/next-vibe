@@ -11,9 +11,11 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
-import { leadCredits, leads } from "@/app/api/[locale]/v1/core/leads/db";
+import { leadCredits, leads, userLeads } from "@/app/api/[locale]/v1/core/leads/db";
 import { LeadSource, LeadStatus } from "@/app/api/[locale]/v1/core/leads/enum";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
+import { subscriptions } from "@/app/api/[locale]/v1/core/subscription/db";
+import { SubscriptionStatus } from "@/app/api/[locale]/v1/core/subscription/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountriesArr, LanguagesArr } from "@/i18n/core/config";
 
@@ -90,6 +92,15 @@ export interface CreditRepositoryInterface {
 
   // Expire old subscription credits (cron job)
   expireCredits(): Promise<ResponseType<number>>;
+
+  // Get correct credit identifier based on subscription status
+  getCreditIdentifier(
+    userId: string,
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{ userId?: string; leadId?: string; creditType: string }>
+  >;
 }
 
 /**
@@ -147,6 +158,7 @@ class CreditRepository implements CreditRepositoryInterface {
 
   /**
    * Get lead's current credit balance
+   * If lead has no credits, create initial 20 free credits
    */
   async getLeadBalance(leadId: string): Promise<ResponseType<number>> {
     try {
@@ -156,7 +168,25 @@ class CreditRepository implements CreditRepositoryInterface {
         .where(eq(leadCredits.leadId, leadId))
         .limit(1);
 
-      return createSuccessResponse(credits[0]?.amount ?? 0);
+      // If lead has no credits, create initial 20 free credits
+      if (!credits[0]) {
+        await db.insert(leadCredits).values({
+          leadId,
+          amount: 20,
+        });
+
+        // Create transaction record
+        await db.insert(creditTransactions).values({
+          leadId,
+          amount: 20,
+          balanceAfter: 20,
+          type: "free_tier",
+        });
+
+        return createSuccessResponse(20);
+      }
+
+      return createSuccessResponse(credits[0].amount);
     } catch {
       return createErrorResponse(
         "app.api.v1.core.agent.chat.credits.errors.getLeadBalanceFailed",
@@ -276,7 +306,8 @@ class CreditRepository implements CreditRepositoryInterface {
       });
 
       return createSuccessResponse(undefined);
-    } catch {
+    } catch (error) {
+      console.error("Failed to add credits:", error);
       return createErrorResponse(
         "app.api.v1.core.agent.chat.credits.errors.addCreditsFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -445,6 +476,79 @@ class CreditRepository implements CreditRepositoryInterface {
     } catch {
       return createErrorResponse(
         "app.api.v1.core.agent.chat.credits.errors.deductCreditsFailed",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Get correct credit identifier based on subscription status
+   * Logic:
+   * - If user has active subscription → return { userId } (use user credits)
+   * - If user has no subscription → return { leadId } (use lead credits)
+   */
+  async getCreditIdentifier(
+    userId: string,
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{ userId?: string; leadId?: string; creditType: string }>
+  > {
+    try {
+      // Check if user has an active subscription
+      const [subscription] = await db
+        .select()
+        .from(subscriptions)
+        .where(eq(subscriptions.userId, userId))
+        .limit(1);
+
+      const hasActiveSubscription =
+        subscription && subscription.status === SubscriptionStatus.ACTIVE;
+
+      if (hasActiveSubscription) {
+        // User has active subscription → use user credits
+        logger.debug("Using user credits (subscription)", {
+          userId,
+          subscriptionId: subscription.id,
+        });
+        return createSuccessResponse({
+          userId,
+          creditType: "user_subscription",
+        });
+      } else {
+        // User has no active subscription → use lead credits
+        // Get primary lead for user
+        const [userLead] = await db
+          .select()
+          .from(userLeads)
+          .where(eq(userLeads.userId, userId))
+          .limit(1);
+
+        if (!userLead) {
+          logger.error("No lead found for user", { userId });
+          return createErrorResponse(
+            "app.api.v1.core.agent.chat.credits.errors.noLeadFound",
+            ErrorResponseTypes.NOT_FOUND,
+          );
+        }
+
+        logger.debug("Using lead credits (non-subscription)", {
+          userId,
+          leadId: userLead.leadId,
+        });
+        return createSuccessResponse({
+          leadId: userLead.leadId,
+          creditType: "lead_free",
+        });
+      }
+    } catch (error) {
+      logger.error("Failed to get credit identifier", {
+        error,
+        userId,
+        leadId,
+      });
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.credits.errors.getCreditIdentifierFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }

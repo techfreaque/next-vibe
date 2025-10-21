@@ -15,11 +15,19 @@ import {
 import type React from "react";
 import { useCallback } from "react";
 
-import { LeadStatus } from "@/app/api/[locale]/v1/core/leads/enum";
-import type { LeadResponseType } from "@/app/api/[locale]/v1/core/leads/schema";
+import {
+  LeadStatus,
+  type LeadStatusValues,
+} from "@/app/api/[locale]/v1/core/leads/enum";
+import type { LeadListGetResponseTypeOutput } from "@/app/api/[locale]/v1/core/leads/list/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
+
+// Extract lead type from response - ResponseTypeOutput has { response: { leads: [...] } }
+type LeadResponseType = NonNullable<
+  LeadListGetResponseTypeOutput["response"]["leads"]
+>[number];
 
 interface LeadsTableProps {
   locale: CountryLanguage;
@@ -38,7 +46,7 @@ export function LeadsTable({
 
   // Get status configuration
   const getStatusConfig = (
-    status: LeadStatus,
+    status: typeof LeadStatusValues,
   ): {
     variant: "default" | "destructive" | "secondary";
     label: TranslationKey;
@@ -47,62 +55,62 @@ export function LeadsTable({
       case LeadStatus.NEW:
         return {
           variant: "secondary" as const,
-          label: `leads.admin.status.new`,
+          label: `app.admin.leads.leads.admin.status.new`,
         };
       case LeadStatus.PENDING:
         return {
           variant: "secondary" as const,
-          label: `leads.admin.status.pending`,
+          label: `app.admin.leads.leads.admin.status.pending`,
         };
       case LeadStatus.CAMPAIGN_RUNNING:
         return {
           variant: "default" as const,
-          label: `leads.admin.status.campaign_running`,
+          label: `app.admin.leads.leads.admin.status.campaign_running`,
         };
       case LeadStatus.WEBSITE_USER:
         return {
           variant: "default" as const,
-          label: `leads.admin.status.website_user`,
+          label: `app.admin.leads.leads.admin.status.website_user`,
         };
       case LeadStatus.NEWSLETTER_SUBSCRIBER:
         return {
           variant: "default" as const,
-          label: `leads.admin.status.newsletter_subscriber`,
+          label: `app.admin.leads.leads.admin.status.newsletter_subscriber`,
         };
       case LeadStatus.IN_CONTACT:
         return {
           variant: "default" as const,
-          label: `leads.admin.status.in_contact`,
+          label: `app.admin.leads.leads.admin.status.in_contact`,
         };
       case LeadStatus.SIGNED_UP:
         return {
           variant: "default" as const,
-          label: `leads.admin.status.signed_up`,
+          label: `app.admin.leads.leads.admin.status.signed_up`,
         };
       case LeadStatus.CONSULTATION_BOOKED:
         return {
           variant: "default" as const,
-          label: `leads.admin.status.consultation_booked`,
+          label: `app.admin.leads.leads.admin.status.consultation_booked`,
         };
       case LeadStatus.SUBSCRIPTION_CONFIRMED:
         return {
           variant: "default" as const,
-          label: `leads.admin.status.subscription_confirmed`,
+          label: `app.admin.leads.leads.admin.status.subscription_confirmed`,
         };
       case LeadStatus.UNSUBSCRIBED:
         return {
           variant: "destructive" as const,
-          label: `leads.admin.status.unsubscribed`,
+          label: `app.admin.leads.leads.admin.status.unsubscribed`,
         };
       case LeadStatus.BOUNCED:
         return {
           variant: "destructive" as const,
-          label: `leads.admin.status.bounced`,
+          label: `app.admin.leads.leads.admin.status.bounced`,
         };
       case LeadStatus.INVALID:
         return {
           variant: "destructive" as const,
-          label: `leads.admin.status.invalid`,
+          label: `app.admin.leads.leads.admin.status.invalid`,
         };
       default:
         return {
@@ -133,7 +141,7 @@ export function LeadsTable({
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100 mx-auto" />
           <p className="mt-2 text-gray-600 dark:text-gray-400">
-            {t("app.common.loading")}
+            {t("app.admin.leads.leads.list.loading")}
           </p>
         </div>
       </div>
@@ -244,7 +252,9 @@ export function LeadsTable({
                   <TableCell>
                     {lead.currentCampaignStage ? (
                       <Badge variant="outline">
-                        {t(`leads.admin.stage.${lead.currentCampaignStage}`)}
+                        {t(
+                          `app.admin.leads.leads.admin.stage.${lead.currentCampaignStage}` as TranslationKey,
+                        )}
                       </Badge>
                     ) : (
                       <span className="text-gray-400">

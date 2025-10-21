@@ -227,6 +227,19 @@ export const translations = {
         },
       },
       emails: {
+        title: "Email Templates",
+        description: "Preview and manage email templates for lead campaigns",
+        subtitle: "Organized by customer journey and campaign stage",
+        journey: "Journey",
+        stage: "Stage",
+        view_preview: "View Preview",
+        total_templates: "Total Templates",
+        templates: "templates",
+        from: "From",
+        recipient: "To",
+        subject: "Subject",
+        email_preview: "Email Preview",
+        preview_title: "Email Preview",
         preview: {
           actions: {
             title: "Email Actions",

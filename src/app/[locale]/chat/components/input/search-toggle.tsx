@@ -27,17 +27,16 @@ export function SearchToggle({
     ? t("app.chat.searchToggle.enabledTitle")
     : t("app.chat.searchToggle.disabledTitle");
 
-  const handleClick = (): void => {
+  const handleChange = (checked: boolean): void => {
     if (!disabled) {
-      onChange(!enabled);
+      onChange(checked);
     }
   };
 
   return (
     <div
-      onClick={handleClick}
       className={cn(
-        "inline-flex items-center justify-center gap-2 text-sm min-h-9 h-auto transition-colors rounded-md border border-input bg-background px-3 hover:bg-accent hover:text-accent-foreground cursor-pointer",
+        "inline-flex items-center justify-center gap-2 text-sm min-h-9 h-auto transition-colors rounded-md border border-input bg-background px-3 hover:bg-accent hover:text-accent-foreground",
         enabled && "border-primary/50 bg-primary/5",
         disabled && "opacity-50 cursor-not-allowed",
       )}
@@ -49,8 +48,9 @@ export function SearchToggle({
       </span>
       <Switch
         checked={enabled}
+        onCheckedChange={handleChange}
         disabled={disabled}
-        className="h-4 w-7 data-[state=checked]:bg-primary pointer-events-none"
+        className="h-4 w-7 data-[state=checked]:bg-primary"
       />
       {enabled && (
         <span className="hidden lg:inline text-[10px] opacity-75">

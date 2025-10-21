@@ -2,10 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import type { JSX } from "react";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
+import { DEFAULT_FOLDER_IDS } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
 import { useTranslation } from "@/i18n/core/client";
 
 import { useChatContext } from "../features/chat/context";
@@ -96,7 +98,7 @@ export function ChatInterface({
     setSelectedPersona,
     setSelectedModel,
     sendMessage,
-    editMessage,
+    branchMessage,
     deleteMessage,
     retryMessage,
     voteMessage,
@@ -123,10 +125,84 @@ export function ChatInterface({
     setEnableSearch,
   } = chat;
 
+  // Branch indices for linear view - tracks which branch is selected at each level
+  // Key: parent message ID, Value: index of selected child
+  const [branchIndices, setBranchIndices] = useState<Record<string, number>>(
+    {},
+  );
+
+  // Track the last message count to detect new messages
+  const lastMessageCountRef = useRef<number>(0);
+
+  // Handler for switching branches in linear view
+  const handleSwitchBranch = useCallback(
+    (parentMessageId: string, branchIndex: number): void => {
+      setBranchIndices((prev) => ({
+        ...prev,
+        [parentMessageId]: branchIndex,
+      }));
+    },
+    [],
+  );
+
+  // Auto-switch to newly created branches
+  useEffect(() => {
+    const currentMessageCount = activeThreadMessages.length;
+
+    // Only process if we have new messages
+    if (currentMessageCount <= lastMessageCountRef.current) {
+      lastMessageCountRef.current = currentMessageCount;
+      return;
+    }
+
+    lastMessageCountRef.current = currentMessageCount;
+
+    // Find the most recently created user message
+    const sortedMessages = [...activeThreadMessages].sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+    );
+    const latestUserMessage = sortedMessages.find((msg) => msg.role === "user");
+
+    if (!latestUserMessage?.parentId) {
+      return;
+    }
+
+    // Find all siblings (messages with the same parent)
+    const siblings = activeThreadMessages
+      .filter((msg) => msg.parentId === latestUserMessage.parentId)
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
+    if (siblings.length <= 1) {
+      return; // No branches to switch to
+    }
+
+    // Find the index of the latest message among its siblings
+    const latestIndex = siblings.findIndex(
+      (msg) => msg.id === latestUserMessage.id,
+    );
+
+    if (latestIndex >= 0 && latestUserMessage.parentId) {
+      // Auto-switch to the newly created branch
+      setBranchIndices((prev) => ({
+        ...prev,
+        [latestUserMessage.parentId!]: latestIndex,
+      }));
+    }
+  }, [activeThreadMessages]);
+
   const { locale, currentCountry } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null = checking
   const router = useRouter();
+
+  // Check if user is authenticated using auth status cookie (client-side only)
+  useEffect(() => {
+    const authStatusResponse = authClientRepository.hasAuthStatus(logger);
+    setIsAuthenticated(
+      authStatusResponse.success && authStatusResponse.data === true,
+    );
+  }, [logger]);
 
   // Parse URL path to determine root folder, sub folder, and thread
   // URL structure: /threads/[rootId] OR /threads/[rootId]/[subFolderId] OR /threads/[rootId]/[subFolderId]/[threadId]
@@ -211,6 +287,29 @@ export function ChatInterface({
       };
     }, [urlPath, deprecatedFolderId, deprecatedThreadId]);
 
+  // Redirect public users to incognito mode if they try to access non-incognito folders
+  useEffect(() => {
+    // Wait for authentication check to complete
+    if (isAuthenticated === null) {
+      return;
+    }
+
+    // If user is not authenticated and tries to access non-incognito folder, redirect to incognito
+    if (
+      !isAuthenticated &&
+      initialRootFolderId !== DEFAULT_FOLDER_IDS.INCOGNITO
+    ) {
+      logger.info(
+        "Non-authenticated user attempted to access non-incognito folder, redirecting to incognito",
+        {
+          attemptedFolder: initialRootFolderId,
+        },
+      );
+      const url = `/${locale}/threads/${DEFAULT_FOLDER_IDS.INCOGNITO}/new`;
+      router.push(url);
+    }
+  }, [isAuthenticated, initialRootFolderId, locale, router, logger]);
+
   // Handle "new" thread case - don't set active thread, let user start fresh
   useEffect(() => {
     if (initialThreadId && !isNewThread(initialThreadId)) {
@@ -222,13 +321,13 @@ export function ChatInterface({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialThreadId]);
 
-  // Navigate to thread URL when a new thread is created (after sending first message)
+  // Update active thread when new thread is created (without navigation)
   const prevThreadCountRef = React.useRef(Object.keys(threads).length);
   useEffect(() => {
     const currentThreadCount = Object.keys(threads).length;
     const prevThreadCount = prevThreadCountRef.current;
 
-    // If thread count increased and we're on "new" page, navigate to the new thread
+    // If thread count increased and we're on "new" page, set active thread without navigating
     if (
       currentThreadCount > prevThreadCount &&
       initialThreadId &&
@@ -242,17 +341,16 @@ export function ChatInterface({
       );
 
       if (newestThread) {
-        logger.debug("Chat", "New thread created, navigating", {
+        logger.debug("Chat", "New thread created, setting active thread", {
           threadId: newestThread.id,
         });
-        const url = buildThreadUrl(locale, newestThread.id, threads);
-        router.push(url);
+        // Only set active thread, don't navigate away from current page
         setActiveThread(newestThread.id);
       }
     }
 
     prevThreadCountRef.current = currentThreadCount;
-  }, [threads, initialThreadId, locale, router, setActiveThread, logger]);
+  }, [threads, initialThreadId, setActiveThread, logger]);
 
   // Handle thread selection with navigation
   const handleSelectThread = useCallback(
@@ -404,9 +502,9 @@ export function ChatInterface({
           onSubmit={handleSubmit}
           onKeyDown={handleKeyDown}
           onStop={stopGeneration}
-          onEditMessage={editMessage}
+          onBranchMessage={branchMessage}
           onDeleteMessage={deleteMessage}
-          onSwitchBranch={() => {}}
+          onSwitchBranch={handleSwitchBranch}
           onRetryMessage={retryMessage}
           onVoteMessage={voteMessage}
           onModelChange={setSelectedModel}
@@ -414,6 +512,7 @@ export function ChatInterface({
           onEnableSearchChange={setEnableSearch}
           onSendMessage={handleFillInputWithPrompt}
           showBranchIndicators={true}
+          branchIndices={branchIndices}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           onScreenshot={handleScreenshot}

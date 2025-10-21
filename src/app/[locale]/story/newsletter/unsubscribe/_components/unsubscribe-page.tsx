@@ -1,7 +1,6 @@
 "use client";
 
 import { Check, Mail, Send, X } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";
 import { Input } from "next-vibe-ui/ui/input";
 import type { JSX } from "react";

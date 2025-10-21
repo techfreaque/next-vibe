@@ -16,6 +16,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { chatAnimations } from "../../lib/design-tokens";
 import type { ChatMessage } from "../../types";
 import { AssistantMessageBubble } from "./assistant-message-bubble";
+import { BranchNavigator } from "./branch-navigator";
 import { ErrorMessageBubble } from "./error-message-bubble";
 import { MessageEditor } from "./message-editor";
 import { ModelPersonaSelectorModal } from "./model-persona-selector-modal";
@@ -23,6 +24,10 @@ import { UserMessageBubble } from "./user-message-bubble";
 
 interface LinearMessageViewProps {
   messages: ChatMessage[];
+  branchInfo: Record<
+    string,
+    { siblings: ChatMessage[]; currentIndex: number }
+  >;
   selectedModel: ModelId;
   selectedPersona: string;
   ttsAutoplay: boolean;
@@ -45,14 +50,15 @@ interface LinearMessageViewProps {
   onStartRetry: (messageId: string) => void;
   onStartAnswer: (messageId: string) => void;
   onCancelAction: () => void;
-  onSaveEdit: (messageId: string, content: string) => Promise<void>;
   onBranchEdit: (messageId: string, content: string) => Promise<void>;
+  onSwitchBranch: (parentMessageId: string, branchIndex: number) => void;
 
   logger: EndpointLogger;
 }
 
 export function LinearMessageView({
   messages,
+  branchInfo,
   selectedModel,
   selectedPersona,
   ttsAutoplay,
@@ -69,30 +75,37 @@ export function LinearMessageView({
   onStartRetry,
   onStartAnswer,
   onCancelAction,
-  onSaveEdit,
   onBranchEdit,
+  onSwitchBranch,
   logger,
 }: LinearMessageViewProps): JSX.Element {
   return (
     <>
-      {messages.map((message) => {
+      {messages.map((message, index) => {
         const isEditing = editingMessageId === message.id;
         const isRetrying = retryingMessageId === message.id;
         const isAnswering = answeringMessageId === message.id;
 
+        // Check if this message has branches (multiple children)
+        const branches = branchInfo[message.id];
+        const hasBranches = branches && branches.siblings.length > 1;
+
+        // Get the next message in the path (the child we're following)
+        const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
+
         return (
-          <div key={message.id} className={cn(chatAnimations.slideIn, "group")}>
-            {isEditing ? (
+          <React.Fragment key={message.id}>
+            <div className={cn(chatAnimations.slideIn, "group")}>
+              {isEditing ? (
               <div className="flex justify-end">
                 <MessageEditor
                   message={message}
                   selectedModel={selectedModel}
                   selectedPersona={selectedPersona}
-                  onSave={onSaveEdit}
+                  onBranch={onBranchEdit}
                   onCancel={onCancelAction}
                   onModelChange={onModelChange}
                   onPersonaChange={onPersonaChange}
-                  onBranch={onBranchEdit}
                   locale={locale}
                   logger={logger}
                 />
@@ -186,9 +199,26 @@ export function LinearMessageView({
                 )}
               </>
             )}
+            </div>
 
-            {/* Branch navigation disabled in new architecture - branches are handled differently */}
-          </div>
+            {/* Show branch navigator if this message has multiple children */}
+            {hasBranches && nextMessage && (
+              <div className="my-3">
+                <BranchNavigator
+                  currentBranchIndex={branches.currentIndex}
+                  totalBranches={branches.siblings.length}
+                  branches={branches.siblings.map((sibling) => ({
+                    id: sibling.id,
+                    preview:
+                      sibling.content.slice(0, 50) +
+                      (sibling.content.length > 50 ? "..." : ""),
+                  }))}
+                  onSwitchBranch={(index) => onSwitchBranch(message.id, index)}
+                  locale={locale}
+                />
+              </div>
+            )}
+          </React.Fragment>
         );
       })}
     </>

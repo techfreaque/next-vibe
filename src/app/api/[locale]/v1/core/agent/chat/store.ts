@@ -141,7 +141,7 @@ interface ChatState {
 
 // Default settings (used for both server and initial client render)
 const getDefaultSettings = (): ChatSettings => ({
-  selectedModel: ModelId.GPT_5_MINI,
+  selectedModel: ModelId.KIMI_K2_FREE,
   selectedPersona: "default",
   temperature: 0.7,
   maxTokens: 2000,
@@ -204,13 +204,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
   settings: getDefaultSettings(),
 
   // Thread actions
-  addThread: (thread: ChatThread): void =>
+  addThread: (thread: ChatThread): void => {
     set((state) => ({
       threads: {
         ...state.threads,
         [thread.id]: thread,
       },
-    })),
+    }));
+  },
 
   updateThread: (threadId: string, updates: Partial<ChatThread>): void =>
     set((state) => {
@@ -364,14 +365,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   // Reset
   reset: (): void => {
-    const defaultSettings = {
-      selectedModel: ModelId.GPT_5_MINI,
-      selectedPersona: "default",
-      temperature: 0.7,
-      maxTokens: 2000,
-      ttsAutoplay: false,
-      sidebarCollapsed: false,
-    };
+    const defaultSettings = getDefaultSettings();
     saveSettings(defaultSettings);
     set({
       threads: {},

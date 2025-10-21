@@ -74,7 +74,7 @@ export function UserEditForm({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <span>{t("app.admin.users.admin.actions.editUser")}</span>
+            <span>{t("app.admin.users.users.admin.actions.editUser")}</span>
             <span className="text-lg font-normal text-gray-500">
               - {user.email}
             </span>
@@ -193,13 +193,13 @@ export function UserEditForm({
                 onClick={handleBack}
                 disabled={isSaving}
               >
-                {t("app.admin.users.form.buttons.cancel")}
+                {t("app.admin.users.users.form.buttons.cancel")}
               </Button>
               <Button type="submit" disabled={isSaving}>
                 <Save className="h-4 w-4 mr-2" />
                 {isSaving
-                  ? t("app.admin.users.form.buttons.saving")
-                  : t("app.admin.users.form.buttons.update")}
+                  ? t("app.admin.users.users.form.buttons.saving")
+                  : t("app.admin.users.users.form.buttons.update")}
               </Button>
             </div>
           </Form>

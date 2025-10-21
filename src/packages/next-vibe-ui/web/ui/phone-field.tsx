@@ -78,7 +78,7 @@ export function PhoneField({
   value = "",
   onChange,
   onBlur,
-  placeholder = "common.enterPhoneNumber",
+  placeholder = "app.common.enterPhoneNumber",
   defaultCountry,
   preferredCountries,
   disabled = false,
@@ -174,12 +174,12 @@ export function PhoneField({
         </PopoverTrigger>
         <PopoverContent className="w-[300px] p-0" align="start">
           <Command>
-            <CommandInput placeholder={t("common.searchCountries")} />
+            <CommandInput placeholder={t("app.common.searchCountries")} />
             <CommandList className="max-h-[200px]">
-              <CommandEmpty>{t("common.noCountryFound")}</CommandEmpty>
+              <CommandEmpty>{t("app.common.noCountryFound")}</CommandEmpty>
 
               {organizedCountries.preferred.length > 0 && (
-                <CommandGroup heading={t("common.preferred")}>
+                <CommandGroup heading={t("app.common.preferred")}>
                   {organizedCountries.preferred.map((country) => (
                     <CommandItem
                       key={country.code}
@@ -199,7 +199,7 @@ export function PhoneField({
                 </CommandGroup>
               )}
 
-              <CommandGroup heading={t("common.allCountries")}>
+              <CommandGroup heading={t("app.common.allCountries")}>
                 {organizedCountries.others.map((country) => (
                   <CommandItem
                     key={country.code}

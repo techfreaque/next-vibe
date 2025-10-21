@@ -1,29 +1,31 @@
 import inquirer from "inquirer";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+
 import type {
   ReleaseOrchestrationOptions,
   ReleaseTarget,
   VersionBumpType,
-} from "../types/types.js";
-import { logger } from "../utils/logger.js";
+} from "../types/types";
 import {
   discoverReleaseTargets,
   findTargetByGitTag,
   getCurrentGitTag,
   validateReleaseTarget,
-} from "../utils/release-discovery.js";
-import { ReleaseExecutor } from "../utils/release-executor.js";
-import { StateManager } from "../utils/state-manager.js";
+} from "../utils/release-discovery";
+import { ReleaseExecutor } from "../utils/release-executor";
+import { StateManager } from "../utils/state-manager";
 
 /**
  * CI Release Command - releases specific package based on git tag
  */
 export async function ciReleaseCommand(
+  logger: EndpointLogger,
   rootDir: string,
   targetDirectory?: string,
   gitTag?: string,
 ): Promise<void> {
-  logger("🤖 CI Release Mode");
+  logger.info("🤖 CI Release Mode");
 
   const targets = discoverReleaseTargets(rootDir);
   let targetToRelease: ReleaseTarget | null = null;
@@ -47,7 +49,7 @@ export async function ciReleaseCommand(
       );
     }
 
-    logger(`Using git tag: ${tagToUse}`);
+    logger.info(`Using git tag: ${tagToUse}`);
     targetToRelease = await findTargetByGitTag(targets, tagToUse);
 
     if (!targetToRelease) {
@@ -57,7 +59,7 @@ export async function ciReleaseCommand(
     }
   }
 
-  logger(`Target for release: ${targetToRelease.directory}`);
+  logger.info(`Target for release: ${targetToRelease.directory}`);
 
   // Validate target
   if (!validateReleaseTarget(rootDir, targetToRelease)) {
@@ -65,7 +67,7 @@ export async function ciReleaseCommand(
   }
 
   // Execute release
-  const executor = new ReleaseExecutor(rootDir);
+  const executor = new ReleaseExecutor(logger, rootDir);
   const options: ReleaseOrchestrationOptions = {
     ciMode: true,
   };
@@ -75,17 +77,17 @@ export async function ciReleaseCommand(
     throw new Error(`Release failed for: ${targetToRelease.directory}`);
   }
 
-  logger("🎉 CI Release completed successfully!");
+  logger.info("🎉 CI Release completed successfully!");
 }
 
 /**
  * Force Update All Command - updates dependencies for all packages
  */
-export async function forceUpdateAllCommand(rootDir: string): Promise<void> {
-  logger("🔄 Force Update All Packages");
+export async function forceUpdateAllCommand(logger: EndpointLogger, rootDir: string): Promise<void> {
+  logger.info("🔄 Force Update All Packages");
 
   const targets = discoverReleaseTargets(rootDir);
-  logger(`Found ${targets.length} targets to update`);
+  logger.info(`Found ${targets.length} targets to update`);
 
   // Validate all targets
   const validTargets = targets.filter((target) =>
@@ -93,23 +95,23 @@ export async function forceUpdateAllCommand(rootDir: string): Promise<void> {
   );
 
   if (validTargets.length !== targets.length) {
-    logger(
+    logger.info(
       `Warning: ${targets.length - validTargets.length} targets failed validation`,
     );
   }
 
-  const executor = new ReleaseExecutor(rootDir);
+  const executor = new ReleaseExecutor(logger, rootDir);
   await executor.executeForceUpdateAll(validTargets);
 }
 
 /**
  * Release All Command - releases all packages sequentially
  */
-export async function releaseAllCommand(rootDir: string): Promise<void> {
-  logger("🚀 Release All Packages");
+export async function releaseAllCommand(logger: EndpointLogger, rootDir: string): Promise<void> {
+  logger.info("🚀 Release All Packages");
 
   const targets = discoverReleaseTargets(rootDir);
-  logger(`Found ${targets.length} targets to release`);
+  logger.info(`Found ${targets.length} targets to release`);
 
   // Validate all targets
   const validTargets = targets.filter((target) =>
@@ -117,7 +119,7 @@ export async function releaseAllCommand(rootDir: string): Promise<void> {
   );
 
   if (validTargets.length !== targets.length) {
-    logger(
+    logger.info(
       `Warning: ${targets.length - validTargets.length} targets failed validation`,
     );
   }
@@ -128,7 +130,7 @@ export async function releaseAllCommand(rootDir: string): Promise<void> {
     continueFromState: true,
   };
 
-  const executor = new ReleaseExecutor(rootDir);
+  const executor = new ReleaseExecutor(logger, rootDir);
   await executor.executeReleaseOrchestration(validTargets, options);
 }
 
@@ -136,13 +138,14 @@ export async function releaseAllCommand(rootDir: string): Promise<void> {
  * Force Release Command - force releases all packages with version bump
  */
 export async function forceReleaseCommand(
+  logger: EndpointLogger,
   rootDir: string,
   versionBump?: VersionBumpType,
 ): Promise<void> {
-  logger("⚡ Force Release All Packages");
+  logger.info("⚡ Force Release All Packages");
 
   const targets = discoverReleaseTargets(rootDir);
-  logger(`Found ${targets.length} targets to release`);
+  logger.info(`Found ${targets.length} targets to release`);
 
   // Validate all targets
   const validTargets = targets.filter((target) =>
@@ -150,7 +153,7 @@ export async function forceReleaseCommand(
   );
 
   if (validTargets.length !== targets.length) {
-    logger(
+    logger.info(
       `Warning: ${targets.length - validTargets.length} targets failed validation`,
     );
   }
@@ -190,30 +193,30 @@ export async function forceReleaseCommand(
   ]);
 
   if (!confirm) {
-    logger("Operation cancelled");
+    logger.info("Operation cancelled");
     return;
   }
 
-  const executor = new ReleaseExecutor(rootDir);
+  const executor = new ReleaseExecutor(logger, rootDir);
   await executor.executeForceRelease(validTargets, selectedVersionBump);
 }
 
 /**
  * Continue Release Command - continues from previous state
  */
-export async function continueReleaseCommand(rootDir: string): Promise<void> {
-  logger("🔄 Continue Release from Previous State");
+export async function continueReleaseCommand(logger: EndpointLogger, rootDir: string): Promise<void> {
+  logger.info("🔄 Continue Release from Previous State");
 
   const stateManager = new StateManager(rootDir);
   const existingState = stateManager.loadState();
 
   if (!existingState) {
-    logger("No previous state found. Nothing to continue.");
+    logger.info("No previous state found. Nothing to continue.");
     return;
   }
 
-  logger("Previous state found:");
-  logger(stateManager.getStateSummary(existingState));
+  logger.info("Previous state found:");
+  logger.info(stateManager.getStateSummary(existingState));
 
   const { action } = await inquirer.prompt([
     {
@@ -230,13 +233,13 @@ export async function continueReleaseCommand(rootDir: string): Promise<void> {
   ]);
 
   if (action === "cancel") {
-    logger("Operation cancelled");
+    logger.info("Operation cancelled");
     return;
   }
 
   if (action === "clear") {
     stateManager.clearState();
-    logger("State cleared");
+    logger.info("State cleared");
     return;
   }
 
@@ -246,46 +249,46 @@ export async function continueReleaseCommand(rootDir: string): Promise<void> {
     allowRetry: action === "retry",
   };
 
-  const executor = new ReleaseExecutor(rootDir);
+  const executor = new ReleaseExecutor(logger, rootDir);
   await executor.executeReleaseOrchestration(existingState.targets, options);
 }
 
 /**
  * Show Release Status Command - displays current state
  */
-export async function showReleaseStatusCommand(rootDir: string): Promise<void> {
-  logger("📊 Release Status");
+export async function showReleaseStatusCommand(logger: EndpointLogger, rootDir: string): Promise<void> {
+  logger.info("📊 Release Status");
 
   const stateManager = new StateManager(rootDir);
   const existingState = stateManager.loadState();
 
   if (!existingState) {
-    logger("No active release state found");
+    logger.info("No active release state found");
     return;
   }
 
-  logger(stateManager.getStateSummary(existingState));
+  logger.info(stateManager.getStateSummary(existingState));
 
   // Show detailed breakdown
   if (existingState.completed.length > 0) {
-    logger("\n✅ Completed:");
-    existingState.completed.forEach((dir) => logger(`  - ${dir}`));
+    logger.info("\n✅ Completed:");
+    existingState.completed.forEach((dir) => logger.info(`  - ${dir}`));
   }
 
   if (existingState.failed.length > 0) {
-    logger("\n❌ Failed:");
-    existingState.failed.forEach((dir) => logger(`  - ${dir}`));
+    logger.info("\n❌ Failed:");
+    existingState.failed.forEach((dir) => logger.info(`  - ${dir}`));
   }
 
   if (existingState.skipped.length > 0) {
-    logger("\n⏭️  Skipped:");
-    existingState.skipped.forEach((dir) => logger(`  - ${dir}`));
+    logger.info("\n⏭️  Skipped:");
+    existingState.skipped.forEach((dir) => logger.info(`  - ${dir}`));
   }
 
   const remaining = stateManager.getRemainingTargets(existingState);
   if (remaining.length > 0) {
-    logger("\n⏳ Remaining:");
-    remaining.forEach((target) => logger(`  - ${target.directory}`));
+    logger.info("\n⏳ Remaining:");
+    remaining.forEach((target) => logger.info(`  - ${target.directory}`));
   }
 }
 
@@ -293,11 +296,12 @@ export async function showReleaseStatusCommand(rootDir: string): Promise<void> {
  * Weekly Update Command - updates all packages, creates branch, runs Snyk, creates PR
  */
 export async function weeklyUpdateCommand(
+  logger: EndpointLogger,
   rootDir: string,
   branchName = "next_version_candidates",
 ): Promise<void> {
-  logger("📅 Weekly Dependency Update");
+  logger.info("📅 Weekly Dependency Update");
 
-  const executor = new ReleaseExecutor(rootDir);
+  const executor = new ReleaseExecutor(logger, rootDir);
   await executor.executeWeeklyUpdate(branchName);
 }

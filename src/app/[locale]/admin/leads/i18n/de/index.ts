@@ -238,6 +238,20 @@ export const translations: typeof enTranslations = {
         },
       },
       emails: {
+        title: "E-Mail-Vorlagen",
+        description:
+          "E-Mail-Vorlagen für Lead-Kampagnen in der Vorschau anzeigen und verwalten",
+        subtitle: "Organisiert nach Customer Journey und Kampagnenphase",
+        journey: "Journey",
+        stage: "Phase",
+        view_preview: "Vorschau anzeigen",
+        total_templates: "Gesamt Vorlagen",
+        templates: "Vorlagen",
+        from: "Von",
+        recipient: "An",
+        subject: "Betreff",
+        email_preview: "E-Mail-Vorschau",
+        preview_title: "E-Mail-Vorschau",
         preview: {
           actions: {
             title: "E-Mail-Aktionen",

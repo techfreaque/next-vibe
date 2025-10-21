@@ -33,7 +33,6 @@ interface ChatAreaProps {
   onSubmit: (e: React.FormEvent) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onStop: () => void;
-  onEditMessage: (messageId: string, newContent: string) => Promise<void>;
   onDeleteMessage: (messageId: string) => void;
   onSwitchBranch: (messageId: string, branchIndex: number) => void;
   onModelChange: (model: ModelId) => void;
@@ -45,6 +44,7 @@ interface ChatAreaProps {
   onAnswerAsModel?: (messageId: string) => Promise<void>;
   onVoteMessage?: (messageId: string, vote: 1 | -1 | 0) => void;
   showBranchIndicators: boolean;
+  branchIndices?: Record<string, number>;
   viewMode?: ViewMode;
   onViewModeChange?: (mode: ViewMode) => void;
   onScreenshot?: () => Promise<void>;
@@ -68,7 +68,6 @@ export function ChatArea({
   onSubmit,
   onKeyDown,
   onStop,
-  onEditMessage,
   onDeleteMessage,
   onSwitchBranch,
   onModelChange,
@@ -80,6 +79,7 @@ export function ChatArea({
   onAnswerAsModel,
   onVoteMessage,
   showBranchIndicators,
+  branchIndices = {},
   chat,
   viewMode = "linear",
   onViewModeChange,
@@ -211,7 +211,6 @@ export function ChatArea({
             selectedModel={selectedModel}
             selectedPersona={selectedPersona}
             ttsAutoplay={ttsAutoplay}
-            onEditMessage={onEditMessage}
             onDeleteMessage={onDeleteMessage}
             onSwitchBranch={onSwitchBranch}
             onModelChange={onModelChange}
@@ -223,6 +222,7 @@ export function ChatArea({
             isLoading={isLoading}
             chat={chat}
             showBranchIndicators={showBranchIndicators}
+            branchIndices={branchIndices}
             onSendMessage={onSendMessage}
             inputHeight={inputHeight}
             viewMode={viewMode}

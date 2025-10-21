@@ -184,8 +184,30 @@ function validateGetRequestData<TRequestInput, TRequestOutput>(
   const queryData: Record<string, unknown> = {};
 
   for (const [key, value] of searchParams.entries()) {
-    // Skip placeholder fields (used to ensure empty objects are sent)
+    // Handle placeholder fields (used to ensure empty objects are sent)
     if (key.endsWith("._placeholder")) {
+      // Create the parent object if it doesn't exist
+      const parentKey = key.replace(/\._placeholder$/, "");
+      const keys = parentKey.split(".");
+      let current: Record<string, unknown> = queryData;
+
+      for (let i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        const isLast = i === keys.length - 1;
+
+        if (isLast) {
+          // Create empty object if it doesn't exist
+          if (!current[k]) {
+            current[k] = {};
+          }
+        } else {
+          // Intermediate key - create nested object if it doesn't exist
+          if (!current[k] || typeof current[k] !== "object") {
+            current[k] = {};
+          }
+          current = current[k] as Record<string, unknown>;
+        }
+      }
       continue;
     }
 

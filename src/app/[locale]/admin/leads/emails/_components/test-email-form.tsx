@@ -19,10 +19,13 @@ import definitions from "@/app/api/[locale]/v1/core/leads/campaigns/emails/test-
 import { useTestEmailEndpoint } from "@/app/api/[locale]/v1/core/leads/campaigns/emails/test-mail/hooks";
 import {
   EmailCampaignStage,
+  type EmailCampaignStageValues,
   EmailJourneyVariant,
+  type EmailJourneyVariantValues,
   LeadSource,
   LeadStatus,
 } from "@/app/api/[locale]/v1/core/leads/enum";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { useTranslation } from "@/i18n/core/client";
 import { Countries, Languages } from "@/i18n/core/config";
 import {
@@ -32,8 +35,8 @@ import {
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 interface TestEmailFormProps {
-  emailJourneyVariant: EmailJourneyVariant;
-  emailCampaignStage: EmailCampaignStage;
+  emailJourneyVariant: typeof EmailJourneyVariantValues;
+  emailCampaignStage: typeof EmailCampaignStageValues;
   onClose?: () => void;
 }
 
@@ -43,6 +46,7 @@ export function TestEmailForm({
   onClose,
 }: TestEmailFormProps): React.JSX.Element {
   const { t, locale } = useTranslation();
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Extract current country and language from locale
   const currentCountry = getCountryFromLocale(locale);
@@ -53,27 +57,27 @@ export function TestEmailForm({
     {
       value: CampaignType.LEAD_CAMPAIGN,
       label:
-        "smtp.admin.campaignTypes.leadCampaign" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.campaignTypes.leadCampaign" as const satisfies TranslationKey,
     },
     {
       value: CampaignType.NEWSLETTER,
       label:
-        "smtp.admin.campaignTypes.newsletter" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.campaignTypes.newsletter" as const satisfies TranslationKey,
     },
     {
       value: CampaignType.TRANSACTIONAL,
       label:
-        "smtp.admin.campaignTypes.transactional" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.campaignTypes.transactional" as const satisfies TranslationKey,
     },
     {
       value: CampaignType.NOTIFICATION,
       label:
-        "smtp.admin.campaignTypes.notification" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.campaignTypes.notification" as const satisfies TranslationKey,
     },
     {
       value: CampaignType.SYSTEM,
       label:
-        "smtp.admin.campaignTypes.system" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.campaignTypes.system" as const satisfies TranslationKey,
     },
   ];
 
@@ -81,17 +85,17 @@ export function TestEmailForm({
     {
       value: EmailJourneyVariant.PERSONAL_APPROACH,
       label:
-        "smtp.admin.emailJourneyVariants.personalApproach" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailJourneyVariants.personalApproach" as const satisfies TranslationKey,
     },
     {
       value: EmailJourneyVariant.RESULTS_FOCUSED,
       label:
-        "smtp.admin.emailJourneyVariants.resultsFocused" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailJourneyVariants.resultsFocused" as const satisfies TranslationKey,
     },
     {
       value: EmailJourneyVariant.PERSONAL_RESULTS,
       label:
-        "smtp.admin.emailJourneyVariants.personalResults" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailJourneyVariants.personalResults" as const satisfies TranslationKey,
     },
   ];
 
@@ -99,41 +103,41 @@ export function TestEmailForm({
     {
       value: EmailCampaignStage.NOT_STARTED,
       label:
-        "smtp.admin.emailCampaignStages.notStarted" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailCampaignStages.notStarted" as const satisfies TranslationKey,
     },
     {
       value: EmailCampaignStage.INITIAL,
       label:
-        "smtp.admin.emailCampaignStages.initial" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailCampaignStages.initial" as const satisfies TranslationKey,
     },
     {
       value: EmailCampaignStage.FOLLOWUP_1,
       label:
-        "smtp.admin.emailCampaignStages.followup1" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailCampaignStages.followup1" as const satisfies TranslationKey,
     },
     {
       value: EmailCampaignStage.FOLLOWUP_2,
       label:
-        "smtp.admin.emailCampaignStages.followup2" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailCampaignStages.followup2" as const satisfies TranslationKey,
     },
     {
       value: EmailCampaignStage.FOLLOWUP_3,
       label:
-        "smtp.admin.emailCampaignStages.followup3" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailCampaignStages.followup3" as const satisfies TranslationKey,
     },
     {
       value: EmailCampaignStage.NURTURE,
       label:
-        "smtp.admin.emailCampaignStages.nurture" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailCampaignStages.nurture" as const satisfies TranslationKey,
     },
     {
       value: EmailCampaignStage.REACTIVATION,
       label:
-        "smtp.admin.emailCampaignStages.reactivation" as const satisfies TranslationKey,
+        "app.admin.emails.smtp.admin.emailCampaignStages.reactivation" as const satisfies TranslationKey,
     },
   ];
 
-  const endpoint = useTestEmailEndpoint({
+  const endpoint = useTestEmailEndpoint(logger, {
     defaultValues: {
       testEmail: "test@example.com",
       // Prefill SMTP account criteria based on template context
@@ -141,16 +145,19 @@ export function TestEmailForm({
       emailJourneyVariant: emailJourneyVariant,
       emailCampaignStage: emailCampaignStage,
       leadData: {
-        businessName: t(
-          "emailJourneys.components.defaults.previewBusinessName",
-        ),
-        contactName: t("emailJourneys.components.defaults.previewContactName"),
-        website: t("leads.admin.emails.testEmail.mockData.website") || null,
+        /* eslint-disable i18next/no-literal-string -- Mock data for email preview */
+        businessName: "Acme Digital Solutions",
+        contactName: "Jane Smith",
+        website: "https://acme-digital.com",
+        /* eslint-enable i18next/no-literal-string */
         country: currentCountry,
         language: currentLanguage,
         status: LeadStatus.NEW,
         source: LeadSource.WEBSITE,
-        notes: t("leads.admin.emails.testEmail.mockData.notes") || null,
+        /* eslint-disable i18next/no-literal-string -- Mock data for email preview */
+        notes:
+          "Interested in premium social media management services. High potential client with established business.",
+        /* eslint-enable i18next/no-literal-string */
       },
     },
   });
@@ -165,7 +172,7 @@ export function TestEmailForm({
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
           <Mail className="h-5 w-5" />
-          <span>{t("leads.admin.emails.testEmail.title")}</span>
+          <span>{t("app.admin.leads.leads.admin.emails.testEmail.title")}</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -177,18 +184,20 @@ export function TestEmailForm({
           {/* Test Email Recipient */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium">
-              {t("leads.admin.emails.testEmail.recipient.title")}
+              {t(
+                "app.admin.leads.leads.admin.emails.testEmail.recipient.title",
+              )}
             </h3>
             <EndpointFormField
               name="testEmail"
               config={{
                 type: "email",
                 label:
-                  "leads.admin.emails.testEmail.recipient.email.label" as const,
+                  "app.admin.leads.leads.admin.emails.testEmail.recipient.email.label" as const,
                 placeholder:
-                  "leads.admin.emails.testEmail.recipient.email.placeholder" as const,
+                  "app.admin.leads.leads.admin.emails.testEmail.recipient.email.placeholder" as const,
                 description:
-                  "leads.admin.emails.testEmail.recipient.email.description" as const,
+                  "app.admin.leads.leads.admin.emails.testEmail.recipient.email.description" as const,
               }}
               control={endpoint.create.form.control}
               schema={schema}
@@ -200,10 +209,12 @@ export function TestEmailForm({
           {/* SMTP Account Selection Criteria */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium">
-              {t("smtp.admin.form.selectionCriteria")}
+              {t("app.admin.emails.smtp.admin.form.selectionCriteria")}
             </h3>
             <p className="text-sm text-muted-foreground">
-              {t("smtp.admin.form.selectionCriteriaDescription")}
+              {t(
+                "app.admin.emails.smtp.admin.form.selectionCriteriaDescription",
+              )}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -211,9 +222,10 @@ export function TestEmailForm({
                 name="campaignType"
                 config={{
                   type: "select",
-                  label: "smtp.admin.fields.campaignTypes" as const,
+                  label:
+                    "app.admin.emails.smtp.admin.fields.campaignTypes" as const,
                   placeholder:
-                    "smtp.admin.fields.campaignTypesPlaceholder" as const,
+                    "app.admin.emails.smtp.admin.fields.campaignTypesPlaceholder" as const,
                   options: campaignTypeOptions,
                 }}
                 control={endpoint.create.form.control}
@@ -224,9 +236,10 @@ export function TestEmailForm({
                 name="emailJourneyVariant"
                 config={{
                   type: "select",
-                  label: "smtp.admin.fields.emailJourneyVariants" as const,
+                  label:
+                    "app.admin.emails.smtp.admin.fields.emailJourneyVariants" as const,
                   placeholder:
-                    "smtp.admin.fields.emailJourneyVariantsPlaceholder" as const,
+                    "app.admin.emails.smtp.admin.fields.emailJourneyVariantsPlaceholder" as const,
                   options: emailJourneyVariantOptions,
                 }}
                 control={endpoint.create.form.control}
@@ -237,9 +250,10 @@ export function TestEmailForm({
                 name="emailCampaignStage"
                 config={{
                   type: "select",
-                  label: "smtp.admin.fields.emailCampaignStages" as const,
+                  label:
+                    "app.admin.emails.smtp.admin.fields.emailCampaignStages" as const,
                   placeholder:
-                    "smtp.admin.fields.emailCampaignStagesPlaceholder" as const,
+                    "app.admin.emails.smtp.admin.fields.emailCampaignStagesPlaceholder" as const,
                   options: emailCampaignStageOptions,
                 }}
                 control={endpoint.create.form.control}
@@ -253,7 +267,7 @@ export function TestEmailForm({
           {/* Lead Data for Template */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium">
-              {t("leads.admin.emails.testEmail.leadData.title")}
+              {t("app.admin.leads.leads.admin.emails.testEmail.leadData.title")}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <EndpointFormField
@@ -261,9 +275,9 @@ export function TestEmailForm({
                 config={{
                   type: "text",
                   label:
-                    "leads.admin.emails.testEmail.leadData.businessName.label" as const,
+                    "app.admin.leads.leads.admin.emails.testEmail.leadData.businessName.label" as const,
                   placeholder:
-                    "leads.admin.emails.testEmail.leadData.businessName.placeholder" as const,
+                    "app.admin.leads.leads.admin.emails.testEmail.leadData.businessName.placeholder" as const,
                 }}
                 control={endpoint.create.form.control}
                 schema={schema}
@@ -273,9 +287,9 @@ export function TestEmailForm({
                 config={{
                   type: "text",
                   label:
-                    "leads.admin.emails.testEmail.leadData.contactName.label" as const,
+                    "app.admin.leads.leads.admin.emails.testEmail.leadData.contactName.label" as const,
                   placeholder:
-                    "leads.admin.emails.testEmail.leadData.contactName.placeholder" as const,
+                    "app.admin.leads.leads.admin.emails.testEmail.leadData.contactName.placeholder" as const,
                 }}
                 control={endpoint.create.form.control}
                 schema={schema}
@@ -286,9 +300,9 @@ export function TestEmailForm({
                 config={{
                   type: "url",
                   label:
-                    "leads.admin.emails.testEmail.leadData.website.label" as const,
+                    "app.admin.leads.leads.admin.emails.testEmail.leadData.website.label" as const,
                   placeholder:
-                    "leads.admin.emails.testEmail.leadData.website.placeholder" as const,
+                    "app.admin.leads.leads.admin.emails.testEmail.leadData.website.placeholder" as const,
                 }}
                 control={endpoint.create.form.control}
                 schema={schema}
@@ -298,19 +312,19 @@ export function TestEmailForm({
                 config={{
                   type: "select",
                   label:
-                    "leads.admin.emails.testEmail.leadData.country.label" as const,
+                    "app.admin.leads.leads.admin.emails.testEmail.leadData.country.label" as const,
                   options: [
                     {
                       value: Countries.GLOBAL,
-                      label: "common.countries.global" as const,
+                      label: "app.common.countries.global" as const,
                     },
                     {
                       value: Countries.DE,
-                      label: "common.countries.de" as const,
+                      label: "app.common.countries.de" as const,
                     },
                     {
                       value: Countries.PL,
-                      label: "common.countries.pl" as const,
+                      label: "app.common.countries.pl" as const,
                     },
                   ],
                 }}
@@ -322,19 +336,19 @@ export function TestEmailForm({
                 config={{
                   type: "select",
                   label:
-                    "leads.admin.emails.testEmail.leadData.language.label" as const,
+                    "app.admin.leads.leads.admin.emails.testEmail.leadData.language.label" as const,
                   options: [
                     {
                       value: Languages.EN,
-                      label: "common.languages.en" as const,
+                      label: "app.common.languages.en" as const,
                     },
                     {
                       value: Languages.DE,
-                      label: "common.languages.de" as const,
+                      label: "app.common.languages.de" as const,
                     },
                     {
                       value: Languages.PL,
-                      label: "common.languages.pl" as const,
+                      label: "app.common.languages.pl" as const,
                     },
                   ],
                 }}
@@ -346,32 +360,36 @@ export function TestEmailForm({
                 config={{
                   type: "select",
                   label:
-                    "leads.admin.emails.testEmail.leadData.status.label" as const,
+                    "app.admin.leads.leads.admin.emails.testEmail.leadData.status.label" as const,
                   options: [
                     {
                       value: LeadStatus.NEW,
-                      label: "leads.admin.status.new" as const,
+                      label: "app.admin.leads.leads.admin.status.new" as const,
                     },
                     {
                       value: LeadStatus.PENDING,
-                      label: "leads.admin.status.pending" as const,
+                      label:
+                        "app.admin.leads.leads.admin.status.pending" as const,
                     },
                     {
                       value: LeadStatus.CAMPAIGN_RUNNING,
-                      label: "leads.admin.status.campaign_running" as const,
+                      label:
+                        "app.admin.leads.leads.admin.status.campaign_running" as const,
                     },
                     {
                       value: LeadStatus.WEBSITE_USER,
-                      label: "leads.admin.status.website_user" as const,
+                      label:
+                        "app.admin.leads.leads.admin.status.website_user" as const,
                     },
                     {
                       value: LeadStatus.NEWSLETTER_SUBSCRIBER,
                       label:
-                        "leads.admin.status.newsletter_subscriber" as const,
+                        "app.admin.leads.leads.admin.status.newsletter_subscriber" as const,
                     },
                     {
                       value: LeadStatus.IN_CONTACT,
-                      label: "leads.admin.status.in_contact" as const,
+                      label:
+                        "app.admin.leads.leads.admin.status.in_contact" as const,
                     },
                   ],
                 }}
@@ -383,31 +401,36 @@ export function TestEmailForm({
                 config={{
                   type: "select",
                   label:
-                    "leads.admin.emails.testEmail.leadData.source.label" as const,
+                    "app.admin.leads.leads.admin.emails.testEmail.leadData.source.label" as const,
                   options: [
                     {
                       value: LeadSource.WEBSITE,
-                      label: "leads.admin.source.website" as const,
+                      label:
+                        "app.admin.leads.leads.admin.source.website" as const,
                     },
                     {
                       value: LeadSource.SOCIAL_MEDIA,
-                      label: "leads.admin.source.social_media" as const,
+                      label:
+                        "app.admin.leads.leads.admin.source.social_media" as const,
                     },
                     {
                       value: LeadSource.EMAIL_CAMPAIGN,
-                      label: "leads.admin.source.email_campaign" as const,
+                      label:
+                        "app.admin.leads.leads.admin.source.email_campaign" as const,
                     },
                     {
                       value: LeadSource.REFERRAL,
-                      label: "leads.admin.source.referral" as const,
+                      label:
+                        "app.admin.leads.leads.admin.source.referral" as const,
                     },
                     {
                       value: LeadSource.CSV_IMPORT,
-                      label: "leads.admin.source.csv_import" as const,
+                      label:
+                        "app.admin.leads.leads.admin.source.csv_import" as const,
                     },
                     {
                       value: LeadSource.API,
-                      label: "leads.admin.source.api" as const,
+                      label: "app.admin.leads.leads.admin.source.api" as const,
                     },
                   ],
                 }}
@@ -420,9 +443,9 @@ export function TestEmailForm({
               config={{
                 type: "textarea",
                 label:
-                  "leads.admin.emails.testEmail.leadData.notes.label" as const,
+                  "app.admin.leads.leads.admin.emails.testEmail.leadData.notes.label" as const,
                 placeholder:
-                  "leads.admin.emails.testEmail.leadData.notes.placeholder" as const,
+                  "app.admin.leads.leads.admin.emails.testEmail.leadData.notes.placeholder" as const,
                 rows: 3,
               }}
               control={endpoint.create.form.control}
@@ -436,7 +459,7 @@ export function TestEmailForm({
             <div className="flex items-center space-x-2">
               {onClose && (
                 <Button type="button" variant="outline" onClick={onClose}>
-                  {t("common.cancel")}
+                  {t("app.common.cancel")}
                 </Button>
               )}
             </div>
@@ -448,8 +471,8 @@ export function TestEmailForm({
               <Send className="h-4 w-4" />
               <span>
                 {isSubmitting
-                  ? t("leads.admin.emails.testEmail.sending")
-                  : t("leads.admin.emails.testEmail.send")}
+                  ? t("app.admin.leads.leads.admin.emails.testEmail.sending")
+                  : t("app.admin.leads.leads.admin.emails.testEmail.send")}
               </span>
             </Button>
           </div>
@@ -458,9 +481,9 @@ export function TestEmailForm({
           {isSuccess && (
             <div className="p-4 bg-green-50 border border-green-200 rounded-md">
               <p className="text-green-800">
-                {t("leads.admin.emails.testEmail.success", {
+                {t("app.admin.leads.leads.admin.emails.testEmail.success", {
                   email: endpoint.create.response?.success
-                    ? endpoint.create.response.data.testEmail
+                    ? endpoint.create.response.data.result.testEmail
                     : "",
                 })}
               </p>

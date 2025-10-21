@@ -44,6 +44,8 @@ export const translations = {
       reset: "Reset",
       submit: "Submit",
       close: "Close",
+      previous: "Previous",
+      next: "Next",
     },
   },
 };

@@ -79,13 +79,13 @@ const PaginationPrevious = ({
 
   return (
     <PaginationLink
-      aria-label={t("common.accessibility.srOnly.previousPage")}
+      aria-label={t("app.common.accessibility.srOnly.previousPage")}
       size="default"
       className={cn("gap-1 pl-2.5", className)}
       {...props}
     >
       <ChevronLeftIcon className="h-4 w-4" />
-      <span>{t("common.actions.previous")}</span>
+      <span>{t("app.common.actions.previous")}</span>
     </PaginationLink>
   );
 };
@@ -99,12 +99,12 @@ const PaginationNext = ({
 
   return (
     <PaginationLink
-      aria-label={t("common.accessibility.srOnly.nextPage")}
+      aria-label={t("app.common.accessibility.srOnly.nextPage")}
       size="default"
       className={cn("gap-1 pr-2.5", className)}
       {...props}
     >
-      <span>{t("common.actions.next")}</span>
+      <span>{t("app.common.actions.next")}</span>
       <ChevronRightIcon className="h-4 w-4" />
     </PaginationLink>
   );
@@ -124,7 +124,9 @@ const PaginationEllipsis = ({
       {...props}
     >
       <DotsHorizontalIcon className="h-4 w-4" />
-      <span className="sr-only">{t("common.accessibility.srOnly.more")}</span>
+      <span className="sr-only">
+        {t("app.common.accessibility.srOnly.more")}
+      </span>
     </span>
   );
 };

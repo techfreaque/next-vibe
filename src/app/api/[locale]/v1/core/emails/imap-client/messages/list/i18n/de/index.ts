@@ -65,6 +65,7 @@ export const translations: typeof enTranslations = {
         isFlagged: "Markiert-Status",
         hasAttachments: "Hat Anhänge",
         sentAt: "Gesendet am",
+        headers: "E-Mail-Header",
       },
       total: "Gesamtnachrichten",
       page: "Aktuelle Seite",

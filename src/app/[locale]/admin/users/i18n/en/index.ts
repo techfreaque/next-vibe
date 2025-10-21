@@ -1,4 +1,15 @@
 export const translations = {
+  admin: {
+    tabs: {
+      overview: "Overview",
+      stats: "Statistics",
+      stats_description: "View detailed user statistics and analytics",
+      list: "All Users",
+      list_description: "Browse and manage all users",
+      add: "Add User",
+      add_description: "Create a new user account",
+    },
+  },
   userRoles: {
     errors: {
       role_not_found: "Role not found",
@@ -352,6 +363,7 @@ export const translations = {
         jobTitle: "Software Engineer",
       },
       buttons: {
+        back: "Back",
         save: "Save User",
         cancel: "Cancel",
         create: "Create User",

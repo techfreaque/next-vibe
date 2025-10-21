@@ -54,7 +54,9 @@ export function LeadsListClient({
   const leadsEndpoint = useLeadsListEndpoint(logger);
   const [viewMode, setViewMode] = useState<"list" | "table">("list");
 
-  type LeadType = LeadListGetResponseTypeOutput["leads"][number];
+  type LeadType = NonNullable<
+    LeadListGetResponseTypeOutput["response"]["leads"]
+  >[number];
 
   const apiResponse = leadsEndpoint.read.response;
   const leads: LeadType[] = apiResponse?.success ? apiResponse.data.leads : [];
@@ -72,8 +74,10 @@ export function LeadsListClient({
   });
 
   // Get current form values for pagination display
-  const currentPage = leadsEndpoint.read.form.getValues("page") || 1;
-  const currentLimit = leadsEndpoint.read.form.getValues("limit") || 20;
+  const currentPage =
+    leadsEndpoint.read.form.getValues("searchPagination.page") || 1;
+  const currentLimit =
+    leadsEndpoint.read.form.getValues("searchPagination.limit") || 20;
 
   // Refresh handler for CSV import
   const handleRefresh = React.useCallback(() => {
@@ -82,16 +86,24 @@ export function LeadsListClient({
 
   const handleClearFilters = (): void => {
     leadsEndpoint.read.form.reset({
-      search: undefined,
-      status: LeadStatusFilter.ALL,
-      currentCampaignStage: undefined,
-      country: undefined,
-      language: undefined,
-      source: undefined,
-      page: 1,
-      limit: 20,
-      sortBy: LeadSortField.CREATED_AT,
-      sortOrder: SortOrder.DESC,
+      searchPagination: {
+        search: undefined,
+        page: 1,
+        limit: 20,
+      },
+      statusFilters: {
+        status: [LeadStatusFilter.ALL],
+        currentCampaignStage: undefined,
+        source: undefined,
+      },
+      locationFilters: {
+        country: undefined,
+        language: undefined,
+      },
+      sorting: {
+        sortBy: LeadSortField.CREATED_AT,
+        sortOrder: SortOrder.DESC,
+      },
     });
   };
 
@@ -104,7 +116,7 @@ export function LeadsListClient({
         source?: LeadSource;
         notes?: string;
       },
-      scope: BatchOperationScope,
+      scope: typeof BatchOperationScope,
       currentFilters: Record<string, string | number | boolean | undefined>,
     ) => {
       // Add scope and pagination info to filters
@@ -130,7 +142,7 @@ export function LeadsListClient({
 
   const handleBatchDelete = useCallback(
     async (
-      scope: BatchOperationScope,
+      scope: typeof BatchOperationScope,
       currentFilters: Record<string, string | number | boolean | undefined>,
     ) => {
       // Add scope and pagination info to filters
@@ -221,7 +233,7 @@ export function LeadsListClient({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {/* Search Field */}
               <EndpointFormField
-                name="search"
+                name="searchPagination.search"
                 config={{
                   type: "text",
                   label: undefined,
@@ -236,63 +248,67 @@ export function LeadsListClient({
 
               {/* Status Filter */}
               <EndpointFormField
-                name="status"
+                name="statusFilters.status"
                 config={{
                   type: "select",
                   label: undefined,
-                  placeholder: "leads.filter.status",
+                  placeholder: "app.admin.leads.leads.filter.status",
                   options: [
                     {
                       value: LeadStatusFilter.ALL,
-                      label: "leads.filter.all_statuses",
+                      label: "app.admin.leads.leads.filter.all_statuses",
                     },
                     {
                       value: LeadStatusFilter.NEW,
-                      label: "leads.admin.status.new",
+                      label: "app.admin.leads.leads.admin.status.new",
                     },
                     {
                       value: LeadStatusFilter.PENDING,
-                      label: "leads.admin.status.pending",
+                      label: "app.admin.leads.leads.admin.status.pending",
                     },
                     {
                       value: LeadStatusFilter.CAMPAIGN_RUNNING,
-                      label: "leads.admin.status.campaign_running",
+                      label:
+                        "app.admin.leads.leads.admin.status.campaign_running",
                     },
                     {
                       value: LeadStatusFilter.WEBSITE_USER,
-                      label: "leads.admin.status.website_user",
+                      label: "app.admin.leads.leads.admin.status.website_user",
                     },
                     {
                       value: LeadStatusFilter.NEWSLETTER_SUBSCRIBER,
-                      label: "leads.admin.status.newsletter_subscriber",
+                      label:
+                        "app.admin.leads.leads.admin.status.newsletter_subscriber",
                     },
                     {
                       value: LeadStatusFilter.IN_CONTACT,
-                      label: "leads.admin.status.in_contact",
+                      label: "app.admin.leads.leads.admin.status.in_contact",
                     },
                     {
                       value: LeadStatusFilter.SIGNED_UP,
-                      label: "leads.admin.status.signed_up",
+                      label: "app.admin.leads.leads.admin.status.signed_up",
                     },
                     {
                       value: LeadStatusFilter.CONSULTATION_BOOKED,
-                      label: "leads.admin.status.consultation_booked",
+                      label:
+                        "app.admin.leads.leads.admin.status.consultation_booked",
                     },
                     {
                       value: LeadStatusFilter.SUBSCRIPTION_CONFIRMED,
-                      label: "leads.admin.status.subscription_confirmed",
+                      label:
+                        "app.admin.leads.leads.admin.status.subscription_confirmed",
                     },
                     {
                       value: LeadStatusFilter.UNSUBSCRIBED,
-                      label: "leads.admin.status.unsubscribed",
+                      label: "app.admin.leads.leads.admin.status.unsubscribed",
                     },
                     {
                       value: LeadStatusFilter.BOUNCED,
-                      label: "leads.admin.status.bounced",
+                      label: "app.admin.leads.leads.admin.status.bounced",
                     },
                     {
                       value: LeadStatusFilter.INVALID,
-                      label: "leads.admin.status.invalid",
+                      label: "app.admin.leads.leads.admin.status.invalid",
                     },
                   ],
                 }}
@@ -305,35 +321,36 @@ export function LeadsListClient({
 
               {/* Campaign Stage Filter */}
               <EndpointFormField
-                name="currentCampaignStage"
+                name="statusFilters.currentCampaignStage"
                 config={{
                   type: "select",
                   label: undefined,
-                  placeholder: "leads.filter.campaign_stage",
+                  placeholder: "app.admin.leads.leads.filter.campaign_stage",
                   options: [
                     {
                       value: EmailCampaignStageFilter.ALL,
-                      label: "leads.admin.filters.campaign_stage.all",
+                      label:
+                        "app.admin.leads.leads.admin.filters.campaign_stage.all",
                     },
                     {
                       value: EmailCampaignStageFilter.INITIAL,
-                      label: "leads.admin.stage.initial",
+                      label: "app.admin.leads.leads.admin.stage.initial",
                     },
                     {
                       value: EmailCampaignStageFilter.FOLLOWUP_1,
-                      label: "leads.admin.stage.followup_1",
+                      label: "app.admin.leads.leads.admin.stage.followup_1",
                     },
                     {
                       value: EmailCampaignStageFilter.FOLLOWUP_2,
-                      label: "leads.admin.stage.followup_2",
+                      label: "app.admin.leads.leads.admin.stage.followup_2",
                     },
                     {
                       value: EmailCampaignStageFilter.FOLLOWUP_3,
-                      label: "leads.admin.stage.followup_3",
+                      label: "app.admin.leads.leads.admin.stage.followup_3",
                     },
                     {
                       value: EmailCampaignStageFilter.NURTURE,
-                      label: "leads.admin.stage.nurture",
+                      label: "app.admin.leads.leads.admin.stage.nurture",
                     },
                   ],
                 }}
@@ -346,27 +363,28 @@ export function LeadsListClient({
 
               {/* Country Filter */}
               <EndpointFormField
-                name="country"
+                name="locationFilters.country"
                 config={{
                   type: "select",
                   label: undefined,
-                  placeholder: "leads.filter.country",
+                  placeholder: "app.admin.leads.leads.filter.country",
                   options: [
                     {
                       value: CountryFilter.ALL,
-                      label: "leads.filter.all_countries",
+                      label: "app.admin.leads.leads.filter.all_countries",
                     },
                     {
                       value: CountryFilter.GLOBAL,
-                      label: "leads.admin.filters.countries.global",
+                      label:
+                        "app.admin.leads.leads.admin.filters.countries.global",
                     },
                     {
                       value: CountryFilter.DE,
-                      label: "leads.admin.filters.countries.de",
+                      label: "app.admin.leads.leads.admin.filters.countries.de",
                     },
                     {
                       value: CountryFilter.PL,
-                      label: "leads.admin.filters.countries.pl",
+                      label: "app.admin.leads.leads.admin.filters.countries.pl",
                     },
                   ],
                 }}
@@ -382,27 +400,27 @@ export function LeadsListClient({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {/* Language Filter */}
               <EndpointFormField
-                name="language"
+                name="locationFilters.language"
                 config={{
                   type: "select",
                   label: undefined,
-                  placeholder: "leads.filter.language",
+                  placeholder: "app.admin.leads.leads.filter.language",
                   options: [
                     {
                       value: LanguageFilter.ALL,
-                      label: "leads.filter.all_languages",
+                      label: "app.admin.leads.leads.filter.all_languages",
                     },
                     {
                       value: LanguageFilter.EN,
-                      label: "leads.admin.filters.languages.en",
+                      label: "app.admin.leads.leads.admin.filters.languages.en",
                     },
                     {
                       value: LanguageFilter.DE,
-                      label: "leads.admin.filters.languages.de",
+                      label: "app.admin.leads.leads.admin.filters.languages.de",
                     },
                     {
                       value: LanguageFilter.PL,
-                      label: "leads.admin.filters.languages.pl",
+                      label: "app.admin.leads.leads.admin.filters.languages.pl",
                     },
                   ],
                 }}
@@ -415,15 +433,15 @@ export function LeadsListClient({
 
               {/* Source Filter */}
               <EndpointFormField
-                name="source"
+                name="statusFilters.source"
                 config={{
                   type: "select",
                   label: undefined,
-                  placeholder: "leads.filter.source",
+                  placeholder: "app.admin.leads.leads.filter.source",
                   options: [
                     {
                       value: LeadSourceFilter.ALL,
-                      label: "leads.filter.all_sources",
+                      label: "app.admin.leads.leads.filter.all_sources",
                     },
                     {
                       value: LeadSourceFilter.WEBSITE,

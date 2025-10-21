@@ -28,11 +28,14 @@ import { ModelId } from "../model-access/models";
 /**
  * Get Threads List Endpoint (GET)
  * Retrieves a paginated list of threads with filtering
+ *
+ * Note: PUBLIC role is allowed for anonymous users to access incognito threads
+ * The repository layer filters results based on authentication status
  */
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "agent", "chat", "threads"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "app.api.v1.core.agent.chat.threads.get.title" as const,
   description: "app.api.v1.core.agent.chat.threads.get.description" as const,

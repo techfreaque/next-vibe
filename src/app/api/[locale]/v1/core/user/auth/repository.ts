@@ -445,23 +445,23 @@ class AuthRepositoryImpl implements AuthRepository {
     requiredRoles: TRoles,
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
-    // Public role is always allowed
-    if (requiredRoles.includes(UserRole.PUBLIC)) {
-      return createPublicUser<TRoles>(leadId);
-    }
-
     // Customer role is allowed for any authenticated user
     if (requiredRoles.includes(UserRole.CUSTOMER)) {
       return createPrivateUser<TRoles>(userId, leadId);
     }
 
-    // For other roles, check the user's roles
+    // For other roles (ADMIN, etc.), check the user's roles
     try {
       const userRolesResponse = await userRolesRepository.findByUserId(
         userId,
         logger,
       );
       if (!userRolesResponse.success) {
+        // If we can't get user roles, but PUBLIC is allowed, return public user
+        if (requiredRoles.includes(UserRole.PUBLIC)) {
+          return createPublicUser<TRoles>(leadId);
+        }
+        // Otherwise, return public user (will be rejected by endpoint handler)
         return createPublicUser<TRoles>(leadId);
       }
 
@@ -474,12 +474,23 @@ class AuthRepositoryImpl implements AuthRepository {
         return createPrivateUser<TRoles>(userId, leadId);
       }
 
+      // User doesn't have required roles - if PUBLIC is allowed, return public user
+      if (requiredRoles.includes(UserRole.PUBLIC)) {
+        return createPublicUser<TRoles>(leadId);
+      }
+
+      // Otherwise, return public user (will be rejected by endpoint handler)
       return createPublicUser<TRoles>(leadId);
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.auth.debug.errorCheckingUserAuth",
         error,
       );
+      // If there's an error but PUBLIC is allowed, return public user
+      if (requiredRoles.includes(UserRole.PUBLIC)) {
+        return createPublicUser<TRoles>(leadId);
+      }
+      // Otherwise, return public user (will be rejected by endpoint handler)
       return createPublicUser<TRoles>(leadId);
     }
   }
@@ -1010,45 +1021,71 @@ class AuthRepositoryImpl implements AuthRepository {
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
     try {
-      // Public role is always allowed
+      logger.info("app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.start");
+
+      // First, try to get authenticated user from cookies
+      const userResult = await this.getCurrentUserNext(logger);
+
+      logger.info("app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.result", {
+        success: userResult.success,
+        hasData: !!userResult.data,
+        userId: userResult.data?.id,
+        isPublic: userResult.data?.isPublic,
+      });
+
+      // If user is authenticated, proceed with authenticated user flow
+      if (
+        userResult.success &&
+        userResult.data?.id &&
+        !userResult.data.isPublic
+      ) {
+        logger.info("app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.authenticated");
+
+        // Get leadId for authenticated user
+        const leadId = await this.getLeadIdForUser(
+          userResult.data.id,
+          locale,
+          logger,
+        );
+
+        logger.info("app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.returningAuth", {
+          userId: userResult.data.id,
+          leadId,
+        });
+
+        // Use internal method to check authentication with roles
+        return await this.getAuthenticatedUserInternal<TRoles>(
+          userResult.data.id,
+          leadId,
+          roles,
+          logger,
+        );
+      }
+
+      logger.info("app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.notAuthenticated");
+
+      // User is not authenticated - check if PUBLIC role is allowed
       if (roles.includes(UserRole.PUBLIC)) {
         // Get leadId for public user
         const leadId = await this.getLeadIdForPublicUser(locale, logger);
         return createPublicUser<TRoles>(leadId);
       }
 
-      // Get user from cookies
-      const userResult = await this.getCurrentUserNext(logger);
-      if (
-        !userResult.success ||
-        !userResult.data?.id ||
-        userResult.data.isPublic
-      ) {
-        // User not authenticated, return public user with leadId
-        const leadId = await this.getLeadIdForPublicUser(locale, logger);
-        return createPublicUser<TRoles>(leadId);
-      }
-
-      // Get leadId for authenticated user
-      const leadId = await this.getLeadIdForUser(
-        userResult.data.id,
-        locale,
-        logger,
-      );
-
-      // Use internal method to check authentication with roles
-      return await this.getAuthenticatedUserInternal<TRoles>(
-        userResult.data.id,
-        leadId,
-        roles,
-        logger,
-      );
+      // User not authenticated and PUBLIC role not allowed - return public user
+      // (will be rejected by role check in getAuthenticatedUserInternal)
+      const leadId = await this.getLeadIdForPublicUser(locale, logger);
+      return createPublicUser<TRoles>(leadId);
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.auth.debug.errorGettingAuthUserForNextjs",
         error,
       );
-      // Fallback to public user with leadId
+      // Fallback to public user with leadId if PUBLIC role is allowed
+      if (roles.includes(UserRole.PUBLIC)) {
+        const leadId = await this.getLeadIdForPublicUser(locale, logger);
+        return createPublicUser<TRoles>(leadId);
+      }
+      // Otherwise, return public user (will be rejected by role check)
       const leadId = await this.getLeadIdForPublicUser(locale, logger);
       return createPublicUser<TRoles>(leadId);
     }
@@ -1072,45 +1109,53 @@ class AuthRepositoryImpl implements AuthRepository {
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
     try {
-      // Public role is always allowed
+      // First, try to get authenticated user from request
+      const userResult = await this.getCurrentUserTrpc(request, logger);
+
+      // If user is authenticated, proceed with authenticated user flow
+      if (
+        userResult.success &&
+        userResult.data?.id &&
+        !userResult.data.isPublic
+      ) {
+        // Get leadId for authenticated user
+        const leadId = await this.getLeadIdForUser(
+          userResult.data.id,
+          locale,
+          logger,
+        );
+
+        // Use internal method to check authentication with roles
+        return await this.getAuthenticatedUserInternal<TRoles>(
+          userResult.data.id,
+          leadId,
+          roles,
+          logger,
+        );
+      }
+
+      // User is not authenticated - check if PUBLIC role is allowed
       if (roles.includes(UserRole.PUBLIC)) {
         // Get leadId for public user
         const leadId = await this.getLeadIdForPublicUser(locale, logger);
         return createPublicUser<TRoles>(leadId);
       }
 
-      // Get user from request
-      const userResult = await this.getCurrentUserTrpc(request, logger);
-      if (
-        !userResult.success ||
-        !userResult.data?.id ||
-        userResult.data.isPublic
-      ) {
-        // User not authenticated, return public user with leadId
-        const leadId = await this.getLeadIdForPublicUser(locale, logger);
-        return createPublicUser<TRoles>(leadId);
-      }
-
-      // Get leadId for authenticated user
-      const leadId = await this.getLeadIdForUser(
-        userResult.data.id,
-        locale,
-        logger,
-      );
-
-      // Use internal method to check authentication with roles
-      return await this.getAuthenticatedUserInternal<TRoles>(
-        userResult.data.id,
-        leadId,
-        roles,
-        logger,
-      );
+      // User not authenticated and PUBLIC role not allowed - return public user
+      // (will be rejected by role check in getAuthenticatedUserInternal)
+      const leadId = await this.getLeadIdForPublicUser(locale, logger);
+      return createPublicUser<TRoles>(leadId);
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.auth.debug.errorGettingAuthUserForTrpc",
         error,
       );
-      // Fallback to public user with leadId
+      // Fallback to public user with leadId if PUBLIC role is allowed
+      if (roles.includes(UserRole.PUBLIC)) {
+        const leadId = await this.getLeadIdForPublicUser(locale, logger);
+        return createPublicUser<TRoles>(leadId);
+      }
+      // Otherwise, return public user (will be rejected by role check)
       const leadId = await this.getLeadIdForPublicUser(locale, logger);
       return createPublicUser<TRoles>(leadId);
     }
@@ -1134,46 +1179,54 @@ class AuthRepositoryImpl implements AuthRepository {
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
     try {
-      // Public role is always allowed, or if no roles specified (empty array means public)
+      // First, try to get authenticated user from token
+      const userResult = await this.getCurrentUserCli(token, logger);
+
+      // If user is authenticated, proceed with authenticated user flow
+      if (
+        userResult.success &&
+        userResult.data?.id &&
+        !userResult.data.isPublic
+      ) {
+        // Get leadId for authenticated user (skip cookies for CLI)
+        const leadId = await this.getLeadIdForUser(
+          userResult.data.id,
+          locale,
+          logger,
+          true,
+        );
+
+        // Use internal method to check authentication with roles
+        return await this.getAuthenticatedUserInternal(
+          userResult.data.id,
+          leadId,
+          roles,
+          logger,
+        );
+      }
+
+      // User is not authenticated - check if PUBLIC role is allowed
       if (roles.includes(UserRole.PUBLIC) || roles.length === 0) {
         // Get leadId for public user (skip cookies for CLI)
         const leadId = await this.getLeadIdForPublicUser(locale, logger, true);
         return createPublicUser<TRoles>(leadId);
       }
 
-      // Get user from token
-      const userResult = await this.getCurrentUserCli(token, logger);
-      if (
-        !userResult.success ||
-        !userResult.data?.id ||
-        userResult.data.isPublic
-      ) {
-        // User not authenticated, return public user with leadId
-        const leadId = await this.getLeadIdForPublicUser(locale, logger, true);
-        return createPublicUser<TRoles>(leadId);
-      }
-
-      // Get leadId for authenticated user (skip cookies for CLI)
-      const leadId = await this.getLeadIdForUser(
-        userResult.data.id,
-        locale,
-        logger,
-        true,
-      );
-
-      // Use internal method to check authentication with roles
-      return await this.getAuthenticatedUserInternal(
-        userResult.data.id,
-        leadId,
-        roles,
-        logger,
-      );
+      // User not authenticated and PUBLIC role not allowed - return public user
+      // (will be rejected by role check in getAuthenticatedUserInternal)
+      const leadId = await this.getLeadIdForPublicUser(locale, logger, true);
+      return createPublicUser<TRoles>(leadId);
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.auth.debug.errorGettingAuthUserForCli",
         error,
       );
-      // Fallback to public user with leadId
+      // Fallback to public user with leadId if PUBLIC role is allowed
+      if (roles.includes(UserRole.PUBLIC) || roles.length === 0) {
+        const leadId = await this.getLeadIdForPublicUser(locale, logger, true);
+        return createPublicUser<TRoles>(leadId);
+      }
+      // Otherwise, return public user (will be rejected by role check)
       const leadId = await this.getLeadIdForPublicUser(locale, logger, true);
       return createPublicUser<TRoles>(leadId);
     }

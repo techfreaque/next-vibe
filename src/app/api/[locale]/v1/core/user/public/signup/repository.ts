@@ -319,6 +319,28 @@ export class SignupRepositoryImpl implements SignupRepository {
         logger,
       );
 
+      // Add 20 free credits for new users
+      const { creditRepository } = await import(
+        "../../agent/chat/credits/repository"
+      );
+      const creditsResult = await creditRepository.addCredits(
+        userResponse.data.id,
+        20,
+        "free",
+        undefined, // No expiry for free credits
+      );
+
+      if (creditsResult.success) {
+        logger.debug("Added 20 free credits to new user", {
+          userId: userResponse.data.id,
+        });
+      } else {
+        logger.error("Failed to add free credits to new user", {
+          userId: userResponse.data.id,
+          error: creditsResult.message,
+        });
+      }
+
       logger.debug("User created successfully", {
         email,
         userId: userResponse.data.id,

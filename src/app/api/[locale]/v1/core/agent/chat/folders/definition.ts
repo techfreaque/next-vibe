@@ -26,11 +26,14 @@ import { DEFAULT_FOLDER_IDS } from "../config";
 /**
  * Get Folders List Endpoint (GET)
  * Retrieves all folders for the current user in hierarchical structure
+ *
+ * Note: PUBLIC role is allowed for anonymous users to access incognito folders
+ * The repository layer filters results based on authentication status
  */
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "agent", "chat", "folders"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "app.api.v1.core.agent.chat.folders.get.title" as const,
   description: "app.api.v1.core.agent.chat.folders.get.description" as const,

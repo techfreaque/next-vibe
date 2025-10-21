@@ -43,6 +43,8 @@ export const translations: typeof enTranslations = {
       reset: "Zurücksetzen",
       submit: "Absenden",
       close: "Schließen",
+      previous: "Zurück",
+      next: "Weiter",
     },
   },
 };

@@ -21,6 +21,7 @@ import type {
   UseChatReturn,
 } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import {
@@ -100,11 +101,21 @@ export function ChatSidebar({
   const [searchQuery, setSearchQuery] = useState("");
   const [newFolderDialogOpen, setNewFolderDialogOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Get the root folder ID from the active folder (could be root or subfolder)
   const activeRootFolderId = activeFolderId
     ? getRootFolderId(chat.folders, activeFolderId)
     : chat.currentRootFolderId || DEFAULT_FOLDER_IDS.PRIVATE;
+
+  // Check if user is authenticated using auth status cookie (client-side only)
+  useEffect(() => {
+    const authStatusResponse = authClientRepository.hasAuthStatus(logger);
+    setIsAuthenticated(authStatusResponse.success && authStatusResponse.data === true);
+  }, [logger]);
+
+  // Check if current folder requires authentication
+  const requiresAuth = activeRootFolderId !== DEFAULT_FOLDER_IDS.INCOGNITO;
 
   // Get color for the active root folder - using simple color mapping
   const rootFolderColor =
@@ -137,6 +148,17 @@ export function ChatSidebar({
 
   const handleSelectFolder = (folderId: string): void => {
     const rootFolderId = getRootFolderId(chat.folders, folderId);
+
+    // If user is not authenticated and tries to access non-incognito folder, redirect to incognito
+    if (!isAuthenticated && rootFolderId !== DEFAULT_FOLDER_IDS.INCOGNITO) {
+      logger.info("Non-authenticated user attempted to access non-incognito folder, redirecting to incognito", {
+        attemptedFolder: rootFolderId,
+      });
+      const url = buildFolderUrl(locale, DEFAULT_FOLDER_IDS.INCOGNITO, null);
+      router.push(url);
+      return;
+    }
+
     // If folderId IS the root folder, don't pass it as subfolder
     const subFolderId = folderId === rootFolderId ? null : folderId;
     const url = buildFolderUrl(locale, rootFolderId, subFolderId);
@@ -176,13 +198,27 @@ export function ChatSidebar({
       />
       {/* New Chat Button */}
       <div className="flex items-center gap-1 px-3 pb-2 min-w-max">
-        <Button
-          onClick={() => onCreateThread(activeRootFolderId)}
-          className={`w-full h-10 sm:h-9 ${getButtonColorClasses(rootFolderColor)}`}
-        >
-          <MessageSquarePlus className="h-4 w-4 mr-2" />
-          {t(getNewChatTranslationKey(activeRootFolderId))}
-        </Button>
+        <TooltipProvider delayDuration={300}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="w-full">
+                <Button
+                  onClick={() => onCreateThread(activeRootFolderId)}
+                  className={`w-full h-10 sm:h-9 ${getButtonColorClasses(rootFolderColor)}`}
+                  disabled={requiresAuth && !isAuthenticated}
+                >
+                  <MessageSquarePlus className="h-4 w-4 mr-2" />
+                  {t(getNewChatTranslationKey(activeRootFolderId))}
+                </Button>
+              </div>
+            </TooltipTrigger>
+            {requiresAuth && !isAuthenticated && (
+              <TooltipContent side="bottom">
+                <p>{t("app.chat.common.loginRequired")}</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
         {/* New Folder Button */}
         <TooltipProvider delayDuration={300}>
           <Tooltip>
@@ -193,12 +229,17 @@ export function ChatSidebar({
                 className="h-11 w-11 hover:bg-accent"
                 onClick={() => setNewFolderDialogOpen(true)}
                 title={t(getNewFolderTranslationKey(activeRootFolderId))}
+                disabled={requiresAuth && !isAuthenticated}
               >
                 <FolderPlus className="h-5 w-5" />
               </Button>
             </TooltipTrigger>
             <TooltipContent side="bottom">
-              <p>{t(getNewFolderTranslationKey(activeRootFolderId))}</p>
+              <p>
+                {requiresAuth && !isAuthenticated
+                  ? t("app.chat.common.loginRequired")
+                  : t(getNewFolderTranslationKey(activeRootFolderId))}
+              </p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

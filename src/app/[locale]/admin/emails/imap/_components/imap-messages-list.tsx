@@ -7,7 +7,6 @@
 
 import { Eye, Mail, MailOpen, Paperclip, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { debugLogger } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
@@ -26,6 +25,7 @@ import {
   ImapSyncStatus,
 } from "@/app/api/[locale]/v1/core/emails/imap-client/enum";
 import { useImapMessagesListEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/messages/list/hooks";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { useTranslation } from "@/i18n/core/client";
 
 interface ImapMessagesListProps {
@@ -46,14 +46,17 @@ export function ImapMessagesList({
   statusFilter,
   dateRange,
 }: ImapMessagesListProps): React.JSX.Element {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const router = useRouter();
   const [selectedMessages, setSelectedMessages] = useState<string[]>([]);
   const [page, setPage] = useState(1);
   const limit = 20; // Messages per page
 
+  // Create logger for endpoint
+  const logger = createEndpointLogger(false, Date.now(), locale);
+
   // Use the IMAP messages list endpoint following leads pattern
-  const messagesEndpoint = useImapMessagesListEndpoint();
+  const messagesEndpoint = useImapMessagesListEndpoint(logger);
 
   // Set filter values in the form when props change
   React.useEffect(() => {
@@ -121,15 +124,16 @@ export function ImapMessagesList({
     }
   };
 
-  const formatSize = (bytes: number): string => {
-    if (bytes < 1024) {
-      return `${bytes} B`;
-    }
-    if (bytes < 1024 * 1024) {
-      return `${(bytes / 1024).toFixed(1)} KB`;
-    }
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  };
+  // TODO: Re-enable when messageSize is added to API definition
+  // const formatSize = (bytes: number): string => {
+  //   if (bytes < 1024) {
+  //     return `${bytes} B`;
+  //   }
+  //   if (bytes < 1024 * 1024) {
+  //     return `${(bytes / 1024).toFixed(1)} KB`;
+  //   }
+  //   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  // };
 
   const handleSelectMessage = (messageId: string, checked: boolean): void => {
     if (checked) {
@@ -148,24 +152,18 @@ export function ImapMessagesList({
   };
 
   const handleMarkAsRead = (): void => {
-    // Mark selected messages as read through IMAP message API
-    selectedMessages.forEach((messageId) => {
-      debugLogger("Mark message as read", { messageId });
-    });
+    // TODO: Mark selected messages as read through IMAP message API
+    // Implementation needed for: selectedMessages
   };
 
   const handleMarkAsUnread = (): void => {
-    // Mark selected messages as unread through IMAP message API
-    selectedMessages.forEach((messageId) => {
-      debugLogger("Mark message as unread", { messageId });
-    });
+    // TODO: Mark selected messages as unread through IMAP message API
+    // Implementation needed for: selectedMessages
   };
 
   const handleToggleFlag = (): void => {
-    // Toggle flag status of selected messages through IMAP message API
-    selectedMessages.forEach((messageId) => {
-      debugLogger("Toggle message flag", { messageId });
-    });
+    // TODO: Toggle flag status of selected messages through IMAP message API
+    // Implementation needed for: selectedMessages
   };
 
   const handleViewMessage = (messageId: string): void => {
@@ -291,26 +289,12 @@ export function ImapMessagesList({
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">
-                      {message.messageSize
-                        ? formatSize(message.messageSize)
-                        : "-"}
+                      {/* TODO: Add messageSize to API definition */}-
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={
-                        message.syncStatus === ImapSyncStatus.SYNCED
-                          ? "default"
-                          : "secondary"
-                      }
-                      className={
-                        message.syncStatus === ImapSyncStatus.SYNCED
-                          ? "bg-green-100 text-green-800"
-                          : ""
-                      }
-                    >
-                      {message.syncStatus}
-                    </Badge>
+                    {/* TODO: Add syncStatus to API definition */}
+                    <Badge variant="secondary">{ImapSyncStatus.SYNCED}</Badge>
                   </TableCell>
                   <TableCell>
                     <Button

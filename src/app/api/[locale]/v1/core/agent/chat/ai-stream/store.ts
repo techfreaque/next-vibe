@@ -14,12 +14,12 @@ import type { ModelId } from "../model-access/models";
 export interface StreamingMessage {
   messageId: string;
   threadId: string;
-  role: "user" | "assistant" | "system";
+  role: "user" | "assistant" | "system" | "error";
   content: string;
   parentId: string | null;
   depth: number;
-  model?: ModelId;
-  persona?: string;
+  model?: ModelId | null;
+  persona?: string | null;
   totalTokens?: number;
   finishReason?: string | null;
   isStreaming: boolean;

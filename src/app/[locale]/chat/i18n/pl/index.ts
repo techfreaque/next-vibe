@@ -44,6 +44,7 @@ export const translations: typeof enTranslations = {
     viewAllThreads: "Zobacz wszystkie wątki",
     backToChat: "Powrót do czatu",
     language: "Język",
+    loginRequired: "Zaloguj się, aby korzystać z trwałych folderów. Użyj trybu incognito dla anonimowych czatów.",
 
     // Copy Button
     copyButton: {
@@ -573,17 +574,14 @@ export const translations: typeof enTranslations = {
   messageEditor: {
     placeholder: "Edytuj swoją wiadomość...",
     hint: {
-      overwrite: "aby nadpisać",
+      branch: "aby rozgałęzić",
       cancel: "aby anulować",
     },
     titles: {
-      overwrite: "Nadpisz wiadomość",
       branch: "Rozgałęź konwersację",
       cancel: "Anuluj edycję",
     },
     buttons: {
-      overwrite: "Nadpisz",
-      overwriting: "Nadpisywanie...",
       branch: "Rozgałęź",
       branching: "Rozgałęzianie...",
       cancel: "Anuluj",

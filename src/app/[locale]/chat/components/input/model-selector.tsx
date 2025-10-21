@@ -37,7 +37,7 @@ const STORAGE_KEY = "chat-favorite-models";
 
 const DEFAULT_FAVORITES: ModelId[] = [
   ModelId.GPT_5_NANO,
-  ModelId.DEEPSEEK_V31_FREE,
+  ModelId.DEEPSEEK_V31,
   ModelId.GEMINI_FLASH_2_5_LITE,
 ];
 

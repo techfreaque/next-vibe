@@ -7,6 +7,7 @@
 import { dateSchema } from "next-vibe/shared/types/common.schema";
 import { z } from "zod";
 
+import type { Countries, Languages } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 // Re-export dateSchema for consistency
@@ -64,7 +65,7 @@ export enum ChartType {
  */
 export const baseStatsFilterSchema = z.object({
   // Time-based filtering
-  timePeriod: z.enum(TimePeriod).default(TimePeriod.DAY),
+  timePeriod: z.nativeEnum(TimePeriod).default(TimePeriod.DAY),
   dateRangePreset: z
     .nativeEnum(DateRangePreset)
     .default(DateRangePreset.LAST_30_DAYS),
@@ -72,11 +73,11 @@ export const baseStatsFilterSchema = z.object({
   dateTo: dateSchema.optional(),
 
   // Chart configuration
-  chartType: z.enum(ChartType).default(ChartType.LINE),
+  chartType: z.nativeEnum(ChartType).default(ChartType.LINE),
 
   // Data options
   includeComparison: z.coerce.boolean().default(false),
-  comparisonPeriod: z.enum(DateRangePreset).optional(),
+  comparisonPeriod: z.nativeEnum(DateRangePreset).optional(),
 });
 
 export type BaseStatsFilterType = z.infer<typeof baseStatsFilterSchema>;
@@ -92,7 +93,9 @@ export const historicalDataPointSchema = z.object({
   labelParams: z
     .record(z.string(), z.union([z.string(), z.number()]))
     .optional(),
-  metadata: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
+  metadata: z
+    .record(z.string(), z.union([z.string(), z.number(), z.boolean()]))
+    .optional(),
 });
 
 export type HistoricalDataPointType = z.infer<typeof historicalDataPointSchema>;
@@ -108,7 +111,7 @@ export const historicalDataSeriesSchema = z.object({
     .optional(),
   data: z.array(historicalDataPointSchema),
   color: z.string().optional(),
-  type: z.enum(ChartType).optional(),
+  type: z.nativeEnum(ChartType).optional(),
 });
 
 export type HistoricalDataSeriesType = z.infer<
@@ -170,15 +173,26 @@ export const currentPeriodStatsSchema = z.object({
     .describe("Consultation booking rate (0-1)"),
 
   // Distribution data
-  byType: z.record(z.number()).optional().describe("Distribution by type"),
-  byStatus: z.record(z.number()).optional().describe("Distribution by status"),
-  bySource: z.record(z.number()).optional().describe("Distribution by source"),
+  // Generic string keys - specific implementations should override with proper enum types
+  byType: z
+    .record(z.string(), z.number())
+    .optional()
+    .describe("Distribution by type"),
+  byStatus: z
+    .record(z.string(), z.number())
+    .optional()
+    .describe("Distribution by status"),
+  bySource: z
+    .record(z.string(), z.number())
+    .optional()
+    .describe("Distribution by source"),
+  // Proper enum types for country and language
   byCountry: z
-    .record(z.number())
+    .record(z.custom<Countries>(), z.number())
     .optional()
     .describe("Distribution by country"),
   byLanguage: z
-    .record(z.number())
+    .record(z.custom<Languages>(), z.number())
     .optional()
     .describe("Distribution by language"),
 
@@ -190,11 +204,11 @@ export const currentPeriodStatsSchema = z.object({
 
   // Top performers
   topPerforming: z
-    .array(z.record(z.unknown()))
+    .array(z.record(z.string(), z.unknown()))
     .optional()
     .describe("Top performing items"),
   recentActivity: z
-    .array(z.record(z.unknown()))
+    .array(z.record(z.string(), z.unknown()))
     .optional()
     .describe("Recent activity"),
 });

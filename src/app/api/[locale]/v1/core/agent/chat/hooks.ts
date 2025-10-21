@@ -104,7 +104,7 @@ export interface UseChatReturn {
   // Message operations
   sendMessage: (content: string) => Promise<void>;
   retryMessage: (messageId: string) => Promise<void>;
-  editMessage: (messageId: string, newContent: string) => Promise<void>;
+  branchMessage: (messageId: string, newContent: string) => Promise<void>;
   answerAsAI: (messageId: string, content: string) => Promise<void>;
   deleteMessage: (messageId: string) => Promise<void>;
   voteMessage: (messageId: string, vote: 1 | -1 | 0) => Promise<void>;
@@ -147,7 +147,19 @@ export function useChat(
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): UseChatReturn {
-  // Get stores
+  // Get stores - subscribe to specific properties to ensure re-renders
+  const threads = useChatStore((state) => state.threads);
+  const messages = useChatStore((state) => state.messages);
+  const folders = useChatStore((state) => state.folders);
+  const activeThreadId = useChatStore((state) => state.activeThreadId);
+  const currentRootFolderId = useChatStore(
+    (state) => state.currentRootFolderId,
+  );
+  const currentSubFolderId = useChatStore((state) => state.currentSubFolderId);
+  const isLoading = useChatStore((state) => state.isLoading);
+  const settings = useChatStore((state) => state.settings);
+
+  // Get store actions (these don't need selectors as they don't change)
   const chatStore = useChatStore();
   const streamStore = useAIStreamStore();
 
@@ -166,16 +178,94 @@ export function useChat(
   // Fetch data from server
   const personasEndpoint = usePersonasList(logger);
 
-  // Load all threads and folders on mount
+  // Load all threads and folders on mount - ONLY ONCE
+  // Use ref to track if data has been loaded to prevent infinite loops
+  const dataLoadedRef = useRef(false);
+
+  // Track which threads have had their messages loaded to prevent duplicate requests
+  const loadedThreadsRef = useRef<Set<string>>(new Set());
+
   useEffect(() => {
+    // Skip if already loaded
+    if (dataLoadedRef.current) {
+      return;
+    }
+
+    dataLoadedRef.current = true;
+
     const loadData = async (): Promise<void> => {
+      // Check if user is authenticated by checking auth_status cookie
+      const authStatusCookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("auth_status="));
+      const isAuthenticated = authStatusCookie !== undefined;
+
+      logger.debug("useChat", "Checking authentication before loading data", {
+        isAuthenticated,
+      });
+
+      // Skip loading server data for non-authenticated users
+      if (!isAuthenticated) {
+        logger.info(
+          "useChat",
+          "User not authenticated, skipping server data load",
+        );
+        // Load incognito data from localStorage instead
+        try {
+          const { loadIncognitoState } = await import("./incognito/storage");
+          const incognitoState = loadIncognitoState();
+
+          logger.debug("useChat", "Loading incognito data from localStorage", {
+            threadCount: Object.keys(incognitoState.threads).length,
+            messageCount: Object.keys(incognitoState.messages).length,
+            folderCount: Object.keys(incognitoState.folders).length,
+          });
+
+          // Load threads into store (convert date strings back to Date objects)
+          Object.values(incognitoState.threads).forEach((thread) => {
+            chatStore.addThread({
+              ...thread,
+              createdAt: new Date(thread.createdAt),
+              updatedAt: new Date(thread.updatedAt),
+            });
+          });
+
+          // Load messages into store (convert date strings back to Date objects)
+          Object.values(incognitoState.messages).forEach((message) => {
+            chatStore.addMessage({
+              ...message,
+              createdAt: new Date(message.createdAt),
+              updatedAt: new Date(message.updatedAt),
+            });
+          });
+
+          // Load folders into store (convert date strings back to Date objects)
+          Object.values(incognitoState.folders).forEach((folder) => {
+            chatStore.addFolder({
+              ...folder,
+              createdAt: new Date(folder.createdAt),
+              updatedAt: new Date(folder.updatedAt),
+            });
+          });
+
+          logger.info("useChat", "Incognito data loaded successfully", {
+            threadCount: Object.keys(incognitoState.threads).length,
+            messageCount: Object.keys(incognitoState.messages).length,
+            folderCount: Object.keys(incognitoState.folders).length,
+          });
+        } catch (error) {
+          logger.error("useChat", "Failed to load incognito data", { error });
+        }
+        return;
+      }
+
       // Load ALL threads (no rootFolderId filter)
       try {
         // Build query params for GET request - use dot notation for nested objects
         // Note: pagination and filters objects are required, but their fields are optional
         const params = new URLSearchParams({
           "pagination.page": "1",
-          "pagination.limit": "1000",
+          "pagination.limit": "100", // Max allowed by schema
           // filters object is required but all fields are optional - send empty placeholder
           "filters._placeholder": "",
         });
@@ -313,7 +403,8 @@ export function useChat(
     };
 
     void loadData();
-  }, [locale, chatStore, logger]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale]); // Only depend on locale - chatStore and logger are stable
 
   const personas = useMemo(() => {
     const response = personasEndpoint.read?.response as
@@ -342,8 +433,7 @@ export function useChat(
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Get settings from store (persisted to localStorage)
-  const settings = chatStore.settings;
+  // Get settings from store (persisted to localStorage) - already subscribed above
   const selectedPersona = settings.selectedPersona;
   const selectedModel = settings.selectedModel;
   const temperature = settings.temperature;
@@ -418,12 +508,10 @@ export function useChat(
     [chatStore],
   );
 
-  // Get active thread and messages
-  const activeThread = chatStore.activeThreadId
-    ? chatStore.threads[chatStore.activeThreadId] || null
-    : null;
-  const activeThreadMessages = chatStore.activeThreadId
-    ? chatStore.getThreadMessages(chatStore.activeThreadId)
+  // Get active thread and messages - use subscribed variables
+  const activeThread = activeThreadId ? threads[activeThreadId] || null : null;
+  const activeThreadMessages = activeThreadId
+    ? chatStore.getThreadMessages(activeThreadId)
     : [];
 
   // Sync streaming messages to chat store
@@ -465,7 +553,8 @@ export function useChat(
         });
       }
     });
-  }, [streamStore.streamingMessages, chatStore, t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [streamStore.streamingMessages, t]); // chatStore is stable, don't include it
 
   // Sync streaming threads to chat store
   useEffect(() => {
@@ -491,7 +580,111 @@ export function useChat(
         });
       }
     });
-  }, [streamStore.threads, chatStore]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [streamStore.threads]); // chatStore is stable, don't include it
+
+  // Load messages from server when activeThreadId changes
+  useEffect(() => {
+    if (!activeThreadId) {
+      return;
+    }
+
+    // Skip if messages already loaded for this thread
+    if (loadedThreadsRef.current.has(activeThreadId)) {
+      return;
+    }
+
+    // Check if user is authenticated
+    const authStatusCookie = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("auth_status="));
+    const isAuthenticated = authStatusCookie !== undefined;
+
+    // Skip loading for incognito mode (messages are in localStorage)
+    const thread = threads[activeThreadId];
+    if (!thread || thread.rootFolderId === "incognito") {
+      return;
+    }
+
+    // Skip if not authenticated (shouldn't happen for non-incognito threads)
+    if (!isAuthenticated) {
+      return;
+    }
+
+    // Mark as loaded before starting the request to prevent duplicate requests
+    loadedThreadsRef.current.add(activeThreadId);
+
+    // Load messages from server
+    const loadMessages = async (): Promise<void> => {
+      try {
+        logger.debug("useChat", "Loading messages for thread", {
+          threadId: activeThreadId,
+        });
+
+        const response = await fetch(
+          `/api/${locale}/v1/core/agent/chat/threads/${activeThreadId}/messages`,
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          logger.debug("useChat", "Loaded messages", {
+            threadId: activeThreadId,
+            count: data.data?.messages?.length || 0,
+          });
+
+          if (data.success && data.data?.messages) {
+            // Add messages to store
+            data.data.messages.forEach(
+              (message: {
+                id: string;
+                threadId: string;
+                role: "user" | "assistant" | "system";
+                content: string;
+                model: string | null;
+                persona: string | null;
+                parentId: string | null;
+                depth: number;
+                childrenIds: string[];
+                createdAt: string;
+                updatedAt: string;
+              }) => {
+                chatStore.addMessage({
+                  id: message.id,
+                  threadId: message.threadId,
+                  role: message.role,
+                  content: message.content,
+                  model: message.model,
+                  persona: message.persona,
+                  parentId: message.parentId,
+                  depth: message.depth,
+                  childrenIds: message.childrenIds,
+                  createdAt: new Date(message.createdAt),
+                  updatedAt: new Date(message.updatedAt),
+                });
+              },
+            );
+          }
+        } else {
+          logger.error("useChat", "Failed to load messages", {
+            threadId: activeThreadId,
+            status: response.status,
+          });
+          // Remove from loaded set on error so it can be retried
+          loadedThreadsRef.current.delete(activeThreadId);
+        }
+      } catch (error) {
+        logger.error("useChat", "Error loading messages", {
+          threadId: activeThreadId,
+          error,
+        });
+        // Remove from loaded set on error so it can be retried
+        loadedThreadsRef.current.delete(activeThreadId);
+      }
+    };
+
+    void loadMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeThreadId, locale, logger, chatStore]); // threads intentionally excluded to prevent infinite loop
 
   // Message operations
   const sendMessage = useCallback(
@@ -513,7 +706,7 @@ export function useChat(
           persona: selectedPersona,
           temperature,
           maxTokens,
-          enableSearch: false,
+          enableSearch,
         });
 
         setInput("");
@@ -531,12 +724,15 @@ export function useChat(
       selectedPersona,
       temperature,
       maxTokens,
+      enableSearch,
     ],
   );
 
   const retryMessage = useCallback(
     async (messageId: string): Promise<void> => {
-      logger.debug("useChat", "Retrying message", { messageId });
+      logger.debug("useChat", "Retrying message (creating branch)", {
+        messageId,
+      });
 
       const message = chatStore.messages[messageId];
       if (!message) {
@@ -547,14 +743,16 @@ export function useChat(
       chatStore.setLoading(true);
 
       try {
+        // Use "retry" operation which creates a branch with the same user message content
+        // The backend will fetch the original message content and create a new branch
         await aiStream.startStream({
           operation: "retry",
           rootFolderId: chatStore.currentRootFolderId,
           subFolderId: chatStore.currentSubFolderId,
           threadId: message.threadId,
           parentMessageId: messageId,
-          content: message.content,
-          role: message.role as "user" | "assistant" | "system",
+          content: "", // Backend fetches original content
+          role: "user", // Backend fetches original role
           model: selectedModel,
           persona: selectedPersona,
           temperature,
@@ -578,9 +776,9 @@ export function useChat(
     ],
   );
 
-  const editMessage = useCallback(
+  const branchMessage = useCallback(
     async (messageId: string, newContent: string): Promise<void> => {
-      logger.debug("useChat", "Editing message", { messageId, newContent });
+      logger.debug("useChat", "Branching message", { messageId, newContent });
 
       const message = chatStore.messages[messageId];
       if (!message) {
@@ -591,6 +789,7 @@ export function useChat(
       chatStore.setLoading(true);
 
       try {
+        // Use "edit" operation which creates a branch with the same parent
         await aiStream.startStream({
           operation: "edit",
           rootFolderId: chatStore.currentRootFolderId,
@@ -606,7 +805,7 @@ export function useChat(
           enableSearch: false,
         });
       } catch (error) {
-        logger.error("useChat", "Failed to edit message", { error });
+        logger.error("useChat", "Failed to branch message", { error });
       } finally {
         chatStore.setLoading(false);
       }
@@ -957,19 +1156,19 @@ export function useChat(
   );
 
   return {
-    // State
-    threads: chatStore.threads,
-    messages: chatStore.messages,
-    folders: chatStore.folders,
+    // State - use subscribed variables for reactivity
+    threads,
+    messages,
+    folders,
     personas,
     activeThread,
     activeThreadMessages,
-    isLoading: chatStore.isLoading,
+    isLoading,
     isStreaming: streamStore.isStreaming,
 
-    // Current context
-    currentRootFolderId: chatStore.currentRootFolderId,
-    currentSubFolderId: chatStore.currentSubFolderId,
+    // Current context - use subscribed variables
+    currentRootFolderId,
+    currentSubFolderId,
 
     // Input
     input,
@@ -998,7 +1197,7 @@ export function useChat(
     // Message operations
     sendMessage,
     retryMessage,
-    editMessage,
+    branchMessage,
     answerAsAI,
     deleteMessage,
     voteMessage,

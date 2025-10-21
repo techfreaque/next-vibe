@@ -6,6 +6,15 @@ export const translations = {
       status_check_failed: "Failed to check authentication status",
     },
   },
+  debug: {
+    getAuthMinimalUserNext: {
+      start: "getAuthMinimalUserNext: FIXED VERSION - Checking authentication first",
+      result: "getAuthMinimalUserNext: getCurrentUserNext result",
+      authenticated: "getAuthMinimalUserNext: User is authenticated, getting leadId",
+      returningAuth: "getAuthMinimalUserNext: Returning authenticated user",
+      notAuthenticated: "getAuthMinimalUserNext: User not authenticated, returning public user",
+    },
+  },
   errors: {
     token_generation_failed: "Failed to generate authentication token",
     invalid_session: "The session is invalid or expired",

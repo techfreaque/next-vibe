@@ -11,6 +11,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DOM_IDS, LAYOUT, QUOTE_CHARACTER } from "../../lib/config/constants";
 import {
+  buildMessagePath,
   getDirectReplies,
   getRootMessages,
 } from "../../lib/utils/thread-builder";
@@ -29,7 +30,6 @@ interface ChatMessagesProps {
   selectedModel: ModelId;
   selectedPersona: string;
   ttsAutoplay: boolean;
-  onEditMessage: (messageId: string, newContent: string) => Promise<void>;
   onDeleteMessage: (messageId: string) => void;
   onSwitchBranch: (messageId: string, branchIndex: number) => void;
   onModelChange?: (model: ModelId) => void;
@@ -40,6 +40,7 @@ interface ChatMessagesProps {
   onVoteMessage?: (messageId: string, vote: 1 | -1 | 0) => void;
   isLoading?: boolean;
   showBranchIndicators?: boolean;
+  branchIndices?: Record<string, number>;
   onSendMessage?: (
     prompt: string,
     personaId: string,
@@ -58,8 +59,8 @@ export function ChatMessages({
   selectedModel,
   selectedPersona,
   ttsAutoplay,
-  onEditMessage,
   onDeleteMessage,
+  onSwitchBranch,
   onModelChange,
   onPersonaChange,
   onBranchMessage,
@@ -67,6 +68,7 @@ export function ChatMessages({
   onAnswerAsModel,
   onVoteMessage,
   isLoading = false,
+  branchIndices = {},
   onSendMessage,
   inputHeight = LAYOUT.DEFAULT_INPUT_HEIGHT,
   viewMode = "linear",
@@ -198,7 +200,6 @@ export function ChatMessages({
                 onRetryMessage={onRetryMessage}
                 onAnswerAsModel={onAnswerAsModel}
                 onDeleteMessage={onDeleteMessage}
-                onEditMessage={onEditMessage}
                 onModelChange={onModelChange}
                 onPersonaChange={onPersonaChange}
                 onInsertQuote={() => {
@@ -225,7 +226,6 @@ export function ChatMessages({
                 ttsAutoplay={ttsAutoplay}
                 locale={locale}
                 logger={logger}
-                onEditMessage={onEditMessage}
                 onDeleteMessage={onDeleteMessage}
                 onBranchMessage={onBranchMessage}
                 onRetryMessage={onRetryMessage}
@@ -237,33 +237,42 @@ export function ChatMessages({
             ));
           })()
         ) : (
-          // Linear view (ChatGPT style)
-          <LinearMessageView
-            messages={messages}
-            selectedModel={selectedModel}
-            selectedPersona={selectedPersona}
-            ttsAutoplay={ttsAutoplay}
-            locale={locale}
-            editingMessageId={messageActions.editingMessageId}
-            retryingMessageId={messageActions.retryingMessageId}
-            answeringMessageId={messageActions.answeringMessageId}
-            onDeleteMessage={onDeleteMessage}
-            onRetryMessage={onRetryMessage}
-            onAnswerAsModel={onAnswerAsModel}
-            onModelChange={onModelChange}
-            onPersonaChange={onPersonaChange}
-            onStartEdit={messageActions.startEdit}
-            onStartRetry={messageActions.startRetry}
-            onStartAnswer={messageActions.startAnswer}
-            onCancelAction={messageActions.cancelAction}
-            onSaveEdit={(id, content) =>
-              messageActions.handleSaveEdit(id, content, onEditMessage)
-            }
-            onBranchEdit={(id, content) =>
-              messageActions.handleBranchEdit(id, content, onBranchMessage)
-            }
-            logger={logger}
-          />
+          // Linear view (ChatGPT style) - Build path through message tree
+          ((): JSX.Element => {
+            const allMessages = Object.values(messages);
+            const { path, branchInfo } = buildMessagePath(
+              allMessages,
+              branchIndices,
+            );
+
+            return (
+              <LinearMessageView
+                messages={path}
+                branchInfo={branchInfo}
+                selectedModel={selectedModel}
+                selectedPersona={selectedPersona}
+                ttsAutoplay={ttsAutoplay}
+                locale={locale}
+                editingMessageId={messageActions.editingMessageId}
+                retryingMessageId={messageActions.retryingMessageId}
+                answeringMessageId={messageActions.answeringMessageId}
+                onDeleteMessage={onDeleteMessage}
+                onRetryMessage={onRetryMessage}
+                onAnswerAsModel={onAnswerAsModel}
+                onModelChange={onModelChange}
+                onPersonaChange={onPersonaChange}
+                onStartEdit={messageActions.startEdit}
+                onStartRetry={messageActions.startRetry}
+                onStartAnswer={messageActions.startAnswer}
+                onCancelAction={messageActions.cancelAction}
+                onBranchEdit={(id, content) =>
+                  messageActions.handleBranchEdit(id, content, onBranchMessage)
+                }
+                onSwitchBranch={onSwitchBranch}
+                logger={logger}
+              />
+            );
+          })()
         )}
 
         {isLoading && <LoadingIndicator />}

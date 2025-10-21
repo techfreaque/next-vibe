@@ -96,12 +96,12 @@ export default async function EmailPreviewPage({
                   className="flex items-center space-x-2"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  <span>{t("common.actions.back")}</span>
+                  <span>{t("app.admin.common.actions.back")}</span>
                 </Button>
               </Link>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {t("leads.admin.emails.preview_title")}
+                  {t("app.admin.leads.leads.admin.emails.preview_title")}
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400">
                   {journeyInfo.name} -{" "}
@@ -113,7 +113,7 @@ export default async function EmailPreviewPage({
             </div>
             <div className="text-sm text-gray-500 dark:text-gray-400">
               <span className="font-medium">
-                {t("leads.admin.emails.subject")}:
+                {t("app.admin.leads.leads.admin.emails.subject")}:
               </span>{" "}
               {emailPreview.subject}
             </div>
@@ -151,7 +151,7 @@ export default async function EmailPreviewPage({
                   className="flex items-center space-x-1"
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  <span>{t("common.actions.previous")}</span>
+                  <span>{t("app.admin.common.actions.previous")}</span>
                 </Button>
               )}
             </div>
@@ -187,7 +187,7 @@ export default async function EmailPreviewPage({
                   disabled
                   className="flex items-center space-x-1"
                 >
-                  <span>{t("common.actions.next")}</span>
+                  <span>{t("app.admin.common.actions.next")}</span>
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               )}
@@ -201,7 +201,7 @@ export default async function EmailPreviewPage({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-center space-x-4">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t("leads.admin.emails.journey")}:
+              {t("app.admin.leads.leads.admin.emails.journey")}:
             </span>
             <div className="flex space-x-2">
               {allJourneys.map((journey) => {

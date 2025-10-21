@@ -1,6 +1,4 @@
-// @ts-expect-error - Node.js built-in modules for CLI tool
 import { execSync } from "child_process";
-// @ts-expect-error - Node.js built-in modules for CLI tool
 import { join } from "path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
@@ -59,7 +57,6 @@ const CLI_MESSAGES = {
  */
 // Helper to get environment variable safely
 function getEnvVar(key: string): string | undefined {
-  // @ts-expect-error - Node.js process for CLI tool
   // eslint-disable-next-line node/no-process-env
   return process.env[key];
 }
@@ -74,7 +71,6 @@ export async function ciRelease(
 
   let overallError = false;
   const affectedPackages: string[] = [];
-  // @ts-expect-error - Node.js process for CLI tool
   const originalCwd = process.cwd();
 
   for (const pkg of config.packages) {
@@ -105,7 +101,6 @@ export async function ciRelease(
     }
 
     try {
-      // @ts-expect-error - Node.js process for CLI tool
       process.chdir(originalCwd);
     } catch {
       // ignore
@@ -115,7 +110,6 @@ export async function ciRelease(
   if (overallError) {
     const packagesStr = affectedPackages.join(", ");
     logger.error(CLI_MESSAGES.ciErrorsSummary, packagesStr);
-    // @ts-expect-error - Node.js process for CLI tool
     process.exit(1);
   }
 }
@@ -179,7 +173,6 @@ function runCiReleaseCommand(
   const ciEnv: Record<string, string> = {};
 
   // Copy all environment variables
-  // @ts-expect-error - Node.js process for CLI tool
   // eslint-disable-next-line node/no-process-env
   for (const key in process.env) {
     const value = getEnvVar(key);

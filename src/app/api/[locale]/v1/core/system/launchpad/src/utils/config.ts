@@ -1,10 +1,14 @@
-import { existsSync, mkdirSync, renameSync, rmSync, unlinkSync } from "node:fs";
+/// <reference types="node" />
+/* eslint-disable no-restricted-syntax */
+import { existsSync } from "node:fs";
 import { dirname, join, parse, resolve } from "node:path";
 
-import { build } from "vite";
+import { defaultLocale } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
-import type { LaunchpadConfig } from "../types/types.js";
-import { logger, loggerError } from "./logger.js";
+import type { LaunchpadConfig } from "../types/types";
+
+const { t } = simpleT(defaultLocale);
 
 export const DEFAULT_CONFIG_PATH = "launchpad.config.ts";
 
@@ -14,60 +18,13 @@ let configRootDir: string | null = null;
 // Get the root directory from the config file location
 export function getRootDirectory(): string {
   if (!configRootDir) {
-    throw new Error("Config has not been loaded yet. Call loadConfig first.");
+    throw new Error(
+      t(
+        "app.api.v1.core.system.launchpad.src.utils.config.errors.configNotLoaded" as const,
+      ),
+    );
   }
   return configRootDir;
-}
-
-async function getCompiledConfigPath(configPath: string): Promise<string> {
-  const outputFileName = `release.config.tmp.${Math.round(Math.random() * 100000)}.cjs`;
-  const outputDir = dirname(configPath);
-  const outputFilePath = join(outputDir, outputFileName);
-  const outputTmpDir = join(outputDir, "tmp");
-  const outputFileTmpPath = join(outputTmpDir, outputFileName);
-
-  try {
-    // Ensure tmp dir exists
-    if (!existsSync(outputTmpDir)) {
-      logger(`creating tmp dir ${outputTmpDir}`);
-      process.umask(0);
-      mkdirSync(outputTmpDir, { recursive: true });
-    }
-
-    await build({
-      plugins: [],
-      build: {
-        lib: {
-          entry: configPath,
-          formats: ["cjs"],
-          fileName: () => outputFileName,
-        },
-        outDir: outputTmpDir,
-        emptyOutDir: false,
-        sourcemap: false,
-      },
-    });
-    renameSync(join(outputTmpDir, outputFileName), outputFilePath);
-    rmSync(outputTmpDir, { force: true, recursive: true });
-    return outputFilePath;
-  } catch (error) {
-    // // Clean up in case of an error
-    try {
-      unlinkSync(outputFileTmpPath);
-    } catch (_cleanupError) {
-      /* empty */
-    }
-    try {
-      unlinkSync(outputFilePath);
-    } catch (_cleanupError) {
-      /* empty */
-    }
-    throw error;
-  }
-}
-
-function cleanCompiledConfig(compiledConfigPath: string): void {
-  unlinkSync(compiledConfigPath);
 }
 
 /**
@@ -119,14 +76,17 @@ function isLaunchpadConfigModule(
   if (!("default" in module)) {
     return false;
   }
-  const defaultExport = (module as { default: unknown }).default;
+  const defaultExport = module.default as Record<
+    string,
+    Record<string, string>
+  > | null;
   if (typeof defaultExport !== "object" || defaultExport === null) {
     return false;
   }
   if (!("packages" in defaultExport)) {
     return false;
   }
-  const packages = (defaultExport as { packages: unknown }).packages;
+  const packages = defaultExport.packages as Record<string, string> | null;
   return typeof packages === "object" && packages !== null;
 }
 
@@ -140,14 +100,26 @@ export async function loadConfig(
     // If explicit path is provided, use it directly
     resolvedConfigPath = resolve(process.cwd(), configPath);
     if (!existsSync(resolvedConfigPath)) {
-      throw new Error(`Config file not found: ${resolvedConfigPath}`);
+      throw new Error(
+        t(
+          "app.api.v1.core.system.launchpad.src.utils.config.errors.configFileNotFound" as const,
+          {
+            path: resolvedConfigPath,
+          },
+        ),
+      );
     }
   } else {
     // Otherwise search up from cwd
     const foundConfigPath = findConfigUp(configPath);
     if (!foundConfigPath) {
       throw new Error(
-        `Config file ${configPath} not found in current or parent directories`,
+        t(
+          "app.api.v1.core.system.launchpad.src.utils.config.errors.configFileNotFoundInParents" as const,
+          {
+            filename: configPath,
+          },
+        ),
       );
     }
     resolvedConfigPath = foundConfigPath;
@@ -155,16 +127,18 @@ export async function loadConfig(
 
   // Store the config directory as the root directory for the application
   configRootDir = dirname(resolvedConfigPath);
-  logger(`Using config file: ${resolvedConfigPath}`);
-  logger(`Root directory set to: ${configRootDir}`);
 
   try {
     // const compiledConfigPath = await getCompiledConfigPath(resolvedConfigPath);
-    const importedModule = await import(`file://${resolvedConfigPath}`);
+    const importedModule = (await import(
+      `file://${resolvedConfigPath}`
+    )) as unknown;
 
     if (!isLaunchpadConfigModule(importedModule)) {
       throw new Error(
-        "Invalid config format. Ensure the config exports a default object with a 'packages' object. Check the docs for more info.",
+        t(
+          "app.api.v1.core.system.launchpad.src.utils.config.errors.invalidConfigFormat" as const,
+        ),
       );
     }
 
@@ -173,7 +147,11 @@ export async function loadConfig(
 
     return config;
   } catch (error) {
-    loggerError("Error loading config:", error);
-    throw error;
+    // Re-throw the error with additional context
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const contextMessage = t(
+      "app.api.v1.core.system.launchpad.src.utils.config.errors.errorLoadingConfig" as const,
+    );
+    throw new Error(`${contextMessage} ${errorMessage}`);
   }
 }

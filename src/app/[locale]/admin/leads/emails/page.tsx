@@ -46,16 +46,16 @@ export default async function LeadsEmailsPage({
       {/* Page Description */}
       <div>
         <p className="text-gray-600 dark:text-gray-400">
-          {t("leads.admin.emails.description")}
+          {t("app.admin.leads.leads.admin.emails.description")}
         </p>
       </div>
 
       {/* Email Templates Overview */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("leads.admin.emails.title")}</CardTitle>
+          <CardTitle>{t("app.admin.leads.leads.admin.emails.title")}</CardTitle>
           <p className="text-gray-600 dark:text-gray-400">
-            {t("leads.admin.emails.subtitle")}
+            {t("app.admin.leads.leads.admin.emails.subtitle")}
           </p>
         </CardHeader>
         <CardContent>
@@ -99,11 +99,15 @@ export default async function LeadsEmailsPage({
                       <CardContent className="space-y-3">
                         <div className="text-sm text-gray-600 dark:text-gray-400">
                           <p>
-                            <strong>{t("leads.admin.emails.journey")}:</strong>{" "}
+                            <strong>
+                              {t("app.admin.leads.leads.admin.emails.journey")}:
+                            </strong>{" "}
                             {journey.info.name}
                           </p>
                           <p>
-                            <strong>{t("leads.admin.emails.stage")}:</strong>{" "}
+                            <strong>
+                              {t("app.admin.leads.leads.admin.emails.stage")}:
+                            </strong>{" "}
                             {getStageDisplayName(stage)}
                           </p>
                         </div>
@@ -112,7 +116,9 @@ export default async function LeadsEmailsPage({
                           <Link
                             href={`/${locale}/admin/leads/emails/${journey.variant}/${stage}`}
                           >
-                            {t("leads.admin.emails.view_preview")}
+                            {t(
+                              "app.admin.leads.leads.admin.emails.view_preview",
+                            )}
                           </Link>
                         </Button>
                       </CardContent>
@@ -124,11 +130,11 @@ export default async function LeadsEmailsPage({
                 <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-400">
-                      {t("leads.admin.emails.total_templates")}:
+                      {t("app.admin.leads.leads.admin.emails.total_templates")}:
                     </span>
                     <span className="font-medium">
                       {journey.stages.length}{" "}
-                      {t("leads.admin.emails.templates")}
+                      {t("app.admin.leads.leads.admin.emails.templates")}
                     </span>
                   </div>
                 </div>

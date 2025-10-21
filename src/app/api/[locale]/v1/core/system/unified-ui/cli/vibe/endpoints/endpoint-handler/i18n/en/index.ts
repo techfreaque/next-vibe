@@ -2,6 +2,9 @@ import { translations as nextTranslations } from "../../next/i18n/en";
 
 export const translations = {
   next: nextTranslations,
+  debug: {
+    authenticatedUser: "Endpoint Handler: Authenticated user",
+  },
   error: {
     errors: {
       invalid_request_data: "Invalid request data",

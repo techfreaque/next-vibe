@@ -23,14 +23,25 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: async ({ data, t, locale, logger, user, request }) => {
-      // Extract userId from user object
-      const userId = user.isPublic ? undefined : user.id;
+      // Log user object for debugging
+      logger.info("app.api.v1.core.agent.chat.aiStream.route.debug.userObject", {
+        isPublic: user.isPublic,
+        hasId: "id" in user,
+        id: "id" in user ? user.id : undefined,
+        hasLeadId: "leadId" in user,
+        leadId: "leadId" in user ? user.leadId : undefined,
+      });
 
-      // Extract leadId from user object (if available)
-      const leadId =
-        user.isPublic && "leadId" in user && typeof user.leadId === "string"
-          ? user.leadId
-          : undefined;
+      // Extract userId and leadId from user object
+      // For authenticated users: user.isPublic = false, user.id exists, user.leadId exists
+      // For public users: user.isPublic = true, user.id doesn't exist, user.leadId exists
+      const userId = !user.isPublic && "id" in user ? user.id : undefined;
+      const leadId = "leadId" in user && typeof user.leadId === "string" ? user.leadId : undefined;
+
+      logger.info("app.api.v1.core.agent.chat.aiStream.route.debug.extracted", {
+        userId,
+        leadId,
+      });
 
       // Extract IP address from request headers
       const ipAddress =

@@ -55,7 +55,6 @@ class TestRepositoryImpl implements TestRepositoryInterface {
       }
 
       // Build test command with optional path and flags
-      // eslint-disable-next-line i18next/no-literal-string
       let command = "npm test";
 
       // Add specific path if provided

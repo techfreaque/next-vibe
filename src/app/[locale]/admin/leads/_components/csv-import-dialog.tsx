@@ -25,11 +25,12 @@ import { Progress } from "next-vibe-ui/ui/progress";
 import React from "react";
 
 import {
-  EmailCampaignStage,
+  EmailCampaignStageOptions,
   LeadSource,
   LeadStatus,
 } from "@/app/api/[locale]/v1/core/leads/enum";
 import { useLeadsImportEndpoint } from "@/app/api/[locale]/v1/core/leads/import/hooks";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { Languages } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -55,8 +56,12 @@ export function CsvImportDialog({
   locale,
 }: CsvImportDialogProps): React.JSX.Element {
   const { t } = simpleT(locale);
+  const logger = React.useMemo(
+    () => createEndpointLogger(true, Date.now(), locale),
+    [locale],
+  );
 
-  const endpoint = useLeadsImportEndpoint();
+  const endpoint = useLeadsImportEndpoint(logger);
 
   // Handle successful submission
   React.useEffect(() => {
@@ -79,10 +84,10 @@ export function CsvImportDialog({
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
-            {t("leads.admin.import.title")}
+            {t("app.admin.leads.leads.admin.import.title")}
           </DialogTitle>
           <DialogDescription>
-            {t("leads.admin.import.description")}
+            {t("app.admin.leads.leads.admin.import.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -95,8 +100,10 @@ export function CsvImportDialog({
                 className="space-y-6"
               >
                 <FormFieldGroup
-                  title={"app.api.errors.not_found"}
-                  description={"app.api.errors.not_found"}
+                  title={"app.admin.leads.leads.admin.import.title" as const}
+                  description={
+                    "app.admin.leads.leads.admin.import.description" as const
+                  }
                 >
                   {/* Template Download */}
                   <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
@@ -104,10 +111,14 @@ export function CsvImportDialog({
                       <FileText className="h-5 w-5 text-blue-600" />
                       <div>
                         <p className="font-medium text-blue-900 dark:text-blue-100">
-                          {t("leads.admin.import.template.title")}
+                          {t(
+                            "app.admin.leads.leads.admin.import.template.title",
+                          )}
                         </p>
                         <p className="text-sm text-blue-700 dark:text-blue-300">
-                          {t("leads.admin.import.template.description")}
+                          {t(
+                            "app.admin.leads.leads.admin.import.template.description",
+                          )}
                         </p>
                       </div>
                     </div>
@@ -118,7 +129,9 @@ export function CsvImportDialog({
                       className="border-blue-200 text-blue-700 hover:bg-blue-100"
                     >
                       <Download className="h-4 w-4 mr-2" />
-                      {t("leads.admin.import.template.download")}
+                      {t(
+                        "app.admin.leads.leads.admin.import.template.download",
+                      )}
                     </Button>
                   </div>
 
@@ -154,10 +167,14 @@ export function CsvImportDialog({
                         <div>
                           <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                           <p className="text-lg font-medium mb-2">
-                            {t("leads.admin.import.file.dropzone.title")}
+                            {t(
+                              "app.admin.leads.leads.admin.import.file.dropzone.title",
+                            )}
                           </p>
                           <p className="text-gray-500 mb-4">
-                            {t("leads.admin.import.file.dropzone.description")}
+                            {t(
+                              "app.admin.leads.leads.admin.import.file.dropzone.description",
+                            )}
                           </p>
                           <Input
                             type="file"
@@ -177,7 +194,9 @@ export function CsvImportDialog({
                   !endpoint.create.form.watch("file")) && (
                   <div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-800">
                     <p className="text-red-800 dark:text-red-200 text-sm">
-                      {t("validationErrors.common.invalid_input")}
+                      {t(
+                        "app.admin.leads.leads.admin.import.file.validation.required",
+                      )}
                     </p>
                   </div>
                 )}
@@ -195,9 +214,11 @@ export function CsvImportDialog({
                 />
 
                 <FormFieldGroup
-                  title={"leads.admin.import.options.title" as const}
+                  title={
+                    "app.admin.leads.leads.admin.import.options.title" as const
+                  }
                   description={
-                    "leads.admin.import.options.description" as const
+                    "app.admin.leads.leads.admin.import.options.description" as const
                   }
                 >
                   {/* Skip Duplicates */}
@@ -205,8 +226,10 @@ export function CsvImportDialog({
                     name="skipDuplicates"
                     config={{
                       type: "switch",
-                      label: "leads.admin.import.options.skipDuplicates",
-                      description: "leads.admin.import.options.skipDuplicates",
+                      label:
+                        "app.admin.leads.leads.admin.import.options.skipDuplicates",
+                      description:
+                        "app.admin.leads.leads.admin.import.options.skipDuplicates",
                     }}
                     control={endpoint.create.form.control}
                     theme={{
@@ -220,8 +243,10 @@ export function CsvImportDialog({
                     name="updateExisting"
                     config={{
                       type: "switch",
-                      label: "leads.admin.import.options.updateExisting",
-                      description: "leads.admin.import.options.updateExisting",
+                      label:
+                        "app.admin.leads.leads.admin.import.options.updateExisting",
+                      description:
+                        "app.admin.leads.leads.admin.import.options.updateExisting",
                     }}
                     control={endpoint.create.form.control}
                     theme={{
@@ -232,17 +257,22 @@ export function CsvImportDialog({
                 </FormFieldGroup>
 
                 <FormFieldGroup
-                  title={"leads.admin.import.batch.title" as const}
-                  description={"leads.admin.import.batch.description" as const}
+                  title={
+                    "app.admin.leads.leads.admin.import.batch.title" as const
+                  }
+                  description={
+                    "app.admin.leads.leads.admin.import.batch.description" as const
+                  }
                 >
                   {/* Use Chunked Processing */}
                   <EndpointFormField
                     name="useChunkedProcessing"
                     config={{
                       type: "switch",
-                      label: "leads.admin.import.batch.useChunkedProcessing",
+                      label:
+                        "app.admin.leads.leads.admin.import.batch.useChunkedProcessing",
                       description:
-                        "leads.admin.import.batch.useChunkedProcessingDescription",
+                        "app.admin.leads.leads.admin.import.batch.useChunkedProcessingDescription",
                     }}
                     control={endpoint.create.form.control}
                     theme={{
@@ -257,11 +287,12 @@ export function CsvImportDialog({
                       name="batchSize"
                       config={{
                         type: "number",
-                        label: "leads.admin.import.batch.batchSize",
+                        label:
+                          "app.admin.leads.leads.admin.import.batch.batchSize",
                         description:
-                          "leads.admin.import.batch.batchSizeDescription",
+                          "app.admin.leads.leads.admin.import.batch.batchSizeDescription",
                         placeholder:
-                          "leads.admin.import.batch.batchSizePlaceholder",
+                          "app.admin.leads.leads.admin.import.batch.batchSizePlaceholder",
                         min: 10,
                         max: 10000,
                       }}
@@ -275,9 +306,11 @@ export function CsvImportDialog({
                 </FormFieldGroup>
 
                 <FormFieldGroup
-                  title={"leads.admin.import.defaults.title" as const}
+                  title={
+                    "app.admin.leads.leads.admin.import.defaults.title" as const
+                  }
                   description={
-                    "leads.admin.import.defaults.description" as const
+                    "app.admin.leads.leads.admin.import.defaults.description" as const
                   }
                 >
                   {/* Default Country */}
@@ -285,18 +318,25 @@ export function CsvImportDialog({
                     name="defaultCountry"
                     config={{
                       type: "select",
-                      label: "leads.admin.import.defaults.country",
+                      label:
+                        "app.admin.leads.leads.admin.import.defaults.country",
                       description:
-                        "leads.admin.import.defaults.countryDescription",
+                        "app.admin.leads.leads.admin.import.defaults.countryDescription",
                       placeholder:
-                        "leads.admin.import.defaults.countryPlaceholder",
+                        "app.admin.leads.leads.admin.import.defaults.countryPlaceholder",
                       options: [
                         {
                           value: "GLOBAL",
-                          label: "common.countries.global" as const,
+                          label: "app.common.countries.global" as const,
                         },
-                        { value: "DE", label: "common.countries.de" as const },
-                        { value: "PL", label: "common.countries.pl" as const },
+                        {
+                          value: "DE",
+                          label: "app.common.countries.de" as const,
+                        },
+                        {
+                          value: "PL",
+                          label: "app.common.countries.pl" as const,
+                        },
                       ],
                     }}
                     control={endpoint.create.form.control}
@@ -311,14 +351,15 @@ export function CsvImportDialog({
                     name="defaultLanguage"
                     config={{
                       type: "select",
-                      label: "leads.admin.import.defaults.language",
+                      label:
+                        "app.admin.leads.leads.admin.import.defaults.language",
                       description:
-                        "leads.admin.import.defaults.languageDescription",
+                        "app.admin.leads.leads.admin.import.defaults.languageDescription",
                       placeholder:
-                        "leads.admin.import.defaults.languagePlaceholder",
+                        "app.admin.leads.leads.admin.import.defaults.languagePlaceholder",
                       options: Object.entries(Languages).map(([, value]) => ({
                         value: value,
-                        label: `constants.languages.${value}` as const,
+                        label: `app.constants.languages.${value}` as const,
                       })),
                     }}
                     control={endpoint.create.form.control}
@@ -333,62 +374,72 @@ export function CsvImportDialog({
                     name="defaultStatus"
                     config={{
                       type: "select",
-                      label: "leads.admin.import.defaults.status",
+                      label:
+                        "app.admin.leads.leads.admin.import.defaults.status",
                       description:
-                        "leads.admin.import.defaults.statusDescription",
+                        "app.admin.leads.leads.admin.import.defaults.statusDescription",
                       placeholder:
-                        "leads.admin.import.defaults.statusPlaceholder",
+                        "app.admin.leads.leads.admin.import.defaults.statusPlaceholder",
                       options: [
                         {
                           value: LeadStatus.NEW,
-                          label: "leads.admin.status.new" as const,
+                          label:
+                            "app.admin.leads.leads.admin.status.new" as const,
                         },
                         {
                           value: LeadStatus.PENDING,
-                          label: "leads.admin.status.pending" as const,
+                          label:
+                            "app.admin.leads.leads.admin.status.pending" as const,
                         },
                         {
                           value: LeadStatus.CAMPAIGN_RUNNING,
-                          label: "leads.admin.status.campaign_running" as const,
+                          label:
+                            "app.admin.leads.leads.admin.status.campaign_running" as const,
                         },
                         {
                           value: LeadStatus.WEBSITE_USER,
-                          label: "leads.admin.status.website_user" as const,
+                          label:
+                            "app.admin.leads.leads.admin.status.website_user" as const,
                         },
                         {
                           value: LeadStatus.NEWSLETTER_SUBSCRIBER,
                           label:
-                            "leads.admin.status.newsletter_subscriber" as const,
+                            "app.admin.leads.leads.admin.status.newsletter_subscriber" as const,
                         },
                         {
                           value: LeadStatus.IN_CONTACT,
-                          label: "leads.admin.status.in_contact" as const,
+                          label:
+                            "app.admin.leads.leads.admin.status.in_contact" as const,
                         },
                         {
                           value: LeadStatus.SIGNED_UP,
-                          label: "leads.admin.status.signed_up" as const,
+                          label:
+                            "app.admin.leads.leads.admin.status.signed_up" as const,
                         },
                         {
                           value: LeadStatus.CONSULTATION_BOOKED,
                           label:
-                            "leads.admin.status.consultation_booked" as const,
+                            "app.admin.leads.leads.admin.status.consultation_booked" as const,
                         },
                         {
                           value: LeadStatus.SUBSCRIPTION_CONFIRMED,
                           label:
-                            "leads.admin.status.subscription_confirmed" as const,
+                            "app.admin.leads.leads.admin.status.subscription_confirmed" as const,
                         },
                         {
                           value: LeadStatus.UNSUBSCRIBED,
-                          label: "leads.admin.status.unsubscribed" as const,
+                          label:
+                            "app.admin.leads.leads.admin.status.unsubscribed" as const,
                         },
                         {
                           value: LeadStatus.BOUNCED,
-                          label: "leads.admin.status.bounced" as const,
+                          label:
+                            "app.admin.leads.leads.admin.status.bounced" as const,
                         },
                         {
                           value: LeadStatus.INVALID,
-                          label: "leads.admin.status.invalid" as const,
+                          label:
+                            "app.admin.leads.leads.admin.status.invalid" as const,
                         },
                       ],
                     }}
@@ -404,17 +455,13 @@ export function CsvImportDialog({
                     name="defaultCampaignStage"
                     config={{
                       type: "select",
-                      label: "leads.admin.import.defaults.campaignStage",
+                      label:
+                        "app.admin.leads.leads.admin.import.defaults.campaignStage",
                       description:
-                        "leads.admin.import.defaults.campaignStageDescription",
+                        "app.admin.leads.leads.admin.import.defaults.campaignStageDescription",
                       placeholder:
-                        "leads.admin.import.defaults.campaignStagePlaceholder",
-                      options: Object.entries(EmailCampaignStage).map(
-                        ([, value]) => ({
-                          value: value,
-                          label: `leads.admin.stage.${value}` as const,
-                        }),
-                      ),
+                        "app.admin.leads.leads.admin.import.defaults.campaignStagePlaceholder",
+                      options: EmailCampaignStageOptions,
                     }}
                     control={endpoint.create.form.control}
                     theme={{
@@ -428,35 +475,42 @@ export function CsvImportDialog({
                     name="defaultSource"
                     config={{
                       type: "select",
-                      label: "leads.admin.import.defaults.source",
+                      label:
+                        "app.admin.leads.leads.admin.import.defaults.source",
                       description:
-                        "leads.admin.import.defaults.sourceDescription",
+                        "app.admin.leads.leads.admin.import.defaults.sourceDescription",
                       placeholder:
-                        "leads.admin.import.defaults.sourcePlaceholder",
+                        "app.admin.leads.leads.admin.import.defaults.sourcePlaceholder",
                       options: [
                         {
                           value: LeadSource.WEBSITE,
-                          label: "leads.admin.source.website" as const,
+                          label:
+                            "app.admin.leads.leads.admin.source.website" as const,
                         },
                         {
                           value: LeadSource.SOCIAL_MEDIA,
-                          label: "leads.admin.source.social_media" as const,
+                          label:
+                            "app.admin.leads.leads.admin.source.social_media" as const,
                         },
                         {
                           value: LeadSource.EMAIL_CAMPAIGN,
-                          label: "leads.admin.source.email_campaign" as const,
+                          label:
+                            "app.admin.leads.leads.admin.source.email_campaign" as const,
                         },
                         {
                           value: LeadSource.REFERRAL,
-                          label: "leads.admin.source.referral" as const,
+                          label:
+                            "app.admin.leads.leads.admin.source.referral" as const,
                         },
                         {
                           value: LeadSource.CSV_IMPORT,
-                          label: "leads.admin.source.csv_import" as const,
+                          label:
+                            "app.admin.leads.leads.admin.source.csv_import" as const,
                         },
                         {
                           value: LeadSource.API,
-                          label: "leads.admin.source.api" as const,
+                          label:
+                            "app.admin.leads.leads.admin.source.api" as const,
                         },
                       ],
                     }}
@@ -473,10 +527,12 @@ export function CsvImportDialog({
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <p className="font-medium">
-                        {t("leads.admin.import.progress.title")}
+                        {t("app.admin.leads.leads.admin.import.progress.title")}
                       </p>
                       <span className="text-sm text-gray-500">
-                        {t("leads.admin.import.progress.processing")}
+                        {t(
+                          "app.admin.leads.leads.admin.import.progress.processing",
+                        )}
                       </span>
                     </div>
                     <Progress value={undefined} className="w-full" />
@@ -488,7 +544,7 @@ export function CsvImportDialog({
                   <Alert>
                     <CheckCircle className="h-4 w-4" />
                     <AlertDescription>
-                      {t("leads.admin.import.success", {
+                      {t("app.admin.leads.leads.admin.import.success", {
                         successful:
                           endpoint.create.response.data.successfulImports,
                         total: endpoint.create.response.data.totalRows,
@@ -515,7 +571,7 @@ export function CsvImportDialog({
             onClick={handleClose}
             disabled={endpoint.create.isSubmitting}
           >
-            {t("common.cancel")}
+            {t("app.admin.common.actions.cancel")}
           </Button>
           <Button
             onClick={async () => {
@@ -536,12 +592,12 @@ export function CsvImportDialog({
             {endpoint.create.isSubmitting ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                {t("leads.admin.import.importing")}
+                {t("app.admin.leads.leads.admin.import.importing")}
               </>
             ) : (
               <>
                 <Upload className="h-4 w-4 mr-2" />
-                {t("leads.admin.import.start")}
+                {t("app.admin.leads.leads.admin.import.start")}
               </>
             )}
           </Button>

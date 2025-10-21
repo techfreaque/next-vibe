@@ -7,8 +7,14 @@ export const translations: typeof enTranslations = {
         more: "Więcej",
         previousSlide: "Poprzedni slajd",
         nextSlide: "Następny slajd",
+        previousPage: "Poprzednia strona",
+        nextPage: "Następna strona",
         close: "Zamknij",
       },
+    },
+    actions: {
+      previous: "Poprzedni",
+      next: "Następny",
     },
     addTags: "Dodaj tagi",
     addCustomValue: "Dodaj '{{value}}'",
@@ -16,5 +22,14 @@ export const translations: typeof enTranslations = {
     enterPhoneNumber: "Wprowadź numer telefonu",
     unknownFieldType: "Nieznany typ pola",
     selectDate: "Wybierz datę",
+  },
+  ui: {
+    markdown: {
+      reasoningProcess: "Proces rozumowania",
+      streaming: "(strumieniowanie...)",
+      copied: "Skopiowano!",
+      copy: "Kopiuj",
+      copyCode: "Kopiuj kod",
+    },
   },
 };

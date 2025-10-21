@@ -53,8 +53,8 @@ export function AutocompleteField({
   onChange,
   onBlur,
   options,
-  placeholder = "common.selectOption",
-  searchPlaceholder = "common.searchOptions",
+  placeholder = "app.common.selectOption",
+  searchPlaceholder = "app.common.searchOptions",
   allowCustom = true,
   disabled = false,
   className,
@@ -150,7 +150,7 @@ export function AutocompleteField({
             <div className="flex items-center gap-2 flex-1 min-w-0">
               {isCustomValue && (
                 <Badge variant="secondary" className="text-xs">
-                  {t("common.customValue")}
+                  {t("app.common.customValue")}
                 </Badge>
               )}
               <span className="truncate">
@@ -188,7 +188,7 @@ export function AutocompleteField({
               <CommandEmpty>
                 <div className="py-6 text-center text-sm">
                   <p className="text-muted-foreground">
-                    {t("common.noOptionsFound")}
+                    {t("app.common.noOptionsFound")}
                   </p>
                   {allowCustom && searchValue && (
                     <Button
@@ -197,7 +197,7 @@ export function AutocompleteField({
                       className="mt-2"
                       onClick={() => handleCustomValue(searchValue)}
                     >
-                      {t("common.useCustomValue", {
+                      {t("app.common.useCustomValue", {
                         value: searchValue,
                       })}
                     </Button>
@@ -248,7 +248,7 @@ export function AutocompleteField({
                       className="flex items-center justify-between"
                     >
                       <span>
-                        {t("common.useCustomValue", {
+                        {t("app.common.useCustomValue", {
                           value: searchValue,
                         })}
                       </span>

@@ -434,10 +434,10 @@ export type ImapFoldersListRequestOutput = typeof GET.types.RequestOutput;
 export type ImapFoldersListResponseInput = typeof GET.types.ResponseInput;
 export type ImapFoldersListResponseOutput = typeof GET.types.ResponseOutput;
 
-const imapFoldersEndpoints = {
+const endpoints = {
   GET,
 };
 
 // Export individual endpoints
 export { GET };
-export default imapFoldersEndpoints;
+export default endpoints;

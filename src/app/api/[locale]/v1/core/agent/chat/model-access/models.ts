@@ -32,7 +32,8 @@ export enum ModelId {
   DEEPSEEK_R1_DISTILL = "deepseek-r1-distill",
   QWEN_2_5_7B = "qwen-2-5-7b",
   KIMI_K2_FREE = "kimi-k2-free",
-  DEEPSEEK_V31_FREE = "deepseek-v3.1-free",
+  DEEPSEEK_V31 = "deepseek-v3.1",
+  DEEPSEEK_R1 = "deepseek-r1",
   QWEN3_235B_FREE = "qwen3_235b-free",
   GPT_OSS_120B = "gpt-oss-120b-free",
   GROK_4_FAST = "grok-4-fast",
@@ -171,7 +172,7 @@ export const modelOptions: ModelOption[] = [
       "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
     creditCost: 0,
     utilities: [ModelUtility.UNCENSORED, ModelUtility.CREATIVE],
-    supportsTools: true,
+    supportsTools: false, // OpenRouter reports: "No endpoints found that support tool use"
   },
   {
     id: ModelId.DOLPHIN_3_0_MISTRAL_24B,
@@ -184,7 +185,7 @@ export const modelOptions: ModelOption[] = [
     openRouterModel: "cognitivecomputations/dolphin3.0-mistral-24b:free",
     creditCost: 0,
     utilities: [ModelUtility.FAST],
-    supportsTools: true,
+    supportsTools: false, // OpenRouter reports: "No endpoints found that support tool use"
   },
   {
     id: ModelId.GLM_4_5_AIR,
@@ -358,7 +359,7 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.GENERAL, ModelUtility.FAST],
     icon: MoonIcon,
     openRouterModel: "moonshotai/kimi-k2:free",
-    supportsTools: true,
+    supportsTools: false, // OpenRouter reports: "No endpoints found that support tool use"
   },
   {
     id: ModelId.GEMINI_FLASH_2_5_LITE,
@@ -413,18 +414,32 @@ export const modelOptions: ModelOption[] = [
     supportsTools: true,
   },
   {
-    id: ModelId.DEEPSEEK_V31_FREE,
+    id: ModelId.DEEPSEEK_V31,
     name: "DeepSeek V3.1",
     provider: "deepSeek",
-    description: "app.chat.models.descriptions.deepseekV31Free",
+    description: "app.chat.models.descriptions.deepseekV31",
     parameterCount: 671,
     contextWindow: 164000,
     icon: "🐋",
-    openRouterModel: "deepseek/deepseek-chat-v3.1:free",
-    creditCost: 0, // Free model
+    openRouterModel: "deepseek/deepseek-chat-v3.1",
+    creditCost: 5,
     utilities: [ModelUtility.GENERAL, ModelUtility.CODING],
     supportsTools: true,
   },
+  {
+    id: ModelId.DEEPSEEK_R1,
+    name: "DeepSeek R1",
+    provider: "deepSeek",
+    description: "app.chat.models.descriptions.deepseekR1",
+    parameterCount: 671,
+    contextWindow: 164000,
+    icon: "🐋",
+    openRouterModel: "deepseek/deepseek-r1-0528",
+    creditCost: 6,
+    utilities: [ModelUtility.GENERAL, ModelUtility.CODING],
+    supportsTools: true,
+  },
+
   {
     id: ModelId.QWEN3_235B_FREE,
     name: "Qwen3 235B ",

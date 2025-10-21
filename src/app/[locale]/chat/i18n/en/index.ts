@@ -42,6 +42,7 @@ export const translations = {
     viewAllThreads: "View all threads",
     backToChat: "Back to chat",
     language: "Language",
+    loginRequired: "Please log in to use persistent folders. Use incognito mode for anonymous chats.",
 
     // Copy Button
     copyButton: {
@@ -568,17 +569,14 @@ export const translations = {
   messageEditor: {
     placeholder: "Edit your message...",
     hint: {
-      overwrite: "to overwrite",
+      branch: "to branch",
       cancel: "to cancel",
     },
     titles: {
-      overwrite: "Overwrite message",
       branch: "Branch conversation",
       cancel: "Cancel editing",
     },
     buttons: {
-      overwrite: "Overwrite",
-      overwriting: "Overwriting...",
       branch: "Branch",
       branching: "Branching...",
       cancel: "Cancel",

@@ -160,6 +160,7 @@ export const translations: typeof enTranslations = {
       streamCreationFailed: "Nie udało się utworzyć strumienia",
       unknownError: "Wystąpił błąd",
       creditValidationFailed: "Nie udało się zweryfikować salda kredytów",
+      authenticationRequired: "Zaloguj się, aby korzystać z trwałych folderów. Użyj trybu incognito dla anonimowych czatów.",
       noIdentifier: "Nie podano identyfikatora użytkownika lub leada",
       insufficientCredits:
         "Niewystarczająca liczba kredytów do wykonania żądania",

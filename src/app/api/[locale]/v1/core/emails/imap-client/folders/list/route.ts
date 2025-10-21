@@ -10,13 +10,13 @@ import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/e
 
 import { ImapFolderSortField, SortOrder } from "../../enum";
 import { imapFoldersRepository } from "../repository";
-import definitions from "./definition";
+import endpoints from "./definition";
 
 /**
  * Export handlers using endpointHandler
  */
 export const { GET, tools } = endpointsHandler({
-  endpoint: definitions,
+  endpoint: endpoints,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
     handler: ({ urlVariables, user, locale, logger }) =>

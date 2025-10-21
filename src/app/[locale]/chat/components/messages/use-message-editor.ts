@@ -10,12 +10,11 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import { TIMING } from "../../lib/config/constants";
 import type { ChatMessage } from "../../types";
 
-export type EditorActionType = "overwrite" | "branch" | null;
+export type EditorActionType = "branch" | null;
 
 export interface UseMessageEditorOptions {
   message: ChatMessage;
-  onSave: (messageId: string, content: string) => Promise<void>;
-  onBranch?: (messageId: string, content: string) => Promise<void>;
+  onBranch: (messageId: string, content: string) => Promise<void>;
   onCancel: () => void;
   logger: EndpointLogger;
 }
@@ -32,7 +31,6 @@ export interface UseMessageEditorReturn {
 
   // Handlers
   setContent: (content: string) => void;
-  handleOverwrite: () => Promise<void>;
   handleBranch: () => Promise<void>;
   handleKeyDown: (e: React.KeyboardEvent) => void;
   handleCancel: () => void;
@@ -43,7 +41,6 @@ export interface UseMessageEditorReturn {
  */
 export function useMessageEditor({
   message,
-  onSave,
   onBranch,
   onCancel,
   logger,
@@ -78,29 +75,9 @@ export function useMessageEditor({
     return (): void => clearTimeout(timeoutId);
   }, []);
 
-  const handleOverwrite = useCallback(async (): Promise<void> => {
-    const trimmedContent = content.trim();
-    if (!trimmedContent || isLoading) {
-      return;
-    }
-
-    setActionType("overwrite");
-    setIsLoading(true);
-    try {
-      await onSave(message.id, trimmedContent);
-    } catch (error) {
-      logger.error("Failed to overwrite message", error);
-      // Don't clear loading state on error so user can retry
-      // Error is logged, no need to throw
-    } finally {
-      setIsLoading(false);
-      setActionType(null);
-    }
-  }, [content, isLoading, message.id, onSave, logger]);
-
   const handleBranch = useCallback(async (): Promise<void> => {
     const trimmedContent = content.trim();
-    if (!trimmedContent || isLoading || !onBranch) {
+    if (!trimmedContent || isLoading) {
       return;
     }
 
@@ -121,13 +98,13 @@ export function useMessageEditor({
     (e: React.KeyboardEvent): void => {
       if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        void handleOverwrite();
+        void handleBranch();
       } else if (e.key === "Escape") {
         e.preventDefault();
         onCancel();
       }
     },
-    [handleOverwrite, onCancel],
+    [handleBranch, onCancel],
   );
 
   const handleCancel = useCallback(() => {
@@ -143,7 +120,6 @@ export function useMessageEditor({
     editorRef,
     textareaRef,
     setContent,
-    handleOverwrite,
     handleBranch,
     handleKeyDown,
     handleCancel,

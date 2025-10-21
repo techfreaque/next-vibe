@@ -72,8 +72,12 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       const dateFrom = data.filters?.dateFrom;
       const dateTo = data.filters?.dateTo;
 
-      logger.debug("Listing threads", {
+      logger.info("Listing threads - START", {
         userId: user.id,
+        leadId: user.leadId,
+        isPublic: user.isPublic,
+        hasUserId: !!user.id,
+        hasLeadId: !!user.leadId,
         page,
         limit,
         search,
@@ -85,16 +89,24 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         dateTo,
       });
 
-      // Type guard to ensure user has id
-      if (!user.id) {
+      // For anonymous users (public), use leadId instead of userId
+      // For authenticated users, use userId
+      const userIdentifier = user.isPublic ? user.leadId : user.id;
+
+      logger.info("Listing threads - User identifier", {
+        userIdentifier,
+        isPublic: user.isPublic,
+      });
+
+      if (!userIdentifier) {
         return createErrorResponse(
           "app.api.v1.core.agent.chat.threads.get.errors.unauthorized.title",
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
 
-      // Build where clause
-      const conditions = [eq(chatThreads.userId, user.id)];
+      // Build where clause - use leadId for anonymous users, userId for authenticated users
+      const conditions = [eq(chatThreads.userId, userIdentifier)];
 
       // Filter by root folder
       if (rootFolderId) {
@@ -172,12 +184,13 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
 
       const pageCount = Math.ceil(total / limit);
 
-      logger.debug("Threads listed successfully", {
+      logger.info("Threads listed successfully", {
         total,
         page,
         limit,
         pageCount,
         resultsCount: threads.length,
+        threadIds: threads.map(t => t.id),
       });
 
       return createSuccessResponse({
@@ -211,6 +224,8 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
     try {
       logger.debug("Creating thread", {
         userId: user.id,
+        leadId: user.leadId,
+        isPublic: user.isPublic,
         title: data.thread?.title,
         rootFolderId: data.thread?.rootFolderId,
         subFolderId: data.thread?.subFolderId,
@@ -231,8 +246,11 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
 
       // Subfolder validation: subFolderId is optional and validated by schema
 
-      // Type guard to ensure user has id
-      if (!user.id) {
+      // For anonymous users (public), use leadId instead of userId
+      // For authenticated users, use userId
+      const userIdentifier = user.isPublic ? user.leadId : user.id;
+
+      if (!userIdentifier) {
         return createErrorResponse(
           "app.api.v1.core.agent.chat.threads.post.errors.unauthorized.title",
           ErrorResponseTypes.UNAUTHORIZED,
@@ -240,7 +258,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       }
 
       const threadData = {
-        userId: user.id,
+        userId: userIdentifier,
         title:
           data.thread?.title ||
           simpleT(locale).t(
