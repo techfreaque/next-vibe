@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../../../../user/auth/definition";
+import type { JwtPayloadType } from "../../../user/auth/definition";
 // Type definitions for seeds generator
 interface SeedsRequestType {
   outputDir: string;
@@ -52,8 +52,8 @@ interface SeedsGeneratorRepository {
 class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
   async generateSeeds(
     data: SeedsRequestType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
+    _user: JwtPayloadType,
+    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<SeedsResponseType>> {
     const startTime = Date.now();
@@ -63,24 +63,36 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
       // Note: Individual generator disabled - use generate-all instead
       // const { generateSeeds } = await import("next-vibe/cli/scripts/generators/functional/generate-seeds");
 
-      // Mock implementation for now
+      // Mock implementation for now - add await to satisfy async requirement
+      await Promise.resolve();
+
       const seedCount = 5;
       const duration = Date.now() - startTime;
 
+      logger.info("Generated seeds file", {
+        seedCount,
+        duration,
+        outputPath: data.outputDir,
+      });
+
       return createSuccessResponse({
         success: true,
-        message: `Generated seeds file with ${seedCount} seeds in ${duration}ms`,
+        message: "app.api.v1.core.system.generators.seeds.success.generated",
         seedsFound: seedCount,
         duration,
         outputPath: data.outputDir,
       });
     } catch (error) {
       const duration = Date.now() - startTime;
+      logger.error("Seeds generation failed", {
+        error: parseError(error),
+        duration,
+      });
+
       return createErrorResponse(
-        "error.errorTypes.internal_error",
+        "app.api.v1.core.system.generators.seeds.error.generation_failed",
         ErrorResponseTypes.INTERNAL_ERROR,
         {
-          error: `Seeds generation failed: ${parseError(error).message}`,
           duration,
         },
       );

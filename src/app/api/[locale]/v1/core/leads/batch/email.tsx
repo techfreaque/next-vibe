@@ -412,7 +412,7 @@ export const renderBatchUpdateNotificationMail: EmailFunctionType<
 
     return createSuccessResponse({
       toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: t("common.appName"),
+      toName: t("app.common.appName"),
       subject: t(
         "app.api.v1.core.leads.batch.email.admin.batchUpdate.subject",
         {
@@ -420,7 +420,7 @@ export const renderBatchUpdateNotificationMail: EmailFunctionType<
         },
       ),
       replyToEmail: contactClientRepository.getSupportEmail(locale),
-      replyToName: t("common.appName"),
+      replyToName: t("app.common.appName"),
 
       jsx: BatchUpdateCompletionEmailContent({
         data: requestData,
@@ -432,7 +432,7 @@ export const renderBatchUpdateNotificationMail: EmailFunctionType<
     });
   } catch {
     return createErrorResponse(
-      "error.general.internal_server_error",
+      "app.api.v1.core.leads.batch.email.error.general.internal_server_error",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }
@@ -457,7 +457,7 @@ export const renderBatchDeleteNotificationMail: EmailFunctionType<
 
     return createSuccessResponse({
       toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: t("common.appName"),
+      toName: t("app.common.appName"),
       subject: t(
         "app.api.v1.core.leads.batch.email.admin.batchDelete.subject",
         {
@@ -465,7 +465,7 @@ export const renderBatchDeleteNotificationMail: EmailFunctionType<
         },
       ),
       replyToEmail: contactClientRepository.getSupportEmail(locale),
-      replyToName: t("common.appName"),
+      replyToName: t("app.common.appName"),
 
       jsx: BatchDeleteCompletionEmailContent({
         data: requestData,
@@ -477,7 +477,7 @@ export const renderBatchDeleteNotificationMail: EmailFunctionType<
     });
   } catch {
     return createErrorResponse(
-      "error.general.internal_server_error",
+      "app.api.v1.core.leads.batch.email.error.general.internal_server_error",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }

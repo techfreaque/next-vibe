@@ -1,7 +1,7 @@
 "use client";
 
 import type { JSX } from "react";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 
 import type { IconValue } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import { MODEL_UTILITIES } from "@/app/api/[locale]/v1/core/agent/chat/model-access/model-utilities";
@@ -13,15 +13,6 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Input,
-  Label,
-} from "@/packages/next-vibe-ui/web/ui";
 
 import { SelectorBase, type SelectorOption } from "./selector-base";
 import { useFavorites } from "./use-favorites";
@@ -53,7 +44,6 @@ export function ModelSelector({
     DEFAULT_FAVORITES,
     logger,
   );
-  const [addModelOpen, setAddModelOpen] = useState(false);
 
   // Convert models to selector options with cost information
   const options: SelectorOption<ModelId>[] = useMemo(() => {
@@ -101,78 +91,14 @@ export function ModelSelector({
   }, [t]);
 
   return (
-    <>
-      <SelectorBase
-        value={value}
-        onChange={onChange}
-        options={options}
-        favorites={favorites}
-        onToggleFavorite={toggleFavorite}
-        onAddNew={() => setAddModelOpen(true)}
-        placeholder={t("app.chat.modelSelector.placeholder")}
-        addNewLabel={t("app.chat.modelSelector.addNewLabel")}
-        locale={locale}
-      />
-
-      {/* Add Custom Model Dialog */}
-      <Dialog open={addModelOpen} onOpenChange={setAddModelOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>
-              {t("app.chat.modelSelector.addDialog.title")}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="model-name">
-                {t("app.chat.modelSelector.addDialog.fields.modelName.label")}
-              </Label>
-              <Input
-                id="model-name"
-                placeholder={t(
-                  "app.chat.modelSelector.addDialog.fields.modelName.placeholder",
-                )}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="provider">
-                {t("app.chat.modelSelector.addDialog.fields.provider.label")}
-              </Label>
-              <Input
-                id="provider"
-                placeholder={t(
-                  "app.chat.modelSelector.addDialog.fields.provider.placeholder",
-                )}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="api-docs">
-                {t("app.chat.modelSelector.addDialog.fields.apiDocs.label")}
-              </Label>
-              <Input id="api-docs" placeholder="https://..." />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="model-id">
-                {t("app.chat.modelSelector.addDialog.fields.modelId.label")}
-              </Label>
-              <Input
-                id="model-id"
-                placeholder={t(
-                  "app.chat.modelSelector.addDialog.fields.modelId.placeholder",
-                )}
-              />
-            </div>
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setAddModelOpen(false)}>
-                {t("app.chat.modelSelector.addDialog.cancel")}
-              </Button>
-              <Button onClick={() => setAddModelOpen(false)}>
-                {t("app.chat.modelSelector.addDialog.add")}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+    <SelectorBase
+      value={value}
+      onChange={onChange}
+      options={options}
+      favorites={favorites}
+      onToggleFavorite={toggleFavorite}
+      placeholder={t("app.chat.modelSelector.placeholder")}
+      locale={locale}
+    />
   );
 }

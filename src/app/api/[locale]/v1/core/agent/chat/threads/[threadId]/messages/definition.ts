@@ -27,11 +27,14 @@ import { ChatMessageRole, ChatMessageRoleOptions } from "../../../enum";
 /**
  * Get Messages List Endpoint (GET)
  * Retrieves all messages in a thread
+ *
+ * Note: PUBLIC role is allowed for anonymous users to view public threads
+ * The repository layer filters results based on thread permissions
  */
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "agent", "chat", "threads", "[threadId]", "messages"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title:
     "app.api.v1.core.agent.chat.threads.threadId.messages.get.title" as const,

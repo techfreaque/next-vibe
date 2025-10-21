@@ -124,33 +124,37 @@ export function useEdenAISpeech({
       endpoint.create.form.setValue("provider", "openai");
       endpoint.create.form.setValue("language", languageCode);
 
-      // Submit form
-      await endpoint.create.form.handleSubmit(async () => {
-        // Form submission is handled by the endpoint
-      })();
-
-      // Wait a bit for the response to be available
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      const result = endpoint.create.response;
-      logger.debug("STT", "Got response", { success: result?.success });
-
-      // Check response
-      if (result?.success && result.data) {
-        const transcribedText = result.data.response.text || "";
-        logger.debug("STT", "Success! Transcription received", {
-          textLength: transcribedText.length,
-        });
-        setTranscript(transcribedText);
-        onTranscript?.(transcribedText);
-      } else {
-        const errorMessage =
-          endpoint.create.error?.message ||
-          t("app.chat.hooks.stt.transcription-failed");
-        logger.error("STT", errorMessage, { error: errorMessage });
-        setError(errorMessage);
-        onError?.(errorMessage);
-      }
+      // Submit form with callbacks
+      await endpoint.create.submitForm(undefined, {
+        onSuccess: ({ responseData }) => {
+          if (responseData.success && responseData.data) {
+            const transcribedText = responseData.data.response.text || "";
+            logger.debug("STT", "Success! Transcription received", {
+              textLength: transcribedText.length,
+            });
+            setTranscript(transcribedText);
+            onTranscript?.(transcribedText);
+            setIsProcessing(false);
+            cleanup();
+          } else {
+            const errorMessage = t("app.chat.hooks.stt.transcription-failed");
+            logger.error("STT", errorMessage);
+            setError(errorMessage);
+            onError?.(errorMessage);
+            setIsProcessing(false);
+            cleanup();
+          }
+        },
+        onError: ({ error }) => {
+          const errorMessage =
+            error.message || t("app.chat.hooks.stt.transcription-failed");
+          logger.error("STT", errorMessage, { error });
+          setError(errorMessage);
+          onError?.(errorMessage);
+          setIsProcessing(false);
+          cleanup();
+        },
+      } as never);
     } catch (err) {
       const errorMsg =
         err instanceof Error
@@ -159,7 +163,6 @@ export function useEdenAISpeech({
       logger.error("STT", "Exception during transcription", err);
       setError(errorMsg);
       onError?.(errorMsg);
-    } finally {
       setIsProcessing(false);
       cleanup();
     }

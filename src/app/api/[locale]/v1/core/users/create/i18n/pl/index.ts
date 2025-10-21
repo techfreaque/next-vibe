@@ -247,6 +247,11 @@ export const translations = {
         missing_data:
           "Brakuje wymaganych danych użytkownika dla szablonu e-mail",
       },
+      error: {
+        general: {
+          internal_server_error: "Wystąpił wewnętrzny błąd serwera",
+        },
+      },
       labels: {
         id: "ID:",
         email: "E-mail:",

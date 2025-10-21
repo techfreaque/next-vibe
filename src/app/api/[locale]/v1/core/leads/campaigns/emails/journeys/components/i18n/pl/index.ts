@@ -1,54 +1,38 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  post: {
-    title: "Tytuł",
-    description: "Opis endpointu",
-    form: {
-      title: "Konfiguracja",
-      description: "Skonfiguruj parametry",
-    },
-    response: {
-      title: "Odpowiedź",
-      description: "Dane odpowiedzi",
-    },
-    errors: {
-      unauthorized: {
-        title: "Brak autoryzacji",
-        description: "Wymagana autoryzacja",
-      },
-      validation: {
-        title: "Błąd walidacji",
-        description: "Nieprawidłowe parametry żądania",
-      },
-      server: {
-        title: "Błąd serwera",
-        description: "Wystąpił wewnętrzny błąd serwera",
-      },
-      unknown: {
-        title: "Nieznany błąd",
-        description: "Wystąpił nieznany błąd",
-      },
-      network: {
-        title: "Błąd sieci",
-        description: "Wystąpił błąd sieci",
-      },
-      forbidden: {
-        title: "Zabronione",
-        description: "Dostęp zabroniony",
-      },
-      notFound: {
-        title: "Nie znaleziono",
-        description: "Zasób nie został znaleziony",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Wystąpił konflikt danych",
+  pricing: {
+    plans: {
+      orSeparator: "lub",
+      perMonth: "/miesiąc",
+      PREMIUM: {
+        featureBadge: "Najpopularniejszy",
       },
     },
-    success: {
-      title: "Sukces",
-      description: "Operacja zakończona pomyślnie",
+  },
+  defaults: {
+    previewBusinessName: "Podgląd Firma",
+    previewContactName: "Podgląd Kontakt",
+    previewEmail: "podglad@przyklad.pl",
+    previewPhone: "+48123456789",
+    previewLeadId: "podglad-lead-123",
+    previewCampaignId: "podglad-kampania-123",
+  },
+  journeyInfo: {
+    resultsFocused: {
+      name: "Podróż Skoncentrowana na Wynikach",
+      description:
+        "Profesjonalne podejście kładące nacisk na mierzalne wyniki i praktyczne rezultaty",
+    },
+    personalResults: {
+      name: "Podróż Osobistych Wyników",
+      description:
+        "Zrównoważone podejście łączące osobistą więź z treściami nastawionymi na wyniki",
+    },
+    personalApproach: {
+      name: "Podróż Osobistego Podejścia",
+      description:
+        "Ciepła, skoncentrowana na relacjach komunikacja budująca zaufanie przez osobistą więź",
     },
   },
 };

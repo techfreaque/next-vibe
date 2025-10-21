@@ -53,7 +53,7 @@ export interface UseMessageActionsReturn {
   ) => Promise<void>;
   handleConfirmAnswer: (
     messageId: string,
-    onAnswer?: (id: string) => Promise<void>,
+    onAnswer?: (id: string, content: string) => Promise<void>,
   ) => Promise<void>;
   handleConfirmDelete: (
     messageId: string,

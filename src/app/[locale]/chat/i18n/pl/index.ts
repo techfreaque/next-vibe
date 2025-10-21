@@ -44,7 +44,8 @@ export const translations: typeof enTranslations = {
     viewAllThreads: "Zobacz wszystkie wątki",
     backToChat: "Powrót do czatu",
     language: "Język",
-    loginRequired: "Zaloguj się, aby korzystać z trwałych folderów. Użyj trybu incognito dla anonimowych czatów.",
+    loginRequired:
+      "Zaloguj się, aby korzystać z trwałych folderów. Użyj trybu incognito dla anonimowych czatów.",
 
     // Copy Button
     copyButton: {
@@ -410,6 +411,7 @@ export const translations: typeof enTranslations = {
   messages: {
     assistant: "Asystent",
     you: "Ty",
+    user: "Użytkownik",
     anonymous: "Anonim",
     edited: "edytowano",
     postNumber: "Nr.{{number}}",
@@ -472,9 +474,12 @@ export const translations: typeof enTranslations = {
       kimiK2Free:
         "Kimi K2 Instruct to wielki model językowy Mixture-of-Experts (MoE) opracowany przez Moonshot AI.",
       deepseekV31Free: "Potężny model z 671B parametrami - całkowicie darmowy!",
+      deepseekV31: "Potężny model z 671B parametrami z zaawansowanymi możliwościami",
       qwen3235bFree:
         "Model Mixture-of-Experts (MoE) opracowany przez Qwen, obsługuje płynne przełączanie między trybami.",
       deepseekR1Distill: "Destylowany model rozumowania z silną wydajnością",
+      deepseekR1:
+        "Zaawansowany model rozumowania z głębokimi możliwościami myślenia",
       qwen257b: "Wydajny model z 7B parametrami",
       grok4: "X-AI Grok 4 - model premium",
       grok4Fast:
@@ -559,6 +564,8 @@ export const translations: typeof enTranslations = {
       title: "Odpowiedz jako model AI",
       description: "Wybierz model i personę, aby wygenerować odpowiedź AI",
       confirmLabel: "Generuj",
+      inputPlaceholder:
+        "Wprowadź monit dla AI (opcjonalnie - pozostaw puste, aby AI wygenerowało własną odpowiedź)",
     },
   },
   suggestedPrompts: {
@@ -625,6 +632,8 @@ export const translations: typeof enTranslations = {
       title: "Odpowiedz jako model AI",
       description: "Wybierz model i personę, aby wygenerować odpowiedź AI",
       confirmLabel: "Generuj",
+      inputPlaceholder:
+        "Wprowadź monit dla AI (opcjonalnie - pozostaw puste, aby AI wygenerowało własną odpowiedź)",
     },
     actions: {
       vote: "Głosuj",
@@ -685,6 +694,8 @@ export const translations: typeof enTranslations = {
       title: "Odpowiedz jako model AI",
       description: "Wybierz model i personę, aby wygenerować odpowiedź AI",
       confirmLabel: "Generuj",
+      inputPlaceholder:
+        "Wprowadź monit dla AI (opcjonalnie - pozostaw puste, aby AI wygenerowało własną odpowiedź)",
     },
     actions: {
       loadingAudio: "Ładowanie audio...",

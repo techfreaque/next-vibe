@@ -122,6 +122,14 @@ export const translations: typeof enTranslations = {
       "Admin-Benachrichtigungs-SMS für Newsletter-Abonnement wird gesendet",
     admin_notification_error:
       "Fehler beim Senden der Admin-Benachrichtigungs-SMS",
+    welcome: {
+      message:
+        "Hallo {{name}}! Willkommen bei unserem Newsletter. Bleiben Sie dran für Updates!",
+    },
+    admin_notification: {
+      message:
+        "Neue Newsletter-Anmeldung: {{displayName}} ({{email}}) hat sich angemeldet",
+    },
   },
   route: {
     sms_failed_continuing:

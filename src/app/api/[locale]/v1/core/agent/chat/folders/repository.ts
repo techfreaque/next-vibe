@@ -9,7 +9,9 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
+import { canCreateFolder } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -75,31 +77,59 @@ export async function createFolder(
   user: JwtPayloadType,
   data: FolderCreateRequestOutput,
   locale: CountryLanguage,
+  logger: EndpointLogger,
 ): Promise<ResponseType<FolderCreateResponseOutput>> {
-  // For anonymous users (public), use leadId instead of userId
-  // For authenticated users, use userId
-  const userIdentifier = user.isPublic ? user.leadId : user.id;
-
-  if (!userIdentifier) {
-    return createErrorResponse(
-      "app.api.v1.core.agent.chat.folders.post.errors.unauthorized.title",
-      ErrorResponseTypes.UNAUTHORIZED,
-    );
-  }
-
   try {
     const { folder: folderData } = data;
 
-    // Reject incognito folder creation - they should never be created on server
-    if (folderData.rootFolderId === "incognito") {
+    // Check permissions using the permission system
+    const hasPermission = await canCreateFolder(
+      user,
+      folderData.rootFolderId,
+      logger,
+    );
+
+    if (!hasPermission) {
+      // Determine the specific error message
+      if (user.isPublic) {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
+          ErrorResponseTypes.FORBIDDEN,
+        );
+      }
+
+      if (folderData.rootFolderId === "incognito") {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
+          ErrorResponseTypes.FORBIDDEN,
+          {
+            message: simpleT(locale).t(
+              "app.api.v1.core.agent.chat.folders.post.errors.forbidden.incognitoNotAllowed",
+            ),
+          },
+        );
+      }
+
+      if (folderData.rootFolderId === "public") {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
+          ErrorResponseTypes.FORBIDDEN,
+        );
+      }
+
       return createErrorResponse(
         "app.api.v1.core.agent.chat.folders.post.errors.forbidden.title",
         ErrorResponseTypes.FORBIDDEN,
-        {
-          message: simpleT(locale).t(
-            "app.api.v1.core.agent.chat.folders.post.errors.forbidden.incognitoNotAllowed",
-          ),
-        },
+      );
+    }
+
+    // For authenticated users, use userId
+    const userIdentifier = user.id;
+
+    if (!userIdentifier) {
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.folders.post.errors.unauthorized.title",
+        ErrorResponseTypes.UNAUTHORIZED,
       );
     }
 
@@ -150,7 +180,9 @@ export async function createFolder(
         },
       },
     }) as ResponseType<FolderCreateResponseOutput>;
-  } catch {
+  } catch (error) {
+    // eslint-disable-next-line no-console, i18next/no-literal-string
+    console.error("createFolder - Failed to create folder:", error);
     return createErrorResponse(
       "app.api.v1.core.agent.chat.folders.post.errors.server.title",
       ErrorResponseTypes.INTERNAL_ERROR,

@@ -23,14 +23,15 @@ import type { EndpointLogger } from "../logger";
 
 /**
  * tRPC validation context
+ * tRPC passes validated data directly, so this accepts OUTPUT types
  */
-export interface TrpcValidationContext<TRequestData, TUrlParameters> {
+export interface TrpcValidationContext<TRequestOutput, TUrlParametersOutput> {
   /** HTTP method being used */
   method: Methods;
-  /** Direct request data */
-  requestData: TRequestData;
-  /** Direct URL parameters */
-  urlParameters: TUrlParameters;
+  /** Request data (already validated by tRPC) */
+  requestData: TRequestOutput;
+  /** URL parameters (already validated by tRPC) */
+  urlParameters: TUrlParametersOutput;
   /** Locale for error messages */
   locale: CountryLanguage;
 }
@@ -46,6 +47,7 @@ export function validateTrpcRequestData<
   TRequestInput,
   TRequestOutput,
   TResponseInput,
+  TResponseOutput,
   TUrlVariablesInput,
   TUrlVariablesOutput,
 >(
@@ -57,6 +59,7 @@ export function validateTrpcRequestData<
     TRequestInput,
     TRequestOutput,
     TResponseInput,
+    TResponseOutput,
     TUrlVariablesInput,
     TUrlVariablesOutput
   >,
@@ -68,14 +71,17 @@ export function validateTrpcRequestData<
     const validatedLocale = validateLocale(context.locale, logger);
 
     // Validate URL parameters
-    const urlValidation = validateEndpointUrlParameters<
-      TUrlVariablesOutput,
-      TUrlVariablesOutput
-    >(context.urlParameters, endpoint.requestUrlParamsSchema, logger);
+    // Note: tRPC data is already validated, so we pass OUTPUT type through schema again
+    const urlValidation = validateEndpointUrlParameters(
+      context.urlParameters,
+      endpoint.requestUrlParamsSchema,
+      logger,
+    );
     if (!urlValidation.success) {
       return {
         success: false,
-        message: "app.error.errors.invalid_url_parameters",
+        message:
+          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_url_parameters",
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: urlValidation.message,
@@ -92,7 +98,8 @@ export function validateTrpcRequestData<
     if (!requestValidation.success) {
       return {
         success: false,
-        message: "app.error.errors.invalid_request_data",
+        message:
+          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: requestValidation.message,
@@ -105,14 +112,15 @@ export function validateTrpcRequestData<
       success: true,
       data: {
         requestData: requestValidation.data as TRequestOutput,
-        urlVariables: urlValidation.data,
+        urlVariables: urlValidation.data as TUrlVariablesOutput,
         locale: validatedLocale,
       },
     };
   } catch (error) {
     return {
       success: false,
-      message: "app.error.form_validation_failed",
+      message:
+        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
         error:

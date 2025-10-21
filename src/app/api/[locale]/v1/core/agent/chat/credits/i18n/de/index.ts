@@ -1,6 +1,12 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  enums: {
+    creditType: {
+      userSubscription: "Benutzer-Abonnement-Credits",
+      leadFree: "Lead-Gratis-Credits",
+    },
+  },
   expire: {
     task: {
       description: "Läuft alte Abonnement-Credits täglich ab",
@@ -17,6 +23,9 @@ export const translations: typeof enTranslations = {
     getTransactionsFailed: "Fehler beim Abrufen der Credit-Transaktionen",
     invalidIdentifier: "Ungültige Benutzer- oder Lead-Kennung",
     userNotFound: "Benutzer nicht gefunden",
+    noLeadFound: "Kein Lead für Benutzer gefunden",
+    getCreditIdentifierFailed: "Fehler beim Abrufen der Credit-Kennung",
+    noCreditSource: "Keine Credit-Quelle verfügbar",
     stripeCustomerFailed: "Fehler beim Erstellen des Stripe-Kunden",
     checkoutFailed: "Fehler beim Erstellen der Checkout-Sitzung",
   },

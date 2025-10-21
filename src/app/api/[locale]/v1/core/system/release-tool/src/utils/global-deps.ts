@@ -84,19 +84,29 @@ export async function handleGlobalDependencyUpdates(
 
   for (const pkg of packagesNeedingUpdates) {
     const cwd = join(originalCwd, pkg.directory);
-    const packageJson = getPackageJson(cwd);
+    const packageJsonResponse = getPackageJson(cwd, logger);
+
+    if (!packageJsonResponse.success) {
+      // eslint-disable-next-line i18next/no-literal-string
+      logger.error(
+        `Failed to read package.json for ${pkg.directory}`,
+        packageJsonResponse.message,
+      );
+      continue;
+    }
 
     try {
       updatePackageDependencies(
         pkg,
         packageManager,
         cwd,
-        packageJson.name,
+        packageJsonResponse.data.name,
         logger,
       );
     } catch (error) {
+      // eslint-disable-next-line i18next/no-literal-string
       logger.error(
-        `Failed to update dependencies for ${packageJson.name}:`,
+        `Failed to update dependencies for ${packageJsonResponse.data.name}:`,
         error,
       );
       // Continue with other packages instead of failing completely
@@ -116,7 +126,14 @@ function updatePackageDependencies(
   packageName: string,
   logger: EndpointLogger,
 ): void {
-  const packageJson = getPackageJson(cwd);
+  const packageJsonResponse = getPackageJson(cwd, logger);
+
+  if (!packageJsonResponse.success) {
+    // eslint-disable-next-line i18next/no-literal-string
+    throw new Error(`Failed to read package.json for ${packageName}`);
+  }
+
+  const packageJson = packageJsonResponse.data;
 
   try {
     const ignoreList = packageJson.updateIgnoreDependencies || [];

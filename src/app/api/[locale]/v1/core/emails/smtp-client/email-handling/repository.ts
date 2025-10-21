@@ -65,13 +65,14 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                 responseData: data.responseData,
                 t: data.t,
                 locale: data.locale,
+                logger,
               });
 
               if (!emailMessage.success) {
                 if (!emailData.ignoreErrors) {
                   errors.push(
                     createErrorResponse(
-                      "email.errors.rendering_failed",
+                      "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.rendering_failed",
                       ErrorResponseTypes.EMAIL_ERROR,
                       { error: emailMessage.message },
                     ),
@@ -85,24 +86,27 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
               // Build comprehensive email data with all template information
               const emailSendResult = await emailSendingRepository.sendEmail(
                 {
-                  jsx: templateData.jsx,
-                  subject: templateData.subject,
-                  toEmail: templateData.toEmail,
-                  toName: templateData.toName,
-                  locale: data.locale,
-                  t: data.t,
-                  // Pass through sender name from template
-                  senderName: templateData.senderName,
-                  // Pass through campaign context from template
-                  campaignType: templateData.campaignType,
-                  emailJourneyVariant: templateData.emailJourneyVariant,
-                  emailCampaignStage: templateData.emailCampaignStage,
-                  // Pass through email metadata
-                  replyToEmail: templateData.replyToEmail,
-                  replyToName: templateData.replyToName,
-                  unsubscribeUrl: templateData.unsubscribeUrl,
-                  // Pass through SMTP selection criteria if provided
-                  selectionCriteriaOverride: templateData.smtpSelectionCriteria,
+                  params: {
+                    jsx: templateData.jsx,
+                    subject: templateData.subject,
+                    toEmail: templateData.toEmail,
+                    toName: templateData.toName,
+                    locale: data.locale,
+                    t: data.t,
+                    // Pass through sender name from template
+                    senderName: templateData.senderName,
+                    // Pass through campaign context from template
+                    campaignType: templateData.campaignType,
+                    emailJourneyVariant: templateData.emailJourneyVariant,
+                    emailCampaignStage: templateData.emailCampaignStage,
+                    // Pass through email metadata
+                    replyToEmail: templateData.replyToEmail,
+                    replyToName: templateData.replyToName,
+                    unsubscribeUrl: templateData.unsubscribeUrl,
+                    // Pass through SMTP selection criteria if provided
+                    selectionCriteriaOverride:
+                      templateData.smtpSelectionCriteria,
+                  },
                 },
                 user,
                 locale,
@@ -113,7 +117,9 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                 logger.debug("Email sent successfully", {
                   recipient: templateData.toEmail,
                   subject: templateData.subject,
-                  messageId: String(emailSendResult.data.messageId ?? ""),
+                  messageId: String(
+                    emailSendResult.data.result.messageId ?? "",
+                  ),
                 });
               } else {
                 logger.error("Failed to send email", {
@@ -131,7 +137,7 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                 );
                 errors.push(
                   createErrorResponse(
-                    "email.errors.send_failed",
+                    "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.send_failed",
                     ErrorResponseTypes.EMAIL_ERROR,
                     { error: emailSendResult.message },
                   ),
@@ -145,30 +151,38 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
               try {
                 await emailMetadataRepository.storeEmailMetadata(
                   {
-                    subject: data.t("email.errors.email_failed_subject"),
-                    recipientEmail: "unknown@example.com", // Fallback since we don't have recipient data
-                    recipientName: data.t("email.errors.unknown_recipient"),
-                    senderEmail: env.EMAIL_FROM_EMAIL,
-                    senderName: data.t("common.appName"),
-                    type: EmailType.SYSTEM,
-                    templateName: null,
-                    status: EmailStatus.FAILED,
-                    error: parsedError.message,
-                    userId: user.isPublic ? null : user.id,
-                    leadId: null,
-                    metadata: {
-                      locale: data.locale,
-                      errorType: data.t("email.errors.email_render_exception"),
-                      errorDetails: parsedError.message,
-                      endpoint: data.urlVariables
-                        ? JSON.stringify(data.urlVariables)
-                        : undefined,
-                      requestData: data.requestData
-                        ? JSON.stringify(data.requestData)
-                        : undefined,
+                    params: {
+                      subject: data.t(
+                        "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.email_failed_subject",
+                      ),
+                      recipientEmail: "unknown@example.com", // Fallback since we don't have recipient data
+                      recipientName: data.t(
+                        "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.unknown_recipient",
+                      ),
+                      senderEmail: env.EMAIL_FROM_EMAIL,
+                      senderName: data.t("app.common.appName"),
+                      type: EmailType.SYSTEM,
+                      templateName: null,
+                      status: EmailStatus.FAILED,
+                      error: parsedError.message,
+                      userId: user.isPublic ? null : user.id,
+                      leadId: null,
+                      metadata: {
+                        locale: data.locale,
+                        errorType: data.t(
+                          "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.email_render_exception",
+                        ),
+                        errorDetails: parsedError.message,
+                        endpoint: data.urlVariables
+                          ? JSON.stringify(data.urlVariables)
+                          : undefined,
+                        requestData: data.requestData
+                          ? JSON.stringify(data.requestData)
+                          : undefined,
+                      },
+                      emailProvider: EmailProvider.SMTP,
+                      externalId: null,
                     },
-                    emailProvider: EmailProvider.SMTP,
-                    externalId: null,
                   },
                   user,
                   locale,
@@ -189,7 +203,7 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
 
               errors.push(
                 createErrorResponse(
-                  "email.errors.rendering_failed",
+                  "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.rendering_failed",
                   ErrorResponseTypes.EMAIL_ERROR,
                   { error: parsedError.message },
                 ),
@@ -201,7 +215,7 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
         const parsedError = parseError(error);
         errors.push(
           createErrorResponse(
-            "email.errors.batch_send_failed",
+            "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.batch_send_failed",
             ErrorResponseTypes.EMAIL_ERROR,
             { error: parsedError.message },
           ),
@@ -212,7 +226,7 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
     if (errors.length) {
       logger.error("Email errors", errors);
       return createErrorResponse(
-        "email.errors.batch_send_failed",
+        "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.batch_send_failed",
         ErrorResponseTypes.EMAIL_ERROR,
         { errors: errors.map((error) => error.message).join(", ") },
       );

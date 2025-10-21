@@ -5,8 +5,6 @@
 
 import chalk from "chalk";
 
-import { FieldDataType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-
 import type {
   DataFormatter,
   ResponseFieldMetadata,
@@ -157,10 +155,11 @@ export abstract class BaseWidgetRenderer implements WidgetRenderer {
     const padding = width - text.length;
 
     switch (align) {
-      case "center":
+      case "center": {
         const leftPad = Math.floor(padding / 2);
         const rightPad = padding - leftPad;
         return " ".repeat(leftPad) + text + " ".repeat(rightPad);
+      }
       case "right":
         return " ".repeat(padding) + text;
       default:
@@ -215,7 +214,7 @@ class DefaultDataFormatter implements DataFormatter {
     return formatted;
   }
 
-  formatObject(value: object, options?: { maxDepth?: number }): string {
+  formatObject(value: object): string {
     try {
       return JSON.stringify(value, null, 2);
     } catch {

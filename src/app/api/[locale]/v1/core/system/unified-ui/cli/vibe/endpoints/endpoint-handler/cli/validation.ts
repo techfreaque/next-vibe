@@ -50,8 +50,25 @@ export function validateCliRequestData<
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
+  TRequestInputInferred = unknown,
+  TRequestOutputInferred = unknown,
+  TResponseInputInferred = unknown,
+  TResponseOutputInferred = unknown,
+  TUrlVariablesInputInferred = unknown,
+  TUrlVariablesOutputInferred = unknown,
 >(
-  endpoint: CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
+  endpoint: CreateApiEndpoint<
+    TExampleKey,
+    TMethod,
+    TUserRoleValue,
+    TFields,
+    TRequestInputInferred,
+    TRequestOutputInferred,
+    TResponseInputInferred,
+    TResponseOutputInferred,
+    TUrlVariablesInputInferred,
+    TUrlVariablesOutputInferred
+  >,
   context: CliValidationContext<TRequestInput, TUrlVariablesInput>,
   logger: EndpointLogger,
 ): ResponseType<ValidatedRequestData<TRequestInput, TUrlVariablesInput>> {

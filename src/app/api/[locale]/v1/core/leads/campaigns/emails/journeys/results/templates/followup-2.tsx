@@ -28,7 +28,9 @@ export const resultsFollowup2Email: EmailTemplateFunction = ({
 
   const emailContent = (
     <EmailLayout
-      previewText={t("resultsJourney.followup2.previewText")}
+      previewText={t(
+        "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup2.previewText",
+      )}
       locale={locale}
     >
       <EmailHeader backgroundColor="#dc2626" t={t} />
@@ -42,7 +44,9 @@ export const resultsFollowup2Email: EmailTemplateFunction = ({
             textAlign: "center",
           }}
         >
-          {t("resultsJourney.followup2.greeting")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup2.greeting",
+          )}
         </Text>
 
         <Text
@@ -54,7 +58,9 @@ export const resultsFollowup2Email: EmailTemplateFunction = ({
             textAlign: "center",
           }}
         >
-          {t("resultsJourney.followup2.intro")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup2.intro",
+          )}
         </Text>
 
         {/* Competitor Analysis Section */}
@@ -76,7 +82,9 @@ export const resultsFollowup2Email: EmailTemplateFunction = ({
               textAlign: "center",
             }}
           >
-            {t("resultsJourney.followup2.competitorTitle")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup2.competitorTitle",
+            )}
           </Text>
 
           <Text
@@ -87,24 +95,35 @@ export const resultsFollowup2Email: EmailTemplateFunction = ({
               margin: "0 0 16px 0",
             }}
           >
-            {t("resultsJourney.followup2.competitorAnalysis")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup2.competitorAnalysis",
+            )}
           </Text>
 
           <div style={{ paddingLeft: "20px" }}>
             <Text
               style={{ fontSize: "14px", color: "#374151", margin: "8px 0" }}
             >
-              • {t("resultsJourney.followup2.competitorPoint1")}
+              •{" "}
+              {t(
+                "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup2.competitorPoint1",
+              )}
             </Text>
             <Text
               style={{ fontSize: "14px", color: "#374151", margin: "8px 0" }}
             >
-              • {t("resultsJourney.followup2.competitorPoint2")}
+              •{" "}
+              {t(
+                "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup2.competitorPoint2",
+              )}
             </Text>
             <Text
               style={{ fontSize: "14px", color: "#374151", margin: "8px 0" }}
             >
-              • {t("resultsJourney.followup2.competitorPoint3")}
+              •{" "}
+              {t(
+                "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup2.competitorPoint3",
+              )}
             </Text>
           </div>
         </div>
@@ -119,7 +138,9 @@ export const resultsFollowup2Email: EmailTemplateFunction = ({
             textAlign: "center",
           }}
         >
-          {t("resultsJourney.followup2.opportunityCostTitle")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup2.opportunityCostTitle",
+          )}
         </Text>
 
         <Text
@@ -131,12 +152,16 @@ export const resultsFollowup2Email: EmailTemplateFunction = ({
             textAlign: "center",
           }}
         >
-          {t("resultsJourney.followup2.opportunityCostText")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup2.opportunityCostText",
+          )}
         </Text>
 
         <CTAButton
           href={trackingUrl}
-          text={t("resultsJourney.followup2.ctaText")}
+          text={t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup2.ctaText",
+          )}
           backgroundColor="#dc2626"
           size="large"
           tracking={tracking}
@@ -152,7 +177,9 @@ export const resultsFollowup2Email: EmailTemplateFunction = ({
             fontStyle: "italic",
           }}
         >
-          {t("resultsJourney.followup2.urgency")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup2.urgency",
+          )}
         </Text>
       </EmailContent>
       <EmailFooter
@@ -167,7 +194,9 @@ export const resultsFollowup2Email: EmailTemplateFunction = ({
 
   return {
     to: lead.email,
-    subject: t("resultsJourney.followup2.subject"),
+    subject: t(
+      "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup2.subject",
+    ),
     jsx: emailContent,
   };
 };

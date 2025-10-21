@@ -33,20 +33,24 @@ export function sortMessagesByTime(messages: ChatMessage[]): ChatMessage[] {
  * Build a linear path through the message tree
  * Follows parent-child relationships, selecting branches based on branchIndices
  * Returns the path and information about available branches at each level
+ *
+ * Special handling for root-level branches:
+ * When there are multiple root messages (parentId === null), they are treated as
+ * siblings at the root level. Use branchIndices["__root__"] to select which root to follow.
  */
 export function buildMessagePath(
   messages: ChatMessage[],
   branchIndices: Record<string, number> = {},
 ): {
   path: ChatMessage[];
-  branchInfo: Record<
-    string,
-    { siblings: ChatMessage[]; currentIndex: number }
-  >;
+  branchInfo: Record<string, { siblings: ChatMessage[]; currentIndex: number }>;
 } {
-  // Find root message (message with no parent)
-  const rootMessage = messages.find((msg) => !msg.parentId);
-  if (!rootMessage) {
+  // Find ALL root messages (messages with no parent)
+  const rootMessages = messages
+    .filter((msg) => !msg.parentId)
+    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
+  if (rootMessages.length === 0) {
     return { path: [], branchInfo: {} };
   }
 
@@ -74,7 +78,25 @@ export function buildMessagePath(
     string,
     { siblings: ChatMessage[]; currentIndex: number }
   > = {};
-  let currentMessage: ChatMessage | undefined = rootMessage;
+
+  // Handle root-level branches
+  let currentMessage: ChatMessage | undefined;
+  if (rootMessages.length > 1) {
+    // Multiple root messages - treat as branches at root level
+    const rootBranchIndex = branchIndices["__root__"] ?? 0;
+    const validRootIndex = Math.min(
+      Math.max(0, rootBranchIndex),
+      rootMessages.length - 1,
+    );
+    branchInfo["__root__"] = {
+      siblings: rootMessages,
+      currentIndex: validRootIndex,
+    };
+    currentMessage = rootMessages[validRootIndex];
+  } else {
+    // Single root message
+    currentMessage = rootMessages[0];
+  }
 
   while (currentMessage) {
     path.push(currentMessage);

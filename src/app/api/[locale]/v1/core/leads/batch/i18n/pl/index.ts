@@ -231,5 +231,10 @@ export const translations: typeof enTranslations = {
         },
       },
     },
+    error: {
+      general: {
+        internal_server_error: "Wystąpił wewnętrzny błąd serwera",
+      },
+    },
   },
 };

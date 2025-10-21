@@ -107,7 +107,8 @@ export function useAIStream(
           try {
             const errorData = await response.json();
             // Extract user-friendly error message from API response
-            errorMessage = errorData.message || errorData.error?.message || errorMessage;
+            errorMessage =
+              errorData.message || errorData.error?.message || errorMessage;
           } catch {
             // If JSON parsing fails, try to get text
             try {
@@ -118,7 +119,10 @@ export function useAIStream(
             }
           }
 
-          logger.error("Stream request failed", { status: response.status, errorMessage });
+          logger.error("Stream request failed", {
+            status: response.status,
+            errorMessage,
+          });
           store.setError(errorMessage);
 
           // Create an error message in the chat thread so user can see what went wrong
@@ -212,27 +216,29 @@ export function useAIStream(
 
                 // Save to localStorage if incognito mode
                 if (eventData.rootFolderId === "incognito") {
-                  import("../incognito/storage").then(({ saveThread }) => {
-                    saveThread({
-                      id: eventData.threadId,
-                      userId: "incognito",
-                      title: eventData.title,
-                      rootFolderId: eventData.rootFolderId,
-                      folderId: eventData.subFolderId,
-                      status: "active",
-                      defaultModel: null,
-                      defaultPersona: null,
-                      systemPrompt: null,
-                      pinned: false,
-                      archived: false,
-                      tags: [],
-                      preview: null,
-                      createdAt: new Date(),
-                      updatedAt: new Date(),
+                  import("../incognito/storage")
+                    .then(({ saveThread }) => {
+                      saveThread({
+                        id: eventData.threadId,
+                        userId: "incognito",
+                        title: eventData.title,
+                        rootFolderId: eventData.rootFolderId,
+                        folderId: eventData.subFolderId,
+                        status: "active",
+                        defaultModel: null,
+                        defaultPersona: null,
+                        systemPrompt: null,
+                        pinned: false,
+                        archived: false,
+                        tags: [],
+                        preview: null,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                      });
+                    })
+                    .catch((error) => {
+                      console.error("Failed to save incognito thread", error);
                     });
-                  }).catch((error) => {
-                    console.error("Failed to save incognito thread", error);
-                  });
                 }
 
                 options.onThreadCreated?.(eventData);
@@ -255,38 +261,53 @@ export function useAIStream(
 
                 // Save to localStorage if incognito mode
                 // Check both stream store and chat store for thread
-                const streamThread = useAIStreamStore.getState().threads[eventData.threadId];
-                const isIncognitoFromStream = streamThread?.rootFolderId === "incognito";
+                const streamThread =
+                  useAIStreamStore.getState().threads[eventData.threadId];
+                const isIncognitoFromStream =
+                  streamThread?.rootFolderId === "incognito";
 
                 // Check chat store asynchronously (for existing threads)
-                import("../store").then(({ useChatStore }) => {
-                  const chatThread = useChatStore.getState().threads[eventData.threadId];
-                  const isIncognito = isIncognitoFromStream || chatThread?.rootFolderId === "incognito";
+                import("../store")
+                  .then(({ useChatStore }) => {
+                    const chatThread =
+                      useChatStore.getState().threads[eventData.threadId];
+                    const isIncognito =
+                      isIncognitoFromStream ||
+                      chatThread?.rootFolderId === "incognito";
 
-                  if (isIncognito) {
-                    import("../incognito/storage").then(({ saveMessage }) => {
-                      saveMessage({
-                        id: eventData.messageId,
-                        threadId: eventData.threadId,
-                        role: eventData.role,
-                        content: eventData.content,
-                        parentMessageId: eventData.parentId,
-                        depth: eventData.depth,
-                        model: eventData.model,
-                        persona: eventData.persona,
-                        tokens: null,
-                        toolCalls: null,
-                        finishReason: null,
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                      });
-                    }).catch((error) => {
-                      console.error("Failed to save incognito message", error);
-                    });
-                  }
-                }).catch((error) => {
-                  console.error("Failed to check chat store for incognito thread", error);
-                });
+                    if (isIncognito) {
+                      import("../incognito/storage")
+                        .then(({ saveMessage }) => {
+                          saveMessage({
+                            id: eventData.messageId,
+                            threadId: eventData.threadId,
+                            role: eventData.role,
+                            content: eventData.content,
+                            parentMessageId: eventData.parentId,
+                            depth: eventData.depth,
+                            model: eventData.model,
+                            persona: eventData.persona,
+                            tokens: null,
+                            toolCalls: null,
+                            finishReason: null,
+                            createdAt: new Date(),
+                            updatedAt: new Date(),
+                          });
+                        })
+                        .catch((error) => {
+                          console.error(
+                            "Failed to save incognito message",
+                            error,
+                          );
+                        });
+                    }
+                  })
+                  .catch((error) => {
+                    console.error(
+                      "Failed to check chat store for incognito thread",
+                      error,
+                    );
+                  });
 
                 options.onMessageCreated?.(eventData);
                 break;
@@ -315,40 +336,57 @@ export function useAIStream(
 
                 // Update message in localStorage if incognito mode
                 const streamState = useAIStreamStore.getState();
-                const message = streamState.streamingMessages[eventData.messageId];
-                const streamThread = message ? streamState.threads[message.threadId] : null;
-                const isIncognitoFromStream = streamThread?.rootFolderId === "incognito";
+                const message =
+                  streamState.streamingMessages[eventData.messageId];
+                const streamThread = message
+                  ? streamState.threads[message.threadId]
+                  : null;
+                const isIncognitoFromStream =
+                  streamThread?.rootFolderId === "incognito";
 
                 // Check chat store asynchronously (for existing threads)
                 if (message) {
-                  import("../store").then(({ useChatStore }) => {
-                    const chatThread = useChatStore.getState().threads[message.threadId];
-                    const isIncognito = isIncognitoFromStream || chatThread?.rootFolderId === "incognito";
+                  import("../store")
+                    .then(({ useChatStore }) => {
+                      const chatThread =
+                        useChatStore.getState().threads[message.threadId];
+                      const isIncognito =
+                        isIncognitoFromStream ||
+                        chatThread?.rootFolderId === "incognito";
 
-                    if (isIncognito) {
-                      import("../incognito/storage").then(({ saveMessage }) => {
-                        saveMessage({
-                          id: message.messageId,
-                          threadId: message.threadId,
-                          role: message.role,
-                          content: eventData.content,
-                          parentMessageId: message.parentId,
-                          depth: message.depth,
-                          model: message.model,
-                          persona: message.persona,
-                          tokens: eventData.totalTokens,
-                          toolCalls: null,
-                          finishReason: eventData.finishReason,
-                          createdAt: new Date(),
-                          updatedAt: new Date(),
-                        });
-                      }).catch((error) => {
-                        console.error("Failed to update incognito message", error);
-                      });
-                    }
-                  }).catch((error) => {
-                    console.error("Failed to check chat store for incognito thread", error);
-                  });
+                      if (isIncognito) {
+                        import("../incognito/storage")
+                          .then(({ saveMessage }) => {
+                            saveMessage({
+                              id: message.messageId,
+                              threadId: message.threadId,
+                              role: message.role,
+                              content: eventData.content,
+                              parentMessageId: message.parentId,
+                              depth: message.depth,
+                              model: message.model,
+                              persona: message.persona,
+                              tokens: eventData.totalTokens,
+                              toolCalls: null,
+                              finishReason: eventData.finishReason,
+                              createdAt: new Date(),
+                              updatedAt: new Date(),
+                            });
+                          })
+                          .catch((error) => {
+                            console.error(
+                              "Failed to update incognito message",
+                              error,
+                            );
+                          });
+                      }
+                    })
+                    .catch((error) => {
+                      console.error(
+                        "Failed to check chat store for incognito thread",
+                        error,
+                      );
+                    });
                 }
 
                 options.onContentDone?.(eventData);

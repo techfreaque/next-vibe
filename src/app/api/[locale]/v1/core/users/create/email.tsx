@@ -68,7 +68,7 @@ function WelcomeEmailContent({
       >
         {t("app.api.v1.core.users.create.email.users.welcome.introduction", {
           name: userData.responsePrivateName,
-          appName: t("common.appName"),
+          appName: t("app.common.appName"),
         })}
       </Text>
 
@@ -375,7 +375,7 @@ export const renderWelcomeEmail: EmailFunctionType<
       toEmail: responseData.responseEmail,
       toName: responseData.responsePrivateName,
       subject: t("app.api.v1.core.users.create.email.users.welcome.subject", {
-        appName: t("common.appName"),
+        appName: t("app.common.appName"),
       }),
       jsx: WelcomeEmailContent({
         userData: responseData,
@@ -385,7 +385,7 @@ export const renderWelcomeEmail: EmailFunctionType<
     });
   } catch {
     return createErrorResponse(
-      "error.general.internal_server_error",
+      "app.api.v1.core.users.create.email.users.error.general.internal_server_error",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }
@@ -410,7 +410,7 @@ export const renderAdminNotificationEmail: EmailFunctionType<
 
     return createSuccessResponse({
       toEmail: "admin@example.com", // Replace with actual admin email
-      toName: t("common.appName"),
+      toName: t("app.common.appName"),
       subject: t("app.api.v1.core.users.create.email.users.admin.subject", {
         name: responseData.responsePrivateName,
       }),
@@ -422,7 +422,7 @@ export const renderAdminNotificationEmail: EmailFunctionType<
     });
   } catch {
     return createErrorResponse(
-      "error.general.internal_server_error",
+      "app.api.v1.core.users.create.email.users.error.general.internal_server_error",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }

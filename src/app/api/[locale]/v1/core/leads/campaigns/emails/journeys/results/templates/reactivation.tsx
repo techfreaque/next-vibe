@@ -43,7 +43,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
 
   const emailContent = (
     <EmailLayout
-      previewText={t("resultsJourney.reactivation.previewText")}
+      previewText={t(
+        "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.previewText",
+      )}
       locale={locale}
     >
       <EmailHeader backgroundColor="#7c3aed" t={t} />
@@ -57,7 +59,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             textAlign: "center",
           }}
         >
-          {t("resultsJourney.reactivation.greeting")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.greeting",
+          )}
         </Text>
 
         <Text
@@ -69,7 +73,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             textAlign: "center",
           }}
         >
-          {t("resultsJourney.reactivation.intro")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.intro",
+          )}
         </Text>
 
         {/* Special Offer Section */}
@@ -91,7 +97,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
               textAlign: "center",
             }}
           >
-            {t("resultsJourney.reactivation.specialOfferTitle")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.specialOfferTitle",
+            )}
           </Text>
 
           <Text
@@ -103,7 +111,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
               textAlign: "center",
             }}
           >
-            {t("resultsJourney.reactivation.intro")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.intro",
+            )}
           </Text>
 
           <Text
@@ -138,7 +148,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
               margin: "0 0 16px 0",
             }}
           >
-            {t("resultsJourney.reactivation.specialOfferTitle")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.specialOfferTitle",
+            )}
           </Text>
           <Text
             style={{
@@ -148,13 +160,16 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
               lineHeight: "1.6",
             }}
           >
-            {t("resultsJourney.reactivation.discountOffer", {
-              price: formatCurrencyNoDecimals(
-                starterPrice,
-                starterCurrency,
-                locale,
-              ),
-            })}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.discountOffer",
+              {
+                price: formatCurrencyNoDecimals(
+                  starterPrice,
+                  starterCurrency,
+                  locale,
+                ),
+              },
+            )}
           </Text>
 
           {/* Discount Badge */}
@@ -169,7 +184,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
               margin: "16px 0",
             }}
           >
-            {t("resultsJourney.reactivation.greeting")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.greeting",
+            )}
           </div>
         </div>
 
@@ -182,7 +199,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             margin: "32px 0 16px 0",
           }}
         >
-          {t("resultsJourney.reactivation.greeting")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.greeting",
+          )}
         </Text>
 
         <div
@@ -203,7 +222,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
               fontStyle: "italic",
             }}
           >
-            {t("resultsJourney.reactivation.intro")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.intro",
+            )}
           </Text>
           <Text
             style={{
@@ -213,7 +234,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
               textAlign: "right",
             }}
           >
-            {t("resultsJourney.reactivation.greeting")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.greeting",
+            )}
           </Text>
         </div>
 
@@ -235,7 +258,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
               fontStyle: "italic",
             }}
           >
-            {t("resultsJourney.reactivation.intro")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.intro",
+            )}
           </Text>
           <Text
             style={{
@@ -245,7 +270,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
               textAlign: "right",
             }}
           >
-            {t("resultsJourney.reactivation.greeting")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.greeting",
+            )}
           </Text>
         </div>
 
@@ -268,7 +295,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
               margin: "0 0 12px 0",
             }}
           >
-            {t("resultsJourney.reactivation.greeting")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.greeting",
+            )}
           </Text>
           <Text
             style={{
@@ -278,14 +307,18 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
               lineHeight: "1.6",
             }}
           >
-            {t("resultsJourney.reactivation.intro")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.intro",
+            )}
           </Text>
         </div>
 
         {/* CTA Button */}
         <CTAButton
           href={trackingUrl}
-          text={t("resultsJourney.reactivation.ctaText")}
+          text={t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.ctaText",
+          )}
           backgroundColor="#7c3aed"
           size="large"
           tracking={tracking}
@@ -305,7 +338,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             border: "1px solid #c4b5fd",
           }}
         >
-          {t("resultsJourney.reactivation.intro")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.intro",
+          )}
         </Text>
 
         {/* Closing */}
@@ -317,7 +352,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             lineHeight: "1.6",
           }}
         >
-          {t("resultsJourney.reactivation.intro")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.intro",
+          )}
         </Text>
       </EmailContent>
       <EmailFooter
@@ -332,7 +369,9 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
 
   return {
     to: lead.email,
-    subject: t("resultsJourney.reactivation.subject"),
+    subject: t(
+      "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.subject",
+    ),
     jsx: emailContent,
   };
 };

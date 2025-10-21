@@ -154,7 +154,9 @@ export function HumanEmailLayout({
                 margin: "0 0 8px 0",
               }}
             >
-              {t("emailJourneys.components.footer.helpText")}{" "}
+              {t(
+                "app.api.v1.core.emails.smtpClient.components.email.footer.helpText",
+              )}{" "}
               <TrackedLink
                 href={`mailto:${companyEmail}`}
                 tracking={tracking}
@@ -175,7 +177,9 @@ export function HumanEmailLayout({
                 margin: "0",
               }}
             >
-              {t("emailJourneys.components.footer.unsubscribeText")}{" "}
+              {t(
+                "app.api.v1.core.emails.smtpClient.components.email.footer.unsubscribeText",
+              )}{" "}
               <TrackedLink
                 href={unsubscribeUrl}
                 tracking={tracking}
@@ -184,7 +188,9 @@ export function HumanEmailLayout({
                   textDecoration: "underline",
                 }}
               >
-                {t("emailJourneys.components.footer.unsubscribeLink")}
+                {t(
+                  "app.api.v1.core.emails.smtpClient.components.email.footer.unsubscribeLink",
+                )}
               </TrackedLink>
             </Text>
 
@@ -196,10 +202,13 @@ export function HumanEmailLayout({
                 margin: "8px 0 0 0",
               }}
             >
-              {t("emailJourneys.components.footer.copyright", {
-                currentYear: new Date().getFullYear(),
-                companyName,
-              })}
+              {t(
+                "app.api.v1.core.emails.smtpClient.components.email.footer.copyright",
+                {
+                  currentYear: new Date().getFullYear(),
+                  companyName,
+                },
+              )}
             </Text>
           </Section>
         </Container>

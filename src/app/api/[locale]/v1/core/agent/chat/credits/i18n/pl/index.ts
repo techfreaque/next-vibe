@@ -1,6 +1,12 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  enums: {
+    creditType: {
+      userSubscription: "Kredyty subskrypcji użytkownika",
+      leadFree: "Darmowe kredyty leada",
+    },
+  },
   expire: {
     task: {
       description: "Wygasa stare kredyty subskrypcyjne codziennie",
@@ -17,6 +23,9 @@ export const translations: typeof enTranslations = {
     getTransactionsFailed: "Nie udało się pobrać transakcji kredytowych",
     invalidIdentifier: "Nieprawidłowy identyfikator użytkownika lub leada",
     userNotFound: "Nie znaleziono użytkownika",
+    noLeadFound: "Nie znaleziono leada dla użytkownika",
+    getCreditIdentifierFailed: "Nie udało się pobrać identyfikatora kredytu",
+    noCreditSource: "Brak dostępnego źródła kredytów",
     stripeCustomerFailed: "Nie udało się utworzyć klienta Stripe",
     checkoutFailed: "Nie udało się utworzyć sesji płatności",
   },

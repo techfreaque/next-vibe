@@ -188,4 +188,7 @@ export const translations = {
       none: "None",
     },
   },
+  error: {
+    default: "An error occurred while processing the engagement",
+  },
 };

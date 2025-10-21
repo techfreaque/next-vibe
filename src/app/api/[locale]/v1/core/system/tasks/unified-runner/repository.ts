@@ -343,11 +343,11 @@ export class UnifiedTaskRunnerRepositoryImpl
   /**
    * Start tasks in background (async)
    */
-  private async startTasksInBackground(
+  private startTasksInBackground(
     tasks: Task[],
     signal: AbortSignal,
     locale: CountryLanguage,
-  ): Promise<void> {
+  ): void {
     try {
       // Start all side tasks and task runners
       const sideTasks = tasks.filter(

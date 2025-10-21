@@ -317,6 +317,11 @@ export interface SMSHandler<
 
 /**
  * API handler options - handlers receive OUTPUT types and return OUTPUT types
+ *
+ * Type parameters with inferred defaults:
+ * - TRequestInput/Output: Inferred from endpoint.types.RequestInput/RequestOutput
+ * - TResponseInput/Output: Inferred from endpoint.types.ResponseInput/ResponseOutput
+ * - TUrlVariablesInput/Output: Inferred from endpoint.types.UrlVariablesInput/UrlVariablesOutput
  */
 export interface ApiHandlerOptions<
   TRequestOutput,
@@ -326,9 +331,9 @@ export interface ApiHandlerOptions<
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
-  TRequestInput = TRequestOutput,
-  TResponseInput = TResponseOutput,
-  TUrlVariablesInput = TUrlVariablesOutput,
+  TRequestInput = unknown,
+  TResponseInput = unknown,
+  TUrlVariablesInput = unknown,
 > {
   /** API endpoint definition */
   endpoint: CreateApiEndpoint<
@@ -339,6 +344,7 @@ export interface ApiHandlerOptions<
     TRequestInput,
     TRequestOutput,
     TResponseInput,
+    TResponseOutput,
     TUrlVariablesInput,
     TUrlVariablesOutput
   >;

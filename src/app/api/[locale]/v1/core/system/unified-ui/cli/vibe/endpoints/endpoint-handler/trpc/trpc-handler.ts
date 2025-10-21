@@ -3,19 +3,17 @@
  * Creates tRPC procedures from API handler options using unified core logic
  */
 
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  isStreamingResponse,
+} from "next-vibe/shared/types/response.schema";
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import type { FieldUsage, Methods } from "../../endpoint-types/core/enums";
-import type {
-  ExtractInput,
-  InferSchemaFromField,
-} from "../../endpoint-types/core/types";
-import type { CreateApiEndpoint } from "../../endpoint-types/endpoint/create";
+import type { Methods } from "../../endpoint-types/core/enums";
 import { authenticateUser, executeHandler } from "../core/handler-core";
 import { createEndpointLogger } from "../logger/endpoint-logger";
-import type { ApiHandlerFunction, ApiHandlerOptions } from "../types";
+import type { ApiHandlerOptions } from "../types";
 import { convertToTRPCError, handleNextVibeResponse } from "./trpc";
 import type { TRPCContext } from "./trpc-context";
 import type { TrpcHandlerReturnType as TrpcHandlerType } from "./types";
@@ -27,60 +25,30 @@ import { validateTrpcRequestData } from "./validation";
  * @returns tRPC procedure function
  */
 export function createTRPCHandler<
+  TRequestInput,
   TRequestOutput,
+  TResponseInput,
   TResponseOutput,
+  TUrlVariablesInput,
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
-  TRequestInput = ExtractInput<
-    InferSchemaFromField<TFields, FieldUsage.RequestData>
-  >,
-  TResponseInput = ExtractInput<
-    InferSchemaFromField<TFields, FieldUsage.Response>
-  >,
-  TUrlVariablesInput = ExtractInput<
-    InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
-  >,
->(options: {
-  endpoint: CreateApiEndpoint<
+>(
+  options: ApiHandlerOptions<
+    TRequestOutput,
+    TResponseOutput,
+    TUrlVariablesOutput,
     TExampleKey,
     TMethod,
     TUserRoleValue,
     TFields,
     TRequestInput,
-    TRequestOutput,
     TResponseInput,
-    TResponseOutput,
-    TUrlVariablesInput,
-    TUrlVariablesOutput
-  >;
-  handler: ApiHandlerFunction<
-    TRequestOutput,
-    TResponseOutput,
-    TUrlVariablesOutput,
-    TUserRoleValue
-  >;
-  email?: ApiHandlerOptions<
-    TRequestOutput,
-    TResponseOutput,
-    TUrlVariablesOutput,
-    TExampleKey,
-    TMethod,
-    TUserRoleValue,
-    TFields
-  >["email"];
-  sms?: ApiHandlerOptions<
-    TRequestOutput,
-    TResponseOutput,
-    TUrlVariablesOutput,
-    TExampleKey,
-    TMethod,
-    TUserRoleValue,
-    TFields
-  >["sms"];
-}): TrpcHandlerType<TRequestOutput, TResponseOutput, TUrlVariablesOutput> {
+    TUrlVariablesInput
+  >,
+): TrpcHandlerType<TRequestOutput, TResponseOutput, TUrlVariablesOutput> {
   const { endpoint, handler } = options;
 
   return async (
@@ -109,17 +77,30 @@ export function createTRPCHandler<
         );
       }
 
-      // Extract urlVariables from input for tRPC
-      const { urlVariables, ...requestData } = input;
-
       // Validate request data using unified core
       const logger = createEndpointLogger(false, Date.now(), ctx.locale);
-      const validationResult = validateTrpcRequestData(
+
+      // tRPC data is already validated by tRPC's own validators
+      // We validate again to ensure it matches our endpoint schema
+      // TypeScript structural typing: input contains all properties of TRequestOutput plus optional urlVariables
+      // So we can pass input directly where TRequestOutput is expected
+      const validationResult = validateTrpcRequestData<
+        TExampleKey,
+        TMethod,
+        TUserRoleValue,
+        TFields,
+        TRequestInput,
+        TRequestOutput,
+        TResponseInput,
+        TResponseOutput,
+        TUrlVariablesInput,
+        TUrlVariablesOutput
+      >(
         endpoint,
         {
           method: endpoint.method,
-          requestData: requestData as TRequestOutput,
-          urlParameters: (urlVariables || {}) as TUrlVariablesOutput,
+          requestData: input,
+          urlParameters: input.urlVariables ?? {},
           locale: ctx.locale,
         },
         logger,
@@ -147,6 +128,22 @@ export function createTRPCHandler<
         request: ctx.request,
         logger,
       });
+
+      // Check if this is a streaming response
+      if (isStreamingResponse(result)) {
+        // tRPC doesn't support streaming responses directly
+        // This should not happen as tRPC endpoints should not return streaming responses
+        logger.error(
+          "tRPC endpoint returned streaming response - not supported",
+        );
+        // eslint-disable-next-line no-restricted-syntax
+        throw convertToTRPCError(
+          ErrorResponseTypes.INTERNAL_ERROR,
+          ctx.t(
+            "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
+          ),
+        );
+      }
 
       // Handle the response using the existing tRPC response handler
       const handlerResponse = handleNextVibeResponse(result);

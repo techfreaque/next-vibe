@@ -232,5 +232,10 @@ export const translations: typeof enTranslations = {
         },
       },
     },
+    error: {
+      general: {
+        internal_server_error: "Ein interner Serverfehler ist aufgetreten",
+      },
+    },
   },
 };

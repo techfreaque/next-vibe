@@ -151,6 +151,10 @@ export const translations: typeof enTranslations = {
     },
   },
   route: {
+    debug: {
+      userObject: "AI Stream Route: Obiekt użytkownika",
+      extracted: "AI Stream Route: Wyodrębnione wartości",
+    },
     errors: {
       invalidJson: "Nieprawidłowy JSON w treści żądania",
       invalidRequestData: "Nieprawidłowe dane żądania",
@@ -160,7 +164,8 @@ export const translations: typeof enTranslations = {
       streamCreationFailed: "Nie udało się utworzyć strumienia",
       unknownError: "Wystąpił błąd",
       creditValidationFailed: "Nie udało się zweryfikować salda kredytów",
-      authenticationRequired: "Zaloguj się, aby korzystać z trwałych folderów. Użyj trybu incognito dla anonimowych czatów.",
+      authenticationRequired:
+        "Zaloguj się, aby korzystać z trwałych folderów. Użyj trybu incognito dla anonimowych czatów.",
       noIdentifier: "Nie podano identyfikatora użytkownika lub leada",
       insufficientCredits:
         "Niewystarczająca liczba kredytów do wykonania żądania",

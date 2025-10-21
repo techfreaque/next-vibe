@@ -68,6 +68,7 @@ export const historicalDataPointSchema = z.object({
   label: z.string().optional() as z.ZodType<TranslationKey | undefined>,
   metadata: z
     .record(
+      z.string(),
       z.union([
         z.string() as z.ZodType<TranslationKey>,
         z.number(),

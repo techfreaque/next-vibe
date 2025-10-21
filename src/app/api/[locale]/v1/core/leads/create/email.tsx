@@ -23,7 +23,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { LeadCreateType } from "../definition";
-import { LeadSource, LeadStatus } from "../enum";
+import { LeadSourceOptions, LeadStatusOptions } from "../enum";
 import type { LeadCreatePostResponseOutput } from "./definition";
 
 /**
@@ -333,7 +333,12 @@ function AdminNotificationEmailContent({
             {t("app.api.v1.core.leads.create.email.admin.newLead.source")}:
           </Text>{" "}
           {lead.trackingInfo.source
-            ? t(LeadSource[lead.trackingInfo.source])
+            ? t(
+                LeadSourceOptions.find(
+                  (opt) => opt.value === lead.trackingInfo.source,
+                )?.label ??
+                  "app.api.v1.core.leads.create.email.admin.newLead.notProvided",
+              )
             : t("app.api.v1.core.leads.create.email.admin.newLead.notProvided")}
         </Text>
 
@@ -347,7 +352,11 @@ function AdminNotificationEmailContent({
           <Text style={{ fontWeight: "700" }}>
             {t("app.api.v1.core.leads.create.email.admin.newLead.status")}:
           </Text>{" "}
-          {t(LeadStatus[lead.summary.status])}
+          {t(
+            LeadStatusOptions.find((opt) => opt.value === lead.summary.status)
+              ?.label ??
+              "app.api.v1.core.leads.create.email.admin.newLead.notProvided",
+          )}
         </Text>
 
         {lead.metadata.notes && (
@@ -443,10 +452,10 @@ export const renderWelcomeMail: EmailFunctionType<
         responseData.lead.summary.businessName ||
         responseData.lead.summary.email,
       subject: t("app.api.v1.core.leads.create.email.welcome.subject", {
-        companyName: t("common.appName"),
+        companyName: t("app.common.appName"),
       }),
       replyToEmail: contactClientRepository.getSupportEmail(locale),
-      replyToName: t("common.appName"),
+      replyToName: t("app.common.appName"),
 
       jsx: WelcomeEmailContent({
         lead: responseData.lead,
@@ -457,7 +466,7 @@ export const renderWelcomeMail: EmailFunctionType<
     });
   } catch {
     return createErrorResponse(
-      "error.general.internal_server_error",
+      "app.api.v1.core.leads.create.email.error.general.internal_server_error",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }
@@ -482,7 +491,7 @@ export const renderAdminNotificationMail: EmailFunctionType<
 
     return createSuccessResponse({
       toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: t("common.appName"),
+      toName: t("app.common.appName"),
       subject: t("app.api.v1.core.leads.create.email.admin.newLead.subject", {
         businessName:
           responseData.lead.summary.businessName ||
@@ -505,7 +514,7 @@ export const renderAdminNotificationMail: EmailFunctionType<
     });
   } catch {
     return createErrorResponse(
-      "error.general.internal_server_error",
+      "app.api.v1.core.leads.create.email.error.general.internal_server_error",
       ErrorResponseTypes.INTERNAL_ERROR,
     );
   }

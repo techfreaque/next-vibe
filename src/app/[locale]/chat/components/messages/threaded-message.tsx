@@ -276,7 +276,9 @@ export function ThreadedMessage({
                         );
                       })()}
                     {message.role === "user"
-                      ? rootFolderId === "general" || rootFolderId === "shared" || rootFolderId === "public"
+                      ? rootFolderId === "general" ||
+                        rootFolderId === "shared" ||
+                        rootFolderId === "public"
                         ? t("app.chat.threadedView.youLabel")
                         : t("app.chat.threadedView.userFallback")
                       : message.role === "assistant" && message.model

@@ -2,6 +2,8 @@ import { translations as componentsTranslations } from "../../components/i18n/de
 import { translations as createTranslations } from "../../create/i18n/de";
 import { translations as editTranslations } from "../../edit/i18n/de";
 import { translations as listTranslations } from "../../list/i18n/de";
+import { translations as emailSendingTranslations } from "../../email-sending/i18n/de";
+import { translations as emailHandlingTranslations } from "../../email-handling/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -11,6 +13,8 @@ export const translations: typeof enTranslations = {
   create: createTranslations,
   edit: editTranslations,
   list: listTranslations,
+  emailSending: emailSendingTranslations,
+  emailHandling: emailHandlingTranslations,
   sending: {
     errors: {
       server: {

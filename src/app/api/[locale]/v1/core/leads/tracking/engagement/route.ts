@@ -127,7 +127,7 @@ export const { GET, POST, tools } = endpointsHandler({
         });
         // Return error response
         return createErrorResponse(
-          "error.default",
+          "app.api.v1.core.leads.tracking.engagement.error.default",
           ErrorResponseTypes.INTERNAL_ERROR,
         );
       }

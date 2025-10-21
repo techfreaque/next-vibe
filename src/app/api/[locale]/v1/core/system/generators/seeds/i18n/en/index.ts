@@ -47,6 +47,13 @@ export const translations = {
     success: {
       title: "Success",
       description: "Operation completed successfully",
+      generated: "Seeds generated successfully",
     },
+  },
+  error: {
+    generation_failed: "Seeds generation failed",
+  },
+  success: {
+    generated: "Seeds generated successfully",
   },
 };

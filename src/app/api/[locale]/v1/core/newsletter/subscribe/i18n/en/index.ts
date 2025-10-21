@@ -114,6 +114,14 @@ export const translations = {
     sending_admin_notification:
       "Sending admin notification SMS for newsletter subscription",
     admin_notification_error: "Error sending admin notification SMS",
+    welcome: {
+      message:
+        "Hi {{name}}! Welcome to our newsletter. Stay tuned for updates!",
+    },
+    admin_notification: {
+      message:
+        "New newsletter subscription: {{displayName}} ({{email}}) has subscribed",
+    },
   },
   route: {
     sms_failed_continuing: "SMS notifications failed but continuing",

@@ -20,8 +20,12 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/defini
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { chatMessages, chatThreads } from "../../../db";
+import { chatFolders, chatMessages, chatThreads } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
+import {
+  canReadThread,
+  canWriteThread,
+} from "../../../permissions/permissions";
 import type {
   MessageCreateRequestOutput,
   MessageCreateResponseOutput,
@@ -61,31 +65,17 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
     logger: EndpointLogger,
   ): Promise<ResponseType<MessageListResponseOutput>> {
     try {
-      // Type guard to ensure user has id
-      if (!user.id) {
-        return createErrorResponse(
-          "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.unauthorized.title" as const,
-          ErrorResponseTypes.UNAUTHORIZED,
-        );
-      }
-
-      const userId = user.id;
-
       logger.debug("Listing messages", {
         threadId: data.threadId,
-        userId,
+        userId: user.id,
+        isPublic: user.isPublic,
       });
 
-      // Verify thread exists and belongs to user
+      // Get thread (without user filter to allow public access)
       const [thread] = await db
         .select()
         .from(chatThreads)
-        .where(
-          and(
-            eq(chatThreads.id, data.threadId),
-            eq(chatThreads.userId, userId),
-          ),
-        )
+        .where(eq(chatThreads.id, data.threadId))
         .limit(1);
 
       if (!thread) {
@@ -105,6 +95,24 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
               "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.forbidden.incognitoNotAllowed",
             ),
           },
+        );
+      }
+
+      // Get folder for permission check
+      let folder = null;
+      if (thread.folderId) {
+        [folder] = await db
+          .select()
+          .from(chatFolders)
+          .where(eq(chatFolders.id, thread.folderId))
+          .limit(1);
+      }
+
+      // Check read permission using permission system
+      if (!canReadThread(user, thread, folder)) {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.forbidden.title" as const,
+          ErrorResponseTypes.FORBIDDEN,
         );
       }
 
@@ -141,6 +149,14 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
     logger: EndpointLogger,
   ): Promise<ResponseType<MessageCreateResponseOutput>> {
     try {
+      // Public users cannot create messages
+      if (user.isPublic) {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,
+          ErrorResponseTypes.FORBIDDEN,
+        );
+      }
+
       // Type guard to ensure user has id
       if (!user.id) {
         return createErrorResponse(
@@ -157,16 +173,11 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
         role: data.message?.role,
       });
 
-      // Verify thread exists and belongs to user
+      // Get thread (without user filter to check permissions)
       const [thread] = await db
         .select()
         .from(chatThreads)
-        .where(
-          and(
-            eq(chatThreads.id, data.threadId),
-            eq(chatThreads.userId, userId),
-          ),
-        )
+        .where(eq(chatThreads.id, data.threadId))
         .limit(1);
 
       if (!thread) {
@@ -186,6 +197,24 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
               "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.incognitoNotAllowed",
             ),
           },
+        );
+      }
+
+      // Get folder for permission check
+      let folder = null;
+      if (thread.folderId) {
+        [folder] = await db
+          .select()
+          .from(chatFolders)
+          .where(eq(chatFolders.id, thread.folderId))
+          .limit(1);
+      }
+
+      // Check write permission using permission system
+      if (!canWriteThread(user, thread, folder)) {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,
+          ErrorResponseTypes.FORBIDDEN,
         );
       }
 

@@ -67,7 +67,9 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
 
   const emailContent = (
     <EmailLayout
-      previewText={t("resultsJourney.initial.previewText")}
+      previewText={t(
+        "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.initial.previewText",
+      )}
       locale={locale}
     >
       <EmailHeader backgroundColor="#2c82c9" t={t} />
@@ -83,7 +85,9 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
             lineHeight: "1.1",
           }}
         >
-          {t("resultsJourney.initial.heroTitle")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.initial.heroTitle",
+          )}
         </Text>
 
         <Text
@@ -95,7 +99,9 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
             lineHeight: "1.2",
           }}
         >
-          {t("resultsJourney.initial.heroSubtitle")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.initial.heroSubtitle",
+          )}
         </Text>
 
         <Text
@@ -107,13 +113,16 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
             textAlign: "center",
           }}
         >
-          {t("resultsJourney.initial.priceText", {
-            price: formatCurrencyNoDecimals(
-              starterPrice,
-              starterCurrency,
-              locale,
-            ),
-          })}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.initial.priceText",
+            {
+              price: formatCurrencyNoDecimals(
+                starterPrice,
+                starterCurrency,
+                locale,
+              ),
+            },
+          )}
         </Text>
 
         {/* Process/Content Image */}
@@ -125,7 +134,9 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
         >
           {await EmailImage({
             src: "/images/process/content.png",
-            alt: t("resultsJourney.initial.processImagePlaceholder"),
+            alt: t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.initial.processImagePlaceholder",
+            ),
             width: 600,
             style: {
               borderRadius: "8px",
@@ -147,7 +158,9 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
             textAlign: "center",
           }}
         >
-          {t("resultsJourney.initial.noContractTitle")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.initial.noContractTitle",
+          )}
         </Text>
 
         <Text
@@ -158,12 +171,16 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
             textAlign: "center",
           }}
         >
-          {t("resultsJourney.initial.monthlyCancellation")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.initial.monthlyCancellation",
+          )}
         </Text>
 
         <CTAButton
           href={trackingUrl}
-          text={t("resultsJourney.initial.ctaText")}
+          text={t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.initial.ctaText",
+          )}
           backgroundColor="#2c82c9"
           size="large"
           tracking={tracking}
@@ -178,7 +195,11 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
             textAlign: "center",
           }}
         >
-          <strong>{t("resultsJourney.initial.contactTitle")}</strong>
+          <strong>
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.initial.contactTitle",
+            )}
+          </strong>
         </Text>
 
         <Text
@@ -204,7 +225,9 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
 
   return {
     to: lead.email,
-    subject: t("resultsJourney.initial.subject"),
+    subject: t(
+      "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.initial.subject",
+    ),
     jsx: emailContent,
   };
 };

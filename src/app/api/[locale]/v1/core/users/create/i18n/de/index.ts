@@ -250,6 +250,11 @@ export const translations = {
       errors: {
         missing_data: "Erforderliche Benutzerdaten fehlen für E-Mail-Vorlage",
       },
+      error: {
+        general: {
+          internal_server_error: "Ein interner Serverfehler ist aufgetreten",
+        },
+      },
       labels: {
         id: "ID:",
         email: "E-Mail:",

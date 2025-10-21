@@ -42,7 +42,8 @@ export const translations = {
     viewAllThreads: "View all threads",
     backToChat: "Back to chat",
     language: "Language",
-    loginRequired: "Please log in to use persistent folders. Use incognito mode for anonymous chats.",
+    loginRequired:
+      "Please log in to use persistent folders. Use incognito mode for anonymous chats.",
 
     // Copy Button
     copyButton: {
@@ -468,9 +469,11 @@ export const translations = {
       kimiK2Free:
         "Kimi K2 Instruct is a large-scale Mixture-of-Experts (MoE) language model developed by Moonshot AI.",
       deepseekV31Free: "Powerful 671B parameter model - completely free!",
+      deepseekV31: "Powerful 671B parameter model with advanced capabilities",
       qwen3235bFree:
         "Mixture-of-experts (MoE) model developed by Qwen, supports seamless switching between modes.",
       deepseekR1Distill: "Distilled reasoning model with strong performance",
+      deepseekR1: "Advanced reasoning model with deep thinking capabilities",
       qwen257b: "Efficient 7B parameter model",
       grok4: "X-AI Grok 4 - premium model",
       grok4Fast:
@@ -622,6 +625,8 @@ export const translations = {
       title: "Answer as AI Model",
       description: "Choose a model and persona to generate an AI response",
       confirmLabel: "Generate",
+      inputPlaceholder:
+        "Enter a prompt for the AI (optional - leave empty to let AI generate its own response)",
     },
     actions: {
       vote: "Vote",
@@ -681,6 +686,8 @@ export const translations = {
       title: "Answer as AI Model",
       description: "Choose a model and persona to generate an AI response",
       confirmLabel: "Generate",
+      inputPlaceholder:
+        "Enter a prompt for the AI (optional - leave empty to let AI generate its own response)",
     },
     actions: {
       loadingAudio: "Loading audio...",

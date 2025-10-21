@@ -192,4 +192,7 @@ export const translations: typeof enTranslations = {
       none: "Brak",
     },
   },
+  error: {
+    default: "Wystąpił błąd podczas przetwarzania zaangażowania",
+  },
 };

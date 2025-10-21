@@ -239,6 +239,11 @@ export const translations = {
       errors: {
         missing_data: "Required user data is missing for email template",
       },
+      error: {
+        general: {
+          internal_server_error: "An internal server error occurred",
+        },
+      },
       labels: {
         id: "ID:",
         email: "Email:",

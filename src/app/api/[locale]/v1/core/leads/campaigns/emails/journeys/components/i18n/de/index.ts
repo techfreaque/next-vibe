@@ -1,54 +1,38 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
-    form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
-    },
-    response: {
-      title: "Antwort",
-      description: "Antwortdaten",
-    },
-    errors: {
-      unauthorized: {
-        title: "Nicht autorisiert",
-        description: "Authentifizierung erforderlich",
-      },
-      validation: {
-        title: "Validierungsfehler",
-        description: "Ungültige Anfrageparameter",
-      },
-      server: {
-        title: "Serverfehler",
-        description: "Interner Serverfehler",
-      },
-      unknown: {
-        title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist aufgetreten",
-      },
-      network: {
-        title: "Netzwerkfehler",
-        description: "Netzwerkfehler aufgetreten",
-      },
-      forbidden: {
-        title: "Verboten",
-        description: "Zugriff verboten",
-      },
-      notFound: {
-        title: "Nicht gefunden",
-        description: "Ressource nicht gefunden",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Datenkonflikt aufgetreten",
+  pricing: {
+    plans: {
+      orSeparator: "oder",
+      perMonth: "/Monat",
+      PREMIUM: {
+        featureBadge: "Beliebteste",
       },
     },
-    success: {
-      title: "Erfolg",
-      description: "Vorgang erfolgreich abgeschlossen",
+  },
+  defaults: {
+    previewBusinessName: "Vorschau Unternehmen",
+    previewContactName: "Vorschau Kontakt",
+    previewEmail: "vorschau@beispiel.de",
+    previewPhone: "+491234567890",
+    previewLeadId: "vorschau-lead-123",
+    previewCampaignId: "vorschau-kampagne-123",
+  },
+  journeyInfo: {
+    resultsFocused: {
+      name: "Ergebnisorientierte Reise",
+      description:
+        "Professioneller Ansatz mit Schwerpunkt auf messbaren Ergebnissen und praktischen Resultaten",
+    },
+    personalResults: {
+      name: "Persönliche Ergebnisse Reise",
+      description:
+        "Ausgewogener Ansatz, der persönliche Verbindung mit ergebnisorientierten Inhalten kombiniert",
+    },
+    personalApproach: {
+      name: "Persönlicher Ansatz Reise",
+      description:
+        "Warme, beziehungsorientierte Kommunikation, die Vertrauen durch persönliche Verbindung aufbaut",
     },
   },
 };

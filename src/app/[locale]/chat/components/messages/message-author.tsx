@@ -42,8 +42,11 @@ export function MessageAuthorInfo({
   const authorColor = isAI ? "text-blue-500" : "text-foreground";
 
   // For private and incognito folders, show "User" instead of "You"
-  const displayName = authorName ??
-    (rootFolderId === "general" || rootFolderId === "shared" || rootFolderId === "public"
+  const displayName =
+    authorName ??
+    (rootFolderId === "general" ||
+    rootFolderId === "shared" ||
+    rootFolderId === "public"
       ? t("app.chat.messages.you")
       : t("app.chat.messages.user"));
 

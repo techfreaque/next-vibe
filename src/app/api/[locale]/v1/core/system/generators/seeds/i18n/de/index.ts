@@ -49,6 +49,13 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Erfolg",
       description: "Vorgang erfolgreich abgeschlossen",
+      generated: "Seeds erfolgreich generiert",
     },
+  },
+  error: {
+    generation_failed: "Seeds-Generierung fehlgeschlagen",
+  },
+  success: {
+    generated: "Seeds erfolgreich generiert",
   },
 };

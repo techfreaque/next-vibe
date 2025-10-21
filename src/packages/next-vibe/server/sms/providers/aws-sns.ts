@@ -73,21 +73,21 @@ export function getAwsSnsProvider(): SmsProvider {
         // Validate credentials
         if (!accessKeyId) {
           return createErrorResponse(
-            "sms.errors.missing_aws_access_key",
+            "packages.nextVibe.server.sms.sms.errors.missing_aws_access_key",
             ErrorResponseTypes.VALIDATION_ERROR,
           );
         }
 
         if (!region) {
           return createErrorResponse(
-            "sms.errors.missing_aws_region",
+            "packages.nextVibe.server.sms.sms.errors.missing_aws_region",
             ErrorResponseTypes.VALIDATION_ERROR,
           );
         }
 
         if (!secretAccessKey) {
           return createErrorResponse(
-            "sms.errors.missing_aws_secret_key",
+            "packages.nextVibe.server.sms.sms.errors.missing_aws_secret_key",
             ErrorResponseTypes.VALIDATION_ERROR,
           );
         }
@@ -95,14 +95,14 @@ export function getAwsSnsProvider(): SmsProvider {
         // Validate required parameters
         if (!params.to) {
           return createErrorResponse(
-            "sms.errors.missing_recipient",
+            "packages.nextVibe.server.sms.sms.errors.missing_recipient",
             ErrorResponseTypes.VALIDATION_ERROR,
           );
         }
 
         if (!params.message || params.message.trim() === "") {
           return createErrorResponse(
-            "sms.errors.empty_message",
+            "packages.nextVibe.server.sms.sms.errors.empty_message",
             ErrorResponseTypes.VALIDATION_ERROR,
           );
         }
@@ -269,10 +269,10 @@ export function getAwsSnsProvider(): SmsProvider {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
-            Host: host,
+            "Host": host,
             "X-Amz-Date": amzDate,
             "X-Amz-Content-Sha256": contentHash,
-            Authorization: authorizationHeader,
+            "Authorization": authorizationHeader,
           },
           body: payload,
         });
@@ -285,7 +285,7 @@ export function getAwsSnsProvider(): SmsProvider {
           const errorMessage = errorMatch?.[1];
 
           return createErrorResponse(
-            "sms.errors.aws_sns_api_error",
+            "packages.nextVibe.server.sms.sms.errors.aws_sns_api_error",
             ErrorResponseTypes.SMS_ERROR,
             {
               error: errorMessage ?? "error.sms.errors.unknown_aws_error",
@@ -329,7 +329,7 @@ export function getAwsSnsProvider(): SmsProvider {
       } catch (error) {
         const parsedError = parseError(error);
         return createErrorResponse(
-          "sms.errors.aws_sns_error",
+          "packages.nextVibe.server.sms.sms.errors.aws_sns_error",
           ErrorResponseTypes.SMS_ERROR,
           { error: parsedError.message },
         );

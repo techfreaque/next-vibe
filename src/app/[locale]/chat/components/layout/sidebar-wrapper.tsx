@@ -97,7 +97,7 @@ export function SidebarWrapper({
 
   // Wrap createFolder to match expected signature
   const handleCreateFolder = React.useCallback(
-    (name: string, parentId: string): string => {
+    (name: string, parentId: string, icon?: string): string => {
       // Determine rootFolderId from parentId
       const isRootFolder =
         parentId === "private" ||
@@ -112,7 +112,7 @@ export function SidebarWrapper({
       const actualParentId = isRootFolder ? null : parentId;
 
       // Call async function but return empty string immediately
-      void chat.createFolder(name, rootFolderId, actualParentId);
+      void chat.createFolder(name, rootFolderId, actualParentId, icon);
       return "";
     },
     [chat],

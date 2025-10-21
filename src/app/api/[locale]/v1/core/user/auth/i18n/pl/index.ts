@@ -125,6 +125,17 @@ export const translations: typeof enTranslations = {
     },
   },
   debug: {
+    getAuthMinimalUserNext: {
+      start:
+        "getAuthMinimalUserNext: FIXED VERSION - Sprawdzanie autentykacji jako pierwsze",
+      result: "getAuthMinimalUserNext: wynik getCurrentUserNext",
+      authenticated:
+        "getAuthMinimalUserNext: Użytkownik jest uwierzytelniony, pobieranie leadId",
+      returningAuth:
+        "getAuthMinimalUserNext: Zwracanie uwierzytelnionego użytkownika",
+      notAuthenticated:
+        "getAuthMinimalUserNext: Użytkownik nie uwierzytelniony, zwracanie użytkownika publicznego",
+    },
     signingJwt: "Podpisywanie JWT",
     jwtSignedSuccessfully: "JWT pomyślnie podpisany",
     errorSigningJwt: "Błąd podczas podpisywania JWT",

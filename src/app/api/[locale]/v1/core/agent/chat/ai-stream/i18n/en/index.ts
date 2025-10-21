@@ -4,6 +4,20 @@ export const translations = {
       userObject: "AI Stream Route: User object",
       extracted: "AI Stream Route: Extracted values",
     },
+    errors: {
+      invalidJson: "Invalid JSON in request body",
+      invalidRequestData: "Invalid request data",
+      uncensoredApiKeyMissing: "Uncensored.ai API key not configured",
+      openrouterApiKeyMissing: "OpenRouter API key not configured",
+      streamCreationFailed: "Failed to create stream",
+      unknownError: "An error occurred",
+      creditValidationFailed: "Failed to validate credit balance",
+      noIdentifier: "No user or lead identifier provided",
+      insufficientCredits: "Insufficient credits to complete this request",
+      noResponseBody: "No response body received from stream",
+      authenticationRequired:
+        "Please log in to use persistent folders. Use incognito mode for anonymous chats.",
+    },
   },
   post: {
     title: "AI Stream Chat",
@@ -149,21 +163,6 @@ export const translations = {
         configuration: "AI streaming configuration error",
         processing: "Error processing AI stream",
       },
-    },
-  },
-  route: {
-    errors: {
-      invalidJson: "Invalid JSON in request body",
-      invalidRequestData: "Invalid request data",
-      uncensoredApiKeyMissing: "Uncensored.ai API key not configured",
-      openrouterApiKeyMissing: "OpenRouter API key not configured",
-      streamCreationFailed: "Failed to create stream",
-      unknownError: "An error occurred",
-      creditValidationFailed: "Failed to validate credit balance",
-      noIdentifier: "No user or lead identifier provided",
-      insufficientCredits: "Insufficient credits to complete this request",
-      noResponseBody: "No response body received from stream",
-      authenticationRequired: "Please log in to use persistent folders. Use incognito mode for anonymous chats.",
     },
   },
   errorTypes: {

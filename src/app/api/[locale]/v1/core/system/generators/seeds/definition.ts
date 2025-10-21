@@ -16,11 +16,13 @@ import {
   requestDataField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
+import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**
  * Seeds generation response schema
+ * Currently unused but kept for future API versioning
  */
-const seedsGenerationResponseSchema = z.object({
+export const seedsGenerationResponseSchema = z.object({
   success: z.boolean(),
   message: z.string(),
   seedsFound: z.number(),
@@ -164,9 +166,6 @@ const POST = createEndpoint({
         duration: 150,
         outputPath: "src/app/api/[locale]/v1/core/system/generated/seeds",
       },
-    },
-    urlPathVariables: {
-      default: {},
     },
   },
 });

@@ -41,7 +41,7 @@ interface ChatAreaProps {
   onSendMessage: (prompt: string, personaId: string, modelId?: ModelId) => void;
   onBranchMessage?: (messageId: string, newContent: string) => Promise<void>;
   onRetryMessage?: (messageId: string) => Promise<void>;
-  onAnswerAsModel?: (messageId: string) => Promise<void>;
+  onAnswerAsModel?: (messageId: string, content: string) => Promise<void>;
   onVoteMessage?: (messageId: string, vote: 1 | -1 | 0) => void;
   showBranchIndicators: boolean;
   branchIndices?: Record<string, number>;

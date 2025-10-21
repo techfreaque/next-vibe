@@ -32,7 +32,7 @@ export function useFoldersList(
         staleTime: 10 * 1000, // 10 seconds
       },
       formOptions: {
-        initialValues: {},
+        defaultValues: {},
       },
     },
     logger,

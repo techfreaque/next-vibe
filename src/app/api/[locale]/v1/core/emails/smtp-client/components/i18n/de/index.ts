@@ -4,7 +4,10 @@ export const translations: typeof enTranslations = {
   email: {
     footer: {
       needHelp: "Brauchen Sie Hilfe?",
-      copyright: "© {{currentYear}} {{appName}}. Alle Rechte vorbehalten.",
+      helpText: "Brauchen Sie Hilfe? Kontaktieren Sie uns unter",
+      unsubscribeText: "Möchten Sie diese E-Mails nicht mehr erhalten?",
+      unsubscribeLink: "Abmelden",
+      copyright: "© {{currentYear}} {{companyName}}. Alle Rechte vorbehalten.",
     },
   },
   post: {

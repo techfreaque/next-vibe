@@ -311,21 +311,27 @@ export class EmailRendererService {
   } {
     const journeyInfo = {
       [EmailJourneyVariant.PERSONAL_APPROACH]: {
-        name: t("emailJourneys.components.journeyInfo.personalApproach.name"),
+        name: t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.personalApproach.name",
+        ),
         description: t(
-          "emailJourneys.components.journeyInfo.personalApproach.description",
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.personalApproach.description",
         ),
       },
       [EmailJourneyVariant.RESULTS_FOCUSED]: {
-        name: t("emailJourneys.components.journeyInfo.resultsFocused.name"),
+        name: t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.resultsFocused.name",
+        ),
         description: t(
-          "emailJourneys.components.journeyInfo.resultsFocused.description",
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.resultsFocused.description",
         ),
       },
       [EmailJourneyVariant.PERSONAL_RESULTS]: {
-        name: t("emailJourneys.components.journeyInfo.personalResults.name"),
+        name: t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.personalResults.name",
+        ),
         description: t(
-          "emailJourneys.components.journeyInfo.personalResults.description",
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.personalResults.description",
         ),
       },
     };
@@ -355,15 +361,21 @@ export class EmailRendererService {
     ];
     // Create mock lead data for preview
     const mockLead: LeadWithEmailType = {
-      id: context.t("emailJourneys.components.defaults.previewLeadId"),
-      email: context.t("emailJourneys.components.defaults.previewEmail"),
+      id: context.t(
+        "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewLeadId",
+      ),
+      email: context.t(
+        "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewEmail",
+      ),
       businessName: context.t(
-        "emailJourneys.components.defaults.previewBusinessName",
+        "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewBusinessName",
       ),
       contactName: context.t(
-        "emailJourneys.components.defaults.previewContactName",
+        "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewContactName",
       ),
-      phone: context.t("emailJourneys.components.defaults.previewPhone"),
+      phone: context.t(
+        "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewPhone",
+      ),
       website: env.NEXT_PUBLIC_APP_URL,
       country: country,
       language: language,
@@ -404,7 +416,7 @@ export class EmailRendererService {
       {
         ...context,
         campaignId: context.t(
-          "emailJourneys.components.defaults.previewCampaignId",
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewCampaignId",
         ),
         unsubscribeUrl: `${env.NEXT_PUBLIC_APP_URL}/unsubscribe?preview=true`,
         trackingUrl: `${env.NEXT_PUBLIC_APP_URL}/track?preview=true`,

@@ -3,8 +3,6 @@
  * /api/v1/core/agent/chat/credits
  */
 
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 // Import response utilities from next-vibe shared types
 import {
   createErrorResponse,
@@ -12,17 +10,20 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+
 import definitions from "./definition";
 import { creditRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: async ({ user, leadId, logger }) => {
+    handler: async ({ user, logger }) => {
       // Get credit identifier (determines if we use user credits or lead credits)
       const identifierResult = await creditRepository.getCreditIdentifier(
         user.id,
-        leadId,
+        user.leadId,
         logger,
       );
 

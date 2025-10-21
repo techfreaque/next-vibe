@@ -181,7 +181,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
             `✅ Database connection ready after ${attempt} attempts (${(attempt * delayMs) / 1000}s)`,
           );
           return;
-        } catch (connError) {
+        } catch {
           await pool.end().catch(() => {});
           // Log progress every 10 attempts
           if (attempt % 10 === 0) {

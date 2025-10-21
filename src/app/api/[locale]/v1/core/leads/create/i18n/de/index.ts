@@ -187,5 +187,10 @@ export const translations: typeof enTranslations = {
         defaultName: "Neuer Lead",
       },
     },
+    error: {
+      general: {
+        internal_server_error: "Ein interner Serverfehler ist aufgetreten",
+      },
+    },
   },
 };

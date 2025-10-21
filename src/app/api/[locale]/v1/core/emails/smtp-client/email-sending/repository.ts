@@ -48,6 +48,7 @@ function isCountry(value: string): value is Countries {
 
 /**
  * Utility function to map locale to country and language for SMTP selection
+ * Note: Throws are caught by parent try-catch and converted to ResponseType
  */
 function mapLocaleToSelectionCriteria(locale: CountryLanguage): {
   country: Countries;
@@ -55,6 +56,7 @@ function mapLocaleToSelectionCriteria(locale: CountryLanguage): {
 } {
   const parts: string[] = locale.split("-");
   if (parts.length !== 2) {
+    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
     throw new Error(`Invalid locale format: ${locale}`);
   }
 
@@ -62,10 +64,12 @@ function mapLocaleToSelectionCriteria(locale: CountryLanguage): {
   const countryPart = parts[1];
 
   if (!isLanguage(languagePart)) {
+    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
     throw new Error(`Invalid language in locale: ${languagePart}`);
   }
 
   if (!isCountry(countryPart)) {
+    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
     throw new Error(`Invalid country in locale: ${countryPart}`);
   }
 
@@ -140,7 +144,8 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
               ? `${data.params.replyToName} <${data.params.replyToEmail}>`
               : undefined,
           unsubscribeUrl: data.params.unsubscribeUrl,
-          senderName: data.params.senderName || data.params.t("common.appName"), // Default to app name if not provided
+          senderName:
+            data.params.senderName || data.params.t("app.common.appName"), // Default to app name if not provided
           selectionCriteria,
           skipRateLimitCheck: data.params.skipRateLimitCheck,
           leadId: data.params.leadId,
@@ -191,7 +196,7 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
         campaignType: data.params.campaignType,
       });
       return createErrorResponse(
-        "email.errors.sending_failed",
+        "app.api.v1.core.emails.smtpClient.emailSending.email.errors.sending_failed",
         ErrorResponseTypes.EMAIL_ERROR,
         {
           recipient: data.params.toEmail,

@@ -190,7 +190,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         limit,
         pageCount,
         resultsCount: threads.length,
-        threadIds: threads.map(t => t.id),
+        threadIds: threads.map((t) => t.id),
       });
 
       return createSuccessResponse({

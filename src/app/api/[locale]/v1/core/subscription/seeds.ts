@@ -97,7 +97,16 @@ export async function dev(logger: EndpointLogger): Promise<void> {
         logger.debug(
           `✅ Created development subscription for demo user: ${createdSubscription.id}`,
         );
-        subscription = createdSubscription;
+        subscription = {
+          ...createdSubscription,
+          plan: createdSubscription.planId,
+          currentPeriodStart:
+            createdSubscription.currentPeriodStart?.toISOString() ?? "",
+          currentPeriodEnd:
+            createdSubscription.currentPeriodEnd?.toISOString() ?? "",
+          createdAt: createdSubscription.createdAt.toISOString(),
+          updatedAt: createdSubscription.updatedAt.toISOString(),
+        };
       }
     }
 
@@ -178,7 +187,16 @@ export async function dev(logger: EndpointLogger): Promise<void> {
           logger.debug(
             `✅ Created premium subscription for admin user: ${adminCreatedSubscription.id}`,
           );
-          adminSubscriptionData = adminCreatedSubscription;
+          adminSubscriptionData = {
+            ...adminCreatedSubscription,
+            plan: adminCreatedSubscription.planId,
+            currentPeriodStart:
+              adminCreatedSubscription.currentPeriodStart?.toISOString() ?? "",
+            currentPeriodEnd:
+              adminCreatedSubscription.currentPeriodEnd?.toISOString() ?? "",
+            createdAt: adminCreatedSubscription.createdAt.toISOString(),
+            updatedAt: adminCreatedSubscription.updatedAt.toISOString(),
+          };
         }
       } else {
         logger.debug(

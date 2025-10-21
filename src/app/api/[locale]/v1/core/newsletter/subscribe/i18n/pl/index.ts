@@ -118,6 +118,14 @@ export const translations: typeof enTranslations = {
     sending_admin_notification:
       "Wysyłanie powiadomienia SMS administratora dla subskrypcji newslettera",
     admin_notification_error: "Błąd wysyłania powiadomienia SMS administratora",
+    welcome: {
+      message:
+        "Cześć {{name}}! Witamy w naszym newsletterze. Czekaj na aktualizacje!",
+    },
+    admin_notification: {
+      message:
+        "Nowa subskrypcja newslettera: {{displayName}} ({{email}}) zasubskrybował",
+    },
   },
   route: {
     sms_failed_continuing: "Powiadomienia SMS nie powiodły się, kontynuowanie",

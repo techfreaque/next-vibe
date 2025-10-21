@@ -527,7 +527,9 @@ export function ChatInterface({
             // Use the content provided by the user (or empty string to let AI generate)
             await answerAsAI(messageId, content);
           }}
-          onVoteMessage={currentRootFolderId === "incognito" ? undefined : voteMessage}
+          onVoteMessage={
+            currentRootFolderId === "incognito" ? undefined : voteMessage
+          }
           onModelChange={setSelectedModel}
           onPersonaChange={setSelectedPersona}
           onEnableSearchChange={setEnableSearch}

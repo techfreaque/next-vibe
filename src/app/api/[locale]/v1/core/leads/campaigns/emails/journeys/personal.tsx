@@ -31,7 +31,7 @@ export const personalInitialEmail: EmailTemplateFunction = ({
   const emailContent = (
     <HumanEmailLayout
       previewText={t(
-        "emailJourneys.leads.journeys.personal.initial.previewText",
+        "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.initial.previewText",
       )}
       locale={locale}
       companyName={companyName}
@@ -41,43 +41,61 @@ export const personalInitialEmail: EmailTemplateFunction = ({
       tracking={tracking}
     >
       <HumanText style="greeting">
-        {t("emailJourneys.leads.journeys.personal.initial.greeting")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.initial.greeting",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.initial.intro")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.initial.intro",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.initial.serviceDescription")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.initial.serviceDescription",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.initial.convenience")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.initial.convenience",
+        )}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t("emailJourneys.leads.journeys.personal.initial.ctaText")}
+        text={t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.initial.ctaText",
+        )}
         style="primary"
         tracking={tracking}
       />
 
       <HumanText style="signature">
-        {t("emailJourneys.leads.journeys.personal.initial.signature")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.initial.signature",
+        )}
         <br />
-        {t("emailJourneys.components.defaults.signatureName")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.components.defaults.signatureName",
+        )}
       </HumanText>
 
       <HumanText style="ps">
-        {t("emailJourneys.leads.journeys.personal.initial.postScript")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.initial.postScript",
+        )}
       </HumanText>
     </HumanEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.personal.initial.subject"),
+    subject: t(
+      "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.initial.subject",
+    ),
     jsx: emailContent,
   };
 };
@@ -96,7 +114,7 @@ export const personalFollowup1Email: EmailTemplateFunction = ({
   const emailContent = (
     <HumanEmailLayout
       previewText={t(
-        "emailJourneys.leads.journeys.personal.followup1.previewText",
+        "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup1.previewText",
       )}
       locale={locale}
       companyName={companyName}
@@ -106,49 +124,67 @@ export const personalFollowup1Email: EmailTemplateFunction = ({
       tracking={tracking}
     >
       <HumanText style="greeting">
-        {t("emailJourneys.leads.journeys.personal.followup1.greeting")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup1.greeting",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.followup1.intro")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup1.intro",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.followup1.empathy")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup1.empathy",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.followup1.socialProof.quote")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup1.socialProof.quote",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.followup1.question")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup1.question",
+        )}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t("emailJourneys.leads.journeys.personal.followup1.ctaText")}
+        text={t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup1.ctaText",
+        )}
         style="primary"
         tracking={tracking}
       />
 
       <HumanText style="body">
         {t(
-          "emailJourneys.leads.journeys.personal.followup1.socialProof.author",
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup1.socialProof.author",
         )}
       </HumanText>
 
       <HumanText style="signature">
-        {t("emailJourneys.leads.journeys.personal.followup1.signature")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup1.signature",
+        )}
         <br />
-        {t("emailJourneys.components.defaults.signatureName")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.components.defaults.signatureName",
+        )}
       </HumanText>
     </HumanEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.personal.followup1.subject"),
+    subject: t(
+      "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup1.subject",
+    ),
     jsx: emailContent,
   };
 };
@@ -167,7 +203,7 @@ export const personalFollowup2Email: EmailTemplateFunction = ({
   const emailContent = (
     <HumanEmailLayout
       previewText={t(
-        "emailJourneys.leads.journeys.personal.followup2.previewText",
+        "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup2.previewText",
       )}
       locale={locale}
       companyName={companyName}
@@ -177,45 +213,63 @@ export const personalFollowup2Email: EmailTemplateFunction = ({
       tracking={tracking}
     >
       <HumanText style="greeting">
-        {t("emailJourneys.leads.journeys.personal.followup2.greeting")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup2.greeting",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.followup2.intro")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup2.intro",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.followup2.story1")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup2.story1",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.followup2.story2")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup2.story2",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.followup2.mission")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup2.mission",
+        )}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t("emailJourneys.leads.journeys.personal.followup2.ctaText")}
+        text={t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup2.ctaText",
+        )}
         style="primary"
         tracking={tracking}
       />
 
       <HumanText style="signature">
-        {t("emailJourneys.leads.journeys.personal.followup2.signature")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup2.signature",
+        )}
       </HumanText>
 
       <HumanText style="ps">
-        {t("emailJourneys.leads.journeys.personal.followup2.closing")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup2.closing",
+        )}
       </HumanText>
     </HumanEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.personal.followup2.subject"),
+    subject: t(
+      "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup2.subject",
+    ),
     jsx: emailContent,
   };
 };
@@ -234,7 +288,7 @@ export const personalFollowup3Email: EmailTemplateFunction = ({
   const emailContent = (
     <HumanEmailLayout
       previewText={t(
-        "emailJourneys.leads.journeys.personal.followup3.previewText",
+        "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup3.previewText",
       )}
       locale={locale}
       companyName={companyName}
@@ -244,41 +298,57 @@ export const personalFollowup3Email: EmailTemplateFunction = ({
       tracking={tracking}
     >
       <HumanText style="greeting">
-        {t("emailJourneys.leads.journeys.personal.followup3.greeting")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup3.greeting",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.followup3.intro")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup3.intro",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.followup3.reflection")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup3.reflection",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.followup3.noPressure")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup3.noPressure",
+        )}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t("emailJourneys.leads.journeys.personal.followup3.ctaText")}
+        text={t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup3.ctaText",
+        )}
         style="primary"
         tracking={tracking}
       />
 
       <HumanText style="signature">
-        {t("emailJourneys.leads.journeys.personal.followup3.signature")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup3.signature",
+        )}
       </HumanText>
 
       <HumanText style="ps">
-        {t("emailJourneys.leads.journeys.personal.followup3.closing")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup3.closing",
+        )}
       </HumanText>
     </HumanEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.personal.followup3.subject"),
+    subject: t(
+      "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.followup3.subject",
+    ),
     jsx: emailContent,
   };
 };
@@ -297,7 +367,7 @@ export const personalNurtureEmail: EmailTemplateFunction = ({
   const emailContent = (
     <HumanEmailLayout
       previewText={t(
-        "emailJourneys.leads.journeys.personal.nurture.previewText",
+        "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.nurture.previewText",
       )}
       locale={locale}
       companyName={companyName}
@@ -307,37 +377,51 @@ export const personalNurtureEmail: EmailTemplateFunction = ({
       tracking={tracking}
     >
       <HumanText style="greeting">
-        {t("emailJourneys.leads.journeys.personal.nurture.greeting")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.nurture.greeting",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.nurture.intro")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.nurture.intro",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.nurture.tip")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.nurture.tip",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.nurture.value")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.nurture.value",
+        )}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t("emailJourneys.leads.journeys.personal.nurture.ctaText")}
+        text={t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.nurture.ctaText",
+        )}
         style="secondary"
         tracking={tracking}
       />
 
       <HumanText style="signature">
-        {t("emailJourneys.leads.journeys.personal.nurture.signature")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.nurture.signature",
+        )}
       </HumanText>
     </HumanEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.personal.nurture.subject"),
+    subject: t(
+      "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.nurture.subject",
+    ),
     jsx: emailContent,
   };
 };
@@ -356,7 +440,7 @@ export const personalReactivationEmail: EmailTemplateFunction = ({
   const emailContent = (
     <HumanEmailLayout
       previewText={t(
-        "emailJourneys.leads.journeys.personal.reactivation.previewText",
+        "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.reactivation.previewText",
       )}
       locale={locale}
       companyName={companyName}
@@ -366,41 +450,57 @@ export const personalReactivationEmail: EmailTemplateFunction = ({
       tracking={tracking}
     >
       <HumanText style="greeting">
-        {t("emailJourneys.leads.journeys.personal.reactivation.greeting")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.reactivation.greeting",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.reactivation.intro")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.reactivation.intro",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.reactivation.checkIn")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.reactivation.checkIn",
+        )}
       </HumanText>
 
       <HumanText style="body">
-        {t("emailJourneys.leads.journeys.personal.reactivation.offer")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.reactivation.offer",
+        )}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t("emailJourneys.leads.journeys.personal.reactivation.ctaText")}
+        text={t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.reactivation.ctaText",
+        )}
         style="primary"
         tracking={tracking}
       />
 
       <HumanText style="signature">
-        {t("emailJourneys.leads.journeys.personal.reactivation.signature")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.reactivation.signature",
+        )}
       </HumanText>
 
       <HumanText style="ps">
-        {t("emailJourneys.leads.journeys.personal.reactivation.closing")}
+        {t(
+          "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.reactivation.closing",
+        )}
       </HumanText>
     </HumanEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.personal.reactivation.subject"),
+    subject: t(
+      "app.api.v1.core.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.personal.reactivation.subject",
+    ),
     jsx: emailContent,
   };
 };

@@ -346,6 +346,7 @@ export async function createAiStream({
     case "retry": {
       // Retry: Re-generate AI response for the same user message
       // parentMessageId should point to the user message to retry
+      // The new AI message will be a sibling of existing AI messages (both children of the user message)
       if (!data.parentMessageId) {
         logger.error("Retry operation requires parentMessageId");
         return createErrorResponse(
@@ -360,30 +361,32 @@ export async function createAiStream({
           parentMessageId: data.parentMessageId,
         });
       } else if (userId) {
-        // For server mode, fetch the parent message
-        const parentMessage = await getParentMessage(
+        // For server mode, fetch the user message
+        const userMessage = await getParentMessage(
           data.parentMessageId,
           userId,
           logger,
         );
 
-        if (!parentMessage) {
+        if (!userMessage) {
           return createErrorResponse(
             "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
             ErrorResponseTypes.NOT_FOUND,
           );
         }
 
-        effectiveThreadId = parentMessage.threadId;
-        effectiveContent = parentMessage.content;
-        effectiveRole = parentMessage.role.toLowerCase() as
+        effectiveThreadId = userMessage.threadId;
+        effectiveContent = userMessage.content;
+        effectiveRole = userMessage.role.toLowerCase() as
           | "user"
           | "assistant"
           | "system";
-        effectiveParentMessageId = parentMessage.parentId;
+        // For retry, the new AI message should be a child of the user message
+        // NOT a child of the user message's parent
+        effectiveParentMessageId = data.parentMessageId;
 
-        logger.info("Retry operation - using parent message", {
-          parentMessageId: data.parentMessageId,
+        logger.info("Retry operation - using user message", {
+          userMessageId: data.parentMessageId,
           threadId: effectiveThreadId,
         });
       }
@@ -468,9 +471,9 @@ export async function createAiStream({
     isIncognito,
   );
 
-  // Step 6: Create user message (skip for answer-as-ai operation)
+  // Step 6: Create user message (skip for answer-as-ai and retry operations)
   const userMessageId = crypto.randomUUID();
-  if (data.operation !== "answer-as-ai") {
+  if (data.operation !== "answer-as-ai" && data.operation !== "retry") {
     if (!isIncognito && userId) {
       await db.insert(chatMessages).values({
         id: userMessageId,
@@ -529,7 +532,7 @@ export async function createAiStream({
   // Step 8: Create AI message placeholder
   const aiMessageId = crypto.randomUUID();
   const parentForAiMessage =
-    data.operation === "answer-as-ai"
+    data.operation === "answer-as-ai" || data.operation === "retry"
       ? effectiveParentMessageId
       : userMessageId;
 
@@ -541,7 +544,9 @@ export async function createAiStream({
       content: data.operation === "answer-as-ai" ? data.content : "", // For answer-as-ai, use content directly
       parentId: parentForAiMessage,
       depth:
-        data.operation === "answer-as-ai" ? messageDepth : messageDepth + 1,
+        data.operation === "answer-as-ai" || data.operation === "retry"
+          ? messageDepth
+          : messageDepth + 1,
       isAI: true,
       model: data.model,
       persona: data.persona || null,
@@ -767,6 +772,63 @@ export async function createAiStream({
           });
           controller.enqueue(encoder.encode(formatSSEEvent(doneEvent)));
 
+          // Deduct credits AFTER successful completion (not optimistically)
+          if (modelCost > 0) {
+            const creditMessageId = crypto.randomUUID();
+
+            // Determine correct credit identifier based on subscription status
+            let creditIdentifier: { userId?: string; leadId?: string };
+            if (userId) {
+              const identifierResult =
+                await creditRepository.getCreditIdentifier(
+                  userId,
+                  effectiveLeadId,
+                  logger,
+                );
+              if (!identifierResult.success) {
+                logger.error("Failed to get credit identifier", {
+                  userId,
+                  leadId: effectiveLeadId,
+                });
+                creditIdentifier = { leadId: effectiveLeadId }; // Fallback to lead credits
+              } else {
+                creditIdentifier = {
+                  userId: identifierResult.data.userId,
+                  leadId: identifierResult.data.leadId,
+                };
+                logger.debug("Using credit identifier", {
+                  creditType: identifierResult.data.creditType,
+                  identifier: creditIdentifier,
+                });
+              }
+            } else {
+              creditIdentifier = { leadId: effectiveLeadId };
+            }
+
+            const deductResult = await creditRepository.deductCredits(
+              creditIdentifier,
+              modelCost,
+              data.model,
+              creditMessageId,
+            );
+
+            if (!deductResult.success) {
+              logger.error("Failed to deduct credits", {
+                userId,
+                leadId: effectiveLeadId,
+                cost: modelCost,
+              });
+            } else {
+              logger.info("Credits deducted successfully", {
+                userId,
+                leadId: effectiveLeadId,
+                cost: modelCost,
+                messageId: creditMessageId,
+                creditIdentifier,
+              });
+            }
+          }
+
           // Track search usage for credit deduction
           if (toolCalls && Array.isArray(toolCalls) && toolCalls.length > 0) {
             const searchCalls = toolCalls.filter(
@@ -783,11 +845,12 @@ export async function createAiStream({
               // Determine correct credit identifier for search deductions
               let searchCreditIdentifier: { userId?: string; leadId?: string };
               if (userId) {
-                const identifierResult = await creditRepository.getCreditIdentifier(
-                  userId,
-                  effectiveLeadId,
-                  logger,
-                );
+                const identifierResult =
+                  await creditRepository.getCreditIdentifier(
+                    userId,
+                    effectiveLeadId,
+                    logger,
+                  );
                 if (!identifierResult.success) {
                   searchCreditIdentifier = { leadId: effectiveLeadId };
                 } else {
@@ -836,63 +899,6 @@ export async function createAiStream({
         }
       },
     });
-
-    // Deduct credits (optimistic - deduct before stream completes)
-    if (modelCost > 0) {
-      const messageId = crypto.randomUUID();
-
-      // Determine correct credit identifier based on subscription status
-      let creditIdentifier: { userId?: string; leadId?: string };
-      if (userId) {
-        const identifierResult = await creditRepository.getCreditIdentifier(
-          userId,
-          effectiveLeadId,
-          logger,
-        );
-        if (!identifierResult.success) {
-          logger.error("Failed to get credit identifier", {
-            userId,
-            leadId: effectiveLeadId,
-          });
-          creditIdentifier = { leadId: effectiveLeadId }; // Fallback to lead credits
-        } else {
-          creditIdentifier = {
-            userId: identifierResult.data.userId,
-            leadId: identifierResult.data.leadId,
-          };
-          logger.debug("Using credit identifier", {
-            creditType: identifierResult.data.creditType,
-            identifier: creditIdentifier,
-          });
-        }
-      } else {
-        creditIdentifier = { leadId: effectiveLeadId };
-      }
-
-      const deductResult = await creditRepository.deductCredits(
-        creditIdentifier,
-        modelCost,
-        data.model,
-        messageId,
-      );
-
-      if (!deductResult.success) {
-        logger.error("Failed to deduct credits", {
-          userId,
-          leadId: effectiveLeadId,
-          cost: modelCost,
-        });
-        // Continue anyway - stream already started
-      } else {
-        logger.info("Credits deducted successfully", {
-          userId,
-          leadId: effectiveLeadId,
-          cost: modelCost,
-          messageId,
-          creditIdentifier,
-        });
-      }
-    }
 
     return createStreamingResponse(
       new Response(stream, {

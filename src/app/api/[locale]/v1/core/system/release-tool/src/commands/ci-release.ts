@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import { execSync } from "child_process";
 import { join } from "path";
 
@@ -65,7 +66,6 @@ export async function ciRelease(
 
   if (!configResponse.success) {
     logger.error("Failed to load config", { error: configResponse.message });
-    // eslint-disable-next-line no-restricted-syntax
     throw new Error(configResponse.message);
   }
 
@@ -78,7 +78,19 @@ export async function ciRelease(
 
   for (const pkg of config.packages) {
     const cwd = join(originalCwd, pkg.directory);
-    const packageJson = getPackageJson(cwd);
+    const packageJsonResponse = getPackageJson(cwd, logger);
+
+    if (!packageJsonResponse.success) {
+      logger.error("Failed to read package.json", {
+        directory: pkg.directory,
+        error: packageJsonResponse.message,
+      });
+      affectedPackages.push(pkg.directory);
+      overallError = true;
+      continue;
+    }
+
+    const packageJson = packageJsonResponse.data;
 
     try {
       logger.info(CLI_MESSAGES.processingPackage(packageJson.name));
@@ -92,7 +104,10 @@ export async function ciRelease(
         // Run Snyk monitor if configured (upload to Snyk dashboard)
         if (pkg.snyk) {
           logger.info(CLI_MESSAGES.runningSnykMonitor(packageJson.name));
-          snykMonitor(cwd);
+          const snykResult = snykMonitor(cwd, logger);
+          if (!snykResult.success) {
+            throw new Error(snykResult.message);
+          }
         }
 
         runCiReleaseCommand(releaseConfig, packageJson.name, logger);
@@ -128,27 +143,42 @@ function runQualityChecks(
 ): void {
   if (pkg.lint) {
     logger.info(CLI_MESSAGES.linting(packageName));
-    lint(cwd, logger);
+    const lintResult = lint(cwd, logger);
+    if (!lintResult.success) {
+      throw new Error(lintResult.message);
+    }
   }
 
   if (pkg.typecheck) {
     logger.info(CLI_MESSAGES.typeChecking(packageName));
-    typecheck(cwd, logger);
+    const typecheckResult = typecheck(cwd, logger);
+    if (!typecheckResult.success) {
+      throw new Error(typecheckResult.message);
+    }
   }
 
   if (pkg.build) {
     logger.info(CLI_MESSAGES.building(packageName));
-    build(cwd);
+    const buildResult = build(cwd, logger);
+    if (!buildResult.success) {
+      throw new Error(buildResult.message);
+    }
   }
 
   if (pkg.test) {
     logger.info(CLI_MESSAGES.runningTests(packageName));
-    runTests(cwd);
+    const testResult = runTests(cwd, logger);
+    if (!testResult.success) {
+      throw new Error(testResult.message);
+    }
   }
 
   if (pkg.snyk) {
     logger.info(CLI_MESSAGES.runningSnykTest(packageName));
-    snykTest(cwd);
+    const snykResult = snykTest(cwd, logger);
+    if (!snykResult.success) {
+      throw new Error(snykResult.message);
+    }
   }
 }
 
@@ -163,7 +193,6 @@ function runCiReleaseCommand(
   if (!releaseConfig.ciReleaseCommand) {
     const errorMsg = CLI_MESSAGES.ciReleaseRequired(packageName);
     logger.error(errorMsg);
-    // eslint-disable-next-line no-restricted-syntax
     throw new Error(errorMsg);
   }
 
@@ -189,14 +218,12 @@ function runCiReleaseCommand(
       if (typeof value !== "string") {
         const errorMsg = CLI_MESSAGES.envVarNotString(packageName);
         logger.error(errorMsg);
-        // eslint-disable-next-line no-restricted-syntax
         throw new Error(errorMsg);
       }
       const envValue = getEnvVar(value);
       if (!envValue) {
         const errorMsg = CLI_MESSAGES.envVarNotSet(value, packageName);
         logger.error(errorMsg);
-        // eslint-disable-next-line no-restricted-syntax
         throw new Error(errorMsg);
       }
       ciEnv[key] = envValue;
@@ -213,7 +240,6 @@ function runCiReleaseCommand(
     const msg = error instanceof Error ? error.message : String(error);
     const errorMsg = CLI_MESSAGES.ciCommandFailed(packageName, msg);
     logger.error(errorMsg);
-    // eslint-disable-next-line no-restricted-syntax
     throw new Error(errorMsg);
   }
 }

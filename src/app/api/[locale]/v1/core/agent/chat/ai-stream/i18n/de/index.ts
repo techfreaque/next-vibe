@@ -150,6 +150,10 @@ export const translations: typeof enTranslations = {
     },
   },
   route: {
+    debug: {
+      userObject: "AI Stream Route: Benutzerobjekt",
+      extracted: "AI Stream Route: Extrahierte Werte",
+    },
     errors: {
       invalidJson: "Ungültiges JSON im Anforderungstext",
       invalidRequestData: "Ungültige Anforderungsdaten",
@@ -160,7 +164,8 @@ export const translations: typeof enTranslations = {
       creditValidationFailed: "Fehler bei der Validierung des Guthabens",
       noIdentifier: "Keine Benutzer- oder Lead-Kennung angegeben",
       insufficientCredits: "Nicht genügend Guthaben für diese Anfrage",
-      authenticationRequired: "Bitte melden Sie sich an, um persistente Ordner zu verwenden. Verwenden Sie den Inkognito-Modus für anonyme Chats.",
+      authenticationRequired:
+        "Bitte melden Sie sich an, um persistente Ordner zu verwenden. Verwenden Sie den Inkognito-Modus für anonyme Chats.",
       noResponseBody: "Kein Antworttext vom Stream erhalten",
     },
   },

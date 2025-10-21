@@ -27,41 +27,8 @@ import { imapAccounts, imapFolders } from "../../messages/db";
 // Note: Removed problematic type imports from definition.ts
 // These types should be defined locally or imported from proper sources
 import { ImapSyncStatus, ImapSyncStatusFilter } from "../enum";
+import type { ImapFoldersListResponseOutput } from "./list/definition";
 import type { FoldersSyncResponseOutput } from "./sync/definition";
-
-/**
- * Local type definitions for folders repository
- */
-interface ImapFolderResponseType {
-  id: string;
-  name: string;
-  displayName: string | null;
-  path: string;
-  delimiter: string;
-  isSelectable: boolean;
-  hasChildren: boolean;
-  isSpecialUse: boolean;
-  specialUseType: string | null;
-  uidValidity: number | null;
-  uidNext: number | null;
-  messageCount: number;
-  recentCount: number;
-  unseenCount: number;
-  accountId: string;
-  syncStatus: string;
-  syncError: string | null;
-  lastSyncAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface ImapFolderListResponseType {
-  folders: ImapFolderResponseType[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
 
 interface ImapFolderQueryType {
   accountId?: string;
@@ -100,14 +67,14 @@ export interface ImapFoldersRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapFolderListResponseType>>;
+  ): Promise<ResponseType<ImapFoldersListResponseOutput>>;
 
   getFolderById(
     data: { id: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapFolderResponseType>>;
+  ): Promise<ResponseType<ImapFoldersListResponseOutput["folders"][number]>>;
 
   syncFolders(
     data: ImapFolderSyncType,
@@ -121,7 +88,7 @@ export interface ImapFoldersRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapFolderListResponseType>>;
+  ): Promise<ResponseType<ImapFoldersListResponseOutput>>;
 
   updateFolderSyncStatus(
     folderId: string,
@@ -146,30 +113,23 @@ export interface ImapFoldersRepository {
  */
 class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
   /**
-   * Format IMAP folder for response
+   * Format IMAP folder for response matching definition.ts structure
    */
-  private formatFolderResponse(folder: ImapFolder): ImapFolderResponseType {
+  private formatFolderResponse(
+    folder: ImapFolder,
+  ): ImapFoldersListResponseOutput["folders"][number] {
     return {
       id: folder.id,
       name: folder.name,
       displayName: folder.displayName || null,
       path: folder.path,
-      delimiter: folder.delimiter || "/",
       isSelectable: folder.isSelectable || true,
       hasChildren: folder.hasChildren || false,
-      isSpecialUse: folder.isSpecialUse || false,
       specialUseType: folder.specialUseType || null,
-      uidValidity: folder.uidValidity || null,
-      uidNext: folder.uidNext || null,
       messageCount: folder.messageCount || 0,
-      recentCount: folder.recentCount || 0,
       unseenCount: folder.unseenCount || 0,
-      accountId: folder.accountId,
-      lastSyncAt: folder.lastSyncAt?.toISOString() || null,
       syncStatus: folder.syncStatus || ImapSyncStatus.PENDING,
-      syncError: folder.syncError ? JSON.stringify(folder.syncError) : null,
       createdAt: folder.createdAt.toISOString(),
-      updatedAt: folder.updatedAt.toISOString(),
     };
   }
 
@@ -181,7 +141,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapFolderListResponseType>> {
+  ): Promise<ResponseType<ImapFoldersListResponseOutput>> {
     try {
       logger.debug(
         "app.api.v1.core.emails.imapClient.folders.list.info.start",
@@ -258,10 +218,12 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
 
       return createSuccessResponse({
         folders: folders.map((folder) => this.formatFolderResponse(folder)),
-        total: totalCount,
-        page,
-        limit,
-        totalPages,
+        pagination: {
+          page,
+          limit,
+          total: totalCount,
+          totalPages,
+        },
       });
     } catch (error) {
       logger.error(
@@ -284,7 +246,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapFolderResponseType>> {
+  ): Promise<ResponseType<ImapFoldersListResponseOutput["folders"][number]>> {
     try {
       logger.debug("app.api.v1.core.emails.imapClient.folders.get.info.start", {
         id: data.id,
@@ -418,7 +380,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ImapFolderListResponseType>> {
+  ): Promise<ResponseType<ImapFoldersListResponseOutput>> {
     try {
       logger.debug(
         "app.api.v1.core.emails.imapClient.folders.byAccount.info.start",
@@ -436,10 +398,12 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
 
       return createSuccessResponse({
         folders: folders.map((folder) => this.formatFolderResponse(folder)),
-        total: folders.length,
-        page: 1,
-        limit: folders.length,
-        totalPages: 1,
+        pagination: {
+          page: 1,
+          limit: folders.length,
+          total: folders.length,
+          totalPages: 1,
+        },
       });
     } catch (error) {
       logger.error(

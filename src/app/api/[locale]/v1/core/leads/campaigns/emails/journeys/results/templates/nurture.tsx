@@ -27,7 +27,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
 
   const emailContent = (
     <EmailLayout
-      previewText={t("resultsJourney.nurture.previewText")}
+      previewText={t(
+        "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.previewText",
+      )}
       locale={locale}
     >
       <EmailContent>
@@ -42,7 +44,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             lineHeight: "1.2",
           }}
         >
-          {t("resultsJourney.nurture.subject")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.subject",
+          )}
         </Text>
 
         {/* Personal Greeting */}
@@ -54,7 +58,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             lineHeight: "1.6",
           }}
         >
-          {t("resultsJourney.nurture.greeting")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.greeting",
+          )}
         </Text>
 
         {/* Industry Insights */}
@@ -76,7 +82,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
               textAlign: "center",
             }}
           >
-            {t("resultsJourney.nurture.insightsTitle")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.insightsTitle",
+            )}
           </Text>
 
           <Text
@@ -87,7 +95,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
               margin: "0 0 16px 0",
             }}
           >
-            {t("resultsJourney.nurture.insight1")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.insight1",
+            )}
           </Text>
 
           <Text
@@ -98,7 +108,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
               margin: "0",
             }}
           >
-            {t("resultsJourney.nurture.insight2")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.insight2",
+            )}
           </Text>
         </div>
 
@@ -112,7 +124,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             textAlign: "center",
           }}
         >
-          {t("resultsJourney.nurture.freeResourceTitle")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.freeResourceTitle",
+          )}
         </Text>
 
         <Text
@@ -124,7 +138,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             textAlign: "center",
           }}
         >
-          {t("resultsJourney.nurture.freeResourceDescription")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.freeResourceDescription",
+          )}
         </Text>
 
         {/* Tip 1 */}
@@ -145,7 +161,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
               margin: "0 0 8px 0",
             }}
           >
-            {t("resultsJourney.nurture.greeting")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.greeting",
+            )}
           </Text>
           <Text
             style={{
@@ -155,7 +173,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
               lineHeight: "1.6",
             }}
           >
-            {t("resultsJourney.nurture.intro")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.intro",
+            )}
           </Text>
         </div>
 
@@ -177,7 +197,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
               margin: "0 0 8px 0",
             }}
           >
-            {t("resultsJourney.nurture.greeting")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.greeting",
+            )}
           </Text>
           <Text
             style={{
@@ -187,7 +209,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
               lineHeight: "1.6",
             }}
           >
-            {t("resultsJourney.nurture.intro")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.intro",
+            )}
           </Text>
         </div>
 
@@ -209,7 +233,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
               margin: "0 0 8px 0",
             }}
           >
-            {t("resultsJourney.nurture.greeting")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.greeting",
+            )}
           </Text>
           <Text
             style={{
@@ -219,7 +245,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
               lineHeight: "1.6",
             }}
           >
-            {t("resultsJourney.nurture.intro")}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.intro",
+            )}
           </Text>
         </div>
 
@@ -232,7 +260,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             margin: "32px 0 16px 0",
           }}
         >
-          {t("resultsJourney.nurture.insightsTitle")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.insightsTitle",
+          )}
         </Text>
 
         <div style={{ paddingLeft: "20px", margin: "0 0 24px 0" }}>
@@ -244,7 +274,10 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
               lineHeight: "1.6",
             }}
           >
-            • {t("resultsJourney.nurture.insight1")}
+            •{" "}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.insight1",
+            )}
           </Text>
           <Text
             style={{
@@ -254,7 +287,10 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
               lineHeight: "1.6",
             }}
           >
-            • {t("resultsJourney.nurture.insight2")}
+            •{" "}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.insight2",
+            )}
           </Text>
           <Text
             style={{
@@ -264,7 +300,10 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
               lineHeight: "1.6",
             }}
           >
-            • {t("resultsJourney.nurture.intro")}
+            •{" "}
+            {t(
+              "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.intro",
+            )}
           </Text>
         </div>
 
@@ -282,13 +321,17 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             border: "1px solid #a7f3d0",
           }}
         >
-          {t("resultsJourney.nurture.greeting")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.greeting",
+          )}
         </Text>
 
         {/* CTA Button */}
         <CTAButton
           href={trackingUrl}
-          text={t("resultsJourney.nurture.ctaText")}
+          text={t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.ctaText",
+          )}
           backgroundColor="#059669"
           size="large"
           tracking={tracking}
@@ -303,7 +346,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
             textAlign: "center",
           }}
         >
-          {t("resultsJourney.nurture.noObligationText")}
+          {t(
+            "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.noObligationText",
+          )}
         </Text>
       </EmailContent>
       <EmailFooter
@@ -318,7 +363,9 @@ export const resultsNurtureEmail: EmailTemplateFunction = ({
 
   return {
     to: lead.email,
-    subject: t("resultsJourney.nurture.subject"),
+    subject: t(
+      "app.api.v1.core.leads.campaigns.emails.journeys.results.templates.resultsJourney.nurture.subject",
+    ),
     jsx: emailContent,
   };
 };

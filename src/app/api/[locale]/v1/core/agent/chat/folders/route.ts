@@ -41,7 +41,12 @@ export const { GET, POST, tools } = endpointsHandler({
         typeof definitions.POST.allowedRoles
       >,
     ): Promise<ResponseType<FolderCreateResponseOutput>> => {
-      return await createFolder(props.user, props.data, props.locale);
+      return await createFolder(
+        props.user,
+        props.data,
+        props.locale,
+        props.logger,
+      );
     },
   },
 });

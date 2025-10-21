@@ -1,52 +1,36 @@
 export const translations = {
-  post: {
-    title: "Components",
-    description: "Components endpoint",
-    form: {
-      title: "Components Configuration",
-      description: "Configure components parameters",
-    },
-    response: {
-      title: "Response",
-      description: "Components response data",
-    },
-    errors: {
-      unauthorized: {
-        title: "Unauthorized",
-        description: "Authentication required",
-      },
-      validation: {
-        title: "Validation Error",
-        description: "Invalid request parameters",
-      },
-      server: {
-        title: "Server Error",
-        description: "Internal server error occurred",
-      },
-      unknown: {
-        title: "Unknown Error",
-        description: "An unknown error occurred",
-      },
-      network: {
-        title: "Network Error",
-        description: "Network error occurred",
-      },
-      forbidden: {
-        title: "Forbidden",
-        description: "Access forbidden",
-      },
-      notFound: {
-        title: "Not Found",
-        description: "Resource not found",
-      },
-      conflict: {
-        title: "Conflict",
-        description: "Data conflict occurred",
+  pricing: {
+    plans: {
+      orSeparator: "or",
+      perMonth: "/month",
+      PREMIUM: {
+        featureBadge: "Most Popular",
       },
     },
-    success: {
-      title: "Success",
-      description: "Operation completed successfully",
+  },
+  defaults: {
+    previewBusinessName: "Preview Business",
+    previewContactName: "Preview Contact",
+    previewEmail: "preview@example.com",
+    previewPhone: "+1234567890",
+    previewLeadId: "preview-lead-123",
+    previewCampaignId: "preview-campaign-123",
+  },
+  journeyInfo: {
+    resultsFocused: {
+      name: "Results-Focused Journey",
+      description:
+        "Professional approach emphasizing measurable outcomes and practical results",
+    },
+    personalResults: {
+      name: "Personal Results Journey",
+      description:
+        "Balanced approach combining personal connection with results-driven content",
+    },
+    personalApproach: {
+      name: "Personal Approach Journey",
+      description:
+        "Warm, relationship-focused communication building trust through personal connection",
     },
   },
 };

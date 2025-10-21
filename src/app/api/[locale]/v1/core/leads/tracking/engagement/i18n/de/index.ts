@@ -191,4 +191,7 @@ export const translations: typeof enTranslations = {
       none: "Keine",
     },
   },
+  error: {
+    default: "Bei der Verarbeitung des Engagements ist ein Fehler aufgetreten",
+  },
 };

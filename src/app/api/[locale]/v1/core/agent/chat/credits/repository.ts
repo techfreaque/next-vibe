@@ -11,15 +11,20 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
-import { leadCredits, leads, userLeads } from "@/app/api/[locale]/v1/core/leads/db";
+import {
+  leadCredits,
+  leads,
+  userLeads,
+} from "@/app/api/[locale]/v1/core/leads/db";
 import { LeadSource, LeadStatus } from "@/app/api/[locale]/v1/core/leads/enum";
-import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { subscriptions } from "@/app/api/[locale]/v1/core/subscription/db";
 import { SubscriptionStatus } from "@/app/api/[locale]/v1/core/subscription/enum";
+import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountriesArr, LanguagesArr } from "@/i18n/core/config";
 
 import { creditTransactions, userCredits } from "./db";
+import { CreditTypeIdentifier, type CreditTypeIdentifierValue } from "./enum";
 
 /**
  * Credit Balance Interface
@@ -99,7 +104,11 @@ export interface CreditRepositoryInterface {
     leadId: string,
     logger: EndpointLogger,
   ): Promise<
-    ResponseType<{ userId?: string; leadId?: string; creditType: string }>
+    ResponseType<{
+      userId?: string;
+      leadId?: string;
+      creditType: CreditTypeIdentifierValue;
+    }>
   >;
 }
 
@@ -306,8 +315,7 @@ class CreditRepository implements CreditRepositoryInterface {
       });
 
       return createSuccessResponse(undefined);
-    } catch (error) {
-      console.error("Failed to add credits:", error);
+    } catch {
       return createErrorResponse(
         "app.api.v1.core.agent.chat.credits.errors.addCreditsFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -492,7 +500,11 @@ class CreditRepository implements CreditRepositoryInterface {
     leadId: string,
     logger: EndpointLogger,
   ): Promise<
-    ResponseType<{ userId?: string; leadId?: string; creditType: string }>
+    ResponseType<{
+      userId?: string;
+      leadId?: string;
+      creditType: CreditTypeIdentifierValue;
+    }>
   > {
     try {
       // Check if user has an active subscription
@@ -513,7 +525,7 @@ class CreditRepository implements CreditRepositoryInterface {
         });
         return createSuccessResponse({
           userId,
-          creditType: "user_subscription",
+          creditType: CreditTypeIdentifier.USER_SUBSCRIPTION,
         });
       } else {
         // User has no active subscription → use lead credits
@@ -538,7 +550,7 @@ class CreditRepository implements CreditRepositoryInterface {
         });
         return createSuccessResponse({
           leadId: userLead.leadId,
-          creditType: "lead_free",
+          creditType: CreditTypeIdentifier.LEAD_FREE,
         });
       }
     } catch (error) {

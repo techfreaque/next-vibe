@@ -323,7 +323,9 @@ export async function EmailPricingSection({
                                 zIndex: "1",
                               }}
                             >
-                              {t("pricing.plans.orSeparator")}
+                              {t(
+                                "app.api.v1.core.leads.campaigns.emails.journeys.components.pricing.plans.orSeparator",
+                              )}
                             </Text>
                           </td>
                           <td
@@ -449,7 +451,9 @@ export async function EmailPricingSection({
               >
                 {plan.highlighted && plan.badge
                   ? plan.badge
-                  : t("pricing.plans.PREMIUM.featureBadge")}
+                  : t(
+                      "app.api.v1.core.leads.campaigns.emails.journeys.components.pricing.plans.PREMIUM.featureBadge",
+                    )}
               </div>
             </td>
           </tr>
@@ -509,7 +513,9 @@ export async function EmailPricingSection({
                             marginLeft: "8px",
                           }}
                         >
-                          {t("pricing.plans.perMonth")}
+                          {t(
+                            "app.api.v1.core.leads.campaigns.emails.journeys.components.pricing.plans.perMonth",
+                          )}
                         </span>
                       }
                     </Text>

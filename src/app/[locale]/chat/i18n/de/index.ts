@@ -44,7 +44,8 @@ export const translations: typeof enTranslations = {
     viewAllThreads: "Alle Threads anzeigen",
     backToChat: "Zurück zum Chat",
     language: "Sprache",
-    loginRequired: "Bitte melden Sie sich an, um persistente Ordner zu verwenden. Verwenden Sie den Inkognito-Modus für anonyme Chats.",
+    loginRequired:
+      "Bitte melden Sie sich an, um persistente Ordner zu verwenden. Verwenden Sie den Inkognito-Modus für anonyme Chats.",
 
     // Copy Button
     copyButton: {
@@ -416,6 +417,7 @@ export const translations: typeof enTranslations = {
   messages: {
     assistant: "Assistent",
     you: "Sie",
+    user: "Benutzer",
     anonymous: "Anonym",
     edited: "bearbeitet",
     postNumber: "Nr.{{number}}",
@@ -482,9 +484,13 @@ export const translations: typeof enTranslations = {
         "Kimi K2 Instruct ist ein großes Mixture-of-Experts (MoE) Sprachmodell, entwickelt von Moonshot AI.",
       deepseekV31Free:
         "Leistungsstarkes 671B-Parameter-Modell - völlig kostenlos!",
+      deepseekV31:
+        "Leistungsstarkes 671B-Parameter-Modell mit erweiterten Fähigkeiten",
       qwen3235bFree:
         "Mixture-of-Experts (MoE) Modell entwickelt von Qwen, unterstützt nahtloses Umschalten zwischen Modi.",
       deepseekR1Distill: "Destilliertes Reasoning-Modell mit starker Leistung",
+      deepseekR1:
+        "Fortgeschrittenes Reasoning-Modell mit tiefen Denkfähigkeiten",
       qwen257b: "Effizientes 7B-Parameter-Modell",
       grok4: "X-AI Grok 4 - Premium-Modell",
       grok4Fast:
@@ -578,6 +584,8 @@ export const translations: typeof enTranslations = {
       description:
         "Wählen Sie ein Modell und eine Persona, um eine KI-Antwort zu generieren",
       confirmLabel: "Generieren",
+      inputPlaceholder:
+        "Geben Sie eine Eingabeaufforderung für die KI ein (optional - leer lassen, damit die KI ihre eigene Antwort generiert)",
     },
   },
   suggestedPrompts: {
@@ -645,6 +653,8 @@ export const translations: typeof enTranslations = {
       description:
         "Wählen Sie ein Modell und eine Persona, um eine KI-Antwort zu generieren",
       confirmLabel: "Generieren",
+      inputPlaceholder:
+        "Geben Sie eine Eingabeaufforderung für die KI ein (optional - leer lassen, damit die KI ihre eigene Antwort generiert)",
     },
     actions: {
       vote: "Abstimmen",
@@ -707,6 +717,8 @@ export const translations: typeof enTranslations = {
       description:
         "Wählen Sie ein Modell und eine Persona, um eine KI-Antwort zu generieren",
       confirmLabel: "Generieren",
+      inputPlaceholder:
+        "Geben Sie eine Eingabeaufforderung für die KI ein (optional - leer lassen, damit die KI ihre eigene Antwort generiert)",
     },
     actions: {
       loadingAudio: "Audio wird geladen...",

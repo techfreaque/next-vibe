@@ -3,6 +3,12 @@
  */
 
 export const translations = {
+  enums: {
+    creditType: {
+      userSubscription: "User Subscription Credits",
+      leadFree: "Lead Free Tier Credits",
+    },
+  },
   expire: {
     task: {
       description: "Expires old subscription credits daily",
@@ -19,6 +25,9 @@ export const translations = {
     getTransactionsFailed: "Failed to get credit transactions",
     invalidIdentifier: "Invalid user or lead identifier",
     userNotFound: "User not found",
+    noLeadFound: "No lead found for user",
+    getCreditIdentifierFailed: "Failed to get credit identifier",
+    noCreditSource: "No credit source available",
     stripeCustomerFailed: "Failed to create Stripe customer",
     checkoutFailed: "Failed to create checkout session",
   },

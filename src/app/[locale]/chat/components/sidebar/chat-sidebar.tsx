@@ -111,7 +111,9 @@ export function ChatSidebar({
   // Check if user is authenticated using auth status cookie (client-side only)
   useEffect(() => {
     const authStatusResponse = authClientRepository.hasAuthStatus(logger);
-    setIsAuthenticated(authStatusResponse.success && authStatusResponse.data === true);
+    setIsAuthenticated(
+      authStatusResponse.success && authStatusResponse.data === true,
+    );
   }, [logger]);
 
   // Check if current folder requires authentication
@@ -151,9 +153,12 @@ export function ChatSidebar({
 
     // If user is not authenticated and tries to access non-incognito folder, redirect to incognito
     if (!isAuthenticated && rootFolderId !== DEFAULT_FOLDER_IDS.INCOGNITO) {
-      logger.info("Non-authenticated user attempted to access non-incognito folder, redirecting to incognito", {
-        attemptedFolder: rootFolderId,
-      });
+      logger.info(
+        "Non-authenticated user attempted to access non-incognito folder, redirecting to incognito",
+        {
+          attemptedFolder: rootFolderId,
+        },
+      );
       const url = buildFolderUrl(locale, DEFAULT_FOLDER_IDS.INCOGNITO, null);
       router.push(url);
       return;

@@ -22,6 +22,7 @@ import {
   ChartType,
   DateRangePreset,
   getDateRangeFromPreset,
+  type HistoricalDataPointType,
   TimePeriod,
 } from "next-vibe/shared/types/stats-filtering.schema";
 
@@ -147,14 +148,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         whereConditions.length > 0 ? and(...whereConditions) : undefined;
 
       // Generate comprehensive email statistics
-      const [
-        currentPeriodStats,
-        historicalData,
-        groupedStats,
-        recentActivity,
-        topPerformingTemplates,
-        topPerformingProviders,
-      ] = await Promise.all([
+      const results = await Promise.all([
         this.generateCurrentPeriodStats(whereClause),
         this.generateHistoricalData(timePeriod, whereClause),
         this.generateGroupedStats(whereClause),
@@ -163,9 +157,18 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         this.generateTopPerformingProviders(whereClause),
       ]);
 
+      const currentPeriodStats = results[0];
+      const historicalData = results[1];
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const groupedStats = results[2];
+      const recentActivity = results[3];
+      const topPerformingTemplates = results[4];
+      const topPerformingProviders = results[5];
+
       const statsResponse: EmailStatsResponseType = {
         ...currentPeriodStats,
         historicalData,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         groupedStats,
         generatedAt: new Date().toISOString(),
         dataRange: {
@@ -373,10 +376,11 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
   private transformToHistoricalData(
     results: Array<{ period: string; [key: string]: number | string }>,
     field: string,
-  ): Array<{ date: string; value: number }> {
+  ): HistoricalDataPointType[] {
     return results.map((item) => ({
       date: item.period,
       value: (item[field] as number) || 0,
+      label: undefined,
     }));
   }
 
@@ -434,144 +438,175 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       .orderBy(sql`date_trunc('${sql.raw(timePeriod)}', ${emails.createdAt})`);
 
     return {
-      totalEmails: {
-        name: "app.api.v1.core.emails.messages.stats.get.response.metrics.totalEmails" as const satisfies TranslationKey,
-        data: this.transformToHistoricalData(historicalResults, "totalEmails"),
-        color: "#3b82f6",
-        type: ChartType.LINE,
-      },
-      sentEmails: {
-        name: "app.api.v1.core.emails.messages.stats.get.response.metrics.sentEmails" as const satisfies TranslationKey,
-        data: this.transformToHistoricalData(historicalResults, "sentEmails"),
-        color: "#10b981",
-        type: ChartType.LINE,
-      },
-      deliveredEmails: {
-        name: "app.api.v1.core.emails.messages.stats.get.response.metrics.deliveredEmails" as const satisfies TranslationKey,
-        data: this.transformToHistoricalData(
-          historicalResults,
-          "deliveredEmails",
-        ),
-        color: "#059669",
-        type: ChartType.LINE,
-      },
-      openedEmails: {
-        name: "app.api.v1.core.emails.messages.stats.get.response.metrics.openedEmails" as const satisfies TranslationKey,
-        data: this.transformToHistoricalData(historicalResults, "openedEmails"),
-        color: "#0891b2",
-        type: ChartType.LINE,
-      },
-      clickedEmails: {
-        name: "app.api.v1.core.emails.messages.stats.get.response.metrics.clickedEmails" as const satisfies TranslationKey,
-        data: this.transformToHistoricalData(
-          historicalResults,
-          "clickedEmails",
-        ),
-        color: "#7c3aed",
-        type: ChartType.LINE,
-      },
-      bouncedEmails: {
-        name: "app.api.v1.core.emails.messages.stats.get.response.metrics.bouncedEmails" as const satisfies TranslationKey,
-        data: this.transformToHistoricalData(
-          historicalResults,
-          "bouncedEmails",
-        ),
-        color: "#dc2626",
-        type: ChartType.LINE,
-      },
-      failedEmails: {
-        name: "app.api.v1.core.emails.messages.stats.get.response.metrics.failedEmails" as const satisfies TranslationKey,
-        data: this.transformToHistoricalData(historicalResults, "failedEmails"),
-        color: "#b91c1c",
-        type: ChartType.LINE,
-      },
-      deliveryRate: {
-        name: "app.api.v1.core.emails.messages.stats.get.response.metrics.deliveryRate" as const satisfies TranslationKey,
-        data: historicalResults.map((item) => ({
-          date: item.period,
-          value:
-            item.sentEmails > 0 ? item.deliveredEmails / item.sentEmails : 0,
-        })),
-        color: "#059669",
-        type: ChartType.LINE,
-      },
-      openRate: {
-        name: "app.api.v1.core.emails.messages.stats.get.response.metrics.openRate" as const satisfies TranslationKey,
-        data: historicalResults.map((item) => ({
-          date: item.period,
-          value:
-            item.deliveredEmails > 0
-              ? item.openedEmails / item.deliveredEmails
-              : 0,
-        })),
-        color: "#0891b2",
-        type: ChartType.LINE,
-      },
-      clickRate: {
-        name: "app.api.v1.core.emails.messages.stats.get.response.metrics.clickRate" as const satisfies TranslationKey,
-        data: historicalResults.map((item) => ({
-          date: item.period,
-          value:
-            item.openedEmails > 0 ? item.clickedEmails / item.openedEmails : 0,
-        })),
-        color: "#7c3aed",
-        type: ChartType.LINE,
-      },
-      bounceRate: {
-        name: "app.api.v1.core.emails.messages.stats.get.response.metrics.bounceRate" as const satisfies TranslationKey,
-        data: historicalResults.map((item) => ({
-          date: item.period,
-          value: item.sentEmails > 0 ? item.bouncedEmails / item.sentEmails : 0,
-        })),
-        color: "#dc2626",
-        type: ChartType.LINE,
-      },
-      failureRate: {
-        name: "app.api.v1.core.emails.messages.stats.get.response.metrics.failureRate" as const satisfies TranslationKey,
-        data: historicalResults.map((item) => ({
-          date: item.period,
-          value:
-            item.totalEmails > 0 ? item.failedEmails / item.totalEmails : 0,
-        })),
-        color: "#b91c1c",
-        type: ChartType.LINE,
-      },
-      emailsWithErrors: {
-        name: "app.api.v1.core.emails.messages.stats.get.response.metrics.emails_with_errors" as const satisfies TranslationKey,
-        data: this.transformToHistoricalData(
-          historicalResults,
-          "emailsWithErrors",
-        ),
-        color: "#ef4444",
-        type: ChartType.LINE,
-      },
-      averageRetryCount: {
-        name: "app.api.v1.core.emails.messages.stats.get.response.metrics.average_retry_count" as const satisfies TranslationKey,
-        data: this.transformToHistoricalData(
-          historicalResults,
-          "averageRetryCount",
-        ),
-        color: "#f97316",
-        type: ChartType.LINE,
-      },
-      averageProcessingTime: {
-        name: "app.api.v1.core.emails.messages.stats.get.response.metrics.average_processing_time" as const satisfies TranslationKey,
-        data: this.transformToHistoricalData(
-          historicalResults,
-          "averageProcessingTime",
-        ),
-        color: "#f97316",
-        type: ChartType.LINE,
-      },
-      averageDeliveryTime: {
-        name: "app.api.v1.core.emails.messages.stats.get.response.metrics.average_delivery_time" as const satisfies TranslationKey,
-        data: this.transformToHistoricalData(
-          historicalResults,
-          "averageDeliveryTime",
-        ),
-        color: "#84cc16",
-        type: ChartType.LINE,
-      },
+      series: [
+        {
+          name: "app.api.v1.core.emails.messages.stats.get.response.metrics.totalEmails" as const satisfies TranslationKey,
+          data: this.transformToHistoricalData(
+            historicalResults,
+            "totalEmails",
+          ),
+          color: "#3b82f6",
+          type: ChartType.LINE,
+        },
+        {
+          name: "app.api.v1.core.emails.messages.stats.get.response.metrics.sentEmails" as const satisfies TranslationKey,
+          data: this.transformToHistoricalData(historicalResults, "sentEmails"),
+          color: "#10b981",
+          type: ChartType.LINE,
+        },
+        {
+          name: "app.api.v1.core.emails.messages.stats.get.response.metrics.deliveredEmails" as const satisfies TranslationKey,
+          data: this.transformToHistoricalData(
+            historicalResults,
+            "deliveredEmails",
+          ),
+          color: "#059669",
+          type: ChartType.LINE,
+        },
+        {
+          name: "app.api.v1.core.emails.messages.stats.get.response.metrics.openedEmails" as const satisfies TranslationKey,
+          data: this.transformToHistoricalData(
+            historicalResults,
+            "openedEmails",
+          ),
+          color: "#0891b2",
+          type: ChartType.LINE,
+        },
+        {
+          name: "app.api.v1.core.emails.messages.stats.get.response.metrics.clickedEmails" as const satisfies TranslationKey,
+          data: this.transformToHistoricalData(
+            historicalResults,
+            "clickedEmails",
+          ),
+          color: "#7c3aed",
+          type: ChartType.LINE,
+        },
+        {
+          name: "app.api.v1.core.emails.messages.stats.get.response.metrics.bouncedEmails" as const satisfies TranslationKey,
+          data: this.transformToHistoricalData(
+            historicalResults,
+            "bouncedEmails",
+          ),
+          color: "#dc2626",
+          type: ChartType.LINE,
+        },
+        {
+          name: "app.api.v1.core.emails.messages.stats.get.response.metrics.failedEmails" as const satisfies TranslationKey,
+          data: this.transformToHistoricalData(
+            historicalResults,
+            "failedEmails",
+          ),
+          color: "#b91c1c",
+          type: ChartType.LINE,
+        },
+        {
+          name: "app.api.v1.core.emails.messages.stats.get.response.metrics.deliveryRate" as const satisfies TranslationKey,
+          data: historicalResults.map(
+            (item): HistoricalDataPointType => ({
+              date: item.period,
+              value:
+                item.sentEmails > 0
+                  ? item.deliveredEmails / item.sentEmails
+                  : 0,
+              label: undefined,
+            }),
+          ),
+          color: "#059669",
+          type: ChartType.LINE,
+        },
+        {
+          name: "app.api.v1.core.emails.messages.stats.get.response.metrics.openRate" as const satisfies TranslationKey,
+          data: historicalResults.map(
+            (item): HistoricalDataPointType => ({
+              date: item.period,
+              value:
+                item.deliveredEmails > 0
+                  ? item.openedEmails / item.deliveredEmails
+                  : 0,
+              label: undefined,
+            }),
+          ),
+          color: "#0891b2",
+          type: ChartType.LINE,
+        },
+        {
+          name: "app.api.v1.core.emails.messages.stats.get.response.metrics.clickRate" as const satisfies TranslationKey,
+          data: historicalResults.map(
+            (item): HistoricalDataPointType => ({
+              date: item.period,
+              value:
+                item.openedEmails > 0
+                  ? item.clickedEmails / item.openedEmails
+                  : 0,
+              label: undefined,
+            }),
+          ),
+          color: "#7c3aed",
+          type: ChartType.LINE,
+        },
+        {
+          name: "app.api.v1.core.emails.messages.stats.get.response.metrics.bounceRate" as const satisfies TranslationKey,
+          data: historicalResults.map(
+            (item): HistoricalDataPointType => ({
+              date: item.period,
+              value:
+                item.sentEmails > 0 ? item.bouncedEmails / item.sentEmails : 0,
+              label: undefined,
+            }),
+          ),
+          color: "#dc2626",
+          type: ChartType.LINE,
+        },
+        {
+          name: "app.api.v1.core.emails.messages.stats.get.response.metrics.failureRate" as const satisfies TranslationKey,
+          data: historicalResults.map(
+            (item): HistoricalDataPointType => ({
+              date: item.period,
+              value:
+                item.totalEmails > 0 ? item.failedEmails / item.totalEmails : 0,
+              label: undefined,
+            }),
+          ),
+          color: "#b91c1c",
+          type: ChartType.LINE,
+        },
+        {
+          name: "app.api.v1.core.emails.messages.stats.get.response.metrics.emails_with_errors" as const satisfies TranslationKey,
+          data: this.transformToHistoricalData(
+            historicalResults,
+            "emailsWithErrors",
+          ),
+          color: "#ef4444",
+          type: ChartType.LINE,
+        },
+        {
+          name: "app.api.v1.core.emails.messages.stats.get.response.metrics.average_retry_count" as const satisfies TranslationKey,
+          data: this.transformToHistoricalData(
+            historicalResults,
+            "averageRetryCount",
+          ),
+          color: "#f97316",
+          type: ChartType.LINE,
+        },
+        {
+          name: "app.api.v1.core.emails.messages.stats.get.response.metrics.average_processing_time" as const satisfies TranslationKey,
+          data: this.transformToHistoricalData(
+            historicalResults,
+            "averageProcessingTime",
+          ),
+          color: "#f97316",
+          type: ChartType.LINE,
+        },
+        {
+          name: "app.api.v1.core.emails.messages.stats.get.response.metrics.average_delivery_time" as const satisfies TranslationKey,
+          data: this.transformToHistoricalData(
+            historicalResults,
+            "averageDeliveryTime",
+          ),
+          color: "#84cc16",
+          type: ChartType.LINE,
+        },
+      ],
     };
   }
 

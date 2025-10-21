@@ -1,9 +1,11 @@
+/* eslint-disable no-restricted-syntax */
 import { join } from "node:path";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 import type { ReleaseConfig } from "../types/index.js";
 import { handleUncommittedChanges } from "../utils/git.js";
 import { handleGlobalDependencyUpdates } from "../utils/global-deps.js";
-import { logger, loggerError } from "../utils/logger.js";
 import { getPackageJson, updatePackageVersion } from "../utils/package-json.js";
 import { publishPackage, zipFolders } from "../utils/publishing.js";
 import { DEFAULT_CONFIG_PATH, loadConfig } from "../utils/release-config.js";
@@ -28,10 +30,15 @@ export async function localRelease(
   forceUpdate = false,
   logger: EndpointLogger,
 ): Promise<void> {
-  const config: ReleaseConfig = await loadConfig(configPath);
+  const configResponse = await loadConfig(logger, configPath);
+  if (!configResponse.success) {
+    logger.error("Failed to load config", { error: configResponse.message });
+    throw new Error(configResponse.message);
+  }
+  const config: ReleaseConfig = configResponse.data;
 
   const packageManager = config.packageManager || "bun";
-  logger(`Using package manager: ${packageManager}`);
+  logger.info(`Using package manager: ${packageManager}`);
 
   let overallError = false;
   const affectedPackages: string[] = [];
@@ -43,11 +50,12 @@ export async function localRelease(
     packageManager,
     originalCwd,
     forceUpdate,
+    logger,
   );
 
   // If forceUpdate is true, only update dependencies and skip all other steps
   if (forceUpdate) {
-    logger(
+    logger.info(
       "Force update completed - skipping quality checks and release steps",
     );
     return;
@@ -55,65 +63,104 @@ export async function localRelease(
 
   for (const pkg of config.packages) {
     const cwd = join(originalCwd, pkg.directory);
-    const packageJson = getPackageJson(cwd);
+    const packageJsonResponse = getPackageJson(cwd, logger);
+
+    if (!packageJsonResponse.success) {
+      logger.error("Failed to read package.json", {
+        directory: pkg.directory,
+        error: packageJsonResponse.message,
+      });
+      affectedPackages.push(pkg.directory);
+      overallError = true;
+      continue;
+    }
+
+    const packageJson = packageJsonResponse.data;
 
     try {
       // Run quality checks
       if (pkg.lint) {
-        logger(`Linting ${packageJson.name}`);
-        lint(cwd);
+        logger.info(`Linting ${packageJson.name}`);
+        const lintResult = lint(cwd, logger);
+        if (!lintResult.success) {
+          throw new Error(lintResult.message);
+        }
       }
 
       if (pkg.typecheck) {
-        logger(`Type checking ${packageJson.name}`);
-        typecheck(cwd);
+        logger.info(`Type checking ${packageJson.name}`);
+        const typecheckResult = typecheck(cwd, logger);
+        if (!typecheckResult.success) {
+          throw new Error(typecheckResult.message);
+        }
       }
 
       if (pkg.build) {
-        logger(`Building ${packageJson.name}`);
-        build(cwd);
+        logger.info(`Building ${packageJson.name}`);
+        const buildResult = build(cwd, logger);
+        if (!buildResult.success) {
+          throw new Error(buildResult.message);
+        }
       }
 
       if (pkg.test) {
-        logger(`Running tests for ${packageJson.name}`);
-        runTests(cwd);
+        logger.info(`Running tests for ${packageJson.name}`);
+        const testResult = runTests(cwd, logger);
+        if (!testResult.success) {
+          throw new Error(testResult.message);
+        }
       }
 
       if (pkg.snyk) {
-        logger(`Running Snyk vulnerability test for ${packageJson.name}`);
-        snykTest(cwd);
+        logger.info(`Running Snyk vulnerability test for ${packageJson.name}`);
+        const snykResult = snykTest(cwd, logger);
+        if (!snykResult.success) {
+          throw new Error(snykResult.message);
+        }
       }
 
       // Handle release if configured
       const releaseConfig = pkg.release;
       if (releaseConfig) {
-        await handleUncommittedChanges();
+        await handleUncommittedChanges(logger);
 
         const { newVersion, lastTag, newTag } = await getVersion(
+          logger,
           pkg,
           packageJson,
           config,
           releaseConfig,
         );
 
-        updatePackageVersion(pkg, newVersion, cwd, originalCwd);
-        updateVariableStringValue(newVersion, releaseConfig);
+        const updateVersionResult = updatePackageVersion(
+          pkg,
+          newVersion,
+          cwd,
+          originalCwd,
+          logger,
+        );
+        if (!updateVersionResult.success) {
+          throw new Error(updateVersionResult.message);
+        }
+
+        updateVariableStringValue(logger, newVersion, releaseConfig);
 
         if (releaseConfig.foldersToZip) {
-          logger(`Zipping folders for ${packageJson.name}`);
+          logger.info(`Zipping folders for ${packageJson.name}`);
           await zipFolders({
             newTag,
             lastTag,
             packageJson,
             pkg,
             foldersToZip: releaseConfig.foldersToZip,
+            logger,
           });
         }
 
-        await publishPackage({ newTag, lastTag, packageJson, pkg });
+        await publishPackage({ newTag, lastTag, packageJson, pkg, logger });
       }
     } catch (error) {
-      loggerError(`Error processing ${packageJson.name}:`, error);
+      logger.error(`Error processing ${packageJson.name}:`, error);
       affectedPackages.push(pkg.directory);
       overallError = true;
     }
@@ -126,7 +173,7 @@ export async function localRelease(
   }
 
   if (overallError) {
-    loggerError(
+    logger.error(
       "The release process encountered the above errors for the following packages:",
       affectedPackages.join(", "),
     );

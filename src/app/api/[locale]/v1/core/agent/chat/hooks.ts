@@ -121,6 +121,7 @@ export interface UseChatReturn {
     name: string,
     rootFolderId: DefaultFolderId,
     parentId: string | null,
+    icon?: string,
   ) => Promise<string>;
   updateFolder: (folderId: string, updates: FolderUpdate) => Promise<void>;
   deleteFolder: (folderId: string) => Promise<void>;
@@ -905,11 +906,15 @@ export function useChat(
 
       // For incognito mode, just delete from store (no API call)
       if (!isAuthenticated || message.rootFolderId === "incognito") {
-        logger.debug("useChat", "Deleting incognito message (client-side only)", {
-          messageId,
-          isAuthenticated,
-          rootFolderId: message.rootFolderId,
-        });
+        logger.debug(
+          "useChat",
+          "Deleting incognito message (client-side only)",
+          {
+            messageId,
+            isAuthenticated,
+            rootFolderId: message.rootFolderId,
+          },
+        );
         chatStore.deleteMessage(messageId);
         return;
       }
@@ -1073,11 +1078,13 @@ export function useChat(
       name: string,
       rootFolderId: DefaultFolderId,
       parentId: string | null,
+      icon?: string,
     ): Promise<string> => {
       logger.debug("useChat", "Creating folder", {
         name,
         rootFolderId,
         parentId,
+        icon,
       });
 
       try {
@@ -1092,15 +1099,18 @@ export function useChat(
               folder: {
                 name,
                 rootFolderId,
-                parentId,
+                ...(parentId && { parentId }),
+                ...(icon && { icon }),
               },
             }),
           },
         );
 
         if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
           logger.error("useChat", "Failed to create folder", {
             status: response.status,
+            error: errorData,
           });
           return "";
         }

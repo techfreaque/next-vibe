@@ -1,8 +1,9 @@
 "use client";
 import type { Route } from "next";
 import type { RouteType } from "next/dist/lib/load-custom-routes";
-import { usePathname, useRouter } from "next/navigation";
 import { LOCALE_COOKIE_NAME } from "next-vibe/shared/constants";
+import { syncStorage } from "next-vibe-ui/ui/storage";
+import { usePathname, useRouter } from "next-vibe-ui/ui/use-navigation";
 import type { JSX, ReactNode } from "react";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
@@ -98,8 +99,8 @@ export function TranslationProvider({
 
     const newLocale = `${lang}-${country}`;
 
-    // Save to localStorage and cookie
-    localStorage.setItem(LOCALE_COOKIE_NAME, newLocale);
+    // Save to storage and cookie
+    syncStorage.setItem(LOCALE_COOKIE_NAME, newLocale);
     setCookie(LOCALE_COOKIE_NAME, newLocale);
 
     // Update URL to reflect language change
@@ -124,8 +125,8 @@ export function TranslationProvider({
 
     const newLocale = `${language}-${newCountry}`;
 
-    // Save to localStorage and cookie
-    localStorage.setItem(LOCALE_COOKIE_NAME, newLocale);
+    // Save to storage and cookie
+    syncStorage.setItem(LOCALE_COOKIE_NAME, newLocale);
     setCookie(LOCALE_COOKIE_NAME, newLocale);
 
     // Update URL to reflect country change

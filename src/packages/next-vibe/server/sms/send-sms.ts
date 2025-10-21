@@ -95,7 +95,7 @@ export async function sendSms(
   const validation = validatePhoneNumber(params.to);
   if (!validation.valid) {
     return createErrorResponse(
-      "sms.error.invalid_phone_format",
+      "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
       ErrorResponseTypes.INVALID_REQUEST_ERROR,
       {
         reason: validation.reason || "",
@@ -146,7 +146,7 @@ export async function sendSms(
 
     // If we get here, all attempts failed
     return createErrorResponse(
-      "sms.error.delivery_failed",
+      "packages.nextVibe.server.sms.sms.error.delivery_failed",
       ErrorResponseTypes.SMS_ERROR,
       {
         errorMessage: lastError?.message ?? "",
@@ -154,7 +154,7 @@ export async function sendSms(
     );
   } catch (error) {
     return createErrorResponse(
-      "sms.error.unexpected_error",
+      "packages.nextVibe.server.sms.sms.error.unexpected_error",
       ErrorResponseTypes.SMS_ERROR,
       {
         errorMessage: error instanceof Error ? error.message : "",
@@ -197,7 +197,7 @@ export async function batchSendSms(messages: SendSmsParams[]): Promise<
 
   if (failureCount === results.length) {
     return createErrorResponse(
-      "sms.error.all_failed",
+      "packages.nextVibe.server.sms.sms.error.all_failed",
       ErrorResponseTypes.SMS_ERROR,
       {
         totalResults: results.length.toString(),
@@ -207,7 +207,7 @@ export async function batchSendSms(messages: SendSmsParams[]): Promise<
 
   if (failureCount > 0) {
     return createErrorResponse(
-      "sms.error.partial_failure",
+      "packages.nextVibe.server.sms.sms.error.partial_failure",
       ErrorResponseTypes.SMS_ERROR,
       {
         failureCount: failureCount.toString(),

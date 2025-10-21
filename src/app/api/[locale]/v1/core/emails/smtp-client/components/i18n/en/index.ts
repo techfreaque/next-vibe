@@ -2,7 +2,10 @@ export const translations = {
   email: {
     footer: {
       needHelp: "Need help?",
-      copyright: "© {{currentYear}} {{appName}}. All rights reserved.",
+      helpText: "Need help? Contact us at",
+      unsubscribeText: "Don't want to receive these emails?",
+      unsubscribeLink: "Unsubscribe",
+      copyright: "© {{currentYear}} {{companyName}}. All rights reserved.",
     },
   },
   post: {

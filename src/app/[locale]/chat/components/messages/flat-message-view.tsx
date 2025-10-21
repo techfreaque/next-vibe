@@ -58,21 +58,6 @@ function countReplies(messages: ChatMessage[], messageId: string): number {
 }
 
 /**
- * Get backlinks (messages that are direct replies to this message)
- * Uses message structure (parentId) instead of parsing content
- */
-function getBacklinks(
-  messages: ChatMessage[],
-  messageId: string,
-  postNumberMap: Record<string, number>,
-): number[] {
-  return messages
-    .filter((msg) => msg.parentId === messageId)
-    .map((msg) => postNumberMap[msg.id])
-    .filter((num): num is number => num !== undefined);
-}
-
-/**
  * Get direct replies to a message (children in the tree)
  */
 function getDirectReplies(
@@ -199,7 +184,9 @@ function MessagePreview({
           )}
         >
           {isUser
-            ? rootFolderId === "general" || rootFolderId === "shared" || rootFolderId === "public"
+            ? rootFolderId === "general" ||
+              rootFolderId === "shared" ||
+              rootFolderId === "public"
               ? t("app.chat.flatView.youLabel")
               : t("app.chat.flatView.anonymous")
             : message.authorName || t("app.chat.flatView.assistantFallback")}
@@ -337,7 +324,7 @@ interface FlatMessageProps {
   ) => void;
   onBranchMessage?: (messageId: string, newContent: string) => Promise<void>;
   onRetryMessage?: (messageId: string) => Promise<void>;
-  onAnswerAsModel?: (messageId: string) => Promise<void>;
+  onAnswerAsModel?: (messageId: string, content: string) => Promise<void>;
   onDeleteMessage?: (messageId: string) => void;
   onModelChange?: (model: ModelId) => void;
   onPersonaChange?: (persona: string) => void;
@@ -400,14 +387,15 @@ function FlatMessage({
       : t("app.chat.flatView.anonymous");
 
   const displayName = isUser
-    ? rootFolderId === "general" || rootFolderId === "shared" || rootFolderId === "public"
+    ? rootFolderId === "general" ||
+      rootFolderId === "shared" ||
+      rootFolderId === "public"
       ? t("app.chat.flatView.youLabel")
       : t("app.chat.flatView.anonymous")
     : modelDisplayName;
 
   const references = extractReferences(message.content);
   const replyCount = countReplies(messages, message.id);
-  const backlinks = getBacklinks(messages, message.id, postNumberMap);
   const isHighlighted = hoveredRef === postNum.toString();
   const directReplies = getDirectReplies(messages, message.id);
 
@@ -664,45 +652,10 @@ function FlatMessage({
         </div>
       )}
 
-      {/* Backlinks */}
-      {backlinks.length > 0 && (
+      {/* Replies */}
+      {directReplies.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
           <span>{t("app.chat.flatView.replies")}</span>
-          {backlinks.map((backlinkPostNum, idx) => (
-            <button
-              key={idx}
-              onClick={(): void => {
-                const element = document.getElementById(`${backlinkPostNum}`);
-                element?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "center",
-                });
-              }}
-              onMouseEnter={(e): void => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                onSetHoveredRef(backlinkPostNum.toString(), {
-                  x: rect.left + rect.width / 2,
-                  y: rect.top,
-                });
-              }}
-              onMouseLeave={(): void => {
-                onSetHoveredRef(null, null);
-              }}
-              className="text-blue-400 hover:text-blue-300 hover:underline"
-            >
-              {/* eslint-disable-next-line i18next/no-literal-string -- Technical 4chan-style reference syntax */}
-              {`>>${backlinkPostNum}`}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Direct Replies */}
-      {directReplies.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-2 text-xs">
-          <span className="text-muted-foreground">
-            {t("app.chat.flatView.replies")}
-          </span>
           {directReplies.map((reply) => {
             const replyPostNum = postNumberMap[reply.id];
             return (

@@ -1,3 +1,5 @@
+/// <reference types="node" />
+/* eslint-disable no-restricted-syntax */
 import type { ExecException } from "node:child_process";
 import { exec, execSync } from "node:child_process";
 
@@ -91,7 +93,7 @@ export function createGitTag(
     // For commit errors (not status check errors)
 
     logger.error("Failed to commit changes.", error);
-    // eslint-disable-next-line i18next/no-literal-string, no-restricted-syntax
+    // eslint-disable-next-line i18next/no-literal-string
     throw new Error("Failed to commit changes");
   }
 
@@ -123,18 +125,22 @@ export function createGitTag(
     }
   } catch (error) {
     logger.error("Failed during tag operations.", error);
-    // eslint-disable-next-line i18next/no-literal-string, no-restricted-syntax
+    // eslint-disable-next-line i18next/no-literal-string
     throw new Error("Failed during tag operations");
   }
 }
 
-export function checkTagExists(tag: string): Promise<boolean> {
+export function checkTagExists(
+  tag: string,
+  logger: EndpointLogger,
+): Promise<boolean> {
   return new Promise((resolve, reject) => {
     /* eslint-disable i18next/no-literal-string */
     void exec(
       `git tag --list ${tag}`,
       (error: ExecException | null, stdout: string) => {
         if (error) {
+          logger.error(`Error checking if tag exists: ${tag}`, error);
           return reject(error);
         }
         resolve(stdout.trim().length > 0);
