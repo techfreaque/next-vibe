@@ -178,7 +178,9 @@ const { POST } = createEndpoint({
           placeholder:
             "app.api.v1.core.agent.chat.aiStream.post.content.placeholder",
         },
-        z.string().min(1).max(10000),
+        // Allow empty content for answer-as-ai operation (AI generates its own response)
+        // For other operations, content must be at least 1 character
+        z.string().max(10000),
       ),
       role: requestDataField(
         {

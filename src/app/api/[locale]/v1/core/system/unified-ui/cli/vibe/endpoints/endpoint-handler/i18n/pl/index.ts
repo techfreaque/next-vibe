@@ -3,6 +3,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   next: nextTranslations,
+  debug: {
+    authenticatedUser: "Endpoint Handler: Uwierzytelniony użytkownik",
+  },
   error: {
     errors: {
       invalid_request_data: "Nieprawidłowe dane żądania",

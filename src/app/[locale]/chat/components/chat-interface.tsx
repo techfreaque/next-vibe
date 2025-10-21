@@ -324,15 +324,27 @@ export function ChatInterface({
 
   // Update active thread when new thread is created (without navigation)
   const prevThreadCountRef = React.useRef(Object.keys(threads).length);
+  const initialLoadCompleteRef = React.useRef(false);
   useEffect(() => {
     const currentThreadCount = Object.keys(threads).length;
     const prevThreadCount = prevThreadCountRef.current;
 
-    // If thread count increased and we're on "new" page, set active thread without navigating
+    // Mark initial load as complete after first render with threads
+    if (!initialLoadCompleteRef.current && currentThreadCount > 0) {
+      initialLoadCompleteRef.current = true;
+      prevThreadCountRef.current = currentThreadCount;
+      return;
+    }
+
+    // Only auto-select if:
+    // 1. Thread count increased (new thread created)
+    // 2. We're on "new" page
+    // 3. Initial load is complete (not just loading existing threads from server)
     if (
       currentThreadCount > prevThreadCount &&
       initialThreadId &&
-      isNewThread(initialThreadId)
+      isNewThread(initialThreadId) &&
+      initialLoadCompleteRef.current
     ) {
       // Find the newest thread (highest createdAt)
       const newestThread = Object.values(threads).reduce(
@@ -507,10 +519,13 @@ export function ChatInterface({
           onDeleteMessage={deleteMessage}
           onSwitchBranch={handleSwitchBranch}
           onRetryMessage={retryMessage}
-          onAnswerAsModel={async (messageId: string): Promise<void> => {
+          onAnswerAsModel={async (
+            messageId: string,
+            content: string,
+          ): Promise<void> => {
             // Answer as AI: Generate an AI response to this message
-            // For now, use empty content - the AI will generate its own response
-            await answerAsAI(messageId, "Generate a helpful response to the above message.");
+            // Use the content provided by the user (or empty string to let AI generate)
+            await answerAsAI(messageId, content);
           }}
           onVoteMessage={currentRootFolderId === "incognito" ? undefined : voteMessage}
           onModelChange={setSelectedModel}

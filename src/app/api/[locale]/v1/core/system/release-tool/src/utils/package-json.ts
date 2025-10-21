@@ -1,8 +1,18 @@
+/// <reference types="node" />
+/* eslint-disable no-restricted-syntax */
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import inquirer from "inquirer";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 import type { PackageJson, ReleasePackage } from "../types/index.js";
 
@@ -20,16 +30,44 @@ function isPackageJson(value: unknown): value is PackageJson {
 /**
  * Reads the package.json file for a package and returns its contents.
  */
-export function getPackageJson(cwd: string): PackageJson {
+export function getPackageJson(
+  cwd: string,
+  logger: EndpointLogger,
+): ResponseType<PackageJson> {
   const packageJsonPath = join(cwd, "package.json");
   if (!existsSync(packageJsonPath)) {
-    throw new Error(`No package.json found in ${packageJsonPath}`);
+    logger.error("Package.json not found", { path: packageJsonPath });
+    return createErrorResponse(
+      "app.api.v1.core.system.releaseTool.packageJson.notFound",
+      ErrorResponseTypes.NOT_FOUND,
+      { path: packageJsonPath },
+    );
   }
-  const parsedJson: unknown = JSON.parse(readFileSync(packageJsonPath, "utf8"));
-  if (!isPackageJson(parsedJson)) {
-    throw new Error(`Invalid package.json format in ${packageJsonPath}`);
+
+  try {
+    const parsedJson: unknown = JSON.parse(
+      readFileSync(packageJsonPath, "utf8"),
+    );
+    if (!isPackageJson(parsedJson)) {
+      logger.error("Invalid package.json format", { path: packageJsonPath });
+      return createErrorResponse(
+        "app.api.v1.core.system.releaseTool.packageJson.invalidFormat",
+        ErrorResponseTypes.INVALID_FORMAT_ERROR,
+        { path: packageJsonPath },
+      );
+    }
+    return createSuccessResponse(parsedJson);
+  } catch (error) {
+    logger.error("Error reading package.json", {
+      error,
+      path: packageJsonPath,
+    });
+    return createErrorResponse(
+      "app.api.v1.core.system.releaseTool.packageJson.errorReading",
+      ErrorResponseTypes.INTERNAL_ERROR,
+      { error: String(error) },
+    );
   }
-  return parsedJson;
 }
 
 /**
@@ -41,7 +79,7 @@ export async function updateDependencies(
   packageManager: string,
   cwd: string,
   logger: EndpointLogger,
-): Promise<void> {
+): Promise<ResponseType<void>> {
   if (pkg.updateDeps !== "force") {
     const { shouldUpdate } = await inquirer.prompt<{
       shouldUpdate: boolean;
@@ -49,44 +87,63 @@ export async function updateDependencies(
       {
         type: "confirm",
         name: "shouldUpdate",
+        // eslint-disable-next-line i18next/no-literal-string
         message: `Update dependencies for ${pkg.directory}?`,
         default: false,
       },
     ]);
 
     if (!shouldUpdate) {
-      logger(`Skipping dependency updates for ${pkg.directory}`);
-      return;
+      logger.info(`Skipping dependency updates for ${pkg.directory}`);
+      return createSuccessResponse(undefined);
     }
   }
 
-  const packageJson = getPackageJson(cwd);
+  const packageJsonResponse = getPackageJson(cwd, logger);
+  if (!packageJsonResponse.success) {
+    return packageJsonResponse;
+  }
+
+  const packageJson = packageJsonResponse.data;
+
   try {
     const ignoreList = packageJson.updateIgnoreDependencies || [];
 
     // Build ignore list arguments
+
     const ignoreArg =
       ignoreList.length > 0 ? `--reject ${ignoreList.join(",")}` : "";
 
-    logger(`Updating dependencies for ${pkg.directory}`);
+    logger.info(`Updating dependencies for ${pkg.directory}`);
     // Run npm-check-updates to find and update package.json
+    // eslint-disable-next-line i18next/no-literal-string
     execSync(`ncu -u ${ignoreArg}`, {
       cwd,
+
       stdio: "inherit",
     });
-    logger(`Successfully updated dependencies for ${pkg.directory}`);
+
+    logger.info(`Successfully updated dependencies for ${pkg.directory}`);
     // // Install dependencies with the correct path setup
+
     execSync(`${packageManager} install`, {
       cwd,
+
       stdio: "inherit",
+      // eslint-disable-next-line node/no-process-env
       env: { ...process.env },
     });
+    return createSuccessResponse(undefined);
   } catch (error) {
-    loggerError(
+    logger.error(
       `Error updating dependencies for ${pkg.directory}. Continuing with release process.`,
       error,
     );
-    throw error;
+    return createErrorResponse(
+      "app.api.v1.core.system.releaseTool.packageJson.errorUpdatingDeps",
+      ErrorResponseTypes.INTERNAL_ERROR,
+      { directory: pkg.directory, error: String(error) },
+    );
   }
 }
 
@@ -99,48 +156,74 @@ export function updatePackageVersion(
   cwd: string,
   originalCwd: string,
   logger: EndpointLogger,
-): void {
+): ResponseType<void> {
   // Update package's package.json
-  const packageJson = getPackageJson(cwd);
+  const packageJsonResponse = getPackageJson(cwd, logger);
+  if (!packageJsonResponse.success) {
+    return packageJsonResponse;
+  }
 
-  packageJson.version = newVersion;
-  const packageJsonPath = join(cwd, "package.json");
-  writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-  logger(`Updated version for ${pkg.directory} to ${newVersion}`);
+  const packageJson = packageJsonResponse.data;
 
-  // Update version in release.config.ts (both globalVersion if available and package's own version)
-  const configPath = join(originalCwd, "release.config.ts");
-  if (existsSync(configPath)) {
-    let configContent = readFileSync(configPath, "utf8");
+  try {
+    packageJson.version = newVersion;
 
-    // Update globalVersion if it exists
-    configContent = configContent.replace(
-      /globalVersion\s*:\s*["']([^"']*)["']/,
-      `globalVersion: "${newVersion}"`,
+    const packageJsonPath = join(cwd, "package.json");
+    writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+
+    logger.info(`Updated version for ${pkg.directory} to ${newVersion}`);
+
+    // Update version in release.config.ts (both globalVersion if available and package's own version)
+
+    const configPath = join(originalCwd, "release.config.ts");
+    if (existsSync(configPath)) {
+      let configContent = readFileSync(configPath, "utf8");
+
+      // Update globalVersion if it exists
+      configContent = configContent.replace(
+        /globalVersion\s*:\s*["']([^"']*)["']/,
+        // eslint-disable-next-line i18next/no-literal-string
+        `globalVersion: "${newVersion}"`,
+      );
+
+      // Helper to escape regex special characters in a directory string
+      const escapeRegex = (s: string): string =>
+        // eslint-disable-next-line i18next/no-literal-string
+        s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const dirPattern = escapeRegex(pkg.directory);
+
+      // Find the package object by matching its directory and update its version property.
+      const packageRegex = new RegExp(
+        // eslint-disable-next-line i18next/no-literal-string
+        `(\\{[^}]*?directory\\s*:\\s*["']${dirPattern}["'][^}]*?version\\s*:\\s*["'])([^"']+)(["'])`,
+        "m",
+      );
+      configContent = configContent.replace(
+        packageRegex,
+        (_match, p1, _p2, p3) => {
+          return `${p1}${newVersion}${p3}`;
+        },
+      );
+
+      writeFileSync(configPath, configContent);
+
+      logger.info(
+        `Updated release.config.ts for package ${pkg.directory} to ${newVersion}`,
+      );
+    } else {
+      logger.info("release.config.ts not found. Skipping config update.");
+    }
+
+    return createSuccessResponse(undefined);
+  } catch (error) {
+    logger.error("Error updating package version", {
+      error,
+      directory: pkg.directory,
+    });
+    return createErrorResponse(
+      "app.api.v1.core.system.releaseTool.packageJson.errorUpdatingVersion",
+      ErrorResponseTypes.INTERNAL_ERROR,
+      { directory: pkg.directory, error: String(error) },
     );
-
-    // Helper to escape regex special characters in a directory string
-    const escapeRegex = (s: string): string =>
-      s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const dirPattern = escapeRegex(pkg.directory);
-
-    // Find the package object by matching its directory and update its version property.
-    const packageRegex = new RegExp(
-      `(\\{[^}]*?directory\\s*:\\s*["']${dirPattern}["'][^}]*?version\\s*:\\s*["'])([^"']+)(["'])`,
-      "m",
-    );
-    configContent = configContent.replace(
-      packageRegex,
-      (_match, p1, _p2, p3) => {
-        return `${p1}${newVersion}${p3}`;
-      },
-    );
-
-    writeFileSync(configPath, configContent);
-    logger(
-      `Updated release.config.ts for package ${pkg.directory} to ${newVersion}`,
-    );
-  } else {
-    logger("release.config.ts not found. Skipping config update.");
   }
 }

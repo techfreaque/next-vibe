@@ -50,7 +50,7 @@ interface ThreadedMessageProps {
   onDeleteMessage: (messageId: string) => void;
   onBranchMessage?: (messageId: string, newContent: string) => Promise<void>;
   onRetryMessage?: (messageId: string) => Promise<void>;
-  onAnswerAsModel?: (messageId: string) => Promise<void>;
+  onAnswerAsModel?: (messageId: string, content: string) => Promise<void>;
   onVoteMessage?: (messageId: string, vote: 1 | -1 | 0) => void;
   onModelChange?: (model: ModelId) => void;
   onPersonaChange?: (persona: string) => void;
@@ -214,22 +214,6 @@ export function ThreadedMessage({
                 logger={logger}
               />
             </div>
-          ) : isAnswering ? (
-            <ModelPersonaSelectorModal
-              titleKey="app.chat.threadedView.answerModal.title"
-              descriptionKey="app.chat.threadedView.answerModal.description"
-              selectedModel={selectedModel}
-              selectedPersona={selectedPersona}
-              onModelChange={onModelChange || ((): void => {})}
-              onPersonaChange={onPersonaChange || ((): void => {})}
-              onConfirm={(): Promise<void> =>
-                messageActions.handleConfirmAnswer(message.id, onAnswerAsModel)
-              }
-              onCancel={messageActions.cancelAction}
-              confirmLabelKey="app.chat.threadedView.answerModal.confirmLabel"
-              locale={locale}
-              logger={logger}
-            />
           ) : (
             <>
               {/* Custom Reddit-style message rendering */}
@@ -551,6 +535,31 @@ export function ThreadedMessage({
             </div>
           )}
         </div>
+
+        {/* Show Answer-as-AI dialog below the message */}
+        {isAnswering && (
+          <div className="mt-3">
+            <ModelPersonaSelectorModal
+              titleKey="app.chat.threadedView.answerModal.title"
+              descriptionKey="app.chat.threadedView.answerModal.description"
+              selectedModel={selectedModel}
+              selectedPersona={selectedPersona}
+              onModelChange={onModelChange || ((): void => {})}
+              onPersonaChange={onPersonaChange || ((): void => {})}
+              showInput={true}
+              inputValue={messageActions.answerContent}
+              onInputChange={messageActions.setAnswerContent}
+              inputPlaceholderKey="app.chat.threadedView.answerModal.inputPlaceholder"
+              onConfirm={(): Promise<void> =>
+                messageActions.handleConfirmAnswer(message.id, onAnswerAsModel)
+              }
+              onCancel={messageActions.cancelAction}
+              confirmLabelKey="app.chat.threadedView.answerModal.confirmLabel"
+              locale={locale}
+              logger={logger}
+            />
+          </div>
+        )}
 
         {/* Nested replies */}
         {hasReplies &&

@@ -20,6 +20,7 @@ export interface UseMessageActionsReturn {
   retryingMessageId: string | null;
   answeringMessageId: string | null;
   deletingMessageId: string | null;
+  answerContent: string;
 
   // Check if a message is in a specific state
   isEditing: (messageId: string) => boolean;
@@ -33,6 +34,7 @@ export interface UseMessageActionsReturn {
   startAnswer: (messageId: string) => void;
   startDelete: (messageId: string) => void;
   cancelAction: () => void;
+  setAnswerContent: (content: string) => void;
 
   // Combined handlers for save operations
   handleSaveEdit: (
@@ -75,6 +77,7 @@ export function useMessageActions(
   const [deletingMessageId, setDeletingMessageId] = useState<string | null>(
     null,
   );
+  const [answerContent, setAnswerContent] = useState<string>("");
 
   // Check functions
   const isEditing = useCallback(
@@ -100,6 +103,7 @@ export function useMessageActions(
     setRetryingMessageId(null);
     setAnsweringMessageId(null);
     setDeletingMessageId(null);
+    setAnswerContent("");
   }, []);
 
   // Start action handlers
@@ -207,14 +211,18 @@ export function useMessageActions(
   );
 
   const handleConfirmAnswer = useCallback(
-    async (messageId: string, onAnswer?: (id: string) => Promise<void>) => {
+    async (
+      messageId: string,
+      onAnswer?: (id: string, content: string) => Promise<void>,
+    ) => {
       if (!onAnswer) {
         return;
       }
 
       try {
-        await onAnswer(messageId);
+        await onAnswer(messageId, answerContent);
         setAnsweringMessageId(null);
+        setAnswerContent("");
       } catch (error) {
         const errorObj =
           error instanceof Error ? error : new Error(String(error));
@@ -224,7 +232,7 @@ export function useMessageActions(
         );
       }
     },
-    [logger],
+    [logger, answerContent],
   );
 
   const handleConfirmDelete = useCallback(
@@ -253,6 +261,7 @@ export function useMessageActions(
     retryingMessageId,
     answeringMessageId,
     deletingMessageId,
+    answerContent,
     isEditing,
     isRetrying,
     isAnswering,
@@ -262,6 +271,7 @@ export function useMessageActions(
     startAnswer,
     startDelete,
     cancelAction,
+    setAnswerContent,
     handleSaveEdit,
     handleBranchEdit,
     handleConfirmRetry,

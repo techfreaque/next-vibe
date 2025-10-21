@@ -555,6 +555,8 @@ export const translations = {
       title: "Answer as AI Model",
       description: "Choose a model and persona to generate an AI response",
       confirmLabel: "Generate",
+      inputPlaceholder:
+        "Enter a prompt for the AI (optional - leave empty to let AI generate its own response)",
     },
   },
   suggestedPrompts: {

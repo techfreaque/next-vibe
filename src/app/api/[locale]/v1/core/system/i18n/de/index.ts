@@ -4,6 +4,7 @@ import { translations as dbTranslations } from "../../db/i18n/de";
 import { translations as generatorsTranslations } from "../../generators/i18n/de";
 import { translations as guardTranslations } from "../../guard/i18n/de";
 import { translations as launchpadTranslations } from "../../launchpad/i18n/de";
+import { translations as releaseToolTranslations } from "../../release-tool/i18n/de";
 import { translations as serverTranslations } from "../../server/i18n/de";
 import { translations as tasksTranslations } from "../../tasks/i18n/de";
 import { translations as translationsTranslations } from "../../translations/i18n/de";
@@ -18,6 +19,7 @@ export const translations: typeof enTranslations = {
   generators: generatorsTranslations,
   guard: guardTranslations,
   launchpad: launchpadTranslations,
+  releaseTool: releaseToolTranslations,
   server: serverTranslations,
   tasks: tasksTranslations,
   translations: translationsTranslations,

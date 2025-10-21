@@ -1,6 +1,10 @@
+/// <reference types="node" />
+/* eslint-disable no-restricted-syntax */
 import { readFileSync, writeFileSync } from "node:fs";
 
 import inquirer from "inquirer";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 import type {
   PackageJson,
@@ -17,29 +21,30 @@ interface VersionInfo {
 }
 
 export async function getVersion(
+  logger: EndpointLogger,
   pkg: ReleasePackage,
   packageJson: PackageJson,
   config: ReleaseConfig,
   releaseConfig: ReleaseOptions,
-  logger: EndpointLogger,
 ): Promise<VersionInfo> {
   const tagPrefix = releaseConfig.tagPrefix || "";
   const currentGitVersionNumber = getLastVersionFromGitTag(
     tagPrefix,
     pkg.directory,
+    logger,
   );
   // Priority: globalVersion > releaseConfig.version > package.json version
   const currentVersionNumber =
     config.globalVersion || releaseConfig.version || packageJson.version;
 
   const lastTag = `${tagPrefix}${currentGitVersionNumber}`;
-  logger(`Processing ${packageJson.name}...`);
+  logger.info("Processing package", { name: packageJson.name });
 
   let finalVersionNumber: string;
   if (!currentVersionNumber) {
-    logger(
-      `No version found in config or package.json, using last git version if available: ${currentGitVersionNumber}`,
-    );
+    logger.info("No version found in config, using last git version", {
+      currentGitVersionNumber,
+    });
     finalVersionNumber = currentGitVersionNumber;
   } else {
     finalVersionNumber = currentVersionNumber;
@@ -59,6 +64,7 @@ export async function getVersion(
         type: "confirm",
         name: "adjust",
         default: false,
+        // eslint-disable-next-line i18next/no-literal-string
         message: `Current version (${currentVersionNumber}) is already newer than the last tag (${currentGitVersionNumber}). Change it again?`,
       },
     ]);
@@ -98,6 +104,7 @@ export function bumpVersion(
 ): string {
   const versionParts = currentVersion.split(".").map(Number);
   if (versionParts.length !== 3) {
+    // eslint-disable-next-line i18next/no-literal-string
     throw new Error("Invalid version format");
   }
 
@@ -120,46 +127,65 @@ export function bumpVersion(
 }
 
 export function updateVariableStringValue(
+  logger: EndpointLogger,
   newVersion: string,
   releaseConfig: ReleaseOptions,
-  logger: EndpointLogger,
 ): void {
   releaseConfig.versionBumper?.forEach((fileInfo) => {
     const fileContent = readFileSync(fileInfo.filePath, "utf8");
     let updatedContent = fileContent;
 
     // Check file extension to determine which regex pattern to use
+    // eslint-disable-next-line i18next/no-literal-string
     const isPhpFile = fileInfo.filePath.toLowerCase().endsWith(".php");
 
     if (isPhpFile) {
       // Match PHP define('CONSTANT_NAME', 'value') pattern
       const phpDefineRegex = new RegExp(
+        // eslint-disable-next-line i18next/no-literal-string
         `(define\\s*\\(\\s*["']${fileInfo.varName}["']\\s*,\\s*["'])([^"']*)(["'])`,
+
         "g",
       );
-      updatedContent = fileContent.replace(phpDefineRegex, `$1${newVersion}$3`);
+      updatedContent = fileContent.replace(
+        phpDefineRegex,
+        // eslint-disable-next-line i18next/no-literal-string
+        `$1${newVersion}$3`,
+      );
     } else {
       // Only match const variableName = "value" pattern for JS/TS
       const constRegex = new RegExp(
+        // eslint-disable-next-line i18next/no-literal-string
         `(const\\s+${fileInfo.varName}\\s*=\\s*["'])([^"']*)(["'])`,
+
         "g",
       );
-      updatedContent = fileContent.replace(constRegex, `$1${newVersion}$3`);
+      updatedContent = fileContent.replace(
+        constRegex,
+        // eslint-disable-next-line i18next/no-literal-string
+        `$1${newVersion}$3`,
+      );
     }
 
     // If no changes were made, the variable wasn't found or isn't in the expected format
     if (updatedContent === fileContent) {
       const formatDescription = isPhpFile
-        ? "define('CONSTANT_NAME', 'value')"
-        : "const variableName = 'value'";
+        ? // eslint-disable-next-line i18next/no-literal-string
+          "define('CONSTANT_NAME', 'value')"
+        : // eslint-disable-next-line i18next/no-literal-string
+          "const variableName = 'value'";
 
       throw new Error(
+        // eslint-disable-next-line i18next/no-literal-string
         `Could not find a matching declaration for '${fileInfo.varName}' in '${fileInfo.filePath}' or the format is not supported. Only ${formatDescription} format is supported.`,
       );
     }
 
     // Write the updated content back to the file
     writeFileSync(fileInfo.filePath, updatedContent);
-    logger(`Updated version in ${fileInfo.filePath} to ${newVersion}`);
+    logger.info("Updated version in file", {
+      filePath: fileInfo.filePath,
+      newVersion,
+    });
   });
 }

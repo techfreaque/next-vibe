@@ -27,7 +27,8 @@ export const translations = {
     },
     dryRun: {
       title: "Dry Run",
-      description: "Preview what would be destroyed without actually destroying",
+      description:
+        "Preview what would be destroyed without actually destroying",
     },
     success: {
       title: "Success",

@@ -41,7 +41,7 @@ interface FlatMessageViewProps {
   onMessageClick?: (messageId: string) => void;
   onBranchMessage?: (messageId: string, newContent: string) => Promise<void>;
   onRetryMessage?: (messageId: string) => Promise<void>;
-  onAnswerAsModel?: (messageId: string) => Promise<void>;
+  onAnswerAsModel?: (messageId: string, content: string) => Promise<void>;
   onDeleteMessage?: (messageId: string) => void;
   onModelChange?: (model: ModelId) => void;
   onPersonaChange?: (persona: string) => void;
@@ -595,24 +595,6 @@ function FlatMessage({
             logger={logger}
           />
         </div>
-      ) : messageActions.answeringMessageId === message.id ? (
-        <div className="my-2">
-          <ModelPersonaSelectorModal
-            titleKey="app.chat.flatView.answerModal.title"
-            descriptionKey="app.chat.flatView.answerModal.description"
-            selectedModel={selectedModel}
-            selectedPersona={selectedPersona}
-            onModelChange={onModelChange || ((): void => {})}
-            onPersonaChange={onPersonaChange || ((): void => {})}
-            onConfirm={(): Promise<void> =>
-              messageActions.handleConfirmAnswer(message.id, onAnswerAsModel)
-            }
-            onCancel={messageActions.cancelAction}
-            confirmLabelKey="app.chat.flatView.answerModal.confirmLabel"
-            locale={locale}
-            logger={logger}
-          />
-        </div>
       ) : (
         <div
           className={cn(
@@ -654,6 +636,31 @@ function FlatMessage({
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Show Answer-as-AI dialog below the message */}
+      {messageActions.answeringMessageId === message.id && (
+        <div className="my-3">
+          <ModelPersonaSelectorModal
+            titleKey="app.chat.flatView.answerModal.title"
+            descriptionKey="app.chat.flatView.answerModal.description"
+            selectedModel={selectedModel}
+            selectedPersona={selectedPersona}
+            onModelChange={onModelChange || ((): void => {})}
+            onPersonaChange={onPersonaChange || ((): void => {})}
+            showInput={true}
+            inputValue={messageActions.answerContent}
+            onInputChange={messageActions.setAnswerContent}
+            inputPlaceholderKey="app.chat.flatView.answerModal.inputPlaceholder"
+            onConfirm={(): Promise<void> =>
+              messageActions.handleConfirmAnswer(message.id, onAnswerAsModel)
+            }
+            onCancel={messageActions.cancelAction}
+            confirmLabelKey="app.chat.flatView.answerModal.confirmLabel"
+            locale={locale}
+            logger={logger}
+          />
         </div>
       )}
 

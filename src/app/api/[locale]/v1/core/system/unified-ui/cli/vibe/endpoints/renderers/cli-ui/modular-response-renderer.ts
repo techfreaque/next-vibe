@@ -63,7 +63,8 @@ export class ModularCLIResponseRenderer {
     const context: WidgetRenderContext = {
       options: this.options,
       depth: 0,
-      translate: (key: string, params?: Record<string, string | number>) => t(key, params),
+      translate: (key: string, params?: Record<string, string | number>) =>
+        t(key, params),
       formatValue: (field, value) =>
         this.formatFieldValue(field, value as string | number | boolean | null),
       getFieldIcon: (type) => this.getFieldIcon(type),

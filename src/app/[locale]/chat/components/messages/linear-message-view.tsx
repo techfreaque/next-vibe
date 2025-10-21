@@ -37,11 +37,13 @@ interface LinearMessageViewProps {
   editingMessageId: string | null;
   retryingMessageId: string | null;
   answeringMessageId: string | null;
+  answerContent: string;
 
   // Action handlers
   onDeleteMessage: (messageId: string) => void;
   onRetryMessage?: (messageId: string) => Promise<void>;
-  onAnswerAsModel?: (messageId: string) => Promise<void>;
+  onAnswerAsModel?: (messageId: string, content: string) => Promise<void>;
+  onSetAnswerContent: (content: string) => void;
   onModelChange?: (model: ModelId) => void;
   onPersonaChange?: (persona: string) => void;
 
@@ -54,6 +56,7 @@ interface LinearMessageViewProps {
   onSwitchBranch: (parentMessageId: string, branchIndex: number) => void;
 
   logger: EndpointLogger;
+  rootFolderId?: string;
 }
 
 export function LinearMessageView({
@@ -66,9 +69,11 @@ export function LinearMessageView({
   editingMessageId,
   retryingMessageId,
   answeringMessageId,
+  answerContent,
   onDeleteMessage,
   onRetryMessage,
   onAnswerAsModel,
+  onSetAnswerContent,
   onModelChange,
   onPersonaChange,
   onStartEdit,
@@ -78,6 +83,7 @@ export function LinearMessageView({
   onBranchEdit,
   onSwitchBranch,
   logger,
+  rootFolderId = "general",
 }: LinearMessageViewProps): JSX.Element {
   return (
     <>
@@ -141,35 +147,6 @@ export function LinearMessageView({
                   logger={logger}
                 />
               </div>
-            ) : isAnswering ? (
-              <ModelPersonaSelectorModal
-                titleKey="app.chat.linearMessageView.answerModal.title"
-                descriptionKey="app.chat.linearMessageView.answerModal.description"
-                selectedModel={selectedModel}
-                selectedPersona={selectedPersona}
-                onModelChange={
-                  onModelChange ||
-                  ((): void => {
-                    /* no-op */
-                  })
-                }
-                onPersonaChange={
-                  onPersonaChange ||
-                  ((): void => {
-                    /* no-op */
-                  })
-                }
-                onConfirm={(): void => {
-                  if (onAnswerAsModel) {
-                    void onAnswerAsModel(message.id);
-                  }
-                  onCancelAction();
-                }}
-                onCancel={onCancelAction}
-                confirmLabelKey="app.chat.linearMessageView.answerModal.confirmLabel"
-                locale={locale}
-                logger={logger}
-              />
             ) : (
               <>
                 {message.role === "user" && (
@@ -181,6 +158,7 @@ export function LinearMessageView({
                     onRetry={onStartRetry}
                     onDelete={onDeleteMessage}
                     showAuthor={true}
+                    rootFolderId={rootFolderId}
                   />
                 )}
                 {message.role === "assistant" && (
@@ -200,6 +178,44 @@ export function LinearMessageView({
               </>
             )}
             </div>
+
+            {/* Show Answer-as-AI dialog below the message */}
+            {isAnswering && (
+              <div className="my-3">
+                <ModelPersonaSelectorModal
+                  titleKey="app.chat.linearMessageView.answerModal.title"
+                  descriptionKey="app.chat.linearMessageView.answerModal.description"
+                  selectedModel={selectedModel}
+                  selectedPersona={selectedPersona}
+                  onModelChange={
+                    onModelChange ||
+                    ((): void => {
+                      /* no-op */
+                    })
+                  }
+                  onPersonaChange={
+                    onPersonaChange ||
+                    ((): void => {
+                      /* no-op */
+                    })
+                  }
+                  showInput={true}
+                  inputValue={answerContent}
+                  onInputChange={onSetAnswerContent}
+                  inputPlaceholderKey="app.chat.linearMessageView.answerModal.inputPlaceholder"
+                  onConfirm={(): void => {
+                    if (onAnswerAsModel) {
+                      void onAnswerAsModel(message.id, answerContent);
+                    }
+                    onCancelAction();
+                  }}
+                  onCancel={onCancelAction}
+                  confirmLabelKey="app.chat.linearMessageView.answerModal.confirmLabel"
+                  locale={locale}
+                  logger={logger}
+                />
+              </div>
+            )}
 
             {/* Show branch navigator if this message has multiple children */}
             {hasBranches && nextMessage && (

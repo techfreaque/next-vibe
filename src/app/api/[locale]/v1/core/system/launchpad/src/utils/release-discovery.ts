@@ -1,10 +1,11 @@
+/// <reference types="node" />
+/* eslint-disable i18next/no-literal-string */
 import { execSync } from "node:child_process";
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 
 import type { ReleaseTarget } from "../types/types.js";
-import { logger, loggerError } from "./logger.js";
 
 // Type for release config structure
 interface ReleaseConfig {
@@ -15,56 +16,39 @@ interface ReleaseConfig {
   }>;
 }
 
-/**
- * Type guard to check if an error has a code property
- */
-function isErrorWithCode(error: unknown): error is Error & { code: string } {
-  return (
-    error instanceof Error &&
-    typeof (error as Error & { code?: string }).code === "string"
-  );
+interface ModuleWithDefault {
+  default: ReleaseConfig;
 }
 
-/**
- * Type guard to check if an unknown value is an Error
- */
-function isError(error: unknown): error is Error {
-  return error instanceof Error;
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LoadedModule = Record<string, any>;
 
 /**
  * Type guard to check if module has a default export with ReleaseConfig
  */
 function hasDefaultReleaseConfig(
-  module: unknown,
-): module is { default: ReleaseConfig } {
-  if (typeof module !== "object" || module === null) {
-    return false;
-  }
+  module: LoadedModule,
+): module is ModuleWithDefault {
   if (!("default" in module)) {
     return false;
   }
-  const defaultExport = (module as { default: unknown }).default;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const defaultExport = module.default;
   if (typeof defaultExport !== "object" || defaultExport === null) {
     return false;
   }
   return (
     "packages" in defaultExport &&
-    Array.isArray((defaultExport as { packages: unknown }).packages)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    Array.isArray(defaultExport.packages)
   );
 }
 
 /**
  * Type guard to check if module is directly a ReleaseConfig
  */
-function isDirectReleaseConfig(module: unknown): module is ReleaseConfig {
-  if (typeof module !== "object" || module === null) {
-    return false;
-  }
-  return (
-    "packages" in module &&
-    Array.isArray((module as { packages: unknown }).packages)
-  );
+function isDirectReleaseConfig(module: LoadedModule): module is ReleaseConfig {
+  return "packages" in module && Array.isArray(module.packages);
 }
 
 /**
@@ -78,71 +62,45 @@ export function discoverReleaseTargets(rootDir: string): ReleaseTarget[] {
       const entries = readdirSync(dir);
 
       for (const entry of entries) {
+        // Skip node_modules and hidden directories
+        if (entry === "node_modules" || entry.startsWith(".")) {
+          continue;
+        }
+
         const fullPath = join(dir, entry);
 
         try {
-          const stat = statSync(fullPath);
+          const stats = statSync(fullPath);
 
-          if (stat.isDirectory()) {
-            // Skip node_modules, .git, and other common directories
-            if (
-              entry === "node_modules" ||
-              entry === ".git" ||
-              entry === ".dist" ||
-              entry.startsWith(".")
-            ) {
-              continue;
-            }
-
-            // Check if this directory has a release.config.ts
-            const releaseConfigPath = join(fullPath, "release.config.ts");
-            if (existsSync(releaseConfigPath)) {
-              const relativeDir = relative(rootDir, fullPath);
-              targets.push({
-                directory: relativeDir || ".",
-                configPath: releaseConfigPath,
-                hasReleaseConfig: true,
-              });
-            }
-
-            // Recursively search subdirectories
+          if (stats.isDirectory()) {
+            // Recurse into subdirectory
             searchDirectory(fullPath);
+          } else if (entry === "release.config.ts") {
+            // Found a release config file
+            const directory = relative(rootDir, dir);
+            targets.push({
+              directory,
+              configPath: relative(rootDir, fullPath),
+              hasReleaseConfig: true,
+            });
           }
-        } catch (statError) {
-          // Skip files/directories we can't stat (like broken symlinks, sockets, etc.)
-          // Only log if it's not a common issue
-          if (
-            isErrorWithCode(statError) &&
-            statError.code !== "ENOENT" &&
-            !fullPath.includes("mysql")
-          ) {
-            loggerError(`Failed to stat ${fullPath}:`, statError);
-          }
+        } catch {
+          // Skip files we can't stat
+          continue;
         }
       }
-    } catch (error) {
+    } catch {
       // Skip directories we can't read
-      // Only log if it's not a permission issue
-      if (isErrorWithCode(error) && error.code !== "EACCES") {
-        loggerError(`Failed to read directory ${dir}:`, error);
-      } else if (!isErrorWithCode(error)) {
-        loggerError(`Failed to read directory ${dir}:`, error);
-      }
     }
   }
 
-  logger("Discovering release targets...");
   searchDirectory(rootDir);
 
-  // Sort targets by directory path for consistent ordering
-  targets.sort((a, b) => a.directory.localeCompare(b.directory));
-
-  logger(`Found ${targets.length} release targets`);
   return targets;
 }
 
 /**
- * Validates that a release target is properly configured
+ * Validates that a release target has all required files and configuration
  */
 export function validateReleaseTarget(
   rootDir: string,
@@ -150,35 +108,28 @@ export function validateReleaseTarget(
 ): boolean {
   const fullPath = join(rootDir, target.directory);
 
-  // Check if directory exists
+  // Check directory exists
   if (!existsSync(fullPath)) {
-    loggerError(
-      `Directory does not exist: ${fullPath}`,
-      new Error("Directory not found"),
-    );
     return false;
   }
 
-  // Check if release config exists
-  if (!existsSync(target.configPath)) {
-    loggerError(
-      `Release config does not exist: ${target.configPath}`,
-      new Error("Config not found"),
-    );
+  // Check release.config.ts exists
+  const configPath = join(rootDir, target.configPath);
+  if (!existsSync(configPath)) {
     return false;
   }
 
-  // Check if package.json exists (most packages should have one)
+  // Check package.json exists
   const packageJsonPath = join(fullPath, "package.json");
   if (!existsSync(packageJsonPath)) {
-    logger(`Warning: No package.json found in ${target.directory}`);
+    return false;
   }
 
   return true;
 }
 
 /**
- * Gets the current git tag to determine which package to release in CI mode
+ * Gets the current git tag if on a tagged commit
  */
 export function getCurrentGitTag(): string | null {
   try {
@@ -188,139 +139,90 @@ export function getCurrentGitTag(): string | null {
     }).trim();
     return tag;
   } catch {
-    // No tag on current commit
     return null;
   }
 }
 
 /**
- * Determines which release target matches the current git tag
+ * Finds a release target that matches the given git tag
  */
 export async function findTargetByGitTag(
   targets: ReleaseTarget[],
   tag: string,
 ): Promise<ReleaseTarget | null> {
-  logger(`Looking for target matching git tag: ${tag}`);
-
-  // Load each target's release config and check if the tag matches its tagPrefix
   for (const target of targets) {
     try {
-      const configPath = target.configPath;
-      if (!existsSync(configPath)) {
-        continue;
+      // Load the release config
+      const configPath = pathToFileURL(target.configPath).href;
+      const module = (await import(configPath)) as LoadedModule;
+
+      let config: ReleaseConfig | null = null;
+
+      if (hasDefaultReleaseConfig(module)) {
+        config = module.default;
+      } else if (isDirectReleaseConfig(module)) {
+        config = module;
       }
 
-      // Dynamically import the release config using dynamic import
-      const configFileUrl = pathToFileURL(configPath).href;
-      const importedModule = await import(configFileUrl);
-
-      let config: ReleaseConfig;
-      if (hasDefaultReleaseConfig(importedModule)) {
-        config = importedModule.default;
-      } else if (isDirectReleaseConfig(importedModule)) {
-        config = importedModule;
-      } else {
+      if (!config) {
         continue;
       }
 
       // Check each package in the config
-      for (const pkg of config.packages || []) {
-        const tagPrefix = pkg.release?.tagPrefix;
-        if (tagPrefix && tag.startsWith(tagPrefix)) {
-          logger(
-            `Found matching target: ${target.directory} (tagPrefix: ${tagPrefix})`,
-          );
+      for (const pkg of config.packages) {
+        if (!pkg.release?.tagPrefix) {
+          continue;
+        }
+
+        const tagPrefix = pkg.release.tagPrefix;
+        if (tag.startsWith(tagPrefix)) {
           return target;
         }
       }
-    } catch (error) {
-      // Skip targets with invalid configs
-      const errorMessage = isError(error) ? error.message : String(error);
-      logger(`Failed to load config for ${target.directory}: ${errorMessage}`);
-    }
-  }
-
-  logger(`No release target found for git tag: ${tag}`);
-  logger(`Available targets: ${targets.map((t) => t.directory).join(", ")}`);
-
-  // Show available tag prefixes for debugging
-  const availablePrefixes: string[] = [];
-  for (const target of targets) {
-    try {
-      const configFileUrl = pathToFileURL(target.configPath).href;
-      const importedModule = await import(configFileUrl);
-
-      let config: ReleaseConfig;
-      if (hasDefaultReleaseConfig(importedModule)) {
-        config = importedModule.default;
-      } else if (isDirectReleaseConfig(importedModule)) {
-        config = importedModule;
-      } else {
-        continue;
-      }
-
-      for (const pkg of config.packages || []) {
-        if (pkg.release?.tagPrefix) {
-          availablePrefixes.push(
-            `${pkg.release.tagPrefix} (${target.directory})`,
-          );
-        }
-      }
     } catch {
-      // Ignore
+      // Skip targets with invalid configs
+      continue;
     }
-  }
-
-  if (availablePrefixes.length > 0) {
-    logger(`Available tag prefixes: ${availablePrefixes.join(", ")}`);
   }
 
   return null;
 }
 
 /**
- * Filters targets based on criteria
+ * Lists all available tag prefixes from all targets
  */
-export function filterTargets(
+export async function listAvailableTagPrefixes(
   targets: ReleaseTarget[],
-  filter?: {
-    includePatterns?: string[];
-    excludePatterns?: string[];
-    onlyWithPackageJson?: boolean;
-  },
-): ReleaseTarget[] {
-  if (!filter) {
-    return targets;
+): Promise<string[]> {
+  const prefixes: string[] = [];
+
+  for (const target of targets) {
+    try {
+      const configPath = pathToFileURL(target.configPath).href;
+      const module = (await import(configPath)) as LoadedModule;
+
+      let config: ReleaseConfig | null = null;
+
+      if (hasDefaultReleaseConfig(module)) {
+        config = module.default;
+      } else if (isDirectReleaseConfig(module)) {
+        config = module;
+      }
+
+      if (!config) {
+        continue;
+      }
+
+      for (const pkg of config.packages) {
+        if (pkg.release?.tagPrefix) {
+          prefixes.push(`${pkg.release.tagPrefix} (${target.directory})`);
+        }
+      }
+    } catch {
+      // Skip targets with errors
+      continue;
+    }
   }
 
-  let filtered = targets;
-
-  // Apply include patterns
-  if (filter.includePatterns && filter.includePatterns.length > 0) {
-    filtered = filtered.filter((target) =>
-      filter.includePatterns!.some((pattern) =>
-        target.directory.includes(pattern),
-      ),
-    );
-  }
-
-  // Apply exclude patterns
-  if (filter.excludePatterns && filter.excludePatterns.length > 0) {
-    filtered = filtered.filter(
-      (target) =>
-        !filter.excludePatterns!.some((pattern) =>
-          target.directory.includes(pattern),
-        ),
-    );
-  }
-
-  // Filter by package.json existence
-  if (filter.onlyWithPackageJson) {
-    filtered = filtered.filter((target) => {
-      const packageJsonPath = join(target.directory, "package.json");
-      return existsSync(packageJsonPath);
-    });
-  }
-
-  return filtered;
+  return prefixes;
 }

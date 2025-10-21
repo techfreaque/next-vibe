@@ -11,6 +11,7 @@ import { registerSeed } from "@/packages/next-vibe/server/db/seed-manager";
 import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { NewSubscription } from "./db";
 import { subscriptions } from "./db";
+import type { SubscriptionGetResponseOutput } from "./definition";
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "./enum";
 import { subscriptionRepository } from "./repository";
 
@@ -74,10 +75,11 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       logger,
     );
 
-    let subscription = existingSubscription.data;
+    let subscription: SubscriptionGetResponseOutput | undefined = undefined;
 
     if (existingSubscription.success && existingSubscription.data) {
       logger.debug("Demo user already has a subscription, skipping creation");
+      subscription = existingSubscription.data;
     } else {
       // Create local subscription record for demo user (active professional plan)
       const demoSubscriptionData = createLocalSubscriptionSeed(demoUser.id, {
@@ -107,8 +109,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 
       // Check if user already has subscription credits
       const balanceResult = await creditRepository.getBalance(demoUser.id);
-      const hasCredits =
-        balanceResult.success && balanceResult.data.total > 0;
+      const hasCredits = balanceResult.success && balanceResult.data.total > 0;
 
       if (!hasCredits) {
         // Convert currentPeriodEnd to Date if it's a string (from database)
@@ -154,7 +155,8 @@ export async function dev(logger: EndpointLogger): Promise<void> {
         logger,
       );
 
-      let adminSubscriptionData = adminSubscription.data;
+      let adminSubscriptionData: SubscriptionGetResponseOutput | undefined =
+        undefined;
 
       if (!adminSubscription.success || !adminSubscription.data) {
         // Create premium subscription for admin user
@@ -179,7 +181,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
           adminSubscriptionData = adminCreatedSubscription;
         }
       } else {
-        logger.debug("Admin user already has a subscription, skipping creation");
+        logger.debug(
+          "Admin user already has a subscription, skipping creation",
+        );
+        adminSubscriptionData = adminSubscription.data;
       }
 
       // Always ensure subscription credits exist (even if subscription already existed)
@@ -217,7 +222,9 @@ export async function dev(logger: EndpointLogger): Promise<void> {
             });
           }
         } else {
-          logger.debug("Admin user already has credits, skipping credit creation");
+          logger.debug(
+            "Admin user already has credits, skipping credit creation",
+          );
         }
       }
     }

@@ -1,5 +1,16 @@
+/// <reference types="node" />
+/* eslint-disable no-restricted-syntax */
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
+
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 import type { ReleaseConfig } from "../types/index.js";
 
@@ -17,100 +28,55 @@ function isReleaseConfigModule(
   if (!("default" in module)) {
     return false;
   }
-  const defaultExport = (module as { default: unknown }).default;
+  const defaultExport = module.default as ReleaseConfig | null;
   if (typeof defaultExport !== "object" || defaultExport === null) {
     return false;
   }
   if (!("packages" in defaultExport)) {
     return false;
   }
-  const packages = (defaultExport as { packages: unknown }).packages;
-  return Array.isArray(packages);
+  return Array.isArray(defaultExport.packages);
 }
-
-// async function getCompiledConfigPath(configPath: string): Promise<string> {
-//   const outputFileName = `release.config.tmp.${Math.round(Math.random() * 100000)}.cjs`;
-//   const outputDir = dirname(configPath);
-//   const outputFilePath = join(outputDir, outputFileName);
-//   const outputTmpDir = join(outputDir, "tmp");
-//   const outputFileTmpPath = join(outputTmpDir, outputFileName);
-
-//   try {
-//     // Ensure tmp dir exists
-//     if (!existsSync(outputTmpDir)) {
-//       logger(`creating tmp dir ${outputTmpDir}`);
-//       process.umask(0);
-//       mkdirSync(outputTmpDir, { recursive: true });
-//     }
-
-//     await build({
-//       logLevel: "silent",
-//       plugins: [],
-//       build: {
-//         lib: {
-//           entry: configPath,
-//           formats: ["cjs"],
-//           fileName: () => outputFileName,
-//         },
-//         outDir: outputTmpDir,
-//         emptyOutDir: false,
-//         sourcemap: false,
-//       },
-//     });
-//     renameSync(join(outputTmpDir, outputFileName), outputFilePath);
-//     rmSync(outputTmpDir, { force: true, recursive: true });
-//     return outputFilePath;
-//   } catch (error) {
-//     // // Clean up in case of an error
-//     try {
-//       unlinkSync(outputFileTmpPath);
-//       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//     } catch (_) {
-//       /* empty */
-//     }
-//     try {
-//       unlinkSync(outputFilePath);
-//       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//     } catch (_) {
-//       /* empty */
-//     }
-//     // eslint-disable-next-line no-restricted-syntax
-//     throw error;
-//   }
-// }
-
-// function cleanCompiledConfig(compiledConfigPath: string): void {
-//   unlinkSync(compiledConfigPath);
-// }
 
 /**
  * Loads and returns the release configuration.
  */
-export async function loadConfig(configPath: string, logger: EndpointLogger,
-): Promise<ReleaseConfig> {
-  logger(`Using config file: ${configPath}`);
+export async function loadConfig(
+  logger: EndpointLogger,
+  configPath: string,
+): Promise<ResponseType<ReleaseConfig>> {
   const resolvedConfigPath = resolve(process.cwd(), configPath);
 
   if (!existsSync(resolvedConfigPath)) {
-    throw new Error(`Config file not found: ${resolvedConfigPath}`);
+    logger.error("Config file not found", { path: resolvedConfigPath });
+    return createErrorResponse(
+      "app.api.v1.core.system.releaseTool.config.fileNotFound",
+      ErrorResponseTypes.NOT_FOUND,
+      { path: resolvedConfigPath },
+    );
   }
 
   try {
-    // const compiledConfigPath = await getCompiledConfigPath(resolvedConfigPath);
-    const importedModule = await import(`file://${resolvedConfigPath}`);
+    const importedModule = (await import(
+      `file://${resolvedConfigPath}`
+    )) as unknown;
 
     if (!isReleaseConfigModule(importedModule)) {
-      throw new Error(
-        "Invalid config format. Ensure the config exports a default object with a 'packages' array. Check the docs for more info.",
+      logger.error("Invalid config format", { path: resolvedConfigPath });
+      return createErrorResponse(
+        "app.api.v1.core.system.releaseTool.config.invalidFormat",
+        ErrorResponseTypes.INVALID_FORMAT_ERROR,
       );
     }
 
-    const config = importedModule.default;
-    // cleanCompiledConfig(compiledConfigPath);
-
-    return config;
+    logger.info("Successfully loaded config", { path: resolvedConfigPath });
+    return createSuccessResponse(importedModule.default);
   } catch (error) {
-    loggerError("Error loading config:", error);
-    throw error;
+    logger.error("Error loading config", { error, path: resolvedConfigPath });
+    return createErrorResponse(
+      "app.api.v1.core.system.releaseTool.config.errorLoading",
+      ErrorResponseTypes.INTERNAL_ERROR,
+      { error: String(error) },
+    );
   }
 }

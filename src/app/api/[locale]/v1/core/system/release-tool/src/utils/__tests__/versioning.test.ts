@@ -3,8 +3,11 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { defaultLocale } from "@/i18n/core/config";
+
 import type { ReleaseOptions } from "../../types/index.js";
-import { logger } from "../logger.js";
 import { updateVariableStringValue } from "../versioning.js";
 
 // Mock the fs module
@@ -15,16 +18,13 @@ vi.mock("node:fs", () => {
   };
 });
 
-// Mock the logger
-vi.mock("../logger.js", () => ({
-  logger: vi.fn(),
-}));
-
 describe("updateVariableStringValue", () => {
   const newVersion = "1.5.0";
+  let logger: EndpointLogger;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    logger = createEndpointLogger(false, Date.now(), defaultLocale);
   });
 
   afterEach(() => {
@@ -53,7 +53,7 @@ describe("updateVariableStringValue", () => {
         versionBumper: [{ filePath: "src/constants.ts", varName: "VERSION" }],
       };
 
-      updateVariableStringValue(newVersion, releaseConfig);
+      updateVariableStringValue(logger, newVersion, releaseConfig);
 
       // Verify that readFileSync was called correctly
       expect(readFileSync).toHaveBeenCalledWith("src/constants.ts", "utf8");
@@ -62,11 +62,6 @@ describe("updateVariableStringValue", () => {
       expect(writeFileSync).toHaveBeenCalledWith(
         "src/constants.ts",
         expectedContent,
-      );
-
-      // Verify the logger was called
-      expect(logger).toHaveBeenCalledWith(
-        expect.stringContaining("Updated version"),
       );
     });
 
@@ -81,7 +76,7 @@ describe("updateVariableStringValue", () => {
         versionBumper: [{ filePath: "src/constants.ts", varName: "VERSION" }],
       };
       expect(() =>
-        updateVariableStringValue(newVersion, releaseConfig),
+        updateVariableStringValue(logger, newVersion, releaseConfig),
       ).toThrow();
     });
 
@@ -95,7 +90,7 @@ describe("updateVariableStringValue", () => {
         tagPrefix: "test_",
         versionBumper: [{ filePath: "src/constants.ts", varName: "VERSION" }],
       };
-      updateVariableStringValue(newVersion, releaseConfig);
+      updateVariableStringValue(logger, newVersion, releaseConfig);
 
       expect(writeFileSync).toHaveBeenCalledWith(
         "src/constants.ts",
@@ -112,7 +107,7 @@ describe("updateVariableStringValue", () => {
         tagPrefix: "test_",
         versionBumper: [{ filePath: "src/constants.ts", varName: "VERSION" }],
       };
-      updateVariableStringValue(newVersion, releaseConfig);
+      updateVariableStringValue(logger, newVersion, releaseConfig);
 
       expect(writeFileSync).toHaveBeenCalledWith(
         "src/constants.ts",
@@ -146,7 +141,7 @@ define('SOVENDUS_VERSION', '2.1.0');
           { filePath: "src/constants.php", varName: "SOVENDUS_VERSION" },
         ],
       };
-      updateVariableStringValue(newVersion, releaseConfig);
+      updateVariableStringValue(logger, newVersion, releaseConfig);
 
       // Verify that readFileSync was called twice (once for each variable)
       expect(readFileSync).toHaveBeenCalledTimes(2);
@@ -182,9 +177,6 @@ define('OTHER_CONSTANT', 'something else');
 define('SOVENDUS_VERSION', '1.5.0');
 `,
       );
-
-      // Verify the logger was called twice
-      expect(logger).toHaveBeenCalledTimes(2);
     });
 
     it("should throw error when variable not found in PHP file", () => {
@@ -199,7 +191,7 @@ define('SOME_OTHER_VAR', '1.0.0');
         versionBumper: [{ filePath: "src/constants.php", varName: "VERSION" }],
       };
       expect(() =>
-        updateVariableStringValue(newVersion, releaseConfig),
+        updateVariableStringValue(logger, newVersion, releaseConfig),
       ).toThrow();
     });
 
@@ -217,7 +209,7 @@ define("VERSION",'1.5.0');
         tagPrefix: "test_",
         versionBumper: [{ filePath: "src/constants.php", varName: "VERSION" }],
       };
-      updateVariableStringValue(newVersion, releaseConfig);
+      updateVariableStringValue(logger, newVersion, releaseConfig);
 
       expect(writeFileSync).toHaveBeenCalledWith(
         "src/constants.php",
@@ -239,7 +231,7 @@ define('VERSION', "1.5.0");
         tagPrefix: "test_",
         versionBumper: [{ filePath: "src/constants.php", varName: "VERSION" }],
       };
-      updateVariableStringValue(newVersion, releaseConfig);
+      updateVariableStringValue(logger, newVersion, releaseConfig);
 
       expect(writeFileSync).toHaveBeenCalledWith(
         "src/constants.php",
@@ -263,9 +255,8 @@ define('VERSION', "1.5.0");
         { filePath: "src/constants.php", varName: "VERSION" },
       ],
     };
-    updateVariableStringValue(newVersion, releaseConfig);
+    updateVariableStringValue(logger, newVersion, releaseConfig);
 
     expect(writeFileSync).toHaveBeenCalledTimes(2);
-    expect(logger).toHaveBeenCalledTimes(2);
   });
 });

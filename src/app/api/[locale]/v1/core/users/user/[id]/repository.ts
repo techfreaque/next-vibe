@@ -98,7 +98,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
           createdAt: foundUser.createdAt.toISOString(),
           updatedAt: foundUser.updatedAt.toISOString(),
         },
-        leadId: foundUser.leadId,
+        leadId: null,
         email: foundUser.email,
         privateName: foundUser.privateName,
         publicName: foundUser.publicName,
@@ -167,9 +167,6 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
       if (data.adminSettings?.emailVerified !== undefined) {
         updateData.emailVerified = data.adminSettings.emailVerified;
       }
-      if (data.adminSettings?.leadId !== undefined) {
-        updateData.leadId = data.adminSettings.leadId;
-      }
 
       // Update user
       const [updatedUser] = await db
@@ -189,7 +186,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
 
       return createSuccessResponse({
         id: updatedUser.id,
-        leadId: updatedUser.leadId,
+        leadId: null,
         email: updatedUser.email,
         privateName: updatedUser.privateName,
         publicName: updatedUser.publicName,

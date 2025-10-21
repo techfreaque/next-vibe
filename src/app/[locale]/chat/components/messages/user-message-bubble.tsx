@@ -23,6 +23,7 @@ interface UserMessageBubbleProps {
   onRetry?: (messageId: string) => void;
   onDelete?: (messageId: string) => void;
   showAuthor?: boolean;
+  rootFolderId?: string;
 }
 
 export function UserMessageBubble({
@@ -33,6 +34,7 @@ export function UserMessageBubble({
   onRetry,
   onDelete,
   showAuthor = false,
+  rootFolderId = "general",
 }: UserMessageBubbleProps): JSX.Element {
   const tone =
     message.role === "user" || message.role === "assistant"
@@ -54,6 +56,7 @@ export function UserMessageBubble({
               tone={tone}
               locale={locale}
               compact
+              rootFolderId={rootFolderId}
             />
           </div>
         )}

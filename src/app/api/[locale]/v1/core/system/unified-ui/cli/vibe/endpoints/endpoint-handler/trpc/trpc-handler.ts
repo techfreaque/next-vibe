@@ -103,7 +103,9 @@ export function createTRPCHandler<
         // eslint-disable-next-line no-restricted-syntax
         throw convertToTRPCError(
           ErrorResponseTypes.UNAUTHORIZED,
-          ctx.t("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.unauthorized"),
+          ctx.t(
+            "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.unauthorized",
+          ),
         );
       }
 
@@ -127,7 +129,9 @@ export function createTRPCHandler<
         // eslint-disable-next-line no-restricted-syntax
         throw convertToTRPCError(
           ErrorResponseTypes.INVALID_REQUEST_ERROR,
-          ctx.t("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data"),
+          ctx.t(
+            "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
+          ),
         );
       }
 
@@ -158,7 +162,9 @@ export function createTRPCHandler<
       // eslint-disable-next-line no-restricted-syntax
       throw convertToTRPCError(
         ErrorResponseTypes.INTERNAL_ERROR,
-        ctx.t("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error"),
+        ctx.t(
+          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
+        ),
       );
     }
   };

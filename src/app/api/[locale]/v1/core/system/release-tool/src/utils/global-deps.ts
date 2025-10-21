@@ -1,7 +1,11 @@
+/// <reference types="node" />
+/* eslint-disable no-restricted-syntax */
 import { execSync } from "node:child_process";
 import { join } from "node:path";
 
 import inquirer from "inquirer";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 import type { ReleaseConfig, ReleasePackage } from "../types/index.js";
 import { getPackageJson } from "./package-json.js";
@@ -22,7 +26,7 @@ export async function handleGlobalDependencyUpdates(
   );
 
   if (packagesNeedingUpdates.length === 0) {
-    logger("No packages require dependency updates");
+    logger.info("No packages require dependency updates");
     return false;
   }
 
@@ -37,12 +41,20 @@ export async function handleGlobalDependencyUpdates(
     // Show all packages that will be updated
     const packageNames = packagesNeedingUpdates.map((pkg) => {
       const cwd = join(originalCwd, pkg.directory);
-      const packageJson = getPackageJson(cwd);
-      return `${packageJson.name} (${pkg.directory})`;
+      const packageJsonResponse = getPackageJson(cwd, logger);
+      if (!packageJsonResponse.success) {
+        // eslint-disable-next-line i18next/no-literal-string
+        return `${pkg.directory} (error reading package.json)`;
+      }
+      // eslint-disable-next-line i18next/no-literal-string
+      return `${packageJsonResponse.data.name} (${pkg.directory})`;
     });
 
-    logger("The following packages are configured for dependency updates:");
-    packageNames.forEach((name) => logger(`  - ${name}`));
+    logger.info(
+      "The following packages are configured for dependency updates:",
+    );
+
+    packageNames.forEach((name) => logger.info(`  - ${name}`));
 
     const { confirmUpdate } = await inquirer.prompt<{
       confirmUpdate: boolean;
@@ -50,6 +62,7 @@ export async function handleGlobalDependencyUpdates(
       {
         type: "confirm",
         name: "confirmUpdate",
+        // eslint-disable-next-line i18next/no-literal-string
         message: `Update dependencies for all ${packagesNeedingUpdates.length} packages?`,
         default: false,
       },
@@ -59,12 +72,13 @@ export async function handleGlobalDependencyUpdates(
   }
 
   if (!shouldUpdate) {
-    logger("Skipping dependency updates for all packages");
+    logger.info("Skipping dependency updates for all packages");
     return false;
   }
 
   // Update dependencies for all packages
-  logger(
+
+  logger.info(
     `Updating dependencies for ${packagesNeedingUpdates.length} packages...`,
   );
 
@@ -73,9 +87,15 @@ export async function handleGlobalDependencyUpdates(
     const packageJson = getPackageJson(cwd);
 
     try {
-      updatePackageDependencies(pkg, packageManager, cwd, packageJson.name);
+      updatePackageDependencies(
+        pkg,
+        packageManager,
+        cwd,
+        packageJson.name,
+        logger,
+      );
     } catch (error) {
-      loggerError(
+      logger.error(
         `Failed to update dependencies for ${packageJson.name}:`,
         error,
       );
@@ -94,6 +114,7 @@ function updatePackageDependencies(
   packageManager: string,
   cwd: string,
   packageName: string,
+  logger: EndpointLogger,
 ): void {
   const packageJson = getPackageJson(cwd);
 
@@ -101,31 +122,37 @@ function updatePackageDependencies(
     const ignoreList = packageJson.updateIgnoreDependencies || [];
 
     // Build ignore list arguments
+
     const ignoreArg =
       ignoreList.length > 0 ? `--reject ${ignoreList.join(",")}` : "";
 
-    logger(`Updating dependencies for ${packageName}`);
+    logger.info(`Updating dependencies for ${packageName}`);
 
     // Run npm-check-updates to find and update package.json
+    // eslint-disable-next-line i18next/no-literal-string
     execSync(`ncu -u ${ignoreArg}`, {
       cwd,
+
       stdio: "inherit",
       timeout: 60000, // 1 minute timeout
     });
 
-    logger(`Successfully updated package.json for ${packageName}`);
+    logger.info(`Successfully updated package.json for ${packageName}`);
 
     // Install dependencies with the correct path setup
+
     execSync(`${packageManager} install`, {
       cwd,
+
       stdio: "inherit",
+      // eslint-disable-next-line node/no-process-env
       env: { ...process.env },
       timeout: 120000, // 2 minutes timeout
     });
 
-    logger(`Successfully installed dependencies for ${packageName}`);
+    logger.info(`Successfully installed dependencies for ${packageName}`);
   } catch (error) {
-    loggerError(
+    logger.error(
       `Error updating dependencies for ${packageName}. Continuing with release process.`,
       error,
     );

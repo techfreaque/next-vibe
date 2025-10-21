@@ -1,8 +1,9 @@
 #!/usr/bin/env node
+/* eslint-disable i18next/no-literal-string */
+/* eslint-disable no-console */
 import { Command } from "commander";
 
 import { release } from "./commands/release.js";
-import { logger, loggerError } from "./utils/logger.js";
 
 const program = new Command();
 
@@ -32,10 +33,10 @@ program
           options.ci || false,
           options.forceUpdate || false,
         );
-        logger("Release process completed successfully.");
+        console.log("Release process completed successfully.");
         process.exit(0);
       } catch (error) {
-        loggerError("Error during release process:", error);
+        console.error("Error during release process:", error);
         process.exit(1);
       }
     },
@@ -45,10 +46,10 @@ program
 program.action(async () => {
   try {
     await release();
-    logger("Release process completed successfully.");
+    console.log("Release process completed successfully.");
     process.exit(0);
   } catch (error) {
-    loggerError("Error during release process:", error);
+    console.error("Error during release process:", error);
     process.exit(1);
   }
 });

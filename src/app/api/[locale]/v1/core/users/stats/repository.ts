@@ -29,6 +29,7 @@ import {
 } from "next-vibe/shared/types/stats-filtering.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { userLeads } from "@/app/api/[locale]/v1/core/leads/db";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
@@ -225,14 +226,6 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         whereConditions.push(eq(users.isActive, query.isActive));
       }
 
-      if (query.hasLeadId !== undefined) {
-        if (query.hasLeadId) {
-          whereConditions.push(isNotNull(users.leadId));
-        } else {
-          whereConditions.push(isNull(users.leadId));
-        }
-      }
-
       if (query.hasStripeCustomerId !== undefined) {
         if (query.hasStripeCustomerId) {
           whereConditions.push(isNotNull(users.stripeCustomerId));
@@ -393,8 +386,6 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         emailUnverifiedUsers: sql<number>`count(*) filter (where ${users.emailVerified} = false)::int`,
         usersWithStripeId: sql<number>`count(*) filter (where ${users.stripeCustomerId} is not null)::int`,
         usersWithoutStripeId: sql<number>`count(*) filter (where ${users.stripeCustomerId} is null)::int`,
-        usersWithLeadId: sql<number>`count(*) filter (where ${users.leadId} is not null)::int`,
-        usersWithoutLeadId: sql<number>`count(*) filter (where ${users.leadId} is null)::int`,
       })
       .from(users);
 
@@ -406,9 +397,20 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
       emailUnverifiedUsers: 0,
       usersWithStripeId: 0,
       usersWithoutStripeId: 0,
-      usersWithLeadId: 0,
-      usersWithoutLeadId: 0,
     };
+
+    // Get users with lead IDs using the userLeads junction table
+    const [leadStats] = await db
+      .select({
+        usersWithLeadId: sql<number>`count(distinct ${userLeads.userId})::int`,
+      })
+      .from(userLeads)
+      .innerJoin(users, eq(userLeads.userId, users.id))
+      .where(whereClause ? sql`${whereClause}` : undefined);
+
+    const usersWithLeadIdCount = leadStats?.usersWithLeadId ?? 0;
+    const usersWithoutLeadIdCount =
+      basicCounts.totalUsers - usersWithLeadIdCount;
 
     // Get time-based metrics
     const now = new Date();
@@ -442,8 +444,6 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
       totalUsers > 0 ? basicCounts.emailVerifiedUsers / totalUsers : 0;
     const stripeIntegrationRate =
       totalUsers > 0 ? basicCounts.usersWithStripeId / totalUsers : 0;
-    const leadAssociationRate =
-      totalUsers > 0 ? basicCounts.usersWithLeadId / totalUsers : 0;
 
     // Calculate growth rate (month-over-month)
     const growthRate =
@@ -475,8 +475,10 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
     const adminUsers = usersByRole.ADMIN || 0;
 
     // Calculate more accurate conversion and retention rates
-    const leadToUserConversionRate =
-      await this.calculateLeadToUserConversionRate(whereClause, logger);
+    const leadToUserConversionRate = this.calculateLeadToUserConversionRate(
+      usersWithLeadIdCount,
+      totalUsers,
+    );
     const retentionRate = await this.calculateRetentionRate(
       whereClause,
       logger,
@@ -493,9 +495,10 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
       usersWithStripeId: basicCounts.usersWithStripeId,
       usersWithoutStripeId: basicCounts.usersWithoutStripeId,
       stripeIntegrationRate,
-      usersWithLeadId: basicCounts.usersWithLeadId,
-      usersWithoutLeadId: basicCounts.usersWithoutLeadId,
-      leadAssociationRate,
+      usersWithLeadId: usersWithLeadIdCount,
+      usersWithoutLeadId: usersWithoutLeadIdCount,
+      leadAssociationRate:
+        totalUsers > 0 ? usersWithLeadIdCount / totalUsers : 0,
       usersByRole,
       publicUsers,
       customerUsers,
@@ -514,29 +517,13 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
 
   /**
    * Calculate lead to user conversion rate
-   * Note: Leads table doesn't exist in current schema, using leadId field instead
+   * Returns the ratio of users with associated leads
    */
-  private async calculateLeadToUserConversionRate(
-    whereClause: SQL | undefined,
-    logger: EndpointLogger,
-  ): Promise<number> {
-    try {
-      // Calculate conversion rate based on users with leadId field
-      const [conversionStats] = await db
-        .select({
-          totalUsers: sql<number>`count(*)::int`,
-          usersWithLeadId: sql<number>`count(case when ${users.leadId} is not null then 1 end)::int`,
-        })
-        .from(users)
-        .where(whereClause);
-
-      return conversionStats.totalUsers > 0
-        ? conversionStats.usersWithLeadId / conversionStats.totalUsers
-        : 0;
-    } catch (error) {
-      logger.error("Error calculating lead to user conversion rate", error);
-      return 0;
-    }
+  private calculateLeadToUserConversionRate(
+    usersWithLeadIdCount: number,
+    totalUsers: number,
+  ): number {
+    return totalUsers > 0 ? usersWithLeadIdCount / totalUsers : 0;
   }
 
   /**

@@ -16,6 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TFunction } from "@/i18n/core/static-types";
 
 import { smsServiceRepository } from "../../emails/sms-service/repository";
 import { CampaignType } from "../../emails/smtp-client/enum";
@@ -208,13 +209,10 @@ export class NewsletterSubscribeSmsServiceImpl
   ): string {
     const { name, email } = subscriptionData;
     const displayName = name || email;
-    return t(
-      "app.api.v1.core.newsletter.sms.admin_notification.message",
-      {
-        displayName,
-        email,
-      },
-    );
+    return t("app.api.v1.core.newsletter.sms.admin_notification.message", {
+      displayName,
+      email,
+    });
   }
 }
 

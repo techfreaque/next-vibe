@@ -144,7 +144,9 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
     }
 
     // Sort groups by filename (alphabetically)
-    return new Map([...groups.entries()].sort((a, b) => a[0].localeCompare(b[0])));
+    return new Map(
+      [...groups.entries()].sort((a, b) => a[0].localeCompare(b[0])),
+    );
   }
 
   /**
@@ -480,8 +482,8 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
     output += `${this.styleText(separator, "dim", context)}${String.fromCharCode(10)}`;
 
     // Sort files by filename (alphabetically)
-    const sortedFiles = Array.from(groups.entries()).sort(
-      ([aKey], [bKey]) => aKey.localeCompare(bKey),
+    const sortedFiles = Array.from(groups.entries()).sort(([aKey], [bKey]) =>
+      aKey.localeCompare(bKey),
     );
 
     // List each file with its error count

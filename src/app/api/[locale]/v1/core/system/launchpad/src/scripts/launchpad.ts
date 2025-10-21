@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 /// <reference types="node" />
-/* eslint-disable node/no-process-env */
 /* eslint-disable i18next/no-literal-string */
 /* eslint-disable no-restricted-syntax */
 import { Command } from "commander";
@@ -77,11 +76,11 @@ program
 program
   .command("force-update-all")
   .description("Force update dependencies for all packages")
-  .action(async () => {
+  .action(() => {
     const logger = createEndpointLogger(true, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
-      await forceUpdateAllCommand(logger, rootDir);
+      forceUpdateAllCommand(logger, rootDir);
     } catch (error) {
       handleError(logger, "Force update failed:", error);
     }
@@ -153,11 +152,11 @@ program
 program
   .command("status")
   .description("Show current release status")
-  .action(async () => {
+  .action(() => {
     const logger = createEndpointLogger(true, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
-      await showReleaseStatusCommand(logger, rootDir);
+      showReleaseStatusCommand(logger, rootDir);
     } catch (error) {
       handleError(logger, "Show status failed:", error);
     }
@@ -177,7 +176,11 @@ program
     }
   });
 
-function handleError(logger: EndpointLogger, message: string, error: unknown): never {
+function handleError(
+  logger: EndpointLogger,
+  message: string,
+  error: unknown,
+): never {
   logger.error(message, error);
   process.exit(1);
 }
@@ -244,7 +247,7 @@ async function runInteractiveMode(): Promise<void> {
             await updateAllRepos(logger, true, configRootDir, config);
             break;
           case "navigate-folders":
-            await navigateFolders(logger, configRootDir, config);
+            await navigateFolders(configRootDir, config);
             break;
         }
         break;
@@ -252,7 +255,7 @@ async function runInteractiveMode(): Promise<void> {
 
       // New release orchestration
       case "force-update-all":
-        await forceUpdateAllCommand(logger, rootDir);
+        forceUpdateAllCommand(logger, rootDir);
         break;
       case "release-all":
         await releaseAllCommand(logger, rootDir);
@@ -264,7 +267,7 @@ async function runInteractiveMode(): Promise<void> {
         await continueReleaseCommand(logger, rootDir);
         break;
       case "show-status":
-        await showReleaseStatusCommand(logger, rootDir);
+        showReleaseStatusCommand(logger, rootDir);
         break;
     }
 

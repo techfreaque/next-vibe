@@ -3,11 +3,7 @@ import { join } from "path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
-import type {
-  ReleaseConfig,
-  ReleaseOptions,
-  ReleasePackage,
-} from "../types/index.js";
+import type { ReleaseOptions, ReleasePackage } from "../types/index.js";
 import { getPackageJson } from "../utils/package-json.js";
 import { DEFAULT_CONFIG_PATH, loadConfig } from "../utils/release-config.js";
 import {
@@ -65,8 +61,15 @@ export async function ciRelease(
   configPath: string = DEFAULT_CONFIG_PATH,
   logger: EndpointLogger,
 ): Promise<void> {
-  const config: ReleaseConfig = await loadConfig(configPath, logger);
+  const configResponse = await loadConfig(logger, configPath);
 
+  if (!configResponse.success) {
+    logger.error("Failed to load config", { error: configResponse.message });
+    // eslint-disable-next-line no-restricted-syntax
+    throw new Error(configResponse.message);
+  }
+
+  const config = configResponse.data;
   logger.info(CLI_MESSAGES.runningCiMode);
 
   let overallError = false;

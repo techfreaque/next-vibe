@@ -123,7 +123,7 @@ export function ModelPersonaSelectorModal({
           </Button>
           <Button
             onClick={onConfirm}
-            disabled={isLoading || (showInput && !inputValue.trim())}
+            disabled={isLoading}
             size="sm"
             variant="default"
             className="h-10 min-h-[44px]"

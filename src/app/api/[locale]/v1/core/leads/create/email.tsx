@@ -20,7 +20,7 @@ import {
 import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
+import type { TFunction } from "@/i18n/core/static-types";
 
 import type { LeadCreateType } from "../definition";
 import { LeadSource, LeadStatus } from "../enum";

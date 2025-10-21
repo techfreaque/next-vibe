@@ -36,7 +36,7 @@ interface ChatMessagesProps {
   onPersonaChange?: (persona: string) => void;
   onBranchMessage?: (messageId: string, newContent: string) => Promise<void>;
   onRetryMessage?: (messageId: string) => Promise<void>;
-  onAnswerAsModel?: (messageId: string) => Promise<void>;
+  onAnswerAsModel?: (messageId: string, content: string) => Promise<void>;
   onVoteMessage?: (messageId: string, vote: 1 | -1 | 0) => void;
   isLoading?: boolean;
   showBranchIndicators?: boolean;
@@ -258,9 +258,11 @@ export function ChatMessages({
                 editingMessageId={messageActions.editingMessageId}
                 retryingMessageId={messageActions.retryingMessageId}
                 answeringMessageId={messageActions.answeringMessageId}
+                answerContent={messageActions.answerContent}
                 onDeleteMessage={onDeleteMessage}
                 onRetryMessage={onRetryMessage}
                 onAnswerAsModel={onAnswerAsModel}
+                onSetAnswerContent={messageActions.setAnswerContent}
                 onModelChange={onModelChange}
                 onPersonaChange={onPersonaChange}
                 onStartEdit={messageActions.startEdit}
@@ -272,6 +274,7 @@ export function ChatMessages({
                 }
                 onSwitchBranch={onSwitchBranch}
                 logger={logger}
+                rootFolderId={rootFolderId}
               />
             );
           })()

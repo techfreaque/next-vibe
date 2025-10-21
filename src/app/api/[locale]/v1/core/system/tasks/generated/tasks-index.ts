@@ -65,5 +65,5 @@ export const taskRegistry: TaskRegistry = {
   taskRunner, // Single unified task runner instance
 };
 
-export { allTasks, cronTasks, sideTasks, taskRunners, tasksByCategory, tasksByName, taskRunner };
+export { allTasks, cronTasks, sideTasks, taskRunner,taskRunners, tasksByCategory, tasksByName };
 export default allTasks;

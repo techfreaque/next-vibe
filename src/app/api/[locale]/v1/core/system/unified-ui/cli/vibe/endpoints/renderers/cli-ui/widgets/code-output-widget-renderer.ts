@@ -59,11 +59,11 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
       case "eslint":
         return this.renderESLintFormat(typedData, config, context);
       case "json":
-        return this.renderJSONFormat(typedData, config, context);
+        return this.renderJSONFormat(typedData);
       case "table":
-        return this.renderTableFormat(typedData, config, context);
+        return this.renderTableFormat(typedData);
       default:
-        return this.renderGenericFormat(typedData, config, context);
+        return this.renderGenericFormat(typedData);
     }
   }
 
@@ -279,7 +279,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
     context: WidgetRenderContext,
   ): string {
     if (config.summaryTemplate) {
-      return this.renderCustomSummary(data, config, context);
+      return this.renderCustomSummary(data, config);
     }
 
     return this.renderDefaultSummary(data, config, context);

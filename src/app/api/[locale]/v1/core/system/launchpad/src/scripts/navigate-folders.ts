@@ -1,3 +1,6 @@
+/// <reference types="node" />
+/* eslint-disable i18next/no-literal-string */
+/* eslint-disable no-console */
 import { exec } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
@@ -11,7 +14,6 @@ import type {
   LaunchpadFolder,
   LaunchpadPackage,
 } from "../types/types.js";
-import { logger, loggerError } from "../utils/logger.js";
 import { cloneRepo } from "../utils/repo-utils.js";
 
 const execAsync = promisify(exec);
@@ -53,14 +55,12 @@ function isLaunchpadFolder(
  */
 async function openInVSCode(folderPath: string): Promise<void> {
   try {
-    logger(`Opening ${folderPath} in VS Code...`);
+    console.log(`Opening ${folderPath} in VS Code...`);
     await execAsync(`code "${folderPath}"`);
-    logger("VS Code opened successfully ✅");
+    console.log("VS Code opened successfully ✅");
   } catch (error) {
-    loggerError("Failed to open VS Code:", error);
-    throw new Error(
-      "Failed to open VS Code. Is it installed and in your PATH?",
-    );
+    console.error("Failed to open VS Code:", error);
+    console.error("Failed to open VS Code. Is it installed and in your PATH?");
   }
 }
 
@@ -209,14 +209,13 @@ export async function navigateFolders(
       // Filter and sort entries - folders first, then packages
       const folderEntries = Object.entries(currentFolder)
         .filter(
-          ([_, item]) =>
-            item && typeof item === "object" && !("branch" in item),
+          ([, item]) => item && typeof item === "object" && !("branch" in item),
         )
         .sort(([a], [b]) => a.localeCompare(b));
 
       const packageEntries = Object.entries(currentFolder)
         .filter(
-          ([_, item]) =>
+          ([, item]) =>
             item &&
             typeof item === "object" &&
             "branch" in item &&
@@ -226,7 +225,7 @@ export async function navigateFolders(
 
       // Add folders with icons and description
       if (folderEntries.length > 0) {
-        folderEntries.forEach(([name, _]) => {
+        folderEntries.forEach(([name]) => {
           choices.push({
             name: chalk.cyan("📁 ") + name + chalk.dim(" [Directory]"),
             value: name,
@@ -301,19 +300,19 @@ export async function navigateFolders(
             console.log(
               chalk.yellow(`⚠️  Directory does not exist: ${physicalPath}`),
             );
-            const { createDir } = await inquirer.prompt([
+            const result = (await inquirer.prompt([
               {
                 type: "confirm",
                 name: "createDir",
                 message: "Would you like to create this directory?",
                 default: false,
               },
-            ]);
+            ])) as { createDir: boolean };
 
-            if (createDir) {
+            if (result.createDir) {
               // Simply create the directory as we have no repo info here
               fs.mkdirSync(physicalPath, { recursive: true });
-              logger(chalk.green(`✅ Created directory: ${physicalPath}`));
+              console.log(chalk.green(`✅ Created directory: ${physicalPath}`));
               await openInVSCode(physicalPath);
             }
           }
@@ -332,16 +331,16 @@ export async function navigateFolders(
               console.log(
                 `⚠️  Package directory does not exist: ${packagePath}`,
               );
-              const { shouldCloneRepo } = await inquirer.prompt([
+              const cloneResult = (await inquirer.prompt([
                 {
                   type: "confirm",
                   name: "shouldCloneRepo",
                   message: "Would you like to clone this repository?",
                   default: true,
                 },
-              ]);
+              ])) as { shouldCloneRepo: boolean };
 
-              if (shouldCloneRepo) {
+              if (cloneResult.shouldCloneRepo) {
                 try {
                   // Use the correct parameters from the selected package info
                   await cloneRepo(
@@ -350,10 +349,10 @@ export async function navigateFolders(
                     selectedItem.branch,
                     rootDir,
                   );
-                  logger(chalk.green(`✅ Repository cloned successfully`));
+                  console.log(chalk.green(`✅ Repository cloned successfully`));
                   await openInVSCode(packagePath);
                 } catch {
-                  logger(chalk.red(`❌ Failed to clone repository`));
+                  console.log(chalk.red(`❌ Failed to clone repository`));
                   console.log(
                     chalk.yellow(
                       "You can try cloning manually or check the repository URL and permissions.",
@@ -374,7 +373,8 @@ export async function navigateFolders(
     // Clear screen when exiting
     clearScreen();
   } catch (error) {
-    loggerError("Error navigating folders:", error);
+    console.error("Error navigating folders:", error);
+    // eslint-disable-next-line no-restricted-syntax
     throw error;
   }
 }
