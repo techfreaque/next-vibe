@@ -437,6 +437,12 @@ export const translations = {
       next: "Next branch",
     },
   },
+  toolCall: {
+    search: {
+      title: "Searching the web",
+      query: "Query",
+    },
+  },
   modelUtilities: {
     general: "General Chat",
     coding: "Coding & Development",

@@ -34,6 +34,7 @@ import type { ChatMessage, ModelId } from "../../types";
 import { ErrorMessageBubble } from "./error-message-bubble";
 import { MessageEditor } from "./message-editor";
 import { ModelPersonaSelectorModal } from "./model-persona-selector-modal";
+import { ToolCallDisplay } from "./tool-call-display";
 import { useMessageActions } from "./use-message-actions";
 import { UserProfileCard } from "./user-profile-card";
 
@@ -313,6 +314,14 @@ export function ThreadedMessage({
                         "prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline",
                       )}
                     >
+                      {/* Tool calls display */}
+                      {message.toolCalls && message.toolCalls.length > 0 && (
+                        <ToolCallDisplay
+                          toolCalls={message.toolCalls}
+                          locale={locale}
+                        />
+                      )}
+
                       <Markdown content={message.content} />
                     </div>
                   ) : (
@@ -431,7 +440,7 @@ export function ThreadedMessage({
               {/* Reply button - Creates a branch from this message */}
               {onBranchMessage && (
                 <button
-                  onClick={(): void => void onBranchMessage(message.id, "")}
+                  onClick={(): void => messageActions.startEdit(message.id)}
                   className="flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all"
                   title={t("app.chat.threadedView.actions.replyToMessage")}
                 >

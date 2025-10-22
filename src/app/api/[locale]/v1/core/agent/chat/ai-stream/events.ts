@@ -22,6 +22,7 @@ export enum StreamEventType {
   MESSAGE_CREATED = "message-created",
   CONTENT_DELTA = "content-delta",
   CONTENT_DONE = "content-done",
+  TOOL_CALL = "tool-call",
   ERROR = "error",
 }
 
@@ -68,6 +69,15 @@ export interface ContentDoneEventData {
 }
 
 /**
+ * Tool call event data
+ */
+export interface ToolCallEventData {
+  messageId: string;
+  toolName: string;
+  args: Record<string, unknown>;
+}
+
+/**
  * Error event data
  */
 export interface ErrorEventData {
@@ -84,6 +94,7 @@ export interface StreamEventDataMap {
   [StreamEventType.MESSAGE_CREATED]: MessageCreatedEventData;
   [StreamEventType.CONTENT_DELTA]: ContentDeltaEventData;
   [StreamEventType.CONTENT_DONE]: ContentDoneEventData;
+  [StreamEventType.TOOL_CALL]: ToolCallEventData;
   [StreamEventType.ERROR]: ErrorEventData;
 }
 
@@ -124,6 +135,13 @@ export const createStreamEvent = {
     data: ContentDoneEventData,
   ): StreamEvent<StreamEventType.CONTENT_DONE> => ({
     type: StreamEventType.CONTENT_DONE,
+    data,
+  }),
+
+  toolCall: (
+    data: ToolCallEventData,
+  ): StreamEvent<StreamEventType.TOOL_CALL> => ({
+    type: StreamEventType.TOOL_CALL,
     data,
   }),
 

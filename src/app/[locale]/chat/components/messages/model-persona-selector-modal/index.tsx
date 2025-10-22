@@ -3,7 +3,7 @@
 import { Send, X } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
-import React from "react";
+import React, { useState } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -22,7 +22,7 @@ interface ModelPersonaSelectorModalProps {
   selectedPersona: string;
   onModelChange: (model: ModelId) => void;
   onPersonaChange: (persona: string) => void;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   onCancel: () => void;
   confirmLabelKey?: TranslationKey;
   isLoading?: boolean;
@@ -53,6 +53,7 @@ export function ModelPersonaSelectorModal({
   logger,
 }: ModelPersonaSelectorModalProps): JSX.Element {
   const { t } = simpleT(locale);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const title = t(titleKey);
   const description = t(descriptionKey);
   const finalConfirmLabel = confirmLabelKey
@@ -61,6 +62,17 @@ export function ModelPersonaSelectorModal({
   const inputPlaceholder = inputPlaceholderKey
     ? t(inputPlaceholderKey)
     : t("app.chat.common.send");
+
+  const handleConfirm = async (): Promise<void> => {
+    setIsSubmitting(true);
+    try {
+      await onConfirm();
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const isDisabled = isLoading || isSubmitting;
 
   return (
     <div className="w-full max-h-[80dvh] overflow-y-auto">
@@ -113,7 +125,7 @@ export function ModelPersonaSelectorModal({
         <div className="flex items-center gap-2 justify-end">
           <Button
             onClick={onCancel}
-            disabled={isLoading}
+            disabled={isDisabled}
             size="sm"
             variant="ghost"
             className="h-10 min-h-[44px]"
@@ -122,14 +134,14 @@ export function ModelPersonaSelectorModal({
             {t("app.chat.common.cancel")}
           </Button>
           <Button
-            onClick={onConfirm}
-            disabled={isLoading}
+            onClick={handleConfirm}
+            disabled={isDisabled}
             size="sm"
             variant="default"
             className="h-10 min-h-[44px]"
           >
             <Send className="h-4 w-4 mr-2" />
-            {isLoading ? t("app.chat.common.sending") : finalConfirmLabel}
+            {isDisabled ? t("app.chat.common.sending") : finalConfirmLabel}
           </Button>
         </div>
       </div>

@@ -170,6 +170,8 @@ async function fetchMessageHistory(
 
 /**
  * Get parent message for retry/edit operations
+ * Note: This function does NOT check thread ownership - that's handled at the API route level
+ * We just need to verify the message exists and return its data
  */
 async function getParentMessage(
   messageId: string,
@@ -183,18 +185,24 @@ async function getParentMessage(
   parentId: string | null;
   depth: number;
 } | null> {
+  // Get the message by ID (supports both user and AI messages)
   const [message] = await db
     .select()
     .from(chatMessages)
-    .where(
-      and(eq(chatMessages.id, messageId), eq(chatMessages.authorId, userId)),
-    )
+    .where(eq(chatMessages.id, messageId))
     .limit(1);
 
   if (!message) {
     logger.error("Parent message not found", { messageId, userId });
     return null;
   }
+
+  logger.info("Found parent message", {
+    messageId: message.id,
+    threadId: message.threadId,
+    role: message.role,
+    authorId: message.authorId,
+  });
 
   return {
     id: message.id,
@@ -505,25 +513,87 @@ export async function createAiStream({
     content: string;
   }>;
 
+  // Prepare system prompt with search instructions if needed
+  let systemPrompt = data.systemPrompt || "";
+  if (data.enableSearch) {
+    const searchInstructions =
+      "You have access to a web search tool. When the user asks about current events, recent information, or anything that requires up-to-date knowledge, use the search tool to find relevant information. After receiving search results, provide a comprehensive answer based on those results. Always cite your sources when using search results.";
+    systemPrompt = systemPrompt
+      ? `${systemPrompt}\n\n${searchInstructions}`
+      : searchInstructions;
+  }
+
   if (data.operation === "answer-as-ai") {
-    // For answer-as-ai, no AI context needed - user provides the content
-    messages = [];
+    // For answer-as-ai, we need the full conversation context up to the parent message
+    // so the AI understands what it's responding to
+    if (!isIncognito && userId && effectiveThreadId && data.parentMessageId) {
+      // Fetch ALL messages in thread up to and including the parent message
+      const allMessages = await db
+        .select()
+        .from(chatMessages)
+        .where(eq(chatMessages.threadId, effectiveThreadId))
+        .orderBy(chatMessages.createdAt);
+
+      // Find the parent message index
+      const parentIndex = allMessages.findIndex(
+        (msg) => msg.id === data.parentMessageId,
+      );
+
+      if (parentIndex !== -1) {
+        // Get all messages up to and including the parent message
+        const contextMessages = allMessages.slice(0, parentIndex + 1);
+
+        messages = contextMessages.map((msg) => ({
+          role: msg.role.toLowerCase() as "user" | "assistant" | "system",
+          content: msg.content,
+        }));
+
+        // Add a user message to prompt the AI to respond
+        // This ensures the AI understands it should generate a response to the previous AI message
+        if (effectiveContent.trim()) {
+          // User provided custom prompt
+          messages.push({ role: "user" as const, content: effectiveContent });
+        } else {
+          // No custom prompt - ask AI to continue/elaborate
+          messages.push({
+            role: "user" as const,
+            content:
+              "Continue the conversation by elaborating on or providing additional information about your previous response.",
+          });
+        }
+      } else {
+        logger.error("Parent message not found in thread", {
+          parentMessageId: data.parentMessageId,
+          threadId: effectiveThreadId,
+        });
+        // Fallback: just use the custom prompt
+        messages = effectiveContent.trim()
+          ? [{ role: "user" as const, content: effectiveContent }]
+          : [];
+      }
+    } else if (effectiveContent.trim()) {
+      // Incognito mode or no parent - just use the custom prompt
+      messages = [{ role: "user" as const, content: effectiveContent }];
+    } else {
+      // No context and no custom prompt - use empty context
+      messages = [];
+    }
   } else if (!isIncognito && userId && effectiveThreadId) {
     // Fetch full thread history for context
     messages = await fetchMessageHistory(effectiveThreadId, userId, logger);
 
     // Add system prompt if provided
-    if (data.systemPrompt) {
-      messages.unshift({ role: "system", content: data.systemPrompt });
+    if (systemPrompt) {
+      messages.unshift({ role: "system", content: systemPrompt });
     }
 
     // Add current message
     messages.push({ role: effectiveRole, content: effectiveContent });
   } else {
     // Incognito mode - use only current message
-    messages = data.systemPrompt
+    messages = systemPrompt
       ? [
-          { role: "system" as const, content: data.systemPrompt },
+          { role: "system" as const, content: systemPrompt },
           { role: effectiveRole, content: effectiveContent },
         ]
       : [{ role: effectiveRole, content: effectiveContent }];
@@ -541,7 +611,7 @@ export async function createAiStream({
       id: aiMessageId,
       threadId: threadResult.threadId,
       role: ChatMessageRole.ASSISTANT,
-      content: data.operation === "answer-as-ai" ? data.content : "", // For answer-as-ai, use content directly
+      content: "", // Always start with empty content - will be filled by AI streaming
       parentId: parentForAiMessage,
       depth:
         data.operation === "answer-as-ai" || data.operation === "retry"
@@ -564,122 +634,7 @@ export async function createAiStream({
     });
   }
 
-  // Step 9: Handle answer-as-ai operation (no AI streaming needed)
-  if (data.operation === "answer-as-ai") {
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      async start(controller): Promise<void> {
-        try {
-          // Emit thread-created event if new thread
-          if (threadResult.isNew) {
-            const threadEvent = createStreamEvent.threadCreated({
-              threadId: threadResult.threadId,
-              title: generateThreadTitle(data.content),
-              rootFolderId: data.rootFolderId,
-              subFolderId: data.subFolderId || null,
-            });
-            controller.enqueue(encoder.encode(formatSSEEvent(threadEvent)));
-          }
-
-          // Emit AI message-created event
-          const aiMessageEvent = createStreamEvent.messageCreated({
-            messageId: aiMessageId,
-            threadId: threadResult.threadId,
-            role: "assistant",
-            parentId: parentForAiMessage || null,
-            depth: messageDepth,
-            content: data.content,
-            model: data.model,
-            persona: data.persona || undefined,
-          });
-          controller.enqueue(encoder.encode(formatSSEEvent(aiMessageEvent)));
-
-          // Emit content-done event immediately (no streaming)
-          const doneEvent = createStreamEvent.contentDone({
-            messageId: aiMessageId,
-            content: data.content,
-            totalTokens: null,
-            finishReason: "user-provided",
-          });
-          controller.enqueue(encoder.encode(formatSSEEvent(doneEvent)));
-
-          // Deduct credits AFTER successful completion (not optimistically)
-          if (modelCost > 0) {
-            const creditMessageId = crypto.randomUUID();
-
-            // Determine correct credit identifier based on subscription status
-            let creditIdentifier: { userId?: string; leadId?: string };
-            if (userId) {
-              const identifierResult =
-                await creditRepository.getCreditIdentifier(userId);
-
-              if (identifierResult.success && identifierResult.data) {
-                if (identifierResult.data.hasSubscription) {
-                  // User has subscription - deduct from user credits
-                  creditIdentifier = { userId };
-                } else {
-                  // User has no subscription - deduct from lead credits
-                  creditIdentifier = { leadId: effectiveLeadId };
-                }
-              } else {
-                // Fallback to lead credits if we can't determine subscription status
-                creditIdentifier = { leadId: effectiveLeadId };
-              }
-            } else {
-              creditIdentifier = { leadId: effectiveLeadId };
-            }
-
-            const deductResult = await creditRepository.deductCredits(
-              creditIdentifier,
-              modelCost,
-              data.model,
-              creditMessageId,
-            );
-
-            if (!deductResult.success) {
-              logger.error("Failed to deduct credits for answer-as-ai", {
-                userId,
-                leadId: effectiveLeadId,
-                cost: modelCost,
-              });
-            } else {
-              logger.info("Credits deducted successfully for answer-as-ai", {
-                userId,
-                leadId: effectiveLeadId,
-                cost: modelCost,
-                messageId: creditMessageId,
-                creditIdentifier,
-              });
-            }
-          }
-
-          controller.close();
-        } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : String(error);
-          logger.error("Answer-as-AI error", { error: errorMessage });
-
-          const errorEvent = createStreamEvent.error({
-            code: "ANSWER_AS_AI_ERROR",
-            message: errorMessage,
-          });
-          controller.enqueue(encoder.encode(formatSSEEvent(errorEvent)));
-          controller.close();
-        }
-      },
-    });
-
-    return createStreamingResponse(
-      new Response(stream, {
-        headers: {
-          "Content-Type": "text/event-stream",
-          "Cache-Control": "no-cache",
-          Connection: "keep-alive",
-        },
-      }),
-    );
-  }
-
+  // Step 9: Start AI streaming (for all operations including answer-as-ai)
   try {
     // Special handling for Uncensored.ai - doesn't support streaming
     if (isUncensoredAIModel(data.model)) {
@@ -715,7 +670,8 @@ export async function createAiStream({
     });
 
     // Build tools object conditionally
-    const tools = data.enableSearch ? { braveSearch } : undefined;
+    // Register the tool with the name "search" so the AI model can call it
+    const tools = data.enableSearch ? { search: braveSearch } : undefined;
 
     // Create SSE stream
     const encoder = new TextEncoder();
@@ -724,6 +680,10 @@ export async function createAiStream({
         try {
           // Emit thread-created event if new thread
           if (threadResult.isNew) {
+            logger.info("[DEBUG] Emitting THREAD_CREATED event", {
+              threadId: threadResult.threadId,
+              rootFolderId: data.rootFolderId,
+            });
             const threadEvent = createStreamEvent.threadCreated({
               threadId: threadResult.threadId,
               title: generateThreadTitle(data.content),
@@ -731,31 +691,84 @@ export async function createAiStream({
               subFolderId: data.subFolderId || null,
             });
             controller.enqueue(encoder.encode(formatSSEEvent(threadEvent)));
+            logger.info("[DEBUG] THREAD_CREATED event emitted", {
+              threadId: threadResult.threadId,
+            });
+          } else {
+            logger.info(
+              "[DEBUG] Thread already exists, not emitting THREAD_CREATED",
+              {
+                threadId: threadResult.threadId,
+                isNew: threadResult.isNew,
+              },
+            );
           }
 
-          // Emit user message-created event
-          const userMessageEvent = createStreamEvent.messageCreated({
-            messageId: userMessageId,
-            threadId: threadResult.threadId,
-            role: data.role,
-            parentId: data.parentMessageId || null,
-            depth: messageDepth,
-            content: data.content,
-          });
-          controller.enqueue(encoder.encode(formatSSEEvent(userMessageEvent)));
+          // For answer-as-ai, skip user message event and only emit AI message
+          // For regular operations, emit both user and AI message events
+          if (data.operation !== "answer-as-ai") {
+            // Emit user message-created event
+            logger.info("[DEBUG] Emitting USER MESSAGE_CREATED event", {
+              messageId: userMessageId,
+              threadId: threadResult.threadId,
+              parentId: data.parentMessageId || null,
+            });
+            const userMessageEvent = createStreamEvent.messageCreated({
+              messageId: userMessageId,
+              threadId: threadResult.threadId,
+              role: data.role,
+              parentId: data.parentMessageId || null,
+              depth: messageDepth,
+              content: data.content,
+            });
+            const userMessageEventString = formatSSEEvent(userMessageEvent);
+            logger.info("[DEBUG] USER MESSAGE_CREATED event formatted", {
+              messageId: userMessageId,
+              eventString: userMessageEventString.substring(0, 200),
+            });
+            controller.enqueue(encoder.encode(userMessageEventString));
+            logger.info("[DEBUG] USER MESSAGE_CREATED event emitted", {
+              messageId: userMessageId,
+            });
+          } else {
+            logger.info(
+              "[DEBUG] Skipping USER MESSAGE_CREATED event for answer-as-ai operation",
+              {
+                messageId: userMessageId,
+              },
+            );
+          }
 
           // Emit AI message-created event
+          // For answer-as-ai, parent is the message we're responding to
+          // For regular operations, parent is the user message we just created
+          const aiParentId =
+            data.operation === "answer-as-ai"
+              ? data.parentMessageId
+              : userMessageId;
+          const aiDepth =
+            data.operation === "answer-as-ai" ? messageDepth : messageDepth + 1;
+
+          logger.info("[DEBUG] Emitting AI MESSAGE_CREATED event", {
+            messageId: aiMessageId,
+            threadId: threadResult.threadId,
+            parentId: aiParentId,
+            operation: data.operation,
+          });
           const aiMessageEvent = createStreamEvent.messageCreated({
             messageId: aiMessageId,
             threadId: threadResult.threadId,
             role: "assistant",
-            parentId: userMessageId,
-            depth: messageDepth + 1,
+            parentId: aiParentId,
+            depth: aiDepth,
             content: "",
             model: data.model,
             persona: data.persona || undefined,
           });
           controller.enqueue(encoder.encode(formatSSEEvent(aiMessageEvent)));
+          logger.info("[DEBUG] AI MESSAGE_CREATED event emitted", {
+            messageId: aiMessageId,
+          });
 
           // Start streaming
           let fullContent = "";
@@ -772,24 +785,94 @@ export async function createAiStream({
             ...(tools && { tools, maxSteps: 5 }),
           });
 
-          // Stream text deltas
-          for await (const chunk of streamResult.textStream) {
-            fullContent += chunk;
+          // Stream all parts including text after tool calls
+          // Use fullStream to get all text parts across all steps
+          let partCount = 0;
+          let textDeltaCount = 0;
+          let toolCallCount = 0;
 
-            // Emit content-delta event
-            const deltaEvent = createStreamEvent.contentDelta({
-              messageId: aiMessageId,
-              delta: chunk,
-            });
-            controller.enqueue(encoder.encode(formatSSEEvent(deltaEvent)));
+          for await (const part of streamResult.fullStream) {
+            partCount++;
+            if (part.type === "text-delta") {
+              textDeltaCount++;
+              // The AI SDK uses 'text' property, not 'textDelta'
+              const deltaText = part.text;
+
+              // Only concatenate if text is defined and not empty
+              if (
+                deltaText !== undefined &&
+                deltaText !== null &&
+                deltaText !== ""
+              ) {
+                fullContent += deltaText;
+
+                // Emit content-delta event
+                const deltaEvent = createStreamEvent.contentDelta({
+                  messageId: aiMessageId,
+                  delta: deltaText,
+                });
+                controller.enqueue(encoder.encode(formatSSEEvent(deltaEvent)));
+              }
+            } else if (part.type === "tool-call") {
+              toolCallCount++;
+              // Log tool call with full details
+              logger.info("[DEBUG] Tool call detected", {
+                toolName: part.toolName,
+                toolCallId: part.toolCallId,
+                args: part.args,
+                argsStringified: JSON.stringify(part.args),
+              });
+
+              // Emit tool-call event to frontend
+              const toolCallEvent = createStreamEvent.toolCall({
+                messageId: aiMessageId,
+                toolName: part.toolName,
+                args: part.args,
+              });
+              controller.enqueue(encoder.encode(formatSSEEvent(toolCallEvent)));
+            } else if (part.type === "tool-result") {
+              logger.info("[DEBUG] Tool result received", {
+                toolName: part.toolName,
+                resultType: typeof part.result,
+                resultKeys:
+                  typeof part.result === "object" && part.result !== null
+                    ? Object.keys(part.result)
+                    : undefined,
+                result:
+                  typeof part.result === "string"
+                    ? part.result.substring(0, 200)
+                    : typeof part.result === "object" && part.result !== null
+                      ? JSON.stringify(part.result).substring(0, 500)
+                      : part.result,
+              });
+            } else if (part.type === "tool-error") {
+              logger.error("[DEBUG] Tool error occurred", {
+                toolName: part.toolName,
+                error: part.error,
+              });
+            }
           }
 
+          logger.info("[DEBUG] fullStream iteration complete", {
+            totalParts: partCount,
+            textDeltaParts: textDeltaCount,
+            toolCallsCount: toolCallCount,
+            fullContentLength: fullContent.length,
+          });
+
           // Wait for completion
-          const [toolCalls, finishReason, usage] = await Promise.all([
+          const [finalToolCalls, finishReason, usage] = await Promise.all([
             streamResult.toolCalls,
             streamResult.finishReason,
             streamResult.usage,
           ]);
+
+          logger.info("Stream completed [FIXED]", {
+            fullContentLength: fullContent.length,
+            finishReason,
+            toolCallsCount: finalToolCalls?.length || 0,
+            isIncognito,
+          });
 
           // Update AI message with final content (if not incognito)
           if (!isIncognito && userId) {
@@ -880,8 +963,12 @@ export async function createAiStream({
           }
 
           // Track search usage for credit deduction
-          if (toolCalls && Array.isArray(toolCalls) && toolCalls.length > 0) {
-            const searchCalls = toolCalls.filter(
+          if (
+            finalToolCalls &&
+            Array.isArray(finalToolCalls) &&
+            finalToolCalls.length > 0
+          ) {
+            const searchCalls = finalToolCalls.filter(
               (call: { toolName: string }) => call.toolName === "braveSearch",
             );
 
@@ -963,7 +1050,7 @@ export async function createAiStream({
         headers: {
           "Content-Type": "text/event-stream",
           "Cache-Control": "no-cache",
-          Connection: "keep-alive",
+          "Connection": "keep-alive",
         },
       }),
     );

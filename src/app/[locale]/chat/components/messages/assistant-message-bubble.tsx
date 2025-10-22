@@ -13,6 +13,7 @@ import { chatProse } from "../../lib/design-tokens";
 import type { ChatMessage } from "../../types";
 import { AssistantMessageActions } from "./assistant-message-actions";
 import { MessageAuthorInfo } from "./message-author";
+import { ToolCallDisplay } from "./tool-call-display";
 
 interface AssistantMessageBubbleProps {
   message: ChatMessage;
@@ -66,6 +67,11 @@ export function AssistantMessageBubble({
         )}
 
         <div className={cn(chatProse.all, "px-3 py-2.5 sm:px-4 sm:py-3")}>
+          {/* Tool calls display */}
+          {message.toolCalls && message.toolCalls.length > 0 && (
+            <ToolCallDisplay toolCalls={message.toolCalls} locale={locale} />
+          )}
+
           <Markdown content={message.content} />
         </div>
 

@@ -31,6 +31,14 @@ export interface ChatThread {
 }
 
 /**
+ * Tool call information
+ */
+export interface ToolCall {
+  toolName: string;
+  args: Record<string, unknown>;
+}
+
+/**
  * Chat message type
  */
 export interface ChatMessage {
@@ -49,6 +57,7 @@ export interface ChatMessage {
   errorMessage: string | null;
   edited: boolean;
   tokens: number | null;
+  toolCalls?: ToolCall[] | null;
   upvotes: number | null;
   downvotes: number | null;
   createdAt: Date;

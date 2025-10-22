@@ -27,6 +27,7 @@ import { formatPostNumber, getPostNumber } from "../../lib/utils/post-numbers";
 import type { ChatMessage, ChatThread, ModelId } from "../../types";
 import { MessageEditor } from "./message-editor";
 import { ModelPersonaSelectorModal } from "./model-persona-selector-modal";
+import { ToolCallDisplay } from "./tool-call-display";
 import { useMessageActions } from "./use-message-actions";
 
 interface FlatMessageViewProps {
@@ -605,6 +606,14 @@ function FlatMessage({
                 "prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline",
               )}
             >
+              {/* Tool calls display */}
+              {message.toolCalls && message.toolCalls.length > 0 && (
+                <ToolCallDisplay
+                  toolCalls={message.toolCalls}
+                  locale={locale}
+                />
+              )}
+
               <Markdown content={message.content} />
             </div>
           ) : (
@@ -704,9 +713,7 @@ function FlatMessage({
             {/* Reply */}
             {onBranchMessage && (
               <button
-                onClick={(): void => {
-                  void onBranchMessage(message.id, "");
-                }}
+                onClick={(): void => messageActions.startEdit(message.id)}
                 className="text-blue-400 hover:text-blue-300 hover:underline transition-colors"
                 title={t("app.chat.flatView.actions.replyToMessage")}
               >

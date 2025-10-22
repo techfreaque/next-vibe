@@ -12,6 +12,7 @@ export type {
   ChatFolder,
   ChatMessage,
   ChatThread,
+  ToolCall,
 } from "@/app/api/[locale]/v1/core/agent/chat/store";
 
 // View mode type (UI-only, not from API)

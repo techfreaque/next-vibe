@@ -223,9 +223,9 @@ export function LinearMessageView({
                   inputValue={answerContent}
                   onInputChange={onSetAnswerContent}
                   inputPlaceholderKey="app.chat.linearMessageView.answerModal.inputPlaceholder"
-                  onConfirm={(): void => {
+                  onConfirm={async (): Promise<void> => {
                     if (onAnswerAsModel) {
-                      void onAnswerAsModel(message.id, answerContent);
+                      await onAnswerAsModel(message.id, answerContent);
                     }
                     onCancelAction();
                   }}

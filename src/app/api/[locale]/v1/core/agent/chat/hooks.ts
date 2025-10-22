@@ -705,13 +705,40 @@ export function useChat(
       chatStore.setLoading(true);
 
       try {
+        // Get the last message in the thread to use as parent
+        // This ensures new messages continue the conversation instead of creating branches
+        let parentMessageId: string | null = null;
+        if (chatStore.activeThreadId) {
+          // For incognito mode, get messages from localStorage
+          // For authenticated mode, get messages from chat store
+          let threadMessages: ChatMessage[] = [];
+          if (chatStore.currentRootFolderId === "incognito") {
+            // Import incognito storage dynamically to avoid circular dependencies
+            const { getMessagesForThread } = await import("./incognito/storage");
+            threadMessages = getMessagesForThread(chatStore.activeThreadId);
+          } else {
+            threadMessages = chatStore.getThreadMessages(chatStore.activeThreadId);
+          }
+
+          if (threadMessages.length > 0) {
+            // Get the last message (most recent)
+            const lastMessage = threadMessages[threadMessages.length - 1];
+            parentMessageId = lastMessage.id;
+            logger.debug("useChat", "Using last message as parent", {
+              parentMessageId,
+              lastMessageContent: lastMessage.content.substring(0, 50),
+              isIncognito: chatStore.currentRootFolderId === "incognito",
+            });
+          }
+        }
+
         await aiStream.startStream(
           {
             operation: "send",
             rootFolderId: chatStore.currentRootFolderId,
             subFolderId: chatStore.currentSubFolderId,
             threadId: chatStore.activeThreadId,
-            parentMessageId: null,
+            parentMessageId,
             content,
             role: "user",
             model: selectedModel,
@@ -726,6 +753,14 @@ export function useChat(
                 threadId: data.threadId,
                 rootFolderId: data.rootFolderId,
               });
+
+              // Set the active thread in the chat store
+              // This ensures subsequent messages use the correct threadId
+              chatStore.setActiveThread(data.threadId);
+              logger.debug("useChat", "Set active thread after creation", {
+                threadId: data.threadId,
+              });
+
               // Call the callback if provided
               if (onThreadCreated) {
                 onThreadCreated(data.threadId, data.rootFolderId);

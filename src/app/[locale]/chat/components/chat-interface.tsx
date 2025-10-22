@@ -180,21 +180,16 @@ export function ChatInterface({
     [messagesRecord],
   );
 
-  // Wrapper for delete message that shows confirmation dialog if message has children
+  // Wrapper for delete message that ALWAYS shows confirmation dialog
   const handleDeleteMessage = useCallback(
     (messageId: string): void => {
       const childrenCount = countMessageChildren(messageId);
-      if (childrenCount > 0) {
-        // Message has children - show confirmation dialog
-        setMessageToDelete(messageId);
-        setMessageChildrenCount(childrenCount);
-        setDeleteDialogOpen(true);
-      } else {
-        // No children - delete immediately
-        void deleteMessage(messageId);
-      }
+      // Always show confirmation dialog for better UX
+      setMessageToDelete(messageId);
+      setMessageChildrenCount(childrenCount);
+      setDeleteDialogOpen(true);
     },
-    [countMessageChildren, deleteMessage],
+    [countMessageChildren],
   );
 
   // Confirm delete message with children
@@ -656,10 +651,19 @@ export function ChatInterface({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Message</AlertDialogTitle>
             <AlertDialogDescription>
-              This message has {messageChildrenCount} child message
-              {messageChildrenCount !== 1 ? "s" : ""} (branches/replies). Deleting
-              this message will also delete all of its children. This action
-              cannot be undone.
+              {messageChildrenCount > 0 ? (
+                <>
+                  This message has {messageChildrenCount} child message
+                  {messageChildrenCount !== 1 ? "s" : ""} (branches/replies).
+                  Deleting this message will also delete all of its children.
+                  This action cannot be undone.
+                </>
+              ) : (
+                <>
+                  Are you sure you want to delete this message? This action
+                  cannot be undone.
+                </>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

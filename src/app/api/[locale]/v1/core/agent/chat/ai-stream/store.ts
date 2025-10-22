@@ -9,6 +9,14 @@ import type { DefaultFolderId } from "../config";
 import type { ModelId } from "../model-access/models";
 
 /**
+ * Tool call information
+ */
+export interface ToolCall {
+  toolName: string;
+  args: Record<string, unknown>;
+}
+
+/**
  * Streaming message state
  */
 export interface StreamingMessage {
@@ -24,6 +32,7 @@ export interface StreamingMessage {
   finishReason?: string | null;
   isStreaming: boolean;
   error?: string;
+  toolCalls?: ToolCall[];
 }
 
 /**
@@ -60,6 +69,7 @@ interface AIStreamState {
   // Message actions
   addMessage: (message: StreamingMessage) => void;
   updateMessageContent: (messageId: string, content: string) => void;
+  addToolCall: (messageId: string, toolCall: ToolCall) => void;
   finalizeMessage: (
     messageId: string,
     content: string,
@@ -132,6 +142,24 @@ export const useAIStreamStore = create<AIStreamState>((set) => ({
           [messageId]: {
             ...message,
             content,
+          },
+        },
+      };
+    }),
+
+  addToolCall: (messageId: string, toolCall: ToolCall): void =>
+    set((state) => {
+      const message = state.streamingMessages[messageId];
+      if (!message) {
+        return state;
+      }
+
+      return {
+        streamingMessages: {
+          ...state.streamingMessages,
+          [messageId]: {
+            ...message,
+            toolCalls: [...(message.toolCalls || []), toolCall],
           },
         },
       };
