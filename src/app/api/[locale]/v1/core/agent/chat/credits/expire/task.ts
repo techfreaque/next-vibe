@@ -1,3 +1,4 @@
+import { TaskCategory } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 /**
  * Credit Expiration Cron Task
  * Expires old subscription credits daily
@@ -68,7 +69,7 @@ const creditExpirationTask: Task = {
   name: "credit-expiration",
   description: "app.api.v1.core.agent.chat.credits.expire.task.description",
   schedule: CRON_SCHEDULES.DAILY_MIDNIGHT, // Daily at midnight
-  category: "credits",
+  category: TaskCategory.MAINTENANCE,
   enabled: true,
   priority: CronTaskPriority.MEDIUM,
   timeout: TASK_TIMEOUTS.SHORT, // 1 minute

@@ -16,11 +16,11 @@ import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import type React from "react";
 import type { JSX } from "react";
 
+import type { LeadDetailResponse } from "@/app/api/[locale]/v1/core/leads/definition";
 import {
   EmailCampaignStage,
   LeadStatus,
 } from "@/app/api/[locale]/v1/core/leads/enum";
-import type { LeadDetailResponse } from "@/app/api/[locale]/v1/core/leads/definition";
 import { useLeadByIdEndpoint } from "@/app/api/[locale]/v1/core/leads/lead/[id]/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { useTranslation } from "@/i18n/core/client";
@@ -66,18 +66,16 @@ export function LeadEditForm({
             {t("app.admin.leads.leads.edit.form.actions.back")}
           </Button>
         </div>
-        <div className="text-sm text-gray-500 dark:text-gray-400">
-          {t("app.admin.leads.leads.edit.form.leadId")}: {leadId}
-        </div>
+        <div className="text-sm text-gray-500 dark:text-gray-400">{leadId}</div>
       </div>
 
       {/* Main Form Card */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <span>{t("app.admin.leads.leads.edit.form.title")}</span>
+            <span>Edit Lead</span>
             <span className="text-lg font-normal text-gray-500">
-              - {lead.businessName}
+              - {lead.lead.basicInfo.businessName}
             </span>
           </CardTitle>
         </CardHeader>
@@ -89,7 +87,7 @@ export function LeadEditForm({
           >
             <FormFieldGroup>
               <EndpointFormField
-                name="email"
+                name="updates.basicInfo.email"
                 config={{
                   type: "email",
                   label: "app.admin.leads.leads.edit.form.fields.email.label",
@@ -104,7 +102,7 @@ export function LeadEditForm({
               />
 
               <EndpointFormField
-                name="businessName"
+                name="updates.basicInfo.businessName"
                 config={{
                   type: "text",
                   label:
@@ -120,7 +118,7 @@ export function LeadEditForm({
               />
 
               <EndpointFormField
-                name="contactName"
+                name="updates.basicInfo.contactName"
                 config={{
                   type: "text",
                   label:
@@ -136,7 +134,7 @@ export function LeadEditForm({
               />
 
               <EndpointFormField
-                name="phone"
+                name="updates.contactDetails.phone"
                 config={{
                   type: "tel",
                   label: "app.admin.leads.leads.edit.form.fields.phone.label",
@@ -151,7 +149,7 @@ export function LeadEditForm({
               />
 
               <EndpointFormField
-                name="website"
+                name="updates.contactDetails.website"
                 config={{
                   type: "url",
                   label: "app.admin.leads.leads.edit.form.fields.website.label",
@@ -166,7 +164,7 @@ export function LeadEditForm({
               />
 
               <EndpointFormField
-                name="country"
+                name="updates.contactDetails.country"
                 config={{
                   type: "select",
                   label: "app.admin.leads.leads.edit.form.fields.country.label",
@@ -189,7 +187,7 @@ export function LeadEditForm({
               />
 
               <EndpointFormField
-                name="language"
+                name="updates.contactDetails.language"
                 config={{
                   type: "select",
                   label:
@@ -210,7 +208,7 @@ export function LeadEditForm({
               />
 
               <EndpointFormField
-                name="status"
+                name="updates.basicInfo.status"
                 config={{
                   type: "select",
                   label: "app.admin.leads.leads.edit.form.fields.status.label",
@@ -287,7 +285,7 @@ export function LeadEditForm({
               />
 
               <EndpointFormField
-                name="currentCampaignStage"
+                name="updates.campaignManagement.currentCampaignStage"
                 config={{
                   type: "select",
                   label: "app.admin.leads.leads.edit.form.fields.status.label",
@@ -350,7 +348,7 @@ export function LeadEditForm({
               */}
 
               <EndpointFormField
-                name="notes"
+                name="updates.additionalDetails.notes"
                 config={{
                   type: "textarea",
                   label: "app.admin.leads.leads.edit.form.fields.notes.label",

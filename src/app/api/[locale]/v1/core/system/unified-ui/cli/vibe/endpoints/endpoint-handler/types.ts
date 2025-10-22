@@ -331,9 +331,12 @@ export interface ApiHandlerOptions<
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
-  TRequestInput = unknown,
-  TResponseInput = unknown,
-  TUrlVariablesInput = unknown,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TRequestInput = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TResponseInput = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TUrlVariablesInput = any,
 > {
   /** API endpoint definition */
   endpoint: CreateApiEndpoint<

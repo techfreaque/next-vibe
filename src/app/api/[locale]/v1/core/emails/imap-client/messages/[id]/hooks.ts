@@ -15,12 +15,24 @@ import definitions from "./definition";
  * Hook for fetching a single IMAP message
  */
 export function useImapMessageById(
+  params: {
+    messageId: string;
+    enabled?: boolean;
+  },
   logger: EndpointLogger,
 ): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {
-      persistForm: false,
+      urlParams: { id: params.messageId },
+      queryOptions: {
+        enabled: params.enabled ?? true,
+        refetchOnWindowFocus: false,
+        staleTime: 30 * 1000, // 30 seconds
+      },
+      formOptions: {
+        persistForm: false,
+      },
     },
     logger,
   );

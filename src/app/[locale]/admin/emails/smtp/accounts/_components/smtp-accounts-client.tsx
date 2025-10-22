@@ -21,9 +21,9 @@ import {
   SmtpAccountStatusFilter,
   SmtpHealthStatusFilter,
 } from "@/app/api/[locale]/v1/core/emails/smtp-client/enum";
+import type { SmtpAccountsListGETResponseOutput } from "@/app/api/[locale]/v1/core/emails/smtp-client/list/definition";
 import { useSmtpAccountsListEndpoint } from "@/app/api/[locale]/v1/core/emails/smtp-client/list/hooks";
-import type { SmtpAccountResponseType } from "@/app/api/[locale]/v1/core/emails/smtp-client/schema";
-import { smtpAccountListFilterSchema } from "@/app/api/[locale]/v1/core/emails/smtp-client/schema";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -37,13 +37,13 @@ export function SmtpAccountsClient({
   locale,
 }: SmtpAccountsClientProps): React.JSX.Element {
   const { t } = simpleT(locale);
-  const smtpAccountsEndpoint = useSmtpAccountsListEndpoint();
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const smtpAccountsEndpoint = useSmtpAccountsListEndpoint(logger);
   const [viewMode, setViewMode] = useState<"list" | "table">("list");
 
-  const apiResponse = smtpAccountsEndpoint.read.response;
-  const accounts: SmtpAccountResponseType[] = apiResponse?.success
-    ? apiResponse.data.accounts
-    : [];
+  const apiResponse = smtpAccountsEndpoint.read?.response;
+  const accounts: SmtpAccountsListGETResponseOutput["accounts"] =
+    apiResponse?.success ? apiResponse.data.accounts : [];
   const totalAccounts = apiResponse?.success
     ? apiResponse.data.pagination.total
     : 0;
@@ -146,8 +146,7 @@ export function SmtpAccountsClient({
                   label: undefined,
                   placeholder: "app.admin.emails.smtp.search.placeholder",
                 }}
-                control={smtpAccountsEndpoint.read.form.control}
-                schema={smtpAccountListFilterSchema}
+                control={smtpAccountsEndpoint.read?.form.control}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -165,7 +164,8 @@ export function SmtpAccountsClient({
                   options: [
                     {
                       value: CampaignTypeFilter.ALL,
-                      label: "common.all" as const,
+                      label:
+                        "app.admin.emails.smtp.filter.purpose.all" as const,
                     },
                     {
                       value: CampaignTypeFilter.LEAD_CAMPAIGN,
@@ -194,8 +194,7 @@ export function SmtpAccountsClient({
                     },
                   ],
                 }}
-                control={smtpAccountsEndpoint.read.form.control}
-                schema={smtpAccountListFilterSchema}
+                control={smtpAccountsEndpoint.read?.form.control}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -233,8 +232,7 @@ export function SmtpAccountsClient({
                     },
                   ],
                 }}
-                control={smtpAccountsEndpoint.read.form.control}
-                schema={smtpAccountListFilterSchema}
+                control={smtpAccountsEndpoint.read?.form.control}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -272,8 +270,7 @@ export function SmtpAccountsClient({
                     },
                   ],
                 }}
-                control={smtpAccountsEndpoint.read.form.control}
-                schema={smtpAccountListFilterSchema}
+                control={smtpAccountsEndpoint.read?.form.control}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -346,7 +343,7 @@ export function SmtpAccountsClient({
                         {account.name}
                       </Link>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {account.host}:{account.port}
+                        {account.id.slice(0, 13)}...
                       </p>
                     </div>
                   </div>

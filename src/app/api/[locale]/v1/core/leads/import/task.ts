@@ -1,3 +1,4 @@
+import { TaskCategory } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 /**
  * CSV Processor Task (Unified Format)
  * Processes CSV import jobs in chunks
@@ -244,7 +245,7 @@ const csvProcessorTask: Task = {
   name: "csv-processor",
   description: "tasks.csv_processor.description",
   schedule: CRON_SCHEDULES.EVERY_MINUTE, // Every minute
-  category: "leads",
+  category: TaskCategory.MAINTENANCE,
   enabled: false,
   priority: CronTaskPriority.MEDIUM,
   timeout: TASK_TIMEOUTS.LONG, // 10 minutes

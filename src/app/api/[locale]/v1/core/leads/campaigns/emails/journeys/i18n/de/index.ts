@@ -46,8 +46,7 @@ export const translations: typeof enTranslations = {
             week1Content:
               "Wir setzen uns zusammen und verstehen wirklich Ihre Geschäftsziele und Herausforderungen.",
             month2Title: "Monat 2: Umsetzung",
-            month2Content:
-              "Hier beginnen wir, echte Dynamik aufzubauen.",
+            month2Content: "Hier beginnen wir, echte Dynamik aufzubauen.",
             week3Title: "Woche 3-4: Schnelle Erfolge",
             week3Content:
               "Sie werden die ersten greifbaren Ergebnisse sehen - normalerweise schneller als erwartet.",
@@ -55,7 +54,8 @@ export const translations: typeof enTranslations = {
               "Was mir an diesem Ansatz gefällt, ist, dass Sie nicht 6 Monate warten müssen, um zu sehen, ob die Dinge funktionieren.",
             personalCommitment:
               "Hier ist etwas, das Sie wissen sollten: Ich bin persönlich in Ihren Erfolg investiert. Dies ist für mich nicht nur eine weitere Kundenbeziehung.",
-            nextSteps: "Wenn das bei Ihnen Anklang findet, lassen Sie uns ein echtes Gespräch darüber führen.",
+            nextSteps:
+              "Wenn das bei Ihnen Anklang findet, lassen Sie uns ein echtes Gespräch darüber führen.",
             ctaText: "Strategiegespräch planen",
             signature: "Begeistert von den Möglichkeiten,",
             signatureClosing: "Herzliche Grüße",
@@ -164,8 +164,7 @@ export const translations: typeof enTranslations = {
             convenience: "Alles, was Sie brauchen, direkt zur Hand.",
             ctaText: "Loslegen",
             signature: "Willkommen an Bord,",
-            postScript:
-              "P.S. Wenn Sie Fragen haben, sind wir für Sie da.",
+            postScript: "P.S. Wenn Sie Fragen haben, sind wir für Sie da.",
           },
           followup1: {
             subject: "Wie läuft es?",
@@ -187,7 +186,8 @@ export const translations: typeof enTranslations = {
             subject: "Unsere Geschichte und Mission",
             previewText: "Warum wir tun, was wir tun",
             greeting: "Hallo {{businessName}},",
-            intro: "Ich wollte ein wenig darüber erzählen, warum wir tun, was wir tun.",
+            intro:
+              "Ich wollte ein wenig darüber erzählen, warum wir tun, was wir tun.",
             mission:
               "Unsere Mission ist es, professionelle Dienstleistungen für alle zugänglich zu machen.",
             story1:
@@ -217,7 +217,8 @@ export const translations: typeof enTranslations = {
             subject: "Kurzer Tipp für Sie",
             previewText: "Eine hilfreiche Einsicht",
             greeting: "Hallo {{businessName}},",
-            intro: "Ich bin auf etwas gestoßen, das Sie wertvoll finden könnten.",
+            intro:
+              "Ich bin auf etwas gestoßen, das Sie wertvoll finden könnten.",
             tip: "Hier ist ein kurzer Tipp, der einen echten Unterschied machen kann:",
             value:
               "Kleine Änderungen können im Laufe der Zeit zu erheblichen Verbesserungen führen.",
@@ -230,7 +231,8 @@ export const translations: typeof enTranslations = {
             greeting: "Hallo {{businessName}},",
             intro: "Es ist eine Weile her - ich wollte mich melden.",
             checkIn: "Wie läuft es mit Ihrem Unternehmen?",
-            offer: "Wir haben einige neue Angebote, die Sie interessieren könnten.",
+            offer:
+              "Wir haben einige neue Angebote, die Sie interessieren könnten.",
             ctaText: "Entdecken Sie, was neu ist",
             signature: "Hoffe, bald von Ihnen zu hören,",
             closing: "Freue mich darauf, von Ihnen zu hören.",

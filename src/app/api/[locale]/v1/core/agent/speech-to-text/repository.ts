@@ -17,6 +17,9 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { MinimalUser } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/types";
+import { creditRepository } from "../chat/credits/repository";
+import { FEATURE_COSTS } from "../chat/model-access/costs";
 import type {
   SpeechToTextPostRequestOutput,
   SpeechToTextPostResponseOutput,
@@ -49,6 +52,7 @@ export interface SpeechToTextRepository {
    * Transcribe audio to text
    * @param file - Audio file to transcribe
    * @param data - Transcription request data
+   * @param user - User information
    * @param locale - User locale
    * @param logger - Logger instance
    * @returns Transcription response
@@ -56,6 +60,7 @@ export interface SpeechToTextRepository {
   transcribeAudio(
     file: File,
     data: SpeechToTextPostRequestOutput,
+    user: MinimalUser,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>>;
@@ -71,6 +76,7 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
   async transcribeAudio(
     file: File,
     data: SpeechToTextPostRequestOutput,
+    user: MinimalUser,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>> {
@@ -157,6 +163,57 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
         textLength: pollResult.data.text.length,
         provider: data.provider,
       });
+
+      // Deduct credits AFTER successful completion
+      const sttCost = FEATURE_COSTS.STT;
+      if (sttCost > 0) {
+        const creditMessageId = crypto.randomUUID();
+
+        // Determine correct credit identifier based on user type
+        let creditIdentifier: { userId?: string; leadId?: string };
+        if (user.id) {
+          const identifierResult =
+            await creditRepository.getCreditIdentifier(user.id);
+
+          if (identifierResult.success && identifierResult.data) {
+            if (identifierResult.data.hasSubscription) {
+              // User has subscription - deduct from user credits
+              creditIdentifier = { userId: user.id };
+            } else {
+              // User has no subscription - deduct from lead credits
+              creditIdentifier = { leadId: user.leadId };
+            }
+          } else {
+            // Fallback to lead credits if we can't determine subscription status
+            creditIdentifier = { leadId: user.leadId };
+          }
+        } else {
+          creditIdentifier = { leadId: user.leadId };
+        }
+
+        const deductResult = await creditRepository.deductCredits(
+          creditIdentifier,
+          sttCost,
+          "stt", // Use "stt" as the model ID
+          creditMessageId,
+        );
+
+        if (!deductResult.success) {
+          logger.error("Failed to deduct credits for STT", {
+            userId: user.id,
+            leadId: user.leadId,
+            cost: sttCost,
+          });
+        } else {
+          logger.info("Credits deducted successfully for STT", {
+            userId: user.id,
+            leadId: user.leadId,
+            cost: sttCost,
+            messageId: creditMessageId,
+            creditIdentifier,
+          });
+        }
+      }
 
       return createSuccessResponse({
         response: {

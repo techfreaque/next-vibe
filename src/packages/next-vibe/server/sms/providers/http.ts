@@ -100,7 +100,7 @@ export function getHttpProvider(): SmsProvider {
             return {
               valid: false,
               reason:
-                result.error.errors[0]?.message ??
+                result.error.issues[0]?.message ??
                 "Invalid phone number format for the configured HTTP provider",
             };
           }
@@ -134,7 +134,7 @@ export function getHttpProvider(): SmsProvider {
           return {
             success: false,
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            message: "error.sms.errors.recipient_required",
+            message: "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
           };
         }
 
@@ -142,7 +142,7 @@ export function getHttpProvider(): SmsProvider {
           return {
             success: false,
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            message: "error.sms.errors.empty_message",
+            message: "packages.nextVibe.server.sms.sms.error.empty_message",
           };
         }
 
@@ -268,7 +268,7 @@ export function getHttpProvider(): SmsProvider {
           return {
             success: false,
             errorType: ErrorResponseTypes.SMS_ERROR,
-            message: "error.sms.errors.http_api_error",
+            message: "packages.nextVibe.server.sms.sms.error.delivery_failed",
           };
         }
 
@@ -345,7 +345,7 @@ export function getHttpProvider(): SmsProvider {
         };
       } catch (error) {
         return createErrorResponse(
-          "sms.errors.http_error",
+          "packages.nextVibe.server.sms.sms.error.delivery_failed",
           ErrorResponseTypes.SMS_ERROR,
           {
             error: error instanceof Error ? error.message : "Unknown error",

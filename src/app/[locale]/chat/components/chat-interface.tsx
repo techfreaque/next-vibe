@@ -6,9 +6,20 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { DEFAULT_FOLDER_IDS } from "@/app/api/[locale]/v1/core/agent/chat/config";
+import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
 import { useTranslation } from "@/i18n/core/client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/packages/next-vibe-ui/web/ui";
 
 import { useChatContext } from "../features/chat/context";
 import type { ChatThread, ModelId } from "../types";
@@ -135,6 +146,11 @@ export function ChatInterface({
   // Track the last message count to detect new messages
   const lastMessageCountRef = useRef<number>(0);
 
+  // Delete confirmation dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
+  const [messageChildrenCount, setMessageChildrenCount] = useState(0);
+
   // Handler for switching branches in linear view
   const handleSwitchBranch = useCallback(
     (parentMessageId: string, branchIndex: number): void => {
@@ -145,6 +161,58 @@ export function ChatInterface({
     },
     [],
   );
+
+  // Count children of a message (recursively)
+  const countMessageChildren = useCallback(
+    (messageId: string): number => {
+      const children = Object.values(messagesRecord).filter(
+        (msg) => msg.parentId === messageId,
+      );
+      if (children.length === 0) {
+        return 0;
+      }
+      // Count direct children + all descendants
+      return children.reduce(
+        (total, child) => total + 1 + countMessageChildren(child.id),
+        0,
+      );
+    },
+    [messagesRecord],
+  );
+
+  // Wrapper for delete message that shows confirmation dialog if message has children
+  const handleDeleteMessage = useCallback(
+    (messageId: string): void => {
+      const childrenCount = countMessageChildren(messageId);
+      if (childrenCount > 0) {
+        // Message has children - show confirmation dialog
+        setMessageToDelete(messageId);
+        setMessageChildrenCount(childrenCount);
+        setDeleteDialogOpen(true);
+      } else {
+        // No children - delete immediately
+        void deleteMessage(messageId);
+      }
+    },
+    [countMessageChildren, deleteMessage],
+  );
+
+  // Confirm delete message with children
+  const handleConfirmDelete = useCallback((): void => {
+    if (messageToDelete) {
+      void deleteMessage(messageToDelete);
+      setDeleteDialogOpen(false);
+      setMessageToDelete(null);
+      setMessageChildrenCount(0);
+    }
+  }, [messageToDelete, deleteMessage]);
+
+  // Cancel delete
+  const handleCancelDelete = useCallback((): void => {
+    setDeleteDialogOpen(false);
+    setMessageToDelete(null);
+    setMessageChildrenCount(0);
+  }, []);
 
   // Auto-switch to newly created branches
   useEffect(() => {
@@ -158,19 +226,19 @@ export function ChatInterface({
 
     lastMessageCountRef.current = currentMessageCount;
 
-    // Find the most recently created user message
+    // Find the most recently created message (any role)
     const sortedMessages = [...activeThreadMessages].sort(
       (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
     );
-    const latestUserMessage = sortedMessages.find((msg) => msg.role === "user");
+    const latestMessage = sortedMessages[0];
 
-    if (!latestUserMessage?.parentId) {
+    if (!latestMessage?.parentId) {
       return;
     }
 
     // Find all siblings (messages with the same parent)
     const siblings = activeThreadMessages
-      .filter((msg) => msg.parentId === latestUserMessage.parentId)
+      .filter((msg) => msg.parentId === latestMessage.parentId)
       .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
     if (siblings.length <= 1) {
@@ -179,14 +247,14 @@ export function ChatInterface({
 
     // Find the index of the latest message among its siblings
     const latestIndex = siblings.findIndex(
-      (msg) => msg.id === latestUserMessage.id,
+      (msg) => msg.id === latestMessage.id,
     );
 
-    if (latestIndex >= 0 && latestUserMessage.parentId) {
+    if (latestIndex >= 0 && latestMessage.parentId) {
       // Auto-switch to the newly created branch
       setBranchIndices((prev) => ({
         ...prev,
-        [latestUserMessage.parentId!]: latestIndex,
+        [latestMessage.parentId!]: latestIndex,
       }));
     }
   }, [activeThreadMessages]);
@@ -417,13 +485,21 @@ export function ChatInterface({
 
       if (isValidInput(input) && !isLoading) {
         logger.debug("Chat", "handleSubmit calling sendMessage");
-        await sendMessage(input);
+        await sendMessage(input, (threadId, rootFolderId) => {
+          // Navigate to the newly created thread
+          logger.debug("Chat", "Navigating to newly created thread", {
+            threadId,
+            rootFolderId,
+          });
+          const url = `/${locale}/threads/${rootFolderId}/${threadId}`;
+          router.push(url);
+        });
         logger.debug("Chat", "handleSubmit sendMessage completed");
       } else {
         logger.debug("Chat", "handleSubmit blocked");
       }
     },
-    [input, isLoading, sendMessage, logger],
+    [input, isLoading, sendMessage, logger, locale, router],
   );
 
   const handleKeyDown = useCallback(
@@ -436,18 +512,37 @@ export function ChatInterface({
     [handleSubmit],
   );
 
+  // Handler for model changes - auto-disable search if model doesn't support tools
+  const handleModelChange = useCallback(
+    (modelId: ModelId) => {
+      const model = getModelById(modelId);
+
+      // Auto-disable search if the new model doesn't support tools
+      if (!model.supportsTools && enableSearch) {
+        setEnableSearch(false);
+        logger.info("Auto-disabled search - model doesn't support tools", {
+          modelId,
+          modelName: model.name,
+        });
+      }
+
+      setSelectedModel(modelId);
+    },
+    [setSelectedModel, enableSearch, setEnableSearch, logger],
+  );
+
   const handleFillInputWithPrompt = useCallback(
     (prompt: string, personaId: string, modelId?: ModelId) => {
       // Switch to the persona's preferred model if provided
       if (modelId) {
-        setSelectedModel(modelId);
+        handleModelChange(modelId);
       }
 
       // Fill the input with the prompt (does NOT submit)
       setInput(prompt);
       inputRef.current?.focus();
     },
-    [setInput, inputRef, setSelectedModel],
+    [setInput, inputRef, handleModelChange],
   );
 
   const handleScreenshot = useCallback(() => {
@@ -516,7 +611,7 @@ export function ChatInterface({
           onKeyDown={handleKeyDown}
           onStop={stopGeneration}
           onBranchMessage={branchMessage}
-          onDeleteMessage={deleteMessage}
+          onDeleteMessage={handleDeleteMessage}
           onSwitchBranch={handleSwitchBranch}
           onRetryMessage={retryMessage}
           onAnswerAsModel={async (
@@ -530,7 +625,7 @@ export function ChatInterface({
           onVoteMessage={
             currentRootFolderId === "incognito" ? undefined : voteMessage
           }
-          onModelChange={setSelectedModel}
+          onModelChange={handleModelChange}
           onPersonaChange={setSelectedPersona}
           onEnableSearchChange={setEnableSearch}
           onSendMessage={handleFillInputWithPrompt}
@@ -554,6 +649,32 @@ export function ChatInterface({
         threads={threads}
         locale={locale}
       />
+
+      {/* Delete Message Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Message</AlertDialogTitle>
+            <AlertDialogDescription>
+              This message has {messageChildrenCount} child message
+              {messageChildrenCount !== 1 ? "s" : ""} (branches/replies). Deleting
+              this message will also delete all of its children. This action
+              cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelDelete}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

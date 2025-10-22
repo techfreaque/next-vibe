@@ -19,7 +19,7 @@ import {
 } from "next-vibe-ui/ui/table";
 import type { JSX } from "react";
 
-import type { ImapMessageResponseType } from "@/app/api/[locale]/v1/core/emails/imap-client/schema";
+import type { ImapMessageResponseType } from "@/app/api/[locale]/v1/core/emails/imap-client/messages/list/definition";
 import { useTranslation } from "@/i18n/core/client";
 
 interface ImapMessagesTableProps {
@@ -160,15 +160,8 @@ export function ImapMessagesTable({
               </div>
             </TableCell>
             <TableCell>
-              <div className="space-y-1">
-                <div className="font-medium">
-                  {message.recipientName || message.recipientEmail}
-                </div>
-                {message.recipientName && (
-                  <div className="text-sm text-muted-foreground">
-                    {message.recipientEmail}
-                  </div>
-                )}
+              <div className="text-sm text-muted-foreground">
+                -
               </div>
             </TableCell>
             <TableCell>
@@ -178,7 +171,6 @@ export function ImapMessagesTable({
               {message.hasAttachments && (
                 <div className="flex items-center space-x-1">
                   <Paperclip className="h-4 w-4 text-gray-600" />
-                  <span className="text-sm">{message.attachmentCount}</span>
                 </div>
               )}
             </TableCell>

@@ -625,7 +625,7 @@ export function useApiQuery<
     } catch (error) {
       // Create a properly typed error response
       return createErrorResponse(
-        "error.api.query.errors.refetch_failed",
+        "app.common.errors.unknown" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: error instanceof Error ? error.message : String(error) },
       );

@@ -14,10 +14,11 @@ import { speechToTextRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, locale, logger }) => {
+    handler: async ({ data, user, locale, logger }) => {
       return await speechToTextRepository.transcribeAudio(
         data.fileUpload.file,
         data,
+        user,
         locale,
         logger,
       );

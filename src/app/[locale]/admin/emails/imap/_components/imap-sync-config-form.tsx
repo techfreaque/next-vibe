@@ -6,24 +6,21 @@
 "use client";
 
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
-import React from "react";
 import type { JSX } from "react";
+import type { Control } from "react-hook-form";
 
-import { useImapConfig } from "@/app/api/[locale]/v1/core/emails/imap-client/config/hooks";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import { useLocale } from "@/i18n/core/client";
+import type { ImapConfigPostRequestOutput } from "@/app/api/[locale]/v1/core/emails/imap-client/config/definition";
+
+interface ImapSyncConfigFormProps {
+  control: Control<ImapConfigPostRequestOutput>;
+}
 
 /**
  * IMAP Sync Configuration Form Component
  */
-export function ImapSyncConfigForm(): JSX.Element {
-  const locale = useLocale();
-  const logger = React.useMemo(
-    () => createEndpointLogger(true, Date.now(), locale),
-    [locale],
-  );
-  const configEndpoint = useImapConfig(logger);
-
+export function ImapSyncConfigForm({
+  control,
+}: ImapSyncConfigFormProps): JSX.Element {
   return (
     <div className="space-y-4">
       <EndpointFormField
@@ -32,7 +29,7 @@ export function ImapSyncConfigForm(): JSX.Element {
           type: "switch",
           label: "app.admin.emails.imap.config.sync.enabled",
         }}
-        control={configEndpoint.create.form.control}
+        control={control}
       />
 
       <EndpointFormField
@@ -42,7 +39,7 @@ export function ImapSyncConfigForm(): JSX.Element {
           label: "app.admin.emails.imap.config.sync.interval",
           placeholder: undefined,
         }}
-        control={configEndpoint.create.form.control}
+        control={control}
       />
 
       <EndpointFormField
@@ -52,7 +49,7 @@ export function ImapSyncConfigForm(): JSX.Element {
           label: "app.admin.emails.imap.config.sync.batchSize",
           placeholder: undefined,
         }}
-        control={configEndpoint.create.form.control}
+        control={control}
       />
 
       <EndpointFormField
@@ -62,7 +59,7 @@ export function ImapSyncConfigForm(): JSX.Element {
           label: "app.admin.emails.imap.config.sync.maxMessages",
           placeholder: undefined,
         }}
-        control={configEndpoint.create.form.control}
+        control={control}
       />
 
       <EndpointFormField
@@ -72,7 +69,7 @@ export function ImapSyncConfigForm(): JSX.Element {
           label: "app.admin.emails.imap.config.sync.concurrentAccounts",
           placeholder: undefined,
         }}
-        control={configEndpoint.create.form.control}
+        control={control}
       />
     </div>
   );

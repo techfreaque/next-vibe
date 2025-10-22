@@ -71,7 +71,7 @@ export function getMessageBirdProvider(): SmsProvider {
           return {
             success: false,
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            message: "error.sms.errors.invalid_parameters",
+            message: "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
           };
         }
 
@@ -82,7 +82,7 @@ export function getMessageBirdProvider(): SmsProvider {
           return {
             success: false,
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            message: "error.sms.errors.recipient_required",
+            message: "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
           };
         }
 
@@ -92,7 +92,7 @@ export function getMessageBirdProvider(): SmsProvider {
           return {
             success: false,
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            message: "error.sms.errors.from_required",
+            message: "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
           };
         }
 
@@ -104,7 +104,7 @@ export function getMessageBirdProvider(): SmsProvider {
           return {
             success: false,
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            message: "error.sms.errors.empty_message",
+            message: "packages.nextVibe.server.sms.sms.error.empty_message",
           };
         }
 
@@ -188,7 +188,7 @@ export function getMessageBirdProvider(): SmsProvider {
           }
 
           return createErrorResponse(
-            "sms.errors.messagebird_api_error",
+            "packages.nextVibe.server.sms.sms.error.delivery_failed",
             ErrorResponseTypes.SMS_ERROR,
             {
               error: errorMessage,
@@ -247,7 +247,7 @@ export function getMessageBirdProvider(): SmsProvider {
         };
       } catch (error) {
         return createErrorResponse(
-          "sms.errors.messagebird_error",
+          "packages.nextVibe.server.sms.sms.error.delivery_failed",
           ErrorResponseTypes.SMS_ERROR,
           {
             error: error instanceof Error ? error.message : "Unknown error",

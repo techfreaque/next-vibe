@@ -29,9 +29,9 @@ import {
 import type React from "react";
 
 import type {
-  EmailCampaignStageValues,
-  LeadSourceValues,
-  LeadStatusValues,
+  EmailCampaignStage,
+  LeadSource,
+  LeadStatus,
 } from "@/app/api/[locale]/v1/core/leads/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -49,13 +49,13 @@ interface BatchOperationsDialogProps {
     id: string;
     email: string;
     businessName: string;
-    currentStatus: typeof LeadStatusValues;
-    currentCampaignStage: typeof EmailCampaignStageValues | null;
+    currentStatus: (typeof LeadStatus)[keyof typeof LeadStatus];
+    currentCampaignStage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage] | null;
   }>;
   updates?: {
-    status?: typeof LeadStatusValues;
-    currentCampaignStage?: typeof EmailCampaignStageValues;
-    source?: typeof LeadSourceValues;
+    status?: (typeof LeadStatus)[keyof typeof LeadStatus];
+    currentCampaignStage?: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
+    source?: (typeof LeadSource)[keyof typeof LeadSource];
     notes?: string;
   };
   result?: {
@@ -95,33 +95,33 @@ export function BatchOperationsDialog({
       <Alert>
         <Eye className="h-4 w-4" />
         <AlertDescription>
-          {t("leads.admin.batch.preview_description", { count: leads.length })}
+          {t("app.admin.leads.leads.batch.preview_description", { count: leads.length })}
         </AlertDescription>
       </Alert>
 
       {updates && (
         <div className="space-y-2">
           <h4 className="text-sm font-medium">
-            {t("leads.admin.batch.planned_changes")}
+            {t("app.admin.leads.leads.batch.planned_changes")}
           </h4>
           <div className="flex flex-wrap gap-2">
             {updates.status && (
               <Badge variant="outline">
-                {t("leads.admin.batch.change_status", {
+                {t("app.admin.leads.leads.batch.change_status", {
                   status: t(updates.status),
                 })}
               </Badge>
             )}
             {updates.currentCampaignStage && (
               <Badge variant="outline">
-                {t("leads.admin.batch.change_stage", {
+                {t("app.admin.leads.leads.batch.change_stage", {
                   stage: t(updates.currentCampaignStage),
                 })}
               </Badge>
             )}
             {updates.source && (
               <Badge variant="outline">
-                {t("leads.admin.batch.change_source", {
+                {t("app.admin.leads.leads.batch.change_source", {
                   source: t(updates.source),
                 })}
               </Badge>
@@ -134,10 +134,10 @@ export function BatchOperationsDialog({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t("leads.admin.table.business")}</TableHead>
-              <TableHead>{t("leads.admin.table.email")}</TableHead>
-              <TableHead>{t("leads.admin.table.status")}</TableHead>
-              <TableHead>{t("leads.admin.table.campaign_stage")}</TableHead>
+              <TableHead>{t("app.admin.leads.leads.table.business")}</TableHead>
+              <TableHead>{t("app.admin.leads.leads.table.email")}</TableHead>
+              <TableHead>{t("app.admin.leads.leads.table.status")}</TableHead>
+              <TableHead>{t("app.admin.leads.leads.table.campaign_stage")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -157,7 +157,7 @@ export function BatchOperationsDialog({
                     </Badge>
                   ) : (
                     <span className="text-muted-foreground">
-                      {t("leads.admin.formatting.fallbacks.notAvailable")}
+                      {t("app.admin.leads.leads.formatting.fallbacks.notAvailable")}
                     </span>
                   )}
                 </TableCell>
@@ -176,11 +176,11 @@ export function BatchOperationsDialog({
           <CheckCircle className="h-4 w-4" />
           <AlertDescription>
             {operationType === "delete"
-              ? t("leads.admin.batch.delete_success_message", {
+              ? t("app.admin.leads.leads.batch.delete_success_message", {
                   deleted: result.totalDeleted || 0,
                   total: result.totalMatched,
                 })
-              : t("leads.admin.batch.success_message", {
+              : t("app.admin.leads.leads.batch.success_message", {
                   updated: result.totalUpdated || 0,
                   total: result.totalMatched,
                 })}
@@ -190,7 +190,7 @@ export function BatchOperationsDialog({
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            {t("leads.admin.batch.error_message")}
+            {t("app.admin.leads.leads.batch.error_message")}
           </AlertDescription>
         </Alert>
       )}
@@ -198,7 +198,7 @@ export function BatchOperationsDialog({
       {result?.errors && result.errors.length > 0 && (
         <div className="space-y-2">
           <h4 className="text-sm font-medium text-destructive">
-            {t("leads.admin.batch.errors_title", {
+            {t("app.admin.leads.leads.batch.errors_title", {
               count: result.errors.length,
             })}
           </h4>
@@ -236,7 +236,7 @@ export function BatchOperationsDialog({
           {mode === "preview" && onConfirm && (
             <>
               <Button variant="outline" onClick={onClose} disabled={isLoading}>
-                {t("common.cancel")}
+                {t("app.common.actions.cancel")}
               </Button>
               <Button
                 onClick={onConfirm}
@@ -244,15 +244,15 @@ export function BatchOperationsDialog({
                 variant={operationType === "delete" ? "destructive" : "default"}
               >
                 {isLoading
-                  ? t("common.processing")
+                  ? t("app.common.actions.processing")
                   : operationType === "delete"
-                    ? t("leads.admin.batch.confirm_delete")
-                    : t("leads.admin.batch.confirm_update")}
+                    ? t("app.admin.leads.leads.batch.confirm_delete")
+                    : t("app.admin.leads.leads.batch.confirm_update")}
               </Button>
             </>
           )}
           {mode === "result" && (
-            <Button onClick={onClose}>{t("common.close")}</Button>
+            <Button onClick={onClose}>{t("app.common.actions.close")}</Button>
           )}
         </DialogFooter>
       </DialogContent>

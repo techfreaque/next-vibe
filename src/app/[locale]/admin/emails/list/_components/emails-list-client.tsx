@@ -12,8 +12,9 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import type React from "react";
 
-import type { EmailGetResponseType } from "@/app/api/[locale]/v1/core/emails/messages/[id]/definition";
-import { useEmailsListEndpoint } from "@/app/api/[locale]/v1/core/emails/messages/list/hooks";
+import type { EmailsListResponseType } from "@/app/api/[locale]/v1/core/emails/messages/list/definition";
+import { useEmailMessagesList } from "@/app/api/[locale]/v1/core/emails/messages/list/hooks";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -29,10 +30,11 @@ export function EmailsListClient({
   locale,
 }: EmailsListClientProps): React.JSX.Element {
   const { t } = simpleT(locale);
-  const emailsEndpoint = useEmailsListEndpoint();
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const emailsEndpoint = useEmailMessagesList(logger);
 
-  const apiResponse = emailsEndpoint.read.response;
-  const emails: EmailGetResponseType[] = apiResponse?.success
+  const apiResponse = emailsEndpoint.read?.response;
+  const emails: EmailsListResponseType["emails"] = apiResponse?.success
     ? apiResponse.data.emails
     : [];
   const totalEmails = apiResponse?.success
@@ -41,11 +43,13 @@ export function EmailsListClient({
   const totalPages = apiResponse?.success
     ? apiResponse.data.pagination.totalPages
     : 0;
-  const queryLoading = emailsEndpoint.read.isLoading || false;
+  const queryLoading = emailsEndpoint.read?.isLoading || false;
 
   // Get current form values for pagination display
-  const currentPage = emailsEndpoint.read.form.getValues("page") || 1;
-  const currentLimit = emailsEndpoint.read.form.getValues("limit") || 20;
+  const currentPage =
+    emailsEndpoint.read?.form.getValues("displayOptions.page") || 1;
+  const currentLimit =
+    emailsEndpoint.read?.form.getValues("displayOptions.limit") || 20;
 
   return (
     <Card>

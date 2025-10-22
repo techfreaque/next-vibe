@@ -1,3 +1,4 @@
+import { TaskCategory } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 /**
  * IMAP Sync Task (Unified Format)
  * Automated synchronization of IMAP accounts, folders, and messages
@@ -173,7 +174,7 @@ const imapSyncTask: Task = {
   name: "imap-sync",
   description: "tasks.imap_sync.description",
   schedule: CRON_SCHEDULES.EVERY_15_MINUTES, // Every 15 minutes
-  category: "emails",
+  category: TaskCategory.SYSTEM,
   enabled: false,
   priority: CronTaskPriority.MEDIUM,
   timeout: TASK_TIMEOUTS.EXTENDED, // 30 minutes

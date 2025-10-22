@@ -7,8 +7,7 @@ export const translations: typeof enTranslations = {
         "Ungültiges Telefonnummernformat. Bitte geben Sie eine gültige Telefonnummer an.",
       delivery_failed:
         "SMS konnte nicht an {{phoneNumber}} gesendet werden: {{error}}",
-      unexpected_error:
-        "Unerwarteter Fehler beim Senden der SMS aufgetreten",
+      unexpected_error: "Unerwarteter Fehler beim Senden der SMS aufgetreten",
       all_failed: "Alle SMS-Nachrichten konnten nicht gesendet werden",
       partial_failure:
         "Einige SMS-Nachrichten konnten nicht gesendet werden. Erfolgreich: {{successCount}}, Fehlgeschlagen: {{failureCount}}",

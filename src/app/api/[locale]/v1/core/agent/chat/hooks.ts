@@ -9,15 +9,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/store";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { useAIStream } from "./ai-stream/hooks";
 import { useAIStreamStore } from "./ai-stream/store";
 import type { DefaultFolderId } from "./config";
+import creditsDefinition from "./credits/definition";
 import { useFoldersList } from "./folders/hooks";
 import type { IconValue } from "./model-access/icons";
 import type { ModelId } from "./model-access/models";
+import { getModelById } from "./model-access/models";
 import type { PersonaListResponseOutput } from "./personas/definition";
 import { usePersonasList } from "./personas/hooks";
 import {
@@ -102,7 +105,10 @@ export interface UseChatReturn {
   setEnableSearch: (enabled: boolean) => void;
 
   // Message operations
-  sendMessage: (content: string) => Promise<void>;
+  sendMessage: (
+    content: string,
+    onThreadCreated?: (threadId: string, rootFolderId: string) => void,
+  ) => Promise<void>;
   retryMessage: (messageId: string) => Promise<void>;
   branchMessage: (messageId: string, newContent: string) => Promise<void>;
   answerAsAI: (messageId: string, content: string) => Promise<void>;
@@ -205,58 +211,59 @@ export function useChat(
         isAuthenticated,
       });
 
+      // ALWAYS load incognito data from localStorage (for both authenticated and non-authenticated users)
+      try {
+        const { loadIncognitoState } = await import("./incognito/storage");
+        const incognitoState = loadIncognitoState();
+
+        logger.debug("useChat", "Loading incognito data from localStorage", {
+          threadCount: Object.keys(incognitoState.threads).length,
+          messageCount: Object.keys(incognitoState.messages).length,
+          folderCount: Object.keys(incognitoState.folders).length,
+        });
+
+        // Load threads into store (convert date strings back to Date objects)
+        Object.values(incognitoState.threads).forEach((thread) => {
+          chatStore.addThread({
+            ...thread,
+            createdAt: new Date(thread.createdAt),
+            updatedAt: new Date(thread.updatedAt),
+          });
+        });
+
+        // Load messages into store (convert date strings back to Date objects)
+        Object.values(incognitoState.messages).forEach((message) => {
+          chatStore.addMessage({
+            ...message,
+            createdAt: new Date(message.createdAt),
+            updatedAt: new Date(message.updatedAt),
+          });
+        });
+
+        // Load folders into store (convert date strings back to Date objects)
+        Object.values(incognitoState.folders).forEach((folder) => {
+          chatStore.addFolder({
+            ...folder,
+            createdAt: new Date(folder.createdAt),
+            updatedAt: new Date(folder.updatedAt),
+          });
+        });
+
+        logger.info("useChat", "Incognito data loaded successfully", {
+          threadCount: Object.keys(incognitoState.threads).length,
+          messageCount: Object.keys(incognitoState.messages).length,
+          folderCount: Object.keys(incognitoState.folders).length,
+        });
+      } catch (error) {
+        logger.error("useChat", "Failed to load incognito data", { error });
+      }
+
       // Skip loading server data for non-authenticated users
       if (!isAuthenticated) {
         logger.info(
           "useChat",
           "User not authenticated, skipping server data load",
         );
-        // Load incognito data from localStorage instead
-        try {
-          const { loadIncognitoState } = await import("./incognito/storage");
-          const incognitoState = loadIncognitoState();
-
-          logger.debug("useChat", "Loading incognito data from localStorage", {
-            threadCount: Object.keys(incognitoState.threads).length,
-            messageCount: Object.keys(incognitoState.messages).length,
-            folderCount: Object.keys(incognitoState.folders).length,
-          });
-
-          // Load threads into store (convert date strings back to Date objects)
-          Object.values(incognitoState.threads).forEach((thread) => {
-            chatStore.addThread({
-              ...thread,
-              createdAt: new Date(thread.createdAt),
-              updatedAt: new Date(thread.updatedAt),
-            });
-          });
-
-          // Load messages into store (convert date strings back to Date objects)
-          Object.values(incognitoState.messages).forEach((message) => {
-            chatStore.addMessage({
-              ...message,
-              createdAt: new Date(message.createdAt),
-              updatedAt: new Date(message.updatedAt),
-            });
-          });
-
-          // Load folders into store (convert date strings back to Date objects)
-          Object.values(incognitoState.folders).forEach((folder) => {
-            chatStore.addFolder({
-              ...folder,
-              createdAt: new Date(folder.createdAt),
-              updatedAt: new Date(folder.updatedAt),
-            });
-          });
-
-          logger.info("useChat", "Incognito data loaded successfully", {
-            threadCount: Object.keys(incognitoState.threads).length,
-            messageCount: Object.keys(incognitoState.messages).length,
-            folderCount: Object.keys(incognitoState.folders).length,
-          });
-        } catch (error) {
-          logger.error("useChat", "Failed to load incognito data", { error });
-        }
         return;
       }
 
@@ -689,26 +696,73 @@ export function useChat(
 
   // Message operations
   const sendMessage = useCallback(
-    async (content: string): Promise<void> => {
+    async (
+      content: string,
+      onThreadCreated?: (threadId: string, rootFolderId: string) => void,
+    ): Promise<void> => {
       logger.debug("useChat", "Sending message", { content });
 
       chatStore.setLoading(true);
 
       try {
-        await aiStream.startStream({
-          operation: "send",
-          rootFolderId: chatStore.currentRootFolderId,
-          subFolderId: chatStore.currentSubFolderId,
-          threadId: chatStore.activeThreadId,
-          parentMessageId: null,
-          content,
-          role: "user",
-          model: selectedModel,
-          persona: selectedPersona,
-          temperature,
-          maxTokens,
-          enableSearch,
-        });
+        await aiStream.startStream(
+          {
+            operation: "send",
+            rootFolderId: chatStore.currentRootFolderId,
+            subFolderId: chatStore.currentSubFolderId,
+            threadId: chatStore.activeThreadId,
+            parentMessageId: null,
+            content,
+            role: "user",
+            model: selectedModel,
+            persona: selectedPersona,
+            temperature,
+            maxTokens,
+            enableSearch,
+          },
+          {
+            onThreadCreated: (data) => {
+              logger.debug("useChat", "Thread created during send", {
+                threadId: data.threadId,
+                rootFolderId: data.rootFolderId,
+              });
+              // Call the callback if provided
+              if (onThreadCreated) {
+                onThreadCreated(data.threadId, data.rootFolderId);
+              }
+            },
+            onContentDone: () => {
+              // Update credit balance in real-time after AI response completes
+              const modelConfig = getModelById(selectedModel);
+              const creditCost = modelConfig.creditCost;
+
+              if (creditCost > 0 && creditsDefinition.GET) {
+                // Update the credit balance using the built-in helper
+                apiClient.updateEndpointData(
+                  creditsDefinition.GET,
+                  (oldData) => {
+                    if (!oldData?.data) {
+                      return oldData;
+                    }
+
+                    return {
+                      ...oldData,
+                      data: {
+                        ...oldData.data,
+                        total: oldData.data.total - creditCost,
+                      },
+                    };
+                  },
+                );
+
+                logger.debug("useChat", "Updated credit balance in cache", {
+                  creditCost,
+                  model: selectedModel,
+                });
+              }
+            },
+          },
+        );
 
         setInput("");
       } catch (error) {
@@ -726,6 +780,7 @@ export function useChat(
       temperature,
       maxTokens,
       enableSearch,
+      locale,
     ],
   );
 
@@ -747,20 +802,54 @@ export function useChat(
         // Use "retry" operation which creates a branch with the same user message content
         // For incognito mode, we need to provide the content since there's no database
         // For authenticated mode, the backend will fetch it from the database
-        await aiStream.startStream({
-          operation: "retry",
-          rootFolderId: chatStore.currentRootFolderId,
-          subFolderId: chatStore.currentSubFolderId,
-          threadId: message.threadId,
-          parentMessageId: messageId,
-          content: message.content, // Provide content for incognito mode
-          role: message.role.toLowerCase() as "user" | "assistant" | "system",
-          model: selectedModel,
-          persona: selectedPersona,
-          temperature,
-          maxTokens,
-          enableSearch: false,
-        });
+        await aiStream.startStream(
+          {
+            operation: "retry",
+            rootFolderId: chatStore.currentRootFolderId,
+            subFolderId: chatStore.currentSubFolderId,
+            threadId: message.threadId,
+            parentMessageId: messageId,
+            content: message.content, // Provide content for incognito mode
+            role: message.role.toLowerCase() as "user" | "assistant" | "system",
+            model: selectedModel,
+            persona: selectedPersona,
+            temperature,
+            maxTokens,
+            enableSearch: false,
+          },
+          {
+            onContentDone: () => {
+              // Update credit balance in real-time after AI response completes
+              const modelConfig = getModelById(selectedModel);
+              const creditCost = modelConfig.creditCost;
+
+              if (creditCost > 0 && creditsDefinition.GET) {
+                // Update the credit balance using the built-in helper
+                apiClient.updateEndpointData(
+                  creditsDefinition.GET,
+                  (oldData) => {
+                    if (!oldData?.data) {
+                      return oldData;
+                    }
+
+                    return {
+                      ...oldData,
+                      data: {
+                        ...oldData.data,
+                        total: oldData.data.total - creditCost,
+                      },
+                    };
+                  },
+                );
+
+                logger.debug("useChat", "Updated credit balance in cache", {
+                  creditCost,
+                  model: selectedModel,
+                });
+              }
+            },
+          },
+        );
       } catch (error) {
         logger.error("useChat", "Failed to retry message", { error });
       } finally {
@@ -792,20 +881,54 @@ export function useChat(
 
       try {
         // Use "edit" operation which creates a branch with the same parent
-        await aiStream.startStream({
-          operation: "edit",
-          rootFolderId: chatStore.currentRootFolderId,
-          subFolderId: chatStore.currentSubFolderId,
-          threadId: message.threadId,
-          parentMessageId: messageId,
-          content: newContent,
-          role: "user",
-          model: selectedModel,
-          persona: selectedPersona,
-          temperature,
-          maxTokens,
-          enableSearch: false,
-        });
+        await aiStream.startStream(
+          {
+            operation: "edit",
+            rootFolderId: chatStore.currentRootFolderId,
+            subFolderId: chatStore.currentSubFolderId,
+            threadId: message.threadId,
+            parentMessageId: messageId,
+            content: newContent,
+            role: "user",
+            model: selectedModel,
+            persona: selectedPersona,
+            temperature,
+            maxTokens,
+            enableSearch: false,
+          },
+          {
+            onContentDone: () => {
+              // Update credit balance in real-time after AI response completes
+              const modelConfig = getModelById(selectedModel);
+              const creditCost = modelConfig.creditCost;
+
+              if (creditCost > 0 && creditsDefinition.GET) {
+                // Update the credit balance using the built-in helper
+                apiClient.updateEndpointData(
+                  creditsDefinition.GET,
+                  (oldData) => {
+                    if (!oldData?.data) {
+                      return oldData;
+                    }
+
+                    return {
+                      ...oldData,
+                      data: {
+                        ...oldData.data,
+                        total: oldData.data.total - creditCost,
+                      },
+                    };
+                  },
+                );
+
+                logger.debug("useChat", "Updated credit balance in cache", {
+                  creditCost,
+                  model: selectedModel,
+                });
+              }
+            },
+          },
+        );
       } catch (error) {
         logger.error("useChat", "Failed to branch message", { error });
       } finally {
@@ -836,20 +959,54 @@ export function useChat(
       chatStore.setLoading(true);
 
       try {
-        await aiStream.startStream({
-          operation: "answer-as-ai",
-          rootFolderId: chatStore.currentRootFolderId,
-          subFolderId: chatStore.currentSubFolderId,
-          threadId: message.threadId,
-          parentMessageId: messageId,
-          content,
-          role: "assistant",
-          model: selectedModel,
-          persona: selectedPersona,
-          temperature,
-          maxTokens,
-          enableSearch: false,
-        });
+        await aiStream.startStream(
+          {
+            operation: "answer-as-ai",
+            rootFolderId: chatStore.currentRootFolderId,
+            subFolderId: chatStore.currentSubFolderId,
+            threadId: message.threadId,
+            parentMessageId: messageId,
+            content,
+            role: "assistant",
+            model: selectedModel,
+            persona: selectedPersona,
+            temperature,
+            maxTokens,
+            enableSearch: false,
+          },
+          {
+            onContentDone: () => {
+              // Update credit balance in real-time after AI response completes
+              const modelConfig = getModelById(selectedModel);
+              const creditCost = modelConfig.creditCost;
+
+              if (creditCost > 0 && creditsDefinition.GET) {
+                // Update the credit balance using the built-in helper
+                apiClient.updateEndpointData(
+                  creditsDefinition.GET,
+                  (oldData) => {
+                    if (!oldData?.data) {
+                      return oldData;
+                    }
+
+                    return {
+                      ...oldData,
+                      data: {
+                        ...oldData.data,
+                        total: oldData.data.total - creditCost,
+                      },
+                    };
+                  },
+                );
+
+                logger.debug("useChat", "Updated credit balance in cache", {
+                  creditCost,
+                  model: selectedModel,
+                });
+              }
+            },
+          },
+        );
       } catch (error) {
         logger.error("useChat", "Failed to answer as AI", { error });
       } finally {
@@ -898,24 +1055,58 @@ export function useChat(
         return;
       }
 
+      // Get the thread to check if it's incognito
+      const thread = chatStore.threads[message.threadId];
+      if (!thread) {
+        logger.error("useChat", "Thread not found for message", {
+          messageId,
+          threadId: message.threadId,
+        });
+        return;
+      }
+
       // Check if user is authenticated
       const authStatusCookie = document.cookie
         .split("; ")
         .find((row) => row.startsWith("auth_status="));
       const isAuthenticated = authStatusCookie !== undefined;
 
-      // For incognito mode, just delete from store (no API call)
-      if (!isAuthenticated || message.rootFolderId === "incognito") {
+      // For incognito mode, delete from both store and localStorage (no API call)
+      if (!isAuthenticated || thread.rootFolderId === "incognito") {
         logger.debug(
           "useChat",
           "Deleting incognito message (client-side only)",
           {
             messageId,
             isAuthenticated,
-            rootFolderId: message.rootFolderId,
+            rootFolderId: thread.rootFolderId,
           },
         );
+
+        // Delete from store (in-memory)
         chatStore.deleteMessage(messageId);
+
+        // Also delete from localStorage
+        try {
+          const { deleteMessage: deleteIncognitoMessage } = await import(
+            "./incognito/storage"
+          );
+          deleteIncognitoMessage(messageId);
+          logger.debug(
+            "useChat",
+            "Deleted incognito message from localStorage",
+            {
+              messageId,
+            },
+          );
+        } catch (error) {
+          logger.error(
+            "useChat",
+            "Failed to delete incognito message from localStorage",
+            { error },
+          );
+        }
+
         return;
       }
 
@@ -954,6 +1145,16 @@ export function useChat(
         return;
       }
 
+      // Get the thread to check if it's incognito
+      const thread = chatStore.threads[message.threadId];
+      if (!thread) {
+        logger.error("useChat", "Thread not found for message", {
+          messageId,
+          threadId: message.threadId,
+        });
+        return;
+      }
+
       // Check if user is authenticated
       const authStatusCookie = document.cookie
         .split("; ")
@@ -961,11 +1162,11 @@ export function useChat(
       const isAuthenticated = authStatusCookie !== undefined;
 
       // Incognito mode doesn't support voting
-      if (!isAuthenticated || message.rootFolderId === "incognito") {
+      if (!isAuthenticated || thread.rootFolderId === "incognito") {
         logger.debug("useChat", "Voting not supported in incognito mode", {
           messageId,
           isAuthenticated,
-          rootFolderId: message.rootFolderId,
+          rootFolderId: thread.rootFolderId,
         });
         return;
       }

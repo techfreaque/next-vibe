@@ -33,7 +33,7 @@ export function useThread(
   return useEndpoint(
     definitions,
     {
-      urlParams: { id: params.threadId },
+      urlParams: { threadId: params.threadId },
       queryOptions: {
         enabled: params.enabled ?? true,
         refetchOnWindowFocus: false,

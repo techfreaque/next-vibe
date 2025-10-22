@@ -171,7 +171,7 @@ export const { GET } = createEndpoint({
             error: z
               .object({
                 message: z.string(),
-                messageParams: z.record(z.unknown()).optional(),
+                messageParams: z.record(z.string(), z.unknown()).optional(),
                 errorType: z.string(),
               })
               .nullable(),
@@ -219,40 +219,40 @@ export const { GET } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "common.cronHistoryGetValidationFailed",
-      description: "common.cronHistoryGetValidationFailed",
+      title: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.validation.title",
+      description: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "common.cronHistoryGetNetworkError",
-      description: "common.cronHistoryGetNetworkError",
+      title: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.network.title",
+      description: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "common.cronHistoryGetUnauthorized",
-      description: "common.cronHistoryGetUnauthorized",
+      title: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.unauthorized.title",
+      description: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "common.cronHistoryGetForbidden",
-      description: "common.cronHistoryGetForbidden",
+      title: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.forbidden.title",
+      description: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "common.cronHistoryGetNotFound",
-      description: "common.cronHistoryGetNotFound",
+      title: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.notFound.title",
+      description: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "common.cronHistoryGetServerError",
-      description: "common.cronHistoryGetServerError",
+      title: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.server.title",
+      description: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "common.cronHistoryGetUnknownError",
-      description: "common.cronHistoryGetUnknownError",
+      title: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.unknown.title",
+      description: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "common.cronHistoryGetUnsavedChanges",
-      description: "common.cronHistoryGetUnsavedChanges",
+      title: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.unsavedChanges.titleChanges",
+      description: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.unsavedChanges.titleChanges",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "common.cronHistoryGetConflict",
-      description: "common.cronHistoryGetConflict",
+      title: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.conflict.title",
+      description: "app.api.v1.core.system.tasks.cronSystem.history.get.errors.conflict.description",
     },
   },
   examples: {

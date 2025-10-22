@@ -34,13 +34,21 @@ export function EmailsListFilters({
 
   const handleClearFilters = (): void => {
     form.reset({
-      search: undefined,
-      status: EmailStatusFilter.ALL,
-      type: EmailTypeFilter.ALL,
-      page: 1,
-      limit: 20,
-      sortBy: EmailSortField.CREATED_AT,
-      sortOrder: SortOrder.DESC,
+      filters: {
+        search: undefined,
+        status: EmailStatusFilter.ALL,
+        type: EmailTypeFilter.ALL,
+        dateRange: {
+          dateFrom: undefined,
+          dateTo: undefined,
+        },
+      },
+      displayOptions: {
+        page: 1,
+        limit: 20,
+        sortBy: EmailSortField.CREATED_AT,
+        sortOrder: SortOrder.DESC,
+      },
     });
   };
 
@@ -49,7 +57,7 @@ export function EmailsListFilters({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {/* Search Field */}
         <EndpointFormField
-          name="search"
+          name="filters.search"
           config={{
             type: "text",
             label: undefined,
@@ -65,7 +73,7 @@ export function EmailsListFilters({
 
         {/* Status Filter */}
         <EndpointFormField
-          name="status"
+          name="filters.status"
           config={{
             type: "select",
             label: undefined,
@@ -119,7 +127,7 @@ export function EmailsListFilters({
 
         {/* Type Filter */}
         <EndpointFormField
-          name="type"
+          name="filters.type"
           config={{
             type: "select",
             label: undefined,
@@ -165,7 +173,7 @@ export function EmailsListFilters({
 
         {/* Sort By */}
         <EndpointFormField
-          name="sortBy"
+          name="displayOptions.sortBy"
           config={{
             type: "select",
             label: undefined,
@@ -210,7 +218,7 @@ export function EmailsListFilters({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {/* Sort Order */}
         <EndpointFormField
-          name="sortOrder"
+          name="displayOptions.sortOrder"
           config={{
             type: "select",
             label: undefined,
@@ -257,7 +265,7 @@ export function EmailsListFilters({
           variant="outline"
           size="sm"
           onClick={() => {
-            form.setValue("status", EmailStatusFilter.SENT);
+            form.setValue("filters.status", EmailStatusFilter.SENT);
           }}
         >
           {t("app.admin.emails.list.admin.filters.quick.sent")}
@@ -267,7 +275,7 @@ export function EmailsListFilters({
           variant="outline"
           size="sm"
           onClick={() => {
-            form.setValue("status", EmailStatusFilter.OPENED);
+            form.setValue("filters.status", EmailStatusFilter.OPENED);
           }}
         >
           {t("app.admin.emails.list.admin.filters.quick.opened")}
@@ -277,7 +285,7 @@ export function EmailsListFilters({
           variant="outline"
           size="sm"
           onClick={() => {
-            form.setValue("status", EmailStatusFilter.BOUNCED);
+            form.setValue("filters.status", EmailStatusFilter.BOUNCED);
           }}
         >
           {t("app.admin.emails.list.admin.filters.quick.bounced")}
@@ -287,7 +295,7 @@ export function EmailsListFilters({
           variant="outline"
           size="sm"
           onClick={() => {
-            form.setValue("type", EmailTypeFilter.LEAD_CAMPAIGN);
+            form.setValue("filters.type", EmailTypeFilter.LEAD_CAMPAIGN);
           }}
         >
           {t("app.admin.emails.list.admin.filters.quick.lead_campaigns")}

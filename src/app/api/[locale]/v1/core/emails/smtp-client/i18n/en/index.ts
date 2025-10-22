@@ -1,9 +1,9 @@
 import { translations as componentsTranslations } from "../../components/i18n/en";
 import { translations as createTranslations } from "../../create/i18n/en";
 import { translations as editTranslations } from "../../edit/i18n/en";
-import { translations as listTranslations } from "../../list/i18n/en";
-import { translations as emailSendingTranslations } from "../../email-sending/i18n/en";
 import { translations as emailHandlingTranslations } from "../../email-handling/i18n/en";
+import { translations as emailSendingTranslations } from "../../email-sending/i18n/en";
+import { translations as listTranslations } from "../../list/i18n/en";
 
 export const translations = {
   tag: "SMTP Client",

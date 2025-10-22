@@ -1,7 +1,7 @@
 import { performance } from "node:perf_hooks";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/schema";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -17,7 +17,12 @@ import {
 import { parseError } from "../../shared/utils";
 import { env } from "../env";
 import { batchSendSms, sendSms } from "./send-sms";
-import type { SendSmsParams, SmsConfig, SmsHandlerOptions } from "./utils";
+import type {
+  ProviderBaseOptions,
+  SendSmsParams,
+  SmsConfig,
+  SmsHandlerOptions,
+} from "./utils";
 
 /**
  * Processes and handles SMS messages triggered by API responses
@@ -79,7 +84,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
             if (!smsData.ignoreErrors) {
               errors.push(
                 createErrorResponse(
-                  "packages.nextVibe.server.sms.sms.errors.rendering_failed",
+                  "packages.nextVibe.server.sms.sms.error.rendering_failed",
                   ErrorResponseTypes.SMS_ERROR,
                   { error: result.message },
                 ),
@@ -106,11 +111,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
               // Only include options if there are any to include
               if (msg.options) {
                 // Build options object with only defined properties
-                const optionsObj: {
-                  provider?: string;
-                  type?: string;
-                  datacoding?: string;
-                } = {};
+                const optionsObj: Partial<ProviderBaseOptions> = {};
 
                 if (msg.options.provider) {
                   optionsObj.provider = msg.options.provider;
@@ -134,7 +135,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
             if (!batchResult.success && !smsData.ignoreErrors) {
               errors.push(
                 createErrorResponse(
-                  "packages.nextVibe.server.sms.sms.errors.batch_send_failed",
+                  "packages.nextVibe.server.sms.sms.error.batch_send_failed",
                   ErrorResponseTypes.SMS_ERROR,
                   { error: batchResult.message },
                 ),
@@ -156,7 +157,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
             if (!smsData.ignoreErrors && !smsResponse.success) {
               errors.push(
                 createErrorResponse(
-                  "packages.nextVibe.server.sms.sms.errors.send_failed",
+                  "packages.nextVibe.server.sms.sms.error.send_failed",
                   ErrorResponseTypes.SMS_ERROR,
                   { error: smsResponse.message },
                 ),
@@ -170,7 +171,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
           if (!smsData.ignoreErrors) {
             errors.push(
               createErrorResponse(
-                "packages.nextVibe.server.sms.sms.errors.rendering_failed",
+                "packages.nextVibe.server.sms.sms.error.rendering_failed",
                 ErrorResponseTypes.SMS_ERROR,
                 { error: parsedError.message },
               ),
@@ -183,7 +184,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
     logger.error("Error sending SMS:", error);
     errors.push(
       createErrorResponse(
-        "packages.nextVibe.server.sms.sms.errors.delivery_failed",
+        "packages.nextVibe.server.sms.sms.error.delivery_failed",
         ErrorResponseTypes.SMS_ERROR,
         { error: parseError(error).message },
       ),
@@ -200,7 +201,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
   if (errors.length) {
     logger.error("SMS errors", errors);
     return createErrorResponse(
-      "packages.nextVibe.server.sms.sms.errors.delivery_failed",
+      "packages.nextVibe.server.sms.sms.error.delivery_failed",
       ErrorResponseTypes.SMS_ERROR,
       { errorCount: errors.length },
     );

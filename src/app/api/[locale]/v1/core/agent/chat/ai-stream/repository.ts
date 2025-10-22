@@ -27,7 +27,7 @@ import { creditRepository } from "../credits/repository";
 import { creditValidator } from "../credits/validator";
 import { chatMessages, chatThreads } from "../db";
 import { ChatMessageRole } from "../enum";
-import { getModelCost } from "../model-access/costs";
+import { FEATURE_COSTS, getModelCost } from "../model-access/costs";
 import { getModelById, type ModelId } from "../model-access/models";
 import type {
   AiStreamPostRequestOutput,
@@ -568,7 +568,7 @@ export async function createAiStream({
   if (data.operation === "answer-as-ai") {
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
-      start(controller): void {
+      async start(controller): Promise<void> {
         try {
           // Emit thread-created event if new thread
           if (threadResult.isNew) {
@@ -602,6 +602,56 @@ export async function createAiStream({
             finishReason: "user-provided",
           });
           controller.enqueue(encoder.encode(formatSSEEvent(doneEvent)));
+
+          // Deduct credits AFTER successful completion (not optimistically)
+          if (modelCost > 0) {
+            const creditMessageId = crypto.randomUUID();
+
+            // Determine correct credit identifier based on subscription status
+            let creditIdentifier: { userId?: string; leadId?: string };
+            if (userId) {
+              const identifierResult =
+                await creditRepository.getCreditIdentifier(userId);
+
+              if (identifierResult.success && identifierResult.data) {
+                if (identifierResult.data.hasSubscription) {
+                  // User has subscription - deduct from user credits
+                  creditIdentifier = { userId };
+                } else {
+                  // User has no subscription - deduct from lead credits
+                  creditIdentifier = { leadId: effectiveLeadId };
+                }
+              } else {
+                // Fallback to lead credits if we can't determine subscription status
+                creditIdentifier = { leadId: effectiveLeadId };
+              }
+            } else {
+              creditIdentifier = { leadId: effectiveLeadId };
+            }
+
+            const deductResult = await creditRepository.deductCredits(
+              creditIdentifier,
+              modelCost,
+              data.model,
+              creditMessageId,
+            );
+
+            if (!deductResult.success) {
+              logger.error("Failed to deduct credits for answer-as-ai", {
+                userId,
+                leadId: effectiveLeadId,
+                cost: modelCost,
+              });
+            } else {
+              logger.info("Credits deducted successfully for answer-as-ai", {
+                userId,
+                leadId: effectiveLeadId,
+                cost: modelCost,
+                messageId: creditMessageId,
+                creditIdentifier,
+              });
+            }
+          }
 
           controller.close();
         } catch (error) {
@@ -868,8 +918,8 @@ export async function createAiStream({
                 const messageId = crypto.randomUUID();
                 const deductResult = await creditRepository.deductCredits(
                   searchCreditIdentifier,
-                  1, // 1 credit per search
-                  data.model,
+                  FEATURE_COSTS.BRAVE_SEARCH, // Use constant for search cost
+                  "brave-search", // Use "brave-search" as the model ID
                   messageId,
                 );
 
@@ -877,6 +927,14 @@ export async function createAiStream({
                   logger.error("Failed to deduct search credits", {
                     userId,
                     leadId: effectiveLeadId,
+                    cost: FEATURE_COSTS.BRAVE_SEARCH,
+                  });
+                } else {
+                  logger.info("Credits deducted successfully for search", {
+                    userId,
+                    leadId: effectiveLeadId,
+                    cost: FEATURE_COSTS.BRAVE_SEARCH,
+                    messageId,
                   });
                 }
               }

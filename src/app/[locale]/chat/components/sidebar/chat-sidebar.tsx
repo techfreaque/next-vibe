@@ -61,6 +61,8 @@ interface ChatSidebarProps {
   onSelectThread: (threadId: string) => void;
   onDeleteThread: (threadId: string) => void;
   onMoveThread: (threadId: string, folderId: string | null) => void;
+  onPinThread: (threadId: string, pinned: boolean) => void;
+  onArchiveThread: (threadId: string, archived: boolean) => void;
   onCreateFolder: (name: string, parentId: string, icon?: string) => string;
   onUpdateFolder: (folderId: string, updates: FolderUpdate) => void;
   onDeleteFolder: (folderId: string, deleteThreads: boolean) => void;
@@ -82,6 +84,8 @@ export function ChatSidebar({
   onSelectThread,
   onDeleteThread,
   onMoveThread,
+  onPinThread,
+  onArchiveThread,
   onCreateFolder,
   onUpdateFolder,
   onDeleteFolder,
@@ -294,6 +298,8 @@ export function ChatSidebar({
                   onDeleteThread={onDeleteThread}
                   onUpdateTitle={onUpdateThreadTitle}
                   onMoveThread={onMoveThread}
+                  onPinThread={onPinThread}
+                  onArchiveThread={onArchiveThread}
                   chat={chat}
                   locale={locale}
                   compact
@@ -315,6 +321,8 @@ export function ChatSidebar({
                 onSelectThread={onSelectThread}
                 onDeleteThread={onDeleteThread}
                 onMoveThread={onMoveThread}
+                onPinThread={onPinThread}
+                onArchiveThread={onArchiveThread}
                 onCreateFolder={onCreateFolder}
                 onUpdateFolder={onUpdateFolder}
                 onDeleteFolder={onDeleteFolder}

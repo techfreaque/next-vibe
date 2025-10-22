@@ -17,6 +17,9 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { MinimalUser } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/types";
+import { creditRepository } from "../chat/credits/repository";
+import { FEATURE_COSTS } from "../chat/model-access/costs";
 import type { TextToSpeechPostRequestOutput } from "./definition";
 
 /**
@@ -36,12 +39,14 @@ export interface TextToSpeechRepository {
   /**
    * Convert text to speech
    * @param data - TTS request data
+   * @param user - User information
    * @param locale - User locale
    * @param logger - Logger instance
    * @returns Audio data URL and metadata
    */
   convertTextToSpeech(
     data: TextToSpeechPostRequestOutput,
+    user: MinimalUser,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<
@@ -60,6 +65,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
    */
   async convertTextToSpeech(
     data: TextToSpeechPostRequestOutput,
+    user: MinimalUser,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<
@@ -182,6 +188,57 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
         contentType,
         provider: data.provider,
       });
+
+      // Deduct credits AFTER successful completion
+      const ttsCost = FEATURE_COSTS.TTS;
+      if (ttsCost > 0) {
+        const creditMessageId = crypto.randomUUID();
+
+        // Determine correct credit identifier based on user type
+        let creditIdentifier: { userId?: string; leadId?: string };
+        if (user.id) {
+          const identifierResult =
+            await creditRepository.getCreditIdentifier(user.id);
+
+          if (identifierResult.success && identifierResult.data) {
+            if (identifierResult.data.hasSubscription) {
+              // User has subscription - deduct from user credits
+              creditIdentifier = { userId: user.id };
+            } else {
+              // User has no subscription - deduct from lead credits
+              creditIdentifier = { leadId: user.leadId };
+            }
+          } else {
+            // Fallback to lead credits if we can't determine subscription status
+            creditIdentifier = { leadId: user.leadId };
+          }
+        } else {
+          creditIdentifier = { leadId: user.leadId };
+        }
+
+        const deductResult = await creditRepository.deductCredits(
+          creditIdentifier,
+          ttsCost,
+          "tts", // Use "tts" as the model ID
+          creditMessageId,
+        );
+
+        if (!deductResult.success) {
+          logger.error("Failed to deduct credits for TTS", {
+            userId: user.id,
+            leadId: user.leadId,
+            cost: ttsCost,
+          });
+        } else {
+          logger.info("Credits deducted successfully for TTS", {
+            userId: user.id,
+            leadId: user.leadId,
+            cost: ttsCost,
+            messageId: creditMessageId,
+            creditIdentifier,
+          });
+        }
+      }
 
       return createSuccessResponse({
         response: {

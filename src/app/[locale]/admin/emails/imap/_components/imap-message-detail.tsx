@@ -26,7 +26,8 @@ import { Separator } from "next-vibe-ui/ui/separator";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
-import { useImapMessageByIdEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/messages/[id]/hooks";
+import { useImapMessageById } from "@/app/api/[locale]/v1/core/emails/imap-client/messages/[id]/hooks";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { useTranslation } from "@/i18n/core/client";
 
 interface ImapMessageDetailProps {
@@ -40,17 +41,18 @@ interface ImapMessageDetailProps {
 export function ImapMessageDetail({
   messageId,
 }: ImapMessageDetailProps): JSX.Element {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const router = useRouter();
   const [isEditMode, setIsEditMode] = useState(false);
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Use real API endpoint following leads/cron patterns
-  const messageEndpoint = useImapMessageByIdEndpoint({
+  const messageEndpoint = useImapMessageById({
     messageId,
     enabled: true,
-  });
+  }, logger);
 
-  const messageData = messageEndpoint.read?.data;
+  const messageData = messageEndpoint.read?.data?.message;
   const isLoading = messageEndpoint.read?.isLoading;
   const readError = messageEndpoint.read?.error;
 
@@ -386,7 +388,7 @@ export function ImapMessageDetail({
                     {t("app.admin.emails.imap.messages.createdAt")}:
                   </span>
                   <span className="text-gray-600 ml-2">
-                    {formatDate(messageData.createdAt)}
+                    {messageData.createdAt ? formatDate(messageData.createdAt) : "-"}
                   </span>
                 </div>
                 <div className="text-sm">

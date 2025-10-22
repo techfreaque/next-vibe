@@ -26,12 +26,12 @@ import {
 import type React from "react";
 
 import { SmtpHealthStatus } from "@/app/api/[locale]/v1/core/emails/smtp-client/enum";
-import type { SmtpAccountResponseType } from "@/app/api/[locale]/v1/core/emails/smtp-client/schema";
+import type { SmtpAccountsListGETResponseOutput } from "@/app/api/[locale]/v1/core/emails/smtp-client/list/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface SmtpAccountsTableProps {
-  accounts: SmtpAccountResponseType[];
+  accounts: SmtpAccountsListGETResponseOutput["accounts"];
   isLoading: boolean;
   locale: CountryLanguage;
   viewMode?: "list" | "table";
@@ -59,50 +59,6 @@ export function SmtpAccountsTable({
       default:
         return "secondary";
     }
-  };
-
-  const getCampaignTypeBadgeVariant = (
-    campaignType: string,
-  ): "default" | "secondary" | "outline" => {
-    switch (campaignType) {
-      case "SYSTEM":
-        return "default";
-      case "LEAD_CAMPAIGN":
-        return "secondary";
-      case "TRANSACTIONAL":
-        return "outline";
-      case "NOTIFICATION":
-        return "secondary";
-      case "NEWSLETTER":
-        return "outline";
-      default:
-        return "secondary";
-    }
-  };
-
-  const renderCampaignTypeBadges = (
-    campaignTypes: string[],
-  ): React.JSX.Element => {
-    if (!campaignTypes || campaignTypes.length === 0) {
-      return (
-        <Badge variant="secondary">
-          {t("app.admin.emails.smtp.admin.fields.campaignTypes")}
-        </Badge>
-      );
-    }
-
-    return (
-      <div className="flex flex-wrap gap-1">
-        {campaignTypes.map((campaignType, index) => (
-          <Badge
-            key={index}
-            variant={getCampaignTypeBadgeVariant(campaignType)}
-          >
-            {campaignType}
-          </Badge>
-        ))}
-      </div>
-    );
   };
 
   if (isLoading) {
@@ -166,23 +122,21 @@ export function SmtpAccountsTable({
               <TableCell>
                 <div>
                   <div className="font-medium">{account.name}</div>
-                  {account.description && (
-                    <div className="text-sm text-gray-500">
-                      {account.description}
-                    </div>
-                  )}
+                  <div className="text-sm text-gray-500">
+                    {account.id.slice(0, 13)}...
+                  </div>
                 </div>
               </TableCell>
               <TableCell>
                 <div className="text-sm">
-                  <div>
-                    {account.host}:{account.port}
+                  <div className="text-gray-500">
+                    {t("app.admin.emails.smtp.list.table.status")}:{" "}
+                    {account.status}
                   </div>
-                  <div className="text-gray-500">{account.securityType}</div>
                 </div>
               </TableCell>
               <TableCell>
-                {renderCampaignTypeBadges(account.campaignTypes || [])}
+                <span className="text-sm text-gray-500">-</span>
               </TableCell>
               <TableCell>
                 <Badge variant={getStatusBadgeVariant(account.status)}>
@@ -202,9 +156,7 @@ export function SmtpAccountsTable({
                             : "destructive"
                       }
                     >
-                      {t(
-                        `app.admin.emails.smtp.admin.health.${account.healthCheckStatus}`,
-                      )}
+                      {account.healthCheckStatus}
                     </Badge>
                   ) : (
                     <span className="text-gray-400">
@@ -215,15 +167,7 @@ export function SmtpAccountsTable({
               </TableCell>
               <TableCell>
                 <div className="text-sm">
-                  <div className="text-gray-900 dark:text-gray-100">
-                    {account.emailsSentToday} /{" "}
-                    {account.rateLimitPerHour ||
-                      t("app.admin.emails.smtp.list.table.unlimited")}
-                  </div>
                   <div className="text-xs text-gray-500">
-                    {t("app.admin.emails.smtp.list.table.todayLimit")}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
                     {t("app.admin.emails.smtp.list.table.totalSent", {
                       count: account.totalEmailsSent,
                     })}
@@ -232,21 +176,7 @@ export function SmtpAccountsTable({
               </TableCell>
               <TableCell>
                 <div className="text-sm">
-                  <div className="flex items-center space-x-2">
-                    <span className="font-medium">{account.priority || 0}</span>
-                    {account.isDefault && (
-                      <Badge variant="outline" className="text-xs">
-                        {t("app.admin.emails.smtp.list.table.default")}
-                      </Badge>
-                    )}
-                  </div>
-                  {account.weight && (
-                    <div className="text-xs text-gray-500">
-                      {t("app.admin.emails.smtp.list.table.weight", {
-                        weight: account.weight,
-                      })}
-                    </div>
-                  )}
+                  <span className="font-medium">{account.priority}</span>
                 </div>
               </TableCell>
               <TableCell className="text-right">

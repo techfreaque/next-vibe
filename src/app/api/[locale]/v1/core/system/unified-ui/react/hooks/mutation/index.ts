@@ -244,7 +244,7 @@ export function useApiMutation<
       } catch (error) {
         // Create a properly typed error response
         const errorResponse = createErrorResponse(
-          "error.errors.unknown",
+          "app.common.errors.unknown",
           ErrorResponseTypes.INTERNAL_ERROR,
           {
             error: parseError(error).message,

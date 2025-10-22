@@ -25,7 +25,7 @@ export function useCredits(
       queryOptions: {
         enabled: true,
         refetchOnWindowFocus: true,
-        staleTime: 10 * 1000, // 10 seconds
+        staleTime: 0, // Always refetch (no caching) for real-time credit updates
       },
     },
     logger,

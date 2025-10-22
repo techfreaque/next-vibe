@@ -7,47 +7,53 @@ import "server-only";
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import type { Countries } from "@/i18n/core/config";
 
 import { imapMessagesRepository } from "../repository";
 import definitions from "./definition";
-
-// Helper to safely convert locale to country
-function getCountryFromLocale(locale: string): Countries {
-  const [, countryPart] = locale.split("-");
-  const upperCountry = countryPart?.toUpperCase();
-
-  // Map to valid Countries values
-  const countryMapping: Record<string, Countries> = {
-    DE: "DE",
-    PL: "PL",
-    GLOBAL: "GLOBAL",
-  };
-
-  return countryMapping[upperCountry || ""] || "GLOBAL";
-}
 
 export const { GET, PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: ({ urlVariables, user, locale, logger }) =>
-      imapMessagesRepository.getMessageById(
+    handler: async ({ urlVariables, user, locale, logger }) => {
+      const response = await imapMessagesRepository.getMessageById(
         { id: urlVariables.id },
         user,
-        getCountryFromLocale(locale),
+        locale,
         logger,
-      ),
+      );
+
+      // Wrap the message response to match definition structure
+      if (response.success && response.data) {
+        return {
+          success: true as const,
+          data: { message: response.data },
+        };
+      }
+
+      return response;
+    },
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: ({ urlVariables, data, user, locale, logger }) =>
-      imapMessagesRepository.updateMessage(
+    handler: async ({ urlVariables, data, user, locale, logger }) => {
+      const response = await imapMessagesRepository.updateMessage(
         { messageId: urlVariables.id, updates: data },
         user,
-        getCountryFromLocale(locale),
+        locale,
         logger,
-      ),
+      );
+
+      // Wrap the message response to match definition structure
+      if (response.success && response.data) {
+        return {
+          success: true as const,
+          data: { message: response.data },
+        };
+      }
+
+      return response;
+    },
   },
 });
 

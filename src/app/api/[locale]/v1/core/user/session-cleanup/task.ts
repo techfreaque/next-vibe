@@ -1,3 +1,4 @@
+import { TaskCategory } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 /**
  * Session Cleanup Task Implementation
  * Handles background session and token cleanup using the proper task system
@@ -88,7 +89,7 @@ const sessionCleanupTask: Task = {
   name: "user-session-cleanup",
   description: "app.api.v1.core.user.sessionCleanup.task.description",
   schedule: CRON_SCHEDULES.DAILY_6AM, // Daily at 6 AM
-  category: "authentication",
+  category: TaskCategory.MAINTENANCE,
   enabled: true,
   priority: CronTaskPriority.MEDIUM,
   timeout: TASK_TIMEOUTS.MEDIUM, // 5 minutes

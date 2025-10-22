@@ -35,7 +35,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
       >,
     ): Promise<ResponseType<ThreadGetResponseOutput>> => {
       return await threadByIdRepository.getThreadById(
-        { id: props.urlVariables.id },
+        { id: props.urlVariables.threadId },
         props.user,
         props.locale,
         props.logger,
@@ -53,7 +53,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
     ): Promise<ResponseType<ThreadPatchResponseOutput>> => {
       const dataWithId: ThreadPatchRequestOutput & { id: string } = {
         ...props.data,
-        id: props.urlVariables.id,
+        id: props.urlVariables.threadId,
       };
       return await threadByIdRepository.updateThread(
         dataWithId,
@@ -73,7 +73,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
       >,
     ): Promise<ResponseType<ThreadDeleteResponseOutput>> => {
       return await threadByIdRepository.deleteThread(
-        { id: props.urlVariables.id },
+        { id: props.urlVariables.threadId },
         props.user,
         props.locale,
         props.logger,

@@ -7,5 +7,18 @@ export const translations: typeof enTranslations = {
   appName: "unbottled.ai",
   api: apiTranslations,
   packages: packagesTranslations,
+  i18n: {
+    common: {
+      calendar: {
+        timezone: {
+          zones: {
+            PL: "Europe/Warsaw",
+            DE: "Europe/Berlin",
+            global: "UTC",
+          },
+        },
+      },
+    },
+  },
   ...appTranslations,
 };

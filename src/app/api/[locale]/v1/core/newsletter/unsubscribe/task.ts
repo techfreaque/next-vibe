@@ -1,3 +1,4 @@
+import { TaskCategory } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 /**
  * Newsletter Unsubscribe Lead Status Sync Task (Unified Format)
  * Synchronizes lead statuses for newsletter unsubscribes that weren't properly updated
@@ -284,7 +285,7 @@ const newsletterUnsubscribeSyncTask: Task = {
   name: "newsletter-unsubscribe-sync",
   description: "tasks.newsletter_unsubscribe_sync.description",
   schedule: CRON_SCHEDULES.EVERY_6_HOURS, // Every 6 hours
-  category: "newsletter",
+  category: TaskCategory.MAINTENANCE,
   enabled: false,
   priority: CronTaskPriority.LOW,
   timeout: TASK_TIMEOUTS.MEDIUM, // 5 minutes

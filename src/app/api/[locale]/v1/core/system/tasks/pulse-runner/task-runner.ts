@@ -1,3 +1,4 @@
+import { TaskCategory } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 /**
  * Pulse Task Runner
  * Dedicated task runner that calls the pulse repository once per minute
@@ -41,7 +42,7 @@ const pulseTaskRunner: TaskRunner = {
   type: "task-runner",
   name: "pulse-runner",
   description: "app.api.v1.core.system.tasks.pulseRunner.description",
-  category: "system",
+  category: TaskCategory.SYSTEM,
   enabled: true,
   priority: "HIGH",
 

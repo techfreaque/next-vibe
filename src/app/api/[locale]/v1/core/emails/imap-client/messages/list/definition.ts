@@ -431,6 +431,9 @@ export type ImapMessagesListGetRequestOutput = typeof GET.types.RequestOutput;
 export type ImapMessagesListGetResponseInput = typeof GET.types.ResponseInput;
 export type ImapMessagesListGetResponseOutput = typeof GET.types.ResponseOutput;
 
+// Export individual message type from the array
+export type ImapMessageResponseType = ImapMessagesListGetResponseOutput["messages"][number];
+
 /**
  * Export definitions
  */

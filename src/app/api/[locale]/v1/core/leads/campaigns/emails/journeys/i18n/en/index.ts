@@ -45,8 +45,7 @@ export const translations = {
             week1Content:
               "We'll sit down and really understand your business goals and challenges.",
             month2Title: "Month 2: Implementation",
-            month2Content:
-              "This is where we start seeing real momentum build.",
+            month2Content: "This is where we start seeing real momentum build.",
             week3Title: "Week 3-4: Quick Wins",
             week3Content:
               "You'll see the first tangible results - usually faster than expected.",
@@ -54,7 +53,8 @@ export const translations = {
               "What I like about this approach is that you're not waiting 6 months to see if things are working.",
             personalCommitment:
               "Here's something I want you to know: I'm personally invested in your success. This isn't just another client relationship for me.",
-            nextSteps: "If this resonates with you, let's have a real conversation about it.",
+            nextSteps:
+              "If this resonates with you, let's have a real conversation about it.",
             ctaText: "Schedule Your Strategy Call",
             signature: "Excited about the possibilities,",
             signatureClosing: "Warm regards",
@@ -163,8 +163,7 @@ export const translations = {
             convenience: "Everything you need, right at your fingertips.",
             ctaText: "Get Started",
             signature: "Welcome aboard,",
-            postScript:
-              "P.S. If you have any questions, we're here to help.",
+            postScript: "P.S. If you have any questions, we're here to help.",
           },
           followup1: {
             subject: "How are things going?",
@@ -209,8 +208,7 @@ export const translations = {
               "But I respect your time and don't want to be a bother.",
             ctaText: "Stay Connected",
             signature: "Best wishes,",
-            closing:
-              "The door is always open if you change your mind later.",
+            closing: "The door is always open if you change your mind later.",
           },
           nurture: {
             subject: "Quick tip for you",

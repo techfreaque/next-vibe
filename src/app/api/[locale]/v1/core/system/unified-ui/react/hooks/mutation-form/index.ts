@@ -310,7 +310,7 @@ export function useApiForm<
         const errorResponse = isErrorResponseType(error)
           ? error
           : createErrorResponse(
-              "app.api.v1.core.system.unifiedUi.react.hooks.mutationForm.post.errors.mutation_failed",
+              "app.api.v1.core.system.unifiedUi.react.hooks.mutationForm.post.errors.mutation_failed.title",
               ErrorResponseTypes.INTERNAL_ERROR,
             );
 
@@ -326,7 +326,7 @@ export function useApiForm<
     void formMethods.handleSubmit(_submitForm, (errors) => {
       // Create an error response for form validation errors
       const errorResponse = createErrorResponse(
-        "app.api.v1.core.system.unifiedUi.react.hooks.mutationForm.post.errors.validation_error",
+        "app.api.v1.core.system.unifiedUi.react.hooks.mutationForm.post.errors.validation_error.title",
         ErrorResponseTypes.VALIDATION_ERROR,
         { formErrors: JSON.stringify(errors) },
       );
@@ -365,7 +365,7 @@ export function useApiForm<
         ? createErrorResponse(
             mutationState.error?.message ||
               formState.formError?.message ||
-              "app.api.v1.core.system.unifiedUi.react.hooks.mutationForm.post.errors.unknown",
+              "app.api.v1.core.system.unifiedUi.react.hooks.mutationForm.post.errors.unknown.title",
             ErrorResponseTypes.INTERNAL_ERROR,
             mutationState.error?.messageParams ||
               formState.formError?.messageParams,

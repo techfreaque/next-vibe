@@ -18,12 +18,12 @@ import {
 } from "next-vibe-ui/ui/table";
 import type { JSX } from "react";
 
-import type { EmailGetResponseType } from "@/app/api/[locale]/v1/core/emails/messages/[id]/definition";
+import type { EmailsListResponseType } from "@/app/api/[locale]/v1/core/emails/messages/list/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface EmailsListTableProps {
-  emails: EmailGetResponseType[];
+  emails: EmailsListResponseType["emails"];
   loading: boolean;
   locale: CountryLanguage;
 }
@@ -127,36 +127,40 @@ export function EmailsListTable({
         </TableHeader>
         <TableBody>
           {emails.map((email) => (
-            <TableRow key={email.id}>
+            <TableRow key={email.emailCore.id}>
               <TableCell className="font-medium">
-                <div className="max-w-48 truncate">{email.subject}</div>
+                <div className="max-w-48 truncate">
+                  {email.emailCore.subject}
+                </div>
               </TableCell>
               <TableCell>
                 <div className="space-y-1">
                   <div className="text-sm font-medium">
-                    {email.recipientEmail}
+                    {email.emailParties.recipient.recipientEmail}
                   </div>
-                  {email.recipientName && (
+                  {email.emailParties.recipient.recipientName && (
                     <div className="text-xs text-muted-foreground">
-                      {email.recipientName}
+                      {email.emailParties.recipient.recipientName}
                     </div>
                   )}
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant={getStatusBadgeVariant(email.status)}>
-                  {email.status}
+                <Badge variant={getStatusBadgeVariant(email.emailCore.status)}>
+                  {email.emailCore.status}
                 </Badge>
               </TableCell>
               <TableCell>
-                <Badge variant={getTypeBadgeVariant(email.type)}>
-                  {email.type.replace(/_/g, " ")}
+                <Badge variant={getTypeBadgeVariant(email.emailMetadata.type)}>
+                  {email.emailMetadata.type.replace(/_/g, " ")}
                 </Badge>
               </TableCell>
               <TableCell>
-                {email.sentAt ? (
+                {email.emailEngagement.sentAt ? (
                   <div className="text-sm">
-                    {new Date(email.sentAt).toLocaleDateString(locale)}
+                    {new Date(email.emailEngagement.sentAt).toLocaleDateString(
+                      locale,
+                    )}
                   </div>
                 ) : (
                   <span className="text-muted-foreground">-</span>
@@ -164,8 +168,10 @@ export function EmailsListTable({
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  {email.openedAt && <Eye className="h-4 w-4 text-green-600" />}
-                  {email.clickedAt && (
+                  {email.emailEngagement.openedAt && (
+                    <Eye className="h-4 w-4 text-green-600" />
+                  )}
+                  {email.emailEngagement.clickedAt && (
                     <MousePointer className="h-4 w-4 text-blue-600" />
                   )}
                 </div>

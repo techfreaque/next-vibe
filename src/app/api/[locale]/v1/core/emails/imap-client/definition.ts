@@ -258,7 +258,5 @@ export const imapMessageResponseSchema = objectField(
   },
 );
 
-// Export the message response types
-export type ImapMessageResponseType = z.output<
-  typeof imapMessageResponseSchema
->;
+// Export the message response schema for reuse
+export { imapMessageResponseSchema };

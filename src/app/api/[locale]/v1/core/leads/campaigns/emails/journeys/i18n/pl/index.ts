@@ -55,7 +55,8 @@ export const translations: typeof enTranslations = {
               "To, co lubię w tym podejściu, to że nie czekasz 6 miesięcy, aby zobaczyć, czy rzeczy działają.",
             personalCommitment:
               "Oto coś, co chcę, żebyś wiedział: jestem osobiście zaangażowany w Twój sukces. To nie jest dla mnie tylko kolejna relacja z klientem.",
-            nextSteps: "Jeśli to do Ciebie przemawia, porozmawiajmy o tym naprawdę.",
+            nextSteps:
+              "Jeśli to do Ciebie przemawia, porozmawiajmy o tym naprawdę.",
             ctaText: "Zaplanuj Rozmowę Strategiczną",
             signature: "Podekscytowany możliwościami,",
             signatureClosing: "Serdeczne pozdrowienia",
@@ -172,8 +173,7 @@ export const translations: typeof enTranslations = {
             previewText: "Sprawdzanie Twoich doświadczeń",
             greeting: "Cześć {{businessName}},",
             intro: "Chciałem sprawdzić, jak się sprawy mają.",
-            empathy:
-              "Wiem, że rozpoczęcie czegoś nowego może być wyzwaniem.",
+            empathy: "Wiem, że rozpoczęcie czegoś nowego może być wyzwaniem.",
             question: "Jak do tej pory układa się Twoje doświadczenie?",
             socialProof: {
               quote:
@@ -187,7 +187,8 @@ export const translations: typeof enTranslations = {
             subject: "Nasza historia i misja",
             previewText: "Dlaczego robimy to, co robimy",
             greeting: "Cześć {{businessName}},",
-            intro: "Chciałem podzielić się trochę o tym, dlaczego robimy to, co robimy.",
+            intro:
+              "Chciałem podzielić się trochę o tym, dlaczego robimy to, co robimy.",
             mission:
               "Naszą misją jest uczynienie profesjonalnych usług dostępnymi dla wszystkich.",
             story1:
@@ -206,12 +207,10 @@ export const translations: typeof enTranslations = {
               "To moja ostatnia wiadomość, chyba że chciałbyś nadal otrzymywać wiadomości od nas.",
             reflection:
               "Skontaktowałem się, ponieważ naprawdę wierzę, że moglibyśmy pomóc Twojej firmie.",
-            noPressure:
-              "Ale szanuję Twój czas i nie chcę być uciążliwy.",
+            noPressure: "Ale szanuję Twój czas i nie chcę być uciążliwy.",
             ctaText: "Pozostań w kontakcie",
             signature: "Życzę wszystkiego najlepszego,",
-            closing:
-              "Drzwi są zawsze otwarte, jeśli później zmienisz zdanie.",
+            closing: "Drzwi są zawsze otwarte, jeśli później zmienisz zdanie.",
           },
           nurture: {
             subject: "Szybka wskazówka dla Ciebie",

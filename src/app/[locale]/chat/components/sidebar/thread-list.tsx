@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit2, FolderInput, MoreVertical, Trash2 } from "lucide-react";
+import { Archive, ArchiveRestore, Edit2, FolderInput, MoreVertical, Pin, PinOff, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
@@ -11,6 +11,14 @@ import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-ac
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -37,6 +45,8 @@ interface ThreadListProps {
   onDeleteThread: (threadId: string) => void;
   onUpdateTitle: (threadId: string, title: string) => void;
   onMoveThread?: (threadId: string, folderId: string | null) => void;
+  onPinThread?: (threadId: string, pinned: boolean) => void;
+  onArchiveThread?: (threadId: string, archived: boolean) => void;
   chat?: UseChatReturn;
   compact?: boolean;
   locale: CountryLanguage;
@@ -49,6 +59,8 @@ export function ThreadList({
   onDeleteThread,
   onUpdateTitle,
   onMoveThread,
+  onPinThread,
+  onArchiveThread,
   chat,
   compact = false,
   locale,
@@ -64,6 +76,8 @@ export function ThreadList({
           onDelete={onDeleteThread}
           onUpdateTitle={onUpdateTitle}
           onMoveThread={onMoveThread}
+          onPinThread={onPinThread}
+          onArchiveThread={onArchiveThread}
           chat={chat}
           compact={compact}
           locale={locale}
@@ -80,6 +94,8 @@ interface ThreadItemProps {
   onDelete: (threadId: string) => void;
   onUpdateTitle: (threadId: string, title: string) => void;
   onMoveThread?: (threadId: string, folderId: string | null) => void;
+  onPinThread?: (threadId: string, pinned: boolean) => void;
+  onArchiveThread?: (threadId: string, archived: boolean) => void;
   chat?: UseChatReturn;
   compact?: boolean;
   locale: CountryLanguage;
@@ -91,6 +107,8 @@ function ThreadItem({
   onDelete,
   onUpdateTitle,
   onMoveThread,
+  onPinThread,
+  onArchiveThread,
   chat,
   compact = false,
   locale,
@@ -103,16 +121,32 @@ function ThreadItem({
   const [isHovered, setIsHovered] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isTouched, setIsTouched] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // Get model icon (fallback to default model if not set)
   // Model config removed - icons no longer shown in thread list for clean design
 
-  const handleDelete = (): void => {
+  const handleDeleteClick = (): void => {
     setDropdownOpen(false);
-    // eslint-disable-next-line i18next/no-literal-string -- Browser confirm dialog, will be replaced with custom modal
-    const confirmed = window.confirm(`Delete chat "${thread.title}"?`);
-    if (confirmed) {
-      onDelete(thread.id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = (): void => {
+    onDelete(thread.id);
+    setDeleteDialogOpen(false);
+  };
+
+  const handlePinToggle = (): void => {
+    setDropdownOpen(false);
+    if (onPinThread) {
+      onPinThread(thread.id, !thread.pinned);
+    }
+  };
+
+  const handleArchiveToggle = (): void => {
+    setDropdownOpen(false);
+    if (onArchiveThread) {
+      onArchiveThread(thread.id, !thread.archived);
     }
   };
 
@@ -281,6 +315,38 @@ function ThreadItem({
                 {t("app.chat.actions.rename")}
               </DropdownMenuItem>
 
+              {onPinThread && (
+                <DropdownMenuItem onSelect={handlePinToggle}>
+                  {thread.pinned ? (
+                    <>
+                      <PinOff className="h-4 w-4 mr-2" />
+                      {t("app.chat.actions.unpin")}
+                    </>
+                  ) : (
+                    <>
+                      <Pin className="h-4 w-4 mr-2" />
+                      {t("app.chat.actions.pin")}
+                    </>
+                  )}
+                </DropdownMenuItem>
+              )}
+
+              {onArchiveThread && (
+                <DropdownMenuItem onSelect={handleArchiveToggle}>
+                  {thread.archived ? (
+                    <>
+                      <ArchiveRestore className="h-4 w-4 mr-2" />
+                      {t("app.chat.actions.unarchive")}
+                    </>
+                  ) : (
+                    <>
+                      <Archive className="h-4 w-4 mr-2" />
+                      {t("app.chat.actions.archive")}
+                    </>
+                  )}
+                </DropdownMenuItem>
+              )}
+
               {onMoveThread && chat && (
                 <>
                   <DropdownMenuSeparator />
@@ -338,7 +404,7 @@ function ThreadItem({
 
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                onSelect={handleDelete}
+                onSelect={handleDeleteClick}
                 className="text-destructive"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
@@ -352,6 +418,36 @@ function ThreadItem({
       {thread.pinned && (
         <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-primary rounded-full" />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("app.chat.threadList.deleteDialog.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("app.chat.threadList.deleteDialog.description", {
+                title: thread.title,
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={(e) => e.stopPropagation()}>
+              {t("app.chat.common.cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.stopPropagation();
+                handleConfirmDelete();
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t("app.chat.common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

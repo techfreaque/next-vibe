@@ -42,9 +42,9 @@ const sideTaskActionSchema = z.enum([
 const sideTasksPostEndpoint = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "tasks", "side-tasks"],
-  title: "app.api.v1.core.system.tasks.sideTasks.post.title",
-  description: "app.api.v1.core.system.tasks.sideTasks.post.description",
-  category: "app.api.v1.core.system.tasks.sideTasks.post.category",
+  title: "app.api.v1.core.system.tasks.sideTasks.get.title",
+  description: "app.api.v1.core.system.tasks.sideTasks.get.description",
+  category: "app.api.v1.core.system.tasks.sideTasks.category",
   tags: ["app.api.v1.core.system.tasks.sideTasks.tags.sidetasks"],
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
   aliases: ["tasks:side", "side-tasks"],
@@ -52,9 +52,9 @@ const sideTasksPostEndpoint = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.system.tasks.sideTasks.post.container.title",
+      title: "app.api.v1.core.system.tasks.sideTasks.get.container.title",
       description:
-        "app.api.v1.core.system.tasks.sideTasks.post.container.description",
+        "app.api.v1.core.system.tasks.sideTasks.get.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -262,61 +262,61 @@ const sideTasksPostEndpoint = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.system.tasks.sideTasks.post.errors.validation.title",
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.validation.title",
       description:
-        "app.api.v1.core.system.tasks.sideTasks.post.errors.validation.description",
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.v1.core.system.tasks.sideTasks.post.errors.network.title",
+      title: "app.api.v1.core.system.tasks.sideTasks.get.errors.network.title",
       description:
-        "app.api.v1.core.system.tasks.sideTasks.post.errors.network.description",
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.system.tasks.sideTasks.post.errors.unauthorized.title",
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.tasks.sideTasks.post.errors.unauthorized.description",
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.system.tasks.sideTasks.post.errors.forbidden.title",
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.tasks.sideTasks.post.errors.forbidden.description",
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.v1.core.system.tasks.sideTasks.post.errors.notFound.title",
+      title: "app.api.v1.core.system.tasks.sideTasks.get.errors.notFound.title",
       description:
-        "app.api.v1.core.system.tasks.sideTasks.post.errors.notFound.description",
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.tasks.sideTasks.post.errors.serverError.title",
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.serverError.title",
       description:
-        "app.api.v1.core.system.tasks.sideTasks.post.errors.serverError.description",
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.system.tasks.sideTasks.post.errors.unknownError.title",
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.unknownError.title",
       description:
-        "app.api.v1.core.system.tasks.sideTasks.post.errors.unknownError.description",
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.unknownError.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.system.tasks.sideTasks.post.errors.unsavedChanges.title",
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.unsavedChanges.title",
       description:
-        "app.api.v1.core.system.tasks.sideTasks.post.errors.unsavedChanges.description",
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.v1.core.system.tasks.sideTasks.post.errors.conflict.title",
+      title: "app.api.v1.core.system.tasks.sideTasks.get.errors.conflict.title",
       description:
-        "app.api.v1.core.system.tasks.sideTasks.post.errors.conflict.description",
+        "app.api.v1.core.system.tasks.sideTasks.get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.v1.core.system.tasks.sideTasks.post.success.title",
+    title: "app.api.v1.core.system.tasks.sideTasks.get.success.title",
     description:
-      "app.api.v1.core.system.tasks.sideTasks.post.success.description",
+      "app.api.v1.core.system.tasks.sideTasks.get.success.description",
   },
 });
 

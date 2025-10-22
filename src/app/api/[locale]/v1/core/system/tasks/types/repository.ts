@@ -20,9 +20,12 @@ import type { z } from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPrivatePayloadType } from "../../../user/auth/definition";
+import type {
+  JwtPayloadType,
+  JwtPrivatePayloadType,
+} from "../../../user/auth/definition";
 import type { EndpointLogger } from "../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type { CronTaskPriorityType } from "../enum";
+import { CronTaskPriority, TaskCategory } from "../enum";
 import type {
   TaskTypesRequestOutput,
   TaskTypesResponseOutput,
@@ -100,7 +103,7 @@ export interface CronTaskDefinition<
   enabled: boolean;
   // Schedule can be either a cron expression string OR a function returning ResponseType<boolean>
   schedule: string | (() => Promise<ResponseType<boolean>>);
-  priority?: CronTaskPriorityType;
+  priority?: (typeof CronTaskPriority)[keyof typeof CronTaskPriority];
   timeout?: number; // Max execution time in milliseconds
   retries?: number;
   defaultConfig: TConfig;
@@ -125,7 +128,7 @@ export interface SideTaskDefinition<
   description: string;
   version?: string;
   enabled: boolean;
-  priority?: CronTaskPriorityType;
+  priority?: (typeof CronTaskPriority)[keyof typeof CronTaskPriority];
   timeout?: number;
   defaultConfig: TConfig;
   configSchema: z.ZodSchema<TConfig>;
@@ -167,9 +170,9 @@ export interface CronTask {
   name: string;
   description: string;
   schedule: string; // Cron expression (e.g., "*/5 * * * *")
-  category: TaskCategoryType;
+  category: (typeof TaskCategory)[keyof typeof TaskCategory];
   enabled: boolean;
-  priority?: CronTaskPriorityType;
+  priority?: (typeof CronTaskPriority)[keyof typeof CronTaskPriority];
   timeout?: number; // Max execution time in milliseconds
   run: (props: {
     logger: EndpointLogger;
@@ -188,9 +191,9 @@ export interface SideTask {
   type: "side";
   name: string;
   description: string;
-  category: TaskCategoryType;
+  category: (typeof TaskCategory)[keyof typeof TaskCategory];
   enabled: boolean;
-  priority?: CronTaskPriorityType;
+  priority?: (typeof CronTaskPriority)[keyof typeof CronTaskPriority];
   run: (signal: AbortSignal) => Promise<void> | void;
   onError?: (error: Error) => Promise<void> | void;
   onShutdown?: () => Promise<void>; // Called during graceful shutdown
@@ -204,9 +207,9 @@ export interface TaskRunner {
   type: "task-runner";
   name: string;
   description: string;
-  category: TaskCategoryType;
+  category: (typeof TaskCategory)[keyof typeof TaskCategory];
   enabled: boolean;
-  priority?: CronTaskPriorityType;
+  priority?: (typeof CronTaskPriority)[keyof typeof CronTaskPriority];
   run: (signal: AbortSignal) => Promise<void>;
   onError?: (error: Error) => Promise<void>;
   onShutdown?: () => Promise<void>;
@@ -233,7 +236,7 @@ export interface TaskRegistry {
   sideTasks: SideTask[];
   taskRunners: TaskRunner[];
   allTasks: Task[];
-  tasksByCategory: Record<TaskCategoryType, Task[]>;
+  tasksByCategory: Record<(typeof TaskCategory)[keyof typeof TaskCategory], Task[]>;
   tasksByName: Record<string, Task>;
   taskRunner: TaskRunnerManager; // Single unified task runner instance
 }
@@ -327,7 +330,7 @@ export interface TaskStatus {
     | "timeout"
     | "cancelled"
     | "skipped";
-  priority?: CronTaskPriorityType;
+  priority?: (typeof CronTaskPriority)[keyof typeof CronTaskPriority];
   lastRun?: Date;
   nextRun?: Date;
   runCount: number;
@@ -439,7 +442,7 @@ export class TaskTypesRepositoryImpl implements TaskTypesRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "common.taskTypesRepositoryFetchFailed",
+        "app.common.errors.default" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
         {
           error: parsedError.message,
@@ -470,7 +473,7 @@ export class TaskTypesRepositoryImpl implements TaskTypesRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "common.taskTypesRepositoryValidationFailed",
+        "app.common.errors.default" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message },
       );
@@ -523,7 +526,7 @@ export interface TaskStatus { /* ... */ }`;
           // Handle unsupported format with proper error response
           logger.error("Unsupported export format", { format });
           return createErrorResponse(
-            "common.errors.unknown" as const,
+            "app.common.errors.unknown" as const,
             ErrorResponseTypes.VALIDATION_ERROR,
             { format },
           );
@@ -538,7 +541,7 @@ export interface TaskStatus { /* ... */ }`;
         error: parsedError.message,
       });
       return createErrorResponse(
-        "common.taskTypesRepositoryExportFailed",
+        "app.common.errors.default" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message, format },
       );

@@ -51,7 +51,7 @@ const { GET } = createEndpoint({
     { request: "urlParams", response: true },
     {
       // === URL PARAMETERS ===
-      id: requestUrlParamsField(
+      threadId: requestUrlParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
@@ -299,7 +299,7 @@ const { GET } = createEndpoint({
  */
 const { PATCH } = createEndpoint({
   method: Methods.PATCH,
-  path: ["v1", "core", "agent", "chat", "threads", "[id]"],
+  path: ["v1", "core", "agent", "chat", "threads", "[threadId]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "app.api.v1.core.agent.chat.threads.threadId.patch.title" as const,
@@ -320,7 +320,7 @@ const { PATCH } = createEndpoint({
     { request: "data&urlParams", response: true },
     {
       // === URL PARAMETERS ===
-      id: requestUrlParamsField(
+      threadId: requestUrlParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
@@ -699,7 +699,7 @@ const { PATCH } = createEndpoint({
  */
 const { DELETE } = createEndpoint({
   method: Methods.DELETE,
-  path: ["v1", "core", "agent", "chat", "threads", "[id]"],
+  path: ["v1", "core", "agent", "chat", "threads", "[threadId]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "app.api.v1.core.agent.chat.threads.threadId.delete.title" as const,
@@ -720,7 +720,7 @@ const { DELETE } = createEndpoint({
     { request: "urlParams", response: true },
     {
       // === URL PARAMETERS ===
-      id: requestUrlParamsField(
+      threadId: requestUrlParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,

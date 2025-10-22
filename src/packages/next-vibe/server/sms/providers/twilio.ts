@@ -62,7 +62,7 @@ export function getTwilioProvider(): SmsProvider {
           return {
             success: false,
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            message: "error.sms.errors.invalid_parameters",
+            message: "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
           };
         }
 
@@ -73,7 +73,7 @@ export function getTwilioProvider(): SmsProvider {
           return {
             success: false,
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            message: "error.sms.errors.recipient_required",
+            message: "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
           };
         }
 
@@ -83,7 +83,7 @@ export function getTwilioProvider(): SmsProvider {
           return {
             success: false,
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            message: "error.sms.errors.from_required",
+            message: "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
           };
         }
 
@@ -95,7 +95,7 @@ export function getTwilioProvider(): SmsProvider {
           return {
             success: false,
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            message: "error.sms.errors.empty_message",
+            message: "packages.nextVibe.server.sms.sms.error.empty_message",
           };
         }
 
@@ -172,7 +172,7 @@ export function getTwilioProvider(): SmsProvider {
             errorData.code ?? errorData.error_code ?? response.status;
 
           return createErrorResponse(
-            "sms.errors.twilio_api_error",
+            "packages.nextVibe.server.sms.sms.error.delivery_failed",
             ErrorResponseTypes.SMS_ERROR,
             {
               error: errorMessage,
@@ -213,7 +213,7 @@ export function getTwilioProvider(): SmsProvider {
         };
       } catch (error) {
         return createErrorResponse(
-          "sms.errors.twilio_error",
+          "packages.nextVibe.server.sms.sms.error.delivery_failed",
           ErrorResponseTypes.SMS_ERROR,
           {
             error: error instanceof Error ? error.message : "Unknown error",

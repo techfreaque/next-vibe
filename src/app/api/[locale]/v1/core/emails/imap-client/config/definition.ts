@@ -190,6 +190,342 @@ const { GET, POST } = createFormEndpoint({
         },
       ),
 
+      // Server configuration fields
+      serverEnabled: field(
+        z.boolean(),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.v1.core.emails.imapClient.config.server.enabled",
+          description: "app.api.v1.core.emails.imapClient.config.server.enabled.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      maxConnections: field(
+        z.number().int().min(1),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.emails.imapClient.config.server.maxConnections",
+          description: "app.api.v1.core.emails.imapClient.config.server.maxConnections.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      connectionTimeout: field(
+        z.number().int().min(1),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.emails.imapClient.config.server.connectionTimeout",
+          description: "app.api.v1.core.emails.imapClient.config.server.connectionTimeout.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      poolIdleTimeout: field(
+        z.number().int().min(1),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.emails.imapClient.config.server.poolIdleTimeout",
+          description: "app.api.v1.core.emails.imapClient.config.server.poolIdleTimeout.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      keepAlive: field(
+        z.boolean(),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.v1.core.emails.imapClient.config.server.keepAlive",
+          description: "app.api.v1.core.emails.imapClient.config.server.keepAlive.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      // Sync configuration fields
+      syncEnabled: field(
+        z.boolean(),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.v1.core.emails.imapClient.config.sync.enabled",
+          description: "app.api.v1.core.emails.imapClient.config.sync.enabled.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      syncInterval: field(
+        z.number().int().min(1),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.emails.imapClient.config.sync.interval",
+          description: "app.api.v1.core.emails.imapClient.config.sync.interval.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      maxMessages: field(
+        z.number().int().min(1),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.emails.imapClient.config.sync.maxMessages",
+          description: "app.api.v1.core.emails.imapClient.config.sync.maxMessages.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      batchSize: field(
+        z.number().int().min(1),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.emails.imapClient.config.sync.batchSize",
+          description: "app.api.v1.core.emails.imapClient.config.sync.batchSize.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      concurrentAccounts: field(
+        z.number().int().min(1),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.emails.imapClient.config.sync.concurrentAccounts",
+          description: "app.api.v1.core.emails.imapClient.config.sync.concurrentAccounts.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      // Performance configuration fields
+      cacheEnabled: field(
+        z.boolean(),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.v1.core.emails.imapClient.config.performance.cacheEnabled",
+          description: "app.api.v1.core.emails.imapClient.config.performance.cacheEnabled.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      cacheMaxSize: field(
+        z.number().int().min(1),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.emails.imapClient.config.performance.cacheMaxSize",
+          description: "app.api.v1.core.emails.imapClient.config.performance.cacheMaxSize.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      cacheTtl: field(
+        z.number().int().min(1),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.emails.imapClient.config.performance.cacheTtl",
+          description: "app.api.v1.core.emails.imapClient.config.performance.cacheTtl.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      memoryThreshold: field(
+        z.number().int().min(1),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.emails.imapClient.config.performance.memoryThreshold",
+          description: "app.api.v1.core.emails.imapClient.config.performance.memoryThreshold.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      // Resilience configuration fields
+      maxRetries: field(
+        z.number().int().min(0),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.emails.imapClient.config.resilience.maxRetries",
+          description: "app.api.v1.core.emails.imapClient.config.resilience.maxRetries.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      retryDelay: field(
+        z.number().int().min(1),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.emails.imapClient.config.resilience.retryDelay",
+          description: "app.api.v1.core.emails.imapClient.config.resilience.retryDelay.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      circuitBreakerThreshold: field(
+        z.number().int().min(1),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.emails.imapClient.config.resilience.circuitBreakerThreshold",
+          description: "app.api.v1.core.emails.imapClient.config.resilience.circuitBreakerThreshold.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      circuitBreakerTimeout: field(
+        z.number().int().min(1),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.emails.imapClient.config.resilience.circuitBreakerTimeout",
+          description: "app.api.v1.core.emails.imapClient.config.resilience.circuitBreakerTimeout.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      // Monitoring configuration fields
+      healthCheckInterval: field(
+        z.number().int().min(1),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.emails.imapClient.config.monitoring.healthCheckInterval",
+          description: "app.api.v1.core.emails.imapClient.config.monitoring.healthCheckInterval.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      metricsEnabled: field(
+        z.boolean(),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.v1.core.emails.imapClient.config.monitoring.metricsEnabled",
+          description: "app.api.v1.core.emails.imapClient.config.monitoring.metricsEnabled.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      // Development configuration fields
+      debugMode: field(
+        z.boolean(),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.v1.core.emails.imapClient.config.development.debugMode",
+          description: "app.api.v1.core.emails.imapClient.config.development.debugMode.description",
+          layout: { columns: 6 },
+        },
+      ),
+
+      testMode: field(
+        z.boolean(),
+        {
+          GET: { response: true },
+          POST: { request: "data", response: true },
+        },
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.v1.core.emails.imapClient.config.development.testMode",
+          description: "app.api.v1.core.emails.imapClient.config.development.testMode.description",
+          layout: { columns: 6 },
+        },
+      ),
+
       // Response message - only for POST
       message: field(
         z.string(),

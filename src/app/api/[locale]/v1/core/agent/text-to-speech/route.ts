@@ -17,9 +17,10 @@ import { textToSpeechRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, locale, logger }) => {
+    handler: async ({ data, user, locale, logger }) => {
       return await textToSpeechRepository.convertTextToSpeech(
         data,
+        user,
         locale,
         logger,
       );

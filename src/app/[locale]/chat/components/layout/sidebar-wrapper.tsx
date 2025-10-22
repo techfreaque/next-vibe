@@ -118,6 +118,53 @@ export function SidebarWrapper({
     [chat],
   );
 
+  // Handle moving thread to a different folder
+  const handleMoveThread = React.useCallback(
+    (threadId: string, folderId: string | null) => {
+      logger.debug("SidebarWrapper", "Moving thread to folder", {
+        threadId,
+        folderId,
+      });
+      void chat.updateThread(threadId, { folderId });
+    },
+    [chat, logger],
+  );
+
+  // Handle pinning/unpinning thread
+  const handlePinThread = React.useCallback(
+    (threadId: string, pinned: boolean) => {
+      logger.debug("SidebarWrapper", "Toggling thread pin", {
+        threadId,
+        pinned,
+      });
+      void chat.updateThread(threadId, { pinned });
+    },
+    [chat, logger],
+  );
+
+  const handleArchiveThread = React.useCallback(
+    (threadId: string, archived: boolean) => {
+      logger.debug("SidebarWrapper", "Toggling thread archive", {
+        threadId,
+        archived,
+      });
+      void chat.updateThread(threadId, { archived });
+    },
+    [chat, logger],
+  );
+
+  // Handle moving folder to a different parent
+  const handleMoveFolderToParent = React.useCallback(
+    (folderId: string, newParentId: string | null) => {
+      logger.debug("SidebarWrapper", "Moving folder to parent", {
+        folderId,
+        newParentId,
+      });
+      void onUpdateFolder(folderId, { parentId: newParentId });
+    },
+    [onUpdateFolder, logger],
+  );
+
   return (
     <>
       {/* Sidebar Container */}
@@ -142,13 +189,15 @@ export function SidebarWrapper({
             onCreateThread={handleCreateThread}
             onSelectThread={handleSelectThread}
             onDeleteThread={onDeleteThread}
-            onMoveThread={() => {}}
+            onMoveThread={handleMoveThread}
+            onPinThread={handlePinThread}
+            onArchiveThread={handleArchiveThread}
             onCreateFolder={handleCreateFolder}
             onUpdateFolder={onUpdateFolder}
             onDeleteFolder={chat.deleteFolder}
             onToggleFolderExpanded={() => {}}
             onReorderFolder={() => {}}
-            onMoveFolderToParent={() => {}}
+            onMoveFolderToParent={handleMoveFolderToParent}
             onUpdateThreadTitle={onUpdateThreadTitle}
             searchThreads={() => []}
           />

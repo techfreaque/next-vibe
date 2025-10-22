@@ -28,6 +28,14 @@ import {
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -130,6 +138,8 @@ interface FolderListProps {
   onSelectThread: (threadId: string) => void;
   onDeleteThread: (threadId: string) => void;
   onMoveThread: (threadId: string, folderId: string | null) => void;
+  onPinThread: (threadId: string, pinned: boolean) => void;
+  onArchiveThread: (threadId: string, archived: boolean) => void;
   onCreateFolder: (name: string, parentId: string, icon?: string) => void;
   onUpdateFolder: (folderId: string, updates: FolderUpdate) => void;
   onDeleteFolder: (folderId: string, deleteThreads: boolean) => void;
@@ -149,6 +159,8 @@ export function FolderList({
   onSelectThread,
   onDeleteThread,
   onMoveThread,
+  onPinThread,
+  onArchiveThread,
   onCreateFolder,
   onUpdateFolder,
   onDeleteFolder,
@@ -191,6 +203,8 @@ export function FolderList({
           onSelectThread={onSelectThread}
           onDeleteThread={onDeleteThread}
           onMoveThread={onMoveThread}
+          onPinThread={onPinThread}
+          onArchiveThread={onArchiveThread}
           onCreateFolder={onCreateFolder}
           onUpdateFolder={onUpdateFolder}
           onDeleteFolder={onDeleteFolder}
@@ -216,6 +230,8 @@ export function FolderList({
                 onDeleteThread={onDeleteThread}
                 onUpdateTitle={onUpdateThreadTitle}
                 onMoveThread={onMoveThread}
+                onPinThread={onPinThread}
+                onArchiveThread={onArchiveThread}
                 chat={chat}
                 locale={locale}
               />
@@ -234,6 +250,8 @@ export function FolderList({
                 onDeleteThread={onDeleteThread}
                 onUpdateTitle={onUpdateThreadTitle}
                 onMoveThread={onMoveThread}
+                onPinThread={onPinThread}
+                onArchiveThread={onArchiveThread}
                 chat={chat}
                 locale={locale}
               />
@@ -252,6 +270,8 @@ export function FolderList({
                 onDeleteThread={onDeleteThread}
                 onUpdateTitle={onUpdateThreadTitle}
                 onMoveThread={onMoveThread}
+                onPinThread={onPinThread}
+                onArchiveThread={onArchiveThread}
                 chat={chat}
                 locale={locale}
               />
@@ -280,6 +300,8 @@ interface FolderItemProps {
   onSelectThread: (threadId: string) => void;
   onDeleteThread: (threadId: string) => void;
   onMoveThread: (threadId: string, folderId: string | null) => void;
+  onPinThread: (threadId: string, pinned: boolean) => void;
+  onArchiveThread: (threadId: string, archived: boolean) => void;
   onCreateFolder: (name: string, parentId: string, icon?: string) => void;
   onUpdateFolder: (folderId: string, updates: Partial<ChatFolder>) => void;
   onDeleteFolder: (folderId: string, deleteThreads: boolean) => void;
@@ -300,6 +322,8 @@ function FolderItem({
   onSelectThread,
   onDeleteThread,
   onMoveThread,
+  onPinThread,
+  onArchiveThread,
   onCreateFolder,
   onUpdateFolder,
   onDeleteFolder,
@@ -315,6 +339,7 @@ function FolderItem({
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const [renameDialogOpen, setRenameDialogOpen] = React.useState(false);
   const [moveDialogOpen, setMoveDialogOpen] = React.useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
   const threadsInFolder = useMemo(() => {
     return Object.values(chat.threads)
@@ -331,6 +356,9 @@ function FolderItem({
   const isDefault = isDefaultFolder(folder.id);
   const directChildrenCount = getDirectChildrenCount(folder.id, chat.folders);
 
+  // Count threads in this folder (not subfolders)
+  const threadCount = threadsInFolder.length;
+
   // Get root folder ID and color for styling
   const rootFolderId = getRootFolderId(chat.folders, folder.id);
   const rootFolderColor = getFolderColor(
@@ -339,26 +367,19 @@ function FolderItem({
   );
   const colorClasses = getFolderColorClasses(rootFolderColor);
 
-  const handleDeleteFolder = (): void => {
+  const handleDeleteClick = (): void => {
     // Cannot delete default folders
     if (isDefault) {
       return;
     }
 
     setDropdownOpen(false);
-    const hasThreads = threadsInFolder.length > 0;
-    if (hasThreads) {
-      const confirmed = window.confirm(
-        t("app.chat.folderList.confirmDelete", {
-          folderName: folderDisplayName,
-          count: threadsInFolder.length,
-        }),
-      );
-      if (!confirmed) {
-        return;
-      }
-    }
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = (): void => {
     onDeleteFolder(folder.id, false);
+    setDeleteDialogOpen(false);
   };
 
   const handleCreateSubfolder = (): void => {
@@ -475,7 +496,7 @@ function FolderItem({
         </span>
         {/* eslint-disable i18next/no-literal-string -- Formatting characters for count display */}
         <span className="text-xs text-muted-foreground flex-shrink-0">
-          ({directChildrenCount})
+          ({threadCount})
         </span>
         {/* eslint-enable i18next/no-literal-string */}
       </div>
@@ -553,7 +574,7 @@ function FolderItem({
                   {t("app.chat.folderList.moveToFolder")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onSelect={handleDeleteFolder}
+                  onSelect={handleDeleteClick}
                   className="text-destructive"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
@@ -589,6 +610,8 @@ function FolderItem({
                 onSelectThread={onSelectThread}
                 onDeleteThread={onDeleteThread}
                 onMoveThread={onMoveThread}
+                onPinThread={onPinThread}
+                onArchiveThread={onArchiveThread}
                 onCreateFolder={onCreateFolder}
                 onUpdateFolder={onUpdateFolder}
                 onDeleteFolder={onDeleteFolder}
@@ -615,6 +638,8 @@ function FolderItem({
                     onDeleteThread={onDeleteThread}
                     onUpdateTitle={onUpdateThreadTitle}
                     onMoveThread={onMoveThread}
+                    onPinThread={onPinThread}
+                    onArchiveThread={onArchiveThread}
                     chat={chat}
                     locale={locale}
                   />
@@ -633,6 +658,8 @@ function FolderItem({
                     onDeleteThread={onDeleteThread}
                     onUpdateTitle={onUpdateThreadTitle}
                     onMoveThread={onMoveThread}
+                    onPinThread={onPinThread}
+                    onArchiveThread={onArchiveThread}
                     chat={chat}
                     locale={locale}
                   />
@@ -651,6 +678,8 @@ function FolderItem({
                     onDeleteThread={onDeleteThread}
                     onUpdateTitle={onUpdateThreadTitle}
                     onMoveThread={onMoveThread}
+                    onPinThread={onPinThread}
+                    onArchiveThread={onArchiveThread}
                     chat={chat}
                     locale={locale}
                   />
@@ -678,6 +707,41 @@ function FolderItem({
         onMove={handleSaveMove}
         locale={locale}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("app.chat.folderList.deleteDialog.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {threadsInFolder.length > 0
+                ? t("app.chat.folderList.deleteDialog.descriptionWithThreads", {
+                    folderName: folderDisplayName,
+                    count: threadsInFolder.length,
+                  })
+                : t("app.chat.folderList.deleteDialog.description", {
+                    folderName: folderDisplayName,
+                  })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={(e) => e.stopPropagation()}>
+              {t("app.chat.common.cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.stopPropagation();
+                handleConfirmDelete();
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t("app.chat.common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

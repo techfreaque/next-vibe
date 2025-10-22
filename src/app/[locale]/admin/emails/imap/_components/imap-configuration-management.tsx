@@ -5,20 +5,17 @@
 
 "use client";
 
-import { Form, FormAlert } from "next-vibe-ui/ui";
-import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
+import { Button } from "next-vibe-ui/ui/button";
+import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form, FormAlert } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
-import {
-  type ImapConfigEndpointReturn,
-  useImapConfig,
-} from "@/app/api/[locale]/v1/core/emails/imap-client/config/hooks";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { useTranslation } from "@/i18n/core/client";
+import { useImapConfig } from "@/app/api/[locale]/v1/core/emails/imap-client/config/hooks";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 import { ImapPerformanceConfigForm } from "./imap-performance-config-form";
 import { ImapServerConfigForm } from "./imap-server-config-form";
@@ -125,15 +122,27 @@ export function ImapConfigurationManagement({
               </TabsList>
 
               <TabsContent value="server" className="mt-6">
-                <ImapServerConfigForm />
+                {configEndpoint.create && (
+                  <ImapServerConfigForm
+                    control={configEndpoint.create.form.control}
+                  />
+                )}
               </TabsContent>
 
               <TabsContent value="sync" className="mt-6">
-                <ImapSyncConfigForm />
+                {configEndpoint.create && (
+                  <ImapSyncConfigForm
+                    control={configEndpoint.create.form.control}
+                  />
+                )}
               </TabsContent>
 
               <TabsContent value="performance" className="mt-6">
-                <ImapPerformanceConfigForm />
+                {configEndpoint.create && (
+                  <ImapPerformanceConfigForm
+                    control={configEndpoint.create.form.control}
+                  />
+                )}
               </TabsContent>
 
               <TabsContent value="resilience" className="mt-6">

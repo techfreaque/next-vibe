@@ -10,8 +10,8 @@ import { getModelById, type ModelId, modelOptions } from "./models";
  */
 export const FEATURE_COSTS = {
   BRAVE_SEARCH: 1, // 1 credit per search
-  TTS_PER_MINUTE: 1, // 1 credit per minute of TTS
-  STT_PER_MINUTE: 1, // 1 credit per minute of STT
+  TTS: 2, // 2 credits per TTS operation
+  STT: 2, // 2 credits per STT operation
 } as const;
 
 /**

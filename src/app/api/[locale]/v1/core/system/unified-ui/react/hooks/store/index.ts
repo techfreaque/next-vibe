@@ -288,6 +288,33 @@ export interface ApiStore {
 
   setFormQueryParams: (formId: string, params: FormQueryParams) => void;
   getFormQueryParams: <T>(formId: string) => T | undefined;
+
+  updateEndpointData: <
+    TEndpoint extends CreateApiEndpoint<
+      string,
+      Methods,
+      readonly (typeof UserRoleValue)[],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      any
+    >,
+  >(
+    endpoint: TEndpoint,
+    updater: (
+      oldData:
+        | {
+            success: boolean;
+            data: TEndpoint["TResponseOutput"];
+          }
+        | undefined,
+    ) =>
+      | {
+          success: boolean;
+          data: TEndpoint["TResponseOutput"];
+        }
+      | undefined,
+    requestData?: TEndpoint["TRequestOutput"],
+    urlParams?: TEndpoint["TUrlVariablesOutput"],
+  ) => void;
 }
 
 export interface QueryStoreType<TResponse> {
@@ -542,7 +569,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
       queries[queryId] = {
         response: undefined,
-        data: existingData as AnyData,
+        data: existingData,
         error: null,
         isError: false,
         isSuccess: false,
@@ -1325,6 +1352,106 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     const form = get().forms[formId];
     return form?.queryParams as T | undefined;
   },
+
+  /**
+   * Update query data for an endpoint
+   * This is useful for optimistic updates or updating cache after mutations/streams
+   */
+  updateEndpointData: <
+    TEndpoint extends CreateApiEndpoint<
+      string,
+      Methods,
+      readonly (typeof UserRoleValue)[],
+      any
+    >,
+  >(
+    endpoint: TEndpoint,
+    updater: (
+      oldData:
+        | {
+            success: boolean;
+            data: TEndpoint["TResponseOutput"];
+          }
+        | undefined,
+    ) =>
+      | {
+          success: boolean;
+          data: TEndpoint["TResponseOutput"];
+        }
+      | undefined,
+    requestData?: TEndpoint["TRequestOutput"],
+    urlParams?: TEndpoint["TUrlVariablesOutput"],
+  ): void => {
+    // Generate the query key in the same format as useApiQuery
+    const endpointKey = `${endpoint.path.join("/")}:${endpoint.method}`;
+
+    // Stringify request data
+    let requestDataKey = "{}";
+    if (requestData !== undefined && requestData !== null) {
+      try {
+        requestDataKey = JSON.stringify(requestData);
+      } catch (err) {
+        requestDataKey =
+          typeof requestData === "object"
+            ? Object.keys(requestData).sort().join(",")
+            : String(requestData);
+      }
+    }
+
+    // Stringify URL params
+    let urlParamsKey = "{}";
+    if (urlParams !== undefined && urlParams !== null) {
+      try {
+        urlParamsKey = JSON.stringify(urlParams);
+      } catch (err) {
+        urlParamsKey =
+          typeof urlParams === "object"
+            ? Object.keys(urlParams).sort().join(",")
+            : String(urlParams);
+      }
+    }
+
+    const queryKey: QueryKey = [endpointKey, requestDataKey, urlParamsKey];
+    const queryId = get().getQueryId(queryKey);
+
+    // Update the query data in the store
+    set((state) => {
+      const queries = { ...state.queries };
+      const existingQuery = queries[queryId];
+
+      if (!existingQuery) {
+        // Query doesn't exist yet, can't update
+        return state;
+      }
+
+      // Apply the updater function
+      // Use response field (not deprecated data field) to get the full ResponseType
+      const oldData = existingQuery.response as
+        | {
+            success: boolean;
+            data: TEndpoint["TResponseOutput"];
+          }
+        | undefined;
+
+      const newData = updater(oldData);
+
+      if (newData === undefined) {
+        // Updater returned undefined, don't update
+        return state;
+      }
+
+      // Create a new query object to ensure reference changes
+      queries[queryId] = {
+        ...existingQuery,
+        response: newData as ResponseType<AnyData>,
+        data: newData.data as AnyData,
+        // Update timestamp to ensure change detection
+        lastFetchTime: Date.now(),
+      };
+
+      return { queries };
+    });
+  },
 }));
 
 // Export QueryClient for potential direct usage
@@ -1505,5 +1632,60 @@ export const apiClient = {
     return mutation as
       | MutationStoreType<TEndpoint["TResponseOutput"]>
       | undefined;
+  },
+
+  /**
+   * Update query data for an endpoint
+   * This is useful for optimistic updates or updating cache after mutations/streams
+   *
+   * @param endpoint - The endpoint definition (GET endpoint)
+   * @param updater - Function that receives the old data and returns the new data
+   * @param requestData - Optional request data (query params)
+   * @param urlParams - Optional URL parameters
+   *
+   * @example
+   * // Update credit balance after AI response completes
+   * apiClient.updateEndpointData(
+   *   creditsDefinition.GET,
+   *   (oldData) => {
+   *     if (!oldData?.data) return oldData;
+   *     return {
+   *       ...oldData,
+   *       data: {
+   *         ...oldData.data,
+   *         total: oldData.data.total - creditCost,
+   *       },
+   *     };
+   *   }
+   * );
+   */
+  updateEndpointData: <
+    TEndpoint extends CreateApiEndpoint<
+      string,
+      Methods,
+      readonly (typeof UserRoleValue)[],
+      any
+    >,
+  >(
+    endpoint: TEndpoint,
+    updater: (
+      oldData:
+        | {
+            success: boolean;
+            data: TEndpoint["TResponseOutput"];
+          }
+        | undefined,
+    ) =>
+      | {
+          success: boolean;
+          data: TEndpoint["TResponseOutput"];
+        }
+      | undefined,
+    requestData?: TEndpoint["TRequestOutput"],
+    urlParams?: TEndpoint["TUrlVariablesOutput"],
+  ): void => {
+    useApiStore
+      .getState()
+      .updateEndpointData(endpoint, updater, requestData, urlParams);
   },
 };

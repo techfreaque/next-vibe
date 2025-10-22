@@ -100,7 +100,7 @@ export function createTRPCHandler<
         {
           method: endpoint.method,
           requestData: input,
-          urlParameters: input.urlVariables ?? {},
+          urlParameters: (input.urlVariables ?? {}) as TUrlVariablesOutput,
           locale: ctx.locale,
         },
         logger,

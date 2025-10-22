@@ -147,6 +147,10 @@ export const translations = {
     playAudio: "Play audio",
     copyContent: "Copy to clipboard",
     rename: "Rename",
+    pin: "Pin to Top",
+    unpin: "Unpin",
+    archive: "Archive",
+    unarchive: "Unarchive",
     moveToFolder: "Move to Folder",
     unfiled: "Unfiled",
     noFoldersAvailable: "No folders available",
@@ -609,6 +613,19 @@ export const translations = {
     changeIcon: "Change Icon",
     delete: "Delete",
     newFolder: "New Folder",
+    deleteDialog: {
+      title: "Delete Folder",
+      description: 'Are you sure you want to delete "{{folderName}}"?',
+      descriptionWithThreads:
+        'Are you sure you want to delete "{{folderName}}"? This folder contains {{count}} thread(s) which will also be deleted.',
+    },
+  },
+  threadList: {
+    deleteDialog: {
+      title: "Delete Thread",
+      description:
+        'Are you sure you want to delete "{{title}}"? This action cannot be undone and all messages in this thread will be permanently deleted.',
+    },
   },
   threadedView: {
     expandReplies: "Expand replies",
