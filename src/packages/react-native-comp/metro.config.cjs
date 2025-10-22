@@ -31,7 +31,7 @@ config.resolver.assetExts = config.resolver.assetExts.filter(ext => ext !== 'css
 config.resolver.extraNodeModules = {
   '@': path.resolve(workspaceRoot, 'src'),
   'next-vibe': path.resolve(workspaceRoot, 'src/packages/next-vibe'),
-  'next-vibe-ui': path.resolve(workspaceRoot, 'src/packages/next-vibe-ui/native/ui/packages/reusables/src'),
+  'next-vibe-ui': path.resolve(workspaceRoot, 'src/packages/next-vibe-ui/native'),
 };
 
 // Watch all files in the workspace
@@ -40,7 +40,7 @@ config.watchFolders = [workspaceRoot];
 // Configure node_modules resolution
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),
-  path.resolve(workspaceRoot, 'node_modules'),
+  // path.resolve(workspaceRoot, 'node_modules'),
 ];
 
 // Ignore Next.js build directories

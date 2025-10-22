@@ -11,10 +11,10 @@
         "../next-vibe/*"
       ],
       "next-vibe-ui/*": [
-        "../next-vibe-ui/native/ui/packages/reusables/src/*"
+        "../next-vibe-ui/native/*"
       ],
       "@/packages/next-vibe-ui/web/ui/*": [
-        "../next-vibe-ui/native/ui/packages/reusables/src/components/ui/*"
+        "../next-vibe-ui/native/*"
       ]
     },
     "jsx": "react-native",

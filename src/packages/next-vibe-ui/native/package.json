@@ -1,0 +1,12 @@
+{
+  "name": "next-vibe-ui",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "exports": {
+    "./ui/*": {
+      "react-native": "./ui/*.tsx",
+      "default": "./ui/*.tsx"
+    }
+  }
+}

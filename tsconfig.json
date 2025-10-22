@@ -51,7 +51,7 @@
     "src/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/types/node.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
   ],
   "exclude": [
     "node_modules",

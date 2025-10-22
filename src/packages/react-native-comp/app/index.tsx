@@ -1,30 +1,16 @@
+import { Redirect } from "expo-router";
 import { useEffect } from "react";
-import { Pressable, Text, View } from "react-native";
 
-export default function HomePage(): React.ReactElement {
+import { defaultLocale } from "@/i18n/core/config";
+
+/**
+ * Root Index - Redirects to default locale
+ * Works for both Next.js and Expo Router
+ */
+export default function RootIndex(): React.ReactElement {
   useEffect(() => {
-    console.log("HomePage mounted");
+    // console.log("Redirecting to default locale:", defaultLocale);
   }, []);
 
-  return (
-    <View className="flex-1 justify-center items-center bg-blue-500">
-      <Text className="text-4xl font-bold text-white mb-4">
-        Welcome to Next Vibe!
-      </Text>
-      <Text className="text-lg text-gray-200 mb-8">
-        React Native + NativeWind v5 + Tailwind v4
-      </Text>
-
-      {/* Inline style test for comparison */}
-      <View style={{ backgroundColor: "red", padding: 10, marginBottom: 10 }}>
-        <Text style={{ color: "white" }}>
-          Inline Style Test (should be red)
-        </Text>
-      </View>
-
-      <Pressable className="bg-green-600 px-6 py-3 rounded-lg active:opacity-80">
-        <Text className="text-white font-semibold">Test NativeWind</Text>
-      </Pressable>
-    </View>
-  );
+  return <Redirect href={`/${defaultLocale}`} />;
 }
