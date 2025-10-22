@@ -1,5 +1,5 @@
 // import { useLocalSearchParams } from "expo-router";
-import { View } from "next-vibe-ui/ui/view";
+import { View } from "next-vibe-ui/ui";
 import { useEffect } from "react";
 import { Pressable, Text } from "react-native";
 

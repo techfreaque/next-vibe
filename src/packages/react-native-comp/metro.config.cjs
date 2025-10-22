@@ -43,6 +43,26 @@ config.resolver.nodeModulesPaths = [
   // path.resolve(workspaceRoot, 'node_modules'),
 ];
 
+// CRITICAL FIX: Prevent duplicate React/React Native instances in monorepo
+// Force react and react-native imports from next-vibe-ui to use app's node_modules
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  // Redirect react and react-native imports from local packages to app's node_modules
+  if (context.originModulePath?.includes('next-vibe-ui')) {
+    if (
+      moduleName === 'react' ||
+      moduleName === 'react-native' ||
+      moduleName.startsWith('react/') ||
+      moduleName.startsWith('react-native/')
+    ) {
+      const redirectedPath = path.join(path.resolve(projectRoot, 'node_modules'), moduleName);
+      return context.resolveRequest(context, redirectedPath, platform);
+    }
+  }
+
+  // Default resolution
+  return context.resolveRequest(context, moduleName, platform);
+};
+
 // Ignore Next.js build directories
 config.resolver.blockList = [
   /\.next\/.*/,
@@ -51,4 +71,5 @@ config.resolver.blockList = [
   /.*\/middleware\.ts$/,
 ];
 
-module.exports = withNativeWind(config);
+module.exports = config
+// module.exports = withNativeWind(config, { input: './global.css' });
