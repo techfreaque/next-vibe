@@ -31,13 +31,8 @@ export const i18nConfig = [
       "**/env-client.ts",
       "next.config.ts",
       "drizzle.config.ts",
-      "src/packages/next-vibe/testing/**",
-      "src/packages/next-vibe/cli/**",
       "**/*schema.ts",
       "to_migrate",
-      "src/app/api/[locale]/v1/core/system/launchpad/**",
-      "src/app/api/[locale]/v1/core/system/release-tool/**",
-      "src/app/api/[locale]/v1/core/system/builder/**",
     ],
 
     plugins: { i18next },

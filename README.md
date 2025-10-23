@@ -6,7 +6,7 @@ NextVibe is the spiritual successor to WordPress for the AI coding age. A revolu
 
 [![License: GPL-3.0](https://img.shields.io/badge/Framework-GPL--3.0-blue.svg)](LICENSE)
 [![License: MIT](https://img.shields.io/badge/App-MIT-green.svg)](LICENSE-MIT)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-7_/_TSGO-blue)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-blue)](https://react.dev/)
 
@@ -69,10 +69,11 @@ cp .env.example .env
 ### 4. Start Development
 
 ```bash
-bun vibe dev
+vibe dev
 ```
 
 That's it! NextVibe automatically:
+
 - ✅ Starts PostgreSQL (if not running)
 - ✅ Runs migrations
 - ✅ Seeds development data
@@ -108,6 +109,7 @@ src/app/api/[locale]/v1/core/user/
 ```
 
 **Result:**
+
 - 🌐 Next.js API: `POST /api/en-GLOBAL/v1/core/user/public/login`
 - 🔌 tRPC: `trpc.user.public.login.mutate()`
 - 💻 CLI: `vibe user:public:login --email=test@example.com`
@@ -158,6 +160,7 @@ t("app.invalid.key")                          // ❌ TypeScript error
 ```
 
 **Enforced by ESLint:**
+
 - All user-facing strings MUST use translation keys
 - AI can't hardcode strings (eslint fails)
 - Supports: English, German, Polish (add more easily)
@@ -165,14 +168,17 @@ t("app.invalid.key")                          // ❌ TypeScript error
 ### 4. **AI-Optimized `vibe check`**
 
 Traditional approach (AI ignores one):
+
 ```bash
 npm run lint   # AI might skip
 npm run typecheck  # Or skip this
 ```
 
 NextVibe approach (AI can't ignore):
+
 ```bash
 vibe check
+vibe check src/path/to/folder/or/file
 # ✅ Runs BOTH lint + typecheck in one command
 # ✅ Extensive ESLint rules force proper patterns
 # ✅ Type-checks translations, schemas, everything
@@ -180,7 +186,8 @@ vibe check
 ```
 
 **Perfect for AI agents:**
-- AI runs one command before committing
+
+- AI runs one command during development and before committing
 - Catches all issues: types, lint, translations, patterns
 - Forces AI to follow framework patterns
 - No way to "half-fix" problems
@@ -212,6 +219,7 @@ vibe leads:create \
 ```
 
 **Why this is revolutionary:**
+
 - AI can test endpoints **during development**
 - No need to write curl commands
 - Type-safe CLI arguments (validated by Zod)
@@ -235,12 +243,14 @@ user/
 ```
 
 **Benefits:**
+
 - Everything for a feature in one place
 - Easy to find related code
 - Delete a folder = delete the feature
 - AI can reason about the whole domain
 
 **Drizzle Magic:**
+
 ```typescript
 // db.ts
 export const users = pgTable("users", {
@@ -269,6 +279,7 @@ vibe dev
 ```
 
 **AI doesn't need to:**
+
 - Install PostgreSQL
 - Create databases
 - Run migrations manually
@@ -296,6 +307,7 @@ export const creditExpirationTask: Task = {
 ```
 
 **Automatically:**
+
 - ✅ Registered with cron system
 - ✅ Uses same repository/business logic
 - ✅ Type-safe logging
@@ -303,6 +315,7 @@ export const creditExpirationTask: Task = {
 - ✅ Monitoring and alerts
 
 **Same code, multiple triggers:**
+
 - HTTP endpoint → Manual trigger
 - CLI command → Admin operations
 - Cron task → Scheduled execution
@@ -321,24 +334,26 @@ export default function LoginPage() {
   const { form, submitForm, mutation } = useLogin();
 
   return (
-    <div className="flex-1 items-center">
+    <Div className="flex-1 items-center">
       <Input {...form.register("email")} />
       <Button onPress={submitForm} loading={mutation.isPending}>
-        Login
+        t("app.user.other.login.auth.login.signInButton")
       </Button>
-    </div>
+    </Div>
   );
 }
 ```
 
 **On Web:**
+
 - `@/packages/next-vibe-ui/web/ui/button` → shadcn/ui
-- `<div>` → HTML div
+- `<Div>` → HTML div
 - Tailwind CSS works
 
 **On Native:**
+
 - Framework automatically resolves to `@/packages/next-vibe-ui/native/ui/...`
-- `<div>` → React Native View (via NativeWind)
+- `<Div>` → React Native View (via NativeWind)
 - Same Tailwind classes work!
 
 **Framework handles all platform differences automatically.**
@@ -353,6 +368,7 @@ Force AI to follow patterns:
 ```
 
 **Catches:**
+
 - ❌ Hardcoded user-facing strings
 - ❌ Missing translation keys
 - ❌ Console.log in production code
@@ -360,6 +376,7 @@ Force AI to follow patterns:
 - ❌ Type-unsafe patterns
 
 **AI must:**
+
 - ✅ Use translation keys everywhere
 - ✅ Follow logger patterns
 - ✅ Type-safe all the things
@@ -385,13 +402,15 @@ Comprehensive documentation in `./docs/`:
 ### Tech Stack
 
 **Frontend:**
+
 - Next.js 15 (App Router)
 - React 19
-- TypeScript 5.9
-- Tailwind CSS 4
-- shadcn/ui components
+- TypeScript 7 / TSGO
+- Tailwind CSS 4 / NativeWind 5
+- shadcn/react-native-reusables UI components
 
 **Backend:**
+
 - Next.js API Routes
 - tRPC 11 (auto-generated)
 - PostgreSQL + Drizzle ORM
@@ -399,6 +418,7 @@ Comprehensive documentation in `./docs/`:
 - Zod validation
 
 **Developer Experience:**
+
 - Bun runtime
 - Vibe CLI (custom tooling)
 - ESLint with custom rules
@@ -406,6 +426,7 @@ Comprehensive documentation in `./docs/`:
 - Hot reload everything
 
 **Cross-Platform (In Progress):**
+
 - React Native / Expo
 - NativeWind (Tailwind for Native)
 - react-native-reusables (shadcn for Native)
@@ -415,18 +436,18 @@ Comprehensive documentation in `./docs/`:
 ```
 src/
 ├── app/
-│   ├── [locale]/              # Next.js pages (Web)
-│   └── api/[locale]/v1/core/  # API endpoints (recursive structure)
+│   ├── [locale]/                   # Next.js pages (Web)
+│   ├── api/[locale]/v1/core/       # API endpoints (recursive structure)
+│   └── api/[locale]/v1/core/system # Core Framework and CLI tools 
 ├── packages/
-│   ├── next-vibe/             # Core framework utilities
-│   │   ├── shared/            # Shared types, utils
-│   │   ├── client/            # Client-side utilities
-│   │   └── server/            # Server-side utilities
+│   ├── next-vibe/                  # Deprecated: Core framework utilities
 │   ├── next-vibe-ui/
-│   │   ├── web/               # Web UI (shadcn/ui)
-│   │   └── native/            # Native UI (react-native-reusables)
-│   └── i18n/                  # i18n utilities
-└── i18n/                      # Translation system
+│   │   ├── web/                    # Web UI (shadcn/ui)
+│   │   └── native/                 # Native UI (react-native-reusables)
+│   ├── react-native-comp/          # React Native / **Next**.JS compatibility layer
+│   └── i18n/                       # Translations for UI components
+├── config/                         # Environment and debug config
+└── i18n/                           # Translation system
 ```
 
 ---
@@ -533,6 +554,7 @@ export const { POST, tools } = endpointsHandler({
 ### 5. Use Everywhere
 
 **React Component:**
+
 ```typescript
 import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation-form";
 import definitions from "@/app/api/[locale]/v1/core/products/create/definition";
@@ -551,11 +573,13 @@ function CreateProduct() {
 ```
 
 **CLI:**
+
 ```bash
 vibe products:create --name="Widget" --price=99.99
 ```
 
 **tRPC:**
+
 ```typescript
 const result = await trpc.products.create.mutate({
   name: "Widget",
@@ -564,6 +588,7 @@ const result = await trpc.products.create.mutate({
 ```
 
 **Cron Task (optional):**
+
 ```typescript
 // task.ts
 export const syncProductsTask: Task = {
@@ -594,11 +619,11 @@ vibe start            # Start production server
 ### Database
 
 ```bash
-vibe migrate:generate # Generate migration from schema changes
-vibe migrate          # Run pending migrations
-vibe migrate:prod     # Run migrations in production
+vibe migrate:generate   # Generate migration from schema changes
+vibe migrate            # Run pending migrations
+vibe migrate:prod       # Run migrations in production
 vibe seed-db --env=dev  # Seed database with dev data
-vibe studio           # Open Drizzle Studio (DB GUI)
+vibe studio             # Open Drizzle Studio (DB GUI)
 ```
 
 ### Quality Checks
@@ -624,14 +649,6 @@ vibe leads:create --data='{"name":"John Doe","email":"john@example.com"}'
 
 # Get help for specific endpoint
 vibe user:public:login --help
-```
-
-### Generators
-
-```bash
-vibe generate:endpoint user/admin/suspend  # Create new endpoint
-vibe generate:migration add-user-status    # Create migration
-vibe generate:trpc                         # Regenerate tRPC router
 ```
 
 ---
@@ -734,6 +751,7 @@ logger.info("app.api.v1.core.user.public.login.success");
 ```
 
 **ESLint enforces translation usage:**
+
 ```typescript
 <h1>Login</h1>  // ❌ ESLint error: Use translation key
 <h1>{t("app.api.v1.core.user.public.login.title")}</h1>  // ✅ Valid
@@ -823,6 +841,7 @@ user-management/
 ```
 
 **Package and share:**
+
 - Upload to registry
 - Others install with one command
 - Full ownership (code is copied, not imported)
@@ -835,6 +854,7 @@ user-management/
 ### 1. **Start with Examples**
 
 Fork the repo and explore existing endpoints:
+
 ```bash
 src/app/api/[locale]/v1/core/user/public/login/
 ```
@@ -867,6 +887,7 @@ vibe check
 ### 5. **Build Your Feature**
 
 Follow the pattern:
+
 1. Create folder structure
 2. Write definition.ts (API contract)
 3. Implement repository.ts (business logic)
@@ -945,6 +966,7 @@ AI: git add . && git commit -m "Add user suspension endpoint"
 ### [Unbottled.ai](./UNBOTTLED_AI.md)
 
 Full-featured AI chat platform built entirely with NextVibe:
+
 - 40+ AI models
 - Advanced folder system
 - Credit management
@@ -1031,10 +1053,12 @@ NextVibe uses a dual licensing model to balance open-source contribution with fl
 ### Framework Core (GPL-3.0-only)
 
 The following directories are licensed under **GPL-3.0-only**:
+
 - `src/app/api/[locale]/v1/core/` - Core API framework
 - `src/packages/` - Framework packages and utilities
 
 **This means:**
+
 - ✅ You can fork and modify freely
 - ✅ You must share improvements if you distribute
 - ✅ Commercial use is allowed
@@ -1043,12 +1067,14 @@ The following directories are licensed under **GPL-3.0-only**:
 ### Your Application Code (MIT)
 
 Everything else is licensed under **MIT**:
+
 - `src/app/[locale]/` - Your Next.js pages and UI
 - Your custom endpoints outside of core
 - Your business logic and components
 - Database schemas and seeds you create
 
 **This means:**
+
 - ✅ Maximum flexibility for your app
 - ✅ No copyleft requirements
 - ✅ Use in proprietary software
@@ -1070,6 +1096,7 @@ See [LICENSE](LICENSE) for full GPL-3.0 details and [LICENSE-MIT](LICENSE-MIT) f
 Marcus Brandstätter ([max@tfq.at](mailto:max@tfq.at))
 
 **AI Development Partners:**
+
 - Augment
 - Claude Code
 - Cursor
@@ -1096,7 +1123,7 @@ NextVibe stands on the shoulders of giants:
 - **Documentation**: [./docs/](./docs/)
 - **Issues**: [GitHub Issues](https://github.com/yourusername/next-vibe/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/yourusername/next-vibe/discussions)
-- **Email**: max@tfq.at
+- **Email**: <max@tfq.at>
 
 ---
 
@@ -1146,7 +1173,7 @@ Fork it. Build with it. Share your creations.
 git clone https://github.com/YOUR_USERNAME/next-vibe
 cd next-vibe
 bun install
-bun vibe dev
+vibe dev
 ```
 
 **Welcome to NextVibe. 🎵**

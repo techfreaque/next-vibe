@@ -45,7 +45,6 @@ const config = [
       "dist",
       ".next",
       ".tmp",
-      // "eslint.config.mjs",
       "postcss.config.mjs",
       "node_modules",
       ".git",
@@ -60,8 +59,6 @@ const config = [
       ".claude",
       "postgres_data",
       "to_migrate",
-      // tmp
-      "src/packages/next-vibe-ui/native",
     ],
   },
 
