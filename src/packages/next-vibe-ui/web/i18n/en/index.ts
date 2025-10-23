@@ -20,6 +20,7 @@ export const translations = {
     enterPhoneNumber: "Enter phone number",
     unknownFieldType: "Unknown field type",
     selectDate: "Select date",
+    other: "Other",
   },
   ui: {
     markdown: {

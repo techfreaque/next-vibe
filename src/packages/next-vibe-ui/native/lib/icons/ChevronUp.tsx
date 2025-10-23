@@ -1,6 +1,6 @@
-import { ChevronUp } from 'lucide-react-native';
+import { ChevronUp } from "lucide-react-native";
 
-import { iconWithClassName } from './iconWithClassName';
+import { iconWithClassName } from "./iconWithClassName";
 
 iconWithClassName(ChevronUp);
 export { ChevronUp };

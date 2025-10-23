@@ -26,8 +26,12 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
 export enum FormFieldCategory {
-  // TODO
+  OTHER = "other",
 }
+
+const CATEGORY_TRANSLATION_KEYS: Record<FormFieldCategory, TranslationKey> = {
+  [FormFieldCategory.OTHER]: "app.packages.nextVibeUi.web.common.other",
+};
 
 export interface AutocompleteOption {
   value: string;

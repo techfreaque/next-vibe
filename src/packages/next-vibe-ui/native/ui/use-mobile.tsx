@@ -5,15 +5,28 @@
  * This component exists in next-vibe-ui/web/ui but not in native UI.
  * Replace this stub with a proper React Native implementation.
  */
-import { View, Text } from 'react-native';
-import type { ReactNode } from 'react';
+import type { ReactNode } from "react";
+import { Text, View } from "react-native";
 
-export function UseMobile({ children, ...props }: { children?: ReactNode; [key: string]: any }) {
-  console.warn('🔶 Using stub: UseMobile');
+export function UseMobile({
+  children,
+  ...props
+}: {
+  children?: ReactNode;
+  [key: string]: any;
+}) {
+  console.warn("🔶 Using stub: UseMobile");
 
   return (
-    <View style={{ padding: 8, backgroundColor: '#FEF3C7', marginVertical: 4, borderRadius: 4 }}>
-      <Text style={{ fontSize: 12, color: '#92400E', marginBottom: 4 }}>
+    <View
+      style={{
+        padding: 8,
+        backgroundColor: "#FEF3C7",
+        marginVertical: 4,
+        borderRadius: 4,
+      }}
+    >
+      <Text style={{ fontSize: 12, color: "#92400E", marginBottom: 4 }}>
         UseMobile (stub)
       </Text>
       {children}

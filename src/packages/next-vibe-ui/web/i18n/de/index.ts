@@ -22,6 +22,7 @@ export const translations: typeof enTranslations = {
     enterPhoneNumber: "Telefonnummer eingeben",
     unknownFieldType: "Unbekannter Feldtyp",
     selectDate: "Datum auswählen",
+    other: "Sonstige",
   },
   ui: {
     markdown: {

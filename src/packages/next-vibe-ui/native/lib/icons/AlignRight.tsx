@@ -1,6 +1,6 @@
-import { AlignRight } from 'lucide-react-native';
+import { AlignRight } from "lucide-react-native";
 
-import { iconWithClassName } from './iconWithClassName';
+import { iconWithClassName } from "./iconWithClassName";
 
 iconWithClassName(AlignRight);
 export { AlignRight };

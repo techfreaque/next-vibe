@@ -96,6 +96,7 @@ export {
   DialogTitle,
   DialogTrigger,
 } from "./dialog";
+export { Div } from "./div";
 export {
   Drawer,
   DrawerClose,
@@ -298,4 +299,5 @@ export {
   TooltipProvider,
   TooltipTrigger,
 } from "./tooltip";
+export { Text } from "./typography";
 export { toast, useToast } from "./use-toast";

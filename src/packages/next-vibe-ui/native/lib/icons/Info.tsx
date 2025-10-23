@@ -1,6 +1,6 @@
-import { Info } from 'lucide-react-native';
+import { Info } from "lucide-react-native";
 
-import { iconWithClassName } from './iconWithClassName';
+import { iconWithClassName } from "./iconWithClassName";
 
 iconWithClassName(Info);
 export { Info };

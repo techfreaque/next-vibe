@@ -1,55 +1,28 @@
 // Platform-specific storage for Web using localStorage
 export const storage = {
-  getItem: async (key: string): Promise<string | null> => {
+  getItem: (key: string): Promise<string | null> => {
     try {
-      return localStorage.getItem(key);
-    } catch (error) {
-      console.error('Error reading from storage:', error);
-      return null;
+      return Promise.resolve(localStorage.getItem(key));
+    } catch {
+      return Promise.resolve(null);
     }
   },
 
-  setItem: async (key: string, value: string): Promise<void> => {
+  setItem: (key: string, value: string): Promise<void> => {
     try {
       localStorage.setItem(key, value);
-    } catch (error) {
-      console.error('Error writing to storage:', error);
+      return Promise.resolve();
+    } catch {
+      return Promise.resolve();
     }
   },
 
-  removeItem: async (key: string): Promise<void> => {
+  removeItem: (key: string): Promise<void> => {
     try {
       localStorage.removeItem(key);
-    } catch (error) {
-      console.error('Error removing from storage:', error);
-    }
-  },
-};
-
-// Synchronous version for compatibility
-export const syncStorage = {
-  getItem: (key: string): string | null => {
-    try {
-      return localStorage.getItem(key);
-    } catch (error) {
-      console.error('Error reading from storage:', error);
-      return null;
-    }
-  },
-
-  setItem: (key: string, value: string): void => {
-    try {
-      localStorage.setItem(key, value);
-    } catch (error) {
-      console.error('Error writing to storage:', error);
-    }
-  },
-
-  removeItem: (key: string): void => {
-    try {
-      localStorage.removeItem(key);
-    } catch (error) {
-      console.error('Error removing from storage:', error);
+      return Promise.resolve();
+    } catch {
+      return Promise.resolve();
     }
   },
 };

@@ -2,11 +2,17 @@
  * STUB: tabs
  * Temporary stub to avoid @rn-primitives/tabs dependency
  */
-import { View, Text, TouchableOpacity } from 'react-native';
-import type { ReactNode } from 'react';
+import type { ReactNode } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 
-export function Tabs({ children, ...props }: { children?: ReactNode; [key: string]: any }) {
-  console.warn('🔶 Using stub: Tabs');
+export function Tabs({
+  children,
+  ...props
+}: {
+  children?: ReactNode;
+  [key: string]: any;
+}) {
+  console.warn("🔶 Using stub: Tabs");
   return <View {...props}>{children}</View>;
 }
 

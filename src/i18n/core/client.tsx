@@ -2,7 +2,7 @@
 import type { Route } from "next";
 import type { RouteType } from "next/dist/lib/load-custom-routes";
 import { LOCALE_COOKIE_NAME } from "next-vibe/shared/constants";
-import { syncStorage } from "next-vibe-ui/ui/storage";
+import { storage } from "next-vibe-ui/ui/storage";
 import { usePathname, useRouter } from "next-vibe-ui/ui/use-navigation";
 import type { JSX, ReactNode } from "react";
 import React, { createContext, useContext, useEffect, useState } from "react";
@@ -92,7 +92,7 @@ export function TranslationProvider({
     globalCountryInfo;
 
   // Custom setLanguage that also updates the URL and cookies
-  const setLanguage = (lang: Languages): void => {
+  const setLanguage = async (lang: Languages): Promise<void> => {
     if (!mounted) {
       return;
     }
@@ -100,7 +100,7 @@ export function TranslationProvider({
     const newLocale = `${lang}-${country}`;
 
     // Save to storage and cookie
-    syncStorage.setItem(LOCALE_COOKIE_NAME, newLocale);
+    await storage.setItem(LOCALE_COOKIE_NAME, newLocale);
     setCookie(LOCALE_COOKIE_NAME, newLocale);
 
     // Update URL to reflect language change
@@ -118,7 +118,7 @@ export function TranslationProvider({
   };
 
   // Custom setCountry that also updates localStorage and cookies
-  const setCountry = (newCountry: Countries): void => {
+  const setCountry = async (newCountry: Countries): Promise<void> => {
     if (!mounted) {
       return;
     }
@@ -126,7 +126,7 @@ export function TranslationProvider({
     const newLocale = `${language}-${newCountry}`;
 
     // Save to storage and cookie
-    syncStorage.setItem(LOCALE_COOKIE_NAME, newLocale);
+    await storage.setItem(LOCALE_COOKIE_NAME, newLocale);
     setCookie(LOCALE_COOKIE_NAME, newLocale);
 
     // Update URL to reflect country change
@@ -144,13 +144,13 @@ export function TranslationProvider({
   };
 
   // Function to change both country and language at once
-  const changeLocale = (newCountry: Countries): void => {
-    setCountry(newCountry);
+  const changeLocale = async (newCountry: Countries): Promise<void> => {
+    await setCountry(newCountry);
     const countryInfo = languageConfig.countryInfo[newCountry];
-    setLanguage(countryInfo.language as Languages);
+    await setLanguage(countryInfo.language as Languages);
     const newLocale = `${countryInfo.language}-${newCountry}`;
     setCookie(LOCALE_COOKIE_NAME, newLocale);
-    localStorage.setItem(LOCALE_COOKIE_NAME, newLocale);
+    await storage.setItem(LOCALE_COOKIE_NAME, newLocale);
     router.push(`/${newLocale}${pathname.replace(`/${currentLocale}`, "")}`);
   };
 
@@ -161,16 +161,18 @@ export function TranslationProvider({
     if (typeof window === "undefined") {
       return;
     }
+    async function initializeLocale(): Promise<void> {
+      // Only save to localStorage if no preference exists (respect existing localStorage)
+      const savedLocale = await storage.getItem(LOCALE_COOKIE_NAME);
+      if (!savedLocale && currentLocale) {
+        await storage.setItem(LOCALE_COOKIE_NAME, currentLocale);
+        setCookie(LOCALE_COOKIE_NAME, currentLocale);
+      }
 
-    // Only save to localStorage if no preference exists (respect existing localStorage)
-    const savedLocale = localStorage.getItem(LOCALE_COOKIE_NAME);
-    if (!savedLocale && currentLocale) {
-      localStorage.setItem(LOCALE_COOKIE_NAME, currentLocale);
-      setCookie(LOCALE_COOKIE_NAME, currentLocale);
+      // Update document language for accessibility
+      document.documentElement.lang = language;
     }
-
-    // Update document language for accessibility
-    document.documentElement.lang = language;
+    void initializeLocale();
   }, [currentLocale, language]);
 
   // Type-safe translation function with parameter support

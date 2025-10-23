@@ -1,5 +1,5 @@
 // Platform-specific storage for React Native using AsyncStorage
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Storage interface matching web localStorage API
 export const storage = {
@@ -7,7 +7,7 @@ export const storage = {
     try {
       return await AsyncStorage.getItem(key);
     } catch (error) {
-      console.error('Error reading from storage:', error);
+      console.error("Error reading from storage:", error);
       return null;
     }
   },
@@ -16,7 +16,7 @@ export const storage = {
     try {
       await AsyncStorage.setItem(key, value);
     } catch (error) {
-      console.error('Error writing to storage:', error);
+      console.error("Error writing to storage:", error);
     }
   },
 
@@ -24,7 +24,7 @@ export const storage = {
     try {
       await AsyncStorage.removeItem(key);
     } catch (error) {
-      console.error('Error removing from storage:', error);
+      console.error("Error removing from storage:", error);
     }
   },
 };

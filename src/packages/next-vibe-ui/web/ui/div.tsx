@@ -1,12 +1,12 @@
-// Re-export web version of View (div element)
 import type { ComponentPropsWithoutRef, ForwardedRef } from "react";
 import { forwardRef } from "react";
 
 /**
- * Platform-agnostic View component for web
+ * Platform-agnostic Div component for web
  * On web, this is a div element
+ * Alias for View to provide more traditional web naming
  */
-export const View = forwardRef(function View(
+export const Div = forwardRef(function Div(
   props: ComponentPropsWithoutRef<"div">,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
