@@ -442,6 +442,7 @@ export const translations = {
       title: "Searching the web",
       query: "Query",
     },
+    multiple: "{{count}} tool calls",
   },
   modelUtilities: {
     general: "General Chat",

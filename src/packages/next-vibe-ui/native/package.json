@@ -8,5 +8,10 @@
       "react-native": "./ui/*.tsx",
       "default": "./ui/*.tsx"
     }
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-css": "*"
   }
 }

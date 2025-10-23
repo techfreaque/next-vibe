@@ -427,14 +427,40 @@ Use this when:
     freshness?: "pd" | "pw" | "pm" | "py";
   }) => {
     try {
-      const searchService = getBraveSearchService();
-      const searchResults = await searchService.search(query, {
+      console.log("[BRAVE SEARCH TOOL] Executing with params:", {
+        query,
         maxResults,
         includeNews,
         freshness,
       });
 
+      // Validate that query is provided
+      if (!query || typeof query !== "string" || query.trim() === "") {
+        console.log("[BRAVE SEARCH TOOL] Query validation failed");
+        return {
+          success: false,
+          // eslint-disable-next-line i18next/no-literal-string
+          message:
+            "Error: Search query is required but was not provided by the model.",
+          query: query || "",
+          results: [],
+        };
+      }
+
+      console.log("[BRAVE SEARCH TOOL] Getting search service");
+      const searchService = getBraveSearchService();
+      console.log("[BRAVE SEARCH TOOL] Calling search API");
+      const searchResults = await searchService.search(query, {
+        maxResults,
+        includeNews,
+        freshness,
+      });
+      console.log("[BRAVE SEARCH TOOL] Search completed:", {
+        resultCount: searchResults.results.length,
+      });
+
       if (searchResults.results.length === 0) {
+        console.log("[BRAVE SEARCH TOOL] No results found");
         return {
           success: false,
           // eslint-disable-next-line i18next/no-literal-string
@@ -444,7 +470,22 @@ Use this when:
         };
       }
 
-      return {
+      console.log("[BRAVE SEARCH TOOL] Building success result object");
+      console.log("[BRAVE SEARCH TOOL] searchResults.query:", searchResults.query);
+      console.log(
+        "[BRAVE SEARCH TOOL] searchResults.results.length:",
+        searchResults.results.length,
+      );
+      console.log(
+        "[BRAVE SEARCH TOOL] searchResults.cached:",
+        searchResults.cached,
+      );
+      console.log(
+        "[BRAVE SEARCH TOOL] searchResults.timestamp:",
+        searchResults.timestamp,
+      );
+
+      const successResult = {
         success: true,
         // eslint-disable-next-line i18next/no-literal-string
         message: `Found ${searchResults.results.length} results for: ${query}`,
@@ -459,7 +500,24 @@ Use this when:
         cached: searchResults.cached,
         timestamp: new Date(searchResults.timestamp).toISOString(),
       };
+      console.log("[BRAVE SEARCH TOOL] Success result built:", {
+        success: successResult.success,
+        message: successResult.message,
+        resultCount: successResult.results.length,
+        hasTimestamp: !!successResult.timestamp,
+        hasCached: successResult.cached !== undefined,
+      });
+      console.log(
+        "[BRAVE SEARCH TOOL] About to return result, type:",
+        typeof successResult,
+      );
+      console.log(
+        "[BRAVE SEARCH TOOL] Result JSON:",
+        JSON.stringify(successResult),
+      );
+      return successResult;
     } catch (error) {
+      console.error("[BRAVE SEARCH TOOL] Error occurred:", error);
       const searchService = getBraveSearchService();
       const braveError =
         error instanceof Error
@@ -467,13 +525,15 @@ Use this when:
           : // eslint-disable-next-line i18next/no-literal-string
             new BraveSearchError("Unknown error occurred");
 
-      return {
+      const errorResult = {
         success: false,
         // eslint-disable-next-line i18next/no-literal-string
         message: `Search failed: ${braveError.message}`,
         query,
         results: [],
       };
+      console.log("[BRAVE SEARCH TOOL] Returning error result:", errorResult);
+      return errorResult;
     }
   },
 });

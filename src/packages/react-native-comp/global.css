@@ -1,3 +1,10 @@
+/* Import NativeWind theme FIRST to ensure color system is available */
+@import "nativewind/theme";
+
 @import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/preflight.css" layer(base);
 @import "tailwindcss/utilities.css";
+@import "tailwindcss/preflight.css" layer(base);
+
+/* Configure Tailwind v4 to scan files in app and next-vibe-ui directories */
+@source "../next-vibe-ui/native";
+@source "./app";

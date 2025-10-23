@@ -56,6 +56,14 @@ interface ThreadMetadata {
 }
 
 /**
+ * Tool call information
+ */
+export interface ToolCall {
+  toolName: string;
+  args: Record<string, unknown>;
+}
+
+/**
  * Message metadata structure
  */
 interface MessageMetadata {
@@ -65,6 +73,7 @@ interface MessageMetadata {
   totalTokens?: number;
   finishReason?: string;
   streamingTime?: number;
+  toolCalls?: ToolCall[];
   attachments?: {
     id: string;
     type: string;

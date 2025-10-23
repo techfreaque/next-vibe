@@ -1,8 +1,3 @@
-import { View as RNView, type ViewProps as RNViewProps } from 'react-native';
-
-export type ViewProps = RNViewProps;
-
-// Simple wrapper function component (no hooks, no forwardRef to avoid circular deps)
-export function View(props: ViewProps) {
-  return <RNView {...props} />;
-}
+// Directly import the NativeWind-enhanced View component
+// Since Metro doesn't rewrite imports for library code, we import directly
+export { View, type ViewProps } from "react-native-css/components";

@@ -251,6 +251,115 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     // Don't throw error - continue with other seeds
   }
 
+  // Create low credits user for testing insufficient credits error
+  try {
+    const lowCreditsUserResponse = await userRepository.getUserByEmail(
+      "lowcredits@example.com",
+      UserDetailLevel.STANDARD,
+      logger,
+    );
+
+    if (lowCreditsUserResponse.success && lowCreditsUserResponse.data) {
+      const lowCreditsUser = lowCreditsUserResponse.data;
+      logger.debug(
+        `Found low credits user for testing: ${lowCreditsUser.id}`,
+      );
+
+      // Check if user already has a subscription
+      const existingSubscription = await subscriptionRepository.getSubscription(
+        lowCreditsUser.id,
+        logger,
+      );
+
+      let subscription: SubscriptionGetResponseOutput | undefined = undefined;
+
+      if (existingSubscription.success && existingSubscription.data) {
+        logger.debug(
+          "Low credits user already has a subscription, skipping creation",
+        );
+        subscription = existingSubscription.data;
+      } else {
+        // Create active subscription for low credits user
+        const lowCreditsSubscriptionData = createLocalSubscriptionSeed(
+          lowCreditsUser.id,
+          {
+            planId: SubscriptionPlan.SUBSCRIPTION,
+            billingInterval: BillingInterval.MONTHLY,
+            status: SubscriptionStatus.ACTIVE,
+          },
+        );
+
+        const [createdSubscription] = await db
+          .insert(subscriptions)
+          .values(lowCreditsSubscriptionData)
+          .returning();
+
+        if (createdSubscription) {
+          logger.debug(
+            `✅ Created subscription for low credits user: ${createdSubscription.id}`,
+          );
+          subscription = {
+            ...createdSubscription,
+            plan: createdSubscription.planId,
+            currentPeriodStart:
+              createdSubscription.currentPeriodStart?.toISOString() ?? "",
+            currentPeriodEnd:
+              createdSubscription.currentPeriodEnd?.toISOString() ?? "",
+            createdAt: createdSubscription.createdAt.toISOString(),
+            updatedAt: createdSubscription.updatedAt.toISOString(),
+          };
+        }
+      }
+
+      // Always ensure subscription credits exist (only 3 credits for testing)
+      if (subscription) {
+        const { creditRepository } = await import(
+          "../agent/chat/credits/repository"
+        );
+
+        // Check if user already has subscription credits
+        const balanceResult = await creditRepository.getBalance(
+          lowCreditsUser.id,
+        );
+        const hasCredits =
+          balanceResult.success && balanceResult.data.total > 0;
+
+        if (!hasCredits) {
+          // Convert currentPeriodEnd to Date if it's a string (from database)
+          const expiresAt = subscription.currentPeriodEnd
+            ? new Date(subscription.currentPeriodEnd)
+            : undefined;
+
+          // Add only 3 subscription credits (not enough for DeepSeek V3.1 which costs 5)
+          const creditsResult = await creditRepository.addCredits(
+            lowCreditsUser.id,
+            3,
+            "subscription",
+            expiresAt,
+          );
+
+          if (creditsResult.success) {
+            logger.debug("Added 3 subscription credits to low credits user", {
+              userId: lowCreditsUser.id,
+            });
+          } else {
+            logger.error("Failed to add subscription credits to low credits user", {
+              userId: lowCreditsUser.id,
+              error: creditsResult.message,
+            });
+          }
+        } else {
+          logger.debug(
+            "Low credits user already has credits, skipping credit creation",
+          );
+        }
+      }
+    }
+  } catch (error) {
+    logger.error("Error creating low credits user seeds:", error);
+    // Don't throw error - continue with other seeds
+  }
+
   logger.debug("✅ Subscription development seeding completed");
 }
 

@@ -71,6 +71,11 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       privateName: "Regular User2",
       publicName: "User2 Corp",
     }),
+    createUserSeed({
+      email: "lowcredits@example.com",
+      privateName: "Low Credits User",
+      publicName: "Low Credits Corp",
+    }),
   ];
 
   const allUsers = [cliUser, adminUser, demoUser, ...regularUsers];

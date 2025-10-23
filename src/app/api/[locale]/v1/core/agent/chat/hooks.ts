@@ -653,6 +653,7 @@ export function useChat(
                 parentId: string | null;
                 depth: number;
                 childrenIds: string[];
+                toolCalls?: Array<{ toolName: string; args: Record<string, unknown> }> | null;
                 createdAt: string;
                 updatedAt: string;
               }) => {
@@ -666,6 +667,7 @@ export function useChat(
                   parentId: message.parentId,
                   depth: message.depth,
                   childrenIds: message.childrenIds,
+                  toolCalls: message.toolCalls || null,
                   createdAt: new Date(message.createdAt),
                   updatedAt: new Date(message.updatedAt),
                 });
@@ -978,6 +980,7 @@ export function useChat(
       selectedPersona,
       temperature,
       maxTokens,
+      enableSearch,
     ],
   );
 

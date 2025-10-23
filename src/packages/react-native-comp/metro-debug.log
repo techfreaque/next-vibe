@@ -1,0 +1,748 @@
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Core/InitializeCore
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@expo/metro-runtime/src/location/install.native.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Core/Devtools/getDevServer
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@expo/metro-runtime/src/getDevServer.native.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Utilities/HMRClient
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@expo/metro-runtime/src/metroServerLogs.native.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-router/build/renderRootComponent.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-constants/build/Constants.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@expo/metro-runtime/src/location/Location.native.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Core/ExceptionsManager
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@expo/metro-runtime/src/error-overlay/modules/ExceptionsManager/index.native.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo/src/launch/registerRootComponent.tsx
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo/src/Expo.fx.tsx
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-css/dist/module/components/index.cjs
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-css/dist/commonjs/components/index.cjs
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-css/src/components/View.tsx
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-modules-core/src/Platform.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeComponent/NativeComponentRegistry
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-modules-core/src/NativeViewManagerAdapter.native.tsx
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo/src/errors/AppEntryNotFound.tsx
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-css/dist/module/components/Button.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-router/build/utils/statusbar.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-router/build/global-state/router-store.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-router/build/fork/NavigationContainer.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-router/build/views/Unmatched.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-router/build/onboard/Tutorial.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Core/Devtools/getDevServer
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo/src/async-require/getDevServer.native.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@react-navigation/native/lib/module/Link.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-is-edge-to-edge/dist/index.android.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-linking/build/Linking.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/ReactPrivate/ReactNativePrivateInterface
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native/Libraries/Renderer/shims/ReactFabric.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Image/resolveAssetSource
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-asset/build/resolveAssetSource.native.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@react-navigation/native/lib/module/theming/fonts.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-safe-area-context/src/SafeAreaContext.tsx
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-asset/build/AssetSources.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeComponent/NativeComponentRegistry
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native/src/private/components/virtualview/VirtualViewNativeComponent.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeComponent/ViewConfigIgnore
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native/src/private/components/virtualview/VirtualViewNativeComponent.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Core/Devtools/getDevServer
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-router/build/getDevServer/index.native.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-router/build/link/linking.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-status-bar/src/NativeStatusBarWrapper.tsx
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/next-vibe-ui/native/ui/view.tsx
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeModules/specs/NativeSourceCode
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo/src/utils/getBundleUrl.native.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Utilities/HMRClient
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo/src/async-require/hmr.native.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-safe-area-context/src/specs/NativeSafeAreaContext.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Utilities/codegenNativeComponent
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-safe-area-context/src/specs/NativeSafeAreaView.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeComponent/NativeComponentRegistry
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-safe-area-context/src/specs/NativeSafeAreaView.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeComponent/NativeComponentRegistry
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native/src/private/specs_DEPRECATED/components/ActivityIndicatorViewNativeComponent.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/StyleSheet/processColor
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native/src/private/specs_DEPRECATED/components/ActivityIndicatorViewNativeComponent.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Image/AssetSourceResolver
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-asset/build/AssetSourceResolver.native.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/src/private/featureflags/ReactNativeFeatureFlags
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@react-native/virtualized-lists/Lists/VirtualizeUtils.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeComponent/ViewConfigIgnore
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native/src/private/specs_DEPRECATED/components/RCTModalHostViewNativeComponent.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/ReactNative/RendererProxy
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidDrawerLayoutNativeComponent.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/StyleSheet/processColorArray
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidSwipeRefreshLayoutNativeComponent.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-router/build/ui/Slot.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-router/build/link/preview/native.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-css/dist/module/native/api.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-css/dist/module/components/index.cjs
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo-router/build/layouts/TabsClient.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@rn-primitives/slot/dist/index.mjs
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-css/dist/commonjs/native/api.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeComponent/ViewConfigIgnore
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-safe-area-context/src/specs/NativeSafeAreaProvider.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-css/dist/module/native/react/useNativeCss.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@react-navigation/bottom-tabs/lib/module/TransitionConfigs/TransitionSpecs.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-css/dist/module/components/ActivityIndicator.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@react-navigation/bottom-tabs/lib/module/views/BottomTabView.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/expo/src/async-require/fetchAsync.native.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-css/dist/commonjs/native/react/useNativeCss.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-css/dist/module/native-internal/root.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@react-navigation/bottom-tabs/lib/module/utils/useAnimatedHashMap.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-css/dist/commonjs/native-internal/root.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-css/dist/module/native/conditions/media-query.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-css/dist/module/native/styles/functions/platform-functions.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@react-navigation/elements/lib/module/Background.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@react-navigation/elements/lib/module/Header/getDefaultHeaderHeight.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@react-navigation/elements/lib/module/Label/Label.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@react-navigation/native-stack/lib/module/views/NativeStackView.native.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-css/src/components/View.tsx
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeComponent/NativeComponentRegistry
+Origin: /home/max/projects/next-vibe/node_modules/react-native/src/private/components/virtualview/VirtualViewExperimentalNativeComponent.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeComponent/ViewConfigIgnore
+Origin: /home/max/projects/next-vibe/node_modules/react-native/src/private/components/virtualview/VirtualViewExperimentalNativeComponent.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/ReactPrivate/ReactNativePrivateInterface
+Origin: /home/max/projects/next-vibe/node_modules/react-native/Libraries/Renderer/shims/createReactNativeComponentClass.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/ReactPrivate/ReactNativePrivateInitializeCore
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-dev.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/ReactPrivate/ReactNativePrivateInterface
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-dev.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-css/dist/commonjs/native/conditions/media-query.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-css/dist/commonjs/native/styles/functions/platform-functions.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/fabric/NativeScreensModule.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/core.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/components/ScreenContainer.tsx
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/components/bottom-tabs/BottomTabs.tsx
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/components/gamma/SplitViewHost.tsx
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeComponent/NativeComponentRegistry
+Origin: /home/max/projects/next-vibe/node_modules/react-native/src/private/specs_DEPRECATED/components/RCTInputAccessoryViewNativeComponent.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/StyleSheet/processColor
+Origin: /home/max/projects/next-vibe/node_modules/react-native/src/private/specs_DEPRECATED/components/RCTInputAccessoryViewNativeComponent.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-reanimated/src/component/PerformanceMonitor.tsx
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeComponent/ViewConfigIgnore
+Origin: /home/max/projects/next-vibe/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidSwipeRefreshLayoutNativeComponent.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/ReactNative/RendererProxy
+Origin: /home/max/projects/next-vibe/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidSwipeRefreshLayoutNativeComponent.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/StyleSheet/processColorArray
+Origin: /home/max/projects/next-vibe/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidSwipeRefreshLayoutNativeComponent.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/src/private/featureflags/ReactNativeFeatureFlags
+Origin: /home/max/projects/next-vibe/node_modules/@react-native/virtualized-lists/Lists/VirtualizeUtils.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-reanimated/src/logger/LogBox.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-css/dist/module/native/api.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-reanimated/src/hook/useAnimatedRef.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-reanimated/src/PlatformChecker.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-reanimated/src/platformFunctions/findNodeHandle.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Utilities/codegenNativeComponent
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/fabric/ScreenContainerNativeComponent.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeComponent/NativeComponentRegistry
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/fabric/ScreenContainerNativeComponent.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/ReactNative/AppContainer
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/components/DebugContainer.tsx
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Components/View/ReactNativeStyleAttributes
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/@react-navigation/native-stack/lib/module/views/FontProcessor.native.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeComponent/ViewConfigIgnore
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/fabric/ScreenStackHeaderConfigNativeComponent.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/StyleSheet/processColor
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/fabric/ScreenStackHeaderConfigNativeComponent.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Utilities/codegenNativeCommands
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/fabric/SearchBarNativeComponent.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/ReactNative/RendererProxy
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/fabric/SearchBarNativeComponent.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/components/helpers/sheet.tsx
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Utilities/codegenNativeComponent
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/fabric/gamma/SplitViewScreenNativeComponent.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeComponent/NativeComponentRegistry
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/fabric/gamma/SplitViewScreenNativeComponent.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeComponent/ViewConfigIgnore
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/fabric/gamma/SplitViewScreenNativeComponent.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Utilities/codegenNativeComponent
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/fabric/bottom-tabs/BottomTabsNativeComponent.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeComponent/NativeComponentRegistry
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/fabric/bottom-tabs/BottomTabsNativeComponent.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/NativeComponent/ViewConfigIgnore
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/fabric/bottom-tabs/BottomTabsNativeComponent.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/StyleSheet/processColor
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/fabric/bottom-tabs/BottomTabsNativeComponent.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Image/resolveAssetSource
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-screens/src/fabric/bottom-tabs/BottomTabsScreenNativeComponent.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-css/dist/module/native/react/useNativeCss.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/ReactNative/ReactFabricPublicInstance/ReactFabricPublicInstance
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-reanimated/src/fabricUtils.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-reanimated/src/createAnimatedComponent/createAnimatedComponent.tsx
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-reanimated/src/layoutReanimation/sharedTransitions/ProgressTransitionManager.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-css/dist/module/native-internal/root.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Renderer/shims/ReactFabric
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-reanimated/src/platform-specific/findHostInstance.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Renderer/shims/ReactNative
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-reanimated/src/platform-specific/findHostInstance.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/src/packages/react-native-comp/node_modules/react-native-reanimated/src/specs/NativeReanimatedModule.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-css/dist/module/native/conditions/media-query.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-css/dist/module/native/styles/functions/platform-functions.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/ReactPrivate/ReactNativePrivateInitializeCore
+Origin: /home/max/projects/next-vibe/node_modules/react-native/Libraries/Renderer/implementations/ReactNativeRenderer-dev.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/ReactPrivate/ReactNativePrivateInterface
+Origin: /home/max/projects/next-vibe/node_modules/react-native/Libraries/Renderer/implementations/ReactNativeRenderer-dev.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-reanimated/src/component/PerformanceMonitor.tsx
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-reanimated/src/common/constants.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-reanimated/src/platformFunctions/findNodeHandle.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-is-edge-to-edge/dist/index.android.js
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-worklets/src/initializers.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/ReactNative/ReactFabricPublicInstance/ReactFabricPublicInstance
+Origin: /home/max/projects/next-vibe/node_modules/react-native-reanimated/src/fabricUtils.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-css/dist/commonjs/components/index.cjs
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native/Libraries/Renderer/shims/ReactFabric
+Origin: /home/max/projects/next-vibe/node_modules/react-native-reanimated/src/platform-specific/findHostInstance.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-reanimated/src/css/component/AnimatedComponent.tsx
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-worklets/src/PlatformChecker/PlatformChecker.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-reanimated/src/specs/NativeReanimatedModule.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-worklets/src/specs/NativeWorkletsModule.ts
+Contains react-native-css: false
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-css/dist/commonjs/native/api.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-css/dist/commonjs/native/react/useNativeCss.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-css/dist/commonjs/native-internal/root.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-css/dist/commonjs/native/conditions/media-query.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css
+
+=== REACT-NATIVE IMPORT ===
+Module: react-native
+Origin: /home/max/projects/next-vibe/node_modules/react-native-css/dist/commonjs/native/styles/functions/platform-functions.js
+Contains react-native-css: true
+>>> PREVENTING REWRITE - from react-native-css

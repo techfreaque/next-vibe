@@ -43,26 +43,6 @@ config.resolver.nodeModulesPaths = [
   // path.resolve(workspaceRoot, 'node_modules'),
 ];
 
-// CRITICAL FIX: Prevent duplicate React/React Native instances in monorepo
-// Force react and react-native imports from next-vibe-ui to use app's node_modules
-config.resolver.resolveRequest = (context, moduleName, platform) => {
-  // Redirect react and react-native imports from local packages to app's node_modules
-  if (context.originModulePath?.includes('next-vibe-ui')) {
-    if (
-      moduleName === 'react' ||
-      moduleName === 'react-native' ||
-      moduleName.startsWith('react/') ||
-      moduleName.startsWith('react-native/')
-    ) {
-      const redirectedPath = path.join(path.resolve(projectRoot, 'node_modules'), moduleName);
-      return context.resolveRequest(context, redirectedPath, platform);
-    }
-  }
-
-  // Default resolution
-  return context.resolveRequest(context, moduleName, platform);
-};
-
 // Ignore Next.js build directories
 config.resolver.blockList = [
   /\.next\/.*/,
@@ -71,5 +51,40 @@ config.resolver.blockList = [
   /.*\/middleware\.ts$/,
 ];
 
-module.exports = config
-// module.exports = withNativeWind(config, { input: './global.css' });
+// Apply NativeWind BEFORE custom resolveRequest so resolution happens after transformation
+// NativeWind v5 uses @source directives in global.css (Tailwind v4 format)
+const nativeWindConfig = withNativeWind(config, {
+  input: './global.css',
+  // Explicitly include the entire src directory for transformation
+  // This ensures next-vibe-ui gets NativeWind treatment
+  projectRoot: workspaceRoot,
+  inlineRem: false,
+});
+
+// Override resolveRequest to fix duplicate React instances AND prevent recursion
+const originalResolveRequest = nativeWindConfig.resolver.resolveRequest;
+
+nativeWindConfig.resolver.resolveRequest = (context, moduleName, platform) => {
+  // ALWAYS redirect React imports to app's node_modules to prevent duplicates
+  if (moduleName === 'react' || moduleName.startsWith('react/')) {
+    const redirectedPath = path.join(path.resolve(projectRoot, 'node_modules'), moduleName);
+    return context.resolveRequest(context, redirectedPath, platform);
+  }
+
+  const originPath = context.originModulePath || '';
+
+  // CRITICAL: Prevent infinite recursion by NOT rewriting react-native imports
+  // that originate from within react-native-css PACKAGE ITSELF (not from next-vibe-ui)
+  // We need to allow rewriting for next-vibe-ui files even though they might be in node_modules
+  const isFromReactNativeCssPackage = originPath.includes('/react-native-css/dist/') ||
+                                       originPath.includes('/react-native-css/src/');
+
+  if (isFromReactNativeCssPackage && (moduleName === 'react-native' || moduleName.startsWith('react-native/'))) {
+    return context.resolveRequest(context, moduleName, platform);
+  }
+
+  // For all other imports (including from next-vibe-ui), use NativeWind's rewriter normally
+  return originalResolveRequest(context, moduleName, platform);
+};
+
+module.exports = nativeWindConfig;

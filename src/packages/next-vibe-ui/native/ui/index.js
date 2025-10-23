@@ -6,4 +6,5 @@
 // All other components require @rn-primitives packages
 
 export { View } from './view';
+export { Text } from './text';
 

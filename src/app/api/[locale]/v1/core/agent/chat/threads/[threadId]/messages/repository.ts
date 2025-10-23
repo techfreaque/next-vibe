@@ -128,7 +128,13 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
         count: messages.length,
       });
 
-      return createSuccessResponse({ messages });
+      // Map messages to include toolCalls from metadata
+      const mappedMessages = messages.map((msg) => ({
+        ...msg,
+        toolCalls: (msg.metadata as { toolCalls?: Array<{ toolName: string; args: Record<string, unknown> }> })?.toolCalls || null,
+      }));
+
+      return createSuccessResponse({ messages: mappedMessages });
     } catch (error) {
       logger.error("Error listing messages", error);
       return createErrorResponse(

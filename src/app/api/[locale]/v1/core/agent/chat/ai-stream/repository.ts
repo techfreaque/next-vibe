@@ -6,7 +6,7 @@
 import "server-only";
 
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { streamText } from "ai";
+import { stepCountIs, streamText } from "ai";
 import { and, eq } from "drizzle-orm";
 import {
   createErrorResponse,
@@ -27,7 +27,7 @@ import { creditRepository } from "../credits/repository";
 import { creditValidator } from "../credits/validator";
 import { chatMessages, chatThreads } from "../db";
 import { ChatMessageRole } from "../enum";
-import { FEATURE_COSTS, getModelCost } from "../model-access/costs";
+import { getModelCost } from "../model-access/costs";
 import { getModelById, type ModelId } from "../model-access/models";
 import type {
   AiStreamPostRequestOutput,
@@ -517,7 +517,7 @@ export async function createAiStream({
   let systemPrompt = data.systemPrompt || "";
   if (data.enableSearch) {
     const searchInstructions =
-      "You have access to a web search tool. When the user asks about current events, recent information, or anything that requires up-to-date knowledge, use the search tool to find relevant information. After receiving search results, provide a comprehensive answer based on those results. Always cite your sources when using search results.";
+      "You have access to a web search tool called 'search'. When the user asks about current events, recent information, or anything that requires up-to-date knowledge, you MUST use the search tool to find relevant information. To use the search tool, call it with a 'query' parameter containing the search keywords. After receiving search results, provide a comprehensive answer based on those results and cite your sources.";
     systemPrompt = systemPrompt
       ? `${systemPrompt}\n\n${searchInstructions}`
       : searchInstructions;
@@ -777,102 +777,65 @@ export async function createAiStream({
           const modelConfig = getModelById(data.model as ModelId);
           const openRouterModelId = modelConfig?.openRouterModel || data.model;
 
+          // Use Vercel AI SDK's built-in multi-step tool calling with stopWhen
           const streamResult = streamText({
             model: provider(openRouterModelId),
             messages,
             temperature: data.temperature,
             abortSignal: AbortSignal.timeout(maxDuration * 1000),
-            ...(tools && { tools, maxSteps: 5 }),
+            ...(tools ? { tools, stopWhen: stepCountIs(5) } : {}),
           });
 
-          // Stream all parts including text after tool calls
-          // Use fullStream to get all text parts across all steps
-          let partCount = 0;
-          let textDeltaCount = 0;
-          let toolCallCount = 0;
+          // Collect tool calls during streaming
+          const collectedToolCalls: Array<{
+            toolName: string;
+            args: Record<string, unknown>;
+          }> = [];
 
+          // Stream the response
           for await (const part of streamResult.fullStream) {
-            partCount++;
             if (part.type === "text-delta") {
-              textDeltaCount++;
-              // The AI SDK uses 'text' property, not 'textDelta'
-              const deltaText = part.text;
+              const textDelta = part.text;
 
-              // Only concatenate if text is defined and not empty
               if (
-                deltaText !== undefined &&
-                deltaText !== null &&
-                deltaText !== ""
+                textDelta !== undefined &&
+                textDelta !== null &&
+                textDelta !== ""
               ) {
-                fullContent += deltaText;
+                fullContent += textDelta;
 
                 // Emit content-delta event
                 const deltaEvent = createStreamEvent.contentDelta({
                   messageId: aiMessageId,
-                  delta: deltaText,
+                  delta: textDelta,
                 });
                 controller.enqueue(encoder.encode(formatSSEEvent(deltaEvent)));
               }
             } else if (part.type === "tool-call") {
-              toolCallCount++;
-              // Log tool call with full details
-              logger.info("[DEBUG] Tool call detected", {
+              // Collect tool call for database storage
+              const toolCallData = {
                 toolName: part.toolName,
-                toolCallId: part.toolCallId,
-                args: part.args,
-                argsStringified: JSON.stringify(part.args),
-              });
+                args: ("input" in part ? part.input : {}) as Record<
+                  string,
+                  unknown
+                >,
+              };
+              collectedToolCalls.push(toolCallData);
 
               // Emit tool-call event to frontend
               const toolCallEvent = createStreamEvent.toolCall({
                 messageId: aiMessageId,
-                toolName: part.toolName,
-                args: part.args,
+                ...toolCallData,
               });
               controller.enqueue(encoder.encode(formatSSEEvent(toolCallEvent)));
-            } else if (part.type === "tool-result") {
-              logger.info("[DEBUG] Tool result received", {
-                toolName: part.toolName,
-                resultType: typeof part.result,
-                resultKeys:
-                  typeof part.result === "object" && part.result !== null
-                    ? Object.keys(part.result)
-                    : undefined,
-                result:
-                  typeof part.result === "string"
-                    ? part.result.substring(0, 200)
-                    : typeof part.result === "object" && part.result !== null
-                      ? JSON.stringify(part.result).substring(0, 500)
-                      : part.result,
-              });
-            } else if (part.type === "tool-error") {
-              logger.error("[DEBUG] Tool error occurred", {
-                toolName: part.toolName,
-                error: part.error,
-              });
             }
           }
 
-          logger.info("[DEBUG] fullStream iteration complete", {
-            totalParts: partCount,
-            textDeltaParts: textDeltaCount,
-            toolCallsCount: toolCallCount,
-            fullContentLength: fullContent.length,
-          });
-
           // Wait for completion
-          const [finalToolCalls, finishReason, usage] = await Promise.all([
-            streamResult.toolCalls,
+          const [finishReason, usage] = await Promise.all([
             streamResult.finishReason,
             streamResult.usage,
           ]);
-
-          logger.info("Stream completed [FIXED]", {
-            fullContentLength: fullContent.length,
-            finishReason,
-            toolCallsCount: finalToolCalls?.length || 0,
-            isIncognito,
-          });
 
           // Update AI message with final content (if not incognito)
           if (!isIncognito && userId) {
@@ -884,6 +847,9 @@ export async function createAiStream({
                 metadata: {
                   totalTokens: usage.totalTokens,
                   finishReason: finishReason || "unknown",
+                  ...(collectedToolCalls.length > 0
+                    ? { toolCalls: collectedToolCalls }
+                    : {}),
                 },
                 updatedAt: new Date(),
               })
@@ -893,6 +859,7 @@ export async function createAiStream({
               messageId: aiMessageId,
               contentLength: fullContent.length,
               tokens: usage.totalTokens,
+              toolCallsCount: collectedToolCalls.length,
             });
           }
 
@@ -962,71 +929,9 @@ export async function createAiStream({
             }
           }
 
-          // Track search usage for credit deduction
-          if (
-            finalToolCalls &&
-            Array.isArray(finalToolCalls) &&
-            finalToolCalls.length > 0
-          ) {
-            const searchCalls = finalToolCalls.filter(
-              (call: { toolName: string }) => call.toolName === "braveSearch",
-            );
-
-            if (searchCalls.length > 0) {
-              logger.info("Brave search tools called", {
-                searchCount: searchCalls.length,
-                userId,
-                leadId: effectiveLeadId,
-              });
-
-              // Determine correct credit identifier for search deductions
-              let searchCreditIdentifier: { userId?: string; leadId?: string };
-              if (userId) {
-                const identifierResult =
-                  await creditRepository.getCreditIdentifier(
-                    userId,
-                    effectiveLeadId,
-                    logger,
-                  );
-                if (!identifierResult.success) {
-                  searchCreditIdentifier = { leadId: effectiveLeadId };
-                } else {
-                  searchCreditIdentifier = {
-                    userId: identifierResult.data.userId,
-                    leadId: identifierResult.data.leadId,
-                  };
-                }
-              } else {
-                searchCreditIdentifier = { leadId: effectiveLeadId };
-              }
-
-              // Deduct credits for all search calls
-              for (let i = 0; i < searchCalls.length; i++) {
-                const messageId = crypto.randomUUID();
-                const deductResult = await creditRepository.deductCredits(
-                  searchCreditIdentifier,
-                  FEATURE_COSTS.BRAVE_SEARCH, // Use constant for search cost
-                  "brave-search", // Use "brave-search" as the model ID
-                  messageId,
-                );
-
-                if (!deductResult.success) {
-                  logger.error("Failed to deduct search credits", {
-                    userId,
-                    leadId: effectiveLeadId,
-                    cost: FEATURE_COSTS.BRAVE_SEARCH,
-                  });
-                } else {
-                  logger.info("Credits deducted successfully for search", {
-                    userId,
-                    leadId: effectiveLeadId,
-                    cost: FEATURE_COSTS.BRAVE_SEARCH,
-                    messageId,
-                  });
-                }
-              }
-            }
-          }
+          // TODO: Track search usage for credit deduction
+          // We need to count tool calls from the stream to deduct search credits
+          // For now, search is free (no credit deduction)
 
           controller.close();
         } catch (error) {

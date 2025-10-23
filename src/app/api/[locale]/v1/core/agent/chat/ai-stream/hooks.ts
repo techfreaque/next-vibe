@@ -548,6 +548,13 @@ export function useAIStream(
                               error,
                             );
                           });
+                      } else {
+                        // Non-incognito message - update chat store with tool calls
+                        useChatStore.getState().updateMessage(message.messageId, {
+                          content: eventData.content,
+                          tokens: eventData.totalTokens,
+                          toolCalls: message.toolCalls || null,
+                        });
                       }
                     })
                     .catch((error) => {
