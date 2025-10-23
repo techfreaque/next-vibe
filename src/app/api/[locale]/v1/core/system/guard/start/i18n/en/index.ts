@@ -1,52 +1,64 @@
 export const translations = {
-  post: {
-    title: "Start",
-    description: "Start endpoint",
-    form: {
-      title: "Start Configuration",
-      description: "Configure start parameters",
+  title: "Start Guard",
+  description: "Start guard environments for VSCode projects",
+  tag: "Start",
+  category: "Guard",
+  container: {
+    title: "Start Configuration",
+    description: "Configure guard start parameters",
+  },
+  fields: {
+    projectPath: {
+      title: "Project Path",
+      description: "Path to the VSCode project",
+      placeholder: "/home/user/projects/my-project",
     },
-    response: {
-      title: "Response",
-      description: "Start response data",
+    guardId: {
+      title: "Guard ID",
+      description: "Unique identifier for the guard environment",
+      placeholder: "guard_my_project_abc123",
     },
-    errors: {
-      unauthorized: {
-        title: "Unauthorized",
-        description: "Authentication required",
-      },
-      validation: {
-        title: "Validation Error",
-        description: "Invalid request parameters",
-      },
-      server: {
-        title: "Server Error",
-        description: "Internal server error occurred",
-      },
-      unknown: {
-        title: "Unknown Error",
-        description: "An unknown error occurred",
-      },
-      network: {
-        title: "Network Error",
-        description: "Network error occurred",
-      },
-      forbidden: {
-        title: "Forbidden",
-        description: "Access forbidden",
-      },
-      notFound: {
-        title: "Not Found",
-        description: "Resource not found",
-      },
-      conflict: {
-        title: "Conflict",
-        description: "Data conflict occurred",
+    startAll: {
+      title: "Start All Guards",
+      description: "Start all available guard environments",
+    },
+    totalStarted: {
+      title: "Total Started",
+    },
+    output: {
+      title: "Output",
+    },
+    startedGuards: {
+      columns: {
+        username: "Username",
+        projectPath: "Project Path",
       },
     },
-    success: {
-      title: "Success",
-      description: "Operation completed successfully",
+  },
+  errors: {
+    unauthorized: {
+      title: "Unauthorized",
+      description: "Authentication required",
     },
+    validation: {
+      title: "Validation Error",
+      description: "Invalid request parameters",
+    },
+    internal: {
+      title: "Internal Error",
+      description: "Internal server error occurred",
+    },
+    notFound: {
+      title: "Not Found",
+      description: "Guard environment not found",
+    },
+    conflict: {
+      title: "Conflict",
+      description: "Guard environment already started",
+    },
+  },
+  success: {
+    title: "Success",
+    description: "Guard started successfully",
   },
 };

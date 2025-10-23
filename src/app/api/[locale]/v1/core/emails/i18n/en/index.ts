@@ -1,6 +1,7 @@
 import { translations as emailServiceTranslations } from "../../email-service/i18n/en";
 import { translations as imapClientTranslations } from "../../imap-client/i18n/en";
 import { translations as messagesTranslations } from "../../messages/i18n/en";
+import { translations as sendTranslations } from "../../send/i18n/en";
 import { translations as smtpClientTranslations } from "../../smtp-client/i18n/en";
 
 export const translations = {
@@ -473,6 +474,7 @@ export const translations = {
   emailService: emailServiceTranslations,
   imapClient: imapClientTranslations,
   messages: messagesTranslations,
+  send: sendTranslations,
   smtpClient: smtpClientTranslations,
 
   // Core emails level translations
@@ -480,134 +482,6 @@ export const translations = {
   tags: {
     stats: "Statistics",
     analytics: "Analytics",
-  },
-  send: {
-    title: "Send Email",
-    description: "Send emails with optional SMS notifications",
-    container: {
-      title: "Email Sending Configuration",
-      description: "Configure email and optional SMS notification settings",
-    },
-    to: {
-      label: "Recipient Email",
-      description: "Email address of the recipient",
-      placeholder: "recipient@example.com",
-    },
-    toName: {
-      label: "Recipient Name",
-      description: "Display name of the recipient (optional)",
-      placeholder: "John Doe",
-    },
-    subject: {
-      label: "Email Subject",
-      description: "Subject line for the email",
-      placeholder: "Your subject here...",
-    },
-    html: {
-      label: "HTML Content",
-      description: "HTML content of the email",
-    },
-    text: {
-      label: "Plain Text Content",
-      description: "Plain text fallback content (optional)",
-    },
-    senderName: {
-      label: "Sender Name",
-      description: "Name displayed as the sender",
-      placeholder: "Your Company",
-    },
-    replyTo: {
-      label: "Reply-To Email",
-      description: "Email address for replies (optional)",
-      placeholder: "noreply@example.com",
-    },
-    campaignType: {
-      label: "Campaign Type",
-      description: "Type of email campaign",
-    },
-    leadId: {
-      label: "Lead ID",
-      description: "Associated lead identifier (optional)",
-      placeholder: "lead-12345",
-    },
-    sendSmsNotification: {
-      label: "Send SMS Notification",
-      description: "Send an SMS notification in addition to the email",
-    },
-    smsPhoneNumber: {
-      label: "SMS Phone Number",
-      description: "Phone number to send SMS notification to",
-      placeholder: "+1234567890",
-    },
-    smsMessage: {
-      label: "SMS Message",
-      description: "Message content for SMS notification",
-      placeholder: "Email sent successfully!",
-    },
-    response: {
-      success: {
-        label: "Success",
-      },
-      messageId: {
-        label: "Message ID",
-      },
-      accountId: {
-        label: "Account ID",
-      },
-      accountName: {
-        label: "SMTP Account",
-      },
-      accepted: {
-        label: "Accepted Recipients",
-      },
-      rejected: {
-        label: "Rejected Recipients",
-      },
-      response: {
-        label: "SMTP Response",
-      },
-      sentAt: {
-        label: "Sent At",
-      },
-      smsResult: {
-        title: "SMS Notification Result",
-        description: "Result of SMS notification sending",
-        success: "SMS Success",
-        messageId: "SMS Message ID",
-        provider: "SMS Provider",
-      },
-    },
-    errors: {
-      validation: {
-        title: "Validation Error",
-        description: "Please check your input and try again",
-      },
-      unauthorized: {
-        title: "Unauthorized",
-        description: "You don't have permission to send emails",
-      },
-      server: {
-        title: "Server Error",
-        description:
-          "An internal server error occurred while sending the email",
-      },
-      unknown: {
-        title: "Unknown Error",
-        description: "An unexpected error occurred",
-      },
-      forbidden: {
-        title: "Forbidden",
-        description: "Access to this resource is forbidden",
-      },
-      network: {
-        title: "Network Error",
-        description: "A network error occurred while sending the email",
-      },
-    },
-    success: {
-      title: "Email Sent Successfully",
-      description: "Your email has been sent successfully",
-    },
   },
   error: {
     default: "An error occurred",

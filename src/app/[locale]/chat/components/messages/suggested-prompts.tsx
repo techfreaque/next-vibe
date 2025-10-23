@@ -20,7 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
   ScrollArea,
-} from "@/packages/next-vibe-ui/web/ui";
+} from "next-vibe-ui/ui";
 
 interface SuggestedPromptsProps {
   onSelectPrompt: (

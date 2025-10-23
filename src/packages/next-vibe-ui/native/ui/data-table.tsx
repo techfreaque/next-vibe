@@ -16,6 +16,7 @@ import {
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { cn } from "../lib/utils";
 import {
   Table,
   TableBody,
@@ -23,8 +24,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../components/ui/table";
-import { cn } from "../lib/utils";
+} from "./table";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

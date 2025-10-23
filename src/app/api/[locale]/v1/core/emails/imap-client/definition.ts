@@ -257,6 +257,3 @@ export const imapMessageResponseSchema = objectField(
     ),
   },
 );
-
-// Export the message response schema for reuse
-export { imapMessageResponseSchema };

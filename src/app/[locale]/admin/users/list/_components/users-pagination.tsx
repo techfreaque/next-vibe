@@ -46,11 +46,21 @@ export function UsersPagination({
 }: UsersPaginationProps): JSX.Element {
   const { t } = simpleT(locale);
 
+  if (!usersEndpoint.read) {
+    return <></>;
+  }
+
   const handlePageChange = (page: number): void => {
+    if (!usersEndpoint.read) {
+      return;
+    }
     usersEndpoint.read.form.setValue("searchAndPagination.page", page);
   };
 
   const handleLimitChange = (limit: string): void => {
+    if (!usersEndpoint.read) {
+      return;
+    }
     usersEndpoint.read.form.setValue(
       "searchAndPagination.limit",
       parseInt(limit, 10),

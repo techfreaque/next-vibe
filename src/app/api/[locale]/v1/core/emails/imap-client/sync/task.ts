@@ -1,11 +1,9 @@
-import { TaskCategory } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 /**
  * IMAP Sync Task (Unified Format)
  * Automated synchronization of IMAP accounts, folders, and messages
  *
  * This file follows the unified task format as specified in spec.md
  */
-
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -20,7 +18,10 @@ import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
 } from "@/app/api/[locale]/v1/core/system/tasks/constants";
-import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/tasks/enum";
+import {
+  CronTaskPriority,
+  TaskCategory,
+} from "@/app/api/[locale]/v1/core/system/tasks/enum";
 import type {
   Task,
   TaskExecutionContext,

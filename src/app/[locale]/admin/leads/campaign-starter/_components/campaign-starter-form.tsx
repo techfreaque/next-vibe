@@ -53,15 +53,19 @@ export function CampaignStarterForm({
         className="space-y-6"
       >
         <FormSection
-          title={"leads.admin.campaignStarter.settings.title"}
-          description={"leads.admin.campaignStarter.settings.description"}
+          title={"app.admin.leads.leads.admin.campaignStarter.settings.title"}
+          description={
+            "app.admin.leads.leads.admin.campaignStarter.settings.description"
+          }
         >
           <Card>
             <CardContent className="pt-6">
               <FormFieldGroup
-                title={"leads.admin.campaignStarter.form.sections.basic.title"}
+                title={
+                  "app.admin.leads.leads.admin.campaignStarter.form.sections.basic.title"
+                }
                 description={
-                  "leads.admin.campaignStarter.form.sections.basic.description"
+                  "app.admin.leads.leads.admin.campaignStarter.form.sections.basic.description"
                 }
               >
                 {/* Dry Run Toggle */}
@@ -69,7 +73,8 @@ export function CampaignStarterForm({
                   name="dryRun"
                   config={{
                     type: "switch",
-                    label: "leads.admin.campaignStarter.form.dryRun.label",
+                    label:
+                      "app.admin.leads.leads.admin.campaignStarter.form.dryRun.label",
                   }}
                   control={endpoint.create.form.control}
                 />
@@ -79,9 +84,10 @@ export function CampaignStarterForm({
                   name="minAgeHours"
                   config={{
                     type: "number",
-                    label: "leads.admin.campaignStarter.form.minAgeHours.label",
+                    label:
+                      "app.admin.leads.leads.admin.campaignStarter.form.minAgeHours.label",
                     placeholder:
-                      "leads.admin.campaignStarter.form.minAgeHours.placeholder",
+                      "app.admin.leads.leads.admin.campaignStarter.form.minAgeHours.placeholder",
                     min: 0,
                     max: 168,
                     step: 1,
@@ -91,9 +97,11 @@ export function CampaignStarterForm({
               </FormFieldGroup>
 
               <FormFieldGroup
-                title={"leads.admin.campaignStarter.form.enabledDays.label"}
+                title={
+                  "app.admin.leads.leads.admin.campaignStarter.form.enabledDays.label"
+                }
                 description={
-                  "leads.admin.campaignStarter.form.enabledDays.description"
+                  "app.admin.leads.leads.admin.campaignStarter.form.enabledDays.description"
                 }
               >
                 {/* Enabled Days - Custom checkbox group */}
@@ -147,9 +155,11 @@ export function CampaignStarterForm({
               </FormFieldGroup>
 
               <FormFieldGroup
-                title={"leads.admin.campaignStarter.form.enabledHours.label"}
+                title={
+                  "app.admin.leads.leads.admin.campaignStarter.form.enabledHours.label"
+                }
                 description={
-                  "leads.admin.campaignStarter.form.enabledHours.description"
+                  "app.admin.leads.leads.admin.campaignStarter.form.enabledHours.description"
                 }
               >
                 {/* Start Hour */}
@@ -158,9 +168,9 @@ export function CampaignStarterForm({
                   config={{
                     type: "number",
                     label:
-                      "leads.admin.campaignStarter.form.enabledHours.startHour.label",
+                      "app.admin.leads.leads.admin.campaignStarter.form.enabledHours.startHour.label",
                     placeholder:
-                      "leads.admin.campaignStarter.form.enabledHours.startHour.placeholder",
+                      "app.admin.leads.leads.admin.campaignStarter.form.enabledHours.startHour.placeholder",
                     min: 0,
                     max: 23,
                     step: 1,
@@ -174,9 +184,9 @@ export function CampaignStarterForm({
                   config={{
                     type: "number",
                     label:
-                      "leads.admin.campaignStarter.form.enabledHours.endHour.label",
+                      "app.admin.leads.leads.admin.campaignStarter.form.enabledHours.endHour.label",
                     placeholder:
-                      "leads.admin.campaignStarter.form.enabledHours.endHour.placeholder",
+                      "app.admin.leads.leads.admin.campaignStarter.form.enabledHours.endHour.placeholder",
                     min: 0,
                     max: 23,
                     step: 1,
@@ -186,9 +196,11 @@ export function CampaignStarterForm({
               </FormFieldGroup>
 
               <FormFieldGroup
-                title={"leads.admin.campaignStarter.form.leadsPerWeek.label"}
+                title={
+                  "app.admin.leads.leads.admin.campaignStarter.form.leadsPerWeek.label"
+                }
                 description={
-                  "leads.admin.campaignStarter.form.leadsPerWeek.description"
+                  "app.admin.leads.leads.admin.campaignStarter.form.leadsPerWeek.description"
                 }
               >
                 {/* Leads Per Week - Custom inputs for each locale */}
@@ -224,9 +236,11 @@ export function CampaignStarterForm({
               </FormFieldGroup>
 
               <FormFieldGroup
-                title={"leads.admin.campaignStarter.form.cronSettings.label"}
+                title={
+                  "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.label"
+                }
                 description={
-                  "leads.admin.campaignStarter.form.cronSettings.description"
+                  "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.description"
                 }
               >
                 {/* Schedule */}
@@ -235,9 +249,9 @@ export function CampaignStarterForm({
                   config={{
                     type: "text",
                     label:
-                      "leads.admin.campaignStarter.form.cronSettings.schedule.label",
+                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.schedule.label",
                     placeholder:
-                      "leads.admin.campaignStarter.form.cronSettings.schedule.placeholder",
+                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.schedule.placeholder",
                   }}
                   control={endpoint.create.form.control}
                 />
@@ -248,9 +262,9 @@ export function CampaignStarterForm({
                   config={{
                     type: "text",
                     label:
-                      "leads.admin.campaignStarter.form.cronSettings.timezone.label",
+                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.timezone.label",
                     placeholder:
-                      "leads.admin.campaignStarter.form.cronSettings.timezone.placeholder",
+                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.timezone.placeholder",
                   }}
                   control={endpoint.create.form.control}
                 />
@@ -261,7 +275,7 @@ export function CampaignStarterForm({
                   config={{
                     type: "switch",
                     label:
-                      "leads.admin.campaignStarter.form.cronSettings.enabled.label",
+                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.enabled.label",
                   }}
                   control={endpoint.create.form.control}
                 />
@@ -272,27 +286,27 @@ export function CampaignStarterForm({
                   config={{
                     type: "select",
                     label:
-                      "leads.admin.campaignStarter.form.cronSettings.priority.label",
+                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.priority.label",
                     options: [
                       {
                         value: CronTaskPriority.LOW,
                         label:
-                          "leads.admin.campaignStarter.form.cronSettings.priority.options.low",
+                          "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.priority.options.low",
                       },
                       {
                         value: CronTaskPriority.NORMAL,
                         label:
-                          "leads.admin.campaignStarter.form.cronSettings.priority.options.normal",
+                          "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.priority.options.normal",
                       },
                       {
                         value: CronTaskPriority.HIGH,
                         label:
-                          "leads.admin.campaignStarter.form.cronSettings.priority.options.high",
+                          "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.priority.options.high",
                       },
                       {
                         value: CronTaskPriority.CRITICAL,
                         label:
-                          "leads.admin.campaignStarter.form.cronSettings.priority.options.critical",
+                          "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.priority.options.critical",
                       },
                     ],
                   }}
@@ -305,9 +319,9 @@ export function CampaignStarterForm({
                   config={{
                     type: "number",
                     label:
-                      "leads.admin.campaignStarter.form.cronSettings.timeout.label",
+                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.timeout.label",
                     placeholder:
-                      "leads.admin.campaignStarter.form.cronSettings.timeout.placeholder",
+                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.timeout.placeholder",
                     min: 1000,
                     max: 3600000,
                     step: 1000,
@@ -321,9 +335,9 @@ export function CampaignStarterForm({
                   config={{
                     type: "number",
                     label:
-                      "leads.admin.campaignStarter.form.cronSettings.retries.label",
+                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.retries.label",
                     placeholder:
-                      "leads.admin.campaignStarter.form.cronSettings.retries.placeholder",
+                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.retries.placeholder",
                     min: 0,
                     max: 10,
                     step: 1,
@@ -337,9 +351,9 @@ export function CampaignStarterForm({
                   config={{
                     type: "number",
                     label:
-                      "leads.admin.campaignStarter.form.cronSettings.retryDelay.label",
+                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.retryDelay.label",
                     placeholder:
-                      "leads.admin.campaignStarter.form.cronSettings.retryDelay.placeholder",
+                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.retryDelay.placeholder",
                     min: 1000,
                     max: 300000,
                     step: 1000,
@@ -357,17 +371,21 @@ export function CampaignStarterForm({
                   {isSaving ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                      {t("common.saving")}
+                      {t("app.admin.common.actions.saving")}
                     </>
                   ) : isSuccess ? (
                     <>
                       <Save className="mr-2 h-4 w-4" />
-                      {t("leads.admin.campaignStarter.form.success")}
+                      {t(
+                        "app.admin.leads.leads.admin.campaignStarter.form.success",
+                      )}
                     </>
                   ) : (
                     <>
                       <Save className="mr-2 h-4 w-4" />
-                      {t("leads.admin.campaignStarter.form.save")}
+                      {t(
+                        "app.admin.leads.leads.admin.campaignStarter.form.save",
+                      )}
                     </>
                   )}
                 </Button>

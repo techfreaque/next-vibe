@@ -1,47 +1,44 @@
 /**
- * STUB: calendar
- * Auto-generated placeholder for web-only component
- *
- * This component exists in next-vibe-ui/web/ui but not in native UI.
- * Replace this stub with a proper React Native implementation.
+ * Calendar Component for React Native
+ * TODO: Implement full calendar functionality with date selection
+ * Currently a placeholder that accepts date props
  */
 import type { ReactNode } from "react";
-import { Text, View } from "react-native";
+import React from "react";
+import { Text as RNText, View } from "react-native";
 
-export function Calendar({
-  children,
-  ...props
-}: {
+import { cn } from "../lib/utils";
+
+interface CalendarProps {
   children?: ReactNode;
-  [key: string]: any;
-}) {
-  console.warn("🔶 Using stub: Calendar");
-
-  return (
-    <View
-      style={{
-        padding: 8,
-        backgroundColor: "#FEF3C7",
-        marginVertical: 4,
-        borderRadius: 4,
-      }}
-    >
-      <Text style={{ fontSize: 12, color: "#92400E", marginBottom: 4 }}>
-        Calendar (stub)
-      </Text>
-      {children}
-    </View>
-  );
+  className?: string;
+  selected?: Date;
+  onSelect?: (date: Date | undefined) => void;
+  mode?: "single" | "multiple" | "range";
+  disabled?: boolean;
 }
 
-// Re-export any common sub-components as stubs
-export const CalendarContent = Calendar;
-export const CalendarHeader = Calendar;
-export const CalendarFooter = Calendar;
-export const CalendarTitle = Calendar;
-export const CalendarDescription = Calendar;
-export const CalendarTrigger = Calendar;
-export const CalendarItem = Calendar;
-export const CalendarLabel = Calendar;
+export const Calendar = React.forwardRef<View, CalendarProps>(
+  ({ className, children, selected, ...props }, ref) => {
+    // TODO: Implement onSelect, mode, disabled functionality
+    return (
+      <View
+        ref={ref}
+        className={cn(
+          "p-3 rounded-md border border-border bg-background",
+          className,
+        )}
+        {...props}
+      >
+        <RNText className="text-sm text-muted-foreground text-center">
+          {/* TODO: Implement calendar UI */}
+          {/* eslint-disable-next-line i18next/no-literal-string -- Placeholder text */}
+          {selected ? selected.toLocaleDateString() : "No date selected"}
+        </RNText>
+        {children}
+      </View>
+    );
+  },
+);
 
-export default Calendar;
+Calendar.displayName = "Calendar";

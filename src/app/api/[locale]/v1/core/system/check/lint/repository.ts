@@ -61,7 +61,7 @@ const IGNORED_FILES = [
   ".env.production",
 ] as const;
 
-const IGNORED_PATHS = ["src/packages/next-vibe-ui/native"] as const;
+const IGNORED_PATHS = [] as const;
 
 /**
  * Error message constants

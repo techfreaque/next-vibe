@@ -47,10 +47,13 @@ export function ImapMessageDetail({
   const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Use real API endpoint following leads/cron patterns
-  const messageEndpoint = useImapMessageById({
-    messageId,
-    enabled: true,
-  }, logger);
+  const messageEndpoint = useImapMessageById(
+    {
+      messageId,
+      enabled: true,
+    },
+    logger,
+  );
 
   const messageData = messageEndpoint.read?.data?.message;
   const isLoading = messageEndpoint.read?.isLoading;
@@ -388,7 +391,9 @@ export function ImapMessageDetail({
                     {t("app.admin.emails.imap.messages.createdAt")}:
                   </span>
                   <span className="text-gray-600 ml-2">
-                    {messageData.createdAt ? formatDate(messageData.createdAt) : "-"}
+                    {messageData.createdAt
+                      ? formatDate(messageData.createdAt)
+                      : "-"}
                   </span>
                 </div>
                 <div className="text-sm">

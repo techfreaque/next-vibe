@@ -102,6 +102,32 @@ export const translations: typeof enTranslations = {
         title: "Nicht gefunden",
         description: "Task oder Ausführungsaufzeichnung nicht gefunden",
       },
+      network: {
+        title: "Netzwerkfehler",
+        description:
+          "Netzwerkfehler beim Abrufen des Task-Verlaufs aufgetreten",
+      },
+      forbidden: {
+        title: "Verboten",
+        description: "Zugriff auf Task-Verlauf ist verboten",
+      },
+      server: {
+        title: "Serverfehler",
+        description: "Interner Serverfehler aufgetreten",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unbekannter Fehler ist aufgetreten",
+      },
+      unsavedChanges: {
+        titleChanges: "Ungespeicherte Änderungen",
+        title: "Ungespeicherte Änderungen",
+        description: "Sie haben ungespeicherte Änderungen",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Datenkonflikt aufgetreten",
+      },
     },
     success: {
       title: "Verlauf abgerufen",

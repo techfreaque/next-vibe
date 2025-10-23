@@ -160,9 +160,7 @@ export function ImapMessagesTable({
               </div>
             </TableCell>
             <TableCell>
-              <div className="text-sm text-muted-foreground">
-                -
-              </div>
+              <div className="text-sm text-muted-foreground">-</div>
             </TableCell>
             <TableCell>
               <div className="text-sm">{formatDate(message.sentAt)}</div>

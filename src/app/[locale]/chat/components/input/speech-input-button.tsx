@@ -9,7 +9,7 @@ import { useEdenAISpeech } from "@/app/api/[locale]/v1/core/agent/speech-to-text
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { Button } from "@/packages/next-vibe-ui/web/ui";
+import { Button } from "next-vibe-ui/ui";
 
 interface SpeechInputButtonProps {
   onTranscript: (text: string) => void;

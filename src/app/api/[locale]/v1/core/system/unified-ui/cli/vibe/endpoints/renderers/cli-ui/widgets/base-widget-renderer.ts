@@ -7,6 +7,7 @@ import chalk from "chalk";
 
 import type {
   DataFormatter,
+  RenderableValue,
   ResponseFieldMetadata,
   WidgetRenderContext,
   WidgetRenderer,
@@ -22,7 +23,7 @@ export abstract class BaseWidgetRenderer implements WidgetRenderer {
     this.formatter = new DefaultDataFormatter();
   }
 
-  abstract canRender(widgetType: any): boolean;
+  abstract canRender(widgetType: string): boolean;
   abstract render(
     field: ResponseFieldMetadata,
     context: WidgetRenderContext,
@@ -189,6 +190,7 @@ class DefaultDataFormatter implements DataFormatter {
   }
 
   formatBoolean(value: boolean): string {
+    // eslint-disable-next-line i18next/no-literal-string
     return value ? "✓" : "✗";
   }
 
@@ -198,26 +200,48 @@ class DefaultDataFormatter implements DataFormatter {
   }
 
   formatArray(
-    value: any[],
+    value: RenderableValue[],
     options?: { separator?: string; maxItems?: number },
   ): string {
     const separator = options?.separator ?? ", ";
     const maxItems = options?.maxItems ?? 10;
 
     const items = value.slice(0, maxItems);
-    const formatted = items.map((item) => String(item)).join(separator);
+    const formatted = items
+      .map((item) => {
+        if (typeof item === "object" && item !== null && !Array.isArray(item)) {
+          return JSON.stringify(item);
+        }
+        if (
+          typeof item === "string" ||
+          typeof item === "number" ||
+          typeof item === "boolean"
+        ) {
+          return String(item);
+        }
+        if (item === null || item === undefined) {
+          return String(item);
+        }
+        if (Array.isArray(item)) {
+          return JSON.stringify(item);
+        }
+        return "";
+      })
+      .join(separator);
 
     if (value.length > maxItems) {
+      // eslint-disable-next-line i18next/no-literal-string
       return `${formatted}... (+${value.length - maxItems} more)`;
     }
 
     return formatted;
   }
 
-  formatObject(value: object): string {
+  formatObject(value: Record<string, RenderableValue>): string {
     try {
       return JSON.stringify(value, null, 2);
     } catch {
+      // eslint-disable-next-line i18next/no-literal-string
       return "[Object]";
     }
   }

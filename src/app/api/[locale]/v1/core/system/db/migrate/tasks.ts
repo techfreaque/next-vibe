@@ -17,7 +17,7 @@ const dbMigrationHealthCheckTask: Task = {
   description: "Check for pending migrations and migration status",
   // eslint-disable-next-line i18next/no-literal-string
   schedule: "0 */6 * * *", // Every 6 hours
-  category: "database",
+  category: "DATABASE",
   enabled: true,
   priority: "MEDIUM",
   timeout: 300000, // 5 minutes
@@ -45,7 +45,7 @@ const autoMigrationRunnerTask: Task = {
   description: "Automatically run pending migrations in development",
   // eslint-disable-next-line i18next/no-literal-string
   schedule: "*/30 * * * *", // Every 30 minutes
-  category: "database",
+  category: "DATABASE",
   enabled: false, // Disabled by default for safety
   priority: "LOW",
   timeout: 600000, // 10 minutes
@@ -71,7 +71,7 @@ const migrationBackupMonitorTask: Task = {
   name: "migration-backup-monitor",
   // eslint-disable-next-line i18next/no-literal-string
   description: "Monitor migration backups and cleanup old backups",
-  category: "maintenance",
+  category: "MAINTENANCE",
   enabled: false, // Disabled by default
   priority: "LOW",
 

@@ -1,47 +1,36 @@
 /**
- * STUB: tags-field
- * Auto-generated placeholder for web-only component
- *
- * This component exists in next-vibe-ui/web/ui but not in native UI.
- * Replace this stub with a proper React Native implementation.
+ * TagsField Component for React Native
+ * TODO: Implement full tags input functionality with add/remove
+ * Currently a simple TextInput wrapper
  */
 import type { ReactNode } from "react";
-import { Text, View } from "react-native";
+import React from "react";
+import type { TextInputProps } from "react-native";
+import { TextInput, View } from "react-native";
 
-export function TagsField({
-  children,
-  ...props
-}: {
+import { cn } from "../lib/utils";
+
+interface TagsFieldProps extends TextInputProps {
   children?: ReactNode;
-  [key: string]: any;
-}) {
-  console.warn("🔶 Using stub: TagsField");
-
-  return (
-    <View
-      style={{
-        padding: 8,
-        backgroundColor: "#FEF3C7",
-        marginVertical: 4,
-        borderRadius: 4,
-      }}
-    >
-      <Text style={{ fontSize: 12, color: "#92400E", marginBottom: 4 }}>
-        TagsField (stub)
-      </Text>
-      {children}
-    </View>
-  );
+  className?: string;
+  tags?: string[];
+  onTagsChange?: (tags: string[]) => void;
 }
 
-// Re-export any common sub-components as stubs
-export const TagsFieldContent = TagsField;
-export const TagsFieldHeader = TagsField;
-export const TagsFieldFooter = TagsField;
-export const TagsFieldTitle = TagsField;
-export const TagsFieldDescription = TagsField;
-export const TagsFieldTrigger = TagsField;
-export const TagsFieldItem = TagsField;
-export const TagsFieldLabel = TagsField;
+export const TagsField = React.forwardRef<TextInput, TagsFieldProps>(
+  ({ className, children, ...props }, ref) => {
+    // TODO: Implement tags and onTagsChange functionality
+    return (
+      <View className={cn("flex flex-col gap-2", className)}>
+        <TextInput
+          ref={ref}
+          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          {...props}
+        />
+        {children}
+      </View>
+    );
+  },
+);
 
-export default TagsField;
+TagsField.displayName = "TagsField";

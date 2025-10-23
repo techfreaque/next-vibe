@@ -13,28 +13,29 @@ import { Controller, FormProvider, useFormContext } from "react-hook-form";
 import { View } from "react-native";
 import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 
-import {
-  BottomSheet,
-  BottomSheetCloseTrigger,
-  BottomSheetContent,
-  BottomSheetOpenTrigger,
-  BottomSheetView,
-} from "../../components/deprecated-ui/bottom-sheet";
-import { Calendar } from "../../components/deprecated-ui/calendar";
-import type { ComboboxOption } from "../../components/deprecated-ui/combobox";
-import { Combobox } from "../../components/deprecated-ui/combobox";
-import { Button, buttonTextVariants } from "../../components/ui/button";
-import { Checkbox } from "../../components/ui/checkbox";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
-import { RadioGroup } from "../../components/ui/radio-group";
-import { type Option, Select } from "../../components/ui/select";
-import { Switch } from "../../components/ui/switch";
-import { Textarea } from "../../components/ui/textarea";
-import { Calendar as CalendarIcon } from "../../lib/icons/Calendar";
-import { X } from "../../lib/icons/X";
+import { Calendar as CalendarIcon } from "../lib/icons/Calendar";
+import { X } from "../lib/icons/X";
 import { cn } from "../lib/utils";
+// TODO: These components need to be implemented
+// import {
+//   BottomSheet,
+//   BottomSheetCloseTrigger,
+//   BottomSheetContent,
+//   BottomSheetOpenTrigger,
+//   BottomSheetView,
+// } from "./bottom-sheet";
+// import { Calendar } from "./calendar";
+// import type { ComboboxOption } from "./combobox";
+// import { Combobox } from "./combobox";
+import { Button, buttonTextVariants } from "./button";
+import { Checkbox } from "./checkbox";
+import { Input } from "./input";
+import { Label } from "./label";
+import { RadioGroup } from "./radio-group";
+import { type Option, Select } from "./select";
+import { Switch } from "./switch";
 import { Text } from "./text";
+import { Textarea } from "./textarea";
 
 const Form = FormProvider;
 
@@ -357,103 +358,104 @@ const FormCheckbox = React.forwardRef<
 
 FormCheckbox.displayName = "FormCheckbox";
 
-const FormDatePicker = React.forwardRef<
-  React.ElementRef<typeof Button>,
-  FormItemProps<typeof Calendar, string>
->(({ label, description, value, onChange, ...props }, ref) => {
-  const {
-    error,
-    formItemNativeID,
-    formDescriptionNativeID,
-    formMessageNativeID,
-  } = useFormField();
+// TODO: Implement Calendar and BottomSheet components
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const FormDatePicker = React.forwardRef<React.ElementRef<typeof Button>, any>(
+  ({ label, description, value, onChange, ...props }, ref) => {
+    const {
+      error,
+      formItemNativeID,
+      formDescriptionNativeID,
+      formMessageNativeID,
+    } = useFormField();
 
-  return (
-    <FormItem>
-      {!!label && <FormLabel nativeID={formItemNativeID}>{label}</FormLabel>}
-      <BottomSheet>
-        <BottomSheetOpenTrigger asChild>
-          <Button
-            variant="outline"
-            className="flex-row gap-3 justify-start px-3 relative"
-            ref={ref}
-            aria-labelledby={formItemNativeID}
-            aria-describedby={
-              error
-                ? `${formDescriptionNativeID} ${formMessageNativeID}`
-                : `${formDescriptionNativeID}`
-            }
-            aria-invalid={!!error}
-          >
-            {({ pressed }) => (
-              <>
-                <CalendarIcon
-                  className={buttonTextVariants({
-                    variant: "outline",
-                    className: cn(
-                      !value && "opacity-80",
-                      pressed && "opacity-60",
-                    ),
-                  })}
-                  size={18}
-                />
-                <Text
-                  className={buttonTextVariants({
-                    variant: "outline",
-                    className: cn(
-                      "font-normal",
-                      !value && "opacity-70",
-                      pressed && "opacity-50",
-                    ),
-                  })}
-                >
-                  {value ? value : "Pick a date"}
-                </Text>
-                {!!value && (
-                  <Button
-                    className="absolute right-0 active:opacity-70 native:pr-3"
-                    variant="ghost"
-                    onPress={() => {
-                      onChange?.("");
-                    }}
+    return (
+      <FormItem>
+        {!!label && <FormLabel nativeID={formItemNativeID}>{label}</FormLabel>}
+        <BottomSheet>
+          <BottomSheetOpenTrigger asChild>
+            <Button
+              variant="outline"
+              className="flex-row gap-3 justify-start px-3 relative"
+              ref={ref}
+              aria-labelledby={formItemNativeID}
+              aria-describedby={
+                error
+                  ? `${formDescriptionNativeID} ${formMessageNativeID}`
+                  : `${formDescriptionNativeID}`
+              }
+              aria-invalid={!!error}
+            >
+              {({ pressed }) => (
+                <>
+                  <CalendarIcon
+                    className={buttonTextVariants({
+                      variant: "outline",
+                      className: cn(
+                        !value && "opacity-80",
+                        pressed && "opacity-60",
+                      ),
+                    })}
+                    size={18}
+                  />
+                  <Text
+                    className={buttonTextVariants({
+                      variant: "outline",
+                      className: cn(
+                        "font-normal",
+                        !value && "opacity-70",
+                        pressed && "opacity-50",
+                      ),
+                    })}
                   >
-                    <X size={18} className="text-muted-foreground text-xs" />
+                    {value ? value : "Pick a date"}
+                  </Text>
+                  {!!value && (
+                    <Button
+                      className="absolute right-0 active:opacity-70 native:pr-3"
+                      variant="ghost"
+                      onPress={() => {
+                        onChange?.("");
+                      }}
+                    >
+                      <X size={18} className="text-muted-foreground text-xs" />
+                    </Button>
+                  )}
+                </>
+              )}
+            </Button>
+          </BottomSheetOpenTrigger>
+          <BottomSheetContent>
+            <BottomSheetView hadHeader={false} className="pt-2">
+              <Calendar
+                style={{ height: 358 }}
+                onDayPress={(day) => {
+                  onChange?.(day.dateString === value ? "" : day.dateString);
+                }}
+                markedDates={{
+                  [value ?? ""]: {
+                    selected: true,
+                  },
+                }}
+                current={value} // opens calendar on selected date
+                {...props}
+              />
+              <View className={"pb-2 pt-4"}>
+                <BottomSheetCloseTrigger asChild>
+                  <Button>
+                    <Text>Close</Text>
                   </Button>
-                )}
-              </>
-            )}
-          </Button>
-        </BottomSheetOpenTrigger>
-        <BottomSheetContent>
-          <BottomSheetView hadHeader={false} className="pt-2">
-            <Calendar
-              style={{ height: 358 }}
-              onDayPress={(day) => {
-                onChange?.(day.dateString === value ? "" : day.dateString);
-              }}
-              markedDates={{
-                [value ?? ""]: {
-                  selected: true,
-                },
-              }}
-              current={value} // opens calendar on selected date
-              {...props}
-            />
-            <View className={"pb-2 pt-4"}>
-              <BottomSheetCloseTrigger asChild>
-                <Button>
-                  <Text>Close</Text>
-                </Button>
-              </BottomSheetCloseTrigger>
-            </View>
-          </BottomSheetView>
-        </BottomSheetContent>
-      </BottomSheet>
-      {!!description && <FormDescription>{description}</FormDescription>}
-      <FormMessage />
-    </FormItem>
-  );
-});
+                </BottomSheetCloseTrigger>
+              </View>
+            </BottomSheetView>
+          </BottomSheetContent>
+        </BottomSheet>
+        {!!description && <FormDescription>{description}</FormDescription>}
+        <FormMessage />
+      </FormItem>
+    );
+  },
+);
 
 FormDatePicker.displayName = "FormDatePicker";
 
@@ -497,39 +499,40 @@ const FormRadioGroup = React.forwardRef<
 
 FormRadioGroup.displayName = "FormRadioGroup";
 
-const FormCombobox = React.forwardRef<
-  React.ElementRef<typeof Combobox>,
-  FormItemProps<typeof Combobox, ComboboxOption | null>
->(({ label, description, value, onChange, ...props }, ref) => {
-  const {
-    error,
-    formItemNativeID,
-    formDescriptionNativeID,
-    formMessageNativeID,
-  } = useFormField();
+// TODO: Implement Combobox component
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const FormCombobox = React.forwardRef<any, any>(
+  ({ label, description, value, onChange, ...props }, ref) => {
+    const {
+      error,
+      formItemNativeID,
+      formDescriptionNativeID,
+      formMessageNativeID,
+    } = useFormField();
 
-  return (
-    <FormItem>
-      {!!label && <FormLabel nativeID={formItemNativeID}>{label}</FormLabel>}
-      <Combobox
-        ref={ref}
-        placeholder="Select framework"
-        aria-labelledby={formItemNativeID}
-        aria-describedby={
-          error
-            ? `${formDescriptionNativeID} ${formMessageNativeID}`
-            : `${formDescriptionNativeID}`
-        }
-        aria-invalid={!!error}
-        selectedItem={value}
-        onSelectedItemChange={onChange}
-        {...props}
-      />
-      {!!description && <FormDescription>{description}</FormDescription>}
-      <FormMessage />
-    </FormItem>
-  );
-});
+    return (
+      <FormItem>
+        {!!label && <FormLabel nativeID={formItemNativeID}>{label}</FormLabel>}
+        <Combobox
+          ref={ref}
+          placeholder="Select framework"
+          aria-labelledby={formItemNativeID}
+          aria-describedby={
+            error
+              ? `${formDescriptionNativeID} ${formMessageNativeID}`
+              : `${formDescriptionNativeID}`
+          }
+          aria-invalid={!!error}
+          selectedItem={value}
+          onSelectedItemChange={onChange}
+          {...props}
+        />
+        {!!description && <FormDescription>{description}</FormDescription>}
+        <FormMessage />
+      </FormItem>
+    );
+  },
+);
 
 FormCombobox.displayName = "FormCombobox";
 
@@ -653,8 +656,8 @@ FormSwitch.displayName = "FormSwitch";
 export {
   Form,
   FormCheckbox,
-  FormCombobox,
-  FormDatePicker,
+  // FormCombobox, // TODO: Implement Combobox component
+  // FormDatePicker, // TODO: Implement Calendar and BottomSheet components
   FormDescription,
   FormField,
   FormInput,

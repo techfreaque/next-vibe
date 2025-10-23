@@ -10,4 +10,37 @@ export const translations: typeof enTranslations = {
   start: startTranslations,
   status: statusTranslations,
   stop: stopTranslations,
+  operations: {
+    create: "Erstellen",
+    setup: "Einrichten",
+    start: "Starten",
+    stop: "Stoppen",
+    destroy: "Zerstören",
+    status: "Status",
+    list: "Liste",
+  },
+  security: {
+    minimal: "Minimale Sicherheit",
+    standard: "Standard-Sicherheit",
+    strict: "Strenge Sicherheit",
+    maximum: "Maximale Sicherheit",
+  },
+  userTypes: {
+    projectUser: "Projektbenutzer",
+    restrictedUser: "Eingeschränkter Benutzer",
+    chrootUser: "Chroot-Benutzer",
+  },
+  status: {
+    created: "Erstellt",
+    running: "Läuft",
+    stopped: "Gestoppt",
+    error: "Fehler",
+    destroyed: "Zerstört",
+  },
+  isolation: {
+    rbash: "Eingeschränkte Bash (rbash)",
+    chroot: "Chroot",
+    bubblewrap: "Bubblewrap",
+    firejail: "Firejail",
+  },
 };

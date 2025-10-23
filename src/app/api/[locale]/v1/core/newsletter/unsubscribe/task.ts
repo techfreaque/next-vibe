@@ -1,4 +1,3 @@
-import { TaskCategory } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 /**
  * Newsletter Unsubscribe Lead Status Sync Task (Unified Format)
  * Synchronizes lead statuses for newsletter unsubscribes that weren't properly updated
@@ -6,7 +5,6 @@ import { TaskCategory } from "@/app/api/[locale]/v1/core/system/tasks/enum";
  *
  * This file follows the unified task format as specified in spec.md
  */
-
 import "server-only";
 
 import { and, eq, ne } from "drizzle-orm";
@@ -25,7 +23,10 @@ import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
 } from "@/app/api/[locale]/v1/core/system/tasks/constants";
-import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/tasks/enum";
+import {
+  CronTaskPriority,
+  TaskCategory,
+} from "@/app/api/[locale]/v1/core/system/tasks/enum";
 import type {
   Task,
   TaskExecutionContext,

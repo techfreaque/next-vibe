@@ -131,7 +131,15 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
       // Map messages to include toolCalls from metadata
       const mappedMessages = messages.map((msg) => ({
         ...msg,
-        toolCalls: (msg.metadata as { toolCalls?: Array<{ toolName: string; args: Record<string, unknown> }> })?.toolCalls || null,
+        toolCalls:
+          (
+            msg.metadata as {
+              toolCalls?: Array<{
+                toolName: string;
+                args: Record<string, string | number | boolean | null>;
+              }>;
+            }
+          )?.toolCalls || null,
       }));
 
       return createSuccessResponse({ messages: mappedMessages });

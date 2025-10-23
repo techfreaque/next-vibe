@@ -32,15 +32,7 @@ const Alert = React.forwardRef<
     }
 >(
   (
-    {
-      className,
-      variant,
-      children,
-      icon: Icon,
-      iconSize = 16,
-      iconClassName,
-      ...props
-    },
+    { className, variant, children, icon: Icon, iconSize = 16, ...props },
     ref,
   ) => {
     const { colors } = useTheme();

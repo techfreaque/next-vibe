@@ -1,9 +1,7 @@
-import { TaskCategory } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 /**
  * Credit Expiration Cron Task
  * Expires old subscription credits daily
  */
-
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -16,7 +14,10 @@ import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
 } from "@/app/api/[locale]/v1/core/system/tasks/constants";
-import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/tasks/enum";
+import {
+  CronTaskPriority,
+  TaskCategory,
+} from "@/app/api/[locale]/v1/core/system/tasks/enum";
 import type { Task } from "@/app/api/[locale]/v1/core/system/tasks/types/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 

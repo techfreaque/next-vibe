@@ -5,6 +5,7 @@
 
 import type { JSX } from "react";
 
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -24,6 +25,7 @@ export default async function ImapFoldersPage({
 }: ImapFoldersPageProps): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -36,7 +38,7 @@ export default async function ImapFoldersPage({
         </p>
       </div>
 
-      <ImapFoldersManagement />
+      <ImapFoldersManagement logger={logger} />
     </div>
   );
 }

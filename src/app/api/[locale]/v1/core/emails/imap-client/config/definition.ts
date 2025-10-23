@@ -200,8 +200,9 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.v1.core.emails.imapClient.config.server.enabled",
-          description: "app.api.v1.core.emails.imapClient.config.server.enabled.description",
+          label: "app.api.v1.core.emails.imapClient.config.serverEnabled.label",
+          description:
+            "app.api.v1.core.emails.imapClient.config.serverEnabled.description",
           layout: { columns: 6 },
         },
       ),
@@ -215,8 +216,10 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.emails.imapClient.config.server.maxConnections",
-          description: "app.api.v1.core.emails.imapClient.config.server.maxConnections.description",
+          label:
+            "app.api.v1.core.emails.imapClient.config.response.maxConnections",
+          description:
+            "app.api.v1.core.emails.imapClient.config.maxConnections.description",
           layout: { columns: 6 },
         },
       ),
@@ -230,8 +233,10 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.emails.imapClient.config.server.connectionTimeout",
-          description: "app.api.v1.core.emails.imapClient.config.server.connectionTimeout.description",
+          label:
+            "app.api.v1.core.emails.imapClient.config.response.connectionTimeout",
+          description:
+            "app.api.v1.core.emails.imapClient.config.connectionTimeout.description",
           layout: { columns: 6 },
         },
       ),
@@ -245,8 +250,10 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.emails.imapClient.config.server.poolIdleTimeout",
-          description: "app.api.v1.core.emails.imapClient.config.server.poolIdleTimeout.description",
+          label:
+            "app.api.v1.core.emails.imapClient.config.response.poolIdleTimeout",
+          description:
+            "app.api.v1.core.emails.imapClient.config.serverEnabled.description",
           layout: { columns: 6 },
         },
       ),
@@ -260,8 +267,9 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.v1.core.emails.imapClient.config.server.keepAlive",
-          description: "app.api.v1.core.emails.imapClient.config.server.keepAlive.description",
+          label: "app.api.v1.core.emails.imapClient.config.response.keepAlive",
+          description:
+            "app.api.v1.core.emails.imapClient.config.serverEnabled.description",
           layout: { columns: 6 },
         },
       ),
@@ -276,8 +284,9 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.v1.core.emails.imapClient.config.sync.enabled",
-          description: "app.api.v1.core.emails.imapClient.config.sync.enabled.description",
+          label: "app.api.v1.core.emails.imapClient.config.syncEnabled.label",
+          description:
+            "app.api.v1.core.emails.imapClient.config.syncEnabled.description",
           layout: { columns: 6 },
         },
       ),
@@ -291,8 +300,9 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.emails.imapClient.config.sync.interval",
-          description: "app.api.v1.core.emails.imapClient.config.sync.interval.description",
+          label: "app.api.v1.core.emails.imapClient.config.syncInterval.label",
+          description:
+            "app.api.v1.core.emails.imapClient.config.syncInterval.description",
           layout: { columns: 6 },
         },
       ),
@@ -306,8 +316,10 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.emails.imapClient.config.sync.maxMessages",
-          description: "app.api.v1.core.emails.imapClient.config.sync.maxMessages.description",
+          label:
+            "app.api.v1.core.emails.imapClient.config.response.maxMessages",
+          description:
+            "app.api.v1.core.emails.imapClient.sync.maxMessages.description",
           layout: { columns: 6 },
         },
       ),
@@ -321,8 +333,9 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.emails.imapClient.config.sync.batchSize",
-          description: "app.api.v1.core.emails.imapClient.config.sync.batchSize.description",
+          label: "app.api.v1.core.emails.imapClient.config.response.batchSize",
+          description:
+            "app.api.v1.core.emails.imapClient.config.batchSize.description",
           layout: { columns: 6 },
         },
       ),
@@ -336,8 +349,10 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.emails.imapClient.config.sync.concurrentAccounts",
-          description: "app.api.v1.core.emails.imapClient.config.sync.concurrentAccounts.description",
+          label:
+            "app.api.v1.core.emails.imapClient.config.response.concurrentAccounts",
+          description:
+            "app.api.v1.core.emails.imapClient.sync.accountIds.description",
           layout: { columns: 6 },
         },
       ),
@@ -352,8 +367,10 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.v1.core.emails.imapClient.config.performance.cacheEnabled",
-          description: "app.api.v1.core.emails.imapClient.config.performance.cacheEnabled.description",
+          label:
+            "app.api.v1.core.emails.imapClient.config.response.cacheEnabled",
+          description:
+            "app.api.v1.core.emails.imapClient.config.serverEnabled.description",
           layout: { columns: 6 },
         },
       ),
@@ -367,8 +384,10 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.emails.imapClient.config.performance.cacheMaxSize",
-          description: "app.api.v1.core.emails.imapClient.config.performance.cacheMaxSize.description",
+          label:
+            "app.api.v1.core.emails.imapClient.config.response.cacheMaxSize",
+          description:
+            "app.api.v1.core.emails.imapClient.config.batchSize.description",
           layout: { columns: 6 },
         },
       ),
@@ -382,8 +401,9 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.emails.imapClient.config.performance.cacheTtl",
-          description: "app.api.v1.core.emails.imapClient.config.performance.cacheTtl.description",
+          label: "app.api.v1.core.emails.imapClient.config.response.cacheTtl",
+          description:
+            "app.api.v1.core.emails.imapClient.config.form.description",
           layout: { columns: 6 },
         },
       ),
@@ -397,8 +417,10 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.emails.imapClient.config.performance.memoryThreshold",
-          description: "app.api.v1.core.emails.imapClient.config.performance.memoryThreshold.description",
+          label:
+            "app.api.v1.core.emails.imapClient.config.response.memoryThreshold",
+          description:
+            "app.api.v1.core.emails.imapClient.config.form.description",
           layout: { columns: 6 },
         },
       ),
@@ -413,8 +435,9 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.emails.imapClient.config.resilience.maxRetries",
-          description: "app.api.v1.core.emails.imapClient.config.resilience.maxRetries.description",
+          label: "app.api.v1.core.emails.imapClient.config.response.maxRetries",
+          description:
+            "app.api.v1.core.emails.imapClient.config.response.maxRetries",
           layout: { columns: 6 },
         },
       ),
@@ -428,8 +451,9 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.emails.imapClient.config.resilience.retryDelay",
-          description: "app.api.v1.core.emails.imapClient.config.resilience.retryDelay.description",
+          label: "app.api.v1.core.emails.imapClient.config.response.retryDelay",
+          description:
+            "app.api.v1.core.emails.imapClient.config.response.retryDelay",
           layout: { columns: 6 },
         },
       ),
@@ -443,8 +467,10 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.emails.imapClient.config.resilience.circuitBreakerThreshold",
-          description: "app.api.v1.core.emails.imapClient.config.resilience.circuitBreakerThreshold.description",
+          label:
+            "app.api.v1.core.emails.imapClient.config.response.circuitBreakerThreshold",
+          description:
+            "app.api.v1.core.emails.imapClient.config.response.circuitBreakerThreshold",
           layout: { columns: 6 },
         },
       ),
@@ -458,8 +484,10 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.emails.imapClient.config.resilience.circuitBreakerTimeout",
-          description: "app.api.v1.core.emails.imapClient.config.resilience.circuitBreakerTimeout.description",
+          label:
+            "app.api.v1.core.emails.imapClient.config.response.circuitBreakerTimeout",
+          description:
+            "app.api.v1.core.emails.imapClient.config.response.circuitBreakerTimeout",
           layout: { columns: 6 },
         },
       ),
@@ -474,8 +502,10 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.emails.imapClient.config.monitoring.healthCheckInterval",
-          description: "app.api.v1.core.emails.imapClient.config.monitoring.healthCheckInterval.description",
+          label:
+            "app.api.v1.core.emails.imapClient.config.response.healthCheckInterval",
+          description:
+            "app.api.v1.core.emails.imapClient.config.syncInterval.description",
           layout: { columns: 6 },
         },
       ),
@@ -489,8 +519,10 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.v1.core.emails.imapClient.config.monitoring.metricsEnabled",
-          description: "app.api.v1.core.emails.imapClient.config.monitoring.metricsEnabled.description",
+          label:
+            "app.api.v1.core.emails.imapClient.config.response.metricsEnabled",
+          description:
+            "app.api.v1.core.emails.imapClient.config.serverEnabled.description",
           layout: { columns: 6 },
         },
       ),
@@ -505,8 +537,9 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.v1.core.emails.imapClient.config.development.debugMode",
-          description: "app.api.v1.core.emails.imapClient.config.development.debugMode.description",
+          label: "app.api.v1.core.emails.imapClient.config.response.debugMode",
+          description:
+            "app.api.v1.core.emails.imapClient.config.debugMode.description",
           layout: { columns: 6 },
         },
       ),
@@ -520,8 +553,9 @@ const { GET, POST } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.v1.core.emails.imapClient.config.development.testMode",
-          description: "app.api.v1.core.emails.imapClient.config.development.testMode.description",
+          label: "app.api.v1.core.emails.imapClient.config.response.testMode",
+          description:
+            "app.api.v1.core.emails.imapClient.config.debugMode.description",
           layout: { columns: 6 },
         },
       ),

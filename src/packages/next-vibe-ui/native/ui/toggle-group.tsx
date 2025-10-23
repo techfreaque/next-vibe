@@ -3,9 +3,9 @@ import type { VariantProps } from "class-variance-authority";
 import type { LucideIcon } from "lucide-react-native";
 import * as React from "react";
 
-import { toggleTextVariants, toggleVariants } from "../../components/ui/toggle";
 import { cn } from "../lib/utils";
 import { TextClassContext } from "./text";
+import { toggleTextVariants, toggleVariants } from "./toggle";
 
 const ToggleGroupContext = React.createContext<VariantProps<
   typeof toggleVariants
@@ -28,11 +28,12 @@ const ToggleGroup = React.forwardRef<
 
 ToggleGroup.displayName = ToggleGroupPrimitive.Root.displayName;
 
-function useToggleGroupContext() {
+function useToggleGroupContext(): ToggleGroupContextProps {
   const context = React.useContext(ToggleGroupContext);
   if (context === null) {
+    // eslint-disable-next-line no-restricted-syntax -- Error handling for context
     throw new Error(
-      "ToggleGroup compound components cannot be rendered outside the ToggleGroup component",
+      "ToggleGroup compound components cannot be rendered outside the ToggleGroup component", // eslint-disable-line i18next/no-literal-string -- Error message
     );
   }
   return context;
@@ -82,7 +83,7 @@ function ToggleGroupIcon({
   ...props
 }: React.ComponentPropsWithoutRef<LucideIcon> & {
   icon: LucideIcon;
-}) {
+}): React.JSX.Element {
   const textClass = React.useContext(TextClassContext);
   return <Icon className={cn(textClass, className)} {...props} />;
 }

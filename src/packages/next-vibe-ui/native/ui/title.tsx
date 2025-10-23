@@ -1,47 +1,47 @@
 /**
- * STUB: title
- * Auto-generated placeholder for web-only component
- *
- * This component exists in next-vibe-ui/web/ui but not in native UI.
- * Replace this stub with a proper React Native implementation.
+ * Title Component for React Native
+ * Provides semantic heading levels with responsive sizing
  */
 import type { ReactNode } from "react";
-import { Text, View } from "react-native";
+import { Text as RNText } from "react-native";
+
+import { cn } from "../lib/utils";
+
+interface TitleProps {
+  children: ReactNode;
+  className?: string;
+  customSizeClassName?: string;
+  level: 1 | 2 | 3 | 4 | 5 | 6;
+}
+
+/* eslint-disable i18next/no-literal-string -- CSS classNames */
+const sizeClasses = {
+  1: "text-4xl native:text-5xl font-bold",
+  2: "text-3xl native:text-4xl font-bold",
+  3: "text-xl native:text-2xl font-semibold",
+  4: "text-lg native:text-xl font-semibold",
+  5: "text-base native:text-lg font-medium",
+  6: "text-sm native:text-base font-medium",
+};
+/* eslint-enable i18next/no-literal-string */
 
 export function Title({
   children,
-  ...props
-}: {
-  children?: ReactNode;
-  [key: string]: any;
-}) {
-  console.warn("🔶 Using stub: Title");
-
+  className = "",
+  customSizeClassName,
+  level,
+}: TitleProps): React.JSX.Element {
   return (
-    <View
-      style={{
-        padding: 8,
-        backgroundColor: "#FEF3C7",
-        marginVertical: 4,
-        borderRadius: 4,
-      }}
+    <RNText
+      role="heading"
+      aria-level={level}
+      className={cn(
+        "leading-tight text-foreground",
+        customSizeClassName || sizeClasses[level],
+        className,
+      )}
     >
-      <Text style={{ fontSize: 12, color: "#92400E", marginBottom: 4 }}>
-        Title (stub)
-      </Text>
       {children}
-    </View>
+    </RNText>
   );
 }
-
-// Re-export any common sub-components as stubs
-export const TitleContent = Title;
-export const TitleHeader = Title;
-export const TitleFooter = Title;
-export const TitleTitle = Title;
-export const TitleDescription = Title;
-export const TitleTrigger = Title;
-export const TitleItem = Title;
-export const TitleLabel = Title;
-
-export default Title;

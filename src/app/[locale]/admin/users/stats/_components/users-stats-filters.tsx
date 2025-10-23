@@ -53,31 +53,32 @@ export function UsersStatsFilters({
           name="timePeriod"
           config={{
             type: "select",
-            label: "app.admin.users.admin.filters.timePeriod",
+            label: "app.admin.users.users.admin.filters.timePeriod",
             options: [
               {
                 value: TimePeriod.HOUR,
-                label: "app.admin.users.admin.filters.timePeriods.hour",
+                label: "app.admin.users.users.admin.filters.timePeriods.hour",
               },
               {
                 value: TimePeriod.DAY,
-                label: "app.admin.users.admin.filters.timePeriods.day",
+                label: "app.admin.users.users.admin.filters.timePeriods.day",
               },
               {
                 value: TimePeriod.WEEK,
-                label: "app.admin.users.admin.filters.timePeriods.week",
+                label: "app.admin.users.users.admin.filters.timePeriods.week",
               },
               {
                 value: TimePeriod.MONTH,
-                label: "app.admin.users.admin.filters.timePeriods.month",
+                label: "app.admin.users.users.admin.filters.timePeriods.month",
               },
               {
                 value: TimePeriod.QUARTER,
-                label: "app.admin.users.admin.filters.timePeriods.quarter",
+                label:
+                  "app.admin.users.users.admin.filters.timePeriods.quarter",
               },
               {
                 value: TimePeriod.YEAR,
-                label: "app.admin.users.admin.filters.timePeriods.year",
+                label: "app.admin.users.users.admin.filters.timePeriods.year",
               },
             ],
           }}
@@ -89,51 +90,61 @@ export function UsersStatsFilters({
           name="dateRangePreset"
           config={{
             type: "select",
-            label: "app.admin.users.admin.filters.dateRange",
+            label: "app.admin.users.users.admin.filters.dateRange",
             options: [
               {
                 value: DateRangePreset.TODAY,
-                label: "app.admin.users.admin.filters.dateRanges.today",
+                label: "app.admin.users.users.admin.filters.dateRanges.today",
               },
               {
                 value: DateRangePreset.YESTERDAY,
-                label: "app.admin.users.admin.filters.dateRanges.yesterday",
+                label:
+                  "app.admin.users.users.admin.filters.dateRanges.yesterday",
               },
               {
                 value: DateRangePreset.LAST_7_DAYS,
-                label: "app.admin.users.admin.filters.dateRanges.last7Days",
+                label:
+                  "app.admin.users.users.admin.filters.dateRanges.last7Days",
               },
               {
                 value: DateRangePreset.LAST_30_DAYS,
-                label: "app.admin.users.admin.filters.dateRanges.last30Days",
+                label:
+                  "app.admin.users.users.admin.filters.dateRanges.last30Days",
               },
               {
                 value: DateRangePreset.LAST_90_DAYS,
-                label: "app.admin.users.admin.filters.dateRanges.last90Days",
+                label:
+                  "app.admin.users.users.admin.filters.dateRanges.last90Days",
               },
               {
                 value: DateRangePreset.THIS_MONTH,
-                label: "app.admin.users.admin.filters.dateRanges.thisMonth",
+                label:
+                  "app.admin.users.users.admin.filters.dateRanges.thisMonth",
               },
               {
                 value: DateRangePreset.LAST_MONTH,
-                label: "app.admin.users.admin.filters.dateRanges.lastMonth",
+                label:
+                  "app.admin.users.users.admin.filters.dateRanges.lastMonth",
               },
               {
                 value: DateRangePreset.THIS_QUARTER,
-                label: "app.admin.users.admin.filters.dateRanges.thisQuarter",
+                label:
+                  "app.admin.users.users.admin.filters.dateRanges.thisQuarter",
               },
               {
                 value: DateRangePreset.LAST_QUARTER,
-                label: "app.admin.users.admin.filters.dateRanges.lastQuarter",
+                label:
+                  "app.admin.users.users.admin.filters.dateRanges.lastQuarter",
               },
               {
                 value: DateRangePreset.THIS_YEAR,
-                label: "app.admin.users.admin.filters.dateRanges.thisYear",
+                label:
+                  "app.admin.users.users.admin.filters.dateRanges.thisYear",
               },
               {
                 value: DateRangePreset.LAST_YEAR,
-                label: "app.admin.users.admin.filters.dateRanges.lastYear",
+                label:
+                  "app.admin.users.users.admin.filters.dateRanges.lastYear",
               },
             ],
           }}
@@ -145,19 +156,19 @@ export function UsersStatsFilters({
           name="chartType"
           config={{
             type: "select",
-            label: "app.admin.users.admin.filters.chartType",
+            label: "app.admin.users.users.admin.filters.chartType",
             options: [
               {
                 value: ChartType.LINE,
-                label: "app.admin.users.admin.filters.chartTypes.line",
+                label: "app.admin.users.users.admin.filters.chartTypes.line",
               },
               {
                 value: ChartType.BAR,
-                label: "app.admin.users.admin.filters.chartTypes.bar",
+                label: "app.admin.users.users.admin.filters.chartTypes.bar",
               },
               {
                 value: ChartType.AREA,
-                label: "app.admin.users.admin.filters.chartTypes.area",
+                label: "app.admin.users.users.admin.filters.chartTypes.area",
               },
             ],
           }}
@@ -172,27 +183,29 @@ export function UsersStatsFilters({
           name="status"
           config={{
             type: "select",
-            label: "app.admin.users.admin.filters.status",
+            label: "app.admin.users.users.admin.filters.status",
             options: [
               {
                 value: UserStatusFilter.ALL,
-                label: "app.admin.users.admin.filters.statuses.all",
+                label: "app.admin.users.users.admin.filters.statuses.all",
               },
               {
                 value: UserStatusFilter.ACTIVE,
-                label: "app.admin.users.admin.filters.statuses.active",
+                label: "app.admin.users.users.admin.filters.statuses.active",
               },
               {
                 value: UserStatusFilter.INACTIVE,
-                label: "app.admin.users.admin.filters.statuses.inactive",
+                label: "app.admin.users.users.admin.filters.statuses.inactive",
               },
               {
                 value: UserStatusFilter.EMAIL_VERIFIED,
-                label: "app.admin.users.admin.filters.statuses.emailVerified",
+                label:
+                  "app.admin.users.users.admin.filters.statuses.emailVerified",
               },
               {
                 value: UserStatusFilter.EMAIL_UNVERIFIED,
-                label: "app.admin.users.admin.filters.statuses.emailUnverified",
+                label:
+                  "app.admin.users.users.admin.filters.statuses.emailUnverified",
               },
             ],
           }}
@@ -204,15 +217,15 @@ export function UsersStatsFilters({
           name="country"
           config={{
             type: "select",
-            label: "leads.admin.filters.countries.title",
+            label: "app.admin.users.users.admin.filters.status",
             options: [
               {
                 value: Countries.DE,
-                label: "leads.admin.filters.countries.de",
+                label: "app.admin.users.users.admin.filters.statuses.active",
               },
               {
                 value: Countries.PL,
-                label: "leads.admin.filters.countries.pl",
+                label: "app.admin.users.users.admin.filters.statuses.inactive",
               },
             ],
           }}
@@ -224,27 +237,27 @@ export function UsersStatsFilters({
           name="role"
           config={{
             type: "select",
-            label: "app.admin.users.admin.filters.role",
+            label: "app.admin.users.users.admin.filters.role",
             options: [
               {
                 value: UserRoleFilter.ALL,
-                label: "app.admin.users.admin.filters.roles.all",
+                label: "app.admin.users.users.admin.filters.roles.all",
               },
               {
                 value: UserRoleFilter.PUBLIC,
-                label: "app.admin.users.admin.filters.roles.public",
+                label: "app.admin.users.users.admin.filters.roles.public",
               },
               {
                 value: UserRoleFilter.CUSTOMER,
-                label: "app.admin.users.admin.filters.roles.customer",
+                label: "app.admin.users.users.admin.filters.roles.customer",
               },
               {
                 value: UserRoleFilter.PARTNER_ADMIN,
-                label: "app.admin.users.admin.filters.roles.partnerAdmin",
+                label: "app.admin.users.users.admin.filters.roles.partnerAdmin",
               },
               {
                 value: UserRoleFilter.ADMIN,
-                label: "app.admin.users.admin.filters.roles.admin",
+                label: "app.admin.users.users.admin.filters.roles.admin",
               },
             ],
           }}
@@ -259,8 +272,9 @@ export function UsersStatsFilters({
           name="includeComparison"
           config={{
             type: "checkbox",
-            label: "app.admin.users.admin.filters.includeComparison",
-            description: "app.admin.users.admin.filters.includeComparisonDescription",
+            label: "app.admin.users.users.admin.filters.includeComparison",
+            description:
+              "app.admin.users.users.admin.filters.includeComparisonDescription",
           }}
         />
       </div>

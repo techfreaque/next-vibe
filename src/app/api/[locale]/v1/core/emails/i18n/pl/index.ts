@@ -1,6 +1,7 @@
 import { translations as emailServiceTranslations } from "../../email-service/i18n/pl";
 import { translations as imapClientTranslations } from "../../imap-client/i18n/pl";
 import { translations as messagesTranslations } from "../../messages/i18n/pl";
+import { translations as sendTranslations } from "../../send/i18n/pl";
 import { translations as smtpClientTranslations } from "../../smtp-client/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
@@ -474,6 +475,7 @@ export const translations: typeof enTranslations = {
   emailService: emailServiceTranslations,
   imapClient: imapClientTranslations,
   messages: messagesTranslations,
+  send: sendTranslations,
   smtpClient: smtpClientTranslations,
 
   // Core emails level translations

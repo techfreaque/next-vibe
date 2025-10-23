@@ -3,7 +3,7 @@ import * as React from "react";
 import { Platform, StyleSheet, View, type ViewProps } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { X } from "../../lib/icons/X";
+import { X } from "../lib/icons/X";
 import { cn } from "../lib/utils";
 
 const Dialog = DialogPrimitive.Root;
@@ -107,7 +107,7 @@ const DialogContent = React.forwardRef<
 });
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
-const DialogHeader = ({ className, ...props }: ViewProps) => (
+const DialogHeader = ({ className, ...props }: ViewProps): React.JSX.Element => (
   <View
     className={cn("flex flex-col gap-1.5 text-center sm:text-left", className)}
     {...props}
@@ -115,7 +115,10 @@ const DialogHeader = ({ className, ...props }: ViewProps) => (
 );
 DialogHeader.displayName = "DialogHeader";
 
-const DialogFooter = ({ className, ...props }: ViewProps) => (
+const DialogFooter = ({
+  className,
+  ...props
+}: ViewProps): React.JSX.Element => (
   <View
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end gap-2",

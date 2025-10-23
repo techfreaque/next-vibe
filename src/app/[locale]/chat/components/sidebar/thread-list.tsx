@@ -1,7 +1,16 @@
 "use client";
 
-import { Archive, ArchiveRestore, Edit2, FolderInput, MoreVertical, Pin, PinOff, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import {
+  Archive,
+  ArchiveRestore,
+  Edit2,
+  FolderInput,
+  MoreVertical,
+  Pin,
+  PinOff,
+  Trash2,
+} from "lucide-react";
+import { useRouter } from "next-vibe-ui/hooks";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useState } from "react";
@@ -32,7 +41,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/packages/next-vibe-ui/web/ui";
+} from "next-vibe-ui/ui";
 
 import { useTouchDevice } from "../../hooks/use-touch-device";
 import { chatColors, chatTransitions } from "../../lib/design-tokens";

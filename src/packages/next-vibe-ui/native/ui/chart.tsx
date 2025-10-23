@@ -1,47 +1,37 @@
 /**
- * STUB: chart
- * Auto-generated placeholder for web-only component
- *
- * This component exists in next-vibe-ui/web/ui but not in native UI.
- * Replace this stub with a proper React Native implementation.
+ * Chart Component for React Native
+ * TODO: Implement charts using react-native-svg or similar library
+ * Currently a placeholder container
  */
 import type { ReactNode } from "react";
-import { Text, View } from "react-native";
+import React from "react";
+import { View } from "react-native";
 
-export function Chart({
-  children,
-  ...props
-}: {
-  children?: ReactNode;
-  [key: string]: any;
-}) {
-  console.warn("🔶 Using stub: Chart");
+import { cn } from "../lib/utils";
 
-  return (
-    <View
-      style={{
-        padding: 8,
-        backgroundColor: "#FEF3C7",
-        marginVertical: 4,
-        borderRadius: 4,
-      }}
-    >
-      <Text style={{ fontSize: 12, color: "#92400E", marginBottom: 4 }}>
-        Chart (stub)
-      </Text>
-      {children}
-    </View>
-  );
+interface ChartProps {
+  children: ReactNode;
+  className?: string;
 }
 
-// Re-export any common sub-components as stubs
-export const ChartContent = Chart;
-export const ChartHeader = Chart;
-export const ChartFooter = Chart;
-export const ChartTitle = Chart;
-export const ChartDescription = Chart;
-export const ChartTrigger = Chart;
-export const ChartItem = Chart;
-export const ChartLabel = Chart;
+export const Chart = React.forwardRef<View, ChartProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <View
+        ref={ref}
+        className={cn("flex flex-col gap-2", className)}
+        {...props}
+      >
+        {children}
+      </View>
+    );
+  },
+);
 
-export default Chart;
+Chart.displayName = "Chart";
+
+export const ChartContainer = Chart;
+export const ChartTooltip = View;
+export const ChartTooltipContent = View;
+export const ChartLegend = View;
+export const ChartLegendContent = View;

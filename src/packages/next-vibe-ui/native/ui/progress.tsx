@@ -40,7 +40,7 @@ function Indicator({
 }: {
   value: number | undefined | null;
   className?: string;
-}) {
+}): React.JSX.Element {
   const progress = useDerivedValue(() => value ?? 0);
 
   const indicator = useAnimatedStyle(() => {

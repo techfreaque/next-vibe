@@ -24,7 +24,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/packages/next-vibe-ui/web/ui";
+} from "next-vibe-ui/ui";
 
 interface IconSelectorProps {
   value: IconValue;

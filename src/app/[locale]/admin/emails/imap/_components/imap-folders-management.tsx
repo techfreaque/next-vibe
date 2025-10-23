@@ -19,22 +19,29 @@ import {
 } from "next-vibe-ui/ui/select";
 import type { JSX } from "react";
 
-import { useImapAccountsListEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/hooks";
-import { useImapFoldersListEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/folders/list/hooks";
-import { useImapFolderSyncEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/folders/sync/hooks";
+import { useImapAccountsList } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/hooks";
+import { useImapFoldersList } from "@/app/api/[locale]/v1/core/emails/imap-client/folders/list/hooks";
+import { useImapFoldersSync } from "@/app/api/[locale]/v1/core/emails/imap-client/folders/sync/hooks";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { useTranslation } from "@/i18n/core/client";
 
 import { ImapFoldersList } from "./imap-folders-list";
+
+interface ImapFoldersManagementProps {
+  logger: EndpointLogger;
+}
 
 /**
  * IMAP Folders Management Component
  * Uses useEndpoint for all state management following leads/cron patterns
  */
-export function ImapFoldersManagement(): JSX.Element {
+export function ImapFoldersManagement({
+  logger,
+}: ImapFoldersManagementProps): JSX.Element {
   const { t } = useTranslation();
 
   // Use endpoints for data management - no local useState
-  const accountsEndpoint = useImapAccountsListEndpoint();
+  const accountsEndpoint = useImapAccountsList(logger);
 
   // Get accounts data for the dropdown
   const accountsResponse = accountsEndpoint.read?.response;
@@ -46,8 +53,8 @@ export function ImapFoldersManagement(): JSX.Element {
   const selectedAccountId = accounts.length > 0 ? accounts[0].id : "";
 
   // Only initialize folders endpoint if we have an account ID
-  const foldersEndpoint = useImapFoldersListEndpoint(selectedAccountId);
-  const syncEndpoint = useImapFolderSyncEndpoint();
+  const foldersEndpoint = useImapFoldersList(selectedAccountId, logger);
+  const syncEndpoint = useImapFoldersSync(logger);
 
   return (
     <div className="space-y-6">
@@ -122,7 +129,7 @@ export function ImapFoldersManagement(): JSX.Element {
 
             {/* Folders Display */}
             <div className="border rounded-lg">
-              <ImapFoldersList accountId={selectedAccountId} />
+              <ImapFoldersList accountId={selectedAccountId} logger={logger} />
             </div>
           </Form>
         </CardContent>
@@ -141,7 +148,7 @@ export function ImapFoldersManagement(): JSX.Element {
             <div className="text-center">
               <div className="text-2xl font-bold">
                 {foldersEndpoint.read?.response?.success
-                  ? foldersEndpoint.read.response.data.total
+                  ? foldersEndpoint.read.response.data.pagination.total
                   : 0}
               </div>
               <div className="text-sm text-gray-600">

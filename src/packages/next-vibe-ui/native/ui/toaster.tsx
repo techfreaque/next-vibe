@@ -1,36 +1,43 @@
 /**
- * STUB: toaster
- * Auto-generated placeholder for web-only component
- *
- * This component exists in next-vibe-ui/web/ui but not in native UI.
- * Replace this stub with a proper React Native implementation.
+ * Toaster Component for React Native
+ * Renders toast notifications from useToast hook
  */
-import type { ReactNode } from "react";
-import { Text, View } from "react-native";
+import React from "react";
+import { View } from "react-native";
 
-export function Toaster({
-  children,
-  ...props
-}: {
-  children?: ReactNode;
-  [key: string]: any;
-}) {
-  console.warn("🔶 Using stub: Toaster");
+import {
+  Toast,
+  ToastClose,
+  ToastDescription,
+  ToastProvider,
+  ToastTitle,
+  ToastViewport,
+} from "./toast";
+import { useToast } from "../hooks/use-toast";
+
+export function Toaster(): React.JSX.Element {
+  const { toasts } = useToast();
 
   return (
-    <View
-      style={{
-        padding: 8,
-        backgroundColor: "#FEF3C7",
-        marginVertical: 4,
-        borderRadius: 4,
-      }}
-    >
-      <Text style={{ fontSize: 12, color: "#92400E", marginBottom: 4 }}>
-        Toaster (stub)
-      </Text>
-      {children}
-    </View>
+    <ToastProvider>
+      <View className="absolute top-0 left-0 right-0 p-4 z-50 pointer-events-none">
+        {toasts.map(({ id, title, description, action, ...props }) => (
+          <View key={id} className="mb-2 pointer-events-auto">
+            <Toast {...props}>
+              <View className="flex-1">
+                {title && <ToastTitle>{title}</ToastTitle>}
+                {description && (
+                  <ToastDescription>{description}</ToastDescription>
+                )}
+              </View>
+              {action}
+              <ToastClose />
+            </Toast>
+          </View>
+        ))}
+      </View>
+      <ToastViewport />
+    </ToastProvider>
   );
 }
 

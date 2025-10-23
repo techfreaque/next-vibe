@@ -19,6 +19,7 @@ import {
   CardHeader,
   CardTitle,
   Div,
+  Link,
   Text,
 } from "next-vibe-ui/ui";
 import { H1, H2, P } from "next-vibe-ui/ui/typography";
@@ -93,9 +94,11 @@ export default async function HomePage({
             </Div>
           </CardContent>
           <CardFooter>
-            <Button className="w-full">
-              <Text>Get Started</Text>
-            </Button>
+            <Link href={`/${locale}/chat`} asChild>
+              <Button className="w-full">
+                <Text>Go to Chat</Text>
+              </Button>
+            </Link>
           </CardFooter>
         </Card>
 

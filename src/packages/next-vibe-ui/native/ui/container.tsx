@@ -1,47 +1,41 @@
 /**
- * STUB: container
- * Auto-generated placeholder for web-only component
- *
- * This component exists in next-vibe-ui/web/ui but not in native UI.
- * Replace this stub with a proper React Native implementation.
+ * Container Component for React Native
+ * Provides consistent max-width and padding for app pages
  */
 import type { ReactNode } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+
+import { cn } from "../lib/utils";
+
+interface ContainerProps {
+  children: ReactNode;
+  className?: string;
+  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "full";
+}
+
+const sizeClasses = {
+  "sm": "max-w-2xl",
+  "md": "max-w-4xl",
+  "lg": "max-w-7xl",
+  "xl": "max-w-screen-xl",
+  "2xl": "max-w-screen-2xl",
+  "full": "max-w-full",
+};
 
 export function Container({
   children,
-  ...props
-}: {
-  children?: ReactNode;
-  [key: string]: any;
-}) {
-  console.warn("🔶 Using stub: Container");
-
+  className,
+  size = "lg",
+}: ContainerProps): React.JSX.Element {
   return (
     <View
-      style={{
-        padding: 8,
-        backgroundColor: "#FEF3C7",
-        marginVertical: 4,
-        borderRadius: 4,
-      }}
+      className={cn(
+        "mx-auto px-4 native:px-6 py-8",
+        sizeClasses[size],
+        className,
+      )}
     >
-      <Text style={{ fontSize: 12, color: "#92400E", marginBottom: 4 }}>
-        Container (stub)
-      </Text>
       {children}
     </View>
   );
 }
-
-// Re-export any common sub-components as stubs
-export const ContainerContent = Container;
-export const ContainerHeader = Container;
-export const ContainerFooter = Container;
-export const ContainerTitle = Container;
-export const ContainerDescription = Container;
-export const ContainerTrigger = Container;
-export const ContainerItem = Container;
-export const ContainerLabel = Container;
-
-export default Container;

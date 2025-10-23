@@ -166,15 +166,18 @@ export function EditSmtpAccountForm({
   const countryOptions = [
     {
       value: Countries.GLOBAL,
-      label: "common.countries.global" as const satisfies TranslationKey,
+      label:
+        "app.admin.emails.smtp.admin.fields.countries" as const satisfies TranslationKey,
     },
     {
       value: Countries.DE,
-      label: "common.countries.de" as const satisfies TranslationKey,
+      label:
+        "app.admin.emails.smtp.admin.countries.de" as const satisfies TranslationKey,
     },
     {
       value: Countries.PL,
-      label: "common.countries.pl" as const satisfies TranslationKey,
+      label:
+        "app.admin.emails.smtp.admin.countries.pl" as const satisfies TranslationKey,
     },
   ];
 
@@ -182,15 +185,18 @@ export function EditSmtpAccountForm({
   const languageOptions = [
     {
       value: Languages.EN,
-      label: "common.languages.en" as const satisfies TranslationKey,
+      label:
+        "app.admin.emails.smtp.admin.fields.languages" as const satisfies TranslationKey,
     },
     {
       value: Languages.DE,
-      label: "common.languages.de" as const satisfies TranslationKey,
+      label:
+        "app.admin.emails.smtp.admin.languages.de" as const satisfies TranslationKey,
     },
     {
       value: Languages.PL,
-      label: "common.languages.pl" as const satisfies TranslationKey,
+      label:
+        "app.admin.emails.smtp.admin.languages.pl" as const satisfies TranslationKey,
     },
   ];
 
@@ -202,7 +208,7 @@ export function EditSmtpAccountForm({
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
           <p className="text-gray-500">
-            {t("app.admin.emails.smtp.list.loading")}
+            {t("app.admin.emails.smtp.admin.list.loading")}
           </p>
         </div>
       </div>
@@ -214,11 +220,11 @@ export function EditSmtpAccountForm({
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <p className="text-gray-500 mb-4">
-            {t("app.admin.emails.smtp.list.noResults")}
+            {t("app.admin.emails.smtp.admin.list.noResults")}
           </p>
           <Button asChild>
             <Link href={`/${locale}/admin/emails/smtp`}>
-              {t("app.admin.emails.smtp.list.actions.back")}
+              {t("app.admin.emails.smtp.admin.list.actions.back")}
             </Link>
           </Button>
         </div>
@@ -233,7 +239,7 @@ export function EditSmtpAccountForm({
         <Button variant="outline" asChild>
           <Link href={`/${locale}/admin/emails/smtp`}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            {t("app.admin.emails.smtp.list.actions.back")}
+            {t("app.admin.emails.smtp.admin.list.actions.back")}
           </Link>
         </Button>
       </div>
@@ -453,18 +459,20 @@ export function EditSmtpAccountForm({
 
             {/* Authentication */}
             <FormFieldGroup
-              title={"app.admin.emails.smtp.form.authentication" as const}
+              title={
+                "app.admin.emails.smtp.admin.form.connectionSettings" as const
+              }
               description={
-                "app.admin.emails.smtp.form.authenticationDescription" as const
+                "app.admin.emails.smtp.admin.form.connectionSettingsDescription" as const
               }
             >
               <EndpointFormField
                 name="username"
                 config={{
                   type: "text",
-                  label: "app.admin.emails.smtp.fields.username" as const,
+                  label: "app.admin.emails.smtp.admin.fields.username" as const,
                   placeholder:
-                    "app.admin.emails.smtp.fields.usernamePlaceholder" as const,
+                    "app.admin.emails.smtp.admin.fields.usernamePlaceholder" as const,
                 }}
                 control={endpoint.create.form.control}
                 schema={updateSmtpAccountSchema}
@@ -477,9 +485,9 @@ export function EditSmtpAccountForm({
 
             {/* Email Settings */}
             <FormFieldGroup
-              title={"app.admin.emails.smtp.form.emailSettings" as const}
+              title={"app.admin.emails.smtp.admin.form.emailSettings" as const}
               description={
-                "app.admin.emails.smtp.form.emailSettingsDescription" as const
+                "app.admin.emails.smtp.admin.form.emailSettingsDescription" as const
               }
             >
               <EndpointFormField
@@ -604,7 +612,7 @@ export function EditSmtpAccountForm({
                 onClick={() => router.push(`/${locale}/admin/emails/smtp`)}
                 disabled={isSaving}
               >
-                {t("app.admin.emails.smtp.actions.cancel")}
+                {t("app.admin.emails.smtp.admin.actions.cancel")}
               </Button>
               <Button type="submit" disabled={isSaving}>
                 <Save className="h-4 w-4 mr-2" />

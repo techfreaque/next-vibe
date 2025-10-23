@@ -88,6 +88,10 @@ export const translations = {
     },
   },
 
+  confirmations: {
+    deleteMessage: "Are you sure you want to delete this message?",
+  },
+
   iconSelector: {
     tabs: {
       library: "Icon Library",

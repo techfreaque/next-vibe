@@ -10,7 +10,7 @@ import {
   Settings,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next-vibe-ui/hooks";
 import type { JSX } from "react";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -37,7 +37,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/packages/next-vibe-ui/web/ui";
+} from "next-vibe-ui/ui";
 
 import { UI_CONFIG } from "../../lib/config/constants";
 import {

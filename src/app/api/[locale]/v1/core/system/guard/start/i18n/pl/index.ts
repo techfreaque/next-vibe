@@ -1,54 +1,66 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  post: {
-    title: "Tytuł",
-    description: "Opis endpointu",
-    form: {
-      title: "Konfiguracja",
-      description: "Skonfiguruj parametry",
+  title: "Uruchom Guard",
+  description: "Uruchom środowiska guard dla projektów VSCode",
+  tag: "Uruchom",
+  category: "Guard",
+  container: {
+    title: "Konfiguracja uruchomienia",
+    description: "Skonfiguruj parametry uruchomienia guard",
+  },
+  fields: {
+    projectPath: {
+      title: "Ścieżka projektu",
+      description: "Ścieżka do projektu VSCode",
+      placeholder: "/home/user/projects/moj-projekt",
     },
-    response: {
-      title: "Odpowiedź",
-      description: "Dane odpowiedzi",
+    guardId: {
+      title: "ID Guard",
+      description: "Unikalny identyfikator środowiska guard",
+      placeholder: "guard_moj_projekt_abc123",
     },
-    errors: {
-      unauthorized: {
-        title: "Brak autoryzacji",
-        description: "Wymagana autoryzacja",
-      },
-      validation: {
-        title: "Błąd walidacji",
-        description: "Nieprawidłowe parametry żądania",
-      },
-      server: {
-        title: "Błąd serwera",
-        description: "Wystąpił wewnętrzny błąd serwera",
-      },
-      unknown: {
-        title: "Nieznany błąd",
-        description: "Wystąpił nieznany błąd",
-      },
-      network: {
-        title: "Błąd sieci",
-        description: "Wystąpił błąd sieci",
-      },
-      forbidden: {
-        title: "Zabronione",
-        description: "Dostęp zabroniony",
-      },
-      notFound: {
-        title: "Nie znaleziono",
-        description: "Zasób nie został znaleziony",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Wystąpił konflikt danych",
+    startAll: {
+      title: "Uruchom wszystkie Guard",
+      description: "Uruchom wszystkie dostępne środowiska guard",
+    },
+    totalStarted: {
+      title: "Całkowita liczba uruchomionych",
+    },
+    output: {
+      title: "Wynik",
+    },
+    startedGuards: {
+      columns: {
+        username: "Nazwa użytkownika",
+        projectPath: "Ścieżka projektu",
       },
     },
-    success: {
-      title: "Sukces",
-      description: "Operacja zakończona pomyślnie",
+  },
+  errors: {
+    unauthorized: {
+      title: "Brak autoryzacji",
+      description: "Wymagana autoryzacja",
     },
+    validation: {
+      title: "Błąd walidacji",
+      description: "Nieprawidłowe parametry żądania",
+    },
+    internal: {
+      title: "Błąd wewnętrzny",
+      description: "Wystąpił wewnętrzny błąd serwera",
+    },
+    notFound: {
+      title: "Nie znaleziono",
+      description: "Środowisko guard nie zostało znalezione",
+    },
+    conflict: {
+      title: "Konflikt",
+      description: "Środowisko guard jest już uruchomione",
+    },
+  },
+  success: {
+    title: "Sukces",
+    description: "Guard uruchomiony pomyślnie",
   },
 };

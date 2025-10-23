@@ -55,14 +55,16 @@ export const translations: typeof enTranslations = {
     followup1: {
       previewText: "Zobacz prawdziwe wyniki naszych klientów",
       headline: "Prawdziwe wyniki, Prawdziwi klienci",
-      subheadline: "Nie wierz nam tylko na słowo - zobacz, co osiągnęliśmy dla firm takich jak Twoja",
+      subheadline:
+        "Nie wierz nam tylko na słowo - zobacz, co osiągnęliśmy dla firm takich jak Twoja",
       caseStudyTitle: "Historia sukcesu",
       caseStudyCompany: "Firma",
       caseStudyIndustry: "Branża",
       caseStudyTimeframe: "Ramy czasowe",
       caseStudyResults: "Osiągnięte wyniki",
       roiTitle: "Twój potencjalny ROI",
-      roiExplanation: "Na podstawie podobnych klientów, oto czego możesz się spodziewać",
+      roiExplanation:
+        "Na podstawie podobnych klientów, oto czego możesz się spodziewać",
       metric1Label: "Wzrost przychodów",
       metric1Value: "Do 300%",
       metric2Label: "Zaoszczędzony czas",
@@ -86,14 +88,17 @@ export const translations: typeof enTranslations = {
     followup2: {
       previewText: "Dlaczego wybór właściwego partnera ma znaczenie",
       greeting: "Wciąż zastanawiasz się?",
-      intro: "Rozumiemy, że chcesz podjąć właściwą decyzję. Bądźmy transparentni co do tego, co nas wyróżnia.",
+      intro:
+        "Rozumiemy, że chcesz podjąć właściwą decyzję. Bądźmy transparentni co do tego, co nas wyróżnia.",
       competitorTitle: "Co powinieneś wiedzieć o alternatywach",
-      competitorAnalysis: "Chociaż dostępne są inne opcje, należy wziąć pod uwagę:",
+      competitorAnalysis:
+        "Chociaż dostępne są inne opcje, należy wziąć pod uwagę:",
       competitorPoint1: "Wyższe koszty z ukrytymi opłatami, które się sumują",
       competitorPoint2: "Ograniczone wsparcie i wolniejsze czasy reakcji",
       competitorPoint3: "Mniej elastyczne warunki i sztywne wymagania umowne",
       opportunityCostTitle: "Prawdziwy koszt oczekiwania",
-      opportunityCostText: "Każdy dzień bez właściwego rozwiązania oznacza utracone możliwości i stracony potencjał. Nie pozwól, aby niezdecydowanie kosztowało Cię więcej niż nasza usługa.",
+      opportunityCostText:
+        "Każdy dzień bez właściwego rozwiązania oznacza utracone możliwości i stracony potencjał. Nie pozwól, aby niezdecydowanie kosztowało Cię więcej niż nasza usługa.",
       ctaText: "Dokonaj mądrego wyboru już dziś",
       urgency: "Ograniczona liczba miejsc w tym miesiącu. Nie przegap.",
       subject: "Prawda o Twoich opcjach",
@@ -101,9 +106,11 @@ export const translations: typeof enTranslations = {
     followup3: {
       previewText: "Twoja ostatnia szansa czeka",
       greeting: "To Twoja ostatnia szansa",
-      intro: "Podzieliliśmy się naszą wartością, odpowiedzieliśmy na obawy i pokazaliśmy, co jest możliwe. Teraz czas na decyzję.",
+      intro:
+        "Podzieliliśmy się naszą wartością, odpowiedzieliśmy na obawy i pokazaliśmy, co jest możliwe. Teraz czas na decyzję.",
       finalOpportunityTitle: "Ostatnia okazja",
-      finalOpportunityText: "Ta specjalna oferta wkrótce wygasa. Nie pozwól, aby ta okazja Ci umknęła.",
+      finalOpportunityText:
+        "Ta specjalna oferta wkrótce wygasa. Nie pozwól, aby ta okazja Ci umknęła.",
       limitedTimeOffer: "Oferta ograniczona czasowo wkrótce się kończy",
       whatYoureMissingTitle: "Co tracisz:",
       missingPoint1: "Sprawdzone rezultaty, które zapewniają prawdziwy ROI",
@@ -116,20 +123,24 @@ export const translations: typeof enTranslations = {
     nurture: {
       previewText: "Cenne spostrzeżenia dla Twojej firmy",
       greeting: "Bądź poinformowany i rośnij silniej",
-      intro: "Jesteśmy tutaj, aby pomóc Ci odnieść sukces, niezależnie od tego, czy z nami współpracujesz, czy nie. Oto kilka spostrzeżeń, które pomogą Twojej firmie prosperować.",
+      intro:
+        "Jesteśmy tutaj, aby pomóc Ci odnieść sukces, niezależnie od tego, czy z nami współpracujesz, czy nie. Oto kilka spostrzeżeń, które pomogą Twojej firmie prosperować.",
       insightsTitle: "Spostrzeżenia branżowe i wskazówki",
       insight1: "Najnowsze trendy i najlepsze praktyki w Twojej branży",
       insight2: "Sprawdzone strategie poprawy wydajności i wyników",
       freeResourceTitle: "Darmowy zasób dla Ciebie",
-      freeResourceDescription: "Pobierz nasz kompleksowy przewodnik pełen praktycznych wskazówek i strategii",
-      noObligationText: "Bez zobowiązań - to nasz sposób na pomoc w Twoim sukcesie",
+      freeResourceDescription:
+        "Pobierz nasz kompleksowy przewodnik pełen praktycznych wskazówek i strategii",
+      noObligationText:
+        "Bez zobowiązań - to nasz sposób na pomoc w Twoim sukcesie",
       ctaText: "Pobierz darmowy zasób",
       subject: "Spostrzeżenia, które pomogą rozwinąć Twoją firmę",
     },
     reactivation: {
       previewText: "Chcielibyśmy Cię z powrotem",
       greeting: "Brakowało nam Ciebie!",
-      intro: "Zauważyliśmy, że ostatnio nie byłeś aktywny. Wprowadziliśmy ekscytujące ulepszenia i mamy dla Ciebie specjalną ofertę powitalną.",
+      intro:
+        "Zauważyliśmy, że ostatnio nie byłeś aktywny. Wprowadziliśmy ekscytujące ulepszenia i mamy dla Ciebie specjalną ofertę powitalną.",
       specialOfferTitle: "Ekskluzywna oferta powitalna",
       discountOffer: "Otrzymaj 50% zniżki na pierwszy miesiąc po powrocie",
       ctaText: "Odbierz swoją ofertę powitalną",

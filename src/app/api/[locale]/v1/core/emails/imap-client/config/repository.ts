@@ -106,13 +106,8 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
       });
 
       return createSuccessResponse({
-        host: DEFAULT_IMAP_CONFIG.host,
-        port: DEFAULT_IMAP_CONFIG.port,
-        username: DEFAULT_IMAP_CONFIG.username,
-        password: DEFAULT_IMAP_CONFIG.password,
-        tls: DEFAULT_IMAP_CONFIG.tls,
-        autoReconnect: DEFAULT_IMAP_CONFIG.autoReconnect,
-        loggingLevel: ImapLoggingLevel.INFO,
+        ...DEFAULT_IMAP_CONFIG,
+        ...DEFAULT_IMAP_CONFIG_DB,
         message:
           "app.api.v1.core.emails.imapClient.config.get.response.message",
       });
@@ -151,6 +146,7 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
       });
 
       return createSuccessResponse({
+        ...DEFAULT_IMAP_CONFIG_DB,
         host: data.host,
         port: data.port,
         username: data.username,

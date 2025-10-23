@@ -16,7 +16,7 @@ const dbResetSafetyCheckTask: Task = {
   description: "Monitor for accidental database resets in production",
   // eslint-disable-next-line i18next/no-literal-string
   schedule: "0 */12 * * *", // Every 12 hours
-  category: "security",
+  category: "SYSTEM",
   enabled: true,
   priority: "HIGH",
 
@@ -43,7 +43,7 @@ const devDbAutoResetTask: Task = {
   description: "Automatically reset development database on schedule",
   // eslint-disable-next-line i18next/no-literal-string
   schedule: "0 6 * * 1", // Every Monday at 6 AM
-  category: "development",
+  category: "DEVELOPMENT",
   enabled: false, // Disabled by default
   priority: "LOW",
 
@@ -68,7 +68,7 @@ const dbBackupVerificationTask: Task = {
   name: "db-backup-verification",
   // eslint-disable-next-line i18next/no-literal-string
   description: "Verify database backups before allowing resets",
-  category: "backup",
+  category: "MAINTENANCE",
   enabled: false, // Disabled by default
   priority: "HIGH",
 

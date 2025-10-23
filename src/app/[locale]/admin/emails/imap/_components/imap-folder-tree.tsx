@@ -13,14 +13,14 @@ import {
   Mail,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { debugLogger } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import type { JSX } from "react";
 import { useState } from "react";
 
-import { useImapFoldersListEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/folders/list/hooks";
-import type { ImapFolderResponseType } from "@/app/api/[locale]/v1/core/emails/imap-client/schema";
+import type { ImapFoldersListResponseOutput } from "@/app/api/[locale]/v1/core/emails/imap-client/folders/list/definition";
+import { useImapFoldersList } from "@/app/api/[locale]/v1/core/emails/imap-client/folders/list/hooks";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -42,6 +42,7 @@ interface FolderNode {
 
 interface ImapFolderTreeProps {
   accountId: string;
+  logger: EndpointLogger;
 }
 
 interface FolderTreeNodeProps {
@@ -219,12 +220,13 @@ function FolderTreeNode({
  */
 export function ImapFolderTree({
   accountId,
+  logger,
 }: ImapFolderTreeProps): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
 
   // Use the IMAP folders list endpoint
-  const foldersEndpoint = useImapFoldersListEndpoint(accountId);
+  const foldersEndpoint = useImapFoldersList(accountId, logger);
 
   // Access data through the read operation following leads pattern
   const apiResponse = foldersEndpoint.read?.response;
@@ -232,12 +234,10 @@ export function ImapFolderTree({
   const isLoading = foldersEndpoint.read?.isLoading || false;
 
   const handleSync = (folderId: string): void => {
+    logger.debug("Folder sync triggered", { folderId });
     // Trigger folder sync by refetching the folders data
     // This will trigger a re-sync of the specific folder through the API
     void foldersEndpoint.read?.refetch();
-
-    // Log the folder sync action for debugging
-    debugLogger("Folder sync triggered", { folderId });
   };
 
   const handleView = (folderId: string): void => {
@@ -246,7 +246,9 @@ export function ImapFolderTree({
   };
 
   // Convert API folder data to tree structure
-  const buildFolderTree = (folders: ImapFolderResponseType[]): FolderNode[] => {
+  const buildFolderTree = (
+    folders: NonNullable<ImapFoldersListResponseOutput["folders"]>,
+  ): FolderNode[] => {
     return folders.map((folder) => ({
       id: folder.id,
       name: folder.name,
@@ -255,11 +257,11 @@ export function ImapFolderTree({
       specialUseType: folder.specialUseType || undefined,
       messageCount: folder.messageCount,
       unseenCount: folder.unseenCount,
-      recentCount: folder.recentCount,
+      recentCount: 0, // API doesn't provide recentCount yet
       isSelectable: folder.isSelectable,
       hasChildren: folder.hasChildren,
       syncStatus: folder.syncStatus,
-      lastSyncAt: folder.lastSyncAt || t("app.admin.emails.imap.common.never"),
+      lastSyncAt: folder.createdAt, // Use createdAt as placeholder until API provides lastSyncAt
       children: [], // Hierarchical structure will be implemented when folder nesting is required
     }));
   };

@@ -14,7 +14,7 @@ import {
   DialogTitle,
   Input,
   Label,
-} from "@/packages/next-vibe-ui/web/ui";
+} from "next-vibe-ui/ui";
 
 import { IconSelector } from "../shared/icon-selector";
 

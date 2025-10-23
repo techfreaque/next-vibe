@@ -6,16 +6,12 @@ import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/e
 import { clearFormsAfterSuccessInDev } from "../../../../../../../../../../config/debug";
 import { envClient } from "../../../../../../../../../../config/env-client";
 
-interface EndpointLike {
-  method: Methods;
-  path: string[];
-}
-
 /**
  * Utility to detect available HTTP methods from endpoints object
  */
 export function useAvailableMethods<
-  T extends Partial<Record<Methods, EndpointLike>>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  T extends Partial<Record<Methods, any>>,
 >(endpoints: T): Methods[] {
   return useMemo(() => {
     return Object.keys(endpoints).filter((method) =>

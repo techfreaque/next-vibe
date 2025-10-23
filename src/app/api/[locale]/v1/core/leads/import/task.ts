@@ -1,11 +1,9 @@
-import { TaskCategory } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 /**
  * CSV Processor Task (Unified Format)
  * Processes CSV import jobs in chunks
  *
  * This file follows the unified task format as specified in spec.md
  */
-
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
@@ -23,7 +21,10 @@ import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
 } from "@/app/api/[locale]/v1/core/system/tasks/constants";
-import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/tasks/enum";
+import {
+  CronTaskPriority,
+  TaskCategory,
+} from "@/app/api/[locale]/v1/core/system/tasks/enum";
 import type {
   Task,
   TaskExecutionContext,

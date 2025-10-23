@@ -50,12 +50,18 @@ export function validateCliRequestData<
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
-  TRequestInputInferred = unknown,
-  TRequestOutputInferred = unknown,
-  TResponseInputInferred = unknown,
-  TResponseOutputInferred = unknown,
-  TUrlVariablesInputInferred = unknown,
-  TUrlVariablesOutputInferred = unknown,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TRequestInputInferred = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TRequestOutputInferred = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TResponseInputInferred = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TResponseOutputInferred = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TUrlVariablesInputInferred = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TUrlVariablesOutputInferred = any,
 >(
   endpoint: CreateApiEndpoint<
     TExampleKey,

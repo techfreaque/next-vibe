@@ -26,7 +26,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/packages/next-vibe-ui/web/ui";
+} from "next-vibe-ui/ui";
 
 import type { ChatMessage } from "../../types";
 import { LocaleSelectorContent } from "../locale-selector-content";

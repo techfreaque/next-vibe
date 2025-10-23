@@ -445,27 +445,29 @@ export function LeadsListClient({
                     },
                     {
                       value: LeadSourceFilter.WEBSITE,
-                      label: "leads.filter.sources.website",
+                      label: "app.admin.leads.leads.filter.sources.website",
                     },
                     {
                       value: LeadSourceFilter.REFERRAL,
-                      label: "leads.filter.sources.referral",
+                      label: "app.admin.leads.leads.filter.sources.referral",
                     },
                     {
                       value: LeadSourceFilter.SOCIAL_MEDIA,
-                      label: "leads.filter.sources.social_media",
+                      label:
+                        "app.admin.leads.leads.filter.sources.social_media",
                     },
                     {
                       value: LeadSourceFilter.EMAIL_CAMPAIGN,
-                      label: "leads.filter.sources.email_campaign",
+                      label:
+                        "app.admin.leads.leads.filter.sources.email_campaign",
                     },
                     {
                       value: LeadSourceFilter.CSV_IMPORT,
-                      label: "leads.filter.sources.csv_import",
+                      label: "app.admin.leads.leads.filter.sources.csv_import",
                     },
                     {
                       value: LeadSourceFilter.API,
-                      label: "leads.filter.sources.api",
+                      label: "app.admin.leads.leads.filter.sources.api",
                     },
                   ],
                 }}
@@ -482,27 +484,27 @@ export function LeadsListClient({
                 config={{
                   type: "select",
                   label: undefined,
-                  placeholder: "leads.sort.placeholder",
+                  placeholder: "app.admin.leads.leads.sort.placeholder",
                   options: [
                     {
                       value: LeadSortField.CREATED_AT,
-                      label: "leads.sort.created",
+                      label: "app.admin.leads.leads.sort.created",
                     },
                     {
                       value: LeadSortField.UPDATED_AT,
-                      label: "leads.sort.updated",
+                      label: "app.admin.leads.leads.sort.updated",
                     },
                     {
                       value: LeadSortField.EMAIL,
-                      label: "leads.sort.email",
+                      label: "app.admin.leads.leads.sort.email",
                     },
                     {
                       value: LeadSortField.BUSINESS_NAME,
-                      label: "leads.sort.business",
+                      label: "app.admin.leads.leads.sort.business",
                     },
                     {
                       value: LeadSortField.LAST_ENGAGEMENT_AT,
-                      label: "leads.sort.last_engagement",
+                      label: "app.admin.leads.leads.sort.last_engagement",
                     },
                   ],
                 }}
@@ -519,15 +521,15 @@ export function LeadsListClient({
                 config={{
                   type: "select",
                   label: undefined,
-                  placeholder: "leads.sort.placeholder",
+                  placeholder: "app.admin.leads.leads.sort.placeholder",
                   options: [
                     {
                       value: SortOrder.DESC,
-                      label: "leads.sort.desc",
+                      label: "app.admin.leads.leads.sort.desc",
                     },
                     {
                       value: SortOrder.ASC,
-                      label: "leads.sort.asc",
+                      label: "app.admin.leads.leads.sort.asc",
                     },
                   ],
                 }}
@@ -542,7 +544,7 @@ export function LeadsListClient({
             {/* Quick filter buttons */}
             <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
               <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
-                {t("leads.filter.quick_filters")}:
+                {t("app.admin.leads.leads.filter.quickFilters")}:
               </span>
               <Button
                 type="button"
@@ -555,7 +557,7 @@ export function LeadsListClient({
                   );
                 }}
               >
-                {t("leads.filter.quick.new_leads")}
+                {t("app.admin.leads.leads.filter.quick.newLeads")}
               </Button>
               <Button
                 type="button"
@@ -568,7 +570,7 @@ export function LeadsListClient({
                   );
                 }}
               >
-                {t("leads.filter.quick.campaign_running")}
+                {t("app.admin.leads.leads.filter.quick.campaignRunning")}
               </Button>
               <Button
                 type="button"
@@ -581,7 +583,7 @@ export function LeadsListClient({
                   );
                 }}
               >
-                {t("leads.filter.quick.imported")}
+                {t("app.admin.leads.leads.filter.quick.imported")}
               </Button>
               <Button
                 type="button"
@@ -589,7 +591,7 @@ export function LeadsListClient({
                 size="sm"
                 onClick={handleClearFilters}
               >
-                {t("leads.admin.filters.clear")}
+                {t("app.admin.leads.leads.admin.filters.clear")}
               </Button>
             </div>
 
@@ -706,19 +708,19 @@ export function LeadsListClient({
         title={
           batchOperations.batchDialogMode === "preview"
             ? batchOperations.operationType === "delete"
-              ? "leads.admin.batch.delete_preview_title"
-              : "leads.admin.batch.preview_title"
+              ? "app.admin.leads.leads.admin.batch.delete_preview_title"
+              : "app.admin.leads.leads.admin.batch.preview_title"
             : batchOperations.batchDialogMode === "result"
-              ? "leads.admin.batch.results.title"
+              ? "app.admin.leads.leads.admin.batch.results.title"
               : batchOperations.operationType === "delete"
-                ? "leads.admin.batch.delete_confirm.title"
-                : "leads.admin.batch.confirm.title"
+                ? "app.admin.leads.leads.admin.batch.delete_confirm_title"
+                : "app.admin.leads.leads.admin.batch.confirm.title"
         }
         description={
           batchOperations.batchDialogMode === "preview"
             ? batchOperations.operationType === "delete"
-              ? "leads.admin.batch.delete_preview_description"
-              : "leads.admin.batch.preview_description"
+              ? "app.admin.leads.leads.admin.batch.delete_preview_description"
+              : "app.admin.leads.leads.admin.batch.preview_description"
             : undefined
         }
         leads={batchOperations.previewLeads.filter(

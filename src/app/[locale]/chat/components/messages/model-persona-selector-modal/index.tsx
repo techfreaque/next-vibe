@@ -9,7 +9,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
-import { Button, Textarea } from "@/packages/next-vibe-ui/web/ui";
+import { Button, Textarea } from "next-vibe-ui/ui";
 
 import type { ModelId } from "../../../types";
 import { ModelSelector } from "../../input/model-selector";

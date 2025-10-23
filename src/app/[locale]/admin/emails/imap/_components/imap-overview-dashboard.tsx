@@ -27,8 +27,9 @@ import {
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
-import { useImapAccountsListEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/hooks";
-import { useImapHealthEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/health/hooks";
+import { useImapAccountsList } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/hooks";
+import { useImapHealth } from "@/app/api/[locale]/v1/core/emails/imap-client/health/hooks";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { useTranslation } from "@/i18n/core/client";
 
 /**
@@ -36,21 +37,24 @@ import { useTranslation } from "@/i18n/core/client";
  * Consolidated component that replaces separate health, status, and overview components
  */
 export function ImapOverviewDashboard(): JSX.Element {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [lastUpdate, setLastUpdate] = useState(new Date());
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Use real health monitoring API endpoint
-  const healthEndpoint = useImapHealthEndpoint({
-    enabled: true,
-  });
+  const healthEndpoint = useImapHealth(logger);
 
   // Use real accounts list API endpoint
-  const accountsEndpoint = useImapAccountsListEndpoint();
+  const accountsEndpoint = useImapAccountsList(logger);
 
-  const healthData = healthEndpoint.read?.data?.data;
-  const accountsData = accountsEndpoint.read?.data;
+  const healthResponse = healthEndpoint.read.response;
+  const accountsResponse = accountsEndpoint.read.response;
+  const healthData = healthResponse?.success ? healthResponse.data : null;
+  const accounts = accountsResponse?.success
+    ? accountsResponse.data.accounts
+    : [];
   const isLoading =
-    healthEndpoint.read?.isLoading || accountsEndpoint.read?.isLoading;
+    healthEndpoint.read.isLoading || accountsEndpoint.read.isLoading;
 
   const getStatusIcon = (status: string): JSX.Element => {
     switch (status) {
@@ -136,16 +140,16 @@ export function ImapOverviewDashboard(): JSX.Element {
 
   const handleRefresh = (): void => {
     setLastUpdate(new Date());
-    void healthEndpoint.read?.refetch();
-    void accountsEndpoint.read?.refetch();
+    void healthEndpoint.read.refetch();
+    void accountsEndpoint.read.refetch();
   };
 
   useEffect(() => {
     // Auto-refresh every 30 seconds
     const interval = setInterval(() => {
       setLastUpdate(new Date());
-      void healthEndpoint.read?.refetch();
-      void accountsEndpoint.read?.refetch();
+      void healthEndpoint.read.refetch();
+      void accountsEndpoint.read.refetch();
     }, 30000);
 
     return (): void => clearInterval(interval);
@@ -171,7 +175,6 @@ export function ImapOverviewDashboard(): JSX.Element {
     );
   }
 
-  const accounts = accountsData?.accounts || [];
   const connectedAccounts = accounts.filter((a) => a.isConnected);
   const disconnectedAccounts = accounts.filter((a) => !a.isConnected);
   const totalErrors = accounts.reduce(

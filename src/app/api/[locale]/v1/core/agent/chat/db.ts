@@ -60,7 +60,7 @@ interface ThreadMetadata {
  */
 export interface ToolCall {
   toolName: string;
-  args: Record<string, unknown>;
+  args: Record<string, string | number | boolean | null>;
 }
 
 /**

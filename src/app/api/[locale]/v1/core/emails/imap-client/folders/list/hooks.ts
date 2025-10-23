@@ -15,12 +15,16 @@ import definitions from "./definition";
  * Hook for listing IMAP folders
  */
 export function useImapFoldersList(
+  accountId: string,
   logger: EndpointLogger,
 ): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {
       persistForm: false,
+      defaultValues: {
+        accountId,
+      },
     },
     logger,
   );

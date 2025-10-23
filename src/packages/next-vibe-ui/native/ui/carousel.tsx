@@ -1,47 +1,55 @@
 /**
- * STUB: carousel
- * Auto-generated placeholder for web-only component
- *
- * This component exists in next-vibe-ui/web/ui but not in native UI.
- * Replace this stub with a proper React Native implementation.
+ * Carousel Component for React Native
+ * TODO: Implement full carousel with swipe gestures
+ * Currently uses ScrollView for horizontal scrolling
  */
 import type { ReactNode } from "react";
-import { Text, View } from "react-native";
+import React from "react";
+import type { ScrollViewProps } from "react-native";
+import { ScrollView, View } from "react-native";
 
-export function Carousel({
-  children,
-  ...props
-}: {
-  children?: ReactNode;
-  [key: string]: any;
-}) {
-  console.warn("🔶 Using stub: Carousel");
+import { cn } from "../lib/utils";
 
-  return (
-    <View
-      style={{
-        padding: 8,
-        backgroundColor: "#FEF3C7",
-        marginVertical: 4,
-        borderRadius: 4,
-      }}
-    >
-      <Text style={{ fontSize: 12, color: "#92400E", marginBottom: 4 }}>
-        Carousel (stub)
-      </Text>
-      {children}
-    </View>
-  );
+interface CarouselProps extends ScrollViewProps {
+  children: ReactNode;
+  className?: string;
 }
 
-// Re-export any common sub-components as stubs
-export const CarouselContent = Carousel;
-export const CarouselHeader = Carousel;
-export const CarouselFooter = Carousel;
-export const CarouselTitle = Carousel;
-export const CarouselDescription = Carousel;
-export const CarouselTrigger = Carousel;
-export const CarouselItem = Carousel;
-export const CarouselLabel = Carousel;
+export const Carousel = React.forwardRef<ScrollView, CarouselProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <ScrollView
+        ref={ref}
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        className={cn("flex flex-row", className)}
+        {...props}
+      >
+        {children}
+      </ScrollView>
+    );
+  },
+);
 
-export default Carousel;
+Carousel.displayName = "Carousel";
+
+interface CarouselItemProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export const CarouselItem = React.forwardRef<View, CarouselItemProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <View ref={ref} className={cn("shrink-0", className)} {...props}>
+        {children}
+      </View>
+    );
+  },
+);
+
+CarouselItem.displayName = "CarouselItem";
+
+export const CarouselContent = Carousel;
+export const CarouselPrevious = View;
+export const CarouselNext = View;

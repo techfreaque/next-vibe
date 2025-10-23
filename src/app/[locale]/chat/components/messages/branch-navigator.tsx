@@ -7,7 +7,7 @@ import React from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { Button } from "@/packages/next-vibe-ui/web/ui";
+import { Button } from "next-vibe-ui/ui";
 
 interface BranchNavigatorProps {
   currentBranchIndex: number;

@@ -74,7 +74,7 @@ export interface ContentDoneEventData {
 export interface ToolCallEventData {
   messageId: string;
   toolName: string;
-  args: Record<string, unknown>;
+  args: Record<string, string | number | boolean | null>;
 }
 
 /**

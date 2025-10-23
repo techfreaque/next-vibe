@@ -76,7 +76,7 @@ export async function handleUncensoredAI(
       headers: {
         "Content-Type": "application/json",
         // eslint-disable-next-line i18next/no-literal-string
-        Authorization: `Bearer ${apiKey}`,
+        "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify(requestBody),
     },

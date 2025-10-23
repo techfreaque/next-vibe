@@ -8,7 +8,7 @@
 import type { LucideIcon } from "lucide-react";
 import type { JSX } from "react";
 
-import { Button } from "@/packages/next-vibe-ui/web/ui";
+import { Button } from "next-vibe-ui/ui";
 
 interface MessageActionButtonProps {
   icon: LucideIcon;

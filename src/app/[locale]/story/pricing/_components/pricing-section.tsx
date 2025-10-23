@@ -16,7 +16,7 @@ import {
 } from "next-vibe-ui/ui/card";
 import { Label } from "next-vibe-ui/ui/label";
 import { Switch } from "next-vibe-ui/ui/switch";
-import { useToast } from "next-vibe-ui/ui/use-toast";
+import { useToast } from "next-vibe-ui/hooks/use-toast";
 import type { JSX } from "react";
 import { useState } from "react";
 import { useInView } from "react-intersection-observer";

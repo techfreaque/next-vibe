@@ -11,7 +11,6 @@ import type { Methods } from "../../../cli/vibe/endpoints/endpoint-types/core/en
 import type { CreateApiEndpoint } from "../../../cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { AutoPrefillConfig } from "../form/types";
 import {
-  type EndpointReturn,
   type EndpointUrlVariables,
   type FormAlertState,
   type GetEndpointTypes,
@@ -92,11 +91,7 @@ export function useEndpoint<
       CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
     >
   >,
->(
-  endpoints: T,
-  options: UseEndpointOptions<T> = {},
-  logger: EndpointLogger,
-): EndpointReturn<T> {
+>(endpoints: T, options: UseEndpointOptions<T> = {}, logger: EndpointLogger) {
   useTranslation();
   // Normalize options with smart defaults
   const { queryOptions, defaultValues, autoPrefill } =
@@ -128,7 +123,6 @@ export function useEndpoint<
   const read = useEndpointRead(readEndpoint, logger, {
     formOptions: {
       persistForm: false, // No local storage
-      defaultValues,
       persistenceKey: undefined,
     },
     queryOptions,
@@ -189,7 +183,9 @@ export function useEndpoint<
         ...createOperation,
         values: createValues,
         setValue: createOperation.form.setValue.bind(createOperation.form),
-        onSubmit: async (e: FormEvent | undefined): Promise<void> => {
+        onSubmit: async (
+          e: FormEvent<HTMLFormElement> | undefined,
+        ): Promise<void> => {
           e?.preventDefault();
           await createOperation.submitForm(e);
         },
@@ -248,7 +244,7 @@ export function useEndpoint<
       return {
         variant: "destructive",
         title: {
-          message: "common.error.title",
+          message: "app.common.error.title",
         },
         message: {
           message: error.message,

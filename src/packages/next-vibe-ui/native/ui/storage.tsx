@@ -7,7 +7,8 @@ export const storage = {
     try {
       return await AsyncStorage.getItem(key);
     } catch (error) {
-      console.error("Error reading from storage:", error);
+      // eslint-disable-next-line no-console -- Error logging for storage operations
+      console.error("Error reading from storage:", error); // eslint-disable-line i18next/no-literal-string -- Error message
       return null;
     }
   },
@@ -16,7 +17,8 @@ export const storage = {
     try {
       await AsyncStorage.setItem(key, value);
     } catch (error) {
-      console.error("Error writing to storage:", error);
+      // eslint-disable-next-line no-console -- Error logging for storage operations
+      console.error("Error writing to storage:", error); // eslint-disable-line i18next/no-literal-string -- Error message
     }
   },
 
@@ -24,14 +26,15 @@ export const storage = {
     try {
       await AsyncStorage.removeItem(key);
     } catch (error) {
-      console.error("Error removing from storage:", error);
+      // eslint-disable-next-line no-console -- Error logging for storage operations
+      console.error("Error removing from storage:", error); // eslint-disable-line i18next/no-literal-string -- Error message
     }
   },
 };
 
 // Synchronous fallback for compatibility (returns empty/does nothing)
 export const syncStorage = {
-  getItem: (key: string): string | null => null,
-  setItem: (key: string, value: string): void => {},
-  removeItem: (key: string): void => {},
+  getItem: (): string | null => null,
+  setItem: (): void => {},
+  removeItem: (): void => {},
 };

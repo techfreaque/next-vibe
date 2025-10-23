@@ -1,47 +1,30 @@
 /**
- * STUB: markdown
- * Auto-generated placeholder for web-only component
- *
- * This component exists in next-vibe-ui/web/ui but not in native UI.
- * Replace this stub with a proper React Native implementation.
+ * Markdown Component for React Native
+ * TODO: Implement markdown rendering using react-native-markdown-display or similar
+ * Currently renders plain text
  */
-import type { ReactNode } from "react";
-import { Text, View } from "react-native";
+import React from "react";
+import { Text as RNText, View } from "react-native";
 
-export function Markdown({
-  children,
-  ...props
-}: {
-  children?: ReactNode;
-  [key: string]: any;
-}) {
-  console.warn("🔶 Using stub: Markdown");
+import { cn } from "../lib/utils";
 
-  return (
-    <View
-      style={{
-        padding: 8,
-        backgroundColor: "#FEF3C7",
-        marginVertical: 4,
-        borderRadius: 4,
-      }}
-    >
-      <Text style={{ fontSize: 12, color: "#92400E", marginBottom: 4 }}>
-        Markdown (stub)
-      </Text>
-      {children}
-    </View>
-  );
+interface MarkdownProps {
+  children?: string;
+  className?: string;
 }
 
-// Re-export any common sub-components as stubs
-export const MarkdownContent = Markdown;
-export const MarkdownHeader = Markdown;
-export const MarkdownFooter = Markdown;
-export const MarkdownTitle = Markdown;
-export const MarkdownDescription = Markdown;
-export const MarkdownTrigger = Markdown;
-export const MarkdownItem = Markdown;
-export const MarkdownLabel = Markdown;
+export const Markdown = React.forwardRef<View, MarkdownProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <View
+        ref={ref}
+        className={cn("flex flex-col gap-2", className)}
+        {...props}
+      >
+        <RNText className="text-sm text-foreground">{children}</RNText>
+      </View>
+    );
+  },
+);
 
-export default Markdown;
+Markdown.displayName = "Markdown";

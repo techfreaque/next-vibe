@@ -100,6 +100,18 @@ export type EndpointUrlVariables<T> =
       : PrimaryMutationTypes<T>["urlVariables"]
     : GetEndpointTypes<T>["urlVariables"];
 
+// AutoPrefill data type - represents data from GET response that can prefill mutation request
+// When both GET and mutation endpoints exist, the GET response is used to prefill the mutation
+// This type represents the intersection: it must be assignable to mutation request
+export type AutoPrefillDataType<T> =
+  GetEndpointTypes<T> extends never
+    ? undefined
+    : PrimaryMutationTypes<T> extends never
+      ? undefined
+      : GetEndpointTypes<T>["response"] extends PrimaryMutationTypes<T>["request"]
+        ? GetEndpointTypes<T>["response"]
+        : Partial<PrimaryMutationTypes<T>["request"]>;
+
 // Hook options interface with smart defaults and simple configuration
 export interface UseEndpointOptions<T> {
   // URL parameters for endpoints that require them (supports both GET and mutation endpoints)

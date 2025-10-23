@@ -23,7 +23,7 @@ import { useTTSAudio } from "@/app/api/[locale]/v1/core/agent/text-to-speech/hoo
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { Markdown } from "@/packages/next-vibe-ui/web/ui/markdown";
+import { Markdown } from "next-vibe-ui/ui/markdown";
 
 import { useTouchDevice } from "../../hooks/use-touch-device";
 import { LAYOUT } from "../../lib/config/constants";

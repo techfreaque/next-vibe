@@ -12,7 +12,7 @@ import {
   MoreVertical,
   Trash2,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next-vibe-ui/hooks";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useMemo } from "react";
@@ -41,11 +41,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/packages/next-vibe-ui/web/ui";
+} from "next-vibe-ui/ui";
 
 import { useTouchDevice } from "../../hooks/use-touch-device";
 import {
-  getDirectChildrenCount,
   getFolderColor,
   getFolderDisplayName,
   getFolderIcon,
@@ -354,7 +353,6 @@ function FolderItem({
   const { t } = simpleT(locale);
   const folderDisplayName = getFolderDisplayName(folder, locale);
   const isDefault = isDefaultFolder(folder.id);
-  const directChildrenCount = getDirectChildrenCount(folder.id, chat.folders);
 
   // Count threads in this folder (not subfolders)
   const threadCount = threadsInFolder.length;

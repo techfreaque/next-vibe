@@ -1,47 +1,33 @@
 /**
- * STUB: slider
- * Auto-generated placeholder for web-only component
- *
- * This component exists in next-vibe-ui/web/ui but not in native UI.
- * Replace this stub with a proper React Native implementation.
+ * Slider Component for React Native
+ * Uses @rn-primitives/slider
  */
-import type { ReactNode } from "react";
-import { Text, View } from "react-native";
+import * as SliderPrimitive from "@rn-primitives/slider";
+import React from "react";
 
-export function Slider({
-  children,
-  ...props
-}: {
-  children?: ReactNode;
-  [key: string]: any;
-}) {
-  console.warn("🔶 Using stub: Slider");
+import { cn } from "../lib/utils";
 
+const Slider = React.forwardRef<
+  React.ElementRef<typeof SliderPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
+>(({ className, ...props }, ref) => {
   return (
-    <View
-      style={{
-        padding: 8,
-        backgroundColor: "#FEF3C7",
-        marginVertical: 4,
-        borderRadius: 4,
-      }}
+    <SliderPrimitive.Root
+      ref={ref}
+      className={cn(
+        "relative flex w-full touch-none select-none items-center",
+        className,
+      )}
+      {...props}
     >
-      <Text style={{ fontSize: 12, color: "#92400E", marginBottom: 4 }}>
-        Slider (stub)
-      </Text>
-      {children}
-    </View>
+      <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-primary/20">
+        <SliderPrimitive.Range className="absolute h-full bg-primary" />
+      </SliderPrimitive.Track>
+      <SliderPrimitive.Thumb className="block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50" />
+    </SliderPrimitive.Root>
   );
-}
+});
 
-// Re-export any common sub-components as stubs
-export const SliderContent = Slider;
-export const SliderHeader = Slider;
-export const SliderFooter = Slider;
-export const SliderTitle = Slider;
-export const SliderDescription = Slider;
-export const SliderTrigger = Slider;
-export const SliderItem = Slider;
-export const SliderLabel = Slider;
+Slider.displayName = SliderPrimitive.Root.displayName;
 
-export default Slider;
+export { Slider };

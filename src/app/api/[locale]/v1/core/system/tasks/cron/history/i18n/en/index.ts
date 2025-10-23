@@ -98,6 +98,31 @@ export const translations = {
         title: "Not Found",
         description: "Task or execution record not found",
       },
+      network: {
+        title: "Network Error",
+        description: "Network error occurred while fetching task history",
+      },
+      forbidden: {
+        title: "Forbidden",
+        description: "Access to task history is forbidden",
+      },
+      server: {
+        title: "Server Error",
+        description: "Internal server error occurred",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unknown error occurred",
+      },
+      unsavedChanges: {
+        titleChanges: "Unsaved Changes",
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
+      },
+      conflict: {
+        title: "Conflict",
+        description: "Data conflict occurred",
+      },
     },
     success: {
       title: "History Retrieved",

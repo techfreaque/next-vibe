@@ -7,7 +7,7 @@ import React, { useState } from "react";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { Button } from "@/packages/next-vibe-ui/web/ui";
+import { Button } from "next-vibe-ui/ui";
 
 const TIMING = {
   COPY_FEEDBACK_DURATION: 2000,

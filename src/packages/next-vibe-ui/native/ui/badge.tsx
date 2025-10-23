@@ -42,7 +42,12 @@ const badgeTextVariants = cva("text-xs font-semibold ", {
 
 type BadgeProps = SlottableViewProps & VariantProps<typeof badgeVariants>;
 
-function Badge({ className, variant, asChild, ...props }: BadgeProps) {
+function Badge({
+  className,
+  variant,
+  asChild,
+  ...props
+}: BadgeProps): React.JSX.Element {
   const Component = asChild ? Slot.View : View;
   return (
     <TextClassContext.Provider value={badgeTextVariants({ variant })}>

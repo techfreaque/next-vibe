@@ -24,7 +24,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/packages/next-vibe-ui/web/ui";
+} from "next-vibe-ui/ui";
 
 import { useTouchDevice } from "../../hooks/use-touch-device";
 

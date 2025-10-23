@@ -1,3 +1,3 @@
-export function Empty(props: any) {
+export function Empty(): null {
   return null;
 }

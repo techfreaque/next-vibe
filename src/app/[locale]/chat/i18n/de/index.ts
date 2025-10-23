@@ -90,6 +90,10 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  confirmations: {
+    deleteMessage: "Möchten Sie diese Nachricht wirklich löschen?",
+  },
+
   iconSelector: {
     tabs: {
       library: "Icon-Bibliothek",
@@ -147,6 +151,10 @@ export const translations: typeof enTranslations = {
     editMessage: "Nachricht bearbeiten",
     stopAudio: "Audio-Wiedergabe stoppen",
     playAudio: "Audio abspielen",
+    pin: "An Anfang anheften",
+    unpin: "Loslösen",
+    archive: "Archivieren",
+    unarchive: "Entarchivieren",
     copyContent: "In Zwischenablage kopieren",
     rename: "Umbenennen",
     moveToFolder: "In Ordner verschieben",
@@ -625,6 +633,12 @@ export const translations: typeof enTranslations = {
     moveToFolder: "In Ordner verschieben",
     newSubfolder: "Neuer Unterordner",
     deleteFolder: "Ordner löschen",
+    deleteDialog: {
+      title: "Ordner löschen",
+      description: 'Möchten Sie "{{folderName}}" wirklich löschen?',
+      descriptionWithThreads:
+        'Möchten Sie "{{folderName}}" wirklich löschen? Dieser Ordner enthält {{count}} Thread(s), die ebenfalls gelöscht werden.',
+    },
     today: "Heute",
     lastWeek: "Letzte 7 Tage",
     lastMonth: "Letzte 30 Tage",
@@ -738,6 +752,20 @@ export const translations: typeof enTranslations = {
       copyReference: "Referenzlink kopieren",
       delete: "Löschen",
       deleteMessage: "Diese Nachricht löschen",
+    },
+  },
+  toolCall: {
+    search: {
+      title: "Durchsuche das Web",
+      query: "Anfrage",
+    },
+    multiple: "{{count}} Tool-Aufrufe",
+  },
+  threadList: {
+    deleteDialog: {
+      title: "Thread löschen",
+      description:
+        'Möchten Sie "{{title}}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden und alle Nachrichten in diesem Thread werden dauerhaft gelöscht.',
     },
   },
 };

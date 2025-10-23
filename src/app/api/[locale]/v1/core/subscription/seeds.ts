@@ -261,9 +261,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 
     if (lowCreditsUserResponse.success && lowCreditsUserResponse.data) {
       const lowCreditsUser = lowCreditsUserResponse.data;
-      logger.debug(
-        `Found low credits user for testing: ${lowCreditsUser.id}`,
-      );
+      logger.debug(`Found low credits user for testing: ${lowCreditsUser.id}`);
 
       // Check if user already has a subscription
       const existingSubscription = await subscriptionRepository.getSubscription(
@@ -343,10 +341,13 @@ export async function dev(logger: EndpointLogger): Promise<void> {
               userId: lowCreditsUser.id,
             });
           } else {
-            logger.error("Failed to add subscription credits to low credits user", {
-              userId: lowCreditsUser.id,
-              error: creditsResult.message,
-            });
+            logger.error(
+              "Failed to add subscription credits to low credits user",
+              {
+                userId: lowCreditsUser.id,
+                error: creditsResult.message,
+              },
+            );
           }
         } else {
           logger.debug(

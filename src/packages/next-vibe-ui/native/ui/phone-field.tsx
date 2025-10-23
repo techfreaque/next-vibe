@@ -1,47 +1,32 @@
 /**
- * STUB: phone-field
- * Auto-generated placeholder for web-only component
- *
- * This component exists in next-vibe-ui/web/ui but not in native UI.
- * Replace this stub with a proper React Native implementation.
+ * PhoneField Component for React Native
+ * TODO: Implement full phone number formatting and validation
+ * Currently a simple TextInput with phone keyboard
  */
-import type { ReactNode } from "react";
-import { Text, View } from "react-native";
+import React from "react";
+import type { TextInputProps } from "react-native";
+import { TextInput } from "react-native";
 
-export function PhoneField({
-  children,
-  ...props
-}: {
-  children?: ReactNode;
-  [key: string]: any;
-}) {
-  console.warn("🔶 Using stub: PhoneField");
+import { cn } from "../lib/utils";
 
-  return (
-    <View
-      style={{
-        padding: 8,
-        backgroundColor: "#FEF3C7",
-        marginVertical: 4,
-        borderRadius: 4,
-      }}
-    >
-      <Text style={{ fontSize: 12, color: "#92400E", marginBottom: 4 }}>
-        PhoneField (stub)
-      </Text>
-      {children}
-    </View>
-  );
+interface PhoneFieldProps extends Omit<TextInputProps, "keyboardType"> {
+  className?: string;
 }
 
-// Re-export any common sub-components as stubs
-export const PhoneFieldContent = PhoneField;
-export const PhoneFieldHeader = PhoneField;
-export const PhoneFieldFooter = PhoneField;
-export const PhoneFieldTitle = PhoneField;
-export const PhoneFieldDescription = PhoneField;
-export const PhoneFieldTrigger = PhoneField;
-export const PhoneFieldItem = PhoneField;
-export const PhoneFieldLabel = PhoneField;
+export const PhoneField = React.forwardRef<TextInput, PhoneFieldProps>(
+  ({ className, ...props }, ref) => {
+    return (
+      <TextInput
+        ref={ref}
+        keyboardType="phone-pad"
+        className={cn(
+          "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+          className,
+        )}
+        {...props}
+      />
+    );
+  },
+);
 
-export default PhoneField;
+PhoneField.displayName = "PhoneField";

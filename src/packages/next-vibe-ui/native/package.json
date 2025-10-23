@@ -2,11 +2,19 @@
   "name": "next-vibe-ui",
   "version": "1.0.0",
   "private": true,
-  "main": "index.js",
+  "main": "ui/index.ts",
   "exports": {
     "./ui/*": {
       "react-native": "./ui/*.tsx",
       "default": "./ui/*.tsx"
+    },
+    "./hooks/*": {
+      "react-native": "./hooks/*.tsx",
+      "default": "./hooks/*.tsx"
+    },
+    "./lib/*": {
+      "react-native": "./lib/*.ts",
+      "default": "./lib/*.ts"
     }
   },
   "peerDependencies": {

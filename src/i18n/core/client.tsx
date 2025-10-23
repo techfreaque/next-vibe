@@ -3,7 +3,7 @@ import type { Route } from "next";
 import type { RouteType } from "next/dist/lib/load-custom-routes";
 import { LOCALE_COOKIE_NAME } from "next-vibe/shared/constants";
 import { storage } from "next-vibe-ui/ui/storage";
-import { usePathname, useRouter } from "next-vibe-ui/ui/use-navigation";
+import { usePathname, useRouter } from "next-vibe-ui/hooks/use-navigation";
 import type { JSX, ReactNode } from "react";
 import React, { createContext, useContext, useEffect, useState } from "react";
 

@@ -162,6 +162,7 @@ export {
   InputOTPSlot,
 } from "./input-otp";
 export { Label } from "./label";
+export { Link } from "./link";
 export {
   Menubar,
   MenubarCheckboxItem,
@@ -290,7 +291,7 @@ export {
 } from "./toast";
 export {
   Toggle,
-  // toggleVariants
+  toggleVariants,
 } from "./toggle";
 export { ToggleGroup, ToggleGroupItem } from "./toggle-group";
 export {
@@ -299,5 +300,5 @@ export {
   TooltipProvider,
   TooltipTrigger,
 } from "./tooltip";
-export { Text } from "./typography";
-export { toast, useToast } from "./use-toast";
+export { Text, BlockQuote, Code, H1, H2, H3, H4, Large, Lead, Muted, P, Small, } from "./typography";
+export { toast, useToast } from "../hooks/use-toast";

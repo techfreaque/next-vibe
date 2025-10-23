@@ -175,7 +175,6 @@ export async function authenticateUser<
       );
     }
 
-    // @ts-ignore - TypeScript cannot infer that getTypedAuthMinimalUser returns the minimal JWT payload type
     return {
       success: true,
       data: user,
@@ -226,7 +225,6 @@ export async function authenticateTypedUser<
       );
     }
 
-    // @ts-ignore - TypeScript cannot infer that getTypedAuthMinimalUser returns the minimal JWT payload type
     return {
       success: true,
       data: user,

@@ -90,6 +90,10 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  confirmations: {
+    deleteMessage: "Czy na pewno chcesz usunąć tę wiadomość?",
+  },
+
   iconSelector: {
     tabs: {
       library: "Biblioteka ikon",
@@ -147,6 +151,10 @@ export const translations: typeof enTranslations = {
     editMessage: "Edytuj wiadomość",
     stopAudio: "Zatrzymaj odtwarzanie audio",
     playAudio: "Odtwórz audio",
+    pin: "Przypnij na górze",
+    unpin: "Odepnij",
+    archive: "Archiwizuj",
+    unarchive: "Przywróć z archiwum",
     copyContent: "Kopiuj do schowka",
     rename: "Zmień nazwę",
     moveToFolder: "Przenieś do folderu",
@@ -474,7 +482,8 @@ export const translations: typeof enTranslations = {
       kimiK2Free:
         "Kimi K2 Instruct to wielki model językowy Mixture-of-Experts (MoE) opracowany przez Moonshot AI.",
       deepseekV31Free: "Potężny model z 671B parametrami - całkowicie darmowy!",
-      deepseekV31: "Potężny model z 671B parametrami z zaawansowanymi możliwościami",
+      deepseekV31:
+        "Potężny model z 671B parametrami z zaawansowanymi możliwościami",
       qwen3235bFree:
         "Model Mixture-of-Experts (MoE) opracowany przez Qwen, obsługuje płynne przełączanie między trybami.",
       deepseekR1Distill: "Destylowany model rozumowania z silną wydajnością",
@@ -605,6 +614,12 @@ export const translations: typeof enTranslations = {
     moveToFolder: "Przenieś do folderu",
     newSubfolder: "Nowy podfolder",
     deleteFolder: "Usuń folder",
+    deleteDialog: {
+      title: "Usuń folder",
+      description: 'Czy na pewno chcesz usunąć "{{folderName}}"?',
+      descriptionWithThreads:
+        'Czy na pewno chcesz usunąć "{{folderName}}"? Ten folder zawiera {{count}} wątek(ów), które również zostaną usunięte.',
+    },
     today: "Dzisiaj",
     lastWeek: "Ostatnie 7 dni",
     lastMonth: "Ostatnie 30 dni",
@@ -715,6 +730,20 @@ export const translations: typeof enTranslations = {
       copyReference: "Kopiuj link odniesienia",
       delete: "Usuń",
       deleteMessage: "Usuń tę wiadomość",
+    },
+  },
+  toolCall: {
+    search: {
+      title: "Przeszukiwanie sieci",
+      query: "Zapytanie",
+    },
+    multiple: "{{count}} wywołań narzędzi",
+  },
+  threadList: {
+    deleteDialog: {
+      title: "Usuń wątek",
+      description:
+        'Czy na pewno chcesz usunąć "{{title}}"? Ta akcja jest nieodwracalna i wszystkie wiadomości w tym wątku zostaną trwale usunięte.',
     },
   },
 };

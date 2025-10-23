@@ -73,7 +73,7 @@ export function LeadEditForm({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <span>Edit Lead</span>
+            <span>{t("app.admin.common.actions.edit")}</span>
             <span className="text-lg font-normal text-gray-500">
               - {lead.lead.basicInfo.businessName}
             </span>

@@ -11,7 +11,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/packages/next-vibe-ui/web/ui/collapsible";
+} from "next-vibe-ui/ui/collapsible";
 
 import type { ToolCall } from "../../types";
 
@@ -66,11 +66,14 @@ export function ToolCallDisplay({
                       count: toolCalls.length,
                     })}
               </span>
-              {!isOpen && toolCalls.length === 1 && toolCalls[0]?.args.query && (
-                <span className="text-muted-foreground text-xs truncate">
-                  - {String(toolCalls[0].args.query)}
-                </span>
-              )}
+              {!isOpen &&
+                toolCalls.length === 1 &&
+                toolCalls[0]?.args.query &&
+                typeof toolCalls[0].args.query === "string" && (
+                  <span className="text-muted-foreground text-xs truncate">
+                    - {toolCalls[0].args.query}
+                  </span>
+                )}
             </button>
           </CollapsibleTrigger>
 
@@ -87,6 +90,7 @@ export function ToolCallDisplay({
                     {toolCall.toolName === "search" ? (
                       <Search className="h-4 w-4 text-blue-400" />
                     ) : (
+                      // eslint-disable-next-line i18next/no-literal-string
                       <span className="text-blue-400">🔧</span>
                     )}
                   </div>
@@ -99,11 +103,13 @@ export function ToolCallDisplay({
                         : toolCall.toolName}
                     </div>
                     <div className="text-muted-foreground text-xs mt-1">
-                      {toolCall.toolName === "search" && toolCall.args.query ? (
+                      {toolCall.toolName === "search" &&
+                      toolCall.args.query &&
+                      typeof toolCall.args.query === "string" ? (
                         <span>
                           {t("app.chat.toolCall.search.query")}:{" "}
                           <span className="text-foreground/80">
-                            {String(toolCall.args.query)}
+                            {toolCall.args.query}
                           </span>
                         </span>
                       ) : (
@@ -122,4 +128,3 @@ export function ToolCallDisplay({
     </div>
   );
 }
-

@@ -7,7 +7,7 @@ import React from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { Switch } from "@/packages/next-vibe-ui/web/ui";
+import { Switch } from "next-vibe-ui/ui";
 
 interface SearchToggleProps {
   enabled: boolean;

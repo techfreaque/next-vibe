@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   Input,
-} from "@/packages/next-vibe-ui/web/ui";
+} from "next-vibe-ui/ui";
 
 import type { ChatThread } from "../types";
 

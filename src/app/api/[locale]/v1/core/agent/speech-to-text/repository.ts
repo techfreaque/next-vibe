@@ -17,7 +17,7 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { MinimalUser } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/types";
+import type { JwtPayloadType } from "../../user/auth/definition";
 import { creditRepository } from "../chat/credits/repository";
 import { FEATURE_COSTS } from "../chat/model-access/costs";
 import type {
@@ -60,7 +60,7 @@ export interface SpeechToTextRepository {
   transcribeAudio(
     file: File,
     data: SpeechToTextPostRequestOutput,
-    user: MinimalUser,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>>;
@@ -76,7 +76,7 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
   async transcribeAudio(
     file: File,
     data: SpeechToTextPostRequestOutput,
-    user: MinimalUser,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>> {
@@ -171,12 +171,15 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
 
         // Determine correct credit identifier based on user type
         let creditIdentifier: { userId?: string; leadId?: string };
-        if (user.id) {
-          const identifierResult =
-            await creditRepository.getCreditIdentifier(user.id);
+        if (!user.isPublic && user.id && user.leadId) {
+          const identifierResult = await creditRepository.getCreditIdentifier(
+            user.id,
+            user.leadId,
+            logger,
+          );
 
           if (identifierResult.success && identifierResult.data) {
-            if (identifierResult.data.hasSubscription) {
+            if (identifierResult.data.creditType === "USER_SUBSCRIPTION") {
               // User has subscription - deduct from user credits
               creditIdentifier = { userId: user.id };
             } else {
@@ -187,8 +190,14 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
             // Fallback to lead credits if we can't determine subscription status
             creditIdentifier = { leadId: user.leadId };
           }
-        } else {
+        } else if (user.leadId) {
           creditIdentifier = { leadId: user.leadId };
+        } else {
+          logger.error("No userId or leadId available for credit deduction");
+          return createErrorResponse(
+            "app.api.v1.core.agent.speechToText.post.errors.transcriptionFailed",
+            ErrorResponseTypes.INTERNAL_ERROR,
+          );
         }
 
         const deductResult = await creditRepository.deductCredits(
@@ -200,13 +209,13 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
 
         if (!deductResult.success) {
           logger.error("Failed to deduct credits for STT", {
-            userId: user.id,
+            userId: user.isPublic ? undefined : user.id,
             leadId: user.leadId,
             cost: sttCost,
           });
         } else {
           logger.info("Credits deducted successfully for STT", {
-            userId: user.id,
+            userId: user.isPublic ? undefined : user.id,
             leadId: user.leadId,
             cost: sttCost,
             messageId: creditMessageId,

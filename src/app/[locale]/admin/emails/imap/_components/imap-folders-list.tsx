@@ -18,11 +18,13 @@ import {
 } from "next-vibe-ui/ui/table";
 import type { JSX } from "react";
 
-import { useImapFoldersListEndpoint } from "@/app/api/[locale]/v1/core/emails/imap-client/folders/list/hooks";
+import { useImapFoldersList } from "@/app/api/[locale]/v1/core/emails/imap-client/folders/list/hooks";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { useTranslation } from "@/i18n/core/client";
 
 interface ImapFoldersListProps {
   accountId: string;
+  logger: EndpointLogger;
 }
 
 /**
@@ -30,17 +32,20 @@ interface ImapFoldersListProps {
  */
 export function ImapFoldersList({
   accountId,
+  logger,
 }: ImapFoldersListProps): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
 
   // Use the IMAP folders list endpoint
-  const foldersEndpoint = useImapFoldersListEndpoint(accountId);
+  const foldersEndpoint = useImapFoldersList(accountId, logger);
 
   // Access data through the read operation following leads pattern
   const apiResponse = foldersEndpoint.read?.response;
   const folders = apiResponse?.success ? apiResponse.data.folders : [];
-  const totalFolders = apiResponse?.success ? apiResponse.data.total : 0;
+  const totalFolders = apiResponse?.success
+    ? apiResponse.data.pagination.total
+    : 0;
   const isLoading = foldersEndpoint.read?.isLoading || false;
   const error = foldersEndpoint.read?.error;
 
@@ -151,18 +156,16 @@ export function ImapFoldersList({
               {t("app.admin.emails.imap.folder.messageCount")}
             </TableHead>
             <TableHead>{t("app.admin.emails.imap.folder.unread")}</TableHead>
-            <TableHead>{t("app.admin.emails.imap.folder.recent")}</TableHead>
             <TableHead>
               {t("app.admin.emails.imap.folder.syncStatus")}
             </TableHead>
-            <TableHead>{t("app.admin.emails.imap.folder.lastSync")}</TableHead>
             <TableHead>{t("app.admin.emails.imap.common.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {folders.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-8">
+              <TableCell colSpan={6} className="text-center py-8">
                 {t("app.admin.emails.imap.admin.folders.no_folders")}
               </TableCell>
             </TableRow>
@@ -195,9 +198,7 @@ export function ImapFoldersList({
                     <span className="text-gray-400">0</span>
                   )}
                 </TableCell>
-                <TableCell>{folder.recentCount}</TableCell>
                 <TableCell>{getSyncStatusBadge(folder.syncStatus)}</TableCell>
-                <TableCell>{folder.lastSyncAt}</TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-2">
                     <Button

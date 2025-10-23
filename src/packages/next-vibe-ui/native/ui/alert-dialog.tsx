@@ -3,8 +3,8 @@ import * as React from "react";
 import { Platform, StyleSheet, View, type ViewProps } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { buttonTextVariants, buttonVariants } from "../../components/ui/button";
 import { cn } from "../lib/utils";
+import { buttonTextVariants, buttonVariants } from "./button";
 import { TextClassContext } from "./text";
 
 const AlertDialog = AlertDialogPrimitive.Root;
@@ -93,12 +93,18 @@ const AlertDialogContent = React.forwardRef<
 });
 AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName;
 
-const AlertDialogHeader = ({ className, ...props }: ViewProps) => (
+const AlertDialogHeader = ({
+  className,
+  ...props
+}: ViewProps): React.JSX.Element => (
   <View className={cn("flex flex-col gap-2", className)} {...props} />
 );
 AlertDialogHeader.displayName = "AlertDialogHeader";
 
-const AlertDialogFooter = ({ className, ...props }: ViewProps) => (
+const AlertDialogFooter = ({
+  className,
+  ...props
+}: ViewProps): React.JSX.Element => (
   <View
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end gap-2",

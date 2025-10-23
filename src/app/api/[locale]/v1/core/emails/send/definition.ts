@@ -285,7 +285,7 @@ const { POST } = createEndpoint({
               success: responseField(
                 {
                   type: WidgetType.BADGE,
-                  text: "app.api.v1.core.emails.send.response.success",
+                  text: "app.api.v1.core.emails.send.response.success.label",
                 },
                 z.boolean(),
               ),
@@ -493,6 +493,7 @@ const { POST } = createEndpoint({
           senderName: "Test App",
           replyTo: "noreply@example.com",
         },
+        campaignTracking: {},
         smsNotifications: {
           sendSmsNotification: false,
         },
@@ -530,6 +531,26 @@ const { POST } = createEndpoint({
         },
         senderSettings: {
           senderName: "Test System",
+        },
+        campaignTracking: {},
+        smsNotifications: {
+          sendSmsNotification: false,
+        },
+      },
+      withError: {
+        recipient: {
+          to: "invalid@example.com",
+        },
+        emailContent: {
+          subject: "Test Error",
+          html: "<p>This should fail</p>",
+        },
+        senderSettings: {
+          senderName: "Test System",
+        },
+        campaignTracking: {},
+        smsNotifications: {
+          sendSmsNotification: false,
         },
       },
     },
@@ -599,6 +620,28 @@ const { POST } = createEndpoint({
           smsResult: {
             success: false,
             error: "Email delivery failed - SMS not sent",
+          },
+        },
+      },
+      minimal: {
+        response: {
+          deliveryStatus: {
+            success: true,
+            messageId: "msg_min_123",
+            sentAt: "2024-01-07T12:00:00.000Z",
+            response: "250 OK: Message accepted",
+          },
+          accountInfo: {
+            accountId: "acc_primary",
+            accountName: "Primary SMTP",
+          },
+          deliveryResults: {
+            accepted: ["test@example.com"],
+            rejected: [],
+          },
+          smsResult: {
+            success: false,
+            error: "SMS notifications disabled",
           },
         },
       },

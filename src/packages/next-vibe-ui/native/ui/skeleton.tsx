@@ -14,7 +14,10 @@ const duration = 1000;
 function Skeleton({
   className,
   ...props
-}: Omit<React.ComponentPropsWithoutRef<typeof Animated.View>, "style">) {
+}: Omit<
+  React.ComponentPropsWithoutRef<typeof Animated.View>,
+  "style"
+>): React.JSX.Element {
   const sv = useSharedValue(1);
 
   React.useEffect(() => {

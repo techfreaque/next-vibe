@@ -779,7 +779,10 @@ export class RouteDelegationHandler {
       typeof firstCliArgKey === "string" &&
       positionalArgs.length > 0
     ) {
-      data[firstCliArgKey] = positionalArgs[0];
+      // If there's only one positional arg, use it as a string for backward compatibility
+      // If there are multiple positional args, use them as an array
+      data[firstCliArgKey] =
+        positionalArgs.length === 1 ? positionalArgs[0] : positionalArgs;
     }
 
     // Map named arguments to data fields (convert kebab-case to camelCase)

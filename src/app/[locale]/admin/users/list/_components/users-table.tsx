@@ -43,7 +43,7 @@ export function UsersTable({
   const formatDate = useCallback(
     (date: Date | string | number | null): string => {
       if (!date) {
-        return t("app.admin.users.admin.formatting.fallbacks.never");
+        return t("app.admin.users.users.admin.formatting.fallbacks.never");
       }
       const dateObj =
         typeof date === "string" || typeof date === "number"
@@ -64,18 +64,18 @@ export function UsersTable({
     if (!user.isActive) {
       return {
         variant: "destructive" as const,
-        label: "app.admin.users.status.inactive",
+        label: "app.admin.users.users.status.inactive",
       };
     }
     if (!user.emailVerified) {
       return {
         variant: "secondary" as const,
-        label: "app.admin.users.status.emailUnverified",
+        label: "app.admin.users.users.status.emailUnverified",
       };
     }
     return {
       variant: "default" as const,
-      label: "app.admin.users.status.active",
+      label: "app.admin.users.users.status.active",
     };
   };
 
@@ -85,12 +85,20 @@ export function UsersTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t("app.admin.users.admin.table.name")}</TableHead>
-              <TableHead>{t("app.admin.users.admin.table.email")}</TableHead>
-              <TableHead>{t("app.admin.users.admin.table.status")}</TableHead>
-              <TableHead>{t("app.admin.users.admin.table.created")}</TableHead>
+              <TableHead>
+                {t("app.admin.users.users.admin.table.name")}
+              </TableHead>
+              <TableHead>
+                {t("app.admin.users.users.admin.table.email")}
+              </TableHead>
+              <TableHead>
+                {t("app.admin.users.users.admin.table.status")}
+              </TableHead>
+              <TableHead>
+                {t("app.admin.users.users.admin.table.created")}
+              </TableHead>
               <TableHead className="text-right">
-                {t("app.admin.users.admin.table.actions")}
+                {t("app.admin.users.users.admin.table.actions")}
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -125,15 +133,15 @@ export function UsersTable({
       <div className="rounded-md border">
         <div className="p-8 text-center">
           <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-            {t("app.admin.users.list.empty.title")}
+            {t("app.admin.users.users.list.empty.title")}
           </h3>
           <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            {t("app.admin.users.list.empty.description")}
+            {t("app.admin.users.users.list.empty.description")}
           </p>
           <div className="mt-6">
             <Button asChild>
               <Link href={`/${locale}/admin/users/create`}>
-                {t("app.admin.users.admin.actions.add")}
+                {t("app.admin.users.users.admin.actions.add")}
               </Link>
             </Button>
           </div>
@@ -148,19 +156,19 @@ export function UsersTable({
         <TableHeader>
           <TableRow>
             <TableHead className="min-w-[200px]">
-              {t("app.admin.users.admin.table.name")}
+              {t("app.admin.users.users.admin.table.name")}
             </TableHead>
             <TableHead className="min-w-[200px]">
-              {t("app.admin.users.admin.table.email")}
+              {t("app.admin.users.users.admin.table.email")}
             </TableHead>
             <TableHead className="min-w-[120px]">
-              {t("app.admin.users.admin.table.status")}
+              {t("app.admin.users.users.admin.table.status")}
             </TableHead>
             <TableHead className="min-w-[120px]">
-              {t("app.admin.users.admin.table.created")}
+              {t("app.admin.users.users.admin.table.created")}
             </TableHead>
             <TableHead className="text-right min-w-[100px]">
-              {t("app.admin.users.admin.table.actions")}
+              {t("app.admin.users.users.admin.table.actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -192,7 +200,7 @@ export function UsersTable({
                   <div className="flex items-center justify-end space-x-2">
                     <Button asChild variant="outline" size="sm">
                       <Link href={`/${locale}/admin/users/${user.id}/edit`}>
-                        {t("app.admin.users.admin.actions.edit")}
+                        {t("app.admin.users.users.admin.actions.edit")}
                       </Link>
                     </Button>
                   </div>

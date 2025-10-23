@@ -25,7 +25,7 @@ import type {
   JwtPrivatePayloadType,
 } from "../../../user/auth/definition";
 import type { EndpointLogger } from "../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import { CronTaskPriority, TaskCategory } from "../enum";
+import type { CronTaskPriority, TaskCategory } from "../enum";
 import type {
   TaskTypesRequestOutput,
   TaskTypesResponseOutput,
@@ -236,7 +236,10 @@ export interface TaskRegistry {
   sideTasks: SideTask[];
   taskRunners: TaskRunner[];
   allTasks: Task[];
-  tasksByCategory: Record<(typeof TaskCategory)[keyof typeof TaskCategory], Task[]>;
+  tasksByCategory: Record<
+    (typeof TaskCategory)[keyof typeof TaskCategory],
+    Task[]
+  >;
   tasksByName: Record<string, Task>;
   taskRunner: TaskRunnerManager; // Single unified task runner instance
 }
@@ -442,7 +445,7 @@ export class TaskTypesRepositoryImpl implements TaskTypesRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "app.common.errors.default" as const,
+        "app.api.v1.core.system.tasks.types.get.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         {
           error: parsedError.message,
@@ -473,7 +476,7 @@ export class TaskTypesRepositoryImpl implements TaskTypesRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "app.common.errors.default" as const,
+        "app.api.v1.core.system.tasks.types.get.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message },
       );
@@ -526,7 +529,7 @@ export interface TaskStatus { /* ... */ }`;
           // Handle unsupported format with proper error response
           logger.error("Unsupported export format", { format });
           return createErrorResponse(
-            "app.common.errors.unknown" as const,
+            "app.api.v1.core.system.tasks.types.get.errors.validation.title",
             ErrorResponseTypes.VALIDATION_ERROR,
             { format },
           );
@@ -541,7 +544,7 @@ export interface TaskStatus { /* ... */ }`;
         error: parsedError.message,
       });
       return createErrorResponse(
-        "app.common.errors.default" as const,
+        "app.api.v1.core.system.tasks.types.get.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message, format },
       );

@@ -207,14 +207,16 @@ export function LeadsStatsChart({
     return (
       <Card className={className}>
         <CardHeader>
-          <CardTitle>{t("leads.admin.stats.chart.title")}</CardTitle>
+          <CardTitle>
+            {t("app.admin.leads.leads.admin.stats.chart.title")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div
             className="flex items-center justify-center text-muted-foreground"
             style={{ height: `${height}px` }}
           >
-            {t("leads.admin.stats.chart.noData")}
+            {t("app.admin.leads.leads.admin.stats.chart.noData")}
           </div>
         </CardContent>
       </Card>
@@ -298,19 +300,19 @@ export function LeadsStatsChart({
 
           switch (sourceEnum) {
             case LeadSource.WEBSITE:
-              return "leads.admin.stats.sources.website";
+              return "app.admin.leads.leads.admin.stats.sources.website";
             case LeadSource.SOCIAL_MEDIA:
-              return "leads.admin.stats.sources.social_media";
+              return "app.admin.leads.leads.admin.stats.sources.social_media";
             case LeadSource.EMAIL_CAMPAIGN:
-              return "leads.admin.stats.sources.email_campaign";
+              return "app.admin.leads.leads.admin.stats.sources.email_campaign";
             case LeadSource.REFERRAL:
-              return "leads.admin.stats.sources.referral";
+              return "app.admin.leads.leads.admin.stats.sources.referral";
             case LeadSource.CSV_IMPORT:
-              return "leads.admin.stats.sources.csv_import";
+              return "app.admin.leads.leads.admin.stats.sources.csv_import";
             case LeadSource.API:
-              return "leads.admin.stats.sources.api";
+              return "app.admin.leads.leads.admin.stats.sources.api";
             default:
-              return "leads.admin.stats.sources.unknown";
+              return "app.admin.leads.leads.admin.stats.sources.unknown";
           }
         };
 
@@ -521,7 +523,7 @@ export function LeadsStatsChart({
       <Card>
         <CardHeader>
           <CardTitle>
-            {data.title || t("leads.admin.stats.chart.title")}
+            {data.title || t("app.admin.leads.leads.admin.stats.chart.title")}
           </CardTitle>
           {data.subtitle && (
             <p className="text-sm text-muted-foreground">{data.subtitle}</p>
@@ -538,20 +540,20 @@ export function LeadsStatsChart({
             <div className="border-t">
               <div className="flex items-center justify-between p-4 border-b">
                 <h4 className="text-sm font-medium">
-                  {t("leads.admin.stats.legend.title")}
+                  {t("app.admin.leads.leads.admin.stats.legend.title")}
                 </h4>
                 <div className="flex gap-2">
                   <button
                     onClick={showAllSeries}
                     className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                   >
-                    {t("leads.admin.stats.legend.showAll")}
+                    {t("app.admin.leads.leads.admin.stats.legend.showAll")}
                   </button>
                   <button
                     onClick={hideAllSeries}
                     className="text-xs text-muted-foreground hover:text-foreground"
                   >
-                    {t("leads.admin.stats.legend.hideAll")}
+                    {t("app.admin.leads.leads.admin.stats.legend.hideAll")}
                   </button>
                 </div>
               </div>
@@ -563,7 +565,9 @@ export function LeadsStatsChart({
                     className={`flex items-center gap-2 text-sm transition-opacity hover:opacity-80 ${
                       item.visible ? "opacity-100" : "opacity-50"
                     }`}
-                    title={t("leads.admin.stats.legend.clickToToggle")}
+                    title={t(
+                      "app.admin.leads.leads.admin.stats.legend.clickToToggle",
+                    )}
                   >
                     <div
                       className="w-3 h-3 rounded-full"

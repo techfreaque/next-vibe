@@ -266,7 +266,7 @@ const { GET } = createEndpoint({
 
   examples: {
     urlPathVariables: {
-      default: { id: "550e8400-e29b-41d4-a716-446655440000" },
+      default: { threadId: "550e8400-e29b-41d4-a716-446655440000" },
     },
     requests: undefined,
     responses: {
@@ -659,7 +659,7 @@ const { PATCH } = createEndpoint({
 
   examples: {
     urlPathVariables: {
-      default: { id: "550e8400-e29b-41d4-a716-446655440000" },
+      default: { threadId: "550e8400-e29b-41d4-a716-446655440000" },
     },
     requests: {
       default: {
@@ -819,7 +819,7 @@ const { DELETE } = createEndpoint({
 
   examples: {
     urlPathVariables: {
-      default: { id: "550e8400-e29b-41d4-a716-446655440000" },
+      default: { threadId: "550e8400-e29b-41d4-a716-446655440000" },
     },
     requests: undefined,
     responses: {

@@ -84,7 +84,7 @@ function ToggleIcon({
   ...props
 }: React.ComponentPropsWithoutRef<LucideIcon> & {
   icon: LucideIcon;
-}) {
+}): React.JSX.Element {
   const textClass = React.useContext(TextClassContext);
   return <Icon className={cn(textClass, className)} {...props} />;
 }

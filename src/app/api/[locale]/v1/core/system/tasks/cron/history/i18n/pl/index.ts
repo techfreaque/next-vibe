@@ -100,6 +100,31 @@ export const translations: typeof enTranslations = {
         title: "Nie znaleziono",
         description: "Zadanie lub rekord wykonania nie został znaleziony",
       },
+      network: {
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas pobierania historii zadania",
+      },
+      forbidden: {
+        title: "Zabronione",
+        description: "Dostęp do historii zadań jest zabroniony",
+      },
+      server: {
+        title: "Błąd serwera",
+        description: "Wystąpił wewnętrzny błąd serwera",
+      },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd",
+      },
+      unsavedChanges: {
+        titleChanges: "Niezapisane zmiany",
+        title: "Niezapisane zmiany",
+        description: "Masz niezapisane zmiany",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Wystąpił konflikt danych",
+      },
     },
     success: {
       title: "Historia pobrana",

@@ -1,47 +1,12 @@
 /**
- * STUB: sonner
- * Auto-generated placeholder for web-only component
- *
- * This component exists in next-vibe-ui/web/ui but not in native UI.
- * Replace this stub with a proper React Native implementation.
+ * Sonner (Toaster) Component for React Native
+ * Alias for Toaster component to match web API
  */
-import type { ReactNode } from "react";
-import { Text, View } from "react-native";
+import { Toaster } from "./toaster";
 
-export function Sonner({
-  children,
-  ...props
-}: {
-  children?: ReactNode;
-  [key: string]: any;
-}) {
-  console.warn("🔶 Using stub: Sonner");
-
-  return (
-    <View
-      style={{
-        padding: 8,
-        backgroundColor: "#FEF3C7",
-        marginVertical: 4,
-        borderRadius: 4,
-      }}
-    >
-      <Text style={{ fontSize: 12, color: "#92400E", marginBottom: 4 }}>
-        Sonner (stub)
-      </Text>
-      {children}
-    </View>
-  );
-}
-
-// Re-export any common sub-components as stubs
-export const SonnerContent = Sonner;
-export const SonnerHeader = Sonner;
-export const SonnerFooter = Sonner;
-export const SonnerTitle = Sonner;
-export const SonnerDescription = Sonner;
-export const SonnerTrigger = Sonner;
-export const SonnerItem = Sonner;
-export const SonnerLabel = Sonner;
-
-export default Sonner;
+/**
+ * Sonner is an alias for Toaster on React Native
+ * On web, Sonner is a third-party toast library
+ * On native, we use our custom Toaster implementation
+ */
+export { Toaster as Sonner, Toaster };

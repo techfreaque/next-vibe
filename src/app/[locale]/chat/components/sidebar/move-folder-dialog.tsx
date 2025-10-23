@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
   ScrollArea,
-} from "@/packages/next-vibe-ui/web/ui";
+} from "next-vibe-ui/ui";
 
 import type { ChatFolder } from "../../types";
 

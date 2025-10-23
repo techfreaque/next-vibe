@@ -39,8 +39,8 @@ export function useEndpointCreate<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line no-restricted-syntax
-    unknown
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
   >,
 >(
   primaryEndpoint: TEndpoint | null,

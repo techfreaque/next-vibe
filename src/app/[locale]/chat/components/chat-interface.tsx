@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter } from "next-vibe-ui/hooks";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
@@ -19,7 +19,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/packages/next-vibe-ui/web/ui";
+} from "next-vibe-ui/ui";
 
 import { useChatContext } from "../features/chat/context";
 import type { ChatThread, ModelId } from "../types";
@@ -149,7 +149,6 @@ export function ChatInterface({
   // Delete confirmation dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
-  const [messageChildrenCount, setMessageChildrenCount] = useState(0);
 
   // Handler for switching branches in linear view
   const handleSwitchBranch = useCallback(
@@ -181,16 +180,11 @@ export function ChatInterface({
   );
 
   // Wrapper for delete message that ALWAYS shows confirmation dialog
-  const handleDeleteMessage = useCallback(
-    (messageId: string): void => {
-      const childrenCount = countMessageChildren(messageId);
-      // Always show confirmation dialog for better UX
-      setMessageToDelete(messageId);
-      setMessageChildrenCount(childrenCount);
-      setDeleteDialogOpen(true);
-    },
-    [countMessageChildren],
-  );
+  const handleDeleteMessage = useCallback((messageId: string): void => {
+    // Always show confirmation dialog for better UX
+    setMessageToDelete(messageId);
+    setDeleteDialogOpen(true);
+  }, []);
 
   // Confirm delete message with children
   const handleConfirmDelete = useCallback((): void => {
@@ -198,7 +192,6 @@ export function ChatInterface({
       void deleteMessage(messageToDelete);
       setDeleteDialogOpen(false);
       setMessageToDelete(null);
-      setMessageChildrenCount(0);
     }
   }, [messageToDelete, deleteMessage]);
 
@@ -206,7 +199,6 @@ export function ChatInterface({
   const handleCancelDelete = useCallback((): void => {
     setDeleteDialogOpen(false);
     setMessageToDelete(null);
-    setMessageChildrenCount(0);
   }, []);
 
   // Auto-switch to newly created branches
@@ -254,7 +246,7 @@ export function ChatInterface({
     }
   }, [activeThreadMessages]);
 
-  const { locale, currentCountry } = useTranslation();
+  const { t, locale, currentCountry } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null = checking
@@ -649,32 +641,22 @@ export function ChatInterface({
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Message</AlertDialogTitle>
+            <AlertDialogTitle>
+              {t("app.admin.common.actions.delete")}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              {messageChildrenCount > 0 ? (
-                <>
-                  This message has {messageChildrenCount} child message
-                  {messageChildrenCount !== 1 ? "s" : ""} (branches/replies).
-                  Deleting this message will also delete all of its children.
-                  This action cannot be undone.
-                </>
-              ) : (
-                <>
-                  Are you sure you want to delete this message? This action
-                  cannot be undone.
-                </>
-              )}
+              {t("app.chat.confirmations.deleteMessage")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={handleCancelDelete}>
-              Cancel
+              {t("app.admin.common.actions.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              {t("app.admin.common.actions.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -33,7 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
   Textarea,
-} from "@/packages/next-vibe-ui/web/ui";
+} from "next-vibe-ui/ui";
 
 import { SelectorBase, type SelectorOption } from "./selector-base";
 import { useFavorites } from "./use-favorites";

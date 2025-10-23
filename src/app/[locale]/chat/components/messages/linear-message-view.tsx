@@ -100,7 +100,10 @@ export function LinearMessageView({
                 sibling.content.slice(0, 50) +
                 (sibling.content.length > 50 ? "..." : ""),
             }))}
-            onSwitchBranch={(index) => onSwitchBranch("__root__", index)}
+            onSwitchBranch={(index) =>
+              // eslint-disable-next-line i18next/no-literal-string
+              onSwitchBranch("__root__", index)
+            }
             locale={locale}
           />
         </div>

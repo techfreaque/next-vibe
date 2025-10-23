@@ -1,10 +1,8 @@
-import { TaskCategory } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 /**
  * Session Cleanup Task Implementation
  * Handles background session and token cleanup using the proper task system
  * Runs via pulse route in production or task runner in development
  */
-
 import "server-only";
 
 import {
@@ -18,7 +16,10 @@ import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
 } from "@/app/api/[locale]/v1/core/system/tasks/constants";
-import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/tasks/enum";
+import {
+  CronTaskPriority,
+  TaskCategory,
+} from "@/app/api/[locale]/v1/core/system/tasks/enum";
 import type { Task } from "@/app/api/[locale]/v1/core/system/tasks/types/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { defaultLocale } from "@/i18n/core/config";
