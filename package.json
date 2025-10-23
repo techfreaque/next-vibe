@@ -1,6 +1,7 @@
 {
   "name": "unbottled.ai",
   "version": "2.0.0",
+  "main": "expo-router/entry",
   "author": "Marcus Brandstätter",
   "private": true,
   "description": "Unbottled AI",
@@ -15,7 +16,12 @@
     "test": "vibe test",
     "check": "vibe check",
     "lint": "vibe lint",
-    "typecheck": "vibe typecheck"
+    "typecheck": "vibe typecheck",
+    "native": "expo start",
+    "native:android": "expo run:android",
+    "native:ios": "expo run:ios",
+    "native:web": "expo start --web",
+    "native:reset": "expo start --clear"
   },
   "contributors": [
     {
@@ -83,6 +89,11 @@
     "@radix-ui/react-tooltip": "1.2.8",
     "@react-email/components": "0.5.7",
     "@react-email/render": "1.4.0",
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-navigation/native": "^7.1.8",
+    "@rn-primitives/portal": "~1.3.0",
+    "@rn-primitives/slot": "^1.2.0",
+    "@rn-primitives/types": "~1.2.0",
     "@stripe/stripe-js": "8.1.0",
     "@tailwindcss/postcss": "4.1.15",
     "@tanstack/react-query": "5.90.5",
@@ -110,6 +121,14 @@
     "embla-carousel-react": "8.6.0",
     "eslint-plugin-i18next": "6.1.3",
     "eslint-plugin-react-compiler": "19.1.0-rc.2",
+    "expo": "~54.0.16",
+    "expo-constants": "~18.0.9",
+    "expo-linking": "~8.0.8",
+    "expo-navigation-bar": "~5.0.8",
+    "expo-router": "^6.0.13",
+    "expo-splash-screen": "~31.0.10",
+    "expo-status-bar": "~3.0.8",
+    "expo-system-ui": "~6.0.7",
     "framer-motion": "12.23.24",
     "google-auth-library": "10.4.1",
     "googleapis": "164.0.0",
@@ -121,6 +140,8 @@
     "ioredis": "5.8.1",
     "jose": "6.1.0",
     "lucide-react": "0.546.0",
+    "lucide-react-native": "^0.546.0",
+    "nativewind": "^5.0.0-preview.2",
     "next": "15.5.6",
     "next-themes": "0.4.6",
     "nodemailer": "7.0.9",
@@ -133,12 +154,20 @@
     "react-intersection-observer": "9.16.0",
     "react-is": "19.2.0",
     "react-markdown": "10.1.0",
+    "react-native": "0.81.4",
+    "react-native-gesture-handler": "~2.28.0",
+    "react-native-safe-area-context": "^5.6.1",
+    "react-native-screens": "~4.16.0",
+    "react-native-svg": "15.12.1",
+    "react-native-web": "~0.21.2",
+    "react-native-worklets": "^0.4.1",
     "react-resizable-panels": "3.0.6",
     "react-syntax-highlighter": "15.6.6",
     "recharts": "3.3.0",
     "rehype-highlight": "7.0.2",
     "remark-breaks": "4.0.0",
     "remark-gfm": "4.0.1",
+    "semver": "^7.7.3",
     "server-only": "0.0.1",
     "socket.io": "4.8.1",
     "socket.io-client": "4.8.1",
@@ -156,6 +185,7 @@
     "zustand": "5.0.8"
   },
   "devDependencies": {
+    "@babel/core": "^7.28.4",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.0",
     "@testing-library/user-event": "14.6.1",
@@ -175,6 +205,7 @@
     "@vitest/coverage-v8": "3.2.4",
     "@vitest/ui": "3.2.4",
     "autoprefixer": "10.4.21",
+    "babel-preset-expo": "~54.0.5",
     "builder": "workspace:*",
     "globals": "16.4.0",
     "jsdom": "27.0.1",
@@ -198,5 +229,8 @@
   ],
   "bin": {
     "vibe": "./src/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/vibe.ts"
+  },
+  "overrides": {
+    "lightningcss": "1.30.1"
   }
 }

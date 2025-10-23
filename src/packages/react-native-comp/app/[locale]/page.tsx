@@ -1,9 +1,7 @@
-// import { useLocalSearchParams } from "expo-router";
-import { Text, View as NextView } from "next-vibe-ui/ui";
+import { useLocalSearchParams } from "expo-router";
+import { Text, View } from "next-vibe-ui/ui";
 import { useEffect } from "react";
 
-import { View as ViewRelative } from "../../../next-vibe-ui/native/ui";
-import { View2, View3 } from "./view";
 // import { Pressable } from "react-native";
 
 // import { useTranslation } from "@/i18n/core/client";
@@ -16,15 +14,15 @@ import { View2, View3 } from "./view";
  * Uses platform-agnostic View component with NativeWind
  */
 export default function HomePage(): React.ReactElement {
-  // const { locale } = useLocalSearchParams<{ locale: string }>();
+  const { locale } = useLocalSearchParams<{ locale: string }>();
   // const { t } = useTranslation();
 
-  // useEffect(() => {
-  //   console.log("HomePage mounted with locale:", locale);
-  // }, [locale]);
+  useEffect(() => {
+    console.log("HomePage mounted with locale:", locale);
+  }, [locale]);
 
   return (
-    <ViewRelative className="flex-1 justify-center items-center bg-violet-600">
+    <View className="flex-1 justify-center items-center bg-violet-600">
       <Text className="text-4xl font-bold text-white mb-4">
         Welcome to Next Vibe!
       </Text>
@@ -35,21 +33,30 @@ export default function HomePage(): React.ReactElement {
         {/* Locale: {locale || "en-GLOBAL"} */}
       </Text>
 
-      <NextView className="bg-red-500 p-4 rounded-md">
+      <View className="bg-red-500 p-4 rounded-md">
         <Text className="text-yellow-300">Next View Component</Text>
-      </NextView>
+      </View>
 
       {/* Test NativeWind classes */}
-      <ViewRelative className="bg-green-600 px-6 py-3 rounded-lg mb-4 active:opacity-80">
+      <View className="bg-green-600 px-6 py-3 rounded-lg mb-4 active:opacity-80">
         <Text className="text-white font-semibold">Test NativeWind</Text>
-      </ViewRelative>
+      </View>
 
-      <View2 className="bg-yellow-500 p-4 rounded-md">
+      <View className="bg-yellow-500 p-4 rounded-md">
         <Text className="text-gray-900 font-medium">View 2</Text>
-      </View2>
-      <View3 className="bg-yellow-500 p-4 rounded-md">
-        <Text className="text-gray-900 font-medium">View 2</Text>
-      </View3>
-    </ViewRelative>
+      </View>
+      <View className="bg-yellow-500 p-4 rounded-md">
+        <Text className="text-gray-900 font-medium">View 3</Text>
+      </View>
+      <View className="bg-yellow-500 p-4 rounded-md">
+        <Text className="text-gray-900 font-medium">View 4</Text>
+      </View>
+      <View className="bg-yellow-500 p-4 rounded-md">
+        <Text className="text-gray-900 font-medium">View 5</Text>
+      </View>
+      <View className="bg-yellow-500 p-4 rounded-md">
+        <Text className="text-gray-900 font-medium">View 6</Text>
+      </View>
+    </View>
   );
 }

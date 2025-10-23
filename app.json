@@ -21,7 +21,13 @@
         "backgroundColor": "#ffffff"
       }
     },
-    "plugins": ["expo-router"]
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "root": "./src/packages/react-native-comp/app"
+        }
+      ]
+    ]
   }
 }
-

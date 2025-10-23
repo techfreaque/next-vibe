@@ -2,8 +2,12 @@ const { getDefaultConfig } = require('expo/metro-config');
 const { withNativeWind } = require('nativewind/metro');
 const path = require('path');
 
+// Now running from workspace root (so NativeWind can scan all of src/)
 const projectRoot = __dirname;
-const workspaceRoot = path.resolve(projectRoot, '../../..');
+const workspaceRoot = projectRoot;
+
+// Point Metro to use custom babel config (renamed to avoid Next.js detection)
+process.env.BABEL_CONFIG_PATH = path.resolve(projectRoot, 'metro.babel.config.cjs');
 
 const config = getDefaultConfig(projectRoot);
 
@@ -27,20 +31,50 @@ config.resolver.sourceExts = [
 // Remove CSS from asset extensions (it's in sourceExts for NativeWind)
 config.resolver.assetExts = config.resolver.assetExts.filter(ext => ext !== 'css');
 
+// CRITICAL: Only include src folder and node_modules - exclude everything else
+config.resolver.blockList = [
+  // Exclude EVERYTHING at root level except src and node_modules
+  new RegExp(`^${workspaceRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/(?!src|node_modules).*`),
+  // Exclude nested node_modules
+  /node_modules\/.*\/node_modules\/.*/,
+  // Exclude build outputs inside src
+  /src\/.*\/\.next\/.*/,
+  /src\/.*\/\.expo\/.*/,
+  /src\/.*\/dist\/.*/,
+  /src\/.*\/build\/.*/,
+];
+
+// Only watch src and node_modules
+config.watchFolders = [
+  path.resolve(workspaceRoot, 'src'),
+  path.resolve(workspaceRoot, 'node_modules'),
+];
+
+// Disable Watchman to avoid file system overload - use node crawler instead
+config.watcher = {
+  ...config.watcher,
+  watchman: false,
+  additionalExts: ['cjs', 'mjs'],
+};
+
+// Limit the number of workers to reduce memory usage
+config.maxWorkers = 2;
+
 // Configure path aliases to match tsconfig.json
+// CRITICAL: next-vibe-ui/* should resolve to next-vibe-ui/native/*
 config.resolver.extraNodeModules = {
   '@': path.resolve(workspaceRoot, 'src'),
   'next-vibe': path.resolve(workspaceRoot, 'src/packages/next-vibe'),
+  // This makes next-vibe-ui/ui resolve to next-vibe-ui/native/ui
   'next-vibe-ui': path.resolve(workspaceRoot, 'src/packages/next-vibe-ui/native'),
 };
 
 // Watch all files in the workspace
 config.watchFolders = [workspaceRoot];
 
-// Configure node_modules resolution
+// Configure node_modules resolution - now at workspace root
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),
-  // path.resolve(workspaceRoot, 'node_modules'),
 ];
 
 // Ignore Next.js build directories
@@ -54,10 +88,8 @@ config.resolver.blockList = [
 // Apply NativeWind BEFORE custom resolveRequest so resolution happens after transformation
 // NativeWind v5 uses @source directives in global.css (Tailwind v4 format)
 const nativeWindConfig = withNativeWind(config, {
-  input: './global.css',
-  // Explicitly include the entire src directory for transformation
-  // This ensures next-vibe-ui gets NativeWind treatment
-  projectRoot: workspaceRoot,
+  input: './src/packages/react-native-comp/global.css',
+  // Running from workspace root now, so projectRoot is already correct
   inlineRem: false,
 });
 
@@ -65,9 +97,16 @@ const nativeWindConfig = withNativeWind(config, {
 const originalResolveRequest = nativeWindConfig.resolver.resolveRequest;
 
 nativeWindConfig.resolver.resolveRequest = (context, moduleName, platform) => {
-  // ALWAYS redirect React imports to app's node_modules to prevent duplicates
+  // CRITICAL: Redirect next-vibe-ui imports to native version
+  if (moduleName.startsWith('next-vibe-ui/')) {
+    const subpath = moduleName.replace('next-vibe-ui/', '');
+    const nativePath = path.join(workspaceRoot, 'src/packages/next-vibe-ui/native', subpath);
+    return context.resolveRequest(context, nativePath, platform);
+  }
+
+  // ALWAYS redirect React imports to workspace root node_modules to prevent duplicates
   if (moduleName === 'react' || moduleName.startsWith('react/')) {
-    const redirectedPath = path.join(path.resolve(projectRoot, 'node_modules'), moduleName);
+    const redirectedPath = path.join(path.resolve(workspaceRoot, 'node_modules'), moduleName);
     return context.resolveRequest(context, redirectedPath, platform);
   }
 

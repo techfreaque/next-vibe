@@ -9,7 +9,7 @@ import { defaultLocale } from "@/i18n/core/config";
  */
 export default function RootIndex(): React.ReactElement {
   useEffect(() => {
-    // console.log("Redirecting to default locale:", defaultLocale);
+    console.log("Redirecting to default locale:", defaultLocale);
   }, []);
 
   return <Redirect href={`/${defaultLocale}`} />;
