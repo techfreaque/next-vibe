@@ -3,7 +3,6 @@
  * /api/v1/core/agent/chat/credits
  */
 
-// Import response utilities from next-vibe shared types
 import {
   createErrorResponse,
   createSuccessResponse,

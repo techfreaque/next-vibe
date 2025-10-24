@@ -1,15 +1,6 @@
 "use client";
 
 import { useRouter } from "next-vibe-ui/hooks";
-import type { JSX } from "react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-
-import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
-import { DEFAULT_FOLDER_IDS } from "@/app/api/[locale]/v1/core/agent/chat/config";
-import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
-import { useTranslation } from "@/i18n/core/client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,14 +10,23 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  Div,
 } from "next-vibe-ui/ui";
+import type { JSX } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+
+import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
+import { DEFAULT_FOLDER_IDS } from "@/app/api/[locale]/v1/core/agent/chat/config";
+import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
+import { useTranslation } from "@/i18n/core/client";
 
 import { useChatContext } from "../features/chat/context";
 import type { ChatThread, ModelId } from "../types";
 import { ChatArea } from "./layout/chat-area";
 import { SidebarWrapper } from "./layout/sidebar-wrapper";
 import { TopBar } from "./layout/top-bar";
-import { SearchModal } from "./search-modal";
 
 // Utility functions
 const isNewThread = (threadId: string | undefined): boolean =>
@@ -248,7 +248,6 @@ export function ChatInterface({
 
   const { t, locale, currentCountry } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null = checking
   const router = useRouter();
 
@@ -540,7 +539,7 @@ export function ChatInterface({
 
   return (
     <>
-      <div className="flex h-[100dvh] overflow-hidden bg-background">
+      <Div className="flex h-[100dvh] overflow-hidden bg-background">
         {/* Top Bar - Menu, Search, Settings */}
         <TopBar
           theme={theme}
@@ -549,7 +548,9 @@ export function ChatInterface({
           onToggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
           onToggleTTSAutoplay={() => setTTSAutoplay(!ttsAutoplay)}
           ttsAutoplay={ttsAutoplay}
-          onOpenSearch={() => setSearchModalOpen(true)}
+          onOpenSearch={() => {
+            // TODO: Implement search modal
+          }}
           sidebarCollapsed={sidebarCollapsed}
           onNewChat={() => handleCreateThread(null)}
           locale={locale}
@@ -625,17 +626,17 @@ export function ChatInterface({
           logger={logger}
           chat={chat}
         />
-      </div>
+      </Div>
 
       {/* Search Modal */}
-      <SearchModal
+      {/* <SearchModal
         open={searchModalOpen}
         onOpenChange={setSearchModalOpen}
         onCreateThread={() => handleCreateThread(null)}
         onSelectThread={handleSelectThread}
         threads={threads}
         locale={locale}
-      />
+      /> */}
 
       {/* Delete Message Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

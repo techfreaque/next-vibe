@@ -431,6 +431,11 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       }
     }
 
+    // If no children matched the usage, return z.never()
+    if (Object.keys(shape).length === 0) {
+      return z.never() as InferSchemaFromField<F, Usage>;
+    }
+
     // Create the object schema and let TypeScript infer the exact type
     // This preserves the specific field types instead of collapsing to ZodTypeAny
     const objectSchema = z.object(shape);

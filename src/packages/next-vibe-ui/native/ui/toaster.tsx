@@ -40,15 +40,3 @@ export function Toaster(): React.JSX.Element {
     </ToastProvider>
   );
 }
-
-// Re-export any common sub-components as stubs
-export const ToasterContent = Toaster;
-export const ToasterHeader = Toaster;
-export const ToasterFooter = Toaster;
-export const ToasterTitle = Toaster;
-export const ToasterDescription = Toaster;
-export const ToasterTrigger = Toaster;
-export const ToasterItem = Toaster;
-export const ToasterLabel = Toaster;
-
-export default Toaster;

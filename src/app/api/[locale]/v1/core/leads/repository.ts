@@ -5,7 +5,6 @@
 
 import type { SQL } from "drizzle-orm";
 import { and, count, desc, eq, gte, ilike, lte, or, sql } from "drizzle-orm";
-import { withTransaction } from "next-vibe/server/db/repository-helpers";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -16,6 +15,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
+import { withTransaction } from "@/app/api/[locale]/v1/core/system/db/utils/repository-helpers";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
@@ -23,8 +23,13 @@ import type { TFunction } from "@/i18n/core/static-types";
 import { newsletterSubscriptions } from "../newsletter/db";
 import { NewsletterSubscriptionStatus } from "../newsletter/enum";
 import type { JwtPayloadType } from "../user/auth/definition";
-import { users } from "../user/db";
-import { emailCampaigns, type Lead, leadEngagements, leads } from "./db";
+import {
+  emailCampaigns,
+  type Lead,
+  leadEngagements,
+  leads,
+  userLeads,
+} from "./db";
 import type {
   LeadCreateType,
   LeadDetailResponse,
@@ -431,8 +436,8 @@ class LeadsRepositoryImpl implements LeadsRepository {
           businessName: data.contactInfo?.businessName ?? "",
           phone: data.contactInfo?.phone ?? null,
           website: data.contactInfo?.website ?? null,
-          country: data.locationPreferences?.country ?? "",
-          language: data.locationPreferences?.language ?? "",
+          country: data.locationPreferences?.country ?? "GLOBAL",
+          language: data.locationPreferences?.language ?? "en",
           source: data.leadDetails?.source ?? null,
           notes: data.leadDetails?.notes ?? null,
           status: LeadStatus.PENDING, // Default status for general lead creation
@@ -603,7 +608,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
             newStatus,
           });
           return createErrorResponse(
-            "error.default",
+            "app.api.v1.core.leads.leadsErrors.batch.update.error.default",
             ErrorResponseTypes.BAD_REQUEST,
           );
         }
@@ -1320,16 +1325,14 @@ class LeadsRepositoryImpl implements LeadsRepository {
             updateData.convertedAt = new Date();
             updateData.signedUpAt = new Date();
 
-            // Update the user record with the leadId for future tracking
-            await tx
-              .update(users)
-              .set({
-                leadId: existingLead.id,
-                updatedAt: new Date(),
-              })
-              .where(eq(users.id, options.userId));
+            // Create user-lead relationship record
+            await tx.insert(userLeads).values({
+              userId: options.userId,
+              leadId: existingLead.id,
+              isPrimary: true,
+            });
 
-            logger.debug("User record updated with leadId (internal)", {
+            logger.debug("User-lead relationship created (internal)", {
               userId: options.userId,
               leadId: existingLead.id,
             });
@@ -1472,14 +1475,14 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       return createSuccessResponse<LeadEngagementResponseOutput>({
         id: engagement.id,
-        engagementType: engagement.engagementType,
-        campaignId: engagement.campaignId || undefined,
-        metadata: engagement.metadata || {},
+        responseEngagementType: engagement.engagementType,
+        responseCampaignId: engagement.campaignId || undefined,
+        responseMetadata: engagement.metadata || {},
         timestamp: engagement.timestamp.toISOString(),
         ipAddress: engagement.ipAddress || undefined,
         userAgent: engagement.userAgent || undefined,
         createdAt: engagement.timestamp.toISOString(),
-        leadId: engagement.leadId,
+        responseLeadId: engagement.leadId,
       });
     } catch (error) {
       logger.error("Error recording engagement", error);
@@ -1542,12 +1545,17 @@ class LeadsRepositoryImpl implements LeadsRepository {
       }
 
       if (query.search) {
-        conditions.push(
-          or(
-            ilike(leads.email, `%${query.search}%`),
-            ilike(leads.businessName, `%${query.search}%`),
-          ),
-        );
+        const searchConditions = [
+          ilike(leads.email, `%${query.search}%`),
+          ilike(leads.businessName, `%${query.search}%`),
+        ].filter((condition): condition is SQL => condition !== undefined);
+
+        if (searchConditions.length > 0) {
+          const orCondition = or(...searchConditions);
+          if (orCondition) {
+            conditions.push(orCondition);
+          }
+        }
       }
 
       if (query.dateFrom) {
@@ -1859,18 +1867,24 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       // Handle country filters (can be array)
       if (country && Array.isArray(country) && country.length > 0) {
-        conditions.push(
-          or(...country.map((c: CountryFilter) => eq(leads.country, c)))!,
+        const countryCondition = or(
+          ...country.map((c: CountryFilter) => eq(leads.country, c)),
         );
+        if (countryCondition) {
+          conditions.push(countryCondition);
+        }
       } else if (country && !Array.isArray(country)) {
         conditions.push(eq(leads.country, country));
       }
 
       // Handle language filters (can be array)
       if (language && Array.isArray(language) && language.length > 0) {
-        conditions.push(
-          or(...language.map((l: LanguageFilter) => eq(leads.language, l)))!,
+        const languageCondition = or(
+          ...language.map((l: LanguageFilter) => eq(leads.language, l)),
         );
+        if (languageCondition) {
+          conditions.push(languageCondition);
+        }
       } else if (language && !Array.isArray(language)) {
         conditions.push(eq(leads.language, language));
       }
@@ -2214,18 +2228,24 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       // Handle country filters (can be array)
       if (country && Array.isArray(country) && country.length > 0) {
-        conditions.push(
-          or(...country.map((c: CountryFilter) => eq(leads.country, c)))!,
+        const countryCondition = or(
+          ...country.map((c: CountryFilter) => eq(leads.country, c)),
         );
+        if (countryCondition) {
+          conditions.push(countryCondition);
+        }
       } else if (country && !Array.isArray(country)) {
         conditions.push(eq(leads.country, country));
       }
 
       // Handle language filters (can be array)
       if (language && Array.isArray(language) && language.length > 0) {
-        conditions.push(
-          or(...language.map((l: LanguageFilter) => eq(leads.language, l)))!,
+        const languageCondition = or(
+          ...language.map((l: LanguageFilter) => eq(leads.language, l)),
         );
+        if (languageCondition) {
+          conditions.push(languageCondition);
+        }
       } else if (language && !Array.isArray(language)) {
         conditions.push(eq(leads.language, language));
       }

@@ -1,5 +1,19 @@
 export const translations = {
   description: "Executes cron tasks and manages side tasks",
+  common: {
+    taskName: "Task Name",
+    taskNamesDescription: "Names of tasks to filter",
+    detailed: "Detailed",
+    detailedDescription: "Include detailed information",
+    active: "Active",
+    total: "Total",
+    uptime: "Uptime",
+    id: "ID",
+    status: "Status",
+    lastRun: "Last Run",
+    nextRun: "Next Run",
+    schedule: "Schedule",
+  },
   post: {
     title: "Unified Task Runner",
     description: "Manage unified task runner for cron tasks and side tasks",

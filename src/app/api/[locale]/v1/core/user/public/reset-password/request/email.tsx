@@ -1,5 +1,5 @@
 import { Button, Section, Text } from "@react-email/components";
-import { env } from "next-vibe/server/env";
+import { env } from "@/config/env";
 import type { UndefinedType } from "next-vibe/shared/types/common.schema";
 import {
   createErrorResponse,

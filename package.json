@@ -17,6 +17,7 @@
     "check": "vibe check",
     "lint": "vibe lint",
     "typecheck": "vibe typecheck",
+    "generate:expo-indexes": "bun src/packages/react-native-comp/scripts/generate-expo-indexes.ts",
     "native": "expo start",
     "native:android": "expo run:android",
     "native:ios": "expo run:ios",

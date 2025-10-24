@@ -1,0 +1,23 @@
+import { createSuccessResponse } from "next-vibe/shared/types/response.schema";
+
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+
+import toolsDefinition from "./definition";
+import { aiToolsRepository } from "./repository";
+
+export const { GET, tools } = endpointsHandler({
+  endpoint: toolsDefinition,
+  [Methods.GET]: {
+    email: undefined,
+    handler: async ({ data, user, logger, locale }) => {
+      const toolsData = await aiToolsRepository.getTools(
+        data,
+        user,
+        logger,
+        locale,
+      );
+      return createSuccessResponse(toolsData);
+    },
+  },
+});

@@ -5,13 +5,12 @@
 
 "use client";
 
-import type { LucideIcon } from "lucide-react";
+import type { LucideProps } from "lucide-react";
+import { Button } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
-import { Button } from "next-vibe-ui/ui";
-
 interface MessageActionButtonProps {
-  icon: LucideIcon;
+  icon: React.ComponentType<LucideProps>;
   onClick: () => void;
   title: string;
   variant?: "default" | "destructive";

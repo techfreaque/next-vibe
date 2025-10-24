@@ -9,7 +9,7 @@ export type CliHandlerReturnType<
   TRequestOutput,
   TResponseOutput,
   TUrlVariablesOutput,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
 > = (
   data: TRequestOutput,
   urlVariables: TUrlVariablesOutput,

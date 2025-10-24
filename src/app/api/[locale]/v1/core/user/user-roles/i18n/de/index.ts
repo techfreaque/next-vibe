@@ -72,9 +72,9 @@ export const translations: typeof enTranslations = {
       partnerAdmin: "Partner-Administrator",
       partnerEmployee: "Partner-Mitarbeiter",
       admin: "Administrator",
-      cliOnly: "Nur CLI",
-      cliWeb: "CLI Web",
-      webOnly: "Nur Web",
+      cliOff: "CLI Deaktiviert",
+      aiToolOff: "KI-Tool Deaktiviert",
+      webOff: "Web Deaktiviert",
     },
   },
 };

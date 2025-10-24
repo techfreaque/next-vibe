@@ -1,13 +1,14 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Div } from "next-vibe-ui/ui";
+import { Markdown } from "next-vibe-ui/ui/markdown";
 import type { JSX } from "react";
 
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { Markdown } from "next-vibe-ui/ui/markdown";
 
 import { chatProse } from "../../lib/design-tokens";
 import type { ChatMessage } from "../../types";
@@ -48,11 +49,11 @@ export function AssistantMessageBubble({
     : t("app.chat.messages.assistant");
 
   return (
-    <div className="flex items-start gap-3">
-      <div className="flex-1 max-w-[90%] sm:max-w-[85%] group/message">
+    <Div className="flex items-start gap-3">
+      <Div className="flex-1 max-w-[90%] sm:max-w-[85%] group/message">
         {/* Author info (for multi-user mode) */}
         {showAuthor && (
-          <div className="mb-2">
+          <Div className="mb-2">
             <MessageAuthorInfo
               authorName={displayName}
               isAI={message.isAI}
@@ -63,10 +64,10 @@ export function AssistantMessageBubble({
               locale={locale}
               compact
             />
-          </div>
+          </Div>
         )}
 
-        <div className={cn(chatProse.all, "px-3 py-2.5 sm:px-4 sm:py-3")}>
+        <Div className={cn(chatProse.all, "px-3 py-2.5 sm:px-4 sm:py-3")}>
           {/* Tool calls display */}
           {message.toolCalls && message.toolCalls.length > 0 && (
             <ToolCallDisplay
@@ -79,10 +80,10 @@ export function AssistantMessageBubble({
           {message.content.trim().length > 0 && (
             <Markdown content={message.content} />
           )}
-        </div>
+        </Div>
 
         {/* Actions - Fixed height container to maintain consistent spacing */}
-        <div className="h-10 sm:h-8 flex items-center">
+        <Div className="h-10 sm:h-8 flex items-center">
           <AssistantMessageActions
             messageId={message.id}
             content={message.content}
@@ -92,8 +93,8 @@ export function AssistantMessageBubble({
             onDelete={onDelete}
             logger={logger}
           />
-        </div>
-      </div>
-    </div>
+        </Div>
+      </Div>
+    </Div>
   );
 }

@@ -29,7 +29,7 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.check.lint.description",
   category: "app.api.v1.core.system.check.lint.category",
   tags: ["app.api.v1.core.system.check.lint.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["lint", "l"],
 
   cli: {

@@ -1,5 +1,14 @@
 "use client";
 
+import {
+  Button,
+  Div,
+  P,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import React, { useCallback } from "react";
 
@@ -10,13 +19,6 @@ import {
 import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import {
-  Button,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "next-vibe-ui/ui";
 
 interface RootFolderBarProps {
   activeFolderId: string | null;
@@ -105,8 +107,8 @@ export function RootFolderBar({
   );
 
   return (
-    <div className="overflow-x-auto bg-background/50">
-      <div className="flex items-center gap-1 px-3 py-2 min-w-max">
+    <Div className="overflow-x-auto bg-background/50">
+      <Div className="flex items-center gap-1 px-3 py-2 min-w-max">
         <TooltipProvider delayDuration={300}>
           {rootFolders.map((folderConfig) => {
             const FolderIcon = getIconComponent(folderConfig.icon);
@@ -137,18 +139,18 @@ export function RootFolderBar({
                   side="bottom"
                   className={tooltipColorClasses || undefined}
                 >
-                  <div className="text-center">
-                    <p className="font-medium">{folderDisplayName}</p>
-                    <p className="text-xs opacity-90 mt-0.5">
+                  <Div className="text-center">
+                    <P className="font-medium">{folderDisplayName}</P>
+                    <P className="text-xs opacity-90 mt-0.5">
                       {folderDescription}
-                    </p>
-                  </div>
+                    </P>
+                  </Div>
                 </TooltipContent>
               </Tooltip>
             );
           })}
         </TooltipProvider>
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 }

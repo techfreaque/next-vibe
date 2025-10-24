@@ -1,5 +1,24 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
+import { useRouter } from "next-vibe-ui/hooks";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  Button,
+  Div,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Span,
+} from "next-vibe-ui/ui";
 import {
   ArrowDown,
   ArrowUp,
@@ -11,9 +30,7 @@ import {
   MessageSquarePlus,
   MoreVertical,
   Trash2,
-} from "lucide-react";
-import { useRouter } from "next-vibe-ui/hooks";
-import { cn } from "next-vibe/shared/utils";
+} from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useMemo } from "react";
 
@@ -27,21 +44,6 @@ import {
 } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "next-vibe-ui/ui";
 
 import { useTouchDevice } from "../../hooks/use-touch-device";
 import {
@@ -188,7 +190,7 @@ export function FolderList({
   const groupedThreads = groupThreadsByTime(childThreads);
 
   return (
-    <div className="space-y-1 py-2">
+    <Div className="space-y-1 py-2">
       {/* Render child folders */}
       {childFolders.map((folder) => (
         <FolderItem
@@ -218,10 +220,10 @@ export function FolderList({
       {childThreads.length > 0 && (
         <>
           {groupedThreads.today.length > 0 && (
-            <div className="mt-4">
-              <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
+            <Div className="mt-4">
+              <Div className="px-2 py-1 text-xs font-medium text-muted-foreground">
                 {t("app.chat.folderList.today")}
-              </div>
+              </Div>
               <ThreadList
                 threads={groupedThreads.today}
                 activeThreadId={activeThreadId}
@@ -234,14 +236,14 @@ export function FolderList({
                 chat={chat}
                 locale={locale}
               />
-            </div>
+            </Div>
           )}
 
           {groupedThreads.lastWeek.length > 0 && (
-            <div className="mt-4">
-              <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
+            <Div className="mt-4">
+              <Div className="px-2 py-1 text-xs font-medium text-muted-foreground">
                 {t("app.chat.folderList.lastWeek")}
-              </div>
+              </Div>
               <ThreadList
                 threads={groupedThreads.lastWeek}
                 activeThreadId={activeThreadId}
@@ -254,14 +256,14 @@ export function FolderList({
                 chat={chat}
                 locale={locale}
               />
-            </div>
+            </Div>
           )}
 
           {groupedThreads.lastMonth.length > 0 && (
-            <div className="mt-4">
-              <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
+            <Div className="mt-4">
+              <Div className="px-2 py-1 text-xs font-medium text-muted-foreground">
                 {t("app.chat.folderList.lastMonth")}
-              </div>
+              </Div>
               <ThreadList
                 threads={groupedThreads.lastMonth}
                 activeThreadId={activeThreadId}
@@ -274,18 +276,18 @@ export function FolderList({
                 chat={chat}
                 locale={locale}
               />
-            </div>
+            </Div>
           )}
         </>
       )}
 
       {/* Empty state */}
       {childFolders.length === 0 && childThreads.length === 0 && (
-        <div className="px-4 py-8 text-center text-sm text-muted-foreground">
+        <Div className="px-4 py-8 text-center text-sm text-muted-foreground">
           {t("app.chat.folderList.emptyFolder")}
-        </div>
+        </Div>
       )}
-    </div>
+    </Div>
   );
 }
 
@@ -458,7 +460,7 @@ function FolderItem({
   };
 
   const folderHeaderContent = (
-    <div
+    <Div
       className={cn(
         "flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors min-h-[36px] cursor-pointer",
         colorClasses.hover,
@@ -487,19 +489,19 @@ function FolderItem({
         )}
       </Button>
 
-      <div className="flex items-center gap-2 flex-1 min-w-0">
+      <Div className="flex items-center gap-2 flex-1 min-w-0">
         <FolderIcon className="h-4 w-4 flex-shrink-0" />
-        <span className="text-sm font-medium truncate">
+        <Span className="text-sm font-medium truncate">
           {folderDisplayName}
-        </span>
+        </Span>
         {/* eslint-disable i18next/no-literal-string -- Formatting characters for count display */}
-        <span className="text-xs text-muted-foreground flex-shrink-0">
+        <Span className="text-xs text-muted-foreground flex-shrink-0">
           ({threadCount})
-        </span>
+        </Span>
         {/* eslint-enable i18next/no-literal-string */}
-      </div>
+      </Div>
 
-      <div
+      <Div
         className="flex items-center gap-1 flex-shrink-0"
         style={{
           width: isHovered || isTouch ? "auto" : "0px",
@@ -582,16 +584,16 @@ function FolderItem({
             )}
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 
   return (
-    <div>
+    <Div>
       {folderHeaderContent}
 
       {folder.expanded && (
-        <div>
+        <Div>
           {/* Child folders */}
           {Object.values(chat.folders)
             .filter((f) => f.parentId === folder.id)
@@ -623,12 +625,12 @@ function FolderItem({
 
           {/* Threads in folder - grouped by time */}
           {threadsInFolder.length > 0 && (
-            <div style={{ paddingLeft: `${(depth + 1) * 12 + 8}px` }}>
+            <Div style={{ paddingLeft: `${(depth + 1) * 12 + 8}px` }}>
               {groupedThreads.today.length > 0 && (
-                <div className="mb-2">
-                  <div className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                <Div className="mb-2">
+                  <Div className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
                     {t("app.chat.folderList.today")}
-                  </div>
+                  </Div>
                   <ThreadList
                     threads={groupedThreads.today}
                     activeThreadId={activeThreadId}
@@ -641,14 +643,14 @@ function FolderItem({
                     chat={chat}
                     locale={locale}
                   />
-                </div>
+                </Div>
               )}
 
               {groupedThreads.lastWeek.length > 0 && (
-                <div className="mb-2">
-                  <div className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                <Div className="mb-2">
+                  <Div className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
                     {t("app.chat.folderList.lastWeek")}
-                  </div>
+                  </Div>
                   <ThreadList
                     threads={groupedThreads.lastWeek}
                     activeThreadId={activeThreadId}
@@ -661,14 +663,14 @@ function FolderItem({
                     chat={chat}
                     locale={locale}
                   />
-                </div>
+                </Div>
               )}
 
               {groupedThreads.lastMonth.length > 0 && (
-                <div className="mb-2">
-                  <div className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                <Div className="mb-2">
+                  <Div className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
                     {t("app.chat.folderList.lastMonth")}
-                  </div>
+                  </Div>
                   <ThreadList
                     threads={groupedThreads.lastMonth}
                     activeThreadId={activeThreadId}
@@ -681,11 +683,11 @@ function FolderItem({
                     chat={chat}
                     locale={locale}
                   />
-                </div>
+                </Div>
               )}
-            </div>
+            </Div>
           )}
-        </div>
+        </Div>
       )}
 
       <RenameFolderDialog
@@ -740,6 +742,6 @@ function FolderItem({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </Div>
   );
 }

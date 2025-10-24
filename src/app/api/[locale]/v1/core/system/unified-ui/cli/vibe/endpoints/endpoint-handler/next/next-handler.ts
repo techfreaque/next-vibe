@@ -71,7 +71,7 @@ export function createNextHandler<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
   TFields,
 >(
   options: ApiHandlerOptions<

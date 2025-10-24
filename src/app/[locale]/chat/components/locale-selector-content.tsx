@@ -1,8 +1,15 @@
 "use client";
 
-import { CheckIcon } from "lucide-react";
-import { Button } from "next-vibe-ui/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
+import {
+  Button,
+  Div,
+  Span,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "next-vibe-ui/ui";
+import { Check } from "next-vibe-ui/ui/icons";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 
@@ -45,7 +52,7 @@ export const LocaleSelectorContent: FC = () => {
       ?.flag || currentCountry.flag;
 
   return (
-    <div className="w-72 p-2">
+    <Div className="w-72 p-2">
       <Tabs
         defaultValue="country"
         value={activeTab}
@@ -59,7 +66,7 @@ export const LocaleSelectorContent: FC = () => {
             onMouseEnter={() => setTabHover("country")}
             onMouseLeave={() => setTabHover(null)}
           >
-            <span className="text-sm">{currentCountry.flag}</span>
+            <Span className="text-sm">{currentCountry.flag}</Span>
             {t("app.chat.common.selector.country")}
           </TabsTrigger>
           <TabsTrigger
@@ -68,13 +75,13 @@ export const LocaleSelectorContent: FC = () => {
             onMouseEnter={() => setTabHover("language")}
             onMouseLeave={() => setTabHover(null)}
           >
-            <span className="text-sm">{currentLanguageFlag}</span>
+            <Span className="text-sm">{currentLanguageFlag}</Span>
             {t("app.chat.common.selector.language")}
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="country" className="max-h-80 overflow-y-auto">
-          <div className="grid grid-cols-1 gap-1">
+          <Div className="grid grid-cols-1 gap-1">
             {countries.map((countryItem) => (
               <Button
                 key={countryItem.code}
@@ -86,25 +93,25 @@ export const LocaleSelectorContent: FC = () => {
                   handleCountryChange(countryItem.code);
                 }}
               >
-                <div className="flex items-center gap-2">
-                  <span className="text-lg mr-1">{countryItem.flag}</span>
-                  <div className="flex flex-col items-start">
-                    <span className="font-medium">{countryItem.name}</span>
-                    <span className="text-xs text-muted-foreground">
+                <Div className="flex items-center gap-2">
+                  <Span className="text-lg mr-1">{countryItem.flag}</Span>
+                  <Div className="flex flex-col items-start">
+                    <Span className="font-medium">{countryItem.name}</Span>
+                    <Span className="text-xs text-muted-foreground">
                       {countryItem.langName}
-                    </span>
-                  </div>
-                </div>
+                    </Span>
+                  </Div>
+                </Div>
                 {country === countryItem.code && (
-                  <CheckIcon className="h-4 w-4 text-primary" />
+                  <Check className="h-4 w-4 text-primary" />
                 )}
               </Button>
             ))}
-          </div>
+          </Div>
         </TabsContent>
 
         <TabsContent value="language" className="max-h-80 overflow-y-auto">
-          <div className="grid grid-cols-1 gap-1">
+          <Div className="grid grid-cols-1 gap-1">
             {uniqueLanguages.map(([langCode, langInfo]) => (
               <Button
                 key={langCode}
@@ -116,24 +123,24 @@ export const LocaleSelectorContent: FC = () => {
                   handleLanguageChange(langCode);
                 }}
               >
-                <div className="flex items-center gap-2">
+                <Div className="flex items-center gap-2">
                   {langInfo.countries.slice(0, 3).map((c) => (
-                    <span key={c.code} className="text-lg mr-1">
+                    <Span key={c.code} className="text-lg mr-1">
                       {c.flag}
-                    </span>
+                    </Span>
                   ))}
-                  <div className="flex flex-col items-start">
-                    <span className="font-medium">{langInfo.name}</span>
-                  </div>
-                </div>
+                  <Div className="flex flex-col items-start">
+                    <Span className="font-medium">{langInfo.name}</Span>
+                  </Div>
+                </Div>
                 {language === langCode && (
-                  <CheckIcon className="h-4 w-4 text-primary" />
+                  <Check className="h-4 w-4 text-primary" />
                 )}
               </Button>
             ))}
-          </div>
+          </Div>
         </TabsContent>
       </Tabs>
-    </div>
+    </Div>
   );
 };

@@ -37,7 +37,7 @@ import { createTRPCHandler } from "./trpc-handler";
 export function createTRPCProcedureFromEndpoint<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
   TFields,
   TRequestInput,
   TRequestOutput,
@@ -158,7 +158,7 @@ export function createTRPCProcedureFromEndpoint<
       // This should never happen in production as all supported methods are handled above
       return publicProcedure.query(() => {
         // eslint-disable-next-line no-restricted-syntax
-        throw new Error("error.general.unsupported_method");
+        throw new Error("app.error.general.unsupported_method");
       });
   }
 }
@@ -167,7 +167,7 @@ export function createTRPCProcedureFromEndpoint<
  * Select the appropriate base tRPC procedure based on required roles
  */
 function selectBaseProcedure<
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
 >(
   allowedRoles: TUserRoleValue,
 ):
@@ -211,7 +211,7 @@ function selectBaseProcedure<
 export function createTRPCProceduresFromEndpoints<
   T extends Record<
     string,
-    CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
+    CreateApiEndpoint<string, Methods, readonly string[], any>
   >,
 >(
   endpoints: T,
@@ -221,7 +221,7 @@ export function createTRPCProceduresFromEndpoints<
       Record<string, string | number | boolean>,
       Record<string, string | number | boolean>,
       Record<string, string | number | boolean>,
-      readonly (typeof UserRoleValue)[]
+      readonly string[]
     >
   >,
   options?: Record<
@@ -233,7 +233,7 @@ export function createTRPCProceduresFromEndpoints<
         Record<string, string | number | boolean>,
         string,
         Methods,
-        readonly (typeof UserRoleValue)[],
+        readonly string[],
         any
       >["email"];
       sms?: ApiHandlerOptions<
@@ -242,7 +242,7 @@ export function createTRPCProceduresFromEndpoints<
         Record<string, string | number | boolean>,
         string,
         Methods,
-        readonly (typeof UserRoleValue)[],
+        readonly string[],
         any
       >["sms"];
     }
@@ -282,7 +282,7 @@ export function createTRPCProceduresFromEndpoints<
 export function createTRPCProceduresFromRouteExports(routeExports: {
   definitions?: Record<
     string,
-    CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
+    CreateApiEndpoint<string, Methods, readonly string[], any>
   >;
   handlers?: Record<
     string,
@@ -290,7 +290,7 @@ export function createTRPCProceduresFromRouteExports(routeExports: {
       Record<string, string | number | boolean>,
       Record<string, string | number | boolean>,
       Record<string, string | number | boolean>,
-      readonly (typeof UserRoleValue)[]
+      readonly string[]
     >
   >;
   email?: Record<string, Record<string, string | number | boolean>>;
@@ -339,7 +339,7 @@ export type ExtractTRPCProcedures<T> = {
   [K in keyof T]: T[K] extends ApiEndpoint<
     string,
     Methods,
-    readonly (typeof UserRoleValue)[],
+    readonly string[],
     any
   >
     ? T[K]["method"] extends Methods.GET
@@ -354,7 +354,7 @@ export type ExtractTRPCProcedures<T> = {
 export interface RouteFileStructure {
   definitions?: Record<
     string,
-    CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
+    CreateApiEndpoint<string, Methods, readonly string[], any>
   >;
   handlers?: Record<
     string,
@@ -362,7 +362,7 @@ export interface RouteFileStructure {
       Record<string, string | number | boolean>,
       Record<string, string | number | boolean>,
       Record<string, string | number | boolean>,
-      readonly (typeof UserRoleValue)[]
+      readonly string[]
     >
   >;
   email?: Record<string, Record<string, string | number | boolean>>;
@@ -391,7 +391,7 @@ export function validateRouteFileForTRPC(routeFile: RouteFileStructure): {
   const hasAnyHandler = httpMethods.some((method) => routeFile[method]);
 
   if (!hasAnyHandler) {
-    errors.push("error.general.no_http_handlers");
+    errors.push("app.error.general.no_http_handlers");
   }
 
   // For the new endpoint system, we don't require definitions or trpc exports
@@ -417,7 +417,7 @@ export function validateRouteFileForTRPC(routeFile: RouteFileStructure): {
     return {
       isValid: true,
       errors: [],
-      warnings: ["error.general.legacy_trpc_format"],
+      warnings: ["app.error.general.legacy_trpc_format"],
     };
   }
 
@@ -461,7 +461,7 @@ function createCombinedInputSchema<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
   TFields,
 >(
   endpoint: CreateApiEndpoint<

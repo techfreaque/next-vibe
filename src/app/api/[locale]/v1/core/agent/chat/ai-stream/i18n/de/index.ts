@@ -78,6 +78,11 @@ export const translations: typeof enTranslations = {
       label: "Wiederaufnahme-Token",
       description: "Token zum Fortsetzen unterbrochener Streams",
     },
+    enabledToolIds: {
+      label: "Aktivierte Tool-IDs",
+      description:
+        "Liste der KI-Tool-IDs, die für diese Konversation aktiviert werden sollen",
+    },
     response: {
       title: "Stream-Antwort",
       description: "KI-generierte Streaming-Antwort",

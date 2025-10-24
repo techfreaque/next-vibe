@@ -111,9 +111,9 @@ export function LeadsListClient({
   const handleBatchUpdate = useCallback(
     async (
       updates: {
-        status?: LeadStatus;
-        currentCampaignStage?: EmailCampaignStage;
-        source?: LeadSource;
+        status?: (typeof LeadStatus)[keyof typeof LeadStatus];
+        currentCampaignStage?: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
+        source?: (typeof LeadSource)[keyof typeof LeadSource];
         notes?: string;
       },
       scope: typeof BatchOperationScope,
@@ -713,7 +713,7 @@ export function LeadsListClient({
             : batchOperations.batchDialogMode === "result"
               ? "app.admin.leads.leads.admin.batch.results.title"
               : batchOperations.operationType === "delete"
-                ? "app.admin.leads.leads.admin.batch.delete_confirm_title"
+                ? "app.admin.leads.leads.admin.batch.delete_confirm.title"
                 : "app.admin.leads.leads.admin.batch.confirm.title"
         }
         description={

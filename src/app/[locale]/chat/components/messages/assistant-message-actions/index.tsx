@@ -1,7 +1,8 @@
 "use client";
 
-import { Bot, Loader2, Square, Trash2, Volume2 } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
+import { Div } from "next-vibe-ui/ui";
+import { Bot, Loader2, Square, Trash2, Volume2 } from "next-vibe-ui/ui/icons";
 import type React from "react";
 
 import { useTTSAudio } from "@/app/api/[locale]/v1/core/agent/text-to-speech/hooks";
@@ -45,7 +46,7 @@ export function AssistantMessageActions({
   });
 
   return (
-    <div
+    <Div
       className={cn(
         "flex items-center gap-1",
         "transition-opacity duration-150",
@@ -93,6 +94,6 @@ export function AssistantMessageActions({
           variant="destructive"
         />
       )}
-    </div>
+    </Div>
   );
 }

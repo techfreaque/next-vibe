@@ -31,7 +31,7 @@ import type { InferJwtPayloadTypeFromRoles } from "../types";
  */
 export interface TRPCContext<
   TUrlParams,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
 > {
   user: InferJwtPayloadTypeFromRoles<TUserRoleValue> | null;
 
@@ -57,7 +57,7 @@ export interface TRPCContext<
  */
 export async function createTRPCContext<
   TUrlParams,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
 >(opts: {
   req: NextRequest;
   urlParams?: TUrlParams;
@@ -101,7 +101,7 @@ export async function createTRPCContext<
   // Authenticate user using the existing auth system
   // Use getAuthMinimalUser which properly handles PUBLIC role with leadId creation
   let user: JwtPayloadType;
-  let userRoles: (typeof UserRoleValue)[] = [];
+  let userRoles: string[] = [];
 
   try {
     // Try to get authenticated user first
@@ -173,9 +173,9 @@ export async function createTRPCContext<
 export async function createAuthenticatedTRPCContext(opts: {
   req: NextRequest;
   urlParams?: Record<string, string>;
-  requiredRoles?: (typeof UserRoleValue)[];
+  requiredRoles?: string[];
 }): Promise<
-  TRPCContext<Record<string, string>, readonly (typeof UserRoleValue)[]> & {
+  TRPCContext<Record<string, string>, readonly string[]> & {
     user: JwtPayloadType;
   }
 > {
@@ -190,7 +190,7 @@ export async function createAuthenticatedTRPCContext(opts: {
     // eslint-disable-next-line no-restricted-syntax
     throw new TRPCError({
       code: "UNAUTHORIZED",
-      message: "error.unauthorized" as string,
+      message: "app.error.unauthorized" as string,
     });
   }
 

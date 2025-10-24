@@ -67,12 +67,8 @@ export const StyledAlertDialogOverlay = styled(AlertDialogPrimitive.Overlay, {
 export const StyledAlertDialogContent = styled(AlertDialogPrimitive.Content, {
   className: "style",
 });
-export const StyledAlertDialogHeader = styled(AlertDialogPrimitive.Header, {
-  className: "style",
-});
-export const StyledAlertDialogFooter = styled(AlertDialogPrimitive.Footer, {
-  className: "style",
-});
+// Note: AlertDialogPrimitive.Header and Footer don't exist in @rn-primitives
+// These are created as simple View components in the alert-dialog.tsx file
 export const StyledAlertDialogTitle = styled(AlertDialogPrimitive.Title, {
   className: "style",
 });
@@ -192,12 +188,8 @@ export const StyledDialogOverlay = styled(DialogPrimitive.Overlay, {
 export const StyledDialogContent = styled(DialogPrimitive.Content, {
   className: "style",
 });
-export const StyledDialogHeader = styled(DialogPrimitive.Header, {
-  className: "style",
-});
-export const StyledDialogFooter = styled(DialogPrimitive.Footer, {
-  className: "style",
-});
+// Note: DialogPrimitive.Header and Footer don't exist in @rn-primitives
+// These are created as simple View components in the dialog.tsx file
 export const StyledDialogTitle = styled(DialogPrimitive.Title, {
   className: "style",
 });
@@ -261,10 +253,12 @@ export const StyledDropdownMenuSubContent = styled(
 export const StyledDropdownMenuGroup = styled(DropdownMenuPrimitive.Group, {
   className: "style",
 });
-export const StyledDropdownMenuShortcut = styled(
-  DropdownMenuPrimitive.Shortcut,
-  { className: "style" },
-);
+// Note: DropdownMenuPrimitive.Shortcut doesn't exist in @rn-primitives
+// This component needs to be created as a simple View component in the dropdown-menu.tsx file
+// export const StyledDropdownMenuShortcut = styled(
+//   DropdownMenuPrimitive.Shortcut,
+//   { className: "style" },
+// );
 
 // HoverCard
 export const StyledHoverCardRoot = styled(HoverCardPrimitive.Root, {
@@ -333,9 +327,11 @@ export const StyledMenubarSubContent = styled(MenubarPrimitive.SubContent, {
 export const StyledMenubarGroup = styled(MenubarPrimitive.Group, {
   className: "style",
 });
-export const StyledMenubarShortcut = styled(MenubarPrimitive.Shortcut, {
-  className: "style",
-});
+// Note: MenubarPrimitive.Shortcut doesn't exist in @rn-primitives
+// This component needs to be created as a simple View component in the menubar.tsx file
+// export const StyledMenubarShortcut = styled(MenubarPrimitive.Shortcut, {
+//   className: "style",
+// });
 
 // NavigationMenu
 export const StyledNavigationMenuRoot = styled(NavigationMenuPrimitive.Root, {

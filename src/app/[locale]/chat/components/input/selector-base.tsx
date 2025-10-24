@@ -1,5 +1,15 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
+import {
+  Button,
+  Div,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Span,
+} from "next-vibe-ui/ui";
 import {
   Check,
   ChevronDown,
@@ -7,8 +17,7 @@ import {
   Plus,
   Search,
   Star,
-} from "lucide-react";
-import { cn } from "next-vibe/shared/utils";
+} from "next-vibe-ui/ui/icons";
 import type { JSX, ReactNode } from "react";
 import React, { useMemo, useState } from "react";
 
@@ -18,13 +27,6 @@ import {
 } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import {
-  Button,
-  Input,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "next-vibe-ui/ui";
 
 import { useTouchDevice } from "../../hooks/use-touch-device";
 
@@ -226,15 +228,15 @@ export function SelectorBase<T extends string = string>({
         >
           {selectedOption ? (
             <>
-              <span className="flex items-center justify-center w-4 h-4 flex-shrink-0">
+              <Span className="flex items-center justify-center w-4 h-4 flex-shrink-0">
                 {renderIcon(selectedOption.icon)}
-              </span>
-              <span className="hidden min-[550px]:inline max-w-[120px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[220px] text-left break-words line-clamp-2">
+              </Span>
+              <Span className="hidden min-[550px]:inline max-w-[120px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[220px] text-left break-words line-clamp-2">
                 {selectedOption.name}
-              </span>
+              </Span>
             </>
           ) : (
-            <span className="text-muted-foreground">{placeholder}</span>
+            <Span className="text-muted-foreground">{placeholder}</Span>
           )}
           <ChevronDown className="h-4 w-4 opacity-50 flex-shrink-0" />
         </Button>
@@ -249,10 +251,10 @@ export function SelectorBase<T extends string = string>({
         align="start"
         sideOffset={4}
       >
-        <div className="flex flex-col max-h-[75dvh] sm:max-h-[600px]">
+        <Div className="flex flex-col max-h-[75dvh] sm:max-h-[600px]">
           {/* Search Bar */}
-          <div className="p-2.5 sm:p-3 border-b flex-shrink-0">
-            <div className="relative">
+          <Div className="p-2.5 sm:p-3 border-b flex-shrink-0">
+            <Div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
               <Input
                 value={searchQuery}
@@ -263,14 +265,14 @@ export function SelectorBase<T extends string = string>({
                 className="pl-9 h-10 sm:h-9 text-base sm:text-sm touch-manipulation"
                 autoComplete="off"
               />
-            </div>
-          </div>
+            </Div>
+          </Div>
 
           {/* Group Mode & Sort Controls - Only visible when showAll */}
           {showAll && (
-            <div className="px-2.5 sm:px-3 py-2 border-b flex-shrink-0 flex gap-2 items-center">
+            <Div className="px-2.5 sm:px-3 py-2 border-b flex-shrink-0 flex gap-2 items-center">
               {/* Group Mode Toggle */}
-              <div className="flex gap-1 bg-muted rounded-md p-0.5">
+              <Div className="flex gap-1 bg-muted rounded-md p-0.5">
                 <Button
                   variant={groupMode === "provider" ? "default" : "ghost"}
                   size="sm"
@@ -287,11 +289,11 @@ export function SelectorBase<T extends string = string>({
                 >
                   {utilityLabel}
                 </Button>
-              </div>
+              </Div>
 
               {/* Sort Order Toggle - Only for provider mode */}
               {groupMode === "provider" && (
-                <div className="flex gap-1 bg-muted rounded-md p-0.5">
+                <Div className="flex gap-1 bg-muted rounded-md p-0.5">
                   <Button
                     variant={sortOrder === "asc" ? "default" : "ghost"}
                     size="sm"
@@ -308,15 +310,15 @@ export function SelectorBase<T extends string = string>({
                   >
                     {t("app.chat.selectorBase.sortZA")}
                   </Button>
-                </div>
+                </Div>
               )}
-            </div>
+            </Div>
           )}
 
           {!showAll ? (
             /* Default List View - Favorites Always Visible */
-            <div className="overflow-y-auto max-h-[400px] overscroll-contain">
-              <div className="p-1.5 sm:p-2">
+            <Div className="overflow-y-auto max-h-[400px] overscroll-contain">
+              <Div className="p-1.5 sm:p-2">
                 {favoriteOptions.length > 0 ? (
                   favoriteOptions.map((option) => (
                     <button
@@ -328,20 +330,20 @@ export function SelectorBase<T extends string = string>({
                         value === option.id && "bg-accent",
                       )}
                     >
-                      <span className="flex items-center justify-center w-5 h-5 sm:w-4.5 sm:h-4.5 flex-shrink-0">
+                      <Span className="flex items-center justify-center w-5 h-5 sm:w-4.5 sm:h-4.5 flex-shrink-0">
                         {renderIcon(option.icon, ICON_SIZE_MEDIUM)}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm sm:text-[13px] font-medium break-words line-clamp-2 leading-snug">
+                      </Span>
+                      <Div className="flex-1 min-w-0">
+                        <Div className="text-sm sm:text-[13px] font-medium break-words line-clamp-2 leading-snug">
                           {option.name}
-                        </div>
+                        </Div>
                         {option.description && (
-                          <div className="text-xs text-muted-foreground break-words line-clamp-1 mt-0.5">
+                          <Div className="text-xs text-muted-foreground break-words line-clamp-1 mt-0.5">
                             {option.description}
-                          </div>
+                          </Div>
                         )}
-                      </div>
-                      <div
+                      </Div>
+                      <Div
                         className={cn(
                           "flex items-center gap-2 transition-opacity",
                           // Touch devices: always visible but slightly transparent
@@ -351,7 +353,7 @@ export function SelectorBase<T extends string = string>({
                             : "opacity-0 group-hover:opacity-100",
                         )}
                       >
-                        <div
+                        <Div
                           onClick={(e) => {
                             e.stopPropagation();
                             onToggleFavorite(option.id);
@@ -370,31 +372,31 @@ export function SelectorBase<T extends string = string>({
                           aria-label={t("app.chat.selectorBase.toggleFavorite")}
                         >
                           <Star className="h-4.5 w-4.5 sm:h-4 sm:w-4 fill-yellow-400 text-yellow-400" />
-                        </div>
+                        </Div>
                         {value === option.id && (
                           <Check className="h-4 w-4 text-primary" />
                         )}
-                      </div>
+                      </Div>
                     </button>
                   ))
                 ) : (
-                  <div className="text-center py-8 text-muted-foreground text-sm">
+                  <Div className="text-center py-8 text-muted-foreground text-sm">
                     {t("app.chat.selectorBase.noFavorites")}
-                  </div>
+                  </Div>
                 )}
-              </div>
-            </div>
+              </Div>
+            </Div>
           ) : (
             /* Grid View - Favorites, Featured, then Grouped */
-            <div className="overflow-y-auto max-h-[500px] overscroll-contain">
-              <div className="p-3 sm:p-4 space-y-5 sm:space-y-6">
+            <Div className="overflow-y-auto max-h-[500px] overscroll-contain">
+              <Div className="p-3 sm:p-4 space-y-5 sm:space-y-6">
                 {/* Favorites Section - Always First */}
                 {favoriteOptions.length > 0 && (
-                  <div>
-                    <div className="text-xs font-semibold text-muted-foreground mb-2.5 sm:mb-3 px-1">
+                  <Div>
+                    <Div className="text-xs font-semibold text-muted-foreground mb-2.5 sm:mb-3 px-1">
                       {t("app.chat.selectorBase.favorites")}
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5">
+                    </Div>
+                    <Div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5">
                       {favoriteOptions.map((option) => (
                         <button
                           key={option.id}
@@ -407,7 +409,7 @@ export function SelectorBase<T extends string = string>({
                               : "border-transparent bg-accent/50",
                           )}
                         >
-                          <div
+                          <Div
                             onClick={(e) => {
                               e.stopPropagation();
                               onToggleFavorite(option.id);
@@ -442,36 +444,36 @@ export function SelectorBase<T extends string = string>({
                                   : "text-muted-foreground",
                               )}
                             />
-                          </div>
-                          <div className="flex items-center justify-center w-9 h-9 sm:w-8 sm:h-8">
+                          </Div>
+                          <Div className="flex items-center justify-center w-9 h-9 sm:w-8 sm:h-8">
                             {renderIcon(option.icon, ICON_SIZE_LARGE)}
-                          </div>
-                          <div className="text-xs sm:text-[11px] font-medium w-full px-1 break-words text-center line-clamp-3 leading-tight">
+                          </Div>
+                          <Div className="text-xs sm:text-[11px] font-medium w-full px-1 break-words text-center line-clamp-3 leading-tight">
                             {option.name}
-                          </div>
+                          </Div>
                           {option.description && (
-                            <div className="text-[10px] text-muted-foreground w-full px-1 break-words text-center line-clamp-2 leading-tight">
+                            <Div className="text-[10px] text-muted-foreground w-full px-1 break-words text-center line-clamp-2 leading-tight">
                               {option.description}
-                            </div>
+                            </Div>
                           )}
                         </button>
                       ))}
-                    </div>
-                  </div>
+                    </Div>
+                  </Div>
                 )}
 
                 {/* Grouped Options - Provider or Utility */}
                 {Object.entries(groupedOptions).map(([group, groupData]) => (
-                  <div key={group}>
-                    <div className="text-xs font-semibold text-muted-foreground mb-2.5 sm:mb-3 px-1 flex items-center gap-2">
+                  <Div key={group}>
+                    <Div className="text-xs font-semibold text-muted-foreground mb-2.5 sm:mb-3 px-1 flex items-center gap-2">
                       {groupData.icon && (
-                        <span className="flex items-center justify-center w-4 h-4">
+                        <Span className="flex items-center justify-center w-4 h-4">
                           {renderIcon(groupData.icon, ICON_SIZE_SMALL)}
-                        </span>
+                        </Span>
                       )}
                       {group}
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5">
+                    </Div>
+                    <Div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5">
                       {groupData.options.map((option) => (
                         <button
                           key={option.id}
@@ -484,7 +486,7 @@ export function SelectorBase<T extends string = string>({
                               : "border-transparent bg-accent/50",
                           )}
                         >
-                          <div
+                          <Div
                             onClick={(e) => {
                               e.stopPropagation();
                               onToggleFavorite(option.id);
@@ -517,29 +519,29 @@ export function SelectorBase<T extends string = string>({
                                   : "text-muted-foreground",
                               )}
                             />
-                          </div>
-                          <div className="flex items-center justify-center w-9 h-9 sm:w-8 sm:h-8">
+                          </Div>
+                          <Div className="flex items-center justify-center w-9 h-9 sm:w-8 sm:h-8">
                             {renderIcon(option.icon, ICON_SIZE_LARGE)}
-                          </div>
-                          <div className="text-xs sm:text-[11px] font-medium w-full px-1 break-words text-center line-clamp-3 leading-tight">
+                          </Div>
+                          <Div className="text-xs sm:text-[11px] font-medium w-full px-1 break-words text-center line-clamp-3 leading-tight">
                             {option.name}
-                          </div>
+                          </Div>
                           {option.description && (
-                            <div className="text-[10px] text-muted-foreground w-full px-1 break-words text-center line-clamp-2 leading-tight">
+                            <Div className="text-[10px] text-muted-foreground w-full px-1 break-words text-center line-clamp-2 leading-tight">
                               {option.description}
-                            </div>
+                            </Div>
                           )}
                         </button>
                       ))}
-                    </div>
-                  </div>
+                    </Div>
+                  </Div>
                 ))}
-              </div>
-            </div>
+              </Div>
+            </Div>
           )}
 
           {/* Footer - Show All / Favorites Toggle + Add New */}
-          <div className="border-t p-2 flex gap-2 flex-shrink-0">
+          <Div className="border-t p-2 flex gap-2 flex-shrink-0">
             <Button
               variant="ghost"
               size="sm"
@@ -572,8 +574,8 @@ export function SelectorBase<T extends string = string>({
                 {addNewLabel}
               </Button>
             )}
-          </div>
-        </div>
+          </Div>
+        </Div>
       </PopoverContent>
     </Popover>
   );

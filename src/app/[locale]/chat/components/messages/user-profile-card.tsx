@@ -6,6 +6,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Div } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -40,7 +41,7 @@ export function UserProfileCard({
   const recentPosts = userMessages.slice(-5).reverse(); // Last 5 posts, newest first
 
   return (
-    <div
+    <Div
       className={cn(
         "fixed z-50",
         "w-80 p-4 rounded-lg",
@@ -54,44 +55,44 @@ export function UserProfileCard({
       }}
     >
       {/* Header */}
-      <div className="flex items-center gap-3 mb-3 pb-3 border-b border-border/50">
-        <div className="flex-1">
-          <div className="font-bold text-sm text-foreground">{userName}</div>
-          <div className="text-xs text-muted-foreground">
+      <Div className="flex items-center gap-3 mb-3 pb-3 border-b border-border/50">
+        <Div className="flex-1">
+          <Div className="font-bold text-sm text-foreground">{userName}</Div>
+          <Div className="text-xs text-muted-foreground">
             {t("app.chat.userProfile.postCount", { count: postCount })}
-          </div>
-        </div>
-      </div>
+          </Div>
+        </Div>
+      </Div>
 
       {/* Recent Posts */}
       {recentPosts.length > 0 && (
-        <div className="space-y-2">
-          <div className="text-xs font-semibold text-muted-foreground mb-2">
+        <Div className="space-y-2">
+          <Div className="text-xs font-semibold text-muted-foreground mb-2">
             {t("app.chat.userProfile.recentPosts")}
-          </div>
+          </Div>
           {recentPosts.map((post) => (
             <button
               key={post.id}
               onClick={() => onPostClick?.(post.id)}
               className="w-full text-left p-2 rounded hover:bg-accent/50 transition-colors"
             >
-              <div className="text-xs text-muted-foreground mb-1">
+              <Div className="text-xs text-muted-foreground mb-1">
                 {formatRelativeTime(post.createdAt.getTime())}
-              </div>
-              <div className="text-sm text-foreground/90 line-clamp-2">
+              </Div>
+              <Div className="text-sm text-foreground/90 line-clamp-2">
                 {post.content.substring(0, 100)}
                 {post.content.length > 100 && "..."}
-              </div>
+              </Div>
             </button>
           ))}
-        </div>
+        </Div>
       )}
 
       {postCount === 0 && (
-        <div className="text-xs text-muted-foreground text-center py-4">
+        <Div className="text-xs text-muted-foreground text-center py-4">
           {t("app.chat.userProfile.noPostsYet")}
-        </div>
+        </Div>
       )}
-    </div>
+    </Div>
   );
 }

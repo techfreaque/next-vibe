@@ -10,10 +10,10 @@ import {
   type ViewStyle,
 } from "react-native";
 
-import { Check } from "../lib/icons/Check";
-import { ChevronDown } from "../lib/icons/ChevronDown";
-import { ChevronRight } from "../lib/icons/ChevronRight";
-import { ChevronUp } from "../lib/icons/ChevronUp";
+import { Check } from "./icons/Check";
+import { ChevronDown } from "./icons/ChevronDown";
+import { ChevronRight } from "./icons/ChevronRight";
+import { ChevronUp } from "./icons/ChevronUp";
 import {
   StyledDropdownMenuCheckboxItem,
   StyledDropdownMenuContent,

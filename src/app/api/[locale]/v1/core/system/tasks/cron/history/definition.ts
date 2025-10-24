@@ -33,7 +33,7 @@ export const { GET } = createEndpoint({
   description:
     "app.api.v1.core.system.tasks.cronSystem.history.get.description",
   category: "app.api.v1.core.system.tasks.category",
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   tags: ["app.api.v1.core.system.tasks.type.cron"],
 
   fields: objectField(

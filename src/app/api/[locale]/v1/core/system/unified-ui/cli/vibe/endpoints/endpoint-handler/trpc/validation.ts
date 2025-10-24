@@ -42,7 +42,7 @@ export interface TrpcValidationContext<TRequestOutput, TUrlParametersOutput> {
 export function validateTrpcRequestData<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
   TFields,
   TRequestInput,
   TRequestOutput,
@@ -126,7 +126,7 @@ export function validateTrpcRequestData<
         error:
           error instanceof Error
             ? error.message
-            : "error.errors.unknown_validation_error",
+            : "app.error.errors.unknown_validation_error",
       },
     };
   }

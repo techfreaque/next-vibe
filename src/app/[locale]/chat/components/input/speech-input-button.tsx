@@ -1,7 +1,8 @@
 "use client";
 
-import { Loader2, Mic, MicOff } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
+import { Button, Div, P, Span } from "next-vibe-ui/ui";
+import { Loader2, Mic, MicOff } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
@@ -9,7 +10,6 @@ import { useEdenAISpeech } from "@/app/api/[locale]/v1/core/agent/speech-to-text
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { Button } from "next-vibe-ui/ui";
 
 interface SpeechInputButtonProps {
   onTranscript: (text: string) => void;
@@ -64,7 +64,7 @@ export function SpeechInputButton({
   const isDisabled = disabled || isProcessing;
 
   return (
-    <div className="relative">
+    <Div className="relative">
       <Button
         type="button"
         size="icon"
@@ -95,34 +95,34 @@ export function SpeechInputButton({
 
       {/* Recording indicator */}
       {isRecording && (
-        <div className="absolute bottom-full left-0 mb-2 p-2 bg-popover border border-border rounded-md shadow-lg z-10 min-w-[200px] max-w-[300px]">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-destructive rounded-full animate-pulse" />
-            <span className="text-xs font-medium text-foreground">
+        <Div className="absolute bottom-full left-0 mb-2 p-2 bg-popover border border-border rounded-md shadow-lg z-10 min-w-[200px] max-w-[300px]">
+          <Div className="flex items-center gap-2">
+            <Div className="w-2 h-2 bg-destructive rounded-full animate-pulse" />
+            <Span className="text-xs font-medium text-foreground">
               {t("app.chat.input.speechInput.recordingClickToStop")}
-            </span>
-          </div>
-        </div>
+            </Span>
+          </Div>
+        </Div>
       )}
 
       {/* Processing indicator */}
       {isProcessing && (
-        <div className="absolute bottom-full left-0 mb-2 p-2 bg-popover border border-border rounded-md shadow-lg z-10 min-w-[200px] max-w-[300px]">
-          <div className="flex items-center gap-2">
+        <Div className="absolute bottom-full left-0 mb-2 p-2 bg-popover border border-border rounded-md shadow-lg z-10 min-w-[200px] max-w-[300px]">
+          <Div className="flex items-center gap-2">
             <Loader2 className="w-3 h-3 animate-spin text-primary" />
-            <span className="text-xs font-medium text-foreground">
+            <Span className="text-xs font-medium text-foreground">
               {t("app.chat.input.speechInput.transcribing")}
-            </span>
-          </div>
-        </div>
+            </Span>
+          </Div>
+        </Div>
       )}
 
       {/* Error message */}
       {displayError && !isRecording && !isProcessing && (
-        <div className="absolute bottom-full left-0 mb-2 p-2 bg-destructive/10 border border-destructive rounded-md shadow-lg z-10 min-w-[200px] max-w-[300px]">
-          <p className="text-xs text-destructive">{displayError}</p>
-        </div>
+        <Div className="absolute bottom-full left-0 mb-2 p-2 bg-destructive/10 border border-destructive rounded-md shadow-lg z-10 min-w-[200px] max-w-[300px]">
+          <P className="text-xs text-destructive">{displayError}</P>
+        </Div>
       )}
-    </div>
+    </Div>
   );
 }

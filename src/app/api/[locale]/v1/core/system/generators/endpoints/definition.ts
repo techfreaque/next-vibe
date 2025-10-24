@@ -26,20 +26,20 @@ import { UserRole } from "../../../user/user-roles/enum";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "generators", "endpoints"],
-  title: "core.system.dev.category",
-  description: "core.system.dev.typecheck.description",
-  category: "core.system.dev.category",
-  tags: ["core.system.dev.category"],
+  title: "app.api.v1.core.system.dev.category",
+  description: "app.api.v1.core.system.dev.typecheck.description",
+  category: "app.api.v1.core.system.dev.category",
+  tags: ["app.api.v1.core.system.dev.category"],
 
   // === ROLES ===
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
 
   // === FIELDS ===
   fields: objectField(
     {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
-      label: "core.system.dev.lint.container.title",
+      label: "app.api.v1.core.system.dev.lint.container.title",
       layout: { columns: 12 },
     },
     { request: "data", response: true },
@@ -49,8 +49,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "core.system.dev.typecheck.title",
-          description: "core.system.dev.typecheck.description",
+          label: "app.api.v1.core.system.dev.typecheck.title",
+          description: "app.api.v1.core.system.dev.typecheck.description",
           required: false,
           layout: { columns: 6 },
         },
@@ -61,8 +61,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "core.system.dev.typecheck.title",
-          description: "core.system.dev.typecheck.description",
+          label: "app.api.v1.core.system.dev.typecheck.title",
+          description: "app.api.v1.core.system.dev.typecheck.description",
           required: false,
           layout: { columns: 6 },
         },
@@ -73,8 +73,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "core.system.dev.typecheck.title",
-          description: "core.system.dev.typecheck.description",
+          label: "app.api.v1.core.system.dev.typecheck.title",
+          description: "app.api.v1.core.system.dev.typecheck.description",
           required: false,
           layout: { columns: 6 },
         },
@@ -85,8 +85,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "core.system.dev.typecheck.title",
-          description: "core.system.dev.typecheck.description",
+          label: "app.api.v1.core.system.dev.typecheck.title",
+          description: "app.api.v1.core.system.dev.typecheck.description",
           required: false,
           layout: { columns: 6 },
         },
@@ -97,8 +97,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "core.system.dev.typecheck.title",
-          description: "core.system.dev.typecheck.description",
+          label: "app.api.v1.core.system.dev.typecheck.title",
+          description: "app.api.v1.core.system.dev.typecheck.description",
           required: false,
           layout: { columns: 6 },
         },
@@ -109,8 +109,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "core.system.dev.typecheck.title",
-          description: "core.system.dev.typecheck.description",
+          label: "app.api.v1.core.system.dev.typecheck.title",
+          description: "app.api.v1.core.system.dev.typecheck.description",
           required: false,
           layout: { columns: 6 },
         },
@@ -121,35 +121,35 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "core.system.dev.typecheck.success.title",
+          content: "app.api.v1.core.system.dev.typecheck.success.title",
         },
         z.boolean(),
       ),
       generatorsRun: responseField(
         {
           type: WidgetType.TEXT,
-          content: "core.system.dev.typecheck.success.title",
+          content: "app.api.v1.core.system.dev.typecheck.success.title",
         },
         z.number(),
       ),
       generatorsSkipped: responseField(
         {
           type: WidgetType.TEXT,
-          content: "core.system.dev.typecheck.success.title",
+          content: "app.api.v1.core.system.dev.typecheck.success.title",
         },
         z.number(),
       ),
       output: responseField(
         {
           type: WidgetType.TEXT,
-          content: "core.system.dev.typecheck.success.title",
+          content: "app.api.v1.core.system.dev.typecheck.success.title",
         },
         z.array(z.string()),
       ),
       results: responseField(
         {
           type: WidgetType.TEXT,
-          content: "core.system.dev.typecheck.success.title",
+          content: "app.api.v1.core.system.dev.typecheck.success.title",
         },
         z.object({
           endpoints: z.boolean(),
@@ -164,47 +164,47 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "core.system.dev.typecheck.title",
-      description: "core.system.dev.typecheck.description",
+      title: "app.api.v1.core.system.dev.typecheck.title",
+      description: "app.api.v1.core.system.dev.typecheck.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "core.system.dev.typecheck.title",
-      description: "core.system.dev.typecheck.description",
+      title: "app.api.v1.core.system.dev.typecheck.title",
+      description: "app.api.v1.core.system.dev.typecheck.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "core.system.dev.typecheck.title",
-      description: "core.system.dev.typecheck.description",
+      title: "app.api.v1.core.system.dev.typecheck.title",
+      description: "app.api.v1.core.system.dev.typecheck.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "core.system.dev.typecheck.title",
-      description: "core.system.dev.typecheck.description",
+      title: "app.api.v1.core.system.dev.typecheck.title",
+      description: "app.api.v1.core.system.dev.typecheck.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "core.system.dev.typecheck.title",
-      description: "core.system.dev.typecheck.description",
+      title: "app.api.v1.core.system.dev.typecheck.title",
+      description: "app.api.v1.core.system.dev.typecheck.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "core.system.dev.typecheck.title",
-      description: "core.system.dev.typecheck.description",
+      title: "app.api.v1.core.system.dev.typecheck.title",
+      description: "app.api.v1.core.system.dev.typecheck.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "core.system.dev.typecheck.title",
-      description: "core.system.dev.typecheck.description",
+      title: "app.api.v1.core.system.dev.typecheck.title",
+      description: "app.api.v1.core.system.dev.typecheck.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "core.system.dev.typecheck.title",
-      description: "core.system.dev.typecheck.description",
+      title: "app.api.v1.core.system.dev.typecheck.title",
+      description: "app.api.v1.core.system.dev.typecheck.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "core.system.dev.typecheck.title",
-      description: "core.system.dev.typecheck.description",
+      title: "app.api.v1.core.system.dev.typecheck.title",
+      description: "app.api.v1.core.system.dev.typecheck.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "core.system.dev.typecheck.success.title",
-    description: "core.system.dev.typecheck.success.description",
+    title: "app.api.v1.core.system.dev.typecheck.success.title",
+    description: "app.api.v1.core.system.dev.typecheck.success.description",
   },
 
   // === EXAMPLES ===

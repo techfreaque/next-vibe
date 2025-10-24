@@ -32,7 +32,7 @@ const { GET } = createEndpoint({
   description: "app.api.v1.core.system.server.health.get.description",
   category: "app.api.v1.core.system.server.category",
   tags: ["app.api.v1.core.system.server.health.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
 
   fields: objectField(
     {

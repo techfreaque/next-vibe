@@ -79,6 +79,10 @@ export const translations: typeof enTranslations = {
       label: "Token wznowienia",
       description: "Token do wznowienia przerwanych strumieni",
     },
+    enabledToolIds: {
+      label: "ID włączonych narzędzi",
+      description: "Lista ID narzędzi AI do włączenia dla tej konwersacji",
+    },
     response: {
       title: "Odpowiedź strumieniowa",
       description: "Odpowiedź strumieniowa wygenerowana przez AI",

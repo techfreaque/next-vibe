@@ -10,7 +10,7 @@ import {
 
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 
 import type {
   FolderDeleteResponseOutput,
@@ -23,10 +23,10 @@ import type {
  * Get a single folder by ID
  */
 export async function getFolder(
-  user: JwtPrivatePayloadType,
+  user: JwtPayloadType,
   data: { id: string },
 ): Promise<ResponseType<FolderGetResponseOutput>> {
-  if (!user.id) {
+  if (user.isPublic) {
     return createErrorResponse(
       "app.api.v1.core.agent.chat.folders.id.get.errors.unauthorized.title",
       ErrorResponseTypes.UNAUTHORIZED,
@@ -68,10 +68,10 @@ export async function getFolder(
  * Update a folder
  */
 export async function updateFolder(
-  user: JwtPrivatePayloadType,
+  user: JwtPayloadType,
   data: FolderUpdateRequestOutput & { id: string },
 ): Promise<ResponseType<FolderUpdateResponseOutput>> {
-  if (!user.id) {
+  if (user.isPublic) {
     return createErrorResponse(
       "app.api.v1.core.agent.chat.folders.id.patch.errors.unauthorized.title",
       ErrorResponseTypes.UNAUTHORIZED,
@@ -141,10 +141,10 @@ export async function updateFolder(
  * Delete a folder (cascade deletes handled by database)
  */
 export async function deleteFolder(
-  user: JwtPrivatePayloadType,
+  user: JwtPayloadType,
   data: { id: string },
 ): Promise<ResponseType<FolderDeleteResponseOutput>> {
-  if (!user.id) {
+  if (user.isPublic) {
     return createErrorResponse(
       "app.api.v1.core.agent.chat.folders.id.delete.errors.unauthorized.title",
       ErrorResponseTypes.UNAUTHORIZED,

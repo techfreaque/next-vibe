@@ -26,6 +26,45 @@ export const translations: typeof enTranslations = {
         title: "Limit Wyników",
         description: "Maksymalna liczba wyników do zwrócenia",
       },
+      timePeriod: {
+        title: "Okres Czasu",
+      },
+      dateRangePreset: {
+        title: "Wstępnie Ustawiony Zakres Dat",
+      },
+      taskName: {
+        title: "Nazwa Zadania",
+      },
+      taskStatus: {
+        title: "Status Zadania",
+      },
+      taskPriority: {
+        title: "Priorytet Zadania",
+      },
+      healthStatus: {
+        title: "Status Zdrowia",
+      },
+      minDuration: {
+        title: "Minimalny Czas Trwania",
+      },
+      maxDuration: {
+        title: "Maksymalny Czas Trwania",
+      },
+      includeDisabled: {
+        title: "Uwzględnij Wyłączone",
+      },
+      includeSystemTasks: {
+        title: "Uwzględnij Zadania Systemowe",
+      },
+      hasRecentFailures: {
+        title: "Ma Ostatnie Błędy",
+      },
+      hasTimeout: {
+        title: "Ma Timeout",
+      },
+      search: {
+        title: "Szukaj",
+      },
     },
     period: {
       hour: "Godzinowe",

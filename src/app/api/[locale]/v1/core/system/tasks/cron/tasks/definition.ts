@@ -40,7 +40,7 @@ const { GET } = createEndpoint({
   title: "app.api.v1.core.system.tasks.cronSystem.tasks.get.title",
   description: "app.api.v1.core.system.tasks.cronSystem.tasks.get.description",
   category: "app.api.v1.core.system.tasks.category",
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   tags: ["app.api.v1.core.system.tasks.cronSystem.tasks.get.title"],
   fields: objectField(
     {
@@ -392,7 +392,7 @@ const { POST } = createEndpoint({
   title: "app.api.v1.core.system.tasks.cronSystem.tasks.post.title",
   description: "app.api.v1.core.system.tasks.cronSystem.tasks.post.description",
   category: "app.api.v1.core.system.tasks.category",
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   tags: ["app.api.v1.core.system.tasks.cronSystem.tasks.post.title"],
   fields: objectField(
     {

@@ -1,5 +1,24 @@
 "use client";
 
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  Div,
+  Input,
+  Label,
+  P,
+  ScrollArea,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Span,
+  Textarea,
+} from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
@@ -18,22 +37,6 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Input,
-  Label,
-  ScrollArea,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Textarea,
-} from "next-vibe-ui/ui";
 
 import { SelectorBase, type SelectorOption } from "./selector-base";
 import { useFavorites } from "./use-favorites";
@@ -281,8 +284,8 @@ export function PersonaSelector({
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="max-h-[60vh] pr-4">
-            <div className="space-y-4">
-              <div className="space-y-2">
+            <Div className="space-y-4">
+              <Div className="space-y-2">
                 <Label htmlFor="persona-name">
                   {t("app.chat.personaSelector.addDialog.fields.name.label")}
                 </Label>
@@ -296,8 +299,8 @@ export function PersonaSelector({
                     setNewPersona({ ...newPersona, name: e.target.value })
                   }
                 />
-              </div>
-              <div className="space-y-2">
+              </Div>
+              <Div className="space-y-2">
                 <Label htmlFor="persona-icon">
                   {t("app.chat.personaSelector.addDialog.fields.icon.label")}
                 </Label>
@@ -312,8 +315,8 @@ export function PersonaSelector({
                   }
                   maxLength={2}
                 />
-              </div>
-              <div className="space-y-2">
+              </Div>
+              <Div className="space-y-2">
                 <Label htmlFor="persona-description">
                   {t(
                     "app.chat.personaSelector.addDialog.fields.description.label",
@@ -332,8 +335,8 @@ export function PersonaSelector({
                     })
                   }
                 />
-              </div>
-              <div className="space-y-2">
+              </Div>
+              <Div className="space-y-2">
                 <Label htmlFor="persona-prompt">
                   {t(
                     "app.chat.personaSelector.addDialog.fields.systemPrompt.label",
@@ -353,11 +356,11 @@ export function PersonaSelector({
                   }
                   rows={4}
                 />
-              </div>
+              </Div>
 
               {/* Category Selector */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
+              <Div className="space-y-2">
+                <Div className="flex items-center justify-between">
                   <Label htmlFor="persona-category">
                     {t(
                       "app.chat.personaSelector.addDialog.fields.category.label",
@@ -372,7 +375,7 @@ export function PersonaSelector({
                   >
                     {t("app.chat.personaSelector.addDialog.createCategory")}
                   </Button>
-                </div>
+                </Div>
                 <Select
                   value={newPersona.category}
                   onValueChange={(value) =>
@@ -388,28 +391,28 @@ export function PersonaSelector({
                   <SelectContent>
                     {categories.map((cat) => (
                       <SelectItem key={cat.id} value={cat.id}>
-                        <span className="flex items-center gap-2">
+                        <Span className="flex items-center gap-2">
                           {renderIcon(cat.icon)}
-                          <span>{cat.name}</span>
-                        </span>
+                          <Span>{cat.name}</Span>
+                        </Span>
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
+              </Div>
 
               {/* Suggested Prompts */}
-              <div className="space-y-2">
+              <Div className="space-y-2">
                 <Label>
                   {t(
                     "app.chat.personaSelector.addDialog.fields.suggestedPrompts.label",
                   )}
                 </Label>
-                <p className="text-sm text-muted-foreground">
+                <P className="text-sm text-muted-foreground">
                   {t(
                     "app.chat.personaSelector.addDialog.fields.suggestedPrompts.description",
                   )}
-                </p>
+                </P>
                 {newPersona.suggestedPrompts.map((prompt, index) => (
                   <Input
                     key={index}
@@ -428,11 +431,11 @@ export function PersonaSelector({
                     }}
                   />
                 ))}
-              </div>
-            </div>
+              </Div>
+            </Div>
           </ScrollArea>
 
-          <div className="flex gap-2 justify-end pt-4 border-t">
+          <Div className="flex gap-2 justify-end pt-4 border-t">
             <Button variant="outline" onClick={() => setAddPersonaOpen(false)}>
               {t("app.chat.personaSelector.addDialog.cancel")}
             </Button>
@@ -442,7 +445,7 @@ export function PersonaSelector({
             >
               {t("app.chat.personaSelector.addDialog.create")}
             </Button>
-          </div>
+          </Div>
         </DialogContent>
       </Dialog>
 
@@ -455,8 +458,8 @@ export function PersonaSelector({
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
+          <Div className="space-y-4 py-4">
+            <Div className="space-y-2">
               <Label htmlFor="category-name">
                 {t(
                   "app.chat.personaSelector.addCategoryDialog.fields.name.label",
@@ -472,8 +475,8 @@ export function PersonaSelector({
                   setNewCategory({ ...newCategory, name: e.target.value })
                 }
               />
-            </div>
-            <div className="space-y-2">
+            </Div>
+            <Div className="space-y-2">
               <Label htmlFor="category-icon">
                 {t(
                   "app.chat.personaSelector.addCategoryDialog.fields.icon.label",
@@ -490,10 +493,10 @@ export function PersonaSelector({
                 }
                 maxLength={2}
               />
-            </div>
-          </div>
+            </Div>
+          </Div>
 
-          <div className="flex gap-2 justify-end">
+          <Div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={() => setAddCategoryOpen(false)}>
               {t("app.chat.personaSelector.addCategoryDialog.cancel")}
             </Button>
@@ -503,7 +506,7 @@ export function PersonaSelector({
             >
               {t("app.chat.personaSelector.addCategoryDialog.create")}
             </Button>
-          </div>
+          </Div>
         </DialogContent>
       </Dialog>
     </>

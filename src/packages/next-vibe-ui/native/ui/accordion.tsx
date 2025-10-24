@@ -13,7 +13,7 @@ import {
   withTiming,
 } from "react-native-reanimated";
 
-import { ChevronDown } from "../lib/icons/ChevronDown";
+import { ChevronDown } from "./icons/ChevronDown";
 import {
   StyledAccordionContent,
   StyledAccordionHeader,

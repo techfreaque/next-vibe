@@ -6,6 +6,7 @@ import { translations as leadsTranslations } from "../../leads/i18n/de";
 import { translations as manifestTranslations } from "../../manifest/i18n/de";
 import { translations as newsletterTranslations } from "../../newsletter/i18n/de";
 import { translations as paymentTranslations } from "../../payment/i18n/de";
+import { translations as sharedTranslations } from "../../shared/i18n/de";
 import { translations as stripeTranslations } from "../../stripe/i18n/de";
 import { translations as subscriptionTranslations } from "../../subscription/i18n/de";
 import { translations as systemTranslations } from "../../system/i18n/de";
@@ -21,6 +22,7 @@ export const translations: typeof enTranslations = {
   manifest: manifestTranslations,
   newsletter: newsletterTranslations,
   payment: paymentTranslations,
+  shared: sharedTranslations,
   stripe: stripeTranslations,
   subscription: subscriptionTranslations,
   system: systemTranslations,

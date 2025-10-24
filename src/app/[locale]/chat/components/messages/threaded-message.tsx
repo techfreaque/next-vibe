@@ -1,5 +1,7 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
+import { Div, Markdown, Span } from "next-vibe-ui/ui";
 import {
   ArrowBigDown,
   ArrowBigUp,
@@ -11,8 +13,7 @@ import {
   Share2,
   Square,
   Volume2,
-} from "lucide-react";
-import { cn } from "next-vibe/shared/utils";
+} from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
@@ -23,7 +24,6 @@ import { useTTSAudio } from "@/app/api/[locale]/v1/core/agent/text-to-speech/hoo
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { Markdown } from "next-vibe-ui/ui/markdown";
 
 import { useTouchDevice } from "../../hooks/use-touch-device";
 import { LAYOUT } from "../../lib/config/constants";
@@ -119,10 +119,10 @@ export function ThreadedMessage({
   const indent = depth > 0 ? LAYOUT.THREAD_INDENT * 2 : 0;
 
   return (
-    <div className={cn(chatAnimations.slideIn, "relative")}>
+    <Div className={cn(chatAnimations.slideIn, "relative")}>
       {/* Thread connector line - vertical line on the left */}
       {depth > 0 && (
-        <div
+        <Div
           className="absolute left-0 top-0 bottom-0 bg-gradient-to-b from-blue-500/30 via-blue-500/20 to-transparent"
           style={{
             marginLeft: `${indent - LAYOUT.THREAD_LINE_MARGIN_OFFSET}px`,
@@ -132,7 +132,7 @@ export function ThreadedMessage({
       )}
 
       {/* Message container */}
-      <div
+      <Div
         className={cn("relative group/thread-item", depth > 0 && "pl-4")}
         style={{ paddingLeft: depth > 0 ? `${indent}px` : "0" }}
       >
@@ -165,22 +165,22 @@ export function ThreadedMessage({
         )}
 
         {/* Message content */}
-        <div id={`thread-msg-${message.id}`} className="group/message relative">
+        <Div id={`thread-msg-${message.id}`} className="group/message relative">
           {/* Collapsed state indicator */}
           {isCollapsed && hasReplies && (
-            <div className="absolute -bottom-2 left-0 right-0 h-8 flex items-center justify-center">
-              <div className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs text-blue-400 font-medium flex items-center gap-2">
+            <Div className="absolute -bottom-2 left-0 right-0 h-8 flex items-center justify-center">
+              <Div className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs text-blue-400 font-medium flex items-center gap-2">
                 <ChevronRight className="h-3 w-3" />
-                <span>
+                <Span>
                   {replies.length} hidden{" "}
                   {replies.length === 1 ? "reply" : "replies"}
-                </span>
-              </div>
-            </div>
+                </Span>
+              </Div>
+            </Div>
           )}
 
           {isEditing ? (
-            <div
+            <Div
               className={cn(message.role === "user" ? "flex justify-end" : "")}
             >
               <MessageEditor
@@ -196,9 +196,9 @@ export function ThreadedMessage({
                 locale={locale}
                 logger={logger}
               />
-            </div>
+            </Div>
           ) : isRetrying ? (
-            <div className="flex justify-end">
+            <Div className="flex justify-end">
               <ModelPersonaSelectorModal
                 titleKey="app.chat.threadedView.retryModal.title"
                 descriptionKey="app.chat.threadedView.retryModal.description"
@@ -214,11 +214,11 @@ export function ThreadedMessage({
                 locale={locale}
                 logger={logger}
               />
-            </div>
+            </Div>
           ) : (
             <>
               {/* Custom Reddit-style message rendering */}
-              <div
+              <Div
                 className={cn(
                   "group/message p-4 rounded-lg",
                   "bg-background/40 backdrop-blur-sm",
@@ -229,17 +229,17 @@ export function ThreadedMessage({
               >
                 {/* Logo watermark for first message */}
                 {depth === 0 && !message.parentId && (
-                  <div className="absolute top-3 right-3 pointer-events-none bg-background/60 backdrop-blur-xl rounded-md p-1.5 shadow-sm border border-border/10">
+                  <Div className="absolute top-3 right-3 pointer-events-none bg-background/60 backdrop-blur-xl rounded-md p-1.5 shadow-sm border border-border/10">
                     <Logo
                       className="h-auto w-auto max-w-[120px] opacity-70"
                       locale={locale}
                       pathName="/"
                     />
-                  </div>
+                  </Div>
                 )}
 
                 {/* Message header */}
-                <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground flex-wrap">
+                <Div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground flex-wrap">
                   <button
                     className={cn(
                       "font-semibold hover:underline cursor-pointer flex items-center gap-1.5",
@@ -269,9 +269,9 @@ export function ThreadedMessage({
                         const modelData = getModelById(message.model);
                         const ModelIcon = modelData.icon;
                         return typeof ModelIcon === "string" ? (
-                          <span className="text-base leading-none">
+                          <Span className="text-base leading-none">
                             {ModelIcon}
-                          </span>
+                          </Span>
                         ) : (
                           <ModelIcon className="h-3 w-3" />
                         );
@@ -290,21 +290,21 @@ export function ThreadedMessage({
                   {/* Persona - only for AI messages */}
                   {message.role === "assistant" && message.persona && (
                     <>
-                      <span>•</span>
-                      <span className="text-muted-foreground/80">
+                      <Span>•</Span>
+                      <Span className="text-muted-foreground/80">
                         {getPersonaName(message.persona)}
-                      </span>
+                      </Span>
                     </>
                   )}
 
-                  <span>•</span>
-                  <span>{message.createdAt.toLocaleString()}</span>
-                </div>
+                  <Span>•</Span>
+                  <Span>{message.createdAt.toLocaleString()}</Span>
+                </Div>
 
                 {/* Message content */}
-                <div className="text-sm">
+                <Div className="text-sm">
                   {message.role === "assistant" ? (
-                    <div
+                    <Div
                       className={cn(
                         "prose prose-sm dark:prose-invert max-w-none",
                         "prose-p:my-2 prose-p:leading-relaxed",
@@ -323,14 +323,14 @@ export function ThreadedMessage({
                       )}
 
                       <Markdown content={message.content} />
-                    </div>
+                    </Div>
                   ) : (
-                    <div className="whitespace-pre-wrap break-words text-foreground/95">
+                    <Div className="whitespace-pre-wrap break-words text-foreground/95">
                       {message.content}
-                    </div>
+                    </Div>
                   )}
-                </div>
-              </div>
+                </Div>
+              </Div>
 
               {message.role === "error" && (
                 <ErrorMessageBubble message={message} />
@@ -340,7 +340,7 @@ export function ThreadedMessage({
 
           {/* Reddit-style action bar - All features */}
           {!isEditing && !isRetrying && !isAnswering && (
-            <div
+            <Div
               className={cn(
                 "flex items-center gap-2 mt-3 text-xs font-medium flex-wrap transition-opacity",
                 // Touch devices: always visible but slightly transparent
@@ -352,7 +352,7 @@ export function ThreadedMessage({
             >
               {/* Voting buttons */}
               {onVoteMessage && (
-                <div className="flex items-center gap-0.5">
+                <Div className="flex items-center gap-0.5">
                   <button
                     onClick={() =>
                       onVoteMessage(message.id, userVote === "up" ? 0 : 1)
@@ -373,7 +373,7 @@ export function ThreadedMessage({
                     />
                   </button>
                   {voteScore !== 0 && (
-                    <span
+                    <Span
                       className={cn(
                         "text-xs font-medium min-w-[1.5rem] text-center",
                         voteScore > 0 && "text-blue-400",
@@ -381,7 +381,7 @@ export function ThreadedMessage({
                       )}
                     >
                       {voteScore > 0 ? `+${voteScore}` : voteScore}
-                    </span>
+                    </Span>
                   )}
                   <button
                     onClick={() =>
@@ -402,7 +402,7 @@ export function ThreadedMessage({
                       )}
                     />
                   </button>
-                </div>
+                </Div>
               )}
 
               {/* TTS Play/Stop button - For assistant messages */}
@@ -429,11 +429,11 @@ export function ThreadedMessage({
                   ) : (
                     <Volume2 className="h-3.5 w-3.5" />
                   )}
-                  <span>
+                  <Span>
                     {isPlaying
                       ? t("app.chat.threadedView.actions.stop")
                       : t("app.chat.threadedView.actions.play")}
-                  </span>
+                  </Span>
                 </button>
               )}
 
@@ -445,7 +445,7 @@ export function ThreadedMessage({
                   title={t("app.chat.threadedView.actions.replyToMessage")}
                 >
                   <MessageSquare className="h-3.5 w-3.5" />
-                  <span>{t("app.chat.threadedView.actions.reply")}</span>
+                  <Span>{t("app.chat.threadedView.actions.reply")}</Span>
                 </button>
               )}
 
@@ -456,7 +456,7 @@ export function ThreadedMessage({
                   className="flex items-center gap-1 px-2 py-1 rounded hover:bg-green-500/10 text-muted-foreground hover:text-green-400 transition-all"
                   title={t("app.chat.threadedView.actions.editMessage")}
                 >
-                  <span>{t("app.chat.threadedView.actions.edit")}</span>
+                  <Span>{t("app.chat.threadedView.actions.edit")}</Span>
                 </button>
               )}
 
@@ -467,7 +467,7 @@ export function ThreadedMessage({
                   className="flex items-center gap-1 px-2 py-1 rounded hover:bg-yellow-500/10 text-muted-foreground hover:text-yellow-400 transition-all"
                   title={t("app.chat.threadedView.actions.retryWithDifferent")}
                 >
-                  <span>{t("app.chat.threadedView.actions.retry")}</span>
+                  <Span>{t("app.chat.threadedView.actions.retry")}</Span>
                 </button>
               )}
 
@@ -482,7 +482,7 @@ export function ThreadedMessage({
                       : t("app.chat.threadedView.actions.generateAIResponse")
                   }
                 >
-                  <span>{t("app.chat.threadedView.actions.answerAsAI")}</span>
+                  <Span>{t("app.chat.threadedView.actions.answerAsAI")}</Span>
                 </button>
               )}
 
@@ -504,7 +504,7 @@ export function ThreadedMessage({
                 title={t("app.chat.threadedView.actions.copyPermalink")}
               >
                 <Share2 className="h-3.5 w-3.5" />
-                <span>{t("app.chat.threadedView.actions.share")}</span>
+                <Span>{t("app.chat.threadedView.actions.share")}</Span>
               </button>
 
               {/* Delete */}
@@ -514,7 +514,7 @@ export function ThreadedMessage({
                   className="flex items-center gap-1 px-2 py-1 rounded hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all"
                   title={t("app.chat.threadedView.actions.deleteMessage")}
                 >
-                  <span>{t("app.chat.threadedView.actions.delete")}</span>
+                  <Span>{t("app.chat.threadedView.actions.delete")}</Span>
                 </button>
               )}
 
@@ -533,23 +533,23 @@ export function ThreadedMessage({
                   className="flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all"
                 >
                   <CornerDownRight className="h-3.5 w-3.5" />
-                  <span>{t("app.chat.threadedView.actions.parent")}</span>
+                  <Span>{t("app.chat.threadedView.actions.parent")}</Span>
                 </button>
               )}
 
               {/* Reply count badge */}
               {hasReplies && (
-                <div className="ml-1 px-2 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold">
+                <Div className="ml-1 px-2 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold">
                   {replies.length} {replies.length === 1 ? "reply" : "replies"}
-                </div>
+                </Div>
               )}
-            </div>
+            </Div>
           )}
-        </div>
+        </Div>
 
         {/* Show Answer-as-AI dialog below the message */}
         {isAnswering && (
-          <div className="mt-3">
+          <Div className="mt-3">
             <ModelPersonaSelectorModal
               titleKey="app.chat.threadedView.answerModal.title"
               descriptionKey="app.chat.threadedView.answerModal.description"
@@ -569,14 +569,14 @@ export function ThreadedMessage({
               locale={locale}
               logger={logger}
             />
-          </div>
+          </Div>
         )}
 
         {/* Nested replies */}
         {hasReplies &&
           !isCollapsed &&
           (depth < maxDepth || showDeepReplies) && (
-            <div className="mt-2 space-y-2">
+            <Div className="mt-2 space-y-2">
               {replies.map((reply) => (
                 <ThreadedMessage
                   key={reply.id}
@@ -600,7 +600,7 @@ export function ThreadedMessage({
                   rootFolderId={rootFolderId}
                 />
               ))}
-            </div>
+            </Div>
           )}
 
         {/* "Continue thread" button for deeply nested conversations */}
@@ -622,7 +622,7 @@ export function ThreadedMessage({
               })}
             </button>
           )}
-      </div>
+      </Div>
 
       {/* User Profile Hover Card */}
       {hoveredUserId && userCardPosition && (
@@ -636,6 +636,6 @@ export function ThreadedMessage({
           locale={locale}
         />
       )}
-    </div>
+    </Div>
   );
 }

@@ -6,6 +6,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Div } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import React from "react";
 
@@ -90,7 +91,7 @@ export function LinearMessageView({
     <>
       {/* Show root-level branch navigator if there are multiple root messages */}
       {hasRootBranches && (
-        <div className="my-3">
+        <Div className="my-3">
           <BranchNavigator
             currentBranchIndex={rootBranches.currentIndex}
             totalBranches={rootBranches.siblings.length}
@@ -106,7 +107,7 @@ export function LinearMessageView({
             }
             locale={locale}
           />
-        </div>
+        </Div>
       )}
 
       {messages.map((message, index) => {
@@ -124,9 +125,9 @@ export function LinearMessageView({
 
         return (
           <React.Fragment key={message.id}>
-            <div className={cn(chatAnimations.slideIn, "group")}>
+            <Div className={cn(chatAnimations.slideIn, "group")}>
               {isEditing ? (
-                <div className="flex justify-end">
+                <Div className="flex justify-end">
                   <MessageEditor
                     message={message}
                     selectedModel={selectedModel}
@@ -138,9 +139,9 @@ export function LinearMessageView({
                     locale={locale}
                     logger={logger}
                   />
-                </div>
+                </Div>
               ) : isRetrying ? (
-                <div className="flex justify-end">
+                <Div className="flex justify-end">
                   <ModelPersonaSelectorModal
                     titleKey="app.chat.linearMessageView.retryModal.title"
                     descriptionKey="app.chat.linearMessageView.retryModal.description"
@@ -169,7 +170,7 @@ export function LinearMessageView({
                     locale={locale}
                     logger={logger}
                   />
-                </div>
+                </Div>
               ) : (
                 <>
                   {message.role === "user" && (
@@ -200,11 +201,11 @@ export function LinearMessageView({
                   )}
                 </>
               )}
-            </div>
+            </Div>
 
             {/* Show Answer-as-AI dialog below the message */}
             {isAnswering && (
-              <div className="my-3">
+              <Div className="my-3">
                 <ModelPersonaSelectorModal
                   titleKey="app.chat.linearMessageView.answerModal.title"
                   descriptionKey="app.chat.linearMessageView.answerModal.description"
@@ -237,12 +238,12 @@ export function LinearMessageView({
                   locale={locale}
                   logger={logger}
                 />
-              </div>
+              </Div>
             )}
 
             {/* Show branch navigator if this message has multiple children */}
             {hasBranches && nextMessage && (
-              <div className="my-3">
+              <Div className="my-3">
                 <BranchNavigator
                   currentBranchIndex={branches.currentIndex}
                   totalBranches={branches.siblings.length}
@@ -255,7 +256,7 @@ export function LinearMessageView({
                   onSwitchBranch={(index) => onSwitchBranch(message.id, index)}
                   locale={locale}
                 />
-              </div>
+              </Div>
             )}
           </React.Fragment>
         );

@@ -1,7 +1,8 @@
 "use client";
 
-import { GitBranch, X } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
+import { Button, Div, Textarea } from "next-vibe-ui/ui";
+import { GitBranch, X } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React from "react";
 
@@ -9,7 +10,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLocaleString } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
-import { Button, Textarea } from "next-vibe-ui/ui";
 
 import type { ChatMessage, ModelId } from "../../../types";
 import { ModelSelector } from "../../input/model-selector";
@@ -52,7 +52,7 @@ export function MessageEditor({
   });
 
   return (
-    <div ref={editor.editorRef} className="w-full">
+    <Div ref={editor.editorRef} className="w-full">
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -65,7 +65,7 @@ export function MessageEditor({
         )}
       >
         {/* Textarea */}
-        <div className="relative mb-3">
+        <Div className="relative mb-3">
           <Textarea
             ref={editor.textareaRef}
             value={editor.content}
@@ -80,7 +80,7 @@ export function MessageEditor({
 
           {/* Hint Text - Shows when textarea is empty */}
           {!editor.content && (
-            <div className="absolute top-2 left-0 pointer-events-none text-sm text-muted-foreground">
+            <Div className="absolute top-2 left-0 pointer-events-none text-sm text-muted-foreground">
               <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
                 ⌘/Ctrl+Enter
               </kbd>{" "}
@@ -88,14 +88,14 @@ export function MessageEditor({
               {/* eslint-disable-next-line i18next/no-literal-string -- Keyboard shortcuts are technical UI elements */}
               <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Esc</kbd>{" "}
               {t("app.chat.messageEditor.hint.cancel")}
-            </div>
+            </Div>
           )}
-        </div>
+        </Div>
 
         {/* Controls */}
-        <div className="space-y-2">
+        <Div className="space-y-2">
           {/* Model and Tone Selectors */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <Div className="flex items-center gap-2 flex-wrap">
             {onModelChange && (
               <ModelSelector
                 value={selectedModel}
@@ -112,10 +112,10 @@ export function MessageEditor({
                 logger={logger}
               />
             )}
-          </div>
+          </Div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <Div className="flex items-center gap-2 flex-wrap">
             {/* Speech Input Button */}
             <SpeechInputButton
               onTranscript={(text): void => {
@@ -159,9 +159,9 @@ export function MessageEditor({
               <X className="h-3.5 w-3.5 mr-2" />
               {t("app.chat.messageEditor.buttons.cancel")}
             </Button>
-          </div>
-        </div>
+          </Div>
+        </Div>
       </form>
-    </div>
+    </Div>
   );
 }

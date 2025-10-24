@@ -30,7 +30,7 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.cli.setup.update.post.description",
   category: "app.api.v1.core.system.cli.setup.update.post.title",
   tags: ["app.api.v1.core.system.cli.setup.update.post.title"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["update", "setup:update"],
   method: Methods.POST,
   path: ["v1", "core", "system", "setup", "update"],

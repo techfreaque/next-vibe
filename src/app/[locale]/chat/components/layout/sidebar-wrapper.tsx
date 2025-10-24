@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Div } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import React from "react";
 
@@ -168,7 +169,7 @@ export function SidebarWrapper({
   return (
     <>
       {/* Sidebar Container */}
-      <div
+      <Div
         suppressHydrationWarning
         className={cn(
           // Desktop: flexible width with smooth transition, z-10 to stay below input (z-20)
@@ -179,7 +180,7 @@ export function SidebarWrapper({
           !collapsed && "block",
         )}
       >
-        <div className={`h-full ${SIDEBAR_WIDTH} bg-background`}>
+        <Div className={`h-full ${SIDEBAR_WIDTH} bg-background`}>
           <ChatSidebar
             chat={chat}
             activeThreadId={activeThreadId}
@@ -201,12 +202,12 @@ export function SidebarWrapper({
             onUpdateThreadTitle={onUpdateThreadTitle}
             searchThreads={() => []}
           />
-        </div>
-      </div>
+        </Div>
+      </Div>
 
       {/* Mobile Overlay Backdrop */}
       {!collapsed && (
-        <div
+        <Div
           className="md:hidden fixed inset-0 bg-black/50 z-30"
           onClick={onToggle}
           aria-label={t("app.chat.common.closeSidebar")}

@@ -64,7 +64,7 @@ const { POST } = createEndpoint({
     "app.api.v1.core.system.db.reset.taskManagement.tags.tasks",
     "app.api.v1.core.system.db.reset.taskManagement.tags.management",
   ],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["reset-tasks", "db-reset-tasks"],
   method: Methods.POST,
   path: ["v1", "core", "system", "db", "reset", "task-management"],

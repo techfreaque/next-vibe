@@ -1,23 +1,8 @@
 "use client";
 
 import {
-  Menu,
-  MessageSquarePlus,
-  Moon,
-  Search,
-  Settings,
-  Sun,
-  Volume2,
-  VolumeX,
-} from "lucide-react";
-import type { JSX } from "react";
-import React, { useEffect, useState } from "react";
-
-import { Logo } from "@/app/[locale]/_components/nav/logo";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-import {
   Button,
+  Div,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -26,7 +11,24 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  Span,
 } from "next-vibe-ui/ui";
+import {
+  Menu,
+  MessageSquarePlus,
+  Moon,
+  Search,
+  Settings,
+  Sun,
+  Volume2,
+  VolumeX,
+} from "next-vibe-ui/ui/icons";
+import type { JSX } from "react";
+import React, { useEffect, useState } from "react";
+
+import { Logo } from "@/app/[locale]/_components/nav/logo";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import type { ChatMessage } from "../../types";
 import { LocaleSelectorContent } from "../locale-selector-content";
@@ -69,7 +71,7 @@ export function TopBar({
   }, []);
 
   return (
-    <div className="absolute top-4 left-4 z-51 flex gap-1">
+    <Div className="absolute top-4 left-4 z-51 flex gap-1">
       {/* Menu Button */}
       <Button
         variant="ghost"
@@ -129,8 +131,8 @@ export function TopBar({
           {/* Locale Selector */}
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <span className="mr-2">{currentCountry.flag}</span>
-              <span>{currentCountry.name}</span>
+              <Span className="mr-2">{currentCountry.flag}</Span>
+              <Span>{currentCountry.name}</Span>
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
               <LocaleSelectorContent />
@@ -164,15 +166,15 @@ export function TopBar({
         </>
       )}
       {(!sidebarCollapsed || Object.keys(messages).length === 0) && (
-        <div className="flex-1 flex justify-center">
+        <Div className="flex-1 flex justify-center">
           <Logo
             locale={locale}
             pathName=""
             className="w-[150px] h-auto"
             linkClassName="my-auto flex"
           />
-        </div>
+        </Div>
       )}
-    </div>
+    </Div>
   );
 }

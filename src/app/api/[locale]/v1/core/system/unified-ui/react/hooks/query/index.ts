@@ -267,7 +267,7 @@ export function useApiQuery<
           isSuccess: false,
           isLoadingFresh: false,
           isCachedData: false,
-          statusMessage: "error.api.store.status.disabled" as const,
+          statusMessage: "app.error.api.store.status.disabled" as const,
           lastFetchTime: null,
         };
       }
@@ -296,7 +296,7 @@ export function useApiQuery<
         isSuccess: false,
         isLoadingFresh: true,
         isCachedData: false,
-        statusMessage: "error.api.store.status.loading_data",
+        statusMessage: "app.error.api.store.status.loading_data",
         lastFetchTime: null,
       };
     }, [initialData, options.enabled, queryId]);

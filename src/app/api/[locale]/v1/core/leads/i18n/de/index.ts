@@ -241,6 +241,19 @@ export const translations: typeof enTranslations = {
     },
   },
   leadsErrors: {
+    batch: {
+      update: {
+        error: {
+          validation: {
+            title: "Ungültige Batch-Aktualisierungsanfrage",
+          },
+          server: {
+            title: "Serverfehler beim Batch-Update von Leads",
+          },
+          default: "Fehler beim Batch-Update von Leads",
+        },
+      },
+    },
     leads: {
       get: {
         error: {

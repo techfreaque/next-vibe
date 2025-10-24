@@ -24,6 +24,45 @@ export const translations = {
         title: "Result Limit",
         description: "Maximum number of results to return",
       },
+      timePeriod: {
+        title: "Time Period",
+      },
+      dateRangePreset: {
+        title: "Date Range Preset",
+      },
+      taskName: {
+        title: "Task Name",
+      },
+      taskStatus: {
+        title: "Task Status",
+      },
+      taskPriority: {
+        title: "Task Priority",
+      },
+      healthStatus: {
+        title: "Health Status",
+      },
+      minDuration: {
+        title: "Minimum Duration",
+      },
+      maxDuration: {
+        title: "Maximum Duration",
+      },
+      includeDisabled: {
+        title: "Include Disabled",
+      },
+      includeSystemTasks: {
+        title: "Include System Tasks",
+      },
+      hasRecentFailures: {
+        title: "Has Recent Failures",
+      },
+      hasTimeout: {
+        title: "Has Timeout",
+      },
+      search: {
+        title: "Search",
+      },
     },
     period: {
       hour: "Hourly",

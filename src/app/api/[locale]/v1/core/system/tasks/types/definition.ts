@@ -28,7 +28,7 @@ const { GET } = createEndpoint({
   title: "app.api.v1.core.system.tasks.types.get.title",
   description: "app.api.v1.core.system.tasks.types.get.description",
   category: "app.api.v1.core.system.tasks.category",
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["tasks:types"],
   tags: ["app.api.v1.core.system.tasks.types.get.title"],
 

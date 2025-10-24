@@ -1,24 +1,7 @@
 "use client";
 
-import {
-  Archive,
-  ArchiveRestore,
-  Edit2,
-  FolderInput,
-  MoreVertical,
-  Pin,
-  PinOff,
-  Trash2,
-} from "lucide-react";
-import { useRouter } from "next-vibe-ui/hooks";
 import { cn } from "next-vibe/shared/utils";
-import type { JSX } from "react";
-import React, { useState } from "react";
-
-import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
-import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { useRouter } from "next-vibe-ui/hooks";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   Button,
+  Div,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -37,11 +21,30 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  P,
+  Span,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui";
+import {
+  Archive,
+  ArchiveRestore,
+  Edit2,
+  FolderInput,
+  MoreVertical,
+  Pin,
+  PinOff,
+  Trash2,
+} from "next-vibe-ui/ui/icons";
+import type { JSX } from "react";
+import React, { useState } from "react";
+
+import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
+import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import { useTouchDevice } from "../../hooks/use-touch-device";
 import { chatColors, chatTransitions } from "../../lib/design-tokens";
@@ -75,7 +78,7 @@ export function ThreadList({
   locale,
 }: ThreadListProps): JSX.Element {
   return (
-    <div className="space-y-0.5">
+    <Div className="space-y-0.5">
       {threads.map((thread) => (
         <ThreadItem
           key={thread.id}
@@ -92,7 +95,7 @@ export function ThreadList({
           locale={locale}
         />
       ))}
-    </div>
+    </Div>
   );
 }
 
@@ -215,7 +218,7 @@ function ThreadItem({
   };
 
   return (
-    <div
+    <Div
       className={cn(
         "relative flex items-center gap-2 px-2 py-2 rounded-md cursor-pointer",
         chatTransitions.colors,
@@ -239,7 +242,7 @@ function ThreadItem({
       }}
     >
       {isEditing ? (
-        <div className="flex-1 min-w-0">
+        <Div className="flex-1 min-w-0">
           <input
             type="text"
             value={editTitle}
@@ -250,43 +253,43 @@ function ThreadItem({
             autoFocus
             onClick={(e) => e.stopPropagation()}
           />
-        </div>
+        </Div>
       ) : (
-        <div className="flex-1 min-w-0">
+        <Div className="flex-1 min-w-0">
           <TooltipProvider delayDuration={500}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="flex-1 min-w-0">
-                  <div
+                <Div className="flex-1 min-w-0">
+                  <Div
                     className={cn(
                       "text-sm font-medium truncate",
                       compact && "text-xs",
                     )}
                   >
                     {thread.title}
-                  </div>
+                  </Div>
                   {!compact && thread.preview && (
-                    <div className="text-xs text-muted-foreground truncate">
+                    <Div className="text-xs text-muted-foreground truncate">
                       {thread.preview}
-                    </div>
+                    </Div>
                   )}
-                </div>
+                </Div>
               </TooltipTrigger>
               <TooltipContent side="right" className="max-w-xs">
-                <p className="text-sm">{thread.title}</p>
+                <P className="text-sm">{thread.title}</P>
                 {thread.preview && (
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <P className="text-xs text-muted-foreground mt-1">
                     {thread.preview}
-                  </p>
+                  </P>
                 )}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        </div>
+        </Div>
       )}
 
       {!isEditing && (isHovered || isTouched || isActive || isTouch) && (
-        <div
+        <Div
           className="flex items-center gap-1"
           onClick={(e) => e.stopPropagation()}
         >
@@ -401,9 +404,9 @@ function ThreadItem({
                         })
                       ) : (
                         <DropdownMenuItem disabled>
-                          <span className="text-sm text-muted-foreground">
+                          <Span className="text-sm text-muted-foreground">
                             {t("app.chat.actions.noFoldersAvailable")}
-                          </span>
+                          </Span>
                         </DropdownMenuItem>
                       )}
                     </DropdownMenuSubContent>
@@ -421,11 +424,11 @@ function ThreadItem({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
+        </Div>
       )}
 
       {thread.pinned && (
-        <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-primary rounded-full" />
+        <Div className="absolute top-1 right-1 w-1.5 h-1.5 bg-primary rounded-full" />
       )}
 
       {/* Delete Confirmation Dialog */}
@@ -457,6 +460,6 @@ function ThreadItem({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </Div>
   );
 }

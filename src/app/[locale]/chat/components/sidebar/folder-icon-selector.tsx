@@ -20,6 +20,15 @@ import {
   SiRust,
   SiTypescript,
 } from "@icons-pack/react-simple-icons";
+import { cn } from "next-vibe/shared/utils";
+import {
+  Button,
+  Div,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Span,
+} from "next-vibe-ui/ui";
 import {
   Activity,
   Atom,
@@ -78,17 +87,9 @@ import {
   Users,
   Utensils,
   Zap,
-} from "lucide-react";
-import { cn } from "next-vibe/shared/utils";
+} from "next-vibe-ui/ui/icons";
 import type { ComponentType, JSX } from "react";
 import React from "react";
-
-import {
-  Button,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "next-vibe-ui/ui";
 
 interface FolderIconSelectorProps {
   value: string;
@@ -113,14 +114,14 @@ const ICON_OPTIONS: {
     id: "1a",
     label: "1A",
     Icon: ({ className = "" }) => (
-      <span
+      <Span
         className={cn(
           "flex items-center justify-center leading-none bg-gradient-to-r from-amber-600 via-yellow-400 to-amber-600 bg-clip-text text-transparent hover:from-amber-500 hover:via-yellow-300 hover:to-amber-500 transition-all duration-300 font-bold text-center animate-gold-sheen bg-[length:150%_100%]",
           className,
         )}
       >
         1A
-      </span>
+      </Span>
     ),
   },
   { id: "home", label: "Home", Icon: Home },
@@ -242,7 +243,7 @@ export function FolderIconSelector({
         className="w-80 p-2 max-h-96 overflow-y-auto"
         align="start"
       >
-        <div className="grid grid-cols-6 gap-1">
+        <Div className="grid grid-cols-6 gap-1">
           {ICON_OPTIONS.map((option) => {
             const Icon = option.Icon;
             return (
@@ -262,7 +263,7 @@ export function FolderIconSelector({
               </button>
             );
           })}
-        </div>
+        </Div>
       </PopoverContent>
     </Popover>
   );

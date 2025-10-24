@@ -2,6 +2,20 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   description: "Wykonuje zadania cron i zarządza zadaniami bocznymi",
+  common: {
+    taskName: "Nazwa zadania",
+    taskNamesDescription: "Nazwy zadań do filtrowania",
+    detailed: "Szczegółowe",
+    detailedDescription: "Uwzględnij szczegółowe informacje",
+    active: "Aktywne",
+    total: "Razem",
+    uptime: "Czas działania",
+    id: "ID",
+    status: "Status",
+    lastRun: "Ostatnie uruchomienie",
+    nextRun: "Następne uruchomienie",
+    schedule: "Harmonogram",
+  },
   post: {
     title: "Ujednolicony Runner Zadań",
     description:

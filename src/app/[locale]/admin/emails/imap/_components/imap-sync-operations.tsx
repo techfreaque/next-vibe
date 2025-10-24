@@ -29,7 +29,9 @@ import {
 import type { JSX } from "react";
 import React, { useState } from "react";
 
-import imapAccountsListDefinition from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/definition";
+import imapAccountsListDefinition, {
+  type ImapAccountsListResponseOutput,
+} from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/definition";
 import { ImapSyncStatus } from "@/app/api/[locale]/v1/core/emails/imap-client/enum";
 import imapSyncDefinition from "@/app/api/[locale]/v1/core/emails/imap-client/sync/definition";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/use-endpoint";
@@ -39,26 +41,32 @@ import { useTranslation } from "@/i18n/core/client";
  * IMAP Sync Operations Component
  */
 export function ImapSyncOperations(): JSX.Element {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [isSyncing, setIsSyncing] = useState(false);
 
   // Use accounts endpoint to get sync status information
-  const accountsEndpoint = useImapAccountsListEndpoint();
+  const accountsEndpoint = useEndpoint(imapAccountsListDefinition, {
+    enabled: true,
+  });
 
   // Use sync endpoint for triggering sync operations
-  const syncEndpoint = useImapSyncEndpoint();
+  const syncEndpoint = useEndpoint(imapSyncDefinition, {
+    enabled: false,
+  });
 
   // Extract sync status from accounts data
   const accountsData = accountsEndpoint.read?.data;
   const syncingAccounts =
     accountsData?.accounts.filter(
-      (acc) => acc.syncStatus === ImapSyncStatus.SYNCING,
+      (acc: ImapAccountsListResponseOutput["accounts"][number]) =>
+        acc.syncStatus === ImapSyncStatus.SYNCING,
     ) || [];
   const lastSyncTimes =
     accountsData?.accounts
-      .map((acc) => acc.lastSyncAt)
-      .filter((time) => time !== null)
-      .sort((a, b) => new Date(b).getTime() - new Date(a).getTime()) || [];
+      .map((acc: ImapAccountsListResponseOutput["accounts"][number]) => acc.lastSyncAt)
+      .filter((time: string | null) => time !== null)
+      .sort((a: string, b: string) => new Date(b).getTime() - new Date(a).getTime()) ||
+    [];
 
   const syncStatus = {
     isRunning: syncingAccounts.length > 0 || isSyncing,

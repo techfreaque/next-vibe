@@ -10,7 +10,6 @@ import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { NextRequest } from "next/server";
-import { env } from "next-vibe/server/env";
 import {
   AUTH_STATUS_COOKIE_NAME,
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
@@ -26,6 +25,7 @@ import {
 import { Environment, parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { leadAuthService } from "../../leads/auth-service";
@@ -257,7 +257,7 @@ class AuthRepositoryImpl implements AuthRepository {
           .where(eq(leads.id, userLead.leadId))
           .limit(1);
         if (lead) {
-          locale = `${lead.language}-${lead.country}` as CountryLanguage;
+          locale = `${lead.language}-${lead.country}`;
         }
       }
 
@@ -1021,17 +1021,22 @@ class AuthRepositoryImpl implements AuthRepository {
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
     try {
-      logger.info("app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.start");
+      logger.info(
+        "app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.start",
+      );
 
       // First, try to get authenticated user from cookies
       const userResult = await this.getCurrentUserNext(logger);
 
-      logger.info("app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.result", {
-        success: userResult.success,
-        hasData: !!userResult.data,
-        userId: userResult.data?.id,
-        isPublic: userResult.data?.isPublic,
-      });
+      logger.info(
+        "app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.result",
+        {
+          success: userResult.success,
+          hasData: !!userResult.data,
+          userId: userResult.data?.id,
+          isPublic: userResult.data?.isPublic,
+        },
+      );
 
       // If user is authenticated, proceed with authenticated user flow
       if (
@@ -1039,7 +1044,9 @@ class AuthRepositoryImpl implements AuthRepository {
         userResult.data?.id &&
         !userResult.data.isPublic
       ) {
-        logger.info("app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.authenticated");
+        logger.info(
+          "app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.authenticated",
+        );
 
         // Get leadId for authenticated user
         const leadId = await this.getLeadIdForUser(
@@ -1048,10 +1055,13 @@ class AuthRepositoryImpl implements AuthRepository {
           logger,
         );
 
-        logger.info("app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.returningAuth", {
-          userId: userResult.data.id,
-          leadId,
-        });
+        logger.info(
+          "app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.returningAuth",
+          {
+            userId: userResult.data.id,
+            leadId,
+          },
+        );
 
         // Use internal method to check authentication with roles
         return await this.getAuthenticatedUserInternal<TRoles>(
@@ -1062,7 +1072,9 @@ class AuthRepositoryImpl implements AuthRepository {
         );
       }
 
-      logger.info("app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.notAuthenticated");
+      logger.info(
+        "app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.notAuthenticated",
+      );
 
       // User is not authenticated - check if PUBLIC role is allowed
       if (roles.includes(UserRole.PUBLIC)) {
@@ -1564,7 +1576,7 @@ class AuthRepositoryImpl implements AuthRepository {
           .where(eq(leads.id, userLead.leadId))
           .limit(1);
         if (lead) {
-          locale = `${lead.language}-${lead.country}` as CountryLanguage;
+          locale = `${lead.language}-${lead.country}`;
         }
       }
 

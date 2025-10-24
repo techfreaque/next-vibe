@@ -93,6 +93,83 @@ export const translations = {
       response: {
         title: "Import Results",
         description: "Summary of your CSV import operation",
+
+        basicResults: {
+          title: "Basic Results",
+          description: "Core import statistics",
+        },
+
+        batchId: {
+          label: "Batch ID",
+        },
+
+        totalRows: {
+          label: "Total Rows",
+        },
+
+        isChunkedProcessing: {
+          label: "Background Processing",
+        },
+
+        jobId: {
+          label: "Job ID",
+        },
+
+        statistics: {
+          title: "Import Statistics",
+          description: "Detailed breakdown of the import operation",
+        },
+
+        successfulImports: {
+          label: "Successful Imports",
+        },
+
+        failedImports: {
+          label: "Failed Imports",
+        },
+
+        duplicateEmails: {
+          label: "Duplicate Emails",
+        },
+
+        processingTimeMs: {
+          label: "Processing Time (ms)",
+        },
+
+        summary: {
+          title: "Import Summary",
+          description: "Overview of import results",
+        },
+
+        newRecords: {
+          label: "New Records",
+        },
+
+        updatedRecords: {
+          label: "Updated Records",
+        },
+
+        skippedDuplicates: {
+          label: "Skipped Duplicates",
+        },
+
+        errors: {
+          row: {
+            label: "Row",
+          },
+          email: {
+            label: "Email",
+          },
+          error: {
+            label: "Error",
+          },
+        },
+
+        nextSteps: {
+          item: {
+            label: "Next Steps",
+          },
+        },
       },
 
       // === ERRORS ===
@@ -120,6 +197,30 @@ export const translations = {
           title: "Import Failed",
           description:
             "An error occurred while processing your import. Please try again.",
+        },
+        network: {
+          title: "Network Error",
+          description: "Network connection failed during import",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "You don't have permission to perform this import",
+        },
+        notFound: {
+          title: "Not Found",
+          description: "Import resource not found",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unexpected error occurred",
+        },
+        unsavedChanges: {
+          title: "Unsaved Changes",
+          description: "You have unsaved changes",
+        },
+        conflict: {
+          title: "Data Conflict",
+          description: "A conflict occurred with existing data",
         },
       },
 

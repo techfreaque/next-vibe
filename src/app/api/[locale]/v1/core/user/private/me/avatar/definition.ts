@@ -38,9 +38,9 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,
-    UserRole.CLI_ONLY,
-    UserRole.CLI_WEB,
-    UserRole.WEB_ONLY,
+    UserRole.CLI_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.WEB_OFF,
   ] as const,
   fields: objectField(
     {
@@ -309,9 +309,9 @@ const { DELETE } = createEndpoint({
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,
-    UserRole.CLI_ONLY,
-    UserRole.CLI_WEB,
-    UserRole.WEB_ONLY,
+    UserRole.CLI_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.WEB_OFF,
   ] as const,
   fields: objectField(
     {

@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.db.studio.post.description",
   category: "app.api.v1.core.system.db.category",
   tags: ["app.api.v1.core.system.db.studio.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["studio", "db:studio"],
 
   fields: objectField(

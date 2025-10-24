@@ -6,6 +6,7 @@
 
 "use client";
 
+import { AUTH_STATUS_COOKIE_PREFIX } from "next-vibe/shared/constants";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
@@ -94,6 +95,7 @@ export interface UseChatReturn {
   theme: "light" | "dark";
   viewMode: "linear" | "flat" | "threaded";
   enableSearch: boolean;
+  enabledToolIds: string[];
   setSelectedPersona: (persona: string) => void;
   setSelectedModel: (model: ModelId) => void;
   setTemperature: (temp: number) => void;
@@ -103,6 +105,7 @@ export interface UseChatReturn {
   setTheme: (theme: "light" | "dark") => void;
   setViewMode: (mode: "linear" | "flat" | "threaded") => void;
   setEnableSearch: (enabled: boolean) => void;
+  setEnabledToolIds: (toolIds: string[]) => void;
 
   // Message operations
   sendMessage: (
@@ -204,7 +207,7 @@ export function useChat(
       // Check if user is authenticated by checking auth_status cookie
       const authStatusCookie = document.cookie
         .split("; ")
-        .find((row) => row.startsWith("auth_status="));
+        .find((row) => row.startsWith(AUTH_STATUS_COOKIE_PREFIX));
       const isAuthenticated = authStatusCookie !== undefined;
 
       logger.debug("useChat", "Checking authentication before loading data", {
@@ -451,6 +454,7 @@ export function useChat(
   const theme = settings.theme;
   const viewMode = settings.viewMode;
   const enableSearch = settings.enableSearch;
+  const enabledToolIds = settings.enabledToolIds;
 
   // Settings setters that update the store
   const setSelectedPersona = useCallback(
@@ -512,6 +516,13 @@ export function useChat(
   const setEnableSearch = useCallback(
     (enabled: boolean) => {
       chatStore.updateSettings({ enableSearch: enabled });
+    },
+    [chatStore],
+  );
+
+  const setEnabledToolIds = useCallback(
+    (toolIds: string[]) => {
+      chatStore.updateSettings({ enabledToolIds: toolIds });
     },
     [chatStore],
   );
@@ -605,7 +616,7 @@ export function useChat(
     // Check if user is authenticated
     const authStatusCookie = document.cookie
       .split("; ")
-      .find((row) => row.startsWith("auth_status="));
+      .find((row) => row.startsWith(AUTH_STATUS_COOKIE_PREFIX));
     const isAuthenticated = authStatusCookie !== undefined;
 
     // Skip loading for incognito mode (messages are in localStorage)
@@ -653,7 +664,10 @@ export function useChat(
                 parentId: string | null;
                 depth: number;
                 childrenIds: string[];
-                toolCalls?: Array<{ toolName: string; args: Record<string, unknown> }> | null;
+                toolCalls?: Array<{
+                  toolName: string;
+                  args: Record<string, unknown>;
+                }> | null;
                 createdAt: string;
                 updatedAt: string;
               }) => {
@@ -716,10 +730,14 @@ export function useChat(
           let threadMessages: ChatMessage[] = [];
           if (chatStore.currentRootFolderId === "incognito") {
             // Import incognito storage dynamically to avoid circular dependencies
-            const { getMessagesForThread } = await import("./incognito/storage");
+            const { getMessagesForThread } = await import(
+              "./incognito/storage"
+            );
             threadMessages = getMessagesForThread(chatStore.activeThreadId);
           } else {
-            threadMessages = chatStore.getThreadMessages(chatStore.activeThreadId);
+            threadMessages = chatStore.getThreadMessages(
+              chatStore.activeThreadId,
+            );
           }
 
           if (threadMessages.length > 0) {
@@ -748,6 +766,7 @@ export function useChat(
             temperature,
             maxTokens,
             enableSearch,
+            enabledToolIds,
           },
           {
             onThreadCreated: (data) => {
@@ -817,6 +836,7 @@ export function useChat(
       temperature,
       maxTokens,
       enableSearch,
+      enabledToolIds,
       locale,
     ],
   );
@@ -853,6 +873,7 @@ export function useChat(
             temperature,
             maxTokens,
             enableSearch: false,
+            enabledToolIds,
           },
           {
             onContentDone: () => {
@@ -901,6 +922,7 @@ export function useChat(
       selectedPersona,
       temperature,
       maxTokens,
+      enabledToolIds,
     ],
   );
 
@@ -932,6 +954,7 @@ export function useChat(
             temperature,
             maxTokens,
             enableSearch: false,
+            enabledToolIds,
           },
           {
             onContentDone: () => {
@@ -981,6 +1004,7 @@ export function useChat(
       temperature,
       maxTokens,
       enableSearch,
+      enabledToolIds,
     ],
   );
 
@@ -1011,6 +1035,7 @@ export function useChat(
             temperature,
             maxTokens,
             enableSearch: false,
+            enabledToolIds,
           },
           {
             onContentDone: () => {
@@ -1059,6 +1084,7 @@ export function useChat(
       selectedPersona,
       temperature,
       maxTokens,
+      enabledToolIds,
     ],
   );
 
@@ -1106,7 +1132,7 @@ export function useChat(
       // Check if user is authenticated
       const authStatusCookie = document.cookie
         .split("; ")
-        .find((row) => row.startsWith("auth_status="));
+        .find((row) => row.startsWith(AUTH_STATUS_COOKIE_PREFIX));
       const isAuthenticated = authStatusCookie !== undefined;
 
       // For incognito mode, delete from both store and localStorage (no API call)
@@ -1196,7 +1222,7 @@ export function useChat(
       // Check if user is authenticated
       const authStatusCookie = document.cookie
         .split("; ")
-        .find((row) => row.startsWith("auth_status="));
+        .find((row) => row.startsWith(AUTH_STATUS_COOKIE_PREFIX));
       const isAuthenticated = authStatusCookie !== undefined;
 
       // Incognito mode doesn't support voting
@@ -1472,6 +1498,7 @@ export function useChat(
     theme,
     viewMode,
     enableSearch,
+    enabledToolIds,
     setSelectedPersona,
     setSelectedModel,
     setTemperature,
@@ -1481,6 +1508,7 @@ export function useChat(
     setTheme,
     setViewMode,
     setEnableSearch,
+    setEnabledToolIds,
 
     // Message operations
     sendMessage,

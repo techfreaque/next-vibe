@@ -32,7 +32,7 @@ const { POST } = createEndpoint({
     "app.api.v1.core.system.db.utils.dockerOperations.tags.docker",
     "app.api.v1.core.system.db.utils.dockerOperations.tags.utils",
   ],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["docker", "docker-utils"],
   method: Methods.POST,
   path: ["v1", "core", "system", "db", "utils", "docker-operations"],

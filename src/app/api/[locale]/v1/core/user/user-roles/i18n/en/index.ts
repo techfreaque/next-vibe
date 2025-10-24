@@ -70,9 +70,9 @@ export const translations = {
       partnerAdmin: "Partner Admin",
       partnerEmployee: "Partner Employee",
       admin: "Admin",
-      cliOnly: "CLI Only",
-      cliWeb: "CLI Web",
-      webOnly: "Web Only",
+      cliOff: "CLI Disabled",
+      aiToolOff: "AI Tool Disabled",
+      webOff: "Web Disabled",
     },
   },
 };

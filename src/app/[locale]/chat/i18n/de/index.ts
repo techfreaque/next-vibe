@@ -90,6 +90,21 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  aiTools: {
+    modal: {
+      title: "KI-Tools-Konfiguration",
+      description:
+        "Wählen Sie aus, welche KI-Tools der Assistent während der Konversation verwenden kann. Tools bieten Funktionen wie Websuche, Berechnungen und Datenzugriff.",
+      searchPlaceholder: "Tools durchsuchen...",
+      loading: "Tools werden geladen...",
+      noToolsFound: "Keine Tools entsprechen Ihrer Suche",
+      noToolsAvailable: "Noch keine KI-Tools gefunden. Tools werden hier automatisch angezeigt, sobald sie im System registriert sind.",
+      enableAll: "Alle sichtbaren Tools aktivieren",
+      disableAll: "Alle sichtbaren Tools deaktivieren",
+      footerInfo: "{{count}} von {{total}} Tools aktiviert",
+    },
+  },
+
   confirmations: {
     deleteMessage: "Möchten Sie diese Nachricht wirklich löschen?",
   },

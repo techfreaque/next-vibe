@@ -33,7 +33,7 @@ export function createTRPCHandler<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
   TFields,
 >(
   options: ApiHandlerOptions<
@@ -53,7 +53,7 @@ export function createTRPCHandler<
 
   return async (
     input: TRequestOutput & { urlVariables?: TUrlVariablesOutput },
-    ctx: TRPCContext<Record<string, string>, readonly (typeof UserRoleValue)[]>,
+    ctx: TRPCContext<Record<string, string>, readonly string[]>,
   ): Promise<TResponseOutput> => {
     try {
       // tRPC procedure execution - debug info available in endpoint logger

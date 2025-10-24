@@ -1,30 +1,31 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Div } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 export function LoadingIndicator(): JSX.Element {
   return (
-    <div className={cn("flex items-start gap-3", "animate-fade-in")}>
-      <div className="flex-1">
-        <div className="flex items-center gap-2">
-          <div
+    <Div className={cn("flex items-start gap-3", "animate-fade-in")}>
+      <Div className="flex-1">
+        <Div className="flex items-center gap-2">
+          <Div
             className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
             style={{ animationDelay: "0ms" }}
           />
-          <div
+          <Div
             className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
             style={{ animationDelay: "150ms" }}
           />
-          <div
+          <Div
             className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
             style={{ animationDelay: "300ms" }}
           />
-        </div>
+        </Div>
 
         {/* Fixed height container to maintain consistent spacing */}
-        <div className="h-8" />
-      </div>
-    </div>
+        <Div className="h-8" />
+      </Div>
+    </Div>
   );
 }

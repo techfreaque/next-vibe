@@ -90,6 +90,21 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  aiTools: {
+    modal: {
+      title: "Konfiguracja narzędzi AI",
+      description:
+        "Wybierz, które narzędzia AI asystent może używać podczas rozmowy. Narzędzia zapewniają funkcje takie jak wyszukiwanie w sieci, obliczenia i dostęp do danych.",
+      searchPlaceholder: "Szukaj narzędzi...",
+      loading: "Ładowanie narzędzi...",
+      noToolsFound: "Brak narzędzi pasujących do wyszukiwania",
+      noToolsAvailable: "Nie znaleziono jeszcze narzędzi AI. Narzędzia pojawią się tutaj automatycznie, gdy zostaną zarejestrowane w systemie.",
+      enableAll: "Włącz wszystkie widoczne narzędzia",
+      disableAll: "Wyłącz wszystkie widoczne narzędzia",
+      footerInfo: "{{count}} z {{total}} narzędzi włączonych",
+    },
+  },
+
   confirmations: {
     deleteMessage: "Czy na pewno chcesz usunąć tę wiadomość?",
   },

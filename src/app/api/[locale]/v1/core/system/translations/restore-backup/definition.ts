@@ -31,7 +31,7 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "translations", "restore-backup"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
 
   title: "app.api.v1.core.system.translations.restoreBackup.post.title",
   description:

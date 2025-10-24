@@ -20,7 +20,7 @@ import type { TRPCContext } from "./trpc-context";
  */
 const t = initTRPC
   .context<
-    TRPCContext<Record<string, string>, readonly (typeof UserRoleValue)[]>
+    TRPCContext<Record<string, string>, readonly string[]>
   >()
   .create({
     errorFormatter({ shape, error }) {
@@ -57,7 +57,7 @@ const isAuthenticated = middleware(async ({ ctx, next }) => {
     // eslint-disable-next-line no-restricted-syntax
     throw new TRPCError({
       code: "UNAUTHORIZED",
-      message: "error.unauthorized" as string,
+      message: "app.error.unauthorized" as string,
     });
   }
 
@@ -80,7 +80,7 @@ export const authenticatedProcedure = publicProcedure.use(isAuthenticated);
  * Creates middleware that checks for specific user roles
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export function requireRoles<TRoles extends readonly (typeof UserRoleValue)[]>(
+export function requireRoles<TRoles extends readonly string[]>(
   roles: TRoles,
   logger: EndpointLogger,
 ) {
@@ -92,7 +92,7 @@ export function requireRoles<TRoles extends readonly (typeof UserRoleValue)[]>(
       // eslint-disable-next-line no-restricted-syntax
       throw new TRPCError({
         code: "UNAUTHORIZED",
-        message: "error.unauthorized",
+        message: "app.error.unauthorized",
       });
     }
 

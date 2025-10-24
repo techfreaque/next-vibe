@@ -28,6 +28,45 @@ export const translations: typeof enTranslations = {
         title: "Ergebnis-Limit",
         description: "Maximale Anzahl der zurückzugebenden Ergebnisse",
       },
+      timePeriod: {
+        title: "Zeitraum",
+      },
+      dateRangePreset: {
+        title: "Datumsbereich-Voreinstellung",
+      },
+      taskName: {
+        title: "Task-Name",
+      },
+      taskStatus: {
+        title: "Task-Status",
+      },
+      taskPriority: {
+        title: "Task-Priorität",
+      },
+      healthStatus: {
+        title: "Gesundheitsstatus",
+      },
+      minDuration: {
+        title: "Mindestdauer",
+      },
+      maxDuration: {
+        title: "Maximaldauer",
+      },
+      includeDisabled: {
+        title: "Deaktivierte einbeziehen",
+      },
+      includeSystemTasks: {
+        title: "Systemtasks einbeziehen",
+      },
+      hasRecentFailures: {
+        title: "Hat kürzliche Fehler",
+      },
+      hasTimeout: {
+        title: "Hat Timeout",
+      },
+      search: {
+        title: "Suche",
+      },
     },
     period: {
       hour: "Stündlich",

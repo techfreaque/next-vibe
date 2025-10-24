@@ -31,15 +31,15 @@ export const {
   options: TRPCValidationOperationTypeOptions,
 } = createEnumOptions({
   VALIDATE_INTEGRATION:
-    "core.system.generators.generateTrpcRouter.validation.operations.validateIntegration",
+    "app.api.v1.core.system.generators.generateTrpcRouter.validation.operations.validateIntegration",
   VALIDATE_ROUTE_FILE:
-    "core.system.generators.generateTrpcRouter.validation.operations.validateRouteFile",
+    "app.api.v1.core.system.generators.generateTrpcRouter.validation.operations.validateRouteFile",
   GENERATE_REPORT:
-    "core.system.generators.generateTrpcRouter.validation.operations.generateReport",
+    "app.api.v1.core.system.generators.generateTrpcRouter.validation.operations.generateReport",
   FIX_ROUTES:
-    "core.system.generators.generateTrpcRouter.validation.operations.fixRoutes",
+    "app.api.v1.core.system.generators.generateTrpcRouter.validation.operations.fixRoutes",
   CHECK_ROUTER_EXISTS:
-    "core.system.generators.generateTrpcRouter.validation.operations.checkRouterExists",
+    "app.api.v1.core.system.generators.generateTrpcRouter.validation.operations.checkRouterExists",
 });
 
 /**
@@ -48,25 +48,25 @@ export const {
 export const { enum: ValidationSeverity, options: ValidationSeverityOptions } =
   createEnumOptions({
     ERROR:
-      "core.system.generators.generateTrpcRouter.validation.severity.error",
+      "app.api.v1.core.system.generators.generateTrpcRouter.validation.severity.error",
     WARNING:
-      "core.system.generators.generateTrpcRouter.validation.severity.warning",
-    INFO: "core.system.generators.generateTrpcRouter.validation.severity.info",
+      "app.api.v1.core.system.generators.generateTrpcRouter.validation.severity.warning",
+    INFO: "app.api.v1.core.system.generators.generateTrpcRouter.validation.severity.info",
   });
 
 /**
  * TRPC Integration Validation Endpoint Definition
  */
 const { POST } = createEndpoint({
-  title: "core.system.generators.generateTrpcRouter.validation.title",
+  title: "app.api.v1.core.system.generators.generateTrpcRouter.validation.title",
   description:
-    "core.system.generators.generateTrpcRouter.validation.description",
-  category: "core.system.generators.generateTrpcRouter.validation.category",
+    "app.api.v1.core.system.generators.generateTrpcRouter.validation.description",
+  category: "app.api.v1.core.system.generators.generateTrpcRouter.validation.category",
   tags: [
-    "core.system.generators.generateTrpcRouter.validation.tags.trpc",
-    "core.system.generators.generateTrpcRouter.validation.tags.validation",
+    "app.api.v1.core.system.generators.generateTrpcRouter.validation.tags.trpc",
+    "app.api.v1.core.system.generators.generateTrpcRouter.validation.tags.validation",
   ],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["trpc-validate", "validate-trpc"],
   method: Methods.POST,
   path: [
@@ -131,11 +131,11 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
           label:
-            "core.system.generators.generateTrpcRouter.validation.fields.operation.label",
+            "app.api.v1.core.system.generators.generateTrpcRouter.validation.fields.operation.label",
           description:
-            "core.system.generators.generateTrpcRouter.validation.fields.operation.description",
+            "app.api.v1.core.system.generators.generateTrpcRouter.validation.fields.operation.description",
           placeholder:
-            "core.system.generators.generateTrpcRouter.validation.fields.operation.placeholder",
+            "app.api.v1.core.system.generators.generateTrpcRouter.validation.fields.operation.placeholder",
           options: TRPCValidationOperationTypeOptions,
           layout: { columns: 12 },
         },
@@ -149,11 +149,11 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "core.system.generators.generateTrpcRouter.validation.fields.filePath.label",
+            "app.api.v1.core.system.generators.generateTrpcRouter.validation.fields.filePath.label",
           description:
-            "core.system.generators.generateTrpcRouter.validation.fields.filePath.description",
+            "app.api.v1.core.system.generators.generateTrpcRouter.validation.fields.filePath.description",
           placeholder:
-            "core.system.generators.generateTrpcRouter.validation.fields.filePath.placeholder",
+            "app.api.v1.core.system.generators.generateTrpcRouter.validation.fields.filePath.placeholder",
           layout: { columns: 12 },
         },
         z.string().optional().describe("Specific route file path to validate"),
@@ -163,11 +163,11 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.JSON,
           label:
-            "core.system.generators.generateTrpcRouter.validation.fields.options.label",
+            "app.api.v1.core.system.generators.generateTrpcRouter.validation.fields.options.label",
           description:
-            "core.system.generators.generateTrpcRouter.validation.fields.options.description",
+            "app.api.v1.core.system.generators.generateTrpcRouter.validation.fields.options.description",
           placeholder:
-            "core.system.generators.generateTrpcRouter.validation.fields.options.placeholder",
+            "app.api.v1.core.system.generators.generateTrpcRouter.validation.fields.options.placeholder",
           layout: { columns: 12 },
         },
         z
@@ -200,7 +200,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "core.system.generators.generateTrpcRouter.validation.response.success.label",
+            "app.api.v1.core.system.generators.generateTrpcRouter.validation.response.success.label",
         },
         z.boolean().describe("Whether the TRPC validation was successful"),
       ),
@@ -208,7 +208,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "core.system.generators.generateTrpcRouter.validation.response.operation.label",
+            "app.api.v1.core.system.generators.generateTrpcRouter.validation.response.operation.label",
         },
         z.string().describe("The validation operation that was executed"),
       ),
@@ -216,7 +216,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.JSON,
           content:
-            "core.system.generators.generateTrpcRouter.validation.response.result.label",
+            "app.api.v1.core.system.generators.generateTrpcRouter.validation.response.result.label",
         },
         z
           .object({

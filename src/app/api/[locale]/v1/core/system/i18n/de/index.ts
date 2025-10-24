@@ -16,7 +16,55 @@ export const translations: typeof enTranslations = {
   check: checkTranslations,
   cli: unifiedUiTranslations.cli, // Alias for CLI translations
   db: dbTranslations,
+  dev: {
+    category: "Entwicklung",
+    typecheck: {
+      title: "Typprüfung überspringen",
+      description: "TypeScript-Typprüfung überspringen",
+      success: {
+        title: "Typprüfung bestanden",
+        description: "TypeScript-Typprüfung erfolgreich abgeschlossen",
+      },
+    },
+    lint: {
+      container: {
+        title: "Generator-Optionen",
+      },
+    },
+  },
   generators: generatorsTranslations,
+  sideTasks: {
+    category: "Nebenaufgaben",
+    generators: {
+      generateTrpcRouter: {
+        title: "tRPC-Router generieren",
+        description: "tRPC-Router aus API-Endpunkten generieren",
+        tag: "tRPC",
+        container: {
+          title: "tRPC-Router-Generierung",
+          description: "tRPC-Router-Konfiguration generieren",
+        },
+        errors: {
+          validation: {
+            title: "Validierungsfehler",
+            description: "Ungültige tRPC-Router-Generierungsparameter",
+          },
+          internal: {
+            title: "Interner Fehler",
+            description: "Bei der tRPC-Router-Generierung ist ein Fehler aufgetreten",
+          },
+          unauthorized: {
+            title: "Nicht autorisiert",
+            description: "Sie haben keine Berechtigung, tRPC-Router zu generieren",
+          },
+        },
+        success: {
+          title: "tRPC-Router generiert",
+          description: "tRPC-Router wurde erfolgreich generiert",
+        },
+      },
+    },
+  },
   guard: guardTranslations,
   launchpad: launchpadTranslations,
   releaseTool: releaseToolTranslations,

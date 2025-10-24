@@ -14,9 +14,11 @@ export const {
   PARTNER_EMPLOYEE:
     "app.api.v1.core.user.userRoles.enums.userRole.partnerEmployee",
   ADMIN: "app.api.v1.core.user.userRoles.enums.userRole.admin",
-  CLI_ONLY: "app.api.v1.core.user.userRoles.enums.userRole.cliOnly",
-  CLI_WEB: "app.api.v1.core.user.userRoles.enums.userRole.cliWeb",
-  WEB_ONLY: "app.api.v1.core.user.userRoles.enums.userRole.webOnly",
+  CLI_OFF: "app.api.v1.core.user.userRoles.enums.userRole.cliOff",
+  AI_TOOL_OFF: "app.api.v1.core.user.userRoles.enums.userRole.aiToolOff",
+  WEB_OFF: "app.api.v1.core.user.userRoles.enums.userRole.webOff",
+
+
 });
 
 // Create DB enum array for Drizzle
@@ -26,7 +28,7 @@ export const UserRoleDB = [
   UserRole.PARTNER_ADMIN,
   UserRole.PARTNER_EMPLOYEE,
   UserRole.ADMIN,
-  UserRole.CLI_ONLY,
-  UserRole.CLI_WEB,
-  UserRole.WEB_ONLY,
+  UserRole.CLI_OFF,
+  UserRole.AI_TOOL_OFF,
+  UserRole.WEB_OFF,
 ] as const;

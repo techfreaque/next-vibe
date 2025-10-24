@@ -13,7 +13,7 @@ import type { CreateApiEndpoint } from "../endpoint-types/endpoint/create";
 import { endpointHandler } from "./endpoint-handler";
 import type { EndpointHandlerConfig, EndpointsHandlerReturn } from "./types";
 
-export function endpointsHandler<T>(
+export function endpointsHandler<const T>(
   config: EndpointHandlerConfig<T>,
 ): Prettify<EndpointsHandlerReturn<T>> {
   const { endpoint: definitions, ...methodHandlers } = config;
@@ -22,7 +22,7 @@ export function endpointsHandler<T>(
   const availableMethods = Object.keys(
     definitions as Record<
       string,
-      CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
+      CreateApiEndpoint<string, Methods, readonly string[], any>
     >,
   ).filter((key) => Object.values(Methods).includes(key as Methods)) as Array<
     keyof T & Methods

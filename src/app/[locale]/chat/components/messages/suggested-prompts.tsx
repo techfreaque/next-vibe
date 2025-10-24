@@ -1,6 +1,18 @@
 "use client";
 
-import { MoreHorizontal } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  Div,
+  H1,
+  P,
+  ScrollArea,
+  Span,
+} from "next-vibe-ui/ui";
+import { MoreHorizontal } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
@@ -13,14 +25,6 @@ import {
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  ScrollArea,
-} from "next-vibe-ui/ui";
 
 interface SuggestedPromptsProps {
   onSelectPrompt: (
@@ -74,13 +78,13 @@ export function SuggestedPrompts({
   };
 
   return (
-    <div className="w-full space-y-6 sm:space-y-8">
-      <h1 className="text-3xl sm:text-4xl font-semibold text-center">
+    <Div className="w-full space-y-6 sm:space-y-8">
+      <H1 className="text-3xl sm:text-4xl font-semibold text-center">
         {t(getTitleKey())}
-      </h1>
+      </H1>
 
       {/* Persona Tabs */}
-      <div className="flex gap-2 justify-center flex-wrap">
+      <Div className="flex gap-2 justify-center flex-wrap">
         {FEATURED_PERSONAS.map((persona) => (
           <button
             key={persona.id}
@@ -94,7 +98,7 @@ export function SuggestedPrompts({
             {React.createElement(getIconComponent(persona.icon), {
               className: "text-base sm:text-lg",
             })}
-            <span className="font-medium hidden sm:inline">{persona.name}</span>
+            <Span className="font-medium hidden sm:inline">{persona.name}</Span>
           </button>
         ))}
 
@@ -103,9 +107,9 @@ export function SuggestedPrompts({
           <DialogTrigger asChild>
             <button className="px-3 sm:px-4 py-2 rounded-full transition-all flex items-center gap-2 hover:bg-accent border border-transparent text-sm sm:text-base">
               <MoreHorizontal className="h-4 w-4 sm:h-5 sm:w-5" />
-              <span className="font-medium hidden sm:inline">
+              <Span className="font-medium hidden sm:inline">
                 {t("app.chat.suggestedPrompts.more")}
-              </span>
+              </Span>
             </button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[80vh]">
@@ -115,7 +119,7 @@ export function SuggestedPrompts({
               </DialogTitle>
             </DialogHeader>
             <ScrollArea className="h-[60vh] pr-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {DEFAULT_PERSONAS.map((persona) => (
                   <button
                     key={persona.id}
@@ -126,27 +130,27 @@ export function SuggestedPrompts({
                         : "border-border hover:border-purple-500/50 hover:bg-accent"
                     }`}
                   >
-                    <div className="flex items-center gap-3 mb-2">
+                    <Div className="flex items-center gap-3 mb-2">
                       {React.createElement(getIconComponent(persona.icon), {
                         className: "text-2xl",
                       })}
-                      <span className="font-semibold">{persona.name}</span>
-                    </div>
+                      <Span className="font-semibold">{persona.name}</Span>
+                    </Div>
                     {persona.description && (
-                      <p className="text-sm text-muted-foreground">
+                      <P className="text-sm text-muted-foreground">
                         {persona.description}
-                      </p>
+                      </P>
                     )}
                   </button>
                 ))}
-              </div>
+              </Div>
             </ScrollArea>
           </DialogContent>
         </Dialog>
-      </div>
+      </Div>
 
       {/* Suggested Prompts for selected persona */}
-      <div className="space-y-3">
+      <Div className="space-y-3">
         {prompts.length > 0 ? (
           prompts.map((prompt, index) => (
             <button
@@ -158,11 +162,11 @@ export function SuggestedPrompts({
             </button>
           ))
         ) : (
-          <p className="text-center text-muted-foreground py-8">
+          <P className="text-center text-muted-foreground py-8">
             {t("app.chat.suggestedPrompts.noPrompts")}
-          </p>
+          </P>
         )}
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 }

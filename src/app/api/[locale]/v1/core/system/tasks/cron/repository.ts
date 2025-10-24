@@ -112,7 +112,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "error.errorTypes.database_error",
+        "app.error.errorTypes.database_error",
         ErrorResponseTypes.DATABASE_ERROR,
         { message: parsedError.message },
       );
@@ -140,7 +140,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "error.errorTypes.database_error",
+        "app.error.errorTypes.database_error",
         ErrorResponseTypes.DATABASE_ERROR,
         { message: parsedError.message },
       );
@@ -168,7 +168,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "error.errorTypes.database_error",
+        "app.error.errorTypes.database_error",
         ErrorResponseTypes.DATABASE_ERROR,
         { message: parsedError.message },
       );
@@ -194,7 +194,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "error.errorTypes.database_error",
+        "app.error.errorTypes.database_error",
         ErrorResponseTypes.DATABASE_ERROR,
         { message: parsedError.message },
       );
@@ -216,7 +216,7 @@ export class CronTasksRepository implements ICronTasksRepository {
 
       if (!updatedTask) {
         return createErrorResponse(
-          "error.errorTypes.not_found",
+          "app.error.errorTypes.not_found",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -229,7 +229,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "common.cronRepositoryTaskUpdateFailed",
+        "app.api.v1.core.system.tasks.common.cronRepositoryTaskUpdateFailed",
         ErrorResponseTypes.DATABASE_ERROR,
         { error: parsedError.message, taskId: id },
       );
@@ -252,7 +252,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "common.cronRepositoryTaskDeleteFailed",
+        "app.api.v1.core.system.tasks.common.cronRepositoryTaskDeleteFailed",
         ErrorResponseTypes.DATABASE_ERROR,
         { error: parsedError.message, taskId: id },
       );
@@ -279,7 +279,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "common.cronRepositoryExecutionCreateFailed",
+        "app.api.v1.core.system.tasks.common.cronRepositoryExecutionCreateFailed",
         ErrorResponseTypes.DATABASE_ERROR,
         { error: parsedError.message, taskId: execution.taskId },
       );
@@ -304,7 +304,7 @@ export class CronTasksRepository implements ICronTasksRepository {
 
       if (!updatedExecution) {
         return createErrorResponse(
-          "error.errorTypes.not_found",
+          "app.error.errorTypes.not_found",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -317,7 +317,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "common.cronRepositoryExecutionUpdateFailed",
+        "app.api.v1.core.system.tasks.common.cronRepositoryExecutionUpdateFailed",
         ErrorResponseTypes.DATABASE_ERROR,
         { error: parsedError.message, executionId: id },
       );
@@ -347,7 +347,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "common.cronRepositoryExecutionsFetchFailed",
+        "app.api.v1.core.system.tasks.common.cronRepositoryExecutionsFetchFailed",
         ErrorResponseTypes.DATABASE_ERROR,
         { error: parsedError.message, taskId, limit },
       );
@@ -374,7 +374,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "common.cronRepositoryRecentExecutionsFetchFailed",
+        "app.api.v1.core.system.tasks.common.cronRepositoryRecentExecutionsFetchFailed",
         ErrorResponseTypes.DATABASE_ERROR,
         { error: parsedError.message, limit },
       );
@@ -397,7 +397,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "common.cronRepositorySchedulesFetchFailed",
+        "app.api.v1.core.system.tasks.common.cronRepositorySchedulesFetchFailed",
         ErrorResponseTypes.DATABASE_ERROR,
         { error: parsedError.message },
       );
@@ -422,7 +422,7 @@ export class CronTasksRepository implements ICronTasksRepository {
 
       if (!updatedSchedule) {
         return createErrorResponse(
-          "error.errorTypes.not_found",
+          "app.error.errorTypes.not_found",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -435,7 +435,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "common.cronRepositoryScheduleUpdateFailed",
+        "app.api.v1.core.system.tasks.common.cronRepositoryScheduleUpdateFailed",
         ErrorResponseTypes.DATABASE_ERROR,
         { error: parsedError.message, taskId },
       );
@@ -473,7 +473,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "common.cronRepositoryStatisticsFetchFailed",
+        "app.api.v1.core.system.tasks.common.cronRepositoryStatisticsFetchFailed",
         ErrorResponseTypes.DATABASE_ERROR,
         { error: parsedError.message },
       );

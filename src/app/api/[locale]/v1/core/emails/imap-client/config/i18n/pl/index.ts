@@ -12,6 +12,12 @@ export const translations: typeof enTranslations = {
     description: "Skonfiguruj ustawienia klienta IMAP",
   },
   response: {
+    host: "Host",
+    port: "Port",
+    username: "Nazwa użytkownika",
+    password: "Hasło",
+    tls: "TLS",
+    autoReconnect: "Automatyczne ponowne połączenie",
     serverEnabled: "Serwer włączony",
     maxConnections: "Maks. połączeń",
     connectionTimeout: "Timeout połączenia",
@@ -85,6 +91,10 @@ export const translations: typeof enTranslations = {
   update: {
     title: "Aktualizuj konfigurację IMAP",
     description: "Zaktualizuj ustawienia konfiguracji klienta IMAP",
+    success: {
+      title: "Konfiguracja zaktualizowana",
+      description: "Konfiguracja IMAP została pomyślnie zaktualizowana",
+    },
     form: {
       title: "Aktualizuj konfigurację",
       description: "Zmodyfikuj ustawienia konfiguracji IMAP",

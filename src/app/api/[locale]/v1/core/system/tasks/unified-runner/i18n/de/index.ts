@@ -2,6 +2,20 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   description: "Führt Cron-Tasks aus und verwaltet Side-Tasks",
+  common: {
+    taskName: "Aufgabenname",
+    taskNamesDescription: "Namen der zu filternden Aufgaben",
+    detailed: "Detailliert",
+    detailedDescription: "Detaillierte Informationen einbeziehen",
+    active: "Aktiv",
+    total: "Gesamt",
+    uptime: "Betriebszeit",
+    id: "ID",
+    status: "Status",
+    lastRun: "Letzter Lauf",
+    nextRun: "Nächster Lauf",
+    schedule: "Zeitplan",
+  },
   post: {
     title: "Einheitlicher Task Runner",
     description:

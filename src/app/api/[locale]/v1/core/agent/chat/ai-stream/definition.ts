@@ -280,6 +280,18 @@ const { POST } = createEndpoint({
         },
         z.boolean().optional().default(false),
       ),
+      enabledToolIds: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label:
+            "app.api.v1.core.agent.chat.aiStream.post.enabledToolIds.label",
+          description:
+            "app.api.v1.core.agent.chat.aiStream.post.enabledToolIds.description",
+          layout: { columns: 8 },
+        },
+        z.array(z.string()).optional().default([]),
+      ),
 
       // === RESUMABLE STREAM SUPPORT ===
       resumeToken: requestDataField(

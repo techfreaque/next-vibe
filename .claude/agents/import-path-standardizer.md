@@ -309,7 +309,7 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { rawPool } from "@/app/api/[locale]/v1/core/system/db";
 
 // ✅ Database utilities
-import { withTransaction } from "next-vibe/server/db/repository-helpers";
+import { withTransaction } from "@/app/api/[locale]/v1/core/system/db/utils/repository-helpers";
 ```
 
 **Translation Functions:**

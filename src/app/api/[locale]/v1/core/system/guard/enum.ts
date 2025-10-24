@@ -47,11 +47,11 @@ export const { enum: SandboxUserType, options: SandboxUserTypeOptions } =
  */
 export const { enum: GuardStatus, options: GuardStatusOptions } =
   createEnumOptions({
-    CREATED: "app.api.v1.core.system.guard.status.created",
-    RUNNING: "app.api.v1.core.system.guard.status.running",
-    STOPPED: "app.api.v1.core.system.guard.status.stopped",
-    ERROR: "app.api.v1.core.system.guard.status.error",
-    DESTROYED: "app.api.v1.core.system.guard.status.destroyed",
+    CREATED: "app.api.v1.core.system.guard.statusValues.created",
+    RUNNING: "app.api.v1.core.system.guard.statusValues.running",
+    STOPPED: "app.api.v1.core.system.guard.statusValues.stopped",
+    ERROR: "app.api.v1.core.system.guard.statusValues.error",
+    DESTROYED: "app.api.v1.core.system.guard.statusValues.destroyed",
   });
 
 /**

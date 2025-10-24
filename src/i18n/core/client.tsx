@@ -3,7 +3,7 @@ import type { Route } from "next";
 import type { RouteType } from "next/dist/lib/load-custom-routes";
 import { LOCALE_COOKIE_NAME } from "next-vibe/shared/constants";
 import { storage } from "next-vibe-ui/ui/storage";
-import { usePathname, useRouter } from "next-vibe-ui/hooks/use-navigation";
+import { usePathname, useRouter } from "next-vibe-ui/hooks";
 import type { JSX, ReactNode } from "react";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
@@ -169,8 +169,10 @@ export function TranslationProvider({
         setCookie(LOCALE_COOKIE_NAME, currentLocale);
       }
 
-      // Update document language for accessibility
-      document.documentElement.lang = language;
+      // Update document language for accessibility (web only)
+      if (typeof document !== "undefined") {
+        document.documentElement.lang = language;
+      }
     }
     void initializeLocale();
   }, [currentLocale, language]);

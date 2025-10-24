@@ -35,7 +35,7 @@ const { POST } = createEndpoint({
     "app.api.v1.core.agent.chat.tags.credits",
     "app.api.v1.core.agent.chat.tags.balance",
   ],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   fields: objectField(
     {
@@ -187,7 +187,7 @@ const { POST } = createEndpoint({
   },
 });
 
-export default { POST };
+export default { POST } as const;
 
 export type CreditsPurchasePostRequestOutput = typeof POST.types.RequestOutput;
 export type CreditsPurchasePostResponseOutput =

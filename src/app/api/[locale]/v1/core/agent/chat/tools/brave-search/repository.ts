@@ -11,6 +11,20 @@ import { z } from "zod";
 import { env } from "@/config/env";
 
 /**
+ * Search error and success messages for AI tool responses
+ * These are technical messages for AI, not user-facing translations
+ */
+const SEARCH_MESSAGES = {
+  QUERY_REQUIRED:
+    "Error: Search query is required but was not provided by the model.",
+  NO_RESULTS_PREFIX: "No results found for",
+  UNKNOWN_ERROR: "Unknown error occurred",
+  SEARCH_FAILED_PREFIX: "Search failed",
+  FOUND_RESULTS_PREFIX: "Found",
+  FOUND_RESULTS_SUFFIX: "results for",
+} as const;
+
+/**
  * Brave Search API Response Types
  */
 interface BraveWebResult {
@@ -174,7 +188,7 @@ class BraveSearchService {
       const response = await fetch(url, {
         method: "GET",
         headers: {
-          Accept: "application/json",
+          "Accept": "application/json",
           "Accept-Encoding": "gzip",
           "X-Subscription-Token": env.BRAVE_SEARCH_API_KEY,
         },
@@ -427,68 +441,35 @@ Use this when:
     freshness?: "pd" | "pw" | "pm" | "py";
   }) => {
     try {
-      console.log("[BRAVE SEARCH TOOL] Executing with params:", {
-        query,
-        maxResults,
-        includeNews,
-        freshness,
-      });
-
       // Validate that query is provided
       if (!query || typeof query !== "string" || query.trim() === "") {
-        console.log("[BRAVE SEARCH TOOL] Query validation failed");
         return {
           success: false,
-          // eslint-disable-next-line i18next/no-literal-string
-          message:
-            "Error: Search query is required but was not provided by the model.",
+          message: SEARCH_MESSAGES.QUERY_REQUIRED,
           query: query || "",
           results: [],
         };
       }
 
-      console.log("[BRAVE SEARCH TOOL] Getting search service");
       const searchService = getBraveSearchService();
-      console.log("[BRAVE SEARCH TOOL] Calling search API");
       const searchResults = await searchService.search(query, {
         maxResults,
         includeNews,
         freshness,
       });
-      console.log("[BRAVE SEARCH TOOL] Search completed:", {
-        resultCount: searchResults.results.length,
-      });
 
       if (searchResults.results.length === 0) {
-        console.log("[BRAVE SEARCH TOOL] No results found");
         return {
           success: false,
-          // eslint-disable-next-line i18next/no-literal-string
-          message: `No results found for: ${query}`,
+          message: `${SEARCH_MESSAGES.NO_RESULTS_PREFIX}: ${query}`,
           query,
           results: [],
         };
       }
 
-      console.log("[BRAVE SEARCH TOOL] Building success result object");
-      console.log("[BRAVE SEARCH TOOL] searchResults.query:", searchResults.query);
-      console.log(
-        "[BRAVE SEARCH TOOL] searchResults.results.length:",
-        searchResults.results.length,
-      );
-      console.log(
-        "[BRAVE SEARCH TOOL] searchResults.cached:",
-        searchResults.cached,
-      );
-      console.log(
-        "[BRAVE SEARCH TOOL] searchResults.timestamp:",
-        searchResults.timestamp,
-      );
-
       const successResult = {
         success: true,
-        // eslint-disable-next-line i18next/no-literal-string
-        message: `Found ${searchResults.results.length} results for: ${query}`,
+        message: `${SEARCH_MESSAGES.FOUND_RESULTS_PREFIX} ${searchResults.results.length} ${SEARCH_MESSAGES.FOUND_RESULTS_SUFFIX}: ${query}`,
         query: searchResults.query,
         results: searchResults.results.map((result) => ({
           title: result.title,
@@ -500,39 +481,20 @@ Use this when:
         cached: searchResults.cached,
         timestamp: new Date(searchResults.timestamp).toISOString(),
       };
-      console.log("[BRAVE SEARCH TOOL] Success result built:", {
-        success: successResult.success,
-        message: successResult.message,
-        resultCount: successResult.results.length,
-        hasTimestamp: !!successResult.timestamp,
-        hasCached: successResult.cached !== undefined,
-      });
-      console.log(
-        "[BRAVE SEARCH TOOL] About to return result, type:",
-        typeof successResult,
-      );
-      console.log(
-        "[BRAVE SEARCH TOOL] Result JSON:",
-        JSON.stringify(successResult),
-      );
       return successResult;
     } catch (error) {
-      console.error("[BRAVE SEARCH TOOL] Error occurred:", error);
       const searchService = getBraveSearchService();
       const braveError =
         error instanceof Error
           ? searchService.handleError(error)
-          : // eslint-disable-next-line i18next/no-literal-string
-            new BraveSearchError("Unknown error occurred");
+          : new BraveSearchError(SEARCH_MESSAGES.UNKNOWN_ERROR);
 
       const errorResult = {
         success: false,
-        // eslint-disable-next-line i18next/no-literal-string
-        message: `Search failed: ${braveError.message}`,
+        message: `${SEARCH_MESSAGES.SEARCH_FAILED_PREFIX}: ${braveError.message}`,
         query,
         results: [],
       };
-      console.log("[BRAVE SEARCH TOOL] Returning error result:", errorResult);
       return errorResult;
     }
   },

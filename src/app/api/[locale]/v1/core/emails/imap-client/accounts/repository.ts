@@ -7,7 +7,7 @@ import "server-only";
 
 import { and, asc, count, desc, eq, ilike, ne, or } from "drizzle-orm";
 import Imap from "imap";
-import { withTransaction } from "next-vibe/server/db/repository-helpers";
+import { withTransaction } from "@";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,

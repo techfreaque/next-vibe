@@ -1,7 +1,8 @@
 "use client";
 
-import { GitBranch, RotateCcw, Trash2 } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
+import { Div } from "next-vibe-ui/ui";
+import { GitBranch, RotateCcw, Trash2 } from "next-vibe-ui/ui/icons";
 import type React from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
@@ -37,7 +38,7 @@ export function UserMessageActions({
   const isTouch = useTouchDevice();
 
   return (
-    <div
+    <Div
       className={cn(
         "flex items-center gap-1",
         "transition-opacity duration-150",
@@ -75,6 +76,6 @@ export function UserMessageActions({
           variant="destructive"
         />
       )}
-    </div>
+    </Div>
   );
 }

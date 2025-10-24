@@ -1,6 +1,7 @@
 "use client";
 
-import { Camera, Loader2 } from "lucide-react";
+import { Button, Div } from "next-vibe-ui/ui";
+import { Camera, Loader2 } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
@@ -8,11 +9,11 @@ import type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks"
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { Button } from "next-vibe-ui/ui";
 
 import { Logo } from "../../../_components/nav/logo";
 import { DOM_IDS, LAYOUT } from "../../lib/config/constants";
 import type { ChatMessage, ChatThread, ModelId, ViewMode } from "../../types";
+import { AIToolsModal } from "../ai-tools-modal";
 import { ChatInput } from "../input/chat-input";
 import { ChatMessages } from "../messages/chat-messages";
 import { SuggestedPrompts } from "../messages/suggested-prompts";
@@ -92,6 +93,7 @@ export function ChatArea({
   const [inputHeight, setInputHeight] = useState<number>(
     LAYOUT.DEFAULT_INPUT_HEIGHT,
   );
+  const [isToolsModalOpen, setIsToolsModalOpen] = useState(false);
 
   // Handle suggested prompt selection - insert into input and change persona/model
   const handleSuggestedPromptSelect = useCallback(
@@ -150,12 +152,12 @@ export function ChatArea({
   }, [onScreenshot, isCapturingScreenshot]);
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 relative w-full h-full">
+    <Div className="flex-1 flex flex-col min-w-0 relative w-full h-full">
       {/* View Mode Toggle & Screenshot - Positioned absolutely at top right (matching TopBar style) */}
       {/* z-40: Above input (z-20), below sidebar on mobile (z-50), below top bar (z-50) */}
       {/* Only show when there are messages in the thread */}
       {messages.length > 0 && (onViewModeChange || onScreenshot) && (
-        <div className="absolute top-4 right-4 z-40 flex gap-1">
+        <Div className="absolute top-4 right-4 z-40 flex gap-1">
           {onViewModeChange && (
             <ViewModeToggle
               mode={viewMode}
@@ -183,27 +185,27 @@ export function ChatArea({
               )}
             </Button>
           )}
-        </div>
+        </Div>
       )}
 
       {/* Logo - Only show in linear view (ChatGPT style) */}
       {viewMode === "linear" && messages.length > 0 && (
-        <div className="w-full h-0">
-          <div className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-15 space-y-5">
-            <div className="max-w-[30%] h-[50px] flex bg-background/80 backdrop-blur-xl rounded-lg p-2 shadow-sm border border-border/20">
+        <Div className="w-full h-0">
+          <Div className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-15 space-y-5">
+            <Div className="max-w-[30%] h-[50px] flex bg-background/80 backdrop-blur-xl rounded-lg p-2 shadow-sm border border-border/20">
               <Logo
                 locale={locale}
                 pathName=""
                 className="w-full h-auto"
                 linkClassName="my-auto"
               />
-            </div>
-          </div>
-        </div>
+            </Div>
+          </Div>
+        </Div>
       )}
 
       {/* Messages Area - Full height, scrollable inside */}
-      <div className="flex-1 overflow-hidden min-h-0">
+      <Div className="flex-1 overflow-hidden min-h-0">
         {thread ? (
           <ChatMessages
             thread={thread}
@@ -232,17 +234,17 @@ export function ChatArea({
           />
         ) : (
           // Empty state for new threads - show suggestions
-          <div
+          <Div
             className="h-full overflow-y-auto scroll-smooth scrollbar-thin scrollbar-track-transparent scrollbar-thumb-blue-400/30 hover:scrollbar-thumb-blue-500/50 scrollbar-thumb-rounded-full"
             id={DOM_IDS.MESSAGES_CONTAINER}
           >
-            <div
+            <Div
               className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pt-15 space-y-5"
               style={{
                 paddingBottom: `${inputHeight + LAYOUT.MESSAGES_BOTTOM_PADDING}px`,
               }}
             >
-              <div
+              <Div
                 className="flex items-center justify-center"
                 style={{ minHeight: `${LAYOUT.SUGGESTIONS_MIN_HEIGHT}vh` }}
               >
@@ -251,20 +253,20 @@ export function ChatArea({
                   locale={locale}
                   rootFolderId={rootFolderId}
                 />
-              </div>
-            </div>
-          </div>
+              </Div>
+            </Div>
+          </Div>
         )}
-      </div>
+      </Div>
 
       {/* Input Area - Positioned absolutely at bottom with max-width */}
       {/* z-20: Above messages, below sidebar on mobile (z-50), below top bar (z-50) */}
       {/* Always show input, even for new threads */}
-      <div
+      <Div
         ref={inputContainerRef}
         className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none"
       >
-        <div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pointer-events-auto">
+        <Div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pointer-events-auto">
           <ChatInput
             ref={inputRef}
             value={input}
@@ -279,11 +281,22 @@ export function ChatArea({
             onPersonaChange={onPersonaChange}
             onModelChange={onModelChange}
             onEnableSearchChange={onEnableSearchChange}
+            onOpenToolsModal={() => setIsToolsModalOpen(true)}
             locale={locale}
             logger={logger}
           />
-        </div>
-      </div>
-    </div>
+        </Div>
+      </Div>
+
+      {/* AI Tools Modal */}
+      <AIToolsModal
+        open={isToolsModalOpen}
+        onOpenChange={setIsToolsModalOpen}
+        enabledToolIds={chat.enabledToolIds}
+        onToolsChange={chat.setEnabledToolIds}
+        locale={locale}
+        logger={logger}
+      />
+    </Div>
   );
 }

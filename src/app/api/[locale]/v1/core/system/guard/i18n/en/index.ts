@@ -29,7 +29,7 @@ export const translations = {
     restrictedUser: "Restricted User",
     chrootUser: "Chroot User",
   },
-  status: {
+  statusValues: {
     created: "Created",
     running: "Running",
     stopped: "Stopped",

@@ -8,7 +8,7 @@ import "server-only";
 
 import { and, desc, eq, isNull, or, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { env } from "next-vibe/server/env";
+import { env } from "@/config/env";
 import { LEAD_ID_COOKIE_NAME } from "next-vibe/shared/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {

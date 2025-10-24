@@ -134,6 +134,16 @@ export const translations = {
       nurture: "Nurture",
       reactivation: "Reactivation",
     },
+    // Country options
+    countries: {
+      de: "Germany",
+      pl: "Poland",
+    },
+    // Language options
+    languages: {
+      de: "German",
+      pl: "Polish",
+    },
     // Rate limiting and error messages
     errors: {
       rateLimit: {

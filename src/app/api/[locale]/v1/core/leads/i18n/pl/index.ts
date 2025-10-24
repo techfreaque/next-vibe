@@ -241,6 +241,19 @@ export const translations: typeof enTranslations = {
     },
   },
   leadsErrors: {
+    batch: {
+      update: {
+        error: {
+          validation: {
+            title: "Nieprawidłowe żądanie aktualizacji wsadowej",
+          },
+          server: {
+            title: "Błąd serwera podczas wsadowej aktualizacji leadów",
+          },
+          default: "Błąd podczas wsadowej aktualizacji leadów",
+        },
+      },
+    },
     leads: {
       get: {
         error: {

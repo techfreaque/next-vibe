@@ -240,6 +240,19 @@ export const translations = {
     },
   },
   leadsErrors: {
+    batch: {
+      update: {
+        error: {
+          validation: {
+            title: "Invalid batch update request",
+          },
+          server: {
+            title: "Server error updating leads in batch",
+          },
+          default: "Error updating leads in batch",
+        },
+      },
+    },
     leads: {
       get: {
         error: {

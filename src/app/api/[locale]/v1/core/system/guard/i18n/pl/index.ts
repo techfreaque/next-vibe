@@ -30,7 +30,7 @@ export const translations: typeof enTranslations = {
     restrictedUser: "Ograniczony użytkownik",
     chrootUser: "Użytkownik Chroot",
   },
-  status: {
+  statusValues: {
     created: "Utworzono",
     running: "Działa",
     stopped: "Zatrzymano",

@@ -1,17 +1,20 @@
 "use client";
 
-import { ChevronDown, ChevronRight, Search } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  Div,
+  Pre,
+  Span,
+} from "next-vibe-ui/ui";
+import { ChevronDown, ChevronRight, Search } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import { useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "next-vibe-ui/ui/collapsible";
 
 import type { ToolCall } from "../../types";
 
@@ -35,9 +38,9 @@ export function ToolCallDisplay({
   }
 
   return (
-    <div className="mb-3">
+    <Div className="mb-3">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <div
+        <Div
           className={cn(
             "rounded-lg border transition-all",
             isOpen
@@ -59,72 +62,72 @@ export function ToolCallDisplay({
                 <ChevronRight className="h-4 w-4 flex-shrink-0" />
               )}
               <Search className="h-4 w-4 flex-shrink-0" />
-              <span>
+              <Span>
                 {toolCalls.length === 1
                   ? t("app.chat.toolCall.search.title")
                   : t("app.chat.toolCall.multiple", {
                       count: toolCalls.length,
                     })}
-              </span>
+              </Span>
               {!isOpen &&
                 toolCalls.length === 1 &&
                 toolCalls[0]?.args.query &&
                 typeof toolCalls[0].args.query === "string" && (
-                  <span className="text-muted-foreground text-xs truncate">
+                  <Span className="text-muted-foreground text-xs truncate">
                     - {toolCalls[0].args.query}
-                  </span>
+                  </Span>
                 )}
             </button>
           </CollapsibleTrigger>
 
           {/* Content - Collapsible */}
           <CollapsibleContent>
-            <div className="px-3 pb-2 space-y-2">
+            <Div className="px-3 pb-2 space-y-2">
               {toolCalls.map((toolCall, index) => (
-                <div
+                <Div
                   key={index}
                   className="flex items-start gap-2 px-3 py-2 rounded-md bg-background/50 border border-border/50 text-sm"
                 >
                   {/* Tool icon */}
-                  <div className="flex-shrink-0 mt-0.5">
+                  <Div className="flex-shrink-0 mt-0.5">
                     {toolCall.toolName === "search" ? (
                       <Search className="h-4 w-4 text-blue-400" />
                     ) : (
                       // eslint-disable-next-line i18next/no-literal-string
-                      <span className="text-blue-400">🔧</span>
+                      <Span className="text-blue-400">🔧</Span>
                     )}
-                  </div>
+                  </Div>
 
                   {/* Tool info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-blue-400">
+                  <Div className="flex-1 min-w-0">
+                    <Div className="font-medium text-blue-400">
                       {toolCall.toolName === "search"
                         ? t("app.chat.toolCall.search.title")
                         : toolCall.toolName}
-                    </div>
-                    <div className="text-muted-foreground text-xs mt-1">
+                    </Div>
+                    <Div className="text-muted-foreground text-xs mt-1">
                       {toolCall.toolName === "search" &&
                       toolCall.args.query &&
                       typeof toolCall.args.query === "string" ? (
-                        <span>
+                        <Span>
                           {t("app.chat.toolCall.search.query")}:{" "}
-                          <span className="text-foreground/80">
+                          <Span className="text-foreground/80">
                             {toolCall.args.query}
-                          </span>
-                        </span>
+                          </Span>
+                        </Span>
                       ) : (
-                        <pre className="text-xs overflow-x-auto">
+                        <Pre className="text-xs overflow-x-auto">
                           {JSON.stringify(toolCall.args, null, 2)}
-                        </pre>
+                        </Pre>
                       )}
-                    </div>
-                  </div>
-                </div>
+                    </Div>
+                  </Div>
+                </Div>
               ))}
-            </div>
+            </Div>
           </CollapsibleContent>
-        </div>
+        </Div>
       </Collapsible>
-    </div>
+    </Div>
   );
 }

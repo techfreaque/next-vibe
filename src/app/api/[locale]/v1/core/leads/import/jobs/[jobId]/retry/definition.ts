@@ -34,7 +34,7 @@ const { POST } = createEndpoint({
     "app.api.v1.core.leads.tags.leads",
     "app.api.v1.core.leads.tags.management",
   ],
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [UserRole.ADMIN] as const,
 
   fields: objectField(
     {
@@ -175,6 +175,8 @@ export type ImportJobRetryPostRequestInput = typeof POST.types.RequestInput;
 export type ImportJobRetryPostRequestOutput = typeof POST.types.RequestOutput;
 export type ImportJobRetryPostResponseInput = typeof POST.types.ResponseInput;
 export type ImportJobRetryPostResponseOutput = typeof POST.types.ResponseOutput;
+export type ImportJobRetryPostUrlParamsTypeOutput =
+  typeof POST.types.UrlVariablesOutput;
 
 // Repository types for standardized import patterns
 export type ImportJobRetryRequestInput = ImportJobRetryPostRequestInput;
@@ -189,6 +191,6 @@ export { POST };
 
 const definitions = {
   POST,
-} as const;
+};
 
 export default definitions;

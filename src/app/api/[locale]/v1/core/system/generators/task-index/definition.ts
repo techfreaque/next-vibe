@@ -25,7 +25,7 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.generators.taskIndex.post.description",
   category: "app.api.v1.core.system.generators.category",
   tags: ["app.api.v1.core.system.generators.taskIndex.post.title"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
 
   fields: objectField(
     {

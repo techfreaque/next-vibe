@@ -1,5 +1,24 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next-vibe-ui/hooks";
+import {
+  Button,
+  Div,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Input,
+  P,
+  ScrollArea,
+  Span,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "next-vibe-ui/ui";
 import {
   Coins,
   FolderPlus,
@@ -8,9 +27,7 @@ import {
   MessageSquarePlus,
   Search,
   Settings,
-} from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next-vibe-ui/hooks";
+} from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -24,20 +41,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  Input,
-  ScrollArea,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "next-vibe-ui/ui";
 
 import { UI_CONFIG } from "../../lib/config/constants";
 import {
@@ -196,8 +199,8 @@ export function ChatSidebar({
   const searchResults = isSearching ? searchThreads(searchQuery) : [];
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      <div className="bg-background space-y-0 pt-15" />
+    <Div className="flex flex-col h-full bg-background">
+      <Div className="bg-background space-y-0 pt-15" />
 
       {/* Root Folder Navigation Bar */}
       <RootFolderBar
@@ -206,11 +209,11 @@ export function ChatSidebar({
         onSelectFolder={handleSelectFolder}
       />
       {/* New Chat Button */}
-      <div className="flex items-center gap-1 px-3 pb-2 min-w-max">
+      <Div className="flex items-center gap-1 px-3 pb-2 min-w-max">
         <TooltipProvider delayDuration={300}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full">
+              <Div className="w-full">
                 <Button
                   onClick={() => onCreateThread(activeRootFolderId)}
                   className={`w-full h-10 sm:h-9 ${getButtonColorClasses(rootFolderColor)}`}
@@ -219,11 +222,11 @@ export function ChatSidebar({
                   <MessageSquarePlus className="h-4 w-4 mr-2" />
                   {t(getNewChatTranslationKey(activeRootFolderId))}
                 </Button>
-              </div>
+              </Div>
             </TooltipTrigger>
             {requiresAuth && !isAuthenticated && (
               <TooltipContent side="bottom">
-                <p>{t("app.chat.common.loginRequired")}</p>
+                <P>{t("app.chat.common.loginRequired")}</P>
               </TooltipContent>
             )}
           </Tooltip>
@@ -244,18 +247,18 @@ export function ChatSidebar({
               </Button>
             </TooltipTrigger>
             <TooltipContent side="bottom">
-              <p>
+              <P>
                 {requiresAuth && !isAuthenticated
                   ? t("app.chat.common.loginRequired")
                   : t(getNewFolderTranslationKey(activeRootFolderId))}
-              </p>
+              </P>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-      </div>
+      </Div>
       {/* Search Bar + Fullscreen Button */}
-      <div className="px-3 pb-3 flex gap-2  border-b border-border ">
-        <div className="relative flex-1">
+      <Div className="px-3 pb-3 flex gap-2  border-b border-border ">
+        <Div className="relative flex-1">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
           <Input
             ref={searchInputRef}
@@ -265,7 +268,7 @@ export function ChatSidebar({
             onChange={(e) => handleSearch(e.target.value)}
             className="pl-8 h-10 sm:h-8 text-sm bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-500"
           />
-        </div>
+        </Div>
         {/* {onNavigateToThreads && (
           <Button
             variant="outline"
@@ -277,18 +280,18 @@ export function ChatSidebar({
             <Maximize2 className="h-3.5 w-3.5" />
           </Button>
         )} */}
-      </div>
+      </Div>
 
-      <div className="flex-1 overflow-hidden px-0">
+      <Div className="flex-1 overflow-hidden px-0">
         <ScrollArea className="h-full">
-          <div className="px-2 py-2">
+          <Div className="px-2 py-2">
             {isSearching ? (
-              <div>
-                <div className="px-2 py-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+              <Div>
+                <Div className="px-2 py-1 text-xs font-medium text-slate-500 dark:text-slate-400">
                   {t("app.chat.common.searchResults", {
                     count: searchResults.length,
                   })}
-                </div>
+                </Div>
                 <ThreadList
                   threads={searchResults
                     .map((result) => chat.threads[result.id])
@@ -305,11 +308,11 @@ export function ChatSidebar({
                   compact
                 />
                 {searchResults.length === 0 && (
-                  <div className="px-4 py-8 text-center text-sm text-slate-500">
+                  <Div className="px-4 py-8 text-center text-sm text-slate-500">
                     {t("app.chat.common.noChatsFound")}
-                  </div>
+                  </Div>
                 )}
-              </div>
+              </Div>
             ) : (
               <FolderList
                 chat={chat}
@@ -332,80 +335,80 @@ export function ChatSidebar({
                 onUpdateThreadTitle={onUpdateThreadTitle}
               />
             )}
-          </div>
+          </Div>
         </ScrollArea>
-      </div>
+      </Div>
 
       {/* Credits Dropdown and Navigation Section */}
-      <div className="border-t border-border bg-background px-3 py-3 space-y-2">
+      <Div className="border-t border-border bg-background px-3 py-3 space-y-2">
         {credits && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="w-full justify-between h-10">
-                <div className="flex items-center gap-2">
+                <Div className="flex items-center gap-2">
                   <Coins className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm font-medium">
+                  <Span className="text-sm font-medium">
                     {t("app.chat.credits.total", { count: credits.total })}
-                  </span>
-                </div>
-                <span className="text-xs text-muted-foreground">
+                  </Span>
+                </Div>
+                <Span className="text-xs text-muted-foreground">
                   {t("app.chat.credits.viewDetails")}
-                </span>
+                </Span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
               className={UI_CONFIG.SIDEBAR_WIDTH}
             >
-              <div className="px-2 py-2 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">
+              <Div className="px-2 py-2 space-y-2">
+                <Div className="flex items-center justify-between">
+                  <Span className="text-sm font-medium">
                     {t("app.chat.credits.breakdown")}
-                  </span>
-                </div>
-                <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">
+                  </Span>
+                </Div>
+                <Div className="space-y-1 text-sm">
+                  <Div className="flex justify-between">
+                    <Span className="text-muted-foreground">
                       {t("app.chat.credits.total")}
-                    </span>
-                    <span className="font-medium">{credits.total}</span>
-                  </div>
+                    </Span>
+                    <Span className="font-medium">{credits.total}</Span>
+                  </Div>
                   {credits.permanent > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">
+                    <Div className="flex justify-between">
+                      <Span className="text-muted-foreground">
                         {t("app.chat.credits.permanent")}
-                      </span>
-                      <span>{credits.permanent}</span>
-                    </div>
+                      </Span>
+                      <Span>{credits.permanent}</Span>
+                    </Div>
                   )}
                   {credits.expiring > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">
+                    <Div className="flex justify-between">
+                      <Span className="text-muted-foreground">
                         {t("app.chat.credits.expiring")}
-                      </span>
-                      <span>{credits.expiring}</span>
-                    </div>
+                      </Span>
+                      <Span>{credits.expiring}</Span>
+                    </Div>
                   )}
                   {credits.free > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">
+                    <Div className="flex justify-between">
+                      <Span className="text-muted-foreground">
                         {t("app.chat.credits.free")}
-                      </span>
-                      <span>{credits.free}</span>
-                    </div>
+                      </Span>
+                      <Span>{credits.free}</Span>
+                    </Div>
                   )}
                   {credits.expiresAt && (
-                    <div className="flex justify-between text-xs">
-                      <span className="text-muted-foreground">
+                    <Div className="flex justify-between text-xs">
+                      <Span className="text-muted-foreground">
                         {t("app.chat.credits.expiresAt")}
-                      </span>
-                      <span>
+                      </Span>
+                      <Span>
                         {new Date(credits.expiresAt).toLocaleDateString()}
-                      </span>
-                    </div>
+                      </Span>
+                    </Div>
                   )}
-                </div>
-              </div>
+                </Div>
+              </Div>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link
@@ -420,7 +423,7 @@ export function ChatSidebar({
           </DropdownMenu>
         )}
 
-        <div className="flex flex-col gap-1">
+        <Div className="flex flex-col gap-1">
           <Link href={`/${locale}/app/dashboard`}>
             <Button
               variant="ghost"
@@ -461,8 +464,8 @@ export function ChatSidebar({
               {t("app.chat.credits.navigation.help")}
             </Button>
           </Link>
-        </div>
-      </div>
+        </Div>
+      </Div>
 
       <NewFolderDialog
         open={newFolderDialogOpen}
@@ -470,6 +473,6 @@ export function ChatSidebar({
         onSave={handleCreateFolder}
         locale={locale}
       />
-    </div>
+    </Div>
   );
 }

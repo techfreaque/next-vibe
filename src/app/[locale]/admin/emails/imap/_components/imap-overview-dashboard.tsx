@@ -193,9 +193,9 @@ export function ImapOverviewDashboard(): JSX.Element {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{healthData.totalAccounts}</div>
+            <div className="text-2xl font-bold">{healthData.accountsTotal}</div>
             <p className="text-xs text-muted-foreground">
-              {healthData.syncedAccounts}{" "}
+              {healthData.accountsHealthy}{" "}
               {t(
                 "app.admin.emails.imap.dashboard.activeAccounts",
               ).toLowerCase()}

@@ -215,7 +215,7 @@ export class FunctionalGeneratorsRepositoryImpl
       });
     } catch (error) {
       return createErrorResponse(
-        "core.system.generators.endpoints.errors.internal.title",
+        "app.api.v1.core.system.generators.endpoints.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -232,7 +232,7 @@ export class FunctionalGeneratorsRepositoryImpl
       // Basic validation - could be expanded
       if (options.rootDir && !options.rootDir.trim()) {
         return createErrorResponse(
-          "core.system.generators.endpoints.errors.validation.title",
+          "app.api.v1.core.system.generators.endpoints.errors.validation.title",
           ErrorResponseTypes.VALIDATION_ERROR,
           { error: "Root directory cannot be empty" },
         );
@@ -241,7 +241,7 @@ export class FunctionalGeneratorsRepositoryImpl
       return createSuccessResponse(true);
     } catch (error) {
       return createErrorResponse(
-        "core.system.generators.endpoints.errors.internal.title",
+        "app.api.v1.core.system.generators.endpoints.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );

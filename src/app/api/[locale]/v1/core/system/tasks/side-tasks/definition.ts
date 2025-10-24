@@ -46,7 +46,7 @@ const sideTasksPostEndpoint = createEndpoint({
   description: "app.api.v1.core.system.tasks.sideTasks.get.description",
   category: "app.api.v1.core.system.tasks.sideTasks.category",
   tags: ["app.api.v1.core.system.tasks.sideTasks.tags.sidetasks"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["tasks:side", "side-tasks"],
 
   fields: objectField(
@@ -331,7 +331,7 @@ const sideTasksGetEndpoint = createEndpoint({
   description: "app.api.v1.core.system.tasks.sideTasks.get.description",
   category: "app.api.v1.core.system.tasks.category",
   tags: ["app.api.v1.core.system.tasks.sideTasks.tags.sidetasks"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["tasks:side:status"],
 
   fields: objectField(

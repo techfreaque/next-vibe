@@ -294,7 +294,7 @@ export function CampaignStarterForm({
                           "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.priority.options.low",
                       },
                       {
-                        value: CronTaskPriority.NORMAL,
+                        value: CronTaskPriority.MEDIUM,
                         label:
                           "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.priority.options.normal",
                       },

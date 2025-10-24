@@ -318,7 +318,7 @@ export function useApiQueryForm<
       if (error) {
         // Convert Error to ErrorResponseType
         const errorResponse = createErrorResponse(
-          "error.api.form.errors.validation_failed",
+          "app.error.api.form.errors.validation_failed",
           ErrorResponseTypes.VALIDATION_ERROR,
           { formId, message: error.message },
         );
@@ -592,7 +592,7 @@ export function useApiQueryForm<
         });
 
         const errorResponse = createErrorResponse(
-          "error.api.form.errors.network_failure",
+          "app.error.api.form.errors.network_failure",
           ErrorResponseTypes.VALIDATION_ERROR,
           { formId, error: errorMessage },
         );
@@ -631,7 +631,7 @@ export function useApiQueryForm<
         if (options.onError) {
           // Create a proper error response for validation errors with translation key
           const errorResponse = createErrorResponse(
-            "error.api.form.errors.validation_failed",
+            "app.error.api.form.errors.validation_failed",
             ErrorResponseTypes.VALIDATION_ERROR,
             { formId, errors: JSON.stringify(errors) },
           );

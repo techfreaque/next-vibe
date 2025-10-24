@@ -18,6 +18,7 @@ import {
 
 import { braveSearch } from "@/app/api/[locale]/v1/core/agent/chat/tools/brave-search/repository";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
+import { getToolRegistry } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
@@ -29,6 +30,10 @@ import { chatMessages, chatThreads } from "../db";
 import { ChatMessageRole } from "../enum";
 import { getModelCost } from "../model-access/costs";
 import { getModelById, type ModelId } from "../model-access/models";
+import {
+  CONTINUE_CONVERSATION_PROMPT,
+  SEARCH_TOOL_INSTRUCTIONS,
+} from "./constants";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
@@ -516,11 +521,9 @@ export async function createAiStream({
   // Prepare system prompt with search instructions if needed
   let systemPrompt = data.systemPrompt || "";
   if (data.enableSearch) {
-    const searchInstructions =
-      "You have access to a web search tool called 'search'. When the user asks about current events, recent information, or anything that requires up-to-date knowledge, you MUST use the search tool to find relevant information. To use the search tool, call it with a 'query' parameter containing the search keywords. After receiving search results, provide a comprehensive answer based on those results and cite your sources.";
     systemPrompt = systemPrompt
-      ? `${systemPrompt}\n\n${searchInstructions}`
-      : searchInstructions;
+      ? [systemPrompt, SEARCH_TOOL_INSTRUCTIONS].join("\n\n")
+      : SEARCH_TOOL_INSTRUCTIONS;
   }
 
   if (data.operation === "answer-as-ai") {
@@ -557,8 +560,7 @@ export async function createAiStream({
           // No custom prompt - ask AI to continue/elaborate
           messages.push({
             role: "user" as const,
-            content:
-              "Continue the conversation by elaborating on or providing additional information about your previous response.",
+            content: CONTINUE_CONVERSATION_PROMPT,
           });
         }
       } else {
@@ -667,11 +669,77 @@ export async function createAiStream({
     logger.info("Starting OpenRouter stream", {
       model: data.model,
       enableSearch: data.enableSearch,
+      enabledToolIds: data.enabledToolIds,
     });
 
-    // Build tools object conditionally
-    // Register the tool with the name "search" so the AI model can call it
-    const tools = data.enableSearch ? { search: braveSearch } : undefined;
+    // Build tools object dynamically from registry
+    let tools: Record<string, any> | undefined = undefined;
+
+    // Always include braveSearch if enableSearch is true (manual tool)
+    if (data.enableSearch) {
+      tools = { search: braveSearch };
+    }
+
+    // Add dynamic tools from registry based on enabledToolIds
+    if (data.enabledToolIds && data.enabledToolIds.length > 0) {
+      logger.info("Loading dynamic tools from registry", {
+        enabledToolIds: data.enabledToolIds,
+      });
+
+      try {
+        // Get tool registry
+        const registry = getToolRegistry();
+
+        // Get tools for user (filtered by permissions)
+        const userContext = {
+          id: userId,
+          email: userId ? "user@example.com" : undefined, // TODO: Get actual email from user
+          role: "USER" as const, // TODO: Get actual role from user
+          isPublic: !userId,
+        };
+
+        const allUserTools = await registry.getToolsForUser(
+          userContext,
+          locale,
+        );
+
+        logger.info("Available tools from registry", {
+          totalTools: allUserTools.length,
+          toolNames: allUserTools.map((t) => t.name),
+        });
+
+        // Filter to only enabled tools
+        const enabledTools = allUserTools.filter((tool) =>
+          data.enabledToolIds!.includes(tool.name),
+        );
+
+        logger.info("Filtered to enabled tools", {
+          enabledCount: enabledTools.length,
+          enabledNames: enabledTools.map((t) => t.name),
+        });
+
+        // Add enabled tools to tools object
+        if (enabledTools.length > 0) {
+          if (!tools) {
+            tools = {};
+          }
+
+          for (const tool of enabledTools) {
+            tools[tool.name] = tool;
+          }
+
+          logger.info("Dynamic tools loaded successfully", {
+            toolCount: enabledTools.length,
+            toolNames: Object.keys(tools),
+          });
+        }
+      } catch (error) {
+        logger.error("Failed to load dynamic tools from registry", {
+          error: error instanceof Error ? error.message : String(error),
+        });
+        // Continue without dynamic tools - don't fail the request
+      }
+    }
 
     // Create SSE stream
     const encoder = new TextEncoder();

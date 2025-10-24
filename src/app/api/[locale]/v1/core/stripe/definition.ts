@@ -35,7 +35,7 @@ const { POST } = createEndpoint({
     "app.api.v1.core.stripe.tags.cli" as const,
     "app.api.v1.core.stripe.tags.webhook" as const,
   ],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
 
   fields: objectField(
     {

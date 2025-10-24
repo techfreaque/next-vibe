@@ -38,16 +38,16 @@ export const seedsGenerationResponseSchema = z.object({
 const POST = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "generators", "seeds"],
-  title: "core.system.db.seed.title",
-  description: "core.system.db.seed.description",
+  title: "app.api.v1.core.system.db.seed.title",
+  description: "app.api.v1.core.system.db.seed.description",
 
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
 
   fields: objectField(
     {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
-      label: "core.system.db.seed.title",
+      label: "app.api.v1.core.system.db.seed.title",
       layout: { columns: 12 },
     },
     { request: "data", response: true },
@@ -56,8 +56,8 @@ const POST = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "core.system.db.seed.title",
-          description: "core.system.db.seed.description",
+          label: "app.api.v1.core.system.db.seed.title",
+          description: "app.api.v1.core.system.db.seed.description",
           layout: { columns: 6 },
         },
         z
@@ -69,8 +69,8 @@ const POST = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "core.system.db.seed.title",
-          description: "core.system.db.seed.description",
+          label: "app.api.v1.core.system.db.seed.title",
+          description: "app.api.v1.core.system.db.seed.description",
           layout: { columns: 3 },
         },
         z.boolean().default(true),
@@ -80,8 +80,8 @@ const POST = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "core.system.db.seed.title",
-          description: "core.system.db.seed.description",
+          label: "app.api.v1.core.system.db.seed.title",
+          description: "app.api.v1.core.system.db.seed.description",
           layout: { columns: 3 },
         },
         z.boolean().default(false),
@@ -91,8 +91,8 @@ const POST = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "core.system.db.seed.title",
-          description: "core.system.db.seed.description",
+          label: "app.api.v1.core.system.db.seed.title",
+          description: "app.api.v1.core.system.db.seed.description",
           layout: { columns: 6 },
         },
         z.boolean().default(false),
@@ -102,8 +102,8 @@ const POST = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "core.system.db.seed.title",
-          description: "core.system.db.seed.description",
+          label: "app.api.v1.core.system.db.seed.title",
+          description: "app.api.v1.core.system.db.seed.description",
           layout: { columns: 6 },
         },
         z.boolean().default(false),
@@ -113,35 +113,35 @@ const POST = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "core.system.db.seed.title",
+          content: "app.api.v1.core.system.db.seed.title",
         },
         z.boolean(),
       ),
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content: "core.system.db.seed.title",
+          content: "app.api.v1.core.system.db.seed.title",
         },
         z.string(),
       ),
       seedsFound: responseField(
         {
           type: WidgetType.TEXT,
-          content: "core.system.db.seed.title",
+          content: "app.api.v1.core.system.db.seed.title",
         },
         z.number(),
       ),
       duration: responseField(
         {
           type: WidgetType.TEXT,
-          content: "core.system.db.seed.title",
+          content: "app.api.v1.core.system.db.seed.title",
         },
         z.number(),
       ),
       outputPath: responseField(
         {
           type: WidgetType.TEXT,
-          content: "core.system.db.seed.title",
+          content: "app.api.v1.core.system.db.seed.title",
         },
         z.string(),
       ),

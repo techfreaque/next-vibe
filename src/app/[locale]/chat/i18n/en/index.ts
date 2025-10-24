@@ -88,6 +88,21 @@ export const translations = {
     },
   },
 
+  aiTools: {
+    modal: {
+      title: "AI Tools Configuration",
+      description:
+        "Select which AI tools the assistant can use during conversation. Tools provide capabilities like web search, calculations, and data access.",
+      searchPlaceholder: "Search tools...",
+      loading: "Loading tools...",
+      noToolsFound: "No tools match your search",
+      noToolsAvailable: "No AI tools discovered yet. Tools will appear here automatically as they are registered with the system.",
+      enableAll: "Enable All Visible Tools",
+      disableAll: "Disable All Visible Tools",
+      footerInfo: "{{count}} of {{total}} tools enabled",
+    },
+  },
+
   confirmations: {
     deleteMessage: "Are you sure you want to delete this message?",
   },

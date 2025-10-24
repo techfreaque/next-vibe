@@ -294,7 +294,6 @@ export interface ApiStore {
       string,
       Methods,
       readonly (typeof UserRoleValue)[],
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       any
     >,
   >(
@@ -573,7 +572,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         error: null,
         isError: false,
         isSuccess: false,
-        statusMessage: "error.api.store.status.loading_data" as const,
+        statusMessage: "app.error.api.store.status.loading_data" as const,
         isCachedData: false,
         lastFetchTime: existingLastFetchTime ?? null,
         isLoading: true,
@@ -624,7 +623,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   isSuccess: true,
                   isLoadingFresh: false,
                   isCachedData: true,
-                  statusMessage: "error.api.store.status.cached_data" as const,
+                  statusMessage: "app.error.api.store.status.cached_data" as const,
                   lastFetchTime: existingQuery.lastFetchTime ?? null,
                 },
               },
@@ -714,7 +713,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
           // Create a proper error response
           const errorResponse = createErrorResponse(
-            "error.api.store.errors.validation_failed",
+            "app.error.api.store.errors.validation_failed",
             ErrorResponseTypes.VALIDATION_ERROR,
             { endpoint: endpoint.path.join("/") },
           );
@@ -739,7 +738,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 isLoadingFresh: false,
                 isCachedData: state.queries[queryId]?.isCachedData ?? false,
                 statusMessage:
-                  "error.api.store.errors.validation_failed" as const,
+                  "app.error.api.store.errors.validation_failed" as const,
                 lastFetchTime: Date.now(),
               },
             },
@@ -796,7 +795,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   isError: true,
                   isSuccess: false,
                   statusMessage:
-                    "error.api.store.errors.request_failed" as const,
+                    "app.error.api.store.errors.request_failed" as const,
                   isLoadingFresh: false,
                   isCachedData: existingQuery?.isCachedData ?? false,
                   lastFetchTime: Date.now(),
@@ -838,7 +837,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 isSuccess: true,
                 isLoadingFresh: false,
                 isCachedData: false,
-                statusMessage: "error.api.store.status.success" as const,
+                statusMessage: "app.error.api.store.status.success" as const,
                 lastFetchTime: Date.now(),
               },
             },
@@ -888,7 +887,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   isLoadingFresh: false,
                   isCachedData: state.queries[queryId]?.isCachedData ?? false,
                   statusMessage:
-                    "error.api.store.errors.validation_failed" as const,
+                    "app.error.api.store.errors.validation_failed" as const,
                   lastFetchTime: Date.now(),
                 },
               },
@@ -914,7 +913,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       } catch (err) {
         // Create a properly typed error response with translation key
         const errorResponse = createErrorResponse(
-          "error.api.store.errors.request_failed",
+          "app.error.api.store.errors.request_failed",
           ErrorResponseTypes.INTERNAL_ERROR,
           {
             error: parseError(err).message,
@@ -941,7 +940,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               isSuccess: false,
               isLoadingFresh: false,
               isCachedData: state.queries[queryId]?.isCachedData ?? false,
-              statusMessage: "error.api.store.errors.request_failed" as const,
+              statusMessage: "app.error.api.store.errors.request_failed" as const,
               lastFetchTime: Date.now(),
             },
           },
@@ -986,7 +985,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       const errorResponse = isErrorResponseType(error)
         ? error
         : createErrorResponse(
-            "error.api.store.errors.request_failed",
+            "app.error.api.store.errors.request_failed",
             ErrorResponseTypes.INTERNAL_ERROR,
             { error: parseError(error).message },
           );
@@ -1051,7 +1050,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
           isError: false,
           error: null,
           isSuccess: false,
-          statusMessage: "error.api.store.status.mutation_pending" as const,
+          statusMessage: "app.error.api.store.status.mutation_pending" as const,
           data: undefined,
         },
       },
@@ -1064,7 +1063,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       if (!requestValidation.success) {
         // Create a proper error response
         const errorResponse = createErrorResponse(
-          "error.api.store.errors.validation_failed",
+          "app.error.api.store.errors.validation_failed",
           ErrorResponseTypes.VALIDATION_ERROR,
           { endpoint: endpoint.path.join("/") },
         );
@@ -1080,7 +1079,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               error: errorResponse,
               isSuccess: false,
               statusMessage:
-                "error.api.store.errors.validation_failed" as const,
+                "app.error.api.store.errors.validation_failed" as const,
               data: undefined,
             },
           },
@@ -1127,7 +1126,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               isError: true,
               error: response,
               isSuccess: false,
-              statusMessage: "error.api.store.errors.mutation_failed" as const,
+              statusMessage: "app.error.api.store.errors.mutation_failed" as const,
               data: undefined,
             },
           },
@@ -1144,7 +1143,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
         // Return error response with proper translation key
         return createErrorResponse(
-          "error.api.store.errors.mutation_failed",
+          "app.error.api.store.errors.mutation_failed",
           ErrorResponseTypes.INTERNAL_ERROR,
           { error: response.message, endpoint: endpoint.path.join("/") },
         );
@@ -1164,7 +1163,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             isError: false,
             error: null,
             isSuccess: true,
-            statusMessage: "error.api.store.status.mutation_success" as const,
+            statusMessage: "app.error.api.store.status.mutation_success" as const,
             data: responseData as AnyData,
           },
         },
@@ -1196,7 +1195,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 error: onSuccessResult,
                 isSuccess: false,
                 statusMessage:
-                  "error.api.store.errors.validation_failed" as const,
+                  "app.error.api.store.errors.validation_failed" as const,
                 data: undefined,
               },
             },
@@ -1221,7 +1220,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       const errorResponse = isErrorResponseType(error)
         ? error
         : createErrorResponse(
-            "error.api.store.errors.mutation_failed",
+            "app.error.api.store.errors.mutation_failed",
             ErrorResponseTypes.INTERNAL_ERROR,
             { error: parseError(error).message },
           );
@@ -1236,7 +1235,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             isError: true,
             error: errorResponse,
             isSuccess: false,
-            statusMessage: "error.api.store.errors.unexpected_failure" as const,
+            statusMessage: "app.error.api.store.errors.unexpected_failure" as const,
             data: undefined,
           },
         },
@@ -1253,7 +1252,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
       // Return error response with proper translation key
       return createErrorResponse(
-        "error.api.store.errors.unexpected_failure",
+        "app.error.api.store.errors.unexpected_failure",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: errorResponse.message, endpoint: endpoint.path.join("/") },
       );
@@ -1305,7 +1304,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       // Create a proper error response with error details and translation key
       const errorMessage = err instanceof Error ? err.message : String(err);
       return createErrorResponse(
-        "error.api.store.errors.refetch_failed",
+        "app.error.api.store.errors.refetch_failed",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: errorMessage, queryKey: JSON.stringify(queryKey) },
       );

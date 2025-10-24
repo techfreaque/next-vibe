@@ -1,6 +1,18 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import {
+  Button,
+  Div,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
@@ -14,17 +26,6 @@ import {
 } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import {
-  Button,
-  Input,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "next-vibe-ui/ui";
 
 interface IconSelectorProps {
   value: IconValue;
@@ -185,13 +186,13 @@ export function IconSelector({
             value="library"
             className="max-h-96 overflow-y-auto p-2 m-0"
           >
-            <div className="space-y-4">
+            <Div className="space-y-4">
               {Object.entries(iconCategories).map(([category, icons]) => (
-                <div key={category}>
+                <Div key={category}>
                   <h4 className="text-xs font-semibold text-muted-foreground mb-2 px-1">
                     {category}
                   </h4>
-                  <div className="grid grid-cols-8 gap-1">
+                  <Div className="grid grid-cols-8 gap-1">
                     {icons.map((iconKey) => {
                       const Icon = ICON_REGISTRY[iconKey];
                       const isSelected =
@@ -212,20 +213,20 @@ export function IconSelector({
                         </button>
                       );
                     })}
-                  </div>
-                </div>
+                  </Div>
+                </Div>
               ))}
-            </div>
+            </Div>
           </TabsContent>
 
           {/* Unicode/Emoji Tab */}
           <TabsContent value="emoji" className="p-4 m-0">
-            <div className="space-y-4">
-              <div>
+            <Div className="space-y-4">
+              <Div>
                 <label className="text-sm font-medium mb-2 block">
                   {t("app.chat.iconSelector.emojiTab.label")}
                 </label>
-                <div className="flex gap-2">
+                <Div className="flex gap-2">
                   <Input
                     value={emojiInput}
                     onChange={handleEmojiChange}
@@ -245,25 +246,25 @@ export function IconSelector({
                   >
                     {t("app.chat.iconSelector.emojiTab.apply")}
                   </Button>
-                </div>
-              </div>
+                </Div>
+              </Div>
 
               {/* Show current emoji if it's a string */}
               {!isIconKey(currentValueString) && currentValueString && (
-                <div className="border rounded-md p-4 text-center">
-                  <div className="text-sm text-muted-foreground mb-2">
+                <Div className="border rounded-md p-4 text-center">
+                  <Div className="text-sm text-muted-foreground mb-2">
                     {t("app.chat.iconSelector.emojiTab.currentIcon")}
-                  </div>
-                  <div className="text-4xl">{currentValueString}</div>
-                </div>
+                  </Div>
+                  <Div className="text-4xl">{currentValueString}</Div>
+                </Div>
               )}
 
               {/* Common emoji suggestions */}
-              <div>
-                <div className="text-sm font-medium mb-2">
+              <Div>
+                <Div className="text-sm font-medium mb-2">
                   {t("app.chat.iconSelector.emojiTab.commonEmojis")}
-                </div>
-                <div className="grid grid-cols-8 gap-1">
+                </Div>
+                <Div className="grid grid-cols-8 gap-1">
                   {COMMON_EMOJIS.map((emoji) => (
                     <button
                       key={emoji}
@@ -280,9 +281,9 @@ export function IconSelector({
                       {emoji}
                     </button>
                   ))}
-                </div>
-              </div>
-            </div>
+                </Div>
+              </Div>
+            </Div>
           </TabsContent>
         </Tabs>
       </PopoverContent>

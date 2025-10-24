@@ -26,6 +26,7 @@ export const { GET, tools } = endpointsHandler({
       if (response.success) {
         return {
           success: true,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           data: { jobs: { items: response.data } },
         };
       }

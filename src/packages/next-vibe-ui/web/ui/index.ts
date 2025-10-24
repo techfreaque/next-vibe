@@ -20,6 +20,8 @@ export {
 } from "./alert-dialog";
 export { AspectRatio } from "./aspect-ratio";
 export { Avatar, AvatarFallback, AvatarImage } from "./avatar";
+export { Image } from "./image";
+export { Link } from "./link";
 export {
   Badge,
   // badgeVariants
@@ -97,6 +99,7 @@ export {
   DialogTrigger,
 } from "./dialog";
 export { Div } from "./div";
+export { Span } from "./span";
 export {
   Drawer,
   DrawerClose,
@@ -162,7 +165,8 @@ export {
   InputOTPSlot,
 } from "./input-otp";
 export { Label } from "./label";
-export { Link } from "./link";
+export { Markdown } from "./markdown";
+export { Pre } from "./pre";
 export {
   Menubar,
   MenubarCheckboxItem,

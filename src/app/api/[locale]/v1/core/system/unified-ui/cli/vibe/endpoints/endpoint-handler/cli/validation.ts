@@ -48,7 +48,7 @@ export function validateCliRequestData<
   TUrlVariablesInput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
   TFields,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TRequestInputInferred = any,
@@ -81,6 +81,57 @@ export function validateCliRequestData<
   try {
     // Validate locale
     const validatedLocale = validateLocale(context.locale, logger);
+
+    // Special case: If the request schema is z.never() and we receive an empty object,
+    // skip validation entirely (GET/HEAD endpoints that don't expect any input)
+    const isEmptyObject =
+      typeof context.requestData === "object" &&
+      context.requestData !== null &&
+      Object.keys(context.requestData).length === 0;
+    // Check if schema is z.never() by examining its _def
+    const isNeverSchema =
+      (endpoint.requestSchema as any)?._def?.type === "never";
+
+    if (isEmptyObject && isNeverSchema) {
+      // This is a GET/HEAD/OPTIONS endpoint that expects no input
+      // Check if URL params schema is also z.never()
+      const isUrlParamsNever =
+        (endpoint.requestUrlParamsSchema as any)?._def?.type === "never";
+
+      let urlVariables: TUrlVariablesInput;
+      if (isUrlParamsNever) {
+        // URL params also expect no input
+        urlVariables = undefined as TUrlVariablesInput;
+      } else {
+        // Validate URL parameters normally
+        const urlValidation = validateEndpointUrlParameters(
+          context.urlParameters,
+          endpoint.requestUrlParamsSchema,
+          logger,
+        );
+        if (!urlValidation.success) {
+          return {
+            success: false,
+            message:
+              "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_url_parameters",
+            errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
+            messageParams: {
+              error: urlValidation.message,
+            },
+          };
+        }
+        urlVariables = urlValidation.data;
+      }
+
+      return {
+        success: true,
+        data: {
+          requestData: undefined as TRequestInput,
+          urlVariables,
+          locale: validatedLocale,
+        },
+      };
+    }
 
     // For CLI, we need to preserve explicitly provided arguments and only apply defaults for missing fields
     // First, validate without applying defaults to see what was actually provided

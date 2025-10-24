@@ -6,13 +6,13 @@
 
 import type { NextRequest, NextResponse } from "next/server";
 
-import type { languageDefaults } from "./i18n";
-import type { Countries, CountryLanguage, Languages } from "./i18n/core/config";
-// we have to use ./packages/ as vercel cant resolve import aliases from here
+// we have to use relative paths as vercel cant resolve import aliases from here
 import {
   createLanguageMiddleware,
   createMiddleware,
-} from "./packages/next-vibe/server/middleware";
+} from "./app/api/[locale]/v1/core/system/middleware";
+import type { languageDefaults } from "./i18n";
+import type { Countries, CountryLanguage, Languages } from "./i18n/core/config";
 
 const availableCountries: Countries[] = ["DE", "PL", "GLOBAL"];
 const availableLanguages: Languages[] = ["de", "pl", "en"];

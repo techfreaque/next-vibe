@@ -91,6 +91,10 @@ export const translations = {
       label: "Enable Web Search",
       description: "Allow AI to search the web for current information",
     },
+    enabledToolIds: {
+      label: "Enabled Tool IDs",
+      description: "List of AI tool IDs to enable for this conversation",
+    },
     resumeToken: {
       label: "Resume Token",
       description: "Token for resuming interrupted streams",

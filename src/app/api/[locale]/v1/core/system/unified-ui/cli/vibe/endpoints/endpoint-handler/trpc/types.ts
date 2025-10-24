@@ -8,5 +8,5 @@ export type TrpcHandlerReturnType<
   TUrlVariablesOutput,
 > = (
   input: TRequestOutput & { urlVariables?: TUrlVariablesOutput },
-  ctx: TRPCContext<Record<string, string>, readonly (typeof UserRoleValue)[]>,
+  ctx: TRPCContext<Record<string, string>, readonly string[]>,
 ) => Promise<TResponseOutput>;

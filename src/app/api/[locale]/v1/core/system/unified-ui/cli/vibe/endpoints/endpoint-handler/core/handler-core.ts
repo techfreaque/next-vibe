@@ -43,7 +43,7 @@ export interface HandlerContext<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
   TFields,
 > {
   endpoint: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>;
@@ -81,7 +81,7 @@ export async function executeHandler<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
   TFields,
 >(
   context: HandlerContext<
@@ -146,7 +146,7 @@ export async function executeHandler<
 export async function authenticateUser<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
   TFields,
 >(
   endpoint: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
@@ -160,13 +160,7 @@ export async function authenticateUser<
       logger,
     );
 
-    logger.info("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.debug.authenticatedUser", {
-      isPublic: user?.isPublic,
-      hasId: user && "id" in user,
-      id: user && "id" in user ? user.id : undefined,
-      hasLeadId: user && "leadId" in user,
-      leadId: user && "leadId" in user ? user.leadId : undefined,
-    });
+    logger.info(`Signed in as user: ${user?.id} - lead: ${user?.leadId}`);
 
     if (!user) {
       return createErrorResponse(
@@ -204,7 +198,7 @@ export async function authenticateUser<
 export async function authenticateTypedUser<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
   TFields,
 >(
   endpoint: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,

@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Div } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
@@ -142,7 +143,7 @@ export function ChatMessages({
   }, [messages, isLoading, userScrolledUp]);
 
   return (
-    <div
+    <Div
       ref={messagesContainerRef}
       id={DOM_IDS.MESSAGES_CONTAINER}
       className={cn(
@@ -151,7 +152,7 @@ export function ChatMessages({
       )}
     >
       {/* Inner container with consistent padding and dynamic bottom padding */}
-      <div
+      <Div
         id={DOM_IDS.MESSAGES_CONTENT}
         className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-15 space-y-5"
         style={{
@@ -159,7 +160,7 @@ export function ChatMessages({
         }}
       >
         {Object.keys(messages).length === 0 && !isLoading && onSendMessage ? (
-          <div
+          <Div
             className="flex items-center justify-center"
             style={{ minHeight: `${LAYOUT.SUGGESTIONS_MIN_HEIGHT}vh` }}
           >
@@ -168,7 +169,7 @@ export function ChatMessages({
               locale={locale}
               rootFolderId={rootFolderId}
             />
-          </div>
+          </Div>
         ) : viewMode === "flat" ? (
           // Flat view (4chan style) - ALL messages in chronological order
           ((): JSX.Element => {
@@ -282,8 +283,8 @@ export function ChatMessages({
 
         {isLoading && <LoadingIndicator />}
 
-        <div ref={messagesEndRef} />
-      </div>
-    </div>
+        <Div ref={messagesEndRef} />
+      </Div>
+    </Div>
   );
 }

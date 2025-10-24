@@ -122,8 +122,8 @@ export async function dev(logger: EndpointLogger): Promise<void> {
         const cliUserId = createdUsers[0].id;
         const allRoles = [
           UserRole.ADMIN,
-          UserRole.CLI_ONLY,
-          UserRole.CLI_WEB,
+          UserRole.CLI_OFF,
+          UserRole.AI_TOOL_OFF,
           UserRole.CUSTOMER,
           UserRole.PARTNER_ADMIN,
           UserRole.PARTNER_EMPLOYEE,

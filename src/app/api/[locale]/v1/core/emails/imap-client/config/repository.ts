@@ -31,19 +31,13 @@ import { ImapLoggingLevel } from "./enum";
  * Default IMAP Configuration (matches API definition shape)
  */
 const DEFAULT_IMAP_CONFIG = {
-  host: "app.api.v1.core.emails.imapClient.imap.gmail.com",
+  host: "imap.gmail.com",
   port: 993,
   username: "",
   password: "",
   tls: true,
   autoReconnect: true,
-  loggingLevel: ImapLoggingLevel.INFO as typeof ImapLoggingLevel.INFO,
-};
-
-/**
- * Default IMAP Configuration for DB (internal storage)
- */
-const DEFAULT_IMAP_CONFIG_DB = {
+  loggingLevel: ImapLoggingLevel.INFO,
   serverEnabled: true,
   maxConnections: 100,
   connectionTimeout: 30000,
@@ -64,10 +58,6 @@ const DEFAULT_IMAP_CONFIG_DB = {
   circuitBreakerTimeout: 60000,
   healthCheckInterval: 60000,
   metricsEnabled: true,
-  loggingLevel: ImapLoggingLevel.INFO,
-  rateLimitEnabled: true,
-  rateLimitRequests: 100,
-  rateLimitWindow: 60000,
   debugMode: false,
   testMode: false,
 };
@@ -99,7 +89,7 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
       logger.debug("Getting IMAP configuration");
 
       // For now, return the default configuration
-      // TODO: Store these fields in a separate table or extend the current schema
+      // NOTE: These fields should be stored in a separate table or extend the current schema
       logger.vibe("📧 IMAP config: Using defaults", {
         host: DEFAULT_IMAP_CONFIG.host,
         port: DEFAULT_IMAP_CONFIG.port,
@@ -107,7 +97,6 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
 
       return createSuccessResponse({
         ...DEFAULT_IMAP_CONFIG,
-        ...DEFAULT_IMAP_CONFIG_DB,
         message:
           "app.api.v1.core.emails.imapClient.config.get.response.message",
       });
@@ -139,21 +128,15 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
       });
 
       // For now, just log the update.
-      // TODO: Store in database when schema is aligned
+      // NOTE: Store in database when schema is aligned
       logger.vibe("📧 IMAP config update requested", {
         host: data.host,
         port: data.port,
       });
 
       return createSuccessResponse({
-        ...DEFAULT_IMAP_CONFIG_DB,
-        host: data.host,
-        port: data.port,
-        username: data.username,
-        password: data.password,
-        tls: data.tls,
-        autoReconnect: data.autoReconnect,
-        loggingLevel: data.loggingLevel,
+        ...DEFAULT_IMAP_CONFIG,
+        ...data,
         message:
           "app.api.v1.core.emails.imapClient.config.update.response.message",
       });
@@ -174,7 +157,7 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
 
   private async createDefaultConfig(logger: EndpointLogger): Promise<void> {
     try {
-      await db.insert(imapConfigurations).values(DEFAULT_IMAP_CONFIG_DB);
+      await db.insert(imapConfigurations).values(DEFAULT_IMAP_CONFIG);
       logger.debug("Default IMAP configuration created");
     } catch (error) {
       const parsedError = parseError(error);

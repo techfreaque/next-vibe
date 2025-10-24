@@ -1,7 +1,8 @@
 "use client";
 
-import { Send, Square } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
+import { Button, Div, Textarea } from "next-vibe-ui/ui";
+import { Send, Square } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { forwardRef } from "react";
 
@@ -10,7 +11,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLocaleString } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
-import { Button, Textarea } from "next-vibe-ui/ui";
 
 import type { ModelId } from "../../types";
 import { ModelSelector } from "./model-selector";
@@ -31,6 +31,7 @@ interface ChatInputProps {
   onPersonaChange: (persona: string) => void;
   onModelChange: (model: ModelId) => void;
   onEnableSearchChange: (enabled: boolean) => void;
+  onOpenToolsModal: () => void;
   locale: CountryLanguage;
   logger: EndpointLogger;
   className?: string;
@@ -51,6 +52,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
       onPersonaChange,
       onModelChange,
       onEnableSearchChange,
+      onOpenToolsModal,
       locale,
       logger,
       className,
@@ -74,7 +76,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
         )}
       >
         {/* Input Area */}
-        <div className="relative mb-3">
+        <Div className="relative mb-3">
           <Textarea
             ref={ref}
             value={value}
@@ -92,7 +94,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
 
           {/* Hint Text - Shows when textarea is empty - Hidden on mobile */}
           {!value && (
-            <div className="absolute top-2 left-0 pointer-events-none text-sm text-muted-foreground hidden sm:block">
+            <Div className="absolute top-2 left-0 pointer-events-none text-sm text-muted-foreground hidden sm:block">
               {t("app.chat.input.keyboardShortcuts.press")}{" "}
               <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
                 {t("app.chat.input.keyboardShortcuts.enter")}
@@ -102,13 +104,13 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
                 {t("app.chat.input.keyboardShortcuts.shiftEnter")}
               </kbd>{" "}
               {t("app.chat.input.keyboardShortcuts.forNewLine")}
-            </div>
+            </Div>
           )}
-        </div>
+        </Div>
 
         {/* Controls */}
-        <div className="flex items-center gap-2 justify-between flex-wrap sm:flex-nowrap">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
+        <Div className="flex items-center gap-2 justify-between flex-wrap sm:flex-nowrap">
+          <Div className="flex items-center gap-2 flex-1 min-w-0">
             {/* Model Selector */}
             <ModelSelector
               value={selectedModel}
@@ -131,13 +133,14 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
               <SearchToggle
                 enabled={enableSearch}
                 onChange={onEnableSearchChange}
+                onOpenToolsModal={onOpenToolsModal}
                 disabled={isLoading}
                 locale={locale}
               />
             )}
-          </div>
+          </Div>
 
-          <div className="flex items-center gap-2">
+          <Div className="flex items-center gap-2">
             {/* Speech Input Button */}
             <SpeechInputButton
               onTranscript={(text) => {
@@ -174,8 +177,8 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
                 <Send className="h-4 w-4" />
               </Button>
             )}
-          </div>
-        </div>
+          </Div>
+        </Div>
       </form>
     );
   },

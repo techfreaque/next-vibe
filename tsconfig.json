@@ -59,8 +59,7 @@
     ".tmp",
     ".next",
     "to_migrate/**/*.ts",
-    "to_migrate/**/*.tsx",
-    "src/packages/next-vibe-ui/native"
+    "to_migrate/**/*.tsx"
   ],
   "extends": "expo/tsconfig.base"
 }

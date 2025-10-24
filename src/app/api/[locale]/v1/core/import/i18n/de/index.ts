@@ -104,6 +104,83 @@ export const translations: typeof enTranslations = {
       response: {
         title: "Import-Ergebnisse",
         description: "Zusammenfassung Ihres CSV-Import Vorgangs",
+
+        basicResults: {
+          title: "Basis-Ergebnisse",
+          description: "Kern-Import-Statistiken",
+        },
+
+        batchId: {
+          label: "Batch-ID",
+        },
+
+        totalRows: {
+          label: "Gesamtzeilen",
+        },
+
+        isChunkedProcessing: {
+          label: "Hintergrundverarbeitung",
+        },
+
+        jobId: {
+          label: "Job-ID",
+        },
+
+        statistics: {
+          title: "Import-Statistiken",
+          description: "Detaillierte Aufschlüsselung des Import-Vorgangs",
+        },
+
+        successfulImports: {
+          label: "Erfolgreiche Importe",
+        },
+
+        failedImports: {
+          label: "Fehlgeschlagene Importe",
+        },
+
+        duplicateEmails: {
+          label: "Doppelte E-Mails",
+        },
+
+        processingTimeMs: {
+          label: "Verarbeitungszeit (ms)",
+        },
+
+        summary: {
+          title: "Import-Zusammenfassung",
+          description: "Übersicht der Import-Ergebnisse",
+        },
+
+        newRecords: {
+          label: "Neue Datensätze",
+        },
+
+        updatedRecords: {
+          label: "Aktualisierte Datensätze",
+        },
+
+        skippedDuplicates: {
+          label: "Übersprungene Duplikate",
+        },
+
+        errors: {
+          row: {
+            label: "Zeile",
+          },
+          email: {
+            label: "E-Mail",
+          },
+          error: {
+            label: "Fehler",
+          },
+        },
+
+        nextSteps: {
+          item: {
+            label: "Nächste Schritte",
+          },
+        },
       },
 
       // === FEHLER ===
@@ -131,6 +208,30 @@ export const translations: typeof enTranslations = {
           title: "Import Fehlgeschlagen",
           description:
             "Ein Fehler ist beim Verarbeiten Ihres Imports aufgetreten. Bitte versuchen Sie es erneut.",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description: "Netzwerkverbindung während des Imports fehlgeschlagen",
+        },
+        forbidden: {
+          title: "Verboten",
+          description: "Sie haben keine Berechtigung für diesen Import",
+        },
+        notFound: {
+          title: "Nicht Gefunden",
+          description: "Import-Ressource nicht gefunden",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+        unsavedChanges: {
+          title: "Nicht Gespeicherte Änderungen",
+          description: "Sie haben nicht gespeicherte Änderungen",
+        },
+        conflict: {
+          title: "Datenkonflikt",
+          description: "Ein Konflikt mit vorhandenen Daten ist aufgetreten",
         },
       },
 

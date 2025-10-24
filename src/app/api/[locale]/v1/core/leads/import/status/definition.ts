@@ -37,7 +37,7 @@ const { GET } = createEndpoint({
     "app.api.v1.core.leads.tags.jobs",
     "app.api.v1.core.leads.tags.list",
   ],
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [UserRole.ADMIN] as const,
 
   fields: objectField(
     {

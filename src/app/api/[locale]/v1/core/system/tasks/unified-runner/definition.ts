@@ -31,7 +31,7 @@ const { POST } = createEndpoint({
   title: "app.api.v1.core.system.tasks.unifiedRunner.post.title",
   description: "app.api.v1.core.system.tasks.unifiedRunner.post.description",
   category: "app.api.v1.core.system.tasks.category",
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   tags: ["app.api.v1.core.system.tasks.unifiedRunner.post.title"],
   fields: objectField(
     {

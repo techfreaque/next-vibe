@@ -29,20 +29,20 @@ const { POST } = createEndpoint({
     "generators",
     "generate-trpc-router",
   ],
-  title: "core.system.sideTasks.generators.generateTrpcRouter.title",
+  title: "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.title",
   description:
-    "core.system.sideTasks.generators.generateTrpcRouter.description",
-  category: "core.system.sideTasks.category",
-  tags: ["core.system.sideTasks.generators.generateTrpcRouter.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+    "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.description",
+  category: "app.api.v1.core.system.sideTasks.category",
+  tags: ["app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.tag"],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
       title:
-        "core.system.sideTasks.generators.generateTrpcRouter.container.title",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.container.title",
       description:
-        "core.system.sideTasks.generators.generateTrpcRouter.container.description",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
     { request: "data", response: true },
@@ -52,8 +52,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "core.system.dev.typecheck.title",
-          description: "core.system.dev.typecheck.description",
+          label: "app.api.v1.core.system.dev.typecheck.title",
+          description: "app.api.v1.core.system.dev.typecheck.description",
           layout: { columns: 6 },
         },
         z.string().optional().default("src/app/api"),
@@ -63,8 +63,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "core.system.dev.typecheck.title",
-          description: "core.system.dev.typecheck.description",
+          label: "app.api.v1.core.system.dev.typecheck.title",
+          description: "app.api.v1.core.system.dev.typecheck.description",
           layout: { columns: 6 },
         },
         z
@@ -77,8 +77,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "core.system.dev.typecheck.title",
-          description: "core.system.dev.typecheck.description",
+          label: "app.api.v1.core.system.dev.typecheck.title",
+          description: "app.api.v1.core.system.dev.typecheck.description",
           layout: { columns: 4 },
         },
         z.boolean().optional().default(false),
@@ -88,8 +88,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "core.system.dev.typecheck.title",
-          description: "core.system.dev.typecheck.description",
+          label: "app.api.v1.core.system.dev.typecheck.title",
+          description: "app.api.v1.core.system.dev.typecheck.description",
           layout: { columns: 4 },
         },
         z.boolean().optional().default(false),
@@ -99,8 +99,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "core.system.dev.typecheck.title",
-          description: "core.system.dev.typecheck.description",
+          label: "app.api.v1.core.system.dev.typecheck.title",
+          description: "app.api.v1.core.system.dev.typecheck.description",
           layout: { columns: 4 },
         },
         z.array(z.string()).optional(),
@@ -110,7 +110,7 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "core.system.dev.typecheck.success.title",
+          content: "app.api.v1.core.system.dev.typecheck.success.title",
         },
         z.boolean(),
       ),
@@ -118,7 +118,7 @@ const { POST } = createEndpoint({
       generationCompleted: responseField(
         {
           type: WidgetType.TEXT,
-          content: "core.system.dev.typecheck.success.title",
+          content: "app.api.v1.core.system.dev.typecheck.success.title",
         },
         z.boolean(),
       ),
@@ -126,7 +126,7 @@ const { POST } = createEndpoint({
       output: responseField(
         {
           type: WidgetType.TEXT,
-          content: "core.system.dev.typecheck.success.title",
+          content: "app.api.v1.core.system.dev.typecheck.success.title",
         },
         z.string(),
       ),
@@ -134,7 +134,7 @@ const { POST } = createEndpoint({
       generationStats: responseField(
         {
           type: WidgetType.TEXT,
-          content: "core.system.dev.typecheck.success.title",
+          content: "app.api.v1.core.system.dev.typecheck.success.title",
         },
         z.object({
           totalRoutes: z.number(),
@@ -152,65 +152,65 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.validation.title",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.validation.title",
       description:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.validation.description",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
       description:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.unauthorized.title",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.unauthorized.title",
       description:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.unauthorized.description",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.unauthorized.title",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.unauthorized.title",
       description:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.unauthorized.description",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.unauthorized.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
       description:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
       description:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
       description:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
       description:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
       description:
-        "core.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
+        "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "core.system.sideTasks.generators.generateTrpcRouter.success.title",
+    title: "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.success.title",
     description:
-      "core.system.sideTasks.generators.generateTrpcRouter.success.description",
+      "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.success.description",
   },
 
   // === EXAMPLES ===

@@ -243,7 +243,7 @@ export function useAIStream(
                     });
                   })
                   .catch((error) => {
-                    console.error("Failed to set active thread", error);
+                    logger.error("Failed to set active thread", { error });
                   });
 
                 // Save to localStorage if incognito mode
@@ -269,7 +269,9 @@ export function useAIStream(
                       });
                     })
                     .catch((error) => {
-                      console.error("Failed to save incognito thread", error);
+                      logger.error("Failed to save incognito thread", {
+                        error,
+                      });
                     });
                 }
 
@@ -360,7 +362,9 @@ export function useAIStream(
                       });
                       logger.info("[DEBUG] Message added to chat store", {
                         messageId: eventData.messageId,
-                        totalMessages: Object.keys(useChatStore.getState().messages).length,
+                        totalMessages: Object.keys(
+                          useChatStore.getState().messages,
+                        ).length,
                       });
 
                       // Also save to localStorage
@@ -391,17 +395,16 @@ export function useAIStream(
                           });
                         })
                         .catch((error) => {
-                          console.error(
-                            "Failed to save incognito message",
+                          logger.error("Failed to save incognito message", {
                             error,
-                          );
+                          });
                         });
                     }
                   })
                   .catch((error) => {
-                    console.error(
+                    logger.error(
                       "Failed to check chat store for incognito thread",
-                      error,
+                      { error },
                     );
                   });
 
@@ -413,7 +416,9 @@ export function useAIStream(
                 const eventData = event.data as ContentDeltaEventData;
                 // Get fresh state from store to avoid stale closure
                 const currentMessage =
-                  useAIStreamStore.getState().streamingMessages[eventData.messageId];
+                  useAIStreamStore.getState().streamingMessages[
+                    eventData.messageId
+                  ];
 
                 logger.info("[DEBUG] CONTENT_DELTA event received", {
                   messageId: eventData.messageId,
@@ -427,7 +432,9 @@ export function useAIStream(
                 if (currentMessage && eventData.delta) {
                   const newContent =
                     (currentMessage.content || "") + eventData.delta;
-                  useAIStreamStore.getState().updateMessageContent(eventData.messageId, newContent);
+                  useAIStreamStore
+                    .getState()
+                    .updateMessageContent(eventData.messageId, newContent);
                 }
                 options.onContentDelta?.(eventData);
                 break;
@@ -467,9 +474,12 @@ export function useAIStream(
                     toolCalls: updatedMessage?.toolCalls,
                   });
                 } else {
-                  logger.warn("[DEBUG] No streaming message found for tool call", {
-                    messageId: eventData.messageId,
-                  });
+                  logger.warn(
+                    "[DEBUG] No streaming message found for tool call",
+                    {
+                      messageId: eventData.messageId,
+                    },
+                  );
                 }
 
                 options.onToolCall?.(eventData);
@@ -535,32 +545,35 @@ export function useAIStream(
                             saveMessage(savedMessage);
 
                             // Also add to chat store so it appears in the UI immediately
-                            useChatStore.getState().updateMessage(message.messageId, {
-                              content: eventData.content,
-                              tokens: eventData.totalTokens,
-                              toolCalls: message.toolCalls || null,
-                              finishReason: eventData.finishReason,
-                            });
+                            useChatStore
+                              .getState()
+                              .updateMessage(message.messageId, {
+                                content: eventData.content,
+                                tokens: eventData.totalTokens,
+                                toolCalls: message.toolCalls || null,
+                                finishReason: eventData.finishReason,
+                              });
                           })
                           .catch((error) => {
-                            console.error(
-                              "Failed to update incognito message",
+                            logger.error("Failed to update incognito message", {
                               error,
-                            );
+                            });
                           });
                       } else {
                         // Non-incognito message - update chat store with tool calls
-                        useChatStore.getState().updateMessage(message.messageId, {
-                          content: eventData.content,
-                          tokens: eventData.totalTokens,
-                          toolCalls: message.toolCalls || null,
-                        });
+                        useChatStore
+                          .getState()
+                          .updateMessage(message.messageId, {
+                            content: eventData.content,
+                            tokens: eventData.totalTokens,
+                            toolCalls: message.toolCalls || null,
+                          });
                       }
                     })
                     .catch((error) => {
-                      console.error(
+                      logger.error(
                         "Failed to check chat store for incognito thread",
-                        error,
+                        { error },
                       );
                     });
                 }

@@ -37,7 +37,7 @@ const { GET } = createEndpoint({
   title: "app.api.v1.core.system.tasks.cronSystem.task.get.title",
   description: "app.api.v1.core.system.tasks.cronSystem.task.get.description",
   category: "app.api.v1.core.system.tasks.category",
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   tags: ["app.api.v1.core.system.tasks.cronSystem.task.get.title"],
   fields: objectField(
     {
@@ -190,7 +190,7 @@ const { PUT } = createEndpoint({
   title: "app.api.v1.core.system.tasks.cronSystem.task.put.title",
   description: "app.api.v1.core.system.tasks.cronSystem.task.put.description",
   category: "app.api.v1.core.system.tasks.category",
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   tags: ["app.api.v1.core.system.tasks.cronSystem.task.put.title"],
   fields: objectField(
     {
@@ -469,7 +469,7 @@ const { DELETE } = createEndpoint({
   description:
     "app.api.v1.core.system.tasks.cronSystem.task.delete.description",
   category: "app.api.v1.core.system.tasks.category",
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   tags: ["app.api.v1.core.system.tasks.cronSystem.task.delete.title"],
   fields: objectField(
     {

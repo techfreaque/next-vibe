@@ -6,6 +6,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Div, Markdown, Span } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
@@ -14,7 +15,6 @@ import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { Markdown } from "next-vibe-ui/ui/markdown";
 
 import { useTouchDevice } from "../../hooks/use-touch-device";
 import {
@@ -103,9 +103,9 @@ function renderContentWithReferences(
     // Add text before the reference
     if (match.index > lastIndex) {
       parts.push(
-        <span key={`text-${key++}`}>
+        <Span key={`text-${key++}`}>
           {content.substring(lastIndex, match.index)}
-        </span>,
+        </Span>,
       );
     }
 
@@ -134,7 +134,7 @@ function renderContentWithReferences(
   // Add remaining text
   if (lastIndex < content.length) {
     parts.push(
-      <span key={`text-${key++}`}>{content.substring(lastIndex)}</span>,
+      <Span key={`text-${key++}`}>{content.substring(lastIndex)}</Span>,
     );
   }
 
@@ -162,7 +162,7 @@ function MessagePreview({
   const isUser = message.role === "user";
 
   return (
-    <div
+    <Div
       className={cn(
         "fixed z-50 pointer-events-none",
         "max-w-md p-3 rounded-lg",
@@ -177,8 +177,8 @@ function MessagePreview({
       }}
     >
       {/* Preview Header */}
-      <div className="flex items-center gap-2 mb-2 text-xs">
-        <span
+      <Div className="flex items-center gap-2 mb-2 text-xs">
+        <Span
           className={cn(
             "font-semibold",
             isUser ? "text-green-400" : "text-blue-400",
@@ -191,8 +191,8 @@ function MessagePreview({
               ? t("app.chat.flatView.youLabel")
               : t("app.chat.flatView.anonymous")
             : message.authorName || t("app.chat.flatView.assistantFallback")}
-        </span>
-        <span
+        </Span>
+        <Span
           className="px-1.5 py-0.5 rounded text-xs font-mono"
           style={{
             backgroundColor: `${idColor}20`,
@@ -202,14 +202,14 @@ function MessagePreview({
           }}
         >
           {shortId}
-        </span>
-      </div>
+        </Span>
+      </Div>
 
       {/* Preview Content */}
-      <div className="text-sm text-foreground/90 line-clamp-4">
+      <Div className="text-sm text-foreground/90 line-clamp-4">
         {message.content}
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 }
 
@@ -235,7 +235,7 @@ function UserIdHoverCard({
   const idColor = getIdColor(userId);
 
   return (
-    <div
+    <Div
       className={cn(
         "fixed z-50",
         "w-72 p-3 rounded-lg",
@@ -249,8 +249,8 @@ function UserIdHoverCard({
       }}
     >
       {/* Header */}
-      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border/50">
-        <span
+      <Div className="flex items-center gap-2 mb-3 pb-2 border-b border-border/50">
+        <Span
           className="px-2 py-1 rounded text-xs font-mono font-semibold"
           style={{
             backgroundColor: `${idColor}20`,
@@ -262,14 +262,14 @@ function UserIdHoverCard({
         >
           {/* eslint-disable-next-line i18next/no-literal-string -- Technical ID label */}
           {`ID: ${userId}`}
-        </span>
-        <span className="text-xs text-muted-foreground font-medium">
+        </Span>
+        <Span className="text-xs text-muted-foreground font-medium">
           {t("app.chat.flatView.postsById", { count: postCount })}
-        </span>
-      </div>
+        </Span>
+      </Div>
 
       {/* Post List */}
-      <div className="space-y-2 max-h-64 overflow-y-auto">
+      <Div className="space-y-2 max-h-64 overflow-y-auto">
         {userPosts.map((post, idx) => {
           const postShortId = getShortId(post.id);
           return (
@@ -280,19 +280,19 @@ function UserIdHoverCard({
               }}
               className="w-full text-left p-2 rounded hover:bg-accent/50 transition-colors"
             >
-              <div className="text-xs text-muted-foreground mb-1">
+              <Div className="text-xs text-muted-foreground mb-1">
                 {/* eslint-disable-next-line i18next/no-literal-string -- Technical post number and separator */}
                 {`Post #${idx + 1} • ${format4chanTimestamp(post.createdAt.getTime(), t)}`}
-              </div>
-              <div className="text-sm text-foreground/90 line-clamp-2">
+              </Div>
+              <Div className="text-sm text-foreground/90 line-clamp-2">
                 {post.content.substring(0, 100)}
                 {post.content.length > 100 && "..."}
-              </div>
+              </Div>
             </button>
           );
         })}
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 }
 
@@ -401,7 +401,7 @@ function FlatMessage({
   const directReplies = getDirectReplies(messages, message.id);
 
   return (
-    <div
+    <Div
       key={message.id}
       id={`${postNum}`}
       className={cn(
@@ -413,19 +413,19 @@ function FlatMessage({
     >
       {/* Logo watermark for first message */}
       {postNum === 1 && (
-        <div className="absolute top-3 right-3 pointer-events-none bg-background/60 backdrop-blur-xl rounded-md p-1.5 shadow-sm border border-border/10">
+        <Div className="absolute top-3 right-3 pointer-events-none bg-background/60 backdrop-blur-xl rounded-md p-1.5 shadow-sm border border-border/10">
           <Logo
             className="h-auto w-auto max-w-[100px] opacity-70"
             locale={locale}
             pathName="/"
           />
-        </div>
+        </Div>
       )}
 
       {/* Post Header */}
-      <div className="flex items-center gap-2.5 mb-3 flex-wrap">
+      <Div className="flex items-center gap-2.5 mb-3 flex-wrap">
         {/* Author Name with Model Icon */}
-        <span
+        <Span
           className={cn(
             "font-bold text-sm flex items-center gap-1.5",
             isUser ? "text-green-400" : "text-blue-400",
@@ -437,13 +437,13 @@ function FlatMessage({
             ((): JSX.Element | null => {
               const ModelIcon = modelData.icon;
               return typeof ModelIcon === "string" ? (
-                <span className="text-base leading-none">{ModelIcon}</span>
+                <Span className="text-base leading-none">{ModelIcon}</Span>
               ) : (
                 <ModelIcon className="h-3.5 w-3.5" />
               );
             })()}
           {displayName}
-        </span>
+        </Span>
 
         {/* ID Badge - Hoverable */}
         <button
@@ -474,9 +474,9 @@ function FlatMessage({
         </button>
 
         {/* Timestamp */}
-        <span className="text-muted-foreground/80 text-xs font-medium">
+        <Span className="text-muted-foreground/80 text-xs font-medium">
           {format4chanTimestamp(message.createdAt.getTime(), t)}
-        </span>
+        </Span>
 
         {/* Post Number */}
         <button
@@ -491,18 +491,18 @@ function FlatMessage({
 
         {/* Reply count badge */}
         {replyCount > 0 && (
-          <span className="px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 text-xs font-bold border border-blue-500/30">
+          <Span className="px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 text-xs font-bold border border-blue-500/30">
             {replyCount} {replyCount === 1 ? "reply" : "replies"}
-          </span>
+          </Span>
         )}
 
         {/* Reply indicator - Arrow symbol is technical, not user-facing text */}
 
         {references.length > 0 && (
           // eslint-disable-next-line i18next/no-literal-string -- Technical arrow symbol for reply indicator
-          <span className="text-blue-400/60 text-xs">▶</span>
+          <Span className="text-blue-400/60 text-xs">▶</Span>
         )}
-      </div>
+      </Div>
 
       {/* Replying To */}
       {message.parentId &&
@@ -513,8 +513,8 @@ function FlatMessage({
           }
           const parentPostNum = postNumberMap[parentMsg.id];
           return (
-            <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
-              <span>{t("app.chat.flatView.replyingTo")}</span>
+            <Div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
+              <Span>{t("app.chat.flatView.replyingTo")}</Span>
               <button
                 onClick={() => {
                   const element = document.getElementById(`${parentPostNum}`);
@@ -538,13 +538,13 @@ function FlatMessage({
                 {/* eslint-disable-next-line i18next/no-literal-string -- Technical 4chan-style reference syntax */}
                 {`>>${parentPostNum}`}
               </button>
-            </div>
+            </Div>
           );
         })()}
 
       {/* Message Content */}
       {messageActions.editingMessageId === message.id ? (
-        <div className="my-2">
+        <Div className="my-2">
           <MessageEditor
             message={message}
             selectedModel={selectedModel}
@@ -565,9 +565,9 @@ function FlatMessage({
             locale={locale}
             logger={logger}
           />
-        </div>
+        </Div>
       ) : messageActions.retryingMessageId === message.id ? (
-        <div className="my-2">
+        <Div className="my-2">
           <ModelPersonaSelectorModal
             titleKey="app.chat.flatView.retryModal.title"
             descriptionKey="app.chat.flatView.retryModal.description"
@@ -583,9 +583,9 @@ function FlatMessage({
             locale={locale}
             logger={logger}
           />
-        </div>
+        </Div>
       ) : (
-        <div
+        <Div
           className={cn(
             "text-sm leading-relaxed",
             "p-3",
@@ -596,7 +596,7 @@ function FlatMessage({
           )}
         >
           {isAssistant ? (
-            <div
+            <Div
               className={cn(
                 "prose prose-sm dark:prose-invert max-w-none",
                 "prose-p:my-2 prose-p:leading-relaxed",
@@ -615,9 +615,9 @@ function FlatMessage({
               )}
 
               <Markdown content={message.content} />
-            </div>
+            </Div>
           ) : (
-            <div className="whitespace-pre-wrap break-words text-foreground/95">
+            <Div className="whitespace-pre-wrap break-words text-foreground/95">
               {renderContentWithReferences(
                 message.content,
                 postNumberToMessageId,
@@ -631,14 +631,14 @@ function FlatMessage({
                   });
                 },
               )}
-            </div>
+            </Div>
           )}
-        </div>
+        </Div>
       )}
 
       {/* Show Answer-as-AI dialog below the message */}
       {messageActions.answeringMessageId === message.id && (
-        <div className="my-3">
+        <Div className="my-3">
           <ModelPersonaSelectorModal
             titleKey="app.chat.flatView.answerModal.title"
             descriptionKey="app.chat.flatView.answerModal.description"
@@ -658,13 +658,13 @@ function FlatMessage({
             locale={locale}
             logger={logger}
           />
-        </div>
+        </Div>
       )}
 
       {/* Replies */}
       {directReplies.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
-          <span>{t("app.chat.flatView.replies")}</span>
+        <Div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
+          <Span>{t("app.chat.flatView.replies")}</Span>
           {directReplies.map((reply) => {
             const replyPostNum = postNumberMap[reply.id];
             return (
@@ -694,14 +694,14 @@ function FlatMessage({
               </button>
             );
           })}
-        </div>
+        </Div>
       )}
 
       {/* Post Actions - 4chan-style text links */}
       {!messageActions.editingMessageId &&
         !messageActions.retryingMessageId &&
         !messageActions.answeringMessageId && (
-          <div
+          <Div
             className={cn(
               "mt-3 flex items-center gap-3 text-xs flex-wrap",
               "transition-opacity duration-200",
@@ -798,9 +798,9 @@ function FlatMessage({
                 [{t("app.chat.flatView.actions.delete")}]
               </button>
             )}
-          </div>
+          </Div>
         )}
-    </div>
+    </Div>
   );
 }
 
@@ -855,7 +855,7 @@ export function FlatMessageView({
     : null;
 
   return (
-    <div className="space-y-4">
+    <Div className="space-y-4">
       {/* Preview Popup */}
       {previewMessage && hoveredRef && previewPosition && (
         <MessagePreview
@@ -918,6 +918,6 @@ export function FlatMessageView({
           rootFolderId={rootFolderId}
         />
       ))}
-    </div>
+    </Div>
   );
 }

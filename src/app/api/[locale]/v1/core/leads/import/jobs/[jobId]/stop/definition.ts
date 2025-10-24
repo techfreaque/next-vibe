@@ -34,7 +34,7 @@ const { POST } = createEndpoint({
     "app.api.v1.core.leads.tags.leads",
     "app.api.v1.core.leads.tags.management",
   ],
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [UserRole.ADMIN] as const,
 
   fields: objectField(
     {

@@ -42,7 +42,7 @@ const config = [
   // 1) Files/Folders to ignore
   {
     ignores: [
-      "dist",
+      ".dist",
       ".next",
       ".tmp",
       "postcss.config.mjs",
@@ -57,7 +57,6 @@ const config = [
       ".next",
       ".github",
       ".claude",
-      "postgres_data",
       "to_migrate",
     ],
   },

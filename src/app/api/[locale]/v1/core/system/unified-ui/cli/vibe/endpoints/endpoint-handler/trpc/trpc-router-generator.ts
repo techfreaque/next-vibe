@@ -137,7 +137,7 @@ export async function generateTRPCRouter(
           );
         }
       } catch (error) {
-        const errorMsg = "error.general.route_processing_failed";
+        const errorMsg = "app.error.general.route_processing_failed";
         errors.push(errorMsg);
         debugLogger(errorMsg, { error });
       }
@@ -165,7 +165,7 @@ export async function generateTRPCRouter(
       warnings,
     };
   } catch (error) {
-    const errorMsg = "error.general.router_generation_failed";
+    const errorMsg = "app.error.general.router_generation_failed";
     errors.push(errorMsg);
     debugLogger(errorMsg, { error });
 
@@ -246,7 +246,7 @@ async function processRouteFile(
     warnings: string[];
   } = {
     isValid: false,
-    errors: ["error.general.route_load_failed"],
+    errors: ["app.error.general.route_load_failed"],
     warnings: [],
   };
   let methods: string[] = [];
@@ -274,7 +274,7 @@ async function processRouteFile(
     // Validate the route file structure
     validation = validateRouteFileForTRPC(routeModule);
   } catch {
-    validation.errors = ["error.general.route_import_failed"];
+    validation.errors = ["app.error.general.route_import_failed"];
   }
 
   return {

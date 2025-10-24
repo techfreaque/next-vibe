@@ -94,7 +94,7 @@ export function useUser(logger: EndpointLogger): UseUserReturn {
         // Suppress toast for unauthorized errors (403) when JWT token contains non-existent user ID
         if (
           [
-            "error.unauthorized",
+            "app.error.unauthorized",
             "app.api.errors.authentication_required",
           ].includes(error.message)
         ) {

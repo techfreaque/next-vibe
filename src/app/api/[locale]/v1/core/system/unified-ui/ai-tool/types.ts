@@ -5,16 +5,22 @@
 
 import "server-only";
 
-import type { CoreTool } from "ai";
 import type { z } from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { EndpointLogger } from "../cli/vibe/endpoints/endpoint-handler/logger";
 import type { Methods } from "../cli/vibe/endpoints/endpoint-types/core/enums";
 import type { UnifiedField } from "../cli/vibe/endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "../cli/vibe/endpoints/endpoint-types/endpoint/create";
-import type { EndpointLogger } from "../cli/vibe/endpoints/endpoint-handler/logger";
+
+/**
+ * Re-export CoreTool from AI SDK for type safety
+ * Using 'ai' package tool() function returns CoreTool
+ * This must be at the top so it's available for use in interfaces below
+ */
+export type CoreTool = ReturnType<typeof import("ai").tool>;
 
 /**
  * Discovered endpoint metadata
@@ -33,13 +39,13 @@ export interface DiscoveredEndpoint {
   method: Methods;
 
   /** Endpoint path segments */
-  path: string[];
+  path: readonly string[];
 
   /** Tool-friendly name (snake_case) */
   toolName: string;
 
   /** Endpoint aliases */
-  aliases: string[];
+  aliases: readonly string[];
 
   /** Allowed user roles */
   allowedRoles: readonly (typeof UserRoleValue)[];
@@ -89,6 +95,18 @@ export interface AIToolMetadata {
 }
 
 /**
+ * Tool parameter value types
+ */
+export type ToolParameterValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | ToolParameterValue[]
+  | { [key: string]: ToolParameterValue };
+
+/**
  * AI Tool execution context
  */
 export interface AIToolExecutionContext {
@@ -96,7 +114,7 @@ export interface AIToolExecutionContext {
   toolName: string;
 
   /** Tool parameters */
-  parameters: Record<string, unknown>;
+  parameters: Record<string, ToolParameterValue>;
 
   /** User context */
   user: {
@@ -128,7 +146,7 @@ export interface AIToolExecutionResult {
   success: boolean;
 
   /** Result data */
-  data?: unknown;
+  data?: ToolParameterValue;
 
   /** Error message if failed */
   error?: string;
@@ -261,7 +279,7 @@ export interface IToolRegistry {
   /** Get all tools filtered by criteria */
   getTools(criteria?: ToolFilterCriteria): Promise<AIToolMetadata[]>;
 
-  /** Get tools as AI SDK CoreTool[] */
+  /** Get tools as AI SDK tool array */
   getAISDKTools(criteria?: ToolFilterCriteria): Promise<CoreTool[]>;
 
   /** Get tools for a specific user */
@@ -316,10 +334,12 @@ export interface IToolConverter {
     options?: ToolConverterOptions,
   ): Promise<AIToolMetadata>;
 
-  /** Convert endpoint to AI SDK CoreTool */
+  /** Convert endpoint to AI SDK tool */
   convertToAISDKTool(
     endpoint: DiscoveredEndpoint,
-    executor: (params: Record<string, unknown>) => Promise<unknown>,
+    executor: (
+      params: Record<string, ToolParameterValue>,
+    ) => Promise<ToolParameterValue>,
     options?: ToolConverterOptions,
   ): Promise<CoreTool>;
 
@@ -335,6 +355,11 @@ export interface IToolConverter {
 }
 
 /**
+ * Platform type for opt-out checking
+ */
+export type Platform = "cli" | "web" | "ai";
+
+/**
  * Tool filter interface
  */
 export interface IToolFilter {
@@ -342,6 +367,7 @@ export interface IToolFilter {
   filterByPermissions(
     tools: AIToolMetadata[],
     user: AIToolExecutionContext["user"],
+    platform?: Platform,
   ): AIToolMetadata[];
 
   /** Filter tools by criteria */
@@ -354,6 +380,7 @@ export interface IToolFilter {
   hasPermission(
     tool: AIToolMetadata,
     user: AIToolExecutionContext["user"],
+    platform?: Platform,
   ): boolean;
 }
 
@@ -376,6 +403,6 @@ export interface IToolExecutor {
   /** Validate tool parameters */
   validateParameters(
     toolName: string,
-    parameters: Record<string, unknown>,
+    parameters: Record<string, ToolParameterValue>,
   ): Promise<{ valid: boolean; errors?: string[] }>;
 }

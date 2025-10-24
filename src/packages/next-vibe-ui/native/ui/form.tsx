@@ -13,8 +13,8 @@ import { Controller, FormProvider, useFormContext } from "react-hook-form";
 import { View } from "react-native";
 import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 
-import { Calendar as CalendarIcon } from "../lib/icons/Calendar";
-import { X } from "../lib/icons/X";
+import { Calendar as CalendarIcon } from "./icons/Calendar";
+import { X } from "./icons/X";
 import { cn } from "../lib/utils";
 // TODO: These components need to be implemented
 // import {
@@ -500,7 +500,6 @@ const FormRadioGroup = React.forwardRef<
 FormRadioGroup.displayName = "FormRadioGroup";
 
 // TODO: Implement Combobox component
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const FormCombobox = React.forwardRef<any, any>(
   ({ label, description, value, onChange, ...props }, ref) => {
     const {

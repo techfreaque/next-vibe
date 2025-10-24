@@ -21,12 +21,30 @@ export function validateData<TSchema extends z.ZodType>(
   logger: EndpointLogger,
 ): ResponseType<z.infer<TSchema>> {
   try {
-    // Validate the data against the schema
     const result = schema.safeParse(data);
 
     if (!result.success) {
+      // Log the full error object to understand its structure
+      logger.error("Zod validation failed", {
+        errorType: typeof result.error,
+        errorConstructor: result.error?.constructor?.name,
+        hasErrors: "errors" in result.error,
+        errorsLength: result.error.errors?.length,
+        errorKeys: Object.keys(result.error),
+        fullError: JSON.stringify(result.error, null, 2),
+      });
+
       const formattedErrors = formatZodErrors(result.error);
-      logger.error("Validation error", result.error);
+      logger.error("Validation error details", {
+        errorCount: result.error.errors?.length || 0,
+        errors: result.error.errors?.slice(0, 3).map((e) => ({
+          path: e.path.join("."),
+          message: e.message,
+          code: e.code,
+        })),
+        allErrors: result.error.errors,
+        formattedErrors,
+      });
       return createErrorResponse(
         "error.general.validation_failed",
         ErrorResponseTypes.VALIDATION_ERROR,
@@ -55,7 +73,11 @@ export function validateData<TSchema extends z.ZodType>(
  * @returns A formatted error string array
  */
 export function formatZodErrors(zodError: ZodError): string[] {
-  if (!zodError?.errors || !Array.isArray(zodError.errors)) {
+  if (
+    !zodError?.errors ||
+    !Array.isArray(zodError.errors) ||
+    zodError.errors.length === 0
+  ) {
     return ["error.general.unknown_validation_error"];
   }
   return zodError.errors.map((err) => `${err.path.join(".")}: ${err.message}`);

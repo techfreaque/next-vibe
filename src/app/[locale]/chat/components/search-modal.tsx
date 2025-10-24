@@ -1,20 +1,21 @@
 "use client";
 
-import { MessageSquarePlus, Search } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
-import type { JSX } from "react";
-import React, { useState } from "react";
-
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 import {
   Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  Div,
   Input,
 } from "next-vibe-ui/ui";
+import { MessageSquarePlus, Search } from "next-vibe-ui/ui/icons";
+import type { JSX } from "react";
+import React, { useState } from "react";
+
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import type { ChatThread } from "../types";
 
@@ -66,7 +67,7 @@ export function SearchModal({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 flex-1 overflow-hidden flex flex-col">
+        <Div className="space-y-4 flex-1 overflow-hidden flex flex-col">
           {/* New Thread Button */}
           <Button onClick={handleCreateThread} className="w-full flex-shrink-0">
             <MessageSquarePlus className="h-4 w-4 mr-2" />
@@ -74,7 +75,7 @@ export function SearchModal({
           </Button>
 
           {/* Search Input */}
-          <div className="relative flex-shrink-0">
+          <Div className="relative flex-shrink-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
@@ -85,11 +86,11 @@ export function SearchModal({
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
             />
-          </div>
+          </Div>
 
           {/* Search Results */}
           {searchQuery.length > 0 && (
-            <div className="flex-1 overflow-y-auto space-y-1 min-h-0">
+            <Div className="flex-1 overflow-y-auto space-y-1 min-h-0">
               {searchResults.length > 0 ? (
                 searchResults.map((thread) => (
                   <button
@@ -104,13 +105,13 @@ export function SearchModal({
                   </button>
                 ))
               ) : (
-                <div className="text-center py-8 text-muted-foreground text-sm">
+                <Div className="text-center py-8 text-muted-foreground text-sm">
                   {t("app.chat.common.searchModal.noThreadsFound")}
-                </div>
+                </Div>
               )}
-            </div>
+            </Div>
           )}
-        </div>
+        </Div>
       </DialogContent>
     </Dialog>
   );

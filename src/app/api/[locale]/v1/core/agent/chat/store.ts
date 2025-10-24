@@ -94,6 +94,7 @@ export interface ChatSettings {
   theme: "light" | "dark";
   viewMode: "linear" | "flat" | "threaded";
   enableSearch: boolean;
+  enabledToolIds: string[];
 }
 
 /**
@@ -159,6 +160,7 @@ const getDefaultSettings = (): ChatSettings => ({
   theme: "dark",
   viewMode: "linear",
   enableSearch: false,
+  enabledToolIds: [],
 });
 
 // Helper to load settings from localStorage (client-only, called after mount)

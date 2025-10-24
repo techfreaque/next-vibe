@@ -98,6 +98,83 @@ export const translations: typeof enTranslations = {
       response: {
         title: "Wyniki Importu",
         description: "Podsumowanie operacji importu CSV",
+
+        basicResults: {
+          title: "Podstawowe Wyniki",
+          description: "Podstawowe statystyki importu",
+        },
+
+        batchId: {
+          label: "ID Partii",
+        },
+
+        totalRows: {
+          label: "Całkowita liczba wierszy",
+        },
+
+        isChunkedProcessing: {
+          label: "Przetwarzanie w tle",
+        },
+
+        jobId: {
+          label: "ID Joba",
+        },
+
+        statistics: {
+          title: "Statystyki Importu",
+          description: "Szczegółowy podział operacji importu",
+        },
+
+        successfulImports: {
+          label: "Udane Importy",
+        },
+
+        failedImports: {
+          label: "Nieudane Importy",
+        },
+
+        duplicateEmails: {
+          label: "Zduplikowane E-maile",
+        },
+
+        processingTimeMs: {
+          label: "Czas przetwarzania (ms)",
+        },
+
+        summary: {
+          title: "Podsumowanie Importu",
+          description: "Przegląd wyników importu",
+        },
+
+        newRecords: {
+          label: "Nowe Rekordy",
+        },
+
+        updatedRecords: {
+          label: "Zaktualizowane Rekordy",
+        },
+
+        skippedDuplicates: {
+          label: "Pominięte Duplikaty",
+        },
+
+        errors: {
+          row: {
+            label: "Wiersz",
+          },
+          email: {
+            label: "E-mail",
+          },
+          error: {
+            label: "Błąd",
+          },
+        },
+
+        nextSteps: {
+          item: {
+            label: "Następne Kroki",
+          },
+        },
       },
 
       // === BŁĘDY ===
@@ -124,6 +201,30 @@ export const translations: typeof enTranslations = {
           title: "Import Nieudany",
           description:
             "Wystąpił błąd podczas przetwarzania importu. Spróbuj ponownie.",
+        },
+        network: {
+          title: "Błąd Sieci",
+          description: "Połączenie sieciowe nie powiodło się podczas importu",
+        },
+        forbidden: {
+          title: "Zabronione",
+          description: "Nie masz uprawnień do wykonania tego importu",
+        },
+        notFound: {
+          title: "Nie Znaleziono",
+          description: "Zasób importu nie został znaleziony",
+        },
+        unknown: {
+          title: "Nieznany Błąd",
+          description: "Wystąpił nieoczekiwany błąd",
+        },
+        unsavedChanges: {
+          title: "Niezapisane Zmiany",
+          description: "Masz niezapisane zmiany",
+        },
+        conflict: {
+          title: "Konflikt Danych",
+          description: "Wystąpił konflikt z istniejącymi danymi",
         },
       },
 

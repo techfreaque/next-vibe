@@ -10,6 +10,12 @@ export const translations = {
     description: "Configure IMAP client settings",
   },
   response: {
+    host: "Host",
+    port: "Port",
+    username: "Username",
+    password: "Password",
+    tls: "TLS",
+    autoReconnect: "Auto Reconnect",
     serverEnabled: "Server Enabled",
     maxConnections: "Max Connections",
     connectionTimeout: "Connection Timeout",
@@ -83,6 +89,10 @@ export const translations = {
   update: {
     title: "Update IMAP Configuration",
     description: "Update IMAP client configuration settings",
+    success: {
+      title: "Configuration Updated",
+      description: "IMAP configuration has been successfully updated",
+    },
     form: {
       title: "Update Configuration",
       description: "Modify IMAP configuration settings",

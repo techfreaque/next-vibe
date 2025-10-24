@@ -1,6 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Guard",
   post: {
     title: "Guard-Status",
     description: "Guard-Umgebungsstatus prüfen",

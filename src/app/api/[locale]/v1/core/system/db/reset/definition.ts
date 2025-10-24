@@ -30,7 +30,7 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.db.reset.post.description",
   category: "app.api.v1.core.system.db.category",
   tags: ["app.api.v1.core.system.db.reset.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_ONLY],
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["reset", "db:reset"],
   method: Methods.POST,
   path: ["v1", "core", "system", "db", "reset"],

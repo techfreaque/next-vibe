@@ -1,20 +1,21 @@
 "use client";
 
-import type { JSX } from "react";
-import React, { useEffect, useState } from "react";
-
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-import type { TranslationKey } from "@/i18n/core/static-types";
 import {
   Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  Div,
   Input,
   Label,
 } from "next-vibe-ui/ui";
+import type { JSX } from "react";
+import React, { useEffect, useState } from "react";
+
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { FolderIconSelector } from "./folder-icon-selector";
 
@@ -61,8 +62,8 @@ export function NewFolderDialog({
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="space-y-2">
+        <Div className="space-y-4">
+          <Div className="space-y-2">
             <Label htmlFor="folder-name">
               {t("app.chat.newFolder.folderName")}
             </Label>
@@ -78,20 +79,20 @@ export function NewFolderDialog({
               }}
               autoFocus
             />
-          </div>
-          <div className="space-y-2">
+          </Div>
+          <Div className="space-y-2">
             <Label>{t("app.chat.newFolder.folderIcon")}</Label>
             <FolderIconSelector value={icon} onChange={setIcon} />
-          </div>
-          <div className="flex gap-2 justify-end">
+          </Div>
+          <Div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               {t("app.chat.newFolder.cancel")}
             </Button>
             <Button onClick={handleSave} disabled={!name.trim()}>
               {t("app.chat.newFolder.create")}
             </Button>
-          </div>
-        </div>
+          </Div>
+        </Div>
       </DialogContent>
     </Dialog>
   );

@@ -51,7 +51,7 @@ export async function validateNextRequestData<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
   TFields,
 >(
   endpoint: CreateApiEndpoint<
@@ -341,7 +341,7 @@ async function validatePostRequestData<TRequestInput, TRequestOutput>(
   } catch (error) {
     return {
       success: false,
-      message: "error.errors.invalid_request_data",
+      message: "app.error.errors.invalid_request_data",
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
         error:

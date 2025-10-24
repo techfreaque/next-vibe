@@ -140,6 +140,16 @@ export const translations: typeof enTranslations = {
       nurture: "Pielęgnacja",
       reactivation: "Reaktywacja",
     },
+    // Country options
+    countries: {
+      de: "Niemcy",
+      pl: "Polska",
+    },
+    // Language options
+    languages: {
+      de: "Niemiecki",
+      pl: "Polski",
+    },
     // Rate limiting and error messages
     errors: {
       rateLimit: {

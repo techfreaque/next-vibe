@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Div, Span } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
@@ -54,10 +55,10 @@ export function MessageAuthorInfo({
   const personaName = tone ? getPersonaById(tone)?.name : null;
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <Div className={cn("flex items-center gap-2", className)}>
       {/* Author info - horizontally aligned */}
-      <div className="flex items-center gap-2 min-w-0">
-        <span
+      <Div className="flex items-center gap-2 min-w-0">
+        <Span
           className={cn(
             "font-medium truncate flex items-center gap-1.5",
             compact ? "text-xs" : "text-sm",
@@ -71,7 +72,7 @@ export function MessageAuthorInfo({
               const modelData = getModelById(model);
               const ModelIcon = modelData.icon;
               return typeof ModelIcon === "string" ? (
-                <span className="text-base leading-none">{ModelIcon}</span>
+                <Span className="text-base leading-none">{ModelIcon}</Span>
               ) : (
                 <ModelIcon
                   className={cn(compact ? "h-3 w-3" : "h-3.5 w-3.5")}
@@ -79,27 +80,27 @@ export function MessageAuthorInfo({
               );
             })()}
           {displayName}
-        </span>
+        </Span>
 
         {/* Show persona for both AI and user messages */}
         {personaName && (
-          <span className="text-xs text-muted-foreground truncate">
+          <Span className="text-xs text-muted-foreground truncate">
             {/* eslint-disable-next-line i18next/no-literal-string -- Formatting characters */}
             {`(${personaName})`}
-          </span>
+          </Span>
         )}
 
-        <span className="text-xs text-muted-foreground flex-shrink-0">
+        <Span className="text-xs text-muted-foreground flex-shrink-0">
           {formatRelativeTime(timestamp.getTime())}
-        </span>
+        </Span>
 
         {edited && (
-          <span className="text-xs text-muted-foreground italic flex-shrink-0">
+          <Span className="text-xs text-muted-foreground italic flex-shrink-0">
             {/* eslint-disable-next-line i18next/no-literal-string -- Formatting characters */}
             {`(${t("app.chat.messages.edited")})`}
-          </span>
+          </Span>
         )}
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 }

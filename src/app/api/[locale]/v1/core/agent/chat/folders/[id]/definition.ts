@@ -772,5 +772,5 @@ export type FolderDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
 export type FolderDeleteUrlParamsTypeOutput =
   typeof DELETE.types.UrlVariablesOutput;
 
-const definitions = { GET, PATCH, DELETE };
+const definitions = { GET, PATCH, DELETE } as const;
 export default definitions;

@@ -1,12 +1,12 @@
 "use client";
 
-import { Hash, List, Network } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
+import { Button, Div } from "next-vibe-ui/ui";
+import { Hash, List, Network } from "next-vibe-ui/ui/icons";
 import type React from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { Button } from "next-vibe-ui/ui";
 
 export type ViewMode = "linear" | "threaded" | "flat";
 
@@ -26,7 +26,7 @@ export function ViewModeToggle({
   const { t } = simpleT(locale);
 
   return (
-    <div className={cn("flex gap-1", className)}>
+    <Div className={cn("flex gap-1", className)}>
       <Button
         variant="ghost"
         size="icon"
@@ -65,6 +65,6 @@ export function ViewModeToggle({
       >
         <Hash className="h-5 w-5" />
       </Button>
-    </div>
+    </Div>
   );
 }

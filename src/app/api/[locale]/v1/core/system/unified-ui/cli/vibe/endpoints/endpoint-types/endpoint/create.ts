@@ -65,7 +65,7 @@ export type ValidationMode =
 export interface ApiEndpoint<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
   TFields,
 > {
   // Core endpoint metadata - all required for type safety
@@ -273,7 +273,7 @@ function generateResponseSchema<F>(
 export type CreateApiEndpoint<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
   TFields,
   RequestInput = ExtractInput<
     InferSchemaFromField<TFields, FieldUsage.RequestData>
@@ -326,7 +326,7 @@ export type CreateEndpointReturnInMethod<
   TFields,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
 > = {
   readonly [KMethod in TMethod]: CreateApiEndpoint<
     TExampleKey,
@@ -341,10 +341,10 @@ export type CreateEndpointReturnInMethod<
  * Returns both legacy format and new destructured format for maximum compatibility
  */
 export function createEndpoint<
-  TFields,
-  TExampleKey extends string,
-  TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  const TFields,
+  const TExampleKey extends string,
+  const TMethod extends Methods,
+  const TUserRoleValue extends readonly string[],
 >(
   config: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
 ): CreateEndpointReturnInMethod<TFields, TExampleKey, TMethod, TUserRoleValue> {
@@ -360,7 +360,8 @@ export function createEndpoint<
   ) as InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>;
 
   function requiresAuthentication(): boolean {
-    return config.allowedRoles.some((role) => role !== UserRole.PUBLIC);
+    // Endpoint requires authentication if PUBLIC role is NOT in the allowed roles
+    return !config.allowedRoles.includes(UserRole.PUBLIC);
   }
 
   // Create endpoint with proper type inference - preserve actual schema types for input/output differentiation
@@ -430,9 +431,11 @@ export function createEndpoint<
   };
 
   // Return the method-keyed object with proper type inference
-  return {
+  const result = {
     [config.method]: endpointDefinition,
-  } as CreateEndpointReturnInMethod<
+  } as const;
+
+  return result as any as CreateEndpointReturnInMethod<
     TFields,
     TExampleKey,
     TMethod,

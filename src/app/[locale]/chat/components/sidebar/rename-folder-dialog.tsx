@@ -1,20 +1,21 @@
 "use client";
 
-import type { JSX } from "react";
-import React, { useEffect, useState } from "react";
-
-import type { IconValue } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 import {
   Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  Div,
   Input,
   Label,
 } from "next-vibe-ui/ui";
+import type { JSX } from "react";
+import React, { useEffect, useState } from "react";
+
+import type { IconValue } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import { IconSelector } from "../shared/icon-selector";
 
@@ -58,8 +59,8 @@ export function RenameFolderDialog({
         <DialogHeader>
           <DialogTitle>{t("app.chat.renameFolder.title")}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="space-y-2">
+        <Div className="space-y-4">
+          <Div className="space-y-2">
             <Label htmlFor="folder-name">
               {t("app.chat.renameFolder.folderName")}
             </Label>
@@ -74,24 +75,24 @@ export function RenameFolderDialog({
                 }
               }}
             />
-          </div>
-          <div className="space-y-2">
+          </Div>
+          <Div className="space-y-2">
             <Label>{t("app.chat.renameFolder.folderIcon")}</Label>
             <IconSelector
               value={icon ?? "folder"}
               onChange={setIcon}
               locale={locale}
             />
-          </div>
-          <div className="flex gap-2 justify-end">
+          </Div>
+          <Div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               {t("app.chat.renameFolder.cancel")}
             </Button>
             <Button onClick={handleSave} disabled={!name.trim()}>
               {t("app.chat.renameFolder.save")}
             </Button>
-          </div>
-        </div>
+          </Div>
+        </Div>
       </DialogContent>
     </Dialog>
   );

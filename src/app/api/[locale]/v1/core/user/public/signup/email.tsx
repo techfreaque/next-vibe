@@ -1,5 +1,5 @@
 import { Button, Section, Text } from "@react-email/components";
-import { env } from "next-vibe/server/env";
+import { env } from "@/config/env";
 import {
   createErrorResponse,
   createSuccessResponse,

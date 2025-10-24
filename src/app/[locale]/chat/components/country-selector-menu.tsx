@@ -1,12 +1,13 @@
 "use client";
 
-import { CheckIcon, Globe } from "lucide-react";
 import {
   DropdownMenuItem,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-} from "next-vibe-ui/ui/dropdown-menu";
+  Span,
+} from "next-vibe-ui/ui";
+import { Check, Globe } from "next-vibe-ui/ui/icons";
 import type { FC } from "react";
 import { useCallback } from "react";
 
@@ -28,8 +29,8 @@ const CountrySelectorMenu: FC = () => {
     <DropdownMenuSub>
       <DropdownMenuSubTrigger>
         <Globe className="h-4 w-4 mr-2" />
-        <span className="mr-2">{currentCountry.name}</span>
-        <span className="ml-auto">{currentCountry.flag}</span>
+        <Span className="mr-2">{currentCountry.name}</Span>
+        <Span className="ml-auto">{currentCountry.flag}</Span>
       </DropdownMenuSubTrigger>
       <DropdownMenuSubContent className="max-h-[400px] overflow-y-auto">
         {countries.map((country) => (
@@ -38,10 +39,10 @@ const CountrySelectorMenu: FC = () => {
             onClick={() => handleCountryChange(country.code)}
             className="cursor-pointer"
           >
-            <span className="mr-2">{country.flag}</span>
-            <span className="flex-1">{country.name}</span>
+            <Span className="mr-2">{country.flag}</Span>
+            <Span className="flex-1">{country.name}</Span>
             {currentCountry.code === country.code && (
-              <CheckIcon className="h-4 w-4 ml-2" />
+              <Check className="h-4 w-4 ml-2" />
             )}
           </DropdownMenuItem>
         ))}

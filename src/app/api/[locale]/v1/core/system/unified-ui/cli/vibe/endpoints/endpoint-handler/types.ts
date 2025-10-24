@@ -73,16 +73,23 @@ export type InferJwtPayloadType<TUserRoleValue extends typeof UserRoleValue> =
 
 /**
  * Type helper for arrays of user roles
+ *
+ * CRITICAL: Must use exact string literal "PUBLIC" instead of typeof UserRole.PUBLIC
+ * because typeof returns the same type for all enum values due to how mapped types work
+ *
+ * Logic:
+ * - Exclude<TRoles[number], "PUBLIC"> removes "PUBLIC" from the union
+ * - If the result is never, then ONLY PUBLIC was in the array → JWTPublicPayloadType
+ * - If TRoles[number] includes "PUBLIC" (check with Extract) → JwtPayloadType (mixed)
+ * - Otherwise → JwtPrivatePayloadType (no PUBLIC, guaranteed authenticated)
  */
 export type InferJwtPayloadTypeFromRoles<
-  TRoles extends readonly (typeof UserRoleValue)[],
-> = TRoles["length"] extends 1
-  ? TRoles[0] extends typeof UserRole.PUBLIC
-    ? JWTPublicPayloadType
-    : JwtPrivatePayloadType
-  : TRoles[number] extends typeof UserRole.PUBLIC
-    ? JwtPayloadType
-    : JwtPrivatePayloadType;
+  TRoles extends readonly string[],
+> = Exclude<TRoles[number], "PUBLIC"> extends never
+  ? JWTPublicPayloadType
+  : Extract<TRoles[number], "PUBLIC"> extends never
+    ? JwtPrivatePayloadType
+    : JwtPayloadType;
 
 /**
  * Extract methods that exist in the definitions object
@@ -127,7 +134,7 @@ export interface MethodHandlerConfig<
   TRequestOutput,
   TResponseOutput,
   TUrlVariablesOutput,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
 > {
   handler: ApiHandlerFunction<
     TRequestOutput,
@@ -151,18 +158,17 @@ export type EndpointHandlerConfig<T> = {
   [K in Methods]?: K extends keyof T
     ? T[K] extends {
         types: {
-          RequestOutput: infer TRequestOutput;
-          ResponseOutput: infer TResponseOutput;
-          UrlVariablesOutput: infer TUrlVariablesOutput;
+          RequestOutput: any;
+          ResponseOutput: any;
+          UrlVariablesOutput: any;
         };
-        allowedRoles: infer TUserRoleValue extends
-          readonly (typeof UserRoleValue)[];
+        allowedRoles: readonly string[];
       }
       ? MethodHandlerConfig<
-          TRequestOutput,
-          TResponseOutput,
-          TUrlVariablesOutput,
-          TUserRoleValue
+          T[K]["types"]["RequestOutput"],
+          T[K]["types"]["ResponseOutput"],
+          T[K]["types"]["UrlVariablesOutput"],
+          T[K]["allowedRoles"]
         >
       : never
     : never;
@@ -222,7 +228,7 @@ export type EndpointsHandlerReturn<T> = {
         Record<string, string | number | boolean>,
         Record<string, string | number | boolean>,
         Record<string, string | number | boolean>,
-        readonly (typeof UserRoleValue)[]
+        readonly string[]
       >
     >;
   };
@@ -236,7 +242,7 @@ export type EndpointsHandlerReturn<T> = {
 export interface ApiHandlerProps<
   TRequestOutput,
   TUrlVariablesOutput,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
 > {
   /** Request data (validated by Zod schema) */
   data: TRequestOutput;
@@ -273,7 +279,7 @@ export type ApiHandlerFunction<
   TRequestOutput,
   TResponseOutput,
   TUrlVariablesOutput,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
 > = (
   props: ApiHandlerProps<TRequestOutput, TUrlVariablesOutput, TUserRoleValue>,
 ) =>
@@ -329,7 +335,7 @@ export interface ApiHandlerOptions<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
   TFields,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TRequestInput = any,
@@ -388,7 +394,7 @@ export type EndpointHandlerReturn<
   TResponseOutput,
   TUrlVariablesOutput,
   TMethod extends Methods,
-  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+  TUserRoleValue extends readonly string[],
 > = {
   [K in TMethod]: NextHandlerReturnType<TResponseOutput, TUrlVariablesOutput>;
 } & {

@@ -12,13 +12,12 @@ import { creditPurchaseRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: async ({ data, user, locale, logger }) => {
-      return await creditPurchaseRepository.createCheckoutSession(
+    handler: async ({ data, user, locale, logger }) =>
+      await creditPurchaseRepository.createCheckoutSession(
         data,
         user.id,
         locale,
         logger,
-      );
-    },
+      ),
   },
 });

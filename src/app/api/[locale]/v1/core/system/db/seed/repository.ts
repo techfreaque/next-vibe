@@ -3,7 +3,6 @@
  * Handles run database seeds operations
  */
 
-import { seedDatabase } from "next-vibe/server/db/seed-manager";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -16,6 +15,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type endpoints from "./definition";
+import { seedDatabase } from "./seed-manager";
 
 type RequestType = typeof endpoints.POST.types.RequestOutput;
 type SeedResponseType = typeof endpoints.POST.types.ResponseOutput;

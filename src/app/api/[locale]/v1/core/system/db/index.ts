@@ -1,5 +1,5 @@
 import { drizzle } from "drizzle-orm/node-postgres";
-import { env } from "next-vibe/server/env";
+import { env } from "@/config/env";
 import pg from "pg";
 
 import * as creditSchema from "../../agent/chat/credits/db";
@@ -67,7 +67,7 @@ export async function closeDatabase(logger: EndpointLogger): Promise<void> {
     await pool.end();
   } catch (error) {
     // Ignore errors during shutdown - this is expected when pool is already closed
-    logger.error("core.system.db.errors.pool_close_failed", error);
+    logger.error("app.api.v1.core.system.db.errors.pool_close_failed", error);
   }
 }
 

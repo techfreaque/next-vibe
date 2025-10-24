@@ -99,11 +99,11 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
 
       // Handle CLI-only user without database access
       if (userId === "00000000-0000-0000-0000-000000000001") {
-        // Return CLI_ONLY role for the default CLI user
+        // Return CLI_OFF role for the default CLI user
         const cliRole: UserRole = {
           id: "cli-role-id",
           userId: userId,
-          role: UserRoleEnum.CLI_ONLY,
+          role: UserRoleEnum.CLI_OFF,
           assignedBy: null,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -165,11 +165,11 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
 
       // Handle CLI-only user without database access
       if (userId === "00000000-0000-0000-0000-000000000001") {
-        // CLI user can have CLI_ONLY, ADMIN, or CLI_WEB roles
+        // CLI user can have CLI_OFF, ADMIN, or AI_TOOL_OFF roles
         if (
-          role === UserRoleEnum.CLI_ONLY ||
+          role === UserRoleEnum.CLI_OFF ||
           role === UserRoleEnum.ADMIN ||
-          role === UserRoleEnum.CLI_WEB
+          role === UserRoleEnum.AI_TOOL_OFF
         ) {
           const cliRole: UserRole = {
             id: "cli-role-id",

@@ -36,6 +36,12 @@
   "files.exclude": {
     "postgres_data": true
   },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/tsconfig.tsbuildinfo": true,
+    "**/*.tmp": true,
+    "**/*.next": true
+  },
   // "terminal.integrated.profiles.linux": {
   //   "Vibe Guard": {
   //     "path": "${workspaceFolder}/.vibe-guard-instance/.guard.sh"

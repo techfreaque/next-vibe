@@ -44,7 +44,6 @@ export async function createHTTPSuccessResponse<TResponse>({
   onSuccess?: (data: TResponse) => Promise<ResponseType<UndefinedType>>;
   logger: EndpointLogger;
 }): Promise<NextResponse<ResponseType<TResponse>>> {
-  // Validate response data against schema
   const validationResult = validateData(data, schema, logger);
 
   if (!validationResult.success) {

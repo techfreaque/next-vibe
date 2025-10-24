@@ -107,7 +107,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       ) as ResponseType<PulseHealth | null>;
     } catch {
       return createErrorResponse(
-        "error.errorTypes.internal_error" as never,
+        "app.error.errorTypes.internal_error" as never,
         "INTERNAL_ERROR" as never,
       );
     }
@@ -123,7 +123,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       if (!currentHealthResponse.success || !currentHealthResponse.data) {
         // If no health record exists, cannot update - require a full create
         return createErrorResponse(
-          "error.errorTypes.not_found" as never,
+          "app.error.errorTypes.not_found" as never,
           "NOT_FOUND" as never,
         );
       }
@@ -137,7 +137,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return createSuccessResponse(updatedHealth) as ResponseType<PulseHealth>;
     } catch {
       return createErrorResponse(
-        "error.errorTypes.internal_error" as never,
+        "app.error.errorTypes.internal_error" as never,
         "INTERNAL_ERROR" as never,
       );
     }
@@ -156,7 +156,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return createSuccessResponse(newHealth) as ResponseType<PulseHealth>;
     } catch {
       return createErrorResponse(
-        "error.errorTypes.internal_error" as never,
+        "app.error.errorTypes.internal_error" as never,
         "INTERNAL_ERROR" as never,
       );
     }
@@ -177,7 +177,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       ) as ResponseType<PulseExecution>;
     } catch {
       return createErrorResponse(
-        "error.errorTypes.internal_error" as never,
+        "app.error.errorTypes.internal_error" as never,
         "INTERNAL_ERROR" as never,
       );
     }
@@ -198,7 +198,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
       if (!updatedExecution) {
         return createErrorResponse(
-          "error.errorTypes.not_found" as never,
+          "app.error.errorTypes.not_found" as never,
           "NOT_FOUND" as never,
         );
       }
@@ -208,7 +208,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       ) as ResponseType<PulseExecution>;
     } catch {
       return createErrorResponse(
-        "error.errorTypes.internal_error" as never,
+        "app.error.errorTypes.internal_error" as never,
         "INTERNAL_ERROR" as never,
       );
     }
@@ -230,7 +230,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       >;
     } catch {
       return createErrorResponse(
-        "error.errorTypes.internal_error" as never,
+        "app.error.errorTypes.internal_error" as never,
         "INTERNAL_ERROR" as never,
       );
     }
@@ -253,7 +253,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       ) as ResponseType<PulseExecution | null>;
     } catch {
       return createErrorResponse(
-        "error.errorTypes.internal_error" as never,
+        "app.error.errorTypes.internal_error" as never,
         "INTERNAL_ERROR" as never,
       );
     }
@@ -274,7 +274,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       ) as ResponseType<PulseNotification>;
     } catch {
       return createErrorResponse(
-        "error.errorTypes.internal_error" as never,
+        "app.error.errorTypes.internal_error" as never,
         "INTERNAL_ERROR" as never,
       );
     }
@@ -296,7 +296,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       >;
     } catch {
       return createErrorResponse(
-        "error.errorTypes.internal_error" as never,
+        "app.error.errorTypes.internal_error" as never,
         "INTERNAL_ERROR" as never,
       );
     }
@@ -316,7 +316,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
       if (!updatedNotification) {
         return createErrorResponse(
-          "error.errorTypes.not_found" as never,
+          "app.error.errorTypes.not_found" as never,
           "NOT_FOUND" as never,
         );
       }
@@ -326,7 +326,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       ) as ResponseType<PulseNotification>;
     } catch {
       return createErrorResponse(
-        "error.errorTypes.internal_error" as never,
+        "app.error.errorTypes.internal_error" as never,
         "INTERNAL_ERROR" as never,
       );
     }
@@ -346,7 +346,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       const currentHealthResponse = await this.getCurrentHealth(_logger);
       if (!currentHealthResponse.success) {
         return createErrorResponse(
-          "error.errorTypes.internal_error" as never,
+          "app.error.errorTypes.internal_error" as never,
           "INTERNAL_ERROR" as never,
         );
       }
@@ -369,7 +369,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       });
     } catch {
       return createErrorResponse(
-        "error.errorTypes.internal_error" as never,
+        "app.error.errorTypes.internal_error" as never,
         "INTERNAL_ERROR" as never,
       );
     }
@@ -439,7 +439,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return createSuccessResponse(response);
     } catch {
       return createErrorResponse(
-        "error.errorTypes.internal_error" as never,
+        "app.error.errorTypes.internal_error" as never,
         "INTERNAL_ERROR" as never,
       );
     }
@@ -506,7 +506,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return createSuccessResponse(undefined);
     } catch {
       return createErrorResponse(
-        "error.errorTypes.internal_error" as never,
+        "app.error.errorTypes.internal_error" as never,
         "INTERNAL_ERROR" as never,
       );
     }
@@ -538,7 +538,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
       if (!healthResponse.success || !healthResponse.data) {
         return createErrorResponse(
-          "error.errorTypes.not_found" as never,
+          "app.error.errorTypes.not_found" as never,
           "NOT_FOUND" as never,
         );
       }
@@ -582,7 +582,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       }>;
     } catch {
       return createErrorResponse(
-        "error.errorTypes.internal_error" as never,
+        "app.error.errorTypes.internal_error" as never,
         "INTERNAL_ERROR" as never,
       );
     }

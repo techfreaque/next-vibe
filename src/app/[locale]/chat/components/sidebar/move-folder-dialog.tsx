@@ -1,19 +1,21 @@
 "use client";
 
-import type { JSX } from "react";
-import React, { useMemo, useState } from "react";
-
-import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 import {
   Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  Div,
   ScrollArea,
+  Span,
 } from "next-vibe-ui/ui";
+import type { JSX } from "react";
+import React, { useMemo, useState } from "react";
+
+import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import type { ChatFolder } from "../../types";
 
@@ -77,7 +79,7 @@ export function MoveFolderDialog({
     );
 
     return (
-      <div key={targetFolder.id}>
+      <Div key={targetFolder.id}>
         <button
           onClick={() => setSelectedFolderId(targetFolder.id)}
           className={`w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent transition-colors ${
@@ -86,12 +88,12 @@ export function MoveFolderDialog({
           style={{ paddingLeft: `${depth * 16 + 12}px` }}
         >
           <Icon className="h-4 w-4 flex-shrink-0" />
-          <span className="text-sm truncate">{displayName}</span>
+          <Span className="text-sm truncate">{displayName}</Span>
         </button>
         {children.map((childFolder) =>
           renderFolderOption(childFolder, depth + 1),
         )}
-      </div>
+      </Div>
     );
   };
 
@@ -103,10 +105,10 @@ export function MoveFolderDialog({
         <DialogHeader>
           <DialogTitle>{t("app.chat.moveFolder.title")}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="text-sm text-muted-foreground">
+        <Div className="space-y-4">
+          <Div className="text-sm text-muted-foreground">
             {t("app.chat.moveFolder.description")}
-          </div>
+          </Div>
 
           {/* Root option */}
           <button
@@ -117,27 +119,27 @@ export function MoveFolderDialog({
                 : ""
             }`}
           >
-            <span className="text-sm font-medium">
+            <Span className="text-sm font-medium">
               {t("app.chat.moveFolder.rootLevel")}
-            </span>
+            </Span>
           </button>
 
           {/* Available folders */}
           <ScrollArea className="h-[300px] border rounded-md p-2">
-            <div className="space-y-1">
+            <Div className="space-y-1">
               {rootFolders.map((f) => renderFolderOption(f))}
-            </div>
+            </Div>
           </ScrollArea>
 
-          <div className="flex gap-2 justify-end">
+          <Div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               {t("app.chat.moveFolder.cancel")}
             </Button>
             <Button onClick={handleMove}>
               {t("app.chat.moveFolder.move")}
             </Button>
-          </div>
-        </div>
+          </Div>
+        </Div>
       </DialogContent>
     </Dialog>
   );

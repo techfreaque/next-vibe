@@ -206,143 +206,143 @@ export type ErrorResponseTypesElements = {
 
 export const ErrorResponseTypes: ErrorResponseTypesElements = {
   EXTERNAL_SERVICE_ERROR: {
-    errorKey: "error.errorTypes.external_service_error",
+    errorKey: "app.error.errorTypes.external_service_error",
     errorCode: 500,
   },
   TWO_FACTOR_REQUIRED: {
-    errorKey: "error.errorTypes.two_factor_required",
+    errorKey: "app.error.errorTypes.two_factor_required",
     errorCode: 202,
   },
   FORBIDDEN: {
-    errorKey: "error.errorTypes.forbidden",
+    errorKey: "app.error.errorTypes.forbidden",
     errorCode: 403,
   },
   BAD_REQUEST: {
-    errorKey: "error.errorTypes.bad_request",
+    errorKey: "app.error.errorTypes.bad_request",
     errorCode: 400,
   },
   UNKNOWN_ERROR: {
-    errorKey: "error.errorTypes.unknown_error",
+    errorKey: "app.error.errorTypes.unknown_error",
     errorCode: 500,
   },
   DATABASE_ERROR: {
-    errorKey: "error.errorTypes.database_error",
+    errorKey: "app.error.errorTypes.database_error",
     errorCode: 500,
   },
   VALIDATION_ERROR: {
-    errorKey: "error.errorTypes.validation_error",
+    errorKey: "app.error.errorTypes.validation_error",
     errorCode: 400,
   },
   AUTH_ERROR: {
-    errorKey: "error.errorTypes.auth_error",
+    errorKey: "app.error.errorTypes.auth_error",
     errorCode: 401,
   },
   UNAUTHORIZED: {
-    errorKey: "error.errorTypes.unauthorized",
+    errorKey: "app.error.errorTypes.unauthorized",
     errorCode: 403,
   },
   NOT_FOUND: {
-    errorKey: "error.errorTypes.not_found",
+    errorKey: "app.error.errorTypes.not_found",
     errorCode: 404,
   },
   EMAIL_ERROR: {
-    errorKey: "error.errorTypes.email_error",
+    errorKey: "app.error.errorTypes.email_error",
     errorCode: 500,
   },
   INTERNAL_ERROR: {
-    errorKey: "error.errorTypes.internal_error",
+    errorKey: "app.error.errorTypes.internal_error",
     errorCode: 500,
   },
   NO_RESPONSE_DATA: {
-    errorKey: "error.errorTypes.no_response_data",
+    errorKey: "app.error.errorTypes.no_response_data",
     errorCode: 500,
   },
   HTTP_ERROR: {
-    errorKey: "error.errorTypes.http_error",
+    errorKey: "app.error.errorTypes.http_error",
     errorCode: 500,
   },
   SMS_ERROR: {
-    errorKey: "error.errorTypes.sms_error",
+    errorKey: "app.error.errorTypes.sms_error",
     errorCode: 500,
   },
   TOKEN_EXPIRED_ERROR: {
-    errorKey: "error.errorTypes.token_expired_error",
+    errorKey: "app.error.errorTypes.token_expired_error",
     errorCode: 401,
   },
   PERMISSION_ERROR: {
-    errorKey: "error.errorTypes.permission_error",
+    errorKey: "app.error.errorTypes.permission_error",
     errorCode: 403,
   },
   INVALID_TOKEN_ERROR: {
-    errorKey: "error.errorTypes.invalid_token_error",
+    errorKey: "app.error.errorTypes.invalid_token_error",
     errorCode: 401,
   },
   PERMISSION_DENIED: {
-    errorKey: "error.errorTypes.permission_denied",
+    errorKey: "app.error.errorTypes.permission_denied",
     errorCode: 403,
   },
   INVALID_CREDENTIALS_ERROR: {
-    errorKey: "error.errorTypes.invalid_credentials_error",
+    errorKey: "app.error.errorTypes.invalid_credentials_error",
     errorCode: 401,
   },
   INVALID_REQUEST_ERROR: {
-    errorKey: "error.errorTypes.invalid_request_error",
+    errorKey: "app.error.errorTypes.invalid_request_error",
     errorCode: 400,
   },
   INVALID_DATA_ERROR: {
-    errorKey: "error.errorTypes.invalid_data_error",
+    errorKey: "app.error.errorTypes.invalid_data_error",
     errorCode: 400,
   },
   INVALID_INPUT_ERROR: {
-    errorKey: "error.errorTypes.invalid_input_error",
+    errorKey: "app.error.errorTypes.invalid_input_error",
     errorCode: 400,
   },
   INVALID_PAYLOAD_ERROR: {
-    errorKey: "error.errorTypes.invalid_payload_error",
+    errorKey: "app.error.errorTypes.invalid_payload_error",
     errorCode: 400,
   },
   INVALID_FORMAT_ERROR: {
-    errorKey: "error.errorTypes.invalid_format_error",
+    errorKey: "app.error.errorTypes.invalid_format_error",
     errorCode: 400,
   },
   INVALID_PARAMETER_ERROR: {
-    errorKey: "error.errorTypes.invalid_parameter_error",
+    errorKey: "app.error.errorTypes.invalid_parameter_error",
     errorCode: 400,
   },
   INVALID_QUERY_ERROR: {
-    errorKey: "error.errorTypes.invalid_query_error",
+    errorKey: "app.error.errorTypes.invalid_query_error",
     errorCode: 400,
   },
   INVALID_URL_ERROR: {
-    errorKey: "error.errorTypes.invalid_url_error",
+    errorKey: "app.error.errorTypes.invalid_url_error",
     errorCode: 400,
   },
   INVALID_PATH_ERROR: {
-    errorKey: "error.errorTypes.invalid_path_error",
+    errorKey: "app.error.errorTypes.invalid_path_error",
     errorCode: 400,
   },
   INVALID_METHOD_ERROR: {
-    errorKey: "error.errorTypes.invalid_method_error",
+    errorKey: "app.error.errorTypes.invalid_method_error",
     errorCode: 400,
   },
   INVALID_STATUS_ERROR: {
-    errorKey: "error.errorTypes.invalid_status_error",
+    errorKey: "app.error.errorTypes.invalid_status_error",
     errorCode: 400,
   },
   INVALID_RESPONSE_ERROR: {
-    errorKey: "error.errorTypes.invalid_response_error",
+    errorKey: "app.error.errorTypes.invalid_response_error",
     errorCode: 400,
   },
   PAYMENT_ERROR: {
-    errorKey: "error.errorTypes.payment_failed",
+    errorKey: "app.error.errorTypes.payment_failed",
     errorCode: 400,
   },
   PARTIAL_FAILURE: {
-    errorKey: "error.errorTypes.partial_failure",
+    errorKey: "app.error.errorTypes.partial_failure",
     errorCode: 207,
   },
   CONFLICT: {
-    errorKey: "error.errorTypes.unknown_error",
+    errorKey: "app.error.errorTypes.unknown_error",
     errorCode: 409,
   },
 } as const;

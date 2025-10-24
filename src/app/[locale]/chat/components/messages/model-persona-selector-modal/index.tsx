@@ -1,7 +1,8 @@
 "use client";
 
-import { Send, X } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
+import { Button, Div, H3, P, Textarea } from "next-vibe-ui/ui";
+import { Send, X } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
@@ -9,7 +10,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
-import { Button, Textarea } from "next-vibe-ui/ui";
 
 import type { ModelId } from "../../../types";
 import { ModelSelector } from "../../input/model-selector";
@@ -75,8 +75,8 @@ export function ModelPersonaSelectorModal({
   const isDisabled = isLoading || isSubmitting;
 
   return (
-    <div className="w-full max-h-[80dvh] overflow-y-auto">
-      <div
+    <Div className="w-full max-h-[80dvh] overflow-y-auto">
+      <Div
         className={cn(
           "p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
           "border border-border rounded-lg shadow-lg",
@@ -84,14 +84,14 @@ export function ModelPersonaSelectorModal({
         )}
       >
         {/* Header */}
-        <div className="mb-4">
-          <h3 className="text-sm font-medium mb-1">{title}</h3>
-          <p className="text-xs text-muted-foreground">{description}</p>
-        </div>
+        <Div className="mb-4">
+          <H3 className="text-sm font-medium mb-1">{title}</H3>
+          <P className="text-xs text-muted-foreground">{description}</P>
+        </Div>
 
         {/* Input field (for Answer as AI) */}
         {showInput && (
-          <div className="mb-4">
+          <Div className="mb-4">
             <Textarea
               value={inputValue}
               onChange={(e) => onInputChange?.(e.target.value)}
@@ -100,12 +100,12 @@ export function ModelPersonaSelectorModal({
               className="w-full min-h-[80px]"
               autoFocus
             />
-          </div>
+          </Div>
         )}
 
         {/* Selectors */}
-        <div className="space-y-3 mb-4">
-          <div className="flex items-center gap-2 flex-wrap">
+        <Div className="space-y-3 mb-4">
+          <Div className="flex items-center gap-2 flex-wrap">
             <ModelSelector
               value={selectedModel}
               onChange={onModelChange}
@@ -118,11 +118,11 @@ export function ModelPersonaSelectorModal({
               locale={locale}
               logger={logger}
             />
-          </div>
-        </div>
+          </Div>
+        </Div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 justify-end">
+        <Div className="flex items-center gap-2 justify-end">
           <Button
             onClick={onCancel}
             disabled={isDisabled}
@@ -143,8 +143,8 @@ export function ModelPersonaSelectorModal({
             <Send className="h-4 w-4 mr-2" />
             {isDisabled ? t("app.chat.common.sending") : finalConfirmLabel}
           </Button>
-        </div>
-      </div>
-    </div>
+        </Div>
+      </Div>
+    </Div>
   );
 }

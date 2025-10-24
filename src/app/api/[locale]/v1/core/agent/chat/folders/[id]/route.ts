@@ -46,7 +46,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
         typeof definitions.PATCH.allowedRoles
       >,
     ): Promise<ResponseType<FolderUpdateResponseOutput>> => {
-      const dataWithId: FolderUpdateRequestOutput & { id: string } = {
+      const dataWithId = {
         ...props.data,
         id: props.urlVariables.id,
       };

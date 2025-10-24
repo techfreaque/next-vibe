@@ -1,4 +1,5 @@
 export const translations = {
+  category: "Guard",
   post: {
     title: "Guard Status",
     description: "Check guard environment status",

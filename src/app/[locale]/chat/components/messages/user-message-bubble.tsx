@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Div } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
@@ -42,11 +43,11 @@ export function UserMessageBubble({
       : undefined;
 
   return (
-    <div className="flex justify-end">
-      <div className="max-w-[90%] sm:max-w-[85%] group/message">
+    <Div className="flex justify-end">
+      <Div className="max-w-[90%] sm:max-w-[85%] group/message">
         {/* Author info (for multi-user mode) */}
         {showAuthor && (
-          <div className="mb-2 flex justify-end">
+          <Div className="mb-2 flex justify-end">
             <MessageAuthorInfo
               authorName={message.authorName}
               isAI={message.isAI}
@@ -58,10 +59,10 @@ export function UserMessageBubble({
               compact
               rootFolderId={rootFolderId}
             />
-          </div>
+          </Div>
         )}
 
-        <div
+        <Div
           className={cn(
             "text-foreground rounded-2xl px-3 py-2.5 sm:px-4 sm:py-3",
             chatColors.message.user,
@@ -69,13 +70,13 @@ export function UserMessageBubble({
             chatTransitions.default,
           )}
         >
-          <div className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap break-words">
+          <Div className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap break-words">
             {message.content}
-          </div>
-        </div>
+          </Div>
+        </Div>
 
         {/* Actions - Fixed height container to maintain consistent spacing */}
-        <div className="h-10 sm:h-8 flex items-center justify-end">
+        <Div className="h-10 sm:h-8 flex items-center justify-end">
           <UserMessageActions
             messageId={message.id}
             content={message.content}
@@ -85,8 +86,8 @@ export function UserMessageBubble({
             onRetry={onRetry}
             onDelete={onDelete}
           />
-        </div>
-      </div>
-    </div>
+        </Div>
+      </Div>
+    </Div>
   );
 }

@@ -33,7 +33,7 @@ const { GET } = createEndpoint({
     "app.api.v1.core.agent.chat.tags.credits",
     "app.api.v1.core.agent.chat.tags.balance",
   ],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   fields: objectField(
     {
@@ -162,6 +162,6 @@ const { GET } = createEndpoint({
   },
 });
 
-export default { GET };
+export default { GET } as const;
 
 export type CreditsGetResponseOutput = typeof GET.types.ResponseOutput;
