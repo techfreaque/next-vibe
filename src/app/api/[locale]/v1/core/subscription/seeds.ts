@@ -6,7 +6,7 @@
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
-import { registerSeed } from "@/packages/next-vibe/server/db/seed-manager";
+import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 
 import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { NewSubscription } from "./db";

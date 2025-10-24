@@ -160,7 +160,7 @@ export async function authenticateUser<
       logger,
     );
 
-    logger.info(`Signed in as user: ${user?.id} - lead: ${user?.leadId}`);
+    logger.debug(`Signed in as user: ${user?.id} - lead: ${user?.leadId}`);
 
     if (!user) {
       return createErrorResponse(

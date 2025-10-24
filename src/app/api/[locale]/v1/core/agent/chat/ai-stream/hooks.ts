@@ -12,6 +12,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { EndpointLogger } from "../../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { ChatMessage } from "../store";
 import type { AiStreamPostRequestOutput } from "./definition";
 import {
   type ContentDeltaEventData,
@@ -281,7 +282,7 @@ export function useAIStream(
 
               case StreamEventType.MESSAGE_CREATED: {
                 const eventData = event.data as MessageCreatedEventData;
-                logger.info("[DEBUG] MESSAGE_CREATED event received", {
+                logger.debug("[DEBUG] MESSAGE_CREATED event received", {
                   messageId: eventData.messageId,
                   role: eventData.role,
                   threadId: eventData.threadId,
@@ -347,8 +348,8 @@ export function useAIStream(
                         authorId: "incognito",
                         authorName: null,
                         isAI: eventData.role === "assistant",
-                        model: eventData.model,
-                        persona: eventData.persona,
+                        model: eventData.model ?? null,
+                        persona: eventData.persona ?? null,
                         errorType: null,
                         errorMessage: null,
                         edited: false,
@@ -380,8 +381,8 @@ export function useAIStream(
                             authorId: "incognito",
                             authorName: null,
                             isAI: eventData.role === "assistant",
-                            model: eventData.model,
-                            persona: eventData.persona,
+                            model: eventData.model ?? null,
+                            persona: eventData.persona ?? null,
                             errorType: null,
                             errorMessage: null,
                             edited: false,
@@ -527,18 +528,25 @@ export function useAIStream(
                                 content: eventData.content.substring(0, 50),
                               },
                             );
-                            const savedMessage = {
+                            const savedMessage: ChatMessage = {
                               id: message.messageId,
                               threadId: message.threadId,
                               role: message.role,
                               content: eventData.content,
-                              parentMessageId: message.parentId,
+                              parentId: message.parentId,
                               depth: message.depth,
-                              model: message.model,
-                              persona: message.persona,
-                              tokens: eventData.totalTokens,
+                              authorId: "incognito",
+                              authorName: null,
+                              isAI: message.role === "assistant",
+                              model: message.model ?? null,
+                              persona: message.persona ?? null,
+                              errorType: null,
+                              errorMessage: null,
+                              edited: false,
+                              tokens: eventData.totalTokens ?? null,
                               toolCalls: message.toolCalls || null,
-                              finishReason: eventData.finishReason,
+                              upvotes: null,
+                              downvotes: null,
                               createdAt: new Date(),
                               updatedAt: new Date(),
                             };
@@ -549,9 +557,8 @@ export function useAIStream(
                               .getState()
                               .updateMessage(message.messageId, {
                                 content: eventData.content,
-                                tokens: eventData.totalTokens,
+                                tokens: eventData.totalTokens ?? null,
                                 toolCalls: message.toolCalls || null,
-                                finishReason: eventData.finishReason,
                               });
                           })
                           .catch((error) => {

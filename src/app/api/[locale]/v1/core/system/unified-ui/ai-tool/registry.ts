@@ -53,7 +53,7 @@ export class ToolRegistry implements IToolRegistry {
     }
 
     try {
-      logger.info("[Tool Registry] Starting discovery...");
+      logger.debug("[Tool Registry] Starting discovery...");
 
       // Use shared endpoint registry
       const endpointRegistry = getEndpointRegistry(logger);
@@ -65,7 +65,7 @@ export class ToolRegistry implements IToolRegistry {
       // Get all endpoints
       const endpoints = await endpointRegistry.getAllEndpoints();
 
-      logger.info("[Tool Registry] Discovery complete", {
+      logger.debug("[Tool Registry] Discovery complete", {
         endpointsFound: endpoints.length,
         sampleEndpoints: endpoints.slice(0, 5).map((e) => e.name),
       });
@@ -84,7 +84,7 @@ export class ToolRegistry implements IToolRegistry {
         parameters: endpoint.requestSchema,
       }));
 
-      logger.info("[Tool Registry] Conversion complete", {
+      logger.debug("[Tool Registry] Conversion complete", {
         toolsRegistered: this.tools.length,
       });
 

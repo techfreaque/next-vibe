@@ -303,12 +303,14 @@ export class UnifiedTaskRunnerRepositoryImpl
     tasks: Task[],
     signal: AbortSignal,
     locale: CountryLanguage,
+    logger: EndpointLogger,
   ): ResponseType<void> {
     try {
       // Store execution context
       this.locale = locale;
+      this.logger = logger;
 
-      this.logger.info("Starting unified task runner", {
+      this.logger.debug("Starting unified task runner", {
         taskCount: tasks.length,
         environment: this.environment,
         supportsSideTasks: this.supportsSideTasks,
@@ -319,7 +321,7 @@ export class UnifiedTaskRunnerRepositoryImpl
       // Start all side tasks and task runners in background
       void this.startTasksInBackground(tasks, signal, locale);
 
-      this.logger.info("Task runner startup initiated");
+      this.logger.debug("Task runner startup initiated");
 
       return createSuccessResponse(undefined);
     } catch (error) {
@@ -355,7 +357,7 @@ export class UnifiedTaskRunnerRepositoryImpl
           task.type === "side" || task.type === "task-runner",
       );
 
-      this.logger.info("Starting side tasks and task runners", {
+      this.logger.debug("Starting side tasks and task runners", {
         sideTaskCount: sideTasks.length,
         taskNames: sideTasks.map((t) => t.name),
       });
@@ -363,11 +365,11 @@ export class UnifiedTaskRunnerRepositoryImpl
       // Start each side task in parallel
       const sideTaskPromises = sideTasks.map(async (task) => {
         if (!task.enabled) {
-          this.logger.info(`Skipping disabled task: ${task.name}`);
+          this.logger.debug(`Skipping disabled task: ${task.name}`);
           return;
         }
 
-        this.logger.info(`Starting side task: ${task.name}`);
+        this.logger.debug(`Starting side task: ${task.name}`);
 
         try {
           // Create abort controller for this specific task
@@ -383,7 +385,7 @@ export class UnifiedTaskRunnerRepositoryImpl
           // Start the task
           await task.run(taskController.signal);
 
-          this.logger.info(`Side task completed: ${task.name}`);
+          this.logger.debug(`Side task completed: ${task.name}`);
           this.markTaskAsCompleted(task.name);
         } catch (error) {
           const errorMsg = parseError(error).message;
@@ -403,7 +405,7 @@ export class UnifiedTaskRunnerRepositoryImpl
       // Don't await all promises - let them run in background
       void Promise.allSettled(sideTaskPromises)
         .then(() => {
-          this.logger.info("All side tasks have completed or failed");
+          this.logger.debug("All side tasks have completed or failed");
           return;
         })
         .catch((error) => {
@@ -415,7 +417,7 @@ export class UnifiedTaskRunnerRepositoryImpl
         (task): task is CronTask => task.type === "cron",
       );
       if (cronTasks.length > 0) {
-        this.logger.info("Setting up cron task scheduler", {
+        this.logger.debug("Setting up cron task scheduler", {
           cronTaskCount: cronTasks.length,
           taskNames: cronTasks.map((t) => t.name),
         });
@@ -424,16 +426,16 @@ export class UnifiedTaskRunnerRepositoryImpl
         // In a real implementation, you'd use a cron scheduler here
         cronTasks.forEach((task) => {
           if (task.enabled) {
-            this.logger.info(
+            this.logger.debug(
               `Would schedule cron task: ${task.name} with schedule: ${task.schedule}`,
             );
           } else {
-            this.logger.info(`Skipping disabled cron task: ${task.name}`);
+            this.logger.debug(`Skipping disabled cron task: ${task.name}`);
           }
         });
       }
 
-      this.logger.info("Task runner startup completed", {
+      this.logger.debug("Task runner startup completed", {
         totalTasks: tasks.length,
         sideTasksStarted: sideTasks.filter((t) => t.enabled).length,
         cronTasksScheduled: cronTasks.filter((t) => t.enabled).length,

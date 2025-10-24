@@ -9,7 +9,7 @@ import type {
   ErrorResponseType,
   ResponseType,
   SuccessResponseType,
-} from "../../shared/types/response.schema";
+} from "@/packages/next-vibe/shared/types/response.schema";
 import { env } from "@/config/env";
 
 /**

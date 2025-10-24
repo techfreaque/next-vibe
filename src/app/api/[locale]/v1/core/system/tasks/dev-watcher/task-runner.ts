@@ -91,11 +91,11 @@ const devWatcherTaskRunner: TaskRunner = {
   async run(signal: AbortSignal): Promise<void> {
     // Only run in development
     if (getEnvVar("NODE_ENV") !== "development") {
-      logger.info("Dev watcher skipped (not in development mode)");
+      logger.debug("Dev watcher skipped (not in development mode)");
       return;
     }
 
-    logger.info("Starting smart development file watcher...");
+    logger.debug("Starting smart development file watcher...");
 
     try {
       // Use actual file system watching instead of polling
@@ -118,7 +118,7 @@ const devWatcherTaskRunner: TaskRunner = {
   },
 
   async onShutdown(): Promise<void> {
-    logger.info("Development file watcher shutting down...");
+    logger.debug("Development file watcher shutting down...");
     await Promise.resolve();
   },
 };
@@ -143,7 +143,7 @@ const startSmartFileWatcher = async (signal: AbortSignal): Promise<void> => {
   const runGenerators = async (): Promise<void> => {
     try {
       changeCount++;
-      logger.info(
+      logger.debug(
         `📁 File changes detected - Running generators (change #${changeCount})...`,
       );
 
@@ -180,7 +180,7 @@ const startSmartFileWatcher = async (signal: AbortSignal): Promise<void> => {
         mockLogger,
       );
 
-      logger.info(`✅ Generators completed for change #${changeCount}`);
+      logger.debug(`✅ Generators completed for change #${changeCount}`);
     } catch (error) {
       const errorMsg = parseError(error).message;
       logger.error("Generator execution failed", new Error(errorMsg));
@@ -214,7 +214,7 @@ const startSmartFileWatcher = async (signal: AbortSignal): Promise<void> => {
         );
 
         watchers.push(watcher);
-        logger.info(`👀 Watching ${watchPath} for changes...`);
+        logger.debug(`👀 Watching ${watchPath} for changes...`);
       } else {
         logger.warn(`Watch path does not exist: ${watchPath}`);
       }
@@ -225,13 +225,13 @@ const startSmartFileWatcher = async (signal: AbortSignal): Promise<void> => {
   }
 
   // Run generators once on startup
-  logger.info("🚀 Running initial generator scan...");
+  logger.debug("🚀 Running initial generator scan...");
   await runGenerators();
 
   // Wait for abort signal
   return await new Promise<void>((resolve) => {
     signal.addEventListener("abort", () => {
-      logger.info("🛑 Stopping file watchers...");
+      logger.debug("🛑 Stopping file watchers...");
 
       // Clean up debounce timer
       if (debounceTimer) {
@@ -248,7 +248,7 @@ const startSmartFileWatcher = async (signal: AbortSignal): Promise<void> => {
         }
       });
 
-      logger.info("✅ File watchers stopped");
+      logger.debug("✅ File watchers stopped");
       resolve();
     });
   });

@@ -1,8 +1,9 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { Div, Span } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
+import { Moon, Sun } from "next-vibe-ui/ui/icons";
 import { type JSX, useEffect, useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -55,7 +56,7 @@ export function ThemeToggleMobile({
   }, []);
 
   return (
-    <div
+    <Div
       className="flex space-x-2 pb-7 border-b text-base font-medium hover:text-primary transition-colors py-2 cursor-pointer"
       onClick={() =>
         setTheme(resolvedTheme === "dark" || !isMounted ? "light" : "dark")
@@ -66,11 +67,11 @@ export function ThemeToggleMobile({
       ) : (
         <Moon className="h-5 w-5 my-auto" />
       )}
-      <span className="text-base font-medium my-auto">
+      <Span className="text-base font-medium my-auto">
         {resolvedTheme === "dark" || !isMounted
           ? t("app.nav.enableLightMode")
           : t("app.nav.enableDarkMode")}
-      </span>
-    </div>
+      </Span>
+    </Div>
   );
 }

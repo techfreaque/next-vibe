@@ -38,7 +38,7 @@ export class EndpointRegistry implements IEndpointRegistry {
       return;
     }
 
-    this.logger.info("[Endpoint Registry] Initializing...");
+    this.logger.debug("[Endpoint Registry] Initializing...");
 
     try {
       // Use static registry from AI tool system (Next.js compatible)
@@ -71,7 +71,7 @@ export class EndpointRegistry implements IEndpointRegistry {
       this.lastRefresh = Date.now();
       this.initialized = true;
 
-      this.logger.info("[Endpoint Registry] Initialization complete", {
+      this.logger.debug("[Endpoint Registry] Initialization complete", {
         totalEndpoints: this.endpoints.length,
       });
     } catch (error) {
@@ -201,7 +201,7 @@ export class EndpointRegistry implements IEndpointRegistry {
    * Refresh the registry by re-loading from static registry
    */
   async refresh(options: EndpointDiscoveryOptions = {}): Promise<void> {
-    this.logger.info("[Endpoint Registry] Refreshing...");
+    this.logger.debug("[Endpoint Registry] Refreshing...");
     this.initialized = false;
     await this.initialize(options);
   }

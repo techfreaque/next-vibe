@@ -25,7 +25,9 @@ import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import imapAccountsListDefinition from "../../../../../api/[locale]/v1/core/emails/imap-client/accounts/list/definition";
+import imapAccountsListDefinition, {
+  type ImapAccountsListResponseOutput,
+} from "../../../../../api/[locale]/v1/core/emails/imap-client/accounts/list/definition";
 import imapAccountTestDefinition from "../../../../../api/[locale]/v1/core/emails/imap-client/accounts/test/definition";
 import { ImapSyncStatus } from "../../../../../api/[locale]/v1/core/emails/imap-client/enum";
 
@@ -65,19 +67,22 @@ export function ImapAccountsList({
   const testEndpoint = useEndpoint(imapAccountTestDefinition, {}, logger);
 
   // Access data through the read operation following leads pattern
+  // Discriminated union allows TypeScript to infer read is defined
   const apiResponse = accountsEndpoint.read.response;
-  const accounts = apiResponse?.success ? apiResponse.data.accounts : [];
-  const totalAccounts = apiResponse?.success
-    ? apiResponse.data.pagination.total
-    : 0;
+  let accounts: ImapAccountsListResponseOutput["accounts"] = [];
+  let totalAccounts = 0;
+  if (apiResponse && apiResponse.success === true) {
+    accounts = apiResponse.data.accounts;
+    totalAccounts = apiResponse.data.pagination.total;
+  }
   const queryLoading = accountsEndpoint.read.isLoading || false;
   const queryError = accountsEndpoint.read.error;
 
   // Get form for search and pagination state
   const form = accountsEndpoint.read.form;
-  const searchValue = form?.watch("search") || "";
-  const currentPage = form?.watch("page") || 1;
-  const limit = form?.watch("limit") || 20;
+  const searchValue = form.watch("search") || "";
+  const currentPage = form.watch("page") || 1;
+  const limit = form.watch("limit") || 20;
 
   const getStatusBadge = (
     status: (typeof ImapSyncStatus)[keyof typeof ImapSyncStatus],
@@ -137,12 +142,12 @@ export function ImapAccountsList({
         <Input
           placeholder={t("app.admin.emails.imap.account.search_placeholder")}
           value={searchValue}
-          onChange={(e) => form?.setValue("search", e.target.value)}
+          onChange={(e) => form.setValue("search", e.target.value)}
           className="max-w-sm"
         />
         <Button
           variant="outline"
-          onClick={() => accountsEndpoint.read?.refetch?.()}
+          onClick={() => accountsEndpoint.read.refetch()}
         >
           {t("app.admin.emails.imap.common.refresh")}
         </Button>
@@ -215,10 +220,7 @@ export function ImapAccountsList({
                         variant="outline"
                         size="sm"
                         onClick={async () => {
-                          testEndpoint.create.form.setValue(
-                            "accountId",
-                            account.id,
-                          );
+                          testEndpoint.create.form.setValue("accountId", account.id);
                           await testEndpoint.create.submitForm(undefined);
                         }}
                       >
@@ -248,7 +250,7 @@ export function ImapAccountsList({
               variant="outline"
               size="sm"
               disabled={currentPage === 1}
-              onClick={() => form?.setValue("page", currentPage - 1)}
+              onClick={() => form.setValue("page", currentPage - 1)}
             >
               {t("app.admin.emails.imap.common.previous")}
             </Button>
@@ -256,7 +258,7 @@ export function ImapAccountsList({
               variant="outline"
               size="sm"
               disabled={currentPage * limit >= totalAccounts}
-              onClick={() => form?.setValue("page", currentPage + 1)}
+              onClick={() => form.setValue("page", currentPage + 1)}
             >
               {t("app.admin.emails.imap.common.next")}
             </Button>
@@ -266,3 +268,4 @@ export function ImapAccountsList({
     </div>
   );
 }
+

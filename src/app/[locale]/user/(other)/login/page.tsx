@@ -1,7 +1,8 @@
-import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Div, H1, P } from "next-vibe-ui/ui";
+import { ArrowLeft } from "next-vibe-ui/ui/icons";
+import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
@@ -92,9 +93,9 @@ export default async function LoginPage({
   );
   if (!loginOptionsResponse.success) {
     return (
-      <div>
+      <Div>
         {t(loginOptionsResponse.message, loginOptionsResponse.messageParams)}
-      </div>
+      </Div>
     );
   }
 
@@ -107,19 +108,19 @@ export default async function LoginPage({
         <ArrowLeft className="mr-2 h-4 w-4" />
         {t("app.user.common.backToHome")}
       </Link>
-      <div className="">
-        <div className="order-1 md:order-2 text-center">
-          <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
+      <Div className="">
+        <Div className="order-1 md:order-2 text-center">
+          <Div className="mb-8">
+            <H1 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
               {t("app.user.other.login.auth.login.title")}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">
+            </H1>
+            <P className="text-gray-600 dark:text-gray-300 text-lg mb-6">
               {t("app.user.other.login.auth.login.subtitle")}
-            </p>
-          </div>
-        </div>
+            </P>
+          </Div>
+        </Div>
         <LoginForm locale={locale} loginOptions={loginOptionsResponse.data} />
-      </div>
+      </Div>
     </>
   );
 }

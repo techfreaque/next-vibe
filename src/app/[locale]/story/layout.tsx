@@ -1,5 +1,6 @@
 import "server-only";
 
+import { Div } from "next-vibe-ui/ui";
 import type { JSX, ReactNode } from "react";
 
 import Footer from "@/app/[locale]/_components/footer";
@@ -37,7 +38,7 @@ export default async function SiteLayoutServer({
   const isOnboardingComplete = false;
 
   return (
-    <main className="min-h-screen ">
+    <Div role="main" className="min-h-screen ">
       <Navbar
         user={userResponse.success ? userResponse.data : undefined}
         locale={locale}
@@ -46,6 +47,6 @@ export default async function SiteLayoutServer({
       />
       {children}
       <Footer locale={locale} />
-    </main>
+    </Div>
   );
 }

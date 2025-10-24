@@ -226,6 +226,8 @@ export const translations: typeof enTranslations = {
               description: "Konfiguruj podstawowe ustawienia startera kampanii",
             },
           },
+          save: "Zapisz Konfigurację",
+          success: "Konfiguracja została pomyślnie zapisana",
         },
         settings: {
           title: "Ustawienia Startera Kampanii",

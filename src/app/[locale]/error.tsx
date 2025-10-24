@@ -1,10 +1,11 @@
 "use client";
 // error page has to stay a client component
 
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Environment } from "next-vibe/shared/utils";
+import { Div, H2, P, Span } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
+import { Link } from "next-vibe-ui/ui/link";
 import type { ReactElement } from "react";
 
 import { envClient } from "@/config/env-client";
@@ -33,34 +34,34 @@ export default function ErrorPage({
   const digest = useErrorHandler(error);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4">
-      <h2 className="text-3xl font-bold mb-4">{t("app.pages.error.title")}</h2>
-      <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md">
+    <Div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4">
+      <H2 className="text-3xl font-bold mb-4">{t("app.pages.error.title")}</H2>
+      <P className="text-gray-600 dark:text-gray-400 mb-8 max-w-md">
         {t("app.pages.error.message")}
         {digest && (
-          <span className="block mt-2 text-xs text-gray-500">
+          <Span className="block mt-2 text-xs text-gray-500">
             {t("app.pages.error.errorId", { id: digest })}
-          </span>
+          </Span>
         )}
         {error.message && (
-          <span className="block mt-2 text-xs text-gray-500">
+          <Span className="block mt-2 text-xs text-gray-500">
             {t("app.pages.error.error_message", { message: error.message })}
-          </span>
+          </Span>
         )}
         {error.stack && (
-          <span className="block mt-2 text-xs text-gray-500">
+          <Span className="block mt-2 text-xs text-gray-500">
             {t("app.pages.error.stackTrace", { stack: error.stack })}
-          </span>
+          </Span>
         )}
-      </p>
-      <div className="flex flex-col sm:flex-row gap-4">
+      </P>
+      <Div className="flex flex-col sm:flex-row gap-4">
         <Button onClick={() => reset()} variant="outline">
           {t("app.pages.error.tryAgain")}
         </Button>
         <Button asChild>
           <Link href={`/${locale}`}>{t("app.pages.error.backToHome")}</Link>
         </Button>
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 }

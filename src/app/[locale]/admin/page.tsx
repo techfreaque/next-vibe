@@ -3,6 +3,7 @@
  * Clean dashboard for admin overview
  */
 
+import { Div, H1, P } from "next-vibe-ui/ui";
 import type React from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -21,15 +22,15 @@ export default async function AdminDashboardPage({
   const { t } = simpleT(locale);
 
   return (
-    <div className="p-6 space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+    <Div className="p-6 space-y-8">
+      <Div>
+        <H1 className="text-3xl font-bold text-gray-900 dark:text-white">
           {t("app.admin.dashboard.title")}
-        </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
+        </H1>
+        <P className="mt-2 text-gray-600 dark:text-gray-400">
           {t("app.admin.dashboard.subtitle")}
-        </p>
-      </div>
-    </div>
+        </P>
+      </Div>
+    </Div>
   );
 }

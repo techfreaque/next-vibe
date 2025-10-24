@@ -66,7 +66,7 @@ export interface ToolCall {
 /**
  * Message metadata structure
  */
-interface MessageMetadata {
+export interface MessageMetadata {
   generationTime?: number;
   promptTokens?: number;
   completionTokens?: number;

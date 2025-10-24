@@ -1,15 +1,16 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, ChevronUp, Menu, X } from "lucide-react";
-import Link from "next/link";
-import { cn } from "next-vibe/shared/utils/utils";
+import { Div, Span } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
+import { ChevronDown, ChevronUp, Menu, X } from "next-vibe-ui/ui/icons";
+import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 import { useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { cn } from "@/packages/next-vibe/shared";
 
 import type { NavItemType } from "./nav-constants";
 import { ThemeToggleMobile } from "./theme-toggle";
@@ -98,37 +99,37 @@ export function MobileMenuClient({
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
           >
-            <div className="container py-6 space-y-6 px-4">
+            <Div className="container py-6 space-y-6 px-4">
               {/* Theme toggle inside mobile menu */}
               <ThemeToggleMobile locale={locale} />
 
               {/* Dynamic Navigation items */}
-              <div className="space-y-3">
+              <Div className="space-y-3">
                 {navigationItems.map((item) => {
                   if (item.children) {
                     // Dropdown item with children
                     const isExpanded = expandedItems[item.title] ?? false;
                     return (
-                      <div key={item.title}>
+                      <Div key={item.title}>
                         {/* Parent item header */}
-                        <div
+                        <Div
                           className="flex space-x-2 pb-4 border-b text-base font-medium hover:text-primary transition-colors py-2 cursor-pointer"
                           onClick={() => toggleDropdown(item.title)}
                         >
-                          <span className="my-auto">{item.icon}</span>
-                          <span className="text-base font-medium my-auto flex-1">
+                          <Span className="my-auto">{item.icon}</Span>
+                          <Span className="text-base font-medium my-auto flex-1">
                             {t(item.title)}
-                          </span>
+                          </Span>
                           {isExpanded ? (
                             <ChevronUp className="h-4 w-4 my-auto" />
                           ) : (
                             <ChevronDown className="h-4 w-4 my-auto" />
                           )}
-                        </div>
+                        </Div>
 
                         {/* Children items */}
                         {isExpanded && (
-                          <div className="pl-7 space-y-3 mb-4">
+                          <Div className="pl-7 space-y-3 mb-4">
                             {item.children.map((childItem) => {
                               const isChildDisabled = childItem.disabled;
                               const childDisabledReason =
@@ -141,24 +142,24 @@ export function MobileMenuClient({
 
                               if (isChildDisabled && childDisabledReason) {
                                 return (
-                                  <div
+                                  <Div
                                     key={childItem.title}
                                     className="relative"
                                   >
-                                    <div
+                                    <Div
                                       className={cn(
                                         "text-base flex items-center py-1 opacity-50 cursor-not-allowed",
                                         isChildActive && "text-primary",
                                       )}
                                     >
-                                      <span className="mr-2">
+                                      <Span className="mr-2">
                                         {childItem.icon}
-                                      </span>
-                                      <div className="flex-1">
-                                        <div className="flex items-center">
-                                          <span>{t(childItem.title)}</span>
+                                      </Span>
+                                      <Div className="flex-1">
+                                        <Div className="flex items-center">
+                                          <Span>{t(childItem.title)}</Span>
                                           {childBadge && (
-                                            <span
+                                            <Span
                                               className={cn(
                                                 "ml-2 px-2 py-0.5 text-xs rounded",
                                                 getBadgeClasses(
@@ -167,18 +168,18 @@ export function MobileMenuClient({
                                               )}
                                             >
                                               {t(childBadge, childBadgePayload)}
-                                            </span>
+                                            </Span>
                                           )}
-                                        </div>
-                                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                                        </Div>
+                                        <Div className="text-xs text-gray-500 dark:text-gray-400">
                                           {t(childItem.description)}
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div className="text-xs text-muted-foreground mt-1 pl-6">
+                                        </Div>
+                                      </Div>
+                                    </Div>
+                                    <Div className="text-xs text-muted-foreground mt-1 pl-6">
                                       {t(childDisabledReason)}
-                                    </div>
-                                  </div>
+                                    </Div>
+                                  </Div>
                                 );
                               }
 
@@ -193,31 +194,31 @@ export function MobileMenuClient({
                                   )}
                                   onClick={toggleMenu}
                                 >
-                                  <span className="mr-2">{childItem.icon}</span>
-                                  <div className="flex-1">
-                                    <div className="flex items-center">
-                                      <span>{t(childItem.title)}</span>
+                                  <Span className="mr-2">{childItem.icon}</Span>
+                                  <Div className="flex-1">
+                                    <Div className="flex items-center">
+                                      <Span>{t(childItem.title)}</Span>
                                       {childBadge && (
-                                        <span
+                                        <Span
                                           className={cn(
                                             "ml-2 px-2 py-0.5 text-xs rounded",
                                             getBadgeClasses(childBadgeVariant),
                                           )}
                                         >
                                           {t(childBadge, childBadgePayload)}
-                                        </span>
+                                        </Span>
                                       )}
-                                    </div>
-                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                    </Div>
+                                    <Div className="text-xs text-gray-500 dark:text-gray-400">
                                       {t(childItem.description)}
-                                    </div>
-                                  </div>
+                                    </Div>
+                                  </Div>
                                 </Link>
                               );
                             })}
-                          </div>
+                          </Div>
                         )}
-                      </div>
+                      </Div>
                     );
                   } else {
                     // Single navigation item
@@ -230,30 +231,30 @@ export function MobileMenuClient({
 
                     if (isDisabled && disabledReason) {
                       return (
-                        <div key={item.title} className="relative">
-                          <div
+                        <Div key={item.title} className="relative">
+                          <Div
                             className={cn(
                               "flex text-base font-medium py-2 opacity-50 cursor-not-allowed",
                               isActive && "text-primary",
                             )}
                           >
-                            <span className="mr-2.5">{item.icon}</span>
-                            <span className="flex-1">{t(item.title)}</span>
+                            <Span className="mr-2.5">{item.icon}</Span>
+                            <Span className="flex-1">{t(item.title)}</Span>
                             {badge && (
-                              <span
+                              <Span
                                 className={cn(
                                   "ml-2 px-2 py-0.5 text-xs rounded",
                                   getBadgeClasses(badgeVariant),
                                 )}
                               >
                                 {t(badge, badgePayload)}
-                              </span>
+                              </Span>
                             )}
-                          </div>
-                          <div className="text-xs text-muted-foreground mt-1 pl-7">
+                          </Div>
+                          <Div className="text-xs text-muted-foreground mt-1 pl-7">
                             {t(disabledReason)}
-                          </div>
-                        </div>
+                          </Div>
+                        </Div>
                       );
                     }
 
@@ -267,24 +268,24 @@ export function MobileMenuClient({
                         )}
                         onClick={toggleMenu}
                       >
-                        <span className="mr-2.5">{item.icon}</span>
-                        <span className="flex-1">{t(item.title)}</span>
+                        <Span className="mr-2.5">{item.icon}</Span>
+                        <Span className="flex-1">{t(item.title)}</Span>
                         {badge && (
-                          <span
+                          <Span
                             className={cn(
                               "ml-2 px-2 py-0.5 text-xs rounded",
                               getBadgeClasses(badgeVariant),
                             )}
                           >
                             {t(badge, badgePayload)}
-                          </span>
+                          </Span>
                         )}
                       </Link>
                     );
                   }
                 })}
-              </div>
-            </div>
+              </Div>
+            </Div>
           </motion.div>
         )}
       </AnimatePresence>

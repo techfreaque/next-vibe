@@ -1,17 +1,19 @@
-import { AlertCircle, Bell, CheckCircle, Info } from "lucide-react";
-import Link from "next/link";
 import {
   Badge,
   Button,
+  Div,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  P,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui";
+import { AlertCircle, Bell, CheckCircle, Info } from "next-vibe-ui/ui/icons";
+import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -64,12 +66,12 @@ export function Notifications({
                 ) : (
                   <Bell className="h-4 w-4 text-gray-500" />
                 )}
-                <div>
+                <Div>
                   {t(childItem.title)}
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <P className="text-xs text-gray-500 dark:text-gray-400">
                     {t(childItem.description)}
-                  </p>
-                </div>
+                  </P>
+                </Div>
               </DropdownMenuItem>
             </Link>
           ))}
@@ -116,7 +118,7 @@ function NotificationButton({
         </DropdownMenuTrigger>
       </TooltipTrigger>
       <TooltipContent>
-        <p>{t("app.nav.notifications")}</p>
+        <P>{t("app.nav.notifications")}</P>
       </TooltipContent>
     </Tooltip>
   );

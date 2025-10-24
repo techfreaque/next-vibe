@@ -220,6 +220,8 @@ export const translations = {
               description: "Configure basic campaign starter settings",
             },
           },
+          save: "Save Configuration",
+          success: "Configuration saved successfully",
         },
         settings: {
           title: "Campaign Starter Settings",

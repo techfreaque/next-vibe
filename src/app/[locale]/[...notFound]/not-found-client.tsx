@@ -1,7 +1,7 @@
 "use client";
 
-import { MoveLeft } from "lucide-react";
-import { Button } from "next-vibe-ui/ui";
+import { Button, Span } from "next-vibe-ui/ui";
+import { ChevronLeft } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React from "react";
 
@@ -16,10 +16,10 @@ export function NotFoundBackButton({
   const { t } = simpleT(locale);
   return (
     <Button variant="outline" asChild className="group">
-      <span>
-        <MoveLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
+      <Span>
+        <ChevronLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
         {t("app.pages.notFound.goBack")}
-      </span>
+      </Span>
     </Button>
   );
 }

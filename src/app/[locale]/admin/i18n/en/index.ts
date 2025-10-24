@@ -33,6 +33,7 @@ export const translations = {
     actions: {
       back: "Back",
       save: "Save",
+      saving: "Saving...",
       cancel: "Cancel",
       delete: "Delete",
       edit: "Edit",

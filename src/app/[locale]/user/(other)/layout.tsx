@@ -1,3 +1,4 @@
+import { Div } from "next-vibe-ui/ui";
 import type { JSX, ReactNode } from "react";
 
 export default function SignupLayout({
@@ -5,5 +6,5 @@ export default function SignupLayout({
 }: {
   children: ReactNode;
 }): JSX.Element {
-  return <div className="container max-w-xl mx-auto py-8 px-4">{children}</div>;
+  return <Div className="container max-w-xl mx-auto py-8 px-4">{children}</Div>;
 }

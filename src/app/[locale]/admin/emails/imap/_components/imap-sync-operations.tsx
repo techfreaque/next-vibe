@@ -27,13 +27,14 @@ import {
   TableRow,
 } from "next-vibe-ui/ui/table";
 import type { JSX } from "react";
-import React, { useState } from "react";
+import { useMemo, useState } from "react";
 
 import imapAccountsListDefinition, {
   type ImapAccountsListResponseOutput,
 } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/definition";
 import { ImapSyncStatus } from "@/app/api/[locale]/v1/core/emails/imap-client/enum";
 import imapSyncDefinition from "@/app/api/[locale]/v1/core/emails/imap-client/sync/definition";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/use-endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
@@ -41,32 +42,48 @@ import { useTranslation } from "@/i18n/core/client";
  * IMAP Sync Operations Component
  */
 export function ImapSyncOperations(): JSX.Element {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
   const [isSyncing, setIsSyncing] = useState(false);
 
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), "en-GLOBAL"),
+    [],
+  );
+
   // Use accounts endpoint to get sync status information
-  const accountsEndpoint = useEndpoint(imapAccountsListDefinition, {
-    enabled: true,
-  });
+  const accountsEndpoint = useEndpoint(
+    imapAccountsListDefinition,
+    {
+      enabled: true,
+    },
+    logger,
+  );
 
   // Use sync endpoint for triggering sync operations
-  const syncEndpoint = useEndpoint(imapSyncDefinition, {
-    enabled: false,
-  });
+  const syncEndpoint = useEndpoint(
+    imapSyncDefinition,
+    {
+      enabled: false,
+    },
+    logger,
+  );
 
   // Extract sync status from accounts data
-  const accountsData = accountsEndpoint.read?.data;
-  const syncingAccounts =
-    accountsData?.accounts.filter(
-      (acc: ImapAccountsListResponseOutput["accounts"][number]) =>
-        acc.syncStatus === ImapSyncStatus.SYNCING,
-    ) || [];
-  const lastSyncTimes =
-    accountsData?.accounts
-      .map((acc: ImapAccountsListResponseOutput["accounts"][number]) => acc.lastSyncAt)
-      .filter((time: string | null) => time !== null)
-      .sort((a: string, b: string) => new Date(b).getTime() - new Date(a).getTime()) ||
-    [];
+  const accountsResponse = accountsEndpoint.read?.response;
+  let accounts: ImapAccountsListResponseOutput["accounts"] = [];
+  if (accountsResponse) {
+    if (accountsResponse.success === true) {
+      accounts = accountsResponse.data.accounts;
+    }
+  }
+
+  const syncingAccounts = accounts.filter(
+    (acc) => acc.syncStatus === ImapSyncStatus.SYNCING,
+  );
+  const lastSyncTimes = accounts
+    .map((acc) => acc.lastSyncAt)
+    .filter((time): time is string => time !== null)
+    .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
   const syncStatus = {
     isRunning: syncingAccounts.length > 0 || isSyncing,
@@ -159,13 +176,18 @@ export function ImapSyncOperations(): JSX.Element {
   };
 
   const handleStartSync = (): void => {
+    const createEndpoint = syncEndpoint.create;
+    if (!createEndpoint) {
+      return;
+    }
+
     setIsSyncing(true);
     // Trigger sync using the sync endpoint
     // Set form values and submit using the form's handleSubmit
-    syncEndpoint.create.form.setValue("accountIds", []);
-    syncEndpoint.create.form.setValue("force", false);
-    syncEndpoint.create.form.setValue("dryRun", false);
-    syncEndpoint.create.form.setValue("maxMessages", 1000);
+    createEndpoint.form.setValue("accountIds", []);
+    createEndpoint.form.setValue("force", false);
+    createEndpoint.form.setValue("dryRun", false);
+    createEndpoint.form.setValue("maxMessages", 1000);
 
     // Create a synthetic form event and submit
     const syntheticEvent = {
@@ -173,7 +195,7 @@ export function ImapSyncOperations(): JSX.Element {
       stopPropagation: () => {},
     } as React.FormEvent<HTMLFormElement>;
 
-    void syncEndpoint.create.onSubmit(syntheticEvent);
+    void createEndpoint.onSubmit(syntheticEvent);
   };
 
   const handleStopSync = (): void => {

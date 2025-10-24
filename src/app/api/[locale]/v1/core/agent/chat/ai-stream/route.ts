@@ -24,7 +24,7 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     handler: async ({ data, t, locale, logger, user, request }) => {
       // Log user object for debugging
-      logger.info(
+      logger.debug(
         "app.api.v1.core.agent.chat.aiStream.route.debug.userObject",
         {
           isPublic: user.isPublic,
@@ -44,10 +44,13 @@ export const { POST, tools } = endpointsHandler({
           ? user.leadId
           : undefined;
 
-      logger.info("app.api.v1.core.agent.chat.aiStream.route.debug.extracted", {
-        userId,
-        leadId,
-      });
+      logger.debug(
+        "app.api.v1.core.agent.chat.aiStream.route.debug.extracted",
+        {
+          userId,
+          leadId,
+        },
+      );
 
       // Extract IP address from request headers
       const ipAddress =

@@ -1,5 +1,6 @@
-import Link from "next/link";
+import { Div } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
+import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -13,7 +14,7 @@ export function AuthButtons({ locale }: AuthButtonsProps): JSX.Element {
   const { t } = simpleT(locale);
 
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <Div className="grid grid-cols-2 gap-2">
       <Button variant="ghost" asChild className="hidden md:inline-flex">
         <Link href={`/${locale}/user/login`}>{t("app.nav.user.login")}</Link>
       </Button>
@@ -23,7 +24,7 @@ export function AuthButtons({ locale }: AuthButtonsProps): JSX.Element {
       >
         <Link href={`/${locale}/user/signup`}>{t("app.nav.user.signup")}</Link>
       </Button>
-    </div>
+    </Div>
   );
 }
 

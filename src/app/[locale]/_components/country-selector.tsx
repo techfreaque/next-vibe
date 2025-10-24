@@ -1,20 +1,21 @@
 "use client";
 
-import { CheckIcon } from "lucide-react";
-import { cn } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "next-vibe-ui/ui/dropdown-menu";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 import { getUniqueLanguages } from "@/i18n/core/language-utils";
+import { cn } from "@/packages/next-vibe/shared";
+import { Div, Span } from "next-vibe-ui/ui";
+import { Button } from "next-vibe-ui/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "next-vibe-ui/ui/dropdown-menu";
+import { Check } from "next-vibe-ui/ui/icons";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 
 interface CountrySelectorProps {
   isNavBar?: boolean;
@@ -73,17 +74,17 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
               : "px-3 rounded-md border",
           )}
         >
-          <span className="text-lg flex items-center justify-center my-auto">
+          <Span className="text-lg flex items-center justify-center my-auto">
             {currentCountry.flag}
-          </span>
-          <span
+          </Span>
+          <Span
             className={cn(
               isNavBar ? "xl:flex hidden" : "flex",
               "items-center text-sm font-medium",
             )}
           >
             {currentCountry.name}
-          </span>
+          </Span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-72 p-2">
@@ -103,7 +104,7 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
               onMouseLeave={() => setTabHover(null)}
             >
               {/* <GlobeIcon className="h-4 w-4" /> */}
-              <span className="text-sm">{currentCountry.flag}</span>
+              <Span className="text-sm">{currentCountry.flag}</Span>
               {t("app.common.selector.country")}
             </TabsTrigger>
             <TabsTrigger
@@ -112,13 +113,13 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
               onMouseEnter={() => setTabHover("language")}
               onMouseLeave={() => setTabHover(null)}
             >
-              <span className="text-sm">{currentLanguageFlag}</span>
+              <Span className="text-sm">{currentLanguageFlag}</Span>
               {t("app.common.selector.language")}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="country" className="max-h-80 overflow-y-auto">
-            <div className="grid grid-cols-1 gap-1">
+            <Div className="grid grid-cols-1 gap-1">
               {countries.map((countryItem) => (
                 <Button
                   key={countryItem.code}
@@ -131,25 +132,25 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
                     handleCountryChange(countryItem.code);
                   }}
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg mr-1">{countryItem.flag}</span>
-                    <div className="flex flex-col items-start">
-                      <span className="font-medium">{countryItem.name}</span>
-                      <span className="text-xs text-muted-foreground">
+                  <Div className="flex items-center gap-2">
+                    <Span className="text-lg mr-1">{countryItem.flag}</Span>
+                    <Div className="flex flex-col items-start">
+                      <Span className="font-medium">{countryItem.name}</Span>
+                      <Span className="text-xs text-muted-foreground">
                         {countryItem.langName}
-                      </span>
-                    </div>
-                  </div>
+                      </Span>
+                    </Div>
+                  </Div>
                   {country === countryItem.code && (
-                    <CheckIcon className="h-4 w-4 text-primary" />
+                    <Check className="h-4 w-4 text-primary" />
                   )}
                 </Button>
               ))}
-            </div>
+            </Div>
           </TabsContent>
 
           <TabsContent value="language" className="max-h-80 overflow-y-auto">
-            <div className="grid grid-cols-1 gap-1">
+            <Div className="grid grid-cols-1 gap-1">
               {uniqueLanguages.map(([langCode, langInfo]) => (
                 <Button
                   key={langCode}
@@ -161,22 +162,22 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
                     handleLanguageChange(langCode);
                   }}
                 >
-                  <div className="flex items-center gap-2">
+                  <Div className="flex items-center gap-2">
                     {langInfo.countries.slice(0, 3).map((c) => (
-                      <span key={c.code} className="text-lg mr-1">
+                      <Span key={c.code} className="text-lg mr-1">
                         {c.flag}
-                      </span>
+                      </Span>
                     ))}
-                    <div className="flex flex-col items-start">
-                      <span className="font-medium">{langInfo.name}</span>
-                    </div>
-                  </div>
+                    <Div className="flex flex-col items-start">
+                      <Span className="font-medium">{langInfo.name}</Span>
+                    </Div>
+                  </Div>
                   {language === langCode && (
-                    <CheckIcon className="h-4 w-4 text-primary" />
+                    <Check className="h-4 w-4 text-primary" />
                   )}
                 </Button>
               ))}
-            </div>
+            </Div>
           </TabsContent>
         </Tabs>
       </DropdownMenuContent>

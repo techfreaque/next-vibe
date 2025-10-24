@@ -28,7 +28,7 @@ import {
 } from "next-vibe-ui/ui/table";
 import type React from "react";
 
-import type {
+import {
   EmailCampaignStage,
   LeadSource,
   LeadStatus,
@@ -112,21 +112,25 @@ export function BatchOperationsDialog({
             {updates.status && (
               <Badge variant="outline">
                 {t("app.admin.leads.leads.admin.batch.change_status", {
-                  status: t(updates.status),
+                  status: t(LeadStatus[updates.status] as TranslationKey),
                 })}
               </Badge>
             )}
             {updates.currentCampaignStage && (
               <Badge variant="outline">
                 {t("app.admin.leads.leads.admin.batch.change_stage", {
-                  stage: t(updates.currentCampaignStage),
+                  stage: t(
+                    EmailCampaignStage[
+                      updates.currentCampaignStage
+                    ] as TranslationKey,
+                  ),
                 })}
               </Badge>
             )}
             {updates.source && (
               <Badge variant="outline">
                 {t("app.admin.leads.leads.admin.batch.change_source", {
-                  source: t(updates.source),
+                  source: t(LeadSource[updates.source] as TranslationKey),
                 })}
               </Badge>
             )}
@@ -160,12 +164,18 @@ export function BatchOperationsDialog({
                 </TableCell>
                 <TableCell>{lead.email}</TableCell>
                 <TableCell>
-                  <Badge variant="outline">{t(lead.currentStatus)}</Badge>
+                  <Badge variant="outline">
+                    {t(LeadStatus[lead.currentStatus] as TranslationKey)}
+                  </Badge>
                 </TableCell>
                 <TableCell>
                   {lead.currentCampaignStage ? (
                     <Badge variant="outline">
-                      {t(lead.currentCampaignStage)}
+                      {t(
+                        EmailCampaignStage[
+                          lead.currentCampaignStage
+                        ] as TranslationKey,
+                      )}
                     </Badge>
                   ) : (
                     <span className="text-muted-foreground">

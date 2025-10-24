@@ -230,6 +230,8 @@ export const translations: typeof enTranslations = {
                 "Grundlegende Kampagnen-Starter-Einstellungen konfigurieren",
             },
           },
+          save: "Konfiguration speichern",
+          success: "Konfiguration erfolgreich gespeichert",
         },
         settings: {
           title: "Kampagnen-Starter-Einstellungen",

@@ -1,5 +1,6 @@
 "use client";
 
+import { Div, P, Span } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -63,12 +64,12 @@ export function PasswordStrengthIndicator({
   const widthPercentage = Math.max(20, Math.min(100, (strength / 5) * 100));
 
   return (
-    <div className="mt-2 space-y-1">
-      <div className="flex justify-between text-xs">
-        <span>
+    <Div className="mt-2 space-y-1">
+      <Div className="flex justify-between text-xs">
+        <Span>
           {t("app.user.components.auth.common.passwordStrength.label")}
-        </span>
-        <span
+        </Span>
+        <Span
           className={
             strength <= 2
               ? "text-red-500"
@@ -80,19 +81,19 @@ export function PasswordStrengthIndicator({
           }
         >
           {labelText}
-        </span>
-      </div>
-      <div className="h-1.5 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-        <div
+        </Span>
+      </Div>
+      <Div className="h-1.5 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <Div
           className={`h-full ${color} transition-all duration-300`}
           style={{ width: `${widthPercentage}%` }}
         />
-      </div>
+      </Div>
       {strength <= 2 && (
-        <p className="text-xs text-red-500 mt-1">
+        <P className="text-xs text-red-500 mt-1">
           {t("app.user.components.auth.common.passwordStrength.suggestion")}
-        </p>
+        </P>
       )}
-    </div>
+    </Div>
   );
 }

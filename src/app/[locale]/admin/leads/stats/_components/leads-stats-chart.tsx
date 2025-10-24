@@ -75,7 +75,7 @@ interface LeadsStatsChartWithSourceControlProps {
   locale: CountryLanguage;
   data: ChartDataType & {
     chartType?: ChartType;
-    sourceData?: Record<LeadSource, number>;
+    sourceData?: Record<keyof typeof LeadSource, number>;
   };
   isLoading?: boolean;
   height?: number;
@@ -98,7 +98,7 @@ export function LeadsStatsChart({
     {},
   );
   const [visibleSources, setVisibleSources] = useState<
-    Partial<Record<LeadSource, boolean>>
+    Partial<Record<keyof typeof LeadSource, boolean>>
   >({});
 
   // Initialize visibility state when data changes
@@ -115,9 +115,9 @@ export function LeadsStatsChart({
   // Initialize source visibility
   useEffect(() => {
     if (data?.sourceData) {
-      const initial: Partial<Record<LeadSource, boolean>> = {};
-      Object.keys(data.sourceData).forEach((source) => {
-        initial[source as LeadSource] = true;
+      const initial: Partial<Record<keyof typeof LeadSource, boolean>> = {};
+      (Object.keys(data.sourceData) as Array<keyof typeof LeadSource>).forEach((source) => {
+        initial[source] = true;
       });
       setVisibleSources(initial);
     }
@@ -130,7 +130,7 @@ export function LeadsStatsChart({
     }));
   };
 
-  const toggleSource = (source: LeadSource): void => {
+  const toggleSource = (source: keyof typeof LeadSource): void => {
     setVisibleSources((prev) => ({
       ...prev,
       [source]: !prev[source],
@@ -292,7 +292,7 @@ export function LeadsStatsChart({
 
         // Get proper translation key for the source
         const getSourceTranslationKey = (
-          source: LeadSource | string,
+          source: keyof typeof LeadSource | string,
         ): TranslationKey => {
           // Convert string to enum value if needed
           const sourceEnum =

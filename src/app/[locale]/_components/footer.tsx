@@ -1,18 +1,19 @@
+import { Div, H3, P } from "next-vibe-ui/ui";
 import {
-  BarChart2,
-  Building,
-  Edit3,
+  Briefcase,
+  Edit,
   FileText,
   HelpCircle,
   Info,
-  MessageCircle,
-  PenTool,
+  MessageSquare,
+  Scale,
   Settings,
   Shield,
   TrendingUp,
   Users,
-} from "lucide-react";
-import Link from "next/link";
+  Wrench,
+} from "next-vibe-ui/ui/icons";
+import { Link } from "next-vibe-ui/ui/link";
 import type React from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -28,14 +29,17 @@ interface FooterProps {
 const Footer: React.FC<FooterProps> = ({ locale }) => {
   const { t } = simpleT(locale);
   return (
-    <footer className="w-full border-t bg-white dark:bg-gray-950">
-      <div className="container px-4 md:px-6 py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-          <div className="space-y-4">
+    <Div
+      role="contentinfo"
+      className="w-full border-t bg-white dark:bg-gray-950"
+    >
+      <Div className="container px-4 md:px-6 py-12 md:py-16">
+        <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+          <Div className="space-y-4">
             <Logo locale={locale} pathName="" />
-            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs">
+            <P className="text-sm text-gray-500 dark:text-gray-400 max-w-xs">
               {t("app.common.footer.description")}
-            </p>
+            </P>
             {/* <div className="flex space-x-3">
               <Button
                 variant="ghost"
@@ -69,15 +73,18 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
               >
                 <Linkedin className="h-5 w-5" />
               </Button>
-            </div> */}
-          </div>
+            </Div> */}
+          </Div>
 
-          <div>
-            <h3 className="font-semibold text-lg mb-4">
+          <Div>
+            <H3 className="font-semibold text-lg mb-4">
               {t("app.common.footer.services.title")}
-            </h3>
-            <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
-              <li>
+            </H3>
+            <Div
+              role="list"
+              className="space-y-3 text-sm text-gray-500 dark:text-gray-400"
+            >
+              <Div role="listitem">
                 <Link
                   href={`/${locale}#free-social-setup`}
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
@@ -85,44 +92,44 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   <Settings className="h-4 w-4 text-blue-500" />
                   {t("app.common.footer.services.socialAccountSetup")}
                 </Link>
-              </li>
-              <li>
+              </Div>
+              <Div role="listitem">
                 <Link
                   href={`/${locale}#features`}
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
-                  <Edit3 className="h-4 w-4 text-blue-500" />
+                  <Edit className="h-4 w-4 text-blue-500" />
                   {t("app.common.footer.services.contentCreation")}
                 </Link>
-              </li>
-              <li>
+              </Div>
+              <Div role="listitem">
                 <Link
                   href={`/${locale}#process`}
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
-                  <PenTool className="h-4 w-4 text-blue-500" />
+                  <Wrench className="h-4 w-4 text-blue-500" />
                   {t("app.common.footer.services.strategyDevelopment")}
                 </Link>
-              </li>
-              <li>
+              </Div>
+              <Div role="listitem">
                 <Link
                   href={`/${locale}#features`}
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
-                  <BarChart2 className="h-4 w-4 text-blue-500" />
+                  <Scale className="h-4 w-4 text-blue-500" />
                   {t("app.common.footer.services.performanceAnalytics")}
                 </Link>
-              </li>
-              <li>
+              </Div>
+              <Div role="listitem">
                 <Link
                   href={`/${locale}#features`}
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
-                  <MessageCircle className="h-4 w-4 text-blue-500" />
+                  <MessageSquare className="h-4 w-4 text-blue-500" />
                   {t("app.common.footer.services.communityManagement")}
                 </Link>
-              </li>
-              <li>
+              </Div>
+              <Div role="listitem">
                 <Link
                   href={`/${locale}#features`}
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
@@ -130,8 +137,8 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   <Users className="h-4 w-4 text-blue-500" />
                   {t("app.common.footer.services.audienceBuilding")}
                 </Link>
-              </li>
-              <li>
+              </Div>
+              <Div role="listitem">
                 <Link
                   href={`/${locale}#features`}
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
@@ -139,16 +146,19 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   <TrendingUp className="h-4 w-4 text-blue-500" />
                   {t("app.common.footer.services.adCampaigns")}
                 </Link>
-              </li>
-            </ul>
-          </div>
+              </Div>
+            </Div>
+          </Div>
 
-          <div>
-            <h3 className="font-semibold text-lg mb-4">
+          <Div>
+            <H3 className="font-semibold text-lg mb-4">
               {t("app.common.footer.company.title")}
-            </h3>
-            <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
-              <li>
+            </H3>
+            <Div
+              role="list"
+              className="space-y-3 text-sm text-gray-500 dark:text-gray-400"
+            >
+              <Div role="listitem">
                 <Link
                   href={`/${locale}/about-us`}
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
@@ -156,8 +166,8 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   <Info className="h-4 w-4 text-blue-500" />
                   {t("app.common.footer.company.aboutUs")}
                 </Link>
-              </li>
-              <li>
+              </Div>
+              <Div role="listitem">
                 <Link
                   href={`/${locale}/help`}
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
@@ -165,17 +175,17 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   <HelpCircle className="h-4 w-4 text-blue-500" />
                   {t("app.common.footer.company.contactUs")}
                 </Link>
-              </li>
-              <li>
+              </Div>
+              <Div role="listitem">
                 <Link
                   href={`/${locale}/careers`}
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
                 >
-                  <Building className="h-4 w-4 text-blue-500" />
+                  <Briefcase className="h-4 w-4 text-blue-500" />
                   {t("app.common.footer.company.careers")}
                 </Link>
-              </li>
-              <li>
+              </Div>
+              <Div role="listitem">
                 <Link
                   href={`/${locale}/privacy-policy`}
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
@@ -183,8 +193,8 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   <Shield className="h-4 w-4 text-blue-500" />
                   {t("app.common.footer.company.privacyPolicy")}
                 </Link>
-              </li>
-              <li>
+              </Div>
+              <Div role="listitem">
                 <Link
                   href={`/${locale}/terms-of-service`}
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
@@ -192,8 +202,8 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   <FileText className="h-4 w-4 text-blue-500" />
                   {t("app.common.footer.company.termsOfService")}
                 </Link>
-              </li>
-              <li>
+              </Div>
+              <Div role="listitem">
                 <Link
                   href={`/${locale}/imprint`}
                   className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors flex items-center gap-2"
@@ -201,25 +211,25 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   <FileText className="h-4 w-4 text-blue-500" />
                   {t("app.common.footer.company.imprint")}
                 </Link>
-              </li>
-            </ul>
-          </div>
+              </Div>
+            </Div>
+          </Div>
           <NewsletterSignupFooter locale={locale} />
-        </div>
+        </Div>
 
-        <div className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+        <Div className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+          <P className="text-sm text-gray-500 dark:text-gray-400">
             {t("app.common.footer.copyright", {
               year: new Date().getFullYear(),
               appName: t("app.common.company.name"),
             })}
-          </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-4 md:mt-0">
+          </P>
+          <P className="text-sm text-gray-500 dark:text-gray-400 mt-4 md:mt-0">
             {t("app.common.footer.tagline")}
-          </p>
-        </div>
-      </div>
-    </footer>
+          </P>
+        </Div>
+      </Div>
+    </Div>
   );
 };
 

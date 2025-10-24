@@ -1,19 +1,22 @@
 import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
-import { ChevronDown } from "lucide-react";
-import Link from "next/link";
-import { cn } from "next-vibe/shared/utils/utils";
 import {
+  Div,
   DropdownMenu,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  P,
+  Span,
 } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
+import { ChevronDown } from "next-vibe-ui/ui/icons";
+import { Link } from "next-vibe-ui/ui/link";
 import { TooltipProvider } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 
 import type { StandardUserType } from "@/app/api/[locale]/v1/core/user/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { cn } from "@/packages/next-vibe/shared";
 
 import CountrySelector from "../country-selector";
 import { AuthButtons, MobileAuthButtons } from "./auth-buttons";
@@ -40,19 +43,23 @@ export function Navbar({
   const { t } = simpleT(locale);
 
   return (
-    <header
+    <Div
+      role="banner"
       className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300",
         "bg-white/95 dark:bg-gray-950/95 backdrop-blur-md shadow-sm",
       )}
     >
-      <div className="container flex h-16 md:h-20 items-center justify-between px-4 lg:px-6">
-        <div className="flex items-center gap-2">
+      <Div className="container flex h-16 md:h-20 items-center justify-between px-4 lg:px-6">
+        <Div className="flex items-center gap-2">
           <Logo locale={locale} pathName="" />
-        </div>
+        </Div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-1 xl:gap-4">
+        <Div
+          role="navigation"
+          className="hidden md:flex items-center gap-1 xl:gap-4"
+        >
           <TooltipProvider>
             {navigationItems.map((item) => {
               return item.children ? (
@@ -81,17 +88,17 @@ export function Navbar({
 
                       if (isDisabled && disabledReason) {
                         return (
-                          <div key={childItem.title} className="relative">
+                          <Div key={childItem.title} className="relative">
                             <DropdownMenuItem
                               className="flex items-center gap-2 opacity-50 cursor-not-allowed"
                               disabled
                             >
                               {childItem.icon}
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2">
+                              <Div className="flex-1">
+                                <Div className="flex items-center gap-2">
                                   {t(childItem.title)}
                                   {badge && (
-                                    <span
+                                    <Span
                                       className={cn(
                                         "px-2 py-0.5 text-xs rounded",
                                         badgeVariant === "destructive"
@@ -105,18 +112,18 @@ export function Navbar({
                                       badge.includes(".")
                                         ? t(badge, badgeTranslationPayload)
                                         : badge}
-                                    </span>
+                                    </Span>
                                   )}
-                                </div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                </Div>
+                                <P className="text-xs text-gray-500 dark:text-gray-400">
                                   {t(childItem.description)}
-                                </p>
-                                <p className="text-xs text-muted-foreground mt-1">
+                                </P>
+                                <P className="text-xs text-muted-foreground mt-1">
                                   {t(disabledReason)}
-                                </p>
-                              </div>
+                                </P>
+                              </Div>
                             </DropdownMenuItem>
-                          </div>
+                          </Div>
                         );
                       }
 
@@ -128,11 +135,11 @@ export function Navbar({
                         >
                           <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
                             {childItem.icon}
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
+                            <Div className="flex-1">
+                              <Div className="flex items-center gap-2">
                                 {t(childItem.title)}
                                 {badge && (
-                                  <span
+                                  <Span
                                     className={cn(
                                       "px-2 py-0.5 text-xs rounded",
                                       badgeVariant === "destructive"
@@ -146,13 +153,13 @@ export function Navbar({
                                     badge.includes(".")
                                       ? t(badge)
                                       : badge}
-                                  </span>
+                                  </Span>
                                 )}
-                              </div>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                              </Div>
+                              <P className="text-xs text-gray-500 dark:text-gray-400">
                                 {t(childItem.description)}
-                              </p>
-                            </div>
+                              </P>
+                            </Div>
                           </DropdownMenuItem>
                         </Link>
                       );
@@ -175,16 +182,16 @@ export function Navbar({
               );
             })}
           </TooltipProvider>
-        </nav>
+        </Div>
 
-        <div className="flex items-center gap-2">
+        <Div className="flex items-center gap-2">
           {/* Notifications - only show when user is logged in */}
           {/* {user && <Notifications locale={locale} user={user} />} */}
 
           {/* Theme toggle only visible on desktop */}
-          <div className="hidden md:block">
+          <Div className="hidden md:block">
             <ThemeToggle locale={locale} />
-          </div>
+          </Div>
 
           <CountrySelector isNavBar locale={locale} />
 
@@ -198,20 +205,20 @@ export function Navbar({
           ) : (
             <>
               {/* Mobile auth button (showing signup) */}
-              <div className="block lg:hidden">
+              <Div className="block lg:hidden">
                 <MobileAuthButtons locale={locale} />
-              </div>
+              </Div>
 
               {/* Desktop auth buttons */}
-              <div className="hidden lg:block">
+              <Div className="hidden lg:block">
                 <AuthButtons locale={locale} />
-              </div>
+              </Div>
             </>
           )}
 
           <MobileMenuClient locale={locale} navigationItems={navigationItems} />
-        </div>
-      </div>
-    </header>
+        </Div>
+      </Div>
+    </Div>
   );
 }

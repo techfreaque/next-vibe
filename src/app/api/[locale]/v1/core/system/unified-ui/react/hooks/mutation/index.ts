@@ -17,10 +17,10 @@ import type { z } from "zod";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { useTranslation } from "@/i18n/core/client";
 
-import type { EndpointLogger } from "../../../cli/vibe/endpoints/endpoint-handler/logger";
-import type { Methods } from "../../../cli/vibe/endpoints/endpoint-types/core/enums";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import type { UnifiedField } from "../../../cli/vibe/endpoints/endpoint-types/core/types";
-import type { CreateApiEndpoint } from "../../../cli/vibe/endpoints/endpoint-types/endpoint/create";
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { AnyData, ApiStore, MutationStoreType } from "../store";
 import { useApiStore } from "../store";
 import type { ApiMutationOptions } from "../types";

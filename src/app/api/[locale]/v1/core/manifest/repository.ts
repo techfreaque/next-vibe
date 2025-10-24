@@ -118,7 +118,7 @@ export class ManifestRepositoryImpl implements ManifestRepository {
         ],
       };
 
-      logger.vibe("Generated localized manifest successfully", {
+      logger.debug("Generated localized manifest successfully", {
         locale,
         language: manifestLang,
       });

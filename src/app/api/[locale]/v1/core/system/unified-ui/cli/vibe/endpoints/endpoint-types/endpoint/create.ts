@@ -278,21 +278,15 @@ export type CreateApiEndpoint<
   RequestInput = ExtractInput<
     InferSchemaFromField<TFields, FieldUsage.RequestData>
   >,
-  RequestOutput = ExtractOutput<
-    InferSchemaFromField<TFields, FieldUsage.RequestData>
-  >,
+  RequestOutput = InferFieldType<TFields, FieldUsage.RequestData>,
   ResponseInput = ExtractInput<
     InferSchemaFromField<TFields, FieldUsage.Response>
   >,
-  ResponseOutput = ExtractOutput<
-    InferSchemaFromField<TFields, FieldUsage.Response>
-  >,
+  ResponseOutput = InferFieldType<TFields, FieldUsage.Response>,
   UrlVariablesInput = ExtractInput<
     InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
   >,
-  UrlVariablesOutput = ExtractOutput<
-    InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
-  >,
+  UrlVariablesOutput = InferFieldType<TFields, FieldUsage.RequestUrlParams>,
 > = ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields> & {
   readonly requestSchema: InferSchemaFromField<TFields, FieldUsage.RequestData>;
   readonly requestUrlParamsSchema: InferSchemaFromField<
@@ -390,55 +384,48 @@ export function createEndpoint<
     requestUrlParamsSchema: requestUrlSchema,
     requiresAuthentication,
     types: {
-      RequestInput: null as ExtractInput<
+      RequestInput: undefined! as ExtractInput<
         InferSchemaFromField<TFields, FieldUsage.RequestData>
       >,
-      RequestOutput: null as ExtractOutput<
+      RequestOutput: undefined! as ExtractOutput<
         InferSchemaFromField<TFields, FieldUsage.RequestData>
       >,
-      ResponseInput: null as ExtractInput<
+      ResponseInput: undefined! as ExtractInput<
         InferSchemaFromField<TFields, FieldUsage.Response>
       >,
-      ResponseOutput: null as ExtractOutput<
+      ResponseOutput: undefined! as ExtractOutput<
         InferSchemaFromField<TFields, FieldUsage.Response>
       >,
-      UrlVariablesInput: null as ExtractInput<
+      UrlVariablesInput: undefined! as ExtractInput<
         InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
       >,
-      UrlVariablesOutput: null as ExtractOutput<
+      UrlVariablesOutput: undefined! as ExtractOutput<
         InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
       >,
     },
     // Direct type access - no need for complex inference
-    TRequestInput: null as ExtractInput<
+    TRequestInput: undefined! as ExtractInput<
       InferSchemaFromField<TFields, FieldUsage.RequestData>
     >,
-    TRequestOutput: null as ExtractOutput<
+    TRequestOutput: undefined! as ExtractOutput<
       InferSchemaFromField<TFields, FieldUsage.RequestData>
     >,
-    TResponseInput: null as ExtractInput<
+    TResponseInput: undefined! as ExtractInput<
       InferSchemaFromField<TFields, FieldUsage.Response>
     >,
-    TResponseOutput: null as ExtractOutput<
+    TResponseOutput: undefined! as ExtractOutput<
       InferSchemaFromField<TFields, FieldUsage.Response>
     >,
-    TUrlVariablesInput: null as ExtractInput<
+    TUrlVariablesInput: undefined! as ExtractInput<
       InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
     >,
-    TUrlVariablesOutput: null as ExtractOutput<
+    TUrlVariablesOutput: undefined! as ExtractOutput<
       InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
     >,
   };
 
   // Return the method-keyed object with proper type inference
-  const result = {
+  return {
     [config.method]: endpointDefinition,
-  } as const;
-
-  return result as any as CreateEndpointReturnInMethod<
-    TFields,
-    TExampleKey,
-    TMethod,
-    TUserRoleValue
-  >;
+  } as CreateEndpointReturnInMethod<TFields, TExampleKey, TMethod, TUserRoleValue>;
 }

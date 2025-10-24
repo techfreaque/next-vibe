@@ -210,7 +210,7 @@ class CreditValidator implements CreditValidatorInterface {
       const balance = balanceResult.data;
       const hasCredits = balance >= cost;
 
-      logger.info("Validated lead credits", {
+      logger.debug("Validated lead credits", {
         leadId,
         modelId,
         cost,
@@ -272,7 +272,7 @@ class CreditValidator implements CreditValidatorInterface {
       const cost = getModelCost(modelId);
       const hasCredits = credits >= cost;
 
-      logger.info("Validated lead by IP", {
+      logger.debug("Validated lead by IP", {
         ipAddress,
         leadId,
         modelId,

@@ -1,19 +1,22 @@
-import Link from "next/link";
-import { cn } from "next-vibe/shared/utils";
 import {
   Badge,
   Button,
+  Div,
+  P,
+  Span,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui";
 import type { BadeVariant } from "next-vibe-ui/ui/badge";
+import { Link } from "next-vibe-ui/ui/link";
 import type { JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
+import { cn } from "@/packages/next-vibe/shared";
 
 import type { NavPaths } from "./nav-constants";
 
@@ -73,7 +76,7 @@ export function NavSingleItem({
   }
 
   return (
-    <Link href={`/${locale}${href}`} as={href}>
+    <Link href={`/${locale}${href}`}>
       <NavButton
         icon={icon}
         title={title}
@@ -118,7 +121,7 @@ function NavButton({
       )}
       disabled={disabled}
     >
-      {icon && <span className="mr-2">{icon}</span>}
+      {icon && <Span className="mr-2">{icon}</Span>}
       {title && t(title)}
       {badge && (
         <Badge
@@ -143,10 +146,10 @@ function DisabledButton({
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div>{children}</div>
+          <Div>{children}</Div>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{reason}</p>
+          <P>{reason}</P>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

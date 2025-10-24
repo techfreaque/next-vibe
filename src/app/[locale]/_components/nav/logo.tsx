@@ -1,11 +1,11 @@
 "use client";
 
+import { Image, Link } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import { cn } from "@/packages/next-vibe/shared";
-import { Image, Link } from "next-vibe-ui/ui";
 
 import logoBlack from "./uai-logo-black.png";
 import logoWhite from "./uai-logo-white.png";

@@ -1,8 +1,9 @@
-import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Div, H1, H3, P } from "next-vibe-ui/ui";
+import { ChevronLeft } from "next-vibe-ui/ui/icons";
+import { Image } from "next-vibe-ui/ui/image";
+import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
@@ -72,32 +73,32 @@ export default async function SignUpPage({
   }
 
   return (
-    <div className="container max-w- mx-auto pt-8 pb-30 px-4 sm:px-2">
+    <Div className="container max-w- mx-auto pt-8 pb-30 px-4 sm:px-2">
       <Link
         href={`/${locale}`}
         className="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 mb-8"
       >
-        <ArrowLeft className="mr-2 h-4 w-4" />
+        <ChevronLeft className="mr-2 h-4 w-4" />
         {t("app.user.common.backToHome")}
       </Link>
-      <div className="grid xl:grid-cols-2 gap-8 items-center">
-        <div className="order-2 xl:order-1">
+      <Div className="grid xl:grid-cols-2 gap-8 items-center">
+        <Div className="order-2 xl:order-1">
           <SignUpForm locale={locale} />
-        </div>
+        </Div>
 
-        <div className="order-1 xl:order-2 text-center xl:text-left">
-          <div className="mb-8">
-            <h1 className="text-3xl xl:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
+        <Div className="order-1 xl:order-2 text-center xl:text-left">
+          <Div className="mb-8">
+            <H1 className="text-3xl xl:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
               {t("app.user.signup.auth.signup.title")}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">
+            </H1>
+            <P className="text-gray-600 dark:text-gray-300 text-lg mb-6">
               {t("app.user.signup.auth.signup.subtitle")}
-            </p>
+            </P>
 
-            <div className="hidden xl:block">
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 mb-6">
-                <div className="flex items-start mb-4">
-                  <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-full mr-4">
+            <Div className="hidden xl:block">
+              <Div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 mb-6">
+                <Div className="flex items-start mb-4">
+                  <Div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-full mr-4">
                     <svg
                       className="h-6 w-6 text-green-600 dark:text-green-400"
                       fill="none"
@@ -111,23 +112,23 @@ export default async function SignUpPage({
                         d="M5 13l4 4L19 7"
                       />
                     </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-1">
+                  </Div>
+                  <Div>
+                    <H3 className="font-semibold text-lg mb-1">
                       {t(
                         "app.user.signup.auth.signup.benefits.contentCreation.title",
                       )}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    </H3>
+                    <P className="text-gray-600 dark:text-gray-400 text-sm">
                       {t(
                         "app.user.signup.auth.signup.benefits.contentCreation.description",
                       )}
-                    </p>
-                  </div>
-                </div>
+                    </P>
+                  </Div>
+                </Div>
 
-                <div className="flex items-start mb-4">
-                  <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-full mr-4">
+                <Div className="flex items-start mb-4">
+                  <Div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-full mr-4">
                     <svg
                       className="h-6 w-6 text-blue-600 dark:text-blue-400"
                       fill="none"
@@ -141,23 +142,23 @@ export default async function SignUpPage({
                         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                       />
                     </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-1">
+                  </Div>
+                  <Div>
+                    <H3 className="font-semibold text-lg mb-1">
                       {t(
                         "app.user.signup.auth.signup.benefits.dataStrategy.title",
                       )}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    </H3>
+                    <P className="text-gray-600 dark:text-gray-400 text-sm">
                       {t(
                         "app.user.signup.auth.signup.benefits.dataStrategy.description",
                       )}
-                    </p>
-                  </div>
-                </div>
+                    </P>
+                  </Div>
+                </Div>
 
-                <div className="flex items-start">
-                  <div className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-full mr-4">
+                <Div className="flex items-start">
+                  <Div className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-full mr-4">
                     <svg
                       className="h-6 w-6 text-purple-600 dark:text-purple-400"
                       fill="none"
@@ -171,23 +172,23 @@ export default async function SignUpPage({
                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-1">
+                  </Div>
+                  <Div>
+                    <H3 className="font-semibold text-lg mb-1">
                       {t("app.user.signup.auth.signup.benefits.saveTime.title")}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    </H3>
+                    <P className="text-gray-600 dark:text-gray-400 text-sm">
                       {t(
                         "app.user.signup.auth.signup.benefits.saveTime.description",
                       )}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+                    </P>
+                  </Div>
+                </Div>
+              </Div>
+            </Div>
 
-            <div className="flex flex-col md:flex-row items-center justify-center xl:justify-start gap-4">
-              <div className="flex -space-x-2">
+            <Div className="flex flex-col md:flex-row items-center justify-center xl:justify-start gap-4">
+              <Div className="flex -space-x-2">
                 <Image
                   src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&auto=format&fit=crop&crop=face"
                   width={40}
@@ -209,17 +210,17 @@ export default async function SignUpPage({
                   alt={t("app.user.signup.auth.signup.avatarAlt")}
                   className="rounded-full border-2 border-white dark:border-gray-800"
                 />
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              </Div>
+              <P className="text-sm text-gray-600 dark:text-gray-400">
                 {t("app.user.signup.auth.signup.userCount", {
                   count: clientCount,
                 })}{" "}
                 {t("app.user.signup.auth.signup.trustText")}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+              </P>
+            </Div>
+          </Div>
+        </Div>
+      </Div>
+    </Div>
   );
 }

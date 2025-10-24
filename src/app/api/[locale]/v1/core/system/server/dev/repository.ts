@@ -9,10 +9,10 @@
 import type { ChildProcess } from "node:child_process";
 import { spawn } from "node:child_process";
 
-import { seedDatabase } from "next-vibe/server/db/seed-manager";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import { seedDatabase } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -396,6 +396,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         devTasks,
         signal,
         locale,
+        logger,
       );
 
       if (startResult.success) {

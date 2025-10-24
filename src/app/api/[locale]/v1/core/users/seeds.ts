@@ -3,8 +3,8 @@
  * Provides seed data for users management functionality
  */
 
+import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 import type { TFunction } from "@/i18n/core/static-types";
-import { registerSeed } from "@/packages/next-vibe/server/db/seed-manager";
 
 import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { userRepository } from "../user/repository";
@@ -50,8 +50,8 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     const adminUser = adminUserResponse.data;
 
     if (!adminUser.leadId) {
-      logger.error(
-        "❌ Admin user has no leadId, skipping users management seeding",
+      logger.debug(
+        "Admin user has no leadId, skipping users management seeding",
       );
       return;
     }
@@ -75,6 +75,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
           isActive: true,
           emailVerified: true,
           roles: [UserRole.CUSTOMER],
+          leadId: null,
         },
       }),
       createUserManagementSeed({
@@ -88,6 +89,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
           isActive: true,
           emailVerified: true,
           roles: [UserRole.CUSTOMER],
+          leadId: null,
         },
       }),
       createUserManagementSeed({
@@ -101,6 +103,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
           isActive: true,
           emailVerified: false, // Mix of verified and unverified for testing
           roles: [UserRole.CUSTOMER],
+          leadId: null,
         },
       }),
     ];
@@ -179,8 +182,8 @@ export async function test(logger: EndpointLogger): Promise<void> {
     const adminUser = adminUserResponse.data;
 
     if (!adminUser.leadId) {
-      logger.error(
-        "❌ Admin user has no leadId, skipping test users management seeding",
+      logger.debug(
+        "Admin user has no leadId, skipping test users management seeding",
       );
       return;
     }
@@ -203,6 +206,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
         isActive: true,
         emailVerified: true,
         roles: [UserRole.CUSTOMER],
+        leadId: null,
       },
     });
 

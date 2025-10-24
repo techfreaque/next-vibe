@@ -256,19 +256,6 @@ export function CampaignStarterForm({
                   control={endpoint.create.form.control}
                 />
 
-                {/* Timezone */}
-                <EndpointFormField
-                  name="timezone"
-                  config={{
-                    type: "text",
-                    label:
-                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.timezone.label",
-                    placeholder:
-                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.timezone.placeholder",
-                  }}
-                  control={endpoint.create.form.control}
-                />
-
                 {/* Enabled */}
                 <EndpointFormField
                   name="enabled"

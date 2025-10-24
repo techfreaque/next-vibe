@@ -1,7 +1,8 @@
 "use client";
 
-import { Check, Send, X } from "lucide-react";
+import { Div, H3, P } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
+import { Check, Send, X } from "next-vibe-ui/ui/icons";
 import { Input } from "next-vibe-ui/ui/input";
 import type { JSX } from "react";
 
@@ -33,14 +34,14 @@ export function NewsletterSignupFooter({
   } = useNewsletterManager();
 
   return (
-    <div>
-      <div className="mb-6">
-        <h3 className="font-semibold text-lg mb-4">
+    <Div>
+      <Div className="mb-6">
+        <H3 className="font-semibold text-lg mb-4">
           {t("app.newsletter.title")}
-        </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+        </H3>
+        <P className="text-sm text-gray-500 dark:text-gray-400 mb-4">
           {t("app.newsletter.description")}
-        </p>
+        </P>
 
         {/* Email input and action button */}
         <form
@@ -95,9 +96,9 @@ export function NewsletterSignupFooter({
             disabled={isAnyOperationInProgress}
           >
             {isSubmitting || isUnsubscribing ? (
-              <div className="animate-spin">
-                <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-              </div>
+              <Div className="animate-spin">
+                <Div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+              </Div>
             ) : isSubscribed ? (
               showConfirmUnsubscribe ? (
                 <Check className="h-4 w-4" />
@@ -112,7 +113,7 @@ export function NewsletterSignupFooter({
 
         {/* Single notification display */}
         {notification && (
-          <div
+          <Div
             className={`text-xs mb-2 ${
               notification.type === "error"
                 ? "text-red-600 dark:text-red-400"
@@ -124,19 +125,19 @@ export function NewsletterSignupFooter({
             }`}
           >
             {t(notification.message)}
-          </div>
+          </Div>
         )}
-      </div>
+      </Div>
 
-      <div className="mt-8">
-        <h3 className="font-semibold text-lg mb-4">
+      <Div className="mt-8">
+        <H3 className="font-semibold text-lg mb-4">
           {t("app.common.selector.country")} /{" "}
           {t("app.common.selector.language")}
-        </h3>
-        <div className="inline-block">
+        </H3>
+        <Div className="inline-block">
           <CountrySelector locale={locale} />
-        </div>
-      </div>
-    </div>
+        </Div>
+      </Div>
+    </Div>
   );
 }

@@ -1,40 +1,14 @@
 import type { QueryKey } from "@tanstack/react-query";
+import { storage } from "next-vibe-ui/ui/storage";
 
 import { envClient } from "@/config/env-client";
 
-// Define AsyncStorage type
-interface AsyncStorageStatic {
-  getItem(key: string): Promise<string | null>;
-  setItem(key: string, value: string): Promise<void>;
-  removeItem(key: string): Promise<void>;
-  clear(): Promise<void>;
-}
-
-// Will be populated in React Native environment
-let AsyncStorage: AsyncStorageStatic | null = null;
-
 /**
- * Initialize AsyncStorage for React Native
- * @returns Promise that resolves when storage is initialized
+ * Initialize storage (no-op for compatibility)
+ * Storage is now handled by next-vibe-ui package
  */
 export async function initializeStorage(): Promise<void> {
-  // if (envClient.platform.isReactNative && !AsyncStorage) {
-  //   try {
-  //     const { default: _AsyncStorage } = await import(
-  //       "@react-native-async-storage/async-storage"
-  //     );
-  //     AsyncStorage = _AsyncStorage;
-  //   } catch (err) {
-  //     errorLogger("Failed to import AsyncStorage:", err);
-  //   }
-  // }
-}
-
-// Call this early in the app to initialize storage
-if (typeof window !== "undefined") {
-  initializeStorage().catch(() => {
-    // Silent error handling - logging should be handled by calling context
-  });
+  // No initialization needed - storage is platform-aware
 }
 
 /**
@@ -73,14 +47,7 @@ export async function getStorageItem<T>(key: string): Promise<T | null> {
       return null;
     }
 
-    let value: string | null = null;
-
-    if (envClient.platform.isReactNative && AsyncStorage) {
-      value = await AsyncStorage.getItem(key);
-    } else {
-      // Browser environment
-      value = localStorage.getItem(key);
-    }
+    const value = await storage.getItem(key);
 
     if (!value) {
       return null;
@@ -131,13 +98,7 @@ export async function setStorageItem<T>(key: string, value: T): Promise<void> {
     };
 
     const serialized = JSON.stringify(wrappedValue);
-
-    if (envClient.platform.isReactNative && AsyncStorage) {
-      await AsyncStorage.setItem(key, serialized);
-    } else {
-      // Browser environment
-      localStorage.setItem(key, serialized);
-    }
+    await storage.setItem(key, serialized);
   } catch {
     // Silent error handling - logging should be handled by calling context
   }
@@ -154,12 +115,7 @@ export async function removeStorageItem(key: string): Promise<void> {
       return;
     }
 
-    if (envClient.platform.isReactNative && AsyncStorage) {
-      await AsyncStorage.removeItem(key);
-    } else {
-      // Browser environment
-      localStorage.removeItem(key);
-    }
+    await storage.removeItem(key);
   } catch {
     // Silent error handling - logging should be handled by calling context
   }
@@ -175,12 +131,9 @@ export async function clearStorageItems(): Promise<void> {
       return;
     }
 
-    if (envClient.platform.isReactNative && AsyncStorage) {
-      await AsyncStorage.clear();
-    } else {
-      // Browser environment
-      localStorage.clear();
-    }
+    // Note: storage from next-vibe-ui doesn't have a clear() method
+    // This is intentional as clearing all storage could affect other app data
+    // If needed, implement selective clearing based on key patterns
   } catch {
     // Silent error handling - logging should be handled by calling context
   }

@@ -2,6 +2,7 @@
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { debugLogger, errorLogger } from "next-vibe/shared/utils";
+import { Div, P } from "next-vibe-ui/ui";
 import type React from "react";
 import { useEffect } from "react";
 
@@ -122,13 +123,13 @@ export default function TrackPage(): React.ReactElement {
 
   // Show loading state while processing
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
-        <p className="text-gray-600 dark:text-gray-400">
+    <Div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <Div className="text-center">
+        <Div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
+        <P className="text-gray-600 dark:text-gray-400">
           {t("app.track.tracking.redirecting")}
-        </p>
-      </div>
-    </div>
+        </P>
+      </Div>
+    </Div>
   );
 }

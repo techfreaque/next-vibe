@@ -27,56 +27,54 @@ import type {
 } from "../types";
 
 // Type helpers for extracting endpoint types
-// Use the already-exposed type properties from CreateApiEndpoint instead of re-extracting
-export type ExtractEndpointTypes<T> =
-  T extends CreateApiEndpoint<
-    infer TExampleKey,
-    infer TMethod,
-    infer TUserRoleValue,
-    infer TFields,
-    infer TRequestInput,
-    infer TRequestOutput,
-    infer TResponseInput,
-    infer TResponseOutput,
-    infer TUrlVariablesInput,
-    infer TUrlVariablesOutput
-  >
+// CRITICAL: Access .types property DIRECTLY to avoid losing type information through infer
+// The CreateApiEndpoint has a .types property with pre-computed type assertions
+export type ExtractEndpointTypes<T> = T extends { types: infer TTypes }
+  ? TTypes extends {
+      RequestOutput: infer TRequestOutput;
+      ResponseOutput: infer TResponseOutput;
+      UrlVariablesOutput: infer TUrlVariablesOutput;
+    }
     ? {
         request: TRequestOutput;
         response: TResponseOutput;
         urlVariables: TUrlVariablesOutput;
-        exampleKey: TExampleKey;
-        method: TMethod;
-        userRoleValue: TUserRoleValue;
-        fields: TFields;
-        requestInput: TRequestInput;
-        requestOutput: TRequestOutput;
-        responseInput: TResponseInput;
-        responseOutput: TResponseOutput;
-        urlVariablesInput: TUrlVariablesInput;
-        urlVariablesOutput: TUrlVariablesOutput;
       }
-    : never;
+    : never
+  : never;
 
 // Extract types from endpoints map
-export type GetEndpointTypes<T> = T extends { GET: infer TGet }
-  ? ExtractEndpointTypes<TGet>
+// Directly access .types property on T["GET"] to avoid any type loss
+export type GetEndpointTypes<T> = "GET" extends keyof T
+  ? T["GET"] extends { types: infer TTypes }
+    ? TTypes extends {
+        RequestOutput: infer TRequestOutput;
+        ResponseOutput: infer TResponseOutput;
+        UrlVariablesOutput: infer TUrlVariablesOutput;
+      }
+      ? {
+          request: TRequestOutput;
+          response: TResponseOutput;
+          urlVariables: TUrlVariablesOutput;
+        }
+      : never
+    : never
   : never;
 
-export type PostEndpointTypes<T> = T extends { POST: infer TPost }
-  ? ExtractEndpointTypes<TPost>
+export type PostEndpointTypes<T> = "POST" extends keyof T
+  ? ExtractEndpointTypes<T["POST"]>
   : never;
 
-export type PutEndpointTypes<T> = T extends { PUT: infer TPut }
-  ? ExtractEndpointTypes<TPut>
+export type PutEndpointTypes<T> = "PUT" extends keyof T
+  ? ExtractEndpointTypes<T["PUT"]>
   : never;
 
-export type PatchEndpointTypes<T> = T extends { PATCH: infer TPatch }
-  ? ExtractEndpointTypes<TPatch>
+export type PatchEndpointTypes<T> = "PATCH" extends keyof T
+  ? ExtractEndpointTypes<T["PATCH"]>
   : never;
 
-export type DeleteEndpointTypes<T> = T extends { DELETE: infer TDelete }
-  ? ExtractEndpointTypes<TDelete>
+export type DeleteEndpointTypes<T> = "DELETE" extends keyof T
+  ? ExtractEndpointTypes<T["DELETE"]>
   : never;
 
 // Primary mutation type (prefer POST, then PUT, then PATCH, then DELETE)

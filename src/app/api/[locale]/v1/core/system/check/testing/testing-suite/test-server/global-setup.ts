@@ -3,7 +3,7 @@
  * This runs once before all test files
  */
 
-import { seedDatabase } from "next-vibe/server/db/seed-manager";
+import { seedDatabase } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 
 import { closeDatabase } from "@/app/api/[locale]/v1/core/system/db";
 import type { CountryLanguage } from "@/i18n/core/config";

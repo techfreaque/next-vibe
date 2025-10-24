@@ -44,7 +44,7 @@ export function UsersListClient({
 
   type UserType = UserListResponseOutput["response"]["users"][number];
 
-  const apiResponse = usersEndpoint.read.response;
+  const apiResponse = usersEndpoint.read?.response;
   const users: UserType[] = apiResponse?.success
     ? apiResponse.data.response.users
     : [];
@@ -54,16 +54,16 @@ export function UsersListClient({
   const totalPages = apiResponse?.success
     ? apiResponse.data.response.pageCount
     : 0;
-  const queryLoading = usersEndpoint.read.isLoading || false;
+  const queryLoading = usersEndpoint.read?.isLoading || false;
 
   // Get current form values for pagination display
   const currentPage =
-    usersEndpoint.read.form.getValues("searchAndPagination.page") || 1;
+    usersEndpoint.read?.form.getValues("searchAndPagination.page") || 1;
   const currentLimit =
-    usersEndpoint.read.form.getValues("searchAndPagination.limit") || 20;
+    usersEndpoint.read?.form.getValues("searchAndPagination.limit") || 20;
 
   const handleClearFilters = (): void => {
-    usersEndpoint.read.form.reset({
+    usersEndpoint.read?.form.reset({
       searchAndPagination: {
         search: undefined,
         page: 1,

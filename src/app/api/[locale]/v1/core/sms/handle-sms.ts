@@ -5,16 +5,16 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/defini
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import type { UndefinedType } from "../../shared/types/common.schema";
+import type { UndefinedType } from "@/packages/next-vibe/shared/types/common.schema";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "../../shared/types/response.schema";
+} from "@/packages/next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   ErrorResponseTypes,
-} from "../../shared/types/response.schema";
-import { parseError } from "../../shared/utils";
+} from "@/packages/next-vibe/shared/types/response.schema";
+import { parseError } from "@/packages/next-vibe/shared/utils";
 import { env } from "@/config/env";
 import { batchSendSms, sendSms } from "./send-sms";
 import type {

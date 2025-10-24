@@ -1,8 +1,13 @@
 "use client";
 
-import { HelpCircle, LogOut, User } from "lucide-react";
-import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "next-vibe-ui/ui";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Div,
+  P,
+  Span,
+} from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   DropdownMenu,
@@ -12,6 +17,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "next-vibe-ui/ui/dropdown-menu";
+import { HelpCircle, LogOut, User } from "next-vibe-ui/ui/icons";
+import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
@@ -49,14 +56,14 @@ export function UserMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">
+          <Div className="flex flex-col space-y-1">
+            <P className="text-sm font-medium leading-none">
               {getUserDisplayName(user)}
-            </p>
-            <p className="text-xs leading-none text-muted-foreground">
+            </P>
+            <P className="text-xs leading-none text-muted-foreground">
               {user.email}
-            </p>
-          </div>
+            </P>
+          </Div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
@@ -68,14 +75,14 @@ export function UserMenu({
             {isOnboardingComplete ? (
               <>
                 <User className="mr-2 h-4 w-4" />
-                <span>{t("app.nav.user.dashboard")}</span>
+                <Span>{t("app.nav.user.dashboard")}</Span>
               </>
             ) : (
               <>
                 <User className="mr-2 h-4 w-4 text-orange-500" />
-                <span className="text-orange-600 dark:text-orange-400">
+                <Span className="text-orange-600 dark:text-orange-400">
                   {t("app.nav.user.completeOnboarding")}
-                </span>
+                </Span>
               </>
             )}
           </Link>
@@ -83,13 +90,13 @@ export function UserMenu({
         <DropdownMenuItem asChild>
           <Link href={`/${locale}/help`}>
             <HelpCircle className="mr-2 h-4 w-4" />
-            <span>{t("app.nav.help")}</span>
+            <Span>{t("app.nav.help")}</Span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout}>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>{t("app.nav.logout")}</span>
+          <Span>{t("app.nav.logout")}</Span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

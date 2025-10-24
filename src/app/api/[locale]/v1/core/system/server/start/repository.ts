@@ -11,7 +11,7 @@
 import type { ChildProcess } from "node:child_process";
 import { spawn } from "node:child_process";
 
-import { seedDatabase } from "next-vibe/server/db/seed-manager";
+import { seedDatabase } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 

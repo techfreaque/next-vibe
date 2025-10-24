@@ -1,9 +1,9 @@
-import Image from "next/image";
-import { cn } from "next-vibe/shared/utils";
+import { Image } from "next-vibe-ui/ui/image";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { cn } from "@/packages/next-vibe/shared";
 
 interface SocialMediaImageProps {
   width?: number;

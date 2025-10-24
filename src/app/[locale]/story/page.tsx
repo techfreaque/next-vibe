@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Div } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
 import { subscriptionRepository } from "@/app/api/[locale]/v1/core/subscription/repository";
@@ -82,7 +83,10 @@ export default async function HomePage({
     : null;
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between w-full">
+    <Div
+      role="main"
+      className="flex min-h-screen flex-col items-center justify-between w-full"
+    >
       <Hero locale={locale} />
       {/* <BrandsSection locale={locale} /> */}
       <PricingSection
@@ -94,6 +98,6 @@ export default async function HomePage({
         isProcessing={null}
       />
       <PricingComparison locale={locale} />
-    </main>
+    </Div>
   );
 }

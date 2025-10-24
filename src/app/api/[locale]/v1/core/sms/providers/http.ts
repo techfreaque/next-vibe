@@ -1,11 +1,11 @@
 import { z } from "zod";
 
-import type { ResponseType } from "../../../shared/types/response.schema";
+import type { ResponseType } from "@/packages/next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   ErrorResponseTypes,
-} from "../../../shared/types/response.schema";
-import { debugLogger } from "../../../shared/utils/logger";
+} from "@/packages/next-vibe/shared/types/response.schema";
+import { debugLogger } from "@/packages/next-vibe/shared/utils/logger";
 import { env } from "@/config/env";
 import {
   phoneNumberSchema,

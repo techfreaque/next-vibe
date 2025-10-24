@@ -1028,7 +1028,7 @@ class AuthRepositoryImpl implements AuthRepository {
       // First, try to get authenticated user from cookies
       const userResult = await this.getCurrentUserNext(logger);
 
-      logger.info(
+      logger.debug(
         "app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.result",
         {
           success: userResult.success,

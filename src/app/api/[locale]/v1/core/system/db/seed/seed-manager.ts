@@ -46,19 +46,19 @@ export function registerSeed(
  * Looks for files named *.seeds.ts or *.seed.ts
  */
 async function discoverSeedFiles(logger: EndpointLogger): Promise<void> {
-  logger.info("🔍 Discovering seed files...");
+  logger.debug("🔍 Discovering seed files...");
 
   // Start from the project root
   const projectRoot = process.cwd();
   const apiRoot = path.join(projectRoot, "src", "app", "api");
 
-  logger.info(`📂 Project root: ${projectRoot}`);
-  logger.info(`📂 API root: ${apiRoot}`);
+  logger.debug(`📂 Project root: ${projectRoot}`);
+  logger.debug(`📂 API root: ${apiRoot}`);
 
   // Find all seed files
   const seedFiles = findSeedFiles(apiRoot);
 
-  logger.info(`📄 Found ${seedFiles.length} seed files`);
+  logger.debug(`📄 Found ${seedFiles.length} seed files`);
 
   // Import and register each seed file
   for (const seedFile of seedFiles) {
@@ -73,17 +73,17 @@ async function discoverSeedFiles(logger: EndpointLogger): Promise<void> {
       // Dynamic import of the seed file
       const fullPath = path.join(projectRoot, modulePath);
 
-      logger.info(`📥 Importing seed file: ${fullPath}`);
+      logger.debug(`📥 Importing seed file: ${fullPath}`);
 
       // This will execute the file which should call registerSeed
       await import(fullPath);
-      logger.info(`✅ Imported: ${modulePath}`);
+      logger.debug(`✅ Imported: ${modulePath}`);
     } catch (error) {
       logger.error(`❌ Error importing seed file ${seedFile}:`, error);
     }
   }
 
-  logger.info(
+  logger.debug(
     `📦 Total modules registered: ${Object.keys(seedRegistry).length}`,
   );
 }
@@ -130,10 +130,10 @@ export async function runSeeds(
   locale: CountryLanguage,
 ): Promise<void> {
   // First discover and load seed files
-  logger.info("🔍 Discovering seed files...");
+  logger.debug("🔍 Discovering seed files...");
   await discoverSeedFiles(logger);
 
-  logger.info(
+  logger.debug(
     `📦 Seed registry has ${Object.keys(seedRegistry).length} modules`,
   );
   logger.info(`🌱 Running ${environment} seeds...`);
@@ -141,11 +141,11 @@ export async function runSeeds(
   for (const [moduleId, seeds] of Object.entries(seedRegistry)) {
     const seedFn = seeds[environment];
     if (seedFn) {
-      logger.info(`🌱 Seeding ${moduleId}...`);
+      logger.debug(`🌱 Seeding ${moduleId}...`);
       if (typeof seedFn === "function") {
         try {
           await seedFn(logger, locale);
-          logger.info(`✅ Seeded ${moduleId} successfully`);
+          logger.debug(`✅ Seeded ${moduleId} successfully`);
         } catch (error) {
           logger.error(`❌ Error seeding ${moduleId}:`, error);
           // Re-throw to propagate seeding errors to the main process
@@ -153,10 +153,10 @@ export async function runSeeds(
           throw error;
         }
       } else {
-        logger.info(`⚠️  No seed function found for ${moduleId}`);
+        logger.debug(`⚠️  No seed function found for ${moduleId}`);
       }
     } else {
-      logger.info(`⏭️  Skipping ${moduleId} (no ${environment} seed)`);
+      logger.debug(`⏭️  Skipping ${moduleId} (no ${environment} seed)`);
     }
   }
 

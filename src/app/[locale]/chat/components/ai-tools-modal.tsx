@@ -57,16 +57,16 @@ export function AIToolsModal({
 
   // Extract tools from response
   const availableTools = useMemo((): AIToolMetadata[] => {
-    const response = toolsEndpoint.read.response;
+    const response = toolsEndpoint.read?.response;
     if (response?.success && response.data?.tools) {
       return response.data.tools;
     }
     return [];
-  }, [toolsEndpoint.read.response]);
+  }, [toolsEndpoint.read?.response]);
 
-  const isLoading = toolsEndpoint.read.isLoading;
+  const isLoading = toolsEndpoint.read?.isLoading ?? false;
   const error =
-    toolsEndpoint.read.response?.success === false
+    toolsEndpoint.read?.response?.success === false
       ? toolsEndpoint.read.response.message
       : null;
 

@@ -1,3 +1,4 @@
+import { Div } from "next-vibe-ui/ui";
 import React, { type JSX } from "react";
 
 /**
@@ -8,11 +9,11 @@ import React, { type JSX } from "react";
  */
 export default function Loading(): JSX.Element {
   return (
-    <div className="flex items-center justify-center min-h-[100vh]">
-      <div className="relative h-16 w-16">
-        <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-gray-800" />
-        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-600 animate-spin" />
-      </div>
-    </div>
+    <Div className="flex items-center justify-center min-h-[100vh]">
+      <Div className="relative h-16 w-16">
+        <Div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-gray-800" />
+        <Div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-600 animate-spin" />
+      </Div>
+    </Div>
   );
 }

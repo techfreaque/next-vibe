@@ -1,8 +1,9 @@
 "use client";
 
-import { AlertTriangleIcon, RefreshCwIcon } from "lucide-react";
+import { H3, P } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
+import { Info, RotateCcw } from "next-vibe-ui/ui/icons";
 import type { JSX, ReactNode } from "react";
 import { useState } from "react";
 
@@ -34,22 +35,22 @@ export function DefaultErrorFallback({
   return (
     <Card className="border-destructive">
       <CardContent className="pt-6 flex flex-col items-center text-center">
-        <AlertTriangleIcon className="h-12 w-12 text-destructive mb-4" />
-        <h3 className="text-xl font-semibold mb-2">
+        <Info className="h-12 w-12 text-destructive mb-4" />
+        <H3 className="text-xl font-semibold mb-2">
           {t("app.common.error.title")}
-        </h3>
-        <p className="text-muted-foreground mb-4">
+        </H3>
+        <P className="text-muted-foreground mb-4">
           {t("app.common.error.message")}
-        </p>
-        <p className="text-sm text-muted-foreground mb-6">
+        </P>
+        <P className="text-sm text-muted-foreground mb-6">
           {error.message || t("app.common.errors.unknown")}
-        </p>
+        </P>
         <Button
           onClick={reset}
           variant="outline"
           className="flex items-center gap-2"
         >
-          <RefreshCwIcon className="h-4 w-4" />
+          <RotateCcw className="h-4 w-4" />
           {t("app.common.error.tryAgain")}
         </Button>
       </CardContent>

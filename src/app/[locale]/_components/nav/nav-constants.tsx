@@ -5,9 +5,9 @@ import {
   Home,
   Info,
   MessageSquare,
-  TagIcon,
+  Tag,
   Video,
-} from "lucide-react";
+} from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -82,7 +82,7 @@ export const navItems: NavItemType[] = [
     href: "",
   },
   {
-    icon: <TagIcon className="h-4 w-4" />,
+    icon: <Tag className="h-4 w-4" />,
     title: "app.nav.pricing",
     href: "#pricing",
   },

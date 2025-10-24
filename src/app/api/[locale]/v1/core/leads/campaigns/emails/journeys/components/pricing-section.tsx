@@ -114,9 +114,7 @@ export async function EmailPricingSection({
           height: "12",
           color: plan.highlighted
             ? "#0891b2" // cyan-600
-            : plan.id === SubscriptionPlan.PREMIUM
-              ? "#9333ea" // purple-600
-              : "#4b5563", // gray-600
+            : "#4b5563", // gray-600
           // eslint-disable-next-line i18next/no-literal-string
           alt: "✓",
         });
@@ -140,9 +138,7 @@ export async function EmailPricingSection({
                       borderRadius: "50%",
                       backgroundColor: plan.highlighted
                         ? "#cffafe" // cyan-100
-                        : plan.id === SubscriptionPlan.PREMIUM
-                          ? "#f3e8ff" // purple-100
-                          : "#f3f4f6", // gray-100
+                        : "#f3f4f6", // gray-100
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -181,7 +177,6 @@ export async function EmailPricingSection({
       feature: string;
       className: string | undefined;
     }>,
-    planId: (typeof SubscriptionPlan)[keyof typeof SubscriptionPlan],
   ): Promise<JSX.Element[]> {
     return await Promise.all(
       premiumFeatures.map(async (feature, i) => {
@@ -214,9 +209,6 @@ export async function EmailPricingSection({
         if (iconName === "Video") {
           // eslint-disable-next-line i18next/no-literal-string
           iconAlt = "🎥";
-        } else if (iconName === "Rocket") {
-          // eslint-disable-next-line i18next/no-literal-string
-          iconAlt = "🚀";
         } else if (iconName === "Star") {
           // eslint-disable-next-line i18next/no-literal-string
           iconAlt = "⭐";
@@ -368,7 +360,7 @@ export async function EmailPricingSection({
     id: plan.id,
     name: t(plan.name),
     description: t(plan.description),
-    price: plan.isEnterprise ? 0 : plan.priceByCountry[country].monthly,
+    price: plan.priceByCountry[country].monthly,
     currency: plan.priceByCountry[country].currency,
     features: plan.features.map((feature) => t(feature)),
     premiumFeatures: plan.premiumFeatures?.map((pf) => ({
@@ -377,7 +369,6 @@ export async function EmailPricingSection({
     })),
     highlighted: plan.highlighted,
     badge: plan.badge ? t(plan.badge) : undefined,
-    isEnterprise: plan.isEnterprise || false,
   }));
 
   // Pre-render all features, premium features, and icons for all plans
@@ -389,7 +380,7 @@ export async function EmailPricingSection({
         id: plan.id,
       }),
       renderedPremiumFeatures: plan.premiumFeatures
-        ? await renderPremiumFeatures(plan.premiumFeatures, plan.id)
+        ? await renderPremiumFeatures(plan.premiumFeatures)
         : undefined,
       renderedIcon: await getPlanIcon(plan.id),
     })),
@@ -410,11 +401,7 @@ export async function EmailPricingSection({
         backgroundColor: "#ffffff",
         border: plan.highlighted
           ? "2px solid #06b6d4" // cyan-500
-          : plan.id === SubscriptionPlan.PREMIUM
-            ? "2px solid #a855f7" // purple-500
-            : plan.isEnterprise
-              ? "2px solid #6b7280" // gray-500
-              : "1px solid #e5e7eb", // gray-200
+          : "1px solid #e5e7eb", // gray-200
         borderRadius: "12px",
         borderCollapse: "separate",
         borderSpacing: "0",
@@ -422,9 +409,7 @@ export async function EmailPricingSection({
     >
       <tbody>
         {/* Badge Row */}
-        {(plan.highlighted && plan.badge) ||
-        plan.id === SubscriptionPlan.PREMIUM ||
-        plan.isEnterprise ? (
+        {plan.highlighted && plan.badge ? (
           <tr>
             <td
               style={{
@@ -434,12 +419,7 @@ export async function EmailPricingSection({
             >
               <div
                 style={{
-                  background:
-                    plan.highlighted && plan.badge
-                      ? "linear-gradient(to right, #06b6d4, #2563eb)"
-                      : plan.id === SubscriptionPlan.PREMIUM
-                        ? "linear-gradient(to right, #a855f7, #ec4899)"
-                        : "linear-gradient(to right, #4b5563, #1f2937)",
+                  background: "linear-gradient(to right, #06b6d4, #2563eb)",
                   color: "#ffffff",
                   padding: "3px 10px",
                   borderRadius: "20px",
@@ -449,11 +429,7 @@ export async function EmailPricingSection({
                   marginBottom: "4px",
                 }}
               >
-                {plan.highlighted && plan.badge
-                  ? plan.badge
-                  : t(
-                      "app.api.v1.core.leads.campaigns.emails.journeys.components.pricing.plans.PREMIUM.featureBadge",
-                    )}
+                {plan.badge}
               </div>
             </td>
           </tr>
@@ -463,12 +439,9 @@ export async function EmailPricingSection({
         <tr>
           <td
             style={{
-              padding:
-                plan.highlighted ||
-                plan.id === SubscriptionPlan.PREMIUM ||
-                plan.isEnterprise
-                  ? "16px 16px 12px 16px"
-                  : "12px 16px 12px 16px",
+              padding: plan.highlighted
+                ? "16px 16px 12px 16px"
+                : "12px 16px 12px 16px",
               textAlign: "center",
             }}
           >
@@ -491,7 +464,7 @@ export async function EmailPricingSection({
                   <td style={{ textAlign: "center" }}>
                     <Text
                       style={{
-                        fontSize: plan.isEnterprise ? "32px" : "48px",
+                        fontSize: "48px",
                         fontWeight: "800",
                         color: "#111827",
                         margin: "0",

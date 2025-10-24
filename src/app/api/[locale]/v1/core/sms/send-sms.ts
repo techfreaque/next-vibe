@@ -1,11 +1,11 @@
 import "server-only";
 
-import type { ResponseType } from "../../shared/types/response.schema";
+import type { ResponseType } from "@/packages/next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
-} from "../../shared/types/response.schema";
+} from "@/packages/next-vibe/shared/types/response.schema";
 import { env } from "@/config/env";
 import { getAwsSnsProvider } from "./providers/aws-sns";
 import { getHttpProvider } from "./providers/http";

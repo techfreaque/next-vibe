@@ -34,6 +34,7 @@ export const translations: typeof enTranslations = {
     actions: {
       back: "Wstecz",
       save: "Zapisz",
+      saving: "Zapisywanie...",
       cancel: "Anuluj",
       delete: "Usuń",
       edit: "Edytuj",

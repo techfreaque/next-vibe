@@ -32,6 +32,7 @@ export const translations: typeof enTranslations = {
     actions: {
       back: "Zurück",
       save: "Speichern",
+      saving: "Wird gespeichert...",
       cancel: "Abbrechen",
       delete: "Löschen",
       edit: "Bearbeiten",

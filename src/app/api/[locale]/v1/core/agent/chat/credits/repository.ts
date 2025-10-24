@@ -264,7 +264,7 @@ class CreditRepository implements CreditRepositoryInterface {
         type: "free_tier",
       });
 
-      logger.info("Created new lead with free tier credits", {
+      logger.debug("Created new lead with free tier credits", {
         leadId: newLead.id,
         ipAddress,
       });

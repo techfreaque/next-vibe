@@ -11,19 +11,17 @@ import { parseError } from "next-vibe/shared/utils";
 import type { FormEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
-import type { z } from "zod";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import type {
   ExtractOutput,
   FieldUsage,
   InferSchemaFromField,
-  UnifiedField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import type { EndpointLogger } from "../../../cli/vibe/endpoints/endpoint-handler/logger";
 import { useApiQuery } from "../query";
 import type { ApiStore, FormQueryParams } from "../store";
 import { useApiStore } from "../store";
@@ -80,15 +78,25 @@ export function useApiQueryForm<
     persistenceKey?: string;
   };
   queryOptions: ApiQueryOptions<
-    ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
-    ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>,
-    ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>>
+    ExtractOutput<
+      InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+    >,
+    ExtractOutput<
+      InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>
+    >,
+    ExtractOutput<
+      InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
+    >
   >;
   logger: EndpointLogger;
 }): ApiQueryFormReturn<
-  ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
-  ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>,
-  ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>>
+  ExtractOutput<
+    InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+  >,
+  ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>>,
+  ExtractOutput<
+    InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
+  >
 > {
   if (!endpoint) {
     // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
@@ -113,7 +121,7 @@ export function useApiQueryForm<
   const defaultQueryParams = useMemo(
     () =>
       ({}) as ExtractOutput<
-        InferSchemaFromField<TFields, FieldUsage.RequestData>
+        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
       >,
     [],
   );
@@ -121,9 +129,11 @@ export function useApiQueryForm<
     () =>
       (
         state: ApiStore,
-      ): ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>> =>
+      ): ExtractOutput<
+        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+      > =>
         (state.forms[formId]?.queryParams as ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestData>
+          InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
         >) ?? defaultQueryParams,
     [formId, defaultQueryParams],
   );
@@ -133,7 +143,7 @@ export function useApiQueryForm<
   const setQueryParams = useCallback(
     (
       params: ExtractOutput<
-        InferSchemaFromField<TFields, FieldUsage.RequestData>
+        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
       >,
     ) => {
       // Type-safe conversion for form query params
@@ -206,8 +216,12 @@ export function useApiQueryForm<
     ...restFormOptions,
     // @ts-ignore - Intentionally ignoring FieldValues constraint requirement
     resolver: zodResolver<
-      ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
-      ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>
+      ExtractOutput<
+        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+      >,
+      ExtractOutput<
+        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+      >
     >(endpoint.requestSchema),
   };
 
@@ -218,7 +232,7 @@ export function useApiQueryForm<
 
   // Initialize form with the proper configuration
   type FormData = ExtractOutput<
-    InferSchemaFromField<TFields, FieldUsage.RequestData>
+    InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
   >;
   const formMethods = useForm<FormData>(formConfig);
   const { watch } = formMethods;
@@ -235,10 +249,10 @@ export function useApiQueryForm<
       // Reset the form to default values if available, otherwise empty
       const resetData =
         (restFormOptions.defaultValues as ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestData>
+          InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
         >) ||
         ({} as ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestData>
+          InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
         >);
       formMethods.reset(resetData);
       // Update query params with reset data
@@ -259,7 +273,7 @@ export function useApiQueryForm<
       const savedFormData = localStorage.getItem(storageKey);
       if (savedFormData) {
         const parsedData = JSON.parse(savedFormData) as ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestData>
+          InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
         >;
         formMethods.reset(parsedData);
         // Update query params with saved data
@@ -368,7 +382,9 @@ export function useApiQueryForm<
 
   // Force refetch when queryParams change (since useApiQuery doesn't auto-refetch)
   const prevQueryParamsRef = useRef<
-    | ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>
+    | ExtractOutput<
+        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+      >
     | undefined
   >(undefined);
   useEffect(() => {
@@ -423,7 +439,10 @@ export function useApiQueryForm<
               lastSubmitTime = Date.now();
               setQueryParams(
                 formData as ExtractOutput<
-                  InferSchemaFromField<TFields, FieldUsage.RequestData>
+                  InferSchemaFromField<
+                    TEndpoint["fields"],
+                    FieldUsage.RequestData
+                  >
                 >,
               );
             }
@@ -439,7 +458,10 @@ export function useApiQueryForm<
               lastSubmitTime = Date.now();
               setQueryParams(
                 formData as ExtractOutput<
-                  InferSchemaFromField<TFields, FieldUsage.RequestData>
+                  InferSchemaFromField<
+                    TEndpoint["fields"],
+                    FieldUsage.RequestData
+                  >
                 >,
               );
             }
@@ -466,15 +488,27 @@ export function useApiQueryForm<
 
   // Create a submit handler that validates and submits the form
   const submitForm: SubmitFormFunction<
-    ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
-    ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>,
-    ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>>
+    ExtractOutput<
+      InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+    >,
+    ExtractOutput<
+      InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>
+    >,
+    ExtractOutput<
+      InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
+    >
   > = (
     event: FormEvent<HTMLFormElement> | undefined,
     inputOptions?: SubmitFormFunctionOptions<
-      ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
-      ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>,
-      ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>>
+      ExtractOutput<
+        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+      >,
+      ExtractOutput<
+        InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>
+      >,
+      ExtractOutput<
+        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
+      >
     >,
   ): void => {
     // Prevent default form submission behavior
@@ -484,15 +518,21 @@ export function useApiQueryForm<
 
     // Create a properly typed options object with urlParamVariables
     const options: SubmitFormFunctionOptions<
-      ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
-      ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>,
-      ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>>
+      ExtractOutput<
+        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+      >,
+      ExtractOutput<
+        InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>
+      >,
+      ExtractOutput<
+        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
+      >
     > = {
       ...(inputOptions || {}),
       urlParamVariables:
         inputOptions?.urlParamVariables ||
         ({} as ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+          InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
         >),
     };
     // Define the internal submit function that will be called after validation
@@ -539,7 +579,7 @@ export function useApiQueryForm<
 
         // Get form data
         const formData: ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestData>
+          InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
         > = formMethods.getValues();
 
         // Clear any previous errors
@@ -579,7 +619,10 @@ export function useApiQueryForm<
             pathParams:
               options.urlParamVariables ||
               ({} as ExtractOutput<
-                InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+                InferSchemaFromField<
+                  TEndpoint["fields"],
+                  FieldUsage.RequestUrlParams
+                >
               >),
           });
         }
@@ -608,7 +651,10 @@ export function useApiQueryForm<
             pathParams:
               options.urlParamVariables ||
               ({} as ExtractOutput<
-                InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+                InferSchemaFromField<
+                  TEndpoint["fields"],
+                  FieldUsage.RequestUrlParams
+                >
               >),
           });
         }
@@ -643,7 +689,10 @@ export function useApiQueryForm<
             pathParams:
               options.urlParamVariables ||
               ({} as ExtractOutput<
-                InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+                InferSchemaFromField<
+                  TEndpoint["fields"],
+                  FieldUsage.RequestUrlParams
+                >
               >),
           });
         }

@@ -7,7 +7,7 @@ import { sql } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { Countries, Languages } from "@/i18n/core/config";
-import { registerSeed } from "@/packages/next-vibe/server/db/seed-manager";
+import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 
 import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import {

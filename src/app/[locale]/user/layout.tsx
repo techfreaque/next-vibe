@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Div } from "next-vibe-ui/ui";
 import type { JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -43,8 +44,8 @@ export default function UserLayout({
   children: ReactNode;
 }): JSX.Element {
   return (
-    <div className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
+    <Div className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
       {children}
-    </div>
+    </Div>
   );
 }

@@ -6,9 +6,9 @@ import { useMemo } from "react";
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import type { EndpointLogger } from "../../../cli/vibe/endpoints/endpoint-handler/logger";
-import type { Methods } from "../../../cli/vibe/endpoints/endpoint-types/core/enums";
-import type { CreateApiEndpoint } from "../../../cli/vibe/endpoints/endpoint-types/endpoint/create";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { AutoPrefillConfig } from "../form/types";
 import {
   type EndpointUrlVariables,

@@ -3,7 +3,7 @@
  * Provides seed data for newsletter subscriptions
  */
 
-import { registerSeed } from "@/packages/next-vibe/server/db/seed-manager";
+import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 
 import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { UserDetailLevel } from "../user/enum";

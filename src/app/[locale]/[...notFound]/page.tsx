@@ -1,9 +1,10 @@
-import { Home } from "lucide-react";
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
+import { Div, H1, H2, P } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
+import { Home } from "next-vibe-ui/ui/icons";
+import { Image } from "next-vibe-ui/ui/image";
+import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -46,16 +47,16 @@ export default async function NotFound({
   const { locale } = await params;
   const { t } = simpleT(locale);
   return (
-    <div className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900 flex flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-3xl">
+    <Div className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900 flex flex-col items-center justify-center px-4 py-12">
+      <Div className="w-full max-w-3xl">
         <Card className="border-none shadow-xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
           <CardContent className="p-0 overflow-hidden">
-            <div className="grid md:grid-cols-2">
+            <Div className="grid md:grid-cols-2">
               {/* Left side - Illustration */}
-              <div className="relative h-64 md:h-full bg-blue-600 dark:bg-blue-800 overflow-hidden">
-                <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=1974')] bg-cover bg-center" />
-                <div className="relative z-10 h-full flex flex-col items-center justify-center p-6 text-white">
-                  <div className="animate-float">
+              <Div className="relative h-64 md:h-full bg-blue-600 dark:bg-blue-800 overflow-hidden">
+                <Div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=1974')] bg-cover bg-center" />
+                <Div className="relative z-10 h-full flex flex-col items-center justify-center p-6 text-white">
+                  <Div className="animate-float">
                     <Image
                       src="https://illustrations.popsy.co/white/crashed-error.svg"
                       alt={t("app.pages.notFound.title")}
@@ -63,24 +64,24 @@ export default async function NotFound({
                       height={250}
                       className="mx-auto"
                     />
-                  </div>
-                  <h1 className="text-7xl font-bold mt-4 animate-pulse-slow">
+                  </Div>
+                  <H1 className="text-7xl font-bold mt-4 animate-pulse-slow">
                     404
-                  </h1>
-                </div>
-              </div>
+                  </H1>
+                </Div>
+              </Div>
 
               {/* Right side - Content */}
-              <div className="p-8 md:p-10 flex flex-col justify-center">
-                <h2 className="text-3xl font-bold mb-4 text-blue-600 dark:text-blue-400">
+              <Div className="p-8 md:p-10 flex flex-col justify-center">
+                <H2 className="text-3xl font-bold mb-4 text-blue-600 dark:text-blue-400">
                   {t("app.pages.notFound.title")}
-                </h2>
-                <p className="text-gray-600 dark:text-gray-300 mb-8">
+                </H2>
+                <P className="text-gray-600 dark:text-gray-300 mb-8">
                   {t("app.pages.notFound.description")}
-                </p>
+                </P>
 
                 {/* Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3">
+                <Div className="flex flex-col sm:flex-row gap-3">
                   <NotFoundBackButton locale={locale} />
                   <Button
                     asChild
@@ -91,12 +92,12 @@ export default async function NotFound({
                       {t("app.pages.notFound.goHome")}
                     </Link>
                   </Button>
-                </div>
-              </div>
-            </div>
+                </Div>
+              </Div>
+            </Div>
           </CardContent>
         </Card>
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 }

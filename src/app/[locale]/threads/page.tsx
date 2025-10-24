@@ -8,15 +8,15 @@ import { redirect } from "next/navigation";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ThreadsRootPageProps {
-  params: {
+  params: Promise<{
     locale: CountryLanguage;
-  };
+  }>;
 }
 
-export default function ThreadsRootPage({
+export default async function ThreadsRootPage({
   params,
-}: ThreadsRootPageProps): never {
-  const { locale } = params;
+}: ThreadsRootPageProps): Promise<never> {
+  const { locale } = await params;
 
   // Redirect to private folder by default
   redirect(`/${locale}/threads/private`);
