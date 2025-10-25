@@ -88,7 +88,7 @@ export function AIToolsModal({
 
   // Group tools by category
   const toolsByCategory = useMemo(() => {
-    const grouped: Record<string, AIToolMetadata[]> = {};
+    const grouped: Record<string, AIToolMetadataSerialized[]> = {};
 
     filteredTools.forEach((tool) => {
       const category = tool.category || "other";

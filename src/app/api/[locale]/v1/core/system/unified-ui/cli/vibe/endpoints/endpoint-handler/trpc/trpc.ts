@@ -119,7 +119,9 @@ export function requireRoles<TRoles extends readonly string[]>(
  * Admin procedure factory - requires admin role
  * Call with logger from context: adminProcedure(ctx.logger)
  */
-export function createAdminProcedure(logger: EndpointLogger) {
+export function createAdminProcedure(
+  logger: EndpointLogger,
+): ReturnType<typeof authenticatedProcedure.use> {
   return authenticatedProcedure.use(requireRoles([UserRole.ADMIN], logger));
 }
 
@@ -127,7 +129,9 @@ export function createAdminProcedure(logger: EndpointLogger) {
  * Customer procedure factory - requires customer role or higher
  * Call with logger from context: customerProcedure(ctx.logger)
  */
-export function createCustomerProcedure(logger: EndpointLogger) {
+export function createCustomerProcedure(
+  logger: EndpointLogger,
+): ReturnType<typeof authenticatedProcedure.use> {
   return authenticatedProcedure.use(
     requireRoles([UserRole.CUSTOMER, UserRole.ADMIN], logger),
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Button, Div, Textarea } from "next-vibe-ui/ui";
+import { Button, Div, Form, Textarea } from "next-vibe-ui/ui";
 import { GitBranch, X } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React from "react";
@@ -53,7 +53,7 @@ export function MessageEditor({
 
   return (
     <Div ref={editor.editorRef} className="w-full">
-      <form
+      <Form
         onSubmit={(e) => {
           e.preventDefault();
           void editor.handleBranch();
@@ -161,7 +161,7 @@ export function MessageEditor({
             </Button>
           </Div>
         </Div>
-      </form>
+      </Form>
     </Div>
   );
 }

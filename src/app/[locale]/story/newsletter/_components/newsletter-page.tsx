@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, Mail, Send, TrendingUp, Users, X, Zap } from "lucide-react";
+import { Form } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { Input } from "next-vibe-ui/ui/input";
 import type { JSX } from "react";
@@ -101,7 +102,7 @@ export function NewsletterPage({
 
           {/* Newsletter Form */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-16 max-w-md mx-auto">
-            <form
+            <Form
               onSubmit={(e) => {
                 e.preventDefault();
                 // Validate email before submission
@@ -198,7 +199,7 @@ export function NewsletterPage({
                   {t(notification.message)}
                 </div>
               )}
-            </form>
+            </Form>
 
             {/* Unsubscribe link */}
             <div className="text-center mt-4">

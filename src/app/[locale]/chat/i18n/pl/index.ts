@@ -98,7 +98,8 @@ export const translations: typeof enTranslations = {
       searchPlaceholder: "Szukaj narzędzi...",
       loading: "Ładowanie narzędzi...",
       noToolsFound: "Brak narzędzi pasujących do wyszukiwania",
-      noToolsAvailable: "Nie znaleziono jeszcze narzędzi AI. Narzędzia pojawią się tutaj automatycznie, gdy zostaną zarejestrowane w systemie.",
+      noToolsAvailable:
+        "Nie znaleziono jeszcze narzędzi AI. Narzędzia pojawią się tutaj automatycznie, gdy zostaną zarejestrowane w systemie.",
       enableAll: "Włącz wszystkie widoczne narzędzia",
       disableAll: "Wyłącz wszystkie widoczne narzędzia",
       footerInfo: "{{count}} z {{total}} narzędzi włączonych",

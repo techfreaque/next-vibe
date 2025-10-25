@@ -74,6 +74,7 @@ export function toolMetadataToMCPTool(
  */
 function zodSchemaToJsonSchema(schema: z.ZodTypeAny): {
   type: "object";
+  // eslint-disable-next-line no-restricted-syntax
   properties?: Record<string, unknown>;
   required?: string[];
   additionalProperties?: boolean;
@@ -88,8 +89,12 @@ function zodSchemaToJsonSchema(schema: z.ZodTypeAny): {
     if (typeof jsonSchema === "object" && jsonSchema !== null) {
       return {
         type: "object",
-        properties: (jsonSchema as { properties?: Record<string, unknown> })
-          .properties,
+        properties: (
+          jsonSchema as {
+            // eslint-disable-next-line no-restricted-syntax
+            properties?: Record<string, unknown>;
+          }
+        ).properties,
         required: (jsonSchema as { required?: string[] }).required,
         additionalProperties: (
           jsonSchema as {

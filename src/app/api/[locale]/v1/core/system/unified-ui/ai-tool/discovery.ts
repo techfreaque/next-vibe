@@ -140,6 +140,7 @@ export class ToolDiscovery implements IToolDiscovery {
   /**
    * Watch for changes (development mode)
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   watch(_callback: (endpoints: DiscoveredEndpoint[]) => void): () => void {
     if (!aiToolConfig.development.enableWatch) {
       return () => {}; // No-op if watching disabled
@@ -231,7 +232,7 @@ export class ToolDiscovery implements IToolDiscovery {
     } catch (error) {
       // Log error for debugging in development
       if (aiToolConfig.development.debug) {
-        const logger = createEndpointLogger(true, Date.now(), "en");
+        const logger = createEndpointLogger(true, Date.now(), "en-GLOBAL");
         logger.error("[Discovery] Failed to load endpoint", {
           definitionPath,
           error: error instanceof Error ? error.message : String(error),

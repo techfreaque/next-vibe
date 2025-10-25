@@ -262,8 +262,6 @@ function parseCliArguments(
   const doubleHyphenPrefix = CLI_CONSTANTS.DOUBLE_HYPHEN;
   const singleHyphenPrefix = CLI_CONSTANTS.SINGLE_HYPHEN;
   const equalsSeparator = CLI_CONSTANTS.EQUALS;
-  const trueValue = CLI_CONSTANTS.TRUE_VALUE;
-  const falseValue = CLI_CONSTANTS.FALSE_VALUE;
 
   for (let i = 0; i < relevantArgs.length; i++) {
     const arg = relevantArgs[i];

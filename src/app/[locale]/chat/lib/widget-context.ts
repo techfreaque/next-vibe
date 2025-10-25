@@ -22,15 +22,17 @@ export function createChatWidgetContext(
     permissions,
     platform: "web",
     theme,
-    onNavigate: (url: string) => {
+    onNavigate: (url: string): void => {
       // Open links in new tab
+      // eslint-disable-next-line i18next/no-literal-string
       window.open(url, "_blank", "noopener,noreferrer");
     },
-    onAction: async (action) => {
+    // eslint-disable-next-line @typescript-eslint/require-await
+    onAction: async (action): Promise<void> => {
       // Handle widget actions (e.g., retry, edit, delete)
+      // eslint-disable-next-line no-console, i18next/no-literal-string
       console.log("[Chat Widget] Action triggered:", action);
       // TODO: Implement action handlers when needed
     },
   };
 }
-

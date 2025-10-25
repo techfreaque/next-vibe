@@ -7,7 +7,7 @@ import "server-only";
 
 import type { CoreTool } from "ai";
 
-import { braveSearch } from "@/app/api/[locale]/v1/core/agent/web/brave-search/repository";
+import { braveSearch } from "@/app/api/[locale]/v1/core/agent/brave-search/repository";
 import { getToolExecutor } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/executor";
 import { createToolsFromEndpoints } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/factory";
 import type { AIToolMetadata } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/types";
@@ -46,7 +46,7 @@ export async function loadToolsForUser(
   const dynamicTools = enabledToolMetadata.filter((t) => !t.isManualTool);
 
   // Load manual tools
-  manualToolCount = await loadManualTools(manualTools, tools, logger);
+  manualToolCount = loadManualTools(manualTools, tools, logger);
 
   // Load dynamic tools
   dynamicToolCount = await loadDynamicTools(
@@ -69,16 +69,17 @@ export async function loadToolsForUser(
 /**
  * Load manual tools (braveSearch, etc.)
  */
-async function loadManualTools(
+function loadManualTools(
   manualTools: AIToolMetadata[],
   tools: Record<string, CoreTool>,
   logger: EndpointLogger,
-): Promise<number> {
+): number {
   let count = 0;
 
   for (const toolMeta of manualTools) {
     if (toolMeta.name === "search") {
-      tools.search = braveSearch;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      tools.search = braveSearch as CoreTool;
       count++;
       logger.debug("[Tool Loader] Added manual tool: search");
     }

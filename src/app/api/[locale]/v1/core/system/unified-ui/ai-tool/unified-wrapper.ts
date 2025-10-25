@@ -135,6 +135,7 @@ export class UnifiedToolDiscovery implements IToolDiscovery {
   /**
    * Watch for changes (not implemented in unified platform yet)
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   watch(_callback: () => void): () => void {
     this.logger.warn(
       "[Unified Tool Discovery] Watch not implemented in unified platform",

@@ -96,7 +96,8 @@ export const translations = {
       searchPlaceholder: "Search tools...",
       loading: "Loading tools...",
       noToolsFound: "No tools match your search",
-      noToolsAvailable: "No AI tools discovered yet. Tools will appear here automatically as they are registered with the system.",
+      noToolsAvailable:
+        "No AI tools discovered yet. Tools will appear here automatically as they are registered with the system.",
       enableAll: "Enable All Visible Tools",
       disableAll: "Disable All Visible Tools",
       footerInfo: "{{count}} of {{total}} tools enabled",

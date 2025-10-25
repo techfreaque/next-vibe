@@ -1,8 +1,8 @@
 {
-  "name": "unbottled.ai",
+  "name": "next-vibe",
   "version": "2.0.0",
   "main": "expo-router/entry",
-  "author": "Marcus Brandstätter",
+  "author": "Max Brandstätter",
   "private": true,
   "description": "Unbottled AI",
   "license": "GPL-3.0-only",
@@ -17,7 +17,7 @@
     "check": "vibe check",
     "lint": "vibe lint",
     "typecheck": "vibe typecheck",
-    "generate:expo-indexes": "bun src/packages/react-native-comp/scripts/generate-expo-indexes.ts",
+    "mcp:test": "bunx @modelcontextprotocol/inspector vibe mcp",
     "native": "expo start",
     "native:android": "expo run:android",
     "native:ios": "expo run:ios",
@@ -26,7 +26,7 @@
   },
   "contributors": [
     {
-      "name": "Marcus Brandstaetter",
+      "name": "Max Brandstaetter",
       "email": "max@tfq.at"
     },
     {
@@ -34,6 +34,9 @@
     },
     {
       "name": "Claude Code"
+    },
+    {
+      "name": "t3.chat"
     },
     {
       "name": "ChatGPT (fired)"

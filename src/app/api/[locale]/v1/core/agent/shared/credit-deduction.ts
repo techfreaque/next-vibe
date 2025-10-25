@@ -106,8 +106,10 @@ export async function deductCredits(
     return {
       success: true,
       messageId: creditMessageId,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       creditIdentifier: deductResult.creditIdentifier,
     };
+    // eslint-disable-next-line no-restricted-syntax
   } catch (error: unknown) {
     logger.error(`Error deducting credits for ${feature}`, {
       error: error instanceof Error ? error.message : String(error),

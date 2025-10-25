@@ -11,13 +11,13 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
+import { getModelCost } from "@/app/api/[locale]/v1/core/agent/chat/model-access/costs";
 import { userLeads } from "@/app/api/[locale]/v1/core/leads/db";
 import { subscriptions } from "@/app/api/[locale]/v1/core/subscription/db";
 import { SubscriptionStatus } from "@/app/api/[locale]/v1/core/subscription/enum";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 
-import { getModelCost } from "../model-access/costs";
 import { creditRepository } from "./repository";
 
 /**

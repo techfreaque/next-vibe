@@ -233,8 +233,8 @@ import type { PUT } from "./definition";
 type AudiencePutRequestOutput = typeof PUT.types.RequestOutput;
 
 // ✅ AFTER: Standardized imports - NO type extraction in repositories
-import type { ResponseType } from "@/packages/next-vibe/shared/types/response.schema";
-import { createErrorResponse, createSuccessResponse } from "@/packages/next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { createErrorResponse, createSuccessResponse } from "next-vibe/shared/types/response.schema";
 import type { JwtPrivatePayloadType } from "../../../user/auth/definition";
 import type { 
   AudienceGetResponseOutput,
@@ -278,8 +278,8 @@ import { eq } from "drizzle-orm";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { ResponseType } from "@/packages/next-vibe/shared/types/response.schema";
-import { createErrorResponse, createSuccessResponse, ErrorResponseTypes } from "@/packages/next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { createErrorResponse, createSuccessResponse, ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 
 // User context imports (from definition.ts)
 import type { JwtPrivatePayloadType } from "../../../user/auth/definition";

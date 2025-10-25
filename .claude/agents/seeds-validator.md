@@ -135,7 +135,7 @@ When creating a new seeds.ts file:
 2. **Include proper imports**:
 
    ```typescript
-   import { registerSeed } from "@/packages/next-vibe/server/db/seed-manager";
+   import { registerSeed } from "next-vibe/server/db/seed-manager";
    import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
    ```
 
@@ -189,7 +189,7 @@ When creating a new seeds.ts file:
  * Provides seed data for {module}-related tables
  */
 
-import { registerSeed } from "@/packages/next-vibe/server/db/seed-manager";
+import { registerSeed } from "next-vibe/server/db/seed-manager";
 import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 
 import type { NewEntity } from "./db";

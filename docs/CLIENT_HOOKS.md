@@ -2,6 +2,8 @@
 
 **Type-safe React and React Native hooks for using endpoints.**
 
+> **Part of NextVibe Framework** (GPL-3.0) - Located in `src/app/api/[locale]/v1/core/system/unified-ui/react/hooks/`
+
 All hooks work in both React (web) and React Native (mobile) with identical APIs.
 
 ---

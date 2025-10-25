@@ -292,8 +292,6 @@ const config = [
       "**/*.spec.tsx",
     ],
     ignores: [
-      "src/packages/next-vibe/cli/**",
-      "src/packages/next-vibe/testing/**",
       "**/seeds.ts",
     ],
     languageOptions: {

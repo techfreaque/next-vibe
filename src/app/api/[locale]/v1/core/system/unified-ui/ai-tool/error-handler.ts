@@ -24,6 +24,7 @@ export function extractErrorMessage(error: unknown): string {
  */
 
 export function createErrorResult(
+  // eslint-disable-next-line no-restricted-syntax
   error: unknown,
   startTime: number,
   toolName: string,

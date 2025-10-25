@@ -103,6 +103,7 @@ function renderContentWithReferences(
     // Add text before the reference
     if (match.index > lastIndex) {
       parts.push(
+        // eslint-disable-next-line i18next/no-literal-string
         <Span key={`text-${key++}`}>
           {content.substring(lastIndex, match.index)}
         </Span>,
@@ -134,6 +135,7 @@ function renderContentWithReferences(
   // Add remaining text
   if (lastIndex < content.length) {
     parts.push(
+      // eslint-disable-next-line i18next/no-literal-string
       <Span key={`text-${key++}`}>{content.substring(lastIndex)}</Span>,
     );
   }

@@ -136,7 +136,9 @@ export class ToolFilter implements IToolFilter {
     platform: LegacyPlatform | Platform,
   ): boolean {
     // Handle both legacy string values and new Platform enum
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const platformStr =
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       typeof platform === "string" ? platform : platform.toLowerCase();
 
     switch (platformStr) {

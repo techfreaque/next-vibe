@@ -54,12 +54,12 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 // ✅ Response types (BOTH patterns work - mixed usage in codebase)
-import type { ResponseType } from "@/packages/next-vibe/shared/types/response.schema";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { createErrorResponse, createSuccessResponse, ErrorResponseTypes } from "@/packages/next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { createErrorResponse, createSuccessResponse, ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 
 // ✅ Utility functions
-import { parseError } from "@/packages/next-vibe/shared/utils";
+import { parseError } from "next-vibe/shared/utils";
 import { parseError } from "next-vibe/shared/utils";
 ```
 
@@ -149,7 +149,7 @@ import path from "node:path";
 
 ```typescript
 // ✅ Environment imports
-import { env } from "@/packages/next-vibe/server/env";
+import { env } from "next-vibe/server/env";
 
 // ✅ Configuration imports
 import { Countries, Languages } from "@/i18n/core/config";
@@ -166,7 +166,7 @@ import { Countries, Languages } from "@/i18n/core/config";
 
 **Category 2: Package Imports**
 
-- Next-vibe: BOTH `next-vibe/*` AND `@/packages/next-vibe/*` patterns are used in codebase
+- Next-vibe: BOTH `next-vibe/*` AND `next-vibe/*` patterns are used in codebase
 - External packages: Standard npm package names (zod, drizzle-orm, etc.)
 
 **Category 3: Cross-Domain Imports**

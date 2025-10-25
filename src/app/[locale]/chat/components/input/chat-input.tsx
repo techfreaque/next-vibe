@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Button, Div, Textarea } from "next-vibe-ui/ui";
+import { Button, Div, Form, Textarea } from "next-vibe-ui/ui";
 import { Send, Square } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { forwardRef } from "react";
@@ -67,7 +67,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
     const modelSupportsTools = currentModel?.supportsTools ?? false;
 
     return (
-      <form
+      <Form
         onSubmit={onSubmit}
         className={cn(
           "p-3 sm:p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
@@ -179,7 +179,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
             )}
           </Div>
         </Div>
-      </form>
+      </Form>
     );
   },
 );

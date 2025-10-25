@@ -6,25 +6,44 @@
 
 import "server-only";
 
+import type { z } from "zod";
+
 import { setupEndpoints } from "@/app/api/[locale]/v1/core/system/generated/endpoints";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import type { EndpointDefinition } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
+import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 
 import type { DiscoveredEndpoint } from "./types";
+
+/**
+ * Type for the nested endpoint structure from generated/endpoints.ts
+ * This is a recursive structure where each level can contain either:
+ * - Method keys (GET, POST, etc.) with endpoint definitions
+ * - Nested objects with more path segments
+ */
+type EndpointNode =
+  | {
+      [K in Methods]?: CreateApiEndpoint<
+        string,
+        K,
+        readonly string[],
+        UnifiedField<z.ZodTypeAny>
+      >;
+    }
+  | {
+      [key: string]: EndpointNode;
+    };
 
 /**
  * Convert generated endpoints to DiscoveredEndpoint format
  * This function traverses the nested endpoint structure and flattens it
  */
 export function getDiscoveredEndpoints(): DiscoveredEndpoint[] {
-  const endpoints = setupEndpoints();
+  const endpoints = setupEndpoints() as EndpointNode;
   const discovered: DiscoveredEndpoint[] = [];
 
   // Recursively traverse the endpoint tree
-  function traverse(
-    obj: Record<string, unknown>,
-    pathSegments: string[] = [],
-  ): void {
+  function traverse(obj: EndpointNode, pathSegments: string[] = []): void {
     if (!obj || typeof obj !== "object") {
       return;
     }
@@ -38,7 +57,14 @@ export function getDiscoveredEndpoints(): DiscoveredEndpoint[] {
       // This is an endpoint - create DiscoveredEndpoint for each method
       for (const method of methods) {
         const methodKey = method as Methods;
-        const definition = obj[methodKey] as EndpointDefinition | undefined;
+        const definition = obj[methodKey] as
+          | CreateApiEndpoint<
+              string,
+              Methods,
+              readonly string[],
+              UnifiedField<z.ZodTypeAny>
+            >
+          | undefined;
 
         if (!definition) {
           continue;
@@ -58,8 +84,10 @@ export function getDiscoveredEndpoints(): DiscoveredEndpoint[] {
         const definitionPath = `/home/max/projects/next-vibe/src/app/api/[locale]/v1/${pathStr}/definition.ts`;
         const routePath = `/home/max/projects/next-vibe/src/app/api/[locale]/v1/${pathStr}/route.ts`;
 
-        // Extract allowed roles from definition
-        const allowedRoles = definition.allowedRoles || [];
+        // Extract allowed roles and aliases from definition
+        const allowedRoles =
+          definition.allowedRoles || ([] as readonly string[]);
+        const aliases = definition.aliases || ([] as readonly string[]);
 
         // Create discovered endpoint
         discovered.push({
@@ -67,11 +95,11 @@ export function getDiscoveredEndpoints(): DiscoveredEndpoint[] {
           method: methodKey,
           path: ["v1", ...pathSegments] as readonly string[],
           toolName,
-          aliases: [] as readonly string[],
-          allowedRoles: allowedRoles as readonly string[],
+          aliases,
+          allowedRoles,
           definitionPath,
           routePath,
-          definition: obj as Record<string, EndpointDefinition>,
+          definition,
           enabled: true,
           discoveredAt: Date.now(),
         });
@@ -86,13 +114,13 @@ export function getDiscoveredEndpoints(): DiscoveredEndpoint[] {
         ) {
           continue;
         }
-        traverse(value as Record<string, unknown>, [...pathSegments, key]);
+        traverse(value as EndpointNode, [...pathSegments, key]);
       }
     }
   }
 
   // Start traversal from root
-  traverse(endpoints as Record<string, unknown>);
+  traverse(endpoints);
 
   return discovered;
 }

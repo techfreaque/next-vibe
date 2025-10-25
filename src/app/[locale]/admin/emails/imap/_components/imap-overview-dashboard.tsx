@@ -193,9 +193,9 @@ export function ImapOverviewDashboard(): JSX.Element {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{healthData.accountsTotal}</div>
+            <div className="text-2xl font-bold">{healthData?.accountsTotal ?? 0}</div>
             <p className="text-xs text-muted-foreground">
-              {healthData.accountsHealthy}{" "}
+              {healthData?.accountsHealthy ?? 0}{" "}
               {t(
                 "app.admin.emails.imap.dashboard.activeAccounts",
               ).toLowerCase()}
@@ -211,7 +211,7 @@ export function ImapOverviewDashboard(): JSX.Element {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {healthData.syncStats.totalSyncs.toLocaleString()}
+              {healthData?.syncStats?.totalSyncs?.toLocaleString() ?? "0"}
             </div>
             <p className="text-xs text-muted-foreground">
               {t("app.admin.emails.imap.dashboard.synchronizedMessages")}
@@ -227,12 +227,12 @@ export function ImapOverviewDashboard(): JSX.Element {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {healthData.syncStats.lastSyncTime ||
+              {healthData?.syncStats?.lastSyncTime ||
                 t("app.admin.emails.imap.dashboard.never")}
             </div>
             <p className="text-xs text-muted-foreground">
               {t("app.admin.emails.imap.dashboard.syncStatus")}:{" "}
-              {healthData.serverStatus}
+              {healthData?.serverStatus ?? "unknown"}
             </p>
           </CardContent>
         </Card>
@@ -244,10 +244,10 @@ export function ImapOverviewDashboard(): JSX.Element {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{healthData.uptime}</div>
+            <div className="text-2xl font-bold">{healthData?.uptime ?? "N/A"}</div>
             <p className="text-xs text-muted-foreground">
               {t("app.admin.emails.imap.admin.health.serverStatus")}:{" "}
-              {healthData.serverStatus}
+              {healthData?.serverStatus ?? "unknown"}
             </p>
           </CardContent>
         </Card>
@@ -258,7 +258,7 @@ export function ImapOverviewDashboard(): JSX.Element {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center space-x-2">
-              {getStatusIcon(healthData.serverStatus)}
+              {getStatusIcon(healthData?.serverStatus ?? "unknown")}
               <span>
                 {t("app.admin.emails.imap.admin.health.serverStatus")}
               </span>
@@ -279,23 +279,23 @@ export function ImapOverviewDashboard(): JSX.Element {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="text-center">
               <div
-                className={`text-2xl font-bold ${getStatusColor(healthData.serverStatus)}`}
+                className={`text-2xl font-bold ${getStatusColor(healthData?.serverStatus ?? "unknown")}`}
               >
-                {healthData.serverStatus.toUpperCase()}
+                {(healthData?.serverStatus ?? "unknown").toUpperCase()}
               </div>
               <div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.admin.health.serverStatus")}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold">{healthData.uptime}</div>
+              <div className="text-2xl font-bold">{healthData?.uptime ?? "N/A"}</div>
               <div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.admin.health.uptime")}
               </div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold">
-                {healthData.syncedAccounts}/{healthData.totalAccounts}
+                {healthData?.syncedAccounts ?? 0}/{healthData?.totalAccounts ?? 0}
               </div>
               <div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.admin.health.accounts")}
@@ -303,7 +303,7 @@ export function ImapOverviewDashboard(): JSX.Element {
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold">
-                {healthData.activeConnections}
+                {healthData?.activeConnections ?? 0}
               </div>
               <div className="text-sm text-gray-600">
                 {t("app.admin.emails.imap.admin.health.activeConnections")}

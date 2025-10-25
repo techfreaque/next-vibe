@@ -20,7 +20,6 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/defini
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chatThreads } from "../../db";
-import type { PersonaId } from "../../personas/config";
 import type {
   ThreadDeleteResponseOutput,
   ThreadGetResponseOutput,
@@ -104,7 +103,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
           ...thread,
           persona: thread.defaultPersona,
         },
-      }) as ResponseType<ThreadGetResponseOutput>;
+      });
     } catch (error) {
       logger.error("Error getting thread by ID", error);
       return createErrorResponse(
@@ -179,7 +178,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
         updateData.defaultModel = data.updates.defaultModel;
       }
       if (data.updates?.persona !== undefined) {
-        updateData.defaultPersona = data.updates.persona as PersonaId | null;
+        updateData.defaultPersona = data.updates.persona;
       }
       if (data.updates?.systemPrompt !== undefined) {
         updateData.systemPrompt = data.updates.systemPrompt;
@@ -212,7 +211,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
           ...updatedThread,
           persona: updatedThread.defaultPersona,
         },
-      }) as ResponseType<ThreadPatchResponseOutput>;
+      });
     } catch (error) {
       logger.error("Error updating thread", error);
       return createErrorResponse(

@@ -1056,8 +1056,9 @@ export async function createAiStream({
                   userId: identifierResult.data.userId,
                   leadId: identifierResult.data.leadId,
                 };
+                const creditType = identifierResult.data.creditType as string;
                 logger.debug("Using credit identifier", {
-                  creditType: identifierResult.data.creditType,
+                  creditType,
                   identifier: creditIdentifier,
                 });
               }

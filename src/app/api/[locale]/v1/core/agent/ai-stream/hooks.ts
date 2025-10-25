@@ -239,7 +239,7 @@ export function useAIStream(
                 // CRITICAL: Set the active thread immediately in the chat store
                 // This ensures subsequent messages use the correct threadId
                 // Import chat store dynamically to avoid circular dependencies
-                void import("../store")
+                void import("../chat/store")
                   .then(({ useChatStore }) => {
                     useChatStore.getState().setActiveThread(eventData.threadId);
                     logger.info("[DEBUG] Set active thread in chat store", {
@@ -254,7 +254,7 @@ export function useAIStream(
 
                 // Save to localStorage if incognito mode
                 if (eventData.rootFolderId === "incognito") {
-                  void import("../incognito/storage")
+                  void import("../chat/incognito/storage")
                     .then(({ saveThread }) => {
                       saveThread({
                         id: eventData.threadId,
@@ -324,7 +324,7 @@ export function useAIStream(
                 });
 
                 // Check chat store asynchronously (for existing threads)
-                void import("../store")
+                void import("../chat/store")
                   .then(({ useChatStore }) => {
                     const chatThread =
                       useChatStore.getState().threads[eventData.threadId];
@@ -375,7 +375,8 @@ export function useAIStream(
                       });
 
                       // Also save to localStorage
-                      void import("../incognito/storage")
+
+                      void import("../chat/incognito/storage")
                         .then(({ saveMessage }) => {
                           saveMessage({
                             id: eventData.messageId,
@@ -517,7 +518,7 @@ export function useAIStream(
 
                 // Check chat store asynchronously (for existing threads)
                 if (message) {
-                  void import("../store")
+                  void import("../chat/store")
                     .then(({ useChatStore }) => {
                       const chatThread =
                         useChatStore.getState().threads[message.threadId];
@@ -527,7 +528,8 @@ export function useAIStream(
 
                       if (isIncognito) {
                         // Save to localStorage
-                        void import("../incognito/storage")
+
+                        void import("../chat/incognito/storage")
                           .then(({ saveMessage }) => {
                             logger.info(
                               "[DEBUG] Saving incognito message with tool calls",
@@ -656,6 +658,7 @@ export function useAIStream(
         }
         store.stopStream();
       } finally {
+        // eslint-disable-next-line require-atomic-updates
         abortControllerRef.current = null;
       }
     },

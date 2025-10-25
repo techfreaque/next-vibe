@@ -56,7 +56,7 @@ export function parseChatUrl(urlPath: string[] | undefined): ParsedChatUrl {
   }
 
   // Check if last segment is a thread by checking UUID format
-  if (isUUID(lastSegment!)) {
+  if (isUUID(lastSegment)) {
     // Last segment is a thread (UUID format)
     // URL is /rootId/threadId or /rootId/subfolderId/threadId
     const threadId = lastSegment;
@@ -108,4 +108,3 @@ export function buildChatUrl(
 
   return parts.join("/");
 }
-

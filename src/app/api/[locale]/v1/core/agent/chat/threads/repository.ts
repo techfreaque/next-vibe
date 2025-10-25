@@ -18,6 +18,7 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import { chatThreads } from "../db";
 import { ThreadStatus } from "../enum";
@@ -265,8 +266,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         folderId: data.thread?.subFolderId ?? null,
         status: ThreadStatus.ACTIVE,
         defaultModel: data.thread?.model ?? null,
-        defaultPersona: (data.thread?.persona ??
-          null) as typeof chatThreads.$inferInsert.defaultPersona,
+        defaultPersona: data.thread?.persona ?? null,
         systemPrompt: data.thread?.systemPrompt ?? null,
         pinned: false,
         archived: false,

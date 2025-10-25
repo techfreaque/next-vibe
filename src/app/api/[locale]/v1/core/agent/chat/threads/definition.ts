@@ -559,7 +559,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.post.defaultTone.description" as const,
               layout: { columns: 6 },
             },
-            z.string(),
+            z.string().nullable(),
           ),
           systemPrompt: requestDataField(
             {

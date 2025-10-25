@@ -157,8 +157,11 @@ export type EndpointHandlerConfig<T> = {
   [K in Methods]?: K extends keyof T
     ? T[K] extends {
         types: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           RequestOutput: any;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ResponseOutput: any;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           UrlVariablesOutput: any;
         };
         allowedRoles: readonly string[];

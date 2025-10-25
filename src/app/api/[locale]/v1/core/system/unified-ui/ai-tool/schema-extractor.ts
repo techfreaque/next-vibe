@@ -7,7 +7,6 @@ import "server-only";
 
 import { z } from "zod";
 
-import type { EndpointDefinition } from "../cli/vibe/endpoints/endpoint-types/core/types";
 import type { DiscoveredEndpoint } from "./types";
 
 /**
@@ -21,7 +20,7 @@ export function extractInputSchema(endpoint: DiscoveredEndpoint): z.ZodTypeAny {
 
   // If endpoint has fields, try to extract request schema
   if (endpoint.definition?.fields) {
-    return extractSchemaFromFields(endpoint.definition);
+    return extractSchemaFromFields();
   }
 
   // Fallback to empty object
@@ -32,9 +31,7 @@ export function extractInputSchema(endpoint: DiscoveredEndpoint): z.ZodTypeAny {
  * Extract schema from field definitions
  * This is a simplified version - full implementation would need to handle all field types
  */
-function extractSchemaFromFields(
-  _definition: EndpointDefinition,
-): z.ZodTypeAny {
+function extractSchemaFromFields(): z.ZodTypeAny {
   // For now, return a generic object schema that accepts any fields
   // TODO: Implement full field-to-schema conversion
   // This would require analyzing the field definitions and converting them to Zod schemas

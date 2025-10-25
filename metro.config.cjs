@@ -88,7 +88,7 @@ config.resolver.blockList = [
 // Apply NativeWind BEFORE custom resolveRequest so resolution happens after transformation
 // NativeWind v5 uses @source directives in global.css (Tailwind v4 format)
 const nativeWindConfig = withNativeWind(config, {
-  input: './src/packages/react-native-comp/global.css',
+  input: './src/app/api/[locale]/v1/core/system/unified-ui/react-native/global.css',
   // Running from workspace root now, so projectRoot is already correct
   inlineRem: false,
 });

@@ -118,7 +118,8 @@ const { POST } = createEndpoint({
       ),
       isError: responseField(
         {
-          type: WidgetType.CHECKBOX,
+          type: WidgetType.BADGE,
+          text: "app.api.v1.core.system.unifiedUi.mcp.execute.post.response.isError" as const,
         },
         z.boolean().optional(),
       ),

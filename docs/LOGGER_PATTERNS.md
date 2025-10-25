@@ -1,8 +1,10 @@
 # Logger Usage Patterns
 
+> **Part of NextVibe Framework** (GPL-3.0) - Standardized logging patterns
+
 ## Overview
 
-This document defines the **strict logger patterns** for the Next Vibe codebase. Follow these patterns religiously - no exceptions unless explicitly documented.
+This document defines the **strict logger patterns** for the NextVibe codebase. Follow these patterns religiously - no exceptions unless explicitly documented.
 
 ---
 

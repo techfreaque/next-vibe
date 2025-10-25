@@ -54,11 +54,13 @@ export class ToolFactory {
     const description = this.generateDescription(endpoint, options);
 
     // Generate input schema from endpoint definition
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const inputSchema = this.generateInputSchema(endpoint);
 
     // Create the tool
-    return tool({
+    const createdTool = tool({
       description,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       parameters: inputSchema,
       execute: async (params: Record<string, ToolParameterValue>) => {
         // Execute the tool via the executor
@@ -78,7 +80,6 @@ export class ToolFactory {
 
         if (!result.success) {
           // Return error in a format the AI can understand
-          // eslint-disable-next-line i18next/no-literal-string
           return {
             success: false,
             // eslint-disable-next-line i18next/no-literal-string
@@ -92,6 +93,8 @@ export class ToolFactory {
         return result.data;
       },
     });
+
+    return createdTool as CoreTool;
   }
 
   /**

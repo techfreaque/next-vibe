@@ -293,7 +293,7 @@ status: requestResponseField({
 
 // STEP 1: CREATE enum.ts file
 // File: enum.ts
-import { createEnumOptions } from "@/packages/next-vibe/shared/utils/enum";
+import { createEnumOptions } from "next-vibe/shared/utils/enum";
 
 export const {
   enum: ConsultationStatus,

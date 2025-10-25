@@ -2,6 +2,7 @@
 
 import { Check, Mail, Send, X } from "lucide-react";
 import { Button } from "next-vibe-ui/ui/button";
+import { Form } from "next-vibe-ui/ui/form/form";
 import { Input } from "next-vibe-ui/ui/input";
 import type { JSX } from "react";
 import React, { useEffect, useRef } from "react";
@@ -74,7 +75,7 @@ export function UnsubscribePage({
 
           {/* Unsubscribe Form */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-16 max-w-md mx-auto">
-            <form
+            <Form
               onSubmit={(e) => {
                 e.preventDefault();
                 // Validate email before submission
@@ -156,7 +157,7 @@ export function UnsubscribePage({
                   {t(notification.message)}
                 </div>
               )}
-            </form>
+            </Form>
 
             {/* Subscribe link */}
             <div className="text-center mt-4">

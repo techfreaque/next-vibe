@@ -2,6 +2,10 @@
 
 **Status:** CRITICAL - NO EXCEPTIONS ALLOWED
 
+> **Part of NextVibe Framework** (GPL-3.0) - Type-safe internationalization system
+
+This document defines the MANDATORY i18n structure rules for NextVibe. These rules are enforced by the type system and `vibe check`.
+
 ---
 
 ## ⚡ CRITICAL: NO CACHE - IMMEDIATE FEEDBACK

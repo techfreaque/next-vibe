@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Button, Div, Span, Switch } from "next-vibe-ui/ui";
+import { Div, Span, Switch } from "next-vibe-ui/ui";
 import { Search } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React from "react";
@@ -38,6 +38,7 @@ export function SearchToggle({
   const handleDivClick = (e: React.MouseEvent): void => {
     // Don't open modal if clicking on the switch itself
     const target = e.target as HTMLElement;
+    // eslint-disable-next-line i18next/no-literal-string
     const isSwitch = target.closest('[role="switch"]');
     if (!isSwitch && !disabled) {
       onOpenToolsModal();

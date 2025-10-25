@@ -9,8 +9,8 @@ import creditsDefinition from "@/app/api/[locale]/v1/core/credits/definition";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/store";
 
-import type { ModelId } from "../model-access/models";
-import { getModelById } from "../model-access/models";
+import type { ModelId } from "./model-access/models";
+import { getModelById } from "./model-access/models";
 
 /**
  * Update credit balance after AI response

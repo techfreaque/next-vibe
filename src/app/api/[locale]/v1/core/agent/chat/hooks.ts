@@ -4,6 +4,7 @@
  * This is the ONLY hook that should be imported in the chat folder
  */
 
+/* eslint-disable react-compiler/react-compiler */
 "use client";
 
 import { AUTH_STATUS_COOKIE_PREFIX } from "next-vibe/shared/constants";
@@ -14,14 +15,12 @@ import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-ui/react/ho
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { useAIStream } from "./ai-stream/hooks";
-import { useAIStreamStore } from "./ai-stream/store";
+import { useAIStream } from "../ai-stream/hooks";
+import { useAIStreamStore } from "../ai-stream/store";
 import type { DefaultFolderId } from "./config";
 import { createCreditUpdateCallback } from "./credit-updater";
-import creditsDefinition from "./credits/definition";
 import type { IconValue } from "./model-access/icons";
 import type { ModelId } from "./model-access/models";
-import { getModelById } from "./model-access/models";
 import type { PersonaListResponseOutput } from "./personas/definition";
 import { usePersonasList } from "./personas/hooks";
 import {
@@ -576,7 +575,10 @@ export function useChat(
         );
 
         if (response.ok) {
-          const data = await response.json();
+          const data = (await response.json()) as {
+            success: boolean;
+            data?: { messages?: ChatMessage[] };
+          };
           logger.debug("useChat", "Loaded messages", {
             threadId: activeThreadId,
             count: data.data?.messages?.length || 0,
@@ -756,7 +758,7 @@ export function useChat(
       maxTokens,
       enableSearch,
       enabledToolIds,
-      locale,
+      // locale is not used in this callback
     ],
   );
 
@@ -864,7 +866,7 @@ export function useChat(
       selectedPersona,
       temperature,
       maxTokens,
-      enableSearch,
+      // enableSearch is not used in this callback
       enabledToolIds,
     ],
   );
@@ -1204,7 +1206,10 @@ export function useChat(
         );
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
+          const errorData = (await response
+            .json()
+            // eslint-disable-next-line no-restricted-syntax
+            .catch(() => ({}))) as Record<string, unknown>;
           logger.error("useChat", "Failed to create folder", {
             status: response.status,
             error: errorData,

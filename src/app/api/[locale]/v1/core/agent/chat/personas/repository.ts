@@ -91,8 +91,13 @@ export async function getPersonaById(
 export async function createCustomPersona(
   data: Omit<NewCustomPersona, "id" | "createdAt" | "updatedAt" | "source">,
 ): Promise<CustomPersona> {
-  // @ts-ignore - Drizzle type inference issue with Omit type
-  const [persona] = await db.insert(customPersonas).values(data).returning();
+  const [persona] = await db
+    .insert(customPersonas)
+    .values({
+      ...data,
+      source: "custom",
+    })
+    .returning();
 
   return persona;
 }

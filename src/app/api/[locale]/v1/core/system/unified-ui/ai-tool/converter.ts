@@ -29,13 +29,17 @@ export class ToolConverter implements IToolConverter {
   /**
    * Convert endpoint to AI tool metadata
    */
-  convert(
+  async convert(
     endpoint: DiscoveredEndpoint,
     options: ToolConverterOptions = {},
-  ): AIToolMetadata {
+  ): Promise<AIToolMetadata> {
     const defaultLocale: CountryLanguage = "en-GLOBAL";
     const locale = options.locale || defaultLocale;
-    const description = this.generateDescription(endpoint, locale, options);
+    const description = await this.generateDescription(
+      endpoint,
+      locale,
+      options,
+    );
 
     // Extract request schema for parameters
     const parameters = this.extractParameters(endpoint);
@@ -73,16 +77,20 @@ export class ToolConverter implements IToolConverter {
   /**
    * Convert endpoint to AI SDK CoreTool
    */
-  convertToAISDKTool(
+  async convertToAISDKTool(
     endpoint: DiscoveredEndpoint,
     executor: (
       params: Record<string, ToolParameterValue>,
     ) => Promise<ToolParameterValue>,
     options: ToolConverterOptions = {},
-  ): CoreTool {
+  ): Promise<CoreTool> {
     const defaultLocale: CountryLanguage = "en-GLOBAL";
     const locale = options.locale || defaultLocale;
-    const description = this.generateDescription(endpoint, locale, options);
+    const description = await this.generateDescription(
+      endpoint,
+      locale,
+      options,
+    );
 
     // Extract request schema for parameters
     const parameters = this.extractParameters(endpoint);
@@ -113,7 +121,7 @@ export class ToolConverter implements IToolConverter {
 
     try {
       if (definition.aiTool?.displayName) {
-        displayName = definition.ai - tool.displayName;
+        displayName = definition.aiTool.displayName;
       } else if (definition.title) {
         displayName = t(definition.title);
       }
@@ -137,7 +145,7 @@ export class ToolConverter implements IToolConverter {
     endpoint: DiscoveredEndpoint,
     locale: CountryLanguage,
     options: ToolConverterOptions = {},
-  ): string {
+  ): Promise<string> {
     const { t } = simpleT(locale);
     const { definition } = endpoint;
 
@@ -173,7 +181,7 @@ export class ToolConverter implements IToolConverter {
       description = description.slice(0, options.maxDescriptionLength);
     }
 
-    return description;
+    return Promise.resolve(description);
   }
 
   /**

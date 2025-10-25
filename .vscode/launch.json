@@ -29,6 +29,25 @@
             ]
         },
         {
+            "type": "node",
+            "request": "launch",
+            "name": "Vibe Native",
+            // "program": "${workspaceFolder}/src/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/vibe.ts",
+            "runtimeExecutable": "${env:HOME}/.bun/bin/bun",
+            "runtimeArgs": [
+                "--inspect-brk",
+            ],
+            "args": [
+                "native"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
             "name": "Vibe Fast Dev Server (Turbo)",
             "type": "node",
             "request": "launch",
