@@ -7,7 +7,6 @@ import "server-only";
 
 import type { EndpointLogger } from "../../cli/vibe/endpoints/endpoint-handler/logger";
 import type { Methods } from "../../cli/vibe/endpoints/endpoint-types/core/enums";
-
 import type {
   DiscoveredEndpointMetadata,
   EndpointDiscoveryOptions,
@@ -41,8 +40,10 @@ export class EndpointRegistry implements IEndpointRegistry {
     this.logger.debug("[Endpoint Registry] Initializing...");
 
     try {
-      // Use static registry from AI tool system (Next.js compatible)
-      const { getStaticEndpoints } = await import("../../ai-tool/static-registry");
+      // Use shared generated endpoints via adapter (single source of truth)
+      const { getStaticEndpoints } = await import(
+        "../../ai-tool/endpoint-adapter"
+      );
       const staticEndpoints = getStaticEndpoints();
 
       // Convert to shared endpoint metadata format
@@ -57,10 +58,14 @@ export class EndpointRegistry implements IEndpointRegistry {
           routePath: endpoint.routePath,
           definitionPath: endpoint.definitionPath,
           method: endpoint.method,
-          title: definition?.title || "",
-          description: definition?.description || "",
-          category: definition?.category || "",
-          tags: definition?.tags || [],
+          title: typeof definition?.title === "string" ? definition.title : "",
+          description:
+            typeof definition?.description === "string"
+              ? definition.description
+              : "",
+          category:
+            typeof definition?.category === "string" ? definition.category : "",
+          tags: Array.isArray(definition?.tags) ? definition.tags : [],
           allowedRoles: endpoint.allowedRoles,
           requiresAuth: !endpoint.allowedRoles.includes("PUBLIC"),
           requestSchema: definition?.fields?.schema,
@@ -227,4 +232,3 @@ export function getEndpointRegistry(logger: EndpointLogger): EndpointRegistry {
   }
   return registryInstance;
 }
-

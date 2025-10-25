@@ -10,7 +10,7 @@ import { validateData } from "next-vibe/shared/utils";
 import { z } from "zod";
 
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
-import type { ResponseType } from "@/packages/next-vibe/shared";
+import type { ResponseType } from "next-vibe/shared";
 
 import { createEndpointLogger } from "../../v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { createTRPCContext } from "../../v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/trpc/trpc-context";

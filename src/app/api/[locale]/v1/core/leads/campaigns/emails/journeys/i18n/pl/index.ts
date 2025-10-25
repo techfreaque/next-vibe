@@ -10,6 +10,20 @@ export const translations: typeof enTranslations = {
       defaults: {
         signatureName: "Twój Partner w Rozwoju",
       },
+      journeyInfo: {
+        personalApproach: {
+          name: "Podejście Osobiste",
+          description: "Buduj prawdziwe połączenia poprzez spersonalizowane wiadomości",
+        },
+        resultsFocused: {
+          name: "Skupione na Wynikach",
+          description: "Podkreśl konkretne wyniki i mierzalne rezultaty",
+        },
+        personalResults: {
+          name: "Osobiste + Wyniki",
+          description: "Połącz osobisty akcent z wiadomościami ukierunkowanymi na wyniki",
+        },
+      },
     },
     leads: {
       journeys: {

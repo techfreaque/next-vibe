@@ -1,6 +1,9 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  success: {
+    created: "Sesja portalu klienta utworzona pomyślnie",
+  },
   post: {
     title: "Tytuł",
     description: "Opis endpointu",

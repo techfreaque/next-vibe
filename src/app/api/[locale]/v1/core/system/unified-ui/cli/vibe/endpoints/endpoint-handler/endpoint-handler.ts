@@ -5,8 +5,6 @@
 
 import "server-only";
 
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
-
 import type { Methods } from "../endpoint-types/core/enums";
 import { createCliHandler } from "./cli/cli-handler";
 import { createNextHandler } from "./next/next-handler";
@@ -77,8 +75,7 @@ export function endpointHandler<
       UrlVariablesOutput: infer TUrlVariablesOutput;
     };
     method: infer TMethod extends Methods;
-    allowedRoles: infer TUserRoleValue extends
-      readonly string[];
+    allowedRoles: infer TUserRoleValue extends readonly string[];
   }
     ? EndpointHandlerReturn<
         TRequestOutput,

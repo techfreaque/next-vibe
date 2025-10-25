@@ -7,7 +7,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { env } from "@/config/env";
-import { parseError } from "@/packages/next-vibe/shared";
+import { parseError } from "next-vibe/shared";
 
 import type {
   SendSmsParams,
@@ -17,25 +17,8 @@ import type {
 } from "../utils";
 import { SmsProviders } from "../utils";
 
-export enum AwsSnsAwsRegions {
-  US_EAST_1 = "us-east-1",
-  US_WEST_1 = "us-west-1",
-  US_WEST_2 = "us-west-2",
-  EU_WEST_1 = "eu-west-1",
-  EU_CENTRAL_1 = "eu-central-1",
-  AP_SOUTHEAST_1 = "ap-southeast-1",
-  AP_SOUTHEAST_2 = "ap-southeast-2",
-  AP_NORTHEAST_1 = "ap-northeast-1",
-  AP_NORTHEAST_2 = "ap-northeast-2",
-  AP_SOUTH_1 = "ap-south-1",
-  AP_EAST_1 = "ap-east-1",
-  CA_CENTRAL_1 = "ca-central-1",
-  SA_EAST_1 = "sa-east-1",
-  AF_SOUTH_1 = "af-south-1",
-  EU_SOUTH_1 = "eu-south-1",
-  ME_SOUTH_1 = "me-south-1",
-  EU_NORTH_1 = "eu-north-1",
-}
+// Re-export enum from separate file to avoid circular dependency
+export { AwsSnsAwsRegions } from "./aws-sns-enum";
 
 const AWS_SNS_CONSTANTS = {
   DATA_TYPE_STRING: "String",
@@ -75,21 +58,21 @@ export function getAwsSnsProvider(): SmsProvider {
         // Validate credentials
         if (!accessKeyId) {
           return createErrorResponse(
-            "packages.nextVibe.server.sms.sms.error.missing_aws_access_key",
+            "app.api.v1.core.sms.sms.error.missing_aws_access_key",
             ErrorResponseTypes.VALIDATION_ERROR,
           );
         }
 
         if (!region) {
           return createErrorResponse(
-            "packages.nextVibe.server.sms.sms.error.missing_aws_region",
+            "app.api.v1.core.sms.sms.error.missing_aws_region",
             ErrorResponseTypes.VALIDATION_ERROR,
           );
         }
 
         if (!secretAccessKey) {
           return createErrorResponse(
-            "packages.nextVibe.server.sms.sms.error.missing_aws_secret_key",
+            "app.api.v1.core.sms.sms.error.missing_aws_secret_key",
             ErrorResponseTypes.VALIDATION_ERROR,
           );
         }
@@ -97,14 +80,14 @@ export function getAwsSnsProvider(): SmsProvider {
         // Validate required parameters
         if (!params.to) {
           return createErrorResponse(
-            "packages.nextVibe.server.sms.sms.error.missing_recipient",
+            "app.api.v1.core.sms.sms.error.missing_recipient",
             ErrorResponseTypes.VALIDATION_ERROR,
           );
         }
 
         if (!params.message || params.message.trim() === "") {
           return createErrorResponse(
-            "packages.nextVibe.server.sms.sms.error.empty_message",
+            "app.api.v1.core.sms.sms.error.empty_message",
             ErrorResponseTypes.VALIDATION_ERROR,
           );
         }
@@ -287,10 +270,10 @@ export function getAwsSnsProvider(): SmsProvider {
           const errorMessage = errorMatch?.[1];
 
           return createErrorResponse(
-            "packages.nextVibe.server.sms.sms.error.aws_sns_api_error",
+            "app.api.v1.core.sms.sms.error.aws_sns_api_error",
             ErrorResponseTypes.SMS_ERROR,
             {
-              error: errorMessage ?? "error.sms.errors.unknown_aws_error",
+              error: errorMessage,
               statusCode: response.status,
             },
           );
@@ -331,7 +314,7 @@ export function getAwsSnsProvider(): SmsProvider {
       } catch (error) {
         const parsedError = parseError(error);
         return createErrorResponse(
-          "packages.nextVibe.server.sms.sms.error.aws_sns_error",
+          "app.api.v1.core.sms.sms.error.aws_sns_error",
           ErrorResponseTypes.SMS_ERROR,
           { error: parsedError.message },
         );

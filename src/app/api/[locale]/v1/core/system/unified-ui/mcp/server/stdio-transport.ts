@@ -6,11 +6,7 @@
 import * as readline from "readline";
 
 import type { EndpointLogger } from "../../cli/vibe/endpoints/endpoint-handler/logger";
-import type {
-  IMCPTransport,
-  JsonRpcRequest,
-  JsonRpcResponse,
-} from "../types";
+import type { IMCPTransport, JsonRpcRequest, JsonRpcResponse } from "../types";
 
 /**
  * STDIO Transport Implementation
@@ -105,7 +101,7 @@ export class StdioTransport implements IMCPTransport {
       });
 
       // Write to stdout with newline
-      process.stdout.write(json + "\n");
+      process.stdout.write(`${json}\n`);
     } catch (error) {
       this.logger.error("[MCP Transport] Failed to send message", {
         error: error instanceof Error ? error.message : String(error),

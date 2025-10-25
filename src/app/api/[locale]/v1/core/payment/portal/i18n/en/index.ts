@@ -1,4 +1,7 @@
 export const translations = {
+  success: {
+    created: "Customer portal session created successfully",
+  },
   post: {
     title: "Customer Portal",
     description: "Create customer portal session for billing management",

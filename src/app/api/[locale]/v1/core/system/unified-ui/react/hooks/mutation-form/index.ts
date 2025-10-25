@@ -15,12 +15,12 @@ import type { FormEvent } from "react";
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 
-import { useTranslation } from "@/i18n/core/client";
-
-import { UserRoleValue } from "../../../../../user/user-roles/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
+import { useTranslation } from "@/i18n/core/client";
+
+import type { UserRoleValue } from "../../../../../user/user-roles/enum";
 import type { ApiStore, FormQueryParams } from "../store";
 import { useApiStore } from "../store";
 import type {
@@ -47,8 +47,12 @@ import type {
  * @returns Form and mutation for API interaction with enhanced error handling
  */
 export function useApiForm<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TEndpoint extends CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>,
+  TEndpoint extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    any
+  >,
 >(
   endpoint: TEndpoint,
   logger: EndpointLogger,

@@ -11,7 +11,6 @@ import { z } from "zod";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/leads/definition";
 import { authRepository } from "@/app/api/[locale]/v1/core/user/auth/repository";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type {
   CountryLanguage,

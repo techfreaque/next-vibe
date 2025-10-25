@@ -13,6 +13,8 @@ import {
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { z } from "zod";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import type {
   ExtractOutput,
   FieldUsage,
@@ -23,8 +25,6 @@ import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unifie
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { useTranslation } from "@/i18n/core/client";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import type { AnyData, ApiStore, QueryStoreType } from "../store";
 import { useApiStore } from "../store";
 import type { ApiQueryReturn } from "../types";
@@ -57,8 +57,12 @@ interface SerializableObject {
  * @returns Enhanced query result with extra loading state information
  */
 export function useApiQuery<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TEndpoint extends CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>,
+  TEndpoint extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    any
+  >,
 >({
   endpoint,
   requestData,

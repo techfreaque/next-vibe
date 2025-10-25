@@ -194,9 +194,23 @@ export interface SideTask {
   category: (typeof TaskCategory)[keyof typeof TaskCategory];
   enabled: boolean;
   priority?: (typeof CronTaskPriority)[keyof typeof CronTaskPriority];
-  run: (signal: AbortSignal) => Promise<void> | void;
-  onError?: (error: Error) => Promise<void> | void;
-  onShutdown?: () => Promise<void>; // Called during graceful shutdown
+  run: (props: {
+    signal: AbortSignal;
+    logger: EndpointLogger;
+    locale: CountryLanguage;
+    cronUser: JwtPrivatePayloadType;
+  }) => Promise<void> | void;
+  onError?: (props: {
+    error: Error;
+    logger: EndpointLogger;
+    locale: CountryLanguage;
+    cronUser: JwtPrivatePayloadType;
+  }) => Promise<void> | void;
+  onShutdown?: (props: {
+    logger: EndpointLogger;
+    locale: CountryLanguage;
+    cronUser: JwtPrivatePayloadType;
+  }) => Promise<void>; // Called during graceful shutdown
 }
 
 /**
@@ -210,9 +224,23 @@ export interface TaskRunner {
   category: (typeof TaskCategory)[keyof typeof TaskCategory];
   enabled: boolean;
   priority?: (typeof CronTaskPriority)[keyof typeof CronTaskPriority];
-  run: (signal: AbortSignal) => Promise<void>;
-  onError?: (error: Error) => Promise<void>;
-  onShutdown?: () => Promise<void>;
+  run: (props: {
+    signal: AbortSignal;
+    logger: EndpointLogger;
+    locale: CountryLanguage;
+    cronUser: JwtPrivatePayloadType;
+  }) => Promise<void>;
+  onError?: (props: {
+    error: Error;
+    logger: EndpointLogger;
+    locale: CountryLanguage;
+    cronUser: JwtPrivatePayloadType;
+  }) => Promise<void>;
+  onShutdown?: (props: {
+    logger: EndpointLogger;
+    locale: CountryLanguage;
+    cronUser: JwtPrivatePayloadType;
+  }) => Promise<void>;
 }
 
 export type Task = CronTask | SideTask | TaskRunner;

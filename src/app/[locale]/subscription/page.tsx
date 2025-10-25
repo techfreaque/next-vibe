@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import type { JSX } from "react";
 
-import { creditRepository } from "@/app/api/[locale]/v1/core/agent/chat/credits/repository";
+import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";

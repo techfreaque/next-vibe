@@ -8,7 +8,6 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { ZodError } from "zod";
 
-import type { UserRoleValue } from "../../../../../../../user/user-roles/enum";
 import { UserRole } from "../../../../../../../user/user-roles/enum";
 import type { EndpointLogger } from "../logger";
 import type { TRPCContext } from "./trpc-context";
@@ -17,9 +16,7 @@ import type { TRPCContext } from "./trpc-context";
  * Initialize tRPC with context
  */
 const t = initTRPC
-  .context<
-    TRPCContext<Record<string, string>, readonly string[]>
-  >()
+  .context<TRPCContext<Record<string, string>, readonly string[]>>()
   .create({
     errorFormatter({ shape, error }) {
       return {

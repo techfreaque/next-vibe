@@ -5,6 +5,7 @@
 
 import "server-only";
 
+import type { tool } from "ai";
 import type { z } from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -20,7 +21,7 @@ import type { CreateApiEndpoint } from "../cli/vibe/endpoints/endpoint-types/end
  * Using 'ai' package tool() function returns CoreTool
  * This must be at the top so it's available for use in interfaces below
  */
-export type CoreTool = ReturnType<typeof import("ai").tool>;
+export type CoreTool = ReturnType<typeof tool>;
 
 /**
  * Discovered endpoint metadata
@@ -66,20 +67,29 @@ export interface DiscoveredEndpoint {
 }
 
 /**
- * AI Tool metadata
+ * AI Tool metadata (internal type with full type safety)
  */
 export interface AIToolMetadata {
   /** Tool name (snake_case) */
   name: string;
 
+  /** Human-readable display name */
+  displayName: string;
+
   /** Tool description for AI */
   description: string;
+
+  /** Icon identifier for UI display */
+  icon?: string;
 
   /** Category for organization */
   category?: string;
 
   /** Tags for filtering */
   tags: string[];
+
+  /** Cost in credits per use (0 = free) */
+  cost?: number;
 
   /** Source endpoint ID */
   endpointId: string;
@@ -92,6 +102,42 @@ export interface AIToolMetadata {
 
   /** Tool parameters schema */
   parameters?: z.ZodTypeAny;
+}
+
+/**
+ * AI Tool metadata (serialized version for API responses)
+ * This is the version returned by the API with serialized types
+ */
+export interface AIToolMetadataSerialized {
+  /** Tool name (snake_case) */
+  name: string;
+
+  /** Human-readable display name */
+  displayName: string;
+
+  /** Tool description for AI */
+  description: string;
+
+  /** Icon identifier for UI display */
+  icon?: string;
+
+  /** Category for organization */
+  category?: string;
+
+  /** Tags for filtering */
+  tags: string[];
+
+  /** Cost in credits per use (0 = free) */
+  cost?: number;
+
+  /** Source endpoint ID */
+  endpointId: string;
+
+  /** Allowed roles (serialized as strings) */
+  allowedRoles: string[];
+
+  /** Whether this is a manual tool (e.g., braveSearch) */
+  isManualTool: boolean;
 }
 
 /**
@@ -120,7 +166,7 @@ export interface AIToolExecutionContext {
   user: {
     id?: string;
     email?: string;
-    role?: string;
+    role?: typeof UserRoleValue;
     isPublic: boolean;
   };
 
@@ -136,6 +182,24 @@ export interface AIToolExecutionContext {
     messageId?: string;
     timestamp: number;
   };
+}
+
+/**
+ * Widget metadata for tool result rendering
+ */
+export interface ToolCallWidgetMetadata {
+  endpointId: string;
+  responseFields: Array<{
+    name: string;
+    widgetType: string;
+    label?: string;
+    description?: string;
+    layout?: Record<string, string | number | boolean>;
+    validation?: Record<string, string | number | boolean>;
+    options?: Array<{ value: string; label: string }>;
+  }>;
+  creditsUsed?: number;
+  executionTime?: number;
 }
 
 /**
@@ -157,6 +221,7 @@ export interface AIToolExecutionResult {
     endpointPath: string;
     method: string;
     cached?: boolean;
+    widgetMetadata?: ToolCallWidgetMetadata;
   };
 }
 

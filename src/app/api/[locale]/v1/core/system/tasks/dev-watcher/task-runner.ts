@@ -7,37 +7,15 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { TaskRunner } from "../types/repository";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
-/**
- * Simple console logger for task runners
- * Task runners don't have access to EndpointLogger, so we use console
- */
-const logger = {
-  info: (message: string, meta?: unknown): void => {
-    // eslint-disable-next-line no-console, i18next/no-literal-string
-    console.log(`ℹ️ [DEV-WATCHER] ${message}`, meta ? meta : "");
-  },
-  error: (message: string, error?: Error | unknown): void => {
-    // eslint-disable-next-line no-console, i18next/no-literal-string
-    console.error(`❌ [DEV-WATCHER] ${message}`, error || "");
-  },
-  warn: (message: string, meta?: unknown): void => {
-    // eslint-disable-next-line no-console, i18next/no-literal-string
-    console.warn(`⚠️ [DEV-WATCHER] ${message}`, meta ? meta : "");
-  },
-  debug: (message: string, meta?: unknown): void => {
-    // eslint-disable-next-line no-console, i18next/no-literal-string
-    console.debug(`🐛 [DEV-WATCHER] ${message}`, meta ? meta : "");
-  },
-};
+import type { TaskRunner } from "../types/repository";
 
 /**
  * Helper to safely access environment variables
  */
 const getEnvVar = (key: string): string | undefined => {
   try {
-    // eslint-disable-next-line node/no-process-env
     return process.env[key];
   } catch {
     return undefined;
@@ -50,6 +28,10 @@ const getEnvVar = (key: string): string | undefined => {
 const shouldTriggerGeneration = (filename: string): boolean => {
   // Skip temporary files, node_modules, and generated files
   if (
+    // FOR NOW WE SKIP ALL EXCEPT:
+    !filename.includes("definition.ts") ||
+    !filename.includes("route.ts") ||
+    // JUST FOR NOW
     // eslint-disable-next-line i18next/no-literal-string
     filename.includes("node_modules") ||
     // eslint-disable-next-line i18next/no-literal-string
@@ -88,7 +70,7 @@ const devWatcherTaskRunner: TaskRunner = {
   enabled: getEnvVar("NODE_ENV") === "development",
   priority: "MEDIUM",
 
-  async run(signal: AbortSignal): Promise<void> {
+  async run(logger: EndpointLogger, signal: AbortSignal): Promise<void> {
     // Only run in development
     if (getEnvVar("NODE_ENV") !== "development") {
       logger.debug("Dev watcher skipped (not in development mode)");
@@ -112,12 +94,12 @@ const devWatcherTaskRunner: TaskRunner = {
     }
   },
 
-  async onError(error: Error): Promise<void> {
+  async onError(error: Error, logger: EndpointLogger): Promise<void> {
     logger.error("Dev watcher error", error);
     await Promise.resolve();
   },
 
-  async onShutdown(): Promise<void> {
+  async onShutdown(logger: EndpointLogger): Promise<void> {
     logger.debug("Development file watcher shutting down...");
     await Promise.resolve();
   },
@@ -126,7 +108,10 @@ const devWatcherTaskRunner: TaskRunner = {
 /**
  * Smart file watcher using fs.watch for real-time file changes
  */
-const startSmartFileWatcher = async (signal: AbortSignal): Promise<void> => {
+const startSmartFileWatcher = async (
+  signal: AbortSignal,
+  logger: EndpointLogger,
+): Promise<void> => {
   const fs = await import("node:fs");
 
   // Directories to watch for changes that require generator runs
@@ -158,15 +143,6 @@ const startSmartFileWatcher = async (signal: AbortSignal): Promise<void> => {
         isPublic: false,
       } as const;
 
-      const mockLogger = {
-        info: (message: string): void => logger.debug(message), // Use debug for less noise
-        error: (message: string, error?: Error): void =>
-          logger.error(message, error),
-        warn: (message: string): void => logger.warn(message),
-        debug: (message: string): void => logger.debug(message),
-        vibe: (message: string): void => logger.debug(`🚀 ${message}`),
-      };
-
       await generateAllRepository.generateAll(
         {
           outputDir: "src/app/api/[locale]/v1/core/system/generated",
@@ -177,7 +153,7 @@ const startSmartFileWatcher = async (signal: AbortSignal): Promise<void> => {
         },
         mockUser,
         "en-GLOBAL",
-        mockLogger,
+        logger,
       );
 
       logger.debug(`✅ Generators completed for change #${changeCount}`);
@@ -257,7 +233,10 @@ const startSmartFileWatcher = async (signal: AbortSignal): Promise<void> => {
 /**
  * Fallback polling watcher (original implementation)
  */
-const startPollingWatcher = async (signal: AbortSignal): Promise<void> => {
+const startPollingWatcher = async (
+  signal: AbortSignal,
+  logger: EndpointLogger,
+): Promise<void> => {
   logger.info("Using fallback polling watcher...");
 
   const WATCH_INTERVAL = 10000; // 10 seconds (less frequent than before)
@@ -280,15 +259,6 @@ const startPollingWatcher = async (signal: AbortSignal): Promise<void> => {
         isPublic: false,
       } as const;
 
-      const mockLogger = {
-        info: (message: string): void => logger.debug(message),
-        error: (message: string, error?: Error): void =>
-          logger.error(message, error),
-        warn: (message: string): void => logger.warn(message),
-        debug: (message: string): void => logger.debug(message),
-        vibe: (message: string): void => logger.debug(`🚀 ${message}`),
-      };
-
       await generateAllRepository.generateAll(
         {
           outputDir: "src/app/api/[locale]/v1/core/system/generated",
@@ -299,7 +269,7 @@ const startPollingWatcher = async (signal: AbortSignal): Promise<void> => {
         },
         mockUser,
         "en-GLOBAL",
-        mockLogger,
+        logger,
       );
 
       logger.info(`✅ Polling cycle #${watchCount} completed`);
@@ -334,7 +304,7 @@ const dbHealthMonitorTaskRunner: TaskRunner = {
   enabled: true,
   priority: "LOW",
 
-  async run(signal: AbortSignal): Promise<void> {
+  async run(signal: AbortSignal, logger: EndpointLogger): Promise<void> {
     logger.info("Starting database health monitor...");
 
     const HEALTH_CHECK_INTERVAL = 30000; // 30 seconds
@@ -374,12 +344,12 @@ const dbHealthMonitorTaskRunner: TaskRunner = {
     logger.info("Database health monitor stopped");
   },
 
-  async onError(error: Error): Promise<void> {
+  async onError(error: Error, logger: EndpointLogger): Promise<void> {
     logger.error("Database health monitor error", error);
     await Promise.resolve();
   },
 
-  async onShutdown(): Promise<void> {
+  async onShutdown(logger: EndpointLogger): Promise<void> {
     logger.info("Database health monitor shutting down...");
     await Promise.resolve();
   },

@@ -8,42 +8,67 @@ import "server-only";
 // Config
 export {
   aiToolConfig,
-  isAIToolSystemEnabled,
   getDiscoveryOptions,
+  isAIToolSystemEnabled,
 } from "./config";
 
 // Types
 export type {
-  CoreTool,
-  DiscoveredEndpoint,
-  AIToolMetadata,
   AIToolExecutionContext,
   AIToolExecutionResult,
-  ToolFilterCriteria,
-  ToolRegistryStats,
-  ToolDiscoveryOptions,
-  ToolConverterOptions,
-  ToolExecutorOptions,
-  IToolRegistry,
-  IToolDiscovery,
+  AIToolMetadata,
+  CoreTool,
+  DiscoveredEndpoint,
   IToolConverter,
-  IToolFilter,
+  IToolDiscovery,
   IToolExecutor,
+  IToolFilter,
+  IToolRegistry,
   Platform,
+  ToolCallWidgetMetadata,
+  ToolConverterOptions,
+  ToolDiscoveryOptions,
+  ToolExecutorOptions,
+  ToolFilterCriteria,
   ToolParameterValue,
+  ToolRegistryStats,
 } from "./types";
 
 // Discovery
-export { ToolDiscovery, toolDiscovery, getToolDiscovery } from "./discovery";
+export { getToolDiscovery, ToolDiscovery, toolDiscovery } from "./discovery";
 
 // Converter
-export { ToolConverter, toolConverter, getToolConverter } from "./converter";
+export { getToolConverter, ToolConverter, toolConverter } from "./converter";
 
 // Filter
-export { ToolFilter, toolFilter, getToolFilter } from "./filter";
+export { getToolFilter, ToolFilter, toolFilter } from "./filter";
 
 // Executor
-export { ToolExecutor, toolExecutor, getToolExecutor } from "./executor";
+export { getToolExecutor, ToolExecutor, toolExecutor } from "./executor";
+
+// Factory
+export type { ToolFactoryOptions } from "./factory";
+export {
+  createToolFromEndpoint,
+  createToolsFromEndpoints,
+  getToolFactory,
+  ToolFactory,
+} from "./factory";
+
+// Widget Metadata
+export {
+  extractWidgetMetadata,
+  extractWidgetMetadataById,
+} from "./widget-metadata-extractor";
+
+// Manual Tools
+export { getManualTool, getManualTools, isManualTool } from "./manual-tools";
+
+// Utilities
+export { CacheManager } from "./cache-manager";
+export { generateToolDescription } from "./description-generator";
+export { createErrorResult, extractErrorMessage } from "./error-handler";
+export { extractInputSchema } from "./schema-extractor";
 
 // Registry (Main Entry Point)
-export { ToolRegistry, aiToolRegistry, getToolRegistry } from "./registry";
+export { aiToolRegistry, getToolRegistry, ToolRegistry } from "./registry";

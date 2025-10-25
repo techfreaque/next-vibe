@@ -1,12 +1,12 @@
 import "server-only";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type { ResponseType } from "@/packages/next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
-} from "@/packages/next-vibe/shared/types/response.schema";
+} from "next-vibe/shared/types/response.schema";
 import { env } from "@/config/env";
 import { getAwsSnsProvider } from "./providers/aws-sns";
 import { getHttpProvider } from "./providers/http";

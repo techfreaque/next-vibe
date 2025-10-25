@@ -1,10 +1,10 @@
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { env } from "@/config/env";
-import type { ResponseType } from "@/packages/next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   ErrorResponseTypes,
-} from "@/packages/next-vibe/shared/types/response.schema";
+} from "next-vibe/shared/types/response.schema";
 
 import type {
   SendSmsParams,
@@ -68,7 +68,7 @@ export function getMessageBirdProvider(): SmsProvider {
         // Validate access key early
         if (!accessKey) {
           return createErrorResponse(
-            "packages.nextVibe.server.sms.sms.error.missing_aws_access_key" as never,
+            "app.api.v1.core.sms.sms.error.missing_aws_access_key",
             ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           );
         }
@@ -76,7 +76,7 @@ export function getMessageBirdProvider(): SmsProvider {
         // Type guard for params
         if (!params || typeof params !== "object") {
           return createErrorResponse(
-            "packages.nextVibe.server.sms.sms.error.invalid_phone_format" as never,
+            "app.api.v1.core.sms.sms.error.invalid_phone_format",
             ErrorResponseTypes.VALIDATION_ERROR,
           );
         }
@@ -86,7 +86,7 @@ export function getMessageBirdProvider(): SmsProvider {
         // Validate required parameters
         if (!params.to) {
           return createErrorResponse(
-            "packages.nextVibe.server.sms.sms.error.invalid_phone_format" as never,
+            "app.api.v1.core.sms.sms.error.invalid_phone_format",
             ErrorResponseTypes.VALIDATION_ERROR,
           );
         }
@@ -95,7 +95,7 @@ export function getMessageBirdProvider(): SmsProvider {
         const originator = params.from ?? env.SMS_FROM_NUMBER;
         if (!originator) {
           return createErrorResponse(
-            "packages.nextVibe.server.sms.sms.error.invalid_phone_format" as never,
+            "app.api.v1.core.sms.sms.error.invalid_phone_format",
             ErrorResponseTypes.VALIDATION_ERROR,
           );
         }
@@ -106,7 +106,7 @@ export function getMessageBirdProvider(): SmsProvider {
           params.message.trim() === ""
         ) {
           return createErrorResponse(
-            "packages.nextVibe.server.sms.sms.error.empty_message" as never,
+            "app.api.v1.core.sms.sms.error.empty_message",
             ErrorResponseTypes.VALIDATION_ERROR,
           );
         }
@@ -199,7 +199,7 @@ export function getMessageBirdProvider(): SmsProvider {
           }
 
           return createErrorResponse(
-            "packages.nextVibe.server.sms.sms.error.delivery_failed" as never,
+            "app.api.v1.core.sms.sms.error.delivery_failed",
             ErrorResponseTypes.SMS_ERROR,
             {
               error: errorMessage,
@@ -260,7 +260,7 @@ export function getMessageBirdProvider(): SmsProvider {
         // eslint-disable-next-line i18next/no-literal-string
         const unknownErrorMsg = "Unknown error";
         return createErrorResponse(
-          "packages.nextVibe.server.sms.sms.error.delivery_failed" as never,
+          "app.api.v1.core.sms.sms.error.delivery_failed",
           ErrorResponseTypes.SMS_ERROR,
           {
             error: error instanceof Error ? error.message : unknownErrorMsg,

@@ -18,7 +18,6 @@ import type {
   EmailHandleResponseOutput,
 } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
 import { EmailHandlingRepositoryImpl } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/repository";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

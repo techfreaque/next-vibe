@@ -128,7 +128,9 @@ export function useTTSAudio({
       })();
 
       // Wait a bit for the response to be available
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise<void>((resolve) => {
+        setTimeout(() => resolve(), 100);
+      });
 
       const result = endpoint.create.response;
 
@@ -140,6 +142,7 @@ export function useTTSAudio({
         setError(errorMsg);
         onError?.(errorMsg);
         setIsLoading(false);
+        // eslint-disable-next-line require-atomic-updates
         isProcessingRef.current = false;
         return;
       }
@@ -149,6 +152,7 @@ export function useTTSAudio({
 
       // Create audio element
       const audio = new Audio(audioDataUrl);
+      // eslint-disable-next-line require-atomic-updates
       audioRef.current = audio;
       setAudioUrl(audioDataUrl);
 
@@ -180,6 +184,7 @@ export function useTTSAudio({
     } finally {
       logger.debug("TTS", "Finished TTS attempt");
       setIsLoading(false);
+      // eslint-disable-next-line require-atomic-updates
       isProcessingRef.current = false;
     }
   }, [text, audioUrl, endpoint, logger, t, onError]);

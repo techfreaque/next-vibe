@@ -1,13 +1,27 @@
 /**
  * AI Tool Filter
  * Filters tools based on user permissions and opt-out logic
+ *
+ * NOTE: This uses the unified platform system for filtering.
+ * See: src/app/api/[locale]/v1/core/system/unified-ui/shared/
  */
 
 import "server-only";
 
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import {
+  UserRole,
+  type UserRoleValue,
+} from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
+import { Platform } from "../shared/config/platform-config";
 import { aiToolConfig } from "./config";
+import {
+  excludeManualTools as excludeManualToolsUtil,
+  filterByCategories,
+  filterByRoles,
+  filterBySearchQuery,
+  filterByTags,
+} from "./filter-utils";
 import type {
   AIToolExecutionContext,
   AIToolMetadata,
@@ -17,8 +31,9 @@ import type {
 
 /**
  * Platform type for opt-out checking
+ * @deprecated Use Platform enum from shared/config/platform-config instead
  */
-type Platform = "cli" | "web" | "ai";
+type LegacyPlatform = "cli" | "web" | "ai";
 
 /**
  * Tool Filter Implementation with Opt-Out Logic
@@ -30,7 +45,7 @@ export class ToolFilter implements IToolFilter {
   filterByPermissions(
     tools: AIToolMetadata[],
     user: AIToolExecutionContext["user"],
-    platform: Platform = "ai",
+    platform: LegacyPlatform | Platform = Platform.AI,
   ): AIToolMetadata[] {
     return tools.filter((tool) => this.hasPermission(tool, user, platform));
   }
@@ -46,28 +61,22 @@ export class ToolFilter implements IToolFilter {
 
     // Filter by roles
     if (criteria.roles && criteria.roles.length > 0) {
-      filtered = filtered.filter((tool) =>
-        tool.allowedRoles.some((role) => criteria.roles?.includes(role)),
-      );
+      filtered = filterByRoles(filtered, criteria.roles);
     }
 
     // Filter by categories
     if (criteria.categories && criteria.categories.length > 0) {
-      filtered = filtered.filter(
-        (tool) => tool.category && criteria.categories?.includes(tool.category),
-      );
+      filtered = filterByCategories(filtered, criteria.categories);
     }
 
     // Filter by tags
     if (criteria.tags && criteria.tags.length > 0) {
-      filtered = filtered.filter((tool) =>
-        tool.tags.some((tag) => criteria.tags?.includes(tag)),
-      );
+      filtered = filterByTags(filtered, criteria.tags);
     }
 
     // Exclude manual tools
     if (criteria.excludeManualTools) {
-      filtered = filtered.filter((tool) => !tool.isManualTool);
+      filtered = excludeManualToolsUtil(filtered);
     }
 
     // Include only enabled tools
@@ -78,13 +87,7 @@ export class ToolFilter implements IToolFilter {
 
     // Search query
     if (criteria.searchQuery) {
-      const query = criteria.searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (tool) =>
-          tool.name.toLowerCase().includes(query) ||
-          tool.description.toLowerCase().includes(query) ||
-          tool.tags.some((tag) => tag.toLowerCase().includes(query)),
-      );
+      filtered = filterBySearchQuery(filtered, criteria.searchQuery);
     }
 
     return filtered;
@@ -99,7 +102,7 @@ export class ToolFilter implements IToolFilter {
   hasPermission(
     tool: AIToolMetadata,
     user: AIToolExecutionContext["user"],
-    platform: Platform = "ai",
+    platform: LegacyPlatform | Platform = Platform.AI,
   ): boolean {
     // Check platform opt-out first
     if (this.isOptedOutOfPlatform(tool, platform)) {
@@ -122,7 +125,7 @@ export class ToolFilter implements IToolFilter {
     );
 
     // Check if user's role is in effective allowed roles
-    return effectiveAllowedRoles.includes(user.role as never);
+    return effectiveAllowedRoles.includes(user.role);
   }
 
   /**
@@ -130,9 +133,13 @@ export class ToolFilter implements IToolFilter {
    */
   private isOptedOutOfPlatform(
     tool: AIToolMetadata,
-    platform: Platform,
+    platform: LegacyPlatform | Platform,
   ): boolean {
-    switch (platform) {
+    // Handle both legacy string values and new Platform enum
+    const platformStr =
+      typeof platform === "string" ? platform : platform.toLowerCase();
+
+    switch (platformStr) {
       case "cli":
         return tool.allowedRoles.includes(UserRole.CLI_OFF);
       case "ai":
@@ -147,7 +154,7 @@ export class ToolFilter implements IToolFilter {
   /**
    * Check if role is an opt-out role
    */
-  private isOptOutRole(role: string): boolean {
+  private isOptOutRole(role: typeof UserRoleValue): boolean {
     return (
       role === UserRole.CLI_OFF ||
       role === UserRole.AI_TOOL_OFF ||
@@ -191,7 +198,7 @@ export class ToolFilter implements IToolFilter {
   getToolCountByCategory(
     tools: AIToolMetadata[],
     user: AIToolExecutionContext["user"],
-    platform: Platform = "ai",
+    platform: LegacyPlatform | Platform = Platform.AI,
   ): Record<string, number> {
     const filtered = this.filterByPermissions(tools, user, platform);
     const counts: Record<string, number> = {};
@@ -215,7 +222,8 @@ export class ToolFilter implements IToolFilter {
       for (const role of tool.allowedRoles) {
         // Only count actual user roles, not opt-out roles
         if (!this.isOptOutRole(role)) {
-          counts[role] = (counts[role] || 0) + 1;
+          const roleKey = role as string;
+          counts[roleKey] = (counts[roleKey] || 0) + 1;
         }
       }
     }
@@ -249,17 +257,17 @@ export class ToolFilter implements IToolFilter {
   /**
    * Get platforms tool is available on
    */
-  getAvailablePlatforms(tool: AIToolMetadata): Platform[] {
-    const platforms: Platform[] = [];
+  getAvailablePlatforms(tool: AIToolMetadata): (LegacyPlatform | Platform)[] {
+    const platforms: (LegacyPlatform | Platform)[] = [];
 
     if (!tool.allowedRoles.includes(UserRole.CLI_OFF)) {
-      platforms.push("cli");
+      platforms.push(Platform.CLI);
     }
     if (!tool.allowedRoles.includes(UserRole.AI_TOOL_OFF)) {
-      platforms.push("ai");
+      platforms.push(Platform.AI);
     }
     if (!tool.allowedRoles.includes(UserRole.WEB_OFF)) {
-      platforms.push("web");
+      platforms.push(Platform.WEB);
     }
 
     return platforms;

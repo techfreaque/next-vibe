@@ -8,7 +8,7 @@ import type { NextRequest } from "next/server";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { Environment } from "@/packages/next-vibe/shared/utils/env-util";
+import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { PixelTrackingRepository } from "./repository";
 

@@ -8,8 +8,7 @@ export const translations = {
   },
   debug: {
     getAuthMinimalUserNext: {
-      start:
-        "getAuthMinimalUserNext: FIXED VERSION - Checking authentication first",
+      start: "getAuthMinimalUserNext: - Checking authentication first",
       result: "getAuthMinimalUserNext: getCurrentUserNext result",
       authenticated:
         "getAuthMinimalUserNext: User is authenticated, getting leadId",

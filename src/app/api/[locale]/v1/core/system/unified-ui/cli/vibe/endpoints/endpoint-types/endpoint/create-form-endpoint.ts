@@ -416,8 +416,6 @@ function transformFieldForMethod<F>(field: F, method: Methods): F {
  * Generate schema for method-specific usage with proper field filtering
  * This function correctly handles method-specific usage patterns where individual fields
  * may have different usage patterns than their parent object
- *
- * FIXED VERSION: Handles all usage patterns correctly including computed property syntax
  */
 export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
   field: F,

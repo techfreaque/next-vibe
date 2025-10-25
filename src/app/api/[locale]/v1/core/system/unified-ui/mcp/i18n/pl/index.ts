@@ -13,7 +13,8 @@ export default {
                   },
                   get: {
                     title: "Lista narzędzi MCP",
-                    description: "Pobierz wszystkie dostępne narzędzia MCP dla bieżącego użytkownika",
+                    description:
+                      "Pobierz wszystkie dostępne narzędzia MCP dla bieżącego użytkownika",
                     fields: {
                       name: "Nazwa narzędzia",
                       description: "Opis",
@@ -74,17 +75,20 @@ export default {
                   },
                   post: {
                     title: "Wykonaj narzędzie MCP",
-                    description: "Wykonaj narzędzie MCP według nazwy z argumentami",
+                    description:
+                      "Wykonaj narzędzie MCP według nazwy z argumentami",
                     fields: {
                       title: "Parametry wykonania narzędzia",
                       description: "Parametry wykonania narzędzia",
                       name: {
                         title: "Nazwa narzędzia",
-                        description: "Nazwa narzędzia do wykonania (np. core:system:db:ping)",
+                        description:
+                          "Nazwa narzędzia do wykonania (np. core:system:db:ping)",
                       },
                       arguments: {
                         title: "Argumenty",
-                        description: "Argumenty narzędzia jako pary klucz-wartość",
+                        description:
+                          "Argumenty narzędzia jako pary klucz-wartość",
                       },
                     },
                     response: {
@@ -98,7 +102,8 @@ export default {
                     errors: {
                       validation: {
                         title: "Walidacja nie powiodła się",
-                        description: "Nieprawidłowa nazwa narzędzia lub argumenty",
+                        description:
+                          "Nieprawidłowa nazwa narzędzia lub argumenty",
                       },
                       network: {
                         title: "Błąd sieci",
@@ -110,7 +115,8 @@ export default {
                       },
                       forbidden: {
                         title: "Zabronione",
-                        description: "Nie masz uprawnień do wykonania tego narzędzia",
+                        description:
+                          "Nie masz uprawnień do wykonania tego narzędzia",
                       },
                       notFound: {
                         title: "Narzędzie nie znalezione",

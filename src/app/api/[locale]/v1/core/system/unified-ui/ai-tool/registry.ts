@@ -1,19 +1,21 @@
 /**
  * AI Tool Registry
  * Central registry for managing and accessing AI tools
- * Now uses shared endpoint registry for discovery
+ *
+ * NOTE: This registry now uses the unified platform system internally.
+ * For new code, consider using createAIPlatform() from shared/platform/unified-platform.ts
+ *
+ * @see src/app/api/[locale]/v1/core/system/unified-ui/shared/platform/unified-platform.ts
  */
 
 import "server-only";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
 import { createEndpointLogger } from "../cli/vibe/endpoints/endpoint-handler/logger";
 import { getEndpointRegistry } from "../shared/endpoint-registry";
-
 import { aiToolConfig, isAIToolSystemEnabled } from "./config";
 import { toolExecutor } from "./executor";
 import { toolFilter } from "./filter";
+import { getManualTools } from "./manual-tools";
 import type {
   AIToolExecutionContext,
   AIToolExecutionResult,
@@ -73,9 +75,12 @@ export class ToolRegistry implements IToolRegistry {
       // Convert to tool metadata using shared endpoint metadata
       this.tools = endpoints.map((endpoint) => ({
         name: endpoint.name,
+        displayName: endpoint.title || endpoint.name,
         description: endpoint.description || endpoint.title || "",
+        icon: endpoint.aiTool?.icon,
         category: endpoint.category || "general",
         tags: Array.isArray(endpoint.tags) ? endpoint.tags : [],
+        cost: endpoint.credits ?? 0,
         endpointId: endpoint.id,
         allowedRoles: Array.isArray(endpoint.allowedRoles)
           ? endpoint.allowedRoles
@@ -83,6 +88,9 @@ export class ToolRegistry implements IToolRegistry {
         isManualTool: false,
         parameters: endpoint.requestSchema,
       }));
+
+      // Add manual tools (e.g., braveSearch)
+      this.tools.push(...getManualTools());
 
       logger.debug("[Tool Registry] Conversion complete", {
         toolsRegistered: this.tools.length,
@@ -94,7 +102,9 @@ export class ToolRegistry implements IToolRegistry {
       logger.error("[Tool Registry] Initialization failed", {
         error: error instanceof Error ? error.message : String(error),
       });
-      throw error;
+      // Don't throw - allow system to continue with empty registry
+      this.initialized = false;
+      this.tools = [];
     }
   }
 
@@ -165,7 +175,8 @@ export class ToolRegistry implements IToolRegistry {
     if (!toolFilter.hasPermission(toolMeta, context.user)) {
       return {
         success: false,
-        error: "app.api.v1.core.system.unifiedUi.aiTool.errors.permissionDenied",
+        error:
+          "app.api.v1.core.system.unifiedUi.aiTool.errors.permissionDenied",
         metadata: {
           executionTime: 0,
           endpointPath: "",
@@ -215,7 +226,8 @@ export class ToolRegistry implements IToolRegistry {
 
       // Count by role
       for (const role of tool.allowedRoles) {
-        toolsByRole[role] = (toolsByRole[role] || 0) + 1;
+        const roleKey = role as string;
+        toolsByRole[roleKey] = (toolsByRole[roleKey] || 0) + 1;
       }
 
       // Count manual vs dynamic

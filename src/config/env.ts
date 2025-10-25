@@ -1,14 +1,14 @@
 import "server-only";
 
+import { stringToIntSchema } from "next-vibe/shared/types/common.schema";
+import { validateEnv } from "next-vibe/shared/utils/env-util";
 import { z } from "zod";
 
-import { AwsSnsAwsRegions } from "@/app/api/[locale]/v1/core/sms/providers/aws-sns";
-import { SmsProviders } from "@/app/api/[locale]/v1/core/sms/utils";
+import { AwsSnsAwsRegions } from "@/app/api/[locale]/v1/core/sms/providers/aws-sns-enum";
+import { SmsProviders } from "@/app/api/[locale]/v1/core/sms/utils-enum";
 import { envClientSchema, envValidationLogger } from "@/config/env-client";
-import { stringToIntSchema } from "@/packages/next-vibe/shared/types/common.schema";
-import { validateEnv } from "@/packages/next-vibe/shared/utils/env-util";
 
-// We intentionally disable process at the type level for react native and validation
+// We intentionally disable process at the type level for react native and typesafety
 declare const process: {
   env: {
     [key: string]: string | undefined | { [key: string]: string | undefined };
@@ -73,6 +73,7 @@ export const envSchema = envClientSchema.extend({
   SMS_MAX_LENGTH: z.string().optional(),
   SMS_MAX_RETRY_ATTEMPTS: z.string().optional(),
   SMS_RETRY_DELAY_MS: z.string().optional(),
+  ADMIN_NOTIFICATION_PHONE: z.string().optional(),
 
   // MessageBird provider
   MESSAGEBIRD_ACCESS_KEY: z.string().optional(),

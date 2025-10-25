@@ -86,6 +86,11 @@ export enum WidgetType {
   TEXT = "text",
   BADGE = "badge",
   AVATAR = "avatar",
+  MARKDOWN = "markdown",
+  MARKDOWN_EDITOR = "markdown_editor",
+  LINK = "link",
+  LINK_CARD = "link_card",
+  LINK_LIST = "link_list",
 
   // Specialized content widgets
   FILE_PATH = "file_path",

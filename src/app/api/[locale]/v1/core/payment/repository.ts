@@ -108,6 +108,18 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     const { t } = simpleT(locale);
 
     try {
+      // Payment endpoints require authenticated users with ID
+      if (user.isPublic) {
+        logger.error("payment.create.error.publicUserNotAllowed");
+        return createErrorResponse(
+          "app.api.v1.core.payment.errors.unauthorized.title",
+          ErrorResponseTypes.UNAUTHORIZED,
+          {
+            error: t("app.api.v1.core.payment.errors.unauthorized.description"),
+          },
+        );
+      }
+
       logger.debug("Creating payment session", {
         userId: user.id,
         priceId: data.priceId,
@@ -158,18 +170,24 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       }
 
       // Create Stripe checkout session
-      const paymentMethodTypes: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] =
-        (data.paymentMethodTypes?.map(
-          (type): Stripe.Checkout.SessionCreateParams.PaymentMethodType =>
-            type.toLowerCase() as Stripe.Checkout.SessionCreateParams.PaymentMethodType,
-        ) as Stripe.Checkout.SessionCreateParams.PaymentMethodType[]) || [
-          "card",
-        ];
+      // Map enum translation keys to Stripe API values
+      const paymentMethodTypes =
+        data.paymentMethodTypes?.map((type) => {
+          // Extract last part of translation key (e.g., "card" from "app.api.v1.core.payment.enums.paymentMethodType.card")
+          const parts = type.split(".");
+          const value = parts[parts.length - 1];
+          // Convert camelCase to snake_case for Stripe (applePay -> apple_pay)
+          return value.replace(/([A-Z])/g, "_$1").toLowerCase();
+        }) || ["card"];
+
+      // Extract mode value from translation key
+      const modeParts = data.mode.split(".");
+      const modeValue = modeParts[modeParts.length - 1];
 
       const sessionConfig: Stripe.Checkout.SessionCreateParams = {
         customer: stripeCustomerId,
         payment_method_types: paymentMethodTypes,
-        mode: data.mode.toLowerCase() as Stripe.Checkout.SessionCreateParams.Mode,
+        mode: modeValue,
         success_url:
           data.successUrl || `${env.NEXT_PUBLIC_APP_URL}/payment/success`,
         cancel_url:
@@ -246,6 +264,18 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     const { t } = simpleT(locale);
 
     try {
+      // Payment endpoints require authenticated users with ID
+      if (user.isPublic) {
+        logger.error("payment.get.error.publicUserNotAllowed");
+        return createErrorResponse(
+          "app.api.v1.core.payment.errors.unauthorized.title",
+          ErrorResponseTypes.UNAUTHORIZED,
+          {
+            error: t("app.api.v1.core.payment.errors.unauthorized.description"),
+          },
+        );
+      }
+
       logger.debug("Getting payment information", {
         userId: user.id,
       });
@@ -597,9 +627,27 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         );
       }
 
-      // Create refund in Stripe (assuming payment intent ID stored)
+      // Verify payment intent ID exists
+      const paymentIntentId =
+        transaction.stripePaymentIntentId || transaction.stripeSessionId;
+      if (!paymentIntentId) {
+        logger.error("payment.refund.error.noPaymentIntent", {
+          transactionId: data.transactionId,
+        });
+        return createErrorResponse(
+          "app.api.v1.core.payment.refund.post.errors.server.title",
+          ErrorResponseTypes.BAD_REQUEST,
+          {
+            error: t(
+              "app.api.v1.core.payment.refund.post.errors.server.description",
+            ),
+          },
+        );
+      }
+
+      // Create refund in Stripe
       const refund = await getStripe().refunds.create({
-        payment_intent: transaction.stripeSessionId, // This should be payment intent ID
+        payment_intent: paymentIntentId,
         amount: data.amount ? Math.round(data.amount * 100) : undefined,
         reason:
           (data.reason as
@@ -760,39 +808,33 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     try {
       logger.debug("Invoice payment succeeded", {
         invoiceId: invoice.id,
-        subscriptionId: invoice.subscription,
       });
 
-      // Check if this is a subscription invoice
-      if (!invoice.subscription) {
-        logger.debug(
-          "Invoice is not for a subscription, skipping credit addition",
-        );
-        return;
-      }
+      // Retrieve the full subscription from Stripe using the invoice's subscription ID
+      // Note: invoice.subscription is an expandable field (string | Subscription object)
+      const subscriptionId =
+        typeof invoice.subscription === "string"
+          ? invoice.subscription
+          : invoice.subscription.id;
 
-      // Get the subscription to find the user
-      const subscription = await getStripe().subscriptions.retrieve(
-        invoice.subscription as string,
-      );
+      const fullSubscription =
+        await getStripe().subscriptions.retrieve(subscriptionId);
 
-      const userId = subscription.metadata?.userId;
+      const userId = fullSubscription.metadata?.userId;
       if (!userId) {
         logger.error("No userId found in subscription metadata", {
-          subscriptionId: subscription.id,
+          subscriptionId: fullSubscription.id,
         });
         return;
       }
 
       // Calculate expiry date (end of current billing period)
-      const expiresAt = subscription.current_period_end
-        ? new Date(subscription.current_period_end * 1000)
+      const expiresAt = fullSubscription.current_period_end
+        ? new Date(fullSubscription.current_period_end * 1000)
         : undefined;
 
       // Import credit repository dynamically to avoid circular dependencies
-      const { creditRepository } = await import(
-        "../agent/chat/credits/repository"
-      );
+      const { creditRepository } = await import("../credits/repository");
 
       // Add 1000 expiring credits for the subscription
       const result = await creditRepository.addCredits(
@@ -849,9 +891,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         }
 
         // Import credit repository dynamically to avoid circular dependencies
-        const { creditRepository } = await import(
-          "../agent/chat/credits/repository"
-        );
+        const { creditRepository } = await import("../credits/repository");
 
         // Add permanent credits to user account
         const result = await creditRepository.addCredits(

@@ -6,42 +6,87 @@
 
 import "server-only";
 
+import type { z } from "zod";
+
+import type { TranslationKey } from "@/i18n/core/static-types";
+
 import type { Methods } from "../../cli/vibe/endpoints/endpoint-types/core/enums";
-import type { EndpointDefinition } from "../../cli/vibe/endpoints/endpoint-types/core/types";
 import type { DiscoveredEndpointMetadata } from "./types";
+
+/**
+ * Simplified endpoint definition type for registry conversion
+ * Matches the structure of CreateApiEndpoint but with optional fields
+ */
+interface SimpleEndpointDefinition {
+  title?: TranslationKey | string;
+  description?: TranslationKey | string;
+  category?: TranslationKey | string;
+  tags?: readonly (TranslationKey | string)[];
+  allowedRoles?: readonly string[];
+  requestSchema?: z.ZodTypeAny;
+  responseSchema?: z.ZodTypeAny;
+  credits?: number;
+  aiTool?: {
+    instructions: string;
+    displayName: string;
+    icon: string;
+    color: string;
+    priority: number;
+  };
+  aliases?: readonly string[];
+}
+
+/**
+ * Type for nested endpoint structure
+ */
+interface NestedEndpoints {
+  [key: string]:
+    | NestedEndpoints
+    | Partial<Record<Methods, SimpleEndpointDefinition>>;
+}
+
+/**
+ * Type guard to check if value is an endpoint definition
+ */
+function isEndpointDefinition(
+  value: unknown,
+): value is Partial<Record<Methods, SimpleEndpointDefinition>> {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const methods = ["GET", "POST", "PUT", "PATCH", "DELETE"] as Methods[];
+  return methods.some((method) => method in value);
+}
 
 /**
  * Convert nested endpoint structure to flat array
  */
 export function convertEndpointsToMetadata(
-  endpoints: any,
+  endpoints: NestedEndpoints,
   basePath: string[] = [],
 ): DiscoveredEndpointMetadata[] {
   const result: DiscoveredEndpointMetadata[] = [];
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   for (const [key, value] of Object.entries(endpoints)) {
     const currentPath = [...basePath, key];
 
     // Check if this is an endpoint definition (has HTTP methods)
-    if (value && typeof value === "object") {
+    if (isEndpointDefinition(value)) {
       const methods = ["GET", "POST", "PUT", "PATCH", "DELETE"] as Methods[];
-      const availableMethods = methods.filter(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-        (method) => (value as any)[method],
-      );
+      const availableMethods = methods.filter((method) => method in value);
 
       if (availableMethods.length > 0) {
         // This is an endpoint definition
         for (const method of availableMethods) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-          const methodDef = (value as any)[method] as EndpointDefinition[Methods];
+          const methodDef = value[method];
 
           if (methodDef) {
             // Convert path array to API path
             const apiPath = currentPath
               .map((segment) => {
-                if (segment === "_locale_") return "";
+                if (segment === "_locale_") {
+                  return "";
+                }
                 if (segment.startsWith("_") && segment.endsWith("_")) {
                   // Convert _id_ to [id]
                   return `[${segment.slice(1, -1)}]`;
@@ -70,27 +115,47 @@ export function convertEndpointsToMetadata(
               routePath,
               definitionPath,
               method,
-              title: methodDef.title || "",
-              description: methodDef.description || "",
-              category: methodDef.category || "",
-              tags: methodDef.tags || [],
-              allowedRoles: methodDef.allowedRoles || [],
+              title: typeof methodDef.title === "string" ? methodDef.title : "",
+              description:
+                typeof methodDef.description === "string"
+                  ? methodDef.description
+                  : "",
+              category:
+                typeof methodDef.category === "string"
+                  ? methodDef.category
+                  : "",
+              tags: Array.isArray(methodDef.tags) ? methodDef.tags : [],
+              allowedRoles: Array.isArray(methodDef.allowedRoles)
+                ? (methodDef.allowedRoles as readonly string[])
+                : [],
               requiresAuth: !methodDef.allowedRoles?.includes("PUBLIC"),
               requestSchema: methodDef.requestSchema,
               responseSchema: methodDef.responseSchema,
+              credits:
+                typeof methodDef.credits === "number"
+                  ? methodDef.credits
+                  : undefined,
               aiTool: methodDef.aiTool,
-              aliases: methodDef.aliases || [],
+              aliases: Array.isArray(methodDef.aliases)
+                ? methodDef.aliases
+                : [],
             };
 
             result.push(metadata);
           }
         }
-      } else {
+      } else if (typeof value === "object" && value !== null) {
         // Recurse into nested structure
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        const nested = convertEndpointsToMetadata(value, currentPath);
+        const nested = convertEndpointsToMetadata(
+          value as NestedEndpoints,
+          currentPath,
+        );
         result.push(...nested);
       }
+    } else if (typeof value === "object" && value !== null) {
+      // Not an endpoint definition, recurse
+      const nested = convertEndpointsToMetadata(value, currentPath);
+      result.push(...nested);
     }
   }
 
@@ -112,4 +177,3 @@ function generateEndpointId(method: Methods, apiPath: string): string {
 function generateEndpointName(apiPath: string): string {
   return apiPath.replace(/^\/v1\//, "").replace(/\//g, "_");
 }
-

@@ -23,6 +23,7 @@ import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repos
 import { useTranslation } from "@/i18n/core/client";
 
 import { useChatContext } from "../features/chat/context";
+import { parseChatUrl } from "../lib/url-parser";
 import type { ChatThread, ModelId } from "../types";
 import { ChatArea } from "./layout/chat-area";
 import { SidebarWrapper } from "./layout/sidebar-wrapper";
@@ -260,62 +261,11 @@ export function ChatInterface({
   }, [logger]);
 
   // Parse URL path to determine root folder, sub folder, and thread
-  // URL structure: /threads/[rootId] OR /threads/[rootId]/[subFolderId] OR /threads/[rootId]/[subFolderId]/[threadId]
   const { initialRootFolderId, initialSubFolderId, initialThreadId } =
     React.useMemo(() => {
       // If urlPath is provided, parse it
       if (urlPath && urlPath.length > 0) {
-        const rootId = urlPath[0] as DefaultFolderId; // First segment is always root folder
-        const lastSegment = urlPath[urlPath.length - 1];
-
-        // Check if last segment is "new" (new thread)
-        if (lastSegment === "new") {
-          // URL is /rootId/new or /rootId/subfolderId/new
-          const subFolderId = urlPath.length >= 3 ? urlPath[1] : null;
-          return {
-            initialRootFolderId: rootId,
-            initialSubFolderId: subFolderId,
-            initialThreadId: "new",
-          };
-        }
-
-        // Check if last segment is a thread by checking UUID format
-        // UUIDs are 36 characters with dashes: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-        const isUUID =
-          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-            lastSegment,
-          );
-
-        if (isUUID) {
-          // Last segment is a thread (UUID format)
-          // URL is /rootId/threadId or /rootId/subfolderId/threadId
-          const threadId = lastSegment;
-          const subFolderId = urlPath.length >= 3 ? urlPath[1] : null;
-          return {
-            initialRootFolderId: rootId,
-            initialSubFolderId: subFolderId,
-            initialThreadId: threadId,
-          };
-        } else {
-          // Last segment is a sub folder (or just root if length is 1)
-          // URL is /rootId or /rootId/subfolderId
-          // IMPORTANT: Check if urlPath[1] is a root folder ID - if so, it's NOT a subfolder
-          const secondSegment = urlPath.length >= 2 ? urlPath[1] : null;
-          const isSecondSegmentRootFolder =
-            secondSegment === "private" ||
-            secondSegment === "shared" ||
-            secondSegment === "public" ||
-            secondSegment === "incognito";
-
-          const subFolderId =
-            secondSegment && !isSecondSegmentRootFolder ? secondSegment : null;
-
-          return {
-            initialRootFolderId: rootId,
-            initialSubFolderId: subFolderId,
-            initialThreadId: undefined,
-          };
-        }
+        return parseChatUrl(urlPath);
       }
 
       // Fallback to deprecated props - parse them properly

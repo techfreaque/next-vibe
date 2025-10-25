@@ -58,7 +58,7 @@ class SetupInstallRepositoryImpl implements SetupInstallRepository {
         // Windows: Use a directory in PATH or create one
 
         const windowsPath =
-          // eslint-disable-next-line i18next/no-literal-string, node/no-process-env
+          // eslint-disable-next-line i18next/no-literal-string
           process.env.APPDATA || path.join(homeDir, "AppData", "Roaming");
 
         return path.join(windowsPath, "vibe", "bin");
@@ -303,9 +303,9 @@ exec bun "${vibeTsPath}" "$@"
     try {
       // Check common installation paths directly instead of using which/where
       const possiblePaths = [
-        // eslint-disable-next-line node/no-process-env, i18next/no-literal-string
+        // eslint-disable-next-line i18next/no-literal-string
         path.join(process.env.HOME || "/tmp", ".local", "bin", "vibe"),
-        // eslint-disable-next-line node/no-process-env, i18next/no-literal-string
+        // eslint-disable-next-line i18next/no-literal-string
         path.join(process.env.HOME || "/tmp", ".yarn", "bin", "vibe"),
 
         "/usr/local/bin/vibe",
@@ -361,7 +361,7 @@ exec bun "${vibeTsPath}" "$@"
         cwd: options.cwd || process.cwd(),
         stdio: options.verbose ? "inherit" : "pipe",
         shell: false, // Disable shell to avoid security warnings
-        // eslint-disable-next-line node/no-process-env
+
         env: { ...process.env, NODE_ENV: "development" },
       });
 

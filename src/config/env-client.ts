@@ -3,11 +3,11 @@
 import { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type { ExplicitAnyType } from "@/packages/next-vibe/shared/types/utils";
+import type { ExplicitAnyType } from "next-vibe/shared/types/utils";
 import {
   Environment,
   validateEnv,
-} from "@/packages/next-vibe/shared/utils/env-util";
+} from "next-vibe/shared/utils/env-util";
 
 const isServer = typeof window === "undefined";
 const isReactNative = false;

@@ -173,7 +173,7 @@ export class PerformanceMonitor {
 
     // Keep only the most recent metrics to prevent memory leaks
     if (this.completedMetrics.length > this.maxMetrics) {
-      this.completedMetrics = this.completedMetrics.slice(-this.maxMetrics);
+      this.completedMetrics.shift();
     }
   }
 

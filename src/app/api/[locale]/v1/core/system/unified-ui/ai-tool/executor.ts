@@ -5,15 +5,18 @@
 
 import "server-only";
 
+import { simpleT } from "@/i18n/core/shared";
+
 import type { EndpointLogger } from "../cli/vibe/endpoints/endpoint-handler/logger";
 import {
   type DiscoveredRoute,
   RouteDelegationHandler,
   type RouteExecutionContext,
 } from "../cli/vibe/utils/route-delegation-handler";
-
 import { aiToolConfig } from "./config";
+import { AI_TOOL_CONSTANTS } from "./constants";
 import { toolDiscovery } from "./discovery";
+import { createErrorResult } from "./error-handler";
 import type {
   AIToolExecutionContext,
   AIToolExecutionResult,
@@ -22,6 +25,7 @@ import type {
   ToolExecutorOptions,
   ToolParameterValue,
 } from "./types";
+import { extractWidgetMetadata } from "./widget-metadata-extractor";
 
 /**
  * Tool Executor Implementation
@@ -41,6 +45,7 @@ export class ToolExecutor implements IToolExecutor {
     options: ToolExecutorOptions = {},
   ): Promise<AIToolExecutionResult> {
     const startTime = Date.now();
+    const { t } = simpleT(context.locale);
 
     try {
       // Get endpoint by tool name
@@ -51,7 +56,10 @@ export class ToolExecutor implements IToolExecutor {
         const emptyMethod = "";
         return {
           success: false,
-          error: `Tool not found: ${context.toolName}`,
+          error: t(
+            "app.api.v1.core.system.unifiedUi.aiTool.executor.errors.toolNotFound",
+            { toolName: context.toolName },
+          ),
           metadata: {
             executionTime: Date.now() - startTime,
             endpointPath: emptyPath,
@@ -71,7 +79,10 @@ export class ToolExecutor implements IToolExecutor {
         const pathSeparator = "/";
         return {
           success: false,
-          error: `Parameter validation failed: ${validation.errors?.join(errorSeparator)}`,
+          error: t(
+            "app.api.v1.core.system.unifiedUi.aiTool.executor.errors.parameterValidationFailed",
+            { errors: validation.errors?.join(errorSeparator) || "" },
+          ),
           metadata: {
             executionTime: Date.now() - startTime,
             endpointPath: endpoint.path.join(pathSeparator),
@@ -82,7 +93,7 @@ export class ToolExecutor implements IToolExecutor {
 
       // Log execution
       if (aiToolConfig.logging.logExecution) {
-        const hiddenPlaceholder = "[hidden]";
+        const hiddenPlaceholder = AI_TOOL_CONSTANTS.converter.hiddenPlaceholder;
         context.logger.info(
           `[AI Tool Executor] Executing tool: ${context.toolName}`,
           {
@@ -160,6 +171,17 @@ export class ToolExecutor implements IToolExecutor {
         });
       }
 
+      // Extract widget metadata from endpoint definition if execution succeeded
+      const widgetMetadata =
+        result.success && result.data
+          ? extractWidgetMetadata(endpoint, result.data, context.logger)
+          : undefined;
+
+      // Add execution time to widget metadata if present
+      if (widgetMetadata) {
+        widgetMetadata.executionTime = Date.now() - startTime;
+      }
+
       const resultPathSeparator = "/";
       return {
         success: result.success,
@@ -170,28 +192,16 @@ export class ToolExecutor implements IToolExecutor {
           endpointPath: endpoint.path.join(resultPathSeparator),
           method: endpoint.method,
           ...result.metadata,
+          widgetMetadata,
         },
       };
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-
-      context.logger.error(`[AI Tool Executor] Execution failed`, {
-        toolName: context.toolName,
-        error: errorMessage,
-      });
-
-      const emptyPath = "";
-      const emptyMethod = "";
-      return {
-        success: false,
-        error: errorMessage,
-        metadata: {
-          executionTime: Date.now() - startTime,
-          endpointPath: emptyPath,
-          method: emptyMethod,
-        },
-      };
+      return createErrorResult(
+        error,
+        startTime,
+        context.toolName,
+        context.logger,
+      );
     }
   }
 
@@ -213,7 +223,7 @@ export class ToolExecutor implements IToolExecutor {
     }
 
     // Execute in parallel
-    return Promise.all(
+    return await Promise.all(
       contexts.map((context) => this.execute(context, options)),
     );
   }
@@ -230,9 +240,15 @@ export class ToolExecutor implements IToolExecutor {
       const endpoint = await this.getEndpointByToolName(toolName);
 
       if (!endpoint) {
+        const { t } = simpleT("en-GLOBAL");
         return {
           valid: false,
-          errors: [`Tool not found: ${toolName}`],
+          errors: [
+            t(
+              "app.api.v1.core.system.unifiedUi.aiTool.executor.errors.toolNotFound",
+              { toolName },
+            ),
+          ],
         };
       }
 
@@ -247,7 +263,8 @@ export class ToolExecutor implements IToolExecutor {
           return {
             valid: false,
             errors: zodError.issues.map(
-              (issue) => `${issue.path.join(pathSeparator)}${errorSeparator}${issue.message}`,
+              (issue) =>
+                `${issue.path.join(pathSeparator)}${errorSeparator}${issue.message}`,
             ),
           };
         }

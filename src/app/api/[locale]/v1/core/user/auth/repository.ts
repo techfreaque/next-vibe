@@ -45,13 +45,18 @@ import type {
 } from "./definition";
 
 /**
+ * Auth platform type - maps to unified Platform enum
+ */
+export type AuthPlatform = "next" | "trpc" | "cli" | "ai" | "mcp" | "web" | "mobile";
+
+/**
  * Platform context for authentication
  */
 export interface AuthContext {
-  platform: "next" | "trpc" | "cli";
-  request?: NextRequest; // Required for tRPC
-  token?: string; // Required for CLI
-  jwtPayload?: JwtPayloadType; // Optional for CLI direct payload auth (can be public or private)
+  platform: AuthPlatform;
+  request?: NextRequest; // Required for Next.js/tRPC/Web
+  token?: string; // Required for CLI/AI/MCP
+  jwtPayload?: JwtPayloadType; // Optional for CLI/AI/MCP direct payload auth
   locale?: CountryLanguage; // Required for lead creation
 }
 
@@ -688,6 +693,7 @@ class AuthRepositoryImpl implements AuthRepository {
           return await this.getCurrentUserNext(logger);
 
         case "trpc":
+        case "web":
           if (!context.request) {
             return createErrorResponse(
               "app.api.v1.core.user.auth.errors.missing_request_context",
@@ -697,6 +703,9 @@ class AuthRepositoryImpl implements AuthRepository {
           return await this.getCurrentUserTrpc(context.request, logger);
 
         case "cli":
+        case "ai":
+        case "mcp":
+        case "mobile":
           if (!context.token) {
             return createErrorResponse(
               "app.api.v1.core.user.auth.errors.missing_token",
@@ -705,11 +714,13 @@ class AuthRepositoryImpl implements AuthRepository {
           }
           return await this.getCurrentUserCli(context.token, logger);
 
-        default:
+        default: {
+          const _exhaustiveCheck: never = context.platform;
           return createErrorResponse(
             "app.api.v1.core.user.auth.errors.unsupported_platform",
             ErrorResponseTypes.INTERNAL_ERROR,
           );
+        }
       }
     } catch (error) {
       logger.error(
@@ -935,6 +946,7 @@ class AuthRepositoryImpl implements AuthRepository {
           );
 
         case "trpc":
+        case "web":
           if (!context.request) {
             logger.error(
               "app.api.v1.core.user.auth.debug.missingRequestContextForTrpc",
@@ -949,6 +961,9 @@ class AuthRepositoryImpl implements AuthRepository {
           );
 
         case "cli":
+        case "ai":
+        case "mcp":
+        case "mobile":
           if (context.jwtPayload) {
             // Direct payload authentication
             // Ensure payload is private (has id and isPublic: false)
@@ -987,14 +1002,16 @@ class AuthRepositoryImpl implements AuthRepository {
             return createPublicUser<TRoles>(leadId);
           }
 
-        default:
+        default: {
+          const _exhaustiveCheck: never = context.platform;
           logger.error(
             "app.api.v1.core.user.auth.debug.unsupportedPlatformForAuth",
             {
-              platform: context.platform,
+              platform: _exhaustiveCheck,
             },
           );
           return { isPublic: true } as InferUserType<TRoles>;
+        }
       }
     } catch (error) {
       logger.error(

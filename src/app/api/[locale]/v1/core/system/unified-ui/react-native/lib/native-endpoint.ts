@@ -21,7 +21,6 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
-
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
@@ -105,7 +104,7 @@ function constructUrl<
 
         if (paramValue === undefined) {
           return createErrorResponse(
-            "app.api.v1.core.system.unified-ui.react-native.errors.missingUrlParam",
+            "app.api.v1.core.system.unifiedUi.react-native.errors.missingUrlParam",
             ErrorResponseTypes.INTERNAL_ERROR,
             { paramName, endpoint: endpoint.title },
           );
@@ -120,7 +119,7 @@ function constructUrl<
     return { success: true, data: urlPath, message: "" };
   } catch (error) {
     return createErrorResponse(
-      "app.api.v1.core.system.unified-ui.react-native.errors.urlConstructionFailed",
+      "app.api.v1.core.system.unifiedUi.react-native.errors.urlConstructionFailed",
       ErrorResponseTypes.INTERNAL_ERROR,
       { error: String(error) },
     );
@@ -178,7 +177,7 @@ export async function nativeEndpoint<
       } catch (validationError) {
         logger.error("Request validation failed", validationError);
         return createErrorResponse(
-          "app.api.v1.core.system.unified-ui.react-native.errors.validationFailed",
+          "app.api.v1.core.system.unifiedUi.react-native.errors.validationFailed",
           ErrorResponseTypes.VALIDATION_ERROR,
           { error: String(validationError) },
         ) as ResponseType<InferResponseOutput<TEndpoint>>;
@@ -262,7 +261,7 @@ export async function nativeEndpoint<
         responseText.includes("<html")
       ) {
         return createErrorResponse(
-          "app.api.v1.core.system.unified-ui.react-native.errors.htmlResponseReceived",
+          "app.api.v1.core.system.unifiedUi.react-native.errors.htmlResponseReceived",
           ErrorResponseTypes.INTERNAL_ERROR,
           {
             url: fetchUrl,
@@ -292,7 +291,7 @@ export async function nativeEndpoint<
   } catch (error) {
     logger.error("Native endpoint call failed", error);
     return createErrorResponse(
-      "app.api.v1.core.system.unified-ui.react-native.errors.networkError",
+      "app.api.v1.core.system.unifiedUi.react-native.errors.networkError",
       ErrorResponseTypes.INTERNAL_ERROR,
       { error: String(error) },
     ) as ResponseType<InferResponseOutput<TEndpoint>>;

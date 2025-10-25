@@ -8,8 +8,6 @@ import {
   isStreamingResponse,
 } from "next-vibe/shared/types/response.schema";
 
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
-
 import type { Methods } from "../../endpoint-types/core/enums";
 import { authenticateUser, executeHandler } from "../core/handler-core";
 import { createEndpointLogger } from "../logger/endpoint-logger";

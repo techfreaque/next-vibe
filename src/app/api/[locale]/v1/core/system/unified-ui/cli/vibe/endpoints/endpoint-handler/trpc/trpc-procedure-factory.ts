@@ -10,7 +10,6 @@
 import { z } from "zod";
 
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type { UnifiedField } from "../../endpoint-types/core/types";
@@ -22,9 +21,9 @@ import { createEndpointLogger } from "../logger/endpoint-logger";
 // import { endpointHandler } from "../endpoint-handler"; // Unused for now
 import type { ApiHandlerFunction, ApiHandlerOptions } from "../types";
 import {
-  adminProcedure,
   authenticatedProcedure,
-  customerProcedure,
+  createAdminProcedure,
+  createCustomerProcedure,
   publicProcedure,
   requireRoles,
 } from "./trpc";
@@ -166,9 +165,7 @@ export function createTRPCProcedureFromEndpoint<
 /**
  * Select the appropriate base tRPC procedure based on required roles
  */
-function selectBaseProcedure<
-  TUserRoleValue extends readonly string[],
->(
+function selectBaseProcedure<TUserRoleValue extends readonly string[]>(
   allowedRoles: TUserRoleValue,
 ):
   | typeof publicProcedure

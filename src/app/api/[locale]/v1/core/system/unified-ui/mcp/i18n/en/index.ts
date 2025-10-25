@@ -38,7 +38,8 @@ export default {
                       },
                       forbidden: {
                         title: "Forbidden",
-                        description: "You don't have permission to access this resource",
+                        description:
+                          "You don't have permission to access this resource",
                       },
                       notFound: {
                         title: "Not Found",
@@ -80,7 +81,8 @@ export default {
                       description: "Parameters for tool execution",
                       name: {
                         title: "Tool Name",
-                        description: "Name of the tool to execute (e.g., core:system:db:ping)",
+                        description:
+                          "Name of the tool to execute (e.g., core:system:db:ping)",
                       },
                       arguments: {
                         title: "Arguments",
@@ -110,7 +112,8 @@ export default {
                       },
                       forbidden: {
                         title: "Forbidden",
-                        description: "You don't have permission to execute this tool",
+                        description:
+                          "You don't have permission to execute this tool",
                       },
                       notFound: {
                         title: "Tool Not Found",

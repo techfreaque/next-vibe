@@ -5,9 +5,11 @@
 
 import type { z } from "zod";
 
-import type { Methods } from "../cli/vibe/endpoints/endpoint-types/core/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+import type { Methods } from "../cli/vibe/endpoints/endpoint-types/core/enums";
 
 /**
  * JSON-RPC 2.0 Base Types
@@ -183,7 +185,7 @@ export interface MCPToolMetadata {
   endpointPath: string;
   routePath: string;
   method: Methods;
-  allowedRoles: string[];
+  allowedRoles: readonly (typeof UserRoleValue)[];
   requiresAuth: boolean;
   requestSchema?: z.ZodTypeAny;
   responseSchema?: z.ZodTypeAny;

@@ -372,9 +372,7 @@ const { POST: ImportCsvPost } = createEndpoint({
           errors: responseArrayField(
             {
               type: WidgetType.DATA_TABLE,
-              title: "app.api.v1.core.import.csv.post.response.errors.title",
-              description:
-                "app.api.v1.core.import.csv.post.response.errors.description",
+              columns: [],
             },
             objectField(
               {
@@ -415,9 +413,9 @@ const { POST: ImportCsvPost } = createEndpoint({
           nextSteps: responseArrayField(
             {
               type: WidgetType.DATA_LIST,
-              title: "app.api.v1.core.import.csv.post.response.nextSteps.title",
-              description:
-                "app.api.v1.core.import.csv.post.response.nextSteps.description",
+              itemConfig: {
+                template: "default",
+              },
             },
             responseField(
               {
@@ -486,47 +484,55 @@ const { POST: ImportCsvPost } = createEndpoint({
   examples: {
     requests: {
       default: {
-        file: "ZW1haWwsYnVzaW5lc3NfbmFtZSxjb250YWN0X25hbWU=", // Base64 CSV
-        fileName: "contacts.csv",
-        domain: ImportDomain.LEADS,
-        skipDuplicates: true,
-        updateExisting: false,
-        useChunkedProcessing: false,
-        batchSize: 100,
-        defaultCountry: "GLOBAL",
-        defaultLanguage: "en",
+        fileUploadSection: {
+          file: "ZW1haWwsYnVzaW5lc3NfbmFtZSxjb250YWN0X25hbWU=", // Base64 CSV
+          fileName: "contacts.csv",
+          domain: ImportDomain.LEADS,
+        },
+        processingSection: {
+          skipDuplicates: true,
+          updateExisting: false,
+          useChunkedProcessing: false,
+          batchSize: 100,
+        },
+        defaultsSection: {
+          defaultCountry: "GLOBAL",
+          defaultLanguage: "en",
+        },
       },
     },
     responses: {
       default: {
-        basicResults: {
-          batchId: "550e8400-e29b-41d4-a716-446655440000",
-          totalRows: 250,
-          isChunkedProcessing: false,
-        },
-        statistics: {
-          successfulImports: 235,
-          failedImports: 12,
-          duplicateEmails: 3,
-          processingTimeMs: 2500,
-        },
-        summary: {
-          newRecords: 232,
-          updatedRecords: 3,
-          skippedDuplicates: 3,
-        },
-        errors: [
-          {
-            row: 15,
-            email: "invalid-email",
-            error: "Invalid email format",
+        importResult: {
+          basicResults: {
+            batchId: "550e8400-e29b-41d4-a716-446655440000",
+            totalRows: 250,
+            isChunkedProcessing: false,
           },
-        ],
-        nextSteps: [
-          "Review error details for failed imports",
-          "Consider updating CSV format for better results",
-          "Check duplicate handling settings if needed",
-        ],
+          statistics: {
+            successfulImports: 235,
+            failedImports: 12,
+            duplicateEmails: 3,
+            processingTimeMs: 2500,
+          },
+          summary: {
+            newRecords: 232,
+            updatedRecords: 3,
+            skippedDuplicates: 3,
+          },
+          errors: [
+            {
+              row: 15,
+              email: "invalid-email",
+              error: "Invalid email format",
+            },
+          ],
+          nextSteps: [
+            "Review error details for failed imports",
+            "Consider updating CSV format for better results",
+            "Check duplicate handling settings if needed",
+          ],
+        },
       },
     },
   },
@@ -609,9 +615,9 @@ const { GET: ListImportJobsGet } = createEndpoint({
       jobs: responseArrayField(
         {
           type: WidgetType.DATA_LIST,
-          title: "app.api.v1.core.import.jobs.get.response.title",
-          description: "app.api.v1.core.import.jobs.get.response.description",
-          layout: { type: LayoutType.STACKED },
+          itemConfig: {
+            template: "default",
+          },
         },
         z.object({
           id: z.uuid().describe("Unique job identifier"),
@@ -682,14 +688,42 @@ const { GET: ListImportJobsGet } = createEndpoint({
   ),
 
   errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "app.api.v1.core.import.jobs.get.errors.validation.title",
+      description: "app.api.v1.core.import.jobs.get.errors.validation.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "app.api.v1.core.import.jobs.get.errors.network.title",
+      description: "app.api.v1.core.import.jobs.get.errors.network.description",
+    },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.v1.core.import.jobs.get.errors.unauthorized.title",
       description:
         "app.api.v1.core.import.jobs.get.errors.unauthorized.description",
     },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "app.api.v1.core.import.jobs.get.errors.forbidden.title",
+      description: "app.api.v1.core.import.jobs.get.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "app.api.v1.core.import.jobs.get.errors.notFound.title",
+      description: "app.api.v1.core.import.jobs.get.errors.notFound.description",
+    },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.v1.core.import.jobs.get.errors.server.title",
       description: "app.api.v1.core.import.jobs.get.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "app.api.v1.core.import.jobs.get.errors.unknown.title",
+      description: "app.api.v1.core.import.jobs.get.errors.unknown.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "app.api.v1.core.import.jobs.get.errors.unsavedChanges.title",
+      description: "app.api.v1.core.import.jobs.get.errors.unsavedChanges.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "app.api.v1.core.import.jobs.get.errors.conflict.title",
+      description: "app.api.v1.core.import.jobs.get.errors.conflict.description",
     },
   },
 

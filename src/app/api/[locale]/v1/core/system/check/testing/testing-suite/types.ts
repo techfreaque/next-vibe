@@ -67,11 +67,12 @@ export interface TestRunner<
 > {
   /**
    * Execute the endpoint with the given data and URL params
+   * User is optional - if not provided, creates default user based on endpoint roles
    */
   executeWith: (options: {
     data: TRequestOutput;
     urlParams: TUrlVariablesOutput;
-    user: JwtPayloadType;
+    user?: JwtPayloadType;
   }) => Promise<ResponseType<TResponseOutput>>;
 
   /**

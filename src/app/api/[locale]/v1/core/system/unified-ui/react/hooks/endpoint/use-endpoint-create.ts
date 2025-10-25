@@ -35,15 +35,17 @@ import { mergeFormData } from "./utils";
  * @returns Form and mutation for API interaction with enhanced error handling
  */
 export function useEndpointCreate<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TEndpoint extends CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>,
+  TEndpoint extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    any
+  >,
 >(
   primaryEndpoint: TEndpoint | null,
   logger: EndpointLogger,
   options: {
-    formOptions?: ApiFormOptions<
-      TEndpoint["TRequestOutput"]
-    >;
+    formOptions?: ApiFormOptions<TEndpoint["TRequestOutput"]>;
     mutationOptions?: ApiMutationOptions<
       TEndpoint["TRequestOutput"],
       TEndpoint["TResponseOutput"],

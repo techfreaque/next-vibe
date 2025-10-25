@@ -1,10 +1,15 @@
 export const translations = {
-  errors: {
-    validationFailed: "Request validation failed: {{error}}",
-    unsupportedMethod: "Unsupported HTTP method: {{method}}",
-    networkError: "Network error occurred: {{error}}",
-    missingUrlParam:
-      "Missing URL parameter '{{paramName}}' for endpoint {{endpoint}}",
-    urlConstructionFailed: "Failed to construct URL: {{error}}",
+  app: {
+    _layout: {
+      failedToLoadLayout: "Failed to load layout",
+    },
+    index: {
+      failedToLoadPage: "Failed to load page",
+    },
+  },
+  utils: {
+    "nextjs-compat-wrapper": {
+      failedToLoadPage: "Failed to load page",
+    },
   },
 };

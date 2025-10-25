@@ -12,10 +12,10 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { chatMessages, chatThreads } from "../../../../../db";
 import { canVoteMessage } from "../../../../../permissions/utils";
+import { validateNotIncognito } from "../../../../../validation";
 import type {
   VotePostRequestOutput,
   VotePostResponseOutput,
@@ -74,16 +74,13 @@ export const voteRepository = {
       const { message, thread } = messageWithThread;
 
       // Reject incognito threads
-      if (thread.rootFolderId === "incognito") {
-        return createErrorResponse(
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.forbidden.title" as const,
-          ErrorResponseTypes.FORBIDDEN,
-          {
-            message: simpleT(locale).t(
-              "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.forbidden.incognitoNotAllowed",
-            ),
-          },
-        );
+      const incognitoError = validateNotIncognito(
+        thread.rootFolderId,
+        locale,
+        "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post",
+      );
+      if (incognitoError) {
+        return incognitoError;
       }
 
       // Check voting permissions - simplified

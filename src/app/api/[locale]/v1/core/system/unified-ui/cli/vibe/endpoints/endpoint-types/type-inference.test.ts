@@ -414,8 +414,11 @@ type ImapStep10_ReadSubmitFormType = ImapStep7_ReadType extends {
   ? S
   : never;
 // Verify submitForm type is a function (SubmitFormFunction takes event and options)
-type ImapStep10_SubmitFormIsFunction =
-  ImapStep10_ReadSubmitFormType extends (...args: any[]) => any ? true : false;
+type ImapStep10_SubmitFormIsFunction = ImapStep10_ReadSubmitFormType extends (
+  ...args: any[]
+) => any
+  ? true
+  : false;
 type ImapStep10_SubmitFormVerify = Expect<
   Equal<ImapStep10_SubmitFormIsFunction, true>
 >;

@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import React from "react";
 
-import { cn } from "@/packages/next-vibe/shared/utils";
+import { cn } from "next-vibe/shared/utils";
 
 export const textareaVariants = cva(
   "flex w-full rounded-md text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 transition-[color,box-shadow] outline-none resize-none overflow-hidden",

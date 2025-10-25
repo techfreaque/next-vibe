@@ -1,6 +1,11 @@
 /**
  * Shared Endpoint Discovery
  * Common endpoint discovery logic used by both CLI and AI Tool systems
+ *
+ * @deprecated This file is deprecated. Use the unified discovery system instead:
+ * import { getUnifiedDiscovery } from "../discovery/unified-discovery";
+ *
+ * This file is kept for backward compatibility only.
  */
 
 import "server-only";
@@ -10,7 +15,6 @@ import path from "node:path";
 
 import type { EndpointLogger } from "../../cli/vibe/endpoints/endpoint-handler/logger";
 import type { Methods } from "../../cli/vibe/endpoints/endpoint-types/core/enums";
-
 import type {
   DiscoveredEndpointMetadata,
   EndpointDiscoveryOptions,
@@ -89,7 +93,10 @@ export class EndpointDiscoveryService {
 
         if (entry.isDirectory()) {
           // Recurse into subdirectories
-          const subEndpoints = await this.discoverInDirectory(fullPath, options);
+          const subEndpoints = await this.discoverInDirectory(
+            fullPath,
+            options,
+          );
           endpoints.push(...subEndpoints);
         } else if (entry.name === "route.ts") {
           // Found a route file, try to load endpoint metadata
@@ -168,7 +175,13 @@ export class EndpointDiscoveryService {
     try {
       // Determine which HTTP methods are available
       const availableMethods: Methods[] = [];
-      for (const method of ["GET", "POST", "PUT", "PATCH", "DELETE"] as Methods[]) {
+      for (const method of [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+      ] as Methods[]) {
         if (routeModule[method] || definition[method]) {
           availableMethods.push(method);
         }
@@ -238,6 +251,7 @@ export class EndpointDiscoveryService {
    */
   private generateEndpointId(method: Methods, apiPath: string): string {
     const pathPart = apiPath.replace(/^\/v1\//, "").replace(/\//g, "_");
+    // eslint-disable-next-line i18next/no-literal-string
     return `${method.toLowerCase()}_v1_${pathPart}`;
   }
 
@@ -270,4 +284,3 @@ export class EndpointDiscoveryService {
     this.cache.clear();
   }
 }
-

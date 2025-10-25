@@ -10,11 +10,11 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import request from "supertest";
 import type z from "zod";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import { env } from "@/config/env";
 
 import type { UserRoleValue } from "../../../../user/user-roles/enum";
-import type { InferJwtPayloadTypeFromRoles } from "../../../unified-ui/cli/vibe/endpoints/endpoint-handler/types";
 import type { UnifiedField } from "../../../unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
 import type { Methods } from "../../../unified-ui/cli/vibe/endpoints/endpoint-types/types";
 
@@ -23,16 +23,16 @@ import type { Methods } from "../../../unified-ui/cli/vibe/endpoints/endpoint-ty
  */
 
 export async function sendTestRequest<
+  TRequestOutput,
+  TResponseInput,
+  TResponseOutput,
+  TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields extends UnifiedField<z.ZodTypeAny>,
-  TRequestInput,
-  TRequestOutput,
-  TResponseInput,
-  TResponseOutput,
-  TUrlVariablesInput,
-  TUrlVariablesOutput,
+  TRequestInput = unknown,
+  TUrlVariablesInput = unknown,
 >({
   endpoint,
   data,
@@ -53,8 +53,22 @@ export async function sendTestRequest<
   >;
   data: TRequestOutput;
   urlParams: TUrlVariablesOutput;
-  user: InferJwtPayloadTypeFromRoles<TUserRoleValue>;
+  user?: JwtPayloadType;
 }): Promise<ResponseType<TResponseOutput>> {
+  // Create default user based on endpoint configuration if not provided
+  const testUser: JwtPayloadType =
+    user ??
+    (endpoint.requiresAuthentication()
+      ? {
+          isPublic: false,
+          id: "test-user-id",
+          leadId: "test-lead-id",
+        }
+      : {
+          isPublic: true,
+          leadId: "test-lead-id",
+        });
+
   try {
     const searchParams = new URLSearchParams();
     if (urlParams) {
@@ -65,7 +79,9 @@ export async function sendTestRequest<
     const url = `/${endpoint.path.join("/")}?${searchParams.toString()}`;
     // In a real implementation, we would create a session for the user
     // This is a placeholder for session creation
-    const token = user ? `test-token-${user.id}` : undefined;
+    const token = testUser.isPublic
+      ? undefined
+      : `test-token-${testUser.id}`;
     // Use a test server URL (this would be configured in a real environment)
     const testServer = env.NEXT_PUBLIC_TEST_SERVER_URL;
     const response = await request(testServer)

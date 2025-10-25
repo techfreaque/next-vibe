@@ -7,8 +7,9 @@ import "server-only";
 
 import type { z } from "zod";
 
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+
 import type { Methods } from "../../cli/vibe/endpoints/endpoint-types/core/enums";
-import type { UserRole } from "../../cli/vibe/endpoints/endpoint-types/core/types";
 
 /**
  * Discovered endpoint metadata
@@ -18,29 +19,44 @@ export interface DiscoveredEndpointMetadata {
   // Identification
   id: string; // Unique identifier (e.g., "get_v1_core_user_profile")
   name: string; // Human-readable name (e.g., "user_profile")
-  
+
   // Location
   path: string; // API path (e.g., "/v1/core/user/profile")
   routePath: string; // File system path to route.ts
   definitionPath: string; // File system path to definition.ts
-  
+
   // HTTP Method
   method: Methods;
-  
+
   // Metadata
   title: string; // Translation key for title
   description: string; // Translation key for description
   category: string; // Translation key for category
   tags: readonly string[]; // Translation keys for tags
-  
+
   // Access Control
-  allowedRoles: readonly UserRole[];
+  allowedRoles: readonly (typeof UserRoleValue)[];
   requiresAuth: boolean;
-  
+
   // Schemas
   requestSchema?: z.ZodTypeAny;
   responseSchema?: z.ZodTypeAny;
-  
+
+  // Credit cost for this endpoint (0 = free, undefined = free)
+  credits?: number;
+
+  // AI Tool metadata
+  aiTool?: {
+    instructions: string;
+    displayName: string;
+    icon: string;
+    color: string;
+    priority: number;
+  };
+
+  // CLI metadata
+  aliases?: readonly string[];
+
   // Additional metadata
   isDeprecated?: boolean;
   version?: string;
@@ -55,27 +71,29 @@ export interface IEndpointRegistry {
    * Initialize the registry by discovering all endpoints
    */
   initialize(): Promise<void>;
-  
+
   /**
    * Get all discovered endpoints
    */
   getAllEndpoints(): Promise<DiscoveredEndpointMetadata[]>;
-  
+
   /**
    * Get endpoint by ID
    */
   getEndpointById(id: string): Promise<DiscoveredEndpointMetadata | null>;
-  
+
   /**
    * Get endpoints by filter criteria
    */
-  getEndpoints(criteria: EndpointFilterCriteria): Promise<DiscoveredEndpointMetadata[]>;
-  
+  getEndpoints(
+    criteria: EndpointFilterCriteria,
+  ): Promise<DiscoveredEndpointMetadata[]>;
+
   /**
    * Check if registry is initialized
    */
   isInitialized(): boolean;
-  
+
   /**
    * Get registry statistics
    */
@@ -87,7 +105,7 @@ export interface IEndpointRegistry {
  */
 export interface EndpointFilterCriteria {
   methods?: Methods[];
-  roles?: UserRole[];
+  roles?: (typeof UserRoleValue)[];
   categories?: string[];
   tags?: string[];
   requiresAuth?: boolean;
@@ -115,4 +133,3 @@ export interface EndpointDiscoveryOptions {
   cache?: boolean;
   cacheTTL?: number;
 }
-

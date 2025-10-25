@@ -28,14 +28,7 @@ export default defineConfig({
     exclude: ["**/node_modules/**", "**/dist/**", "**/to_migrate/**"],
     coverage: {
       reporter: ["text", "json", "html"],
-      exclude: [
-        "node_modules/",
-        "dist/",
-        "to_migrate/",
-        "**/*.d.ts",
-        "**/types.ts",
-        "**/*.config.ts",
-      ],
+      exclude: ["node_modules/", ".dist/", "to_migrate/"],
     },
   },
 });

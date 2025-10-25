@@ -18,7 +18,6 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { chatFolders, chatMessages, chatThreads } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
@@ -26,6 +25,7 @@ import {
   canReadThread,
   canWriteThread,
 } from "../../../permissions/permissions";
+import { validateNotIncognito } from "../../../validation";
 import type {
   MessageCreateRequestOutput,
   MessageCreateResponseOutput,
@@ -86,16 +86,13 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
       }
 
       // Reject incognito threads - they should never be accessed on server
-      if (thread.rootFolderId === "incognito") {
-        return createErrorResponse(
-          "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.forbidden.title" as const,
-          ErrorResponseTypes.FORBIDDEN,
-          {
-            message: simpleT(locale).t(
-              "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.forbidden.incognitoNotAllowed",
-            ),
-          },
-        );
+      const incognitoError = validateNotIncognito(
+        thread.rootFolderId,
+        locale,
+        "app.api.v1.core.agent.chat.threads.threadId.messages.get",
+      );
+      if (incognitoError) {
+        return incognitoError;
       }
 
       // Get folder for permission check
@@ -202,16 +199,13 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
       }
 
       // Reject incognito threads - they should never be accessed on server
-      if (thread.rootFolderId === "incognito") {
-        return createErrorResponse(
-          "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,
-          ErrorResponseTypes.FORBIDDEN,
-          {
-            message: simpleT(locale).t(
-              "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.forbidden.incognitoNotAllowed",
-            ),
-          },
-        );
+      const incognitoError = validateNotIncognito(
+        thread.rootFolderId,
+        locale,
+        "app.api.v1.core.agent.chat.threads.threadId.messages.post",
+      );
+      if (incognitoError) {
+        return incognitoError;
       }
 
       // Get folder for permission check

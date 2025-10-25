@@ -1,8 +1,7 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import React from "react";
-
-import { cn } from "@/packages/next-vibe/shared/utils";
 
 interface TitleProps {
   children: React.ReactNode;

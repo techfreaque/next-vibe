@@ -1,10 +1,17 @@
-export const translations = {
-  errors: {
-    validationFailed: "Walidacja żądania nie powiodła się: {{error}}",
-    unsupportedMethod: "Nieobsługiwana metoda HTTP: {{method}}",
-    networkError: "Wystąpił błąd sieci: {{error}}",
-    missingUrlParam:
-      "Brak parametru URL '{{paramName}}' dla endpointu {{endpoint}}",
-    urlConstructionFailed: "Konstrukcja URL nie powiodła się: {{error}}",
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  app: {
+    _layout: {
+      failedToLoadLayout: "Nie udało się załadować układu",
+    },
+    index: {
+      failedToLoadPage: "Nie udało się załadować strony",
+    },
+  },
+  utils: {
+    "nextjs-compat-wrapper": {
+      failedToLoadPage: "Nie udało się załadować strony",
+    },
   },
 };

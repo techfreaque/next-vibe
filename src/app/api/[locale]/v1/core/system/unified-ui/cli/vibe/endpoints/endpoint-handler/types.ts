@@ -34,13 +34,13 @@
  */
 
 import type { NextRequest, NextResponse } from "next/server";
-import type { SmsFunctionType } from "@/app/api/[locale]/v1/core/sms/utils";
 import type {
   ResponseType,
   StreamingResponse,
 } from "next-vibe/shared/types/response.schema";
 
 import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
+import type { SmsFunctionType } from "@/app/api/[locale]/v1/core/sms/utils";
 import type {
   UserRole,
   UserRoleValue,
@@ -83,13 +83,12 @@ export type InferJwtPayloadType<TUserRoleValue extends typeof UserRoleValue> =
  * - If TRoles[number] includes "PUBLIC" (check with Extract) → JwtPayloadType (mixed)
  * - Otherwise → JwtPrivatePayloadType (no PUBLIC, guaranteed authenticated)
  */
-export type InferJwtPayloadTypeFromRoles<
-  TRoles extends readonly string[],
-> = Exclude<TRoles[number], "PUBLIC"> extends never
-  ? JWTPublicPayloadType
-  : Extract<TRoles[number], "PUBLIC"> extends never
-    ? JwtPrivatePayloadType
-    : JwtPayloadType;
+export type InferJwtPayloadTypeFromRoles<TRoles extends readonly string[]> =
+  Exclude<TRoles[number], "PUBLIC"> extends never
+    ? JWTPublicPayloadType
+    : Extract<TRoles[number], "PUBLIC"> extends never
+      ? JwtPrivatePayloadType
+      : JwtPayloadType;
 
 /**
  * Extract methods that exist in the definitions object

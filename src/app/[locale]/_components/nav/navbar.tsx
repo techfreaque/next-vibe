@@ -16,7 +16,7 @@ import type { JSX } from "react";
 import type { StandardUserType } from "@/app/api/[locale]/v1/core/user/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { cn } from "@/packages/next-vibe/shared";
+import { cn } from "next-vibe/shared/utils";
 
 import CountrySelector from "../country-selector";
 import { AuthButtons, MobileAuthButtons } from "./auth-buttons";

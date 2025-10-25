@@ -1,10 +1,10 @@
-import { translations as aiStreamTranslations } from "../../ai-stream/i18n/en";
-import { translations as creditsTranslations } from "../../credits/i18n/en";
+import { translations as creditsTranslations } from "../../../../credits/i18n/en";
+import { translations as aiStreamTranslations } from "../../../ai-stream/i18n/en";
+import { translations as braveSearchTranslations } from "../../../brave-search/i18n/en";
 import { translations as foldersTranslations } from "../../folders/i18n/en";
 import { translations as personasTranslations } from "../../personas/i18n/en";
 import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/en";
 import { translations as threadsTranslations } from "../../threads/i18n/en";
-import { translations as braveSearchTranslations } from "../../tools/brave-search/i18n/en";
 
 export const translations = {
   category: "Chat",

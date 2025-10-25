@@ -12,6 +12,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { aiToolConfig } from "./config";
+import { AI_TOOL_CONSTANTS } from "./constants";
 import type {
   AIToolMetadata,
   CoreTool,
@@ -28,17 +29,13 @@ export class ToolConverter implements IToolConverter {
   /**
    * Convert endpoint to AI tool metadata
    */
-  async convert(
+  convert(
     endpoint: DiscoveredEndpoint,
     options: ToolConverterOptions = {},
-  ): Promise<AIToolMetadata> {
+  ): AIToolMetadata {
     const defaultLocale: CountryLanguage = "en-GLOBAL";
     const locale = options.locale || defaultLocale;
-    const description = await this.generateDescription(
-      endpoint,
-      locale,
-      options,
-    );
+    const description = this.generateDescription(endpoint, locale, options);
 
     // Extract request schema for parameters
     const parameters = this.extractParameters(endpoint);
@@ -49,11 +46,21 @@ export class ToolConverter implements IToolConverter {
     // Get tags from definition
     const tags = this.extractTags(endpoint);
 
+    // Generate display name from title or path
+    const displayName = this.generateDisplayName(endpoint, locale);
+
+    // Extract icon and cost from definition metadata
+    const icon = endpoint.definition.aiTool?.icon;
+    const cost = endpoint.definition.credits ?? 0;
+
     const metadata: AIToolMetadata = {
       name: endpoint.toolName,
+      displayName,
       description,
+      icon,
       category,
       tags,
+      cost,
       endpointId: endpoint.id,
       allowedRoles: endpoint.allowedRoles,
       isManualTool: false,
@@ -66,18 +73,16 @@ export class ToolConverter implements IToolConverter {
   /**
    * Convert endpoint to AI SDK CoreTool
    */
-  async convertToAISDKTool(
+  convertToAISDKTool(
     endpoint: DiscoveredEndpoint,
-    executor: (params: Record<string, ToolParameterValue>) => Promise<ToolParameterValue>,
+    executor: (
+      params: Record<string, ToolParameterValue>,
+    ) => Promise<ToolParameterValue>,
     options: ToolConverterOptions = {},
-  ): Promise<CoreTool> {
+  ): CoreTool {
     const defaultLocale: CountryLanguage = "en-GLOBAL";
     const locale = options.locale || defaultLocale;
-    const description = await this.generateDescription(
-      endpoint,
-      locale,
-      options,
-    );
+    const description = this.generateDescription(endpoint, locale, options);
 
     // Extract request schema for parameters
     const parameters = this.extractParameters(endpoint);
@@ -94,13 +99,45 @@ export class ToolConverter implements IToolConverter {
   }
 
   /**
+   * Generate display name from endpoint
+   */
+  generateDisplayName(
+    endpoint: DiscoveredEndpoint,
+    locale: CountryLanguage,
+  ): string {
+    const { t } = simpleT(locale);
+    const { definition } = endpoint;
+
+    // Try to get translated title
+    let displayName = "";
+
+    try {
+      if (definition.aiTool?.displayName) {
+        displayName = definition.ai - tool.displayName;
+      } else if (definition.title) {
+        displayName = t(definition.title);
+      }
+    } catch {
+      // Translation failed, use key as fallback
+      displayName = definition.aiTool?.displayName || definition.title || "";
+    }
+
+    // If still empty, generate from path
+    if (!displayName) {
+      displayName = this.generateDisplayNameFromPath([...endpoint.path]);
+    }
+
+    return displayName;
+  }
+
+  /**
    * Generate tool description from endpoint
    */
-  async generateDescription(
+  generateDescription(
     endpoint: DiscoveredEndpoint,
     locale: CountryLanguage,
     options: ToolConverterOptions = {},
-  ): Promise<string> {
+  ): string {
     const { t } = simpleT(locale);
     const { definition } = endpoint;
 
@@ -125,10 +162,9 @@ export class ToolConverter implements IToolConverter {
 
     // Add examples if configured
     if (options.includeExamples && definition.examples) {
-      const exampleDesc = this.generateExampleDescription(endpoint, locale);
+      const exampleDesc = this.generateExampleDescription(endpoint);
       if (exampleDesc) {
-        const examplePrefix = "\n\nExample: ";
-        description += examplePrefix + exampleDesc;
+        description += AI_TOOL_CONSTANTS.converter.examplePrefix + exampleDesc;
       }
     }
 
@@ -147,19 +183,22 @@ export class ToolConverter implements IToolConverter {
     const { prefix, separator } = aiToolConfig.naming;
 
     // Remove version and core segments
-    const versionSegments = ["v1", "v2", "core"];
+    const versionSegments = AI_TOOL_CONSTANTS.converter.versionSegments;
     const filteredSegments = path.filter(
-      (segment) => !versionSegments.includes(segment),
+      (segment) => !(versionSegments as readonly string[]).includes(segment),
     );
 
     // Convert to snake_case
     const specialCharsRegex = /[^a-zA-Z0-9]+/g;
     const camelCaseRegex = /([a-z])([A-Z])/g;
+    const underscore = AI_TOOL_CONSTANTS.converter.underscore;
+    const dollarOne = AI_TOOL_CONSTANTS.converter.dollarOne;
+    const dollarTwo = AI_TOOL_CONSTANTS.converter.dollarTwo;
     const name = filteredSegments
       .map((segment) =>
         segment
-          .replace(specialCharsRegex, "_")
-          .replace(camelCaseRegex, "$1_$2")
+          .replace(specialCharsRegex, underscore)
+          .replace(camelCaseRegex, `${dollarOne}${underscore}${dollarTwo}`)
           .toLowerCase(),
       )
       .join(separator);
@@ -222,24 +261,61 @@ export class ToolConverter implements IToolConverter {
   }
 
   /**
-   * Generate description from path segments
+   * Generate display name from path segments
    */
-  private generateDescriptionFromPath(path: string[]): string {
+  private generateDisplayNameFromPath(path: string[]): string {
+    const versionSegments = AI_TOOL_CONSTANTS.converter.versionSegments;
     const filteredPath = path.filter(
-      (seg) => !["v1", "v2", "core"].includes(seg),
+      (seg) => !(versionSegments as readonly string[]).includes(seg),
     );
 
-    // Convert path to readable description
+    // Convert path to readable title case
+
+    const space = " ";
+    // eslint-disable-next-line i18next/no-literal-string
+    const dollarOne = "$1";
+    // eslint-disable-next-line i18next/no-literal-string
+    const dollarTwo = "$2";
     const readable = filteredPath
       .map((seg) =>
         seg
-          .replace(/[^a-zA-Z0-9]+/g, " ")
-          .replace(/([a-z])([A-Z])/g, "$1 $2")
+          .replace(/[^a-zA-Z0-9]+/g, space)
+          .replace(/([a-z])([A-Z])/g, `${dollarOne} ${dollarTwo}`)
+          .split(space)
+          .map(
+            (word) =>
+              word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+          )
+          .join(space),
+      )
+      .join(space);
+
+    return readable;
+  }
+
+  /**
+   * Generate description from path segments
+   */
+  private generateDescriptionFromPath(path: string[]): string {
+    const versionSegments = AI_TOOL_CONSTANTS.converter.versionSegments;
+    const filteredPath = path.filter(
+      (seg) => !(versionSegments as readonly string[]).includes(seg),
+    );
+
+    // Convert path to readable description
+    const space = AI_TOOL_CONSTANTS.converter.space;
+    const dollarOne = AI_TOOL_CONSTANTS.converter.dollarOne;
+    const dollarTwo = AI_TOOL_CONSTANTS.converter.dollarTwo;
+    const readable = filteredPath
+      .map((seg) =>
+        seg
+          .replace(/[^a-zA-Z0-9]+/g, space)
+          .replace(/([a-z])([A-Z])/g, `${dollarOne}${space}${dollarTwo}`)
           .toLowerCase(),
       )
-      .join(" ");
+      .join(space);
 
-    return `Endpoint for ${readable}`;
+    return `${AI_TOOL_CONSTANTS.converter.endpointForPrefix}${readable}`;
   }
 
   /**
@@ -247,7 +323,6 @@ export class ToolConverter implements IToolConverter {
    */
   private generateExampleDescription(
     endpoint: DiscoveredEndpoint,
-    locale: CountryLanguage,
   ): string | null {
     const { definition } = endpoint;
 
@@ -279,10 +354,7 @@ export class ToolConverter implements IToolConverter {
   /**
    * Enhance schema with AI-friendly descriptions
    */
-  private enhanceSchemaDescriptions(
-    schema: z.ZodTypeAny,
-    locale: CountryLanguage,
-  ): z.ZodTypeAny {
+  private enhanceSchemaDescriptions(schema: z.ZodTypeAny): z.ZodTypeAny {
     // This is a placeholder for future enhancement
     // Could add more detailed descriptions to schema fields
     return schema;

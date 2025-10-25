@@ -1,5 +1,6 @@
 /**
  * Type extensions for Node.js internal APIs
+ * @types/node is already installed, so we only extend what's needed
  */
 
 declare global {
@@ -75,6 +76,10 @@ declare module "node:fs" {
 
 declare module "node:path" {
   export * from "path";
+}
+
+declare module "node:crypto" {
+  export * from "crypto";
 }
 
 export {};

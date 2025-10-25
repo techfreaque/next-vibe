@@ -112,6 +112,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         rows,
         config,
         domainRepository,
+        logger,
       );
 
       // Update batch with final results
@@ -377,6 +378,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         batchRows,
         config,
         domainRepository,
+        logger,
       );
 
       // Update job progress
@@ -459,6 +461,7 @@ export class ImportRepositoryImpl implements ImportRepository {
     rows: Record<string, string>[],
     config: CsvImportConfig,
     domainRepository: DomainImportRepository<T>,
+    logger: EndpointLogger,
   ): Promise<{
     successfulImports: number;
     failedImports: number;
@@ -498,7 +501,10 @@ export class ImportRepositoryImpl implements ImportRepository {
 
         // Check for duplicates if needed
         if (config.skipDuplicates) {
-          const exists = await domainRepository.recordExistsByEmail(row.email);
+          const exists = await domainRepository.recordExistsByEmail(
+            row.email,
+            logger,
+          );
           if (exists) {
             duplicateEmails++;
             skippedDuplicates++;
@@ -510,6 +516,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         const result = await domainRepository.createOrUpdateRecord(
           validation.data as T,
           config,
+          logger,
         );
 
         if (result.success) {
@@ -601,7 +608,7 @@ export class ImportRepositoryImpl implements ImportRepository {
           currentBatchStart: job.currentBatchStart,
           batchSize: job.batchSize,
           percentComplete:
-            job.totalRows > 0
+            job.totalRows !== null && job.totalRows > 0
               ? Math.round((job.processedRows / job.totalRows) * 100)
               : 0,
         },

@@ -9,6 +9,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
+import { validateNoCircularReference } from "@/app/api/[locale]/v1/core/agent/chat/validation";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 
@@ -96,11 +97,13 @@ export async function updateFolder(
     }
 
     // Prevent circular parent references
-    if (updates.parentId === id) {
-      return createErrorResponse(
-        "app.api.v1.core.agent.chat.folders.id.patch.errors.validation.title",
-        ErrorResponseTypes.VALIDATION_ERROR,
-      );
+    const circularError = validateNoCircularReference(
+      id,
+      updates.parentId,
+      "app.api.v1.core.agent.chat.folders.id.patch",
+    );
+    if (circularError) {
+      return circularError;
     }
 
     // Update the folder

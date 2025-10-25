@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { Environment } from "next-vibe/shared/utils/env-util";
 import {
   Button,
   Card,
@@ -23,7 +24,6 @@ import { useResetPasswordConfirm } from "@/app/api/[locale]/v1/core/user/public/
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { Environment } from "@/packages/next-vibe/shared";
 
 import { PasswordStrengthIndicator } from "../../../../_components/password-strength-indicator";
 

@@ -110,28 +110,28 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer {
     if (typeof value === "number") {
       if (value === 0) {
         // eslint-disable-next-line i18next/no-literal-string
-        return context.useColors ? "⚪ " : "○ ";
+        return context.options.useColors ? "⚪ " : "○ ";
       }
       if (value > 0) {
         // eslint-disable-next-line i18next/no-literal-string
-        return context.useColors ? "🟢 " : "● ";
+        return context.options.useColors ? "🟢 " : "● ";
       }
       // eslint-disable-next-line i18next/no-literal-string
-      return context.useColors ? "🔴 " : "● ";
+      return context.options.useColors ? "🔴 " : "● ";
     }
 
     if (Array.isArray(value)) {
       // eslint-disable-next-line i18next/no-literal-string
-      return context.useColors ? "📋 " : "□ ";
+      return context.options.useColors ? "📋 " : "□ ";
     }
 
     if (typeof value === "object" && value !== null) {
       // eslint-disable-next-line i18next/no-literal-string
-      return context.useColors ? "📊 " : "■ ";
+      return context.options.useColors ? "📊 " : "■ ";
     }
 
     // eslint-disable-next-line i18next/no-literal-string
-    return context.useColors ? "ℹ️ " : "i ";
+    return context.options.useColors ? "ℹ️ " : "i ";
   }
 
   private getMetricConfig(field: ResponseFieldMetadata): MetricConfig {

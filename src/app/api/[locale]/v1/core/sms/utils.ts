@@ -9,8 +9,11 @@ import type {
   ErrorResponseType,
   ResponseType,
   SuccessResponseType,
-} from "@/packages/next-vibe/shared/types/response.schema";
+} from "next-vibe/shared/types/response.schema";
 import { env } from "@/config/env";
+
+// Re-export enum from separate file to avoid circular dependency
+export { SmsProviders } from "./utils-enum";
 
 /**
  * SendSmsParams defines the parameters needed to send an SMS
@@ -111,14 +114,6 @@ export interface SmsProvider {
     valid: boolean;
     reason?: string;
   };
-}
-
-export enum SmsProviders {
-  TWILIO = "twilio",
-  AWS = "aws",
-  AWS_SNS = "aws-sns",
-  MESSAGEBIRD = "messagebird",
-  HTTP = "http",
 }
 
 /**

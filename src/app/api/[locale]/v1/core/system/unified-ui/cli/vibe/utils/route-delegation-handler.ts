@@ -19,6 +19,16 @@ import { modularCLIResponseRenderer } from "../endpoints/renderers/cli-ui/modula
 import { responseMetadataExtractor } from "../endpoints/renderers/cli-ui/response-metadata-extractor";
 import { schemaUIHandler } from "../endpoints/renderers/cli-ui/schema-ui-handler";
 
+const ALL_HTTP_METHODS = [
+  "POST",
+  "GET",
+  "PUT",
+  "PATCH",
+  "DELETE",
+  "HEAD",
+  "OPTIONS",
+] as const;
+
 // CLI user type - simplified for CLI context
 interface CliUserType {
   isPublic: boolean;

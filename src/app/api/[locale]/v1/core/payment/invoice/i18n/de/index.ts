@@ -1,6 +1,10 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  defaultItem: "Rechnungsposition",
+  success: {
+    created: "Rechnung erfolgreich erstellt",
+  },
   post: {
     title: "Titel",
     description: "Endpunkt-Beschreibung",

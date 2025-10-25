@@ -8,6 +8,14 @@ export const translations = {
     transaction: "transaction",
   },
 
+  success: {
+    created: "Refund processed successfully",
+  },
+
+  reason: {
+    requestedByCustomer: "Requested by customer",
+  },
+
   form: {
     title: "Refund Form",
     description: "Enter refund details",

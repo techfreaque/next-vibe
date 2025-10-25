@@ -14,13 +14,13 @@ import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useMemo, useState } from "react";
 import type { z } from "zod";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { useTranslation } from "@/i18n/core/client";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import type { UnifiedField } from "../../../cli/vibe/endpoints/endpoint-types/core/types";
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { AnyData, ApiStore, MutationStoreType } from "../store";
 import { useApiStore } from "../store";
 import type { ApiMutationOptions } from "../types";
@@ -113,8 +113,12 @@ export type EnhancedMutationResult<TResponse, TRequest, TUrlVariables> = Omit<
  * @returns Mutation result
  */
 export function useApiMutation<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TEndpoint extends CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>,
+  TEndpoint extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    any
+  >,
 >(
   endpoint: TEndpoint,
   logger: EndpointLogger,

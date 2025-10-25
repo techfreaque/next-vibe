@@ -2,6 +2,8 @@
 
 import { Edit, ExternalLink, Eye } from "lucide-react";
 import Link from "next/link";
+import { LeadStatus, type LeadStatusValues } from "next-vibe/leads/enum";
+import type { LeadListGetResponseTypeOutput } from "next-vibe/leads/list/definition";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import {
@@ -15,11 +17,6 @@ import {
 import type React from "react";
 import { useCallback } from "react";
 
-import {
-  LeadStatus,
-  type LeadStatusValues,
-} from "@/app/api/[locale]/v1/core/leads/enum";
-import type { LeadListGetResponseTypeOutput } from "@/app/api/[locale]/v1/core/leads/list/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";

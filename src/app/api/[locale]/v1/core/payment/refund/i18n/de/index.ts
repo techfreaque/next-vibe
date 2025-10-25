@@ -10,6 +10,14 @@ export const translations: typeof enTranslations = {
     transaction: "transaktion",
   },
 
+  success: {
+    created: "Rückerstattung erfolgreich verarbeitet",
+  },
+
+  reason: {
+    requestedByCustomer: "Vom Kunden angefordert",
+  },
+
   form: {
     title: "Rückerstattungsformular",
     description: "Rückerstattungsdetails eingeben",

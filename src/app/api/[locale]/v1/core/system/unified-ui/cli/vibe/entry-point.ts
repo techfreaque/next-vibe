@@ -7,13 +7,13 @@
  */
 
 import * as fs from "fs";
-import { parseError } from "next-vibe/shared/utils";
 import * as path from "path";
 
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "./endpoints/endpoint-handler/logger";
 import { helpHandler } from "./endpoints/renderers/cli-ui/help-handler";

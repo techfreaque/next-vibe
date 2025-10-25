@@ -10,7 +10,7 @@ import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
 import { useTranslation } from "@/i18n/core/client";
-import { cn } from "@/packages/next-vibe/shared/utils";
+import { cn } from "next-vibe/shared/utils";
 
 // Constants for non-translatable values
 const DECORATIVE_QUOTE = String.fromCharCode(0x201c); // Left double quotation mark

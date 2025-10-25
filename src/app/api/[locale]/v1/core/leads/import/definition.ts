@@ -487,7 +487,7 @@ export interface ImportJobUpdateResponseType {
   id: string;
   fileName: string;
   status: (typeof CsvImportJobStatus)[keyof typeof CsvImportJobStatus];
-  totalRows: number;
+  totalRows: number | null;
   processedRows: number;
   successfulImports: number;
   failedImports: number;

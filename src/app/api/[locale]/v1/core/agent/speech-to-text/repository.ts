@@ -18,8 +18,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "../../user/auth/definition";
-import { creditRepository } from "../chat/credits/repository";
 import { FEATURE_COSTS } from "../chat/model-access/costs";
+import { deductCredits } from "../shared/credit-deduction";
 import type {
   SpeechToTextPostRequestOutput,
   SpeechToTextPostResponseOutput,
@@ -165,64 +165,12 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
       });
 
       // Deduct credits AFTER successful completion
-      const sttCost = FEATURE_COSTS.STT;
-      if (sttCost > 0) {
-        const creditMessageId = crypto.randomUUID();
-
-        // Determine correct credit identifier based on user type
-        let creditIdentifier: { userId?: string; leadId?: string };
-        if (!user.isPublic && user.id && user.leadId) {
-          const identifierResult = await creditRepository.getCreditIdentifier(
-            user.id,
-            user.leadId,
-            logger,
-          );
-
-          if (identifierResult.success && identifierResult.data) {
-            if (identifierResult.data.creditType === "USER_SUBSCRIPTION") {
-              // User has subscription - deduct from user credits
-              creditIdentifier = { userId: user.id };
-            } else {
-              // User has no subscription - deduct from lead credits
-              creditIdentifier = { leadId: user.leadId };
-            }
-          } else {
-            // Fallback to lead credits if we can't determine subscription status
-            creditIdentifier = { leadId: user.leadId };
-          }
-        } else if (user.leadId) {
-          creditIdentifier = { leadId: user.leadId };
-        } else {
-          logger.error("No userId or leadId available for credit deduction");
-          return createErrorResponse(
-            "app.api.v1.core.agent.speechToText.post.errors.transcriptionFailed",
-            ErrorResponseTypes.INTERNAL_ERROR,
-          );
-        }
-
-        const deductResult = await creditRepository.deductCredits(
-          creditIdentifier,
-          sttCost,
-          "stt", // Use "stt" as the model ID
-          creditMessageId,
-        );
-
-        if (!deductResult.success) {
-          logger.error("Failed to deduct credits for STT", {
-            userId: user.isPublic ? undefined : user.id,
-            leadId: user.leadId,
-            cost: sttCost,
-          });
-        } else {
-          logger.info("Credits deducted successfully for STT", {
-            userId: user.isPublic ? undefined : user.id,
-            leadId: user.leadId,
-            cost: sttCost,
-            messageId: creditMessageId,
-            creditIdentifier,
-          });
-        }
-      }
+      await deductCredits({
+        user,
+        cost: FEATURE_COSTS.STT,
+        feature: "stt",
+        logger,
+      });
 
       return createSuccessResponse({
         response: {

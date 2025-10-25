@@ -56,11 +56,53 @@ interface ThreadMetadata {
 }
 
 /**
+ * Tool call result type
+ */
+export type ToolCallResult =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: ToolCallResult }
+  | ToolCallResult[];
+
+/**
+ * Widget metadata for tool result rendering
+ */
+export interface ToolCallWidgetMetadata {
+  endpointId: string;
+  responseFields: Array<{
+    name: string;
+    widgetType: string;
+    label?: string;
+    description?: string;
+    layout?: Record<string, string | number | boolean>;
+    validation?: Record<string, string | number | boolean>;
+    options?: Array<{ value: string; label: string }>;
+  }>;
+}
+
+/**
  * Tool call information
  */
 export interface ToolCall {
   toolName: string;
+  displayName: string;
+  icon?: string;
   args: Record<string, string | number | boolean | null>;
+  result?: ToolCallResult;
+  error?: string;
+  executionTime?: number;
+  widgetMetadata?: ToolCallWidgetMetadata;
+  creditsUsed?: number;
+}
+
+/**
+ * Tool cost information
+ */
+export interface ToolCost {
+  toolName: string;
+  credits: number;
 }
 
 /**
@@ -74,6 +116,7 @@ export interface MessageMetadata {
   finishReason?: string;
   streamingTime?: number;
   toolCalls?: ToolCall[];
+  toolCosts?: ToolCost[];
   attachments?: {
     id: string;
     type: string;

@@ -17,7 +17,13 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
 import { withTransaction } from "@/app/api/[locale]/v1/core/system/db/utils/repository-helpers";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
+import {
+  convertCountryFilter,
+  convertLanguageFilter,
+  type Countries,
+  type CountryLanguage,
+  type Languages,
+} from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import { newsletterSubscriptions } from "../newsletter/db";
@@ -1867,26 +1873,36 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       // Handle country filters (can be array)
       if (country && Array.isArray(country) && country.length > 0) {
-        const countryCondition = or(
-          ...country.map((c: CountryFilter) => eq(leads.country, c)),
-        );
-        if (countryCondition) {
-          conditions.push(countryCondition);
+        const mappedCountries = country
+          .map((filter: CountryFilter) => convertCountryFilter(filter))
+          .filter((c): c is NonNullable<Countries> => c !== null);
+        if (mappedCountries.length > 0) {
+          conditions.push(
+            or(...mappedCountries.map((c) => eq(leads.country, c)))!,
+          );
         }
       } else if (country && !Array.isArray(country)) {
-        conditions.push(eq(leads.country, country));
+        const dbCountry = convertCountryFilter(country);
+        if (dbCountry !== null) {
+          conditions.push(eq(leads.country, dbCountry));
+        }
       }
 
       // Handle language filters (can be array)
       if (language && Array.isArray(language) && language.length > 0) {
-        const languageCondition = or(
-          ...language.map((l: LanguageFilter) => eq(leads.language, l)),
-        );
-        if (languageCondition) {
-          conditions.push(languageCondition);
+        const mappedLanguages = language
+          .map((filter: LanguageFilter) => convertLanguageFilter(filter))
+          .filter((l): l is NonNullable<Languages> => l !== null);
+        if (mappedLanguages.length > 0) {
+          conditions.push(
+            or(...mappedLanguages.map((l) => eq(leads.language, l)))!,
+          );
         }
       } else if (language && !Array.isArray(language)) {
-        conditions.push(eq(leads.language, language));
+        const dbLanguage = convertLanguageFilter(language);
+        if (dbLanguage !== null) {
+          conditions.push(eq(leads.language, dbLanguage));
+        }
       }
 
       if (search) {
@@ -2228,26 +2244,36 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       // Handle country filters (can be array)
       if (country && Array.isArray(country) && country.length > 0) {
-        const countryCondition = or(
-          ...country.map((c: CountryFilter) => eq(leads.country, c)),
-        );
-        if (countryCondition) {
-          conditions.push(countryCondition);
+        const mappedCountries = country
+          .map((filter: CountryFilter) => convertCountryFilter(filter))
+          .filter((c): c is NonNullable<Countries> => c !== null);
+        if (mappedCountries.length > 0) {
+          conditions.push(
+            or(...mappedCountries.map((c) => eq(leads.country, c)))!,
+          );
         }
       } else if (country && !Array.isArray(country)) {
-        conditions.push(eq(leads.country, country));
+        const dbCountry = convertCountryFilter(country);
+        if (dbCountry !== null) {
+          conditions.push(eq(leads.country, dbCountry));
+        }
       }
 
       // Handle language filters (can be array)
       if (language && Array.isArray(language) && language.length > 0) {
-        const languageCondition = or(
-          ...language.map((l: LanguageFilter) => eq(leads.language, l)),
-        );
-        if (languageCondition) {
-          conditions.push(languageCondition);
+        const mappedLanguages = language
+          .map((filter: LanguageFilter) => convertLanguageFilter(filter))
+          .filter((l): l is NonNullable<Languages> => l !== null);
+        if (mappedLanguages.length > 0) {
+          conditions.push(
+            or(...mappedLanguages.map((l) => eq(leads.language, l)))!,
+          );
         }
       } else if (language && !Array.isArray(language)) {
-        conditions.push(eq(leads.language, language));
+        const dbLanguage = convertLanguageFilter(language);
+        if (dbLanguage !== null) {
+          conditions.push(eq(leads.language, dbLanguage));
+        }
       }
 
       const whereClause =

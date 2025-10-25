@@ -152,7 +152,7 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
         cwd: options.cwd || process.cwd(),
         stdio: options.verbose ? "inherit" : "pipe",
         shell: false,
-        // eslint-disable-next-line node/no-process-env
+
         env: { ...process.env, NODE_ENV: "development" },
       });
 

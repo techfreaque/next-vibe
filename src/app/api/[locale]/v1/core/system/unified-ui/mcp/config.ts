@@ -1,34 +1,35 @@
 /**
  * MCP Server Configuration
+ *
+ * @deprecated This file is deprecated. Use the unified platform configuration instead:
+ * import { MCP_CONFIG, getPlatformConfig, Platform } from "../shared/config/platform-config";
+ *
+ * This file is kept for backward compatibility only.
  */
 
 import "server-only";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { MCP_CONFIG } from "../shared/config/platform-config";
 import type { MCPServerConfig } from "./types";
 
 /**
  * MCP Server Configuration
+ * @deprecated Use MCP_CONFIG from unified platform instead
  */
 export const mcpConfig: MCPServerConfig = {
   name: "Vibe MCP Server",
   version: "1.0.0",
   locale: (process.env.VIBE_LOCALE as CountryLanguage) || "en-GLOBAL",
   debug: process.env.DEBUG === "true" || process.env.VIBE_LOG_LEVEL === "debug",
-  capabilities: {
+  capabilities: (MCP_CONFIG.platformSpecific as any)?.capabilities || {
     tools: true,
-    prompts: false, // Future
-    resources: false, // Future
+    prompts: false,
+    resources: false,
   },
-  rootDir: process.env.VIBE_API_ROOT_DIR || process.cwd(),
-  excludePaths: [
-    "**/node_modules/**",
-    "**/.next/**",
-    "**/dist/**",
-    "**/*.test.ts",
-    "**/*.spec.ts",
-  ],
+  rootDir: MCP_CONFIG.rootDir,
+  excludePaths: MCP_CONFIG.excludePaths,
 };
 
 /**

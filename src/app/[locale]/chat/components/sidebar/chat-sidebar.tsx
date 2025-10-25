@@ -32,7 +32,7 @@ import type { JSX } from "react";
 import React, { useEffect, useRef, useState } from "react";
 
 import { DEFAULT_FOLDER_IDS } from "@/app/api/[locale]/v1/core/agent/chat/config";
-import { useCredits } from "@/app/api/[locale]/v1/core/agent/chat/credits/hooks";
+import { useCredits } from "@/app/api/[locale]/v1/core/credits/hooks";
 import type {
   FolderUpdate,
   UseChatReturn,

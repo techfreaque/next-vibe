@@ -1,12 +1,6 @@
 "use client";
 
-import type { FC } from "react";
-import { useCallback, useState } from "react";
-
-import { useTranslation } from "@/i18n/core/client";
-import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
-import { getUniqueLanguages } from "@/i18n/core/language-utils";
-import { cn } from "@/packages/next-vibe/shared";
+import { cn } from "next-vibe/shared/utils";
 import { Div, Span } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import {
@@ -16,6 +10,12 @@ import {
 } from "next-vibe-ui/ui/dropdown-menu";
 import { Check } from "next-vibe-ui/ui/icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
+import type { FC } from "react";
+import { useCallback, useState } from "react";
+
+import { useTranslation } from "@/i18n/core/client";
+import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
+import { getUniqueLanguages } from "@/i18n/core/language-utils";
 
 interface CountrySelectorProps {
   isNavBar?: boolean;

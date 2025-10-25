@@ -1,4 +1,3 @@
-/* eslint-disable i18next/no-literal-string */
 /* eslint-disable no-console */
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
@@ -31,7 +30,7 @@ export function createEndpointLogger(
   };
 
   const formatMessage = (level: string, message: TranslationKey): string => {
-    return `[${getElapsedTime()}] [vibe][${level}] ${t(message)}`;
+    return `[${getElapsedTime()}] ${t(message)}`;
   };
 
   return {

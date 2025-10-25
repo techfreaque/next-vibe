@@ -6,6 +6,7 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 
 import type {
   CsvImportConfig,
@@ -35,6 +36,7 @@ export interface ImportRepository {
     config: CsvImportConfig,
     uploadedBy: DbId,
     domainRepository: DomainImportRepository<T>,
+    logger: EndpointLogger,
   ): Promise<ResponseType<LeadsImportResponseOutput>>;
 
   /**
@@ -44,6 +46,7 @@ export interface ImportRepository {
     config: CsvImportConfig,
     uploadedBy: DbId,
     domainName: string,
+    logger: EndpointLogger,
   ): Promise<ResponseType<LeadsImportResponseOutput>>;
 
   /**
@@ -52,6 +55,7 @@ export interface ImportRepository {
   getCsvImportJobStatus(
     jobId: string,
     userId: DbId,
+    logger: EndpointLogger,
   ): Promise<ResponseType<ImportJobsListResponseType[0]>>;
 
   /**
@@ -60,6 +64,7 @@ export interface ImportRepository {
   deleteImportJob(
     userId: DbId,
     jobId: string,
+    logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean; message: string }>>;
 
   /**
@@ -69,6 +74,7 @@ export interface ImportRepository {
     userId: DbId,
     jobId: string,
     action: "stop" | "retry",
+    logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean; message: string }>>;
 
   /**
@@ -77,5 +83,6 @@ export interface ImportRepository {
   processBatch<T extends DomainRecord>(
     jobId: string,
     domainRepository: DomainImportRepository<T>,
+    logger: EndpointLogger,
   ): Promise<ResponseType<{ processed: number; hasMore: boolean }>>;
 }

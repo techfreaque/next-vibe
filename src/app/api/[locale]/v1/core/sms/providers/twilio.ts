@@ -1,10 +1,11 @@
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type { ResponseType } from "@/packages/next-vibe/shared/types/response.schema";
+import { env } from "@/config/env";
 import {
   createErrorResponse,
   ErrorResponseTypes,
-} from "@/packages/next-vibe/shared/types/response.schema";
-import { env } from "@/config/env";
+  type ResponseType,
+} from "next-vibe/shared/types/response.schema";
+
 import type { SendSmsParams, SmsProvider, SmsResult } from "../utils";
 import { SmsProviders } from "../utils";
 
@@ -35,56 +36,63 @@ export function getTwilioProvider(): SmsProvider {
   const authToken = env.TWILIO_AUTH_TOKEN;
   const region = env.TWILIO_REGION;
 
-  // Validate credentials at initialization time
-  if (!accountSid) {
-    throw new Error("Missing TWILIO_ACCOUNT_SID environment variable");
-  }
-
-  if (!authToken) {
-    throw new Error("Missing TWILIO_AUTH_TOKEN environment variable");
-  }
-
-  // Cache API base URL
-  const baseUrl = region
-    ? `https://api.${region}.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`
-    : `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-
-  // Create authorization header value only once
-  const authHeader = `Basic ${Buffer.from(`${accountSid}:${authToken}`).toString("base64")}`;
-
   return {
     name: SmsProviders.TWILIO,
 
-    async sendSms(params: SendSmsParams, logger: EndpointLogger): Promise<ResponseType<SmsResult>> {
+    async sendSms(
+      params: SendSmsParams,
+      logger: EndpointLogger,
+    ): Promise<ResponseType<SmsResult>> {
       try {
+        // Validate credentials
+        if (!accountSid) {
+          return createErrorResponse(
+            "app.api.v1.core.sms.sms.error.missing_recipient",
+            ErrorResponseTypes.VALIDATION_ERROR,
+          );
+        }
+
+        if (!authToken) {
+          return createErrorResponse(
+            "app.api.v1.core.sms.sms.error.missing_recipient",
+            ErrorResponseTypes.VALIDATION_ERROR,
+          );
+        }
+
+        // Cache API base URL
+        const baseUrl = region
+          ? `https://api.${region}.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`
+          : `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+
+        // Create authorization header value
+        // eslint-disable-next-line i18next/no-literal-string
+        const authHeader = `Basic ${Buffer.from(`${accountSid}:${authToken}`).toString("base64")}`;
+
         // Type guard for params
         if (!params || typeof params !== "object") {
-          return {
-            success: false,
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            message: "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
-          };
+          return createErrorResponse(
+            "app.api.v1.core.sms.sms.error.invalid_phone_format",
+            ErrorResponseTypes.VALIDATION_ERROR,
+          );
         }
 
         logger.debug("Sending SMS via Twilio", { to: params.to });
 
         // Validate required parameters
         if (!params.to) {
-          return {
-            success: false,
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            message: "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
-          };
+          return createErrorResponse(
+            "app.api.v1.core.sms.sms.error.invalid_phone_format",
+            ErrorResponseTypes.VALIDATION_ERROR,
+          );
         }
 
         // From phone number fallback with nullish coalescing
         const fromNumber = params.from ?? env.SMS_FROM_NUMBER;
         if (!fromNumber) {
-          return {
-            success: false,
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            message: "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
-          };
+          return createErrorResponse(
+            "app.api.v1.core.sms.sms.error.invalid_phone_format",
+            ErrorResponseTypes.VALIDATION_ERROR,
+          );
         }
 
         if (
@@ -92,11 +100,10 @@ export function getTwilioProvider(): SmsProvider {
           typeof params.message !== "string" ||
           params.message.trim() === ""
         ) {
-          return {
-            success: false,
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            message: "packages.nextVibe.server.sms.sms.error.empty_message",
-          };
+          return createErrorResponse(
+            "app.api.v1.core.sms.sms.error.empty_message",
+            ErrorResponseTypes.VALIDATION_ERROR,
+          );
         }
 
         // Prepare request body
@@ -126,11 +133,11 @@ export function getTwilioProvider(): SmsProvider {
         // Type-safe headers handling
         const headers: {
           "Content-Type": string;
-          Authorization: string;
+          "Authorization": string;
           [key: string]: string;
         } = {
           "Content-Type": "application/x-www-form-urlencoded",
-          Authorization: authHeader,
+          "Authorization": authHeader,
         };
 
         // Type-safe header merging
@@ -160,19 +167,16 @@ export function getTwilioProvider(): SmsProvider {
           try {
             errorData = (await response.json()) as TwilioErrorResponse;
           } catch {
-            errorData = { message: "Failed to parse error response" };
+            // Error parsing response, will use default error
           }
 
-          const errorMessage =
-            errorData.message ??
-            errorData.error_message ??
-            "Unknown Twilio API error";
+          const errorMessage = errorData.message ?? errorData.error_message;
 
           const errorCode =
             errorData.code ?? errorData.error_code ?? response.status;
 
           return createErrorResponse(
-            "packages.nextVibe.server.sms.sms.error.delivery_failed",
+            "app.api.v1.core.sms.sms.error.delivery_failed",
             ErrorResponseTypes.SMS_ERROR,
             {
               error: errorMessage,
@@ -212,11 +216,12 @@ export function getTwilioProvider(): SmsProvider {
           data: responseData,
         };
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : undefined;
         return createErrorResponse(
-          "packages.nextVibe.server.sms.sms.error.delivery_failed",
+          "app.api.v1.core.sms.sms.error.delivery_failed",
           ErrorResponseTypes.SMS_ERROR,
           {
-            error: error instanceof Error ? error.message : "Unknown error",
+            error: errorMessage,
           },
         );
       }

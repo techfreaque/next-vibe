@@ -6,8 +6,6 @@ import "server-only";
 
 import type { Prettify } from "next-vibe/shared/types/utils";
 
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
-
 import { Methods } from "../endpoint-types/core/enums";
 import type { CreateApiEndpoint } from "../endpoint-types/endpoint/create";
 import { endpointHandler } from "./endpoint-handler";

@@ -130,8 +130,7 @@ export const translations: typeof enTranslations = {
   },
   debug: {
     getAuthMinimalUserNext: {
-      start:
-        "getAuthMinimalUserNext: FIXED VERSION - Authentifizierung wird zuerst geprüft",
+      start: "getAuthMinimalUserNext: Authentifizierung wird zuerst geprüft",
       result: "getAuthMinimalUserNext: getCurrentUserNext Ergebnis",
       authenticated:
         "getAuthMinimalUserNext: Benutzer ist authentifiziert, leadId wird abgerufen",

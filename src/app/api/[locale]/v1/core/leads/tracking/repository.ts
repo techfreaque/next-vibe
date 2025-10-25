@@ -230,7 +230,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       if (!result.success || !result.data) {
         return result.success
           ? createErrorResponse(
-              "error.default",
+              "app.api.v1.core.leads.tracking.errors.default",
               ErrorResponseTypes.INTERNAL_ERROR,
             )
           : result;
@@ -309,7 +309,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         engagementType: data.engagementType,
       });
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -439,7 +439,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         campaignId,
       });
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -594,7 +594,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         error: error instanceof Error ? error.message : String(error),
       });
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -635,7 +635,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         leadId,
       });
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -676,7 +676,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         leadId,
       });
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -727,13 +727,13 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       const [language, country] = locale.split("-");
 
       const newLead = {
-        email: null,
+        email: `anonymous-${crypto.randomUUID()}@tracking.local`,
         businessName: "",
         contactName: "",
         phone: "",
         website: "",
-        country: country || Countries.GLOBAL,
-        language: language || Languages.EN,
+        country: (country || Countries.GLOBAL) as Countries,
+        language: (language || Languages.EN) as Languages,
         source: LeadSource.WEBSITE,
         status: LeadStatus.WEBSITE_USER, // Website leads are always WEBSITE_USER
         notes: "", // Will be set with proper translation key when needed
@@ -758,7 +758,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           locale,
         });
         return createErrorResponse(
-          "error.default",
+          "app.api.v1.core.leads.tracking.errors.default",
           ErrorResponseTypes.INTERNAL_ERROR,
         );
       }
@@ -779,7 +779,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         locale,
       });
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -848,7 +848,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       );
       if (!leadResult.success || !leadResult.data) {
         return createErrorResponse(
-          "error.default",
+          "app.api.v1.core.leads.tracking.errors.default",
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -959,7 +959,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
                 },
               );
               return createErrorResponse(
-                "error.default",
+                "app.api.v1.core.leads.tracking.errors.default",
                 ErrorResponseTypes.INTERNAL_ERROR,
               );
             }
@@ -1008,7 +1008,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         action,
       });
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -1028,7 +1028,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
     try {
       // Get leadId from user prop (JWT payload) - always present
       // Fallback to data.leadId for backward compatibility (tracking links)
-      let leadId = data.leadId || user.leadId;
+      let leadId: string | undefined = data.leadId || user.leadId;
 
       logger.debug(
         "app.api.v1.core.leads.tracking.engagement.relationship.handling",
@@ -1081,7 +1081,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           );
         } else {
           return createErrorResponse(
-            "error.default",
+            "app.api.v1.core.leads.tracking.errors.default",
             ErrorResponseTypes.INTERNAL_ERROR,
           );
         }
@@ -1090,20 +1090,20 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       // If we still don't have a leadId, return error
       if (!leadId) {
         return createErrorResponse(
-          "error.default",
+          "app.api.v1.core.leads.tracking.errors.default",
           ErrorResponseTypes.VALIDATION_ERROR,
         );
       }
 
       // Establish lead-user relationship if user is logged in
-      const currentUserId = data.userId || user.id;
+      const currentUserId = data.userId || (user.isPublic ? undefined : user.id);
       if (currentUserId && !user.isPublic) {
         try {
           const convertResult = await leadsRepository.convertLeadInternal(
             leadId,
             {
               userId: currentUserId,
-              email: user.email || "", // Use user's email for conversion
+              email: "", // Email will be fetched from user record during conversion
             },
             logger,
           );
@@ -1221,7 +1221,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         },
       );
       return createErrorResponse(
-        "error.default",
+        "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }

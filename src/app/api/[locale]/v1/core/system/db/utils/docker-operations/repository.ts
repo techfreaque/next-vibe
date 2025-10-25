@@ -109,7 +109,7 @@ export class DockerOperationsRepositoryImpl
         logger,
       });
 
-      logger.info("Docker command execution completed", {
+      logger.info("🗄️  Docker command execution completed", {
         success: result.success,
       });
 
@@ -120,7 +120,7 @@ export class DockerOperationsRepositoryImpl
       });
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error("Docker command execution failed", parsedError);
+      logger.error("🗄️  Docker command execution failed", parsedError);
 
       return createErrorResponse(
         "app.api.v1.core.system.db.utils.dockerOperations.errors.executionFailed.title",
@@ -141,8 +141,6 @@ export class DockerOperationsRepositoryImpl
   ): Promise<ResponseType<boolean>> {
     try {
       const { t } = simpleT(locale);
-      logger.info("Starting Docker Compose down", { composeFile });
-
       const commandParts = [];
       commandParts.push("docker");
       commandParts.push("compose");
@@ -160,14 +158,12 @@ export class DockerOperationsRepositoryImpl
         logger,
       });
 
-      logger.info("Docker Compose down completed", {
-        success: result.success,
-      });
+      logger.info(`🗄️  Docker Compose down completed: ${result.success}`);
 
       return createSuccessResponse(result.success);
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error("Docker Compose down failed", parsedError);
+      logger.error("🗄️ Docker Compose down failed", parsedError);
 
       return createErrorResponse(
         "app.api.v1.core.system.db.utils.dockerOperations.errors.composeDownFailed.title",
@@ -188,8 +184,6 @@ export class DockerOperationsRepositoryImpl
   ): Promise<ResponseType<boolean>> {
     try {
       const { t } = simpleT(locale);
-      logger.info("Starting Docker Compose up", { composeFile });
-
       const commandParts = [];
       commandParts.push("docker");
       commandParts.push("compose");
@@ -208,12 +202,12 @@ export class DockerOperationsRepositoryImpl
         logger,
       });
 
-      logger.info("Docker Compose up completed", { success: result.success });
+      logger.info("🗄️  Docker Compose up completed:", result.success);
 
       return createSuccessResponse(result.success);
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error("Docker Compose up failed", parsedError);
+      logger.error("🗄️  Docker Compose up failed", parsedError);
 
       return createErrorResponse(
         "app.api.v1.core.system.db.utils.dockerOperations.errors.composeUpFailed.title",

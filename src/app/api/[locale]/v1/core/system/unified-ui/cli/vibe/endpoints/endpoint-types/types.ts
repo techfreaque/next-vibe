@@ -317,7 +317,11 @@ export type WidgetConfig =
   | AvatarWidgetConfig
   | ButtonGroupWidgetConfig
   | ActionBarWidgetConfig
-  | TextWidgetConfig;
+  | TextWidgetConfig
+  | LinkWidgetConfig
+  | LinkCardWidgetConfig
+  | LinkListWidgetConfig
+  | MarkdownWidgetConfig;
 
 /**
  * Layout configuration
@@ -659,6 +663,49 @@ export interface StatsGridWidgetConfig extends BaseWidgetConfig {
   showTotals?: boolean;
   showPercentages?: boolean;
   layout?: LayoutConfig;
+}
+
+/**
+ * Link widget configuration
+ */
+export interface LinkWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.LINK;
+  content: TranslationKey;
+  href?: string;
+  openInNewTab?: boolean;
+  variant?: ComponentVariant;
+}
+
+/**
+ * Link card widget configuration
+ */
+export interface LinkCardWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.LINK_CARD;
+  title?: TranslationKey;
+  description?: TranslationKey;
+  href?: string;
+  openInNewTab?: boolean;
+  image?: string;
+  layout?: LayoutConfig;
+}
+
+/**
+ * Link list widget configuration
+ */
+export interface LinkListWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.LINK_LIST;
+  title?: TranslationKey;
+  description?: TranslationKey;
+  layout?: LayoutConfig;
+}
+
+/**
+ * Markdown widget configuration
+ */
+export interface MarkdownWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.MARKDOWN;
+  content: TranslationKey;
+  sanitize?: boolean;
 }
 
 // WidgetConfig union type is declared at the top of the file (line ~300)

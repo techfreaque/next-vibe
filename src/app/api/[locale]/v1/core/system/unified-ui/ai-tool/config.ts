@@ -1,18 +1,21 @@
 /**
  * AI Tool Handler Configuration
+ *
+ * @deprecated This file is deprecated. Use the unified platform configuration instead:
+ * import { AI_CONFIG, getPlatformConfig, Platform } from "../shared/config/platform-config";
+ *
+ * This file is kept for backward compatibility only.
  */
 
 import "server-only";
 
-import { Methods } from "../cli/vibe/endpoints/endpoint-types/core/enums";
-
+import { AI_CONFIG } from "../shared/config/platform-config";
 import type { ToolDiscoveryOptions } from "./types";
 
 /**
  * Check if running in development mode
  */
 const isDevelopment = (): boolean => {
-  // eslint-disable-next-line node/no-process-env
   return process.env.NODE_ENV === "development";
 };
 
@@ -20,7 +23,6 @@ const isDevelopment = (): boolean => {
  * Check if running in production mode
  */
 const isProduction = (): boolean => {
-  // eslint-disable-next-line node/no-process-env
   return process.env.NODE_ENV === "production";
 };
 
@@ -28,89 +30,58 @@ const isProduction = (): boolean => {
  * Check if running in test mode
  */
 const isTest = (): boolean => {
-  // eslint-disable-next-line node/no-process-env
   return process.env.NODE_ENV === "test";
 };
 
 /**
  * AI Tool System Configuration
+ * @deprecated Use AI_CONFIG from unified platform instead
  */
 export const aiToolConfig = {
   /**
    * Enable or disable the AI tool system
-   * Uses static registry (generated at build time) for Next.js compatibility
    */
   enabled: true,
 
   /**
    * Root directory for endpoint discovery
+   * @deprecated Use AI_CONFIG.rootDir instead
    */
-  rootDir: "src/app/api/[locale]/v1" as string,
+  rootDir: AI_CONFIG.rootDir,
 
   /**
    * Paths to exclude from discovery
-   * These endpoints will never be exposed as AI tools
+   * @deprecated Use AI_CONFIG.excludePaths instead
    */
-  excludePaths: [
-    // System-critical operations
-    "v1/core/system/db/reset/**",
-    "v1/core/system/db/migrate/**",
-    "v1/core/system/db/seed/**",
-
-    // Authentication internals
-    "v1/core/user/auth/**",
-    "v1/core/user/session/**",
-
-    // Dangerous batch operations
-    "v1/core/user/delete-all/**",
-    "v1/core/leads/delete-all/**",
-
-    // Internal AI system (prevent recursion)
-    "v1/core/agent/**",
-    "v1/core/system/unified-ui/ai-tool/**",
-  ] as string[],
+  excludePaths: AI_CONFIG.excludePaths,
 
   /**
    * Include only specific HTTP methods
-   * Prevents AI from using destructive operations
+   * @deprecated Use AI_CONFIG.includeMethods instead
    */
-  includeMethods: [
-    Methods.GET,
-    Methods.POST,
-    // Uncomment to allow updates/deletes (not recommended)
-    // Methods.PUT,
-    // Methods.PATCH,
-    // Methods.DELETE,
-  ] as Methods[],
+  includeMethods: AI_CONFIG.includeMethods,
 
   /**
    * Cache configuration
+   * @deprecated Use AI_CONFIG.cache instead
    */
   cache: {
-    /** Enable caching for discovery */
-    enabled: true,
-
-    /** Cache TTL in milliseconds (1 hour) */
-    ttl: 3600000,
-
-    /** Maximum cache size (entries) */
-    maxSize: 500,
+    enabled: AI_CONFIG.cache.enabled,
+    ttl: AI_CONFIG.cache.ttl,
+    maxSize: AI_CONFIG.cache.maxSize,
   },
 
   /**
    * Tool execution limits
+   * @deprecated Use AI_CONFIG.platformSpecific.maxToolsPerRequest instead
    */
   execution: {
-    /** Maximum tool calls per message */
-    maxCallsPerMessage: 10,
-
-    /** Maximum tool calls per minute per user */
-    maxCallsPerMinute: 100,
-
-    /** Default timeout for tool execution (ms) */
+    maxCallsPerMessage:
+      typeof AI_CONFIG.platformSpecific?.maxToolsPerRequest === "number"
+        ? AI_CONFIG.platformSpecific.maxToolsPerRequest
+        : 10,
+    maxCallsPerMinute: AI_CONFIG.rateLimit?.maxRequests || 100,
     defaultTimeout: 30000,
-
-    /** Maximum timeout for tool execution (ms) */
     maxTimeout: 120000,
   },
 
@@ -118,13 +89,8 @@ export const aiToolConfig = {
    * Tool naming configuration
    */
   naming: {
-    /** Prefix for dynamic tools */
     prefix: "",
-
-    /** Separator for path segments */
     separator: "_",
-
-    /** Whether to include HTTP method in name */
     includeMethod: false,
   },
 
@@ -132,16 +98,9 @@ export const aiToolConfig = {
    * Tool description configuration
    */
   descriptions: {
-    /** Include endpoint examples in descriptions */
     includeExamples: true,
-
-    /** Include parameter descriptions */
     includeParameters: true,
-
-    /** Maximum description length */
     maxLength: 500,
-
-    /** Fallback to English if translation missing */
     fallbackToEnglish: true,
   },
 
@@ -149,13 +108,8 @@ export const aiToolConfig = {
    * Permission configuration
    */
   permissions: {
-    /** Require authentication for all tools */
     requireAuth: true,
-
-    /** Allow public tools (tools with PUBLIC role) */
     allowPublicTools: true,
-
-    /** Strict mode: double-check permissions at execution */
     strictMode: true,
   },
 
@@ -163,16 +117,9 @@ export const aiToolConfig = {
    * Logging configuration
    */
   logging: {
-    /** Log all tool discoveries */
     logDiscovery: true,
-
-    /** Log all tool executions */
     logExecution: true,
-
-    /** Log tool execution parameters */
-    logParameters: false, // Set to true for debugging
-
-    /** Log execution timing */
+    logParameters: false,
     logTiming: true,
   },
 
@@ -180,31 +127,20 @@ export const aiToolConfig = {
    * Development configuration
    */
   development: {
-    /** Enable file watching in development */
     enableWatch: isDevelopment(),
-
-    /** Reload tools on file change */
     hotReload: isDevelopment(),
-
-    /** Show debug information */
     debug: isDevelopment(),
   },
 
   /**
    * Feature flags
+   * @deprecated Use AI_CONFIG.features instead
    */
   features: {
-    /** Enable parallel tool execution */
-    parallelExecution: true,
-
-    /** Enable tool result streaming */
-    streaming: true,
-
-    /** Enable tool composition (tools calling tools) */
-    composition: false, // Disabled for safety
-
-    /** Enable tool result caching */
-    resultCaching: true,
+    parallelExecution: AI_CONFIG.features.parallelExecution,
+    streaming: AI_CONFIG.features.streaming,
+    composition: AI_CONFIG.features.composition,
+    resultCaching: AI_CONFIG.features.resultCaching,
   },
 };
 
@@ -226,7 +162,6 @@ export function getDiscoveryOptions(): ToolDiscoveryOptions {
  * Check if AI tool system is enabled
  */
 export function isAIToolSystemEnabled(): boolean {
-  // eslint-disable-next-line node/no-process-env
   return aiToolConfig.enabled && process.env.AI_TOOLS_ENABLED !== "false";
 }
 

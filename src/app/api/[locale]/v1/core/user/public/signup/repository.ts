@@ -13,7 +13,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { creditRepository } from "@/app/api/[locale]/v1/core/agent/chat/credits/repository";
+import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository";
 import { leadsRepository } from "@/app/api/[locale]/v1/core/leads/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";

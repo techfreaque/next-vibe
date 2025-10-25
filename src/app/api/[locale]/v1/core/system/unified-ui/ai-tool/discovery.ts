@@ -7,7 +7,6 @@ import "server-only";
 
 import fs from "fs/promises";
 import path from "path";
-
 import type { z } from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -16,8 +15,9 @@ import { createEndpointLogger } from "../cli/vibe/endpoints/endpoint-handler/log
 import type { Methods } from "../cli/vibe/endpoints/endpoint-types/core/enums";
 import type { UnifiedField } from "../cli/vibe/endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "../cli/vibe/endpoints/endpoint-types/endpoint/create";
-
+import { CacheManager } from "./cache-manager";
 import { aiToolConfig } from "./config";
+import { AI_TOOL_CONSTANTS } from "./constants";
 import type {
   DiscoveredEndpoint,
   IToolDiscovery,
@@ -28,11 +28,11 @@ import type {
  * Tool Discovery Implementation
  */
 export class ToolDiscovery implements IToolDiscovery {
-  private cache: Map<string, { data: DiscoveredEndpoint[]; expiresAt: number }>;
+  private cache: CacheManager<DiscoveredEndpoint[]>;
   private watchers: Map<string, () => void>;
 
   constructor() {
-    this.cache = new Map();
+    this.cache = new CacheManager();
     this.watchers = new Map();
   }
 
@@ -54,9 +54,9 @@ export class ToolDiscovery implements IToolDiscovery {
       }
     }
 
-    // Try to use static registry first (for Next.js compatibility)
+    // Use shared generated endpoints via adapter (single source of truth)
     try {
-      const { getStaticEndpoints } = await import("./static-registry");
+      const { getStaticEndpoints } = await import("./endpoint-adapter");
       const staticEndpoints = getStaticEndpoints();
 
       // Filter by included methods
@@ -149,19 +149,12 @@ export class ToolDiscovery implements IToolDiscovery {
 
     // Implement file watching logic here if needed
     // For now, return a cleanup function
-    const cleanup = () => {
+    const cleanup = (): void => {
       this.watchers.delete(watchId);
     };
 
     this.watchers.set(watchId, cleanup);
     return cleanup;
-  }
-
-  /**
-   * Clear discovery cache
-   */
-  clearCache(): void {
-    this.cache.clear();
   }
 
   /**
@@ -174,7 +167,15 @@ export class ToolDiscovery implements IToolDiscovery {
     try {
       // Import the definition module
       const definitionModule = (await import(definitionPath)) as {
-        default: Record<string, CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], UnifiedField<z.ZodTypeAny>>>;
+        default: Record<
+          string,
+          CreateApiEndpoint<
+            string,
+            Methods,
+            readonly (typeof UserRoleValue)[],
+            UnifiedField<z.ZodTypeAny>
+          >
+        >;
       };
       const definitions = definitionModule.default;
 
@@ -199,7 +200,7 @@ export class ToolDiscovery implements IToolDiscovery {
 
       // For now, take the first method
       // TODO: Support multiple methods per endpoint
-      const method = methods[0] as Methods;
+      const method = methods[0];
       const definition = definitions[method];
 
       if (!definition) {
@@ -207,20 +208,20 @@ export class ToolDiscovery implements IToolDiscovery {
       }
 
       // Generate unique ID from path
-      const id = this.generateEndpointId(definition.path as readonly string[], method);
+      const id = this.generateEndpointId(definition.path, method);
 
       // Generate tool name
-      const toolName = this.pathToToolName(definition.path as readonly string[]);
+      const toolName = this.pathToToolName(definition.path);
 
       const endpoint: DiscoveredEndpoint = {
         id,
         routePath,
         definitionPath,
         method,
-        path: definition.path as readonly string[],
+        path: definition.path,
         toolName,
         aliases: definition.aliases || [],
-        allowedRoles: definition.allowedRoles as readonly (typeof UserRoleValue)[],
+        allowedRoles: definition.allowedRoles,
         definition,
         enabled: true,
         discoveredAt: Date.now(),
@@ -230,7 +231,7 @@ export class ToolDiscovery implements IToolDiscovery {
     } catch (error) {
       // Log error for debugging in development
       if (aiToolConfig.development.debug) {
-        const logger = createEndpointLogger();
+        const logger = createEndpointLogger(true, Date.now(), "en");
         logger.error("[Discovery] Failed to load endpoint", {
           definitionPath,
           error: error instanceof Error ? error.message : String(error),
@@ -259,7 +260,10 @@ export class ToolDiscovery implements IToolDiscovery {
   /**
    * Generate endpoint ID
    */
-  private generateEndpointId(pathSegments: readonly string[], method: Methods): string {
+  private generateEndpointId(
+    pathSegments: readonly string[],
+    method: Methods,
+  ): string {
     const separator = "_";
     return `${method.toLowerCase()}${separator}${pathSegments.join(separator)}`;
   }
@@ -271,19 +275,22 @@ export class ToolDiscovery implements IToolDiscovery {
     const { prefix, separator } = aiToolConfig.naming;
 
     // Remove version and core segments
-    const versionSegments = ["v1", "v2", "core"];
+    const versionSegments = AI_TOOL_CONSTANTS.discovery.versionSegments;
     const filteredSegments = pathSegments.filter(
-      (segment) => !versionSegments.includes(segment),
+      (segment) => !(versionSegments as readonly string[]).includes(segment),
     );
 
     // Convert to snake_case
     const specialCharsRegex = /[^a-zA-Z0-9]+/g;
     const camelCaseRegex = /([a-z])([A-Z])/g;
+    const underscore = AI_TOOL_CONSTANTS.converter.underscore;
+    const dollarOne = AI_TOOL_CONSTANTS.converter.dollarOne;
+    const dollarTwo = AI_TOOL_CONSTANTS.converter.dollarTwo;
     const name = filteredSegments
       .map((segment) =>
         segment
-          .replace(specialCharsRegex, "_")
-          .replace(camelCaseRegex, "$1_$2")
+          .replace(specialCharsRegex, underscore)
+          .replace(camelCaseRegex, `${dollarOne}${underscore}${dollarTwo}`)
           .toLowerCase(),
       )
       .join(separator);
@@ -309,33 +316,29 @@ export class ToolDiscovery implements IToolDiscovery {
    * Get from cache
    */
   private getFromCache(key: string): DiscoveredEndpoint[] | null {
-    const cached = this.cache.get(key);
-    if (!cached) {
-      return null;
-    }
-
-    if (Date.now() > cached.expiresAt) {
-      this.cache.delete(key);
-      return null;
-    }
-
-    return cached.data;
+    return this.cache.get(key);
   }
 
   /**
    * Set cache
    */
   private setCache(key: string, data: DiscoveredEndpoint[], ttl: number): void {
-    this.cache.set(key, {
-      data,
-      expiresAt: Date.now() + ttl,
-    });
+    this.cache.set(key, data, ttl);
 
     // Cleanup old cache entries
-    if (this.cache.size > aiToolConfig.cache.maxSize) {
-      const firstKey = this.cache.keys().next().value as string;
-      this.cache.delete(firstKey);
+    if (this.cache.size() > aiToolConfig.cache.maxSize) {
+      const firstKey = this.cache.keys()[0];
+      if (firstKey) {
+        this.cache.delete(firstKey);
+      }
     }
+  }
+
+  /**
+   * Clear cache
+   */
+  clearCache(): void {
+    this.cache.clear();
   }
 }
 

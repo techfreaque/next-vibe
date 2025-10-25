@@ -21,7 +21,7 @@ import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
 import { useAIToolsList } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/tools/hooks";
-import type { AIToolMetadata } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/types";
+import type { AIToolMetadataSerialized } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -56,7 +56,7 @@ export function AIToolsModal({
   });
 
   // Extract tools from response
-  const availableTools = useMemo((): AIToolMetadata[] => {
+  const availableTools = useMemo((): AIToolMetadataSerialized[] => {
     const response = toolsEndpoint.read?.response;
     if (response?.success && response.data?.tools) {
       return response.data.tools;

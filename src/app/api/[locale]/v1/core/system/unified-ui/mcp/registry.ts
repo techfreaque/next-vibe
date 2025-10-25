@@ -1,22 +1,24 @@
 /**
  * MCP Tool Registry
  * Wraps shared endpoint registry and provides MCP-specific functionality
+ *
+ * NOTE: This registry now uses the unified platform system internally.
+ * For new code, consider using createMCPPlatform() from shared/platform/unified-platform.ts
+ *
+ * @see src/app/api/[locale]/v1/core/system/unified-ui/shared/platform/unified-platform.ts
  */
 
 import "server-only";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import { createEndpointLogger } from "../cli/vibe/endpoints/endpoint-handler/logger";
-import type { EndpointLogger } from "../cli/vibe/endpoints/endpoint-handler/logger";
-import { getEndpointRegistry } from "../shared/endpoint-registry";
-import { toolFilter } from "../ai-tool/filter";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { CountryLanguage } from "@/i18n/core/config";
 
+import { toolFilter } from "../ai-tool/filter";
+import type { EndpointLogger } from "../cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "../cli/vibe/endpoints/endpoint-handler/logger";
+import { getEndpointRegistry } from "../shared/endpoint-registry";
 import { getMCPConfig, isMCPServerEnabled } from "./config";
-import {
-  endpointToMCPToolMetadata,
-  toolMetadataToMCPTool,
-} from "./converter";
+import { endpointToMCPToolMetadata, toolMetadataToMCPTool } from "./converter";
 import type {
   IMCPRegistry,
   MCPExecutionContext,
@@ -130,9 +132,7 @@ export class MCPRegistry implements IMCPRegistry {
   /**
    * Execute a tool
    */
-  async executeTool(
-    context: MCPExecutionContext,
-  ): Promise<MCPToolCallResult> {
+  async executeTool(context: MCPExecutionContext): Promise<MCPToolCallResult> {
     await this.ensureInitialized();
 
     // Get tool metadata
@@ -312,9 +312,7 @@ export class MCPRegistry implements IMCPRegistry {
     alias: string,
   ): Promise<MCPToolMetadata | null> {
     // Get unique route files
-    const uniqueRouteFiles = [
-      ...new Set(this.tools.map((t) => t.routePath)),
-    ];
+    const uniqueRouteFiles = [...new Set(this.tools.map((t) => t.routePath))];
 
     for (const routeFile of uniqueRouteFiles) {
       const definitionPath = routeFile.replace("/route.ts", "/definition.ts");

@@ -17,8 +17,6 @@ export const {
   CLI_OFF: "app.api.v1.core.user.userRoles.enums.userRole.cliOff",
   AI_TOOL_OFF: "app.api.v1.core.user.userRoles.enums.userRole.aiToolOff",
   WEB_OFF: "app.api.v1.core.user.userRoles.enums.userRole.webOff",
-
-
 });
 
 // Create DB enum array for Drizzle

@@ -10,6 +10,14 @@ export const translations: typeof enTranslations = {
     transaction: "transakcja",
   },
 
+  success: {
+    created: "Zwrot przetworzony pomyślnie",
+  },
+
+  reason: {
+    requestedByCustomer: "Na żądanie klienta",
+  },
+
   form: {
     title: "Formularz zwrotu",
     description: "Wprowadź szczegóły zwrotu",

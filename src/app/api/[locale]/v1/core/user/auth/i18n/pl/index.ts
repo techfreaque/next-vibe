@@ -126,8 +126,7 @@ export const translations: typeof enTranslations = {
   },
   debug: {
     getAuthMinimalUserNext: {
-      start:
-        "getAuthMinimalUserNext: FIXED VERSION - Sprawdzanie autentykacji jako pierwsze",
+      start: "getAuthMinimalUserNext: - Sprawdzanie autentykacji jako pierwsze",
       result: "getAuthMinimalUserNext: wynik getCurrentUserNext",
       authenticated:
         "getAuthMinimalUserNext: Użytkownik jest uwierzytelniony, pobieranie leadId",

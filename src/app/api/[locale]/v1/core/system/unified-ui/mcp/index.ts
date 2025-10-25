@@ -3,16 +3,14 @@
  * Exports for external use
  */
 
-export { MCPServer } from "./server/entry-point";
-export type { MCPServerOptions } from "./server/entry-point";
-
-export { getMCPRegistry } from "./registry";
 export { getMCPConfig, isMCPServerEnabled } from "./config";
-
+export { getMCPRegistry } from "./registry";
+export type { MCPServerOptions } from "./server/entry-point";
+export { MCPServer } from "./server/entry-point";
 export type {
-  MCPTool,
-  MCPToolMetadata,
   MCPExecutionContext,
-  MCPToolCallResult,
   MCPServerConfig,
+  MCPTool,
+  MCPToolCallResult,
+  MCPToolMetadata,
 } from "./types";

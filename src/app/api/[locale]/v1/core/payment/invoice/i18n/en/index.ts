@@ -1,4 +1,8 @@
 export const translations = {
+  defaultItem: "Invoice item",
+  success: {
+    created: "Invoice created successfully",
+  },
   post: {
     title: "Invoice",
     description: "Invoice endpoint",

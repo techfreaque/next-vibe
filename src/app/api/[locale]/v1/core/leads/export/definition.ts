@@ -20,14 +20,26 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
+import {
+  Countries,
+  CountriesArr,
+  CountriesOptions,
+  type Languages,
+  LanguagesArr,
+  LanguagesOptions,
+} from "@/i18n/core/config";
+
 import type {
   ExportFormatValues,
+  LeadSourceValues,
   LeadStatusValues,
   MimeTypeValues,
 } from "../enum";
 import {
   ExportFormat,
   ExportFormatOptions,
+  LeadSource,
+  LeadSourceOptions,
   LeadStatus,
   LeadStatusOptions,
   MimeType,
@@ -88,37 +100,37 @@ const { GET } = createEndpoint({
       country: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
+          fieldType: FieldDataType.SELECT,
           label: "app.api.v1.core.leads.export.get.country.label",
           description: "app.api.v1.core.leads.export.get.country.description",
-          placeholder: "app.api.v1.core.leads.export.get.country.placeholder",
+          options: CountriesOptions,
           layout: { columns: 6 },
         },
-        z.string().optional(),
+        z.enum(CountriesArr).optional(),
       ),
 
       language: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
+          fieldType: FieldDataType.SELECT,
           label: "app.api.v1.core.leads.export.get.language.label",
           description: "app.api.v1.core.leads.export.get.language.description",
-          placeholder: "app.api.v1.core.leads.export.get.language.placeholder",
+          options: LanguagesOptions,
           layout: { columns: 6 },
         },
-        z.string().optional(),
+        z.enum(LanguagesArr).optional(),
       ),
 
       source: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
+          fieldType: FieldDataType.SELECT,
           label: "app.api.v1.core.leads.export.get.source.label",
           description: "app.api.v1.core.leads.export.get.source.description",
-          placeholder: "app.api.v1.core.leads.export.get.source.placeholder",
+          options: LeadSourceOptions,
           layout: { columns: 12 },
         },
-        z.string().optional(),
+        z.enum(LeadSource).optional(),
       ),
 
       search: requestDataField(
@@ -299,9 +311,9 @@ export type LeadExportResponseOutput = typeof GET.types.ResponseOutput;
 export interface ExportQueryType {
   format: typeof ExportFormatValues;
   status?: typeof LeadStatusValues;
-  country?: string;
-  language?: string;
-  source?: string;
+  country?: Countries;
+  language?: Languages;
+  source?: typeof LeadSourceValues;
   search?: string;
   dateFrom?: Date;
   dateTo?: Date;

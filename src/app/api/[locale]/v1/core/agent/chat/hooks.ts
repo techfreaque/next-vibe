@@ -17,8 +17,8 @@ import { simpleT } from "@/i18n/core/shared";
 import { useAIStream } from "./ai-stream/hooks";
 import { useAIStreamStore } from "./ai-stream/store";
 import type { DefaultFolderId } from "./config";
+import { createCreditUpdateCallback } from "./credit-updater";
 import creditsDefinition from "./credits/definition";
-import { useFoldersList } from "./folders/hooks";
 import type { IconValue } from "./model-access/icons";
 import type { ModelId } from "./model-access/models";
 import { getModelById } from "./model-access/models";
@@ -31,7 +31,7 @@ import {
   type ToolCall,
   useChatStore,
 } from "./store";
-import { useThreadsList } from "./threads/hooks";
+import threadsDefinition from "./threads/definition";
 
 // Re-export types for convenience
 export type { ChatFolder, ChatMessage, ChatThread };
@@ -273,145 +273,75 @@ export function useChat(
 
       // Load ALL threads (no rootFolderId filter)
       try {
-        // Build query params for GET request - use dot notation for nested objects
-        // Note: pagination and filters objects are required, but their fields are optional
-        const params = new URLSearchParams({
-          "pagination.page": "1",
-          "pagination.limit": "100", // Max allowed by schema
-          // filters object is required but all fields are optional - send empty placeholder
-          "filters._placeholder": "",
-        });
-
-        const threadsResponse = await fetch(
-          `/api/${locale}/v1/core/agent/chat/threads?${params.toString()}`,
+        const threadsResponse = await apiClient.fetch(
+          threadsDefinition.GET,
+          logger,
           {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
+            pagination: {
+              page: 1,
+              limit: 100,
+            },
+            filters: {},
           },
+          {},
+          t,
+          locale,
         );
 
-        if (threadsResponse.ok) {
-          const threadsData = await threadsResponse.json();
-          logger.debug("useChat", "Loaded threads", { threadsData });
+        logger.debug("useChat", "Loaded threads", { threadsResponse });
 
-          if (threadsData.success && threadsData.data?.response?.threads) {
-            threadsData.data.response.threads.forEach(
-              (thread: {
+        if (threadsResponse.success) {
+          const responseData = threadsResponse.data as {
+            response: {
+              threads: Array<{
                 id: string;
                 title: string;
-                rootFolderId: string;
+                rootFolderId: DefaultFolderId;
                 folderId: string | null;
-                status: string;
+                status: "active" | "archived" | "deleted";
                 pinned: boolean;
                 preview: string | null;
-                createdAt: string;
-                updatedAt: string;
-              }) => {
-                chatStore.addThread({
-                  id: thread.id,
-                  userId: "",
-                  title: thread.title,
-                  rootFolderId: thread.rootFolderId as DefaultFolderId,
-                  folderId: thread.folderId,
-                  status: thread.status as "active" | "archived" | "deleted",
-                  defaultModel: null,
-                  defaultPersona: null,
-                  systemPrompt: null,
-                  pinned: thread.pinned || false,
-                  archived: false,
-                  tags: [],
-                  preview: thread.preview || null,
-                  createdAt: new Date(thread.createdAt),
-                  updatedAt: new Date(thread.updatedAt),
-                });
-              },
-            );
+                createdAt: Date;
+                updatedAt: Date;
+              }>;
+              totalCount: number;
+              pageCount: number;
+              page: number;
+              limit: number;
+            };
+          };
+
+          if (responseData.response?.threads) {
+            responseData.response.threads.forEach((thread) => {
+              chatStore.addThread({
+                id: thread.id,
+                userId: "",
+                title: thread.title,
+                rootFolderId: thread.rootFolderId,
+                folderId: thread.folderId,
+                status: thread.status,
+                defaultModel: null,
+                defaultPersona: null,
+                systemPrompt: null,
+                pinned: thread.pinned,
+                archived: false,
+                tags: [],
+                preview: thread.preview,
+                createdAt: new Date(thread.createdAt),
+                updatedAt: new Date(thread.updatedAt),
+              });
+            });
             logger.debug("useChat", "Threads loaded successfully", {
-              count: threadsData.data.response.threads.length,
+              count: responseData.response.threads.length,
             });
           }
-        } else {
-          logger.error("useChat", "Failed to load threads", {
-            status: threadsResponse.status,
-            statusText: threadsResponse.statusText,
-          });
         }
       } catch (error) {
         logger.error("useChat", "Failed to load threads", { error });
       }
 
-      // Load folders for each root folder (skip incognito - no server folders)
-      const rootFolders: DefaultFolderId[] = ["private", "shared", "public"];
-      for (const rootFolderId of rootFolders) {
-        try {
-          const params = new URLSearchParams({
-            rootFolderId,
-          });
-
-          const foldersResponse = await fetch(
-            `/api/${locale}/v1/core/agent/chat/folders?${params.toString()}`,
-            {
-              method: "GET",
-              headers: { "Content-Type": "application/json" },
-            },
-          );
-
-          if (foldersResponse.ok) {
-            const foldersData = await foldersResponse.json();
-            logger.debug("useChat", "Loaded folders", {
-              rootFolderId,
-              foldersData,
-            });
-
-            if (foldersData.success && foldersData.data?.folders) {
-              foldersData.data.folders.forEach(
-                (folder: {
-                  id: string;
-                  userId: string;
-                  name: string;
-                  icon: string | null;
-                  color: string | null;
-                  rootFolderId: string;
-                  parentId: string | null;
-                  expanded: boolean;
-                  sortOrder: number;
-                  createdAt: string;
-                  updatedAt: string;
-                }) => {
-                  chatStore.addFolder({
-                    id: folder.id,
-                    userId: folder.userId,
-                    name: folder.name,
-                    icon: folder.icon,
-                    color: folder.color,
-                    rootFolderId: folder.rootFolderId as DefaultFolderId,
-                    parentId: folder.parentId,
-                    expanded: folder.expanded,
-                    sortOrder: folder.sortOrder,
-                    createdAt: new Date(folder.createdAt),
-                    updatedAt: new Date(folder.updatedAt),
-                  });
-                },
-              );
-              logger.debug("useChat", "Folders loaded successfully", {
-                rootFolderId,
-                count: foldersData.data.folders.length,
-              });
-            }
-          } else {
-            logger.error("useChat", "Failed to load folders", {
-              rootFolderId,
-              status: foldersResponse.status,
-              statusText: foldersResponse.statusText,
-            });
-          }
-        } catch (error) {
-          logger.error("useChat", "Failed to load folders", {
-            rootFolderId,
-            error,
-          });
-        }
-      }
+      // Folders are not loaded from server - they are managed client-side only
+      // This keeps the architecture simple and avoids unnecessary API calls
     };
 
     void loadData();
@@ -667,6 +597,7 @@ export function useChat(
                 childrenIds: string[];
                 toolCalls?: Array<{
                   toolName: string;
+                  // eslint-disable-next-line no-restricted-syntax
                   args: Record<string, unknown>;
                 }> | null;
                 createdAt: string;
@@ -804,36 +735,7 @@ export function useChat(
                 onThreadCreated(data.threadId, data.rootFolderId);
               }
             },
-            onContentDone: () => {
-              // Update credit balance in real-time after AI response completes
-              const modelConfig = getModelById(selectedModel);
-              const creditCost = modelConfig.creditCost;
-
-              if (creditCost > 0 && creditsDefinition.GET) {
-                // Update the credit balance using the built-in helper
-                apiClient.updateEndpointData(
-                  creditsDefinition.GET,
-                  (oldData) => {
-                    if (!oldData?.data) {
-                      return oldData;
-                    }
-
-                    return {
-                      ...oldData,
-                      data: {
-                        ...oldData.data,
-                        total: oldData.data.total - creditCost,
-                      },
-                    };
-                  },
-                );
-
-                logger.debug("useChat", "Updated credit balance in cache", {
-                  creditCost,
-                  model: selectedModel,
-                });
-              }
-            },
+            onContentDone: createCreditUpdateCallback(selectedModel, logger),
           },
         );
 
@@ -893,36 +795,7 @@ export function useChat(
             enabledToolIds,
           },
           {
-            onContentDone: () => {
-              // Update credit balance in real-time after AI response completes
-              const modelConfig = getModelById(selectedModel);
-              const creditCost = modelConfig.creditCost;
-
-              if (creditCost > 0 && creditsDefinition.GET) {
-                // Update the credit balance using the built-in helper
-                apiClient.updateEndpointData(
-                  creditsDefinition.GET,
-                  (oldData) => {
-                    if (!oldData?.data) {
-                      return oldData;
-                    }
-
-                    return {
-                      ...oldData,
-                      data: {
-                        ...oldData.data,
-                        total: oldData.data.total - creditCost,
-                      },
-                    };
-                  },
-                );
-
-                logger.debug("useChat", "Updated credit balance in cache", {
-                  creditCost,
-                  model: selectedModel,
-                });
-              }
-            },
+            onContentDone: createCreditUpdateCallback(selectedModel, logger),
           },
         );
       } catch (error) {
@@ -974,36 +847,7 @@ export function useChat(
             enabledToolIds,
           },
           {
-            onContentDone: () => {
-              // Update credit balance in real-time after AI response completes
-              const modelConfig = getModelById(selectedModel);
-              const creditCost = modelConfig.creditCost;
-
-              if (creditCost > 0 && creditsDefinition.GET) {
-                // Update the credit balance using the built-in helper
-                apiClient.updateEndpointData(
-                  creditsDefinition.GET,
-                  (oldData) => {
-                    if (!oldData?.data) {
-                      return oldData;
-                    }
-
-                    return {
-                      ...oldData,
-                      data: {
-                        ...oldData.data,
-                        total: oldData.data.total - creditCost,
-                      },
-                    };
-                  },
-                );
-
-                logger.debug("useChat", "Updated credit balance in cache", {
-                  creditCost,
-                  model: selectedModel,
-                });
-              }
-            },
+            onContentDone: createCreditUpdateCallback(selectedModel, logger),
           },
         );
       } catch (error) {
@@ -1055,36 +899,7 @@ export function useChat(
             enabledToolIds,
           },
           {
-            onContentDone: () => {
-              // Update credit balance in real-time after AI response completes
-              const modelConfig = getModelById(selectedModel);
-              const creditCost = modelConfig.creditCost;
-
-              if (creditCost > 0 && creditsDefinition.GET) {
-                // Update the credit balance using the built-in helper
-                apiClient.updateEndpointData(
-                  creditsDefinition.GET,
-                  (oldData) => {
-                    if (!oldData?.data) {
-                      return oldData;
-                    }
-
-                    return {
-                      ...oldData,
-                      data: {
-                        ...oldData.data,
-                        total: oldData.data.total - creditCost,
-                      },
-                    };
-                  },
-                );
-
-                logger.debug("useChat", "Updated credit balance in cache", {
-                  creditCost,
-                  model: selectedModel,
-                });
-              }
-            },
+            onContentDone: createCreditUpdateCallback(selectedModel, logger),
           },
         );
       } catch (error) {

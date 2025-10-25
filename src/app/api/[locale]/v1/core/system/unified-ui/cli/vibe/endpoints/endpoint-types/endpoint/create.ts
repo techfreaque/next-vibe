@@ -85,6 +85,25 @@ export interface ApiEndpoint<
     firstCliArgKey?: string;
   };
 
+  /**
+   * Credit cost for this endpoint (0 = free, undefined = free)
+   */
+  readonly credits?: number;
+
+  // AI Tool metadata for AI agent integration
+  readonly aiTool?: {
+    /** Instructions for AI on how to use this tool */
+    instructions: string;
+    /** Display name for the tool */
+    displayName: string;
+    /** Icon identifier */
+    icon: string;
+    /** Color for UI display */
+    color: string;
+    /** Priority for tool selection (higher = more important) */
+    priority: number;
+  };
+
   // Unified fields for schema generation
   readonly fields: TFields;
 
@@ -385,6 +404,8 @@ export function createEndpoint<
     debug: config.debug,
     aliases: config.aliases,
     cli: config.cli,
+    credits: config.credits,
+    aiTool: config.aiTool,
     requestSchema,
     responseSchema,
     requestUrlParamsSchema: requestUrlSchema,
@@ -433,5 +454,10 @@ export function createEndpoint<
   // Return the method-keyed object with proper type inference
   return {
     [config.method]: endpointDefinition,
-  } as CreateEndpointReturnInMethod<TFields, TExampleKey, TMethod, TUserRoleValue>;
+  } as CreateEndpointReturnInMethod<
+    TFields,
+    TExampleKey,
+    TMethod,
+    TUserRoleValue
+  >;
 }

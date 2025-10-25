@@ -13,7 +13,8 @@ export default {
                   },
                   get: {
                     title: "MCP-Tools auflisten",
-                    description: "Alle verfügbaren MCP-Tools für den aktuellen Benutzer abrufen",
+                    description:
+                      "Alle verfügbaren MCP-Tools für den aktuellen Benutzer abrufen",
                     fields: {
                       name: "Tool-Name",
                       description: "Beschreibung",
@@ -38,7 +39,8 @@ export default {
                       },
                       forbidden: {
                         title: "Verboten",
-                        description: "Sie haben keine Berechtigung für diese Ressource",
+                        description:
+                          "Sie haben keine Berechtigung für diese Ressource",
                       },
                       notFound: {
                         title: "Nicht gefunden",
@@ -74,13 +76,15 @@ export default {
                   },
                   post: {
                     title: "MCP-Tool ausführen",
-                    description: "Ein MCP-Tool nach Namen mit Argumenten ausführen",
+                    description:
+                      "Ein MCP-Tool nach Namen mit Argumenten ausführen",
                     fields: {
                       title: "Tool-Ausführungsparameter",
                       description: "Parameter für die Tool-Ausführung",
                       name: {
                         title: "Tool-Name",
-                        description: "Name des auszuführenden Tools (z.B. core:system:db:ping)",
+                        description:
+                          "Name des auszuführenden Tools (z.B. core:system:db:ping)",
                       },
                       arguments: {
                         title: "Argumente",
@@ -110,7 +114,8 @@ export default {
                       },
                       forbidden: {
                         title: "Verboten",
-                        description: "Sie haben keine Berechtigung, dieses Tool auszuführen",
+                        description:
+                          "Sie haben keine Berechtigung, dieses Tool auszuführen",
                       },
                       notFound: {
                         title: "Tool nicht gefunden",

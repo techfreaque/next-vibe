@@ -13,7 +13,7 @@ import type { z, ZodType } from "zod";
 
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
-import { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { EnhancedMutationResult } from "./mutation";

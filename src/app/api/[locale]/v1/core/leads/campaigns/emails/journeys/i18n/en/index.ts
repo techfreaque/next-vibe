@@ -9,6 +9,20 @@ export const translations = {
       defaults: {
         signatureName: "Your Partner in Growth",
       },
+      journeyInfo: {
+        personalApproach: {
+          name: "Personal Approach",
+          description: "Build genuine connections with personalized messaging",
+        },
+        resultsFocused: {
+          name: "Results Focused",
+          description: "Emphasize concrete outcomes and measurable results",
+        },
+        personalResults: {
+          name: "Personal + Results",
+          description: "Combine personal touch with results-driven messaging",
+        },
+      },
     },
     leads: {
       journeys: {

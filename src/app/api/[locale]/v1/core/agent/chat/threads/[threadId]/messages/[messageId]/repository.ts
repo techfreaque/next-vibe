@@ -17,9 +17,9 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { chatMessages, chatThreads } from "../../../../db";
+import { validateNotIncognito } from "../../../../validation";
 import type {
   MessageDeleteResponseOutput,
   MessageDeleteUrlVariablesOutput,
@@ -101,16 +101,13 @@ class MessageRepository implements MessageRepositoryInterface {
       }
 
       // Reject incognito threads
-      if (thread.rootFolderId === "incognito") {
-        return createErrorResponse(
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.errors.forbidden.title" as const,
-          ErrorResponseTypes.FORBIDDEN,
-          {
-            message: simpleT(locale).t(
-              "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.forbidden.incognitoNotAllowed",
-            ),
-          },
-        );
+      const incognitoError = validateNotIncognito(
+        thread.rootFolderId,
+        locale,
+        "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get",
+      );
+      if (incognitoError) {
+        return incognitoError;
       }
 
       // Get message
@@ -198,16 +195,13 @@ class MessageRepository implements MessageRepositoryInterface {
       }
 
       // Reject incognito threads
-      if (thread.rootFolderId === "incognito") {
-        return createErrorResponse(
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.forbidden.title" as const,
-          ErrorResponseTypes.FORBIDDEN,
-          {
-            message: simpleT(locale).t(
-              "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.forbidden.incognitoNotAllowed",
-            ),
-          },
-        );
+      const incognitoError = validateNotIncognito(
+        thread.rootFolderId,
+        locale,
+        "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch",
+      );
+      if (incognitoError) {
+        return incognitoError;
       }
 
       // Verify message exists and belongs to thread
@@ -304,16 +298,13 @@ class MessageRepository implements MessageRepositoryInterface {
       }
 
       // Reject incognito threads
-      if (thread.rootFolderId === "incognito") {
-        return createErrorResponse(
-          "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.forbidden.title" as const,
-          ErrorResponseTypes.FORBIDDEN,
-          {
-            message: simpleT(locale).t(
-              "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.forbidden.incognitoNotAllowed",
-            ),
-          },
-        );
+      const incognitoError = validateNotIncognito(
+        thread.rootFolderId,
+        locale,
+        "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete",
+      );
+      if (incognitoError) {
+        return incognitoError;
       }
 
       // Verify message exists

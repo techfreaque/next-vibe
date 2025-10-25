@@ -20,7 +20,7 @@ import { tasks as taskModule0 } from "../../../newsletter/unsubscribe/task";
 import { tasks as taskModule1 } from "../../../user/session-cleanup/task";
 import { tasks as taskModule2 } from "../../../leads/import/task";
 import { tasks as taskModule3 } from "../../../emails/imap-client/sync/task";
-import { tasks as taskModule4 } from "../../../agent/chat/credits/expire/task";
+import { tasks as taskModule4 } from "../../../credits/expire/task";
 import { taskRunners as runnerModule5 } from "../pulse-runner/task-runner";
 import { taskRunners as runnerModule6 } from "../dev-watcher/task-runner";
 

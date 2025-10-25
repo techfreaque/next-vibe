@@ -10,7 +10,7 @@ import { useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { cn } from "@/packages/next-vibe/shared";
+import { cn } from "next-vibe/shared/utils";
 
 import type { NavItemType } from "./nav-constants";
 import { ThemeToggleMobile } from "./theme-toggle";

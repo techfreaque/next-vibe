@@ -22,9 +22,9 @@ import { default as endpointDefinition7 } from "@/app/api/[locale]/v1/core/agent
 import { default as endpointDefinition8 } from "@/app/api/[locale]/v1/core/agent/chat/ai-stream/definition";
 import { default as endpointDefinition9 } from "@/app/api/[locale]/v1/core/agent/chat/folders/[id]/definition";
 import { default as endpointDefinition10 } from "@/app/api/[locale]/v1/core/agent/chat/folders/definition";
-import { default as endpointDefinition11 } from "@/app/api/[locale]/v1/core/agent/chat/credits/history/definition";
-import { default as endpointDefinition12 } from "@/app/api/[locale]/v1/core/agent/chat/credits/definition";
-import { default as endpointDefinition13 } from "@/app/api/[locale]/v1/core/agent/chat/credits/purchase/definition";
+import { default as endpointDefinition11 } from "@/app/api/[locale]/v1/core/credits/history/definition";
+import { default as endpointDefinition12 } from "@/app/api/[locale]/v1/core/credits/definition";
+import { default as endpointDefinition13 } from "@/app/api/[locale]/v1/core/credits/purchase/definition";
 import { default as endpointDefinition14 } from "@/app/api/[locale]/v1/core/agent/text-to-speech/definition";
 import { default as endpointDefinition15 } from "@/app/api/[locale]/v1/core/agent/speech-to-text/definition";
 import { default as endpointDefinition16 } from "@/app/api/[locale]/v1/core/system/server/dev/definition";

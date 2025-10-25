@@ -1,13 +1,18 @@
+/* eslint-disable i18next/no-literal-string */
+// Testing infrastructure - test descriptions are for developers, not end users
+
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { describe, expect, it } from "vitest";
 import type z from "zod";
 
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
-import { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
+import {
+  UserRole,
+  type UserRoleValue,
+} from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import type { UnifiedField } from "../../../unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
-import type { CreateApiEndpoint } from "../../../unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import { sendTestRequest } from "./send-test-request";
 import type { TestEndpointOptions, TestRunner } from "./types";
 
@@ -76,7 +81,6 @@ export function testEndpoint<
 ): void {
   const { customTests = {}, skipExampleTests = false } = options;
 
-  // eslint-disable-next-line i18next/no-literal-string
   describe(`API: ${endpoint.method} ${endpoint.path.join("/")}`, () => {
     // Create a test runner that can be reused
     const testRunner: TestRunner<
@@ -126,7 +130,7 @@ export function testEndpoint<
     }
 
     // Group tests for payload examples
-    const payloads = endpoint.ui.examples.payloads;
+    const payloads = endpoint.examples.requests;
     const urlPathVariables = endpoint.examples.urlPathVariables;
     if (payloads) {
       describe("Payload Examples", () => {
@@ -143,19 +147,10 @@ export function testEndpoint<
                 ]
               : undefined;
 
-            // Create a default user with permissions for the endpoint
-            const defaultUser: JwtPayloadType =
-              endpoint.requiresAuthentication()
-                ? {
-                    isPublic: false,
-                    id: "test-user-id",
-                  }
-                : { isPublic: true };
-
+            // Test with a user that has the endpoint's allowed roles
             const response = await testRunner.executeWith({
               data: payload,
               urlParams: urlParams as TUrlVariablesOutput,
-              user: defaultUser,
             });
 
             // Expect success
@@ -178,9 +173,6 @@ export function testEndpoint<
       describe("Authentication & Authorization", () => {
         // Test with unauthorized user
         it("should reject unauthorized users", async () => {
-          // Create a user with no roles
-          const unauthorizedUser: JwtPayloadType = { isPublic: true };
-
           const exampleKey = payloads
             ? (Object.keys(payloads)[0] as keyof typeof payloads)
             : undefined;
@@ -193,7 +185,11 @@ export function testEndpoint<
               exampleKey && urlPathVariables
                 ? (urlPathVariables[exampleKey] as TUrlVariablesOutput)
                 : (undefined as TUrlVariablesOutput),
-            user: unauthorizedUser,
+            // Use public user (unauthorized) for this test
+            user: {
+              isPublic: true,
+              leadId: "test-lead-id",
+            },
           });
 
           // Expect unauthorized response
@@ -209,7 +205,7 @@ export function testEndpoint<
           it("should accept users with valid roles", async () => {
             // Use a user with the first allowed role that's not PUBLIC
             const validRoles = endpoint.allowedRoles.filter(
-              (role) => role !== UserRoleValue.PUBLIC,
+              (role) => role !== UserRole.PUBLIC,
             );
 
             if (validRoles.length > 0) {
@@ -217,12 +213,6 @@ export function testEndpoint<
               const exampleKey = payloads
                 ? (Object.keys(payloads)[0] as keyof typeof payloads)
                 : undefined;
-
-              // Create an authorized user with the first valid role
-              const authorizedUser: JwtPayloadType = {
-                isPublic: false,
-                id: "authorized-test-user-id",
-              };
 
               const response = await testRunner.executeWith({
                 data:
@@ -233,7 +223,12 @@ export function testEndpoint<
                   exampleKey && urlPathVariables
                     ? (urlPathVariables[exampleKey] as TUrlVariablesOutput)
                     : (undefined as TUrlVariablesOutput),
-                user: authorizedUser,
+                // Use authorized private user for this test
+                user: {
+                  isPublic: false,
+                  id: "authorized-test-user-id",
+                  leadId: "test-lead-id",
+                },
               });
 
               // Should succeed with proper authorization

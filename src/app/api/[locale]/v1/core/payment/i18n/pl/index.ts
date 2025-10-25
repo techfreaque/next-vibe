@@ -213,12 +213,16 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Wykryto konflikt płatności",
     },
+    customerCreationFailed: "Nie udało się utworzyć klienta Stripe",
+    customerNotFound: "Nie znaleziono klienta Stripe",
   },
 
   // Top-level success
   success: {
     title: "Sukces",
     description: "Operacja zakończona pomyślnie",
+    sessionCreated: "Sesja płatności utworzona pomyślnie",
+    infoRetrieved: "Informacje o płatności pobrane pomyślnie",
   },
 
   // Field labels and descriptions

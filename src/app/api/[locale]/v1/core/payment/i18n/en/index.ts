@@ -212,12 +212,16 @@ export const translations = {
       title: "Conflict",
       description: "Payment conflict detected",
     },
+    customerCreationFailed: "Failed to create Stripe customer",
+    customerNotFound: "Stripe customer not found",
   },
 
   // Top-level success
   success: {
     title: "Success",
     description: "Operation completed successfully",
+    sessionCreated: "Payment session created successfully",
+    infoRetrieved: "Payment information retrieved successfully",
   },
 
   // Field labels and descriptions

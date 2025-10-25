@@ -18,10 +18,10 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { chatThreads } from "../db";
 import { ThreadStatus } from "../enum";
+import { validateNotIncognito } from "../validation";
 import type {
   ThreadCreateRequestOutput,
   ThreadCreateResponseOutput,
@@ -232,16 +232,13 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       });
 
       // Reject incognito threads - they should never be created on server
-      if (data.thread?.rootFolderId === "incognito") {
-        return createErrorResponse(
-          "app.api.v1.core.agent.chat.threads.post.errors.forbidden.title",
-          ErrorResponseTypes.FORBIDDEN,
-          {
-            message: simpleT(locale).t(
-              "app.api.v1.core.agent.chat.threads.post.errors.forbidden.incognitoNotAllowed",
-            ),
-          },
-        );
+      const incognitoError = validateNotIncognito(
+        data.thread?.rootFolderId || "",
+        locale,
+        "app.api.v1.core.agent.chat.threads.post",
+      );
+      if (incognitoError) {
+        return incognitoError;
       }
 
       // Subfolder validation: subFolderId is optional and validated by schema

@@ -2,11 +2,11 @@ import { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { env } from "@/config/env";
-import type { ResponseType } from "@/packages/next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   ErrorResponseTypes,
-} from "@/packages/next-vibe/shared/types/response.schema";
+} from "next-vibe/shared/types/response.schema";
 
 import {
   phoneNumberSchema,
@@ -83,8 +83,7 @@ export function getHttpProvider(): SmsProvider {
           const customSchema = z
             .string()
             .refine((value) => pattern.test(value), {
-              message:
-                "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
+              message: "app.api.v1.core.sms.sms.error.invalid_phone_format",
             });
 
           const result = customSchema.safeParse(phoneNumber);
@@ -93,7 +92,7 @@ export function getHttpProvider(): SmsProvider {
               valid: false,
               reason:
                 result.error.issues[0]?.message ??
-                "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
+                "app.api.v1.core.sms.sms.error.invalid_phone_format",
             };
           }
           return { valid: true };
@@ -109,7 +108,7 @@ export function getHttpProvider(): SmsProvider {
       if (!result.success) {
         return {
           valid: false,
-          reason: "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
+          reason: "app.api.v1.core.sms.sms.error.invalid_phone_format",
         };
       }
       return { valid: true };
@@ -125,7 +124,7 @@ export function getHttpProvider(): SmsProvider {
         // Validate required configuration early
         if (!apiUrl) {
           return createErrorResponse(
-            "packages.nextVibe.server.sms.sms.error.missing_aws_region" as never,
+            "app.api.v1.core.sms.sms.error.missing_aws_region",
             ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           );
         }
@@ -133,14 +132,14 @@ export function getHttpProvider(): SmsProvider {
         // Validate required parameters
         if (!params.to) {
           return createErrorResponse(
-            "packages.nextVibe.server.sms.sms.error.invalid_phone_format" as never,
+            "app.api.v1.core.sms.sms.error.invalid_phone_format",
             ErrorResponseTypes.VALIDATION_ERROR,
           );
         }
 
         if (!params.message || params.message.trim() === "") {
           return createErrorResponse(
-            "packages.nextVibe.server.sms.sms.error.empty_message" as never,
+            "app.api.v1.core.sms.sms.error.empty_message",
             ErrorResponseTypes.VALIDATION_ERROR,
           );
         }
@@ -248,7 +247,7 @@ export function getHttpProvider(): SmsProvider {
         // Handle HTTP errors
         if (!response.ok) {
           return createErrorResponse(
-            "packages.nextVibe.server.sms.sms.error.delivery_failed" as never,
+            "app.api.v1.core.sms.sms.error.delivery_failed",
             ErrorResponseTypes.SMS_ERROR,
           );
         }
@@ -339,7 +338,7 @@ export function getHttpProvider(): SmsProvider {
         const unknownMsg = "Unknown error";
         const unknownErrorMsg = unknownMsg;
         return createErrorResponse(
-          "packages.nextVibe.server.sms.sms.error.delivery_failed" as never,
+          "app.api.v1.core.sms.sms.error.delivery_failed",
           ErrorResponseTypes.SMS_ERROR,
           {
             error: error instanceof Error ? error.message : unknownErrorMsg,
