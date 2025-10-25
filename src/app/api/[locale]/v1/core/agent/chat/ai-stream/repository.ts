@@ -673,7 +673,13 @@ export async function createAiStream({
     });
 
     // Build tools object dynamically from registry
-    let tools: Record<string, CoreTool> | undefined = undefined;
+    // Type is inferred from usage - DO NOT add type annotations
+    // as Tool generic types are incompatible between different tools
+    let tools:
+      | {
+          [key: string]: typeof braveSearch;
+        }
+      | undefined = undefined;
 
     // Always include braveSearch if enableSearch is true (manual tool)
     if (data.enableSearch) {
@@ -886,10 +892,7 @@ export async function createAiStream({
               const toolCallEvent = createStreamEvent.toolCall({
                 messageId: aiMessageId,
                 toolName: toolCallData.toolName,
-                args: toolCallData.args as Record<
-                  string,
-                  string | number | boolean | null
-                >,
+                args: toolCallData.args,
               });
               controller.enqueue(encoder.encode(formatSSEEvent(toolCallEvent)));
             }
@@ -915,10 +918,7 @@ export async function createAiStream({
                     ? {
                         toolCalls: collectedToolCalls.map((tc) => ({
                           toolName: tc.toolName,
-                          args: tc.args as Record<
-                            string,
-                            string | number | boolean | null
-                          >,
+                          args: tc.args,
                         })),
                       }
                     : {}),
@@ -977,7 +977,9 @@ export async function createAiStream({
               creditIdentifier = { leadId: effectiveLeadId };
             } else {
               // This should not happen as we validated credits earlier
-              logger.error("No effective leadId available for credit deduction");
+              logger.error(
+                "No effective leadId available for credit deduction",
+              );
               creditIdentifier = { leadId: leadId ?? "" };
             }
 

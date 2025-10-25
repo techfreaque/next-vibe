@@ -49,6 +49,14 @@ export const translations = {
       results: {
         title: "Results",
         description: "Array of search results",
+        item: {
+          title: "Search Result",
+          description: "Individual search result",
+          url: "URL",
+          snippet: "Snippet",
+          age: "Age",
+          source: "Source",
+        },
       },
       cached: {
         title: "Cached",

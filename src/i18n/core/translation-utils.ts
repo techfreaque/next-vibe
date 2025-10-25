@@ -1,4 +1,4 @@
-import { Environment, errorLogger } from "next-vibe/shared/utils";
+import { Environment } from "next-vibe/shared/utils";
 import type { ReactNode } from "react";
 
 import { translationsKeyMode } from "@/config/debug";
@@ -34,15 +34,18 @@ export function logTranslationError(
 
   switch (errorType) {
     case "missing":
-      errorLogger(`${prefix}Translation key not found: ${key}`);
+      // eslint-disable-next-line no-console
+      console.error(`${prefix}Translation key not found: ${key}`);
       break;
     case "invalid_type":
-      errorLogger(
+      // eslint-disable-next-line no-console
+      console.error(
         `${prefix}Translation key "${key}" has invalid type (expected string)`,
       );
       break;
     case "fallback_missing":
-      errorLogger(
+      // eslint-disable-next-line no-console
+      console.error(
         `${prefix}Translation key not found in fallback language: ${key}`,
       );
       break;

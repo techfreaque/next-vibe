@@ -2,16 +2,18 @@ import type {
   DefaultError,
   QueryKey,
   UseQueryOptions,
-} from "@tantml:react-query";
+} from "@tanstack/react-query";
 import type {
   ErrorResponseType,
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import type { FormEvent } from "react";
-import type { UseFormProps, UseFormReturn } from "react-hook-form";
-import type { ZodType, ZodTypeDef } from "zod";
+import type { FieldValues, UseFormProps, UseFormReturn } from "react-hook-form";
+import type { z, ZodType } from "zod";
 
+import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
+import { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { EnhancedMutationResult } from "./mutation";
@@ -26,12 +28,21 @@ import type { EnhancedMutationResult } from "./mutation";
  * Uses direct property access instead of infer for better type inference
  */
 export type InferApiFormReturn<T> =
-  T extends CreateApiEndpoint<any, any, any, any>
-    ? ApiFormReturn<
-        T["TRequestOutput"],
-        T["TResponseOutput"],
-        T["TUrlVariablesOutput"]
-      >
+  T extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    any
+  >
+    ? T extends {
+        types: {
+          RequestOutput: infer TRequestOutput;
+          ResponseOutput: infer TResponseOutput;
+          UrlVariablesOutput: infer TUrlVariablesOutput;
+        };
+      }
+      ? ApiFormReturn<TRequestOutput, TResponseOutput, TUrlVariablesOutput>
+      : never
     : never;
 
 /**
@@ -39,8 +50,15 @@ export type InferApiFormReturn<T> =
  * Uses direct property access instead of infer for better type inference
  */
 export type InferApiQueryReturn<T> =
-  T extends CreateApiEndpoint<any, any, any, any>
-    ? ApiQueryReturn<T["TResponseOutput"]>
+  T extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    any
+  >
+    ? T extends { types: { ResponseOutput: infer TResponseOutput } }
+      ? ApiQueryReturn<TResponseOutput>
+      : never
     : never;
 
 /**
@@ -48,12 +66,21 @@ export type InferApiQueryReturn<T> =
  * Uses direct property access instead of infer for better type inference
  */
 export type InferApiQueryFormReturn<T> =
-  T extends CreateApiEndpoint<any, any, any, any>
-    ? ApiQueryFormReturn<
-        T["TRequestOutput"],
-        T["TResponseOutput"],
-        T["TUrlVariablesOutput"]
-      >
+  T extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    any
+  >
+    ? T extends {
+        types: {
+          RequestOutput: infer TRequestOutput;
+          ResponseOutput: infer TResponseOutput;
+          UrlVariablesOutput: infer TUrlVariablesOutput;
+        };
+      }
+      ? ApiQueryFormReturn<TRequestOutput, TResponseOutput, TUrlVariablesOutput>
+      : never
     : never;
 
 /**
@@ -61,12 +88,25 @@ export type InferApiQueryFormReturn<T> =
  * Uses direct property access instead of infer for better type inference
  */
 export type InferEnhancedMutationResult<T> =
-  T extends CreateApiEndpoint<any, any, any, any>
-    ? EnhancedMutationResult<
-        T["TResponseOutput"],
-        T["TRequestOutput"],
-        T["TUrlVariablesOutput"]
-      >
+  T extends CreateApiEndpoint<
+    string,
+    Methods,
+    readonly (typeof UserRoleValue)[],
+    any
+  >
+    ? T extends {
+        types: {
+          RequestOutput: infer TRequestOutput;
+          ResponseOutput: infer TResponseOutput;
+          UrlVariablesOutput: infer TUrlVariablesOutput;
+        };
+      }
+      ? EnhancedMutationResult<
+          TResponseOutput,
+          TRequestOutput,
+          TUrlVariablesOutput
+        >
+      : never
     : never;
 
 /**
@@ -154,7 +194,7 @@ export interface ApiMutationOptions<TRequest, TResponse, TUrlVariables> {
 /**
  * Type for the API query form options
  */
-export interface ApiQueryFormOptions<TRequest>
+export interface ApiQueryFormOptions<TRequest extends FieldValues>
   extends ApiFormOptions<TRequest> {
   autoSubmit?: boolean; // Whether to automatically submit the form when values change
   debounceMs?: number; // Debounce time in ms for auto-submission
@@ -190,23 +230,24 @@ export interface ApiQueryFormReturn<TRequest, TResponse, TUrlVariables>
 }
 
 // Form-specific types
-export type ApiFormOptions<TRequest> = UseFormProps<TRequest> & {
-  defaultValues?: Partial<TRequest>;
-  /**
-   * Whether to enable form persistence using localStorage
-   * @default true
-   */
-  persistForm?: boolean;
-  /**
-   * The key to use for storing form data in localStorage
-   * If not provided, a key will be generated based on the endpoint
-   */
-  persistenceKey?: string;
-};
+export type ApiFormOptions<TRequest extends FieldValues> =
+  UseFormProps<TRequest> & {
+    defaultValues?: Partial<TRequest>;
+    /**
+     * Whether to enable form persistence using localStorage
+     * @default true
+     */
+    persistForm?: boolean;
+    /**
+     * The key to use for storing form data in localStorage
+     * If not provided, a key will be generated based on the endpoint
+     */
+    persistenceKey?: string;
+  };
 
 export interface ApiFormReturn<TRequest, TResponse, TUrlVariables> {
   // @ts-ignore - Intentionally ignoring FieldValues constraint requirement
-  form: UseFormReturn<TRequest, ZodType<TRequest, ZodTypeDef, TRequest>>;
+  form: UseFormReturn<TRequest, ZodType<TRequest, z.ZodTypeDef, TRequest>>;
 
   /** The complete response including success/error state */
   response: ResponseType<TResponse> | undefined;

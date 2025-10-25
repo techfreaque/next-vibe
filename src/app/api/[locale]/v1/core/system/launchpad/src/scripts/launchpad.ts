@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 /// <reference types="node" />
-/* eslint-disable i18next/no-literal-string */
-/* eslint-disable no-restricted-syntax */
 import { Command } from "commander";
 import inquirer from "inquirer";
 
@@ -23,6 +21,7 @@ import {
   weeklyUpdateCommand,
 } from "./release-orchestration.js";
 import { updateAllRepos } from "./update-all.js";
+import { simpleT } from "@/i18n/core/shared.js";
 
 interface CIReleaseOptions {
   target?: string;
@@ -38,6 +37,8 @@ interface ForceReleaseOptions {
 }
 
 const program = new Command();
+
+const locale = defaultLocale;
 
 program
   .name("launchpad")
@@ -64,10 +65,10 @@ program
     "Git tag to determine target (overrides auto-detection)",
   )
   .action(async (options: CIReleaseOptions) => {
-    const logger = createEndpointLogger(true, Date.now(), defaultLocale);
+    const logger = createEndpointLogger(true, Date.now(), locale);
     try {
       const rootDir = process.cwd();
-      await ciReleaseCommand(logger, rootDir, options.target, options.tag);
+      await ciReleaseCommand(logger, rootDir, options.target, options.tag, locale);
     } catch (error) {
       handleError(logger, "CI release failed:", error);
     }
@@ -90,8 +91,8 @@ program
   .command("release-all")
   .description("Release all packages sequentially with state persistence")
   .action(async () => {
-    const logger = createEndpointLogger(true, Date.now(), defaultLocale);
-    try {
+    const logger = createEndpointLogger(true, Date.now(), locale);
+    const t = simpleT(locale);    try {
       const rootDir = process.cwd();
       await releaseAllCommand(logger, rootDir);
     } catch (error) {
@@ -107,7 +108,8 @@ program
     "Version bump type (patch|minor|major|init)",
   )
   .action(async (options: ForceReleaseOptions) => {
-    const logger = createEndpointLogger(true, Date.now(), defaultLocale);
+    const logger = createEndpointLogger(true, Date.now(), locale);
+    const t = simpleT(locale);
     try {
       const rootDir = process.cwd();
 
@@ -140,10 +142,11 @@ program
   .command("continue")
   .description("Continue release from previous state")
   .action(async () => {
-    const logger = createEndpointLogger(true, Date.now(), defaultLocale);
+    const logger = createEndpointLogger(true, Date.now(), locale);
+    const t = simpleT(locale);
     try {
       const rootDir = process.cwd();
-      await continueReleaseCommand(logger, rootDir);
+      await continueReleaseCommand(logger, rootDir, t);
     } catch (error) {
       handleError(logger, "Continue release failed:", error);
     }
@@ -153,10 +156,11 @@ program
   .command("status")
   .description("Show current release status")
   .action(() => {
-    const logger = createEndpointLogger(true, Date.now(), defaultLocale);
+    const logger = createEndpointLogger(true, Date.now(), locale);
+    const t = simpleT(locale);
     try {
       const rootDir = process.cwd();
-      showReleaseStatusCommand(logger, rootDir);
+      showReleaseStatusCommand(logger, rootDir, t);
     } catch (error) {
       handleError(logger, "Show status failed:", error);
     }
@@ -167,7 +171,8 @@ program
   .description("Weekly dependency update with branch creation and PR")
   .option("--branch <branch>", "Target branch name", "next_version_candidates")
   .action(async (options: WeeklyUpdateOptions) => {
-    const logger = createEndpointLogger(true, Date.now(), defaultLocale);
+    const logger = createEndpointLogger(true, Date.now(), locale);
+    const t = simpleT(locale);
     try {
       const rootDir = process.cwd();
       await weeklyUpdateCommand(logger, rootDir, options.branch);
@@ -238,13 +243,13 @@ async function runInteractiveMode(): Promise<void> {
 
         switch (action) {
           case "clone-missing":
-            await cloneMissingRepos(logger, configRootDir, config);
+            await cloneMissingRepos(logger, configRootDir, config, locale);
             break;
           case "update-all":
-            await updateAllRepos(logger, false, configRootDir, config);
+            await updateAllRepos(logger, false, configRootDir, config, locale);
             break;
           case "update-all-force":
-            await updateAllRepos(logger, true, configRootDir, config);
+            await updateAllRepos(logger, true, configRootDir, config, locale);
             break;
           case "navigate-folders":
             await navigateFolders(configRootDir, config);

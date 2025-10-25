@@ -51,6 +51,22 @@ export const translations: typeof enTranslations = {
           connectionsActive: "Aktywne połączenia",
           connectionErrors: "Błędy połączenia",
           lastSyncAt: "Ostatnia synchronizacja",
+          syncStats: {
+            title: "Statystyki synchronizacji",
+            description: "Statystyki i metryki synchronizacji",
+            totalSyncs: "Wszystkie synchronizacje",
+            lastSyncTime: "Czas ostatniej synchronizacji",
+          },
+          serverStatus: "Status serwera",
+          uptime: "Czas pracy",
+          syncedAccounts: "Zsynchronizowane konta",
+          totalAccounts: "Wszystkie konta",
+          activeConnections: "Aktywne połączenia",
+          performanceMetrics: {
+            title: "Metryki wydajności",
+            description: "Metryki i statystyki wydajności",
+            avgResponseTime: "Średni czas odpowiedzi",
+          },
         },
       },
       errors: {

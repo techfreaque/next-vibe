@@ -128,8 +128,7 @@ export class NewsletterSubscribeSmsServiceImpl
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>> {
     try {
       // Get admin phone number from environment or config
-      // eslint-disable-next-line node/no-process-env
-      const adminPhone = process.env.ADMIN_NOTIFICATION_PHONE;
+      const adminPhone = env.ADMIN_NOTIFICATION_PHONE;
 
       if (!adminPhone) {
         logger.debug(

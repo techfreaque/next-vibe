@@ -4,6 +4,7 @@ import { translations as foldersTranslations } from "../../folders/i18n/pl";
 import { translations as personasTranslations } from "../../personas/i18n/pl";
 import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/pl";
 import { translations as threadsTranslations } from "../../threads/i18n/pl";
+import { translations as braveSearchTranslations } from "../../tools/brave-search/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -146,5 +147,8 @@ export const translations: typeof enTranslations = {
   threads: {
     ...threadsTranslations,
     messages: messagesTranslations,
+  },
+  tools: {
+    braveSearch: braveSearchTranslations,
   },
 };

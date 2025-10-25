@@ -10,23 +10,24 @@
  * - Generated at: 2025-10-10T17:19:42.646Z
  */
 
-import { tasks as taskModule4 } from "../../agent/classification/task";
-import { tasks as taskModule3 } from "../../agent/execution/task";
+// TODO: These task files do not exist yet - uncomment when implemented
+// import { tasks as taskModule4 } from "../../agent/classification/task";
+// import { tasks as taskModule3 } from "../../agent/execution/task";
 import { tasks as taskModule5 } from "../../emails/imap-client/sync/task";
 import { tasks as taskModule2 } from "../../leads/import/task";
 import { tasks as taskModule0 } from "../../newsletter/unsubscribe/task";
 import { tasks as taskModule1 } from "../../user/session-cleanup/task";
 import { taskRunners as runnerModule7 } from "../tasks/dev-watcher/task-runner";
 import { taskRunners as runnerModule6 } from "../tasks/pulse-runner/task-runner";
-import type { Task, TaskRegistry } from "../types/repository";
-import { UnifiedTaskRunnerRepositoryImpl } from "../unified-runner/repository";
+import type { Task, TaskRegistry } from "../tasks/types/repository";
+import { UnifiedTaskRunnerRepositoryImpl } from "../tasks/unified-runner/repository";
 
 const allTasks: Task[] = [
   ...taskModule0,
   ...taskModule1,
   ...taskModule2,
-  ...taskModule3,
-  ...taskModule4,
+  // ...taskModule3,  // TODO: Uncomment when agent/execution/task exists
+  // ...taskModule4,  // TODO: Uncomment when agent/classification/task exists
   ...taskModule5,
   ...runnerModule6,
   ...runnerModule7,

@@ -77,7 +77,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.query.label" as const,
+            "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.query.title" as const,
           description:
             "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.query.description" as const,
           placeholder:
@@ -93,7 +93,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label:
-            "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.maxResults.label" as const,
+            "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.maxResults.title" as const,
           description:
             "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.maxResults.description" as const,
           layout: { columns: 6 },
@@ -107,7 +107,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.includeNews.label" as const,
+            "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.includeNews.title" as const,
           description:
             "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.includeNews.description" as const,
           layout: { columns: 6 },
@@ -121,7 +121,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label:
-            "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.freshness.label" as const,
+            "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.freshness.title" as const,
           description:
             "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.freshness.description" as const,
           options: [
@@ -157,7 +157,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.agent.chat.tools.braveSearch.get.response.success" as const,
+            "app.api.v1.core.agent.chat.tools.braveSearch.get.response.success.title" as const,
         },
         z.boolean(),
       ),
@@ -166,16 +166,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.agent.chat.tools.braveSearch.get.response.message" as const,
-        },
-        z.string(),
-      ),
-
-      query: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.agent.chat.tools.braveSearch.get.response.query" as const,
+            "app.api.v1.core.agent.chat.tools.braveSearch.get.response.message.title" as const,
         },
         z.string(),
       ),
@@ -244,7 +235,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.agent.chat.tools.braveSearch.get.response.cached" as const,
+            "app.api.v1.core.agent.chat.tools.braveSearch.get.response.cached.title" as const,
         },
         z.boolean().optional(),
       ),
@@ -253,7 +244,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.agent.chat.tools.braveSearch.get.response.timestamp" as const,
+            "app.api.v1.core.agent.chat.tools.braveSearch.get.response.timestamp.title" as const,
         },
         z.string().optional(),
       ),
@@ -262,13 +253,13 @@ const { GET } = createEndpoint({
 
   // === ERROR HANDLING ===
   errorTypes: {
-    [EndpointErrorTypes.VALIDATION_ERROR]: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
         "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.validation.title" as const,
       description:
         "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.validation.description" as const,
     },
-    [EndpointErrorTypes.INTERNAL_ERROR]: {
+    [EndpointErrorTypes.SERVER_ERROR]: {
       title:
         "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
       description:
@@ -276,33 +267,45 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.unauthorized.title" as const,
+        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
       description:
-        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.unauthorized.description" as const,
+        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.notFound.title" as const,
+        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
       description:
-        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.notFound.description" as const,
+        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.network.title" as const,
+        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
       description:
-        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.network.description" as const,
+        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.conflict.title" as const,
+        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
       description:
-        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.conflict.description" as const,
+        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.unsavedChanges.title" as const,
+        "app.api.v1.core.agent.chat.threads.search.get.errors.unsavedChanges.title" as const,
       description:
-        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.unsavedChanges.description" as const,
+        "app.api.v1.core.agent.chat.threads.search.get.errors.unsavedChanges.description" as const,
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title:
+        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
+      description:
+        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title:
+        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
+      description:
+        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
     },
   },
 
@@ -336,7 +339,6 @@ const { GET } = createEndpoint({
       default: {
         success: true,
         message: "Found 5 results for: latest AI news",
-        query: "latest AI news",
         results: [
           {
             title: "Breaking: GPT-5 Announced",
@@ -345,6 +347,36 @@ const { GET } = createEndpoint({
               "OpenAI announces the next generation of language models...",
             age: "2 hours ago",
             source: "TechNews",
+          },
+        ],
+        cached: false,
+        timestamp: "2024-01-15T10:30:00Z",
+      },
+      withNews: {
+        success: true,
+        message: "Found 10 results for: breaking news today",
+        results: [
+          {
+            title: "Breaking News Update",
+            url: "https://example.com/news",
+            snippet: "Latest breaking news from around the world...",
+            age: "1 hour ago",
+            source: "NewsSource",
+          },
+        ],
+        cached: false,
+        timestamp: "2024-01-15T10:30:00Z",
+      },
+      recent: {
+        success: true,
+        message: "Found 5 results for: tech updates",
+        results: [
+          {
+            title: "Tech Updates Today",
+            url: "https://example.com/tech",
+            snippet: "Latest technology updates and innovations...",
+            age: "3 hours ago",
+            source: "TechDaily",
           },
         ],
         cached: false,

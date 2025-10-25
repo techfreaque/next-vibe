@@ -4,13 +4,23 @@ import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import type { FormEvent } from "react";
 import { useMemo } from "react";
 
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { z } from "zod";
+
+import { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import type {
+  ArrayField,
+  FieldUsageConfig,
+  ObjectField,
+  PrimitiveField,
+  UnifiedField,
+} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { AutoPrefillConfig } from "../form/types";
 import {
+  type EndpointReturn,
   type EndpointUrlVariables,
   type FormAlertState,
   type GetEndpointTypes,
@@ -24,7 +34,7 @@ import { useEndpointRead } from "./use-endpoint-read";
 import { useAvailableMethods, usePrimaryMutationMethod } from "./utils";
 
 // Re-export EndpointReturn for external use
-export type { EndpointReturn } from "./types";
+export type { EndpointReturn };
 
 /**
  * Utility function to normalize options with smart defaults and full type safety
@@ -91,7 +101,11 @@ export function useEndpoint<
       CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
     >
   >,
->(endpoints: T, options: UseEndpointOptions<T> = {}, logger: EndpointLogger) {
+>(
+  endpoints: T,
+  options: UseEndpointOptions<T> = {},
+  logger: EndpointLogger,
+): EndpointReturn<T> {
   useTranslation();
   // Normalize options with smart defaults
   const { queryOptions, defaultValues, autoPrefill } =

@@ -116,9 +116,11 @@ export function LeadsStatsChart({
   useEffect(() => {
     if (data?.sourceData) {
       const initial: Partial<Record<keyof typeof LeadSource, boolean>> = {};
-      (Object.keys(data.sourceData) as Array<keyof typeof LeadSource>).forEach((source) => {
-        initial[source] = true;
-      });
+      (Object.keys(data.sourceData) as Array<keyof typeof LeadSource>).forEach(
+        (source) => {
+          initial[source] = true;
+        },
+      );
       setVisibleSources(initial);
     }
   }, [data?.sourceData]);
@@ -161,7 +163,7 @@ export function LeadsStatsChart({
     setVisibleSources((prev) => {
       const updated = { ...prev };
       Object.keys(updated).forEach((key) => {
-        updated[key as LeadSource] = true;
+        updated[key as keyof typeof LeadSource] = true;
       });
       return updated;
     });
@@ -171,7 +173,7 @@ export function LeadsStatsChart({
     setVisibleSources((prev) => {
       const updated = { ...prev };
       Object.keys(updated).forEach((key) => {
-        updated[key as LeadSource] = false;
+        updated[key as keyof typeof LeadSource] = false;
       });
       return updated;
     });
@@ -296,7 +298,9 @@ export function LeadsStatsChart({
         ): TranslationKey => {
           // Convert string to enum value if needed
           const sourceEnum =
-            typeof source === "string" ? (source as LeadSource) : source;
+            typeof source === "string"
+              ? (source as keyof typeof LeadSource)
+              : source;
 
           switch (sourceEnum) {
             case LeadSource.WEBSITE:
@@ -317,11 +321,12 @@ export function LeadsStatsChart({
         };
 
         return {
-          source: source as LeadSource,
+          source: source as keyof typeof LeadSource,
           name: t(getSourceTranslationKey(source)),
           color:
-            CHART_CONSTANTS.SOURCE_COLORS[source as LeadSource] || "#6b7280",
-          visible: visibleSources[source as LeadSource] || false,
+            CHART_CONSTANTS.SOURCE_COLORS[source as keyof typeof LeadSource] ||
+            "#6b7280",
+          visible: visibleSources[source as keyof typeof LeadSource] || false,
           count,
           percentage: total > 0 ? (count / total) * 100 : 0,
         };

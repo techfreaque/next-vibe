@@ -1,4 +1,6 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   get: {
     title: "Wyszukaj w sieci",
     description:
@@ -49,6 +51,14 @@ export const translations = {
       results: {
         title: "Wyniki",
         description: "Tablica wyników wyszukiwania",
+        item: {
+          title: "Wynik wyszukiwania",
+          description: "Pojedynczy wynik wyszukiwania",
+          url: "URL",
+          snippet: "Fragment",
+          age: "Wiek",
+          source: "Źródło",
+        },
       },
       cached: {
         title: "W pamięci podręcznej",

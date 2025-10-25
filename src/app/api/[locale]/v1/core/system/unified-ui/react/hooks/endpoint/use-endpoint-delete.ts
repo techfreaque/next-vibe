@@ -27,13 +27,8 @@ import type { ApiMutationOptions } from "../types";
  * - Consistent with mutation-form pattern
  */
 export function useEndpointDelete<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
-  >,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TEndpoint extends CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any> ,
 >(
   deleteEndpoint: TEndpoint | null,
   logger: EndpointLogger,

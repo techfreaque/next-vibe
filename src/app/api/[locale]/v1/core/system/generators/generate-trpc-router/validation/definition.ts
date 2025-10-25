@@ -248,9 +248,8 @@ const { POST } = createEndpoint({
   errorTypes: [
     EndpointErrorTypes.UNAUTHORIZED,
     EndpointErrorTypes.FORBIDDEN,
-    EndpointErrorTypes.INTERNAL_ERROR,
-    EndpointErrorTypes.TIMEOUT,
-    EndpointErrorTypes.VALIDATION_ERROR,
+    EndpointErrorTypes.SERVER_ERROR,
+    EndpointErrorTypes.VALIDATION_FAILED,
     EndpointErrorTypes.NOT_FOUND,
   ],
 });

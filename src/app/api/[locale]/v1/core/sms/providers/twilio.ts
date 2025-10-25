@@ -1,9 +1,9 @@
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { ResponseType } from "@/packages/next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   ErrorResponseTypes,
 } from "@/packages/next-vibe/shared/types/response.schema";
-import { debugLogger } from "@/packages/next-vibe/shared/utils/logger";
 import { env } from "@/config/env";
 import type { SendSmsParams, SmsProvider, SmsResult } from "../utils";
 import { SmsProviders } from "../utils";
@@ -55,7 +55,7 @@ export function getTwilioProvider(): SmsProvider {
   return {
     name: SmsProviders.TWILIO,
 
-    async sendSms(params: SendSmsParams): Promise<ResponseType<SmsResult>> {
+    async sendSms(params: SendSmsParams, logger: EndpointLogger): Promise<ResponseType<SmsResult>> {
       try {
         // Type guard for params
         if (!params || typeof params !== "object") {
@@ -66,7 +66,7 @@ export function getTwilioProvider(): SmsProvider {
           };
         }
 
-        debugLogger("Sending SMS via Twilio", { to: params.to });
+        logger.debug("Sending SMS via Twilio", { to: params.to });
 
         // Validate required parameters
         if (!params.to) {

@@ -4,11 +4,10 @@ import { existsSync } from "node:fs";
 import { dirname, join, parse, resolve } from "node:path";
 
 import { defaultLocale } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import type { LaunchpadConfig } from "../types/types";
+import { TFunction } from "@/i18n/core/static-types";
 
-const { t } = simpleT(defaultLocale);
 
 export const DEFAULT_CONFIG_PATH = "launchpad.config.ts";
 
@@ -16,11 +15,11 @@ export const DEFAULT_CONFIG_PATH = "launchpad.config.ts";
 let configRootDir: string | null = null;
 
 // Get the root directory from the config file location
-export function getRootDirectory(): string {
+export function getRootDirectory(t: TFunction): string {
   if (!configRootDir) {
     throw new Error(
       t(
-        "app.api.v1.core.system.launchpad.src.utils.config.errors.configNotLoaded" as const,
+        "app.api.v1.core.system.launchpad.src.utils.config.errors.configNotLoaded" ,
       ),
     );
   }
@@ -92,6 +91,7 @@ function isLaunchpadConfigModule(
 
 export async function loadConfig(
   explicitConfigPath?: string,
+  t: TFunction,
 ): Promise<LaunchpadConfig> {
   const configPath = explicitConfigPath || DEFAULT_CONFIG_PATH;
   let resolvedConfigPath: string;

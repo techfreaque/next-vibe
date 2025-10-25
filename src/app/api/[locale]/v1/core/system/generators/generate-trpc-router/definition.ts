@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import {
   EndpointErrorTypes,
   FieldDataType,

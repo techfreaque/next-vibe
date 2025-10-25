@@ -1,13 +1,16 @@
 /* eslint-disable no-console */
-/* eslint-disable node/no-process-env */
+
 import { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { ExplicitAnyType } from "@/packages/next-vibe/shared/types/utils";
-import { Environment, validateEnv } from "@/packages/next-vibe/shared/utils/env-util";
+import {
+  Environment,
+  validateEnv,
+} from "@/packages/next-vibe/shared/utils/env-util";
 
 const isServer = typeof window === "undefined";
-const isReactNative = !isServer && !window.document;
+const isReactNative = false;
 const isBrowser = !isServer && !!window.document;
 
 const platform = {
@@ -16,7 +19,19 @@ const platform = {
   isBrowser,
 };
 
-export const envClientBaseSchema = z.object({
+// We intentionally disable process at the type level for react native and validation
+declare const process: {
+  env: {
+    [key: string]: string | undefined;
+  };
+};
+
+export const envClientSchema = z.object({
+  platform: z.object({
+    isServer: z.boolean(),
+    isReactNative: z.boolean(),
+    isBrowser: z.boolean(),
+  }),
   NODE_ENV: z.enum(Environment),
   NEXT_PUBLIC_APP_URL: z.string(),
   NEXT_PUBLIC_TEST_SERVER_URL: z.string(),
@@ -33,7 +48,14 @@ export const envClientBaseSchema = z.object({
       `The env NEXT_PUBLIC_DEBUG_PRODUCTION must be a boolean, received: ${val}`,
     );
   }),
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().min(1),
+  NEXT_PUBLIC_SUPPORT_EMAIL_DE: z.email(),
+  NEXT_PUBLIC_SUPPORT_EMAIL_PL: z.email(),
+  NEXT_PUBLIC_SUPPORT_EMAIL_GLOBAL: z.email(),
 });
+
+export type EnvFrontend = z.infer<typeof envClientSchema>;
+export type EnvFrontendInput = z.input<typeof envClientSchema>;
 
 // Simple console logger for environment validation to avoid circular dependencies
 export const envValidationLogger: EndpointLogger = {
@@ -49,21 +71,6 @@ export const envValidationLogger: EndpointLogger = {
     console.log(`[ENV] ${message}`, meta || ""),
   isDebugEnabled: false,
 };
-
-export const envClientSchema = envClientBaseSchema.extend({
-  platform: z.object({
-    isServer: z.boolean(),
-    isReactNative: z.boolean(),
-    isBrowser: z.boolean(),
-  }),
-  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().min(1),
-  NEXT_PUBLIC_SUPPORT_EMAIL_DE: z.email(),
-  NEXT_PUBLIC_SUPPORT_EMAIL_PL: z.email(),
-  NEXT_PUBLIC_SUPPORT_EMAIL_GLOBAL: z.email(),
-});
-
-export type EnvFrontend = z.infer<typeof envClientSchema>;
-export type EnvFrontendInput = z.input<typeof envClientSchema>;
 
 // Export validated environment for use throughout the application
 export const envClient: EnvFrontend = validateEnv(

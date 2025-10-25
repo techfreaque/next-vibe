@@ -34,7 +34,7 @@
  */
 
 import type { NextRequest, NextResponse } from "next/server";
-import type { SmsFunctionType } from "next-vibe/server/sms/utils";
+import type { SmsFunctionType } from "@/app/api/[locale]/v1/core/sms/utils";
 import type {
   ResponseType,
   StreamingResponse,

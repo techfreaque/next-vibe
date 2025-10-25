@@ -106,8 +106,8 @@ export interface SmsResult {
  */
 export interface SmsProvider {
   name: SmsProviders;
-  sendSms(params: SendSmsParams): Promise<ResponseType<SmsResult>>;
-  validatePhoneNumber?(phoneNumber: string): {
+  sendSms(params: SendSmsParams, logger: EndpointLogger): Promise<ResponseType<SmsResult>>;
+  validatePhoneNumber?(phoneNumber: string, logger: EndpointLogger): {
     valid: boolean;
     reason?: string;
   };

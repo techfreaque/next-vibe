@@ -36,7 +36,4 @@ export function useSmtpAccountById(
   );
 }
 
-// Export with alternative name for compatibility
-export const useSmtpAccountByIdEndpoint = useSmtpAccountById;
-
 export type SmtpAccountByIdEndpointReturn = EndpointReturn<typeof definitions>;

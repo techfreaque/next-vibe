@@ -116,6 +116,95 @@ const { GET } = createEndpoint({
             },
             z.enum(ImapHealthStatus),
           ),
+          syncStats: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.emails.imapClient.health.health.get.response.data.syncStats.title",
+              description:
+                "app.api.v1.core.emails.imapClient.health.health.get.response.data.syncStats.description",
+              layout: { type: LayoutType.GRID, columns: 12 },
+            },
+            { response: true },
+            {
+              totalSyncs: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.emails.imapClient.health.health.get.response.data.syncStats.totalSyncs",
+                },
+                z.number().int(),
+              ),
+              lastSyncTime: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.emails.imapClient.health.health.get.response.data.syncStats.lastSyncTime",
+                },
+                z.string().nullable(),
+              ),
+            },
+          ),
+          serverStatus: responseField(
+            {
+              type: WidgetType.BADGE,
+              text: "app.api.v1.core.emails.imapClient.health.health.get.response.data.serverStatus",
+            },
+            z.string(),
+          ),
+          uptime: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.emails.imapClient.health.health.get.response.data.uptime",
+            },
+            z.string(),
+          ),
+          syncedAccounts: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.emails.imapClient.health.health.get.response.data.syncedAccounts",
+            },
+            z.number().int(),
+          ),
+          totalAccounts: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.emails.imapClient.health.health.get.response.data.totalAccounts",
+            },
+            z.number().int(),
+          ),
+          activeConnections: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.emails.imapClient.health.health.get.response.data.activeConnections",
+            },
+            z.number().int(),
+          ),
+          performanceMetrics: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title:
+                "app.api.v1.core.emails.imapClient.health.health.get.response.data.performanceMetrics.title",
+              description:
+                "app.api.v1.core.emails.imapClient.health.health.get.response.data.performanceMetrics.description",
+              layout: { type: LayoutType.GRID, columns: 12 },
+            },
+            { response: true },
+            {
+              avgResponseTime: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.emails.imapClient.health.health.get.response.data.performanceMetrics.avgResponseTime",
+                },
+                z.number(),
+              ),
+            },
+          ),
         },
       ),
 
@@ -205,6 +294,18 @@ const { GET } = createEndpoint({
           connectionErrors: 1,
           lastSyncAt: "2023-12-01T10:32:15Z",
           status: ImapHealthStatus.HEALTHY,
+          syncStats: {
+            totalSyncs: 1250,
+            lastSyncTime: "2023-12-01T10:32:15Z",
+          },
+          serverStatus: "healthy",
+          uptime: "5d 12h 30m",
+          syncedAccounts: 5,
+          totalAccounts: 8,
+          activeConnections: 12,
+          performanceMetrics: {
+            avgResponseTime: 150.5,
+          },
         },
         message:
           "app.api.v1.core.emails.imapClient.health.health.get.success.description",

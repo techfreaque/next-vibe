@@ -59,9 +59,9 @@ export function LeadsListClient({
   >[number];
 
   const apiResponse = leadsEndpoint.read.response;
-  const leads: LeadType[] = apiResponse?.success ? apiResponse.data.leads : [];
-  const totalLeads = apiResponse?.success ? apiResponse.data.total : 0;
-  const totalPages = apiResponse?.success ? apiResponse.data.totalPages : 0;
+  const leads: LeadType[] = apiResponse?.success ? apiResponse.data.response.leads : [];
+  const totalLeads = apiResponse?.success ? apiResponse.data.response.total : 0;
+  const totalPages = apiResponse?.success ? apiResponse.data.response.totalPages : 0;
   const queryLoading = leadsEndpoint.read.isLoading || false;
 
   // Reset trigger for toolbar state
@@ -606,7 +606,7 @@ export function LeadsListClient({
             locale={locale}
             totalCount={
               leadsEndpoint.read.response?.success
-                ? leadsEndpoint.read.response.data.total
+                ? leadsEndpoint.read.response.data.response.total
                 : leads.length
             }
             currentPage={leadsEndpoint.read.form.watch("page") || 1}

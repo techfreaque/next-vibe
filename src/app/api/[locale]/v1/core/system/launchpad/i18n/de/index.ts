@@ -1,8 +1,6 @@
-import { translations as srcTranslations } from "../../src/i18n/en";
-
-export const translations = {
+import type { translations as enTranslations } from "../en";
+export const translations : typeof enTranslations = {
   category: "Release-Executor",
-  src: srcTranslations,
   releaseExecutor: {
     processing: "Verarbeite: {{directory}}",
     executing: "Führe aus: {{command}}",

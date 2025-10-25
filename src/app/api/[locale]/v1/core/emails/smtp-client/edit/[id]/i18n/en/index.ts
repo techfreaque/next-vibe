@@ -135,4 +135,9 @@ export const translations = {
     title: "Success",
     description: "Operation completed successfully",
   },
+  actions: {
+    back: "Back",
+    cancel: "Cancel",
+  },
+  notFound: "Account not found",
 };

@@ -21,11 +21,11 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
-import { envClientNative } from "@/config/env-client.native";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
+import { envClient } from "@/config/env-client";
 
 /**
  * Type helpers to extract input/output types from endpoint definitions
@@ -88,7 +88,7 @@ function constructUrl<
 ): ResponseType<string> {
   try {
     // Use clean config from env-client.native
-    const baseUrl = envClientNative.API_BASE_URL;
+    const baseUrl = envClient.NEXT_PUBLIC_APP_URL;
 
     // Build path from endpoint.path array
     let urlPath = `${baseUrl}/api/${locale}`;

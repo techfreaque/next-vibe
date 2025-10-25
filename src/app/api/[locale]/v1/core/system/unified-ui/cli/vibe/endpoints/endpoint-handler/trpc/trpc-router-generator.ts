@@ -7,9 +7,6 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { debugLogger } from "next-vibe/shared/utils";
-
-// parseError removed - using translation keys instead
 import {
   type RouteFileStructure,
   validateRouteFileForTRPC,
@@ -136,10 +133,10 @@ export async function generateTRPCRouter(
             ),
           );
         }
-      } catch (error) {
+      } catch {
         const errorMsg = "app.error.general.route_processing_failed";
         errors.push(errorMsg);
-        debugLogger(errorMsg, { error });
+        // Error processing route - continuing with other routes
       }
     }
 
@@ -164,10 +161,10 @@ export async function generateTRPCRouter(
       errors,
       warnings,
     };
-  } catch (error) {
+  } catch {
     const errorMsg = "app.error.general.router_generation_failed";
     errors.push(errorMsg);
-    debugLogger(errorMsg, { error });
+    // Error generating router - returning failure
 
     return {
       success: false,

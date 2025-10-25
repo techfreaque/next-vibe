@@ -97,17 +97,24 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
       const lastSyncTime = this.getLastSyncTime(accounts);
 
       return createSuccessResponse({
-        success: true,
-        data: {
-          accountsHealthy: syncedAccounts,
-          accountsTotal: totalAccounts,
-          connectionsActive: activeConnections,
-          connectionErrors: failedAccounts,
-          lastSyncAt: lastSyncTime,
-          status: this.determineHealthStatus(accounts),
+        accountsHealthy: syncedAccounts,
+        accountsTotal: totalAccounts,
+        connectionsActive: activeConnections,
+        connectionErrors: failedAccounts,
+        lastSyncAt: lastSyncTime,
+        status: this.determineHealthStatus(accounts),
+        syncStats: {
+          totalSyncs: totalAccounts,
+          lastSyncTime: lastSyncTime,
         },
-        message:
-          "app.api.v1.core.emails.imapClient.health.health.get.success.description",
+        serverStatus: this.determineHealthStatus(accounts),
+        uptime: "N/A",
+        syncedAccounts,
+        totalAccounts,
+        activeConnections,
+        performanceMetrics: {
+          avgResponseTime: 0,
+        },
       });
     } catch (error) {
       const parsedError = parseError(error);

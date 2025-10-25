@@ -5,7 +5,6 @@
 
 import { format } from "date-fns";
 import { de, enUS, type Locale, pl } from "date-fns/locale";
-import { errorLogger } from "next-vibe/shared/utils";
 
 import type { CountryLanguage, Currencies } from "./config";
 import { simpleT } from "./shared";
@@ -129,8 +128,8 @@ export function formatTimestamp(
       minute: "numeric",
       hour12: !use24Hour,
     }).format(date);
-  } catch (error) {
-    errorLogger("Error formatting timestamp", error);
+  } catch {
+    // Error formatting timestamp - return raw value
     return typeof timestamp === "string" ? timestamp : timestamp.toString();
   }
 }
@@ -399,9 +398,8 @@ export function formatDateTimeInTimezone(
     }
 
     return new Intl.DateTimeFormat(localeString, formatOptions).format(date);
-  } catch (error) {
-    errorLogger("Error formatting date/time with timezone", error);
-    // Fallback to basic formatting
+  } catch {
+    // Error formatting date/time with timezone - fallback to basic formatting
     const localeString = getLocaleString(locale);
     return date.toLocaleString(localeString);
   }

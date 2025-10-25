@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { ResponseType } from "@/packages/next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -65,6 +66,7 @@ export function getSmsProvider(providerName?: SmsProviders): SmsProvider {
  */
 export function validatePhoneNumber(
   phoneNumber: string,
+  logger: EndpointLogger,
   providerName?: SmsProviders,
 ): {
   valid: boolean;
@@ -73,7 +75,7 @@ export function validatePhoneNumber(
   // Use provider's validation if available
   const provider = getSmsProvider(providerName);
   if (provider.validatePhoneNumber) {
-    return provider.validatePhoneNumber(phoneNumber);
+    return provider.validatePhoneNumber(phoneNumber, logger);
   }
 
   // Use the shared validation helper
@@ -85,6 +87,7 @@ export function validatePhoneNumber(
  */
 export async function sendSms(
   params: SendSmsParams,
+  logger: EndpointLogger,
 ): Promise<ResponseType<SmsResult>> {
   const maxAttempts =
     params.retry?.attempts || parseInt(env.SMS_MAX_RETRY_ATTEMPTS || "3", 10);
@@ -92,8 +95,12 @@ export async function sendSms(
     params.retry?.delayMs || parseInt(env.SMS_RETRY_DELAY_MS || "1000", 10);
 
   // Validate phone number
-  const validation = validatePhoneNumber(params.to);
+  const validation = validatePhoneNumber(params.to, logger);
   if (!validation.valid) {
+    logger.error("packages.nextVibe.server.sms.sms.error.invalid_phone_format", {
+      to: params.to,
+      reason: validation.reason,
+    });
     return createErrorResponse(
       "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
       ErrorResponseTypes.INVALID_REQUEST_ERROR,
@@ -105,6 +112,7 @@ export async function sendSms(
 
   try {
     const provider = getSmsProvider(params.options?.provider);
+    logger.debug("Sending SMS via provider", { provider: provider.name, to: params.to });
 
     // Use default from number if not provided
     const smsParams: SendSmsParams = {
@@ -118,13 +126,19 @@ export async function sendSms(
     // Implement retry logic
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        const result = await provider.sendSms(smsParams);
+        const result = await provider.sendSms(smsParams, logger);
 
         if (result.success) {
+          logger.info("SMS sent successfully", {
+            to: params.to,
+            messageId: result.data.messageId,
+            attempt
+          });
           return result;
         }
 
         lastError = new Error(result.message);
+        logger.warn("SMS send attempt failed", { attempt, error: result.message });
 
         if (attempt < maxAttempts) {
           // Wait before retry - fix promise executor issue
@@ -135,6 +149,7 @@ export async function sendSms(
       } catch (error) {
         lastError =
           error instanceof Error ? error : new Error("error.general.unknown");
+        logger.error("SMS send attempt exception", error, { attempt });
         if (attempt < maxAttempts) {
           // Wait before retry - fix promise executor issue
           await new Promise<void>((resolve) => {
@@ -145,6 +160,10 @@ export async function sendSms(
     }
 
     // If we get here, all attempts failed
+    logger.error("packages.nextVibe.server.sms.sms.error.delivery_failed", {
+      to: params.to,
+      attempts: maxAttempts,
+    });
     return createErrorResponse(
       "packages.nextVibe.server.sms.sms.error.delivery_failed",
       ErrorResponseTypes.SMS_ERROR,
@@ -153,6 +172,7 @@ export async function sendSms(
       },
     );
   } catch (error) {
+    logger.error("packages.nextVibe.server.sms.sms.error.unexpected_error", error);
     return createErrorResponse(
       "packages.nextVibe.server.sms.sms.error.unexpected_error",
       ErrorResponseTypes.SMS_ERROR,
@@ -166,7 +186,10 @@ export async function sendSms(
 /**
  * Batch send SMS messages to multiple recipients
  */
-export async function batchSendSms(messages: SendSmsParams[]): Promise<
+export async function batchSendSms(
+  messages: SendSmsParams[],
+  logger: EndpointLogger,
+): Promise<
   ResponseType<{
     results: Array<{
       to: string;
@@ -176,6 +199,8 @@ export async function batchSendSms(messages: SendSmsParams[]): Promise<
     }>;
   }>
 > {
+  logger.info("Sending batch SMS", { count: messages.length });
+
   const results: Array<{
     to: string;
     success: boolean;
@@ -183,7 +208,7 @@ export async function batchSendSms(messages: SendSmsParams[]): Promise<
     error: string | undefined;
   }> = await Promise.all(
     messages.map(async (params) => {
-      const result = await sendSms(params);
+      const result = await sendSms(params, logger);
       return {
         to: params.to,
         success: result.success,
@@ -196,6 +221,9 @@ export async function batchSendSms(messages: SendSmsParams[]): Promise<
   const failureCount = results.filter((r) => !r.success).length;
 
   if (failureCount === results.length) {
+    logger.error("packages.nextVibe.server.sms.sms.error.all_failed", {
+      totalResults: results.length,
+    });
     return createErrorResponse(
       "packages.nextVibe.server.sms.sms.error.all_failed",
       ErrorResponseTypes.SMS_ERROR,
@@ -206,6 +234,10 @@ export async function batchSendSms(messages: SendSmsParams[]): Promise<
   }
 
   if (failureCount > 0) {
+    logger.warn("packages.nextVibe.server.sms.sms.error.partial_failure", {
+      failureCount,
+      totalCount: results.length,
+    });
     return createErrorResponse(
       "packages.nextVibe.server.sms.sms.error.partial_failure",
       ErrorResponseTypes.SMS_ERROR,
@@ -215,5 +247,7 @@ export async function batchSendSms(messages: SendSmsParams[]): Promise<
       },
     );
   }
+
+  logger.info("Batch SMS sent successfully", { count: messages.length });
   return createSuccessResponse({ results });
 }

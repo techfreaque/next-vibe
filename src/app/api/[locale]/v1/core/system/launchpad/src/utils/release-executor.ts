@@ -20,8 +20,8 @@ import type {
 } from "../types/types";
 import { discoverReleaseTargets } from "./release-discovery";
 import { StateManager } from "./state-manager";
+import { TFunction } from "@/i18n/core/static-types";
 
-const { t } = simpleT(defaultLocale);
 
 // Inquirer response types
 interface TargetActionResponse {
@@ -49,6 +49,7 @@ export class ReleaseExecutor {
   executeReleaseTarget(
     target: ReleaseTarget,
     options: ReleaseOrchestrationOptions,
+    t: TFunction,
   ): boolean {
     const fullPath = join(this.rootDir, target.directory);
     this.logger.info(
@@ -96,6 +97,7 @@ export class ReleaseExecutor {
   private buildReleaseCommand(
     target: ReleaseTarget,
     options: ReleaseOrchestrationOptions,
+    t: TFunction,
   ): string {
     const baseCommand = t(
       "app.api.v1.core.system.launchpad.releaseExecutor.baseCommand",
@@ -120,6 +122,7 @@ export class ReleaseExecutor {
   async executeReleaseOrchestration(
     targets: ReleaseTarget[],
     options: ReleaseOrchestrationOptions,
+    t: TFunction,
   ): Promise<void> {
     let state: ReleaseState;
 
@@ -318,7 +321,7 @@ export class ReleaseExecutor {
   /**
    * Execute force update for all targets
    */
-  executeForceUpdateAll(targets: ReleaseTarget[]): void {
+  executeForceUpdateAll(targets: ReleaseTarget[], t: TFunction): void {
     this.logger.info(
       `🔄 ${t("app.api.v1.core.system.launchpad.releaseExecutor.forceUpdate.starting")}`,
     );
@@ -367,6 +370,7 @@ export class ReleaseExecutor {
   async executeForceRelease(
     targets: ReleaseTarget[],
     versionBump: VersionBumpType,
+    t: TFunction,
   ): Promise<void> {
     this.logger.info(
       t(
@@ -383,13 +387,14 @@ export class ReleaseExecutor {
     };
 
     // Execute orchestration without prompts
-    await this.executeReleaseOrchestration(targets, options);
+    await this.executeReleaseOrchestration(targets, options, t);
   }
 
   /**
    * Execute weekly update - updates all packages, creates branch, runs Snyk, creates PR
    */
-  async executeWeeklyUpdate(branchName: string): Promise<void> {
+  async executeWeeklyUpdate(branchName: string, t: TFunction,
+  ): Promise<void> {
     this.logger.info(
       `📅 ${t("app.api.v1.core.system.launchpad.releaseExecutor.weeklyUpdate.starting")}`,
     );

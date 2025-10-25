@@ -5,6 +5,7 @@
 import "server-only";
 
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { MCPServerConfig } from "./types";
 
 /**

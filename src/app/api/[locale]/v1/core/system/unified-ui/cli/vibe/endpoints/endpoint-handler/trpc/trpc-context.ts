@@ -49,6 +49,9 @@ export interface TRPCContext<
 
   /** User roles for authorization (empty array if not authenticated) */
   userRoles: TUserRoleValue;
+
+  /** Endpoint logger for this request */
+  logger: EndpointLogger;
 }
 
 /**
@@ -163,6 +166,7 @@ export async function createTRPCContext<
     request: req,
     urlParams: urlParams as TUrlParams,
     userRoles: userRoles as never as TUserRoleValue,
+    logger: opts.logger,
   };
 }
 

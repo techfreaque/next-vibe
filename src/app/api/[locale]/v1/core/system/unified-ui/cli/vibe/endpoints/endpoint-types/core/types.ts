@@ -25,6 +25,28 @@ import type {
 export { EndpointErrorTypes, FieldUsage } from "./enums";
 
 // ============================================================================
+// ENDPOINT REGISTRY TYPES
+// ============================================================================
+
+/**
+ * Endpoint definition type for CLI and generated files
+ */
+export interface EndpointDefinition {
+  title?: string;
+  description?: string;
+  requestSchema?: Record<string, string | number | boolean>;
+  requestUrlParamsSchema?: Record<string, string | number | boolean>;
+  responseSchema?: Record<string, string | number | boolean>;
+  fields?: Record<string, string | number | boolean>;
+}
+
+/**
+ * API section type for nested endpoint structure
+ * Used in generated endpoints.ts file
+ */
+export type ApiSection = Record<string, EndpointDefinition | ApiSection>;
+
+// ============================================================================
 // SCHEMA TYPE PRESERVATION AND BACK-PROPAGATION SYSTEM
 // ============================================================================
 

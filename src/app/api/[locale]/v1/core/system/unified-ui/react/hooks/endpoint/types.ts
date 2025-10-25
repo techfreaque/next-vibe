@@ -31,14 +31,23 @@ import type {
 // The CreateApiEndpoint has a .types property with pre-computed type assertions
 export type ExtractEndpointTypes<T> = T extends { types: infer TTypes }
   ? TTypes extends {
+      RequestInput: infer TRequestInput;
       RequestOutput: infer TRequestOutput;
+      ResponseInput: infer TResponseInput;
       ResponseOutput: infer TResponseOutput;
+      UrlVariablesInput: infer TUrlVariablesInput;
       UrlVariablesOutput: infer TUrlVariablesOutput;
     }
     ? {
         request: TRequestOutput;
         response: TResponseOutput;
         urlVariables: TUrlVariablesOutput;
+        requestInput: TRequestInput;
+        requestOutput: TRequestOutput;
+        responseInput: TResponseInput;
+        responseOutput: TResponseOutput;
+        urlVariablesInput: TUrlVariablesInput;
+        urlVariablesOutput: TUrlVariablesOutput;
       }
     : never
   : never;
@@ -48,14 +57,23 @@ export type ExtractEndpointTypes<T> = T extends { types: infer TTypes }
 export type GetEndpointTypes<T> = "GET" extends keyof T
   ? T["GET"] extends { types: infer TTypes }
     ? TTypes extends {
+        RequestInput: infer TRequestInput;
         RequestOutput: infer TRequestOutput;
+        ResponseInput: infer TResponseInput;
         ResponseOutput: infer TResponseOutput;
+        UrlVariablesInput: infer TUrlVariablesInput;
         UrlVariablesOutput: infer TUrlVariablesOutput;
       }
       ? {
           request: TRequestOutput;
           response: TResponseOutput;
           urlVariables: TUrlVariablesOutput;
+          requestInput: TRequestInput;
+          requestOutput: TRequestOutput;
+          responseInput: TResponseInput;
+          responseOutput: TResponseOutput;
+          urlVariablesInput: TUrlVariablesInput;
+          urlVariablesOutput: TUrlVariablesOutput;
         }
       : never
     : never

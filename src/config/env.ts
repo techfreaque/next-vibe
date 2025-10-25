@@ -1,18 +1,31 @@
-/* eslint-disable node/no-process-env */
 import "server-only";
 
 import { z } from "zod";
 
 import { AwsSnsAwsRegions } from "@/app/api/[locale]/v1/core/sms/providers/aws-sns";
 import { SmsProviders } from "@/app/api/[locale]/v1/core/sms/utils";
-import { envClientBaseSchema, envValidationLogger } from "@/config/env-client";
+import { envClientSchema, envValidationLogger } from "@/config/env-client";
 import { stringToIntSchema } from "@/packages/next-vibe/shared/types/common.schema";
 import { validateEnv } from "@/packages/next-vibe/shared/utils/env-util";
 
-// Declare process for TypeScript in server-only files
-declare const process: { env: Record<string, string | undefined> };
+// We intentionally disable process at the type level for react native and validation
+declare const process: {
+  env: {
+    [key: string]: string | undefined | { [key: string]: string | undefined };
+  };
+};
 
-export const envSchema = envClientBaseSchema.extend({
+const isServer = true;
+const isReactNative = false;
+const isBrowser = false;
+
+const platform = {
+  isServer,
+  isReactNative,
+  isBrowser,
+};
+
+export const envSchema = envClientSchema.extend({
   JWT_SECRET_KEY: z.string(),
   CRON_SECRET: z.string(),
   DATABASE_URL: z.string(),
@@ -48,7 +61,7 @@ export const envSchema = envClientBaseSchema.extend({
   }),
 
   // SMS environment variables
-  // TODO validate based on provider
+  // TODO validate config based on provider
   SMS_PROVIDER: z.enum([
     SmsProviders.TWILIO,
     SmsProviders.AWS,
@@ -204,7 +217,7 @@ export type Env = z.infer<typeof envSchema>;
 
 // Export validated environment for use throughout the application
 export const env: Env = validateEnv(
-  process.env,
+  { ...process.env, platform },
   envSchema,
   envValidationLogger,
 );

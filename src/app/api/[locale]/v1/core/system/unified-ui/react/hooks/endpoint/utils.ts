@@ -2,6 +2,8 @@ import { Environment } from "next-vibe/shared/utils";
 import { useMemo } from "react";
 
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
+import { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { clearFormsAfterSuccessInDev } from "../../../../../../../../../../config/debug";
 import { envClient } from "../../../../../../../../../../config/env-client";
@@ -10,8 +12,7 @@ import { envClient } from "../../../../../../../../../../config/env-client";
  * Utility to detect available HTTP methods from endpoints object
  */
 export function useAvailableMethods<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  T extends Partial<Record<Methods, any>>,
+  T extends Partial<Record<Methods, CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>>>,
 >(endpoints: T): Methods[] {
   return useMemo(() => {
     return Object.keys(endpoints).filter((method) =>

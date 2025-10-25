@@ -14,7 +14,7 @@ import { env } from "@/config/env";
  * Search error and success messages for AI tool responses
  * These are technical messages for AI, not user-facing translations
  */
-const SEARCH_MESSAGES = {
+export const SEARCH_MESSAGES = {
   QUERY_REQUIRED:
     "Error: Search query is required but was not provided by the model.",
   NO_RESULTS_PREFIX: "No results found for",

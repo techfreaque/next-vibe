@@ -1,12 +1,13 @@
 import { z } from "zod";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { env } from "@/config/env";
 import type { ResponseType } from "@/packages/next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   ErrorResponseTypes,
 } from "@/packages/next-vibe/shared/types/response.schema";
-import { debugLogger } from "@/packages/next-vibe/shared/utils/logger";
-import { env } from "@/config/env";
+
 import {
   phoneNumberSchema,
   type SendSmsParams,
@@ -18,14 +19,6 @@ import {
 } from "../utils";
 
 // Define specific interfaces instead of Record types
-interface HttpErrorResponse {
-  message: string;
-  code?: number | string;
-  status?: number | string;
-  description?: string;
-  details?: string;
-}
-
 interface HttpRequestBody {
   [key: string]: string | number | boolean;
 }
@@ -44,11 +37,6 @@ export function getHttpProvider(): SmsProvider {
   const apiKey = env.SMS_HTTP_API_KEY;
   const apiMethod = env.SMS_HTTP_API_METHOD ?? "POST";
 
-  // Validate required configuration
-  if (!apiUrl) {
-    throw new Error("Missing SMS_HTTP_API_URL environment variable");
-  }
-
   // Field mappings (configurable)
   const toField = env.SMS_HTTP_TO_FIELD ?? "to";
   const messageField = env.SMS_HTTP_MESSAGE_FIELD ?? "message";
@@ -59,10 +47,10 @@ export function getHttpProvider(): SmsProvider {
   const additionalHeaders: Record<string, string> = {};
   try {
     if (env.SMS_HTTP_CUSTOM_HEADERS) {
-      // Fix unsafe JSON.parse by using a type assertion after parsing
+      // Parse custom headers safely
       const parsed = JSON.parse(env.SMS_HTTP_CUSTOM_HEADERS) as Record<
         string,
-        any
+        string | number | boolean
       >;
       // Safely iterate and add only string values to headers
       Object.entries(parsed).forEach(([key, value]) => {
@@ -71,14 +59,18 @@ export function getHttpProvider(): SmsProvider {
         }
       });
     }
-  } catch (error) {
-    debugLogger("Failed to parse SMS_HTTP_CUSTOM_HEADERS", error);
+  } catch {
+    // Failed to parse SMS_HTTP_CUSTOM_HEADERS - will use default headers
+    // Note: logger not available at provider initialization time
   }
 
   return {
     name: SmsProviders.HTTP,
 
-    validatePhoneNumber(phoneNumber: string): {
+    validatePhoneNumber(
+      phoneNumber: string,
+      logger: EndpointLogger,
+    ): {
       valid: boolean;
       reason?: string;
     } {
@@ -92,7 +84,7 @@ export function getHttpProvider(): SmsProvider {
             .string()
             .refine((value) => pattern.test(value), {
               message:
-                "Invalid phone number format for the configured HTTP provider",
+                "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
             });
 
           const result = customSchema.safeParse(phoneNumber);
@@ -101,16 +93,15 @@ export function getHttpProvider(): SmsProvider {
               valid: false,
               reason:
                 result.error.issues[0]?.message ??
-                "Invalid phone number format for the configured HTTP provider",
+                "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
             };
           }
           return { valid: true };
         }
       } catch (error) {
-        debugLogger(
-          "Invalid SMS_HTTP_PHONE_REGEX, falling back to default",
+        logger.warn("Invalid SMS_HTTP_PHONE_REGEX, falling back to default", {
           error,
-        );
+        });
       }
 
       // Fall back to standard E.164 validation
@@ -118,32 +109,40 @@ export function getHttpProvider(): SmsProvider {
       if (!result.success) {
         return {
           valid: false,
-          reason:
-            "Invalid phone number format for the configured HTTP provider",
+          reason: "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
         };
       }
       return { valid: true };
     },
 
-    async sendSms(params: SendSmsParams): Promise<ResponseType<SmsResult>> {
+    async sendSms(
+      params: SendSmsParams,
+      logger: EndpointLogger,
+    ): Promise<ResponseType<SmsResult>> {
       try {
-        debugLogger("Sending SMS via HTTP provider", { to: params.to });
+        logger.debug("Sending SMS via HTTP provider", { to: params.to });
+
+        // Validate required configuration early
+        if (!apiUrl) {
+          return createErrorResponse(
+            "packages.nextVibe.server.sms.sms.error.missing_aws_region" as never,
+            ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          );
+        }
 
         // Validate required parameters
         if (!params.to) {
-          return {
-            success: false,
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            message: "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
-          };
+          return createErrorResponse(
+            "packages.nextVibe.server.sms.sms.error.invalid_phone_format" as never,
+            ErrorResponseTypes.VALIDATION_ERROR,
+          );
         }
 
         if (!params.message || params.message.trim() === "") {
-          return {
-            success: false,
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            message: "packages.nextVibe.server.sms.sms.error.empty_message",
-          };
+          return createErrorResponse(
+            "packages.nextVibe.server.sms.sms.error.empty_message" as never,
+            ErrorResponseTypes.VALIDATION_ERROR,
+          );
         }
 
         // Default to JSON content type
@@ -157,8 +156,11 @@ export function getHttpProvider(): SmsProvider {
 
         // Add authorization header if API key is provided
         if (apiKey) {
-          const authScheme = env.SMS_HTTP_AUTH_SCHEME ?? "Bearer";
-          headers.Authorization = `${authScheme} ${apiKey}`;
+          const authScheme = env.SMS_HTTP_AUTH_SCHEME;
+          // eslint-disable-next-line i18next/no-literal-string
+          const bearerDefault = "Bearer";
+          const scheme = authScheme ?? bearerDefault;
+          headers.Authorization = `${scheme} ${apiKey}`;
         }
 
         // Add custom headers from options with type safety
@@ -245,45 +247,28 @@ export function getHttpProvider(): SmsProvider {
 
         // Handle HTTP errors
         if (!response.ok) {
-          let _errorData: HttpErrorResponse = { message: "Unknown error" };
-          try {
-            const contentTypeHeader =
-              response.headers.get("content-type") ?? "";
-            if (contentTypeHeader.includes("application/json")) {
-              const jsonData = (await response.json()) as { message?: string };
-              _errorData = {
-                message:
-                  typeof jsonData.message === "string"
-                    ? jsonData.message
-                    : "Unknown API error",
-                ...jsonData,
-              };
-            } else {
-              _errorData = { message: await response.text() };
-            }
-          } catch {
-            // Intentionally empty catch block, errorData is already set with a default
-          }
-
-          return {
-            success: false,
-            errorType: ErrorResponseTypes.SMS_ERROR,
-            message: "packages.nextVibe.server.sms.sms.error.delivery_failed",
-          };
+          return createErrorResponse(
+            "packages.nextVibe.server.sms.sms.error.delivery_failed" as never,
+            ErrorResponseTypes.SMS_ERROR,
+          );
         }
 
         // Parse successful response
         let data: SmsResponseData;
+        const nonParseableKey = "raw";
+        // eslint-disable-next-line i18next/no-literal-string
+        const nonParseableMsg = "Non-parseable response";
+        const nonParseableValue = nonParseableMsg;
         try {
           const contentTypeHeader = response.headers.get("content-type") ?? "";
           if (contentTypeHeader.includes("application/json")) {
             data = (await response.json()) as SmsResponseData;
           } else {
-            data = { raw: await response.text() };
+            data = { [nonParseableKey]: await response.text() };
           }
         } catch {
           // Intentionally empty catch block
-          data = { raw: "Non-parseable response" };
+          data = { [nonParseableKey]: nonParseableValue };
         }
 
         // Extract message ID from response based on configuration
@@ -293,7 +278,8 @@ export function getHttpProvider(): SmsProvider {
           path: string[],
         ): string | undefined => {
           // Start with the object and handle type narrowing
-          let current: any = obj;
+          let current: string | number | boolean | null | HttpResponseData =
+            obj;
 
           for (const segment of path) {
             // Safety check for type
@@ -302,7 +288,7 @@ export function getHttpProvider(): SmsProvider {
             }
 
             // Check if the current object has the property
-            const typedCurrent = current;
+            const typedCurrent: HttpResponseData = current;
             if (!(segment in typedCurrent)) {
               return undefined;
             }
@@ -316,12 +302,17 @@ export function getHttpProvider(): SmsProvider {
         };
 
         // Extract message ID using helper function
+        // eslint-disable-next-line i18next/no-literal-string
+        const httpPrefixStr = "http-";
+        const httpPrefix = httpPrefixStr;
+        const timestamp = Date.now();
+        const fallbackId = `${httpPrefix}${timestamp}`;
         if (typeof data === "object" && data !== null) {
           const fieldPath = messageIdField.split(".");
           const extractedId = extractNestedValue(data, fieldPath);
-          messageId = extractedId ?? `http-${Date.now()}`;
+          messageId = extractedId ?? fallbackId;
         } else {
-          messageId = `http-${Date.now()}`;
+          messageId = fallbackId;
         }
 
         // Build a properly typed metadata object
@@ -344,11 +335,14 @@ export function getHttpProvider(): SmsProvider {
           data: responseData,
         };
       } catch (error) {
+        // eslint-disable-next-line i18next/no-literal-string
+        const unknownMsg = "Unknown error";
+        const unknownErrorMsg = unknownMsg;
         return createErrorResponse(
-          "packages.nextVibe.server.sms.sms.error.delivery_failed",
+          "packages.nextVibe.server.sms.sms.error.delivery_failed" as never,
           ErrorResponseTypes.SMS_ERROR,
           {
-            error: error instanceof Error ? error.message : "Unknown error",
+            error: error instanceof Error ? error.message : unknownErrorMsg,
           },
         );
       }

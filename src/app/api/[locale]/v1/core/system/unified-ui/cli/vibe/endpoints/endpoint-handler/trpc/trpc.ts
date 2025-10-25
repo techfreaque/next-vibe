@@ -6,13 +6,11 @@
 
 import { initTRPC, TRPCError } from "@trpc/server";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
-// debugLogger removed - using comments instead
 import { ZodError } from "zod";
 
 import type { UserRoleValue } from "../../../../../../../user/user-roles/enum";
 import { UserRole } from "../../../../../../../user/user-roles/enum";
 import type { EndpointLogger } from "../logger";
-import { createEndpointLogger } from "../logger/endpoint-logger";
 import type { TRPCContext } from "./trpc-context";
 
 /**
@@ -121,24 +119,22 @@ export function requireRoles<TRoles extends readonly string[]>(
 }
 
 /**
- * Admin procedure - requires admin role
+ * Admin procedure factory - requires admin role
+ * Call with logger from context: adminProcedure(ctx.logger)
  */
-export const adminProcedure = authenticatedProcedure.use(
-  requireRoles(
-    [UserRole.ADMIN],
-    createEndpointLogger(false, Date.now(), "en-GLOBAL"),
-  ),
-);
+export function createAdminProcedure(logger: EndpointLogger) {
+  return authenticatedProcedure.use(requireRoles([UserRole.ADMIN], logger));
+}
 
 /**
- * Customer procedure - requires customer role or higher
+ * Customer procedure factory - requires customer role or higher
+ * Call with logger from context: customerProcedure(ctx.logger)
  */
-export const customerProcedure = authenticatedProcedure.use(
-  requireRoles(
-    [UserRole.CUSTOMER, UserRole.ADMIN],
-    createEndpointLogger(false, Date.now(), "en-GLOBAL"),
-  ),
-);
+export function createCustomerProcedure(logger: EndpointLogger) {
+  return authenticatedProcedure.use(
+    requireRoles([UserRole.CUSTOMER, UserRole.ADMIN], logger),
+  );
+}
 
 /**
  * Helper to convert next-vibe error types to tRPC errors

@@ -1,4 +1,5 @@
 {
+  "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "lib": [
       "dom",
@@ -41,7 +42,7 @@
         "./src/packages/next-vibe-ui/web/*"
       ],
       "server-only": [
-        "./src/packages/next-vibe/server/utils/server-only.ts"
+        "./src/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/server-only.ts"
       ]
     }
   },
@@ -60,6 +61,5 @@
     ".next",
     "to_migrate/**/*.ts",
     "to_migrate/**/*.tsx"
-  ],
-  "extends": "expo/tsconfig.base"
+  ]
 }

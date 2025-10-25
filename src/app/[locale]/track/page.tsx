@@ -1,11 +1,11 @@
 "use client";
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { debugLogger, errorLogger } from "next-vibe/shared/utils";
 import { Div, P } from "next-vibe-ui/ui";
 import type React from "react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { generateEngagementTrackingApiUrl } from "@/app/api/[locale]/v1/core/leads/tracking/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -22,6 +22,12 @@ export default function TrackPage(): React.ReactElement {
   const locale = params.locale as CountryLanguage;
   const { t } = simpleT(locale);
 
+  // Create logger at top-level component
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale]
+  );
+
   useEffect(() => {
     let isMounted = true; // Prevent race conditions
 
@@ -36,8 +42,7 @@ export default function TrackPage(): React.ReactElement {
 
         // Validate required id parameter
         if (!id) {
-          // eslint-disable-next-line i18next/no-literal-string
-          errorLogger("Missing tracking ID", {
+          logger.error("Missing tracking ID", {
             url: window.location.href,
           });
           router.push(`/${locale}`);
@@ -48,16 +53,14 @@ export default function TrackPage(): React.ReactElement {
         if (url) {
           try {
             new URL(url);
-          } catch {
-            // eslint-disable-next-line i18next/no-literal-string
-            errorLogger("Invalid tracking URL", { url });
+          } catch (error) {
+            logger.error("Invalid tracking URL", error, { url });
             router.push(`/${locale}`);
             return;
           }
         }
 
-        // eslint-disable-next-line i18next/no-literal-string
-        debugLogger("Processing tracking click", {
+        logger.debug("Processing tracking click", {
           id,
           campaignId,
           stage,
@@ -79,8 +82,7 @@ export default function TrackPage(): React.ReactElement {
             },
           );
 
-          // eslint-disable-next-line i18next/no-literal-string
-          debugLogger("Making tracking API call", {
+          logger.debug("Making tracking API call", {
             trackingUrl,
           });
 
@@ -91,8 +93,7 @@ export default function TrackPage(): React.ReactElement {
             data?: { redirectUrl: string };
           };
 
-          // eslint-disable-next-line i18next/no-literal-string
-          debugLogger("Tracking API response", {
+          logger.debug("Tracking API response", {
             success: result.success,
             leadId: id,
           });
@@ -106,8 +107,7 @@ export default function TrackPage(): React.ReactElement {
           window.location.assign(redirectUrl);
         }
       } catch (error) {
-        // eslint-disable-next-line i18next/no-literal-string
-        errorLogger("Error in tracking page", error);
+        logger.error("Error in tracking page", error);
         // Fallback redirect to home page
         router.push(`/${locale}`);
       }

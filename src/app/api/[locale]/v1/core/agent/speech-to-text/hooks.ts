@@ -12,7 +12,9 @@ import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import speechToTextDefinitions from "./definition";
+import speechToTextDefinitions, {
+  type SpeechToTextPostResponseOutput,
+} from "./definition";
 
 interface UseEdenAISpeechOptions {
   onTranscript?: (text: string) => void;
@@ -126,9 +128,13 @@ export function useEdenAISpeech({
 
       // Submit form with callbacks
       await endpoint.create.submitForm(undefined, {
-        onSuccess: ({ responseData }) => {
-          if (responseData.success && responseData.data) {
-            const transcribedText = responseData.data.response.text || "";
+        onSuccess: ({
+          responseData,
+        }: {
+          responseData: SpeechToTextPostResponseOutput;
+        }) => {
+          if (responseData.response.success) {
+            const transcribedText = responseData.response.text;
             logger.debug("STT", "Success! Transcription received", {
               textLength: transcribedText.length,
             });
@@ -145,9 +151,9 @@ export function useEdenAISpeech({
             cleanup();
           }
         },
-        onError: ({ error }) => {
+        onError: ({ error }: { error: Error }) => {
           const errorMessage =
-            error.message || t("app.chat.hooks.stt.transcription-failed");
+            error.message ?? t("app.chat.hooks.stt.transcription-failed");
           logger.error("STT", errorMessage, { error });
           setError(errorMessage);
           onError?.(errorMessage);
@@ -201,7 +207,7 @@ export function useEdenAISpeech({
       const errorMsg =
         err instanceof Error
           ? err.message
-          : t("app.chat.hooks.stt.microphone-access-denied");
+          : t("app.chat.hooks.stt.permission-denied");
       logger.error("STT", "Failed to start recording", err);
       setError(errorMsg);
       onError?.(errorMsg);

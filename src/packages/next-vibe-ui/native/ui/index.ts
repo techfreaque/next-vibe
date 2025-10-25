@@ -69,14 +69,12 @@ export {
 } from "./collapsible";
 export {
   Command,
-  CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
   CommandSeparator,
-  CommandShortcut,
 } from "./command";
 export { Container } from "./container";
 export {
@@ -86,7 +84,6 @@ export {
   ContextMenuGroup,
   ContextMenuItem,
   ContextMenuLabel,
-  ContextMenuPortal,
   ContextMenuRadioGroup,
   ContextMenuRadioItem,
   ContextMenuSeparator,
@@ -117,8 +114,6 @@ export {
   DrawerDescription,
   DrawerFooter,
   DrawerHeader,
-  DrawerOverlay,
-  DrawerPortal,
   DrawerTitle,
   DrawerTrigger,
 } from "./drawer";
@@ -144,7 +139,6 @@ export {
 export { Empty } from "./empty";
 export {
   Form,
-  FormControl,
   FormDescription,
   FormField,
   FormItem,
@@ -181,7 +175,6 @@ export {
   MenubarSubContent,
   MenubarSubTrigger,
   MenubarTrigger,
-  MenuItem,
 } from "./menubar";
 export {
   NavigationMenu,
@@ -233,8 +226,6 @@ export {
   SheetDescription,
   SheetFooter,
   SheetHeader,
-  SheetOverlay,
-  SheetPortal,
   SheetTitle,
   SheetTrigger,
 } from "./sheet";
@@ -248,7 +239,6 @@ export { Switch } from "./switch";
 export {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableFooter,
   TableHead,
@@ -280,7 +270,6 @@ export { ToggleGroup, ToggleGroupIcon, ToggleGroupItem } from "./toggle-group";
 export {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "./tooltip";
 export { BlockQuote, Code, Large, Lead, Muted, Small } from "./typography";

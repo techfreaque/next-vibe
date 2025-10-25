@@ -108,10 +108,13 @@ export function useAIStream(
         if (!response.ok) {
           let errorMessage = `HTTP ${response.status}`;
           try {
-            const errorData = await response.json();
+            const errorData = (await response.json()) as {
+              message?: string;
+              error?: { message?: string };
+            };
             // Extract user-friendly error message from API response
             errorMessage =
-              errorData.message || errorData.error?.message || errorMessage;
+              errorData.message ?? errorData.error?.message ?? errorMessage;
           } catch {
             // If JSON parsing fails, try to get text
             try {
@@ -236,20 +239,22 @@ export function useAIStream(
                 // CRITICAL: Set the active thread immediately in the chat store
                 // This ensures subsequent messages use the correct threadId
                 // Import chat store dynamically to avoid circular dependencies
-                import("../store")
+                void import("../store")
                   .then(({ useChatStore }) => {
                     useChatStore.getState().setActiveThread(eventData.threadId);
                     logger.info("[DEBUG] Set active thread in chat store", {
                       threadId: eventData.threadId,
                     });
+                    return;
                   })
-                  .catch((error) => {
+                  .catch((error: Error) => {
                     logger.error("Failed to set active thread", { error });
+                    return;
                   });
 
                 // Save to localStorage if incognito mode
                 if (eventData.rootFolderId === "incognito") {
-                  import("../incognito/storage")
+                  void import("../incognito/storage")
                     .then(({ saveThread }) => {
                       saveThread({
                         id: eventData.threadId,
@@ -268,11 +273,13 @@ export function useAIStream(
                         createdAt: new Date(),
                         updatedAt: new Date(),
                       });
+                      return;
                     })
-                    .catch((error) => {
+                    .catch((error: Error) => {
                       logger.error("Failed to save incognito thread", {
                         error,
                       });
+                      return;
                     });
                 }
 
@@ -317,7 +324,7 @@ export function useAIStream(
                 });
 
                 // Check chat store asynchronously (for existing threads)
-                import("../store")
+                void import("../store")
                   .then(({ useChatStore }) => {
                     const chatThread =
                       useChatStore.getState().threads[eventData.threadId];
@@ -355,7 +362,6 @@ export function useAIStream(
                         edited: false,
                         tokens: null,
                         toolCalls: null,
-                        finishReason: null,
                         upvotes: null,
                         downvotes: null,
                         createdAt: new Date(),
@@ -369,7 +375,7 @@ export function useAIStream(
                       });
 
                       // Also save to localStorage
-                      import("../incognito/storage")
+                      void import("../incognito/storage")
                         .then(({ saveMessage }) => {
                           saveMessage({
                             id: eventData.messageId,
@@ -388,25 +394,28 @@ export function useAIStream(
                             edited: false,
                             tokens: null,
                             toolCalls: null,
-                            finishReason: null,
                             upvotes: null,
                             downvotes: null,
                             createdAt: new Date(),
                             updatedAt: new Date(),
                           });
+                          return;
                         })
-                        .catch((error) => {
+                        .catch((error: Error) => {
                           logger.error("Failed to save incognito message", {
                             error,
                           });
+                          return;
                         });
                     }
+                    return;
                   })
-                  .catch((error) => {
+                  .catch((error: Error) => {
                     logger.error(
                       "Failed to check chat store for incognito thread",
                       { error },
                     );
+                    return;
                   });
 
                 options.onMessageCreated?.(eventData);
@@ -508,7 +517,7 @@ export function useAIStream(
 
                 // Check chat store asynchronously (for existing threads)
                 if (message) {
-                  import("../store")
+                  void import("../store")
                     .then(({ useChatStore }) => {
                       const chatThread =
                         useChatStore.getState().threads[message.threadId];
@@ -518,7 +527,7 @@ export function useAIStream(
 
                       if (isIncognito) {
                         // Save to localStorage
-                        import("../incognito/storage")
+                        void import("../incognito/storage")
                           .then(({ saveMessage }) => {
                             logger.info(
                               "[DEBUG] Saving incognito message with tool calls",
@@ -560,11 +569,13 @@ export function useAIStream(
                                 tokens: eventData.totalTokens ?? null,
                                 toolCalls: message.toolCalls || null,
                               });
+                            return;
                           })
-                          .catch((error) => {
+                          .catch((error: Error) => {
                             logger.error("Failed to update incognito message", {
                               error,
                             });
+                            return;
                           });
                       } else {
                         // Non-incognito message - update chat store with tool calls
@@ -576,12 +587,14 @@ export function useAIStream(
                             toolCalls: message.toolCalls || null,
                           });
                       }
+                      return;
                     })
-                    .catch((error) => {
+                    .catch((error: Error) => {
                       logger.error(
                         "Failed to check chat store for incognito thread",
                         { error },
                       );
+                      return;
                     });
                 }
 

@@ -623,7 +623,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   isSuccess: true,
                   isLoadingFresh: false,
                   isCachedData: true,
-                  statusMessage: "app.error.api.store.status.cached_data" as const,
+                  statusMessage:
+                    "app.error.api.store.status.cached_data" as const,
                   lastFetchTime: existingQuery.lastFetchTime ?? null,
                 },
               },
@@ -940,7 +941,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               isSuccess: false,
               isLoadingFresh: false,
               isCachedData: state.queries[queryId]?.isCachedData ?? false,
-              statusMessage: "app.error.api.store.errors.request_failed" as const,
+              statusMessage:
+                "app.error.api.store.errors.request_failed" as const,
               lastFetchTime: Date.now(),
             },
           },
@@ -1126,7 +1128,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               isError: true,
               error: response,
               isSuccess: false,
-              statusMessage: "app.error.api.store.errors.mutation_failed" as const,
+              statusMessage:
+                "app.error.api.store.errors.mutation_failed" as const,
               data: undefined,
             },
           },
@@ -1163,7 +1166,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             isError: false,
             error: null,
             isSuccess: true,
-            statusMessage: "app.error.api.store.status.mutation_success" as const,
+            statusMessage:
+              "app.error.api.store.status.mutation_success" as const,
             data: responseData as AnyData,
           },
         },
@@ -1235,7 +1239,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             isError: true,
             error: errorResponse,
             isSuccess: false,
-            statusMessage: "app.error.api.store.errors.unexpected_failure" as const,
+            statusMessage:
+              "app.error.api.store.errors.unexpected_failure" as const,
             data: undefined,
           },
         },
@@ -1541,11 +1546,13 @@ export const apiClient = {
    * Mutate data through an API endpoint without using React hooks
    */
   mutate: async <
+    TFields,
+    TUserRoleValue extends readonly (typeof UserRoleValue)[],
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
-      readonly (typeof UserRoleValue)[],
-      any
+      TUserRoleValue,
+      TFields
     >,
   >(
     endpoint: TEndpoint,
@@ -1616,11 +1623,13 @@ export const apiClient = {
    * Get current mutation state without using React hooks
    */
   getMutationState: <
+    TFields,
+    TUserRoleValue extends readonly (typeof UserRoleValue)[],
     TEndpoint extends CreateApiEndpoint<
       string,
       Methods,
-      readonly (typeof UserRoleValue)[],
-      any
+      TUserRoleValue,
+      TFields
     >,
   >(
     endpoint: TEndpoint,

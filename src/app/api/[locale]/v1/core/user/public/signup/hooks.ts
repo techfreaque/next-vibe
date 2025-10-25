@@ -26,6 +26,7 @@ export function useRegister(): InferApiFormReturn<
   typeof signupEndpoints.POST
 > & {
   alert: FormAlertState | null;
+  logger: ReturnType<typeof createEndpointLogger>;
 } {
   const { toast } = useToast();
   const router = useRouter();
@@ -163,6 +164,7 @@ export function useRegister(): InferApiFormReturn<
     clearSavedForm: formResult.clearSavedForm,
     setErrorType: formResult.setErrorType,
     alert,
+    logger,
   };
 }
 

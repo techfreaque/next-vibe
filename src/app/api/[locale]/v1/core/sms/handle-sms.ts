@@ -129,7 +129,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
               return smsParams;
             });
 
-            const batchResult = await batchSendSms(messages);
+            const batchResult = await batchSendSms(messages, logger);
             processedCount += messages.length;
 
             if (!batchResult.success && !smsData.ignoreErrors) {
@@ -151,7 +151,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
                   : result.data.message,
             };
 
-            const smsResponse = await sendSms(_smsData);
+            const smsResponse = await sendSms(_smsData, logger);
             processedCount++;
 
             if (!smsData.ignoreErrors && !smsResponse.success) {

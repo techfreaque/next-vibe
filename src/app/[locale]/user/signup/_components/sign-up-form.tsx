@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { Calendar, CreditCard, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { errorLogger } from "next-vibe/shared/utils";
 import {
   Form,
   FormControl,
@@ -57,7 +56,7 @@ export default function SignUpForm({
   locale,
 }: SignUpFormProps): React.ReactElement {
   const { t } = simpleT(locale);
-  const { form, submitForm, isSubmitting, alert } = useRegister();
+  const { form, submitForm, isSubmitting, alert, logger } = useRegister();
   const signupType = form.watch("preferences.signupType");
 
   return (
@@ -86,7 +85,7 @@ export default function SignUpForm({
                         ) {
                           field.onChange(value);
                         } else {
-                          errorLogger(
+                          logger.error(
                             "app.api.v1.core.user.public.signup.errors.invalidSignupType",
                             { value },
                           );

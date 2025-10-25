@@ -21,9 +21,14 @@ export function useImapFoldersList(
   return useEndpoint(
     definitions,
     {
-      persistForm: false,
-      defaultValues: {
-        accountId,
+      queryOptions: {
+        urlParams: {
+          accountId,
+          page: 1,
+          limit: 20,
+          sortBy: ["NAME"] as const,
+          sortOrder: ["ASC"] as const,
+        },
       },
     },
     logger,

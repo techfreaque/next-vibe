@@ -137,4 +137,9 @@ export const translations: typeof enTranslations = {
     title: "Erfolg",
     description: "Vorgang erfolgreich abgeschlossen",
   },
+  actions: {
+    back: "Zurück",
+    cancel: "Abbrechen",
+  },
+  notFound: "Konto nicht gefunden",
 };

@@ -1,9 +1,9 @@
 import { createHash, createHmac } from "node:crypto";
 
-import type {
+import {
   createErrorResponse,
   ErrorResponseTypes,
-  ResponseType,
+  type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
 import { env } from "@/config/env";

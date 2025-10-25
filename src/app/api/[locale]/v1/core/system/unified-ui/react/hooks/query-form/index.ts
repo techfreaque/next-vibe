@@ -50,12 +50,8 @@ import type {
  * @returns Form and query for API interaction with enhanced error handling
  */
 export function useApiQueryForm<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    any
-  >,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TEndpoint extends CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>,
 >({
   endpoint,
   urlVariables,

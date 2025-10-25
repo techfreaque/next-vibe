@@ -49,6 +49,22 @@ export const translations = {
           connectionsActive: "Active Connections",
           connectionErrors: "Connection Errors",
           lastSyncAt: "Last Sync At",
+          syncStats: {
+            title: "Sync Statistics",
+            description: "Synchronization statistics and metrics",
+            totalSyncs: "Total Syncs",
+            lastSyncTime: "Last Sync Time",
+          },
+          serverStatus: "Server Status",
+          uptime: "Uptime",
+          syncedAccounts: "Synced Accounts",
+          totalAccounts: "Total Accounts",
+          activeConnections: "Active Connections",
+          performanceMetrics: {
+            title: "Performance Metrics",
+            description: "Performance metrics and statistics",
+            avgResponseTime: "Average Response Time",
+          },
         },
       },
       errors: {

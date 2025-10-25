@@ -57,7 +57,8 @@ interface SerializableObject {
  * @returns Enhanced query result with extra loading state information
  */
 export function useApiQuery<
-  TEndpoint extends CreateApiEndpoint<any, any, any, any>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TEndpoint extends CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>,
 >({
   endpoint,
   requestData,

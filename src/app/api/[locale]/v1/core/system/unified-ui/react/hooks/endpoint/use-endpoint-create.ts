@@ -35,18 +35,15 @@ import { mergeFormData } from "./utils";
  * @returns Form and mutation for API interaction with enhanced error handling
  */
 export function useEndpointCreate<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly (typeof UserRoleValue)[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
-  >,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TEndpoint extends CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>,
 >(
   primaryEndpoint: TEndpoint | null,
   logger: EndpointLogger,
   options: {
-    formOptions?: ApiFormOptions<TEndpoint["TRequestOutput"]>;
+    formOptions?: ApiFormOptions<
+      TEndpoint["TRequestOutput"]
+    >;
     mutationOptions?: ApiMutationOptions<
       TEndpoint["TRequestOutput"],
       TEndpoint["TResponseOutput"],
@@ -90,7 +87,7 @@ export function useEndpointCreate<
     return {
       ...formOptions,
       defaultValues: mergedDefaultValues,
-    } as ApiFormOptions<TEndpoint["TRequestInput"]>;
+    } as ApiFormOptions<TEndpoint["TRequestOutput"]>;
   }, [formOptions, autoPrefillData, initialState, primaryEndpoint]);
 
   // Use the existing mutation form hook with enhanced options

@@ -7,9 +7,9 @@
 import "server-only";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { createEndpointLogger } from "../../cli/vibe/endpoints/endpoint-handler/logger";
-import type { EndpointLogger } from "../../cli/vibe/endpoints/endpoint-handler/logger";
 
+import type { EndpointLogger } from "../../cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "../../cli/vibe/endpoints/endpoint-handler/logger";
 import { getMCPConfig, isMCPServerEnabled } from "../config";
 import { createMCPProtocolHandler } from "./protocol-handler";
 import { StdioTransport } from "./stdio-transport";
@@ -68,8 +68,10 @@ export class MCPServer {
       });
 
       // Create protocol handler
-      const protocolHandler =
-        await createMCPProtocolHandler(this.logger, this.locale);
+      const protocolHandler = await createMCPProtocolHandler(
+        this.logger,
+        this.locale,
+      );
 
       // Create transport
       this.transport = new StdioTransport(this.logger);
@@ -160,24 +162,9 @@ export class MCPServer {
    */
   private async keepAlive(): Promise<void> {
     // Wait indefinitely
-    return new Promise(() => {
+    return await new Promise(() => {
       // This promise never resolves, keeping the process alive
       // The process will exit via shutdown handlers
     });
   }
-}
-
-/**
- * Main entry point when run directly
- */
-if (require.main === module) {
-  const server = new MCPServer({
-    locale: (process.env.VIBE_LOCALE as CountryLanguage) || "en-GLOBAL",
-    debug: process.env.DEBUG === "true" || process.env.VIBE_LOG_LEVEL === "debug",
-  });
-
-  server.start().catch((error) => {
-    console.error("Failed to start MCP server:", error);
-    process.exit(1);
-  });
 }

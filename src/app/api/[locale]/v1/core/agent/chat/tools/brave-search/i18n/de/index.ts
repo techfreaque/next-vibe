@@ -1,4 +1,6 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   get: {
     title: "Im Web suchen",
     description:
@@ -20,7 +22,8 @@ export const translations = {
       },
       includeNews: {
         title: "Nachrichten einbeziehen",
-        description: "Nachrichtenergebnisse für aktuelle Ereignisse einbeziehen",
+        description:
+          "Nachrichtenergebnisse für aktuelle Ereignisse einbeziehen",
       },
       freshness: {
         title: "Aktualität",
@@ -49,6 +52,14 @@ export const translations = {
       results: {
         title: "Ergebnisse",
         description: "Array von Suchergebnissen",
+        item: {
+          title: "Suchergebnis",
+          description: "Einzelnes Suchergebnis",
+          url: "URL",
+          snippet: "Snippet",
+          age: "Alter",
+          source: "Quelle",
+        },
       },
       cached: {
         title: "Gecacht",

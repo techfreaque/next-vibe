@@ -167,9 +167,6 @@ const config = [
       '@typescript-eslint/no-unsafe-function-type': 'error',
       '@typescript-eslint/no-wrapper-object-types': 'error',
 
-      // Node
-      "node/no-process-env": "error",
-
       // React Hooks
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "error",

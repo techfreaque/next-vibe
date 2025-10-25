@@ -7,7 +7,7 @@
  * - Native: Validates Bearer token from Authorization header
  */
 
-import { createEndpointHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/next/createEndpointHandler";
+import { createNextHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/next/next-handler";
 
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import {
@@ -20,7 +20,7 @@ import {
  * GET /api/[locale]/v1/core/user/auth/check
  * Check authentication status for current user
  */
-export const GET = createEndpointHandler<
+export const GET = createNextHandler<
   CheckAuthStatusGetRequestOutput,
   CheckAuthStatusGetResponseOutput
 >({

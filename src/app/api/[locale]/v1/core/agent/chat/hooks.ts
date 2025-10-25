@@ -28,6 +28,7 @@ import {
   type ChatFolder,
   type ChatMessage,
   type ChatThread,
+  type ToolCall,
   useChatStore,
 } from "./store";
 import { useThreadsList } from "./threads/hooks";
@@ -310,9 +311,9 @@ export function useChat(
                   id: thread.id,
                   userId: "",
                   title: thread.title,
-                  rootFolderId: thread.rootFolderId,
+                  rootFolderId: thread.rootFolderId as DefaultFolderId,
                   folderId: thread.folderId,
-                  status: thread.status,
+                  status: thread.status as "active" | "archived" | "deleted",
                   defaultModel: null,
                   defaultPersona: null,
                   systemPrompt: null,
@@ -383,7 +384,7 @@ export function useChat(
                     name: folder.name,
                     icon: folder.icon,
                     color: folder.color,
-                    rootFolderId: folder.rootFolderId,
+                    rootFolderId: folder.rootFolderId as DefaultFolderId,
                     parentId: folder.parentId,
                     expanded: folder.expanded,
                     sortOrder: folder.sortOrder,
@@ -676,12 +677,28 @@ export function useChat(
                   threadId: message.threadId,
                   role: message.role,
                   content: message.content,
-                  model: message.model,
+                  model: message.model as ModelId | null,
                   persona: message.persona,
                   parentId: message.parentId,
                   depth: message.depth,
-                  childrenIds: message.childrenIds,
-                  toolCalls: message.toolCalls || null,
+                  authorId: null,
+                  authorName: null,
+                  isAI: message.role === "assistant",
+                  errorType: null,
+                  errorMessage: null,
+                  edited: false,
+                  tokens: null,
+                  toolCalls: message.toolCalls
+                    ? (message.toolCalls.map((tc) => ({
+                        toolName: tc.toolName,
+                        args: tc.args as Record<
+                          string,
+                          string | number | boolean | null
+                        >,
+                      })) as ToolCall[])
+                    : null,
+                  upvotes: null,
+                  downvotes: null,
                   createdAt: new Date(message.createdAt),
                   updatedAt: new Date(message.updatedAt),
                 });

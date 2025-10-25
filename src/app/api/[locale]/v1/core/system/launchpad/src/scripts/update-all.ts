@@ -2,7 +2,8 @@
 import { join } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import { defaultLocale } from "@/i18n/core/config";
+import { CountryLanguage,
+defaultLocale } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { LaunchpadConfig } from "../types/types.js";
@@ -15,15 +16,16 @@ import {
   updateRootRepo,
 } from "../utils/repo-utils.js";
 
-const { t } = simpleT(defaultLocale);
 
 export async function updateAllRepos(
   logger: EndpointLogger,
   force: boolean,
   rootDir: string,
   config: LaunchpadConfig,
+  locale: CountryLanguage,
 ): Promise<void> {
-  logger.info(t("app.api.v1.core.system.launchpad.updateAll.updating"));
+  const { t } = simpleT(locale);
+  logger.info("app.api.v1.core.system.launchpad.updateAll.updating");
   const repos = getAllRepos(config);
 
   let clonedCount = 0;

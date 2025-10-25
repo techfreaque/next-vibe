@@ -273,20 +273,26 @@ function generateResponseSchema<F>(
 export type CreateApiEndpoint<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
   RequestInput = ExtractInput<
     InferSchemaFromField<TFields, FieldUsage.RequestData>
   >,
-  RequestOutput = InferFieldType<TFields, FieldUsage.RequestData>,
+  RequestOutput = ExtractOutput<
+    InferSchemaFromField<TFields, FieldUsage.RequestData>
+  >,
   ResponseInput = ExtractInput<
     InferSchemaFromField<TFields, FieldUsage.Response>
   >,
-  ResponseOutput = InferFieldType<TFields, FieldUsage.Response>,
+  ResponseOutput = ExtractOutput<
+    InferSchemaFromField<TFields, FieldUsage.Response>
+  >,
   UrlVariablesInput = ExtractInput<
     InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
   >,
-  UrlVariablesOutput = InferFieldType<TFields, FieldUsage.RequestUrlParams>,
+  UrlVariablesOutput = ExtractOutput<
+    InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+  >,
 > = ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields> & {
   readonly requestSchema: InferSchemaFromField<TFields, FieldUsage.RequestData>;
   readonly requestUrlParamsSchema: InferSchemaFromField<
@@ -320,7 +326,7 @@ export type CreateEndpointReturnInMethod<
   TFields,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
 > = {
   readonly [KMethod in TMethod]: CreateApiEndpoint<
     TExampleKey,
@@ -338,7 +344,7 @@ export function createEndpoint<
   const TFields,
   const TExampleKey extends string,
   const TMethod extends Methods,
-  const TUserRoleValue extends readonly string[],
+  const TUserRoleValue extends readonly (typeof UserRoleValue)[],
 >(
   config: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
 ): CreateEndpointReturnInMethod<TFields, TExampleKey, TMethod, TUserRoleValue> {

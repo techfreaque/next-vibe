@@ -17,7 +17,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../../../../user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type endpoints from "./definition";
 // Import options utilities from the consolidated options repository
 import { applyOptionDefaults, defineOptions } from "./options-repository";
@@ -353,76 +353,60 @@ export const endpointsGeneratorRepository = {
 // Export the main function for backward compatibility
 export const runFunctionalGenerators = async (
   options: FunctionalGeneratorOptions = {},
+  logger: EndpointLogger,
 ): Promise<void> => {
   try {
     const rootDir = options.rootDir || process.cwd();
 
-    // Create a minimal logger implementation for backward compatibility
-    // TODO: Replace with proper EndpointLogger injection
-    const defaultLogger: Pick<EndpointLogger, "debug" | "error"> = {
-      debug: (msg: string) => {
-        // Silent in production, log in development
-        if (process.env.NODE_ENV === "development") {
-          // eslint-disable-next-line no-console
-          console.log(msg);
-        }
-      },
-      error: (msg: string, error?: unknown) => {
-        // Always log errors
-        // eslint-disable-next-line no-console
-        console.error(msg, error);
-      },
-    };
-
     // Step 1: Generate endpoints
     if (options.skipEndpoints) {
-      defaultLogger.debug("⏭️ Skipping endpoints generation");
+      logger.debug("⏭️ Skipping endpoints generation");
     } else {
-      defaultLogger.debug("📝 Generating endpoints...");
+      logger.debug("📝 Generating endpoints...");
       await functionalGeneratorsRepository["generateEndpoints"](
         rootDir,
-        defaultLogger,
+        logger,
       );
-      defaultLogger.debug("✅ Endpoints generated successfully");
+      logger.debug("✅ Endpoints generated successfully");
     }
 
     // Step 2: Generate seeds
     if (options.skipSeeds) {
-      defaultLogger.debug("⏭️ Skipping seeds generation");
+      logger.debug("⏭️ Skipping seeds generation");
     } else {
-      defaultLogger.debug("🌱 Generating seeds...");
+      logger.debug("🌱 Generating seeds...");
       await functionalGeneratorsRepository["generateSeeds"](
         rootDir,
-        defaultLogger,
+        logger,
       );
-      defaultLogger.debug("✅ Seeds generated successfully");
+      logger.debug("✅ Seeds generated successfully");
     }
 
     // Step 3: Generate cron tasks
     if (options.skipCronTasks) {
-      defaultLogger.debug("⏭️ Skipping cron tasks generation");
+      logger.debug("⏭️ Skipping cron tasks generation");
     } else {
-      defaultLogger.debug("⏰ Generating cron tasks...");
+      logger.debug("⏰ Generating cron tasks...");
       await functionalGeneratorsRepository["generateCronTasks"](
         rootDir,
-        defaultLogger,
+        logger,
       );
-      defaultLogger.debug("✅ Cron tasks generated successfully");
+      logger.debug("✅ Cron tasks generated successfully");
     }
 
     // Step 4: Generate tRPC router (development mode)
     if (options.skipTRPCRouter) {
-      defaultLogger.debug("⏭️ Skipping tRPC router generation");
+      logger.debug("⏭️ Skipping tRPC router generation");
     } else {
-      defaultLogger.debug("🔄 Generating tRPC router...");
+      logger.debug("🔄 Generating tRPC router...");
       await functionalGeneratorsRepository["generateTRPCRouterDev"](
         rootDir,
-        defaultLogger,
+        logger,
       );
-      defaultLogger.debug("✅ tRPC router generated successfully");
+      logger.debug("✅ tRPC router generated successfully");
     }
   } catch (error) {
-    defaultLogger.error(
+    logger.error(
       "❌ Error running functional generators:",
       parseError(error),
     );

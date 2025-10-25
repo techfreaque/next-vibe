@@ -5,7 +5,14 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import { validateData } from "./validation";
 
 export function validateEnv<TSchema extends z.ZodType>(
-  env: z.input<TSchema> | typeof process.env,
+  env: {
+    [key: string]:
+      | string
+      | undefined
+      | boolean
+      | number
+      | { [key: string]: string | undefined | boolean | number };
+  },
   envSchema: TSchema,
   logger: EndpointLogger,
 ): z.infer<TSchema> {

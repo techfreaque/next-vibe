@@ -120,6 +120,9 @@ export const chatFolders = pgTable(
     // Metadata
     metadata: jsonb("metadata").$type<FolderMetadata>().default({}),
 
+    // Moderators (array of user IDs who can moderate this folder)
+    moderatorIds: jsonb("moderator_ids").$type<string[]>().default([]),
+
     // Timestamps
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -174,6 +177,9 @@ export const chatThreads = pgTable(
     tags: jsonb("tags").$type<string[]>().default([]),
     preview: text("preview"), // First user message preview
     metadata: jsonb("metadata").$type<ThreadMetadata>().default({}),
+
+    // Moderators (array of user IDs who can moderate this thread)
+    moderatorIds: jsonb("moderator_ids").$type<string[]>().default([]),
 
     // Timestamps
     createdAt: timestamp("created_at").defaultNow().notNull(),

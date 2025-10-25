@@ -5,11 +5,12 @@
 
 import "server-only";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { EndpointLogger } from "../../cli/vibe/endpoints/endpoint-handler/logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { env } from "@/config/env";
+import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { EndpointLogger } from "../../cli/vibe/endpoints/endpoint-handler/logger";
 import { getMCPConfig } from "../config";
 import { getMCPRegistry, toolMetadataToMCPTool } from "../registry";
 import type {
@@ -193,9 +194,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
   /**
    * Handle tools/call request
    */
-  async handleToolCall(
-    params: MCPToolCallParams,
-  ): Promise<MCPToolCallResult> {
+  async handleToolCall(params: MCPToolCallParams): Promise<MCPToolCallResult> {
     this.logger.info("[MCP Protocol] Calling tool", {
       toolName: params.name,
     });
@@ -280,15 +279,16 @@ export async function createMCPProtocolHandler(
 /**
  * Get CLI user with fallback
  */
-async function getCliUser(
-  logger: EndpointLogger,
-): Promise<JwtPayloadType> {
+async function getCliUser(logger: EndpointLogger): Promise<JwtPayloadType> {
   try {
-    const { userRepository } = await import("@/app/api/[locale]/v1/core/user/repository");
-    const { UserDetailLevel } = await import("@/app/api/[locale]/v1/core/user/enum");
+    const { userRepository } = await import(
+      "@/app/api/[locale]/v1/core/user/repository"
+    );
+    const { UserDetailLevel } = await import(
+      "@/app/api/[locale]/v1/core/user/enum"
+    );
 
-    const CLI_USER_EMAIL =
-      process.env.VIBE_CLI_USER_EMAIL || "cli@system.local";
+    const CLI_USER_EMAIL = env.VIBE_CLI_USER_EMAIL || "cli@system.local";
 
     const userResponse = await userRepository.getUserByEmail(
       CLI_USER_EMAIL,

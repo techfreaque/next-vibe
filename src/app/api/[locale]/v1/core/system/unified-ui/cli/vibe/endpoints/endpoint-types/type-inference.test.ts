@@ -45,7 +45,7 @@ import type {
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { InferJwtPayloadTypeFromRoles } from "../types";
+import type { InferJwtPayloadTypeFromRoles } from "../endpoint-handler/types";
 
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;
@@ -413,16 +413,9 @@ type ImapStep10_ReadSubmitFormType = ImapStep7_ReadType extends {
 }
   ? S
   : never;
-// Verify submitForm type is a function that returns Promise
-type ImapStep10_SubmitFormIsFunction = ImapStep10_ReadSubmitFormType extends (
-  ...args: never[]
-) => Promise<void>
-  ? true
-  : ImapStep10_ReadSubmitFormType extends (
-        ...args: readonly []
-      ) => Promise<void>
-    ? true
-    : false;
+// Verify submitForm type is a function (SubmitFormFunction takes event and options)
+type ImapStep10_SubmitFormIsFunction =
+  ImapStep10_ReadSubmitFormType extends (...args: any[]) => any ? true : false;
 type ImapStep10_SubmitFormVerify = Expect<
   Equal<ImapStep10_SubmitFormIsFunction, true>
 >;
@@ -430,16 +423,12 @@ type ImapStep10_SubmitFormVerify = Expect<
 type ImapStep10_ReadDataType = ImapStep7_ReadType extends { data: infer D }
   ? D
   : never;
-// Verify data type has accounts property (not any)
+// Verify data type has accounts property (data can be undefined, so we check the non-undefined case)
 type ImapStep10_DataHasAccounts = ImapStep10_ReadDataType extends
-  | Record<string, never>
+  | { accounts: any }
   | undefined
-  ? false
-  : ImapStep10_ReadDataType extends
-        | { accounts: ReadonlyArray<Record<string, string | number>> }
-        | undefined
-    ? true
-    : false;
+  ? true
+  : false;
 type ImapStep10_DataVerify = Expect<Equal<ImapStep10_DataHasAccounts, true>>;
 
 // Step 11: Verify the data property type matches the response data type

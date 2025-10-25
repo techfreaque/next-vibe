@@ -2,8 +2,9 @@
 import { join } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import { defaultLocale } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { CountryLanguage,
+defaultLocale } from "@/i18n/core/config";
+
 
 import type { LaunchpadConfig } from "../types/types.js";
 import {
@@ -12,13 +13,14 @@ import {
   getAllRepos,
   repoExists,
 } from "../utils/repo-utils.js";
+import { TFunction } from "@/i18n/core/static-types.js";
 
-const { t } = simpleT(defaultLocale);
 
 export async function cloneMissingRepos(
   logger: EndpointLogger,
   rootDir: string,
   config: LaunchpadConfig,
+  t: TFunction,
 ): Promise<void> {
   logger.info(t("app.api.v1.core.system.launchpad.cloneMissing.checking"));
   const repos = getAllRepos(config);
