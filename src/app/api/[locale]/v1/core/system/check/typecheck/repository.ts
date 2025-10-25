@@ -7,17 +7,17 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { promisify } from "node:util";
 
 import { exec } from "child_process";
-import { z } from "zod";
-
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-
-import type { ResponseType as ApiResponseType } from "../../../../../../../../packages/next-vibe/shared/types/response.schema";
+import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
-} from "../../../../../../../../packages/next-vibe/shared/types/response.schema";
-import { parseError } from "../../../../../../../../packages/next-vibe/shared/utils/parse-error";
+} from "../../../shared/types/response.schema";
+import { parseError } from "../../../shared/utils/parse-error";
+import { z } from "zod";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+
 import { TYPECHECK_PATTERNS } from "./constants";
 import type {
   TypecheckRequestOutput,

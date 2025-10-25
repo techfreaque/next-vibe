@@ -7,7 +7,6 @@
 
 import type {
   ApiSection,
-  EndpointDefinition,
 } from "../unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
 import { setNestedPath } from "next-vibe/shared/utils/object-path";
 
@@ -18,8 +17,8 @@ import { default as endpointDefinition3 } from "@/app/api/[locale]/v1/core/agent
 import { default as endpointDefinition4 } from "@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/search/definition";
 import { default as endpointDefinition5 } from "@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/[messageId]/definition";
 import { default as endpointDefinition6 } from "@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/definition";
-import { default as endpointDefinition7 } from "@/app/api/[locale]/v1/core/agent/chat/tools/brave-search/definition";
-import { default as endpointDefinition8 } from "@/app/api/[locale]/v1/core/agent/chat/ai-stream/definition";
+import { default as endpointDefinition7 } from "@/app/api/[locale]/v1/core/agent/brave-search/definition";
+import { default as endpointDefinition8 } from "@/app/api/[locale]/v1/core/agent/ai-stream/definition";
 import { default as endpointDefinition9 } from "@/app/api/[locale]/v1/core/agent/chat/folders/[id]/definition";
 import { default as endpointDefinition10 } from "@/app/api/[locale]/v1/core/agent/chat/folders/definition";
 import { default as endpointDefinition11 } from "@/app/api/[locale]/v1/core/credits/history/definition";

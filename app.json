@@ -25,7 +25,7 @@
       [
         "expo-router",
         {
-          "root": "./src/packages/react-native-comp/app"
+          "root": "./src/app-native"
         }
       ]
     ]

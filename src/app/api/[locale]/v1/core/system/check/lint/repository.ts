@@ -7,12 +7,12 @@ import { existsSync, promises as fs } from "node:fs";
 import { cpus, freemem, totalmem } from "node:os";
 import { dirname, extname, join, relative, resolve } from "node:path";
 
+import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
+import { createSuccessResponse } from "../../../shared/types/response.schema";
+import { parseError } from "../../../shared/utils/parse-error";
+
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { ResponseType as ApiResponseType } from "../../../../../../../../packages/next-vibe/shared/types/response.schema";
-import { createSuccessResponse } from "../../../../../../../../packages/next-vibe/shared/types/response.schema";
-import { parseError } from "../../../../../../../../packages/next-vibe/shared/utils/parse-error";
 import type { LintRequestOutput, LintResponseOutput } from "./definition";
 
 /**

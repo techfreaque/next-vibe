@@ -25,24 +25,29 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
     }
 
     // Fallback to simple display
-    return `${this.formatLabel(field, context)}: ${String(value)}`;
+    const label = this.formatLabel(field, context);
+    const valueStr =
+      typeof value === "object" ? JSON.stringify(value) : String(value);
+    return `${label}: ${valueStr}`;
   }
 
   /**
    * Render container object with nested fields
    */
   private renderContainerObject(
-    value: Record<string, any>,
+    value: Record<string, string | number | boolean>,
     field: ResponseFieldMetadata,
     context: WidgetRenderContext,
   ): string {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const config = this.getContainerConfig(field);
     const result: string[] = [];
 
     // Add container title if present
     if (field.label) {
       const title = context.translate(field.label);
-      const titleIcon = config.icon || "📊 ";
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, i18next/no-literal-string
+      const titleIcon = (config.icon as string) || "📊 ";
       const titleWithIcon = titleIcon + title;
       const styledTitle = this.styleText(titleWithIcon, "bold", context);
       result.push(styledTitle);
@@ -66,15 +71,19 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
    * Render fields within the container
    */
   private renderFields(
-    data: Record<string, any>,
+    data: Record<string, string | number | boolean>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     config: any,
     context: WidgetRenderContext,
   ): string {
     const result: string[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     const layout = config.layout || { type: "vertical", columns: 1 };
 
     // For grid layout with multiple columns, render in a grid format
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (layout.type === "grid" && layout.columns > 1) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
       return this.renderGridLayout(data, layout.columns, context);
     }
 
@@ -91,7 +100,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
    * Render fields in a grid layout
    */
   private renderGridLayout(
-    data: Record<string, any>,
+    data: Record<string, string | number | boolean>,
     columns: number,
     context: WidgetRenderContext,
   ): string {
@@ -115,7 +124,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
    */
   private formatContainerValue(
     key: string,
-    value: any,
+    value: string | number | boolean,
     context: WidgetRenderContext,
   ): string {
     // Format as metric card style
@@ -130,8 +139,8 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
    * Get icon for metric based on configuration
    */
   private getMetricIcon(
-    key: string,
-    value: any,
+    _key: string,
+    _value: string | number | boolean,
     context: WidgetRenderContext,
   ): string {
     if (!context.options.useEmojis) {
@@ -139,6 +148,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
     }
 
     // Default icon for metrics
+    // eslint-disable-next-line i18next/no-literal-string
     return "📊 ";
   }
 
@@ -147,16 +157,14 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
    */
   private formatMetricLabel(key: string): string {
     // Convert camelCase to Title Case
-    return key
-      .replace(/([A-Z])/g, " $1")
-      .replace(/^./, (str) => str.toUpperCase())
-      .trim();
+    const spaced = key.replace(/([A-Z])/g, (match) => ` ${match}`);
+    return spaced.replace(/^./, (str) => str.toUpperCase()).trim();
   }
 
   /**
    * Format metric value (handle integers properly)
    */
-  private formatMetricValue(value: any, context: WidgetRenderContext): string {
+  private formatMetricValue(value: string | number | boolean): string {
     if (typeof value === "number") {
       // For integers, don't show decimal places
       if (Number.isInteger(value)) {
@@ -180,8 +188,9 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
   /**
    * Get container configuration
    */
-  private getContainerConfig(field: ResponseFieldMetadata): any {
-    const config = field.config || {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private getContainerConfig(_field: ResponseFieldMetadata): any {
+    const config = _field.config || {};
 
     return {
       layout: config.layout || { type: "vertical", columns: 1 },

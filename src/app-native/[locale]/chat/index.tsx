@@ -65,7 +65,7 @@ export default function LocaleIndexWrapper(): React.ReactElement {
                 ? err
                 : new Error(
                     t(
-                      "app.api.v1.core.system.unifiedUi.react-native.app.index.failedToLoadPage",
+                      "app.api.v1.core.system.unifiedUi.reactNative.app.index.failedToLoadPage",
                     ),
                   ),
             );
@@ -92,7 +92,7 @@ export default function LocaleIndexWrapper(): React.ReactElement {
       >
         <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
           {t(
-            "app.api.v1.core.system.unifiedUi.react-native.app.index.failedToLoadPage",
+            "app.api.v1.core.system.unifiedUi.reactNative.app.index.failedToLoadPage",
           )}
         </Text>
         <Text style={{ fontSize: 14, color: "#666", textAlign: "center" }}>

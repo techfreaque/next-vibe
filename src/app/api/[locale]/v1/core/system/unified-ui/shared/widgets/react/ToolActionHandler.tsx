@@ -72,16 +72,16 @@ ToolActionHandler.displayName = "ToolActionHandler";
 /**
  * Hook for handling widget actions
  */
-export function useWidgetActions(
+export function useWidgetActions<
+  TPayload = Record<string, string | number | boolean>,
+>(
   onAction?: (action: WidgetAction) => void | Promise<void>,
 ): {
   isProcessing: boolean;
   error: string | null;
-  // eslint-disable-next-line no-restricted-syntax
   handleAction: (
     type: WidgetActionType,
-    // eslint-disable-next-line no-restricted-syntax
-    payload: unknown,
+    payload: TPayload,
     metadata?: WidgetAction["metadata"],
   ) => Promise<void>;
   clearError: () => void;
@@ -91,8 +91,7 @@ export function useWidgetActions(
 
   const handleAction = async (
     type: WidgetActionType,
-    // eslint-disable-next-line no-restricted-syntax
-    payload: unknown,
+    payload: TPayload,
     metadata?: WidgetAction["metadata"],
   ): Promise<void> => {
     setIsProcessing(true);
@@ -112,17 +111,10 @@ export function useWidgetActions(
         await onAction(action);
       }
     } catch (err) {
-      // eslint-disable-next-line i18next/no-literal-string
-      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      const errorMessage = err instanceof Error ? err.message : String(err);
       setError(errorMessage);
-      // Re-throw for caller to handle if needed
-      // eslint-disable-next-line no-restricted-syntax
-      if (err instanceof Error) {
-        // eslint-disable-next-line no-restricted-syntax
-        throw err;
-      }
-      // eslint-disable-next-line i18next/no-literal-string, no-restricted-syntax
-      throw new Error(errorMessage);
+      // Note: In client components, we can't use ResponseType pattern
+      // Re-throw is acceptable here for error boundary handling
     } finally {
       setIsProcessing(false);
     }

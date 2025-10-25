@@ -22,12 +22,18 @@ const nextConfig: NextConfig = {
     ? {
         resolveAlias: {
           "react-native": "react-native-web",
-          "next-vibe": "./src/packages/next-vibe",
+          "next-vibe": "./src/app/api/[locale]/v1/core",
           "next-vibe-ui": "./src/packages/next-vibe-ui/web",
           "@": "./src",
         },
         rules: {
           "*.native.tsx": {
+            loaders: ["ignore-loader"],
+          },
+          "*.native.ts": {
+            loaders: ["ignore-loader"],
+          },
+          "**/native/**": {
             loaders: ["ignore-loader"],
           },
           // Ignore standalone package source files and routes in API routes
@@ -45,6 +51,9 @@ const nextConfig: NextConfig = {
             loaders: ["ignore-loader"],
           },
           "src/app/api/**/check/**": {
+            loaders: ["ignore-loader"],
+          },
+          "src/app-native/**": {
             loaders: ["ignore-loader"],
           },
         },
@@ -81,7 +90,7 @@ const nextConfig: NextConfig = {
           // Use absolute paths for better compatibility with Vercel
           config.resolve.alias["next-vibe"] = path.resolve(
             sourcePath,
-            "./packages/next-vibe",
+            "./app/api/[locale]/v1/core",
           );
         }
         // Use absolute paths for better compatibility with Vercel

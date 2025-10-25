@@ -100,7 +100,7 @@ export function LeadsListClient({
         country: undefined,
         language: undefined,
       },
-      sorting: {
+      sortingOptions: {
         sortBy: LeadSortField.CREATED_AT,
         sortOrder: SortOrder.DESC,
       },
@@ -480,7 +480,7 @@ export function LeadsListClient({
 
               {/* Sort By */}
               <EndpointFormField
-                name="sortBy"
+                name="sortingOptions.sortBy"
                 config={{
                   type: "select",
                   label: undefined,
@@ -517,7 +517,7 @@ export function LeadsListClient({
 
               {/* Sort Order */}
               <EndpointFormField
-                name="sortOrder"
+                name="sortingOptions.sortOrder"
                 config={{
                   type: "select",
                   label: undefined,

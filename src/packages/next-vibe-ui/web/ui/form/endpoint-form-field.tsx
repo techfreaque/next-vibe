@@ -8,6 +8,7 @@
 
 import { AlertCircle, Calendar } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
+import { safeGetRequiredFields } from "next-vibe/shared/utils/zod-required-fields";
 import type { JSX } from "react";
 import type {
   Control,
@@ -20,7 +21,6 @@ import type { z } from "zod";
 import { useTranslation } from "@/i18n/core/client";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { safeGetRequiredFields } from "../../../../next-vibe/shared/utils/zod-required-fields";
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
 import { Button } from "../button";

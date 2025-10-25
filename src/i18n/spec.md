@@ -1,5 +1,7 @@
 # i18n Folder Structure Specification
 
+> **Part of NextVibe Framework** (GPL-3.0) - Type-safe internationalization system
+
 ## Overview
 
 This document defines the standardized structure for internationalization (i18n) folders throughout the API codebase. Every API endpoint must have a corresponding i18n folder with translations for English (en), German (de), and Polish (pl).

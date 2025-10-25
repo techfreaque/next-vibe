@@ -92,15 +92,16 @@ export const translations = {
     modal: {
       title: "AI Tools Configuration",
       description:
-        "Select which AI tools the assistant can use during conversation. Tools provide capabilities like web search, calculations, and data access.",
+        "Select which AI tools the assistant can use during conversation. Search is available as a quick toggle and also appears in this list.",
       searchPlaceholder: "Search tools...",
       loading: "Loading tools...",
       noToolsFound: "No tools match your search",
-      noToolsAvailable:
-        "No AI tools discovered yet. Tools will appear here automatically as they are registered with the system.",
-      enableAll: "Enable All Visible Tools",
-      disableAll: "Disable All Visible Tools",
-      footerInfo: "{{count}} of {{total}} tools enabled",
+      noToolsAvailable: "No AI tools available",
+      expandAll: "Expand All",
+      collapseAll: "Collapse All",
+      selectAll: "Select All",
+      deselectAll: "Deselect All",
+      stats: "{{enabled}} of {{total}} tools enabled",
     },
   },
 
@@ -301,6 +302,10 @@ export const translations = {
     enabledTitle: "Brave Search enabled (+1 credit per search)",
     disabledTitle: "Brave Search disabled (+1 credit per search)",
     creditIndicator: "+1",
+  },
+  toolsButton: {
+    title: "Configure AI Tools",
+    tools: "Tools",
   },
   selectorBase: {
     favorites: "Favorites",

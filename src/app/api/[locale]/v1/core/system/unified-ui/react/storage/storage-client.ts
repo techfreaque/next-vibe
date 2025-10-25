@@ -125,6 +125,7 @@ export async function removeStorageItem(key: string): Promise<void> {
  * Clear all items from storage (works in both browser and React Native)
  * @returns Promise that resolves when clearing is complete
  */
+// eslint-disable-next-line @typescript-eslint/require-await
 export async function clearStorageItems(): Promise<void> {
   try {
     if (envClient.platform.isServer) {

@@ -274,10 +274,10 @@ export class SchemaUIHandler {
           message,
           default: field.defaultValue?.toString(),
           validate: field.validation
-            ? (inputStr) => {
+            ? (inputStr): string | boolean => {
                 const num = parseFloat(inputStr);
                 if (isNaN(num)) {
-                  return "Please enter a valid number";
+                  return String(num);
                 }
                 return this.validateField(num, field.validation!);
               }
@@ -291,7 +291,8 @@ export class SchemaUIHandler {
           message,
           default: field.defaultValue?.toString(),
           validate: field.validation
-            ? (inputStr) => this.validateField(inputStr, field.validation!)
+            ? (inputStr): string | boolean =>
+                this.validateField(inputStr, field.validation!)
             : undefined,
         });
       }

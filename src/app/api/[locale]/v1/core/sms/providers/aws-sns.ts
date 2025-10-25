@@ -5,9 +5,9 @@ import {
   ErrorResponseTypes,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 import { env } from "@/config/env";
-import { parseError } from "next-vibe/shared";
 
 import type {
   SendSmsParams,

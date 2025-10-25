@@ -40,7 +40,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
   }
 
   private renderMetricObject(
-    value: Record<string, any>,
+    value: Record<string, string | number | boolean>,
     config: MetricConfig,
     context: WidgetRenderContext,
     indent: string,
@@ -138,7 +138,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
   }
 
   private formatMetricValue(
-    value: any,
+    value: string | number | boolean,
     config: MetricConfig,
     context: WidgetRenderContext,
   ): string {
@@ -187,7 +187,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
 
   private getMetricIcon(
     config: MetricConfig,
-    value: any,
+    value: string | number | boolean,
     context: WidgetRenderContext,
   ): string {
     if (!context.options.useEmojis) {

@@ -78,8 +78,11 @@ type AnyNextPageComponent =
   | ((props: {
       params: ExpoRouterParams;
     }) => Promise<JSX.Element> | JSX.Element | never)
-  // Any other Next.js page shape
-  | ((props: any) => Promise<JSX.Element> | JSX.Element | never);
+  // Any other Next.js page shape with generic props
+  | ((
+      // eslint-disable-next-line no-restricted-syntax
+      props: Record<string, unknown>,
+    ) => Promise<JSX.Element> | JSX.Element | never);
 
 /**
  * Creates a wrapper for Next.js page components to work in Expo Router

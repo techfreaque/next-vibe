@@ -4,6 +4,7 @@ import { cn } from "next-vibe/shared/utils";
 import {
   Badge,
   Button,
+  Checkbox,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -13,10 +14,15 @@ import {
   Input,
   P,
   ScrollArea,
-  Separator,
-  Switch,
+  Span,
 } from "next-vibe-ui/ui";
-import { Check, Search, X } from "next-vibe-ui/ui/icons";
+import {
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Search,
+  X,
+} from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
@@ -49,6 +55,9 @@ export function AIToolsModal({
 }: AIToolsModalProps): JSX.Element {
   const { t } = simpleT(locale);
   const [searchQuery, setSearchQuery] = useState("");
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
+    new Set(),
+  );
 
   // Use the proper hooks pattern to fetch tools
   const toolsEndpoint = useAIToolsList(logger, {
@@ -151,6 +160,48 @@ export function AIToolsModal({
     return filteredTools.every((tool) => enabledToolIds.includes(tool.name));
   }, [filteredTools, enabledToolIds]);
 
+  // Toggle category expansion
+  const toggleCategory = (category: string): void => {
+    const newExpanded = new Set(expandedCategories);
+    if (newExpanded.has(category)) {
+      newExpanded.delete(category);
+    } else {
+      newExpanded.add(category);
+    }
+    setExpandedCategories(newExpanded);
+  };
+
+  // Toggle all tools in a category
+  const toggleCategoryTools = (
+    categoryTools: AIToolMetadataSerialized[],
+  ): void => {
+    const categoryToolIds = categoryTools.map((t) => t.name);
+    const allEnabled = categoryToolIds.every((id) =>
+      enabledToolIds.includes(id),
+    );
+
+    if (allEnabled) {
+      // Disable all tools in category
+      onToolsChange(
+        enabledToolIds.filter((id) => !categoryToolIds.includes(id)),
+      );
+    } else {
+      // Enable all tools in category
+      const newIds = new Set([...enabledToolIds, ...categoryToolIds]);
+      onToolsChange(Array.from(newIds));
+    }
+  };
+
+  // Expand all categories
+  const expandAll = (): void => {
+    setExpandedCategories(new Set(Object.keys(toolsByCategory)));
+  };
+
+  // Collapse all categories
+  const collapseAll = (): void => {
+    setExpandedCategories(new Set());
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[700px] max-h-[90dvh] flex flex-col">
@@ -162,8 +213,8 @@ export function AIToolsModal({
         </DialogHeader>
 
         <Div className="space-y-4 flex-1 overflow-hidden flex flex-col">
-          {/* Search and Toggle All */}
-          <Div className="space-y-2 flex-shrink-0">
+          {/* Search and Controls */}
+          <Div className="space-y-2 shrink-0">
             {/* Search Input */}
             <Div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -176,26 +227,43 @@ export function AIToolsModal({
               />
             </Div>
 
-            {/* Toggle All Button */}
+            {/* Control Buttons */}
             {filteredTools.length > 0 && (
-              <Button
-                onClick={handleToggleAll}
-                variant="outline"
-                size="sm"
-                className="w-full"
-              >
-                {allVisibleToolsEnabled ? (
-                  <>
-                    <X className="h-4 w-4 mr-2" />
-                    {t("app.chat.aiTools.modal.disableAll")}
-                  </>
-                ) : (
-                  <>
-                    <Check className="h-4 w-4 mr-2" />
-                    {t("app.chat.aiTools.modal.enableAll")}
-                  </>
-                )}
-              </Button>
+              <Div className="flex gap-2">
+                {/* Expand/Collapse All */}
+                <Button
+                  onClick={
+                    expandedCategories.size === 0 ? expandAll : collapseAll
+                  }
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                >
+                  {expandedCategories.size === 0
+                    ? t("app.chat.aiTools.modal.expandAll")
+                    : t("app.chat.aiTools.modal.collapseAll")}
+                </Button>
+
+                {/* Select/Deselect All */}
+                <Button
+                  onClick={handleToggleAll}
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                >
+                  {allVisibleToolsEnabled ? (
+                    <>
+                      <X className="h-4 w-4 mr-2" />
+                      {t("app.chat.aiTools.modal.deselectAll")}
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-4 w-4 mr-2" />
+                      {t("app.chat.aiTools.modal.selectAll")}
+                    </>
+                  )}
+                </Button>
+              </Div>
             )}
           </Div>
 
@@ -216,86 +284,119 @@ export function AIToolsModal({
                   : t("app.chat.aiTools.modal.noToolsAvailable")}
               </Div>
             ) : (
-              <Div className="space-y-6">
-                {Object.entries(toolsByCategory).map(([category, tools]) => (
-                  <Div key={category}>
-                    {/* Category Header */}
-                    <Div className="mb-3">
-                      <P className="text-sm font-medium capitalize">
-                        {category}
-                      </P>
-                      <Separator className="mt-2" />
-                    </Div>
+              <Div className="space-y-4">
+                {Object.entries(toolsByCategory).map(([category, tools]) => {
+                  const isExpanded = expandedCategories.has(category);
+                  const categoryToolIds = tools.map((t) => t.name);
+                  const allCategoryEnabled = categoryToolIds.every((id) =>
+                    enabledToolIds.includes(id),
+                  );
+                  const someCategoryEnabled = categoryToolIds.some((id) =>
+                    enabledToolIds.includes(id),
+                  );
 
-                    {/* Tools in Category */}
-                    <Div className="space-y-2">
-                      {tools.map((tool) => {
-                        const isEnabled = enabledToolIds.includes(tool.name);
+                  return (
+                    <Div key={category} className="border rounded-lg">
+                      {/* Category Header - Clickable to expand/collapse */}
+                      <button
+                        onClick={() => toggleCategory(category)}
+                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-accent/50 transition-colors rounded-t-lg"
+                      >
+                        {isExpanded ? (
+                          <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                        )}
+                        <Span className="text-sm font-medium capitalize flex-1 text-left">
+                          {category}
+                        </Span>
+                        <Badge variant="secondary" className="text-xs">
+                          {
+                            categoryToolIds.filter((id) =>
+                              enabledToolIds.includes(id),
+                            ).length
+                          }{" "}
+                          / {tools.length}
+                        </Badge>
+                        <Checkbox
+                          checked={allCategoryEnabled}
+                          indeterminate={
+                            someCategoryEnabled && !allCategoryEnabled
+                          }
+                          onCheckedChange={() => toggleCategoryTools(tools)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="shrink-0"
+                        />
+                      </button>
 
-                        return (
-                          <button
-                            key={tool.name}
-                            onClick={() => handleToggleTool(tool.name)}
-                            className={cn(
-                              "w-full text-left px-4 py-3 rounded-lg border transition-all",
-                              "hover:border-primary/50 hover:bg-accent/50",
-                              "min-h-[60px] flex items-start gap-3",
-                              isEnabled && "border-primary bg-primary/5",
-                            )}
-                          >
-                            <Switch
-                              checked={isEnabled}
-                              onCheckedChange={() =>
-                                handleToggleTool(tool.name)
-                              }
-                              className="mt-0.5 flex-shrink-0"
-                              onClick={(e) => e.stopPropagation()}
-                            />
+                      {/* Tools in Category - Collapsible */}
+                      {isExpanded && (
+                        <Div className="px-4 pb-3 space-y-2 border-t">
+                          {tools.map((tool) => {
+                            const isEnabled = enabledToolIds.includes(
+                              tool.name,
+                            );
 
-                            <Div className="flex-1 min-w-0">
-                              <Div className="flex items-start gap-2 mb-1">
-                                <P className="text-sm font-medium truncate flex-1">
-                                  {tool.name}
-                                </P>
-                                {isEnabled && (
-                                  <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                            return (
+                              <button
+                                key={tool.name}
+                                onClick={() => handleToggleTool(tool.name)}
+                                className={cn(
+                                  "w-full text-left px-3 py-2 rounded-md border transition-all",
+                                  "hover:border-primary/50 hover:bg-accent/50",
+                                  "flex items-start gap-3",
+                                  isEnabled && "border-primary bg-primary/5",
                                 )}
-                              </Div>
+                              >
+                                <Checkbox
+                                  checked={isEnabled}
+                                  onCheckedChange={() =>
+                                    handleToggleTool(tool.name)
+                                  }
+                                  className="mt-0.5 shrink-0"
+                                  onClick={(e) => e.stopPropagation()}
+                                />
 
-                              <P className="text-xs text-muted-foreground line-clamp-2">
-                                {tool.description}
-                              </P>
+                                <Div className="flex-1 min-w-0">
+                                  <P className="text-sm font-medium truncate">
+                                    {tool.name}
+                                  </P>
+                                  <P className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
+                                    {tool.description}
+                                  </P>
 
-                              {/* Tags */}
-                              {tool.tags.length > 0 && (
-                                <Div className="flex flex-wrap gap-1 mt-2">
-                                  {tool.tags.slice(0, 3).map((tag) => (
-                                    <Badge
-                                      key={tag}
-                                      variant="secondary"
-                                      className="text-[10px] px-1.5 py-0"
-                                    >
-                                      {tag}
-                                    </Badge>
-                                  ))}
+                                  {/* Tags */}
+                                  {tool.tags.length > 0 && (
+                                    <Div className="flex flex-wrap gap-1 mt-1.5">
+                                      {tool.tags.slice(0, 3).map((tag) => (
+                                        <Badge
+                                          key={tag}
+                                          variant="secondary"
+                                          className="text-[10px] px-1.5 py-0"
+                                        >
+                                          {tag}
+                                        </Badge>
+                                      ))}
+                                    </Div>
+                                  )}
                                 </Div>
-                              )}
-                            </Div>
-                          </button>
-                        );
-                      })}
+                              </button>
+                            );
+                          })}
+                        </Div>
+                      )}
                     </Div>
-                  </Div>
-                ))}
+                  );
+                })}
               </Div>
             )}
           </ScrollArea>
 
           {/* Footer Info */}
-          <Div className="flex-shrink-0 pt-2 border-t">
+          <Div className="shrink-0 pt-2 border-t">
             <P className="text-xs text-muted-foreground text-center">
-              {t("app.chat.aiTools.modal.footerInfo", {
-                count: enabledToolIds.length,
+              {t("app.chat.aiTools.modal.stats", {
+                enabled: enabledToolIds.length,
                 total: availableTools.length,
               })}
             </P>

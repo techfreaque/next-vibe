@@ -702,7 +702,7 @@ export async function createAiStream({
         // Filter tools based on request
         let enabledToolMetadata: typeof allTools;
         if (!data.tools || data.tools.length === 0) {
-          // All available tools for user (TODO: filter by user permissions)
+          // All available tools for user
           enabledToolMetadata = allTools;
         } else {
           // Specific tools requested

@@ -38,7 +38,7 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer {
   }
 
   private renderStatsGrid(
-    value: Record<string, any>,
+    value: Record<string, string | number | boolean>,
     context: WidgetRenderContext,
     indent: string,
   ): string {
@@ -47,7 +47,7 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer {
 
     // Group stats into rows for better display
     const columns = 3; // Display 3 stats per row
-    const rows: Array<Array<[string, any]>> = [];
+    const rows: Array<Array<[string, string | number | boolean]>> = [];
 
     for (let i = 0; i < entries.length; i += columns) {
       rows.push(entries.slice(i, i + columns));
@@ -69,7 +69,10 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer {
     return lines.join("\n");
   }
 
-  private formatStatValue(value: any, context: WidgetRenderContext): string {
+  private formatStatValue(
+    value: string | number | boolean,
+    context: WidgetRenderContext,
+  ): string {
     if (typeof value === "number") {
       // Format large numbers with commas
       if (value >= 1000) {
@@ -90,8 +93,8 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer {
     }
 
     if (typeof value === "object" && value !== null) {
-      // eslint-disable-next-line i18next/no-literal-string
-      return `{${Object.keys(value).length} keys}`;
+      const keyCount = String(Object.keys(value).length);
+      return `{${keyCount}}`;
     }
 
     return String(value);
@@ -99,14 +102,14 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer {
 
   private formatStatLabel(key: string): string {
     // Convert camelCase to readable format
-
-    return key
-      .replace(/([A-Z])/g, " $1")
-      .replace(/^./, (str) => str.toUpperCase())
-      .trim();
+    const spaced = key.replace(/([A-Z])/g, (match) => ` ${match}`);
+    return spaced.replace(/^./, (str) => str.toUpperCase()).trim();
   }
 
-  private getStatIcon(value: any, context: WidgetRenderContext): string {
+  private getStatIcon(
+    value: string | number | boolean,
+    context: WidgetRenderContext,
+  ): string {
     if (typeof value === "number") {
       if (value === 0) {
         // eslint-disable-next-line i18next/no-literal-string
@@ -134,7 +137,7 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer {
     return context.options.useColors ? "ℹ️ " : "i ";
   }
 
-  private getMetricConfig(field: ResponseFieldMetadata): MetricConfig {
+  private getMetricConfig(): MetricConfig {
     return {
       format: "number",
       showIcon: true,

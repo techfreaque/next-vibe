@@ -44,6 +44,7 @@ export interface EndpointDefinition {
  * API section type for nested endpoint structure
  * Used in generated endpoints.ts file
  */
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 export type ApiSection = Record<string, EndpointDefinition | ApiSection>;
 
 // ============================================================================

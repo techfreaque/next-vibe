@@ -7,13 +7,13 @@
  */
 
 import * as fs from "fs";
+import { parseError } from "next-vibe/shared/utils";
 import * as path from "path";
 
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
-import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "./endpoints/endpoint-handler/logger";
 import { helpHandler } from "./endpoints/renderers/cli-ui/help-handler";
@@ -454,21 +454,27 @@ export class CliEntryPoint {
 
       try {
         // Use synchronous require for faster lookup
-
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment
         const definitionModule = require(definitionPath);
 
         // Check default export
         if (
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           definitionModule.default &&
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           typeof definitionModule.default === "object"
         ) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
           for (const methodKey of Object.keys(definitionModule.default)) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
             const methodDef = definitionModule.default[methodKey];
             if (
               methodDef &&
               typeof methodDef === "object" &&
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
               Array.isArray(methodDef.aliases)
             ) {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
               if (methodDef.aliases.includes(command)) {
                 // Found it! Return a route with this alias
                 const existingRoute = this.routes.find(

@@ -72,9 +72,10 @@ export class WidgetErrorBoundary extends Component<
           {/* eslint-disable-next-line i18next/no-literal-string */}
           <AlertTitle>Widget Error</AlertTitle>
           <AlertDescription>
-            {/* eslint-disable-next-line i18next/no-literal-string */}
+            {/* eslint-disable i18next/no-literal-string */}
             {this.state.error?.message ||
               "An error occurred while rendering this widget"}
+            {/* eslint-enable i18next/no-literal-string */}
             {this.state.errorInfo && (
               <details className="mt-2 text-xs">
                 {/* eslint-disable-next-line i18next/no-literal-string */}

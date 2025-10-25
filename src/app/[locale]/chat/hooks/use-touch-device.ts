@@ -18,8 +18,9 @@ export function useTouchDevice(): boolean {
       const hasTouch =
         "ontouchstart" in window ||
         navigator.maxTouchPoints > 0 ||
-        // @ts-ignore - msMaxTouchPoints is a legacy IE property not in TypeScript types
-        navigator.msMaxTouchPoints > 0;
+        ("msMaxTouchPoints" in navigator &&
+          (navigator as Navigator & { msMaxTouchPoints: number })
+            .msMaxTouchPoints > 0);
 
       setIsTouch(hasTouch);
     };
@@ -49,8 +50,9 @@ export function getTouchAwareClasses(alwaysVisibleOnTouch = true): string {
   const isTouch =
     "ontouchstart" in window ||
     navigator.maxTouchPoints > 0 ||
-    // @ts-ignore - msMaxTouchPoints is a legacy IE property not in TypeScript types
-    navigator.msMaxTouchPoints > 0;
+    ("msMaxTouchPoints" in navigator &&
+      (navigator as Navigator & { msMaxTouchPoints: number }).msMaxTouchPoints >
+        0);
 
   if (isTouch && alwaysVisibleOnTouch) {
     // On touch devices: always visible but slightly transparent for better UX

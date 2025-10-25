@@ -89,12 +89,14 @@ export function validateCliRequestData<
       Object.keys(context.requestData).length === 0;
     // Check if schema is z.never() by examining its _def
     const isNeverSchema =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
       (endpoint.requestSchema as any)?._def?.type === "never";
 
     if (isEmptyObject && isNeverSchema) {
       // This is a GET/HEAD/OPTIONS endpoint that expects no input
       // Check if URL params schema is also z.never()
       const isUrlParamsNever =
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         (endpoint.requestUrlParamsSchema as any)?._def?.type === "never";
 
       let urlVariables: TUrlVariablesInput;

@@ -6,10 +6,10 @@
 
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { LOCALE_COOKIE_NAME } from "next-vibe/shared/constants";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { LOCALE_COOKIE_NAME } from "../../../shared/constants";
 import type { MiddlewareFunction, MiddlewareHandler } from "../core/types";
 
 export interface LanguageMiddlewareOptions {

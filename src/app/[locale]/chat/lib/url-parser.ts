@@ -30,7 +30,7 @@ export function isUUID(str: string): boolean {
 export function parseChatUrl(urlPath: string[] | undefined): ParsedChatUrl {
   // Default values
   const defaultResult: ParsedChatUrl = {
-    initialRootFolderId: "general",
+    initialRootFolderId: "private",
     initialSubFolderId: null,
     initialThreadId: null,
   };

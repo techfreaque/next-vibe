@@ -3,6 +3,14 @@
  * Comprehensive endpoint for user analytics with historical charts
  */
 
+import {
+  ChartType,
+  ChartTypeOptions,
+  DateRangePreset,
+  DateRangePresetOptions,
+  TimePeriod,
+  TimePeriodOptions,
+} from "next-vibe/shared/types/stats-filtering.schema";
 import { z } from "zod";
 
 import {
@@ -108,6 +116,57 @@ const { GET } = createEndpoint({
           layout: { columns: 12 },
         },
         z.string().optional(),
+      ),
+
+      // === STATS FILTERING OPTIONS ===
+      timePeriod: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "app.api.v1.core.users.stats.fields.timePeriod.label" as const,
+          description:
+            "app.api.v1.core.users.stats.fields.timePeriod.description" as const,
+          options: TimePeriodOptions,
+          layout: { columns: 3 },
+        },
+        z.nativeEnum(TimePeriod).default(TimePeriod.DAY),
+      ),
+      dateRangePreset: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label:
+            "app.api.v1.core.users.stats.fields.dateRangePreset.label" as const,
+          description:
+            "app.api.v1.core.users.stats.fields.dateRangePreset.description" as const,
+          options: DateRangePresetOptions,
+          layout: { columns: 3 },
+        },
+        z.nativeEnum(DateRangePreset).default(DateRangePreset.LAST_30_DAYS),
+      ),
+      chartType: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "app.api.v1.core.users.stats.fields.chartType.label" as const,
+          description:
+            "app.api.v1.core.users.stats.fields.chartType.description" as const,
+          options: ChartTypeOptions,
+          layout: { columns: 3 },
+        },
+        z.nativeEnum(ChartType).default(ChartType.LINE),
+      ),
+      includeComparison: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.CHECKBOX,
+          label:
+            "app.api.v1.core.users.stats.fields.includeComparison.label" as const,
+          description:
+            "app.api.v1.core.users.stats.fields.includeComparison.description" as const,
+          layout: { columns: 3 },
+        },
+        z.coerce.boolean().default(false),
       ),
 
       // === OVERVIEW STATISTICS ===

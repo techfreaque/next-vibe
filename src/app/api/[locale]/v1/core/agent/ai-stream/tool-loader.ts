@@ -5,12 +5,13 @@
 
 import "server-only";
 
-import type { CoreTool } from "ai";
-
 import { braveSearch } from "@/app/api/[locale]/v1/core/agent/brave-search/repository";
 import { getToolExecutor } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/executor";
 import { createToolsFromEndpoints } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/factory";
-import type { AIToolMetadata } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/types";
+import type {
+  AIToolMetadata,
+  CoreTool,
+} from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 

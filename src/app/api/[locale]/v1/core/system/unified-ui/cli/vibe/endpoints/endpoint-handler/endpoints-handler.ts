@@ -20,6 +20,7 @@ export function endpointsHandler<const T>(
   const availableMethods = Object.keys(
     definitions as Record<
       string,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       CreateApiEndpoint<string, Methods, readonly string[], any>
     >,
   ).filter((key) => Object.values(Methods).includes(key as Methods)) as Array<

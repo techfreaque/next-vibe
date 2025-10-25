@@ -10,7 +10,6 @@ import "server-only";
 
 import type { DiscoveredEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { AuthPlatform } from "@/app/api/[locale]/v1/core/user/auth/repository";
 
 import type { PlatformConfig } from "../config/platform-config";
 import { getPlatformConfig, Platform } from "../config/platform-config";

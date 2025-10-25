@@ -278,6 +278,7 @@ export function ChatArea({
             selectedPersona={selectedPersona}
             selectedModel={selectedModel}
             enableSearch={enableSearch}
+            enabledToolIds={chat.enabledToolIds}
             onPersonaChange={onPersonaChange}
             onModelChange={onModelChange}
             onEnableSearchChange={onEnableSearchChange}

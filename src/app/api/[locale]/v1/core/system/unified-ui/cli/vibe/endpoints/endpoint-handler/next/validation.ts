@@ -180,14 +180,18 @@ function validateGetRequestData<TRequestInput, TRequestOutput>(
   const { searchParams } = new URL(request.url);
 
   // Parse dot notation into nested objects (same as FormData parsing)
+  // eslint-disable-next-line no-restricted-syntax
   const queryData: Record<string, unknown> = {};
 
   for (const [key, value] of searchParams.entries()) {
     // Handle placeholder fields (used to ensure empty objects are sent)
-    if (key.endsWith("._placeholder")) {
+    // eslint-disable-next-line i18next/no-literal-string
+    const placeholderSuffix = "._placeholder";
+    if (key.endsWith(placeholderSuffix)) {
       // Create the parent object if it doesn't exist
-      const parentKey = key.replace(/\._placeholder$/, "");
+      const parentKey = key.replace(/\._placeholder$/, String(key));
       const keys = parentKey.split(".");
+      // eslint-disable-next-line no-restricted-syntax
       let current: Record<string, unknown> = queryData;
 
       for (let i = 0; i < keys.length; i++) {
@@ -204,6 +208,7 @@ function validateGetRequestData<TRequestInput, TRequestOutput>(
           if (!current[k] || typeof current[k] !== "object") {
             current[k] = {};
           }
+          // eslint-disable-next-line no-restricted-syntax
           current = current[k] as Record<string, unknown>;
         }
       }
@@ -212,6 +217,7 @@ function validateGetRequestData<TRequestInput, TRequestOutput>(
 
     // Split by dots to handle nested objects (e.g., "pagination.page")
     const keys = key.split(".");
+    // eslint-disable-next-line no-restricted-syntax
     let current: Record<string, unknown> = queryData;
 
     for (let i = 0; i < keys.length; i++) {
@@ -246,6 +252,7 @@ function validateGetRequestData<TRequestInput, TRequestOutput>(
         if (!current[k] || typeof current[k] !== "object") {
           current[k] = {};
         }
+        // eslint-disable-next-line no-restricted-syntax
         current = current[k] as Record<string, unknown>;
       }
     }

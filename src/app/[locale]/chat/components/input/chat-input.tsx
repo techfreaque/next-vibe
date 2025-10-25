@@ -17,6 +17,7 @@ import { ModelSelector } from "./model-selector";
 import { PersonaSelector } from "./persona-selector";
 import { SearchToggle } from "./search-toggle";
 import { SpeechInputButton } from "./speech-input-button";
+import { ToolsButton } from "./tools-button";
 
 interface ChatInputProps {
   value: string;
@@ -28,6 +29,7 @@ interface ChatInputProps {
   selectedPersona: string;
   selectedModel: ModelId;
   enableSearch: boolean;
+  enabledToolIds: string[]; // All enabled tool IDs (including search if enabled)
   onPersonaChange: (persona: string) => void;
   onModelChange: (model: ModelId) => void;
   onEnableSearchChange: (enabled: boolean) => void;
@@ -49,6 +51,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
       selectedPersona,
       selectedModel,
       enableSearch,
+      enabledToolIds,
       onPersonaChange,
       onModelChange,
       onEnableSearchChange,
@@ -65,6 +68,9 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
     // Check if current model supports tools (for search toggle visibility)
     const currentModel = getModelById(selectedModel);
     const modelSupportsTools = currentModel?.supportsTools ?? false;
+
+    // Calculate active tool count (search is treated as one of the tools)
+    const activeToolCount = enabledToolIds.length;
 
     return (
       <Form
@@ -130,13 +136,20 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
 
             {/* Search Toggle - Only show if model supports tools */}
             {modelSupportsTools && (
-              <SearchToggle
-                enabled={enableSearch}
-                onChange={onEnableSearchChange}
-                onOpenToolsModal={onOpenToolsModal}
-                disabled={isLoading}
-                locale={locale}
-              />
+              <>
+                <SearchToggle
+                  enabled={enableSearch}
+                  onChange={onEnableSearchChange}
+                  disabled={isLoading}
+                  locale={locale}
+                />
+                <ToolsButton
+                  activeToolCount={activeToolCount}
+                  onOpenToolsModal={onOpenToolsModal}
+                  disabled={isLoading}
+                  locale={locale}
+                />
+              </>
             )}
           </Div>
 

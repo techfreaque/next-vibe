@@ -21,17 +21,27 @@ import { Label } from "../label";
 function Form<TRequest extends FieldValues>(props: {
   className?: string;
   children: React.ReactNode;
-  form: UseFormReturn<TRequest>;
+  form?: UseFormReturn<TRequest>;
   onSubmit:
     | ((e: React.FormEvent<HTMLFormElement>) => void | Promise<void>)
     | undefined;
 }): React.JSX.Element {
+  // If form is provided, wrap with FormProvider for react-hook-form integration
+  if (props.form) {
+    return (
+      <FormProvider {...props.form}>
+        <form className={cn(props.className)} onSubmit={props.onSubmit}>
+          {props.children}
+        </form>
+      </FormProvider>
+    );
+  }
+
+  // Otherwise, render a simple form element
   return (
-    <FormProvider {...props.form}>
-      <form className={cn(props.className)} onSubmit={props.onSubmit}>
-        {props.children}
-      </form>
-    </FormProvider>
+    <form className={cn(props.className)} onSubmit={props.onSubmit}>
+      {props.children}
+    </form>
   );
 }
 

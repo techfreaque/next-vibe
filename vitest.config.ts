@@ -13,7 +13,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "next-vibe": path.resolve(__dirname, "./src/packages/next-vibe"),
+      "next-vibe": path.resolve(__dirname, "./src/app/api/[locale]/v1/core"),
       "next-vibe-ui": path.resolve(
         __dirname,
         "./src/packages/next-vibe-ui/web",

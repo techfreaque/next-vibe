@@ -4,7 +4,7 @@
  * Generate Expo Router index files from Next.js pages and layouts
  *
  * This script scans src/app/[locale] for page.tsx and layout.tsx files,
- * then creates corresponding index.tsx files in src/app/api/[locale]/v1/core/system/unified-ui/react-native/app/[locale]
+ * then creates corresponding index.tsx files in src/app-native/[locale]
  * that use the nextjs-compat-wrapper utilities.
  *
  * Features:

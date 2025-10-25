@@ -181,8 +181,7 @@ export async function createFolder(
       },
     }) as ResponseType<FolderCreateResponseOutput>;
   } catch (error) {
-    // eslint-disable-next-line no-console, i18next/no-literal-string
-    console.error("createFolder - Failed to create folder:", error);
+    logger.error("Failed to create folder", error);
     return createErrorResponse(
       "app.api.v1.core.agent.chat.folders.post.errors.server.title",
       ErrorResponseTypes.INTERNAL_ERROR,
