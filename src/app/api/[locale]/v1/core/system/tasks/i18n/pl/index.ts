@@ -205,6 +205,24 @@ export const translations: typeof enTranslations = {
     fetchPulseStatus: "Nie udało się pobrać statusu Pulse",
     pulseExecutionFailed: "Wykonanie Pulse nie powiodło się",
   },
+  common: {
+    cronRepositoryTaskUpdateFailed: "Nie udało się zaktualizować zadania cron",
+    cronRepositoryTaskDeleteFailed: "Nie udało się usunąć zadania cron",
+    cronRepositoryExecutionCreateFailed:
+      "Nie udało się utworzyć wykonania zadania cron",
+    cronRepositoryExecutionUpdateFailed:
+      "Nie udało się zaktualizować wykonania zadania cron",
+    cronRepositoryExecutionsFetchFailed:
+      "Nie udało się pobrać wykonań zadań cron",
+    cronRepositoryRecentExecutionsFetchFailed:
+      "Nie udało się pobrać ostatnich wykonań zadań cron",
+    cronRepositorySchedulesFetchFailed:
+      "Nie udało się pobrać harmonogramów zadań cron",
+    cronRepositoryScheduleUpdateFailed:
+      "Nie udało się zaktualizować harmonogramu zadania cron",
+    cronRepositoryStatisticsFetchFailed:
+      "Nie udało się pobrać statystyk zadań cron",
+  },
   cronSystem: cronTranslations,
   pulseSystem: pulseTranslations,
   sideTasks: sideTasksTranslations,

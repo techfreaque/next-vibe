@@ -17,6 +17,7 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
+import type { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import { users } from "@/app/api/[locale]/v1/core/user/db";
 
 import type { DefaultFolderId } from "./config";
@@ -73,7 +74,7 @@ export interface ToolCallWidgetMetadata {
   endpointId: string;
   responseFields: Array<{
     name: string;
-    widgetType: string;
+    widgetType: WidgetType;
     label?: string;
     description?: string;
     layout?: Record<string, string | number | boolean>;

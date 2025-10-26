@@ -6,6 +6,8 @@ import "server-only";
 
 import type { Prettify } from "next-vibe/shared/types/utils";
 
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+
 import { Methods } from "../endpoint-types/core/enums";
 import type { CreateApiEndpoint } from "../endpoint-types/endpoint/create";
 import { endpointHandler } from "./endpoint-handler";
@@ -21,7 +23,7 @@ export function endpointsHandler<const T>(
     definitions as Record<
       string,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      CreateApiEndpoint<string, Methods, readonly string[], any>
+      CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
     >,
   ).filter((key) => Object.values(Methods).includes(key as Methods)) as Array<
     keyof T & Methods

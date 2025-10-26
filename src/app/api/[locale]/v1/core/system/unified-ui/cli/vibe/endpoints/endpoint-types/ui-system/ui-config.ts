@@ -96,7 +96,7 @@ export interface EnhancedFieldConfig {
   // Core field properties (from existing system)
   key: string;
   schema: z.ZodTypeAny;
-  usage: { request?: "data" | "urlParams"; response?: boolean };
+  usage: { request?: "data" | "urlPathParams"; response?: boolean };
 
   // Enhanced UI configuration
   ui?: UIConfig;

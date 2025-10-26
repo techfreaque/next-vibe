@@ -28,11 +28,10 @@ interface ChatInputProps {
   onStop: () => void;
   selectedPersona: string;
   selectedModel: ModelId;
-  enableSearch: boolean;
-  enabledToolIds: string[]; // All enabled tool IDs (including search if enabled)
+  enabledToolIds: string[]; // All enabled tool IDs (search is treated as one of the tools)
   onPersonaChange: (persona: string) => void;
   onModelChange: (model: ModelId) => void;
-  onEnableSearchChange: (enabled: boolean) => void;
+  onToolsChange: (toolIds: string[]) => void;
   onOpenToolsModal: () => void;
   locale: CountryLanguage;
   logger: EndpointLogger;
@@ -50,11 +49,10 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
       onStop,
       selectedPersona,
       selectedModel,
-      enableSearch,
       enabledToolIds,
       onPersonaChange,
       onModelChange,
-      onEnableSearchChange,
+      onToolsChange,
       onOpenToolsModal,
       locale,
       logger,
@@ -134,12 +132,12 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
               logger={logger}
             />
 
-            {/* Search Toggle - Only show if model supports tools */}
+            {/* Search Toggle and Tools - Only show if model supports tools */}
             {modelSupportsTools && (
               <>
                 <SearchToggle
-                  enabled={enableSearch}
-                  onChange={onEnableSearchChange}
+                  enabledToolIds={enabledToolIds}
+                  onToolsChange={onToolsChange}
                   disabled={isLoading}
                   locale={locale}
                 />

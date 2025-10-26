@@ -85,6 +85,7 @@ export class MCPRegistry implements IMCPRegistry {
       this.logger.error("[MCP Registry] Initialization failed", {
         error: error instanceof Error ? error.message : String(error),
       });
+      // eslint-disable-next-line no-restricted-syntax
       throw error;
     }
   }
@@ -105,7 +106,6 @@ export class MCPRegistry implements IMCPRegistry {
         tags: tool.tags,
         endpointId: tool.endpointId,
         allowedRoles: tool.allowedRoles,
-        isManualTool: false,
       };
 
       return toolFilter.hasPermission(aiToolMeta, user);
@@ -143,6 +143,7 @@ export class MCPRegistry implements IMCPRegistry {
           {
             type: "text",
             text: JSON.stringify({
+              // eslint-disable-next-line i18next/no-literal-string
               error: "Tool not found",
               code: MCPErrorCode.TOOL_NOT_FOUND,
               toolName: context.toolName,
@@ -161,7 +162,6 @@ export class MCPRegistry implements IMCPRegistry {
       tags: toolMeta.tags,
       endpointId: toolMeta.endpointId,
       allowedRoles: toolMeta.allowedRoles,
-      isManualTool: false,
     };
 
     if (!toolFilter.hasPermission(aiToolMeta, context.user)) {
@@ -202,7 +202,7 @@ export class MCPRegistry implements IMCPRegistry {
       const executionContext = {
         command: toolMeta.name,
         data: context.arguments,
-        urlParams: {},
+        urlPathParams: {},
         user: context.user,
         locale: context.locale,
         options: {
@@ -238,6 +238,7 @@ export class MCPRegistry implements IMCPRegistry {
               type: "text",
               text: JSON.stringify(
                 {
+                  // eslint-disable-next-line i18next/no-literal-string
                   error: result.error || "Tool execution failed",
                   code: MCPErrorCode.TOOL_EXECUTION_FAILED,
                   toolName: context.toolName,

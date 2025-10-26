@@ -20,6 +20,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-u
 import {
   convertCountryFilter,
   convertLanguageFilter,
+  CountryFilter,
+  LanguageFilter,
   type Countries,
   type CountryLanguage,
   type Languages,
@@ -82,9 +84,7 @@ type EmailCampaignStageType = typeof EmailCampaignStageValues;
 type LeadSourceType = typeof LeadSourceValues;
 type EngagementTypesType = typeof EngagementTypesValues;
 
-// Type aliases for filter values
-type CountryFilter = (typeof Countries)[keyof typeof Countries] | "ALL";
-type LanguageFilter = (typeof Languages)[keyof typeof Languages] | "ALL";
+// Type aliases for filter values (CountryFilter and LanguageFilter are imported from i18n/core/config)
 type LeadStatusFilterType = typeof LeadStatusValues | "ALL";
 type EmailCampaignStageFilterType = typeof EmailCampaignStageValues | "ALL";
 type LeadSourceFilterType = typeof LeadSourceValues | "ALL";
@@ -486,7 +486,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         },
       });
     } catch (error) {
-      logger.error("Error creating lead", error);
+      logger.error("Error creating lead", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.leads.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -534,7 +534,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       return createSuccessResponse(this.formatLeadResponse(lead));
     } catch (error) {
-      logger.error("Error fetching lead by tracking ID", error);
+      logger.error("Error fetching lead by tracking ID", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -569,7 +569,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       return createSuccessResponse(this.formatLeadResponse(lead));
     } catch (error) {
-      logger.error("Error fetching lead by email", error);
+      logger.error("Error fetching lead by email", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -629,7 +629,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
       // Delegate to internal method
       return await this.updateLeadInternal(id, data, logger);
     } catch (error) {
-      logger.error("Error updating lead", error);
+      logger.error("Error updating lead", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.leads.patch.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -800,7 +800,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         },
       });
     } catch (error) {
-      logger.error("Error listing leads", error);
+      logger.error("Error listing leads", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -924,7 +924,10 @@ class LeadsRepositoryImpl implements LeadsRepository {
     ResponseType<{ success: boolean; message?: string; unsubscribedAt?: Date }>
   > {
     try {
-      logger.debug("Unsubscribing lead and newsletter", data);
+      logger.debug("Unsubscribing lead and newsletter", {
+        leadId: data.leadId,
+        email: data.email,
+      });
 
       let whereClause;
       let email: string | null;
@@ -988,7 +991,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         unsubscribedAt: updatedLead.unsubscribedAt || undefined,
       });
     } catch (error) {
-      logger.error("Error unsubscribing lead and newsletter", error);
+      logger.error("Error unsubscribing lead and newsletter", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.leadsUnsubscribe.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -1048,7 +1051,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       logger.debug("Newsletter opt-out completed", { email });
     } catch (error) {
-      logger.error("Error unsubscribing from newsletter (internal)", error);
+      logger.error("Error unsubscribing from newsletter (internal)", parseError(error));
       // Don't re-throw - we want lead opt-out to succeed even if newsletter fails
     }
   }
@@ -1110,7 +1113,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
     } catch (error) {
       logger.error(
         "Error updating lead status on newsletter unsubscribe",
-        error,
+        parseError(error).message,
       );
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
@@ -1145,7 +1148,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       return createSuccessResponse(this.formatLeadDetailResponse(lead));
     } catch (error) {
-      logger.error("Error fetching lead by ID (internal)", error);
+      logger.error("Error fetching lead by ID (internal)", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -1206,7 +1209,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       return createSuccessResponse(this.formatLeadDetailResponse(updatedLead));
     } catch (error) {
-      logger.error("Error updating lead (internal)", error);
+      logger.error("Error updating lead (internal)", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.leads.patch.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -1365,7 +1368,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       return result;
     } catch (error) {
-      logger.error("Error converting lead (internal)", error);
+      logger.error("Error converting lead (internal)", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.leads.patch.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -1491,7 +1494,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         responseLeadId: engagement.leadId,
       });
     } catch (error) {
-      logger.error("Error recording engagement", error);
+      logger.error("Error recording engagement", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.leadsEngagement.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -1529,7 +1532,10 @@ class LeadsRepositoryImpl implements LeadsRepository {
     t: TFunction,
   ): Promise<ResponseType<ExportResponseType>> {
     try {
-      logger.debug("Exporting leads", { query });
+      logger.debug("Exporting leads", {
+        format: query.format,
+        limit: query.limit,
+      });
 
       // Build where conditions (similar to listLeads)
       const conditions: SQL[] = [];
@@ -1616,7 +1622,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         exportedAt: new Date(),
       });
     } catch (error) {
-      logger.error("Error exporting leads", error);
+      logger.error("Error exporting leads", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.leadsExport.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -2046,9 +2052,10 @@ class LeadsRepositoryImpl implements LeadsRepository {
             await tx.update(leads).set(updateData).where(eq(leads.id, lead.id));
             totalUpdated++;
           } catch (error) {
-            logger.error("Error updating lead in batch", error, {
-              leadId: lead.id,
-            });
+            logger.error(
+              "Error updating lead in batch",
+              parseError(error).message,
+            );
             errors.push({
               leadId: lead.id,
               error: parseError(error).toString(),
@@ -2071,7 +2078,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         errors,
       });
     } catch (error) {
-      logger.error("Error in batch update", error);
+      logger.error("Error in batch update", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.batch.update.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -2393,9 +2400,10 @@ class LeadsRepositoryImpl implements LeadsRepository {
             await tx.delete(leads).where(eq(leads.id, lead.id));
             totalDeleted++;
           } catch (error) {
-            logger.error("Error deleting lead in batch", error, {
-              leadId: lead.id,
-            });
+            logger.error(
+              "Error deleting lead in batch",
+              parseError(error).message,
+            );
             errors.push({
               leadId: lead.id,
               error: parseError(error).toString(),
@@ -2425,7 +2433,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         errors,
       });
     } catch (error) {
-      logger.error("Error in batch delete", error);
+      logger.error("Error in batch delete", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.batch.update.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,

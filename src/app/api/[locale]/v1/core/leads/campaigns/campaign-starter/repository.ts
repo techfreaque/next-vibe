@@ -78,7 +78,7 @@ export class CampaignStarterRepositoryImpl
       logger.debug("Processing locale leads for campaign starter", {
         locale,
         leadsPerRun,
-        minAgeDate,
+        minAgeDate: minAgeDate.toISOString(),
         dryRun: config.dryRun,
       });
 

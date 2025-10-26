@@ -391,7 +391,7 @@ const { POST } = createEndpoint({
         leadCreated: true,
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
 });
 
@@ -426,7 +426,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.leads.tracking.engagement.get.form.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: "urlParams", response: true },
+    { request: "data", response: true },
     {
       // === REQUEST FIELDS (Query Parameters) ===
       id: requestDataField(
@@ -637,7 +637,15 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    requests: undefined,
+    requests: {
+      default: {
+        id: "123e4567-e89b-12d3-a456-426614174000",
+        campaignId: "456e7890-e89b-12d3-a456-426614174001",
+        stage: EmailCampaignStage.NOT_STARTED,
+        source: LeadSource.EMAIL_CAMPAIGN,
+        url: "https://example.com/signup",
+      },
+    },
     responses: {
       default: {
         success: true,
@@ -649,7 +657,7 @@ const { GET } = createEndpoint({
         isLoggedIn: false,
       },
     },
-    urlPathVariables: { default: {} },
+    urlPathParams: undefined,
   },
 });
 

@@ -3,6 +3,7 @@
  * Handles background session and token cleanup using the proper task system
  * Runs via pulse route in production or task runner in development
  */
+import { parseError } from "next-vibe/shared/utils";
 import "server-only";
 
 import {
@@ -108,7 +109,7 @@ const sessionCleanupTask: Task = {
   },
 
   onError: ({ error, logger }) => {
-    logger.error("Session cleanup task failed", error);
+    logger.error("Session cleanup task failed", parseError(error));
   },
 };
 

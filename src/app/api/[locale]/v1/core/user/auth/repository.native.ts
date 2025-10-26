@@ -13,6 +13,7 @@
  * Storage methods (setAuthCookies/clearAuthCookies) use AsyncStorage on native.
  */
 
+import { parseError } from "next-vibe/shared/utils";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -155,7 +156,7 @@ class AuthRepositoryNativeImpl implements AuthRepository {
       logger.debug("Auth token stored successfully");
       return createSuccessResponse(undefined);
     } catch (error) {
-      logger.error("Error storing auth token", error);
+      logger.error("Error storing auth token", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.auth.errors.native.storage_failed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -174,7 +175,7 @@ class AuthRepositoryNativeImpl implements AuthRepository {
       logger.debug("Auth token cleared successfully");
       return createSuccessResponse(undefined);
     } catch (error) {
-      logger.error("Error clearing auth token", error);
+      logger.error("Error clearing auth token", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.auth.errors.native.clear_failed",
         ErrorResponseTypes.INTERNAL_ERROR,

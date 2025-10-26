@@ -14,6 +14,7 @@
  * All methods return ResponseType<T> for consistent error handling
  */
 
+import { parseError } from "next-vibe/shared/utils";
 import { AUTH_STATUS_COOKIE_NAME } from "next-vibe/shared/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -82,7 +83,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
 
       return createSuccessResponse(undefined);
     } catch (error) {
-      logger.error("Error setting auth status", error);
+      logger.error("Error setting auth status", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.auth.authClient.errors.status_save_failed",
         ErrorResponseTypes.AUTH_ERROR,
@@ -106,7 +107,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
 
       return createSuccessResponse(undefined);
     } catch (error) {
-      logger.error("Error removing auth status", error);
+      logger.error("Error removing auth status", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.auth.authClient.errors.status_remove_failed",
         ErrorResponseTypes.AUTH_ERROR,
@@ -139,7 +140,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
 
       return createSuccessResponse(hasStatus);
     } catch (error) {
-      logger.error("Error in hasAuthStatus", error);
+      logger.error("Error in hasAuthStatus", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.auth.authClient.errors.status_check_failed",
         ErrorResponseTypes.AUTH_ERROR,

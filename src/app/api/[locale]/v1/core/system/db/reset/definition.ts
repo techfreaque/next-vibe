@@ -67,7 +67,7 @@ const { POST } = createEndpoint({
         dryRun: false,
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
     responses: {
       default: {
         success: true,

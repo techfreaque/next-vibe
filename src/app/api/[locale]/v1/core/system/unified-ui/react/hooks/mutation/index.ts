@@ -12,7 +12,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useMemo, useState } from "react";
-import type { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
@@ -20,7 +19,6 @@ import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unifie
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { useTranslation } from "@/i18n/core/client";
 
-import type { UnifiedField } from "../../../cli/vibe/endpoints/endpoint-types/core/types";
 import type { AnyData, ApiStore, MutationStoreType } from "../store";
 import { useApiStore } from "../store";
 import type { ApiMutationOptions } from "../types";
@@ -29,17 +27,17 @@ import type { ApiMutationOptions } from "../types";
  * Type for mutation variables
  * When both TRequest and TUrlVariables are never (no request data needed),
  * the variables should be an empty object.
- * When TUrlVariables is never, urlParams is optional (can be omitted).
+ * When TUrlVariables is never, urlPathParams is optional (can be omitted).
  */
 export type MutationVariables<TRequest, TUrlVariables> = [TRequest] extends [
   never,
 ]
   ? [TUrlVariables] extends [never]
     ? Record<string, never> // Both are never - empty object
-    : { requestData: TRequest; urlParams: TUrlVariables }
+    : { requestData: TRequest; urlPathParams: TUrlVariables }
   : [TUrlVariables] extends [never]
-    ? { requestData: TRequest; urlParams?: never } // TRequest exists, TUrlVariables is never - urlParams is optional
-    : { requestData: TRequest; urlParams: TUrlVariables };
+    ? { requestData: TRequest; urlPathParams?: never } // TRequest exists, TUrlVariables is never - urlPathParams is optional
+    : { requestData: TRequest; urlPathParams: TUrlVariables };
 
 /**
  * Mutation context type for tracking additional mutation state
@@ -117,6 +115,7 @@ export function useApiMutation<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >,
 >(
@@ -174,7 +173,7 @@ export function useApiMutation<
   // Get mutation state from store with shallow comparison
   const mutationState = useApiStore(selector);
 
-  // Create a type-safe mutate function that accepts both data and urlParams
+  // Create a type-safe mutate function that accepts both data and urlPathParams
   const mutate = useCallback(
     (
       variables: MutationVariables<
@@ -190,16 +189,16 @@ export function useApiMutation<
         "requestData" in variables
           ? variables.requestData
           : ({} as TEndpoint["TRequestOutput"]);
-      const urlParams =
-        "urlParams" in variables
-          ? variables.urlParams
+      const urlPathParams =
+        "urlPathParams" in variables
+          ? variables.urlPathParams
           : ({} as TEndpoint["TUrlVariablesOutput"]);
 
       void executeMutation(
         endpoint,
         logger,
         requestData,
-        urlParams,
+        urlPathParams,
         t,
         locale,
         options,
@@ -225,16 +224,16 @@ export function useApiMutation<
           "requestData" in variables
             ? variables.requestData
             : ({} as TEndpoint["TRequestOutput"]);
-        const urlParams =
-          "urlParams" in variables
-            ? variables.urlParams
+        const urlPathParams =
+          "urlPathParams" in variables
+            ? variables.urlPathParams
             : ({} as TEndpoint["TUrlVariablesOutput"]);
 
         const response = await executeMutation(
           endpoint,
           logger,
           requestData,
-          urlParams,
+          urlPathParams,
           t,
           locale,
           options,

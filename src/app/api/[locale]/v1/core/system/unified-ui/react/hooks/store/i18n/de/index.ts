@@ -51,4 +51,18 @@ export const translations: typeof enTranslations = {
       description: "Vorgang erfolgreich abgeschlossen",
     },
   },
+  errors: {
+    validation_failed: "Validierung fehlgeschlagen",
+    request_failed: "Anfrage fehlgeschlagen",
+    mutation_failed: "Mutation fehlgeschlagen",
+    unexpected_failure: "Unerwarteter Fehler aufgetreten",
+    refetch_failed: "Daten konnten nicht erneut abgerufen werden",
+  },
+  status: {
+    loading_data: "Daten werden geladen...",
+    cached_data: "Zwischengespeicherte Daten werden verwendet",
+    success: "Erfolg",
+    mutation_pending: "Mutation ausstehend...",
+    mutation_success: "Mutation erfolgreich",
+  },
 };

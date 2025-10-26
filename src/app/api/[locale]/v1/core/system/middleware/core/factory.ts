@@ -25,7 +25,6 @@ import type { MiddlewareFunction, MiddlewareHandler } from "./types";
 export function createMiddleware(
   middlewares: MiddlewareHandler[],
 ): MiddlewareFunction {
-  // eslint-disable-next-line node/no-process-env
   const debug = process.env.NODE_ENV === "development";
   return async function composedMiddleware(
     request: NextRequest,

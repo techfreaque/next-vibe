@@ -44,7 +44,7 @@ export interface TRPCContext<
   request: NextRequest;
 
   /** URL parameters extracted from the request path */
-  urlParams: TUrlParams;
+  urlPathParams: TUrlParams;
 
   /** User roles for authorization (empty array if not authenticated) */
   userRoles: TUserRoleValue;
@@ -62,11 +62,11 @@ export async function createTRPCContext<
   TUserRoleValue extends readonly string[],
 >(opts: {
   req: NextRequest;
-  urlParams?: TUrlParams;
+  urlPathParams?: TUrlParams;
   logger: EndpointLogger;
   locale: CountryLanguage;
 }): Promise<TRPCContext<TUrlParams, TUserRoleValue>> {
-  const { req, urlParams = {} } = opts;
+  const { req, urlPathParams = {} } = opts;
 
   // Extract locale from URL path
   // Expected format: /api/[locale]/trpc/[...trpc]
@@ -163,7 +163,7 @@ export async function createTRPCContext<
     locale: locale as CountryLanguage,
     t,
     request: req,
-    urlParams: urlParams as TUrlParams,
+    urlPathParams: urlPathParams as TUrlParams,
     userRoles: userRoles as never as TUserRoleValue,
     logger: opts.logger,
   };
@@ -175,7 +175,7 @@ export async function createTRPCContext<
  */
 export async function createAuthenticatedTRPCContext(opts: {
   req: NextRequest;
-  urlParams?: Record<string, string>;
+  urlPathParams?: Record<string, string>;
   requiredRoles?: string[];
 }): Promise<
   TRPCContext<Record<string, string>, readonly string[]> & {

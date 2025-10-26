@@ -19,12 +19,10 @@ import {
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
-
+import type { Countries, Languages } from "@/i18n/core/config";
 import {
-  Countries,
   CountriesArr,
   CountriesOptions,
-  type Languages,
   LanguagesArr,
   LanguagesOptions,
 } from "@/i18n/core/config";
@@ -287,7 +285,7 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
     requests: undefined,
     responses: {
       default: {

@@ -562,7 +562,7 @@ export class InteractiveModeHandler {
       title?: string;
       description?: string;
       requestSchema?: z.ZodTypeAny;
-      requestUrlParamsSchema?: z.ZodTypeAny;
+      requestUrlPathParamsSchema?: z.ZodTypeAny;
     },
   ): Promise<void> {
     const title = endpoint.title || route.alias || route.path;
@@ -595,17 +595,17 @@ export class InteractiveModeHandler {
     }
 
     // Collect URL parameters if schema exists
-    let urlParams = {};
+    let urlPathParams = {};
     if (
-      endpoint.requestUrlParamsSchema &&
-      !this.isEmptySchema(endpoint.requestUrlParamsSchema)
+      endpoint.requestUrlPathParamsSchema &&
+      !this.isEmptySchema(endpoint.requestUrlPathParamsSchema)
     ) {
       const urlParametersText = tSelected(
         "app.api.v1.core.system.cli.vibe.interactive.navigation.urlParameters",
       );
       this.logger.info(urlParametersText);
-      urlParams = await this.generateFormFromSchema(
-        endpoint.requestUrlParamsSchema,
+      urlPathParams = await this.generateFormFromSchema(
+        endpoint.requestUrlPathParamsSchema,
         urlParametersText,
       );
     }
@@ -613,7 +613,7 @@ export class InteractiveModeHandler {
     // Show preview before execution
     if (
       Object.keys(requestData).length > 0 ||
-      Object.keys(urlParams).length > 0
+      Object.keys(urlPathParams).length > 0
     ) {
       const previewText = tSelected(
         "app.api.v1.core.system.cli.vibe.interactive.navigation.preview",
@@ -634,9 +634,9 @@ export class InteractiveModeHandler {
           `${requestDataText}: ${JSON.stringify(requestData, null, 2)}`,
         );
       }
-      if (Object.keys(urlParams).length > 0) {
+      if (Object.keys(urlPathParams).length > 0) {
         this.logger.info(
-          `${urlParametersText}: ${JSON.stringify(urlParams, null, 2)}`,
+          `${urlParametersText}: ${JSON.stringify(urlPathParams, null, 2)}`,
         );
       }
 
@@ -651,7 +651,7 @@ export class InteractiveModeHandler {
     }
 
     // Execute the route
-    await this.executeRouteWithData(route, requestData, urlParams);
+    await this.executeRouteWithData(route, requestData, urlPathParams);
   }
 
   /**
@@ -713,7 +713,7 @@ export class InteractiveModeHandler {
     title?: string;
     description?: string;
     requestSchema?: z.ZodTypeAny;
-    requestUrlParamsSchema?: z.ZodTypeAny;
+    requestUrlPathParamsSchema?: z.ZodTypeAny;
     responseSchema?: z.ZodTypeAny;
     fields?: Record<string, EndpointField>;
   } | null> {
@@ -727,7 +727,7 @@ export class InteractiveModeHandler {
               title?: string;
               description?: string;
               requestSchema?: z.ZodTypeAny;
-              requestUrlParamsSchema?: z.ZodTypeAny;
+              requestUrlPathParamsSchema?: z.ZodTypeAny;
               responseSchema?: z.ZodTypeAny;
               fields?: Record<string, EndpointField>;
             }
@@ -754,7 +754,7 @@ export class InteractiveModeHandler {
               title?: string;
               description?: string;
               requestSchema?: z.ZodTypeAny;
-              requestUrlParamsSchema?: z.ZodTypeAny;
+              requestUrlPathParamsSchema?: z.ZodTypeAny;
               responseSchema?: z.ZodTypeAny;
               fields?: Record<string, EndpointField>;
             }
@@ -786,12 +786,12 @@ export class InteractiveModeHandler {
   private async executeRouteWithData(
     route: DiscoveredRoute,
     requestData: Record<string, string | number | boolean>,
-    urlParams: Record<string, string | number | boolean>,
+    urlPathParams: Record<string, string | number | boolean>,
   ): Promise<void> {
     const context: RouteExecutionContext = {
       command: route.alias,
       data: requestData,
-      urlParams: urlParams,
+      urlPathParams: urlPathParams,
       user: this.session.user,
       locale: this.session.locale,
       options: this.session.options,

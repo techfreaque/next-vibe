@@ -14,8 +14,8 @@ import definitions from "./definition";
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: async ({ user, urlVariables, logger }) => {
-      const { jobId } = urlVariables;
+    handler: async ({ user, urlPathParams, logger }) => {
+      const { jobId } = urlPathParams;
 
       const response = await importRepository.performJobAction(
         user.id,

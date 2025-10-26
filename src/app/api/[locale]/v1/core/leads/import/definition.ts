@@ -467,7 +467,7 @@ const { POST } = createEndpoint({
         isChunkedProcessing: false,
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
 });
 

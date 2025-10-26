@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { cn } from "next-vibe/shared/utils";
 import { Div, Span } from "next-vibe-ui/ui";
 import { Button } from "next-vibe-ui/ui/button";
 import { ChevronDown, ChevronUp, Menu, X } from "next-vibe-ui/ui/icons";
@@ -10,7 +11,6 @@ import { useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { cn } from "next-vibe/shared/utils";
 
 import type { NavItemType } from "./nav-constants";
 import { ThemeToggleMobile } from "./theme-toggle";

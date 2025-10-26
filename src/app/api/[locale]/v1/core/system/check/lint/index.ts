@@ -354,9 +354,7 @@ export function createEslintConfig(
         "**/*.spec.ts",
         "**/*.spec.tsx",
       ],
-      ignores: [
-        "**/seeds.ts",
-      ],
+      ignores: ["**/seeds.ts"],
       languageOptions: {
         parser: tsParser,
         parserOptions: {

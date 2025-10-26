@@ -88,16 +88,13 @@ export function validateCliRequestData<
       context.requestData !== null &&
       Object.keys(context.requestData).length === 0;
     // Check if schema is z.never() by examining its _def
-    const isNeverSchema =
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-      (endpoint.requestSchema as any)?._def?.type === "never";
+    const isNeverSchema = endpoint.requestSchema?._def?.type === "never";
 
     if (isEmptyObject && isNeverSchema) {
       // This is a GET/HEAD/OPTIONS endpoint that expects no input
       // Check if URL params schema is also z.never()
       const isUrlParamsNever =
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        (endpoint.requestUrlParamsSchema as any)?._def?.type === "never";
+        endpoint.requestUrlPathParamsSchema?._def?.type === "never";
 
       let urlVariables: TUrlVariablesInput;
       if (isUrlParamsNever) {
@@ -107,7 +104,7 @@ export function validateCliRequestData<
         // Validate URL parameters normally
         const urlValidation = validateEndpointUrlParameters(
           context.urlParameters,
-          endpoint.requestUrlParamsSchema,
+          endpoint.requestUrlPathParamsSchema,
           logger,
         );
         if (!urlValidation.success) {
@@ -174,9 +171,9 @@ export function validateCliRequestData<
 
     // Validate URL parameters if schema exists and expects parameters
     let urlValidation: ResponseType<TUrlVariablesInput>;
-    if (endpoint.requestUrlParamsSchema) {
+    if (endpoint.requestUrlPathParamsSchema) {
       // Check if schema expects never (no parameters)
-      const testResult = endpoint.requestUrlParamsSchema.safeParse({});
+      const testResult = endpoint.requestUrlPathParamsSchema.safeParse({});
       const isNeverSchema =
         !testResult.success &&
         testResult.error?.issues?.[0]?.code === "invalid_type";
@@ -191,7 +188,7 @@ export function validateCliRequestData<
         // Schema expects parameters, validate them
         urlValidation = validateEndpointUrlParameters(
           context.urlParameters,
-          endpoint.requestUrlParamsSchema,
+          endpoint.requestUrlPathParamsSchema,
           logger,
         ) as ResponseType<TUrlVariablesInput>;
         if (!urlValidation.success) {

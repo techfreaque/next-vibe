@@ -58,10 +58,12 @@ export const { enum: ValidationSeverity, options: ValidationSeverityOptions } =
  * TRPC Integration Validation Endpoint Definition
  */
 const { POST } = createEndpoint({
-  title: "app.api.v1.core.system.generators.generateTrpcRouter.validation.title",
+  title:
+    "app.api.v1.core.system.generators.generateTrpcRouter.validation.title",
   description:
     "app.api.v1.core.system.generators.generateTrpcRouter.validation.description",
-  category: "app.api.v1.core.system.generators.generateTrpcRouter.validation.category",
+  category:
+    "app.api.v1.core.system.generators.generateTrpcRouter.validation.category",
   tags: [
     "app.api.v1.core.system.generators.generateTrpcRouter.validation.tags.trpc",
     "app.api.v1.core.system.generators.generateTrpcRouter.validation.tags.validation",
@@ -118,7 +120,7 @@ const { POST } = createEndpoint({
         },
       },
     },
-    urlPathVariables: {},
+    urlPathParams: {},
   },
   fields: objectField(
     {

@@ -10,6 +10,8 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { UserDetailLevel } from "../../../../user/enum";
+import { userRepository } from "../../../../user/repository";
 import type { EndpointLogger } from "../../cli/vibe/endpoints/endpoint-handler/logger";
 import { getMCPConfig } from "../config";
 import { getMCPRegistry, toolMetadataToMCPTool } from "../registry";
@@ -61,14 +63,17 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
         return this.createErrorResponse(
           request.id || null,
           MCPErrorCode.INVALID_REQUEST,
+          // eslint-disable-next-line i18next/no-literal-string
           "Invalid JSON-RPC version",
         );
       }
 
       // Route to appropriate handler
+      // eslint-disable-next-line no-restricted-syntax
       let result: unknown;
 
       switch (request.method) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
         case MCPMethod.INITIALIZE:
           result = await this.handleInitialize(
             request.params as MCPInitializeParams,
@@ -76,15 +81,18 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
           this.initialized = true;
           break;
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
         case MCPMethod.PING:
           result = await this.handlePing();
           break;
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
         case MCPMethod.TOOLS_LIST:
           if (!this.initialized) {
             return this.createErrorResponse(
               request.id || null,
               MCPErrorCode.INVALID_REQUEST,
+              // eslint-disable-next-line i18next/no-literal-string
               "Server not initialized. Call initialize first.",
             );
           }
@@ -93,11 +101,13 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
           );
           break;
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
         case MCPMethod.TOOLS_CALL:
           if (!this.initialized) {
             return this.createErrorResponse(
               request.id || null,
               MCPErrorCode.INVALID_REQUEST,
+              // eslint-disable-next-line i18next/no-literal-string
               "Server not initialized. Call initialize first.",
             );
           }
@@ -110,6 +120,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
           return this.createErrorResponse(
             request.id || null,
             MCPErrorCode.METHOD_NOT_FOUND,
+            // eslint-disable-next-line i18next/no-literal-string
             `Method not found: ${request.method}`,
           );
       }
@@ -169,6 +180,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
    * Handle tools/list request
    */
   async handleToolsList(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _params: MCPToolsListParams,
   ): Promise<MCPToolsListResult> {
     this.logger.info("[MCP Protocol] Listing tools");
@@ -221,6 +233,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
   /**
    * Handle ping request
    */
+  // eslint-disable-next-line @typescript-eslint/require-await
   async handlePing(): Promise<Record<string, never>> {
     this.logger.debug("[MCP Protocol] Ping");
     return {};
@@ -231,6 +244,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
    */
   private createSuccessResponse(
     id: string | number | null,
+    // eslint-disable-next-line no-restricted-syntax
     result: unknown,
   ): JsonRpcResponse {
     return {
@@ -247,6 +261,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     id: string | number | null,
     code: MCPErrorCode,
     message: string,
+    // eslint-disable-next-line no-restricted-syntax
     data?: unknown,
   ): JsonRpcResponse {
     const error: JsonRpcError = {
@@ -281,13 +296,6 @@ export async function createMCPProtocolHandler(
  */
 async function getCliUser(logger: EndpointLogger): Promise<JwtPayloadType> {
   try {
-    const { userRepository } = await import(
-      "@/app/api/[locale]/v1/core/user/repository"
-    );
-    const { UserDetailLevel } = await import(
-      "@/app/api/[locale]/v1/core/user/enum"
-    );
-
     const CLI_USER_EMAIL = env.VIBE_CLI_USER_EMAIL || "cli@system.local";
 
     const userResponse = await userRepository.getUserByEmail(
@@ -322,8 +330,9 @@ async function getCliUser(logger: EndpointLogger): Promise<JwtPayloadType> {
       };
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     logger.debug("[MCP Protocol] Error getting CLI user, using default:", {
-      error: error instanceof Error ? error.message : String(error),
+      error: errorMessage,
     });
 
     // Fallback to default CLI user

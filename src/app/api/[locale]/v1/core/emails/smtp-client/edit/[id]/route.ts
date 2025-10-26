@@ -15,9 +15,9 @@ export const { GET, PUT, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: ({ urlVariables, user, locale, logger }) =>
+    handler: ({ urlPathParams, user, locale, logger }) =>
       smtpAccountEditRepository.getSmtpAccount(
-        urlVariables,
+        urlPathParams,
         user,
         locale,
         logger,
@@ -25,9 +25,9 @@ export const { GET, PUT, tools } = endpointsHandler({
   },
   [Methods.PUT]: {
     email: undefined, // No emails for PUT requests
-    handler: ({ data, urlVariables, user, locale, logger }) => {
+    handler: ({ data, urlPathParams, user, locale, logger }) => {
       const updateData = {
-        id: urlVariables.id,
+        id: urlPathParams.id,
         name: data.updates.name,
         description: data.updates.description,
         host: data.updates.host,

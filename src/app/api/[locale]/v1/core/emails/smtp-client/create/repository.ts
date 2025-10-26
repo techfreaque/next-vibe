@@ -119,10 +119,10 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
 
       return createSuccessResponse(responseAccount);
     } catch (error) {
-      logger.error("Error creating SMTP account", error);
+      const errorMessage = parseError(error).message;
+      logger.error("Error creating SMTP account", parseError(error));
 
       // Check for unique constraint violations
-      const errorMessage = parseError(error).message;
       if (
         errorMessage.includes("unique") ||
         errorMessage.includes("duplicate")

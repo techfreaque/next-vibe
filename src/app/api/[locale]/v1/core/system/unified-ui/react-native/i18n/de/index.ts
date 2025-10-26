@@ -14,4 +14,11 @@ export const translations: typeof enTranslations = {
       failedToLoadPage: "Seite konnte nicht geladen werden",
     },
   },
+  errors: {
+    missingUrlParam: "Erforderlicher URL-Parameter fehlt",
+    urlConstructionFailed: "URL konnte nicht erstellt werden",
+    validationFailed: "Validierung fehlgeschlagen",
+    htmlResponseReceived: "HTML-Antwort statt JSON erhalten",
+    networkError: "Netzwerkfehler aufgetreten",
+  },
 };

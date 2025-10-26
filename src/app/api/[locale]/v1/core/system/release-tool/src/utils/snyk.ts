@@ -1,5 +1,5 @@
 /// <reference types="node" />
-/* eslint-disable no-restricted-syntax, node/no-process-env */
+
 import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -44,7 +44,7 @@ export function runSnykTest(
     // eslint-disable-next-line i18next/no-literal-string
     execSync("snyk test", {
       cwd,
-      // eslint-disable-next-line i18next/no-literal-string
+
       stdio: "inherit",
     });
     logger.info(`Snyk vulnerability test passed for ${packageName}`);
@@ -87,7 +87,7 @@ export function runSnykMonitor(
 
   // Check if required environment variables are set
   const env = { ...process.env };
-  // eslint-disable-next-line i18next/no-literal-string
+
   if (!env["SNYK_TOKEN"]) {
     logger.error(
       "SNYK_TOKEN environment variable is required for Snyk monitoring",
@@ -100,7 +100,6 @@ export function runSnykMonitor(
     );
   }
 
-  // eslint-disable-next-line i18next/no-literal-string
   if (!env["SNYK_ORG_KEY"]) {
     logger.error(
       "SNYK_ORG_KEY environment variable is required for Snyk monitoring",
@@ -116,12 +115,11 @@ export function runSnykMonitor(
   try {
     // Determine lock file for monitoring
     const lockFile = getLockFile(cwd);
-    // eslint-disable-next-line i18next/no-literal-string
+
     const lockFileArg = lockFile ? `--file=${lockFile}` : "";
 
-    // eslint-disable-next-line i18next/no-literal-string
     const orgKey = env["SNYK_ORG_KEY"];
-    // eslint-disable-next-line i18next/no-literal-string
+
     const projectName = `/github/repository/${packageName}`;
 
     // Run Snyk monitor to upload to dashboard
@@ -131,7 +129,7 @@ export function runSnykMonitor(
 
     execSync(command, {
       cwd,
-      // eslint-disable-next-line i18next/no-literal-string
+
       stdio: "inherit",
       env,
     });
@@ -153,13 +151,12 @@ export function runSnykMonitor(
  */
 function getLockFile(cwd: string): string | null {
   const lockFiles = [
-    // eslint-disable-next-line i18next/no-literal-string
     "bun.lockb",
-    // eslint-disable-next-line i18next/no-literal-string
+
     "yarn.lock",
-    // eslint-disable-next-line i18next/no-literal-string
+
     "package-lock.json",
-    // eslint-disable-next-line i18next/no-literal-string
+
     "pnpm-lock.yaml",
   ];
 

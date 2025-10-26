@@ -11,16 +11,9 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import type { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import type {
-  ExtractOutput,
-  FieldUsage,
-  InferSchemaFromField,
-  UnifiedField,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { useTranslation } from "@/i18n/core/client";
@@ -52,7 +45,7 @@ interface SerializableObject {
  * React Query hook for GET requests with local storage caching
  * @param endpoint - The endpoint to call
  * @param requestData - Request data for the API call
- * @param urlParams - URL parameters for the API call
+ * @param urlPathParams - URL parameters for the API call
  * @param options - Query options
  * @returns Enhanced query result with extra loading state information
  */
@@ -66,7 +59,7 @@ export function useApiQuery<
 >({
   endpoint,
   requestData,
-  urlParams,
+  urlPathParams,
   options,
   logger,
 }: {
@@ -79,9 +72,9 @@ export function useApiQuery<
       requestData: TEndpoint["TRequestOutput"];
     }) &
   (TEndpoint["TUrlVariablesOutput"] extends never
-    ? { urlParams?: never }
+    ? { urlPathParams?: never }
     : {
-        urlParams: TEndpoint["TUrlVariablesOutput"];
+        urlPathParams: TEndpoint["TUrlVariablesOutput"];
       }) & {
     options: {
       queryKey?: QueryKey;
@@ -91,16 +84,16 @@ export function useApiQuery<
       onSuccess?: (data: {
         responseData: TEndpoint["TResponseOutput"];
         requestData: TEndpoint["TRequestOutput"];
-        urlParams: TEndpoint["TUrlVariablesOutput"];
+        urlPathParams: TEndpoint["TUrlVariablesOutput"];
       }) => void;
       onError?: ({
         error,
         requestData,
-        urlParams,
+        urlPathParams,
       }: {
         error: ErrorResponseType;
         requestData: TEndpoint["TRequestOutput"];
-        urlParams: TEndpoint["TUrlVariablesOutput"];
+        urlPathParams: TEndpoint["TUrlVariablesOutput"];
       }) => void;
       disableLocalCache?: boolean;
       refreshDelay?: number;
@@ -187,14 +180,14 @@ export function useApiQuery<
     }
 
     // Create a stable representation of URL parameters
-    let urlParamsKey: string | undefined;
-    if (urlParams) {
+    let urlPathParamsKey: string | undefined;
+    if (urlPathParams) {
       try {
         // For objects, create a stable JSON representation
-        if (typeof urlParams === "object") {
+        if (typeof urlPathParams === "object") {
           // Filter out internal properties and handle circular references
-          urlParamsKey = JSON.stringify(
-            urlParams,
+          urlPathParamsKey = JSON.stringify(
+            urlPathParams,
             (key: string, value: SerializableValue) => {
               // Skip internal properties
               if (key.startsWith("_")) {
@@ -225,26 +218,26 @@ export function useApiQuery<
           );
         } else {
           // For primitives, use string representation
-          urlParamsKey = String(urlParams);
+          urlPathParamsKey = String(urlPathParams);
         }
       } catch (err) {
         // If JSON stringification fails, use a fallback
         // Log the error for debugging
         logger.error("Failed to stringify URL parameters:", err);
-        urlParamsKey =
-          typeof urlParams === "object"
-            ? Object.keys(urlParams).sort().join(",")
-            : String(urlParams);
+        urlPathParamsKey =
+          typeof urlPathParams === "object"
+            ? Object.keys(urlPathParams).sort().join(",")
+            : String(urlPathParams);
       }
     }
 
     // Return the custom query key or build one from the components
-    return customQueryKey ?? [endpointKey, requestDataKey, urlParamsKey];
+    return customQueryKey ?? [endpointKey, requestDataKey, urlPathParamsKey];
   }, [
     endpoint.path,
     endpoint.method,
     requestData,
-    urlParams,
+    urlPathParams,
     customQueryKey,
     logger,
   ]);
@@ -439,7 +432,7 @@ export function useApiQuery<
                 endpoint,
                 logger,
                 requestData,
-                urlParams,
+                urlPathParams,
                 t,
                 locale,
                 {
@@ -452,7 +445,7 @@ export function useApiQuery<
                           queryOptions.onError({
                             error,
                             requestData: requestData!,
-                            urlParams: urlParams!,
+                            urlPathParams: urlPathParams!,
                           });
                         }
                       }
@@ -530,7 +523,7 @@ export function useApiQuery<
           endpoint,
           logger,
           requestData,
-          urlParams,
+          urlPathParams,
           t,
           locale,
           {
@@ -543,7 +536,7 @@ export function useApiQuery<
                     queryOptions.onError({
                       error,
                       requestData: requestData!,
-                      urlParams: urlParams!,
+                      urlPathParams: urlPathParams!,
                     });
                   }
                 }
@@ -599,7 +592,7 @@ export function useApiQuery<
         endpoint,
         logger,
         requestData,
-        urlParams,
+        urlPathParams,
         t,
         locale,
         {
@@ -613,7 +606,7 @@ export function useApiQuery<
                   queryOptions.onError({
                     error,
                     requestData: requestData!,
-                    urlParams: urlParams!,
+                    urlPathParams: urlPathParams!,
                   });
                 }
               }
@@ -639,7 +632,7 @@ export function useApiQuery<
     executeQuery,
     endpoint,
     requestData,
-    urlParams,
+    urlPathParams,
     t,
     locale,
     queryOptions,

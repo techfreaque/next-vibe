@@ -14,6 +14,7 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 import { z } from "zod";
 
 import { leads } from "@/app/api/[locale]/v1/core/leads/db";
@@ -316,7 +317,7 @@ const newsletterUnsubscribeSyncTask: Task = {
   },
 
   onError: ({ error, logger }) => {
-    logger.error("Newsletter unsubscribe sync task error", error);
+    logger.error("Newsletter unsubscribe sync task error", parseError(error));
   },
 };
 

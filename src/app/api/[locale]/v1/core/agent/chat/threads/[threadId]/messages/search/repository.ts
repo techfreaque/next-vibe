@@ -33,7 +33,7 @@ import type {
 export interface MessageSearchRepositoryInterface {
   searchMessages(
     data: MessageSearchRequestOutput,
-    urlVariables: MessageSearchUrlVariablesOutput,
+    urlPathParams: MessageSearchUrlVariablesOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -51,13 +51,13 @@ export class MessageSearchRepositoryImpl
    */
   async searchMessages(
     data: MessageSearchRequestOutput,
-    urlVariables: MessageSearchUrlVariablesOutput,
+    urlPathParams: MessageSearchUrlVariablesOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<MessageSearchResponseOutput>> {
     try {
-      const { threadId } = urlVariables;
+      const { threadId } = urlPathParams;
       const { query } = data;
       const page = data.pagination?.page ?? 1;
       const limit = data.pagination?.limit ?? 20;
@@ -162,7 +162,7 @@ export class MessageSearchRepositoryImpl
         totalCount,
       });
     } catch (error) {
-      logger.error("Failed to search messages", { error: parseError(error) });
+      logger.error("Failed to search messages", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.agent.chat.threads.threadId.messages.search.get.errors.serverError.title",
         ErrorResponseTypes.INTERNAL_ERROR,

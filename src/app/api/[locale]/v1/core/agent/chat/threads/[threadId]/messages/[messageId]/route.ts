@@ -33,7 +33,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
       >,
     ): Promise<ResponseType<MessageGetResponseOutput>> => {
       return await messageRepository.getMessage(
-        props.urlVariables,
+        props.urlPathParams,
         props.user,
         props.locale,
         props.logger,
@@ -52,7 +52,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
     ): Promise<ResponseType<MessagePatchResponseOutput>> => {
       return await messageRepository.updateMessage(
         props.data,
-        props.urlVariables,
+        props.urlPathParams,
         props.user,
         props.locale,
         props.logger,
@@ -70,7 +70,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
       >,
     ): Promise<ResponseType<MessageDeleteResponseOutput>> => {
       return await messageRepository.deleteMessage(
-        props.urlVariables,
+        props.urlPathParams,
         props.user,
         props.locale,
         props.logger,

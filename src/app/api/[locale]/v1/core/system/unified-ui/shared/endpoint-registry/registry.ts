@@ -32,7 +32,7 @@ export class EndpointRegistry implements IEndpointRegistry {
   /**
    * Initialize the registry by loading from static registry
    */
-  async initialize(_options: EndpointDiscoveryOptions = {}): Promise<void> {
+  async initialize(): Promise<void> {
     if (this.initialized) {
       return;
     }
@@ -48,8 +48,7 @@ export class EndpointRegistry implements IEndpointRegistry {
 
       // Convert to shared endpoint metadata format
       this.endpoints = staticEndpoints.map((endpoint) => {
-        const method = endpoint.method;
-        const definition = endpoint.definition[method];
+        const definition = endpoint.definition;
 
         return {
           id: endpoint.id,
@@ -58,18 +57,18 @@ export class EndpointRegistry implements IEndpointRegistry {
           routePath: endpoint.routePath,
           definitionPath: endpoint.definitionPath,
           method: endpoint.method,
-          title: typeof definition?.title === "string" ? definition.title : "",
+          title: typeof definition.title === "string" ? definition.title : "",
           description:
-            typeof definition?.description === "string"
+            typeof definition.description === "string"
               ? definition.description
               : "",
           category:
-            typeof definition?.category === "string" ? definition.category : "",
-          tags: Array.isArray(definition?.tags) ? definition.tags : [],
+            typeof definition.category === "string" ? definition.category : "",
+          tags: Array.isArray(definition.tags) ? definition.tags : [],
           allowedRoles: endpoint.allowedRoles,
           requiresAuth: !endpoint.allowedRoles.includes("PUBLIC"),
-          requestSchema: definition?.fields?.schema,
-          responseSchema: definition?.fields?.schema,
+          requestSchema: definition.requestSchema,
+          responseSchema: definition.responseSchema,
         };
       });
 
@@ -79,11 +78,11 @@ export class EndpointRegistry implements IEndpointRegistry {
       this.logger.debug("[Endpoint Registry] Initialization complete", {
         totalEndpoints: this.endpoints.length,
       });
-    } catch (error) {
+    } catch {
       this.logger.error("[Endpoint Registry] Initialization failed", {
-        error: error instanceof Error ? error.message : String(error),
+        error: "Failed to initialize endpoint registry",
       });
-      throw error;
+      return;
     }
   }
 

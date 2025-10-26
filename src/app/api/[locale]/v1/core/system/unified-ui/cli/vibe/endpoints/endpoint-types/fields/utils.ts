@@ -68,7 +68,7 @@ export function requestResponseField<TSchema extends z.ZodTypeAny>(
 ): PrimitiveField<
   TSchema,
   {
-    request: "urlParams";
+    request: "urlPathParams";
     response: true;
   }
 >;
@@ -81,11 +81,11 @@ export function requestResponseField<TSchema extends z.ZodTypeAny>(
 ): PrimitiveField<
   TSchema,
   {
-    request: "data" | "urlParams";
+    request: "data" | "urlPathParams";
     response: true;
   }
 > {
-  const requestType = requestAsUrlParams ? "urlParams" : "data";
+  const requestType = requestAsUrlParams ? "urlPathParams" : "data";
   return {
     type: "primitive" as const,
     schema,
@@ -115,15 +115,15 @@ export function requestDataField<TSchema extends z.ZodTypeAny>(
 /**
  * Create a request URL params field
  */
-export function requestUrlParamsField<TSchema extends z.ZodTypeAny>(
+export function requestUrlPathParamsField<TSchema extends z.ZodTypeAny>(
   ui: Partial<WidgetConfig>,
   schema: TSchema,
   cache?: CacheStrategy,
-): PrimitiveField<TSchema, { request: "urlParams"; response?: never }> {
+): PrimitiveField<TSchema, { request: "urlPathParams"; response?: never }> {
   return {
     type: "primitive" as const,
     schema,
-    usage: { request: "urlParams" },
+    usage: { request: "urlPathParams" },
     ui: ui as WidgetConfig,
     cache,
   };
@@ -239,16 +239,16 @@ export type HasResponseUsage<U> = U extends { response: true } ? true : false;
  */
 export type HasRequestDataUsage<U> = U extends { request: "data" }
   ? true
-  : U extends { request: "data&urlParams" }
+  : U extends { request: "data&urlPathParams" }
     ? true
     : false;
 
 /**
  * Check if a field usage has request URL params capability
  */
-export type HasRequestUrlParamsUsage<U> = U extends { request: "urlParams" }
+export type HasRequestUrlParamsUsage<U> = U extends { request: "urlPathParams" }
   ? true
-  : U extends { request: "data&urlParams" }
+  : U extends { request: "data&urlPathParams" }
     ? true
     : false;
 
@@ -383,12 +383,13 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       case FieldUsage.RequestData:
         return (
           "request" in usage &&
-          (usage.request === "data" || usage.request === "data&urlParams")
+          (usage.request === "data" || usage.request === "data&urlPathParams")
         );
       case FieldUsage.RequestUrlParams:
         return (
           "request" in usage &&
-          (usage.request === "urlParams" || usage.request === "data&urlParams")
+          (usage.request === "urlPathParams" ||
+            usage.request === "data&urlPathParams")
         );
       default:
         return false;
@@ -414,7 +415,16 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
 
   if (typedField.type === "object") {
     // Check if the object itself has the required usage
-    if (typedField.usage && !hasUsage(typedField.usage)) {
+    // If it has explicit usage that doesn't match, skip processing children
+    const objectHasUsage = typedField.usage ? hasUsage(typedField.usage) : true;
+
+    if (typedField.usage && !objectHasUsage) {
+      // For request data, return empty object (endpoints with no parameters)
+      // This is critical for OpenAI function calling which requires type: "object"
+      if (targetUsage === FieldUsage.RequestData) {
+        const emptySchema = z.object({});
+        return emptySchema as InferSchemaFromField<F, Usage>;
+      }
       return z.never() as InferSchemaFromField<F, Usage>;
     }
 
@@ -424,16 +434,45 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
 
     if (typedField.children) {
       for (const [key, childField] of Object.entries(typedField.children)) {
+        // Check if the child field has the required usage BEFORE generating the schema
+        // This is more efficient and avoids issues with z.never() detection
+        if (childField.usage) {
+          const childHasUsage =
+            targetUsage === FieldUsage.Response
+              ? "response" in childField.usage &&
+                childField.usage.response === true
+              : targetUsage === FieldUsage.RequestData
+                ? "request" in childField.usage &&
+                  (childField.usage.request === "data" ||
+                    childField.usage.request === "data&urlPathParams")
+                : targetUsage === FieldUsage.RequestUrlParams
+                  ? "request" in childField.usage &&
+                    (childField.usage.request === "urlPathParams" ||
+                      childField.usage.request === "data&urlPathParams")
+                  : false;
+
+          // Skip fields that don't have the required usage
+          if (!childHasUsage) {
+            continue;
+          }
+        }
+
         const childSchema = generateSchemaForUsage(childField, targetUsage);
+        // Check if schema is z.never() using instanceof check
         if (!(childSchema instanceof z.ZodNever)) {
           shape[key] = childSchema;
         }
       }
     }
 
-    // If no children matched the usage, return z.never()
+    // If no children matched the usage, return appropriate schema
     if (Object.keys(shape).length === 0) {
-      return z.never() as InferSchemaFromField<F, Usage>;
+      // For request data, empty object is valid (endpoints with no parameters)
+      // For other usages, z.never() is appropriate
+      const emptySchema = z.object({});
+      return (
+        targetUsage === FieldUsage.RequestData ? emptySchema : z.never()
+      ) as InferSchemaFromField<F, Usage>;
     }
 
     // Create the object schema and let TypeScript infer the exact type
@@ -445,9 +484,11 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
   if (typedField.type === "array") {
     if (hasUsage(typedField.usage)) {
       const childSchema = generateSchemaForUsage(typedField.child, targetUsage);
-      return (
-        childSchema instanceof z.ZodNever ? z.never() : z.array(childSchema)
-      ) as InferSchemaFromField<F, Usage>;
+      // Check if schema is z.never() using instanceof check
+      if (childSchema instanceof z.ZodNever) {
+        return z.never() as InferSchemaFromField<F, Usage>;
+      }
+      return z.array(childSchema) as InferSchemaFromField<F, Usage>;
     }
     return z.never() as InferSchemaFromField<F, Usage>;
   }

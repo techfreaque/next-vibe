@@ -4,7 +4,7 @@
  */
 import { Text, View } from "react-native";
 
-export function FormAlert(props: any) {
+export function FormAlert(props: Record<string, unknown>) {
   console.warn("🔶 Using stub: FormAlert");
   return (
     <View style={{ padding: 8, backgroundColor: "#FEF3C7", marginVertical: 4 }}>

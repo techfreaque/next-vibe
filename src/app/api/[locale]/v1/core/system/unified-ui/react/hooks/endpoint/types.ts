@@ -41,13 +41,13 @@ export type ExtractEndpointTypes<T> = T extends { types: infer TTypes }
     ? {
         request: TRequestOutput;
         response: TResponseOutput;
-        urlVariables: TUrlVariablesOutput;
+        urlPathParams: TUrlVariablesOutput;
         requestInput: TRequestInput;
         requestOutput: TRequestOutput;
         responseInput: TResponseInput;
         responseOutput: TResponseOutput;
-        urlVariablesInput: TUrlVariablesInput;
-        urlVariablesOutput: TUrlVariablesOutput;
+        urlPathParamsInput: TUrlVariablesInput;
+        urlPathParamsOutput: TUrlVariablesOutput;
       }
     : never
   : never;
@@ -67,13 +67,13 @@ export type GetEndpointTypes<T> = "GET" extends keyof T
       ? {
           request: TRequestOutput;
           response: TResponseOutput;
-          urlVariables: TUrlVariablesOutput;
+          urlPathParams: TUrlVariablesOutput;
           requestInput: TRequestInput;
           requestOutput: TRequestOutput;
           responseInput: TResponseInput;
           responseOutput: TResponseOutput;
-          urlVariablesInput: TUrlVariablesInput;
-          urlVariablesOutput: TUrlVariablesOutput;
+          urlPathParamsInput: TUrlVariablesInput;
+          urlPathParamsOutput: TUrlVariablesOutput;
         }
       : never
     : never
@@ -108,13 +108,13 @@ export type PrimaryMutationTypes<T> =
     : PostEndpointTypes<T>;
 
 // Combined URL variables type - supports both GET and mutation endpoints
-// If GET exists, use its urlVariables; otherwise use primary mutation's urlVariables
+// If GET exists, use its urlPathParams; otherwise use primary mutation's urlPathParams
 export type EndpointUrlVariables<T> =
   GetEndpointTypes<T> extends never
     ? PrimaryMutationTypes<T> extends never
       ? undefined
-      : PrimaryMutationTypes<T>["urlVariables"]
-    : GetEndpointTypes<T>["urlVariables"];
+      : PrimaryMutationTypes<T>["urlPathParams"]
+    : GetEndpointTypes<T>["urlPathParams"];
 
 // AutoPrefill data type - represents data from GET response that can prefill mutation request
 // When both GET and mutation endpoints exist, the GET response is used to prefill the mutation
@@ -131,7 +131,7 @@ export type AutoPrefillDataType<T> =
 // Hook options interface with smart defaults and simple configuration
 export interface UseEndpointOptions<T> {
   // URL parameters for endpoints that require them (supports both GET and mutation endpoints)
-  urlParams?: EndpointUrlVariables<T>;
+  urlPathParams?: EndpointUrlVariables<T>;
 
   // Query configuration
   enabled?: boolean;
@@ -163,7 +163,7 @@ export interface UseEndpointOptions<T> {
     requestData?: GetEndpointTypes<T> extends never
       ? undefined
       : GetEndpointTypes<T>["request"];
-    urlParams?: EndpointUrlVariables<T>;
+    urlPathParams?: EndpointUrlVariables<T>;
     staleTime?: number;
     refetchOnWindowFocus?: boolean;
   };
@@ -268,7 +268,7 @@ export type ReadOperationReturn<T> =
         submitForm: SubmitFormFunction<
           GetEndpointTypes<T>["request"],
           GetEndpointTypes<T>["response"],
-          GetEndpointTypes<T>["urlVariables"]
+          GetEndpointTypes<T>["urlPathParams"]
         >;
         isSubmitting: boolean;
         clearSavedForm: () => void;
@@ -351,7 +351,7 @@ export type EndpointReturn<T> = Prettify<{
         submitForm: SubmitFormFunction<
           GetEndpointTypes<T>["request"],
           GetEndpointTypes<T>["response"],
-          GetEndpointTypes<T>["urlVariables"]
+          GetEndpointTypes<T>["urlPathParams"]
         >;
         isSubmitting: boolean;
         clearSavedForm: () => void;
@@ -393,7 +393,7 @@ export type EndpointReturn<T> = Prettify<{
         submitForm: SubmitFormFunction<
           PrimaryMutationTypes<T>["request"],
           PrimaryMutationTypes<T>["response"],
-          PrimaryMutationTypes<T>["urlVariables"]
+          PrimaryMutationTypes<T>["urlPathParams"]
         >;
         clearSavedForm: () => void;
         /** @deprecated Use response property instead */
@@ -457,11 +457,11 @@ export interface UseEndpointCreateOptions<T> {
       : PrimaryMutationTypes<T>["response"],
     PrimaryMutationTypes<T> extends never
       ? never
-      : PrimaryMutationTypes<T>["urlVariables"]
+      : PrimaryMutationTypes<T>["urlPathParams"]
   >;
-  urlParams?: PrimaryMutationTypes<T> extends never
+  urlPathParams?: PrimaryMutationTypes<T> extends never
     ? undefined
-    : PrimaryMutationTypes<T>["urlVariables"];
+    : PrimaryMutationTypes<T>["urlPathParams"];
   autoPrefillData?: PrimaryMutationTypes<T> extends never
     ? undefined
     : Partial<PrimaryMutationTypes<T>["request"]>;
@@ -476,11 +476,11 @@ export interface UseEndpointReadOptions<T> {
     GetEndpointTypes<T> extends never ? never : GetEndpointTypes<T>["response"],
     GetEndpointTypes<T> extends never
       ? never
-      : GetEndpointTypes<T>["urlVariables"]
+      : GetEndpointTypes<T>["urlPathParams"]
   >;
-  urlVariables: GetEndpointTypes<T> extends never
+  urlPathParams: GetEndpointTypes<T> extends never
     ? undefined
-    : GetEndpointTypes<T>["urlVariables"];
+    : GetEndpointTypes<T>["urlPathParams"];
 }
 
 export interface UseEndpointDeleteOptions<T> {
@@ -493,11 +493,11 @@ export interface UseEndpointDeleteOptions<T> {
       : DeleteEndpointTypes<T>["response"],
     DeleteEndpointTypes<T> extends never
       ? never
-      : DeleteEndpointTypes<T>["urlVariables"]
+      : DeleteEndpointTypes<T>["urlPathParams"]
   >;
-  urlParams?: DeleteEndpointTypes<T> extends never
+  urlPathParams?: DeleteEndpointTypes<T> extends never
     ? undefined
-    : DeleteEndpointTypes<T>["urlVariables"];
+    : DeleteEndpointTypes<T>["urlPathParams"];
 }
 
 // Re-export the Infer types and hooks for easier access

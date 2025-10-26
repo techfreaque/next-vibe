@@ -17,6 +17,7 @@ import {
   userLeads,
 } from "@/app/api/[locale]/v1/core/leads/db";
 import { LeadSource, LeadStatus } from "@/app/api/[locale]/v1/core/leads/enum";
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import { subscriptions } from "@/app/api/[locale]/v1/core/subscription/db";
 import { SubscriptionStatus } from "@/app/api/[locale]/v1/core/subscription/enum";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
@@ -274,7 +275,9 @@ class CreditRepository implements CreditRepositoryInterface {
         credits: 20,
       });
     } catch (error) {
-      logger.error("Failed to get or create lead by IP", { error, ipAddress });
+      logger.error("Failed to get or create lead by IP", parseError(error), {
+        ipAddress,
+      });
       return createErrorResponse(
         "app.api.v1.core.agent.chat.credits.errors.getOrCreateLeadFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -554,8 +557,7 @@ class CreditRepository implements CreditRepositoryInterface {
         });
       }
     } catch (error) {
-      logger.error("Failed to get credit identifier", {
-        error,
+      logger.error("Failed to get credit identifier", parseError(error), {
         userId,
         leadId,
       });

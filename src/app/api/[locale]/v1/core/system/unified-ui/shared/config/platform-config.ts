@@ -67,6 +67,7 @@ export interface PlatformConfig {
   };
 
   /** Platform-specific settings */
+  // eslint-disable-next-line no-restricted-syntax
   platformSpecific?: Record<string, unknown>;
 }
 
@@ -291,6 +292,7 @@ export function platformToAuthPlatform(platform: Platform): AuthPlatform {
       // Email uses web auth
       return "web";
     default: {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _exhaustiveCheck: never = platform;
       return "web";
     }
@@ -327,6 +329,7 @@ export function validatePlatformConfig(config: PlatformConfig): {
       errors.push("RATE_LIMIT_MIN_ONE");
     }
     if (config.rateLimit.windowMs < 1000) {
+      // eslint-disable-next-line i18next/no-literal-string
       errors.push("RATE_LIMIT_WINDOW_MIN_1S");
     }
   }

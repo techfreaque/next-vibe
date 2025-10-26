@@ -69,7 +69,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "db", "reset", "task-management"],
   examples: {
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
     requests: {
       safetyCheck: {
         operation: [TaskOperationType.RUN_SAFETY_CHECK],

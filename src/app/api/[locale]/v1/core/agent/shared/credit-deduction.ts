@@ -103,14 +103,17 @@ export async function deductCredits(
       messageId: creditMessageId,
     });
 
+    // Build creditIdentifier string for response
+    const creditIdentifierStr = creditIdentifier.userId
+      ? creditIdentifier.userId
+      : creditIdentifier.leadId;
+
     return {
       success: true,
       messageId: creditMessageId,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      creditIdentifier: deductResult.creditIdentifier,
+      creditIdentifier: creditIdentifierStr,
     };
-    // eslint-disable-next-line no-restricted-syntax
-  } catch (error: unknown) {
+  } catch (error) {
     logger.error(`Error deducting credits for ${feature}`, {
       error: error instanceof Error ? error.message : String(error),
       userId: user.id,
@@ -129,8 +132,11 @@ export async function hasEnoughCredits(
   logger: EndpointLogger,
 ): Promise<boolean> {
   try {
-    const balance = await creditRepository.getBalance(userId);
-    return balance >= requiredCredits;
+    const balanceResult = await creditRepository.getBalance(userId);
+    if (!balanceResult.success || !balanceResult.data) {
+      return false;
+    }
+    return balanceResult.data.total >= requiredCredits;
   } catch (error) {
     logger.error("Error checking credit balance", {
       error: error instanceof Error ? error.message : String(error),

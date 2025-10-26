@@ -34,7 +34,7 @@ export function useCronTaskEndpoint(
   return useEndpoint(
     taskEndpoints,
     {
-      urlParams: { id: params.taskId },
+      urlPathParams: { id: params.taskId },
       queryOptions: {
         enabled: params.enabled ?? true,
         refetchOnWindowFocus: false,
@@ -66,7 +66,7 @@ export function useDeleteCronTask(
   return useEndpoint(
     taskEndpoints,
     {
-      urlParams: { id: taskId },
+      urlPathParams: { id: taskId },
       queryOptions: {
         enabled: false, // Don't auto-fetch for delete operations
         refetchOnWindowFocus: false,
@@ -87,7 +87,7 @@ export function useToggleCronTask(
   return useEndpoint(
     taskEndpoints,
     {
-      urlParams: { id: taskId },
+      urlPathParams: { id: taskId },
       queryOptions: {
         enabled: false, // Don't auto-fetch for update operations
         refetchOnWindowFocus: false,

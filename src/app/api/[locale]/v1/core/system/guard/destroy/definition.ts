@@ -309,7 +309,7 @@ const { POST } = createEndpoint({
         totalDestroyed: 1,
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
 });
 

@@ -28,6 +28,13 @@ export const translations: typeof enTranslations = {
       "Öffentlicher JWT-Payload wird für CLI-Authentifizierung nicht unterstützt",
     jwt_signing_failed: "JWT-Token konnte nicht signiert werden",
     validation_failed: "Validierung fehlgeschlagen",
+    native: {
+      unsupported:
+        "Diese Authentifizierungsmethode wird in React Native nicht unterstützt",
+      storage_failed:
+        "Authentifizierungsdaten konnten nicht gespeichert werden",
+      clear_failed: "Authentifizierungsdaten konnten nicht gelöscht werden",
+    },
   },
   post: {
     title: "Titel",

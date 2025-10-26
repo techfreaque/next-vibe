@@ -161,7 +161,6 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
           toEmail: data.params.toEmail,
           subject: data.params.subject,
           error: emailResponse.message,
-          selectionCriteria,
         });
         return createErrorResponse(
           emailResponse.message,
@@ -189,7 +188,7 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
         },
       });
     } catch (error) {
-      logger.error("Enhanced email sending error", error, {
+      logger.error("Enhanced email sending error", parseError(error), {
         toEmail: data.params.toEmail,
         subject: data.params.subject,
         locale: data.params.locale,

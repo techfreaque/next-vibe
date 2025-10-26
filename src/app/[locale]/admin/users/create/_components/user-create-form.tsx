@@ -58,7 +58,7 @@ export function UserCreateForm({
           className="flex items-center space-x-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>{t("app.admin.users.users.form.buttons.back")}</span>
+          <span>{t("app.admin.users.form.buttons.back")}</span>
         </Button>
       </div>
 
@@ -66,7 +66,7 @@ export function UserCreateForm({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <span>{t("app.admin.users.users.form.buttons.create")}</span>
+            <span>{t("app.admin.users.form.buttons.create")}</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -210,13 +210,13 @@ export function UserCreateForm({
                 onClick={handleBack}
                 disabled={isSaving}
               >
-                {t("app.admin.users.users.form.buttons.cancel")}
+                {t("app.admin.users.form.buttons.cancel")}
               </Button>
               <Button type="submit" disabled={isSaving}>
                 <Save className="h-4 w-4 mr-2" />
                 {isSaving
-                  ? t("app.admin.users.users.form.buttons.saving")
-                  : t("app.admin.users.users.form.buttons.create")}
+                  ? t("app.admin.users.form.buttons.saving")
+                  : t("app.admin.users.form.buttons.create")}
               </Button>
             </div>
           </Form>

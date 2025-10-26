@@ -7,6 +7,7 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
@@ -31,7 +32,7 @@ export const pathRepository = {
    * Traverses the message tree from root to leaf following branch indices
    */
   async getPath(
-    urlVariables: PathGetUrlVariablesOutput,
+    urlPathParams: PathGetUrlVariablesOutput,
     data: PathGetRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -54,7 +55,7 @@ export const pathRepository = {
         .from(chatThreads)
         .where(
           and(
-            eq(chatThreads.id, urlVariables.threadId),
+            eq(chatThreads.id, urlPathParams.threadId),
             eq(chatThreads.userId, userId),
           ),
         )
@@ -81,7 +82,7 @@ export const pathRepository = {
       const allMessages = await db
         .select()
         .from(chatMessages)
-        .where(eq(chatMessages.threadId, urlVariables.threadId));
+        .where(eq(chatMessages.threadId, urlPathParams.threadId));
 
       // Find root message (message with no parent)
       const rootMessage = allMessages.find((msg) => !msg.parentId);
@@ -135,7 +136,7 @@ export const pathRepository = {
       }
 
       logger.info("Conversation path retrieved successfully", {
-        threadId: urlVariables.threadId,
+        threadId: urlPathParams.threadId,
         pathLength: path.length,
       });
 
@@ -156,7 +157,7 @@ export const pathRepository = {
         })),
       });
     } catch (error) {
-      logger.error("Failed to get conversation path", { error });
+      logger.error("Failed to get conversation path", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.agent.chat.threads.threadId.messages.path.get.errors.getFailed.title",
         ErrorResponseTypes.INTERNAL_ERROR,

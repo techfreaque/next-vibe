@@ -13,9 +13,9 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ user, urlVariables, logger }) => {
+    handler: async ({ user, urlPathParams, logger }) => {
       const userId = authRepository.requireUserId(user);
-      const { jobId } = urlVariables;
+      const { jobId } = urlPathParams;
 
       const response = await importRepository.performJobAction(
         userId,

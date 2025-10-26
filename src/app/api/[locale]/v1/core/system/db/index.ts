@@ -1,6 +1,8 @@
+import { parseError } from "next-vibe/shared/utils";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { env } from "@/config/env";
 import pg from "pg";
+
+import { env } from "@/config/env";
 
 import * as agentChatSchema from "../../agent/chat/db";
 import * as creditSchema from "../../credits/db";
@@ -67,7 +69,7 @@ export async function closeDatabase(logger: EndpointLogger): Promise<void> {
     await pool.end();
   } catch (error) {
     // Ignore errors during shutdown - this is expected when pool is already closed
-    logger.error("app.api.v1.core.system.db.errors.pool_close_failed", error);
+    logger.error("app.api.v1.core.system.db.errors.pool_close_failed", parseError(error));
   }
 }
 

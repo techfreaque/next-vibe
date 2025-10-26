@@ -122,7 +122,7 @@ export function useIncognitoChat(
     (threadId: string, updates: Partial<ChatThread>): void => {
       logger.debug("useIncognitoChat", "Updating thread", {
         threadId,
-        updates,
+        updatedFields: Object.keys(updates).join(", "),
       });
 
       updateIncognitoThread(threadId, updates);
@@ -211,7 +211,7 @@ export function useIncognitoChat(
     (messageId: string, updates: Partial<ChatMessage>): void => {
       logger.debug("useIncognitoChat", "Updating message", {
         messageId,
-        updates,
+        updatedFields: Object.keys(updates).join(", "),
       });
 
       updateIncognitoMessage(messageId, updates);

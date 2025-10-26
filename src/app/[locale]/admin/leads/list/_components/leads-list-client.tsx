@@ -15,14 +15,16 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import React, { useCallback, useState } from "react";
 
 import { useBatchOperations } from "@/app/api/[locale]/v1/core/leads/batch/hooks";
-import {
+import type {
   BatchOperationScope,
   EmailCampaignStage,
+  LeadSource,
+  LeadStatus,
+} from "@/app/api/[locale]/v1/core/leads/enum";
+import {
   EmailCampaignStageFilter,
   LeadSortField,
-  LeadSource,
   LeadSourceFilter,
-  LeadStatus,
   LeadStatusFilter,
   SortOrder,
 } from "@/app/api/[locale]/v1/core/leads/enum";
@@ -59,9 +61,13 @@ export function LeadsListClient({
   >[number];
 
   const apiResponse = leadsEndpoint.read.response;
-  const leads: LeadType[] = apiResponse?.success ? apiResponse.data.response.leads : [];
+  const leads: LeadType[] = apiResponse?.success
+    ? apiResponse.data.response.leads
+    : [];
   const totalLeads = apiResponse?.success ? apiResponse.data.response.total : 0;
-  const totalPages = apiResponse?.success ? apiResponse.data.response.totalPages : 0;
+  const totalPages = apiResponse?.success
+    ? apiResponse.data.response.totalPages
+    : 0;
   const queryLoading = leadsEndpoint.read.isLoading || false;
 
   // Reset trigger for toolbar state
@@ -116,20 +122,12 @@ export function LeadsListClient({
         source?: (typeof LeadSource)[keyof typeof LeadSource];
         notes?: string;
       },
-      scope: typeof BatchOperationScope,
-      currentFilters: Record<string, string | number | boolean | undefined>,
+      scope: (typeof BatchOperationScope)[keyof typeof BatchOperationScope],
     ) => {
-      // Add scope and pagination info to filters
-      const filtersWithScope = {
-        ...currentFilters,
-        scope,
-        page: currentFilters.page || 1,
-        pageSize: currentFilters.limit || 20,
-      };
-
-      await batchOperations.handleBatchUpdate(updates, filtersWithScope);
+      const currentFilters = leadsEndpoint.read.form.getValues();
+      await batchOperations.handleBatchUpdate(updates, currentFilters, scope);
     },
-    [batchOperations],
+    [batchOperations, leadsEndpoint.read.form],
   );
 
   const handleConfirmBatchUpdate = useCallback(async () => {
@@ -141,21 +139,11 @@ export function LeadsListClient({
   }, [batchOperations, leadsEndpoint.read.form, handleRefresh]);
 
   const handleBatchDelete = useCallback(
-    async (
-      scope: typeof BatchOperationScope,
-      currentFilters: Record<string, string | number | boolean | undefined>,
-    ) => {
-      // Add scope and pagination info to filters
-      const filtersWithScope = {
-        ...currentFilters,
-        scope,
-        page: currentFilters.page || 1,
-        pageSize: currentFilters.limit || 20, // This is correct - pageSize should match limit
-      };
-
-      await batchOperations.handleBatchDelete(filtersWithScope);
+    async (scope: (typeof BatchOperationScope)[keyof typeof BatchOperationScope]) => {
+      const currentFilters = leadsEndpoint.read.form.getValues();
+      await batchOperations.handleBatchDelete(currentFilters, scope);
     },
-    [batchOperations],
+    [batchOperations, leadsEndpoint.read.form],
   );
 
   const handleConfirmBatchDelete = useCallback(async () => {
@@ -544,43 +532,40 @@ export function LeadsListClient({
             {/* Quick filter buttons */}
             <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
               <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
-                {t("app.admin.leads.leads.filter.quickFilters")}:
+                {t("app.admin.leads.leads.filter.quick_filters")}:
               </span>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  leadsEndpoint.read.form.setValue(
-                    "status",
+                  leadsEndpoint.read.form.setValue("statusFilters.status", [
                     LeadStatusFilter.NEW,
-                  );
+                  ]);
                 }}
               >
-                {t("app.admin.leads.leads.filter.quick.newLeads")}
+                {t("app.admin.leads.leads.filter.quick.new_leads")}
               </Button>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  leadsEndpoint.read.form.setValue(
-                    "status",
+                  leadsEndpoint.read.form.setValue("statusFilters.status", [
                     LeadStatusFilter.CAMPAIGN_RUNNING,
-                  );
+                  ]);
                 }}
               >
-                {t("app.admin.leads.leads.filter.quick.campaignRunning")}
+                {t("app.admin.leads.leads.filter.quick.campaign_running")}
               </Button>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  leadsEndpoint.read.form.setValue(
-                    "source",
+                  leadsEndpoint.read.form.setValue("statusFilters.source", [
                     LeadSourceFilter.CSV_IMPORT,
-                  );
+                  ]);
                 }}
               >
                 {t("app.admin.leads.leads.filter.quick.imported")}
@@ -609,8 +594,12 @@ export function LeadsListClient({
                 ? leadsEndpoint.read.response.data.response.total
                 : leads.length
             }
-            currentPage={leadsEndpoint.read.form.watch("page") || 1}
-            pageSize={leadsEndpoint.read.form.watch("limit") || 20}
+            currentPage={
+              leadsEndpoint.read.form.watch("searchPagination.page") || 1
+            }
+            pageSize={
+              leadsEndpoint.read.form.watch("searchPagination.limit") || 20
+            }
             onBatchUpdate={handleBatchUpdate}
             onBatchDelete={handleBatchDelete}
             currentFilters={leadsEndpoint.read.form.getValues()}
@@ -732,9 +721,11 @@ export function LeadsListClient({
           batchOperations.operationType === "delete"
             ? batchOperations.batchDeleteEndpoint.create.response?.success
               ? batchOperations.batchDeleteEndpoint.create.response.data
+                  ?.response
               : undefined
             : batchOperations.batchUpdateEndpoint.create.response?.success
               ? batchOperations.batchUpdateEndpoint.create.response.data
+                  ?.response
               : undefined
         }
         onConfirm={

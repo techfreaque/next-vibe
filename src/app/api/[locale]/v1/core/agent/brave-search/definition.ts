@@ -15,7 +15,7 @@ import {
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import {
   objectField,
-  requestUrlParamsField,
+  requestDataField,
   responseArrayField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
@@ -31,7 +31,7 @@ const FRESHNESS_OPTIONS = ["pd", "pw", "pm", "py"] as const;
  */
 const { GET } = createEndpoint({
   method: Methods.GET,
-  path: ["v1", "core", "agent", "chat", "tools", "brave-search"],
+  path: ["v1", "core", "agent", "brave-search"],
   title: "app.api.v1.core.agent.chat.tools.braveSearch.get.title" as const,
   description:
     "app.api.v1.core.agent.chat.tools.braveSearch.get.description" as const,
@@ -71,10 +71,10 @@ const { GET } = createEndpoint({
         "app.api.v1.core.agent.chat.tools.braveSearch.get.form.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: "urlParams", response: true },
+    { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
-      query: requestUrlParamsField(
+      query: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -90,7 +90,7 @@ const { GET } = createEndpoint({
         z.string().min(1).max(400),
       ),
 
-      maxResults: requestUrlParamsField(
+      maxResults: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
@@ -104,7 +104,7 @@ const { GET } = createEndpoint({
         z.number().min(1).max(10).optional().default(5),
       ),
 
-      includeNews: requestUrlParamsField(
+      includeNews: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
@@ -118,7 +118,7 @@ const { GET } = createEndpoint({
         z.boolean().optional().default(false),
       ),
 
-      freshness: requestUrlParamsField(
+      freshness: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
@@ -321,8 +321,7 @@ const { GET } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    requests: undefined,
-    urlPathVariables: {
+    requests: {
       default: {
         query: "latest AI news",
         maxResults: 5,

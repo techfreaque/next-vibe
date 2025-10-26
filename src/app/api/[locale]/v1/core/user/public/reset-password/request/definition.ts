@@ -229,7 +229,7 @@ const { POST } = createEndpoint({
         },
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
     responses: {
       default: {
         response: {

@@ -7,6 +7,7 @@ import {
   ErrorResponseTypes,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
@@ -31,7 +32,7 @@ export const branchRepository = {
    * Creates a new message with the same parent as the source message
    */
   async createBranch(
-    urlVariables: BranchPostUrlVariablesOutput,
+    urlPathParams: BranchPostUrlVariablesOutput,
     data: BranchPostRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -54,7 +55,7 @@ export const branchRepository = {
         .from(chatThreads)
         .where(
           and(
-            eq(chatThreads.id, urlVariables.threadId),
+            eq(chatThreads.id, urlPathParams.threadId),
             eq(chatThreads.userId, userId),
           ),
         )
@@ -83,8 +84,8 @@ export const branchRepository = {
         .from(chatMessages)
         .where(
           and(
-            eq(chatMessages.id, urlVariables.messageId),
-            eq(chatMessages.threadId, urlVariables.threadId),
+            eq(chatMessages.id, urlPathParams.messageId),
+            eq(chatMessages.threadId, urlPathParams.threadId),
           ),
         )
         .limit(1);
@@ -109,7 +110,7 @@ export const branchRepository = {
       const [newMessage] = await db
         .insert(chatMessages)
         .values({
-          threadId: urlVariables.threadId,
+          threadId: urlPathParams.threadId,
           content: data.content,
           role: data.role,
           parentId: sourceMessage.parentId, // Same parent as source
@@ -124,12 +125,12 @@ export const branchRepository = {
       await db
         .update(chatThreads)
         .set({ updatedAt: new Date() })
-        .where(eq(chatThreads.id, urlVariables.threadId));
+        .where(eq(chatThreads.id, urlPathParams.threadId));
 
       logger.info("Branch created successfully", {
         messageId: newMessage.id,
-        sourceMessageId: urlVariables.messageId,
-        threadId: urlVariables.threadId,
+        sourceMessageId: urlPathParams.messageId,
+        threadId: urlPathParams.threadId,
       });
 
       return createSuccessResponse({
@@ -149,7 +150,7 @@ export const branchRepository = {
         },
       });
     } catch (error) {
-      logger.error("Failed to create branch", { error });
+      logger.error("Failed to create branch", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.errors.createFailed.title",
         ErrorResponseTypes.INTERNAL_ERROR,

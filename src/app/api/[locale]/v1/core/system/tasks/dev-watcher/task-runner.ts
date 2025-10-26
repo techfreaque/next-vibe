@@ -5,6 +5,8 @@
 
 import "server-only";
 
+import type { FSWatcher } from "fs";
+
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
@@ -172,7 +174,7 @@ const startSmartFileWatcher = async (
     }, DEBOUNCE_MS);
   };
 
-  const watchers: any[] = [];
+  const watchers: FSWatcher[] = [];
 
   // Set up file watchers for each path
   for (const watchPath of watchPaths) {
@@ -217,7 +219,6 @@ const startSmartFileWatcher = async (
       // Close all watchers
       watchers.forEach((watcher) => {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
           watcher.close();
         } catch (error) {
           logger.debug("Error closing watcher:", { error: String(error) });

@@ -10,7 +10,7 @@ import { Search } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 
 import type { ToolCall } from "@/app/api/[locale]/v1/core/agent/chat/db";
-import type { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import { FieldDataType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
 import type { ResponseFieldMetadata } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/renderers/cli-ui/widgets/types";
 import { WidgetRenderer } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/widgets/react";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -93,8 +93,8 @@ function ToolResult({
             // Create ResponseFieldMetadata from the stored metadata
             const fieldMetadata: ResponseFieldMetadata = {
               name: field.name,
-              type: "text" as const,
-              widgetType: field.widgetType as WidgetType,
+              type: FieldDataType.TEXT,
+              widgetType: field.widgetType,
               value: toolCall.result,
               label: field.label,
               description: field.description,
@@ -104,7 +104,7 @@ function ToolResult({
             return (
               <WidgetRenderer
                 key={fieldIndex}
-                widgetType={field.widgetType as WidgetType}
+                widgetType={field.widgetType}
                 data={toolCall.result}
                 metadata={fieldMetadata}
                 context={createChatWidgetContext(locale)}
@@ -145,7 +145,7 @@ function ToolError({
   return (
     <Div className="p-3 bg-red-500/10 border-t border-red-500/20">
       <Div className="text-sm font-medium text-red-400">
-        {t("app.chat.toolCall.error")}
+        {t("app.chat.errors.unexpectedError")}
       </Div>
       <Div className="text-xs text-red-300 mt-1">{toolCall.error}</Div>
     </Div>

@@ -3,6 +3,11 @@
  * Utilities for parsing chat URL paths
  */
 
+import {
+  DEFAULT_FOLDER_IDS,
+  isDefaultFolderId,
+} from "@/app/api/[locale]/v1/core/agent/chat/config";
+
 import type { DefaultFolderId } from "../types";
 
 /**
@@ -30,7 +35,7 @@ export function isUUID(str: string): boolean {
 export function parseChatUrl(urlPath: string[] | undefined): ParsedChatUrl {
   // Default values
   const defaultResult: ParsedChatUrl = {
-    initialRootFolderId: "private",
+    initialRootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
     initialSubFolderId: null,
     initialThreadId: null,
   };
@@ -40,8 +45,14 @@ export function parseChatUrl(urlPath: string[] | undefined): ParsedChatUrl {
     return defaultResult;
   }
 
-  // First segment is always root folder
-  const rootId = urlPath[0] as DefaultFolderId;
+  // First segment should be a root folder - validate it
+  const firstSegment = urlPath[0];
+  if (!firstSegment || !isDefaultFolderId(firstSegment)) {
+    // Invalid root folder ID, return defaults
+    return defaultResult;
+  }
+
+  const rootId: DefaultFolderId = firstSegment;
   const lastSegment = urlPath[urlPath.length - 1];
 
   // Check if last segment is "new" (new thread)

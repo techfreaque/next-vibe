@@ -160,7 +160,7 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
 
       return createSuccessResponse(responseData);
     } catch (error) {
-      logger.error("Error creating user", error);
+      logger.error("Error creating user", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.users.create.post.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,

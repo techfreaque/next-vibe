@@ -69,6 +69,12 @@ export const translations = {
       "Public JWT payload is not supported for CLI authentication",
     jwt_signing_failed: "Failed to sign JWT token",
     validation_failed: "Validation failed",
+    native: {
+      unsupported:
+        "This authentication method is not supported on React Native",
+      storage_failed: "Failed to store authentication data",
+      clear_failed: "Failed to clear authentication data",
+    },
   },
   post: {
     title: "Auth",

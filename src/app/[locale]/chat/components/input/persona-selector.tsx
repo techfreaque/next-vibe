@@ -1,5 +1,6 @@
 "use client";
 
+import { parseError } from "next-vibe/shared/utils";
 import {
   Button,
   Dialog,
@@ -105,7 +106,7 @@ export function PersonaSelector({
           setPersonas([...DEFAULT_PERSONAS, ...parsed]);
         }
       } catch (e) {
-        logger.error("Storage", "Failed to load personas", e);
+        logger.error("Storage", "Failed to load personas", parseError(e));
       }
     }
   }, [logger]);
@@ -120,7 +121,7 @@ export function PersonaSelector({
           setCategories([...DEFAULT_CATEGORIES, ...parsed]);
         }
       } catch (e) {
-        logger.error("Storage", "Failed to load categories", e);
+        logger.error("Storage", "Failed to load categories", parseError(e));
       }
     }
   }, [logger]);

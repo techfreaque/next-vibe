@@ -73,7 +73,7 @@ export function validateTrpcRequestData<
     // Note: tRPC data is already validated, so we pass OUTPUT type through schema again
     const urlValidation = validateEndpointUrlParameters(
       context.urlParameters,
-      endpoint.requestUrlParamsSchema,
+      endpoint.requestUrlPathParamsSchema,
       logger,
     );
     if (!urlValidation.success) {

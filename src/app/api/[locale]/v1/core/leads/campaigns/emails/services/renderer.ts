@@ -3,6 +3,8 @@
  * Handles email template rendering and journey management
  */
 
+import { parseError } from "next-vibe/shared/utils";
+
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { env } from "@/config/env";
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
@@ -229,8 +231,7 @@ export class EmailRendererService {
       // No HTML manipulation needed - tracking is built into React components
       return result;
     } catch (error) {
-      logger.error("email.render.error", {
-        error,
+      logger.error("email.render.error", parseError(error), {
         leadId: lead.id,
         journeyVariant,
         stage,

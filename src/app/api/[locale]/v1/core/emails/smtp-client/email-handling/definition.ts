@@ -51,7 +51,7 @@ export interface EmailTemplateReturnType {
  */
 export interface EmailRenderProps<TRequest, TResponse, TUrlVariables> {
   requestData: TRequest;
-  urlVariables: TUrlVariables;
+  urlPathParams: TUrlVariables;
   responseData: TResponse;
   user: JwtPayloadType;
   t: TFunction;
@@ -83,7 +83,7 @@ export interface EmailHandleRequestOutput<TRequest, TResponse, TUrlVariables> {
     | undefined;
   user: JwtPayloadType;
   responseData: TResponse;
-  urlVariables: TUrlVariables;
+  urlPathParams: TUrlVariables;
   requestData: TRequest;
   t: TFunction;
   locale: CountryLanguage;

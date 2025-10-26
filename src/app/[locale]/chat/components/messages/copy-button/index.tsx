@@ -5,6 +5,7 @@ import { Check, Copy } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -39,7 +40,7 @@ export function CopyButton({
       setCopied(true);
       setTimeout(() => setCopied(false), TIMING.COPY_FEEDBACK_DURATION);
     } catch (error) {
-      logger.error("app.chat.actions.copyContent", error);
+      logger.error("app.chat.actions.copyContent", parseError(error));
     }
   };
 

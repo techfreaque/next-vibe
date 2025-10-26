@@ -7,12 +7,12 @@ import { existsSync, promises as fs } from "node:fs";
 import { cpus, freemem, totalmem } from "node:os";
 import { dirname, extname, join, relative, resolve } from "node:path";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
 import { createSuccessResponse } from "../../../shared/types/response.schema";
 import { parseError } from "../../../shared/utils/parse-error";
-
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { LintRequestOutput, LintResponseOutput } from "./definition";
 
 /**
@@ -808,11 +808,24 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     }>;
 
     try {
-      const results: EslintResult = JSON.parse(stdout) as EslintResult;
+      let parsedResults: EslintResult;
+      try {
+        parsedResults = JSON.parse(stdout) as EslintResult;
+      } catch (parseError) {
+        // JSON parse failed - log the error and return empty results
+        logger.warn("Failed to parse ESLint JSON output", {
+          error:
+            parseError instanceof Error
+              ? parseError.message
+              : String(parseError),
+          stdoutPreview: stdout.substring(0, 200),
+        });
+        return { issues, hasFixableIssues };
+      }
 
       // If --fix was used, write the fixed content back to files in parallel
       if (shouldFix) {
-        const writePromises = results
+        const writePromises = parsedResults
           .filter((result) => result.output)
           .map(async (result) => {
             try {
@@ -829,7 +842,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       }
 
       // Convert results to issues and detect fixable ones in parallel
-      const processedResults = results.map((result) => {
+      const processedResults = parsedResults.map((result) => {
         const relativePath = relative(process.cwd(), result.filePath);
         const resultIssues: Array<{
           file: string;
@@ -870,9 +883,10 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         }
       }
     } catch (error) {
-      logger.error("Failed to parse ESLint output", {
-        error: parseError(error).message,
-        stdout: stdout.substring(0, 500), // Log first 500 chars for debugging
+      // Unexpected error during processing
+      logger.error("Unexpected error processing ESLint results", {
+        error:
+          error instanceof Error ? error.message : String(error),
       });
     }
 

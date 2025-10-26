@@ -3,9 +3,9 @@
  * This runs once before all test files
  */
 
-import { seedDatabase } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
-
+import { parseError } from "next-vibe/shared/utils";
 import { closeDatabase } from "@/app/api/[locale]/v1/core/system/db";
+import { seedDatabase } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
@@ -27,7 +27,7 @@ export default async function setup(
       // The actual teardown logic is in global-teardown.ts
     };
   } catch (error) {
-    logger.error("Error during test setup:", error);
+    logger.error("Error during test setup:", parseError(error));
     // Make sure to disconnect Prisma on error
     await closeDatabase(logger).catch(void logger.error);
     // eslint-disable-next-line no-restricted-syntax -- Test infrastructure can throw errors

@@ -1,5 +1,5 @@
 /// <reference types="node" />
-/* eslint-disable no-restricted-syntax, node/no-process-env */
+/* eslint-disable no-restricted-syntax */
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -47,7 +47,6 @@ export function runTests(
   packagePath: string,
   logger: EndpointLogger,
 ): ResponseType<void> {
-  // eslint-disable-next-line i18next/no-literal-string
   const pkgPath = `${packagePath}/package.json`;
   if (!existsSync(pkgPath)) {
     logger.info(`No package.json found in ${packagePath}, skipping tests.`);
@@ -64,7 +63,6 @@ export function runTests(
     );
   }
 
-  // eslint-disable-next-line i18next/no-literal-string
   if (!parsedJson.scripts?.["test"]) {
     logger.info(
       `No test script found in package.json at ${pkgPath}, skipping tests.`,
@@ -98,11 +96,9 @@ export const lint = (
 
     // Check if eslint exists and use it directly
     if (existsSync(eslintPath)) {
-      // eslint-disable-next-line i18next/no-literal-string
       lintOutput = execSync(`${eslintPath} --fix`, {
-        // eslint-disable-next-line i18next/no-literal-string
         encoding: "utf8",
-        // eslint-disable-next-line i18next/no-literal-string
+
         env: { ...process.env, FORCE_COLOR: "1" },
         cwd: cwd,
       });
@@ -110,9 +106,8 @@ export const lint = (
       // Fall back to yarn lint if eslint binary not found
       // eslint-disable-next-line i18next/no-literal-string
       lintOutput = execSync(`yarn lint`, {
-        // eslint-disable-next-line i18next/no-literal-string
         encoding: "utf8",
-        // eslint-disable-next-line i18next/no-literal-string
+
         env: { ...process.env, FORCE_COLOR: "1" },
         cwd: cwd,
       });
@@ -149,7 +144,7 @@ export const typecheck = (
   logger: EndpointLogger,
 ): ResponseType<void> => {
   // Check if tsconfig.json exists in the package directory
-  // eslint-disable-next-line i18next/no-literal-string
+
   const tsconfigPath = join(cwd, "tsconfig.json");
   if (!existsSync(tsconfigPath)) {
     logger.info(`No tsconfig.json found in ${cwd}, skipping typecheck.`);
@@ -163,18 +158,16 @@ export const typecheck = (
 
     if (existsSync(tscPath)) {
       // Use local tsc binary with --noEmit flag for type checking only
-      // eslint-disable-next-line i18next/no-literal-string
+
       execSync(`${tscPath} --noEmit`, {
-        // eslint-disable-next-line i18next/no-literal-string
         stdio: "inherit",
         cwd,
-        // eslint-disable-next-line i18next/no-literal-string
+
         env: { ...process.env, FORCE_COLOR: "1" },
       });
     } else {
       // Fall back to yarn/npm script if available
       const parsedJson: unknown = JSON.parse(
-        // eslint-disable-next-line i18next/no-literal-string
         readFileSync(join(cwd, "package.json"), "utf8"),
       );
       if (!isPackageJson(parsedJson)) {
@@ -185,7 +178,7 @@ export const typecheck = (
           { path: cwd },
         );
       }
-      // eslint-disable-next-line i18next/no-literal-string
+
       if (parsedJson.scripts?.["typecheck"]) {
         // eslint-disable-next-line i18next/no-literal-string
         execSync(`yarn typecheck`, { stdio: "inherit", cwd });
@@ -193,10 +186,9 @@ export const typecheck = (
         // Try global tsc as last resort
         // eslint-disable-next-line i18next/no-literal-string
         execSync(`tsc --noEmit`, {
-          // eslint-disable-next-line i18next/no-literal-string
           stdio: "inherit",
           cwd,
-          // eslint-disable-next-line i18next/no-literal-string
+
           env: { ...process.env, FORCE_COLOR: "1" },
         });
       }
@@ -269,7 +261,6 @@ function getPackageJson(
   cwd: string,
   logger: EndpointLogger,
 ): ResponseType<PackageJson> {
-  // eslint-disable-next-line i18next/no-literal-string
   const pkgPath = join(cwd, "package.json");
   if (!existsSync(pkgPath)) {
     logger.error(`No package.json found in ${cwd}`, undefined);

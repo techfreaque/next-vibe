@@ -36,7 +36,7 @@ export function useMessageSearch(
   return useEndpoint(
     definitions,
     {
-      urlParams: { threadId: params.threadId },
+      urlPathParams: { threadId: params.threadId },
       queryOptions: {
         enabled: params.enabled ?? false, // Disabled by default
         refetchOnWindowFocus: false,

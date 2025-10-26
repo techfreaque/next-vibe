@@ -10,7 +10,6 @@
 import "server-only";
 
 import { AI_CONFIG } from "../shared/config/platform-config";
-import type { ToolDiscoveryOptions } from "./types";
 
 /**
  * Check if running in development mode
@@ -143,20 +142,6 @@ export const aiToolConfig = {
     resultCaching: AI_CONFIG.features.resultCaching,
   },
 };
-
-/**
- * Get discovery options from config
- */
-export function getDiscoveryOptions(): ToolDiscoveryOptions {
-  return {
-    rootDir: aiToolConfig.rootDir,
-    excludePaths: aiToolConfig.excludePaths,
-    includeMethods: aiToolConfig.includeMethods,
-    cache: aiToolConfig.cache.enabled,
-    cacheTTL: aiToolConfig.cache.ttl,
-    followSymlinks: false,
-  };
-}
 
 /**
  * Check if AI tool system is enabled

@@ -16,7 +16,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli
 import {
   objectField,
   requestDataField,
-  requestUrlParamsField,
+  requestUrlPathParamsField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 
 import { UserRole } from "../../../../user/user-roles/enum";
@@ -44,10 +44,10 @@ const { GET } = createEndpoint({
         "app.api.v1.core.emails.imapClient.messages.id.get.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: "urlParams", response: true },
+    { request: "urlPathParams", response: true },
     {
       // === URL PARAM FIELDS ===
-      id: requestUrlParamsField(
+      id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -129,7 +129,7 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: {
         id: "123e4567-e89b-12d3-a456-426614174000",
       },
@@ -204,10 +204,10 @@ const { PATCH } = createEndpoint({
         "app.api.v1.core.emails.imapClient.messages.id.patch.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: "data", response: true, urlParams: true },
+    { request: "data", response: true, urlPathParams: true },
     {
       // === URL PARAM FIELDS ===
-      id: requestUrlParamsField(
+      id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,

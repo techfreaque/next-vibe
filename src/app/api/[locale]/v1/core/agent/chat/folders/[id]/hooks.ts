@@ -33,7 +33,7 @@ export function useFolder(
   return useEndpoint(
     definitions,
     {
-      urlParams: { id: params.folderId },
+      urlPathParams: { id: params.folderId },
       queryOptions: {
         enabled: params.enabled ?? true,
         refetchOnWindowFocus: false,

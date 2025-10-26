@@ -13,6 +13,9 @@ export const translations = {
     errors: {
       executionFailed: "Tool execution failed",
     },
+    descriptions: {
+      noParametersRequired: "No parameters required for this endpoint",
+    },
   },
   converter: {},
   discovery: {},

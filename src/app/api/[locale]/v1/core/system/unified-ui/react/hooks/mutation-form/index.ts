@@ -1,5 +1,6 @@
 "use client";
 
+import { parseError } from "next-vibe/shared/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type {
   ErrorResponseType,
@@ -163,7 +164,7 @@ export function useApiForm<
         ({} as TEndpoint["TRequestOutput"]);
       formMethods.reset(resetData);
     } catch (error) {
-      logger.error("Error clearing form data from storage:", error);
+      logger.error("Error clearing form data from storage:", parseError(error));
     }
   }, [formMethods, storageKey, options.defaultValues, logger]);
 
@@ -182,7 +183,7 @@ export function useApiForm<
         formMethods.reset(parsedData);
       }
     } catch (error) {
-      logger.error("Error loading form data from storage:", error);
+      logger.error("Error loading form data from storage:", parseError(error));
     }
   }, [formMethods, storageKey, persistForm, logger]);
 
@@ -207,7 +208,7 @@ export function useApiForm<
           try {
             localStorage.setItem(storageKey, JSON.stringify(formValues));
           } catch (error) {
-            logger.error("Error saving form data to storage:", error);
+            logger.error("Error saving form data to storage:", parseError(error));
           }
         }, debounceMs);
       }
@@ -251,12 +252,25 @@ export function useApiForm<
           TEndpoint["TUrlVariablesOutput"]
         >,
   ): void => {
+    logger.debug("submitForm called", {
+      endpoint: endpoint.path.join("/"),
+      eventType: event?.type,
+      hasEvent: !!event,
+    });
+
     // Prevent default form submission behavior
     if (event) {
+      logger.debug("Preventing default form submission", {
+        endpoint: endpoint.path.join("/"),
+      });
       event.preventDefault();
     }
 
     const _submitForm = async (validatedData: FormData): Promise<void> => {
+      logger.debug("_submitForm called with validated data", {
+        endpoint: endpoint.path.join("/"),
+        validatedData,
+      });
       try {
         // Clear any previous errors
         clearFormError();
@@ -323,6 +337,11 @@ export function useApiForm<
       }
     };
     void formMethods.handleSubmit(_submitForm, (errors) => {
+      logger.error("Form validation errors", {
+        endpoint: endpoint.path.join("/"),
+        errors,
+      });
+
       // Create an error response for form validation errors
       const errorResponse = createErrorResponse(
         "app.api.v1.core.system.unifiedUi.react.hooks.mutationForm.post.errors.validation_error.title",

@@ -8,6 +8,7 @@
 "use client";
 
 import { AUTH_STATUS_COOKIE_PREFIX } from "next-vibe/shared/constants";
+import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
@@ -27,7 +28,6 @@ import {
   type ChatFolder,
   type ChatMessage,
   type ChatThread,
-  type ToolCall,
   useChatStore,
 } from "./store";
 import threadsDefinition from "./threads/definition";
@@ -94,7 +94,6 @@ export interface UseChatReturn {
   sidebarCollapsed: boolean;
   theme: "light" | "dark";
   viewMode: "linear" | "flat" | "threaded";
-  enableSearch: boolean;
   enabledToolIds: string[];
   setSelectedPersona: (persona: string) => void;
   setSelectedModel: (model: ModelId) => void;
@@ -104,7 +103,6 @@ export interface UseChatReturn {
   setSidebarCollapsed: (collapsed: boolean) => void;
   setTheme: (theme: "light" | "dark") => void;
   setViewMode: (mode: "linear" | "flat" | "threaded") => void;
-  setEnableSearch: (enabled: boolean) => void;
   setEnabledToolIds: (toolIds: string[]) => void;
 
   // Message operations
@@ -258,7 +256,11 @@ export function useChat(
           folderCount: Object.keys(incognitoState.folders).length,
         });
       } catch (error) {
-        logger.error("useChat", "Failed to load incognito data", { error });
+        logger.error(
+          "useChat",
+          "Failed to load incognito data",
+          parseError(error),
+        );
       }
 
       // Skip loading server data for non-authenticated users
@@ -276,18 +278,18 @@ export function useChat(
           threadsDefinition.GET,
           logger,
           {
-            pagination: {
-              page: 1,
-              limit: 100,
-            },
-            filters: {},
+            page: 1,
+            limit: 100,
           },
           {},
           t,
           locale,
         );
 
-        logger.debug("useChat", "Loaded threads", { threadsResponse });
+        logger.debug("useChat", "Loaded threads", {
+          success: threadsResponse.success,
+          hasData: threadsResponse.success && !!threadsResponse.data,
+        });
 
         if (threadsResponse.success) {
           const responseData = threadsResponse.data as {
@@ -336,7 +338,7 @@ export function useChat(
           }
         }
       } catch (error) {
-        logger.error("useChat", "Failed to load threads", { error });
+        logger.error("useChat", "Failed to load threads", parseError(error));
       }
 
       // Folders are not loaded from server - they are managed client-side only
@@ -383,7 +385,6 @@ export function useChat(
   const sidebarCollapsed = settings.sidebarCollapsed;
   const theme = settings.theme;
   const viewMode = settings.viewMode;
-  const enableSearch = settings.enableSearch;
   const enabledToolIds = settings.enabledToolIds;
 
   // Settings setters that update the store
@@ -439,13 +440,6 @@ export function useChat(
   const setViewMode = useCallback(
     (mode: "linear" | "flat" | "threaded") => {
       chatStore.updateSettings({ viewMode: mode });
-    },
-    [chatStore],
-  );
-
-  const setEnableSearch = useCallback(
-    (enabled: boolean) => {
-      chatStore.updateSettings({ enableSearch: enabled });
     },
     [chatStore],
   );
@@ -586,57 +580,35 @@ export function useChat(
 
           if (data.success && data.data?.messages) {
             // Add messages to store
-            data.data.messages.forEach(
-              (message: {
-                id: string;
-                threadId: string;
-                role: "user" | "assistant" | "system";
-                content: string;
-                model: string | null;
-                persona: string | null;
-                parentId: string | null;
-                depth: number;
-                childrenIds: string[];
-                toolCalls?: Array<{
-                  toolName: string;
-                  // eslint-disable-next-line no-restricted-syntax
-                  args: Record<string, unknown>;
-                }> | null;
-                createdAt: string;
-                updatedAt: string;
-              }) => {
-                chatStore.addMessage({
-                  id: message.id,
-                  threadId: message.threadId,
-                  role: message.role,
-                  content: message.content,
-                  model: message.model as ModelId | null,
-                  persona: message.persona,
-                  parentId: message.parentId,
-                  depth: message.depth,
-                  authorId: null,
-                  authorName: null,
-                  isAI: message.role === "assistant",
-                  errorType: null,
-                  errorMessage: null,
-                  edited: false,
-                  tokens: null,
-                  toolCalls: message.toolCalls
-                    ? (message.toolCalls.map((tc) => ({
-                        toolName: tc.toolName,
-                        args: tc.args as Record<
-                          string,
-                          string | number | boolean | null
-                        >,
-                      })) as ToolCall[])
-                    : null,
-                  upvotes: null,
-                  downvotes: null,
-                  createdAt: new Date(message.createdAt),
-                  updatedAt: new Date(message.updatedAt),
-                });
-              },
-            );
+            data.data.messages.forEach((message) => {
+              chatStore.addMessage({
+                id: message.id,
+                threadId: message.threadId,
+                role: message.role,
+                content: message.content,
+                model: message.model,
+                persona: message.persona,
+                parentId: message.parentId,
+                depth: message.depth,
+                authorId: null,
+                authorName: null,
+                isAI: message.role === "assistant",
+                errorType: null,
+                errorMessage: null,
+                edited: false,
+                tokens: null,
+                toolCalls: message.toolCalls
+                  ? message.toolCalls.map((tc) => ({
+                      toolName: tc.toolName,
+                      args: tc.args,
+                    }))
+                  : null,
+                upvotes: null,
+                downvotes: null,
+                createdAt: new Date(message.createdAt),
+                updatedAt: new Date(message.updatedAt),
+              });
+            });
           }
         } else {
           logger.error("useChat", "Failed to load messages", {
@@ -649,7 +621,7 @@ export function useChat(
       } catch (error) {
         logger.error("useChat", "Error loading messages", {
           threadId: activeThreadId,
-          error,
+          error: parseError(error).message,
         });
         // Remove from loaded set on error so it can be retried
         loadedThreadsRef.current.delete(activeThreadId);
@@ -715,8 +687,7 @@ export function useChat(
             persona: selectedPersona,
             temperature,
             maxTokens,
-            enableSearch,
-            enabledToolIds,
+            tools: enabledToolIds,
           },
           {
             onThreadCreated: (data) => {
@@ -743,7 +714,7 @@ export function useChat(
 
         setInput("");
       } catch (error) {
-        logger.error("useChat", "Failed to send message", { error });
+        logger.error("useChat", "Failed to send message", parseError(error));
       } finally {
         chatStore.setLoading(false);
       }
@@ -756,7 +727,6 @@ export function useChat(
       selectedPersona,
       temperature,
       maxTokens,
-      enableSearch,
       enabledToolIds,
       // locale is not used in this callback
     ],
@@ -793,15 +763,14 @@ export function useChat(
             persona: selectedPersona,
             temperature,
             maxTokens,
-            enableSearch: false,
-            enabledToolIds,
+            tools: enabledToolIds,
           },
           {
             onContentDone: createCreditUpdateCallback(selectedModel, logger),
           },
         );
       } catch (error) {
-        logger.error("useChat", "Failed to retry message", { error });
+        logger.error("useChat", "Failed to retry message", parseError(error));
       } finally {
         chatStore.setLoading(false);
       }
@@ -845,15 +814,14 @@ export function useChat(
             persona: selectedPersona,
             temperature,
             maxTokens,
-            enableSearch: false,
-            enabledToolIds,
+            tools: enabledToolIds,
           },
           {
             onContentDone: createCreditUpdateCallback(selectedModel, logger),
           },
         );
       } catch (error) {
-        logger.error("useChat", "Failed to branch message", { error });
+        logger.error("useChat", "Failed to branch message", parseError(error));
       } finally {
         chatStore.setLoading(false);
       }
@@ -866,7 +834,6 @@ export function useChat(
       selectedPersona,
       temperature,
       maxTokens,
-      // enableSearch is not used in this callback
       enabledToolIds,
     ],
   );
@@ -897,15 +864,14 @@ export function useChat(
             persona: selectedPersona,
             temperature,
             maxTokens,
-            enableSearch: false,
-            enabledToolIds,
+            tools: enabledToolIds,
           },
           {
             onContentDone: createCreditUpdateCallback(selectedModel, logger),
           },
         );
       } catch (error) {
-        logger.error("useChat", "Failed to answer as AI", { error });
+        logger.error("useChat", "Failed to answer as AI", parseError(error));
       } finally {
         chatStore.setLoading(false);
       }
@@ -1001,7 +967,7 @@ export function useChat(
           logger.error(
             "useChat",
             "Failed to delete incognito message from localStorage",
-            { error },
+            parseError(error),
           );
         }
 
@@ -1027,7 +993,7 @@ export function useChat(
         // Remove from store
         chatStore.deleteMessage(messageId);
       } catch (error) {
-        logger.error("useChat", "Failed to delete message", { error });
+        logger.error("useChat", "Failed to delete message", parseError(error));
       }
     },
     [logger, chatStore, locale],
@@ -1101,7 +1067,7 @@ export function useChat(
         }
         chatStore.updateMessage(messageId, updates);
       } catch (error) {
-        logger.error("useChat", "Failed to vote on message", { error });
+        logger.error("useChat", "Failed to vote on message", parseError(error));
       }
     },
     [logger, chatStore, locale],
@@ -1134,7 +1100,7 @@ export function useChat(
           chatStore.setActiveThread(null);
         }
       } catch (error) {
-        logger.error("useChat", "Failed to delete thread", { error });
+        logger.error("useChat", "Failed to delete thread", parseError(error));
       }
     },
     [logger, chatStore, locale],
@@ -1142,7 +1108,10 @@ export function useChat(
 
   const updateThread = useCallback(
     async (threadId: string, updates: ThreadUpdate): Promise<void> => {
-      logger.debug("useChat", "Updating thread", { threadId, updates });
+      logger.debug("useChat", "Updating thread", {
+        threadId,
+        updatedFields: Object.keys(updates).join(", "),
+      });
 
       try {
         const response = await fetch(
@@ -1166,7 +1135,7 @@ export function useChat(
         // Update local store
         chatStore.updateThread(threadId, updates);
       } catch (error) {
-        logger.error("useChat", "Failed to update thread", { error });
+        logger.error("useChat", "Failed to update thread", parseError(error));
       }
     },
     [logger, chatStore, locale],
@@ -1212,7 +1181,7 @@ export function useChat(
             .catch(() => ({}))) as Record<string, unknown>;
           logger.error("useChat", "Failed to create folder", {
             status: response.status,
-            error: errorData,
+            error: parseError(errorData).message,
           });
           return "";
         }
@@ -1228,7 +1197,7 @@ export function useChat(
 
         return folder.id;
       } catch (error) {
-        logger.error("useChat", "Failed to create folder", { error });
+        logger.error("useChat", "Failed to create folder", parseError(error));
         return "";
       }
     },
@@ -1237,7 +1206,10 @@ export function useChat(
 
   const updateFolder = useCallback(
     async (folderId: string, updates: FolderUpdate): Promise<void> => {
-      logger.debug("useChat", "Updating folder", { folderId, updates });
+      logger.debug("useChat", "Updating folder", {
+        folderId,
+        updatedFields: Object.keys(updates).join(", "),
+      });
 
       try {
         const response = await fetch(
@@ -1261,7 +1233,7 @@ export function useChat(
         // Update local store
         chatStore.updateFolder(folderId, updates);
       } catch (error) {
-        logger.error("useChat", "Failed to update folder", { error });
+        logger.error("useChat", "Failed to update folder", parseError(error));
       }
     },
     [logger, chatStore, locale],
@@ -1289,7 +1261,7 @@ export function useChat(
         // Remove from store
         chatStore.deleteFolder(folderId);
       } catch (error) {
-        logger.error("useChat", "Failed to delete folder", { error });
+        logger.error("useChat", "Failed to delete folder", parseError(error));
       }
     },
     [logger, chatStore, locale],
@@ -1334,7 +1306,6 @@ export function useChat(
     sidebarCollapsed,
     theme,
     viewMode,
-    enableSearch,
     enabledToolIds,
     setSelectedPersona,
     setSelectedModel,
@@ -1344,7 +1315,6 @@ export function useChat(
     setSidebarCollapsed,
     setTheme,
     setViewMode,
-    setEnableSearch,
     setEnabledToolIds,
 
     // Message operations

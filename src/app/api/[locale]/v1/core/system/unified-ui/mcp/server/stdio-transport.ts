@@ -24,6 +24,7 @@ export class StdioTransport implements IMCPTransport {
   /**
    * Start the transport
    */
+  // eslint-disable-next-line @typescript-eslint/require-await
   async start(): Promise<void> {
     if (this.running) {
       return;
@@ -50,15 +51,21 @@ export class StdioTransport implements IMCPTransport {
     });
 
     // Handle errors
-    process.stdin.on("error", (error) => {
+    // eslint-disable-next-line no-restricted-syntax
+    process.stdin.on("error", (error: unknown) => {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       this.logger.error("[MCP Transport] stdin error", {
-        error: error.message,
+        error: errorMessage,
       });
     });
 
-    process.stdout.on("error", (error) => {
+    // eslint-disable-next-line no-restricted-syntax
+    process.stdout.on("error", (error: unknown) => {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       this.logger.error("[MCP Transport] stdout error", {
-        error: error.message,
+        error: errorMessage,
       });
     });
 
@@ -69,6 +76,7 @@ export class StdioTransport implements IMCPTransport {
   /**
    * Stop the transport
    */
+  // eslint-disable-next-line @typescript-eslint/require-await
   async stop(): Promise<void> {
     if (!this.running) {
       return;
@@ -88,8 +96,10 @@ export class StdioTransport implements IMCPTransport {
   /**
    * Send a message
    */
+  // eslint-disable-next-line @typescript-eslint/require-await
   async send(message: JsonRpcResponse): Promise<void> {
     if (!this.running) {
+      // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
       throw new Error("Transport not running");
     }
 
@@ -101,11 +111,13 @@ export class StdioTransport implements IMCPTransport {
       });
 
       // Write to stdout with newline
+      // eslint-disable-next-line i18next/no-literal-string
       process.stdout.write(`${json}\n`);
     } catch (error) {
       this.logger.error("[MCP Transport] Failed to send message", {
         error: error instanceof Error ? error.message : String(error),
       });
+      // eslint-disable-next-line no-restricted-syntax
       throw error;
     }
   }
@@ -151,6 +163,7 @@ export class StdioTransport implements IMCPTransport {
           jsonrpc: "2.0",
           error: {
             code: -32700,
+            // eslint-disable-next-line i18next/no-literal-string
             message: "Parse error",
           },
           id: partialMessage.id || null,

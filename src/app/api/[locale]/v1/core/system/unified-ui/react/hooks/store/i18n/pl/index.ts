@@ -51,4 +51,18 @@ export const translations: typeof enTranslations = {
       description: "Operacja zakończona pomyślnie",
     },
   },
+  errors: {
+    validation_failed: "Walidacja nie powiodła się",
+    request_failed: "Żądanie nie powiodło się",
+    mutation_failed: "Mutacja nie powiodła się",
+    unexpected_failure: "Wystąpił nieoczekiwany błąd",
+    refetch_failed: "Nie udało się ponownie pobrać danych",
+  },
+  status: {
+    loading_data: "Ładowanie danych...",
+    cached_data: "Używanie danych z pamięci podręcznej",
+    success: "Sukces",
+    mutation_pending: "Mutacja w toku...",
+    mutation_success: "Mutacja zakończona pomyślnie",
+  },
 };

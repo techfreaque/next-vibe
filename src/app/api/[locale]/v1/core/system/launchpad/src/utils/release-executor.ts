@@ -1,5 +1,5 @@
 /// <reference types="node" />
-/* eslint-disable node/no-process-env */
+
 /* eslint-disable i18next/no-literal-string */
 /* eslint-disable no-restricted-syntax */
 import { execSync, spawn } from "node:child_process";
@@ -9,8 +9,8 @@ import { dirname, join } from "node:path";
 import inquirer from "inquirer";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import { defaultLocale } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { TFunction } from "@/i18n/core/static-types";
 
 import type {
   ReleaseOrchestrationOptions,
@@ -20,8 +20,6 @@ import type {
 } from "../types/types";
 import { discoverReleaseTargets } from "./release-discovery";
 import { StateManager } from "./state-manager";
-import { TFunction } from "@/i18n/core/static-types";
-
 
 // Inquirer response types
 interface TargetActionResponse {
@@ -393,8 +391,7 @@ export class ReleaseExecutor {
   /**
    * Execute weekly update - updates all packages, creates branch, runs Snyk, creates PR
    */
-  async executeWeeklyUpdate(branchName: string, t: TFunction,
-  ): Promise<void> {
+  async executeWeeklyUpdate(branchName: string, t: TFunction): Promise<void> {
     this.logger.info(
       `📅 ${t("app.api.v1.core.system.launchpad.releaseExecutor.weeklyUpdate.starting")}`,
     );

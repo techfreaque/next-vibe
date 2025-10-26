@@ -67,9 +67,9 @@ export {
  * Field usage configuration
  */
 export type FieldUsageConfig =
-  | { request: "data" | "urlParams" | "data&urlParams"; response?: never }
+  | { request: "data" | "urlPathParams" | "data&urlPathParams"; response?: never }
   | { request?: never; response: true }
-  | { request: "data" | "urlParams" | "data&urlParams"; response: true };
+  | { request: "data" | "urlPathParams" | "data&urlPathParams"; response: true };
 
 /**
  * Action condition for conditional execution

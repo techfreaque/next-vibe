@@ -207,6 +207,25 @@ export const translations: typeof enTranslations = {
     fetchPulseStatus: "Fehler beim Abrufen des Pulse-Status",
     pulseExecutionFailed: "Pulse-Ausführung fehlgeschlagen",
   },
+  common: {
+    cronRepositoryTaskUpdateFailed:
+      "Fehler beim Aktualisieren der Cron-Aufgabe",
+    cronRepositoryTaskDeleteFailed: "Fehler beim Löschen der Cron-Aufgabe",
+    cronRepositoryExecutionCreateFailed:
+      "Fehler beim Erstellen der Cron-Aufgabenausführung",
+    cronRepositoryExecutionUpdateFailed:
+      "Fehler beim Aktualisieren der Cron-Aufgabenausführung",
+    cronRepositoryExecutionsFetchFailed:
+      "Fehler beim Abrufen der Cron-Aufgabenausführungen",
+    cronRepositoryRecentExecutionsFetchFailed:
+      "Fehler beim Abrufen der letzten Cron-Aufgabenausführungen",
+    cronRepositorySchedulesFetchFailed:
+      "Fehler beim Abrufen der Cron-Aufgabenpläne",
+    cronRepositoryScheduleUpdateFailed:
+      "Fehler beim Aktualisieren des Cron-Aufgabenplans",
+    cronRepositoryStatisticsFetchFailed:
+      "Fehler beim Abrufen der Cron-Aufgabenstatistiken",
+  },
   cronSystem: cronTranslations,
   pulseSystem: pulseTranslations,
   sideTasks: sideTasksTranslations,

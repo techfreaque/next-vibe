@@ -161,7 +161,7 @@ const { POST } = createEndpoint({
         message: "Successfully unsubscribed from newsletter",
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
 });
 

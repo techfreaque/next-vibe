@@ -16,9 +16,9 @@ import definitions from "./definition";
 export const { PATCH, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.PATCH]: {
-    handler: async ({ user, data, urlVariables, logger }) => {
+    handler: async ({ user, data, urlPathParams, logger }) => {
       const userId = authRepository.requireUserId(user);
-      const { jobId } = urlVariables;
+      const { jobId } = urlPathParams;
       const updates = data.settings;
 
       const response = await importRepository.updateImportJob(
@@ -69,9 +69,9 @@ export const { PATCH, DELETE, tools } = endpointsHandler({
     },
   },
   [Methods.DELETE]: {
-    handler: async ({ user, urlVariables, logger }) => {
+    handler: async ({ user, urlPathParams, logger }) => {
       const userId = authRepository.requireUserId(user);
-      const { jobId } = urlVariables;
+      const { jobId } = urlPathParams;
 
       const response = await importRepository.deleteImportJob(
         userId,

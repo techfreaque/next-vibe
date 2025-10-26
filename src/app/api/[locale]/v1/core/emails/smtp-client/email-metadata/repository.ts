@@ -146,7 +146,6 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
     try {
       logger.debug("Updating email engagement", {
         emailId: data.params.emailId,
-        engagement: data.params.engagement,
       });
 
       const updateData: {

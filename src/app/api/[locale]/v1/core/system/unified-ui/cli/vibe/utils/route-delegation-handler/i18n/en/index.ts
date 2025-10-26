@@ -6,7 +6,7 @@ export const translations = {
     executingRoute: "🎯 Executing route: {{route}}",
     method: "Method: {{method}}",
     data: "Data: {{data}}",
-    urlParams: "URL Params: {{urlParams}}",
+    urlPathParams: "URL Params: {{urlPathParams}}",
     dryRun: "🔍 Dry run - would execute with:",
     requestData: "📝 Request Data:",
     missingRequiredFields: "⚠️  Missing required fields: {{fields}}",

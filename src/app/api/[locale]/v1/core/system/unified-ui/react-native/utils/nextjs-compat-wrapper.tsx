@@ -205,7 +205,6 @@ type AnyNextLayoutComponent =
       children: React.ReactNode;
     }) => Promise<JSX.Element> | JSX.Element)
   // Any other Next.js layout shape
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   | ((props: any) => Promise<JSX.Element> | JSX.Element);
 
 /**

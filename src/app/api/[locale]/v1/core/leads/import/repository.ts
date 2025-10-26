@@ -15,6 +15,7 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
@@ -360,7 +361,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
         duplicate: false,
       });
     } catch (error) {
-      logger.error("Error creating/updating lead", error);
+      logger.error("Error creating/updating lead", parseError(error));
       return createErrorResponse(
         "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -384,7 +385,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
 
       return existingLead.length > 0;
     } catch (error) {
-      logger.error("Error checking lead existence", error);
+      logger.error("Error checking lead existence", parseError(error));
       return false;
     }
   }
@@ -448,7 +449,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
         return result;
       }
     } catch (error) {
-      logger.error("Error importing leads from CSV", error);
+      logger.error("Error importing leads from CSV", parseError(error));
       return createErrorResponse(
         "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,

@@ -2,6 +2,7 @@
  * Auth Utilities
  * Helper functions for authentication in server components
  */
+import { parseError } from "next-vibe/shared/utils";
 import "server-only";
 
 import { redirect } from "next/navigation";
@@ -53,7 +54,7 @@ export async function requireAdminUser(
 
     return userResult.data;
   } catch (error) {
-    logger.error("Error in requireAdminUser", error);
+    logger.error("Error in requireAdminUser", parseError(error));
     redirect(
       `/${locale}/login?redirect=${encodeURIComponent(redirectPath || `/${locale}/admin`)}`,
     );
@@ -100,7 +101,7 @@ export async function requireUser(
 
     return userResult.data;
   } catch (error) {
-    logger.error("Error in requireUser", error);
+    logger.error("Error in requireUser", parseError(error));
     redirect(
       `/${locale}/login?redirect=${encodeURIComponent(redirectPath || `/${locale}`)}`,
     );

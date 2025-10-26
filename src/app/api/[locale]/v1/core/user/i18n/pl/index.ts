@@ -67,6 +67,8 @@ export const translations: typeof enTranslations = {
     creation_failed: "Nie udało się utworzyć użytkownika",
     no_data_returned: "Brak danych zwróconych z bazy danych",
     password_hashing_failed: "Hashowanie hasła nie powiodło się",
+    not_implemented_on_native:
+      "Ta funkcja nie jest zaimplementowana w React Native",
   },
   "notifications": {
     profileUpdated: {

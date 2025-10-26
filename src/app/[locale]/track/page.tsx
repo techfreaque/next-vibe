@@ -2,11 +2,12 @@
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Div, P } from "next-vibe-ui/ui";
+import { parseError } from "next-vibe/shared/utils";
 import type React from "react";
 import { useEffect, useMemo } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { generateEngagementTrackingApiUrl } from "@/app/api/[locale]/v1/core/leads/tracking/utils";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -25,7 +26,7 @@ export default function TrackPage(): React.ReactElement {
   // Create logger at top-level component
   const logger = useMemo(
     () => createEndpointLogger(false, Date.now(), locale),
-    [locale]
+    [locale],
   );
 
   useEffect(() => {
@@ -54,7 +55,7 @@ export default function TrackPage(): React.ReactElement {
           try {
             new URL(url);
           } catch (error) {
-            logger.error("Invalid tracking URL", error, { url });
+            logger.error("Invalid tracking URL", parseError(error), { url });
             router.push(`/${locale}`);
             return;
           }
@@ -107,7 +108,7 @@ export default function TrackPage(): React.ReactElement {
           window.location.assign(redirectUrl);
         }
       } catch (error) {
-        logger.error("Error in tracking page", error);
+        logger.error("Error in tracking page", parseError(error));
         // Fallback redirect to home page
         router.push(`/${locale}`);
       }

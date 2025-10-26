@@ -16,8 +16,10 @@ import {
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
-import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
-import { DEFAULT_FOLDER_IDS } from "@/app/api/[locale]/v1/core/agent/chat/config";
+import {
+  DEFAULT_FOLDER_IDS,
+  isDefaultFolderId,
+} from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
@@ -131,12 +133,12 @@ export function ChatInterface({
     sidebarCollapsed,
     theme,
     viewMode,
-    enableSearch,
+    enabledToolIds,
     setTTSAutoplay,
     setSidebarCollapsed,
     setTheme,
     setViewMode,
-    setEnableSearch,
+    setEnabledToolIds,
   } = chat;
 
   // Branch indices for linear view - tracks which branch is selected at each level
@@ -271,23 +273,19 @@ export function ChatInterface({
 
       // Fallback to deprecated props - parse them properly
       if (deprecatedFolderId) {
-        const isRoot =
-          deprecatedFolderId === "private" ||
-          deprecatedFolderId === "shared" ||
-          deprecatedFolderId === "public" ||
-          deprecatedFolderId === "incognito";
+        const isRoot = isDefaultFolderId(deprecatedFolderId);
 
         return {
           initialRootFolderId: isRoot
-            ? (deprecatedFolderId as DefaultFolderId)
-            : "private",
+            ? deprecatedFolderId
+            : DEFAULT_FOLDER_IDS.PRIVATE,
           initialSubFolderId: isRoot ? null : deprecatedFolderId,
           initialThreadId: deprecatedThreadId,
         };
       }
 
       return {
-        initialRootFolderId: "private" as DefaultFolderId,
+        initialRootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
         initialSubFolderId: null,
         initialThreadId: deprecatedThreadId,
       };
@@ -320,7 +318,7 @@ export function ChatInterface({
   useEffect(() => {
     if (initialThreadId && !isNewThread(initialThreadId)) {
       setActiveThread(initialThreadId);
-    } else if (isNewThread(initialThreadId)) {
+    } else if (initialThreadId && isNewThread(initialThreadId)) {
       // Clear active thread for new chat
       setActiveThread(null);
     }
@@ -352,10 +350,10 @@ export function ChatInterface({
       initialLoadCompleteRef.current
     ) {
       // Find the newest thread (highest createdAt)
-      const newestThread = Object.values(threads).reduce(
+      const newestThread = Object.values(threads).reduce<ChatThread | null>(
         (newest, thread) =>
           !newest || thread.createdAt > newest.createdAt ? thread : newest,
-        null as ChatThread | null,
+        null,
       );
 
       if (newestThread) {
@@ -449,15 +447,16 @@ export function ChatInterface({
     [handleSubmit],
   );
 
-  // Handler for model changes - auto-disable search if model doesn't support tools
+  // Handler for model changes - auto-disable search tool if model doesn't support tools
   const handleModelChange = useCallback(
     (modelId: ModelId) => {
       const model = getModelById(modelId);
 
-      // Auto-disable search if the new model doesn't support tools
-      if (!model.supportsTools && enableSearch) {
-        setEnableSearch(false);
-        logger.info("Auto-disabled search - model doesn't support tools", {
+      // Auto-remove search tool if the new model doesn't support tools
+      const SEARCH_TOOL_ID = "core_agent_chat_tools_brave-search";
+      if (!model.supportsTools && enabledToolIds.includes(SEARCH_TOOL_ID)) {
+        setEnabledToolIds(enabledToolIds.filter((id) => id !== SEARCH_TOOL_ID));
+        logger.info("Auto-disabled search tool - model doesn't support tools", {
           modelId,
           modelName: model.name,
         });
@@ -465,7 +464,7 @@ export function ChatInterface({
 
       setSelectedModel(modelId);
     },
-    [setSelectedModel, enableSearch, setEnableSearch, logger],
+    [setSelectedModel, enabledToolIds, setEnabledToolIds, logger],
   );
 
   const handleFillInputWithPrompt = useCallback(
@@ -540,7 +539,6 @@ export function ChatInterface({
           messages={activeThreadMessages}
           selectedModel={selectedModel}
           selectedPersona={selectedPersona}
-          enableSearch={enableSearch}
           ttsAutoplay={ttsAutoplay}
           input={input}
           isLoading={isLoading}
@@ -566,7 +564,6 @@ export function ChatInterface({
           }
           onModelChange={handleModelChange}
           onPersonaChange={setSelectedPersona}
-          onEnableSearchChange={setEnableSearch}
           onSendMessage={handleFillInputWithPrompt}
           showBranchIndicators={true}
           branchIndices={branchIndices}

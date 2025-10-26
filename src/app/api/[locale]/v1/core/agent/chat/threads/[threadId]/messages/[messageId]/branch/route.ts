@@ -20,7 +20,7 @@ export const { POST, tools } = endpointsHandler({
       >,
     ): Promise<ResponseType<BranchPostResponseOutput>> => {
       return await branchRepository.createBranch(
-        props.urlVariables,
+        props.urlPathParams,
         props.data,
         props.user,
         props.locale,

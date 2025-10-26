@@ -248,7 +248,7 @@ const { POST } = createEndpoint({
         fixedIssues: ["Added missing index", "Updated constraint"],
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
 });
 

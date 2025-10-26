@@ -213,7 +213,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         logger,
       )) as ResponseType<UserType<T>>;
     } catch (error) {
-      logger.error("Error getting authenticated user", error);
+      logger.error("Error getting authenticated user", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.errors.auth_retrieval_failed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -294,7 +294,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         completeUser as ExtendedUserType<T>,
       );
     } catch (error) {
-      logger.error("Error getting user by ID", error);
+      logger.error("Error getting user by ID", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.errors.id_lookup_failed",
         ErrorResponseTypes.DATABASE_ERROR,
@@ -336,7 +336,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       return await this.getUserById(results[0].id, detailLevel, logger);
     } catch (error) {
       const errorMessage = parseError(error).message;
-      logger.error("Error getting user by email", error);
+      logger.error("Error getting user by email", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.errors.email_lookup_failed",
         ErrorResponseTypes.DATABASE_ERROR,
@@ -360,7 +360,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         .limit(1);
       return createSuccessResponse(results.length > 0);
     } catch (error) {
-      logger.error("Error checking if user exists", error);
+      logger.error("Error checking if user exists", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.errors.id_lookup_failed",
         ErrorResponseTypes.DATABASE_ERROR,
@@ -384,7 +384,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         .limit(1);
       return createSuccessResponse(results.length > 0);
     } catch (error) {
-      logger.error("Error checking if email exists", error);
+      logger.error("Error checking if email exists", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.errors.email_check_failed",
         ErrorResponseTypes.DATABASE_ERROR,
@@ -410,7 +410,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
       return createSuccessResponse(results.length > 0);
     } catch (error) {
-      logger.error("Error checking if email exists by other user", error);
+      logger.error("Error checking if email exists by other user", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.errors.email_duplicate_check_failed",
         ErrorResponseTypes.DATABASE_ERROR,
@@ -498,7 +498,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
       return createSuccessResponse(mappedResults);
     } catch (error) {
-      logger.error("Error searching users", error);
+      logger.error("Error searching users", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.errors.search_failed",
         ErrorResponseTypes.DATABASE_ERROR,
@@ -562,7 +562,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
       return createSuccessResponse(mappedResults);
     } catch (error) {
-      logger.error("Error getting all users", error);
+      logger.error("Error getting all users", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.errors.search_failed",
         ErrorResponseTypes.DATABASE_ERROR,
@@ -609,7 +609,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
       return createSuccessResponse(totalCount);
     } catch (error) {
-      logger.error("Error getting user search count", error);
+      logger.error("Error getting user search count", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.errors.search_failed",
         ErrorResponseTypes.DATABASE_ERROR,
@@ -648,7 +648,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       }
       return createSuccessResponse(results[0] as User);
     } catch (error) {
-      logger.error("Error creating user", error);
+      logger.error("Error creating user", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.errors.creation_failed",
         ErrorResponseTypes.DATABASE_ERROR,
@@ -690,7 +690,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         logger,
       );
     } catch (error) {
-      logger.error("Error creating user with hashed password", error);
+      logger.error("Error creating user with hashed password", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.errors.password_hashing_failed",
         ErrorResponseTypes.DATABASE_ERROR,

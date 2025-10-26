@@ -220,7 +220,7 @@ const { POST } = createEndpoint({
         success: true,
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
 });
 

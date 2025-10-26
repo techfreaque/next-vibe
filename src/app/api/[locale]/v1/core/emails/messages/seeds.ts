@@ -3,6 +3,8 @@
  * Provides seed data for email message storage and tracking
  */
 
+import { parseError } from "next-vibe/shared/utils";
+
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 
 import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
@@ -197,14 +199,14 @@ export async function dev(logger: EndpointLogger): Promise<void> {
             );
           }
         } catch (error) {
-          logger.error(`Error creating email ${email.subject}:`, error);
+          logger.error(`Error creating email ${email.subject}:`, parseError(error).message);
         }
       }
     }
 
     logger.debug("✅ Inserted development email messages data");
   } catch (error) {
-    logger.error("Error seeding email messages data:", error);
+    logger.error("Error seeding email messages data:", parseError(error).message);
   }
 }
 
@@ -251,7 +253,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
       }
     }
   } catch (error) {
-    logger.error("Error seeding test email messages data:", error);
+    logger.error("Error seeding test email messages data:", parseError(error).message);
   }
 }
 
@@ -268,7 +270,7 @@ export function prod(logger: EndpointLogger): void {
       "✅ Email messages system ready for production email handling",
     );
   } catch (error) {
-    logger.error("Error seeding production email messages data:", error);
+    logger.error("Error seeding production email messages data:", parseError(error).message);
   }
 }
 

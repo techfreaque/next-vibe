@@ -15,7 +15,7 @@ import {
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import {
   objectField,
-  requestUrlParamsField,
+  requestDataField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -79,10 +79,10 @@ const { GET } = createEndpoint({
       description: "app.api.v1.core.leads.search.get.form.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: "urlParams", response: true },
+    { request: "data", response: true },
     {
       // === QUERY PARAMETERS ===
-      search: requestUrlParamsField(
+      search: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -95,7 +95,7 @@ const { GET } = createEndpoint({
         },
         z.string().optional(),
       ),
-      limit: requestUrlParamsField(
+      limit: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
@@ -106,7 +106,7 @@ const { GET } = createEndpoint({
         },
         z.coerce.number().min(1).max(50).default(10),
       ),
-      offset: requestUrlParamsField(
+      offset: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
@@ -194,7 +194,7 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
+    requests: {
       default: {
         search: "acme",
         limit: 10,

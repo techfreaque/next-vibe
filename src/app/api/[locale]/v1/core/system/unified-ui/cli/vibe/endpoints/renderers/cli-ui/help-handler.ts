@@ -47,7 +47,7 @@ const CLI_FLAG_STRINGS = {
  */
 interface EndpointDefinition {
   requestSchema?: z.ZodTypeAny;
-  requestUrlParamsSchema?: z.ZodTypeAny;
+  requestUrlPathParamsSchema?: z.ZodTypeAny;
 }
 
 /**
@@ -223,12 +223,12 @@ export class HelpHandler {
     }
 
     // Generate help for URL parameters
-    if (endpoint.requestUrlParamsSchema) {
-      const urlParams = this.extractParametersFromSchema(
-        endpoint.requestUrlParamsSchema,
+    if (endpoint.requestUrlPathParamsSchema) {
+      const urlPathParams = this.extractParametersFromSchema(
+        endpoint.requestUrlPathParamsSchema,
         "url",
       );
-      parameters.push(...urlParams);
+      parameters.push(...urlPathParams);
     }
 
     return parameters;
@@ -382,12 +382,12 @@ export class HelpHandler {
       }
 
       // Add URL parameter flags
-      const zodWithDef = endpoint.requestUrlParamsSchema as
+      const zodWithDef = endpoint.requestUrlPathParamsSchema as
         | ZodWithDef
         | undefined;
       if (zodWithDef?.shape) {
-        const urlParams = Object.keys(zodWithDef.shape);
-        for (const param of urlParams) {
+        const urlPathParams = Object.keys(zodWithDef.shape);
+        for (const param of urlPathParams) {
           // eslint-disable-next-line i18next/no-literal-string
           usage += ` [${CLI_FLAGS.PREFIX}${param} <value>]`;
         }

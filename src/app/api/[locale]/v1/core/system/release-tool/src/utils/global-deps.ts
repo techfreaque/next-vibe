@@ -87,7 +87,6 @@ export async function handleGlobalDependencyUpdates(
     const packageJsonResponse = getPackageJson(cwd, logger);
 
     if (!packageJsonResponse.success) {
-      // eslint-disable-next-line i18next/no-literal-string
       logger.error(
         `Failed to read package.json for ${pkg.directory}`,
         packageJsonResponse.message,
@@ -104,7 +103,6 @@ export async function handleGlobalDependencyUpdates(
         logger,
       );
     } catch (error) {
-      // eslint-disable-next-line i18next/no-literal-string
       logger.error(
         `Failed to update dependencies for ${packageJsonResponse.data.name}:`,
         error,
@@ -162,7 +160,7 @@ function updatePackageDependencies(
       cwd,
 
       stdio: "inherit",
-      // eslint-disable-next-line node/no-process-env
+
       env: { ...process.env },
       timeout: 120000, // 2 minutes timeout
     });

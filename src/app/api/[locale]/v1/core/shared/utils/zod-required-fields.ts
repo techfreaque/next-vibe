@@ -28,13 +28,13 @@ export function safeGetRequiredFields(schema: z.ZodTypeAny): string[] {
     }
 
     // Handle other schema types that might have nested objects
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+
     if (
-      (schema._def as any).typeName === "ZodEffects" &&
+      "typeName" in schema._def &&
+      schema._def.typeName === "ZodEffects" &&
       "schema" in schema._def
     ) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-      return safeGetRequiredFields((schema._def as any).schema as z.ZodTypeAny);
+      return safeGetRequiredFields(schema._def.schema as z.ZodTypeAny);
     }
 
     if (schema instanceof z.ZodDefault) {
@@ -80,13 +80,13 @@ function isFieldRequired(fieldSchema: z.ZodTypeAny): boolean {
     }
 
     // Check if field is wrapped in effects (like transforms)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+
     if (
-      (fieldSchema._def as any).typeName === "ZodEffects" &&
+      "typeName" in fieldSchema._def &&
+      fieldSchema._def.typeName === "ZodEffects" &&
       "schema" in fieldSchema._def
     ) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-      return isFieldRequired((fieldSchema._def as any).schema as z.ZodTypeAny);
+      return isFieldRequired(fieldSchema._def.schema as z.ZodTypeAny);
     }
 
     // For union types, check if undefined/null is allowed

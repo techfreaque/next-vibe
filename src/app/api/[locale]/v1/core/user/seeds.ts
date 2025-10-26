@@ -3,6 +3,7 @@
  * Provides seed data for auth-related tables
  */
 
+import { parseError } from "next-vibe/shared/utils";
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 
 import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
@@ -209,7 +210,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       }
     }
   } catch (error) {
-    logger.error("Error creating user roles:", error);
+    logger.error("Error creating user roles:", parseError(error));
     // Don't throw the error, just log it and continue
     // This allows the seed to complete even if roles can't be created
   }
@@ -350,7 +351,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
       }
     }
   } catch (error) {
-    logger.error("Error creating test user roles:", error);
+    logger.error("Error creating test user roles:", parseError(error));
     // Don't throw the error, just log it and continue
   }
 
@@ -434,7 +435,7 @@ export async function prod(logger: EndpointLogger): Promise<void> {
       }
     }
   } catch (error) {
-    logger.error("Error creating admin user or role:", error);
+    logger.error("Error creating admin user or role:", parseError(error));
     // Don't throw the error, just log it and continue
   }
 

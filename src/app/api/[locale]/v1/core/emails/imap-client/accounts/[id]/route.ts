@@ -15,14 +15,14 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ urlVariables, user, locale, logger }) =>
-      imapAccountsRepository.getAccountById(urlVariables, user, locale, logger),
+    handler: ({ urlPathParams, user, locale, logger }) =>
+      imapAccountsRepository.getAccountById(urlPathParams, user, locale, logger),
   },
   [Methods.PUT]: {
     email: undefined,
-    handler: ({ data, urlVariables, user, locale, logger }) =>
+    handler: ({ data, urlPathParams, user, locale, logger }) =>
       imapAccountsRepository.updateAccount(
-        { ...data, id: urlVariables.id },
+        { ...data, id: urlPathParams.id },
         user,
         locale,
         logger,
@@ -30,7 +30,7 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
   },
   [Methods.DELETE]: {
     email: undefined,
-    handler: ({ urlVariables, user, locale, logger }) =>
-      imapAccountsRepository.deleteAccount(urlVariables, user, locale, logger),
+    handler: ({ urlPathParams, user, locale, logger }) =>
+      imapAccountsRepository.deleteAccount(urlPathParams, user, locale, logger),
   },
 });

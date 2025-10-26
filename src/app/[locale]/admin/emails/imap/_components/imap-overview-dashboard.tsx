@@ -327,19 +327,17 @@ export function ImapOverviewDashboard(): JSX.Element {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {healthData.data.performanceMetrics.map((metric, index) => (
-              <div key={index} className="text-center">
-                <div
-                  className={`text-2xl font-bold ${getStatusColor(metric.status)}`}
-                >
-                  {metric.value}
-                  {metric.unit && (
-                    <span className="text-sm ml-1">{metric.unit}</span>
-                  )}
-                </div>
-                <div className="text-sm text-gray-600">{t(metric.name)}</div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">
+                {healthData.data.performanceMetrics.avgResponseTime}
+                <span className="text-sm ml-1">ms</span>
               </div>
-            ))}
+              <div className="text-sm text-gray-600">
+                {t(
+                  "app.api.v1.core.emails.imapClient.health.health.get.response.data.performanceMetrics.avgResponseTime",
+                )}
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

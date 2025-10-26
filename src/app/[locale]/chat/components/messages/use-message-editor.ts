@@ -5,6 +5,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 import { TIMING } from "../../lib/config/constants";
@@ -86,7 +87,7 @@ export function useMessageEditor({
     try {
       await onBranch(message.id, trimmedContent);
     } catch (error) {
-      logger.error("Failed to branch message", error);
+      logger.error("Failed to branch message", parseError(error));
       // Error is logged, no need to throw
     } finally {
       setIsLoading(false);

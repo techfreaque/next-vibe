@@ -57,80 +57,42 @@ export function WidgetRenderer({
 
     case WidgetType.MARKDOWN:
       return (
-        <MarkdownWidget
-          {...baseProps}
-          // eslint-disable-next-line no-restricted-syntax
-          data={data as unknown as MarkdownWidgetData}
-        />
+        <MarkdownWidget {...baseProps} data={data as MarkdownWidgetData} />
       );
 
     // Link widgets
     case WidgetType.LINK:
-      return (
-        <LinkWidget
-          {...baseProps}
-          // eslint-disable-next-line no-restricted-syntax
-          data={data as unknown as LinkWidgetData}
-        />
-      );
+      return <LinkWidget {...baseProps} data={data as LinkWidgetData} />;
 
     // Code widgets
     case WidgetType.CODE_OUTPUT:
       return (
-        <CodeOutputWidget
-          {...baseProps}
-          // eslint-disable-next-line no-restricted-syntax
-          data={data as unknown as CodeOutputWidgetData}
-        />
+        <CodeOutputWidget {...baseProps} data={data as CodeOutputWidgetData} />
       );
 
     // Metric widgets
     case WidgetType.METRIC_CARD:
       return (
-        <MetricCardWidget
-          {...baseProps}
-          // eslint-disable-next-line no-restricted-syntax
-          data={data as unknown as MetricCardWidgetData}
-        />
+        <MetricCardWidget {...baseProps} data={data as MetricCardWidgetData} />
       );
 
     case WidgetType.STATS_GRID:
       return (
-        <StatsGridWidget
-          {...baseProps}
-          // eslint-disable-next-line no-restricted-syntax
-          data={data as unknown as StatsGridWidgetData}
-        />
+        <StatsGridWidget {...baseProps} data={data as StatsGridWidgetData} />
       );
 
     // Layout widgets
     case WidgetType.CONTAINER:
       return (
-        <ContainerWidget
-          {...baseProps}
-          // eslint-disable-next-line no-restricted-syntax
-          data={data as unknown as ContainerWidgetData}
-        />
+        <ContainerWidget {...baseProps} data={data as ContainerWidgetData} />
       );
 
     // Custom widget types for search results
     case WidgetType.LINK_CARD:
-      return (
-        <LinkCardWidget
-          {...baseProps}
-          // eslint-disable-next-line no-restricted-syntax
-          data={data as unknown as LinkCardData}
-        />
-      );
+      return <LinkCardWidget {...baseProps} data={data as LinkCardData} />;
 
     case WidgetType.LINK_LIST:
-      return (
-        <LinkListWidget
-          {...baseProps}
-          // eslint-disable-next-line no-restricted-syntax
-          data={data as unknown as LinkListData}
-        />
-      );
+      return <LinkListWidget {...baseProps} data={data as LinkListData} />;
 
     // Fallback to text widget
     default:

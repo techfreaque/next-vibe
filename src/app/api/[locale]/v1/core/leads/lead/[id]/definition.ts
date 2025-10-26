@@ -16,7 +16,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli
 import {
   objectField,
   requestDataField,
-  requestUrlParamsField,
+  requestUrlPathParamsField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -54,10 +54,10 @@ const { GET } = createEndpoint({
       description: "app.api.v1.core.leads.lead.id.get.form.description",
       layout: { type: LayoutType.STACKED },
     },
-    { request: "urlParams", response: true },
+    { request: "urlPathParams", response: true },
     {
       // === URL PARAMETERS ===
-      id: requestUrlParamsField(
+      id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
@@ -440,7 +440,7 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: { id: "550e8400-e29b-41d4-a716-446655440000" },
     },
     requests: undefined,
@@ -515,10 +515,10 @@ const { PATCH } = createEndpoint({
       description: "app.api.v1.core.leads.lead.id.patch.form.description",
       layout: { type: LayoutType.STACKED },
     },
-    { request: "data&urlParams", response: true },
+    { request: "data&urlPathParams", response: true },
     {
       // === URL PARAMETERS ===
-      id: requestUrlParamsField(
+      id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
@@ -1195,7 +1195,7 @@ const { PATCH } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: { id: "550e8400-e29b-41d4-a716-446655440000" },
     },
     requests: {

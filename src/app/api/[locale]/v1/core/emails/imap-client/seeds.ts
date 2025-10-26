@@ -4,6 +4,7 @@
  */
 
 import { eq } from "drizzle-orm";
+import { parseError } from "next-vibe/shared/utils";
 
 import { env } from "@/config/env";
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
@@ -102,7 +103,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       `✅ Seeded IMAP account: ${seedAccount.name} (${seedAccount.email})`,
     );
   } catch (error) {
-    logger.error("❌ Failed to seed IMAP accounts:", error);
+    logger.error("❌ Failed to seed IMAP accounts:", parseError(error));
   }
 }
 

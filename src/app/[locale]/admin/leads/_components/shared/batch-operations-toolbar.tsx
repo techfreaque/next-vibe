@@ -46,13 +46,9 @@ interface BatchOperationsToolbarProps {
       notes?: string;
     },
     scope: typeof BatchOperationScopeValues,
-    currentFilters: Record<string, string | number | boolean | undefined>,
   ) => void;
-  onBatchDelete: (
-    scope: typeof BatchOperationScopeValues,
-    currentFilters: Record<string, string | number | boolean | undefined>,
-  ) => void;
-  currentFilters: Record<string, string | number | boolean | undefined>;
+  onBatchDelete: (scope: typeof BatchOperationScopeValues) => void;
+  currentFilters: unknown;
   isLoading?: boolean;
   resetTrigger?: number; // Used to trigger state reset
 }
@@ -90,7 +86,7 @@ export function BatchOperationsToolbar({
     }
 
     if (selectedAction === "delete") {
-      onBatchDelete(operationScope, currentFilters);
+      onBatchDelete(operationScope);
       // Don't reset the action immediately - let the user see the result
       return;
     }
@@ -117,7 +113,7 @@ export function BatchOperationsToolbar({
       updates.notes = selectedValue;
     }
 
-    onBatchUpdate(updates, operationScope, currentFilters);
+    onBatchUpdate(updates, operationScope);
     // Don't reset the action immediately - let the user see the result
   };
 

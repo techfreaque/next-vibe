@@ -78,7 +78,7 @@ export function useCustomerPortal(logger: EndpointLogger): {
       requestData: {
         returnUrl,
       },
-      urlParams: undefined as never,
+      urlPathParams: undefined as never,
     });
   };
 

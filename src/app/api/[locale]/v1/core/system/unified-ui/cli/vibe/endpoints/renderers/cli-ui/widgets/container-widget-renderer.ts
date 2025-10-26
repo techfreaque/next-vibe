@@ -39,15 +39,13 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
     field: ResponseFieldMetadata,
     context: WidgetRenderContext,
   ): string {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const config = this.getContainerConfig(field);
     const result: string[] = [];
 
     // Add container title if present
     if (field.label) {
       const title = context.translate(field.label);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, i18next/no-literal-string
-      const titleIcon = (config.icon as string) || "📊 ";
+      const titleIcon = (config.icon) || "📊 ";
       const titleWithIcon = titleIcon + title;
       const styledTitle = this.styleText(titleWithIcon, "bold", context);
       result.push(styledTitle);
@@ -72,18 +70,14 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
    */
   private renderFields(
     data: Record<string, string | number | boolean>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     config: any,
     context: WidgetRenderContext,
   ): string {
     const result: string[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     const layout = config.layout || { type: "vertical", columns: 1 };
 
     // For grid layout with multiple columns, render in a grid format
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (layout.type === "grid" && layout.columns > 1) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
       return this.renderGridLayout(data, layout.columns, context);
     }
 
@@ -188,7 +182,6 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
   /**
    * Get container configuration
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private getContainerConfig(_field: ResponseFieldMetadata): any {
     const config = _field.config || {};
 

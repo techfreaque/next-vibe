@@ -25,7 +25,7 @@ export function useCronTask(
   return useEndpoint(
     endpoints,
     {
-      urlParams: { id: params.taskId },
+      urlPathParams: { id: params.taskId },
       queryOptions: {
         enabled: params.enabled ?? true,
         refetchOnWindowFocus: false,

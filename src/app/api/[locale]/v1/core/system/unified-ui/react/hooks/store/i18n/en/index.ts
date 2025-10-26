@@ -49,4 +49,18 @@ export const translations = {
       description: "Operation completed successfully",
     },
   },
+  errors: {
+    validation_failed: "Validation failed",
+    request_failed: "Request failed",
+    mutation_failed: "Mutation failed",
+    unexpected_failure: "Unexpected error occurred",
+    refetch_failed: "Failed to refetch data",
+  },
+  status: {
+    loading_data: "Loading data...",
+    cached_data: "Using cached data",
+    success: "Success",
+    mutation_pending: "Mutation pending...",
+    mutation_success: "Mutation successful",
+  },
 };

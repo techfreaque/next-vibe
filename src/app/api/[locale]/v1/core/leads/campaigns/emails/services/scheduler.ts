@@ -4,6 +4,7 @@
  */
 
 import { and, count, eq, isNotNull, isNull, lt, sql } from "drizzle-orm";
+import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
@@ -123,7 +124,7 @@ export class CampaignSchedulerService {
         logger.info("campaign.schedule.initial.skip.ineligible", {
           leadId,
           status: lead.status,
-          convertedAt: lead.convertedAt,
+          convertedAt: lead.convertedAt?.toISOString() || null,
         });
         return null;
       }
@@ -170,7 +171,9 @@ export class CampaignSchedulerService {
 
       return campaignId;
     } catch (error) {
-      logger.error("campaign.schedule.initial.error", { error, leadId });
+      logger.error("campaign.schedule.initial.error", parseError(error), {
+        leadId,
+      });
       return null;
     }
   }
@@ -232,7 +235,7 @@ export class CampaignSchedulerService {
 
       return campaign.id;
     } catch (error) {
-      logger.error("campaign.schedule.email.error", { error, options });
+      logger.error("campaign.schedule.email.error", parseError(error));
       return null;
     }
   }
@@ -271,8 +274,7 @@ export class CampaignSchedulerService {
         logger,
       );
     } catch (error) {
-      logger.error("campaign.schedule.next.error", {
-        error,
+      logger.error("campaign.schedule.next.error", parseError(error), {
         leadId,
         currentStage,
         journeyVariant,
@@ -351,7 +353,7 @@ export class CampaignSchedulerService {
         },
       }));
     } catch (error) {
-      logger.error("campaign.pending.emails.error", { error });
+      logger.error("campaign.pending.emails.error", parseError(error));
       return [];
     }
   }
@@ -384,7 +386,9 @@ export class CampaignSchedulerService {
 
       return true;
     } catch (error) {
-      logger.error("campaign.mark.email.sent.error", { error, campaignId });
+      logger.error("campaign.mark.email.sent.error", parseError(error), {
+        campaignId,
+      });
       return false;
     }
   }
@@ -427,8 +431,7 @@ export class CampaignSchedulerService {
 
       return result.rowCount || 0;
     } catch (error) {
-      logger.error("campaign.cancel.scheduled.emails.error", {
-        error,
+      logger.error("campaign.cancel.scheduled.emails.error", parseError(error), {
         leadId,
       });
       return 0;
@@ -487,7 +490,7 @@ export class CampaignSchedulerService {
 
       return result;
     } catch (error) {
-      logger.error("campaign.stats.error", { error });
+      logger.error("campaign.stats.error", parseError(error));
       return {
         total: 0,
         pending: 0,

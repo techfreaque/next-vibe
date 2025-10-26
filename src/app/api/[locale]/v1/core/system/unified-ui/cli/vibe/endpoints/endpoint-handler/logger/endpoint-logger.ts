@@ -5,13 +5,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { EndpointLogger } from "./types";
-
-// Type for logger arguments to satisfy ESLint
-interface LoggerArg {
-  [key: string]: string | number | boolean | null;
-}
-type LoggerArgs = Array<string | number | boolean | null | LoggerArg>;
+import type { EndpointLogger, LoggerMetadata } from "./types";
 
 /**
  * Creates a logger instance for endpoint handlers
@@ -34,32 +28,32 @@ export function createEndpointLogger(
   };
 
   return {
-    info(message: TranslationKey, ...args: LoggerArgs): void {
-      console.log(formatMessage("INFO", message), ...args);
+    info(message: TranslationKey, ...metadata: LoggerMetadata[]): void {
+      console.log(formatMessage("INFO", message), ...metadata);
     },
 
     error(
       message: TranslationKey,
-      error?: LoggerArg,
-      ...args: LoggerArgs
+      error?: LoggerMetadata,
+      ...metadata: LoggerMetadata[]
     ): void {
       const typedError = error ? parseError(error) : undefined;
-      console.error(formatMessage("ERROR", message), typedError, ...args);
+      console.error(formatMessage("ERROR", message), typedError, ...metadata);
     },
 
-    vibe(message: TranslationKey, ...args: LoggerArgs): void {
+    vibe(message: TranslationKey, ...metadata: LoggerMetadata[]): void {
       // Special vibe formatting
       const translatedMessage = t(message);
-      console.log(`[${getElapsedTime()}] ${translatedMessage}`, ...args);
+      console.log(`[${getElapsedTime()}] ${translatedMessage}`, ...metadata);
     },
 
-    debug(message: TranslationKey, ...args: LoggerArgs): void {
+    debug(message: TranslationKey, ...metadata: LoggerMetadata[]): void {
       if (debugEnabled) {
-        console.log(formatMessage("DEBUG", message), ...args);
+        console.log(formatMessage("DEBUG", message), ...metadata);
       }
     },
-    warn(message: TranslationKey, ...args: LoggerArgs): void {
-      console.warn(formatMessage("WARN", message), ...args);
+    warn(message: TranslationKey, ...metadata: LoggerMetadata[]): void {
+      console.warn(formatMessage("WARN", message), ...metadata);
     },
     isDebugEnabled: debugEnabled,
   };

@@ -3,6 +3,7 @@
  * Provides seed validation for Stripe CLI integration
  */
 
+import { parseError } from "next-vibe/shared/utils";
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 
 import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
@@ -39,7 +40,7 @@ export function dev(logger: EndpointLogger): void {
 
     logger.debug("✅ Stripe CLI integration validated for development");
   } catch (error) {
-    logger.error("Error validating Stripe CLI integration:", error);
+    logger.error("Error validating Stripe CLI integration:", parseError(error));
   }
 }
 
@@ -61,7 +62,7 @@ export function test(logger: EndpointLogger): void {
       );
     }
   } catch (error) {
-    logger.error("Error validating test Stripe CLI configuration:", error);
+    logger.error("Error validating test Stripe CLI configuration:", parseError(error));
   }
 }
 
@@ -93,7 +94,7 @@ export function prod(logger: EndpointLogger): void {
 
     logger.debug("✅ Production Stripe integration validated");
   } catch (error) {
-    logger.error("Error validating production Stripe integration:", error);
+    logger.error("Error validating production Stripe integration:", parseError(error));
   }
 }
 

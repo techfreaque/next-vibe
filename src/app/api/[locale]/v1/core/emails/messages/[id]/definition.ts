@@ -15,7 +15,7 @@ import {
 import { createEndpoint } from "../../../system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import {
   objectField,
-  requestUrlParamsField,
+  requestUrlPathParamsField,
   responseField,
 } from "../../../system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "../../../user/user-roles/enum";
@@ -37,10 +37,10 @@ const { GET } = createEndpoint({
       description: "app.api.v1.core.emails.messages.id.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: "urlParams", response: true },
+    { request: "urlPathParams", response: true },
     {
       // === URL PARAMETER ===
-      id: requestUrlParamsField(
+      id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -290,7 +290,7 @@ const { GET } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: {
         id: "123e4567-e89b-12d3-a456-426614174000",
       },

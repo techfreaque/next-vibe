@@ -141,7 +141,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
 
       return createSuccessResponse({ messages: mappedMessages });
     } catch (error) {
-      logger.error("Error listing messages", error);
+      logger.error("Error listing messages", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.agent.chat.threads.threadId.messages.get.errors.server.title" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -295,7 +295,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
         createdAt: message.createdAt,
       });
     } catch (error) {
-      logger.error("Error creating message", error);
+      logger.error("Error creating message", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.agent.chat.threads.threadId.messages.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,

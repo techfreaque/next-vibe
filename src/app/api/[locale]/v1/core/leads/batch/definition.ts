@@ -350,7 +350,7 @@ const { PATCH } = createEndpoint({
       "app.api.v1.core.leads.batch.patch.success.description" as const,
   },
   examples: {
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
     requests: {
       default: {
         search: "",
@@ -607,7 +607,7 @@ const { DELETE } = createEndpoint({
       "app.api.v1.core.leads.batch.delete.success.description" as const,
   },
   examples: {
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
     requests: {
       default: {
         search: "",
@@ -654,5 +654,5 @@ const definitions = {
   DELETE,
 };
 
-export { DELETE, PATCH };
+export { BatchOperationScope, DELETE, PATCH };
 export default definitions;

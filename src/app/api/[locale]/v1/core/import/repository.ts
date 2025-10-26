@@ -146,7 +146,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         isChunkedProcessing: false,
       });
     } catch (error) {
-      logger.error("Error importing CSV", error);
+      logger.error("Error importing CSV", parseError(error).message);
       return createErrorResponse(
         "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -232,7 +232,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         jobId: createdJob.id,
       });
     } catch (error) {
-      logger.error("Error creating chunked import job", error);
+      logger.error("Error creating chunked import job", parseError(error).message);
       return createErrorResponse(
         "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -288,7 +288,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         completedAt: jobData.completedAt?.toISOString() || null,
       });
     } catch (error) {
-      logger.error("Error getting CSV import job status", error);
+      logger.error("Error getting CSV import job status", parseError(error).message);
       return createErrorResponse(
         "app.admin.leads.leadsErrors.leads.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -408,7 +408,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         hasMore,
       });
     } catch (error) {
-      logger.error("Error processing batch", error);
+      logger.error("Error processing batch", parseError(error).message);
 
       // Mark job as failed
       await db
@@ -632,7 +632,7 @@ export class ImportRepositoryImpl implements ImportRepository {
 
       return createSuccessResponse({ jobs: transformedJobs });
     } catch (error) {
-      logger.error("Error listing import jobs", error);
+      logger.error("Error listing import jobs", parseError(error).message);
       return createErrorResponse(
         "app.admin.leads.leadsErrors.leads.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -723,7 +723,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         completedAt: job.completedAt?.toISOString() || null,
       });
     } catch (error) {
-      logger.error("Error updating import job", error);
+      logger.error("Error updating import job", parseError(error).message);
       return createErrorResponse(
         "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -767,7 +767,7 @@ export class ImportRepositoryImpl implements ImportRepository {
           "app.admin.leads.leadsErrors.leadsImport.delete.success.description",
       });
     } catch (error) {
-      logger.error("Error deleting import job:", error);
+      logger.error("Error deleting import job:", parseError(error).message);
       return createErrorResponse(
         "app.admin.leads.leadsErrors.leadsImport.delete.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -868,7 +868,7 @@ export class ImportRepositoryImpl implements ImportRepository {
           );
       }
     } catch (error) {
-      logger.error("Error performing job action", error);
+      logger.error("Error performing job action", parseError(error).message);
       return createErrorResponse(
         "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,

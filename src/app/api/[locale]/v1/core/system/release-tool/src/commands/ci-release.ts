@@ -54,7 +54,6 @@ const CLI_MESSAGES = {
  */
 // Helper to get environment variable safely
 function getEnvVar(key: string): string | undefined {
-  // eslint-disable-next-line node/no-process-env
   return process.env[key];
 }
 
@@ -205,7 +204,7 @@ function runCiReleaseCommand(
   const ciEnv: Record<string, string> = {};
 
   // Copy all environment variables
-  // eslint-disable-next-line node/no-process-env
+
   for (const key in process.env) {
     const value = getEnvVar(key);
     if (value !== undefined) {

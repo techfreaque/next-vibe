@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Check, Clock, Loader, Sparkles, Users } from "lucide-react";
 import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
+import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import {
@@ -16,7 +17,6 @@ import {
 } from "next-vibe-ui/ui/card";
 import { Label } from "next-vibe-ui/ui/label";
 import { Switch } from "next-vibe-ui/ui/switch";
-import { useToast } from "next-vibe-ui/hooks/use-toast";
 import type { JSX } from "react";
 import { useState } from "react";
 import { useInView } from "react-intersection-observer";

@@ -3,11 +3,13 @@
  * Provides seed data for subscription-related tables
  */
 
+import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
+import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
-import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 
+import { creditRepository } from "../credits/repository";
 import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { NewSubscription } from "./db";
 import { subscriptions } from "./db";
@@ -112,10 +114,6 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 
     // Always ensure subscription credits exist (even if subscription already existed)
     if (subscription) {
-      const { creditRepository } = await import(
-        "../agent/chat/credits/repository"
-      );
-
       // Check if user already has subscription credits
       const balanceResult = await creditRepository.getBalance(demoUser.id);
       const hasCredits = balanceResult.success && balanceResult.data.total > 0;
@@ -207,10 +205,6 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 
       // Always ensure subscription credits exist (even if subscription already existed)
       if (adminSubscriptionData) {
-        const { creditRepository } = await import(
-          "../agent/chat/credits/repository"
-        );
-
         // Check if user already has subscription credits
         const balanceResult = await creditRepository.getBalance(adminUser.id);
         const hasCredits =
@@ -247,7 +241,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       }
     }
   } catch (error) {
-    logger.error("Error creating development subscription seeds:", error);
+    logger.error("Error creating development subscription seeds:", parseError(error));
     // Don't throw error - continue with other seeds
   }
 
@@ -311,10 +305,6 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 
       // Always ensure subscription credits exist (only 3 credits for testing)
       if (subscription) {
-        const { creditRepository } = await import(
-          "../agent/chat/credits/repository"
-        );
-
         // Check if user already has subscription credits
         const balanceResult = await creditRepository.getBalance(
           lowCreditsUser.id,
@@ -357,7 +347,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       }
     }
   } catch (error) {
-    logger.error("Error creating low credits user seeds:", error);
+    logger.error("Error creating low credits user seeds:", parseError(error));
     // Don't throw error - continue with other seeds
   }
 
@@ -444,7 +434,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
       }
     }
   } catch (error) {
-    logger.error("Error preparing subscription test seeds:", error);
+    logger.error("Error preparing subscription test seeds:", parseError(error));
     // Don't throw error - continue with other seeds
   }
 
@@ -509,7 +499,7 @@ export async function prod(logger: EndpointLogger): Promise<void> {
 
     logger.debug("✅ Subscription system verified for production");
   } catch (error) {
-    logger.error("Error in subscription production setup:", error);
+    logger.error("Error in subscription production setup:", parseError(error));
     // Don't throw error - log and continue
   }
 

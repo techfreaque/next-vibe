@@ -128,15 +128,15 @@ export interface ApiEndpoint<
     (ExtractInput<
       InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
     > extends undefined
-      ? { urlPathVariables?: undefined }
+      ? { urlPathParams?: undefined }
       : ExtractInput<
             InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
           > extends never
         ? {
-            urlPathVariables?: undefined;
+            urlPathParams?: undefined;
           }
         : {
-            urlPathVariables: ExamplesList<
+            urlPathParams: ExamplesList<
               ExtractInput<
                 InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
               >,
@@ -180,7 +180,7 @@ export interface ApiEndpoint<
 }
 
 // --- COMPILE-TIME TYPE INFERENCE FROM UNIFIED FIELDS ---
-// Ergonomic system that prevents requestData + requestUrlParams conflicts
+// Ergonomic system that prevents requestData + requestUrlPathParams conflicts
 
 // Extract core properties from UnifiedField - handle all the extra properties
 export type ExtractFieldCore<F> = F extends {
@@ -203,7 +203,7 @@ type FieldCore<F> = ExtractFieldCore<F>;
 // Usage checking helpers
 type HasResponseUsage<U> = U extends { response: true } ? true : false;
 type HasRequestDataUsage<U> = U extends { request: "data" } ? true : false;
-type HasRequestUrlParamsUsage<U> = U extends { request: "urlParams" }
+type HasRequestUrlParamsUsage<U> = U extends { request: "urlPathParams" }
   ? true
   : false;
 
@@ -314,7 +314,7 @@ export type CreateApiEndpoint<
   >,
 > = ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields> & {
   readonly requestSchema: InferSchemaFromField<TFields, FieldUsage.RequestData>;
-  readonly requestUrlParamsSchema: InferSchemaFromField<
+  readonly requestUrlPathParamsSchema: InferSchemaFromField<
     TFields,
     FieldUsage.RequestUrlParams
   >;
@@ -408,7 +408,7 @@ export function createEndpoint<
     aiTool: config.aiTool,
     requestSchema,
     responseSchema,
-    requestUrlParamsSchema: requestUrlSchema,
+    requestUrlPathParamsSchema: requestUrlSchema,
     requiresAuthentication,
     types: {
       RequestInput: undefined! as ExtractInput<

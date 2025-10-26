@@ -106,7 +106,7 @@ export class EndpointDiscoveryService {
           }
         }
       }
-    } catch (error) {
+    } catch {
       // Directory read failed, continue silently
       // These are expected during development (permission issues, symlinks, etc.)
     }
@@ -147,7 +147,7 @@ export class EndpointDiscoveryService {
       }
 
       // Extract metadata from definition
-      const metadata = await this.extractMetadata(
+      const metadata = this.extractMetadata(
         definition,
         routePath,
         definitionPath,
@@ -155,7 +155,7 @@ export class EndpointDiscoveryService {
       );
 
       return metadata;
-    } catch (error) {
+    } catch {
       // Definition file exists but failed to load - this is a real error
       // Suppress warnings for now as these are expected during development
       // (TypeScript path aliases don't work in dynamic imports during discovery)
@@ -166,12 +166,14 @@ export class EndpointDiscoveryService {
   /**
    * Extract metadata from endpoint definition
    */
-  private async extractMetadata(
-    definition: any,
+  private extractMetadata(
+    // eslint-disable-next-line no-restricted-syntax
+    definition: unknown,
     routePath: string,
     definitionPath: string,
-    routeModule: any,
-  ): Promise<DiscoveredEndpointMetadata | null> {
+    // eslint-disable-next-line no-restricted-syntax
+    routeModule: unknown,
+  ): DiscoveredEndpointMetadata | null {
     try {
       // Determine which HTTP methods are available
       const availableMethods: Methods[] = [];
@@ -182,7 +184,12 @@ export class EndpointDiscoveryService {
         "PATCH",
         "DELETE",
       ] as Methods[]) {
-        if (routeModule[method] || definition[method]) {
+        if (
+          (routeModule &&
+            typeof routeModule === "object" &&
+            method in routeModule) ||
+          (definition && typeof definition === "object" && method in definition)
+        ) {
           availableMethods.push(method);
         }
       }
@@ -193,9 +200,13 @@ export class EndpointDiscoveryService {
 
       // Use the first available method for metadata
       const method = availableMethods[0];
-      const methodDef = definition[method];
+      const methodDef =
+        definition && typeof definition === "object"
+          ? // eslint-disable-next-line no-restricted-syntax
+            (definition as Record<string, unknown>)[method]
+          : undefined;
 
-      if (!methodDef) {
+      if (!methodDef || typeof methodDef !== "object") {
         return null;
       }
 
@@ -207,6 +218,8 @@ export class EndpointDiscoveryService {
       const name = this.generateEndpointName(apiPath);
 
       // Extract metadata
+      // eslint-disable-next-line no-restricted-syntax
+      const methodDefRecord = methodDef as Record<string, unknown>;
       const metadata: DiscoveredEndpointMetadata = {
         id,
         name,
@@ -214,18 +227,24 @@ export class EndpointDiscoveryService {
         routePath,
         definitionPath,
         method,
-        title: methodDef.title || "",
-        description: methodDef.description || "",
-        category: methodDef.category || "",
-        tags: methodDef.tags || [],
-        allowedRoles: methodDef.allowedRoles || [],
-        requiresAuth: this.determineAuthRequirement(methodDef.allowedRoles),
-        requestSchema: methodDef.fields?.schema,
-        responseSchema: methodDef.fields?.schema,
+        title: (methodDefRecord.title as string) || "",
+        description: (methodDefRecord.description as string) || "",
+        category: (methodDefRecord.category as string) || "",
+        tags: (methodDefRecord.tags as string[]) || [],
+        allowedRoles: (methodDefRecord.allowedRoles as string[]) || [],
+        requiresAuth: this.determineAuthRequirement(
+          (methodDefRecord.allowedRoles as string[]) || [],
+        ),
+        // eslint-disable-next-line no-restricted-syntax
+        requestSchema: (methodDefRecord.fields as Record<string, unknown>)
+          ?.schema,
+        // eslint-disable-next-line no-restricted-syntax
+        responseSchema: (methodDefRecord.fields as Record<string, unknown>)
+          ?.schema,
       };
 
       return metadata;
-    } catch (error) {
+    } catch {
       // Suppress warnings for metadata extraction failures
       // These are expected during development (TypeScript path aliases, etc.)
       return null;
@@ -265,7 +284,7 @@ export class EndpointDiscoveryService {
   /**
    * Determine if endpoint requires authentication
    */
-  private determineAuthRequirement(allowedRoles: readonly any[]): boolean {
+  private determineAuthRequirement(allowedRoles: readonly string[]): boolean {
     // If PUBLIC role is in allowed roles, auth is not required
     return !allowedRoles.includes("PUBLIC");
   }

@@ -20,7 +20,7 @@ export const { POST, tools } = endpointsHandler({
       >,
     ): Promise<ResponseType<VotePostResponseOutput>> => {
       return await voteRepository.voteMessage(
-        props.urlVariables,
+        props.urlPathParams,
         props.data,
         props.user,
         props.locale,

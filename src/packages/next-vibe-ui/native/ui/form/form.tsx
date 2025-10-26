@@ -4,7 +4,7 @@
  */
 import { Text, View } from "react-native";
 
-export function Form(props: any) {
+export function Form(props) {
   console.warn("🔶 Using stub: Form");
   return (
     <View style={{ padding: 8, backgroundColor: "#FEF3C7", marginVertical: 4 }}>

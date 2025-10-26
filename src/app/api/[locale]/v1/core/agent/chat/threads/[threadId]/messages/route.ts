@@ -32,7 +32,7 @@ export const { GET, POST, tools } = endpointsHandler({
       >,
     ): Promise<ResponseType<MessageListResponseOutput>> => {
       return await messagesRepository.listMessages(
-        { threadId: props.urlVariables.threadId },
+        { threadId: props.urlPathParams.threadId },
         props.user,
         props.locale,
         props.logger,
@@ -51,7 +51,7 @@ export const { GET, POST, tools } = endpointsHandler({
       return await messagesRepository.createMessage(
         {
           ...props.data,
-          threadId: props.urlVariables.threadId,
+          threadId: props.urlPathParams.threadId,
         },
         props.user,
         props.locale,

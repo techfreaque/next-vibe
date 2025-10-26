@@ -15,16 +15,9 @@ import {
 
 import { Platform } from "../shared/config/platform-config";
 import { aiToolConfig } from "./config";
-import {
-  excludeManualTools as excludeManualToolsUtil,
-  filterByCategories,
-  filterByRoles,
-  filterBySearchQuery,
-  filterByTags,
-} from "./filter-utils";
 import type {
   AIToolExecutionContext,
-  AIToolMetadata,
+  DiscoveredEndpoint,
   IToolFilter,
   ToolFilterCriteria,
 } from "./types";
@@ -37,81 +30,90 @@ type LegacyPlatform = "cli" | "web" | "ai";
 
 /**
  * Tool Filter Implementation with Opt-Out Logic
+ * Now works with DiscoveredEndpoint[] directly
  */
 export class ToolFilter implements IToolFilter {
   /**
-   * Filter tools by user permissions
+   * Filter endpoints by user permissions
    */
-  filterByPermissions(
-    tools: AIToolMetadata[],
+  filterEndpointsByPermissions(
+    endpoints: DiscoveredEndpoint[],
     user: AIToolExecutionContext["user"],
     platform: LegacyPlatform | Platform = Platform.AI,
-  ): AIToolMetadata[] {
-    return tools.filter((tool) => this.hasPermission(tool, user, platform));
+  ): DiscoveredEndpoint[] {
+    return endpoints.filter((endpoint) =>
+      this.hasEndpointPermission(endpoint, user, platform),
+    );
   }
 
   /**
-   * Filter tools by criteria
+   * Filter endpoints by criteria
    */
-  filterByCriteria(
-    tools: AIToolMetadata[],
+  filterEndpointsByCriteria(
+    endpoints: DiscoveredEndpoint[],
     criteria: ToolFilterCriteria,
-  ): AIToolMetadata[] {
-    let filtered = tools;
+  ): DiscoveredEndpoint[] {
+    let filtered = endpoints;
 
     // Filter by roles
     if (criteria.roles && criteria.roles.length > 0) {
-      filtered = filterByRoles(filtered, criteria.roles);
+      filtered = filtered.filter((e) =>
+        criteria.roles!.some((role) => e.allowedRoles.includes(role)),
+      );
     }
 
     // Filter by categories
     if (criteria.categories && criteria.categories.length > 0) {
-      filtered = filterByCategories(filtered, criteria.categories);
+      filtered = filtered.filter((e) =>
+        criteria.categories!.includes(e.definition.category || ""),
+      );
     }
 
     // Filter by tags
     if (criteria.tags && criteria.tags.length > 0) {
-      filtered = filterByTags(filtered, criteria.tags);
-    }
-
-    // Exclude manual tools
-    if (criteria.excludeManualTools) {
-      filtered = excludeManualToolsUtil(filtered);
+      filtered = filtered.filter((e) =>
+        criteria.tags!.some((tag) => e.definition.tags?.includes(tag)),
+      );
     }
 
     // Include only enabled tools
     if (criteria.enabledOnly) {
-      // All tools in the registry are enabled by default
-      // This is a placeholder for future functionality
+      filtered = filtered.filter((e) => e.enabled);
     }
 
     // Search query
     if (criteria.searchQuery) {
-      filtered = filterBySearchQuery(filtered, criteria.searchQuery);
+      const query = criteria.searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (e) =>
+          e.toolName.toLowerCase().includes(query) ||
+          e.definition.title?.toLowerCase().includes(query) ||
+          e.definition.description?.toLowerCase().includes(query),
+      );
     }
 
     return filtered;
   }
 
   /**
-   * Check if user has permission for tool on specific platform
+   * Check if user has permission for endpoint on specific platform
    * Uses OPT-OUT logic:
-   * - Tool is accessible by default if user has the required role
-   * - Tool can opt-out of specific platforms using CLI_OFF, AI_TOOL_OFF, WEB_OFF
+   * - Endpoint is accessible by default if user has the required role
+   * - Endpoint can opt-out of specific platforms using CLI_OFF, AI_TOOL_OFF, WEB_OFF
    */
-  hasPermission(
-    tool: AIToolMetadata,
+  hasEndpointPermission(
+    endpoint: DiscoveredEndpoint,
     user: AIToolExecutionContext["user"],
     platform: LegacyPlatform | Platform = Platform.AI,
   ): boolean {
     // Check platform opt-out first
-    if (this.isOptedOutOfPlatform(tool, platform)) {
+    if (this.isEndpointOptedOutOfPlatform(endpoint, platform)) {
       return false;
     }
 
-    // Public user - only public tools
+    // Public user - only public endpoints
     if (user.isPublic) {
-      return tool.allowedRoles.includes(UserRole.PUBLIC);
+      return endpoint.allowedRoles.includes(UserRole.PUBLIC);
     }
 
     // Authenticated user - check role
@@ -120,7 +122,7 @@ export class ToolFilter implements IToolFilter {
     }
 
     // Filter out opt-out roles from allowed roles for permission check
-    const effectiveAllowedRoles = tool.allowedRoles.filter(
+    const effectiveAllowedRoles = endpoint.allowedRoles.filter(
       (role) => !this.isOptOutRole(role),
     );
 
@@ -129,25 +131,22 @@ export class ToolFilter implements IToolFilter {
   }
 
   /**
-   * Check if tool is opted out of specific platform
+   * Check if endpoint is opted out of specific platform
    */
-  private isOptedOutOfPlatform(
-    tool: AIToolMetadata,
+  private isEndpointOptedOutOfPlatform(
+    endpoint: DiscoveredEndpoint,
     platform: LegacyPlatform | Platform,
   ): boolean {
-    // Handle both legacy string values and new Platform enum
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const platformStr =
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      typeof platform === "string" ? platform : platform.toLowerCase();
+    // Normalize platform to lowercase string
+    const platformStr = String(platform).toLowerCase();
 
     switch (platformStr) {
       case "cli":
-        return tool.allowedRoles.includes(UserRole.CLI_OFF);
+        return endpoint.allowedRoles.includes(UserRole.CLI_OFF);
       case "ai":
-        return tool.allowedRoles.includes(UserRole.AI_TOOL_OFF);
+        return endpoint.allowedRoles.includes(UserRole.AI_TOOL_OFF);
       case "web":
-        return tool.allowedRoles.includes(UserRole.WEB_OFF);
+        return endpoint.allowedRoles.includes(UserRole.WEB_OFF);
       default:
         return false;
     }
@@ -195,19 +194,24 @@ export class ToolFilter implements IToolFilter {
   }
 
   /**
-   * Get available tools count by category for user
+   * Get available endpoints count by category for user
    */
-  getToolCountByCategory(
-    tools: AIToolMetadata[],
+  getEndpointCountByCategory(
+    endpoints: DiscoveredEndpoint[],
     user: AIToolExecutionContext["user"],
     platform: LegacyPlatform | Platform = Platform.AI,
   ): Record<string, number> {
-    const filtered = this.filterByPermissions(tools, user, platform);
+    const filtered = this.filterEndpointsByPermissions(
+      endpoints,
+      user,
+      platform,
+    );
     const counts: Record<string, number> = {};
 
-    for (const tool of filtered) {
-      if (tool.category) {
-        counts[tool.category] = (counts[tool.category] || 0) + 1;
+    for (const endpoint of filtered) {
+      const category = endpoint.definition.category;
+      if (category) {
+        counts[category] = (counts[category] || 0) + 1;
       }
     }
 
@@ -215,13 +219,15 @@ export class ToolFilter implements IToolFilter {
   }
 
   /**
-   * Get available tools count by role
+   * Get available endpoints count by role
    */
-  getToolCountByRole(tools: AIToolMetadata[]): Record<string, number> {
+  getEndpointCountByRole(
+    endpoints: DiscoveredEndpoint[],
+  ): Record<string, number> {
     const counts: Record<string, number> = {};
 
-    for (const tool of tools) {
-      for (const role of tool.allowedRoles) {
+    for (const endpoint of endpoints) {
+      for (const role of endpoint.allowedRoles) {
         // Only count actual user roles, not opt-out roles
         if (!this.isOptOutRole(role)) {
           const roleKey = role as string;
@@ -257,18 +263,20 @@ export class ToolFilter implements IToolFilter {
   }
 
   /**
-   * Get platforms tool is available on
+   * Get platforms endpoint is available on
    */
-  getAvailablePlatforms(tool: AIToolMetadata): (LegacyPlatform | Platform)[] {
+  getAvailablePlatforms(
+    endpoint: DiscoveredEndpoint,
+  ): (LegacyPlatform | Platform)[] {
     const platforms: (LegacyPlatform | Platform)[] = [];
 
-    if (!tool.allowedRoles.includes(UserRole.CLI_OFF)) {
+    if (!endpoint.allowedRoles.includes(UserRole.CLI_OFF)) {
       platforms.push(Platform.CLI);
     }
-    if (!tool.allowedRoles.includes(UserRole.AI_TOOL_OFF)) {
+    if (!endpoint.allowedRoles.includes(UserRole.AI_TOOL_OFF)) {
       platforms.push(Platform.AI);
     }
-    if (!tool.allowedRoles.includes(UserRole.WEB_OFF)) {
+    if (!endpoint.allowedRoles.includes(UserRole.WEB_OFF)) {
       platforms.push(Platform.WEB);
     }
 

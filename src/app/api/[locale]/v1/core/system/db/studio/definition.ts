@@ -169,7 +169,7 @@ const { POST } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
     requests: {
       default: {
         port: "5555",

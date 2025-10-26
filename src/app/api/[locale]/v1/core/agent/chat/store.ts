@@ -93,7 +93,6 @@ export interface ChatSettings {
   sidebarCollapsed: boolean;
   theme: "light" | "dark";
   viewMode: "linear" | "flat" | "threaded";
-  enableSearch: boolean;
   enabledToolIds: string[];
 }
 
@@ -159,7 +158,6 @@ const getDefaultSettings = (): ChatSettings => ({
   sidebarCollapsed: false,
   theme: "dark",
   viewMode: "linear",
-  enableSearch: false,
   enabledToolIds: [],
 });
 

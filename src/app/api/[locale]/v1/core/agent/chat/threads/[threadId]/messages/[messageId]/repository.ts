@@ -12,6 +12,7 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
@@ -35,7 +36,7 @@ import type {
  */
 export interface MessageRepositoryInterface {
   getMessage(
-    urlVariables: MessageGetUrlVariablesOutput,
+    urlPathParams: MessageGetUrlVariablesOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -43,14 +44,14 @@ export interface MessageRepositoryInterface {
 
   updateMessage(
     data: MessagePatchRequestOutput,
-    urlVariables: MessagePatchUrlVariablesOutput,
+    urlPathParams: MessagePatchUrlVariablesOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<MessagePatchResponseOutput>>;
 
   deleteMessage(
-    urlVariables: MessageDeleteUrlVariablesOutput,
+    urlPathParams: MessageDeleteUrlVariablesOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -65,7 +66,7 @@ class MessageRepository implements MessageRepositoryInterface {
    * Get a specific message by ID
    */
   async getMessage(
-    urlVariables: MessageGetUrlVariablesOutput,
+    urlPathParams: MessageGetUrlVariablesOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -87,7 +88,7 @@ class MessageRepository implements MessageRepositoryInterface {
         .from(chatThreads)
         .where(
           and(
-            eq(chatThreads.id, urlVariables.threadId),
+            eq(chatThreads.id, urlPathParams.threadId),
             eq(chatThreads.userId, userId),
           ),
         )
@@ -116,8 +117,8 @@ class MessageRepository implements MessageRepositoryInterface {
         .from(chatMessages)
         .where(
           and(
-            eq(chatMessages.id, urlVariables.messageId),
-            eq(chatMessages.threadId, urlVariables.threadId),
+            eq(chatMessages.id, urlPathParams.messageId),
+            eq(chatMessages.threadId, urlPathParams.threadId),
           ),
         )
         .limit(1);
@@ -146,7 +147,7 @@ class MessageRepository implements MessageRepositoryInterface {
         },
       });
     } catch (error) {
-      logger.error("Error getting message:", error);
+      logger.error("Error getting message:", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.errors.server.description" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -159,7 +160,7 @@ class MessageRepository implements MessageRepositoryInterface {
    */
   async updateMessage(
     data: MessagePatchRequestOutput,
-    urlVariables: MessagePatchUrlVariablesOutput,
+    urlPathParams: MessagePatchUrlVariablesOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -181,7 +182,7 @@ class MessageRepository implements MessageRepositoryInterface {
         .from(chatThreads)
         .where(
           and(
-            eq(chatThreads.id, urlVariables.threadId),
+            eq(chatThreads.id, urlPathParams.threadId),
             eq(chatThreads.userId, userId),
           ),
         )
@@ -210,8 +211,8 @@ class MessageRepository implements MessageRepositoryInterface {
         .from(chatMessages)
         .where(
           and(
-            eq(chatMessages.id, urlVariables.messageId),
-            eq(chatMessages.threadId, urlVariables.threadId),
+            eq(chatMessages.id, urlPathParams.messageId),
+            eq(chatMessages.threadId, urlPathParams.threadId),
           ),
         )
         .limit(1);
@@ -238,7 +239,7 @@ class MessageRepository implements MessageRepositoryInterface {
       const [updatedMessage] = await db
         .update(chatMessages)
         .set(updateData)
-        .where(eq(chatMessages.id, urlVariables.messageId))
+        .where(eq(chatMessages.id, urlPathParams.messageId))
         .returning();
 
       return createSuccessResponse({
@@ -250,7 +251,7 @@ class MessageRepository implements MessageRepositoryInterface {
         },
       });
     } catch (error) {
-      logger.error("Error updating message:", error);
+      logger.error("Error updating message:", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.errors.server.description" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -262,7 +263,7 @@ class MessageRepository implements MessageRepositoryInterface {
    * Delete a message
    */
   async deleteMessage(
-    urlVariables: MessageDeleteUrlVariablesOutput,
+    urlPathParams: MessageDeleteUrlVariablesOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -284,7 +285,7 @@ class MessageRepository implements MessageRepositoryInterface {
         .from(chatThreads)
         .where(
           and(
-            eq(chatThreads.id, urlVariables.threadId),
+            eq(chatThreads.id, urlPathParams.threadId),
             eq(chatThreads.userId, userId),
           ),
         )
@@ -313,8 +314,8 @@ class MessageRepository implements MessageRepositoryInterface {
         .from(chatMessages)
         .where(
           and(
-            eq(chatMessages.id, urlVariables.messageId),
-            eq(chatMessages.threadId, urlVariables.threadId),
+            eq(chatMessages.id, urlPathParams.messageId),
+            eq(chatMessages.threadId, urlPathParams.threadId),
           ),
         )
         .limit(1);
@@ -329,13 +330,13 @@ class MessageRepository implements MessageRepositoryInterface {
       // Delete message
       await db
         .delete(chatMessages)
-        .where(eq(chatMessages.id, urlVariables.messageId));
+        .where(eq(chatMessages.id, urlPathParams.messageId));
 
       return createSuccessResponse({
         success: true,
       });
     } catch (error) {
-      logger.error("Error deleting message:", error);
+      logger.error("Error deleting message:", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.errors.server.description" as const,
         ErrorResponseTypes.INTERNAL_ERROR,

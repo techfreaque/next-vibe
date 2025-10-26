@@ -1,6 +1,17 @@
 import type { translations as enTranslations } from "../en";
-export const translations : typeof enTranslations = {
+
+export const translations: typeof enTranslations = {
   category: "Release-Executor",
+  errors: {
+    configNotLoaded:
+      "Konfiguration nicht geladen. Bitte laden Sie zuerst die Konfiguration.",
+    configFileNotFound: "Konfigurationsdatei nicht gefunden: {{path}}",
+    configFileNotFoundInParents:
+      "Konfigurationsdatei '{{filename}}' wurde im aktuellen Verzeichnis oder in übergeordneten Verzeichnissen nicht gefunden",
+    invalidConfigFormat:
+      "Ungültiges Konfigurationsformat. Stellen Sie sicher, dass die Konfiguration ein Standardobjekt mit einer 'packages'-Eigenschaft exportiert.",
+    errorLoadingConfig: "Fehler beim Laden der Konfiguration:",
+  },
   releaseExecutor: {
     processing: "Verarbeite: {{directory}}",
     executing: "Führe aus: {{command}}",

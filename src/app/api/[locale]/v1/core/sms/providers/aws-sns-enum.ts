@@ -22,4 +22,3 @@ export enum AwsSnsAwsRegions {
   ME_SOUTH_1 = "me-south-1",
   EU_NORTH_1 = "eu-north-1",
 }
-

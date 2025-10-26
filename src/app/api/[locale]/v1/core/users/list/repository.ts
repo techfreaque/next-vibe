@@ -3,6 +3,7 @@
  * Business logic for listing and filtering users
  */
 
+import { parseError } from "next-vibe/shared/utils";
 import "server-only";
 
 import { and, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
@@ -244,7 +245,7 @@ export class UserListRepositoryImpl implements UserListRepository {
         },
       });
     } catch (error) {
-      logger.error("Error listing users", error);
+      logger.error("Error listing users", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.users.list.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,

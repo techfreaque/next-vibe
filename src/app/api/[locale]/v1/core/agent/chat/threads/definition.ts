@@ -52,171 +52,141 @@ const { GET } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      // === PAGINATION & FILTERS ===
-      pagination: objectField(
+      // === PAGINATION ===
+      page: requestDataField(
         {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.v1.core.agent.chat.threads.get.sections.pagination.title" as const,
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.agent.chat.threads.get.page.label" as const,
           description:
-            "app.api.v1.core.agent.chat.threads.get.sections.pagination.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+            "app.api.v1.core.agent.chat.threads.get.page.description" as const,
+          layout: { columns: 6 },
         },
-        { request: "data" },
+        z.number().min(1).optional().default(1),
+      ),
+      limit: requestDataField(
         {
-          page: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label:
-                "app.api.v1.core.agent.chat.threads.get.page.label" as const,
-              description:
-                "app.api.v1.core.agent.chat.threads.get.page.description" as const,
-              layout: { columns: 6 },
-            },
-            z.number().min(1).optional().default(1),
-          ),
-          limit: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label:
-                "app.api.v1.core.agent.chat.threads.get.limit.label" as const,
-              description:
-                "app.api.v1.core.agent.chat.threads.get.limit.description" as const,
-              layout: { columns: 6 },
-            },
-            z.number().min(1).max(100).optional().default(20),
-          ),
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.v1.core.agent.chat.threads.get.limit.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.get.limit.description" as const,
+          layout: { columns: 6 },
         },
+        z.number().min(1).max(100).optional().default(20),
       ),
 
-      filters: objectField(
+      // === FILTERS ===
+      rootFolderId: requestDataField(
         {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.v1.core.agent.chat.threads.get.sections.filters.title" as const,
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label:
+            "app.api.v1.core.agent.chat.threads.get.rootFolderId.label" as const,
           description:
-            "app.api.v1.core.agent.chat.threads.get.sections.filters.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+            "app.api.v1.core.agent.chat.threads.get.rootFolderId.description" as const,
+          layout: { columns: 6 },
+          options: [
+            {
+              value: DEFAULT_FOLDER_IDS.PRIVATE,
+              label:
+                "app.api.v1.core.agent.chat.config.folders.private" as const,
+            },
+            {
+              value: DEFAULT_FOLDER_IDS.SHARED,
+              label:
+                "app.api.v1.core.agent.chat.config.folders.shared" as const,
+            },
+            {
+              value: DEFAULT_FOLDER_IDS.PUBLIC,
+              label:
+                "app.api.v1.core.agent.chat.config.folders.public" as const,
+            },
+            {
+              value: DEFAULT_FOLDER_IDS.INCOGNITO,
+              label:
+                "app.api.v1.core.agent.chat.config.folders.incognito" as const,
+            },
+          ],
         },
-        { request: "data" },
+        z
+          .enum([
+            DEFAULT_FOLDER_IDS.PRIVATE,
+            DEFAULT_FOLDER_IDS.SHARED,
+            DEFAULT_FOLDER_IDS.PUBLIC,
+            DEFAULT_FOLDER_IDS.INCOGNITO,
+          ])
+          .optional(),
+      ),
+      subFolderId: requestDataField(
         {
-          rootFolderId: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label:
-                "app.api.v1.core.agent.chat.threads.get.rootFolderId.label" as const,
-              description:
-                "app.api.v1.core.agent.chat.threads.get.rootFolderId.description" as const,
-              layout: { columns: 6 },
-              options: [
-                {
-                  value: DEFAULT_FOLDER_IDS.PRIVATE,
-                  label:
-                    "app.api.v1.core.agent.chat.config.folders.private" as const,
-                },
-                {
-                  value: DEFAULT_FOLDER_IDS.SHARED,
-                  label:
-                    "app.api.v1.core.agent.chat.config.folders.shared" as const,
-                },
-                {
-                  value: DEFAULT_FOLDER_IDS.PUBLIC,
-                  label:
-                    "app.api.v1.core.agent.chat.config.folders.public" as const,
-                },
-                {
-                  value: DEFAULT_FOLDER_IDS.INCOGNITO,
-                  label:
-                    "app.api.v1.core.agent.chat.config.folders.incognito" as const,
-                },
-              ],
-            },
-            z
-              .enum([
-                DEFAULT_FOLDER_IDS.PRIVATE,
-                DEFAULT_FOLDER_IDS.SHARED,
-                DEFAULT_FOLDER_IDS.PUBLIC,
-                DEFAULT_FOLDER_IDS.INCOGNITO,
-              ])
-              .optional(),
-          ),
-          subFolderId: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.UUID,
-              label:
-                "app.api.v1.core.agent.chat.threads.get.subFolderId.label" as const,
-              description:
-                "app.api.v1.core.agent.chat.threads.get.subFolderId.description" as const,
-              layout: { columns: 6 },
-            },
-            z.uuid().optional().nullable(),
-          ),
-          status: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label:
-                "app.api.v1.core.agent.chat.threads.get.status.label" as const,
-              description:
-                "app.api.v1.core.agent.chat.threads.get.status.description" as const,
-              layout: { columns: 6 },
-              options: ThreadStatusOptions,
-            },
-            z.enum(ThreadStatus).optional(),
-          ),
-          search: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.v1.core.agent.chat.threads.get.search.label" as const,
-              description:
-                "app.api.v1.core.agent.chat.threads.get.search.description" as const,
-              layout: { columns: 12 },
-            },
-            z.string().optional(),
-          ),
-          isPinned: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label:
-                "app.api.v1.core.agent.chat.threads.get.isPinned.label" as const,
-              description:
-                "app.api.v1.core.agent.chat.threads.get.isPinned.description" as const,
-              layout: { columns: 6 },
-            },
-            z.boolean().optional(),
-          ),
-          dateFrom: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.v1.core.agent.chat.threads.get.dateFrom.label" as const,
-              description:
-                "app.api.v1.core.agent.chat.threads.get.dateFrom.description" as const,
-              layout: { columns: 6 },
-            },
-            z.string().datetime().optional(),
-          ),
-          dateTo: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.v1.core.agent.chat.threads.get.dateTo.label" as const,
-              description:
-                "app.api.v1.core.agent.chat.threads.get.dateTo.description" as const,
-              layout: { columns: 6 },
-            },
-            z.string().datetime().optional(),
-          ),
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.UUID,
+          label:
+            "app.api.v1.core.agent.chat.threads.get.subFolderId.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.get.subFolderId.description" as const,
+          layout: { columns: 6 },
         },
+        z.uuid().optional().nullable(),
+      ),
+      status: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "app.api.v1.core.agent.chat.threads.get.status.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.get.status.description" as const,
+          layout: { columns: 6 },
+          options: ThreadStatusOptions,
+        },
+        z.enum(ThreadStatus).optional(),
+      ),
+      search: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.v1.core.agent.chat.threads.get.search.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.get.search.description" as const,
+          layout: { columns: 12 },
+        },
+        z.string().optional(),
+      ),
+      isPinned: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label:
+            "app.api.v1.core.agent.chat.threads.get.isPinned.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.get.isPinned.description" as const,
+          layout: { columns: 6 },
+        },
+        z.boolean().optional(),
+      ),
+      dateFrom: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label:
+            "app.api.v1.core.agent.chat.threads.get.dateFrom.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.get.dateFrom.description" as const,
+          layout: { columns: 6 },
+        },
+        z.string().datetime().optional(),
+      ),
+      dateTo: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.v1.core.agent.chat.threads.get.dateTo.label" as const,
+          description:
+            "app.api.v1.core.agent.chat.threads.get.dateTo.description" as const,
+          layout: { columns: 6 },
+        },
+        z.string().datetime().optional(),
       ),
 
       // === RESPONSE ===
@@ -418,10 +388,9 @@ const { GET } = createEndpoint({
   examples: {
     requests: {
       default: {
-        pagination: { page: 1, limit: 20 },
-        filters: {
-          rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
-        },
+        page: 1,
+        limit: 20,
+        rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
       },
     },
     responses: {

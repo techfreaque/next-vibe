@@ -16,10 +16,9 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { env } from "@/config/env";
-
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { EmailProvider, EmailStatus, EmailType } from "../../messages/enum";
@@ -61,7 +60,7 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
             try {
               const emailMessage = await emailData.render({
                 user: data.user,
-                urlVariables: data.urlVariables,
+                urlPathParams: data.urlPathParams,
                 requestData: data.requestData,
                 responseData: data.responseData,
                 t: data.t,
@@ -189,8 +188,8 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                           "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.email_render_exception",
                         ),
                         errorDetails: parsedError.message,
-                        endpoint: data.urlVariables
-                          ? JSON.stringify(data.urlVariables)
+                        endpoint: data.urlPathParams
+                          ? JSON.stringify(data.urlPathParams)
                           : undefined,
                         requestData: data.requestData
                           ? JSON.stringify(data.requestData)
@@ -212,7 +211,7 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
               } catch (metadataError) {
                 logger.error(
                   "Failed to store email metadata for exception",
-                  metadataError,
+                  parseError(metadataError),
                 );
                 // Don't fail the process if metadata storage fails
               }
@@ -240,7 +239,7 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
     }
 
     if (errors.length) {
-      logger.error("Email errors", errors);
+      logger.error("Email errors");
       return createErrorResponse(
         "app.api.v1.core.emails.smtpClient.emailHandling.email.errors.batch_send_failed",
         ErrorResponseTypes.EMAIL_ERROR,

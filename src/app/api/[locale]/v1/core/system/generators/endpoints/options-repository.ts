@@ -14,10 +14,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type {
   CliOptionsRequestOutput,
   CliOptionsResponseOutput,
@@ -93,9 +93,13 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
     // Validate user permissions
     if (!user?.id) {
       return createErrorResponse(
-        "app.api.v1.core.system.cli.options.errors.unauthorized",
+        "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.unauthorized.title",
         ErrorResponseTypes.UNAUTHORIZED,
-        { error: t("app.api.v1.core.system.cli.options.errors.invalidUser") },
+        {
+          error: t(
+            "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.unauthorized.description",
+          ),
+        },
       );
     }
 
@@ -124,7 +128,9 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
             response.validation = {
               isValid: false,
               errors: [
-                t("app.api.v1.core.system.cli.options.validation.required"),
+                t(
+                  "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.validation.title",
+                ),
               ],
             };
           }
@@ -132,22 +138,26 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
         case "define":
           // Define new option (implementation would go here)
           response.options = [
-            t("app.api.v1.core.system.cli.options.options.optionDefined"),
+            t(
+              "app.api.v1.core.system.unifiedUi.cli.setup.install.post.success.title",
+            ),
           ];
           break;
         case "parse":
           // Parse option values (implementation would go here)
           response.options = [
-            t("app.api.v1.core.system.cli.options.options.optionsParsed"),
+            t(
+              "app.api.v1.core.system.unifiedUi.cli.setup.install.post.success.title",
+            ),
           ];
           break;
         default:
           return createErrorResponse(
-            "app.api.v1.core.system.cli.options.errors.invalidOperation",
+            "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
             ErrorResponseTypes.INTERNAL_ERROR,
             {
               error: t(
-                "app.api.v1.core.system.cli.options.errors.invalidOperation",
+                "app.api.v1.core.system.generators.endpoints.post.errors.server.description",
               ),
             },
           );

@@ -25,7 +25,10 @@ import {
   YAxis,
 } from "recharts";
 
-import { LeadSource } from "@/app/api/[locale]/v1/core/leads/enum";
+import {
+  LeadSource,
+  LeadSourceOptions,
+} from "@/app/api/[locale]/v1/core/leads/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -132,11 +135,19 @@ export function LeadsStatsChart({
     }));
   };
 
-  const toggleSource = (source: keyof typeof LeadSource): void => {
-    setVisibleSources((prev) => ({
-      ...prev,
-      [source]: !prev[source],
-    }));
+  const toggleSource = (sourceTranslationKey: TranslationKey): void => {
+    // Find the option that has this translation key as its label
+    const option = LeadSourceOptions.find(
+      (opt) => opt.label === sourceTranslationKey,
+    );
+
+    if (option) {
+      // option.value is the enum key (e.g., "WEBSITE")
+      setVisibleSources((prev) => ({
+        ...prev,
+        [option.value]: !prev[option.value],
+      }));
+    }
   };
 
   const showAllSeries = (): void => {
@@ -292,41 +303,14 @@ export function LeadsStatsChart({
           0,
         );
 
-        // Get proper translation key for the source
-        const getSourceTranslationKey = (
-          source: keyof typeof LeadSource | string,
-        ): TranslationKey => {
-          // Convert string to enum value if needed
-          const sourceEnum =
-            typeof source === "string"
-              ? (source as keyof typeof LeadSource)
-              : source;
-
-          switch (sourceEnum) {
-            case LeadSource.WEBSITE:
-              return "app.admin.leads.leads.admin.stats.sources.website";
-            case LeadSource.SOCIAL_MEDIA:
-              return "app.admin.leads.leads.admin.stats.sources.social_media";
-            case LeadSource.EMAIL_CAMPAIGN:
-              return "app.admin.leads.leads.admin.stats.sources.email_campaign";
-            case LeadSource.REFERRAL:
-              return "app.admin.leads.leads.admin.stats.sources.referral";
-            case LeadSource.CSV_IMPORT:
-              return "app.admin.leads.leads.admin.stats.sources.csv_import";
-            case LeadSource.API:
-              return "app.admin.leads.leads.admin.stats.sources.api";
-            default:
-              return "app.admin.leads.leads.admin.stats.sources.unknown";
-          }
-        };
+        const sourceKey = source as keyof typeof LeadSource;
+        const sourceTranslationKey = LeadSource[sourceKey] as TranslationKey;
 
         return {
-          source: source as keyof typeof LeadSource,
-          name: t(getSourceTranslationKey(source)),
-          color:
-            CHART_CONSTANTS.SOURCE_COLORS[source as keyof typeof LeadSource] ||
-            "#6b7280",
-          visible: visibleSources[source as keyof typeof LeadSource] || false,
+          source: sourceTranslationKey,
+          name: t(sourceTranslationKey),
+          color: CHART_CONSTANTS.SOURCE_COLORS[sourceKey] || "#6b7280",
+          visible: visibleSources[sourceKey] || false,
           count,
           percentage: total > 0 ? (count / total) * 100 : 0,
         };

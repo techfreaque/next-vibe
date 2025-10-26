@@ -220,7 +220,10 @@ export function ImapAccountsList({
                         variant="outline"
                         size="sm"
                         onClick={async () => {
-                          testEndpoint.create.form.setValue("accountId", account.id);
+                          testEndpoint.create.form.setValue(
+                            "accountId",
+                            account.id,
+                          );
                           await testEndpoint.create.submitForm(undefined);
                         }}
                       >
@@ -268,4 +271,3 @@ export function ImapAccountsList({
     </div>
   );
 }
-

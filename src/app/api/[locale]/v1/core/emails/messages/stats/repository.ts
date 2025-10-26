@@ -18,6 +18,7 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 import {
   ChartType,
   DateRangePreset,
@@ -159,7 +160,6 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
 
       const currentPeriodStats = results[0];
       const historicalData = results[1];
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const groupedStats = results[2];
       const recentActivity = results[3];
       const topPerformingTemplates = results[4];
@@ -168,7 +168,6 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       const statsResponse: EmailStatsResponseType = {
         ...currentPeriodStats,
         historicalData,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         groupedStats,
         generatedAt: new Date().toISOString(),
         dataRange: {
@@ -190,7 +189,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
 
       return createSuccessResponse(statsResponse);
     } catch (error) {
-      logger.error("Error generating email stats", error);
+      logger.error("Error generating email stats", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.emails.messages.stats.get.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,

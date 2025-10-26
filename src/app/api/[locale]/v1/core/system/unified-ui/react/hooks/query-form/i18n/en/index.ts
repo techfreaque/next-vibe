@@ -49,4 +49,8 @@ export const translations = {
       description: "Operation completed successfully",
     },
   },
+  errors: {
+    validation_failed: "Form validation failed",
+    network_failure: "Network request failed",
+  },
 };

@@ -101,6 +101,7 @@ export const translations = {
       collapseAll: "Collapse All",
       selectAll: "Select All",
       deselectAll: "Deselect All",
+      enableAll: "Enable All",
       stats: "{{enabled}} of {{total}} tools enabled",
     },
   },

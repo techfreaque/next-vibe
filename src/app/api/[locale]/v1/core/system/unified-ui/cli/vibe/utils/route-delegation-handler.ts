@@ -19,16 +19,6 @@ import { modularCLIResponseRenderer } from "../endpoints/renderers/cli-ui/modula
 import { responseMetadataExtractor } from "../endpoints/renderers/cli-ui/response-metadata-extractor";
 import { schemaUIHandler } from "../endpoints/renderers/cli-ui/schema-ui-handler";
 
-const ALL_HTTP_METHODS = [
-  "POST",
-  "GET",
-  "PUT",
-  "PATCH",
-  "DELETE",
-  "HEAD",
-  "OPTIONS",
-] as const;
-
 // CLI user type - simplified for CLI context
 interface CliUserType {
   isPublic: boolean;
@@ -70,7 +60,7 @@ interface InputData {
 
 interface CollectedInputData {
   data?: InputData;
-  urlParams?: InputData;
+  urlPathParams?: InputData;
 }
 
 // Schema interface for validation
@@ -120,7 +110,7 @@ interface CliResponseData {
 export interface RouteExecutionContext {
   command: string;
   data?: CliRequestData;
-  urlParams?: CliUrlParams;
+  urlPathParams?: CliUrlParams;
   cliArgs?: {
     positionalArgs: string[];
     namedArgs: CliNamedArgs;
@@ -238,11 +228,11 @@ export class RouteDelegationHandler {
         logger.info(`Method: ${route.method}`);
         logger.info(`Data: ${JSON.stringify(inputData.data, null, 2)}`);
         if (
-          inputData.urlParams &&
-          Object.keys(inputData.urlParams).length > 0
+          inputData.urlPathParams &&
+          Object.keys(inputData.urlPathParams).length > 0
         ) {
           logger.info(
-            `URL Params: ${JSON.stringify(inputData.urlParams, null, 2)}`,
+            `URL Params: ${JSON.stringify(inputData.urlPathParams, null, 2)}`,
           );
         }
       }
@@ -252,7 +242,7 @@ export class RouteDelegationHandler {
         logger.info("🔍 Dry run - would execute with:");
         logger.info(
           JSON.stringify(
-            { data: inputData.data, urlParams: inputData.urlParams },
+            { data: inputData.data, urlPathParams: inputData.urlPathParams },
             null,
             2,
           ),
@@ -261,7 +251,10 @@ export class RouteDelegationHandler {
           success: true,
           data: {
             dryRun: true,
-            args: { data: inputData.data, urlParams: inputData.urlParams },
+            args: {
+              data: inputData.data,
+              urlPathParams: inputData.urlPathParams,
+            },
           },
           metadata: {
             executionTime: Date.now() - startTime,
@@ -273,7 +266,7 @@ export class RouteDelegationHandler {
 
       // Execute the CLI handler
       // Only pass URL parameters if they exist, otherwise pass undefined for never schemas
-      const urlParams = inputData.urlParams as CliUrlParams | undefined;
+      const urlPathParams = inputData.urlPathParams as CliUrlParams | undefined;
 
       // Debug locale before passing to CLI handler
       logger.debug("CLI handler execution", {
@@ -285,12 +278,12 @@ export class RouteDelegationHandler {
       logger.debug("About to call CLI handler", {
         handlerType: typeof cliHandler,
         dataKeys: Object.keys(inputData.data || {}),
-        urlParamsKeys: Object.keys(urlParams || {}),
+        urlPathParamsKeys: Object.keys(urlPathParams || {}),
       });
 
       const result = await cliHandler(
         inputData.data || {},
-        urlParams || {},
+        urlPathParams || {},
         cliUser,
         locale,
         context.options?.verbose || false,
@@ -335,6 +328,7 @@ export class RouteDelegationHandler {
     try {
       // Import the route module dynamically
       const routeModule = (await import(route.routePath)) as {
+        // eslint-disable-next-line no-restricted-syntax
         tools?: Record<string, unknown>;
       };
 
@@ -482,34 +476,35 @@ export class RouteDelegationHandler {
     }
 
     // Collect URL parameters if needed
-    if (endpoint?.requestUrlParamsSchema && !context.urlParams) {
-      // Safely check if the schema is effectively empty (z.never() or empty object)
+    if (endpoint?.requestUrlPathParamsSchema && !context.urlPathParams) {
+      // Safely check if the schema is effectively empty (z.never() or
+      // empty object)
       try {
-        const schema =
-          endpoint.requestUrlParamsSchema as unknown as SchemaValidator;
+        const schema = endpoint.requestUrlPathParamsSchema as SchemaValidator;
         const testResult = schema.safeParse({});
         const isNeverSchema =
           !testResult.success &&
           testResult.error?.issues?.[0]?.code === "invalid_type";
         const isEmptySchema =
           testResult.success &&
-          Object.keys((testResult as { data?: object }).data || {}).length ===
-            0;
+          Object.keys(
+            (testResult as { data?: Record<string, unknown> }).data || {},
+          ).length === 0;
 
         if (!isNeverSchema && !isEmptySchema) {
           logger.info("🔗 URL Parameters:");
-          inputData.urlParams = await this.generateFormFromEndpoint(
+          inputData.urlPathParams = await this.generateFormFromEndpoint(
             endpoint,
-            "urlParams",
+            "urlPathParams",
           );
         }
-        // For never schema, don't set urlParams at all
+        // For never schema, don't set urlPathParams at all
       } catch (error) {
         // If schema validation fails, skip URL parameters collection
         logger.debug("Failed to validate URL parameters schema:", error);
       }
-    } else if (context.urlParams) {
-      inputData.urlParams = context.urlParams;
+    } else if (context.urlPathParams) {
+      inputData.urlPathParams = context.urlPathParams;
     }
 
     return inputData;
@@ -520,12 +515,11 @@ export class RouteDelegationHandler {
    */
   private async generateFormFromEndpoint(
     endpoint: any,
-    formType: "request" | "urlParams" = "request",
+    formType: "request" | "urlPathParams" = "request",
   ): Promise<any> {
-    const schema =
-      formType === "request"
-        ? endpoint.requestSchema
-        : endpoint.requestUrlParamsSchema;
+    const schema = formType === "request";
+    endpoint.requestSchema;
+    endpoint.requestUrlPathParamsSchema;
 
     if (!schema) {
       return {};
@@ -601,19 +595,21 @@ export class RouteDelegationHandler {
   formatResult(
     result: RouteExecutionResult,
     outputFormat = "pretty",
-    endpointDefinition: any,
+    endpointDefinition,
     locale: CountryLanguage,
     verbose = false,
     logger: EndpointLogger,
   ): string {
     if (!result.success) {
       if (verbose) {
+        // eslint-disable-next-line i18next/no-literal-string
         return `❌ Error: ${result.error}\n\n${JSON.stringify(
           result,
           null,
           2,
         )}`;
       }
+      // eslint-disable-next-line i18next/no-literal-string
       return `❌ Error: ${result.error}`;
     }
 
@@ -622,11 +618,13 @@ export class RouteDelegationHandler {
     // Only show metadata in verbose mode
     if (verbose) {
       // Add success indicator
+      // eslint-disable-next-line i18next/no-literal-string
       output += "✅ Success\n";
 
       // Add execution metadata if available
       if (result.metadata) {
         if (result.metadata.route) {
+          // eslint-disable-next-line i18next/no-literal-string
           output += `🛣️  Route: ${result.metadata.method} ${result.metadata.route}\n`;
         }
       }
@@ -639,6 +637,7 @@ export class RouteDelegationHandler {
 
       switch (outputFormat) {
         case "json":
+          // eslint-disable-next-line i18next/no-literal-string
           output += "📊 Result (JSON):\n";
           output += JSON.stringify(result.data, null, 2);
           break;
@@ -648,6 +647,7 @@ export class RouteDelegationHandler {
           if (endpointDefinition) {
             output += this.formatWithEnhancedRenderer(
               result.data,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
               endpointDefinition,
               locale,
               logger,
@@ -729,6 +729,7 @@ export class RouteDelegationHandler {
         "Enhanced rendering failed, falling back to basic format:",
         error,
       );
+      // eslint-disable-next-line i18next/no-literal-string
       return `📊 Result:\n${this.formatPretty(data, locale)}`;
     }
   }
@@ -849,7 +850,7 @@ export class RouteDelegationHandler {
 
     try {
       // Try to parse the provided data with the schema
-      const validator = requestSchema as unknown as SchemaValidator;
+      const validator = requestSchema as SchemaValidator;
       const result = validator.safeParse(providedData);
 
       if (!result.success && result.error) {

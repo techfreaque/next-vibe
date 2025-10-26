@@ -26,7 +26,7 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
  */
 const { POST } = createEndpoint({
   method: Methods.POST,
-  path: ["v1", "core", "agent", "chat", "credits", "purchase"],
+  path: ["v1", "core", "credits", "purchase"],
   title: "app.api.v1.core.agent.chat.credits.purchase.post.title",
   description: "app.api.v1.core.agent.chat.credits.purchase.post.description",
   category: "app.api.v1.core.agent.chat.category",

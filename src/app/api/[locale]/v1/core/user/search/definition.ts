@@ -604,7 +604,7 @@ const { GET } = createEndpoint({
         },
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
     responses: {
       default: {
         response: {

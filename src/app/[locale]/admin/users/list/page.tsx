@@ -23,7 +23,7 @@ export default async function UsersListPage({
       {/* Page Description */}
       <div>
         <p className="text-gray-600 dark:text-gray-400">
-          {t("app.admin.users.users.list.description")}
+          {t("app.admin.users.list.description")}
         </p>
       </div>
 

@@ -3,6 +3,8 @@
  * Provides seed data for newsletter subscriptions
  */
 
+import { parseError } from "next-vibe/shared/utils";
+
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 
 import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
@@ -96,7 +98,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 
     logger.debug("✅ Newsletter subscription data ready for development");
   } catch (error) {
-    logger.error("Error seeding newsletter data:", error);
+    logger.error("Error seeding newsletter data:", parseError(error));
   }
 }
 
@@ -122,7 +124,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
       subscription: testSubscription,
     });
   } catch (error) {
-    logger.error("Error seeding test newsletter data:", error);
+    logger.error("Error seeding test newsletter data:", parseError(error));
   }
 }
 
@@ -138,7 +140,7 @@ export async function prod(logger: EndpointLogger): Promise<void> {
     await Promise.resolve(); // Add await expression for async function
     logger.debug("✅ Newsletter system ready for production subscriptions");
   } catch (error) {
-    logger.error("Error seeding production newsletter data:", error);
+    logger.error("Error seeding production newsletter data:", parseError(error));
   }
 }
 

@@ -47,7 +47,7 @@ interface SmtpAccountUpdateData {
  */
 export interface SmtpAccountEditRepository {
   getSmtpAccount(
-    urlVariables: { id: string },
+    urlPathParams: { id: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -70,28 +70,28 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
    * Get SMTP account by ID
    */
   async getSmtpAccount(
-    urlVariables: { id: string },
+    urlPathParams: { id: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpAccountEditGETResponseOutput>> {
     try {
       logger.debug("Getting SMTP account", {
-        accountId: urlVariables.id,
+        accountId: urlPathParams.id,
         userId: user.id,
       });
 
       const [account] = await db
         .select()
         .from(smtpAccounts)
-        .where(eq(smtpAccounts.id, urlVariables.id))
+        .where(eq(smtpAccounts.id, urlPathParams.id))
         .limit(1);
 
       if (!account) {
         return createErrorResponse(
           "app.api.v1.core.emails.smtpClient.edit.id.errors.notFound.title",
           ErrorResponseTypes.NOT_FOUND,
-          { accountId: urlVariables.id },
+          { accountId: urlPathParams.id },
         );
       }
 
@@ -124,7 +124,7 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
 
       return createSuccessResponse(response);
     } catch (error) {
-      logger.error("Error getting SMTP account", error);
+      logger.error("Error getting SMTP account", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.emails.smtpClient.edit.id.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -246,7 +246,7 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
 
       return createSuccessResponse(response);
     } catch (error) {
-      logger.error("Error updating SMTP account", error);
+      logger.error("Error updating SMTP account", parseError(error));
 
       // Check for unique constraint violations
       const errorMessage = parseError(error).message;

@@ -201,6 +201,18 @@ export const translations = {
     fetchPulseStatus: "Failed to fetch pulse status",
     pulseExecutionFailed: "Pulse execution failed",
   },
+  common: {
+    cronRepositoryTaskUpdateFailed: "Failed to update cron task",
+    cronRepositoryTaskDeleteFailed: "Failed to delete cron task",
+    cronRepositoryExecutionCreateFailed: "Failed to create cron task execution",
+    cronRepositoryExecutionUpdateFailed: "Failed to update cron task execution",
+    cronRepositoryExecutionsFetchFailed: "Failed to fetch cron task executions",
+    cronRepositoryRecentExecutionsFetchFailed:
+      "Failed to fetch recent cron task executions",
+    cronRepositorySchedulesFetchFailed: "Failed to fetch cron task schedules",
+    cronRepositoryScheduleUpdateFailed: "Failed to update cron task schedule",
+    cronRepositoryStatisticsFetchFailed: "Failed to fetch cron task statistics",
+  },
   cronSystem: cronTranslations,
   pulseSystem: pulseTranslations,
   sideTasks: sideTasksTranslations,

@@ -24,7 +24,7 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
  */
 const { GET } = createEndpoint({
   method: Methods.GET,
-  path: ["v1", "core", "agent", "chat", "credits"],
+  path: ["v1", "core", "credits"],
   title: "app.api.v1.core.agent.chat.credits.get.title",
   description: "app.api.v1.core.agent.chat.credits.get.description",
   category: "app.api.v1.core.agent.chat.category",

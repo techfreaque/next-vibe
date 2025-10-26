@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Environment } from "next-vibe/shared/utils/env-util";
+import { Environment, parseError } from "next-vibe/shared/utils";
 import { useCallback, useEffect, useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
@@ -15,7 +15,8 @@ import { envClient } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
 
 import type { EmailCampaignStage, LeadSource, LeadStatus } from "../enum";
-import definitions from "./definition";
+import type { LeadListGetRequestTypeOutput } from "../list/definition";
+import definitions, { type BatchOperationScope } from "./definition";
 
 /**
  * Hook for batch updating leads
@@ -95,13 +96,15 @@ interface BatchOperationsReturn {
     id: string;
     email: string | null;
     businessName: string;
-    currentStatus: string;
-    currentCampaignStage: string | null;
+    currentStatus: (typeof LeadStatus)[keyof typeof LeadStatus];
+    currentCampaignStage:
+      | (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]
+      | null;
   }>;
 
   // Handlers
   handlePreview: (
-    currentFilters: Record<string, string | number | boolean | undefined>,
+    currentFilters: LeadListGetRequestTypeOutput,
     updates: {
       status?: (typeof LeadStatus)[keyof typeof LeadStatus];
       currentCampaignStage?: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
@@ -110,7 +113,7 @@ interface BatchOperationsReturn {
     },
   ) => Promise<void>;
   handleDeletePreview: (
-    currentFilters: Record<string, string | number | boolean | undefined>,
+    currentFilters: LeadListGetRequestTypeOutput,
   ) => Promise<void>;
   handleBatchUpdate: (
     updates: {
@@ -119,17 +122,19 @@ interface BatchOperationsReturn {
       source?: (typeof LeadSource)[keyof typeof LeadSource];
       notes?: string;
     },
-    currentFilters: Record<string, string | number | boolean | undefined>,
+    currentFilters: LeadListGetRequestTypeOutput,
+    scope: (typeof BatchOperationScope)[keyof typeof BatchOperationScope],
   ) => Promise<void>;
   handleBatchDelete: (
-    currentFilters: Record<string, string | number | boolean | undefined>,
+    currentFilters: LeadListGetRequestTypeOutput,
+    scope: (typeof BatchOperationScope)[keyof typeof BatchOperationScope],
   ) => Promise<void>;
   handleConfirmBatchUpdate: (
-    currentFilters: Record<string, string | number | boolean | undefined>,
+    currentFilters: LeadListGetRequestTypeOutput,
     onSuccess?: () => void,
   ) => Promise<void>;
   handleConfirmBatchDelete: (
-    currentFilters: Record<string, string | number | boolean | undefined>,
+    currentFilters: LeadListGetRequestTypeOutput,
     onSuccess?: () => void,
   ) => Promise<void>;
   handleCloseDialog: () => void;
@@ -177,8 +182,10 @@ export function useBatchOperations(
       id: string;
       email: string | null;
       businessName: string;
-      currentStatus: string;
-      currentCampaignStage: string | null;
+      currentStatus: (typeof LeadStatus)[keyof typeof LeadStatus];
+      currentCampaignStage:
+        | (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]
+        | null;
     }>
   >([]);
 
@@ -246,7 +253,7 @@ export function useBatchOperations(
   // Preview handler
   const handlePreview = useCallback(
     async (
-      currentFilters: Record<string, string | number | boolean | undefined>,
+      currentFilters: LeadListGetRequestTypeOutput,
       updates: {
         status?: (typeof LeadStatus)[keyof typeof LeadStatus];
         currentCampaignStage?: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
@@ -270,7 +277,10 @@ export function useBatchOperations(
 
         // Response will be handled by useEffect
       } catch (error) {
-        logger.error("app.api.v1.core.leads.batch.preview.failed", error);
+        logger.error(
+          "app.api.v1.core.leads.batch.preview.failed",
+          parseError(error).message,
+        );
       }
     },
     [batchUpdateEndpoint.create, logger],
@@ -285,7 +295,8 @@ export function useBatchOperations(
         source?: (typeof LeadSource)[keyof typeof LeadSource];
         notes?: string;
       },
-      currentFilters: Record<string, string | number | boolean | undefined>,
+      currentFilters: LeadListGetRequestTypeOutput,
+      scope: (typeof BatchOperationScope)[keyof typeof BatchOperationScope],
     ): Promise<void> => {
       try {
         // Prevent double calls by checking if already submitting
@@ -302,6 +313,7 @@ export function useBatchOperations(
         // Set form values with all filters including scope
         batchUpdateEndpoint.create.form.reset({
           ...currentFilters,
+          scope,
           updates,
           dryRun: true,
           maxRecords: 1000,
@@ -322,7 +334,10 @@ export function useBatchOperations(
           setBatchDialogOpen(true);
         }
       } catch (error) {
-        logger.error("app.api.v1.core.leads.batch.update.failed", error);
+        logger.error(
+          "app.api.v1.core.leads.batch.update.failed",
+          parseError(error).message,
+        );
       }
     },
     [batchUpdateEndpoint.create, logger],
@@ -331,7 +346,7 @@ export function useBatchOperations(
   // Confirm batch update handler
   const handleConfirmBatchUpdate = useCallback(
     async (
-      currentFilters: Record<string, string | number | boolean | undefined>,
+      currentFilters: LeadListGetRequestTypeOutput,
       onSuccess?: () => void,
     ) => {
       try {
@@ -354,7 +369,10 @@ export function useBatchOperations(
           onOperationComplete?.();
         }
       } catch (error) {
-        logger.error("app.api.v1.core.leads.batch.update.failed", error);
+        logger.error(
+          "app.api.v1.core.leads.batch.update.failed",
+          parseError(error).message,
+        );
       }
     },
     [batchUpdateEndpoint.create, pendingUpdates, onOperationComplete, logger],
@@ -362,9 +380,7 @@ export function useBatchOperations(
 
   // Delete preview handler
   const handleDeletePreview = useCallback(
-    async (
-      currentFilters: Record<string, string | number | boolean | undefined>,
-    ) => {
+    async (currentFilters: LeadListGetRequestTypeOutput) => {
       try {
         setOperationType("delete");
 
@@ -393,7 +409,7 @@ export function useBatchOperations(
       } catch (error) {
         logger.error(
           "app.api.v1.core.leads.batch.delete.preview.failed",
-          error,
+          parseError(error).message,
         );
       }
     },
@@ -403,7 +419,8 @@ export function useBatchOperations(
   // Batch delete handler
   const handleBatchDelete = useCallback(
     async (
-      currentFilters: Record<string, string | number | boolean | undefined>,
+      currentFilters: LeadListGetRequestTypeOutput,
+      scope: (typeof BatchOperationScope)[keyof typeof BatchOperationScope],
     ): Promise<void> => {
       try {
         // Prevent double calls by checking if already submitting
@@ -422,6 +439,7 @@ export function useBatchOperations(
         // Set form values for delete preview with all filters including scope
         const formData = {
           ...currentFilters,
+          scope,
           confirmDelete: true,
           dryRun: true,
           maxRecords: 1000,
@@ -443,7 +461,7 @@ export function useBatchOperations(
       } catch (error) {
         logger.error(
           "app.api.v1.core.leads.batch.delete.preview.failed",
-          error,
+          parseError(error).message,
         );
       }
     },
@@ -453,7 +471,7 @@ export function useBatchOperations(
   // Confirm batch delete handler
   const handleConfirmBatchDelete = useCallback(
     async (
-      currentFilters: Record<string, string | number | boolean | undefined>,
+      currentFilters: LeadListGetRequestTypeOutput,
       onSuccess?: () => void,
     ) => {
       try {
@@ -476,7 +494,10 @@ export function useBatchOperations(
           onOperationComplete?.();
         }
       } catch (error) {
-        logger.error("app.api.v1.core.leads.batch.delete.failed", error);
+        logger.error(
+          "app.api.v1.core.leads.batch.delete.failed",
+          parseError(error).message,
+        );
       }
     },
     [batchDeleteEndpoint.create, onOperationComplete, logger],

@@ -17,7 +17,6 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli
 import {
   objectField,
   requestDataField,
-  requestUrlParamsField,
   responseArrayField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
@@ -564,10 +563,10 @@ const { GET: ListImportJobsGet } = createEndpoint({
       description: "app.api.v1.core.import.jobs.get.form.description",
       layout: { type: LayoutType.GRID, columns: 2 },
     },
-    { request: "urlParams", response: true },
+    { request: "data", response: true },
     {
       // === FILTER OPTIONS ===
-      status: requestUrlParamsField(
+      status: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
@@ -582,7 +581,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
         z.string().default("all"),
       ),
 
-      limit: requestUrlParamsField(
+      limit: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
@@ -597,7 +596,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
         z.number().min(1).max(100).default(20),
       ),
 
-      offset: requestUrlParamsField(
+      offset: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
@@ -689,47 +688,93 @@ const { GET: ListImportJobsGet } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.v1.core.import.jobs.get.errors.validation.title",
-      description: "app.api.v1.core.import.jobs.get.errors.validation.description",
+      title: "app.api.v1.core.import.csv.post.errors.validation.title",
+      description: "app.api.v1.core.import.csv.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.v1.core.import.jobs.get.errors.network.title",
-      description: "app.api.v1.core.import.jobs.get.errors.network.description",
+      title: "app.api.v1.core.import.csv.post.errors.network.title",
+      description: "app.api.v1.core.import.csv.post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.v1.core.import.jobs.get.errors.unauthorized.title",
+      title: "app.api.v1.core.import.csv.post.errors.unauthorized.title",
       description:
-        "app.api.v1.core.import.jobs.get.errors.unauthorized.description",
+        "app.api.v1.core.import.csv.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.v1.core.import.jobs.get.errors.forbidden.title",
-      description: "app.api.v1.core.import.jobs.get.errors.forbidden.description",
+      title: "app.api.v1.core.import.csv.post.errors.forbidden.title",
+      description: "app.api.v1.core.import.csv.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.v1.core.import.jobs.get.errors.notFound.title",
-      description: "app.api.v1.core.import.jobs.get.errors.notFound.description",
+      title: "app.api.v1.core.import.csv.post.errors.notFound.title",
+      description: "app.api.v1.core.import.csv.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.v1.core.import.jobs.get.errors.server.title",
       description: "app.api.v1.core.import.jobs.get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.v1.core.import.jobs.get.errors.unknown.title",
-      description: "app.api.v1.core.import.jobs.get.errors.unknown.description",
+      title: "app.api.v1.core.import.csv.post.errors.unknown.title",
+      description: "app.api.v1.core.import.csv.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.v1.core.import.jobs.get.errors.unsavedChanges.title",
-      description: "app.api.v1.core.import.jobs.get.errors.unsavedChanges.description",
+      title: "app.api.v1.core.import.csv.post.errors.unsavedChanges.title",
+      description: "app.api.v1.core.import.csv.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.v1.core.import.jobs.get.errors.conflict.title",
-      description: "app.api.v1.core.import.jobs.get.errors.conflict.description",
+      title: "app.api.v1.core.import.csv.post.errors.conflict.title",
+      description: "app.api.v1.core.import.csv.post.errors.conflict.description",
     },
   },
 
   successTypes: {
     title: "app.api.v1.core.import.jobs.get.success.title",
     description: "app.api.v1.core.import.jobs.get.success.description",
+  },
+
+  examples: {
+    urlPathParams: undefined,
+    requests: {
+      default: {
+        status: "all",
+        limit: 20,
+        offset: 0,
+      },
+    },
+    responses: {
+      default: {
+        jobs: [
+          {
+            id: "job_123",
+            fileName: "leads.csv",
+            domain: "leads",
+            status: CsvImportJobStatus.COMPLETED,
+            progress: {
+              totalRows: 1000,
+              processedRows: 1000,
+              currentBatchStart: 1000,
+              batchSize: 100,
+              percentComplete: 100,
+            },
+            results: {
+              successfulImports: 950,
+              failedImports: 50,
+              duplicateEmails: 25,
+            },
+            timing: {
+              createdAt: "2024-01-01T00:00:00Z",
+              updatedAt: "2024-01-01T00:05:00Z",
+              startedAt: "2024-01-01T00:00:10Z",
+              completedAt: "2024-01-01T00:05:00Z",
+            },
+            errorInfo: {
+              error: null,
+              retryCount: 0,
+              maxRetries: 3,
+            },
+          },
+        ],
+      },
+    },
   },
 });
 

@@ -228,7 +228,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     } catch (error) {
       logger.error(
         "app.api.v1.core.emails.imapClient.folders.list.error.server",
-        error,
+        parseError(error),
       );
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
@@ -270,7 +270,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     } catch (error) {
       logger.error(
         "app.api.v1.core.emails.imapClient.folders.get.error.server",
-        error,
+        parseError(error),
       );
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
@@ -362,7 +362,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     } catch (error) {
       logger.error(
         "app.api.v1.core.emails.imapClient.folders.sync.error.server",
-        error,
+        parseError(error),
       );
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
@@ -461,7 +461,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     } catch (error) {
       logger.error(
         "app.api.v1.core.emails.imapClient.folders.updateSyncStatus.error.server",
-        error,
+        parseError(error),
       );
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",
@@ -512,7 +512,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     } catch (error) {
       logger.error(
         "app.api.v1.core.emails.imapClient.folders.updateCounts.error.server",
-        error,
+        parseError(error),
       );
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imapErrors.folders.get.error.server.title",

@@ -4,6 +4,7 @@
  * No duplicate check logic - imports from lint and typecheck repositories
  */
 
+import { parseError } from "next-vibe/shared/utils";
 import "server-only";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
@@ -137,7 +138,7 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
 
       return createSuccessResponse(response);
     } catch (error) {
-      logger.error("Vibe check failed", error);
+      logger.error("Vibe check failed", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.system.check.vibeCheck.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,

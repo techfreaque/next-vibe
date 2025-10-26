@@ -241,7 +241,7 @@ const { POST } = createEndpoint({
         subscriptionId: "sub_123456789",
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
 });
 

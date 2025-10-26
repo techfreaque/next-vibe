@@ -100,9 +100,12 @@ export const translations: typeof enTranslations = {
       noToolsFound: "Keine Tools entsprechen Ihrer Suche",
       noToolsAvailable:
         "Noch keine KI-Tools gefunden. Tools werden hier automatisch angezeigt, sobald sie im System registriert sind.",
-      enableAll: "Alle sichtbaren Tools aktivieren",
-      disableAll: "Alle sichtbaren Tools deaktivieren",
-      footerInfo: "{{count}} von {{total}} Tools aktiviert",
+      expandAll: "Alle erweitern",
+      collapseAll: "Alle einklappen",
+      selectAll: "Alle auswählen",
+      deselectAll: "Alle abwählen",
+      enableAll: "Alle aktivieren",
+      stats: "{{enabled}} von {{total}} Tools aktiviert",
     },
   },
 
@@ -303,6 +306,10 @@ export const translations: typeof enTranslations = {
     enabledTitle: "Brave Search aktiviert (+1 Credits pro Suche)",
     disabledTitle: "Brave Search deaktiviert (+1 Credits pro Suche)",
     creditIndicator: "+1",
+  },
+  toolsButton: {
+    title: "KI-Tools konfigurieren",
+    tools: "Tools",
   },
   selectorBase: {
     favorites: "Favoriten",

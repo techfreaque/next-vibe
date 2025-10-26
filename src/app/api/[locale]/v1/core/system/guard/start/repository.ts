@@ -300,7 +300,7 @@ function setupVSCodeIntegration(
         const existingContent = fs.readFileSync(settingsPath, "utf8");
         existingSettings = JSON.parse(existingContent);
         logger.info(`📖 Loaded existing VSCode settings`);
-      } catch (error) {
+      } catch {
         logger.info(`⚠️ Could not parse existing settings, creating new ones`);
         existingSettings = {};
       }
@@ -337,7 +337,7 @@ function setupVSCodeIntegration(
     }
 
     const guardScriptPath = path.join(guardInstancePath, ".guard.sh");
-    const guardScript = createGuardScript(config, projectPath);
+    const guardScript = createGuardScript();
     fs.writeFileSync(guardScriptPath, guardScript, { mode: 0o755 });
     logger.info(`🛡️ Created guard script: ${guardScriptPath}`);
 
@@ -357,10 +357,7 @@ function setupVSCodeIntegration(
 /**
  * Create guard script for VSCode
  */
-function createGuardScript(
-  _config: GuardJailConfig,
-  _projectPath: string,
-): string {
+function createGuardScript(): string {
   return `#!/bin/bash
 # Vibe Guard - Environment-Based Security
 set -e
@@ -471,19 +468,6 @@ exec env -i \
     PWD="$GUARD_PROJECT" \
     bash --rcfile "$GUARD_PROFILE"
 `;
-}
-
-/**
- * Expand variables in command strings
- * Currently unused but available for future template expansion
- */
-function _expandVariables(
-  template: string,
-  variables: Record<string, string>,
-): string {
-  return template.replace(/\$\{(\w+)\}/g, (match, varName) => {
-    return variables[varName] || match;
-  });
 }
 
 /**

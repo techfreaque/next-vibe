@@ -163,18 +163,13 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
           // Note: Would use logger here if passed to private method
           logger.error(
             "No SMTP accounts match lead campaign criteria - strict matching required",
-            {
-              selectionCriteria,
-            },
           );
           return null;
         }
 
         // For non-lead campaigns, try fallback to any active account
         // Note: Would use logger here if passed to private method
-        logger.info("No accounts match criteria, trying fallback", {
-          selectionCriteria,
-        });
+        logger.info("No accounts match criteria, trying fallback");
 
         const fallbackAccounts = await db
           .select()
@@ -184,16 +179,13 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
           .limit(1);
 
         if (fallbackAccounts.length === 0) {
-          logger.error("No active SMTP accounts available", {
-            selectionCriteria,
-          });
+          logger.error("No active SMTP accounts available");
           return null;
         }
 
         logger.info("Using fallback SMTP account", {
           accountId: fallbackAccounts[0].id,
           accountName: fallbackAccounts[0].name,
-          selectionCriteria,
         });
 
         return fallbackAccounts[0];
@@ -323,7 +315,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
       // Fallback to first candidate
       return topCandidates[0].account;
     } catch (error) {
-      logger.error("Error getting SMTP account with criteria", error);
+      logger.error("Error getting SMTP account with criteria", parseError(error));
       return null;
     }
   }
@@ -354,7 +346,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
 
       return fallbackAccounts[0];
     } catch (error) {
-      logger.error("Error getting fallback SMTP account", error);
+      logger.error("Error getting fallback SMTP account", parseError(error));
       return null;
     }
   }
@@ -431,7 +423,6 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
       logger.debug("Sending email via SMTP service", {
         to: data.to,
         subject: data.subject,
-        selectionCriteria: data.selectionCriteria,
       });
 
       // Get the primary account first
@@ -516,7 +507,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
 
       return fallbackResult; // Return the last error
     } catch (error) {
-      logger.error("Critical error in email sending", error);
+      logger.error("Critical error in email sending", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.emails.smtpClient.sending.errors.server.title",
         ErrorResponseTypes.EMAIL_ERROR,
@@ -795,7 +786,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
         response: result.response,
       });
     } catch (error) {
-      logger.error("Error performing email send", error);
+      logger.error("Error performing email send", parseError(error));
 
       // Mark account as unhealthy on connection errors
       const errorMessage = parseError(error).message;
@@ -899,7 +890,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
         currentUsage: emailsSentThisHour,
       });
     } catch (error) {
-      logger.error("Error checking rate limit", error);
+      logger.error("Error checking rate limit", parseError(error));
       // On error, allow limited sending to be safe
       return createSuccessResponse({
         canSend: true,
@@ -954,7 +945,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
         },
       });
     } catch (error) {
-      logger.error("Error recording email in database", error);
+      logger.error("Error recording email in database", parseError(error));
       // Don't throw error to avoid breaking email sending
     }
   }
@@ -1000,7 +991,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
         })
         .where(eq(smtpAccounts.id, accountId));
     } catch (error) {
-      logger.error("Error updating account usage", error);
+      logger.error("Error updating account usage", parseError(error));
     }
   }
 
@@ -1040,7 +1031,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
           .where(eq(smtpAccounts.id, accountId));
       }
     } catch (error) {
-      logger.error("Error updating account health", error);
+      logger.error("Error updating account health", parseError(error));
     }
   }
 
@@ -1090,7 +1081,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
         remainingCapacity: totalRemainingCapacity,
       });
     } catch (error) {
-      logger.error("Error getting total sending capacity", error);
+      logger.error("Error getting total sending capacity", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.emails.smtpClient.sending.errors.capacity.title",
         ErrorResponseTypes.EMAIL_ERROR,
@@ -1112,7 +1103,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
           resolve();
         });
       } catch (error) {
-        logger.error("Error closing transport", { accountId, error });
+        logger.error("Error closing transport", { accountId }, parseError(error));
       }
     }
     this.transportCache.clear();

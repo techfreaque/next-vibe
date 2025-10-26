@@ -19,9 +19,9 @@ export const { GET, PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ user, urlVariables }) => {
+    handler: async ({ user, urlPathParams }) => {
       const userId = user.id;
-      const { id } = urlVariables;
+      const { id } = urlPathParams;
 
       const persona = await repository.getPersonaById(id, userId);
 
@@ -37,9 +37,9 @@ export const { GET, PATCH, tools } = endpointsHandler({
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: async ({ user, urlVariables, data }) => {
+    handler: async ({ user, urlPathParams, data }) => {
       const userId = user.id;
-      const { id } = urlVariables;
+      const { id } = urlPathParams;
 
       if (!userId) {
         return createErrorResponse(

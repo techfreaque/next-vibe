@@ -13,7 +13,8 @@ export const translations: typeof enTranslations = {
       journeyInfo: {
         personalApproach: {
           name: "Podejście Osobiste",
-          description: "Buduj prawdziwe połączenia poprzez spersonalizowane wiadomości",
+          description:
+            "Buduj prawdziwe połączenia poprzez spersonalizowane wiadomości",
         },
         resultsFocused: {
           name: "Skupione na Wynikach",
@@ -21,7 +22,8 @@ export const translations: typeof enTranslations = {
         },
         personalResults: {
           name: "Osobiste + Wyniki",
-          description: "Połącz osobisty akcent z wiadomościami ukierunkowanymi na wyniki",
+          description:
+            "Połącz osobisty akcent z wiadomościami ukierunkowanymi na wyniki",
         },
       },
     },

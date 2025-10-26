@@ -52,7 +52,7 @@ async function handler(
     createContext: async () => {
       return await createTRPCContext({
         req,
-        urlParams: { locale },
+        urlPathParams: { locale },
         logger,
         locale,
       });

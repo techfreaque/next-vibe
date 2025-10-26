@@ -33,7 +33,7 @@ export function useMessagesList(
   return useEndpoint(
     definitions,
     {
-      urlParams: { threadId: params.threadId },
+      urlPathParams: { threadId: params.threadId },
       queryOptions: {
         enabled: params.enabled ?? true,
         refetchOnWindowFocus: true,
@@ -66,7 +66,7 @@ export function useCreateMessage(
   return useEndpoint(
     definitions,
     {
-      urlParams: { threadId: params.threadId },
+      urlPathParams: { threadId: params.threadId },
       formOptions: {
         persistForm: false,
       },

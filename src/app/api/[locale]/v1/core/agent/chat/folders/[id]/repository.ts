@@ -100,7 +100,8 @@ export async function updateFolder(
     const circularError = validateNoCircularReference(
       id,
       updates.parentId,
-      "app.api.v1.core.agent.chat.folders.id.patch",
+      "app.api.v1.core.agent.chat.folders.id.patch.errors.validation.title" as const,
+      "app.api.v1.core.agent.chat.folders.id.patch.errors.validation.circularReference" as const,
     );
     if (circularError) {
       return circularError;

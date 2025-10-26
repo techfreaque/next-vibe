@@ -3,17 +3,9 @@
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import type { FormEvent } from "react";
 import { useMemo } from "react";
-import { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import type {
-  ArrayField,
-  FieldUsageConfig,
-  ObjectField,
-  PrimitiveField,
-  UnifiedField,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
@@ -44,7 +36,7 @@ function normalizeOptions<T>(options: UseEndpointOptions<T> = {}): {
     requestData?: GetEndpointTypes<T> extends never
       ? undefined
       : GetEndpointTypes<T>["request"];
-    urlParams?: EndpointUrlVariables<T>;
+    urlPathParams?: EndpointUrlVariables<T>;
     staleTime: number;
     refetchOnWindowFocus: boolean;
   };
@@ -57,7 +49,7 @@ function normalizeOptions<T>(options: UseEndpointOptions<T> = {}): {
   const queryOptions = {
     enabled: options.enabled ?? options.queryOptions?.enabled ?? true,
     requestData: options.queryOptions?.requestData,
-    urlParams: options.urlParams ?? options.queryOptions?.urlParams,
+    urlPathParams: options.urlPathParams ?? options.queryOptions?.urlPathParams,
     staleTime:
       options.staleTime ?? options.queryOptions?.staleTime ?? 5 * 60 * 1000, // 5 minutes default
     refetchOnWindowFocus:
@@ -139,7 +131,7 @@ export function useEndpoint<
       persistenceKey: undefined,
     },
     queryOptions,
-    urlParams: queryOptions?.urlParams,
+    urlPathParams: queryOptions?.urlPathParams,
     autoPrefillConfig,
   });
 
@@ -167,13 +159,13 @@ export function useEndpoint<
       persistenceKey: undefined,
     },
     mutationOptions: {},
-    urlParams: queryOptions?.urlParams,
+    urlPathParams: queryOptions?.urlPathParams,
     autoPrefillData,
   });
 
   const deleteOperation = useEndpointDelete(deleteEndpoint, logger, {
     mutationOptions: {},
-    urlParams: queryOptions?.urlParams,
+    urlPathParams: queryOptions?.urlPathParams,
   });
 
   const isLoading =

@@ -1,3 +1,4 @@
+import { parseError } from "next-vibe/shared/utils";
 import type { QueryKey } from "@tanstack/react-query";
 import { QueryClient } from "@tanstack/react-query";
 import type {
@@ -18,7 +19,6 @@ import { create } from "zustand";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import {
   callApi,
@@ -312,7 +312,7 @@ export interface ApiStore {
         }
       | undefined,
     requestData?: TEndpoint["TRequestOutput"],
-    urlParams?: TEndpoint["TUrlVariablesOutput"],
+    urlPathParams?: TEndpoint["TUrlVariablesOutput"],
   ) => void;
 }
 
@@ -572,7 +572,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         error: null,
         isError: false,
         isSuccess: false,
-        statusMessage: "app.error.api.store.status.loading_data" as const,
+        statusMessage:
+          "app.api.v1.core.system.unifiedUi.react.hooks.store.status.loading_data" as const,
         isCachedData: false,
         lastFetchTime: existingLastFetchTime ?? null,
         isLoading: true,
@@ -596,7 +597,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         }
       } catch (error) {
         // If the shared request fails, we'll continue and try again
-        logger.error("Shared request failed, retrying", error);
+        logger.error("Shared request failed, retrying", parseError(error));
         // Remove the failed request
         inFlightRequests.delete(requestKey);
       }
@@ -624,7 +625,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   isLoadingFresh: false,
                   isCachedData: true,
                   statusMessage:
-                    "app.error.api.store.status.cached_data" as const,
+                    "app.api.v1.core.system.unifiedUi.react.hooks.store.status.cached_data" as const,
                   lastFetchTime: existingQuery.lastFetchTime ?? null,
                 },
               },
@@ -692,7 +693,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
           return createSuccessResponse(cachedData);
         }
       } catch (error) {
-        logger.error("Failed to load data from storage:", error);
+        logger.error("Failed to load data from storage:", parseError(error));
       }
     }
 
@@ -714,7 +715,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
           // Create a proper error response
           const errorResponse = createErrorResponse(
-            "app.error.api.store.errors.validation_failed",
+            "app.api.v1.core.system.unifiedUi.react.hooks.store.errors.validation_failed",
             ErrorResponseTypes.VALIDATION_ERROR,
             { endpoint: endpoint.path.join("/") },
           );
@@ -739,7 +740,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 isLoadingFresh: false,
                 isCachedData: state.queries[queryId]?.isCachedData ?? false,
                 statusMessage:
-                  "app.error.api.store.errors.validation_failed" as const,
+                  "app.api.v1.core.system.unifiedUi.react.hooks.store.errors.validation_failed" as const,
                 lastFetchTime: Date.now(),
               },
             },
@@ -750,7 +751,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             options.onError({
               error: errorResponse,
               requestData,
-              urlParams: pathParams,
+              urlPathParams: pathParams,
             });
           }
 
@@ -769,6 +770,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         if (endpoint.method !== Methods.GET) {
           if (containsFile(requestData)) {
             // Convert to FormData
+            // eslint-disable-next-line no-restricted-syntax
             postBody = objectToFormData(requestData as Record<string, unknown>);
           } else {
             // Use JSON
@@ -796,7 +798,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   isError: true,
                   isSuccess: false,
                   statusMessage:
-                    "app.error.api.store.errors.request_failed" as const,
+                    "app.api.v1.core.system.unifiedUi.react.hooks.store.errors.request_failed" as const,
                   isLoadingFresh: false,
                   isCachedData: existingQuery?.isCachedData ?? false,
                   lastFetchTime: Date.now(),
@@ -810,7 +812,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             options.onError({
               error: response,
               requestData,
-              urlParams: pathParams,
+              urlPathParams: pathParams,
             });
           }
 
@@ -838,7 +840,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 isSuccess: true,
                 isLoadingFresh: false,
                 isCachedData: false,
-                statusMessage: "app.error.api.store.status.success" as const,
+                statusMessage:
+                  "app.api.v1.core.system.unifiedUi.react.hooks.store.status.success" as const,
                 lastFetchTime: Date.now(),
               },
             },
@@ -858,7 +861,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         if (options.onSuccess) {
           const onSuccessResult = options.onSuccess({
             requestData,
-            urlParams: pathParams,
+            urlPathParams: pathParams,
             responseData: (response.success
               ? response.data
               : undefined) as TResponseOutput,
@@ -888,7 +891,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                   isLoadingFresh: false,
                   isCachedData: state.queries[queryId]?.isCachedData ?? false,
                   statusMessage:
-                    "app.error.api.store.errors.validation_failed" as const,
+                    "app.api.v1.core.system.unifiedUi.react.hooks.store.errors.validation_failed" as const,
                   lastFetchTime: Date.now(),
                 },
               },
@@ -899,7 +902,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               options.onError({
                 error: onSuccessResult,
                 requestData,
-                urlParams: pathParams,
+                urlPathParams: pathParams,
               });
             }
 
@@ -914,7 +917,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       } catch (err) {
         // Create a properly typed error response with translation key
         const errorResponse = createErrorResponse(
-          "app.error.api.store.errors.request_failed",
+          "app.api.v1.core.system.unifiedUi.react.hooks.store.errors.request_failed",
           ErrorResponseTypes.INTERNAL_ERROR,
           {
             error: parseError(err).message,
@@ -942,7 +945,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               isLoadingFresh: false,
               isCachedData: state.queries[queryId]?.isCachedData ?? false,
               statusMessage:
-                "app.error.api.store.errors.request_failed" as const,
+                "app.api.v1.core.system.unifiedUi.react.hooks.store.errors.request_failed" as const,
               lastFetchTime: Date.now(),
             },
           },
@@ -953,7 +956,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
           options.onError({
             error: errorResponse,
             requestData,
-            urlParams: pathParams,
+            urlPathParams: pathParams,
           });
         }
 
@@ -987,7 +990,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       const errorResponse = isErrorResponseType(error)
         ? error
         : createErrorResponse(
-            "app.error.api.store.errors.request_failed",
+            "app.api.v1.core.system.unifiedUi.react.hooks.store.errors.request_failed",
             ErrorResponseTypes.INTERNAL_ERROR,
             { error: parseError(error).message },
           );
@@ -1052,7 +1055,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
           isError: false,
           error: null,
           isSuccess: false,
-          statusMessage: "app.error.api.store.status.mutation_pending" as const,
+          statusMessage:
+            "app.api.v1.core.system.unifiedUi.react.hooks.store.status.mutation_pending" as const,
           data: undefined,
         },
       },
@@ -1065,7 +1069,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       if (!requestValidation.success) {
         // Create a proper error response
         const errorResponse = createErrorResponse(
-          "app.error.api.store.errors.validation_failed",
+          "app.api.v1.core.system.unifiedUi.react.hooks.store.errors.validation_failed",
           ErrorResponseTypes.VALIDATION_ERROR,
           { endpoint: endpoint.path.join("/") },
         );
@@ -1081,7 +1085,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               error: errorResponse,
               isSuccess: false,
               statusMessage:
-                "app.error.api.store.errors.validation_failed" as const,
+                "app.api.v1.core.system.unifiedUi.react.hooks.store.errors.validation_failed" as const,
               data: undefined,
             },
           },
@@ -1108,6 +1112,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       if (endpoint.method !== Methods.GET) {
         if (containsFile(requestData)) {
           // Convert to FormData
+          // eslint-disable-next-line no-restricted-syntax
           postBody = objectToFormData(requestData as Record<string, unknown>);
         } else {
           // Use JSON
@@ -1129,7 +1134,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               error: response,
               isSuccess: false,
               statusMessage:
-                "app.error.api.store.errors.mutation_failed" as const,
+                "app.api.v1.core.system.unifiedUi.react.hooks.store.errors.mutation_failed" as const,
               data: undefined,
             },
           },
@@ -1146,7 +1151,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
         // Return error response with proper translation key
         return createErrorResponse(
-          "app.error.api.store.errors.mutation_failed",
+          "app.api.v1.core.system.unifiedUi.react.hooks.store.errors.mutation_failed",
           ErrorResponseTypes.INTERNAL_ERROR,
           { error: response.message, endpoint: endpoint.path.join("/") },
         );
@@ -1167,7 +1172,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             error: null,
             isSuccess: true,
             statusMessage:
-              "app.error.api.store.status.mutation_success" as const,
+              "app.api.v1.core.system.unifiedUi.react.hooks.store.status.mutation_success" as const,
             data: responseData as AnyData,
           },
         },
@@ -1199,7 +1204,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 error: onSuccessResult,
                 isSuccess: false,
                 statusMessage:
-                  "app.error.api.store.errors.validation_failed" as const,
+                  "app.api.v1.core.system.unifiedUi.react.hooks.store.errors.validation_failed" as const,
                 data: undefined,
               },
             },
@@ -1224,7 +1229,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       const errorResponse = isErrorResponseType(error)
         ? error
         : createErrorResponse(
-            "app.error.api.store.errors.mutation_failed",
+            "app.api.v1.core.system.unifiedUi.react.hooks.store.errors.mutation_failed",
             ErrorResponseTypes.INTERNAL_ERROR,
             { error: parseError(error).message },
           );
@@ -1240,7 +1245,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
             error: errorResponse,
             isSuccess: false,
             statusMessage:
-              "app.error.api.store.errors.unexpected_failure" as const,
+              "app.api.v1.core.system.unifiedUi.react.hooks.store.errors.unexpected_failure" as const,
             data: undefined,
           },
         },
@@ -1257,7 +1262,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
       // Return error response with proper translation key
       return createErrorResponse(
-        "app.error.api.store.errors.unexpected_failure",
+        "app.api.v1.core.system.unifiedUi.react.hooks.store.errors.unexpected_failure",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: errorResponse.message, endpoint: endpoint.path.join("/") },
       );
@@ -1309,7 +1314,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       // Create a proper error response with error details and translation key
       const errorMessage = err instanceof Error ? err.message : String(err);
       return createErrorResponse(
-        "app.error.api.store.errors.refetch_failed",
+        "app.api.v1.core.system.unifiedUi.react.hooks.store.errors.refetch_failed",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: errorMessage, queryKey: JSON.stringify(queryKey) },
       );
@@ -1366,6 +1371,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       string,
       Methods,
       readonly (typeof UserRoleValue)[],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       any
     >,
   >(
@@ -1384,17 +1390,18 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         }
       | undefined,
     requestData?: TEndpoint["TRequestOutput"],
-    urlParams?: TEndpoint["TUrlVariablesOutput"],
+    urlPathParams?: TEndpoint["TUrlVariablesOutput"],
   ): void => {
     // Generate the query key in the same format as useApiQuery
     const endpointKey = `${endpoint.path.join("/")}:${endpoint.method}`;
 
     // Stringify request data
+    // eslint-disable-next-line i18next/no-literal-string
     let requestDataKey = "{}";
     if (requestData !== undefined && requestData !== null) {
       try {
         requestDataKey = JSON.stringify(requestData);
-      } catch (err) {
+      } catch {
         requestDataKey =
           typeof requestData === "object"
             ? Object.keys(requestData).sort().join(",")
@@ -1403,19 +1410,20 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     }
 
     // Stringify URL params
-    let urlParamsKey = "{}";
-    if (urlParams !== undefined && urlParams !== null) {
+    // eslint-disable-next-line i18next/no-literal-string
+    let urlPathParamsKey = "{}";
+    if (urlPathParams !== undefined && urlPathParams !== null) {
       try {
-        urlParamsKey = JSON.stringify(urlParams);
-      } catch (err) {
-        urlParamsKey =
-          typeof urlParams === "object"
-            ? Object.keys(urlParams).sort().join(",")
-            : String(urlParams);
+        urlPathParamsKey = JSON.stringify(urlPathParams);
+      } catch {
+        urlPathParamsKey =
+          typeof urlPathParams === "object"
+            ? Object.keys(urlPathParams).sort().join(",")
+            : String(urlPathParams);
       }
     }
 
-    const queryKey: QueryKey = [endpointKey, requestDataKey, urlParamsKey];
+    const queryKey: QueryKey = [endpointKey, requestDataKey, urlPathParamsKey];
     const queryId = get().getQueryId(queryKey);
 
     // Update the query data in the store
@@ -1649,7 +1657,7 @@ export const apiClient = {
    * @param endpoint - The endpoint definition (GET endpoint)
    * @param updater - Function that receives the old data and returns the new data
    * @param requestData - Optional request data (query params)
-   * @param urlParams - Optional URL parameters
+   * @param urlPathParams - Optional URL parameters
    *
    * @example
    * // Update credit balance after AI response completes
@@ -1690,10 +1698,10 @@ export const apiClient = {
         }
       | undefined,
     requestData?: TEndpoint["TRequestOutput"],
-    urlParams?: TEndpoint["TUrlVariablesOutput"],
+    urlPathParams?: TEndpoint["TUrlVariablesOutput"],
   ): void => {
     useApiStore
       .getState()
-      .updateEndpointData(endpoint, updater, requestData, urlParams);
+      .updateEndpointData(endpoint, updater, requestData, urlPathParams);
   },
 };

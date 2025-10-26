@@ -57,9 +57,7 @@ export async function loadConfig(
   }
 
   try {
-    const importedModule = (await import(
-      `file://${resolvedConfigPath}`
-    )) as unknown;
+    const importedModule = await import(`file://${resolvedConfigPath}`);
 
     if (!isReleaseConfigModule(importedModule)) {
       logger.error("Invalid config format", { path: resolvedConfigPath });

@@ -5,7 +5,6 @@
 
 import { z } from "zod";
 
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -19,6 +18,7 @@ import {
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { LayoutType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
+import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 const { POST } = createEndpoint({
   method: Methods.POST,
@@ -209,7 +209,8 @@ const { POST } = createEndpoint({
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.success.title",
+    title:
+      "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.success.title",
     description:
       "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.success.description",
   },
@@ -321,7 +322,7 @@ const { POST } = createEndpoint({
         },
       },
     },
-    urlPathVariables: {
+    urlPathParams: {
       default: {},
       success: {},
       verbose: {},

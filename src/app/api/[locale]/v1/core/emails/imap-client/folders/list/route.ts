@@ -19,17 +19,17 @@ export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: ({ urlVariables, user, locale, logger }) =>
+    handler: ({ urlPathParams, user, locale, logger }) =>
       imapFoldersRepository.listFolders(
         {
-          page: urlVariables.page ?? 1,
-          limit: urlVariables.limit ?? 20,
-          accountId: urlVariables.accountId,
-          sortBy: urlVariables.sortBy ?? [ImapFolderSortField.NAME],
-          sortOrder: urlVariables.sortOrder ?? [SortOrder.ASC],
-          search: urlVariables.search,
-          specialUseType: urlVariables.specialUseType,
-          syncStatus: urlVariables.syncStatus,
+          page: urlPathParams.page ?? 1,
+          limit: urlPathParams.limit ?? 20,
+          accountId: urlPathParams.accountId,
+          sortBy: urlPathParams.sortBy ?? [ImapFolderSortField.NAME],
+          sortOrder: urlPathParams.sortOrder ?? [SortOrder.ASC],
+          search: urlPathParams.search,
+          specialUseType: urlPathParams.specialUseType,
+          syncStatus: urlPathParams.syncStatus,
         },
         user,
         locale,

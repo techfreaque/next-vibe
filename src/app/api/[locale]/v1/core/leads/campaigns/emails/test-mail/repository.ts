@@ -200,7 +200,7 @@ class TestEmailRepository {
           messageId,
           testEmail: data.testEmail,
           subject: emailContent.subject,
-          sentAt,
+          sentAt: sentAt.toISOString(),
         });
 
         return createSuccessResponse({
@@ -213,7 +213,7 @@ class TestEmailRepository {
           },
         });
       } catch (error) {
-        logger.error("test.email.send.error", error);
+        logger.error("test.email.send.error", parseError(error));
         return createErrorResponse(
           "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.sendingFailed.title",
           ErrorResponseTypes.EMAIL_ERROR,
@@ -225,7 +225,7 @@ class TestEmailRepository {
         );
       }
     } catch (error) {
-      logger.error("test.email.send.server.error", error);
+      logger.error("test.email.send.server.error", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.campaigns.emails.testMail.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,

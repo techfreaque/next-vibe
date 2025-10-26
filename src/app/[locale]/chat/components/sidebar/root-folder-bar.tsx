@@ -14,7 +14,7 @@ import React, { useCallback } from "react";
 
 import {
   DEFAULT_FOLDER_CONFIGS,
-  type DefaultFolderId,
+  isDefaultFolderId,
 } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -98,8 +98,8 @@ export function RootFolderBar({
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>): void => {
-      const folderId = event.currentTarget.dataset.folderId as DefaultFolderId;
-      if (folderId) {
+      const folderId = event.currentTarget.dataset.folderId;
+      if (folderId && isDefaultFolderId(folderId)) {
         onSelectFolder(folderId);
       }
     },

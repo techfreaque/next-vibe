@@ -51,4 +51,8 @@ export const translations: typeof enTranslations = {
       description: "Operacja zakończona pomyślnie",
     },
   },
+  errors: {
+    validation_failed: "Walidacja formularza nie powiodła się",
+    network_failure: "Żądanie sieciowe nie powiodło się",
+  },
 };

@@ -3,6 +3,7 @@
  * Handles database operations and business logic for campaign starter configuration
  */
 
+import { parseError } from "next-vibe/shared/utils";
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -245,7 +246,7 @@ class CampaignStarterConfigRepositoryImpl
       logger.debug("No config found, returning default", { environment });
       return createSuccessResponse(combinedConfig);
     } catch (error) {
-      logger.error("Error fetching campaign starter config", error);
+      logger.error("Error fetching campaign starter config", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -316,7 +317,7 @@ class CampaignStarterConfigRepositoryImpl
 
       return createSuccessResponse(data);
     } catch (error) {
-      logger.error("Error updating campaign starter config", error);
+      logger.error("Error updating campaign starter config", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.leads.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -371,7 +372,7 @@ class CampaignStarterConfigRepositoryImpl
       // Return combined config
       return createSuccessResponse(defaultConfigWithCron);
     } catch (error) {
-      logger.error("Error ensuring config exists", error);
+      logger.error("Error ensuring config exists", parseError(error));
       // Fall back to default config with default cron settings if database operation fails
       const defaultConfig = getDefaultConfigWithCron();
       return createSuccessResponse(defaultConfig);

@@ -4,11 +4,11 @@ import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
-import { env } from "@/config/env";
 import { ThemeProvider } from "next-vibe-ui/ui/theme-provider";
 import { Toaster } from "next-vibe-ui/ui/toaster";
 import type { JSX, ReactNode } from "react";
 
+import { env } from "@/config/env";
 import { TranslationProvider } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";

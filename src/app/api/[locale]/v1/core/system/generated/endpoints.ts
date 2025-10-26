@@ -5,9 +5,7 @@
 
 /* eslint-disable simple-import-sort/imports */
 
-import type {
-  ApiSection,
-} from "../unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
+import type { ApiSection } from "../unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
 import { setNestedPath } from "next-vibe/shared/utils/object-path";
 
 import { default as endpointDefinition0 } from "@/app/api/[locale]/v1/core/agent/chat/personas/[id]/definition";
@@ -140,131 +138,573 @@ import { default as endpointDefinition125 } from "@/app/api/[locale]/v1/core/new
 export const endpoints: ApiSection = {};
 
 export function setupEndpoints(): ApiSection {
-  setNestedPath(endpoints, ["core","agent","chat","personas","[id]"], endpointDefinition0);
-  setNestedPath(endpoints, ["core","agent","chat","personas"], endpointDefinition1);
-  setNestedPath(endpoints, ["core","agent","chat","threads"], endpointDefinition2);
-  setNestedPath(endpoints, ["core","agent","chat","threads","[threadId]","messages"], endpointDefinition3);
-  setNestedPath(endpoints, ["core","agent","chat","threads","[threadId]","messages","search"], endpointDefinition4);
-  setNestedPath(endpoints, ["core","agent","chat","threads","[threadId]","messages","[messageId]"], endpointDefinition5);
-  setNestedPath(endpoints, ["core","agent","chat","threads","[threadId]"], endpointDefinition6);
-  setNestedPath(endpoints, ["core","agent","chat","tools","brave-search"], endpointDefinition7);
-  setNestedPath(endpoints, ["core","agent","chat","ai-stream"], endpointDefinition8);
-  setNestedPath(endpoints, ["core","agent","chat","folders","[id]"], endpointDefinition9);
-  setNestedPath(endpoints, ["core","agent","chat","folders"], endpointDefinition10);
-  setNestedPath(endpoints, ["core","agent","chat","credits","history"], endpointDefinition11);
-  setNestedPath(endpoints, ["core","agent","chat","credits"], endpointDefinition12);
-  setNestedPath(endpoints, ["core","agent","chat","credits","purchase"], endpointDefinition13);
-  setNestedPath(endpoints, ["core","agent","text-to-speech"], endpointDefinition14);
-  setNestedPath(endpoints, ["core","agent","speech-to-text"], endpointDefinition15);
-  setNestedPath(endpoints, ["core","system","server","dev"], endpointDefinition16);
-  setNestedPath(endpoints, ["core","system","server","start"], endpointDefinition17);
-  setNestedPath(endpoints, ["core","system","server","build"], endpointDefinition18);
-  setNestedPath(endpoints, ["core","system","server","health"], endpointDefinition19);
-  setNestedPath(endpoints, ["core","system","guard","start"], endpointDefinition20);
-  setNestedPath(endpoints, ["core","system","guard","stop"], endpointDefinition21);
-  setNestedPath(endpoints, ["core","system","guard","status"], endpointDefinition22);
-  setNestedPath(endpoints, ["core","system","guard","destroy"], endpointDefinition23);
-  setNestedPath(endpoints, ["core","system","translations","reorganize"], endpointDefinition24);
-  setNestedPath(endpoints, ["core","system","translations","restore-backup"], endpointDefinition25);
-  setNestedPath(endpoints, ["core","system","translations","stats"], endpointDefinition26);
-  setNestedPath(endpoints, ["core","system","tasks","cron","tasks"], endpointDefinition27);
-  setNestedPath(endpoints, ["core","system","tasks","cron","history"], endpointDefinition28);
-  setNestedPath(endpoints, ["core","system","tasks","cron","status"], endpointDefinition29);
-  setNestedPath(endpoints, ["core","system","tasks","cron","stats"], endpointDefinition30);
-  setNestedPath(endpoints, ["core","system","tasks","side-tasks"], endpointDefinition31);
-  setNestedPath(endpoints, ["core","system","tasks","types"], endpointDefinition32);
-  setNestedPath(endpoints, ["core","system","tasks","pulse","execute"], endpointDefinition33);
-  setNestedPath(endpoints, ["core","system","tasks","unified-runner"], endpointDefinition34);
-  setNestedPath(endpoints, ["core","system","db","schema-verify"], endpointDefinition35);
-  setNestedPath(endpoints, ["core","system","db","utils","docker-operations"], endpointDefinition36);
-  setNestedPath(endpoints, ["core","system","db","utils"], endpointDefinition37);
-  setNestedPath(endpoints, ["core","system","db","migrate-repair"], endpointDefinition38);
-  setNestedPath(endpoints, ["core","system","db","migrate-prod"], endpointDefinition39);
-  setNestedPath(endpoints, ["core","system","db","seed"], endpointDefinition40);
-  setNestedPath(endpoints, ["core","system","db","reset"], endpointDefinition41);
-  setNestedPath(endpoints, ["core","system","db","reset","task-management"], endpointDefinition42);
-  setNestedPath(endpoints, ["core","system","db","migrate-sync"], endpointDefinition43);
-  setNestedPath(endpoints, ["core","system","db","migrate"], endpointDefinition44);
-  setNestedPath(endpoints, ["core","system","db","migrate","task-management"], endpointDefinition45);
-  setNestedPath(endpoints, ["core","system","db","ping"], endpointDefinition46);
-  setNestedPath(endpoints, ["core","system","db","sql"], endpointDefinition47);
-  setNestedPath(endpoints, ["core","system","db","studio"], endpointDefinition48);
-  setNestedPath(endpoints, ["core","system","check","testing","test"], endpointDefinition49);
-  setNestedPath(endpoints, ["core","system","check","vibe-check"], endpointDefinition50);
-  setNestedPath(endpoints, ["core","system","check","typecheck"], endpointDefinition51);
-  setNestedPath(endpoints, ["core","system","unified-ui","ai-tool","tools"], endpointDefinition52);
-  setNestedPath(endpoints, ["core","system","unified-ui","mcp","tools"], endpointDefinition53);
-  setNestedPath(endpoints, ["core","system","unified-ui","mcp","execute"], endpointDefinition54);
-  setNestedPath(endpoints, ["core","system","unified-ui","cli","setup","uninstall"], endpointDefinition55);
-  setNestedPath(endpoints, ["core","system","unified-ui","cli","setup","update"], endpointDefinition56);
-  setNestedPath(endpoints, ["core","system","unified-ui","cli","setup","status"], endpointDefinition57);
-  setNestedPath(endpoints, ["core","system","unified-ui","cli","setup","install"], endpointDefinition58);
-  setNestedPath(endpoints, ["core","system","generators","generate-all"], endpointDefinition59);
-  setNestedPath(endpoints, ["core","system","generators","endpoints"], endpointDefinition60);
-  setNestedPath(endpoints, ["core","system","generators","task-index"], endpointDefinition61);
-  setNestedPath(endpoints, ["core","system","generators","seeds"], endpointDefinition62);
-  setNestedPath(endpoints, ["core","system","generators","generate-trpc-router","validation"], endpointDefinition63);
-  setNestedPath(endpoints, ["core","manifest"], endpointDefinition64);
-  setNestedPath(endpoints, ["core","leads","lead","[id]"], endpointDefinition65);
-  setNestedPath(endpoints, ["core","leads","tracking","engagement"], endpointDefinition66);
-  setNestedPath(endpoints, ["core","leads","search"], endpointDefinition67);
-  setNestedPath(endpoints, ["core","leads","campaigns","campaign-starter","campaign-starter-config"], endpointDefinition68);
-  setNestedPath(endpoints, ["core","leads","campaigns","emails","test-mail"], endpointDefinition69);
-  setNestedPath(endpoints, ["core","leads","list"], endpointDefinition70);
-  setNestedPath(endpoints, ["core","leads","import"], endpointDefinition71);
-  setNestedPath(endpoints, ["core","leads","import","jobs","[jobId]"], endpointDefinition72);
-  setNestedPath(endpoints, ["core","leads","import","jobs","[jobId]","stop"], endpointDefinition73);
-  setNestedPath(endpoints, ["core","leads","import","jobs","[jobId]","retry"], endpointDefinition74);
-  setNestedPath(endpoints, ["core","leads","import","status"], endpointDefinition75);
-  setNestedPath(endpoints, ["core","leads","export"], endpointDefinition76);
-  setNestedPath(endpoints, ["core","leads","stats"], endpointDefinition77);
-  setNestedPath(endpoints, ["core","leads","create"], endpointDefinition78);
-  setNestedPath(endpoints, ["core","leads","batch"], endpointDefinition79);
-  setNestedPath(endpoints, ["core","users","user","[id]"], endpointDefinition80);
-  setNestedPath(endpoints, ["core","users","list"], endpointDefinition81);
-  setNestedPath(endpoints, ["core","users","stats"], endpointDefinition82);
-  setNestedPath(endpoints, ["core","users","create"], endpointDefinition83);
-  setNestedPath(endpoints, ["core","user","private","logout"], endpointDefinition84);
-  setNestedPath(endpoints, ["core","user","private","me"], endpointDefinition85);
-  setNestedPath(endpoints, ["core","user","private","me","password"], endpointDefinition86);
-  setNestedPath(endpoints, ["core","user","private","me","avatar"], endpointDefinition87);
-  setNestedPath(endpoints, ["core","user","public","login","options"], endpointDefinition88);
-  setNestedPath(endpoints, ["core","user","public","login"], endpointDefinition89);
-  setNestedPath(endpoints, ["core","user","public","signup"], endpointDefinition90);
-  setNestedPath(endpoints, ["core","user","public","reset-password","validate"], endpointDefinition91);
-  setNestedPath(endpoints, ["core","user","public","reset-password","request"], endpointDefinition92);
-  setNestedPath(endpoints, ["core","user","public","reset-password","confirm"], endpointDefinition93);
-  setNestedPath(endpoints, ["core","user","search"], endpointDefinition94);
-  setNestedPath(endpoints, ["core","stripe"], endpointDefinition95);
-  setNestedPath(endpoints, ["core","subscription"], endpointDefinition96);
-  setNestedPath(endpoints, ["core","subscription","checkout"], endpointDefinition97);
-  setNestedPath(endpoints, ["core","payment","portal"], endpointDefinition98);
-  setNestedPath(endpoints, ["core","payment"], endpointDefinition99);
-  setNestedPath(endpoints, ["core","payment","invoice"], endpointDefinition100);
-  setNestedPath(endpoints, ["core","payment","refund"], endpointDefinition101);
-  setNestedPath(endpoints, ["core","contact"], endpointDefinition102);
-  setNestedPath(endpoints, ["core","emails","smtp-client","list"], endpointDefinition103);
-  setNestedPath(endpoints, ["core","emails","smtp-client","edit","[id]"], endpointDefinition104);
-  setNestedPath(endpoints, ["core","emails","smtp-client","create"], endpointDefinition105);
-  setNestedPath(endpoints, ["core","emails","send"], endpointDefinition106);
-  setNestedPath(endpoints, ["core","emails","messages","[id]"], endpointDefinition107);
-  setNestedPath(endpoints, ["core","emails","messages","list"], endpointDefinition108);
-  setNestedPath(endpoints, ["core","emails","messages","stats"], endpointDefinition109);
-  setNestedPath(endpoints, ["core","emails","imap-client","messages","[id]"], endpointDefinition110);
-  setNestedPath(endpoints, ["core","emails","imap-client","messages","list"], endpointDefinition111);
-  setNestedPath(endpoints, ["core","emails","imap-client","messages","sync"], endpointDefinition112);
-  setNestedPath(endpoints, ["core","emails","imap-client","folders","list"], endpointDefinition113);
-  setNestedPath(endpoints, ["core","emails","imap-client","folders","sync"], endpointDefinition114);
-  setNestedPath(endpoints, ["core","emails","imap-client","config"], endpointDefinition115);
-  setNestedPath(endpoints, ["core","emails","imap-client","health"], endpointDefinition116);
-  setNestedPath(endpoints, ["core","emails","imap-client","sync"], endpointDefinition117);
-  setNestedPath(endpoints, ["core","emails","imap-client","accounts","[id]"], endpointDefinition118);
-  setNestedPath(endpoints, ["core","emails","imap-client","accounts","list"], endpointDefinition119);
-  setNestedPath(endpoints, ["core","emails","imap-client","accounts","create"], endpointDefinition120);
-  setNestedPath(endpoints, ["core","emails","imap-client","accounts","test"], endpointDefinition121);
-  setNestedPath(endpoints, ["core","import"], endpointDefinition122);
-  setNestedPath(endpoints, ["core","newsletter","unsubscribe"], endpointDefinition123);
-  setNestedPath(endpoints, ["core","newsletter","subscribe"], endpointDefinition124);
-  setNestedPath(endpoints, ["core","newsletter","status"], endpointDefinition125);
+  setNestedPath(
+    endpoints,
+    ["core", "agent", "chat", "personas", "[id]"],
+    endpointDefinition0,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "agent", "chat", "personas"],
+    endpointDefinition1,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "agent", "chat", "threads"],
+    endpointDefinition2,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "agent", "chat", "threads", "[threadId]", "messages"],
+    endpointDefinition3,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "agent", "chat", "threads", "[threadId]", "messages", "search"],
+    endpointDefinition4,
+  );
+  setNestedPath(
+    endpoints,
+    [
+      "core",
+      "agent",
+      "chat",
+      "threads",
+      "[threadId]",
+      "messages",
+      "[messageId]",
+    ],
+    endpointDefinition5,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "agent", "chat", "threads", "[threadId]"],
+    endpointDefinition6,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "agent", "chat", "tools", "brave-search"],
+    endpointDefinition7,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "agent", "chat", "ai-stream"],
+    endpointDefinition8,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "agent", "chat", "folders", "[id]"],
+    endpointDefinition9,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "agent", "chat", "folders"],
+    endpointDefinition10,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "agent", "chat", "credits", "history"],
+    endpointDefinition11,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "agent", "chat", "credits"],
+    endpointDefinition12,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "agent", "chat", "credits", "purchase"],
+    endpointDefinition13,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "agent", "text-to-speech"],
+    endpointDefinition14,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "agent", "speech-to-text"],
+    endpointDefinition15,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "server", "dev"],
+    endpointDefinition16,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "server", "start"],
+    endpointDefinition17,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "server", "build"],
+    endpointDefinition18,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "server", "health"],
+    endpointDefinition19,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "guard", "start"],
+    endpointDefinition20,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "guard", "stop"],
+    endpointDefinition21,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "guard", "status"],
+    endpointDefinition22,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "guard", "destroy"],
+    endpointDefinition23,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "translations", "reorganize"],
+    endpointDefinition24,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "translations", "restore-backup"],
+    endpointDefinition25,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "translations", "stats"],
+    endpointDefinition26,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "tasks", "cron", "tasks"],
+    endpointDefinition27,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "tasks", "cron", "history"],
+    endpointDefinition28,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "tasks", "cron", "status"],
+    endpointDefinition29,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "tasks", "cron", "stats"],
+    endpointDefinition30,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "tasks", "side-tasks"],
+    endpointDefinition31,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "tasks", "types"],
+    endpointDefinition32,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "tasks", "pulse", "execute"],
+    endpointDefinition33,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "tasks", "unified-runner"],
+    endpointDefinition34,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "db", "schema-verify"],
+    endpointDefinition35,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "db", "utils", "docker-operations"],
+    endpointDefinition36,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "db", "utils"],
+    endpointDefinition37,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "db", "migrate-repair"],
+    endpointDefinition38,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "db", "migrate-prod"],
+    endpointDefinition39,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "db", "seed"],
+    endpointDefinition40,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "db", "reset"],
+    endpointDefinition41,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "db", "reset", "task-management"],
+    endpointDefinition42,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "db", "migrate-sync"],
+    endpointDefinition43,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "db", "migrate"],
+    endpointDefinition44,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "db", "migrate", "task-management"],
+    endpointDefinition45,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "db", "ping"],
+    endpointDefinition46,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "db", "sql"],
+    endpointDefinition47,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "db", "studio"],
+    endpointDefinition48,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "check", "testing", "test"],
+    endpointDefinition49,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "check", "vibe-check"],
+    endpointDefinition50,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "check", "typecheck"],
+    endpointDefinition51,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "unified-ui", "ai-tool", "tools"],
+    endpointDefinition52,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "unified-ui", "mcp", "tools"],
+    endpointDefinition53,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "unified-ui", "mcp", "execute"],
+    endpointDefinition54,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "unified-ui", "cli", "setup", "uninstall"],
+    endpointDefinition55,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "unified-ui", "cli", "setup", "update"],
+    endpointDefinition56,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "unified-ui", "cli", "setup", "status"],
+    endpointDefinition57,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "unified-ui", "cli", "setup", "install"],
+    endpointDefinition58,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "generators", "generate-all"],
+    endpointDefinition59,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "generators", "endpoints"],
+    endpointDefinition60,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "generators", "task-index"],
+    endpointDefinition61,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "generators", "seeds"],
+    endpointDefinition62,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "system", "generators", "generate-trpc-router", "validation"],
+    endpointDefinition63,
+  );
+  setNestedPath(endpoints, ["core", "manifest"], endpointDefinition64);
+  setNestedPath(
+    endpoints,
+    ["core", "leads", "lead", "[id]"],
+    endpointDefinition65,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "leads", "tracking", "engagement"],
+    endpointDefinition66,
+  );
+  setNestedPath(endpoints, ["core", "leads", "search"], endpointDefinition67);
+  setNestedPath(
+    endpoints,
+    [
+      "core",
+      "leads",
+      "campaigns",
+      "campaign-starter",
+      "campaign-starter-config",
+    ],
+    endpointDefinition68,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "leads", "campaigns", "emails", "test-mail"],
+    endpointDefinition69,
+  );
+  setNestedPath(endpoints, ["core", "leads", "list"], endpointDefinition70);
+  setNestedPath(endpoints, ["core", "leads", "import"], endpointDefinition71);
+  setNestedPath(
+    endpoints,
+    ["core", "leads", "import", "jobs", "[jobId]"],
+    endpointDefinition72,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "leads", "import", "jobs", "[jobId]", "stop"],
+    endpointDefinition73,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "leads", "import", "jobs", "[jobId]", "retry"],
+    endpointDefinition74,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "leads", "import", "status"],
+    endpointDefinition75,
+  );
+  setNestedPath(endpoints, ["core", "leads", "export"], endpointDefinition76);
+  setNestedPath(endpoints, ["core", "leads", "stats"], endpointDefinition77);
+  setNestedPath(endpoints, ["core", "leads", "create"], endpointDefinition78);
+  setNestedPath(endpoints, ["core", "leads", "batch"], endpointDefinition79);
+  setNestedPath(
+    endpoints,
+    ["core", "users", "user", "[id]"],
+    endpointDefinition80,
+  );
+  setNestedPath(endpoints, ["core", "users", "list"], endpointDefinition81);
+  setNestedPath(endpoints, ["core", "users", "stats"], endpointDefinition82);
+  setNestedPath(endpoints, ["core", "users", "create"], endpointDefinition83);
+  setNestedPath(
+    endpoints,
+    ["core", "user", "private", "logout"],
+    endpointDefinition84,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "user", "private", "me"],
+    endpointDefinition85,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "user", "private", "me", "password"],
+    endpointDefinition86,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "user", "private", "me", "avatar"],
+    endpointDefinition87,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "user", "public", "login", "options"],
+    endpointDefinition88,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "user", "public", "login"],
+    endpointDefinition89,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "user", "public", "signup"],
+    endpointDefinition90,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "user", "public", "reset-password", "validate"],
+    endpointDefinition91,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "user", "public", "reset-password", "request"],
+    endpointDefinition92,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "user", "public", "reset-password", "confirm"],
+    endpointDefinition93,
+  );
+  setNestedPath(endpoints, ["core", "user", "search"], endpointDefinition94);
+  setNestedPath(endpoints, ["core", "stripe"], endpointDefinition95);
+  setNestedPath(endpoints, ["core", "subscription"], endpointDefinition96);
+  setNestedPath(
+    endpoints,
+    ["core", "subscription", "checkout"],
+    endpointDefinition97,
+  );
+  setNestedPath(endpoints, ["core", "payment", "portal"], endpointDefinition98);
+  setNestedPath(endpoints, ["core", "payment"], endpointDefinition99);
+  setNestedPath(
+    endpoints,
+    ["core", "payment", "invoice"],
+    endpointDefinition100,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "payment", "refund"],
+    endpointDefinition101,
+  );
+  setNestedPath(endpoints, ["core", "contact"], endpointDefinition102);
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "smtp-client", "list"],
+    endpointDefinition103,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "smtp-client", "edit", "[id]"],
+    endpointDefinition104,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "smtp-client", "create"],
+    endpointDefinition105,
+  );
+  setNestedPath(endpoints, ["core", "emails", "send"], endpointDefinition106);
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "messages", "[id]"],
+    endpointDefinition107,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "messages", "list"],
+    endpointDefinition108,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "messages", "stats"],
+    endpointDefinition109,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "imap-client", "messages", "[id]"],
+    endpointDefinition110,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "imap-client", "messages", "list"],
+    endpointDefinition111,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "imap-client", "messages", "sync"],
+    endpointDefinition112,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "imap-client", "folders", "list"],
+    endpointDefinition113,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "imap-client", "folders", "sync"],
+    endpointDefinition114,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "imap-client", "config"],
+    endpointDefinition115,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "imap-client", "health"],
+    endpointDefinition116,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "imap-client", "sync"],
+    endpointDefinition117,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "imap-client", "accounts", "[id]"],
+    endpointDefinition118,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "imap-client", "accounts", "list"],
+    endpointDefinition119,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "imap-client", "accounts", "create"],
+    endpointDefinition120,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "emails", "imap-client", "accounts", "test"],
+    endpointDefinition121,
+  );
+  setNestedPath(endpoints, ["core", "import"], endpointDefinition122);
+  setNestedPath(
+    endpoints,
+    ["core", "newsletter", "unsubscribe"],
+    endpointDefinition123,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "newsletter", "subscribe"],
+    endpointDefinition124,
+  );
+  setNestedPath(
+    endpoints,
+    ["core", "newsletter", "status"],
+    endpointDefinition125,
+  );
   return endpoints;
 }

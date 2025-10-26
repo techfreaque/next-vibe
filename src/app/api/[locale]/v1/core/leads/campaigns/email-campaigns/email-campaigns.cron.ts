@@ -152,7 +152,7 @@ async function processEmailCampaignStage(
     return createSuccessResponse(stageResult.data);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error("Error processing stage", { stage, error: errorMessage });
+    logger.error("Error processing stage", { stage, message: errorMessage });
 
     return createErrorResponse(
       "app.api.v1.core.leads.campaigns.emailCampaigns.post.errors.server.title",
@@ -278,7 +278,7 @@ export async function execute(
       if (!stageResult.success) {
         logger.error("Stage processing failed", {
           stage,
-          error: stageResult,
+          message: stageResult.message,
         });
         return stageResult;
       }

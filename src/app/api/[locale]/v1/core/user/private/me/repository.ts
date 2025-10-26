@@ -131,7 +131,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
         user: userResponse.data,
       });
     } catch (error) {
-      logger.error("Error getting user profile", error);
+      logger.error("Error getting user profile", parseError(error));
       const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.user.private.me.get.errors.internal.title",
@@ -274,7 +274,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
         },
       });
     } catch (error) {
-      logger.error("Error updating user profile", error);
+      logger.error("Error updating user profile", parseError(error));
       const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.user.private.me.update.errors.internal.title",
@@ -332,7 +332,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
         exists: true,
       });
     } catch (error) {
-      logger.error("Error deleting user account", error);
+      logger.error("Error deleting user account", parseError(error));
       const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.user.private.me.delete.errors.internal.title",

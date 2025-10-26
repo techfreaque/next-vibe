@@ -678,7 +678,7 @@ const { PUT } = createEndpoint({
         message: "Subscription updated successfully",
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
 });
 
@@ -824,7 +824,7 @@ const { DELETE } = createEndpoint({
         message: "Subscription canceled successfully",
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
 });
 

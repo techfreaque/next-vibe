@@ -7,6 +7,7 @@
 
 import { useCallback, useRef, useState } from "react";
 
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -166,7 +167,7 @@ export function useEdenAISpeech({
         err instanceof Error
           ? err.message
           : t("app.chat.hooks.stt.transcription-failed");
-      logger.error("STT", "Exception during transcription", err);
+      logger.error("STT", "Exception during transcription", parseError(err));
       setError(errorMsg);
       onError?.(errorMsg);
       setIsProcessing(false);
@@ -208,7 +209,7 @@ export function useEdenAISpeech({
         err instanceof Error
           ? err.message
           : t("app.chat.hooks.stt.permission-denied");
-      logger.error("STT", "Failed to start recording", err);
+      logger.error("STT", "Failed to start recording", parseError(err));
       setError(errorMsg);
       onError?.(errorMsg);
       cleanup();

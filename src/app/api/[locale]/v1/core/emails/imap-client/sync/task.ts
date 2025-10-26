@@ -12,6 +12,7 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 import { z } from "zod";
 
 import {
@@ -208,7 +209,7 @@ const imapSyncTask: Task = {
   },
 
   onError: ({ error, logger }) => {
-    logger.error("IMAP sync task error", error);
+    logger.error("IMAP sync task error", parseError(error));
   },
 };
 

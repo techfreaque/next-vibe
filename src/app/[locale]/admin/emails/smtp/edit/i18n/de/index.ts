@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   edit: "SMTP-Konto bearbeiten",
   editDescription: "SMTP-Kontokonfiguration aktualisieren",
+  notFound: "SMTP-Konto nicht gefunden",
   actions: {
     back: "Zurück",
     cancel: "Abbrechen",

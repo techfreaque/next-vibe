@@ -176,7 +176,7 @@ export class SignupRepositoryImpl implements SignupRepository {
         },
       });
     } catch (error) {
-      logger.error("Registration error", error);
+      logger.error("Registration error", parseError(error));
       const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.user.public.signup.errors.internal.title",
@@ -225,7 +225,7 @@ export class SignupRepositoryImpl implements SignupRepository {
         },
       });
     } catch (error) {
-      logger.error("Error checking email availability", error);
+      logger.error("Error checking email availability", parseError(error));
       const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.user.public.signup.emailCheck.errors.internal.title",
@@ -365,7 +365,7 @@ export class SignupRepositoryImpl implements SignupRepository {
 
       return createSuccessResponse(userResponse.data);
     } catch (error) {
-      logger.error("User creation error", error);
+      logger.error("User creation error", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.public.signup.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -395,7 +395,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       );
       return createSuccessResponse(existingUserResponse.success); // true if email exists
     } catch (error) {
-      logger.error("Error checking email registration", error);
+      logger.error("Error checking email registration", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.public.signup.emailCheck.errors.internal.title",
         ErrorResponseTypes.INTERNAL_ERROR,

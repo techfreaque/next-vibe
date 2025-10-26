@@ -32,6 +32,7 @@ export type InferApiFormReturn<T> =
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >
     ? T extends {
@@ -70,6 +71,7 @@ export type InferApiQueryFormReturn<T> =
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >
     ? T extends {
@@ -159,12 +161,12 @@ export interface ApiQueryOptions<TRequest, TResponse, TUrlVariables>
   onSuccess?: (data: {
     responseData: TResponse;
     requestData: TRequest;
-    urlParams: TUrlVariables;
+    urlPathParams: TUrlVariables;
   }) => ErrorResponseType | void;
   onError?: (data: {
     error: ErrorResponseType;
     requestData: TRequest;
-    urlParams: TUrlVariables;
+    urlPathParams: TUrlVariables;
   }) => void;
   disableLocalCache?: boolean; // Option to disable local caching
   cacheDuration?: number; // Override default cache duration in ms
@@ -245,8 +247,11 @@ export type ApiFormOptions<TRequest extends FieldValues> =
     persistenceKey?: string;
   };
 
-export interface ApiFormReturn<TRequest, TResponse, TUrlVariables> {
-  // @ts-ignore - Intentionally ignoring FieldValues constraint requirement
+export interface ApiFormReturn<
+  TRequest extends FieldValues,
+  TResponse,
+  TUrlVariables,
+> {
   form: UseFormReturn<TRequest, ZodType<TRequest, z.ZodTypeDef, TRequest>>;
 
   /** The complete response including success/error state */

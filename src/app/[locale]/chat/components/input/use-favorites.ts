@@ -1,3 +1,4 @@
+import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useEffect, useState } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
@@ -29,7 +30,7 @@ export function useFavorites<T extends string>(
         logger.error(
           "Storage",
           `Failed to load favorites from ${storageKey}`,
-          error,
+          parseError(error),
         );
       }
     }
@@ -46,7 +47,7 @@ export function useFavorites<T extends string>(
           logger.error(
             "Storage",
             `Failed to save favorites to ${storageKey}`,
-            error,
+            parseError(error),
           );
         }
       }

@@ -6,6 +6,10 @@
 import { z } from "zod";
 
 import {
+  CronTaskPriority,
+  CronTaskStatus,
+} from "@/app/api/[locale]/v1/core/system/tasks/enum";
+import {
   EndpointErrorTypes,
   FieldDataType,
   Methods,
@@ -18,10 +22,6 @@ import {
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { LayoutType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
-import {
-  CronTaskPriority,
-  CronTaskStatus,
-} from "@/app/api/[locale]/v1/core/system/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 // Stats period enum
@@ -479,40 +479,58 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.server.title",
-      description: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.server.description",
+      title:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.server.title",
+      description:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.server.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.validation.title",
-      description: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.validation.description",
+      title:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.validation.title",
+      description:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.unauthorized.title",
-      description: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.unauthorized.description",
+      title:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.forbidden.title",
-      description: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.forbidden.description",
+      title:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.forbidden.title",
+      description:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.notFound.title",
-      description: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.notFound.description",
+      title:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.notFound.title",
+      description:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.conflict.title",
-      description: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.conflict.description",
+      title:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.conflict.title",
+      description:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.network.title",
-      description: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.network.description",
+      title:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.network.title",
+      description:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.unknown.title",
-      description: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.unknown.description",
+      title:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.unknown.title",
+      description:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.unsavedChanges.title",
-      description: "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.unsavedChanges.description",
+      title:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.system.tasks.cronSystem.stats.get.errors.unsavedChanges.description",
     },
   },
 

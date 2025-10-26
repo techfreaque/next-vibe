@@ -32,7 +32,7 @@ export const { GET, tools } = endpointsHandler({
     ): Promise<ResponseType<MessageSearchResponseOutput>> => {
       return await messageSearchRepository.searchMessages(
         props.data,
-        props.urlVariables,
+        props.urlPathParams,
         props.user,
         props.locale,
         props.logger,

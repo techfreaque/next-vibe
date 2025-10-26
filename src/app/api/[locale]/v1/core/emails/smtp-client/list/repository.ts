@@ -155,7 +155,7 @@ class SmtpAccountsListRepositoryImpl implements SmtpAccountsListRepository {
         },
       });
     } catch (error) {
-      logger.error("Error getting SMTP accounts", error);
+      logger.error("Error getting SMTP accounts", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.emails.smtpClient.list.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,

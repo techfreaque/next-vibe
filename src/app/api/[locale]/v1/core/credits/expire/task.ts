@@ -10,6 +10,7 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
@@ -53,7 +54,7 @@ async function executeTask(
       data: { expiredCount },
     };
   } catch (error) {
-    logger.error("Credit expiration task crashed", { error });
+    logger.error("Credit expiration task crashed", parseError(error));
     return createErrorResponse(
       "app.api.v1.core.agent.chat.credits.expire.task.error",
       ErrorResponseTypes.INTERNAL_ERROR,
@@ -88,7 +89,7 @@ const creditExpirationTask: Task = {
   },
 
   onError: ({ error, logger }) => {
-    logger.error("Credit expiration task failed", error);
+    logger.error("Credit expiration task failed", parseError(error));
   },
 };
 

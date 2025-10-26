@@ -107,10 +107,10 @@ export const TYPE_TESTS_PASS = true;
 const testPublicEndpoint = createEndpoint({
   method: Methods.GET,
   path: ["test"],
-  title: "test" as TranslationKey,
-  description: "test" as TranslationKey,
-  category: "test" as TranslationKey,
-  tags: [] as TranslationKey[],
+  title: "test",
+  description: "test",
+  category: "test",
+  tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
     { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } },
@@ -124,7 +124,7 @@ const testPublicEndpoint = createEndpoint({
   successTypes: {} as { title: TranslationKey; description: TranslationKey },
   examples: {
     requests: undefined,
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
     responses: undefined,
   },
 });
@@ -132,10 +132,10 @@ const testPublicEndpoint = createEndpoint({
 const testAdminEndpoint = createEndpoint({
   method: Methods.GET,
   path: ["test"],
-  title: "test" as TranslationKey,
-  description: "test" as TranslationKey,
-  category: "test" as TranslationKey,
-  tags: [] as TranslationKey[],
+  title: "test",
+  description: "test",
+  category: "test",
+  tags: [],
   allowedRoles: [UserRole.ADMIN] as const,
   fields: objectField(
     { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } },
@@ -149,7 +149,7 @@ const testAdminEndpoint = createEndpoint({
   successTypes: {} as { title: TranslationKey; description: TranslationKey },
   examples: {
     requests: undefined,
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
     responses: undefined,
   },
 });
@@ -173,21 +173,21 @@ type AdminRolesCheck = AdminEndpointRoles extends readonly ["ADMIN"]
 const testResponseEndpoint = createEndpoint({
   method: Methods.GET,
   path: ["test", "response"],
-  title: "test" as TranslationKey,
-  description: "test" as TranslationKey,
-  category: "test" as TranslationKey,
-  tags: [] as TranslationKey[],
+  title: "test",
+  description: "test",
+  category: "test",
+  tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
     { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } },
     { response: true },
     {
       userId: responseField(
-        { type: WidgetType.TEXT, content: "test" as TranslationKey },
+        { type: WidgetType.TEXT, content: "test" },
         z.string(),
       ),
       count: responseField(
-        { type: WidgetType.TEXT, content: "test" as TranslationKey },
+        { type: WidgetType.TEXT, content: "test" },
         z.number(),
       ),
     },
@@ -199,7 +199,7 @@ const testResponseEndpoint = createEndpoint({
   successTypes: {} as { title: TranslationKey; description: TranslationKey },
   examples: {
     requests: undefined,
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
     responses: {
       default: { userId: "test-user-id", count: 42 },
     },

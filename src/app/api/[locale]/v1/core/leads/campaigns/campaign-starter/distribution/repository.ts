@@ -12,6 +12,7 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { getCronFrequencyMinutes } from "@/app/api/[locale]/v1/core/system/tasks/cron-formatter";
@@ -90,7 +91,7 @@ export class DistributionRepositoryImpl implements DistributionRepository {
 
       return createSuccessResponse(result);
     } catch (error) {
-      logger.error("Distribution calculation failed", { error });
+      logger.error("Distribution calculation failed", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title" as const,
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -175,7 +176,7 @@ export class DistributionRepositoryImpl implements DistributionRepository {
 
       return createSuccessResponse(result);
     } catch (error) {
-      logger.error("Locale quota calculation failed", { error });
+      logger.error("Locale quota calculation failed", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.campaigns.common.error.server.title" as const,
         ErrorResponseTypes.INTERNAL_ERROR,

@@ -65,6 +65,8 @@ export const translations = {
     creation_failed: "Failed to create user",
     no_data_returned: "No data returned from database",
     password_hashing_failed: "Failed to hash password",
+    not_implemented_on_native:
+      "This feature is not implemented on React Native",
   },
   "notifications": {
     profileUpdated: {

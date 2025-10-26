@@ -33,7 +33,7 @@ interface EndpointDefinition {
   title?: string;
   description?: string;
   requestSchema?: Record<string, string | number | boolean>;
-  requestUrlParamsSchema?: Record<string, string | number | boolean>;
+  requestUrlPathParamsSchema?: Record<string, string | number | boolean>;
   responseSchema?: Record<string, string | number | boolean>;
   fields?: Record<string, string | number | boolean>;
 }
@@ -41,7 +41,7 @@ interface EndpointDefinition {
 // Types for CLI execution - compatible with RouteExecutionContext
 interface CliExecutionOptions {
   data?: CliRequestData;
-  urlParams?: Record<string, string | number | boolean | null | undefined>;
+  urlPathParams?: Record<string, string | number | boolean | null | undefined>;
   cliArgs?: {
     positionalArgs: string[];
     namedArgs: Record<string, string>;
@@ -220,7 +220,7 @@ export class CliEntryPoint {
     const context = {
       command,
       data: options.data,
-      urlParams: options.urlParams,
+      urlPathParams: options.urlPathParams,
       cliArgs: options.cliArgs, // Pass CLI arguments
       user: cliUser
         ? {
@@ -454,29 +454,22 @@ export class CliEntryPoint {
 
       try {
         // Use synchronous require for faster lookup
-        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment
         const definitionModule = require(definitionPath);
 
         // Check default export
         if (
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           definitionModule.default &&
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           typeof definitionModule.default === "object"
         ) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
           for (const methodKey of Object.keys(definitionModule.default)) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
             const methodDef = definitionModule.default[methodKey];
             if (
               methodDef &&
               typeof methodDef === "object" &&
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
               Array.isArray(methodDef.aliases)
             ) {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
               if (methodDef.aliases.includes(command)) {
-                // Found it! Return a route with this alias
                 const existingRoute = this.routes.find(
                   (r) => r.routePath === routeFile,
                 );

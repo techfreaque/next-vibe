@@ -13,6 +13,7 @@ import {
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 /**
  * Validate that thread is not incognito
@@ -21,15 +22,15 @@ import { simpleT } from "@/i18n/core/shared";
 export function validateNotIncognito(
   rootFolderId: string,
   locale: CountryLanguage,
-  errorKey: string,
+  errorKeyPrefix: string,
 ): ResponseType<never> | null {
   if (rootFolderId === "incognito") {
     return createErrorResponse(
-      `${errorKey}.errors.forbidden.title` as const,
+      `${errorKeyPrefix}.errors.forbidden.title` as TranslationKey,
       ErrorResponseTypes.FORBIDDEN,
       {
         message: simpleT(locale).t(
-          `${errorKey}.errors.forbidden.incognitoNotAllowed`,
+          `${errorKeyPrefix}.errors.forbidden.incognitoNotAllowed` as TranslationKey,
         ),
       },
     );
@@ -42,13 +43,10 @@ export function validateNotIncognito(
  */
 export function validateUserHasId(
   userId: string | undefined,
-  errorKey: string,
+  titleKey: TranslationKey,
 ): ResponseType<never> | null {
   if (!userId) {
-    return createErrorResponse(
-      `${errorKey}.errors.unauthorized.title` as const,
-      ErrorResponseTypes.UNAUTHORIZED,
-    );
+    return createErrorResponse(titleKey, ErrorResponseTypes.UNAUTHORIZED);
   }
   return null;
 }
@@ -58,19 +56,13 @@ export function validateUserHasId(
  */
 export function validateExists<T>(
   entity: T | undefined | null,
-  errorKey: string,
-  entityType: string,
+  titleKey: TranslationKey,
+  messageKey: TranslationKey,
 ): ResponseType<never> | null {
   if (!entity) {
-    // eslint-disable-next-line i18next/no-literal-string
-    const errorMessage = `${errorKey}.errors.notFound.${entityType}NotFound`;
-    return createErrorResponse(
-      `${errorKey}.errors.notFound.title` as const,
-      ErrorResponseTypes.NOT_FOUND,
-      {
-        error: errorMessage,
-      },
-    );
+    return createErrorResponse(titleKey, ErrorResponseTypes.NOT_FOUND, {
+      error: messageKey,
+    });
   }
   return null;
 }
@@ -81,16 +73,13 @@ export function validateExists<T>(
 export function validateNoCircularReference(
   id: string,
   parentId: string | null | undefined,
-  errorKey: string,
+  titleKey: TranslationKey,
+  messageKey: TranslationKey,
 ): ResponseType<never> | null {
   if (parentId === id) {
-    return createErrorResponse(
-      `${errorKey}.errors.validation.title` as const,
-      ErrorResponseTypes.VALIDATION_ERROR,
-      {
-        error: `${errorKey}.errors.validation.circularReference`,
-      },
-    );
+    return createErrorResponse(titleKey, ErrorResponseTypes.VALIDATION_ERROR, {
+      error: messageKey,
+    });
   }
   return null;
 }

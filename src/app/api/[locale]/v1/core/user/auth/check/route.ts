@@ -11,11 +11,6 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { endpointsHandler } from "../../../system/unified-ui/cli/vibe/endpoints/endpoint-handler";
 import { Methods } from "../../../system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
-import {
-  type CheckAuthStatusGetRequestOutput,
-  checkAuthStatusGetRequestSchema,
-  type CheckAuthStatusGetResponseOutput,
-} from "./definition";
 import endpoints from "./definition";
 
 /**

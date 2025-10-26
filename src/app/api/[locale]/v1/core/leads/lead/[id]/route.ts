@@ -14,9 +14,9 @@ export const { GET, PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ urlVariables, user, locale, logger }) => {
+    handler: async ({ urlPathParams, user, locale, logger }) => {
       return await leadsRepository.getLeadById(
-        urlVariables.id,
+        urlPathParams.id,
         user,
         locale,
         logger,
@@ -25,8 +25,8 @@ export const { GET, PATCH, tools } = endpointsHandler({
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: async ({ urlVariables, data, user, locale, logger }) => {
-      const leadId = urlVariables.id;
+    handler: async ({ urlPathParams, data, user, locale, logger }) => {
+      const leadId = urlPathParams.id;
       // Flatten nested update structure to match repository's flat LeadUpdateType
       const {
         basicInfo,

@@ -7,6 +7,7 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import { canCreateFolder } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
@@ -181,7 +182,7 @@ export async function createFolder(
       },
     }) as ResponseType<FolderCreateResponseOutput>;
   } catch (error) {
-    logger.error("Failed to create folder", error);
+    logger.error("Failed to create folder", parseError(error));
     return createErrorResponse(
       "app.api.v1.core.agent.chat.folders.post.errors.server.title",
       ErrorResponseTypes.INTERNAL_ERROR,

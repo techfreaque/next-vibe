@@ -33,7 +33,7 @@ export interface AIToolsRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     locale?: CountryLanguage,
-  ): Promise<AIToolsListResponseOutput>;
+  ): AIToolsListResponseOutput;
 }
 
 /**
@@ -43,33 +43,35 @@ export class AIToolsRepositoryImpl implements AIToolsRepository {
   /**
    * Get all available AI tools for current user
    */
-  async getTools(
+  getTools(
     data: AIToolsListRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage = "en-GLOBAL",
-  ): Promise<AIToolsListResponseOutput> {
+  ): AIToolsListResponseOutput {
     logger.info("[AI Tools Repository] Fetching available tools");
 
     // Get tool registry
     const registry = getToolRegistry();
 
-    // Get ALL tools without any filters
-    const allTools = await registry.getTools();
+    // Get ALL endpoints without any filters
+    const allEndpoints = registry.getEndpoints();
 
-    logger.info("[AI Tools Repository] Found tools", {
-      count: allTools.length,
+    logger.info("[AI Tools Repository] Found endpoints", {
+      count: allEndpoints.length,
     });
 
     // Get translation function
     const { t } = simpleT(locale);
 
-    // Transform tools to serializable format and resolve translation keys
-    const serializableTools = allTools.map((tool) => {
+    // Transform endpoints to serializable format and resolve translation keys
+    const serializableTools = allEndpoints.map((endpoint) => {
+      const definition = endpoint.definition;
+
       // Resolve translation keys to actual text
-      let description = tool.description;
-      let category = tool.category;
-      const tags = tool.tags;
+      let description = definition.description || definition.title || "";
+      let category = definition.category;
+      const tags = Array.isArray(definition.tags) ? definition.tags : [];
 
       try {
         // Try to translate description
@@ -90,7 +92,7 @@ export class AIToolsRepositoryImpl implements AIToolsRepository {
       }
 
       // Try to translate tags
-      const translatedTags = tags.map((tag) => {
+      const translatedTags = tags.map((tag: string) => {
         try {
           return t(tag);
         } catch {
@@ -99,13 +101,12 @@ export class AIToolsRepositoryImpl implements AIToolsRepository {
       });
 
       return {
-        name: tool.name,
+        name: endpoint.toolName,
         description: description || "",
         category: category || undefined,
         tags: translatedTags,
-        endpointId: tool.endpointId,
-        allowedRoles: Array.from(tool.allowedRoles),
-        isManualTool: tool.isManualTool,
+        endpointId: endpoint.id,
+        allowedRoles: Array.from(endpoint.allowedRoles),
         // Omit parameters as Zod schemas cannot be JSON serialized
       };
     });

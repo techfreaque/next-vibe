@@ -389,7 +389,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       return createSuccessResponse(this.formatMessageResponse(message));
     } catch (error) {
-      logger.error("Error getting IMAP message by ID", error);
+      logger.error("Error getting IMAP message by ID", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -460,7 +460,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       return createSuccessResponse(this.formatMessageResponse(updatedMessage));
     } catch (error) {
-      logger.error("Error updating IMAP message", error);
+      logger.error("Error updating IMAP message", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -478,7 +478,12 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapMessageSyncPostResponseOutput>> {
     try {
-      logger.debug("Syncing IMAP messages", { data, userId: user.id });
+      logger.debug("Syncing IMAP messages", {
+        accountId: data.accountId,
+        folderId: data.folderId,
+        force: data.force,
+        userId: user.id,
+      });
 
       // Implement actual message sync using the sync service
       const { imapSyncRepository } = await import("../sync-service/repository");
@@ -581,7 +586,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         }
       }
     } catch (error) {
-      logger.error("Error syncing IMAP messages", error);
+      logger.error("Error syncing IMAP messages", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imapErrors.sync.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -641,7 +646,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       return createSuccessResponse({ success: true });
     } catch (error) {
-      logger.error("Error updating message sync status", error);
+      logger.error("Error updating message sync status", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -682,7 +687,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       return createSuccessResponse({ success: true });
     } catch (error) {
-      logger.error("Error updating message read status", error);
+      logger.error("Error updating message read status", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imapErrors.messages.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,

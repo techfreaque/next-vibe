@@ -10,4 +10,3 @@ export enum SmsProviders {
   MESSAGEBIRD = "messagebird",
   HTTP = "http",
 }
-

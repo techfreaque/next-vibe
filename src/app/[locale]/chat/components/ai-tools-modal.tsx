@@ -291,9 +291,6 @@ export function AIToolsModal({
                   const allCategoryEnabled = categoryToolIds.every((id) =>
                     enabledToolIds.includes(id),
                   );
-                  const someCategoryEnabled = categoryToolIds.some((id) =>
-                    enabledToolIds.includes(id),
-                  );
 
                   return (
                     <Div key={category} className="border rounded-lg">
@@ -320,9 +317,6 @@ export function AIToolsModal({
                         </Badge>
                         <Checkbox
                           checked={allCategoryEnabled}
-                          indeterminate={
-                            someCategoryEnabled && !allCategoryEnabled
-                          }
                           onCheckedChange={() => toggleCategoryTools(tools)}
                           onClick={(e) => e.stopPropagation()}
                           className="shrink-0"

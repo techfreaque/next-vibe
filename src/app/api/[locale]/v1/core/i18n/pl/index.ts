@@ -7,13 +7,13 @@ import { translations as manifestTranslations } from "../../manifest/i18n/pl";
 import { translations as newsletterTranslations } from "../../newsletter/i18n/pl";
 import { translations as paymentTranslations } from "../../payment/i18n/pl";
 import { translations as sharedTranslations } from "../../shared/i18n/pl";
+import { translations as sharedUtilsTranslations } from "../../shared/utils/i18n/pl";
 import { translations as smsTranslations } from "../../sms/i18n/pl";
 import { translations as stripeTranslations } from "../../stripe/i18n/pl";
 import { translations as subscriptionTranslations } from "../../subscription/i18n/pl";
 import { translations as systemTranslations } from "../../system/i18n/pl";
 import { translations as userTranslations } from "../../user/i18n/pl";
 import { translations as usersTranslations } from "../../users/i18n/pl";
-
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -25,7 +25,10 @@ export const translations: typeof enTranslations = {
   manifest: manifestTranslations,
   newsletter: newsletterTranslations,
   payment: paymentTranslations,
-  shared: sharedTranslations,
+  shared: {
+    ...sharedTranslations,
+    utils: sharedUtilsTranslations,
+  },
   sms: smsTranslations,
   stripe: stripeTranslations,
   subscription: subscriptionTranslations,

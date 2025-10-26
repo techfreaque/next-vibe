@@ -16,7 +16,7 @@ import { createEndpoint } from "../../../../system/unified-ui/cli/vibe/endpoints
 import {
   objectField,
   requestDataField,
-  requestUrlParamsField,
+  requestUrlPathParamsField,
   responseField,
 } from "../../../../system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "../../../../user/user-roles/enum";
@@ -167,10 +167,10 @@ const { GET } = createEndpoint({
         "app.api.v1.core.emails.smtpClient.edit.id.get.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: "urlParams", response: true },
+    { request: "urlPathParams", response: true },
     {
       // === URL PARAMETER ===
-      id: requestUrlParamsField(
+      id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -260,7 +260,7 @@ const { GET } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: {
         id: "550e8400-e29b-41d4-a716-446655440001",
       },
@@ -310,10 +310,10 @@ const { PUT } = createEndpoint({
         "app.api.v1.core.emails.smtpClient.edit.id.put.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: "data&urlParams", response: true },
+    { request: "data&urlPathParams", response: true },
     {
       // === URL PARAMETER ===
-      id: requestUrlParamsField(
+      id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -554,7 +554,7 @@ const { PUT } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: {
         id: "550e8400-e29b-41d4-a716-446655440001",
       },

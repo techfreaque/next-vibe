@@ -14,11 +14,11 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ user, urlVariables, logger }) => {
+    handler: async ({ user, urlPathParams, logger }) => {
       const userId = authRepository.requireUserId(user);
       const response = await importRepository.listImportJobs(
         userId,
-        urlVariables.filters,
+        urlPathParams.filters,
         logger,
       );
 
@@ -26,7 +26,7 @@ export const { GET, tools } = endpointsHandler({
       if (response.success) {
         return {
           success: true,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
           data: { jobs: { items: response.data } },
         };
       }

@@ -3,6 +3,7 @@
  * Provides seed data for users management functionality
  */
 
+import { parseError } from "next-vibe/shared/utils";
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -154,7 +155,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       `✅ Created ${createdCount} sample users for development environment`,
     );
   } catch (error) {
-    logger.error("Error seeding users management data:", error);
+    logger.error("Error seeding users management data:", parseError(error));
   }
 }
 
@@ -241,7 +242,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
       );
     }
   } catch (error) {
-    logger.error("Error seeding test users management data:", error);
+    logger.error("Error seeding test users management data:", parseError(error));
   }
 }
 
@@ -258,7 +259,7 @@ export async function prod(logger: EndpointLogger): Promise<void> {
 
     logger.debug("✅ Users management system ready for production use");
   } catch (error) {
-    logger.error("Error seeding production users management data:", error);
+    logger.error("Error seeding production users management data:", parseError(error));
   }
 }
 

@@ -285,7 +285,7 @@ const { POST } = createEndpoint({
         issues: [],
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
 });
 

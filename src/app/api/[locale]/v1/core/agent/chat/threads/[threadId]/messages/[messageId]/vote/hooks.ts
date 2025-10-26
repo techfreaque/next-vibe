@@ -33,7 +33,7 @@ export function useMessageVote(
   return useEndpoint(
     definitions,
     {
-      urlParams: {
+      urlPathParams: {
         threadId: params.threadId,
         messageId: params.messageId,
       },

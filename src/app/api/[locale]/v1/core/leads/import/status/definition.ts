@@ -47,7 +47,7 @@ const { GET } = createEndpoint({
       layout: { type: LayoutType.STACKED },
       children: [],
     },
-    { request: "urlParams", response: true },
+    { request: "data", response: true },
     {
       // === QUERY PARAMETERS ===
       filters: objectField(
@@ -59,7 +59,7 @@ const { GET } = createEndpoint({
           layout: { type: LayoutType.GRID, columns: 3 },
           children: [],
         },
-        { request: "urlParams" },
+        { request: "data" },
         {
           status: requestDataField(
             {
@@ -215,8 +215,8 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    requests: undefined,
-    urlPathVariables: {
+    urlPathParams: undefined,
+    requests: {
       default: {
         filters: {},
       },

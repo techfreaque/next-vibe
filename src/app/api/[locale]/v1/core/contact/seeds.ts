@@ -3,6 +3,8 @@
  * Provides seed data for contact form submissions
  */
 
+import { parseError } from "next-vibe/shared/utils";
+
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 
 import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
@@ -77,16 +79,19 @@ export async function dev(logger: EndpointLogger): Promise<void> {
           });
         }
       } catch (error) {
-        logger.error("app.api.v1.core.contact.seeds.dev.submission.error", {
-          email: contact.email,
-          error,
-        });
+        logger.error(
+          "app.api.v1.core.contact.seeds.dev.submission.error",
+          parseError(error),
+          {
+            email: contact.email,
+          },
+        );
       }
     }
 
     logger.debug("app.api.v1.core.contact.seeds.dev.complete");
   } catch (error) {
-    logger.error("app.api.v1.core.contact.seeds.dev.error", error);
+    logger.error("app.api.v1.core.contact.seeds.dev.error", parseError(error));
   }
 }
 
@@ -115,7 +120,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
       });
     }
   } catch (error) {
-    logger.error("app.api.v1.core.contact.seeds.test.error", error);
+    logger.error("app.api.v1.core.contact.seeds.test.error", parseError(error));
   }
 }
 
@@ -131,7 +136,7 @@ export async function prod(logger: EndpointLogger): Promise<void> {
     await Promise.resolve(); // Ensure async behavior for consistency
     logger.debug("app.api.v1.core.contact.seeds.prod.ready");
   } catch (error) {
-    logger.error("app.api.v1.core.contact.seeds.prod.error", error);
+    logger.error("app.api.v1.core.contact.seeds.prod.error", parseError(error));
   }
 }
 

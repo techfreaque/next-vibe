@@ -27,7 +27,6 @@ const aiToolMetadataSchema = z.object({
   tags: z.array(z.string()),
   endpointId: z.string(),
   allowedRoles: z.array(z.string()),
-  isManualTool: z.boolean(),
 });
 
 const { GET } = createEndpoint({

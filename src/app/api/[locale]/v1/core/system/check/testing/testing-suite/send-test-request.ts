@@ -10,8 +10,8 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import request from "supertest";
 import type z from "zod";
 
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { env } from "@/config/env";
 
 import type { UserRoleValue } from "../../../../user/user-roles/enum";
@@ -36,7 +36,7 @@ export async function sendTestRequest<
 >({
   endpoint,
   data,
-  urlParams,
+  urlPathParams,
   user,
 }: {
   endpoint: CreateApiEndpoint<
@@ -52,7 +52,7 @@ export async function sendTestRequest<
     TUrlVariablesOutput
   >;
   data: TRequestOutput;
-  urlParams: TUrlVariablesOutput;
+  urlPathParams: TUrlVariablesOutput;
   user?: JwtPayloadType;
 }): Promise<ResponseType<TResponseOutput>> {
   // Create default user based on endpoint configuration if not provided
@@ -71,17 +71,15 @@ export async function sendTestRequest<
 
   try {
     const searchParams = new URLSearchParams();
-    if (urlParams) {
-      for (const [key, value] of Object.entries(urlParams)) {
+    if (urlPathParams) {
+      for (const [key, value] of Object.entries(urlPathParams)) {
         searchParams.append(key, String(value));
       }
     }
     const url = `/${endpoint.path.join("/")}?${searchParams.toString()}`;
     // In a real implementation, we would create a session for the user
     // This is a placeholder for session creation
-    const token = testUser.isPublic
-      ? undefined
-      : `test-token-${testUser.id}`;
+    const token = testUser.isPublic ? undefined : `test-token-${testUser.id}`;
     // Use a test server URL (this would be configured in a real environment)
     const testServer = env.NEXT_PUBLIC_TEST_SERVER_URL;
     const response = await request(testServer)

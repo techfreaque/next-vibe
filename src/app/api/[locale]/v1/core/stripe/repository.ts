@@ -151,7 +151,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
 
       return createSuccessResponse(response);
     } catch (error) {
-      logger.error("Error processing Stripe CLI operation:", error);
+      logger.error("Error processing Stripe CLI operation:", parseError(error));
       const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.stripe.errors.serverError.title",
@@ -175,7 +175,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       logger.debug(`Stripe CLI installation status: ${installed}`);
       return createSuccessResponse(installed);
     } catch (error) {
-      logger.error("Error checking Stripe CLI installation:", error);
+      logger.error("Error checking Stripe CLI installation:", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.stripe.errors.serverError.title",
         ErrorResponseTypes.INTERNAL_ERROR,

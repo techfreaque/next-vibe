@@ -32,7 +32,6 @@ function hasDefaultReleaseConfig(
   if (!("default" in module)) {
     return false;
   }
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const defaultExport = module.default;
   if (typeof defaultExport !== "object" || defaultExport === null) {
     return false;

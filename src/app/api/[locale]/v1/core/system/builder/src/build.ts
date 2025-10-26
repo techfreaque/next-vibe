@@ -281,12 +281,12 @@ export async function getCompiledConfigPath(
     // Clean up in case of an error
     try {
       unlinkSync(outputFileTmpPath);
-    } catch (_cleanupError) {
+    } catch {
       /* empty */
     }
     try {
       unlinkSync(outputFilePath);
-    } catch (_cleanupError) {
+    } catch {
       /* empty */
     }
     throw error;
@@ -317,7 +317,7 @@ export function cleanDistFolders(buildConfig: BuildConfig): void {
         rmSync(folder, { force: true, recursive: true });
         // eslint-disable-next-line i18next/no-literal-string
         logger(`Done dist folder cleaning (${folder})`);
-      } catch (_cleanupError) {
+      } catch {
         /* empty */
       }
     });

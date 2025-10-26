@@ -16,17 +16,9 @@ import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import type React from "react";
 
 import { useSmtpAccountById } from "@/app/api/[locale]/v1/core/emails/smtp-client/edit/[id]/hooks";
-import {
-  CampaignType,
-  SmtpSecurityType,
-} from "@/app/api/[locale]/v1/core/emails/smtp-client/enum";
-import {
-  EmailCampaignStage,
-  EmailJourneyVariant,
-} from "@/app/api/[locale]/v1/core/leads/enum";
+import { SmtpSecurityType } from "@/app/api/[locale]/v1/core/emails/smtp-client/enum";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { Countries, Languages } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -78,131 +70,6 @@ export function EditSmtpAccountForm({
     },
   ];
 
-  // Campaign type options for multi-select field
-  const campaignTypeOptions = [
-    {
-      value: CampaignType.LEAD_CAMPAIGN,
-      label:
-        "app.admin.emails.smtp.admin.campaignTypes.leadCampaign" as const satisfies TranslationKey,
-    },
-    {
-      value: CampaignType.NEWSLETTER,
-      label:
-        "app.admin.emails.smtp.admin.campaignTypes.newsletter" as const satisfies TranslationKey,
-    },
-    {
-      value: CampaignType.TRANSACTIONAL,
-      label:
-        "app.admin.emails.smtp.admin.campaignTypes.transactional" as const satisfies TranslationKey,
-    },
-    {
-      value: CampaignType.NOTIFICATION,
-      label:
-        "app.admin.emails.smtp.admin.campaignTypes.notification" as const satisfies TranslationKey,
-    },
-    {
-      value: CampaignType.SYSTEM,
-      label:
-        "app.admin.emails.smtp.admin.campaignTypes.system" as const satisfies TranslationKey,
-    },
-  ];
-
-  // Email journey variant options for multi-select field
-  const emailJourneyVariantOptions = [
-    {
-      value: EmailJourneyVariant.PERSONAL_APPROACH,
-      label:
-        "app.admin.emails.smtp.admin.emailJourneyVariants.personalApproach" as const satisfies TranslationKey,
-    },
-    {
-      value: EmailJourneyVariant.RESULTS_FOCUSED,
-      label:
-        "app.admin.emails.smtp.admin.emailJourneyVariants.resultsFocused" as const satisfies TranslationKey,
-    },
-    {
-      value: EmailJourneyVariant.PERSONAL_RESULTS,
-      label:
-        "app.admin.emails.smtp.admin.emailJourneyVariants.personalResults" as const satisfies TranslationKey,
-    },
-  ];
-
-  // Email campaign stage options for multi-select field
-  const emailCampaignStageOptions = [
-    {
-      value: EmailCampaignStage.NOT_STARTED,
-      label:
-        "app.admin.emails.smtp.admin.emailCampaignStages.notStarted" as const satisfies TranslationKey,
-    },
-    {
-      value: EmailCampaignStage.INITIAL,
-      label:
-        "app.admin.emails.smtp.admin.emailCampaignStages.initial" as const satisfies TranslationKey,
-    },
-    {
-      value: EmailCampaignStage.FOLLOWUP_1,
-      label:
-        "app.admin.emails.smtp.admin.emailCampaignStages.followup1" as const satisfies TranslationKey,
-    },
-    {
-      value: EmailCampaignStage.FOLLOWUP_2,
-      label:
-        "app.admin.emails.smtp.admin.emailCampaignStages.followup2" as const satisfies TranslationKey,
-    },
-    {
-      value: EmailCampaignStage.FOLLOWUP_3,
-      label:
-        "app.admin.emails.smtp.admin.emailCampaignStages.followup3" as const satisfies TranslationKey,
-    },
-    {
-      value: EmailCampaignStage.NURTURE,
-      label:
-        "app.admin.emails.smtp.admin.emailCampaignStages.nurture" as const satisfies TranslationKey,
-    },
-    {
-      value: EmailCampaignStage.REACTIVATION,
-      label:
-        "app.admin.emails.smtp.admin.emailCampaignStages.reactivation" as const satisfies TranslationKey,
-    },
-  ];
-
-  // Country options for multi-select field
-  const countryOptions = [
-    {
-      value: Countries.GLOBAL,
-      label:
-        "app.admin.emails.smtp.admin.fields.countries" as const satisfies TranslationKey,
-    },
-    {
-      value: Countries.DE,
-      label:
-        "app.admin.emails.smtp.admin.countries.de" as const satisfies TranslationKey,
-    },
-    {
-      value: Countries.PL,
-      label:
-        "app.admin.emails.smtp.admin.countries.pl" as const satisfies TranslationKey,
-    },
-  ];
-
-  // Language options for multi-select field
-  const languageOptions = [
-    {
-      value: Languages.EN,
-      label:
-        "app.admin.emails.smtp.admin.fields.languages" as const satisfies TranslationKey,
-    },
-    {
-      value: Languages.DE,
-      label:
-        "app.admin.emails.smtp.admin.languages.de" as const satisfies TranslationKey,
-    },
-    {
-      value: Languages.PL,
-      label:
-        "app.admin.emails.smtp.admin.languages.pl" as const satisfies TranslationKey,
-    },
-  ];
-
   const handleSubmit = endpoint.create.onSubmit;
 
   if (isLoading) {
@@ -221,7 +88,7 @@ export function EditSmtpAccountForm({
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <p className="text-gray-500 mb-4">
-            {t("app.admin.emails.smtp.edit.notFound")}
+            {t("app.admin.emails.smtp.pages.edit.notFound")}
           </p>
           <Button asChild>
             <Link href={`/${locale}/admin/emails/smtp`}>
@@ -240,7 +107,7 @@ export function EditSmtpAccountForm({
         <Button variant="outline" asChild>
           <Link href={`/${locale}/admin/emails/smtp`}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            {t("app.admin.emails.smtp.edit.actions.back")}
+            {t("app.admin.emails.smtp.pages.edit.actions.back")}
           </Link>
         </Button>
       </div>
@@ -295,105 +162,7 @@ export function EditSmtpAccountForm({
               />
             </FormFieldGroup>
 
-            {/* Selection Criteria */}
-            <FormFieldGroup
-              title="app.admin.emails.smtp.admin.form.selectionCriteria"
-              description="app.admin.emails.smtp.admin.form.selectionCriteriaDescription"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <EndpointFormField
-                  name="updates.campaignTypes"
-                  config={{
-                    type: "multiselect",
-                    label: "app.admin.emails.smtp.admin.fields.campaignTypes",
-                    placeholder:
-                      "app.admin.emails.smtp.admin.fields.campaignTypesPlaceholder",
-                    options: campaignTypeOptions,
-                    maxSelections: 5,
-                    searchable: true,
-                  }}
-                  control={endpoint.create.form.control}
-                  theme={{
-                    style: "none",
-                    showAllRequired: false,
-                  }}
-                />
-
-                <EndpointFormField
-                  name="updates.emailJourneyVariants"
-                  config={{
-                    type: "multiselect",
-                    label:
-                      "app.admin.emails.smtp.admin.fields.emailJourneyVariants",
-                    placeholder:
-                      "app.admin.emails.smtp.admin.fields.emailJourneyVariantsPlaceholder",
-                    options: emailJourneyVariantOptions,
-                    maxSelections: 3,
-                    searchable: true,
-                  }}
-                  control={endpoint.create.form.control}
-                  theme={{
-                    style: "none",
-                    showAllRequired: false,
-                  }}
-                />
-
-                <EndpointFormField
-                  name="updates.emailCampaignStages"
-                  config={{
-                    type: "multiselect",
-                    label:
-                      "app.admin.emails.smtp.admin.fields.emailCampaignStages",
-                    placeholder:
-                      "app.admin.emails.smtp.admin.fields.emailCampaignStagesPlaceholder",
-                    options: emailCampaignStageOptions,
-                    maxSelections: 7,
-                    searchable: true,
-                  }}
-                  control={endpoint.create.form.control}
-                  theme={{
-                    style: "none",
-                    showAllRequired: false,
-                  }}
-                />
-
-                <EndpointFormField
-                  name="updates.countries"
-                  config={{
-                    type: "multiselect",
-                    label: "app.admin.emails.smtp.admin.fields.countries",
-                    placeholder:
-                      "app.admin.emails.smtp.admin.fields.countriesPlaceholder",
-                    options: countryOptions,
-                    maxSelections: 3,
-                    searchable: true,
-                  }}
-                  control={endpoint.create.form.control}
-                  theme={{
-                    style: "none",
-                    showAllRequired: false,
-                  }}
-                />
-
-                <EndpointFormField
-                  name="updates.languages"
-                  config={{
-                    type: "multiselect",
-                    label: "app.admin.emails.smtp.admin.fields.languages",
-                    placeholder:
-                      "app.admin.emails.smtp.admin.fields.languagesPlaceholder",
-                    options: languageOptions,
-                    maxSelections: 3,
-                    searchable: true,
-                  }}
-                  control={endpoint.create.form.control}
-                  theme={{
-                    style: "none",
-                    showAllRequired: false,
-                  }}
-                />
-              </div>
-            </FormFieldGroup>
+            {/* Selection Criteria - Fields removed as they don't exist in definition.ts */}
 
             {/* Server Configuration */}
             <FormFieldGroup
@@ -503,71 +272,7 @@ export function EditSmtpAccountForm({
               description="app.admin.emails.smtp.admin.form.advancedSettingsDescription"
             >
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <EndpointFormField
-                  name="updates.connectionTimeout"
-                  config={{
-                    type: "number",
-                    label:
-                      "app.admin.emails.smtp.admin.fields.connectionTimeout",
-                    placeholder:
-                      "app.admin.emails.smtp.admin.fields.connectionTimeoutPlaceholder",
-                  }}
-                  control={endpoint.create.form.control}
-                  theme={{
-                    style: "none",
-                    showAllRequired: false,
-                  }}
-                />
-
-                <EndpointFormField
-                  name="updates.maxConnections"
-                  config={{
-                    type: "number",
-                    label: "app.admin.emails.smtp.admin.fields.maxConnections",
-                    placeholder:
-                      "app.admin.emails.smtp.admin.fields.maxConnectionsPlaceholder",
-                  }}
-                  control={endpoint.create.form.control}
-                  theme={{
-                    style: "none",
-                    showAllRequired: false,
-                  }}
-                />
-
-                <EndpointFormField
-                  name="updates.rateLimitPerHour"
-                  config={{
-                    type: "number",
-                    label:
-                      "app.admin.emails.smtp.admin.fields.rateLimitPerHour",
-                    placeholder:
-                      "app.admin.emails.smtp.admin.fields.rateLimitPerHourPlaceholder",
-                    min: 1,
-                    max: 36000,
-                  }}
-                  control={endpoint.create.form.control}
-                  theme={{
-                    style: "none",
-                    showAllRequired: false,
-                  }}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <EndpointFormField
-                  name="updates.isDefault"
-                  config={{
-                    type: "switch",
-                    label: "app.admin.emails.smtp.admin.fields.isDefault",
-                    description:
-                      "app.admin.emails.smtp.admin.fields.isDefaultDescription",
-                  }}
-                  control={endpoint.create.form.control}
-                  theme={{
-                    style: "none",
-                    showAllRequired: false,
-                  }}
-                />
+                {/* connectionTimeout, maxConnections, rateLimitPerHour, isDefault removed - not in definition.ts */}
 
                 <EndpointFormField
                   name="updates.priority"
@@ -597,7 +302,7 @@ export function EditSmtpAccountForm({
                 onClick={() => router.push(`/${locale}/admin/emails/smtp`)}
                 disabled={isSaving}
               >
-                {t("app.admin.emails.smtp.edit.actions.cancel")}
+                {t("app.admin.emails.smtp.pages.edit.actions.cancel")}
               </Button>
               <Button type="submit" disabled={isSaving}>
                 <Save className="h-4 w-4 mr-2" />

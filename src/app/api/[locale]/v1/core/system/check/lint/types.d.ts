@@ -1,26 +1,27 @@
-/* eslint-disable no-restricted-syntax */
-interface EslintPlugin {
-  rules: Record<string, unknown>;
-  configs?: Record<string, unknown>;
-  processors?: Record<string, unknown>;
-}
+/**
+ * ESLint Plugin Type Declarations
+ * These types are used by the lint package's local tsconfig
+ * The main project uses types from the /types directory
+ */
+
+import type { ESLint } from "eslint";
 
 declare module "eslint-plugin-node" {
-  const plugin: EslintPlugin;
-  export default plugin;
+  const plugin: ESLint.Plugin;
+  export = plugin;
 }
 
 declare module "eslint-plugin-jsx-a11y" {
-  const plugin: EslintPlugin;
-  export default plugin;
+  const plugin: ESLint.Plugin;
+  export = plugin;
 }
 
 declare module "eslint-plugin-promise" {
-  const plugin: EslintPlugin;
-  export default plugin;
+  const plugin: ESLint.Plugin;
+  export = plugin;
 }
 
 declare module "@c-ehrlich/eslint-plugin-use-server" {
-  const plugin: EslintPlugin;
-  export default plugin;
+  const plugin: ESLint.Plugin;
+  export = plugin;
 }

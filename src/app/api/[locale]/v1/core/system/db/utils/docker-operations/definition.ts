@@ -87,7 +87,7 @@ const { POST } = createEndpoint({
         error: "Docker command failed",
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
   fields: objectField(
     {

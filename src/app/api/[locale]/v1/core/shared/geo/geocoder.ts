@@ -1,3 +1,5 @@
+import { parseError } from "next-vibe/shared/utils";
+
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 import type { Coordinates } from "./coordinates";
@@ -50,7 +52,7 @@ export async function geocodeAddress(
     // Return null when no geocoding is possible
     return null;
   } catch (error) {
-    logger.error("Geocoding failed:", error);
+    logger.error("Geocoding failed:", parseError(error));
     return null;
   }
 }

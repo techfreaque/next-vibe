@@ -16,7 +16,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli
 import {
   objectField,
   requestDataField,
-  requestUrlParamsField,
+  requestUrlPathParamsField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -48,10 +48,10 @@ const { GET } = createEndpoint({
         "app.api.v1.core.agent.chat.personas.id.get.container.description" as const,
       layout: { type: LayoutType.STACKED },
     },
-    { request: "urlParams", response: true },
+    { request: "urlPathParams", response: true },
     {
       // === REQUEST URL PARAMS ===
-      id: requestUrlParamsField(
+      id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -241,7 +241,7 @@ const { GET } = createEndpoint({
         },
       },
     },
-    urlPathVariables: {
+    urlPathParams: {
       getDefault: { id: "default" },
       getCustom: { id: "550e8400-e29b-41d4-a716-446655440000" },
     },
@@ -272,10 +272,10 @@ const { PATCH } = createEndpoint({
         "app.api.v1.core.agent.chat.personas.id.patch.container.description" as const,
       layout: { type: LayoutType.STACKED },
     },
-    { request: "data&urlParams", response: true },
+    { request: "data&urlPathParams", response: true },
     {
       // === REQUEST URL PARAMS ===
-      id: requestUrlParamsField(
+      id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
@@ -449,7 +449,7 @@ const { PATCH } = createEndpoint({
         success: true,
       },
     },
-    urlPathVariables: {
+    urlPathParams: {
       update: { id: "550e8400-e29b-41d4-a716-446655440000" },
     },
   },

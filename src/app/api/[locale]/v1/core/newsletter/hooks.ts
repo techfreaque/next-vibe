@@ -71,7 +71,7 @@ export function useNewsletterStatus(params: {
   return useApiQuery({
     endpoint: statusEndpoints.GET,
     requestData: { email: params.email },
-    urlParams: undefined,
+    urlPathParams: undefined,
     logger,
     options: {
       enabled: params.enabled !== false,
@@ -372,7 +372,7 @@ export function useNewsletterManager(): NewsletterManagerResult {
             email: emailToUse,
             // Note: leadId removed - server gets it from JWT
           },
-          urlParams: undefined,
+          urlPathParams: undefined,
         });
       }
     },
@@ -411,7 +411,7 @@ export function useNewsletterManager(): NewsletterManagerResult {
         };
         unsubscribeMutation.mutate({
           requestData,
-          urlParams: undefined,
+          urlPathParams: undefined,
         });
         setShowConfirmUnsubscribe(false);
       }

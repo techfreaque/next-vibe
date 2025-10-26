@@ -12,6 +12,8 @@ import {
 } from "node:fs";
 import { extname, join, relative, resolve } from "node:path";
 
+import { parseJsonWithComments } from "../../../shared/utils/parse-json";
+
 /**
  * TypeScript file extensions
  */
@@ -80,7 +82,9 @@ export function determinePathType(path?: string): PathType {
  */
 function getTsConfigExcludePatterns(): string[] {
   try {
-    const tsconfig = JSON.parse(readFileSync("tsconfig.json", "utf8")) as {
+    const tsconfig = parseJsonWithComments(
+      readFileSync("tsconfig.json", "utf8"),
+    ) as {
       exclude?: string[];
     };
     return tsconfig.exclude ?? [];

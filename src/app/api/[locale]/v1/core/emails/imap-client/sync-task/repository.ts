@@ -11,6 +11,7 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -57,7 +58,12 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ExecuteImapSyncResponseOutput>> {
-    logger.info("tasks.imap_sync.start", { config: data.config });
+    logger.info("tasks.imap_sync.start", {
+      maxAccountsPerRun: data.config.maxAccountsPerRun ?? 0,
+      enableFolderSync: data.config.enableFolderSync ?? false,
+      enableMessageSync: data.config.enableMessageSync ?? false,
+      dryRun: data.config.dryRun ?? false,
+    });
 
     try {
       // For now, we'll execute a simplified sync all accounts operation
@@ -134,7 +140,7 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
       // In a real implementation, this would check service availability
       return createSuccessResponse({ isValid: true });
     } catch (error) {
-      logger.error("IMAP sync validation failed", error);
+      logger.error("IMAP sync validation failed", error instanceof Error ? error.message : String(error));
       return createErrorResponse(
         "app.api.v1.core.emails.error.default",
         ErrorResponseTypes.INTERNAL_ERROR,

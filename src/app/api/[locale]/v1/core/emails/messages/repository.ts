@@ -52,7 +52,7 @@ export interface EmailsRepository {
   ): Promise<ResponseType<EmailsListResponseOutput>>;
 
   getEmailById(
-    urlVariables: EmailGetGETUrlVariablesOutput,
+    urlPathParams: EmailGetGETUrlVariablesOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -264,13 +264,13 @@ class EmailsRepositoryImpl implements EmailsRepository {
    * Get email by ID
    */
   async getEmailById(
-    urlVariables: EmailGetGETUrlVariablesOutput,
+    urlPathParams: EmailGetGETUrlVariablesOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailGetGETResponseOutput>> {
     try {
-      const emailId = urlVariables.id;
+      const emailId = urlPathParams.id;
       logger.debug("Fetching email by ID", {
         id: emailId,
         userId: user.id,

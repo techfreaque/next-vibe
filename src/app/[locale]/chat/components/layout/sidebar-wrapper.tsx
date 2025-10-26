@@ -5,6 +5,7 @@ import { Div } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 import React from "react";
 
+import { isDefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type {
   FolderUpdate,
   UseChatReturn,
@@ -100,14 +101,10 @@ export function SidebarWrapper({
   const handleCreateFolder = React.useCallback(
     (name: string, parentId: string, icon?: string): string => {
       // Determine rootFolderId from parentId
-      const isRootFolder =
-        parentId === "private" ||
-        parentId === "shared" ||
-        parentId === "public" ||
-        parentId === "incognito";
+      const isRootFolder = isDefaultFolderId(parentId);
 
       const rootFolderId = isRootFolder
-        ? (parentId as DefaultFolderId)
+        ? parentId
         : chat.folders[parentId]?.rootFolderId || "private";
 
       const actualParentId = isRootFolder ? null : parentId;

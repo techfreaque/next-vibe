@@ -96,7 +96,7 @@ export function testEndpoint<
       TFields
     > = {
       endpoint,
-      executeWith: async ({ data, urlParams, user }) => {
+      executeWith: async ({ data, urlPathParams, user }) => {
         return await sendTestRequest<
           TRequestOutput,
           TResponseInput,
@@ -109,7 +109,7 @@ export function testEndpoint<
         >({
           endpoint,
           data,
-          urlParams,
+          urlPathParams,
           user,
         });
       },
@@ -131,7 +131,7 @@ export function testEndpoint<
 
     // Group tests for payload examples
     const payloads = endpoint.examples.requests;
-    const urlPathVariables = endpoint.examples.urlPathVariables;
+    const urlPathParams = endpoint.examples.urlPathParams;
     if (payloads) {
       describe("Payload Examples", () => {
         // Test each example payload
@@ -141,8 +141,8 @@ export function testEndpoint<
 
         payloadEntries.forEach(([exampleName, payload]) => {
           it(`should handle ${exampleName} example`, async () => {
-            const urlParams = urlPathVariables
-              ? (urlPathVariables as Record<string, TUrlVariablesOutput>)[
+            const urlPathParams = urlPathParams
+              ? (urlPathParams as Record<string, TUrlVariablesOutput>)[
                   exampleName
                 ]
               : undefined;
@@ -150,7 +150,7 @@ export function testEndpoint<
             // Test with a user that has the endpoint's allowed roles
             const response = await testRunner.executeWith({
               data: payload,
-              urlParams: urlParams as TUrlVariablesOutput,
+              urlPathParams: urlPathParams as TUrlVariablesOutput,
             });
 
             // Expect success
@@ -181,9 +181,9 @@ export function testEndpoint<
               exampleKey && payloads
                 ? (payloads[exampleKey] as TRequestOutput)
                 : (undefined as TRequestOutput),
-            urlParams:
-              exampleKey && urlPathVariables
-                ? (urlPathVariables[exampleKey] as TUrlVariablesOutput)
+            urlPathParams:
+              exampleKey && urlPathParams
+                ? (urlPathParams[exampleKey] as TUrlVariablesOutput)
                 : (undefined as TUrlVariablesOutput),
             // Use public user (unauthorized) for this test
             user: {
@@ -219,9 +219,9 @@ export function testEndpoint<
                   exampleKey && payloads
                     ? (payloads[exampleKey] as TRequestOutput)
                     : (undefined as TRequestOutput),
-                urlParams:
-                  exampleKey && urlPathVariables
-                    ? (urlPathVariables[exampleKey] as TUrlVariablesOutput)
+                urlPathParams:
+                  exampleKey && urlPathParams
+                    ? (urlPathParams[exampleKey] as TUrlVariablesOutput)
                     : (undefined as TUrlVariablesOutput),
                 // Use authorized private user for this test
                 user: {

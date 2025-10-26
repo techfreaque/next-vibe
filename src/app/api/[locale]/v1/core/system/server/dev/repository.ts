@@ -11,8 +11,8 @@ import { spawn } from "node:child_process";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { seedDatabase } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 

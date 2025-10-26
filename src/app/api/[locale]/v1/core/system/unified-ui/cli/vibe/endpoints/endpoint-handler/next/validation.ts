@@ -80,7 +80,7 @@ export async function validateNextRequestData<
     const urlValidation = hasUrlParams
       ? validateEndpointUrlParameters(
           context.urlParameters,
-          endpoint.requestUrlParamsSchema,
+          endpoint.requestUrlPathParamsSchema,
           logger,
         )
       : { success: true as const, data: undefined };
@@ -163,16 +163,21 @@ function validateGetRequestData<TRequestInput, TRequestOutput>(
   request: NextRequest,
   logger: EndpointLogger,
 ): ResponseType<TRequestOutput> {
-  // Check if the schema is z.undefined() or z.never() (no request data expected)
+  // Check if the schema is z.undefined(), z.never(), or empty z.object({}) (no request data expected)
   // This happens when an endpoint has no request fields
+  const isEmptyObject =
+    endpoint.requestSchema instanceof z.ZodObject &&
+    Object.keys(endpoint.requestSchema.shape).length === 0;
+
   if (
     endpoint.requestSchema instanceof z.ZodUndefined ||
-    endpoint.requestSchema instanceof z.ZodNever
+    endpoint.requestSchema instanceof z.ZodNever ||
+    isEmptyObject
   ) {
-    // Return success with undefined as the data (will be cast to TRequestOutput)
+    // Return success with empty object as the data (will be cast to TRequestOutput)
     return {
       success: true,
-      data: undefined as TRequestOutput,
+      data: {} as TRequestOutput,
     };
   }
 

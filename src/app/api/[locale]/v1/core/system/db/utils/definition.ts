@@ -45,7 +45,7 @@ const { GET } = createEndpoint({
         checkConnections: true,
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
     responses: {
       default: {
         status: "healthy",

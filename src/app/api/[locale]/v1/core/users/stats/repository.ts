@@ -333,7 +333,7 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
 
       return createSuccessResponse(response);
     } catch (error) {
-      logger.error("Error fetching user statistics", error);
+      logger.error("Error fetching user statistics", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.users.list.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -547,7 +547,7 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         ? retentionStats.activeUsers / retentionStats.totalUsers
         : 0;
     } catch (error) {
-      logger.error("Error calculating retention rate", error);
+      logger.error("Error calculating retention rate", parseError(error));
       return 0.85; // Default fallback
     }
   }

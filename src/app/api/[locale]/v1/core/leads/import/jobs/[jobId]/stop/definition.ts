@@ -15,7 +15,7 @@ import {
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import {
   objectField,
-  requestUrlParamsField,
+  requestUrlPathParamsField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -44,10 +44,10 @@ const { POST } = createEndpoint({
         "app.api.v1.core.leads.import.jobs.jobId.stop.post.form.description",
       layout: { type: LayoutType.STACKED },
     },
-    { request: "urlParams", response: true },
+    { request: "urlPathParams", response: true },
     {
       // === URL PARAMETERS ===
-      jobId: requestUrlParamsField(
+      jobId: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
@@ -158,7 +158,7 @@ const { POST } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: { jobId: "550e8400-e29b-41d4-a716-446655440000" },
     },
     requests: undefined,

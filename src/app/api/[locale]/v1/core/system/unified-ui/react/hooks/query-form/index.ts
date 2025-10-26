@@ -44,7 +44,7 @@ import type {
  * - Debounced form submissions to prevent excessive API calls
  *
  * @param endpoint - The API endpoint to use
- * @param urlVariables - URL variables for the endpoint
+ * @param urlPathParams - URL variables for the endpoint
  * @param formOptions - Form options including defaultValues and persistence options
  * @param queryOptions - API query options
  * @returns Form and query for API interaction with enhanced error handling
@@ -54,17 +54,18 @@ export function useApiQueryForm<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >,
 >({
   endpoint,
-  urlVariables,
+  urlPathParams,
   formOptions = { persistForm: true, autoSubmit: true, debounceMs: 500 },
   queryOptions = { enabled: true },
   logger,
 }: {
   endpoint: TEndpoint;
-  urlVariables: TEndpoint["TUrlVariablesOutput"];
+  urlPathParams: TEndpoint["TUrlVariablesOutput"];
   formOptions: ApiQueryFormOptions<TEndpoint["TRequestOutput"]> & {
     /**
      * Whether to enable form persistence
@@ -222,6 +223,7 @@ export function useApiQueryForm<
       ExtractOutput<
         InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
       >
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     >(endpoint.requestSchema),
   };
 
@@ -332,7 +334,7 @@ export function useApiQueryForm<
       if (error) {
         // Convert Error to ErrorResponseType
         const errorResponse = createErrorResponse(
-          "app.error.api.form.errors.validation_failed",
+          "app.api.v1.core.system.unifiedUi.react.hooks.queryForm.errors.validation_failed",
           ErrorResponseTypes.VALIDATION_ERROR,
           { formId, message: error.message },
         );
@@ -350,7 +352,7 @@ export function useApiQueryForm<
   const query = useApiQuery({
     endpoint,
     requestData: queryParams,
-    urlParams: urlVariables,
+    urlPathParams: urlPathParams,
     logger,
     options: {
       ...queryOptions,
@@ -364,7 +366,7 @@ export function useApiQueryForm<
           queryOptions.onError({
             error,
             requestData: queryParams,
-            urlParams: urlVariables,
+            urlPathParams: urlPathParams,
           });
         }
       },
@@ -635,7 +637,7 @@ export function useApiQueryForm<
         });
 
         const errorResponse = createErrorResponse(
-          "app.error.api.form.errors.network_failure",
+          "app.api.v1.core.system.unifiedUi.react.hooks.queryForm.errors.network_failure",
           ErrorResponseTypes.VALIDATION_ERROR,
           { formId, error: errorMessage },
         );
@@ -677,7 +679,7 @@ export function useApiQueryForm<
         if (options.onError) {
           // Create a proper error response for validation errors with translation key
           const errorResponse = createErrorResponse(
-            "app.error.api.form.errors.validation_failed",
+            "app.api.v1.core.system.unifiedUi.react.hooks.queryForm.errors.validation_failed",
             ErrorResponseTypes.VALIDATION_ERROR,
             { formId, errors: JSON.stringify(errors) },
           );

@@ -2,7 +2,11 @@
 
 import { Edit, ExternalLink, Eye } from "lucide-react";
 import Link from "next/link";
-import { LeadStatus, type LeadStatusValues } from "next-vibe/leads/enum";
+import {
+  EmailCampaignStageOptions,
+  LeadStatus,
+  type LeadStatusValues,
+} from "next-vibe/leads/enum";
 import type { LeadListGetResponseTypeOutput } from "next-vibe/leads/list/definition";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
@@ -250,7 +254,10 @@ export function LeadsTable({
                     {lead.currentCampaignStage ? (
                       <Badge variant="outline">
                         {t(
-                          `app.admin.leads.leads.admin.stage.${lead.currentCampaignStage}` as TranslationKey,
+                          EmailCampaignStageOptions.find(
+                            (opt) => opt.value === lead.currentCampaignStage,
+                          )?.label ||
+                            "app.admin.leads.leads.admin.formatting.fallbacks.notAvailable",
                         )}
                       </Badge>
                     ) : (

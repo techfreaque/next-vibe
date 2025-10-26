@@ -92,8 +92,8 @@ export class ContactRepositoryImpl implements ContactRepository {
         // Log error but don't fail the contact form submission
         logger.error(
           "app.api.v1.core.contact.repository.lead.conversion.error",
+          parseError(error),
           {
-            error,
             leadId,
             email: data.email,
           },
@@ -138,8 +138,11 @@ export class ContactRepositoryImpl implements ContactRepository {
         status: [ContactStatus.NEW],
       });
     } catch (error) {
-      logger.error("app.api.v1.core.contact.repository.create.error", error);
       const parsedError = parseError(error);
+      logger.error(
+        "app.api.v1.core.contact.repository.create.error",
+        parsedError,
+      );
       return createErrorResponse(
         "app.api.v1.core.contact.errors.repositoryCreateFailed",
         ErrorResponseTypes.DATABASE_ERROR,
@@ -198,11 +201,11 @@ export class ContactRepositoryImpl implements ContactRepository {
         status: [data.status || ContactStatus.NEW],
       });
     } catch (error) {
+      const parsedError = parseError(error);
       logger.error(
         "app.api.v1.core.contact.repository.seed.create.error",
-        error,
+        parsedError,
       );
-      const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.contact.errors.repositoryCreateFailed",
         ErrorResponseTypes.DATABASE_ERROR,

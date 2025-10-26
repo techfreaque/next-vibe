@@ -51,4 +51,8 @@ export const translations: typeof enTranslations = {
       description: "Vorgang erfolgreich abgeschlossen",
     },
   },
+  errors: {
+    validation_failed: "Formularvalidierung fehlgeschlagen",
+    network_failure: "Netzwerkanfrage fehlgeschlagen",
+  },
 };

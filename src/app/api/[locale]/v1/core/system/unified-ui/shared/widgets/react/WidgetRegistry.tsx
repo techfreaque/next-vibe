@@ -14,7 +14,6 @@ import type { WidgetComponentProps } from "../types";
  * Widget component type
  * Accepts any data type to support typed widget components
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type WidgetComponent = FC<WidgetComponentProps<any>>;
 
 /**

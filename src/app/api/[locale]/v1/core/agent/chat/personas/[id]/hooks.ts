@@ -30,7 +30,7 @@ export function usePersona(
         refetchOnWindowFocus: false,
         staleTime: 5 * 60 * 1000, // 5 minutes
       },
-      urlParams: { id: personaId },
+      urlPathParams: { id: personaId },
     },
     logger,
   );
@@ -54,7 +54,7 @@ export function useUpdatePersona(
       formOptions: {
         persistForm: false,
       },
-      urlParams: { id: personaId },
+      urlPathParams: { id: personaId },
     },
     logger,
   );

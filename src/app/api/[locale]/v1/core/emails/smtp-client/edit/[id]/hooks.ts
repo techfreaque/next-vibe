@@ -24,7 +24,7 @@ export function useSmtpAccountById(
   return useEndpoint(
     definitions,
     {
-      urlParams: { id: params.accountId },
+      urlPathParams: { id: params.accountId },
       enabled: params.enabled,
       staleTime: 5 * 60 * 1000,
       refetchOnWindowFocus: false,

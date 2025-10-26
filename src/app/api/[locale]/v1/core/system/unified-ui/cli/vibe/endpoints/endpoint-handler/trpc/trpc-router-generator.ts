@@ -260,13 +260,11 @@ async function processRouteFile(
     const routeModule = (await import(importPath)) as RouteFileStructure;
 
     // Extract available HTTP methods
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any */
+
     methods = ["GET", "POST", "PUT", "PATCH", "DELETE"].filter(
       (method) =>
-        method in routeModule &&
-        typeof (routeModule as any)[method] === "function",
+        method in routeModule && typeof routeModule[method] === "function",
     );
-    /* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any */
 
     // Validate the route file structure
     validation = validateRouteFileForTRPC(routeModule);

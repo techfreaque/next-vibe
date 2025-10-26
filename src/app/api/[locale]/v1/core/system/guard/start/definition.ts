@@ -248,7 +248,7 @@ const { POST } = createEndpoint({
         scriptPath: "/home/user/projects/my-project/.vscode/.guard.sh",
       },
     },
-    urlPathVariables: {
+    urlPathParams: {
       default: {},
       byGuardId: {},
       startAll: {},

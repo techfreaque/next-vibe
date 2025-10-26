@@ -3,6 +3,7 @@
  * Handles pixel tracking requests and engagement recording
  */
 
+import { parseError } from "next-vibe/shared/utils";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -113,7 +114,7 @@ export class PixelTrackingRepository {
 
       return pixelResponse;
     } catch (error) {
-      logger.error("tracking.pixel.serve.error", error);
+      logger.error("tracking.pixel.serve.error", parseError(error));
       return LeadTrackingRepository.createTrackingPixelResponse(); // Always return pixel to avoid broken images
     }
   }

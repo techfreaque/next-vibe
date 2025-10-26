@@ -20,6 +20,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/defini
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chatThreads } from "../../db";
+import type { PersonaId } from "../../personas/config";
 import type {
   ThreadDeleteResponseOutput,
   ThreadGetResponseOutput,
@@ -98,14 +99,30 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
 
       logger.debug("Thread found successfully", { threadId: thread.id });
 
+      // Map database fields to response fields
+      // Exclude: rootFolderId (not in response), moderatorIds, searchVector
+      // Map: defaultModel (ModelId -> string), defaultPersona -> persona (PersonaId -> string)
       return createSuccessResponse({
         thread: {
-          ...thread,
-          persona: thread.defaultPersona,
+          id: thread.id,
+          userId: thread.userId,
+          title: thread.title,
+          folderId: thread.folderId,
+          status: thread.status,
+          defaultModel: (thread.defaultModel as string | null) ?? null,
+          persona: (thread.defaultPersona as string | null) ?? null,
+          systemPrompt: thread.systemPrompt,
+          pinned: thread.pinned,
+          archived: thread.archived,
+          tags: thread.tags,
+          preview: thread.preview,
+          metadata: thread.metadata as Record<string, unknown>,
+          createdAt: thread.createdAt,
+          updatedAt: thread.updatedAt,
         },
       });
     } catch (error) {
-      logger.error("Error getting thread by ID", error);
+      logger.error("Error getting thread by ID", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.agent.chat.threads.threadId.get.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -178,7 +195,8 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
         updateData.defaultModel = data.updates.defaultModel;
       }
       if (data.updates?.persona !== undefined) {
-        updateData.defaultPersona = data.updates.persona;
+        updateData.defaultPersona =
+          (data.updates.persona as PersonaId | null) ?? null;
       }
       if (data.updates?.systemPrompt !== undefined) {
         updateData.systemPrompt = data.updates.systemPrompt;
@@ -206,14 +224,30 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
         threadId: updatedThread.id,
       });
 
+      // Map database fields to response fields
+      // Exclude: rootFolderId (not in response), moderatorIds, searchVector
+      // Map: defaultModel (ModelId -> string), defaultPersona -> persona (PersonaId -> string)
       return createSuccessResponse({
         thread: {
-          ...updatedThread,
-          persona: updatedThread.defaultPersona,
+          id: updatedThread.id,
+          userId: updatedThread.userId,
+          title: updatedThread.title,
+          folderId: updatedThread.folderId,
+          status: updatedThread.status,
+          defaultModel: (updatedThread.defaultModel as string | null) ?? null,
+          persona: (updatedThread.defaultPersona as string | null) ?? null,
+          systemPrompt: updatedThread.systemPrompt,
+          pinned: updatedThread.pinned,
+          archived: updatedThread.archived,
+          tags: updatedThread.tags,
+          preview: updatedThread.preview,
+          metadata: updatedThread.metadata as Record<string, unknown>,
+          createdAt: updatedThread.createdAt,
+          updatedAt: updatedThread.updatedAt,
         },
       });
     } catch (error) {
-      logger.error("Error updating thread", error);
+      logger.error("Error updating thread", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.agent.chat.threads.threadId.patch.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -276,7 +310,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
         deletedId: data.id,
       });
     } catch (error) {
-      logger.error("Error deleting thread", error);
+      logger.error("Error deleting thread", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.agent.chat.threads.threadId.delete.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,

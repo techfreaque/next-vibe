@@ -89,7 +89,7 @@ export function createTRPCProcedureFromEndpoint<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any {
   // Create enhanced handler to get the tRPC procedure
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
   const trpcHandler = createTRPCHandler({
     endpoint: endpoint,
 
@@ -108,7 +108,6 @@ export function createTRPCProcedureFromEndpoint<
   // Create the appropriate tRPC procedure based on HTTP method
   switch (endpoint.method) {
     case Methods.GET:
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       return baseProcedure
         .input(combinedInputSchema)
         .query(async ({ input, ctx }) => {
@@ -121,13 +120,11 @@ export function createTRPCProcedureFromEndpoint<
           );
 
           // Update context with URL variables
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const enhancedCtx = {
             ...ctx,
-            urlParams: urlVariables as Record<string, string>,
+            urlPathParams: urlVariables as Record<string, string>,
           };
 
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           return await trpcHandler(
             { ...requestData, urlVariables },
             enhancedCtx,
@@ -138,7 +135,6 @@ export function createTRPCProcedureFromEndpoint<
     case Methods.PUT:
     case Methods.PATCH:
     case Methods.DELETE:
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       return baseProcedure
         .input(combinedInputSchema)
         .mutation(async ({ input, ctx }) => {
@@ -151,13 +147,11 @@ export function createTRPCProcedureFromEndpoint<
           );
 
           // Update context with URL variables
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const enhancedCtx = {
             ...ctx,
-            urlParams: urlVariables as Record<string, string>,
+            urlPathParams: urlVariables as Record<string, string>,
           };
 
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           return await trpcHandler(
             { ...requestData, urlVariables },
             enhancedCtx,
@@ -166,6 +160,7 @@ export function createTRPCProcedureFromEndpoint<
 
     default:
       // This should never happen in production as all supported methods are handled above
+
       return publicProcedure.query(() => {
         // eslint-disable-next-line no-restricted-syntax
         throw new Error("app.error.general.unsupported_method");
@@ -178,7 +173,6 @@ export function createTRPCProcedureFromEndpoint<
  */
 function selectBaseProcedure<TUserRoleValue extends readonly string[]>(
   allowedRoles: TUserRoleValue,
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 ):
   | typeof publicProcedure
   | typeof authenticatedProcedure
@@ -244,7 +238,6 @@ export function createTRPCProceduresFromEndpoints<
         string,
         Methods,
         readonly string[],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         any
       >["email"];
       sms?: ApiHandlerOptions<
@@ -254,7 +247,6 @@ export function createTRPCProceduresFromEndpoints<
         string,
         Methods,
         readonly string[],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         any
       >["sms"];
     }
@@ -276,7 +268,6 @@ export function createTRPCProceduresFromEndpoints<
       const handler = handlers[method as keyof T];
       const procedureOptions = options?.[method as keyof T];
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       procedures[method as keyof T] = createTRPCProcedureFromEndpoint(
         endpoint,
         handler,
@@ -295,7 +286,6 @@ export function createTRPCProceduresFromEndpoints<
 export function createTRPCProceduresFromRouteExports(routeExports: {
   definitions?: Record<
     string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     CreateApiEndpoint<string, Methods, readonly string[], any>
   >;
   handlers?: Record<
@@ -336,7 +326,6 @@ export function createTRPCProceduresFromRouteExports(routeExports: {
 
   if (sms) {
     for (const [method, smsConfig] of Object.entries(sms)) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       options[method] = {
         ...options[method],
         sms: smsConfig,
@@ -355,7 +344,6 @@ export type ExtractTRPCProcedures<T> = {
     string,
     Methods,
     readonly string[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >
     ? T[K]["method"] extends Methods.GET
@@ -370,7 +358,6 @@ export type ExtractTRPCProcedures<T> = {
 export interface RouteFileStructure {
   definitions?: Record<
     string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     CreateApiEndpoint<string, Methods, readonly string[], any>
   >;
   handlers?: Record<
@@ -495,12 +482,12 @@ function createCombinedInputSchema<
   >,
 ): z.ZodTypeAny {
   // Check if endpoint has URL parameters
-  if (endpoint.requestUrlParamsSchema) {
+  if (endpoint.requestUrlPathParamsSchema) {
     // Create a combined schema that includes both request data and URL variables
     // We use z.object to create a new schema that merges both
     return z.object({
       requestData: endpoint.requestSchema,
-      urlVariables: endpoint.requestUrlParamsSchema,
+      urlVariables: endpoint.requestUrlPathParamsSchema,
     });
   }
 

@@ -73,7 +73,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "db", "migrate", "task-management"],
   examples: {
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
     requests: {
       healthCheck: {
         operation: [MigrationTaskOperationType.RUN_HEALTH_CHECK],

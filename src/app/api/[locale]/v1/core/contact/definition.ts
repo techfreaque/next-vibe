@@ -207,7 +207,7 @@ const { POST } = createEndpoint({
         status: [ContactStatus.NEW],
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

@@ -290,7 +290,7 @@ const { POST } = createEndpoint({
         activeGuards: 1,
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
 });
 

@@ -2,9 +2,7 @@
 import { join } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import { CountryLanguage,
-defaultLocale } from "@/i18n/core/config";
-
+import type { TFunction } from "@/i18n/core/static-types.js";
 
 import type { LaunchpadConfig } from "../types/types.js";
 import {
@@ -13,8 +11,6 @@ import {
   getAllRepos,
   repoExists,
 } from "../utils/repo-utils.js";
-import { TFunction } from "@/i18n/core/static-types.js";
-
 
 export async function cloneMissingRepos(
   logger: EndpointLogger,

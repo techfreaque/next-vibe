@@ -110,7 +110,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
         updatedAt: foundUser.updatedAt.toISOString(),
       });
     } catch (error) {
-      logger.error("Error getting user by ID", error);
+      logger.error("Error getting user by ID", parseError(error));
       const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.users.user.errors.internal.title",
@@ -198,7 +198,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
         updatedAt: updatedUser.updatedAt.toISOString(),
       });
     } catch (error) {
-      logger.error("Error updating user", error);
+      logger.error("Error updating user", parseError(error));
       const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.users.user.errors.internal.title",
@@ -215,7 +215,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<UserDeleteResponseOutput>> {
     try {
-      logger.debug("Deleting user", { id: data.id, requestingUser: user.id });
+      logger.debug("Deleting user", { id: data.id?.toISOString() || null, requestingUser: user.id });
 
       // Check if user exists
       const [existingUser] = await db
@@ -249,7 +249,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
         message: "app.api.v1.core.users.user.delete.success.title",
       });
     } catch (error) {
-      logger.error("Error deleting user", error);
+      logger.error("Error deleting user", parseError(error));
       const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.users.user.errors.internal.title",

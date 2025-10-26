@@ -122,7 +122,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
 
       // Safety check for logger
       if (logger && typeof logger.error === "function") {
-        logger.error("Error finding user roles by user ID", error);
+        logger.error("Error finding user roles by user ID", parseError(error));
       }
 
       // Check if this is a database connection error
@@ -204,7 +204,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
 
       return createSuccessResponse(results[0]);
     } catch (error) {
-      logger.error("Error finding user role by user ID and role", error);
+      logger.error("Error finding user role by user ID and role", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.userRoles.errors.lookup_failed",
         ErrorResponseTypes.DATABASE_ERROR,
@@ -262,7 +262,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
 
       return createSuccessResponse(results[0]);
     } catch (error) {
-      logger.error("Error adding role to user", error);
+      logger.error("Error adding role to user", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.userRoles.errors.add_failed",
         ErrorResponseTypes.DATABASE_ERROR,
@@ -296,7 +296,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
 
       return createSuccessResponse(results.length > 0);
     } catch (error) {
-      logger.error("Error removing role from user", error);
+      logger.error("Error removing role from user", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.userRoles.errors.remove_failed",
         ErrorResponseTypes.DATABASE_ERROR,
@@ -327,7 +327,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
 
       return createSuccessResponse(existingRoleResult.success);
     } catch (error) {
-      logger.error("Error checking if user has role", error);
+      logger.error("Error checking if user has role", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.userRoles.errors.check_failed",
         ErrorResponseTypes.DATABASE_ERROR,
@@ -352,7 +352,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
 
       return createSuccessResponse(undefined);
     } catch (error) {
-      logger.error("Error deleting user roles by user ID", error);
+      logger.error("Error deleting user roles by user ID", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.userRoles.errors.delete_failed",
         ErrorResponseTypes.DATABASE_ERROR,

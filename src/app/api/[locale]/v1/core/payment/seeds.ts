@@ -3,6 +3,8 @@
  * Provides seed data for payment-related tables
  */
 
+import { parseError } from "next-vibe/shared/utils";
+
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
@@ -76,7 +78,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       `Created ${paymentTestCases.length} payment test case configurations`,
     );
   } catch (error) {
-    logger.error("Error preparing payment development seeds:", error);
+    logger.error("Error preparing payment development seeds:", parseError(error));
     // Don't throw error - continue with other seeds
   }
 
@@ -131,7 +133,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
       `✅ Created ${testPaymentCases.length} payment test configurations`,
     );
   } catch (error) {
-    logger.error("Error preparing payment test seeds:", error);
+    logger.error("Error preparing payment test seeds:", parseError(error));
     // Don't throw error - continue with other seeds
   }
 
@@ -152,7 +154,7 @@ export function prod(logger: EndpointLogger): void {
     // Verify payment system configuration
     logger.debug("✅ Payment system verified for production");
   } catch (error) {
-    logger.error("Error in payment production setup:", error);
+    logger.error("Error in payment production setup:", parseError(error));
     // Don't throw error - log and continue
   }
 

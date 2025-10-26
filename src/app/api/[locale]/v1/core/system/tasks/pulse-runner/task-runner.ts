@@ -1,13 +1,13 @@
-import { TaskCategory } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 /**
  * Pulse Task Runner
  * Dedicated task runner that calls the pulse repository once per minute
  * Designed for environments like Vercel that don't support persistent runners
  */
-
 import "server-only";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
+
+import { TaskCategory } from "@/app/api/[locale]/v1/core/system/tasks/enum";
 
 import type { TaskRunner } from "../types/repository";
 

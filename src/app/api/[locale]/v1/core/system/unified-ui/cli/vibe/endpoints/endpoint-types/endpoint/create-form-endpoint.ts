@@ -72,7 +72,7 @@ export interface FormExamples<
       >,
       TExampleKey
     >;
-    urlPathVariables?: ExtractInput<
+    urlPathParams?: ExtractInput<
       InferSchemaFromFieldForMethod<
         TFields,
         Methods.GET,
@@ -120,7 +120,7 @@ export interface FormExamples<
       >,
       TExampleKey
     >;
-    urlPathVariables?: ExtractInput<
+    urlPathParams?: ExtractInput<
       InferSchemaFromFieldForMethod<
         TFields,
         Methods.POST,
@@ -198,11 +198,11 @@ type SupportsMethodAndUsage<
   TMethod extends keyof TUsage
     ? TUsage[TMethod] extends infer TMethodUsage
       ? TTargetUsage extends FieldUsage.RequestData
-        ? TMethodUsage extends { request: "data" | "data&urlParams" }
+        ? TMethodUsage extends { request: "data" | "data&urlPathParams" }
           ? true
           : false
         : TTargetUsage extends FieldUsage.RequestUrlParams
-          ? TMethodUsage extends { request: "urlParams" | "data&urlParams" }
+          ? TMethodUsage extends { request: "urlPathParams" | "data&urlPathParams" }
             ? true
             : false
           : TTargetUsage extends FieldUsage.Response
@@ -213,11 +213,11 @@ type SupportsMethodAndUsage<
       : false
     : // Fall back to original logic for backward compatibility
       TTargetUsage extends FieldUsage.RequestData
-      ? TUsage extends { request: "data" | "data&urlParams" }
+      ? TUsage extends { request: "data" | "data&urlPathParams" }
         ? true
         : false
       : TTargetUsage extends FieldUsage.RequestUrlParams
-        ? TUsage extends { request: "urlParams" | "data&urlParams" }
+        ? TUsage extends { request: "urlPathParams" | "data&urlPathParams" }
           ? true
           : false
         : TTargetUsage extends FieldUsage.Response
@@ -321,7 +321,7 @@ function transformFieldForMethod<F>(field: F, method: Methods): F {
       const methodSpecificUsage = typedField.usage as Record<
         string,
         {
-          request?: "data" | "urlParams" | "data&urlParams";
+          request?: "data" | "urlPathParams" | "data&urlPathParams";
           response?: boolean;
         }
       >;
@@ -349,7 +349,7 @@ function transformFieldForMethod<F>(field: F, method: Methods): F {
       const methodSpecificUsage = typedField.usage as Record<
         string,
         {
-          request?: "data" | "urlParams" | "data&urlParams";
+          request?: "data" | "urlPathParams" | "data&urlPathParams";
           response?: boolean;
         }
       >;
@@ -384,7 +384,7 @@ function transformFieldForMethod<F>(field: F, method: Methods): F {
       const methodSpecificUsage = typedField.usage as Record<
         string,
         {
-          request?: "data" | "urlParams" | "data&urlParams";
+          request?: "data" | "urlPathParams" | "data&urlPathParams";
           response?: boolean;
         }
       >;
@@ -471,7 +471,7 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
     const methodSpecificUsage = usage as Record<
       string,
       {
-        request?: "data" | "urlParams" | "data&urlParams";
+        request?: "data" | "urlPathParams" | "data&urlPathParams";
         response?: boolean;
       }
     >;
@@ -488,7 +488,7 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
   };
 
   const convertMethodUsageToStandard = (methodUsage: {
-    request?: "data" | "urlParams" | "data&urlParams";
+    request?: "data" | "urlPathParams" | "data&urlPathParams";
     response?: boolean;
   }): FieldUsageConfig => {
     if (methodUsage.request && methodUsage.response) {
@@ -520,12 +520,12 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
       case FieldUsage.RequestData:
         return (
           "request" in usage &&
-          (usage.request === "data" || usage.request === "data&urlParams")
+          (usage.request === "data" || usage.request === "data&urlPathParams")
         );
       case FieldUsage.RequestUrlParams:
         return (
           "request" in usage &&
-          (usage.request === "urlParams" || usage.request === "data&urlParams")
+          (usage.request === "urlPathParams" || usage.request === "data&urlPathParams")
         );
       default:
         return false;
@@ -678,11 +678,11 @@ export function createFormEndpoint<
     examples: config.examples.GET || {
       requests: undefined,
       responses: undefined,
-      urlPathVariables: undefined,
+      urlPathParams: undefined,
     },
     requestSchema: getRequestSchema,
     responseSchema: getResponseSchema,
-    requestUrlParamsSchema: getUrlSchema,
+    requestUrlPathParamsSchema: getUrlSchema,
     types: {
       RequestInput: null as InferInputFromFieldForMethod<
         TFields,
@@ -748,11 +748,11 @@ export function createFormEndpoint<
     examples: config.examples.POST || {
       requests: {},
       responses: {},
-      urlPathVariables: undefined,
+      urlPathParams: undefined,
     },
     requestSchema: postRequestSchema,
     responseSchema: postResponseSchema,
-    requestUrlParamsSchema: postRequestUrlSchema,
+    requestUrlPathParamsSchema: postRequestUrlSchema,
     types: {
       RequestInput: null as InferInputFromFieldForMethod<
         TFields,
@@ -790,15 +790,14 @@ export function createFormEndpoint<
   // Return the form endpoints
   // Type assertion needed: method-specific types are structurally compatible but TypeScript can't verify
   return {
-    // eslint-disable-next-line no-restricted-syntax
-    GET: getEndpoint as unknown as MethodSpecificEndpoint<
+    GET: getEndpoint as MethodSpecificEndpoint<
       TFields,
       Methods.GET,
       TExampleKey,
       TUserRoleValue
     >,
-    // eslint-disable-next-line no-restricted-syntax
-    POST: postEndpoint as unknown as MethodSpecificEndpoint<
+
+    POST: postEndpoint as MethodSpecificEndpoint<
       TFields,
       Methods.POST,
       TExampleKey,

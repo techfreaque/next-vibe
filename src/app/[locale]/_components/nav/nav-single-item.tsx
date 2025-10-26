@@ -1,3 +1,4 @@
+import { cn } from "next-vibe/shared/utils";
 import {
   Badge,
   Button,
@@ -16,7 +17,6 @@ import type { JSX, ReactNode } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
-import { cn } from "next-vibe/shared/utils";
 
 import type { NavPaths } from "./nav-constants";
 

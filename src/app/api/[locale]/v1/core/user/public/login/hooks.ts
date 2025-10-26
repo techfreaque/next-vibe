@@ -288,7 +288,7 @@ export function useLogin(
     isAccountLocked,
     errorMessage,
     responseMessage,
-    JSON.stringify(responseMessageParams),
+    responseMessageParams,
     responseSuccess,
   ]);
 

@@ -52,6 +52,7 @@ export class MCPServer {
 
     if (!isMCPServerEnabled()) {
       this.logger.error("[MCP Server] MCP server is disabled");
+      // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
       throw new Error("MCP server is disabled");
     }
 
@@ -97,6 +98,7 @@ export class MCPServer {
       this.logger.error("[MCP Server] Failed to start", {
         error: error instanceof Error ? error.message : String(error),
       });
+      // eslint-disable-next-line no-restricted-syntax
       throw error;
     }
   }
@@ -131,7 +133,7 @@ export class MCPServer {
    * Setup graceful shutdown handlers
    */
   private setupShutdownHandlers(): void {
-    const shutdown = async (signal: string) => {
+    const shutdown = async (signal: string): Promise<void> => {
       this.logger.info(`[MCP Server] Received ${signal}, shutting down...`);
       await this.stop();
       process.exit(0);

@@ -15,12 +15,18 @@ import {
   type ResponseType,
   type StreamingResponse,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository";
 import { creditValidator } from "@/app/api/[locale]/v1/core/credits/validator";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { getToolRegistry } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool";
-import { extractWidgetMetadataById } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/widget-metadata-extractor";
+import { getToolExecutor } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/executor";
+import { createToolsFromEndpoints } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/factory";
+import type {
+  CoreTool,
+  IToolExecutor,
+} from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -30,10 +36,7 @@ import { chatMessages, chatThreads, type MessageMetadata } from "../chat/db";
 import { ChatMessageRole } from "../chat/enum";
 import { getModelCost } from "../chat/model-access/costs";
 import { getModelById, type ModelId } from "../chat/model-access/models";
-import {
-  CONTINUE_CONVERSATION_PROMPT,
-  SEARCH_TOOL_INSTRUCTIONS,
-} from "./constants";
+import { CONTINUE_CONVERSATION_PROMPT } from "./constants";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
@@ -41,7 +44,6 @@ import type {
 import { createStreamEvent, formatSSEEvent } from "./events";
 import { isUncensoredAIModel } from "./providers/uncensored-ai";
 import { handleUncensoredAI } from "./providers/uncensored-handler";
-import { loadToolsForUser } from "./tool-loader";
 
 /**
  * Maximum duration for streaming responses (in seconds)
@@ -472,7 +474,9 @@ export async function createAiStream({
       logger,
     });
   } catch (error) {
-    logger.error("Failed to ensure thread", { error });
+    logger.error("Failed to ensure thread", {
+      error: parseError(error).message,
+    });
     return createErrorResponse(
       "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
       ErrorResponseTypes.NOT_FOUND,
@@ -519,14 +523,8 @@ export async function createAiStream({
     content: string;
   }>;
 
-  // Prepare system prompt with search instructions if needed
+  // System prompt will be set later after loading tools with their instructions
   let systemPrompt = data.systemPrompt || "";
-  const hasSearchTool = data.tools?.includes("search");
-  if (hasSearchTool) {
-    systemPrompt = systemPrompt
-      ? [systemPrompt, SEARCH_TOOL_INSTRUCTIONS].join("\n\n")
-      : SEARCH_TOOL_INSTRUCTIONS;
-  }
 
   if (data.operation === "answer-as-ai") {
     // For answer-as-ai, we need the full conversation context up to the parent message
@@ -673,58 +671,83 @@ export async function createAiStream({
       tools: data.tools,
     });
 
+    // Get model config to check tool support
+    const modelConfig = getModelById(data.model as ModelId);
+
     // Build tools object dynamically from registry
     // Type is inferred from usage - DO NOT add type annotations
     // as Tool generic types are incompatible between different tools
-    let tools:
-      | {
-          [key: string]: typeof braveSearch;
-        }
-      | undefined = undefined;
+    let tools: Record<string, CoreTool> | undefined = undefined;
 
     // Handle tools array
     // null = no tools
     // undefined/[] = all available tools for user (filtered by permissions)
     // ["search", "core_user_create"] = specific tools
-    if (data.tools !== null) {
+    // IMPORTANT: Only load tools if the model supports them
+    if (data.tools !== null && modelConfig?.supportsTools) {
       try {
         // Get tool registry
         const registry = getToolRegistry();
 
-        // Get all tools from registry (includes manual tools like search)
-        const allTools = await registry.getTools();
+        // Get all endpoints from registry
+        const allEndpoints = registry.getEndpoints();
 
-        logger.info("Available tools from registry", {
-          totalTools: allTools.length,
-          toolNames: allTools.map((t) => t.name),
-        });
+        logger.info("Available endpoints from registry:", allEndpoints.length);
 
-        // Filter tools based on request
-        let enabledToolMetadata: typeof allTools;
+        // Filter endpoints based on request
+        let enabledEndpoints: typeof allEndpoints;
         if (!data.tools || data.tools.length === 0) {
-          // All available tools for user
-          enabledToolMetadata = allTools;
+          // All available endpoints for user
+          enabledEndpoints = allEndpoints;
         } else {
           // Specific tools requested
-          enabledToolMetadata = allTools.filter((tool) =>
-            data.tools?.includes(tool.name),
+          enabledEndpoints = allEndpoints.filter((endpoint) =>
+            data.tools?.includes(endpoint.toolName),
           );
         }
 
-        logger.info("Filtered to enabled tools", {
-          enabledCount: enabledToolMetadata.length,
-          enabledNames: enabledToolMetadata.map((t) => t.name),
+        logger.info("Filtered to enabled endpoints", {
+          enabledCount: enabledEndpoints.length,
+          enabledNames: enabledEndpoints.map((e) => e.toolName),
         });
 
-        // Load AI tools (manual + dynamic)
-        if (enabledToolMetadata.length > 0) {
-          const toolLoadingResult = await loadToolsForUser(
-            enabledToolMetadata,
-            userId,
-            locale,
-            logger,
+        // Create CoreTools directly from endpoints using factory
+        if (enabledEndpoints.length > 0) {
+          // Create CoreTools directly using factory
+          const toolExecutor = getToolExecutor() as IToolExecutor;
+          const toolsMap = createToolsFromEndpoints(
+            enabledEndpoints,
+            toolExecutor,
+            {
+              user: {
+                id: userId,
+                email: "",
+                isPublic: !userId,
+              },
+              locale,
+              logger,
+            },
           );
-          tools = toolLoadingResult.tools;
+
+          // Convert Map to Record
+          tools = Object.fromEntries(toolsMap.entries());
+
+          logger.info("[AI Stream] Tools created", {
+            count: toolsMap.size,
+            toolNames: Array.from(toolsMap.keys()),
+          });
+
+          // Add tool instructions to system prompt
+          const toolInstructions = enabledEndpoints
+            .map((endpoint) => endpoint.definition.aiTool?.instructions)
+            .filter((instructions): instructions is string => !!instructions);
+
+          if (toolInstructions.length > 0) {
+            const combinedInstructions = toolInstructions.join("\n\n");
+            systemPrompt = systemPrompt
+              ? [systemPrompt, combinedInstructions].join("\n\n")
+              : combinedInstructions;
+          }
         }
       } catch (error) {
         logger.error("Failed to load tools from registry", {
@@ -835,7 +858,6 @@ export async function createAiStream({
           let fullContent = "";
 
           // Get the OpenRouter model ID (use openRouterModel if available, otherwise use model ID directly)
-          const modelConfig = getModelById(data.model as ModelId);
           const openRouterModelId = modelConfig?.openRouterModel || data.model;
 
           // Use Vercel AI SDK's built-in multi-step tool calling with stopWhen
@@ -876,12 +898,10 @@ export async function createAiStream({
             creditsUsed?: number;
           }> = [];
 
-          // Get tool metadata for display info
+          // Get endpoint metadata for display info
           const registry = getToolRegistry();
-          const allToolMetadata = await registry.getTools();
-          const toolMetadataMap = new Map(
-            allToolMetadata.map((t) => [t.name, t]),
-          );
+          const allEndpoints = registry.getEndpoints();
+          const endpointMap = new Map(allEndpoints.map((e) => [e.toolName, e]));
 
           // Stream the response
           for await (const part of streamResult.fullStream) {
@@ -903,8 +923,9 @@ export async function createAiStream({
                 controller.enqueue(encoder.encode(formatSSEEvent(deltaEvent)));
               }
             } else if (part.type === "tool-call") {
-              // Get tool metadata for display info
-              const toolMeta = toolMetadataMap.get(part.toolName);
+              // Get endpoint metadata for display info
+              const endpoint = endpointMap.get(part.toolName);
+              const definition = endpoint?.definition;
 
               // Try to get widget metadata from endpoint definition
               let widgetMetadata:
@@ -920,27 +941,22 @@ export async function createAiStream({
                       options?: Array<{ value: string; label: string }>;
                     }>;
                   }
+                | null
                 | undefined;
 
-              if (toolMeta?.endpointId && !toolMeta.isManualTool) {
-                // For dynamic tools, extract widget metadata
-                widgetMetadata = await extractWidgetMetadataById(
-                  toolMeta.endpointId,
-                  {}, // Empty object for metadata extraction
-                  logger,
-                );
-              }
+              // Widget metadata extraction removed - will be added back later
+              widgetMetadata = undefined;
 
               // Collect tool call for database storage
               const toolCallData = {
                 toolName: part.toolName,
-                displayName: toolMeta?.displayName || part.toolName,
-                icon: toolMeta?.icon,
+                displayName: definition?.title || part.toolName,
+                icon: definition?.aiTool?.icon,
                 args: ("input" in part ? part.input : {}) as Record<
                   string,
                   string | number | boolean | null
                 >,
-                creditsUsed: toolMeta?.cost ?? 0,
+                creditsUsed: definition?.credits ?? 0,
                 widgetMetadata,
               };
               collectedToolCalls.push(toolCallData);
@@ -959,7 +975,10 @@ export async function createAiStream({
               );
 
               if (toolCallIndex !== -1) {
-                collectedToolCalls[toolCallIndex].result = part.result as
+                // AI SDK uses 'output' property for tool results
+                // The output type is unknown from AI SDK, so we assert it to our expected types
+                const output = "output" in part ? part.output : undefined;
+                collectedToolCalls[toolCallIndex].result = output as
                   | string
                   | number
                   | boolean
@@ -970,7 +989,7 @@ export async function createAiStream({
                 // For now, we just store the result
                 logger.debug("[AI Stream] Tool result received", {
                   toolName: part.toolName,
-                  hasResult: !!part.result,
+                  hasResult: !!output,
                 });
               }
             }
@@ -1095,10 +1114,6 @@ export async function createAiStream({
               });
             }
           }
-
-          // TODO: Track search usage for credit deduction
-          // We need to count tool calls from the stream to deduct search credits
-          // For now, search is free (no credit deduction)
 
           controller.close();
         } catch (error) {

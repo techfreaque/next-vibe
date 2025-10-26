@@ -34,7 +34,7 @@ const { POST } = createEndpoint({
   path: ["v1", "core", "system", "setup", "status"],
   examples: {
     requests: {},
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
     responses: {},
   },
 

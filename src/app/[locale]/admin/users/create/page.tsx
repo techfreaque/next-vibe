@@ -25,8 +25,8 @@ export async function generateMetadata({
   const { t } = simpleT(locale);
 
   return {
-    title: t("app.admin.users.users.admin.actions.addUser"),
-    description: t("app.admin.users.users.create.description"),
+    title: t("app.admin.users.actions.addUser"),
+    description: t("app.admin.users.create.description"),
   };
 }
 
@@ -44,10 +44,10 @@ export default async function UserCreatePage({
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">
-          {t("app.admin.users.users.admin.actions.addUser")}
+          {t("app.admin.users.actions.addUser")}
         </h1>
         <p className="text-muted-foreground mt-2">
-          {t("app.admin.users.users.create.description")}
+          {t("app.admin.users.create.description")}
         </p>
       </div>
 

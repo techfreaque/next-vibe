@@ -7,6 +7,7 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import type { JSX } from "react";
 
+import contactDefinitions from "@/app/api/[locale]/v1/core/contact/definition";
 import { useContactWithEngagement } from "@/app/api/[locale]/v1/core/contact/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { StandardUserType } from "@/app/api/[locale]/v1/core/user/definition";
@@ -57,14 +58,8 @@ export default function ContactForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <EndpointFormField
             name="name"
-            config={{
-              type: "text",
-              label: "app.help.components.pages.help.form.name",
-              placeholder:
-                "app.help.components.pages.help.form.namePlaceholder",
-              disabled: isSubmitting,
-            }}
             control={form.control}
+            endpointFields={contactDefinitions.POST.fields}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -73,14 +68,8 @@ export default function ContactForm({
 
           <EndpointFormField
             name="email"
-            config={{
-              type: "email",
-              label: "app.help.components.pages.help.form.email",
-              placeholder:
-                "app.help.components.pages.help.form.emailPlaceholder",
-              disabled: isSubmitting,
-            }}
             control={form.control}
+            endpointFields={contactDefinitions.POST.fields}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -90,14 +79,8 @@ export default function ContactForm({
 
         <EndpointFormField
           name="company"
-          config={{
-            type: "text",
-            label: "app.help.components.pages.help.form.company",
-            placeholder:
-              "app.help.components.pages.help.form.companyPlaceholder",
-            disabled: isSubmitting,
-          }}
           control={form.control}
+          endpointFields={contactDefinitions.POST.fields}
           theme={{
             style: "none",
             showAllRequired: false,
@@ -106,64 +89,8 @@ export default function ContactForm({
 
         <EndpointFormField
           name="subject"
-          config={{
-            type: "select",
-            label: "app.help.components.pages.help.form.subject",
-            placeholder:
-              "app.help.components.pages.help.form.subjectPlaceholder",
-            disabled: isSubmitting,
-            options: [
-              {
-                value: "HELP_SUPPORT",
-                label: "app.help.components.contact.subjects.HELP_SUPPORT",
-              },
-              {
-                value: "GENERAL_INQUIRY",
-                label: "app.help.components.contact.subjects.GENERAL_INQUIRY",
-              },
-              {
-                value: "TECHNICAL_SUPPORT",
-                label: "app.help.components.contact.subjects.TECHNICAL_SUPPORT",
-              },
-              {
-                value: "ACCOUNT_QUESTION",
-                label: "app.help.components.contact.subjects.ACCOUNT_QUESTION",
-              },
-              {
-                value: "BILLING_QUESTION",
-                label: "app.help.components.contact.subjects.BILLING_QUESTION",
-              },
-              {
-                value: "SALES_INQUIRY",
-                label: "app.help.components.contact.subjects.SALES_INQUIRY",
-              },
-              {
-                value: "FEATURE_REQUEST",
-                label: "app.help.components.contact.subjects.FEATURE_REQUEST",
-              },
-              {
-                value: "BUG_REPORT",
-                label: "app.help.components.contact.subjects.BUG_REPORT",
-              },
-              {
-                value: "FEEDBACK",
-                label: "app.help.components.contact.subjects.FEEDBACK",
-              },
-              {
-                value: "COMPLAINT",
-                label: "app.help.components.contact.subjects.COMPLAINT",
-              },
-              {
-                value: "PARTNERSHIP",
-                label: "app.help.components.contact.subjects.PARTNERSHIP",
-              },
-              {
-                value: "OTHER",
-                label: "app.help.components.contact.subjects.OTHER",
-              },
-            ],
-          }}
           control={form.control}
+          endpointFields={contactDefinitions.POST.fields}
           theme={{
             style: "none",
             showAllRequired: false,
@@ -172,15 +99,8 @@ export default function ContactForm({
 
         <EndpointFormField
           name="message"
-          config={{
-            type: "textarea",
-            label: "app.help.components.pages.help.form.message",
-            placeholder:
-              "app.help.components.pages.help.form.messagePlaceholder",
-            disabled: isSubmitting,
-            rows: 6,
-          }}
           control={form.control}
+          endpointFields={contactDefinitions.POST.fields}
           theme={{
             style: "none",
             showAllRequired: false,

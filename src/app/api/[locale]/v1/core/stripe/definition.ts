@@ -268,7 +268,7 @@ const { POST } = createEndpoint({
         webhookEndpoint: "https://webhook.stripe.com/listen",
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
 
   errorTypes: {

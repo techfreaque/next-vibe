@@ -8,6 +8,7 @@ export const translations = {
     remove_failed: "Failed to remove role from user",
     check_failed: "Failed to check if user has role",
     delete_failed: "Failed to delete user roles",
+    endpoint_not_created: "User roles endpoint has not been created yet",
   },
   post: {
     title: "User Roles",

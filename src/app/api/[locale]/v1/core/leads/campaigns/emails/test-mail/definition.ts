@@ -416,7 +416,7 @@ const { POST } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
     requests: {
       default: {
         campaignType: CampaignType.LEAD_CAMPAIGN,

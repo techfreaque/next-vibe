@@ -414,9 +414,13 @@ const loginDefinitions = createEndpoint({
 });
 
 // Extract types for use in other files
-export type LoginPostRequestInput = typeof loginDefinitions.POST.types.RequestInput;
-export type LoginPostRequestOutput = typeof loginDefinitions.POST.types.RequestOutput;
-export type LoginPostResponseInput = typeof loginDefinitions.POST.types.ResponseInput;
-export type LoginPostResponseOutput = typeof loginDefinitions.POST.types.ResponseOutput;
+export type LoginPostRequestInput =
+  typeof loginDefinitions.POST.types.RequestInput;
+export type LoginPostRequestOutput =
+  typeof loginDefinitions.POST.types.RequestOutput;
+export type LoginPostResponseInput =
+  typeof loginDefinitions.POST.types.ResponseInput;
+export type LoginPostResponseOutput =
+  typeof loginDefinitions.POST.types.ResponseOutput;
 
 export default loginDefinitions;

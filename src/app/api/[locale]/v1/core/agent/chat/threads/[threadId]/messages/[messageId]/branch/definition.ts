@@ -16,7 +16,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli
 import {
   objectField,
   requestDataField,
-  requestUrlParamsField,
+  requestUrlPathParamsField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -115,10 +115,10 @@ const { POST } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.container.description" as const,
       layout: { type: LayoutType.STACKED },
     },
-    { request: "data&urlParams", response: true },
+    { request: "data&urlPathParams", response: true },
     {
       // === URL PARAMS ===
-      threadId: requestUrlParamsField(
+      threadId: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
@@ -129,7 +129,7 @@ const { POST } = createEndpoint({
         },
         z.uuid(),
       ),
-      messageId: requestUrlParamsField(
+      messageId: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
@@ -298,7 +298,7 @@ const { POST } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: {
         threadId: "550e8400-e29b-41d4-a716-446655440000",
         messageId: "660e8400-e29b-41d4-a716-446655440001",

@@ -186,6 +186,8 @@ export const translations: typeof enTranslations = {
       validation: {
         title: "Validierungsfehler",
         description: "Die angegebenen Daten sind ungültig",
+        circularReference:
+          "Ordner kann nicht als eigener übergeordneter Ordner festgelegt werden",
       },
       unauthorized: {
         title: "Nicht autorisiert",

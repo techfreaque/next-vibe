@@ -615,9 +615,9 @@ type Test14_2_DeleteEndpoint = CreateApiEndpoint<
   readonly ["ADMIN"],
   ObjectField<
     {
-      id: PrimitiveField<z.ZodString, { request: "urlParams" }>;
+      id: PrimitiveField<z.ZodString, { request: "urlPathParams" }>;
     },
-    { request: "urlParams" }
+    { request: "urlPathParams" }
   >
 >;
 type Test14_2_Result =

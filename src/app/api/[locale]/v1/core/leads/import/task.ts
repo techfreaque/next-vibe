@@ -278,7 +278,7 @@ const csvProcessorTask: Task = {
   },
 
   onError: ({ error, logger }) => {
-    logger.error("CSV processor task error", error);
+    logger.error("CSV processor task error", parseError(error));
   },
 };
 

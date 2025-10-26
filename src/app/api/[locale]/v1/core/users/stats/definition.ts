@@ -3,6 +3,8 @@
  * Comprehensive endpoint for user analytics with historical charts
  */
 
+import { z } from "zod";
+
 import {
   ChartType,
   ChartTypeOptions,
@@ -10,9 +12,7 @@ import {
   DateRangePresetOptions,
   TimePeriod,
   TimePeriodOptions,
-} from "next-vibe/shared/types/stats-filtering.schema";
-import { z } from "zod";
-
+} from "@/app/api/[locale]/v1/core/shared/stats-filtering";
 import {
   EndpointErrorTypes,
   FieldDataType,

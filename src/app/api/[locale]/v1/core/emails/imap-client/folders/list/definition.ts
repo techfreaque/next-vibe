@@ -15,7 +15,7 @@ import {
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
 import {
   objectField,
-  requestUrlParamsField,
+  requestDataField,
   responseArrayField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
@@ -54,10 +54,10 @@ const { GET } = createEndpoint({
         "app.api.v1.core.emails.imapClient.folders.list.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: "urlParams", response: true },
+    { request: "data", response: true },
     {
       // === URL PARAMETERS ===
-      page: requestUrlParamsField(
+      page: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
@@ -70,7 +70,7 @@ const { GET } = createEndpoint({
         z.coerce.number().min(1).default(1),
       ),
 
-      limit: requestUrlParamsField(
+      limit: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
@@ -83,7 +83,7 @@ const { GET } = createEndpoint({
         z.coerce.number().min(1).max(100).default(20),
       ),
 
-      accountId: requestUrlParamsField(
+      accountId: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -97,7 +97,7 @@ const { GET } = createEndpoint({
         z.uuid(),
       ),
 
-      search: requestUrlParamsField(
+      search: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -110,7 +110,7 @@ const { GET } = createEndpoint({
         z.string().optional(),
       ),
 
-      specialUseType: requestUrlParamsField(
+      specialUseType: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
@@ -125,7 +125,7 @@ const { GET } = createEndpoint({
         z.array(z.enum(ImapSpecialUseType)).optional(),
       ),
 
-      syncStatus: requestUrlParamsField(
+      syncStatus: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
@@ -140,7 +140,7 @@ const { GET } = createEndpoint({
         z.array(z.enum(ImapSyncStatus)).optional(),
       ),
 
-      sortBy: requestUrlParamsField(
+      sortBy: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
@@ -156,7 +156,7 @@ const { GET } = createEndpoint({
           .default([ImapFolderSortField.NAME]),
       ),
 
-      sortOrder: requestUrlParamsField(
+      sortOrder: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
@@ -394,7 +394,7 @@ const { GET } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    requests: undefined,
+    urlPathParams: undefined,
     responses: {
       default: {
         folders: [
@@ -420,7 +420,7 @@ const { GET } = createEndpoint({
         },
       },
     },
-    urlPathVariables: {
+    requests: {
       default: {
         accountId: "123e4567-e89b-12d3-a456-426614174000",
       },

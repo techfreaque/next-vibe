@@ -4,7 +4,7 @@
  */
 import { Text, View } from "react-native";
 
-export function FormSection(props: any) {
+export function FormSection(props) {
   console.warn("🔶 Using stub: FormSection");
   return (
     <View style={{ padding: 8, backgroundColor: "#FEF3C7", marginVertical: 4 }}>

@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -93,8 +94,10 @@ export function useTTSAudio({
       // If we already have audio URL, just play it
       if (audioUrl && audioRef.current) {
         logger.debug("TTS", "Using cached audio");
-        audioRef.current.play().catch((err) => {
-          logger.error("TTS", "Failed to play cached audio", err);
+        audioRef.current.play().catch((err: Error | null) => {
+          logger.error("TTS", "Failed to play cached audio", {
+            error: err instanceof Error ? err.message : String(err),
+          });
           setError(t("app.chat.hooks.tts.failed-to-play"));
         });
         setIsPlaying(true);
@@ -135,7 +138,13 @@ export function useTTSAudio({
       const result = endpoint.create.response;
 
       if (!result?.success || !result.data) {
-        logger.error("TTS", "TTS API returned error", endpoint.create.error);
+        logger.error(
+          "TTS",
+          "TTS API returned error",
+          endpoint.create.error
+            ? parseError(endpoint.create.error)
+            : new Error("Unknown error"),
+        );
         const errorMsg =
           endpoint.create.error?.message ||
           t("app.chat.hooks.tts.failed-to-generate");
@@ -163,7 +172,11 @@ export function useTTSAudio({
       };
 
       audio.onerror = (err): void => {
-        logger.error("TTS", "Audio playback error", err);
+        const audioError =
+          err instanceof Error
+            ? err
+            : new Error(t("app.chat.hooks.tts.failed-to-play"));
+        logger.error("TTS", "Audio playback error", parseError(audioError));
         setError(t("app.chat.hooks.tts.failed-to-play"));
         setIsPlaying(false);
       };
@@ -178,7 +191,7 @@ export function useTTSAudio({
         err instanceof Error
           ? err.message
           : t("app.chat.hooks.tts.failed-to-generate");
-      logger.error("TTS", "Exception during TTS", err);
+      logger.error("TTS", "Exception during TTS", parseError(err));
       setError(errorMsg);
       onError?.(errorMsg);
     } finally {

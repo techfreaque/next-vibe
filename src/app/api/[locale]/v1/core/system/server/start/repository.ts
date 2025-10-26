@@ -4,17 +4,17 @@
  * Implements task system specification requirements for production environment
  */
 
-/* eslint-disable i18next/no-literal-string, node/no-process-env */
+/* eslint-disable i18next/no-literal-string */
 // CLI output messages don't need internationalization
 // Process environment access is required for server configuration
 
 import type { ChildProcess } from "node:child_process";
 import { spawn } from "node:child_process";
 
-import { seedDatabase } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { seedDatabase } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 

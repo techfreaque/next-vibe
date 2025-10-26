@@ -3,11 +3,9 @@
 import { existsSync } from "node:fs";
 import { dirname, join, parse, resolve } from "node:path";
 
-import { defaultLocale } from "@/i18n/core/config";
+import type { TFunction } from "@/i18n/core/static-types";
 
 import type { LaunchpadConfig } from "../types/types";
-import { TFunction } from "@/i18n/core/static-types";
-
 
 export const DEFAULT_CONFIG_PATH = "launchpad.config.ts";
 
@@ -18,9 +16,7 @@ let configRootDir: string | null = null;
 export function getRootDirectory(t: TFunction): string {
   if (!configRootDir) {
     throw new Error(
-      t(
-        "app.api.v1.core.system.launchpad.src.utils.config.errors.configNotLoaded" ,
-      ),
+      t("app.api.v1.core.system.launchpad.errors.configNotLoaded"),
     );
   }
   return configRootDir;
@@ -102,7 +98,7 @@ export async function loadConfig(
     if (!existsSync(resolvedConfigPath)) {
       throw new Error(
         t(
-          "app.api.v1.core.system.launchpad.src.utils.config.errors.configFileNotFound" as const,
+          "app.api.v1.core.system.launchpad.errors.configFileNotFound" as const,
           {
             path: resolvedConfigPath,
           },
@@ -115,7 +111,7 @@ export async function loadConfig(
     if (!foundConfigPath) {
       throw new Error(
         t(
-          "app.api.v1.core.system.launchpad.src.utils.config.errors.configFileNotFoundInParents" as const,
+          "app.api.v1.core.system.launchpad.errors.configFileNotFoundInParents" as const,
           {
             filename: configPath,
           },
@@ -130,14 +126,12 @@ export async function loadConfig(
 
   try {
     // const compiledConfigPath = await getCompiledConfigPath(resolvedConfigPath);
-    const importedModule = (await import(
-      `file://${resolvedConfigPath}`
-    )) as unknown;
+    const importedModule = await import(`file://${resolvedConfigPath}`);
 
     if (!isLaunchpadConfigModule(importedModule)) {
       throw new Error(
         t(
-          "app.api.v1.core.system.launchpad.src.utils.config.errors.invalidConfigFormat" as const,
+          "app.api.v1.core.system.launchpad.errors.invalidConfigFormat" as const,
         ),
       );
     }
@@ -150,7 +144,7 @@ export async function loadConfig(
     // Re-throw the error with additional context
     const errorMessage = error instanceof Error ? error.message : String(error);
     const contextMessage = t(
-      "app.api.v1.core.system.launchpad.src.utils.config.errors.errorLoadingConfig" as const,
+      "app.api.v1.core.system.launchpad.errors.errorLoadingConfig" as const,
     );
     throw new Error(`${contextMessage} ${errorMessage}`);
   }

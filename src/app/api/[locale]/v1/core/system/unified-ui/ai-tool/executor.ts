@@ -15,7 +15,7 @@ import {
 } from "../cli/vibe/utils/route-delegation-handler";
 import { aiToolConfig } from "./config";
 import { AI_TOOL_CONSTANTS } from "./constants";
-import { toolDiscovery } from "./discovery";
+import { getDiscoveredEndpoints } from "./endpoint-adapter";
 import { createErrorResult } from "./error-handler";
 import type {
   AIToolExecutionContext,
@@ -25,7 +25,6 @@ import type {
   ToolExecutorOptions,
   ToolParameterValue,
 } from "./types";
-import { extractWidgetMetadata } from "./widget-metadata-extractor";
 
 /**
  * Tool Executor Implementation
@@ -49,7 +48,7 @@ export class ToolExecutor implements IToolExecutor {
 
     try {
       // Get endpoint by tool name
-      const endpoint = await this.getEndpointByToolName(context.toolName);
+      const endpoint = this.getEndpointByToolName(context.toolName);
 
       if (!endpoint) {
         const emptyPath = "";
@@ -69,7 +68,7 @@ export class ToolExecutor implements IToolExecutor {
       }
 
       // Validate parameters
-      const validation = await this.validateParameters(
+      const validation = this.validateParameters(
         context.toolName,
         context.parameters,
       );
@@ -77,11 +76,12 @@ export class ToolExecutor implements IToolExecutor {
       if (!validation.valid) {
         const errorSeparator = ", ";
         const pathSeparator = "/";
+        const errorMessages = validation.errors ?? [];
         return {
           success: false,
           error: t(
             "app.api.v1.core.system.unifiedUi.aiTool.executor.errors.parameterValidationFailed",
-            { errors: validation.errors?.join(errorSeparator) || "" },
+            { errors: errorMessages.join(errorSeparator) },
           ),
           metadata: {
             executionTime: Date.now() - startTime,
@@ -171,17 +171,6 @@ export class ToolExecutor implements IToolExecutor {
         });
       }
 
-      // Extract widget metadata from endpoint definition if execution succeeded
-      const widgetMetadata =
-        result.success && result.data
-          ? extractWidgetMetadata(endpoint, result.data, context.logger)
-          : undefined;
-
-      // Add execution time to widget metadata if present
-      if (widgetMetadata) {
-        widgetMetadata.executionTime = Date.now() - startTime;
-      }
-
       const resultPathSeparator = "/";
       return {
         success: result.success,
@@ -192,7 +181,6 @@ export class ToolExecutor implements IToolExecutor {
           endpointPath: endpoint.path.join(resultPathSeparator),
           method: endpoint.method,
           ...result.metadata,
-          widgetMetadata,
         },
       };
     } catch (error) {
@@ -231,13 +219,13 @@ export class ToolExecutor implements IToolExecutor {
   /**
    * Validate tool parameters
    */
-  async validateParameters(
+  validateParameters(
     toolName: string,
     parameters: Record<string, ToolParameterValue>,
-  ): Promise<{ valid: boolean; errors?: string[] }> {
+  ): { valid: boolean; errors?: string[] } {
     try {
       // Get endpoint
-      const endpoint = await this.getEndpointByToolName(toolName);
+      const endpoint = this.getEndpointByToolName(toolName);
 
       if (!endpoint) {
         const { t } = simpleT("en-GLOBAL");
@@ -282,10 +270,8 @@ export class ToolExecutor implements IToolExecutor {
   /**
    * Get endpoint by tool name
    */
-  private async getEndpointByToolName(
-    toolName: string,
-  ): Promise<DiscoveredEndpoint | null> {
-    const endpoints = await toolDiscovery.discover();
+  private getEndpointByToolName(toolName: string): DiscoveredEndpoint | null {
+    const endpoints = getDiscoveredEndpoints();
     return endpoints.find((e) => e.toolName === toolName) || null;
   }
 

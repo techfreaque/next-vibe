@@ -5,6 +5,7 @@
  * Most of the implementation details are handled by the next-vibe package.
  */
 
+import { parseError } from "next-vibe/shared/utils";
 import type {
   ErrorResponseType,
   ResponseType,
@@ -140,7 +141,7 @@ export function useUser(logger: EndpointLogger): UseUserReturn {
 
         setAuthChecked(true);
       } catch (error) {
-        logger.error("user.auth.initial.check.failed", error);
+        logger.error("user.auth.initial.check.failed", parseError(error));
         setAuthChecked(true);
       }
     };

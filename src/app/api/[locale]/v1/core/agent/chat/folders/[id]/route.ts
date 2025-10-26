@@ -34,7 +34,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
         typeof definitions.GET.allowedRoles
       >,
     ): Promise<ResponseType<FolderGetResponseOutput>> => {
-      return await getFolder(props.user, { id: props.urlVariables.id });
+      return await getFolder(props.user, { id: props.urlPathParams.id });
     },
   },
   [Methods.PATCH]: {
@@ -48,7 +48,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
     ): Promise<ResponseType<FolderUpdateResponseOutput>> => {
       const dataWithId = {
         ...props.data,
-        id: props.urlVariables.id,
+        id: props.urlPathParams.id,
       };
       return await updateFolder(props.user, dataWithId);
     },
@@ -62,7 +62,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
         typeof definitions.DELETE.allowedRoles
       >,
     ): Promise<ResponseType<FolderDeleteResponseOutput>> => {
-      return await deleteFolder(props.user, { id: props.urlVariables.id });
+      return await deleteFolder(props.user, { id: props.urlPathParams.id });
     },
   },
 });

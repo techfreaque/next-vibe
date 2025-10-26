@@ -12,6 +12,7 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -217,7 +218,9 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
         ) {
           logger.error("IMAP connection test failed", {
             error: "Missing required configuration",
-            config,
+            host: config.host,
+            port: config.port,
+            username: config.username,
           });
           return createErrorResponse(
             "app.api.v1.core.emails.imapClient.imapErrors.validation.account.username.required",
@@ -333,7 +336,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
           imap.connect();
         });
       } catch (error) {
-        logger.error("IMAP connection test failed", error);
+        logger.error("IMAP connection test failed", parseError(error));
 
         return createErrorResponse(
           "app.api.v1.core.emails.imapClient.imap.connection.test.failed",
@@ -341,7 +344,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
         );
       }
     } catch (error) {
-      logger.error("IMAP connection test failed", error);
+      logger.error("IMAP connection test failed", parseError(error));
 
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imap.connection.test.failed",
@@ -434,7 +437,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
         },
       );
     } catch (error) {
-      logger.error("Failed to connect to IMAP server", error);
+      logger.error("Failed to connect to IMAP server", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imapErrors.connection.failed",
         ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
@@ -473,7 +476,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
           "app.api.v1.core.emails.imapClient.imap.connection.test.success",
       });
     } catch (error) {
-      logger.error("Error closing IMAP connection", error);
+      logger.error("Error closing IMAP connection", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imapErrors.connection.close.failed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -565,7 +568,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
 
       return createSuccessResponse({ folders });
     } catch (error) {
-      logger.error("Error listing IMAP folders", error);
+      logger.error("Error listing IMAP folders", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imapErrors.connection.folders.list.failed",
         ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
@@ -586,7 +589,6 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
       logger.debug("Listing IMAP messages", {
         accountId: data.account.id,
         folderPath: data.folderPath,
-        options: data.options,
       });
 
       // Implement actual message listing using IMAP
@@ -724,7 +726,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
 
       return createSuccessResponse({ messages });
     } catch (error) {
-      logger.error("Error listing IMAP messages", error);
+      logger.error("Error listing IMAP messages", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imapErrors.connection.messages.list.failed",
         ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
@@ -820,7 +822,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
           "app.api.v1.core.emails.imapClient.imap.connection.test.success",
       });
     } catch (error) {
-      logger.error("Error closing IMAP connections", error);
+      logger.error("Error closing IMAP connections", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imapErrors.connection.close.failed",
         ErrorResponseTypes.INTERNAL_ERROR,

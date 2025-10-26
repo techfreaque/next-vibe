@@ -1,4 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * Logger metadata - structured data for logging
+ */
+export type LoggerMetadata =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | Error
+  | { [key: string]: LoggerMetadata }
+  | LoggerMetadata[];
 
 /**
  * Logger interface for endpoint handlers
@@ -8,27 +19,27 @@ export interface EndpointLogger {
   /**
    * Log an info message - always runs
    */
-  info(message: string, ...args: any[]): void;
+  info(message: string, ...metadata: LoggerMetadata[]): void;
 
   /**
    * Log an error message - always runs
    */
-  error(message: string, error?: any, ...args: any[]): void;
+  error(message: string, error?: LoggerMetadata, ...metadata: LoggerMetadata[]): void;
 
   /**
    * Log a warning message - always runs
    */
-  warn(message: string, ...args: any[]): void;
+  warn(message: string, ...metadata: LoggerMetadata[]): void;
 
   /**
    * Log a vibe message (special formatted info) - always runs
    */
-  vibe(message: string, ...args: any[]): void;
+  vibe(message: string, ...metadata: LoggerMetadata[]): void;
 
   /**
    * Log a debug message - only runs when debug flag is enabled
    */
-  debug(message: string, ...args: any[]): void;
+  debug(message: string, ...metadata: LoggerMetadata[]): void;
 
   isDebugEnabled: boolean;
 }

@@ -38,7 +38,7 @@ const chatMessageSchema = z.object({
  */
 const { POST } = createEndpoint({
   method: Methods.POST,
-  path: ["v1", "core", "agent", "chat", "ai-stream"],
+  path: ["v1", "core", "agent", "ai-stream"],
   allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
 
   title: "app.api.v1.core.agent.chat.aiStream.post.title",
@@ -301,49 +301,36 @@ const { POST } = createEndpoint({
       ),
 
       // === RESPONSE FIELDS ===
-      response: objectField(
+      success: responseField(
         {
-          type: WidgetType.CONTAINER,
-          title: "app.api.v1.core.agent.chat.aiStream.post.response.title",
-          description:
-            "app.api.v1.core.agent.chat.aiStream.post.response.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          type: WidgetType.TEXT,
+          content: "app.api.v1.core.agent.chat.aiStream.post.response.success",
         },
-        { response: true },
+        z.boolean(),
+      ),
+      messageId: responseField(
         {
-          success: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.agent.chat.aiStream.post.response.success",
-            },
-            z.boolean(),
-          ),
-          messageId: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.agent.chat.aiStream.post.response.messageId",
-            },
-            z.string(),
-          ),
-          totalTokens: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.agent.chat.aiStream.post.response.totalTokens",
-            },
-            z.coerce.number().optional(),
-          ),
-          finishReason: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.agent.chat.aiStream.post.response.finishReason",
-            },
-            z.string().optional(),
-          ),
+          type: WidgetType.TEXT,
+          content:
+            "app.api.v1.core.agent.chat.aiStream.post.response.messageId",
         },
+        z.string(),
+      ),
+      totalTokens: responseField(
+        {
+          type: WidgetType.TEXT,
+          content:
+            "app.api.v1.core.agent.chat.aiStream.post.response.totalTokens",
+        },
+        z.coerce.number().optional(),
+      ),
+      finishReason: responseField(
+        {
+          type: WidgetType.TEXT,
+          content:
+            "app.api.v1.core.agent.chat.aiStream.post.response.finishReason",
+        },
+        z.string().optional(),
       ),
     },
   ),
@@ -449,31 +436,25 @@ const { POST } = createEndpoint({
     },
     responses: {
       default: {
-        response: {
-          success: true,
-          messageId: "msg_123e4567-e89b-12d3-a456-426614174000",
-          totalTokens: 245,
-          finishReason: "stop",
-        },
+        success: true,
+        messageId: "msg_123e4567-e89b-12d3-a456-426614174000",
+        totalTokens: 245,
+        finishReason: "stop",
       },
       withSystemPrompt: {
-        response: {
-          success: true,
-          messageId: "msg_456e7890-e89b-12d3-a456-426614174001",
-          totalTokens: 387,
-          finishReason: "stop",
-        },
+        success: true,
+        messageId: "msg_456e7890-e89b-12d3-a456-426614174001",
+        totalTokens: 387,
+        finishReason: "stop",
       },
       retry: {
-        response: {
-          success: true,
-          messageId: "msg_789e0123-e89b-12d3-a456-426614174002",
-          totalTokens: 298,
-          finishReason: "stop",
-        },
+        success: true,
+        messageId: "msg_789e0123-e89b-12d3-a456-426614174002",
+        totalTokens: 298,
+        finishReason: "stop",
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
 });
 

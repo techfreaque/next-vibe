@@ -1,4 +1,4 @@
-import type { z, ZodError } from "zod";
+import type { z, ZodError, ZodIssue } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
@@ -26,25 +26,26 @@ export function validateData<TSchema extends z.ZodType>(
     if (!result.success) {
       const formattedErrors = formatZodErrors(result.error);
       const error = {
-        errorCount: result.error.errors?.length || 0,
-        errors: result.error.errors?.slice(0, 3).map((e) => ({
+        errorCount: result.error.issues?.length || 0,
+        errors: result.error.issues?.slice(0, 3).map((e: ZodIssue) => ({
           path: e.path.join("."),
           message: e.message,
           code: e.code,
         })),
-        allErrors: result.error.errors,
+        allErrors: result.error.issues,
         formattedErrors,
         errorType: typeof result.error,
         errorConstructor: result.error?.constructor?.name,
-        hasErrors: "errors" in result.error,
+        hasIssues: "issues" in result.error,
         fullError: JSON.stringify(result.error, null, 2),
       };
-      logger.error("Validation error details", error);
+      logger.error("Validation error details", parseError(error));
       return createErrorResponse(
-        "error.general.validation_failed",
+        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
         ErrorResponseTypes.VALIDATION_ERROR,
         {
-          error: error,
+          error: formattedErrors.join(", "),
+          errorCount: error.errorCount,
         },
       );
     }
@@ -55,7 +56,7 @@ export function validateData<TSchema extends z.ZodType>(
     const parsedError = parseError(error);
     logger.error("Unexpected validation error", parsedError);
     return createErrorResponse(
-      "error.general.unexpected_validation_error",
+      "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.unknown_validation_error",
       ErrorResponseTypes.VALIDATION_ERROR,
       { error: parsedError.message },
     );
@@ -69,11 +70,13 @@ export function validateData<TSchema extends z.ZodType>(
  */
 export function formatZodErrors(zodError: ZodError): string[] {
   if (
-    !zodError?.errors ||
-    !Array.isArray(zodError.errors) ||
-    zodError.errors.length === 0
+    !zodError?.issues ||
+    !Array.isArray(zodError.issues) ||
+    zodError.issues.length === 0
   ) {
     return ["error.general.unknown_validation_error"];
   }
-  return zodError.errors.map((err) => `${err.path.join(".")}: ${err.message}`);
+  return zodError.issues.map(
+    (err: ZodIssue) => `${err.path.join(".")}: ${err.message}`,
+  );
 }

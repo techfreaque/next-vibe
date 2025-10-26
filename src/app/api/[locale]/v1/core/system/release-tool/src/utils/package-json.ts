@@ -130,7 +130,7 @@ export async function updateDependencies(
       cwd,
 
       stdio: "inherit",
-      // eslint-disable-next-line node/no-process-env
+
       env: { ...process.env },
     });
     return createSuccessResponse(undefined);

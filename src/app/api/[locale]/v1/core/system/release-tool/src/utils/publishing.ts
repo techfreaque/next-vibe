@@ -29,10 +29,8 @@ export async function publishPackage({
   pkg: ReleasePackage;
   logger: EndpointLogger;
 }): Promise<void> {
-  // eslint-disable-next-line i18next/no-literal-string
   logger.info(`Processing tag release (${newTag}) for ${packageJson.name}...`);
   if (await checkTagExists(newTag, logger)) {
-    // eslint-disable-next-line i18next/no-literal-string
     logger.info(`Skipping ${packageJson.name}: tag ${newTag} already exists.`);
     return;
   }
@@ -40,10 +38,8 @@ export async function publishPackage({
 
   // Special handling for repositories with no existing tags
   if (lastTag === "0.0.0") {
-    // eslint-disable-next-line i18next/no-literal-string
     logger.info("No previous tags found. This will be the first release.");
   } else if (!hasNewCommitsSinceTag(lastTag, pkg.directory, logger)) {
-    // eslint-disable-next-line i18next/no-literal-string
     logger.info(`No new commits since ${lastTag}, skipping release.`);
     return;
   }
@@ -62,12 +58,10 @@ export async function publishPackage({
   ]);
 
   if (!shouldPublish) {
-    // eslint-disable-next-line i18next/no-literal-string
     logger.info(`Skipping release of ${packageJson.name}`);
     return;
   }
 
-  // eslint-disable-next-line i18next/no-literal-string
   logger.info(`Releasing ${packageJson.name}...`);
   createGitTag(newTag, pkg.directory, logger);
 }
@@ -89,7 +83,6 @@ export async function zipFolders({
   logger: EndpointLogger;
 }): Promise<void> {
   if (foldersToZip.length > 0) {
-    // eslint-disable-next-line i18next/no-literal-string
     logger.info("Starting to zip folders");
 
     for (const zipConfig of foldersToZip) {
@@ -97,7 +90,7 @@ export async function zipFolders({
 
       // Process template variables in output filename
       let outputFileName = basename(zipConfig.output);
-      // eslint-disable-next-line i18next/no-literal-string
+
       outputFileName = outputFileName
         .replace(/%NAME%/g, packageJson.name)
         .replace(/%VERSION%/g, newTag)
@@ -134,7 +127,6 @@ export async function zipFolders({
         // Listen for all archive data to be written
         await new Promise<void>((resolve, reject) => {
           output.on("close", () => {
-            // eslint-disable-next-line i18next/no-literal-string
             logger.info(
               `Successfully zipped ${inputPath} to ${outputPath} (${archive.pointer()} total bytes)`,
             );
@@ -144,7 +136,7 @@ export async function zipFolders({
           archive.on("warning", (err) => {
             if (err.code === "ENOENT") {
               // Log warning
-              // eslint-disable-next-line i18next/no-literal-string
+
               logger.warn(`Warning while zipping: ${err.message}`);
             } else {
               // Throw error
@@ -166,17 +158,14 @@ export async function zipFolders({
           archive.finalize().then(resolve).catch(reject);
         });
       } catch (error) {
-        // eslint-disable-next-line i18next/no-literal-string
         logger.error(
           `Error zipping folder ${inputPath}: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
     }
 
-    // eslint-disable-next-line i18next/no-literal-string
     logger.info("Finished zipping folders");
   } else {
-    // eslint-disable-next-line i18next/no-literal-string
     logger.info("No folders to zip in your config");
   }
 }

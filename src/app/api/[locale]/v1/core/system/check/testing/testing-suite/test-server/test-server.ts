@@ -1,5 +1,6 @@
 /* global NodeJS */
 
+import { parseError } from "next-vibe/shared/utils";
 import type { Server } from "node:http";
 import { createServer } from "node:http";
 import { cwd } from "node:process";
@@ -69,7 +70,7 @@ export async function startServer(logger: EndpointLogger): Promise<void> {
       });
     });
   } catch (error) {
-    logger.error("Failed to start server:", error);
+    logger.error("Failed to start server:", parseError(error));
     // eslint-disable-next-line no-restricted-syntax -- Test infrastructure can throw errors
     throw error;
   }

@@ -68,7 +68,7 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
           type: "truncate",
           status: "skipped",
           details: t(
-            "app.api.v1.core.system.db.reset.operations.truncate.requiresForce",
+            "app.api.v1.core.system.db.reset.messages.truncateRequiresForce",
           ),
           count: 0,
         });
@@ -76,9 +76,7 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
         operations.push({
           type: "truncate",
           status: "skipped",
-          details: t(
-            "app.api.v1.core.system.db.reset.operations.truncate.dryRun",
-          ),
+          details: t("app.api.v1.core.system.db.reset.messages.dryRun"),
           count: tablesAffected,
         });
       } else {
@@ -87,9 +85,11 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
           status: truncateResult.count > 0 ? "success" : "skipped",
           details:
             truncateResult.count > 0
-              ? t("app.api.v1.core.system.db.reset.operations.truncate.success")
+              ? t("app.api.v1.core.system.db.reset.messages.truncatedTables", {
+                  count: truncateResult.count,
+                })
               : t(
-                  "app.api.v1.core.system.db.reset.operations.truncate.noTables",
+                  "app.api.v1.core.system.db.reset.messages.noTablesToTruncate",
                 ),
           count: truncateResult.count,
         });
@@ -103,7 +103,7 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
           type: "migrate",
           status: "success",
           details: t(
-            "app.api.v1.core.system.db.reset.operations.migrate.success",
+            "app.api.v1.core.system.db.reset.messages.runningMigrations",
           ),
           count: migrationResult.count,
         });
@@ -111,9 +111,7 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
         operations.push({
           type: "migrate",
           status: "skipped",
-          details: t(
-            "app.api.v1.core.system.db.reset.operations.migrate.dryRun",
-          ),
+          details: t("app.api.v1.core.system.db.reset.messages.dryRun"),
           count: 24, // Placeholder count
         });
       } else if (data.skipMigrations) {
@@ -121,7 +119,7 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
           type: "migrate",
           status: "skipped",
           details: t(
-            "app.api.v1.core.system.db.reset.operations.migrate.skippedByUser",
+            "app.api.v1.core.system.db.reset.messages.runningMigrations",
           ),
           count: 0,
         });
@@ -130,7 +128,7 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
           type: "migrate",
           status: "pending",
           details: t(
-            "app.api.v1.core.system.db.reset.operations.migrate.notExecuted",
+            "app.api.v1.core.system.db.reset.messages.runningMigrations",
           ),
           count: 0,
         });
@@ -143,32 +141,28 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
         operations.push({
           type: "seed",
           status: "success",
-          details: t("app.api.v1.core.system.db.reset.operations.seed.success"),
+          details: t("app.api.v1.core.system.db.reset.messages.runningSeeds"),
           count: seedResult.count,
         });
       } else if (data.dryRun) {
         operations.push({
           type: "seed",
           status: "skipped",
-          details: t("app.api.v1.core.system.db.reset.operations.seed.dryRun"),
+          details: t("app.api.v1.core.system.db.reset.messages.dryRun"),
           count: 12, // Placeholder count
         });
       } else if (data.skipSeeds) {
         operations.push({
           type: "seed",
           status: "skipped",
-          details: t(
-            "app.api.v1.core.system.db.reset.operations.seed.skippedByUser",
-          ),
+          details: t("app.api.v1.core.system.db.reset.messages.runningSeeds"),
           count: 0,
         });
       } else {
         operations.push({
           type: "seed",
           status: "pending",
-          details: t(
-            "app.api.v1.core.system.db.reset.operations.seed.notExecuted",
-          ),
+          details: t("app.api.v1.core.system.db.reset.messages.runningSeeds"),
           count: 0,
         });
       }
@@ -349,10 +343,9 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
     // This would integrate with the migration repository
     // For now, returning realistic placeholder
     return Promise.resolve({
-      output: t(
-        "app.api.v1.core.system.db.reset.operations.migrate.appliedSuccessfully",
-        { count: 24 },
-      ),
+      output: t("app.api.v1.core.system.db.reset.messages.runningMigrations", {
+        count: 24,
+      }),
       count: 24,
     });
   }
@@ -367,10 +360,9 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
     // This would integrate with the seed system
     // For now, returning realistic placeholder
     return Promise.resolve({
-      output: t(
-        "app.api.v1.core.system.db.reset.operations.seed.executedSuccessfully",
-        { count: 12 },
-      ),
+      output: t("app.api.v1.core.system.db.reset.messages.runningSeeds", {
+        count: 12,
+      }),
       count: 12,
     });
   }

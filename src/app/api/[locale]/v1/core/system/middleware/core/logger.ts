@@ -1,7 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-console */
 /* eslint-disable i18next/no-literal-string */
-/* eslint-disable node/no-process-env */
 
 import { Environment } from "next-vibe/shared/utils";
 

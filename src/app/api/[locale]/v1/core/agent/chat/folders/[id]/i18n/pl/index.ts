@@ -185,6 +185,8 @@ export const translations: typeof enTranslations = {
       validation: {
         title: "Błąd walidacji",
         description: "Podane dane są nieprawidłowe",
+        circularReference:
+          "Nie można ustawić folderu jako własnego folderu nadrzędnego",
       },
       unauthorized: {
         title: "Nieautoryzowany",

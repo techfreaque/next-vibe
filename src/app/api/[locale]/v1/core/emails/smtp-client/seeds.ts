@@ -4,11 +4,12 @@
  */
 
 import { eq } from "drizzle-orm";
+import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
+import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 import { env } from "@/config/env";
 import { Countries, Languages } from "@/i18n/core/config";
-import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 
 import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 // EmailJourneyVariant and EmailCampaignStage are defined as string arrays for seeding
@@ -206,7 +207,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       );
     }
   } catch (error) {
-    logger.error("❌ Failed to seed SMTP accounts:", error);
+    logger.error("❌ Failed to seed SMTP accounts:", parseError(error));
   }
 }
 

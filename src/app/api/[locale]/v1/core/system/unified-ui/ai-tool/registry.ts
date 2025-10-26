@@ -11,16 +11,14 @@
 import "server-only";
 
 import { createEndpointLogger } from "../cli/vibe/endpoints/endpoint-handler/logger";
-import { getEndpointRegistry } from "../shared/endpoint-registry";
-import { aiToolConfig, isAIToolSystemEnabled } from "./config";
+import { isAIToolSystemEnabled } from "./config";
+import { getDiscoveredEndpoints } from "./endpoint-adapter";
 import { toolExecutor } from "./executor";
 import { toolFilter } from "./filter";
-import { getManualTools } from "./manual-tools";
 import type {
   AIToolExecutionContext,
   AIToolExecutionResult,
-  AIToolMetadata,
-  CoreTool,
+  DiscoveredEndpoint,
   IToolRegistry,
   ToolExecutorOptions,
   ToolFilterCriteria,
@@ -29,10 +27,11 @@ import type {
 
 /**
  * Tool Registry Implementation
+ * Now stores DiscoveredEndpoint[] directly - no conversion needed
  */
 export class ToolRegistry implements IToolRegistry {
   private initialized = false;
-  private tools: AIToolMetadata[] = [];
+  private endpoints: DiscoveredEndpoint[] = [];
   private cacheStats = {
     hits: 0,
     misses: 0,
@@ -40,9 +39,9 @@ export class ToolRegistry implements IToolRegistry {
   };
 
   /**
-   * Initialize the registry using shared endpoint registry
+   * Initialize the registry using generated endpoints
    */
-  async initialize(): Promise<void> {
+  initialize(): void {
     if (this.initialized) {
       return;
     }
@@ -55,45 +54,14 @@ export class ToolRegistry implements IToolRegistry {
     }
 
     try {
-      logger.debug("[Tool Registry] Starting discovery...");
+      logger.debug("[Tool Registry] Loading from generated endpoints...");
 
-      // Use shared endpoint registry
-      const endpointRegistry = getEndpointRegistry(logger);
-      await endpointRegistry.initialize({
-        rootDir: aiToolConfig.rootDir,
-        excludePaths: aiToolConfig.excludePaths,
-      });
+      // Get endpoints from generated/endpoints.ts via adapter
+      // No conversion needed - store directly
+      this.endpoints = getDiscoveredEndpoints();
 
-      // Get all endpoints
-      const endpoints = await endpointRegistry.getAllEndpoints();
-
-      logger.debug("[Tool Registry] Discovery complete", {
-        endpointsFound: endpoints.length,
-        sampleEndpoints: endpoints.slice(0, 5).map((e) => e.name),
-      });
-
-      // Convert to tool metadata using shared endpoint metadata
-      this.tools = endpoints.map((endpoint) => ({
-        name: endpoint.name,
-        displayName: endpoint.title || endpoint.name,
-        description: endpoint.description || endpoint.title || "",
-        icon: endpoint.aiTool?.icon,
-        category: endpoint.category || "general",
-        tags: Array.isArray(endpoint.tags) ? endpoint.tags : [],
-        cost: endpoint.credits ?? 0,
-        endpointId: endpoint.id,
-        allowedRoles: Array.isArray(endpoint.allowedRoles)
-          ? endpoint.allowedRoles
-          : [],
-        isManualTool: false,
-        parameters: endpoint.requestSchema,
-      }));
-
-      // Add manual tools (e.g., braveSearch)
-      this.tools.push(...getManualTools());
-
-      logger.debug("[Tool Registry] Conversion complete", {
-        toolsRegistered: this.tools.length,
+      logger.debug("[Tool Registry] Endpoints loaded", {
+        endpointsFound: this.endpoints.length,
       });
 
       this.cacheStats.lastRefresh = Date.now();
@@ -102,51 +70,38 @@ export class ToolRegistry implements IToolRegistry {
       logger.error("[Tool Registry] Initialization failed", {
         error: error instanceof Error ? error.message : String(error),
       });
-      // Don't throw - allow system to continue with empty registry
       this.initialized = false;
-      this.tools = [];
+      this.endpoints = [];
     }
   }
 
   /**
-   * Get all tools filtered by criteria
+   * Get all endpoints (no conversion needed)
    */
-  async getTools(criteria?: ToolFilterCriteria): Promise<AIToolMetadata[]> {
-    await this.ensureInitialized();
+  getEndpoints(criteria?: ToolFilterCriteria): DiscoveredEndpoint[] {
+    this.ensureInitialized();
 
     if (!criteria) {
-      return this.tools;
+      return this.endpoints;
     }
 
-    return toolFilter.filterByCriteria(this.tools, criteria);
+    return toolFilter.filterEndpointsByCriteria(this.endpoints, criteria);
   }
 
   /**
-   * Get tools as AI SDK CoreTool[]
-   * Note: This method is deprecated. Use the AI stream repository to create tools with proper execution context.
+   * Get endpoint by tool name
    */
-  getAISDKTools(): CoreTool[] {
-    // This method is no longer used - tools are created in the AI stream repository
-    // with proper execution context
-    return [];
+  getEndpointByToolName(toolName: string): DiscoveredEndpoint | null {
+    this.ensureInitialized();
+    return this.endpoints.find((e) => e.toolName === toolName) || null;
   }
 
   /**
-   * Get tools for a specific user
-   * Note: This method is deprecated. Use the AI stream repository to create tools with proper execution context.
+   * Get endpoint by ID
    */
-  getToolsForUser(): CoreTool[] {
-    // This method is no longer used - tools are created in the AI stream repository
-    // with proper execution context
-    return [];
-  }
-
-  /**
-   * Get tool metadata by name
-   */
-  async getToolByName(name: string): Promise<AIToolMetadata | null> {
-    await this.ensureInitialized();
-    return this.tools.find((t) => t.name === name) || null;
+  getEndpointById(id: string): DiscoveredEndpoint | null {
+    this.ensureInitialized();
+    return this.endpoints.find((e) => e.id === id) || null;
   }
 
   /**
@@ -156,11 +111,11 @@ export class ToolRegistry implements IToolRegistry {
     context: AIToolExecutionContext,
     options?: ToolExecutorOptions,
   ): Promise<AIToolExecutionResult> {
-    await this.ensureInitialized();
+    this.ensureInitialized();
 
     // Check if user has permission
-    const toolMeta = await this.getToolByName(context.toolName);
-    if (!toolMeta) {
+    const endpoint = this.getEndpointByToolName(context.toolName);
+    if (!endpoint) {
       return {
         success: false,
         error: "app.api.v1.core.system.unifiedUi.aiTool.errors.toolNotFound",
@@ -172,7 +127,7 @@ export class ToolRegistry implements IToolRegistry {
       };
     }
 
-    if (!toolFilter.hasPermission(toolMeta, context.user)) {
+    if (!toolFilter.hasEndpointPermission(endpoint, context.user)) {
       return {
         success: false,
         error:
@@ -189,23 +144,12 @@ export class ToolRegistry implements IToolRegistry {
   }
 
   /**
-   * Refresh the registry (rediscover endpoints)
+   * Refresh the registry (reload from generated endpoints)
    */
-  async refresh(): Promise<void> {
-    const logger = createEndpointLogger(false, Date.now(), "en-GLOBAL");
-
-    // Get shared endpoint registry and refresh it
-    const endpointRegistry = getEndpointRegistry(logger);
-    await endpointRegistry.refresh({
-      rootDir: aiToolConfig.rootDir,
-      excludePaths: aiToolConfig.excludePaths,
-    });
-
-    // Re-initialize
+  refresh(): void {
     this.initialized = false;
     this.tools = [];
-
-    await this.initialize();
+    this.initialize();
   }
 
   /**
@@ -217,36 +161,32 @@ export class ToolRegistry implements IToolRegistry {
     let manualTools = 0;
     let dynamicTools = 0;
 
-    for (const tool of this.tools) {
+    for (const endpoint of this.endpoints) {
       // Count by category
-      if (tool.category) {
-        toolsByCategory[tool.category] =
-          (toolsByCategory[tool.category] || 0) + 1;
+      const category = endpoint.definition.category;
+      if (category) {
+        toolsByCategory[category] = (toolsByCategory[category] || 0) + 1;
       }
 
       // Count by role
-      for (const role of tool.allowedRoles) {
+      for (const role of endpoint.allowedRoles) {
         const roleKey = role as string;
         toolsByRole[roleKey] = (toolsByRole[roleKey] || 0) + 1;
       }
 
-      // Count manual vs dynamic
-      if (tool.isManualTool) {
-        manualTools++;
-      } else {
-        dynamicTools++;
-      }
+      // All endpoints are dynamic (from generated endpoints)
+      dynamicTools++;
     }
 
     return {
-      totalEndpoints: this.tools.length,
-      totalTools: this.tools.length,
+      totalEndpoints: this.endpoints.length,
+      totalTools: this.endpoints.length,
       toolsByCategory,
       toolsByRole,
       manualTools,
       dynamicTools,
       cacheStats: {
-        size: this.tools.length,
+        size: this.endpoints.length,
         hits: this.cacheStats.hits,
         misses: this.cacheStats.misses,
         lastRefresh: this.cacheStats.lastRefresh,
@@ -258,15 +198,6 @@ export class ToolRegistry implements IToolRegistry {
    * Clear cache
    */
   clearCache(): void {
-    const logger = createEndpointLogger(false, Date.now(), "en-GLOBAL");
-
-    // Clear shared endpoint registry cache
-    const endpointRegistry = getEndpointRegistry(logger);
-    void endpointRegistry.refresh({
-      rootDir: aiToolConfig.rootDir,
-      excludePaths: aiToolConfig.excludePaths,
-    });
-
     this.cacheStats.hits = 0;
     this.cacheStats.misses = 0;
   }
@@ -274,9 +205,9 @@ export class ToolRegistry implements IToolRegistry {
   /**
    * Ensure registry is initialized
    */
-  private async ensureInitialized(): Promise<void> {
+  private ensureInitialized(): void {
     if (!this.initialized) {
-      await this.initialize();
+      this.initialize();
     }
   }
 }
@@ -305,9 +236,11 @@ export const aiToolRegistry = getToolRegistry();
  * Initialize registry on module load (lazy)
  * Only initializes when first accessed
  */
-if (isAIToolSystemEnabled() && aiToolConfig.cache.enabled) {
-  // Pre-initialize in background if caching enabled
-  aiToolRegistry.initialize().catch(() => {
+if (isAIToolSystemEnabled()) {
+  // Pre-initialize in background
+  try {
+    aiToolRegistry.initialize();
+  } catch {
     // Background initialization failed, will retry on first access
-  });
+  }
 }

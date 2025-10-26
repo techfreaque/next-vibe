@@ -1,6 +1,16 @@
-
 export const translations = {
   category: "Release Executor",
+
+  errors: {
+    configNotLoaded:
+      "Configuration not loaded. Please load the configuration first.",
+    configFileNotFound: "Config file not found: {{path}}",
+    configFileNotFoundInParents:
+      "Config file '{{filename}}' not found in current directory or any parent directories",
+    invalidConfigFormat:
+      "Invalid config format. Ensure the config exports a default object with a 'packages' property.",
+    errorLoadingConfig: "Error loading config:",
+  },
 
   releaseExecutor: {
     processing: "\n🚀 Processing: {{directory}}",

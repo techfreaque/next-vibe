@@ -209,7 +209,10 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
             })
             .where(eq(imapAccounts.id, account.id));
 
-          logger.error(`Error syncing account ${account.email}`, error);
+          logger.error(
+            `Error syncing account ${account.email}`,
+            parseError(error),
+          );
         }
       }
 
@@ -236,10 +239,10 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
         },
       };
 
-      logger.debug("Completed sync for all accounts", result.results);
+      logger.debug("Completed sync for all accounts");
       return createSuccessResponse({ result });
     } catch (error) {
-      logger.error("Error in syncAllAccounts", error);
+      logger.error("Error in syncAllAccounts", parseError(error));
 
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imapErrors.sync.failed",
@@ -338,14 +341,14 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
             );
           }
         } catch (error) {
-          logger.error("Error syncing folder messages", error);
+          logger.error("Error syncing folder messages", parseError(error));
           errors.push(
             createErrorResponse(
               "app.api.v1.core.emails.imapClient.imap.sync.errors.message_sync_error",
               ErrorResponseTypes.UNKNOWN_ERROR,
             ),
           );
-          logger.error(`Error syncing folder ${folder.name}`, error);
+          logger.error(`Error syncing folder ${folder.name}`, parseError(error));
         }
       }
 
@@ -372,13 +375,13 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
         },
       };
 
-      logger.debug(
-        `Completed sync for account: ${data.account.email}`,
-        result.results,
-      );
+      logger.debug(`Completed sync for account: ${data.account.email}`);
       return createSuccessResponse({ result });
     } catch (error) {
-      logger.error(`Error syncing account ${data.account.email}`, error);
+      logger.error(
+        `Error syncing account ${data.account.email}`,
+        parseError(error),
+      );
 
       return createErrorResponse(
         "app.api.v1.core.emails.imapClient.imapErrors.sync.account.failed",
@@ -483,7 +486,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
             logger.debug(`Added folder: ${remoteFolder.name}`);
           }
         } catch (error) {
-          logger.error("Error syncing folder", error);
+          logger.error("Error syncing folder", parseError(error));
           errors.push(
             createErrorResponse(
               "app.api.v1.core.emails.imapClient.imap.sync.errors.folder_sync_failed",
@@ -491,7 +494,10 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
               { error: parseError(error).message },
             ),
           );
-          logger.error(`Error syncing folder ${remoteFolder.name}`, error);
+          logger.error(
+            `Error syncing folder ${remoteFolder.name}`,
+            parseError(error),
+          );
         }
       }
 
@@ -520,13 +526,12 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
 
       logger.debug(
         `Completed folder sync for account: ${data.account.email}`,
-        result.results,
       );
       return createSuccessResponse({ result });
     } catch (error) {
       logger.error(
         `Error syncing folders for account ${data.account.email}`,
-        error,
+        parseError(error),
       );
 
       return createErrorResponse(
@@ -637,7 +642,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
             messagesAdded++;
           }
         } catch (error) {
-          logger.error("Error syncing message", error);
+          logger.error("Error syncing message", parseError(error));
           errors.push(
             createErrorResponse(
               "app.api.v1.core.emails.imapClient.imapErrors.sync.message.failed",
@@ -646,7 +651,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
           );
           logger.error(
             `Error syncing message ${remoteMessage.messageId}`,
-            error,
+            parseError(error),
           );
         }
       }
@@ -674,15 +679,12 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
         },
       };
 
-      logger.debug(
-        `Completed message sync for folder: ${data.folder.name}`,
-        result.results,
-      );
+      logger.debug(`Completed message sync for folder: ${data.folder.name}`);
       return createSuccessResponse({ result });
     } catch (error) {
       logger.error(
         `Error syncing messages for folder ${data.folder.name}`,
-        error,
+        parseError(error),
       );
 
       return createErrorResponse(

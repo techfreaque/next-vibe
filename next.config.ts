@@ -2,8 +2,9 @@ import type { NextConfig } from "next";
 import path from "path";
 import type { Configuration } from "webpack";
 
+import { useTurbopack } from "./src/config/constants";
+
 // Configuration flags
-const useTurbopack = true; // Set to true to use Turbopack, false for Webpack
 const useTypedRoutes = false; // Set to true to enable typed routes
 const useNextQueryPortalPackage = false;
 

@@ -20,6 +20,7 @@ import {
   createErrorResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
@@ -30,31 +31,26 @@ import { envClient } from "@/config/env-client";
  * Type helpers to extract input/output types from endpoint definitions
  */
 type InferRequestInput<T> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends CreateApiEndpoint<any, any, any, any>
     ? T["types"]["RequestInput"]
     : never;
 
 type InferRequestOutput<T> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends CreateApiEndpoint<any, any, any, any>
     ? T["types"]["RequestOutput"]
     : never;
 
 type InferResponseOutput<T> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends CreateApiEndpoint<any, any, any, any>
     ? T["types"]["ResponseOutput"]
     : never;
 
 type InferUrlVariablesInput<T> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends CreateApiEndpoint<any, any, any, any>
     ? T["types"]["UrlVariablesInput"]
     : never;
 
 type InferUrlVariablesOutput<T> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends CreateApiEndpoint<any, any, any, any>
     ? T["types"]["UrlVariablesOutput"]
     : never;
@@ -71,7 +67,7 @@ type EndpointParams<TEndpoint> =
     (InferUrlVariablesOutput<TEndpoint> extends undefined
       ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
         {}
-      : { urlParams: InferUrlVariablesOutput<TEndpoint> });
+      : { urlPathParams: InferUrlVariablesOutput<TEndpoint> });
 
 /**
  * Construct URL path from endpoint definition and parameters
@@ -98,9 +94,11 @@ function constructUrl<
         // Extract parameter name (e.g., "[id]" → "id")
         const paramName = segment.slice(1, -1);
 
-        // Get value from urlParams
-        const urlParams = "urlParams" in params ? params.urlParams : {};
-        const paramValue = urlParams[paramName as keyof typeof urlParams];
+        // Get value from urlPathParams
+        const urlPathParams =
+          "urlPathParams" in params ? params.urlPathParams : {};
+        const paramValue =
+          urlPathParams[paramName as keyof typeof urlPathParams];
 
         if (paramValue === undefined) {
           return createErrorResponse(
@@ -140,17 +138,16 @@ function constructUrl<
  * import { getUserByIdEndpoint } from './definition';
  *
  * // TypeScript automatically infers:
- * // - params must be: { urlParams: { id: string } }
+ * // - params must be: { urlPathParams: { id: string } }
  * // - return type is: ResponseType<UserType>
  * const user = await nativeEndpoint(
  *   getUserByIdEndpoint.GET,
- *   { urlParams: { id: '123' } },
+ *   { urlPathParams: { id: '123' } },
  *   logger
  * );
  * ```
  */
 export async function nativeEndpoint<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TEndpoint extends CreateApiEndpoint<any, Methods, any, any>,
 >(
   endpoint: TEndpoint,
@@ -172,7 +169,6 @@ export async function nativeEndpoint<
     // Validate request data against endpoint schema (if present)
     if (requestData && endpoint.requestSchema) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         endpoint.requestSchema.parse(requestData);
       } catch (validationError) {
         logger.error("Request validation failed", validationError);
@@ -257,7 +253,9 @@ export async function nativeEndpoint<
 
       // Check if it's HTML (likely an error page)
       if (
+        // eslint-disable-next-line i18next/no-literal-string
         responseText.includes("<!DOCTYPE") ||
+        // eslint-disable-next-line i18next/no-literal-string
         responseText.includes("<html")
       ) {
         return createErrorResponse(
@@ -266,6 +264,7 @@ export async function nativeEndpoint<
           {
             url: fetchUrl,
             status: fetchResponse.status,
+            // eslint-disable-next-line i18next/no-literal-string
             hint: "Server returned HTML instead of JSON. Check that the API server is running and the endpoint exists.",
           },
         ) as ResponseType<InferResponseOutput<TEndpoint>>;
@@ -279,7 +278,6 @@ export async function nativeEndpoint<
     // Validate response against endpoint schema (if present and successful)
     if (response.success && endpoint.responseSchema) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         endpoint.responseSchema.parse(response.data);
       } catch (validationError) {
         logger.warn("Response validation failed", validationError);
@@ -289,7 +287,7 @@ export async function nativeEndpoint<
 
     return response;
   } catch (error) {
-    logger.error("Native endpoint call failed", error);
+    logger.error("Native endpoint call failed", parseError(error));
     return createErrorResponse(
       "app.api.v1.core.system.unifiedUi.react-native.errors.networkError",
       ErrorResponseTypes.INTERNAL_ERROR,

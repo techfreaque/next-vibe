@@ -3,10 +3,10 @@
  * Default configurations for production and development environments
  */
 
-import { env } from "@/config/env";
 import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/tasks/enum";
+import { env } from "@/config/env";
 
 import type { CampaignStarterConfigType } from "../types";
 import type { CampaignStarterConfigType as CampaignStarterConfigWithCronType } from "./definition";

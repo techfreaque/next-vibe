@@ -171,14 +171,13 @@ export class PaymentRepositoryImpl implements PaymentRepository {
 
       // Create Stripe checkout session
       // Map enum translation keys to Stripe API values
-      const paymentMethodTypes =
-        data.paymentMethodTypes?.map((type) => {
-          // Extract last part of translation key (e.g., "card" from "app.api.v1.core.payment.enums.paymentMethodType.card")
-          const parts = type.split(".");
-          const value = parts[parts.length - 1];
-          // Convert camelCase to snake_case for Stripe (applePay -> apple_pay)
-          return value.replace(/([A-Z])/g, "_$1").toLowerCase();
-        }) || ["card"];
+      const paymentMethodTypes = data.paymentMethodTypes?.map((type) => {
+        // Extract last part of translation key (e.g., "card" from "app.api.v1.core.payment.enums.paymentMethodType.card")
+        const parts = type.split(".");
+        const value = parts[parts.length - 1];
+        // Convert camelCase to snake_case for Stripe (applePay -> apple_pay)
+        return value.replace(/([A-Z])/g, "_$1").toLowerCase();
+      }) || ["card"];
 
       // Extract mode value from translation key
       const modeParts = data.mode.split(".");

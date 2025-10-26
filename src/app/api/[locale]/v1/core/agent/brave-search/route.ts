@@ -33,14 +33,14 @@ export const { GET, tools } = endpointsHandler({
         typeof braveSearchDefinition.GET.allowedRoles
       >,
     ): Promise<ResponseType<BraveSearchGetResponseOutput>> => {
-      const { urlVariables, logger } = props;
+      const { data, logger } = props;
 
       try {
         // Validate that query is provided
         if (
-          !urlVariables.query ||
-          typeof urlVariables.query !== "string" ||
-          urlVariables.query.trim() === ""
+          !data.query ||
+          typeof data.query !== "string" ||
+          data.query.trim() === ""
         ) {
           return createErrorResponse(
             "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.validation.title" as const,
@@ -50,23 +50,23 @@ export const { GET, tools } = endpointsHandler({
         }
 
         const searchService = getBraveSearchService();
-        const searchResults = await searchService.search(urlVariables.query, {
-          maxResults: urlVariables.maxResults,
-          includeNews: urlVariables.includeNews,
-          freshness: urlVariables.freshness,
+        const searchResults = await searchService.search(data.query, {
+          maxResults: data.maxResults,
+          includeNews: data.includeNews,
+          freshness: data.freshness,
         });
 
         if (searchResults.results.length === 0) {
           return createSuccessResponse({
             success: false,
-            message: `${SEARCH_MESSAGES.NO_RESULTS_PREFIX}: ${urlVariables.query}`,
+            message: `${SEARCH_MESSAGES.NO_RESULTS_PREFIX}: ${data.query}`,
             results: [],
           });
         }
 
         return createSuccessResponse({
           success: true,
-          message: `${SEARCH_MESSAGES.FOUND_RESULTS_PREFIX} ${searchResults.results.length} ${SEARCH_MESSAGES.FOUND_RESULTS_SUFFIX}: ${urlVariables.query}`,
+          message: `${SEARCH_MESSAGES.FOUND_RESULTS_PREFIX} ${searchResults.results.length} ${SEARCH_MESSAGES.FOUND_RESULTS_SUFFIX}: ${data.query}`,
           results: searchResults.results.map((result) => ({
             title: result.title,
             url: result.url,
@@ -86,7 +86,7 @@ export const { GET, tools } = endpointsHandler({
 
         logger.error("Brave Search error", {
           error: braveError.message,
-          query: urlVariables.query,
+          query: data.query,
         });
 
         return createErrorResponse(

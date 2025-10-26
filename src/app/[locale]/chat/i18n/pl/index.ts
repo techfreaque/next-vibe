@@ -100,9 +100,12 @@ export const translations: typeof enTranslations = {
       noToolsFound: "Brak narzędzi pasujących do wyszukiwania",
       noToolsAvailable:
         "Nie znaleziono jeszcze narzędzi AI. Narzędzia pojawią się tutaj automatycznie, gdy zostaną zarejestrowane w systemie.",
-      enableAll: "Włącz wszystkie widoczne narzędzia",
-      disableAll: "Wyłącz wszystkie widoczne narzędzia",
-      footerInfo: "{{count}} z {{total}} narzędzi włączonych",
+      expandAll: "Rozwiń wszystkie",
+      collapseAll: "Zwiń wszystkie",
+      selectAll: "Zaznacz wszystkie",
+      deselectAll: "Odznacz wszystkie",
+      enableAll: "Włącz wszystkie",
+      stats: "{{enabled}} z {{total}} narzędzi włączonych",
     },
   },
 
@@ -303,6 +306,10 @@ export const translations: typeof enTranslations = {
     enabledTitle: "Brave Search włączone (+1 kredyt za wyszukiwanie)",
     disabledTitle: "Brave Search wyłączone (+1 kredyt za wyszukiwanie)",
     creditIndicator: "+1",
+  },
+  toolsButton: {
+    title: "Konfiguruj narzędzia AI",
+    tools: "Narzędzia",
   },
   selectorBase: {
     favorites: "Ulubione",

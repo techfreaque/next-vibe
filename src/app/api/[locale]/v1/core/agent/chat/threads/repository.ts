@@ -22,6 +22,7 @@ import { simpleT } from "@/i18n/core/shared";
 
 import { chatThreads } from "../db";
 import { ThreadStatus } from "../enum";
+import type { PersonaId } from "../personas/config";
 import { validateNotIncognito } from "../validation";
 import type {
   ThreadCreateRequestOutput,
@@ -63,15 +64,15 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadListResponseOutput>> {
     try {
-      const page = data.pagination?.page ?? 1;
-      const limit = data.pagination?.limit ?? 20;
-      const search = data.filters?.search;
-      const rootFolderId = data.filters?.rootFolderId;
-      const subFolderId = data.filters?.subFolderId;
-      const status = data.filters?.status;
-      const isPinned = data.filters?.isPinned;
-      const dateFrom = data.filters?.dateFrom;
-      const dateTo = data.filters?.dateTo;
+      const page = data.page ?? 1;
+      const limit = data.limit ?? 20;
+      const search = data.search;
+      const rootFolderId = data.rootFolderId;
+      const subFolderId = data.subFolderId;
+      const status = data.status;
+      const isPinned = data.isPinned;
+      const dateFrom = data.dateFrom;
+      const dateTo = data.dateTo;
 
       logger.info("Listing threads - START", {
         userId: user.id,
@@ -204,7 +205,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         },
       });
     } catch (error) {
-      logger.error("Error listing threads", error);
+      logger.error("Error listing threads", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.agent.chat.threads.get.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -266,7 +267,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         folderId: data.thread?.subFolderId ?? null,
         status: ThreadStatus.ACTIVE,
         defaultModel: data.thread?.model ?? null,
-        defaultPersona: data.thread?.persona ?? null,
+        defaultPersona: (data.thread?.persona as PersonaId | null) ?? null,
         systemPrompt: data.thread?.systemPrompt ?? null,
         pinned: false,
         archived: false,
@@ -277,7 +278,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
 
       const [dbThread] = await db
         .insert(chatThreads)
-        .values(threadData)
+        .values(threadData as typeof chatThreads.$inferInsert)
         .returning();
 
       // Map DB fields to API response format (DB has rootFolderId as DefaultFolderId, folderId as UUID)
@@ -299,7 +300,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         },
       });
     } catch (error) {
-      logger.error("Error creating thread", error);
+      logger.error("Error creating thread", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.agent.chat.threads.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,

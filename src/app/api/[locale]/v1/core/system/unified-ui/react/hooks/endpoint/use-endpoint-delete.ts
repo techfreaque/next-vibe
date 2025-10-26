@@ -42,7 +42,7 @@ export function useEndpointDelete<
       TEndpoint["TResponseOutput"],
       TEndpoint["TUrlVariablesOutput"]
     >;
-    urlParams?: TEndpoint["TUrlVariablesOutput"];
+    urlPathParams?: TEndpoint["TUrlVariablesOutput"];
   } = {},
 ): {
   /** The complete response including success/error state */
@@ -64,7 +64,7 @@ export function useEndpointDelete<
 
   const {
     mutationOptions = {},
-    urlParams = {} as TEndpoint["TUrlVariablesOutput"],
+    urlPathParams = {} as TEndpoint["TUrlVariablesOutput"],
   } = options;
 
   // Use the existing mutation hook for consistency
@@ -75,10 +75,10 @@ export function useEndpointDelete<
     async (data?: TEndpoint["TRequestOutput"]): Promise<void> => {
       await mutation.mutateAsync({
         requestData: data || ({} as TEndpoint["TRequestOutput"]),
-        urlParams: urlParams,
+        urlPathParams: urlPathParams,
       });
     },
-    [mutation, urlParams],
+    [mutation, urlPathParams],
   );
 
   return {

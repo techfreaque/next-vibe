@@ -15,6 +15,10 @@ export const translations: typeof enTranslations = {
     errors: {
       executionFailed: "Wykonanie narzędzia nie powiodło się",
     },
+    descriptions: {
+      noParametersRequired:
+        "Brak wymaganych parametrów dla tego punktu końcowego",
+    },
   },
   converter: {
     constants: {

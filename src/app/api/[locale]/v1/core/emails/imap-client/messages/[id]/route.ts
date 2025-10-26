@@ -15,47 +15,24 @@ export const { GET, PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: async ({ urlVariables, user, locale, logger }) => {
-      const response = await imapMessagesRepository.getMessageById(
-        { id: urlVariables.id },
+    handler: async ({ urlPathParams, user, locale, logger }) => {
+      return await imapMessagesRepository.getMessageById(
+        { id: urlPathParams.id },
         user,
         locale,
         logger,
       );
-
-      // Wrap the message response to match definition structure
-      if (response.success && response.data) {
-        return {
-          success: true as const,
-          data: { message: response.data },
-        };
-      }
-
-      return response;
     },
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: async ({ urlVariables, data, user, locale, logger }) => {
-      const response = await imapMessagesRepository.updateMessage(
-        { messageId: urlVariables.id, updates: data },
+    handler: async ({ urlPathParams, data, user, locale, logger }) => {
+      return await imapMessagesRepository.updateMessage(
+        { messageId: urlPathParams.id, updates: data },
         user,
         locale,
         logger,
       );
-
-      // Wrap the message response to match definition structure
-      if (response.success && response.data) {
-        return {
-          success: true as const,
-          data: { message: response.data },
-        };
-      }
-
-      return response;
     },
   },
 });
-
-// Add default export for Next.js API route compatibility
-export default { GET, PATCH };

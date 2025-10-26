@@ -8,8 +8,6 @@ import "server-only";
 
 import type { z } from "zod";
 
-import type { TranslationKey } from "@/i18n/core/static-types";
-
 import type { Methods } from "../../cli/vibe/endpoints/endpoint-types/core/enums";
 import type { DiscoveredEndpointMetadata } from "./types";
 
@@ -18,10 +16,10 @@ import type { DiscoveredEndpointMetadata } from "./types";
  * Matches the structure of CreateApiEndpoint but with optional fields
  */
 interface SimpleEndpointDefinition {
-  title?: TranslationKey | string;
-  description?: TranslationKey | string;
-  category?: TranslationKey | string;
-  tags?: readonly (TranslationKey | string)[];
+  title?: string;
+  description?: string;
+  category?: string;
+  tags?: readonly string[];
   allowedRoles?: readonly string[];
   requestSchema?: z.ZodTypeAny;
   responseSchema?: z.ZodTypeAny;
@@ -48,14 +46,14 @@ interface NestedEndpoints {
 /**
  * Type guard to check if value is an endpoint definition
  */
-function isEndpointDefinition(
-  value: unknown,
-): value is Partial<Record<Methods, SimpleEndpointDefinition>> {
+function isEndpointDefinition<T>(
+  value: T,
+): value is T & Partial<Record<Methods, SimpleEndpointDefinition>> {
   if (!value || typeof value !== "object") {
     return false;
   }
   const methods = ["GET", "POST", "PUT", "PATCH", "DELETE"] as Methods[];
-  return methods.some((method) => method in value);
+  return methods.some((method) => method in (value));
 }
 
 /**

@@ -77,7 +77,7 @@ export function useLeadsImportEndpoint(
       } catch (error) {
         logger.error(
           "app.api.v1.core.leads.import.file.processing.error",
-          error,
+          error instanceof Error ? error.message : String(error),
         );
       }
     },

@@ -6,39 +6,28 @@
 import "server-only";
 
 // Config
-export {
-  aiToolConfig,
-  getDiscoveryOptions,
-  isAIToolSystemEnabled,
-} from "./config";
+export { aiToolConfig, isAIToolSystemEnabled } from "./config";
 
 // Types
 export type {
   AIToolExecutionContext,
   AIToolExecutionResult,
-  AIToolMetadata,
+  AIToolMetadataSerialized,
   CoreTool,
   DiscoveredEndpoint,
-  IToolConverter,
-  IToolDiscovery,
   IToolExecutor,
   IToolFilter,
   IToolRegistry,
   Platform,
   ToolCallWidgetMetadata,
-  ToolConverterOptions,
-  ToolDiscoveryOptions,
   ToolExecutorOptions,
   ToolFilterCriteria,
   ToolParameterValue,
   ToolRegistryStats,
 } from "./types";
 
-// Discovery
-export { getToolDiscovery, ToolDiscovery, toolDiscovery } from "./discovery";
-
-// Converter
-export { getToolConverter, ToolConverter, toolConverter } from "./converter";
+// Endpoint Adapter
+export { getDiscoveredEndpoints, getStaticEndpoints } from "./endpoint-adapter";
 
 // Filter
 export { getToolFilter, ToolFilter, toolFilter } from "./filter";
@@ -48,27 +37,10 @@ export { getToolExecutor, ToolExecutor, toolExecutor } from "./executor";
 
 // Factory
 export type { ToolFactoryOptions } from "./factory";
-export {
-  createToolFromEndpoint,
-  createToolsFromEndpoints,
-  getToolFactory,
-  ToolFactory,
-} from "./factory";
-
-// Widget Metadata
-export {
-  extractWidgetMetadata,
-  extractWidgetMetadataById,
-} from "./widget-metadata-extractor";
-
-// Manual Tools
-export { getManualTool, getManualTools, isManualTool } from "./manual-tools";
+export { getToolFactory, ToolFactory } from "./factory";
 
 // Utilities
-export { CacheManager } from "./cache-manager";
-export { generateToolDescription } from "./description-generator";
 export { createErrorResult, extractErrorMessage } from "./error-handler";
-export { extractInputSchema } from "./schema-extractor";
 
 // Registry (Main Entry Point)
 export { aiToolRegistry, getToolRegistry, ToolRegistry } from "./registry";

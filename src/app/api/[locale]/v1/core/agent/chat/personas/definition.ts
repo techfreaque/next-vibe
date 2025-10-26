@@ -236,7 +236,7 @@ const { GET } = createEndpoint({
         ],
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
 });
 
@@ -445,7 +445,7 @@ const { POST } = createEndpoint({
         id: "550e8400-e29b-41d4-a716-446655440000",
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
 });
 

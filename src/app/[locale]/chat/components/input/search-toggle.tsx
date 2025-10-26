@@ -9,32 +9,51 @@ import React from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+// Search tool ID from the unified-ui system
+const SEARCH_TOOL_ID = "core_agent_chat_tools_brave-search";
+
 interface SearchToggleProps {
-  enabled: boolean;
-  onChange: (enabled: boolean) => void;
+  enabledToolIds: string[];
+  onToolsChange: (toolIds: string[]) => void;
   disabled?: boolean;
   locale: CountryLanguage;
 }
 
 /**
  * Search Toggle Component
- * Simple toggle for enabling/disabling search tool
+ * Convenience UI for toggling the search tool on/off
  * Note: Search is treated as one of the ~130 tools, but has a quick-access toggle for convenience
+ * The toggle reads/writes to the same enabledToolIds state as the tools modal
  */
 export function SearchToggle({
-  enabled,
-  onChange,
+  enabledToolIds,
+  onToolsChange,
   disabled = false,
   locale,
 }: SearchToggleProps): JSX.Element {
   const { t } = simpleT(locale);
+
+  // Check if search tool is enabled
+  const enabled = enabledToolIds.includes(SEARCH_TOOL_ID);
+
   const titleText = enabled
     ? t("app.chat.searchToggle.enabledTitle")
     : t("app.chat.searchToggle.disabledTitle");
 
   const handleChange = (checked: boolean): void => {
-    if (!disabled) {
-      onChange(checked);
+    if (disabled) {
+      return;
+    }
+
+    // Toggle search tool in the enabledToolIds array
+    if (checked) {
+      // Add search tool if not already present
+      if (!enabledToolIds.includes(SEARCH_TOOL_ID)) {
+        onToolsChange([...enabledToolIds, SEARCH_TOOL_ID]);
+      }
+    } else {
+      // Remove search tool
+      onToolsChange(enabledToolIds.filter((id) => id !== SEARCH_TOOL_ID));
     }
   };
 

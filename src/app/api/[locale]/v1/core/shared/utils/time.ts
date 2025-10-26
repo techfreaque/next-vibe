@@ -16,7 +16,7 @@ export function timeToSeconds(
   const [hours, minutes] = timeStr.split(":").map(Number);
   if (hours === undefined || minutes === undefined) {
     return createErrorResponse(
-      "app.packages.nextVibe.shared.utils.time.errors.invalid_time_format.title",
+      "app.api.v1.core.shared.utils.time.errors.invalid_time_format.title",
       ErrorResponseTypes.VALIDATION_ERROR,
       {
         inputValue: timeStr,
@@ -36,7 +36,7 @@ export type SimpleTimeFormat = `${number}:${number}`;
 export function secondsToTime(seconds: number): ResponseType<SimpleTimeFormat> {
   if (seconds < 0 || seconds >= 86_400) {
     return createErrorResponse(
-      "app.packages.nextVibe.shared.utils.time.errors.invalid_time_range.title",
+      "app.api.v1.core.shared.utils.time.errors.invalid_time_range.title",
       ErrorResponseTypes.VALIDATION_ERROR,
       {
         inputValue: seconds,

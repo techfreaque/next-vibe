@@ -13,6 +13,7 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 // Removed unused import - using direct database operations instead
 import { db } from "@/app/api/[locale]/v1/core/system/db";
@@ -211,7 +212,8 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         leadId: data.leadId,
         engagementType: data.engagementType,
         campaignId: data.campaignId,
-        clientInfo,
+        userAgent: clientInfo?.userAgent,
+        referer: clientInfo?.referer,
       });
 
       const result = await leadsRepository.recordEngagementInternal(
@@ -281,11 +283,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           // Don't fail the engagement recording if status transition fails
           logger.warn(
             "app.api.v1.core.leads.tracking.engagement.status.transition.failed",
-            {
-              error,
-              leadId: data.leadId,
-              engagementType: data.engagementType,
-            },
+            parseError(error).message,
           );
         }
       }
@@ -303,11 +301,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         createdAt: engagementData.createdAt,
       });
     } catch (error) {
-      logger.error("app.api.v1.core.leads.tracking.engagement.record.error", {
-        error,
-        leadId: data.leadId,
-        engagementType: data.engagementType,
-      });
+      logger.error(
+        "app.api.v1.core.leads.tracking.engagement.record.error",
+        parseError(error).message,
+      );
       return createErrorResponse(
         "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -372,18 +369,15 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
             emailId: emailRecord.id,
             campaignId,
             engagementType,
-            engagement,
+            openedAt: engagement.openedAt?.toISOString(),
+            clickedAt: engagement.clickedAt?.toISOString(),
           },
         );
       }
     } catch (error) {
       logger.error(
         "app.api.v1.core.leads.tracking.email.engagement.update.error",
-        {
-          error,
-          campaignId,
-          engagementType,
-        },
+        parseError(error).message,
       );
       // Don't throw - this is a secondary operation
     }
@@ -433,11 +427,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         engagementRecorded,
       });
     } catch (error) {
-      logger.error("app.api.v1.core.leads.tracking.pixel.failed", {
-        error,
-        leadId,
-        campaignId,
-      });
+      logger.error(
+        "app.api.v1.core.leads.tracking.pixel.failed",
+        parseError(error).message,
+      );
       return createErrorResponse(
         "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -525,11 +518,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         } catch (error) {
           logger.error(
             "app.api.v1.core.leads.tracking.click.engagement.failed",
-            {
-              error,
-              leadId,
-              campaignId,
-            },
+            parseError(error).message,
           );
         }
       }
@@ -562,11 +551,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
             );
           }
         } catch (error) {
-          logger.error("app.api.v1.core.leads.tracking.click.status.failed", {
-            error,
-            leadId,
-            isLoggedIn,
-          });
+          logger.error(
+            "app.api.v1.core.leads.tracking.click.status.failed",
+            parseError(error).message,
+          );
         }
       }
 
@@ -630,10 +618,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         leadStatusUpdated: true,
       });
     } catch (error) {
-      logger.error("app.api.v1.core.leads.tracking.consultation.failed", {
-        error,
-        leadId,
-      });
+      logger.error(
+        "app.api.v1.core.leads.tracking.consultation.failed",
+        parseError(error).message,
+      );
       return createErrorResponse(
         "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -671,10 +659,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         leadStatusUpdated: true,
       });
     } catch (error) {
-      logger.error("app.api.v1.core.leads.tracking.subscription.failed", {
-        error,
-        leadId,
-      });
+      logger.error(
+        "app.api.v1.core.leads.tracking.subscription.failed",
+        parseError(error).message,
+      );
       return createErrorResponse(
         "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -718,7 +706,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       if (existingLead.length > 0) {
         logger.debug("app.api.v1.core.leads.tracking.anonymous.existing", {
           leadId: existingLead[0].id,
-          createdAt: existingLead[0].createdAt,
+          createdAt: existingLead[0].createdAt.toISOString(),
         });
         return createSuccessResponse({ leadId: existingLead[0].id });
       }
@@ -754,7 +742,8 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         logger.error("app.api.v1.core.leads.tracking.anonymous.create.failed", {
           errorKey:
             "app.api.v1.core.leads.tracking.anonymous.create.noLeadReturned",
-          clientInfo,
+          userAgent: clientInfo.userAgent,
+          referer: clientInfo.referer,
           locale,
         });
         return createErrorResponse(
@@ -773,11 +762,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         leadId: createdLead.id,
       });
     } catch (error) {
-      logger.error("app.api.v1.core.leads.tracking.anonymous.error", {
-        error,
-        clientInfo,
-        locale,
-      });
+      logger.error("app.api.v1.core.leads.tracking.anonymous.error", parseError(error).message);
       return createErrorResponse(
         "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -1096,7 +1081,8 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       }
 
       // Establish lead-user relationship if user is logged in
-      const currentUserId = data.userId || (user.isPublic ? undefined : user.id);
+      const currentUserId =
+        data.userId || (user.isPublic ? undefined : user.id);
       if (currentUserId && !user.isPublic) {
         try {
           const convertResult = await leadsRepository.convertLeadInternal(

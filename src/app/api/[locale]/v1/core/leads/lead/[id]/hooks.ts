@@ -24,7 +24,7 @@ export function useLeadByIdEndpoint(
   return useEndpoint(
     definitions,
     {
-      urlParams: { id: params.leadId }, // URL parameters as top-level option
+      urlPathParams: { id: params.leadId }, // URL parameters as top-level option
       enabled: params.enabled,
       staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,

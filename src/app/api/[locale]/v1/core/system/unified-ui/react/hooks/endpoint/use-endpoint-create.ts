@@ -51,7 +51,7 @@ export function useEndpointCreate<
       TEndpoint["TResponseOutput"],
       TEndpoint["TUrlVariablesOutput"]
     >;
-    urlParams?: TEndpoint["TUrlVariablesOutput"];
+    urlPathParams?: TEndpoint["TUrlVariablesOutput"];
     autoPrefillData?: Partial<TEndpoint["TRequestOutput"]>;
     initialState?: Partial<TEndpoint["TRequestOutput"]>;
   } = {},
@@ -112,7 +112,7 @@ export function useEndpointCreate<
   }, [autoPrefillData, formResult?.form]);
 
   // If no URL parameters are needed, return the form result as-is
-  if (!options.urlParams) {
+  if (!options.urlPathParams) {
     return formResult;
   }
 
@@ -124,7 +124,7 @@ export function useEndpointCreate<
       event: FormEvent<HTMLFormElement> | undefined,
     ): Promise<void> | void => {
       return originalSubmitForm(event, {
-        urlParamVariables: options.urlParams,
+        urlParamVariables: options.urlPathParams,
       } as never);
     };
 

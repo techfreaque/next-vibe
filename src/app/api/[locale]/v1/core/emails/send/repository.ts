@@ -187,7 +187,7 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
         } catch (smsError) {
           logger.warn(
             "Email send repository: SMS notification error (non-blocking)",
-            smsError,
+            parseError(smsError),
           );
           response.response.smsResult = {
             success: false,

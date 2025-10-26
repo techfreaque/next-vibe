@@ -1,19 +1,20 @@
-import { z } from "zod";
-
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
-
 import type {
   ErrorResponseType,
   ResponseType,
   SuccessResponseType,
 } from "next-vibe/shared/types/response.schema";
-import { env } from "@/config/env";
+import { z } from "zod";
 
-// Re-export enum from separate file to avoid circular dependency
-export { SmsProviders } from "./utils-enum";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import { env } from "@/config/env";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { TFunction } from "@/i18n/core/static-types";
+
+// Import and re-export enum from separate file to avoid circular dependency
+import { SmsProviders } from "./utils-enum";
+
+export { SmsProviders };
 
 /**
  * SendSmsParams defines the parameters needed to send an SMS
@@ -109,8 +110,14 @@ export interface SmsResult {
  */
 export interface SmsProvider {
   name: SmsProviders;
-  sendSms(params: SendSmsParams, logger: EndpointLogger): Promise<ResponseType<SmsResult>>;
-  validatePhoneNumber?(phoneNumber: string, logger: EndpointLogger): {
+  sendSms(
+    params: SendSmsParams,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SmsResult>>;
+  validatePhoneNumber?(
+    phoneNumber: string,
+    logger: EndpointLogger,
+  ): {
     valid: boolean;
     reason?: string;
   };
@@ -125,7 +132,7 @@ export type SmsRenderReturnType = ResponseType<
 
 export interface SmsRenderProps<TRequest, TResponse, TUrlVariables> {
   requestData: TRequest;
-  urlVariables: TUrlVariables;
+  urlPathParams: TUrlVariables;
   responseData: TResponse;
   user: JwtPayloadType;
   t: TFunction;

@@ -330,6 +330,7 @@ export class UnifiedGroupingService {
     const count = endpoints.length;
     const plural = count > 1 ? "s" : "";
     const methodList = Array.from(methods).join(", ");
+    // eslint-disable-next-line i18next/no-literal-string
     return `${count} endpoint${plural} (${methodList})`;
   }
 

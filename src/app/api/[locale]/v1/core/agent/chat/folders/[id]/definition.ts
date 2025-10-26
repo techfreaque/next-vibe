@@ -11,7 +11,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli
 import {
   objectField,
   requestDataField,
-  requestUrlParamsField,
+  requestUrlPathParamsField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -39,10 +39,10 @@ const { GET } = createEndpoint({
         "app.api.v1.core.agent.chat.folders.id.get.container.description" as const,
       layout: { type: LayoutType.STACKED },
     },
-    { request: "urlParams", response: true },
+    { request: "urlPathParams", response: true },
     {
       // === REQUEST URL PARAMS ===
-      id: requestUrlParamsField(
+      id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
@@ -227,7 +227,7 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: { id: "123e4567-e89b-12d3-a456-426614174000" },
     },
     requests: undefined,
@@ -277,10 +277,10 @@ const { PATCH } = createEndpoint({
         "app.api.v1.core.agent.chat.folders.id.patch.container.description" as const,
       layout: { type: LayoutType.STACKED },
     },
-    { request: "data&urlParams", response: true },
+    { request: "data&urlPathParams", response: true },
     {
       // === REQUEST URL PARAMS ===
-      id: requestUrlParamsField(
+      id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
@@ -568,7 +568,7 @@ const { PATCH } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: { id: "123e4567-e89b-12d3-a456-426614174000" },
     },
     requests: {
@@ -625,10 +625,10 @@ const { DELETE } = createEndpoint({
         "app.api.v1.core.agent.chat.folders.id.delete.container.description" as const,
       layout: { type: LayoutType.STACKED },
     },
-    { request: "urlParams", response: true },
+    { request: "urlPathParams", response: true },
     {
       // === REQUEST URL PARAMS ===
-      id: requestUrlParamsField(
+      id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
@@ -736,7 +736,7 @@ const { DELETE } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: { id: "123e4567-e89b-12d3-a456-426614174000" },
     },
     requests: undefined,

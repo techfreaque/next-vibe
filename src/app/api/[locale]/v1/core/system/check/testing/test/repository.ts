@@ -104,7 +104,7 @@ class TestRepositoryImpl implements TestRepositoryInterface {
       const duration = Date.now() - startTime;
       const parsedError = parseError(error);
 
-      logger.error("system.check.testing.test.execute.error", error);
+      logger.error("system.check.testing.test.execute.error", parseError(error));
 
       return createErrorResponse(
         "app.api.v1.core.system.check.testing.test.errors.internal.title",

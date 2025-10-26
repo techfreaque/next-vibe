@@ -93,9 +93,7 @@ export class UnifiedDiscoveryService {
   /**
    * Discover endpoints with filtering and caching
    */
-  async discover(
-    options: UnifiedDiscoveryOptions = {},
-  ): Promise<DiscoveryResult> {
+  discover(options: UnifiedDiscoveryOptions = {}): DiscoveryResult {
     const startTime = Date.now();
     const cacheKey = this.getCacheKey(options);
 
@@ -146,16 +144,16 @@ export class UnifiedDiscoveryService {
   /**
    * Get endpoint by ID
    */
-  async getEndpointById(id: string): Promise<DiscoveredEndpoint | null> {
-    const result = await this.discover({ cache: true, cacheTTL: 60000 });
+  getEndpointById(id: string): DiscoveredEndpoint | null {
+    const result = this.discover({ cache: true, cacheTTL: 60000 });
     return result.endpoints.find((e) => e.id === id) || null;
   }
 
   /**
    * Get endpoints by path pattern
    */
-  async getEndpointsByPath(pathPattern: string): Promise<DiscoveredEndpoint[]> {
-    const result = await this.discover({ cache: true, cacheTTL: 60000 });
+  getEndpointsByPath(pathPattern: string): DiscoveredEndpoint[] {
+    const result = this.discover({ cache: true, cacheTTL: 60000 });
     const pattern = new RegExp(pathPattern);
     return result.endpoints.filter((e) => pattern.test(e.path.join("/")));
   }
@@ -217,12 +215,11 @@ export class UnifiedDiscoveryService {
     if (options.searchQuery) {
       const query = options.searchQuery.toLowerCase();
       filtered = filtered.filter((e) => {
-        const definition = e.definition[e.method];
         const title =
-          typeof definition?.title === "string" ? definition.title : "";
+          typeof e.definition.title === "string" ? e.definition.title : "";
         const description =
-          typeof definition?.description === "string"
-            ? definition.description
+          typeof e.definition.description === "string"
+            ? e.definition.description
             : "";
         const pathStr = e.path.join("/");
 

@@ -20,7 +20,7 @@ export const { GET, tools } = endpointsHandler({
       >,
     ): Promise<ResponseType<PathGetResponseOutput>> => {
       return await pathRepository.getPath(
-        props.urlVariables,
+        props.urlPathParams,
         props.data,
         props.user,
         props.locale,

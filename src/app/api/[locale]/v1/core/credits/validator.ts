@@ -13,6 +13,7 @@ import {
 
 import { getModelCost } from "@/app/api/[locale]/v1/core/agent/chat/model-access/costs";
 import { userLeads } from "@/app/api/[locale]/v1/core/leads/db";
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import { subscriptions } from "@/app/api/[locale]/v1/core/subscription/db";
 import { SubscriptionStatus } from "@/app/api/[locale]/v1/core/subscription/enum";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
@@ -175,8 +176,7 @@ class CreditValidator implements CreditValidatorInterface {
         });
       }
     } catch (error) {
-      logger.error("Failed to validate user credits", {
-        error,
+      logger.error("Failed to validate user credits", parseError(error), {
         userId,
         modelId,
       });
@@ -225,8 +225,7 @@ class CreditValidator implements CreditValidatorInterface {
         canUseModel: hasCredits || cost === 0, // Free models always allowed
       });
     } catch (error) {
-      logger.error("Failed to validate lead credits", {
-        error,
+      logger.error("Failed to validate lead credits", parseError(error), {
         leadId,
         modelId,
       });
@@ -291,8 +290,7 @@ class CreditValidator implements CreditValidatorInterface {
         },
       });
     } catch (error) {
-      logger.error("Failed to validate lead by IP", {
-        error,
+      logger.error("Failed to validate lead by IP", parseError(error), {
         ipAddress,
         modelId,
       });

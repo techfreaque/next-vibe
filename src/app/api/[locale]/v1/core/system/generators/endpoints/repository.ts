@@ -15,9 +15,9 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type endpoints from "./definition";
 // Import options utilities from the consolidated options repository
 import { applyOptionDefaults, defineOptions } from "./options-repository";
@@ -215,7 +215,7 @@ export class FunctionalGeneratorsRepositoryImpl
       });
     } catch (error) {
       return createErrorResponse(
-        "app.api.v1.core.system.generators.endpoints.errors.internal.title",
+        "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -232,7 +232,7 @@ export class FunctionalGeneratorsRepositoryImpl
       // Basic validation - could be expanded
       if (options.rootDir && !options.rootDir.trim()) {
         return createErrorResponse(
-          "app.api.v1.core.system.generators.endpoints.errors.validation.title",
+          "app.api.v1.core.system.generators.endpoints.post.errors.validation.title",
           ErrorResponseTypes.VALIDATION_ERROR,
           { error: "Root directory cannot be empty" },
         );
@@ -241,7 +241,7 @@ export class FunctionalGeneratorsRepositoryImpl
       return createSuccessResponse(true);
     } catch (error) {
       return createErrorResponse(
-        "app.api.v1.core.system.generators.endpoints.errors.internal.title",
+        "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -375,10 +375,7 @@ export const runFunctionalGenerators = async (
       logger.debug("⏭️ Skipping seeds generation");
     } else {
       logger.debug("🌱 Generating seeds...");
-      await functionalGeneratorsRepository["generateSeeds"](
-        rootDir,
-        logger,
-      );
+      await functionalGeneratorsRepository["generateSeeds"](rootDir, logger);
       logger.debug("✅ Seeds generated successfully");
     }
 
@@ -406,10 +403,7 @@ export const runFunctionalGenerators = async (
       logger.debug("✅ tRPC router generated successfully");
     }
   } catch (error) {
-    logger.error(
-      "❌ Error running functional generators:",
-      parseError(error),
-    );
+    logger.error("❌ Error running functional generators:", parseError(error));
     throw error;
   }
 };

@@ -5,23 +5,25 @@
 
 import "server-only";
 
-import type { tool } from "ai";
+import type { CoreTool as AISDKCoreTool } from "ai";
 import type { z } from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../cli/vibe/endpoints/endpoint-handler/logger";
-import type { Methods } from "../cli/vibe/endpoints/endpoint-types/core/enums";
+import type {
+  Methods,
+  WidgetType,
+} from "../cli/vibe/endpoints/endpoint-types/core/enums";
 import type { UnifiedField } from "../cli/vibe/endpoints/endpoint-types/core/types";
 import type { CreateApiEndpoint } from "../cli/vibe/endpoints/endpoint-types/endpoint/create";
 
 /**
  * Re-export CoreTool from AI SDK for type safety
- * Using 'ai' package tool() function returns CoreTool
- * This must be at the top so it's available for use in interfaces below
+ * This is the ONLY tool type we use - no custom wrappers or conversions
  */
-export type CoreTool = ReturnType<typeof tool>;
+export type CoreTool = AISDKCoreTool;
 
 /**
  * Discovered endpoint metadata
@@ -67,54 +69,13 @@ export interface DiscoveredEndpoint {
 }
 
 /**
- * AI Tool metadata (internal type with full type safety)
- */
-export interface AIToolMetadata {
-  /** Tool name (snake_case) */
-  name: string;
-
-  /** Human-readable display name */
-  displayName: string;
-
-  /** Tool description for AI */
-  description: string;
-
-  /** Icon identifier for UI display */
-  icon?: string;
-
-  /** Category for organization */
-  category?: string;
-
-  /** Tags for filtering */
-  tags: string[];
-
-  /** Cost in credits per use (0 = free) */
-  cost?: number;
-
-  /** Source endpoint ID */
-  endpointId: string;
-
-  /** Allowed roles */
-  allowedRoles: readonly (typeof UserRoleValue)[];
-
-  /** Whether this is a manual tool (e.g., braveSearch) */
-  isManualTool: boolean;
-
-  /** Tool parameters schema */
-  parameters?: z.ZodTypeAny;
-}
-
-/**
  * AI Tool metadata (serialized version for API responses)
- * This is the version returned by the API with serialized types
+ * This is derived from DiscoveredEndpoint for API responses
  */
 export interface AIToolMetadataSerialized {
   /** Tool name (snake_case) */
   name: string;
 
-  /** Human-readable display name */
-  displayName: string;
-
   /** Tool description for AI */
   description: string;
 
@@ -126,18 +87,12 @@ export interface AIToolMetadataSerialized {
 
   /** Tags for filtering */
   tags: string[];
-
-  /** Cost in credits per use (0 = free) */
-  cost?: number;
 
   /** Source endpoint ID */
   endpointId: string;
 
   /** Allowed roles (serialized as strings) */
   allowedRoles: string[];
-
-  /** Whether this is a manual tool (e.g., braveSearch) */
-  isManualTool: boolean;
 }
 
 /**
@@ -191,7 +146,7 @@ export interface ToolCallWidgetMetadata {
   endpointId: string;
   responseFields: Array<{
     name: string;
-    widgetType: string;
+    widgetType: WidgetType;
     label?: string;
     description?: string;
     layout?: Record<string, string | number | boolean>;
@@ -238,9 +193,6 @@ export interface ToolFilterCriteria {
   /** Include only specific tags */
   tags?: string[];
 
-  /** Exclude manual tools */
-  excludeManualTools?: boolean;
-
   /** Include only enabled tools */
   enabledOnly?: boolean;
 
@@ -278,46 +230,6 @@ export interface ToolRegistryStats {
 }
 
 /**
- * Tool discovery options
- */
-export interface ToolDiscoveryOptions {
-  /** Root directory to scan */
-  rootDir?: string;
-
-  /** Paths to exclude */
-  excludePaths?: string[];
-
-  /** Include only specific methods */
-  includeMethods?: Methods[];
-
-  /** Enable caching */
-  cache?: boolean;
-
-  /** Cache TTL in milliseconds */
-  cacheTTL?: number;
-
-  /** Whether to follow symbolic links */
-  followSymlinks?: boolean;
-}
-
-/**
- * Tool converter options
- */
-export interface ToolConverterOptions {
-  /** Target locale for descriptions */
-  locale?: CountryLanguage;
-
-  /** Include verbose descriptions */
-  verbose?: boolean;
-
-  /** Include examples in descriptions */
-  includeExamples?: boolean;
-
-  /** Maximum description length */
-  maxDescriptionLength?: number;
-}
-
-/**
  * Tool executor options
  */
 export interface ToolExecutorOptions {
@@ -336,25 +248,20 @@ export interface ToolExecutorOptions {
 
 /**
  * Tool registry interface
+ * Now works with DiscoveredEndpoint[] directly - no conversion
  */
 export interface IToolRegistry {
   /** Initialize the registry */
-  initialize(): Promise<void>;
+  initialize(): void;
 
-  /** Get all tools filtered by criteria */
-  getTools(criteria?: ToolFilterCriteria): Promise<AIToolMetadata[]>;
+  /** Get all endpoints filtered by criteria */
+  getEndpoints(criteria?: ToolFilterCriteria): DiscoveredEndpoint[];
 
-  /** Get tools as AI SDK tool array */
-  getAISDKTools(criteria?: ToolFilterCriteria): Promise<CoreTool[]>;
+  /** Get endpoint by tool name */
+  getEndpointByToolName(toolName: string): DiscoveredEndpoint | null;
 
-  /** Get tools for a specific user */
-  getToolsForUser(
-    user: AIToolExecutionContext["user"],
-    locale: CountryLanguage,
-  ): Promise<CoreTool[]>;
-
-  /** Get tool metadata by name */
-  getToolByName(name: string): Promise<AIToolMetadata | null>;
+  /** Get endpoint by ID */
+  getEndpointById(id: string): DiscoveredEndpoint | null;
 
   /** Execute a tool */
   executeTool(
@@ -363,7 +270,7 @@ export interface IToolRegistry {
   ): Promise<AIToolExecutionResult>;
 
   /** Refresh the registry (rediscover endpoints) */
-  refresh(): Promise<void>;
+  refresh(): void;
 
   /** Get registry statistics */
   getStats(): ToolRegistryStats;
@@ -373,77 +280,31 @@ export interface IToolRegistry {
 }
 
 /**
- * Tool discovery interface
- */
-export interface IToolDiscovery {
-  /** Discover all endpoints */
-  discover(options?: ToolDiscoveryOptions): Promise<DiscoveredEndpoint[]>;
-
-  /** Discover endpoints in a specific directory */
-  discoverInDirectory(dirPath: string): Promise<DiscoveredEndpoint[]>;
-
-  /** Watch for changes (development mode) */
-  watch(callback: (endpoints: DiscoveredEndpoint[]) => void): () => void;
-
-  /** Clear discovery cache */
-  clearCache(): void;
-}
-
-/**
- * Tool converter interface
- */
-export interface IToolConverter {
-  /** Convert endpoint to AI tool metadata */
-  convert(
-    endpoint: DiscoveredEndpoint,
-    options?: ToolConverterOptions,
-  ): Promise<AIToolMetadata>;
-
-  /** Convert endpoint to AI SDK tool */
-  convertToAISDKTool(
-    endpoint: DiscoveredEndpoint,
-    executor: (
-      params: Record<string, ToolParameterValue>,
-    ) => Promise<ToolParameterValue>,
-    options?: ToolConverterOptions,
-  ): Promise<CoreTool>;
-
-  /** Generate tool description from endpoint */
-  generateDescription(
-    endpoint: DiscoveredEndpoint,
-    locale: CountryLanguage,
-    options?: ToolConverterOptions,
-  ): Promise<string>;
-
-  /** Convert endpoint path to tool name */
-  pathToToolName(path: string[]): string;
-}
-
-/**
  * Platform type for opt-out checking
  */
 export type Platform = "cli" | "web" | "ai";
 
 /**
  * Tool filter interface
+ * Now works with DiscoveredEndpoint[] directly
  */
 export interface IToolFilter {
-  /** Filter tools by user permissions */
-  filterByPermissions(
-    tools: AIToolMetadata[],
+  /** Filter endpoints by user permissions */
+  filterEndpointsByPermissions(
+    endpoints: DiscoveredEndpoint[],
     user: AIToolExecutionContext["user"],
     platform?: Platform,
-  ): AIToolMetadata[];
+  ): DiscoveredEndpoint[];
 
-  /** Filter tools by criteria */
-  filterByCriteria(
-    tools: AIToolMetadata[],
+  /** Filter endpoints by criteria */
+  filterEndpointsByCriteria(
+    endpoints: DiscoveredEndpoint[],
     criteria: ToolFilterCriteria,
-  ): AIToolMetadata[];
+  ): DiscoveredEndpoint[];
 
-  /** Check if user has permission for tool */
-  hasPermission(
-    tool: AIToolMetadata,
+  /** Check if user has permission for endpoint */
+  hasEndpointPermission(
+    endpoint: DiscoveredEndpoint,
     user: AIToolExecutionContext["user"],
     platform?: Platform,
   ): boolean;

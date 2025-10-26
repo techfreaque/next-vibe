@@ -182,6 +182,7 @@ export const translations = {
       validation: {
         title: "Validation Error",
         description: "The provided data is invalid",
+        circularReference: "Cannot set folder as its own parent",
       },
       unauthorized: {
         title: "Unauthorized",

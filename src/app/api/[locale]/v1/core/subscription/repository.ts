@@ -399,7 +399,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
       return createSuccessResponse(subscriptionData);
     } catch (error) {
-      logger.error("Error getting subscription:", error);
+      logger.error("Error getting subscription:", parseError(error));
       const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.subscription.errors.database_error",
@@ -458,7 +458,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
       // Return full subscription data from syncResult
       return syncResult;
     } catch (error) {
-      logger.error("Error creating subscription:", error);
+      logger.error("Error creating subscription:", parseError(error));
       const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.subscription.errors.create_crashed",
@@ -598,7 +598,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
       return createSuccessResponse(subscriptionData);
     } catch (error) {
-      logger.error("Error updating subscription:", error);
+      logger.error("Error updating subscription:", parseError(error));
       const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.subscription.errors.database_error",
@@ -718,7 +718,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         message: t("app.api.v1.core.subscription.cancel.success"),
       });
     } catch (error) {
-      logger.error("Error canceling subscription:", error);
+      logger.error("Error canceling subscription:", parseError(error));
       const parsedError = parseError(error);
       return createErrorResponse(
         "app.api.v1.core.subscription.errors.cancel_failed",

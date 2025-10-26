@@ -1,6 +1,7 @@
 export const translations = {
   edit: "Edit SMTP Account",
   editDescription: "Update SMTP account configuration",
+  notFound: "SMTP account not found",
   actions: {
     back: "Back",
     cancel: "Cancel",

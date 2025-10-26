@@ -6,6 +6,7 @@ import inquirer from "inquirer";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { defaultLocale } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared.js";
 
 import type { VersionBumpType } from "../types/types.js";
 import { getRootDirectory, loadConfig } from "../utils/config.js";
@@ -21,7 +22,6 @@ import {
   weeklyUpdateCommand,
 } from "./release-orchestration.js";
 import { updateAllRepos } from "./update-all.js";
-import { simpleT } from "@/i18n/core/shared.js";
 
 interface CIReleaseOptions {
   target?: string;
@@ -68,7 +68,13 @@ program
     const logger = createEndpointLogger(true, Date.now(), locale);
     try {
       const rootDir = process.cwd();
-      await ciReleaseCommand(logger, rootDir, options.target, options.tag, locale);
+      await ciReleaseCommand(
+        logger,
+        rootDir,
+        options.target,
+        options.tag,
+        locale,
+      );
     } catch (error) {
       handleError(logger, "CI release failed:", error);
     }
@@ -92,7 +98,7 @@ program
   .description("Release all packages sequentially with state persistence")
   .action(async () => {
     const logger = createEndpointLogger(true, Date.now(), locale);
-    const t = simpleT(locale);    try {
+    try {
       const rootDir = process.cwd();
       await releaseAllCommand(logger, rootDir);
     } catch (error) {
@@ -109,7 +115,6 @@ program
   )
   .action(async (options: ForceReleaseOptions) => {
     const logger = createEndpointLogger(true, Date.now(), locale);
-    const t = simpleT(locale);
     try {
       const rootDir = process.cwd();
 
@@ -172,7 +177,6 @@ program
   .option("--branch <branch>", "Target branch name", "next_version_candidates")
   .action(async (options: WeeklyUpdateOptions) => {
     const logger = createEndpointLogger(true, Date.now(), locale);
-    const t = simpleT(locale);
     try {
       const rootDir = process.cwd();
       await weeklyUpdateCommand(logger, rootDir, options.branch);

@@ -145,7 +145,7 @@ const { GET } = createEndpoint({
       "app.api.v1.core.newsletter.status.success.description" as const,
   },
   examples: {
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
     requests: {
       basic: {
         email: "user@example.com",

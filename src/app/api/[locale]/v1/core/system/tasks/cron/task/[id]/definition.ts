@@ -15,7 +15,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli
 import {
   objectField,
   requestDataField,
-  requestUrlParamsField,
+  requestUrlPathParamsField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { LayoutType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
@@ -47,10 +47,10 @@ const { GET } = createEndpoint({
         "app.api.v1.core.system.tasks.cronSystem.task.get.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: "urlParams", response: true },
+    { request: "urlPathParams", response: true },
     {
       // URL parameter
-      id: requestUrlParamsField(
+      id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -153,7 +153,7 @@ const { GET } = createEndpoint({
       "app.api.v1.core.system.tasks.cronSystem.task.get.success.retrieved.description",
   },
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: {
         id: "task-123",
       },
@@ -200,10 +200,10 @@ const { PUT } = createEndpoint({
         "app.api.v1.core.system.tasks.cronSystem.task.put.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: "data&urlParams", response: true },
+    { request: "data&urlPathParams", response: true },
     {
       // URL parameter
-      id: requestUrlParamsField(
+      id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -420,7 +420,7 @@ const { PUT } = createEndpoint({
       "app.api.v1.core.system.tasks.cronSystem.task.put.success.updated.description",
   },
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: {
         id: "task-123",
       },
@@ -480,10 +480,10 @@ const { DELETE } = createEndpoint({
         "app.api.v1.core.system.tasks.cronSystem.task.delete.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: "urlParams", response: true },
+    { request: "urlPathParams", response: true },
     {
       // URL parameter
-      id: requestUrlParamsField(
+      id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -579,7 +579,7 @@ const { DELETE } = createEndpoint({
       "app.api.v1.core.system.tasks.cronSystem.task.delete.success.deleted.description",
   },
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: {
         id: "task-123",
       },

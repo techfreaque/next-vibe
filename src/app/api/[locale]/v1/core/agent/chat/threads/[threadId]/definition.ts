@@ -16,7 +16,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli
 import {
   objectField,
   requestDataField,
-  requestUrlParamsField,
+  requestUrlPathParamsField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -48,10 +48,10 @@ const { GET } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.get.container.description" as const,
       layout: { type: LayoutType.STACKED },
     },
-    { request: "urlParams", response: true },
+    { request: "urlPathParams", response: true },
     {
       // === URL PARAMETERS ===
-      threadId: requestUrlParamsField(
+      threadId: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
@@ -265,7 +265,7 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: { threadId: "550e8400-e29b-41d4-a716-446655440000" },
     },
     requests: undefined,
@@ -317,10 +317,10 @@ const { PATCH } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.patch.container.description" as const,
       layout: { type: LayoutType.STACKED },
     },
-    { request: "data&urlParams", response: true },
+    { request: "data&urlPathParams", response: true },
     {
       // === URL PARAMETERS ===
-      threadId: requestUrlParamsField(
+      threadId: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
@@ -658,7 +658,7 @@ const { PATCH } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: { threadId: "550e8400-e29b-41d4-a716-446655440000" },
     },
     requests: {
@@ -717,10 +717,10 @@ const { DELETE } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.delete.container.description" as const,
       layout: { type: LayoutType.STACKED },
     },
-    { request: "urlParams", response: true },
+    { request: "urlPathParams", response: true },
     {
       // === URL PARAMETERS ===
-      threadId: requestUrlParamsField(
+      threadId: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
@@ -818,7 +818,7 @@ const { DELETE } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: { threadId: "550e8400-e29b-41d4-a716-446655440000" },
     },
     requests: undefined,

@@ -24,7 +24,7 @@ export function useImapMessageById(
   return useEndpoint(
     definitions,
     {
-      urlParams: { id: params.messageId },
+      urlPathParams: { id: params.messageId },
       queryOptions: {
         enabled: params.enabled ?? true,
         refetchOnWindowFocus: false,

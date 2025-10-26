@@ -70,20 +70,20 @@ function ChartLegend({
     <div className="border-t">
       <div className="flex items-center justify-between p-4 border-b">
         <h4 className="text-sm font-medium">
-          {t("app.admin.users.users.admin.stats.legend.title")}
+          {t("app.admin.users.stats.legend.title")}
         </h4>
         <div className="flex gap-2">
           <button
             onClick={onShowAll}
             className="text-xs text-muted-foreground hover:text-foreground"
           >
-            {t("app.admin.users.users.admin.stats.legend.showAll")}
+            {t("app.admin.users.stats.legend.showAll")}
           </button>
           <button
             onClick={onHideAll}
             className="text-xs text-muted-foreground hover:text-foreground"
           >
-            {t("app.admin.users.users.admin.stats.legend.hideAll")}
+            {t("app.admin.users.stats.legend.hideAll")}
           </button>
         </div>
       </div>
@@ -181,16 +181,14 @@ export function UsersStatsChart({
     return (
       <Card className={className}>
         <CardHeader>
-          <CardTitle>
-            {t("app.admin.users.users.admin.stats.chart.title")}
-          </CardTitle>
+          <CardTitle>{t("app.admin.users.stats.chart.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div
             className="flex items-center justify-center text-muted-foreground"
             style={{ height: `${height}px` }}
           >
-            {t("app.admin.users.users.admin.stats.chart.noData")}
+            {t("app.admin.users.stats.chart.noData")}
           </div>
         </CardContent>
       </Card>
@@ -384,7 +382,7 @@ export function UsersStatsChart({
     <Card className={className}>
       <CardHeader>
         <CardTitle>
-          {data.title || t("app.admin.users.users.admin.stats.chart.title")}
+          {data.title || t("app.admin.users.stats.chart.title")}
         </CardTitle>
         {data.subtitle && (
           <p className="text-sm text-muted-foreground">{data.subtitle}</p>

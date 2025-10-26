@@ -48,10 +48,11 @@ export class MCPExecuteRepositoryImpl implements MCPExecuteRepository {
     logger: EndpointLogger,
     locale: CountryLanguage = "en-GLOBAL",
   ): Promise<MCPExecuteResponseOutput> {
-    logger.info("[MCP Execute Repository] Executing tool", {
+    const logData1 = {
       toolName: data.name,
       argumentKeys: Object.keys(data.arguments || {}),
-    });
+    };
+    logger.info("[MCP Execute Repository] Executing tool", logData1);
 
     // Get MCP registry
     const registry = getMCPRegistry(locale);
@@ -70,11 +71,12 @@ export class MCPExecuteRepositoryImpl implements MCPExecuteRepository {
       requestId: Date.now(),
     });
 
-    logger.info("[MCP Execute Repository] Tool execution complete", {
+    const logData2 = {
       toolName: data.name,
       isError: result.isError,
       contentLength: result.content.length,
-    });
+    };
+    logger.info("[MCP Execute Repository] Tool execution complete", logData2);
 
     // Return plain object - route handler will wrap with createSuccessResponse
     return result;

@@ -19,11 +19,12 @@ import type { MCPServerConfig } from "./types";
  * @deprecated Use MCP_CONFIG from unified platform instead
  */
 export const mcpConfig: MCPServerConfig = {
+  // eslint-disable-next-line i18next/no-literal-string
   name: "Vibe MCP Server",
   version: "1.0.0",
   locale: (process.env.VIBE_LOCALE as CountryLanguage) || "en-GLOBAL",
   debug: process.env.DEBUG === "true" || process.env.VIBE_LOG_LEVEL === "debug",
-  capabilities: (MCP_CONFIG.platformSpecific as any)?.capabilities || {
+  capabilities: MCP_CONFIG.platformSpecific?.capabilities || {
     tools: true,
     prompts: false,
     resources: false,

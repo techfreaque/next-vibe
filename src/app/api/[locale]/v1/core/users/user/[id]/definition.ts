@@ -18,7 +18,7 @@ import {
   objectField,
   requestDataField,
   requestResponseField,
-  requestUrlParamsField,
+  requestUrlPathParamsField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -43,10 +43,10 @@ const { GET } = createEndpoint({
         "app.api.v1.core.users.user.id.id.get.container.description" as const,
       layout: { type: LayoutType.STACKED },
     },
-    { request: "urlParams", response: true },
+    { request: "urlPathParams", response: true },
     {
       // === URL PARAMS ===
-      id: requestUrlParamsField(
+      id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
@@ -350,7 +350,7 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: {
         id: "123e4567-e89b-12d3-a456-426614174000",
       },
@@ -421,7 +421,7 @@ const { PUT } = createEndpoint({
         "app.api.v1.core.users.user.id.id.put.container.description" as const,
       layout: { type: LayoutType.STACKED },
     },
-    { request: "data&urlParams", response: true },
+    { request: "data&urlPathParams", response: true },
     {
       // === URL PARAMS ===
       id: requestResponseField(
@@ -702,7 +702,7 @@ const { PUT } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: {
         id: "123e4567-e89b-12d3-a456-426614174000",
       },
@@ -765,10 +765,10 @@ const { DELETE } = createEndpoint({
         "app.api.v1.core.users.user.id.id.delete.container.description" as const,
       layout: { type: LayoutType.STACKED },
     },
-    { request: "urlParams", response: true },
+    { request: "urlPathParams", response: true },
     {
       // === URL PARAMS ===
-      id: requestUrlParamsField(
+      id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
@@ -899,7 +899,7 @@ const { DELETE } = createEndpoint({
   },
 
   examples: {
-    urlPathVariables: {
+    urlPathParams: {
       default: {
         id: "123e4567-e89b-12d3-a456-426614174000",
       },

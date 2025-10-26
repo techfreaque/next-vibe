@@ -2,7 +2,6 @@
 import inquirer from "inquirer";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
@@ -27,7 +26,6 @@ export async function ciReleaseCommand(
   rootDir: string,
   targetDirectory?: string,
   gitTag?: string,
-  locale: CountryLanguage,
 ): Promise<void> {
   logger.info("🤖 CI Release Mode");
 

@@ -31,22 +31,22 @@ export function UsersNavigation({
       key: CurrentPageType.overview,
       href: `/${locale}/admin/users` as const,
       icon: BarChart3,
-      label: t("app.admin.users.admin.tabs.stats"),
-      description: t("app.admin.users.admin.tabs.stats_description"),
+      label: t("app.admin.users.tabs.stats"),
+      description: t("app.admin.users.tabs.stats_description"),
     },
     {
       key: CurrentPageType.list,
       href: `/${locale}/admin/users/list` as const,
       icon: List,
-      label: t("app.admin.users.admin.tabs.list"),
-      description: t("app.admin.users.admin.tabs.list_description"),
+      label: t("app.admin.users.tabs.list"),
+      description: t("app.admin.users.tabs.list_description"),
     },
     {
       key: CurrentPageType.add,
       href: `/${locale}/admin/users/create` as const,
       icon: UserPlus,
-      label: t("app.admin.users.admin.tabs.add"),
-      description: t("app.admin.users.admin.tabs.add_description"),
+      label: t("app.admin.users.tabs.add"),
+      description: t("app.admin.users.tabs.add_description"),
     },
   ] as const;
 
@@ -54,7 +54,7 @@ export function UsersNavigation({
     <div className="border-b border-gray-200 dark:border-gray-700">
       <nav
         className="flex space-x-8"
-        aria-label={t("app.admin.users.admin.tabs.overview")}
+        aria-label={t("app.admin.users.tabs.overview")}
       >
         {navigationItems.map((item) => {
           const Icon = item.icon;

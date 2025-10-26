@@ -19,12 +19,14 @@ export type JsonRpcVersion = "2.0";
 export interface JsonRpcRequest {
   jsonrpc: JsonRpcVersion;
   method: string;
+  // eslint-disable-next-line no-restricted-syntax
   params?: unknown;
   id?: string | number;
 }
 
 export interface JsonRpcResponse {
   jsonrpc: JsonRpcVersion;
+  // eslint-disable-next-line no-restricted-syntax
   result?: unknown;
   error?: JsonRpcError;
   id: string | number | null;
@@ -33,6 +35,7 @@ export interface JsonRpcResponse {
 export interface JsonRpcError {
   code: number;
   message: string;
+  // eslint-disable-next-line no-restricted-syntax
   data?: unknown;
 }
 
@@ -109,6 +112,7 @@ export interface MCPTool {
   description: string;
   inputSchema: {
     type: "object";
+    // eslint-disable-next-line no-restricted-syntax
     properties?: Record<string, unknown>;
     required?: string[];
     additionalProperties?: boolean;
@@ -132,6 +136,7 @@ export interface MCPToolsListResult {
  */
 export interface MCPToolCallParams {
   name: string;
+  // eslint-disable-next-line no-restricted-syntax
   arguments?: Record<string, unknown>;
 }
 
@@ -167,6 +172,7 @@ export interface MCPServerConfig {
  */
 export interface MCPExecutionContext {
   toolName: string;
+  // eslint-disable-next-line no-restricted-syntax
   arguments: Record<string, unknown>;
   user: JwtPayloadType;
   locale: CountryLanguage;

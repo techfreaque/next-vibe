@@ -1,13 +1,15 @@
 import "server-only";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { env } from "@/config/env";
+
 import { getAwsSnsProvider } from "./providers/aws-sns";
 import { getHttpProvider } from "./providers/http";
 import { getMessageBirdProvider } from "./providers/messagebird";
@@ -97,10 +99,13 @@ export async function sendSms(
   // Validate phone number
   const validation = validatePhoneNumber(params.to, logger);
   if (!validation.valid) {
-    logger.error("packages.nextVibe.server.sms.sms.error.invalid_phone_format", {
-      to: params.to,
-      reason: validation.reason,
-    });
+    logger.error(
+      "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
+      {
+        to: params.to,
+        reason: validation.reason,
+      },
+    );
     return createErrorResponse(
       "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
       ErrorResponseTypes.INVALID_REQUEST_ERROR,
@@ -112,7 +117,10 @@ export async function sendSms(
 
   try {
     const provider = getSmsProvider(params.options?.provider);
-    logger.debug("Sending SMS via provider", { provider: provider.name, to: params.to });
+    logger.debug("Sending SMS via provider", {
+      provider: provider.name,
+      to: params.to,
+    });
 
     // Use default from number if not provided
     const smsParams: SendSmsParams = {
@@ -132,13 +140,16 @@ export async function sendSms(
           logger.info("SMS sent successfully", {
             to: params.to,
             messageId: result.data.messageId,
-            attempt
+            attempt,
           });
           return result;
         }
 
         lastError = new Error(result.message);
-        logger.warn("SMS send attempt failed", { attempt, error: result.message });
+        logger.warn("SMS send attempt failed", {
+          attempt,
+          error: result.message,
+        });
 
         if (attempt < maxAttempts) {
           // Wait before retry - fix promise executor issue
@@ -172,7 +183,10 @@ export async function sendSms(
       },
     );
   } catch (error) {
-    logger.error("packages.nextVibe.server.sms.sms.error.unexpected_error", error);
+    logger.error(
+      "packages.nextVibe.server.sms.sms.error.unexpected_error",
+      error,
+    );
     return createErrorResponse(
       "packages.nextVibe.server.sms.sms.error.unexpected_error",
       ErrorResponseTypes.SMS_ERROR,

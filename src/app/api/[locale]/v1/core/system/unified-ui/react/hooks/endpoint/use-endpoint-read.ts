@@ -40,6 +40,7 @@ export function useEndpointRead<
     string,
     Methods,
     readonly (typeof UserRoleValue)[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >,
 >(
@@ -52,7 +53,7 @@ export function useEndpointRead<
       TEndpoint["TResponseOutput"],
       TEndpoint["TUrlVariablesOutput"]
     >;
-    urlParams?: TEndpoint["TUrlVariablesOutput"];
+    urlPathParams?: TEndpoint["TUrlVariablesOutput"];
     autoPrefillData?: Partial<TEndpoint["TRequestOutput"]>;
     initialState?: Partial<TEndpoint["TRequestOutput"]>;
     autoPrefillConfig?: AutoPrefillConfig;
@@ -69,7 +70,7 @@ export function useEndpointRead<
   const {
     formOptions = { persistForm: true, autoSubmit: true, debounceMs: 500 },
     queryOptions = {},
-    urlParams = {} as TEndpoint["TUrlVariablesOutput"],
+    urlPathParams = {} as TEndpoint["TUrlVariablesOutput"],
     autoPrefillData,
     initialState,
     autoPrefillConfig = {
@@ -130,7 +131,7 @@ export function useEndpointRead<
   // Use the existing query form hook with enhanced options
   const queryFormResult = useApiQueryForm({
     endpoint: primaryEndpoint,
-    urlVariables: urlParams || ({} as TEndpoint["TUrlVariablesOutput"]),
+    urlPathParams: urlPathParams || ({} as TEndpoint["TUrlVariablesOutput"]),
     formOptions: enhancedFormOptions,
     queryOptions: enhancedQueryOptions,
     logger,

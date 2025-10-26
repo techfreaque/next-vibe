@@ -7,6 +7,7 @@ import {
   DEFAULT_FOLDER_CONFIGS,
   DEFAULT_FOLDER_IDS,
   type DefaultFolderId,
+  isDefaultFolderId,
 } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { IconValue } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -18,8 +19,8 @@ import type { ChatFolder } from "../../types";
  * Check if a folder ID is a default/root folder
  * Default folders are the 4 root folders: private, incognito, shared, public
  */
-export function isDefaultFolder(folderId: string): boolean {
-  return (Object.values(DEFAULT_FOLDER_IDS) as string[]).includes(folderId);
+export function isDefaultFolder(folderId: string): folderId is DefaultFolderId {
+  return isDefaultFolderId(folderId);
 }
 
 /**
@@ -33,7 +34,7 @@ export function getFolderIcon(
 ): IconValue {
   if (isDefaultFolder(folderId)) {
     const config = DEFAULT_FOLDER_CONFIGS.find((c) => c.id === folderId);
-    return (config?.icon as IconValue) || "folder";
+    return config?.icon || "folder";
   }
   return customIcon || "folder";
 }
@@ -181,9 +182,9 @@ export function getRootFolderIdForFolder(
   folderId: string,
   folders: Record<string, ChatFolder>,
 ): DefaultFolderId {
-  // Check if this is already a root folder
+  // Check if this is already a root folder - type guard narrows the type
   if (isDefaultFolder(folderId)) {
-    return folderId as DefaultFolderId;
+    return folderId;
   }
 
   // Find the folder and get its rootFolderId

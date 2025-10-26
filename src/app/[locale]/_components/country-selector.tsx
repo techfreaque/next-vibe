@@ -36,6 +36,18 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
   const [activeTab, setActiveTab] = useState<"country" | "language">("country");
   const [tabHover, setTabHover] = useState<"country" | "language" | null>(null);
 
+  // Type guard for tab values
+  const isValidTab = (value: string): value is "country" | "language" => {
+    return value === "country" || value === "language";
+  };
+
+  // Memoize the tab change handler
+  const handleTabChange = useCallback((value: string) => {
+    if (isValidTab(value)) {
+      setActiveTab(value);
+    }
+  }, []);
+
   // Memoize the language change handler to prevent infinite loops
   const handleLanguageChange = useCallback(
     (langCode: Languages) => {
@@ -91,9 +103,7 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
         <Tabs
           defaultValue="country"
           value={activeTab}
-          onValueChange={(value) =>
-            setActiveTab(value as "country" | "language")
-          }
+          onValueChange={handleTabChange}
           className="w-full"
         >
           <TabsList className="grid grid-cols-2 mb-2">

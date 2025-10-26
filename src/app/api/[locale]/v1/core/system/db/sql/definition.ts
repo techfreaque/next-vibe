@@ -253,7 +253,7 @@ const { POST } = createEndpoint({
         queryType: "SELECT",
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
 });
 

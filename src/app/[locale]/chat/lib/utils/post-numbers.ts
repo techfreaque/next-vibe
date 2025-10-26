@@ -3,6 +3,8 @@
  * Generates and stores sequential post numbers for messages
  */
 
+import { parseError } from "next-vibe/shared/utils";
+
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -16,6 +18,18 @@ interface PostNumberMap {
 }
 
 /**
+ * Type guard to validate if parsed JSON matches PostNumberMap structure
+ */
+function isPostNumberMap(
+  value: Record<string, number> | null | string | number | boolean,
+): value is PostNumberMap {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  return Object.values(value).every((val) => typeof val === "number");
+}
+
+/**
  * Get post number map from localStorage
  */
 function getPostNumberMap(logger: EndpointLogger): PostNumberMap {
@@ -25,9 +39,24 @@ function getPostNumberMap(logger: EndpointLogger): PostNumberMap {
 
   try {
     const stored = localStorage.getItem(POST_NUMBER_KEY);
-    return stored ? (JSON.parse(stored) as PostNumberMap) : {};
+    if (!stored) {
+      return {};
+    }
+    const parsed = JSON.parse(stored) as
+      | Record<string, number>
+      | null
+      | string
+      | number
+      | boolean;
+    if (!isPostNumberMap(parsed)) {
+      logger.error("Storage", "Invalid post number map format", {
+        message: "Stored data is not a valid PostNumberMap",
+      });
+      return {};
+    }
+    return parsed;
   } catch (error) {
-    logger.error("Storage", "Error loading post numbers", error);
+    logger.error("Storage", "Error loading post numbers", parseError(error));
     return {};
   }
 }
@@ -43,7 +72,7 @@ function savePostNumberMap(map: PostNumberMap, logger: EndpointLogger): void {
   try {
     localStorage.setItem(POST_NUMBER_KEY, JSON.stringify(map));
   } catch (error) {
-    logger.error("Storage", "Error saving post numbers", error);
+    logger.error("Storage", "Error saving post numbers", parseError(error));
   }
 }
 
@@ -59,7 +88,7 @@ function getCounter(logger: EndpointLogger): number {
     const stored = localStorage.getItem(POST_NUMBER_COUNTER_KEY);
     return stored ? parseInt(stored, 10) : POST_NUMBER_START;
   } catch (error) {
-    logger.error("Storage", "Error loading counter", error);
+    logger.error("Storage", "Error loading counter", parseError(error));
     return POST_NUMBER_START;
   }
 }
@@ -75,7 +104,7 @@ function saveCounter(counter: number, logger: EndpointLogger): void {
   try {
     localStorage.setItem(POST_NUMBER_COUNTER_KEY, counter.toString());
   } catch (error) {
-    logger.error("Storage", "Error saving counter", error);
+    logger.error("Storage", "Error saving counter", parseError(error));
   }
 }
 
@@ -152,7 +181,7 @@ export function clearPostNumbers(logger: EndpointLogger): void {
     localStorage.removeItem(POST_NUMBER_KEY);
     localStorage.removeItem(POST_NUMBER_COUNTER_KEY);
   } catch (error) {
-    logger.error("Storage", "Error clearing post numbers", error);
+    logger.error("Storage", "Error clearing post numbers", parseError(error));
   }
 }
 

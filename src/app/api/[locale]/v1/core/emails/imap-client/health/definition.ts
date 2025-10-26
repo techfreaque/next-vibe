@@ -311,7 +311,7 @@ const { GET } = createEndpoint({
           "app.api.v1.core.emails.imapClient.health.health.get.success.description",
       },
     },
-    urlPathVariables: undefined,
+    urlPathParams: undefined,
   },
 });
 

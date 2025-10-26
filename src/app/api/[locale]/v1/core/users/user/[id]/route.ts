@@ -37,7 +37,7 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
       >,
     ): Promise<ResponseType<UserGetResponseOutput>> => {
       return await userByIdRepository.getUserById(
-        { id: props.urlVariables.id },
+        { id: props.urlPathParams.id },
         props.user,
         props.locale,
         props.logger,
@@ -55,7 +55,7 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
     ): Promise<ResponseType<UserPutResponseOutput>> => {
       return await userByIdRepository.updateUser(
         props.data,
-        props.urlVariables.id,
+        props.urlPathParams.id,
         props.user,
         props.logger,
       );
@@ -71,7 +71,7 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
       >,
     ): Promise<ResponseType<UserDeleteResponseOutput>> => {
       return await userByIdRepository.deleteUser(
-        { id: props.urlVariables.id },
+        { id: props.urlPathParams.id },
         props.user,
         props.locale,
         props.logger,

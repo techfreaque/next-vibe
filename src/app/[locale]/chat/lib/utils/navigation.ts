@@ -3,7 +3,10 @@
  * Handles routing logic for threads and folders
  */
 
-import { DEFAULT_FOLDER_IDS } from "@/app/api/[locale]/v1/core/agent/chat/config";
+import {
+  DEFAULT_FOLDER_IDS,
+  isDefaultFolderId,
+} from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -24,7 +27,7 @@ export function getRootFolderId(
   }
 
   // Check if this is already a root folder
-  if ((Object.values(DEFAULT_FOLDER_IDS) as string[]).includes(folderId)) {
+  if (isDefaultFolderId(folderId)) {
     return folderId;
   }
 

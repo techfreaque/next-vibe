@@ -9,6 +9,7 @@ import { render } from "@react-email/render";
 import { Mail, Send } from "lucide-react";
 import { Button } from "next-vibe-ui/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "next-vibe-ui/ui/dialog";
+import { parseError } from "next-vibe/shared/utils";
 import type React from "react";
 import { useEffect, useState } from "react";
 
@@ -52,7 +53,7 @@ export function EmailPreviewClient({
         const html = await render(emailPreview.jsx);
         setRenderedHtml(html);
       } catch (error) {
-        logger.error("Failed to render email HTML:", error);
+        logger.error("Failed to render email HTML:", parseError(error));
         setRenderedHtml(t("app.admin.leads.leads.admin.emails.preview.error"));
       }
     };

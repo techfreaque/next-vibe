@@ -7,6 +7,7 @@ import {
   ErrorResponseTypes,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
@@ -31,7 +32,7 @@ export const voteRepository = {
    * Vote on a message (upvote, downvote, or remove vote)
    */
   async voteMessage(
-    urlVariables: VotePostUrlVariablesOutput,
+    urlPathParams: VotePostUrlVariablesOutput,
     data: VotePostRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -58,8 +59,8 @@ export const voteRepository = {
         .innerJoin(chatThreads, eq(chatMessages.threadId, chatThreads.id))
         .where(
           and(
-            eq(chatMessages.id, urlVariables.messageId),
-            eq(chatMessages.threadId, urlVariables.threadId),
+            eq(chatMessages.id, urlPathParams.messageId),
+            eq(chatMessages.threadId, urlPathParams.threadId),
           ),
         )
         .limit(1);
@@ -169,10 +170,10 @@ export const voteRepository = {
           metadata: newMetadata,
           updatedAt: new Date(),
         })
-        .where(eq(chatMessages.id, urlVariables.messageId));
+        .where(eq(chatMessages.id, urlPathParams.messageId));
 
       logger.info("Vote recorded successfully", {
-        messageId: urlVariables.messageId,
+        messageId: urlPathParams.messageId,
         userId,
         vote: data.vote,
         upvotes,
@@ -185,7 +186,7 @@ export const voteRepository = {
         userVote: newVoteType,
       });
     } catch (error) {
-      logger.error("Failed to record vote", { error });
+      logger.error("Failed to record vote", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,

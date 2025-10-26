@@ -35,7 +35,7 @@ export interface EndpointDefinition {
   title?: string;
   description?: string;
   requestSchema?: Record<string, string | number | boolean>;
-  requestUrlParamsSchema?: Record<string, string | number | boolean>;
+  requestUrlPathParamsSchema?: Record<string, string | number | boolean>;
   responseSchema?: Record<string, string | number | boolean>;
   fields?: Record<string, string | number | boolean>;
 }
@@ -76,7 +76,7 @@ export type ExtractInputOutput<T> =
  * Method usage structure
  */
 interface MethodUsageStructure {
-  request?: "data" | "urlParams" | "data&urlParams";
+  request?: "data" | "urlPathParams" | "data&urlPathParams";
   response?: boolean;
 }
 
@@ -144,23 +144,23 @@ type AnyMethodSupportsUsage<
   : TTargetUsage extends FieldUsage.RequestData
     ? // Use union types to check all possibilities in parallel
       // String key syntax (primary)
-      TUsage extends { POST: { request: "data" | "data&urlParams" } }
+      TUsage extends { POST: { request: "data" | "data&urlPathParams" } }
       ? true
-      : TUsage extends { PUT: { request: "data" | "data&urlParams" } }
+      : TUsage extends { PUT: { request: "data" | "data&urlPathParams" } }
         ? true
-        : TUsage extends { PATCH: { request: "data" | "data&urlParams" } }
+        : TUsage extends { PATCH: { request: "data" | "data&urlPathParams" } }
           ? true
           : // Computed property syntax (fallback)
             TUsage extends {
-                [Methods.POST]: { request: "data" | "data&urlParams" };
+                [Methods.POST]: { request: "data" | "data&urlPathParams" };
               }
             ? true
             : TUsage extends {
-                  [Methods.PUT]: { request: "data" | "data&urlParams" };
+                  [Methods.PUT]: { request: "data" | "data&urlPathParams" };
                 }
               ? true
               : TUsage extends {
-                    [Methods.PATCH]: { request: "data" | "data&urlParams" };
+                    [Methods.PATCH]: { request: "data" | "data&urlPathParams" };
                   }
                 ? true
                 : false
@@ -178,11 +178,11 @@ type MatchesUsage<TUsage, TTargetUsage extends FieldUsage> =
       AnyMethodSupportsUsage<TUsage, TTargetUsage>
     : // Original simple usage matching for backward compatibility
       TTargetUsage extends FieldUsage.RequestData
-      ? TUsage extends { request: "data" | "data&urlParams" }
+      ? TUsage extends { request: "data" | "data&urlPathParams" }
         ? true
         : false
       : TTargetUsage extends FieldUsage.RequestUrlParams
-        ? TUsage extends { request: "urlParams" | "data&urlParams" }
+        ? TUsage extends { request: "urlPathParams" | "data&urlPathParams" }
           ? true
           : false
         : TTargetUsage extends FieldUsage.Response
@@ -271,11 +271,11 @@ type MatchesUsageForMethod<
   TMethod extends keyof TUsage
     ? TUsage[TMethod] extends infer TMethodUsage
       ? TTargetUsage extends FieldUsage.RequestData
-        ? TMethodUsage extends { request: "data" | "data&urlParams" }
+        ? TMethodUsage extends { request: "data" | "data&urlPathParams" }
           ? true
           : false
         : TTargetUsage extends FieldUsage.RequestUrlParams
-          ? TMethodUsage extends { request: "urlParams" | "data&urlParams" }
+          ? TMethodUsage extends { request: "urlPathParams" | "data&urlPathParams" }
             ? true
             : false
           : TTargetUsage extends FieldUsage.Response
@@ -286,11 +286,11 @@ type MatchesUsageForMethod<
       : false
     : // Fall back to original logic for backward compatibility
       TTargetUsage extends FieldUsage.RequestData
-      ? TUsage extends { request: "data" | "data&urlParams" }
+      ? TUsage extends { request: "data" | "data&urlPathParams" }
         ? true
         : false
       : TTargetUsage extends FieldUsage.RequestUrlParams
-        ? TUsage extends { request: "urlParams" | "data&urlParams" }
+        ? TUsage extends { request: "urlPathParams" | "data&urlPathParams" }
           ? true
           : false
         : TTargetUsage extends FieldUsage.Response
@@ -397,12 +397,12 @@ export type FieldValue = string | number | boolean | Date | null | undefined;
 export type FieldUsageConfig =
   // Current format (backward compatible) - applies to all methods
   | { request: "data"; response?: never }
-  | { request: "urlParams"; response?: never }
-  | { request: "data&urlParams"; response?: never }
+  | { request: "urlPathParams"; response?: never }
+  | { request: "data&urlPathParams"; response?: never }
   | { request?: never; response: true }
   | { request: "data"; response: true }
-  | { request: "urlParams"; response: true }
-  | { request: "data&urlParams"; response: true }
+  | { request: "urlPathParams"; response: true }
+  | { request: "data&urlPathParams"; response: true }
   // New method-specific format - data request type
   | {
       [Methods.GET]?: { request?: "data"; response?: true };
@@ -422,41 +422,41 @@ export type FieldUsageConfig =
       request?: never;
       response?: never;
     }
-  // New method-specific format - urlParams request type
+  // New method-specific format - urlPathParams request type
   | {
-      [Methods.GET]?: { request?: "urlParams"; response?: true };
-      [Methods.POST]?: { request?: "urlParams"; response?: true };
-      [Methods.PUT]?: { request?: "urlParams"; response?: true };
-      [Methods.PATCH]?: { request?: "urlParams"; response?: true };
-      [Methods.DELETE]?: { request?: "urlParams"; response?: true };
+      [Methods.GET]?: { request?: "urlPathParams"; response?: true };
+      [Methods.POST]?: { request?: "urlPathParams"; response?: true };
+      [Methods.PUT]?: { request?: "urlPathParams"; response?: true };
+      [Methods.PATCH]?: { request?: "urlPathParams"; response?: true };
+      [Methods.DELETE]?: { request?: "urlPathParams"; response?: true };
       request?: never;
       response?: never;
     }
   | {
-      [Methods.GET]?: { request?: "urlParams"; response?: never };
-      [Methods.POST]?: { request?: "urlParams"; response?: never };
-      [Methods.PUT]?: { request?: "urlParams"; response?: never };
-      [Methods.PATCH]?: { request?: "urlParams"; response?: never };
-      [Methods.DELETE]?: { request?: "urlParams"; response?: never };
+      [Methods.GET]?: { request?: "urlPathParams"; response?: never };
+      [Methods.POST]?: { request?: "urlPathParams"; response?: never };
+      [Methods.PUT]?: { request?: "urlPathParams"; response?: never };
+      [Methods.PATCH]?: { request?: "urlPathParams"; response?: never };
+      [Methods.DELETE]?: { request?: "urlPathParams"; response?: never };
       request?: never;
       response?: never;
     }
-  // New method-specific format - data&urlParams request type
+  // New method-specific format - data&urlPathParams request type
   | {
-      [Methods.GET]?: { request?: "data&urlParams"; response?: true };
-      [Methods.POST]?: { request?: "data&urlParams"; response?: true };
-      [Methods.PUT]?: { request?: "data&urlParams"; response?: true };
-      [Methods.PATCH]?: { request?: "data&urlParams"; response?: true };
-      [Methods.DELETE]?: { request?: "data&urlParams"; response?: true };
+      [Methods.GET]?: { request?: "data&urlPathParams"; response?: true };
+      [Methods.POST]?: { request?: "data&urlPathParams"; response?: true };
+      [Methods.PUT]?: { request?: "data&urlPathParams"; response?: true };
+      [Methods.PATCH]?: { request?: "data&urlPathParams"; response?: true };
+      [Methods.DELETE]?: { request?: "data&urlPathParams"; response?: true };
       request?: never;
       response?: never;
     }
   | {
-      [Methods.GET]?: { request?: "data&urlParams"; response?: never };
-      [Methods.POST]?: { request?: "data&urlParams"; response?: never };
-      [Methods.PUT]?: { request?: "data&urlParams"; response?: never };
-      [Methods.PATCH]?: { request?: "data&urlParams"; response?: never };
-      [Methods.DELETE]?: { request?: "data&urlParams"; response?: never };
+      [Methods.GET]?: { request?: "data&urlPathParams"; response?: never };
+      [Methods.POST]?: { request?: "data&urlPathParams"; response?: never };
+      [Methods.PUT]?: { request?: "data&urlPathParams"; response?: never };
+      [Methods.PATCH]?: { request?: "data&urlPathParams"; response?: never };
+      [Methods.DELETE]?: { request?: "data&urlPathParams"; response?: never };
       request?: never;
       response?: never;
     }

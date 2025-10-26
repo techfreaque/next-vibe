@@ -50,7 +50,7 @@ export function useEndpointFilter<
       TEndpoint["TResponseOutput"],
       TEndpoint["TUrlVariablesOutput"]
     >;
-    urlParams?: TEndpoint["TUrlVariablesOutput"];
+    urlPathParams?: TEndpoint["TUrlVariablesOutput"];
     initialFilters?: Partial<TEndpoint["TRequestOutput"]>;
   } = {},
 ): ApiQueryFormReturn<
@@ -65,7 +65,7 @@ export function useEndpointFilter<
   const {
     formOptions = { persistForm: true, autoSubmit: true, debounceMs: 300 },
     queryOptions = {},
-    urlParams = {} as TEndpoint["TUrlVariablesOutput"],
+    urlPathParams = {} as TEndpoint["TUrlVariablesOutput"],
     initialFilters,
   } = options;
 
@@ -103,7 +103,7 @@ export function useEndpointFilter<
   // Only call the hook if endpoint is provided to avoid conditional hook calls
   const queryFormResult = useApiQueryForm({
     endpoint: filterEndpoint,
-    urlVariables: urlParams,
+    urlPathParams: urlPathParams,
     queryOptions: enhancedQueryOptions,
     formOptions: enhancedFormOptions as ApiQueryFormOptions<
       TEndpoint["TRequestOutput"]

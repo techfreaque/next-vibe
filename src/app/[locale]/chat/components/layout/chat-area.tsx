@@ -25,7 +25,6 @@ interface ChatAreaProps {
   messages: ChatMessage[];
   selectedModel: ModelId;
   selectedPersona: string;
-  enableSearch: boolean;
   ttsAutoplay: boolean;
   input: string;
   isLoading: boolean;
@@ -38,7 +37,6 @@ interface ChatAreaProps {
   onSwitchBranch: (messageId: string, branchIndex: number) => void;
   onModelChange: (model: ModelId) => void;
   onPersonaChange: (persona: string) => void;
-  onEnableSearchChange: (enabled: boolean) => void;
   onSendMessage: (prompt: string, personaId: string, modelId?: ModelId) => void;
   onBranchMessage?: (messageId: string, newContent: string) => Promise<void>;
   onRetryMessage?: (messageId: string) => Promise<void>;
@@ -60,7 +58,6 @@ export function ChatArea({
   messages,
   selectedModel,
   selectedPersona,
-  enableSearch,
   ttsAutoplay,
   input,
   isLoading,
@@ -73,7 +70,6 @@ export function ChatArea({
   onSwitchBranch,
   onModelChange,
   onPersonaChange,
-  onEnableSearchChange,
   onSendMessage,
   onBranchMessage,
   onRetryMessage,
@@ -277,11 +273,10 @@ export function ChatArea({
             onStop={onStop}
             selectedPersona={selectedPersona}
             selectedModel={selectedModel}
-            enableSearch={enableSearch}
             enabledToolIds={chat.enabledToolIds}
             onPersonaChange={onPersonaChange}
             onModelChange={onModelChange}
-            onEnableSearchChange={onEnableSearchChange}
+            onToolsChange={chat.setEnabledToolIds}
             onOpenToolsModal={() => setIsToolsModalOpen(true)}
             locale={locale}
             logger={logger}
