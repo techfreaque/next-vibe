@@ -7,8 +7,10 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
-import { createErrorResponse } from "next-vibe/shared/types/response.schema";
+import {
+  createErrorResponse,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -280,4 +282,3 @@ export function isRecoverableError(error: unknown): boolean {
   const errorMessage = error.message.toUpperCase();
   return recoverablePatterns.some((pattern) => errorMessage.includes(pattern));
 }
-

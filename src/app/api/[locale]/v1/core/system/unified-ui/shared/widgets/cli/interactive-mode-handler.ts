@@ -5,6 +5,7 @@
 
 import { confirm, select } from "@inquirer/prompts";
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/system/unified-backend/shared/endpoint-logger";
 import type { z } from "zod";
 
 import type {
@@ -16,7 +17,6 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/defini
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { EndpointLogger } from "../../../../unified-backend/shared/endpoint-logger";
 import { schemaUIHandler } from "./schema-ui-handler";
 
 // Type for endpoint fields
@@ -30,8 +30,8 @@ interface EndpointField {
  * Interactive session state
  */
 interface InteractiveSession {
-  user?: JwtPayloadType;
-  locale?: CountryLanguage;
+  user: JwtPayloadType;
+  locale: CountryLanguage;
   options?: {
     verbose?: boolean;
     output?: "json" | "table" | "pretty";
@@ -63,7 +63,7 @@ interface NavigationBreadcrumb {
  * Interactive mode handler class with file explorer navigation
  */
 export class InteractiveModeHandler {
-  private session: InteractiveSession = {};
+  private session!: InteractiveSession;
   private routeTree: DirectoryNode | null = null;
   private currentNode: DirectoryNode | null = null;
   private breadcrumbs: NavigationBreadcrumb[] = [];
@@ -109,13 +109,17 @@ export class InteractiveModeHandler {
   /**
    * Initialize session with default values for better UX
    */
-  private initializeDefaultSession(): void {
+  private initializeDefaultSession(
+    locale: CountryLanguage,
+    user: JwtPayloadType,
+  ): void {
     this.session = {
       options: {
         verbose: false,
         output: "pretty",
       },
-      locale: "en-GLOBAL",
+      locale,
+      user,
     };
   }
 
@@ -123,6 +127,8 @@ export class InteractiveModeHandler {
    * Start interactive mode with file explorer navigation
    */
   async startInteractiveMode(
+    user: JwtPayloadType,
+    locale: CountryLanguage,
     routes: DiscoveredRoute[],
     logger: EndpointLogger,
   ): Promise<void> {
@@ -130,16 +136,20 @@ export class InteractiveModeHandler {
     this.logger = logger;
 
     // Initialize with default session first (needed for locale)
-    this.initializeDefaultSession();
+    this.initializeDefaultSession(locale, user);
 
     // Set up Ctrl+C handling
     this.setupSignalHandlers();
 
-    const { t } = simpleT(this.session.locale || "en-GLOBAL");
+    const { t } = simpleT(this.session.locale);
 
     // Show welcome message
-    this.logger.info(t("app.api.v1.core.system.unifiedBackend.cli.vibe.interactive.welcome"));
-    this.logger.info(t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.description"));
+    this.logger.info(
+      t("app.api.v1.core.system.unifiedBackend.cli.vibe.interactive.welcome"),
+    );
+    this.logger.info(
+      t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.description"),
+    );
     this.logger.info(""); // Empty line for better spacing
 
     // Build route tree for file explorer navigation
@@ -157,7 +167,7 @@ export class InteractiveModeHandler {
    * Build route tree from discovered routes for file explorer navigation
    */
   private buildRouteTree(routes: DiscoveredRoute[]): void {
-    const { t } = simpleT(this.session.locale || "en-GLOBAL");
+    const { t } = simpleT(this.session.locale);
 
     this.routeTree = {
       name: t(
@@ -263,7 +273,7 @@ export class InteractiveModeHandler {
       return "exit";
     }
 
-    const { t } = simpleT(this.session.locale || "en-GLOBAL");
+    const { t } = simpleT(this.session.locale);
 
     // Display breadcrumbs
     const breadcrumbPath = this.breadcrumbs.map((b) => b.name).join(" > ");
@@ -466,9 +476,11 @@ export class InteractiveModeHandler {
   private async executeRouteWithDataDrivenUI(
     route: DiscoveredRoute,
   ): Promise<void> {
-    const { t } = simpleT(this.session.locale || "en-GLOBAL");
+    const { t } = simpleT(this.session.locale);
 
-    const executingText = t("app.api.v1.core.system.unifiedBackend.cli.vibe.vibe.executing");
+    const executingText = t(
+      "app.api.v1.core.system.unifiedUi.cli.vibe.executing",
+    );
     const routeText = t(
       "app.api.v1.core.system.unifiedBackend.cli.vibe.interactive.navigation.route",
     );
@@ -526,7 +538,7 @@ export class InteractiveModeHandler {
    * Collect locale selection for route execution
    */
   private async collectLocaleSelection(): Promise<CountryLanguage> {
-    const { t } = simpleT(this.session.locale || "en-GLOBAL");
+    const { t } = simpleT(this.session.locale);
 
     const selectLocaleText = t(
       "app.api.v1.core.system.unifiedBackend.cli.vibe.interactive.navigation.selectLocale",
@@ -548,7 +560,7 @@ export class InteractiveModeHandler {
     const locale = await select({
       message: selectLocaleText,
       choices: localeOptions,
-      default: this.session.locale || "en-GLOBAL",
+      default: this.session.locale,
     });
 
     // The input prompt returns a string, but we trust the user input here
@@ -801,12 +813,12 @@ export class InteractiveModeHandler {
     };
 
     try {
-      const { t } = simpleT(this.session.locale || "en-GLOBAL");
+      const { t } = simpleT(this.session.locale);
       const result = await routeDelegationHandler.executeRoute(
         route,
         context,
         this.logger,
-        this.session.locale || "en-GLOBAL",
+        this.session.locale,
         t,
       );
 
@@ -817,14 +829,14 @@ export class InteractiveModeHandler {
         result,
         this.session.options?.output || "pretty",
         endpointDefinition,
-        this.session.locale || "en-GLOBAL",
+        this.session.locale,
         this.session.options?.verbose || false,
         this.logger,
       );
 
       this.logger.info(formattedResult);
     } catch (error) {
-      const { t } = simpleT(this.session.locale || "en-GLOBAL");
+      const { t } = simpleT(this.session.locale);
       const executionFailedText = t(
         "app.api.v1.core.system.unifiedBackend.cli.vibe.interactive.navigation.executionFailed",
       );
@@ -844,12 +856,12 @@ export class InteractiveModeHandler {
     };
 
     try {
-      const { t } = simpleT(this.session.locale || "en-GLOBAL");
+      const { t } = simpleT(this.session.locale);
       const result = await routeDelegationHandler.executeRoute(
         route,
         context,
         this.logger,
-        this.session.locale || "en-GLOBAL",
+        this.session.locale,
         t,
       );
 
@@ -860,14 +872,14 @@ export class InteractiveModeHandler {
         result,
         this.session.options?.output || "pretty",
         endpointDefinition,
-        this.session.locale || "en-GLOBAL",
+        this.session.locale,
         this.session.options?.verbose || false,
         this.logger,
       );
 
       this.logger.info(formattedResult);
     } catch (error) {
-      const { t } = simpleT(this.session.locale || "en-GLOBAL");
+      const { t } = simpleT(this.session.locale);
       const executionFailedText = t(
         "app.api.v1.core.system.unifiedBackend.cli.vibe.interactive.navigation.executionFailed",
       );
@@ -884,7 +896,7 @@ export class InteractiveModeHandler {
         const action = await this.showNavigationMenu();
 
         if (action === InteractiveModeHandler.EXIT_ACTION) {
-          const { t } = simpleT(this.session.locale || "en-GLOBAL");
+          const { t } = simpleT(this.session.locale);
           const goodbyeText = t(
             "app.api.v1.core.system.unifiedBackend.cli.vibe.interactive.goodbye",
           );
@@ -911,7 +923,7 @@ export class InteractiveModeHandler {
           await this.executeRouteByPath(routePath);
         }
       } catch (error) {
-        const { t } = simpleT(this.session.locale || "en-GLOBAL");
+        const { t } = simpleT(this.session.locale);
         const navigationErrorText = t(
           "app.api.v1.core.system.unifiedBackend.cli.vibe.interactive.navigation.navigationError",
         );
@@ -924,7 +936,7 @@ export class InteractiveModeHandler {
    * Show settings menu
    */
   private async showSettingsMenu(): Promise<void> {
-    const { t } = simpleT(this.session.locale || "en-GLOBAL");
+    const { t } = simpleT(this.session.locale);
 
     const chooseSettingText = t(
       "app.api.v1.core.system.unifiedBackend.cli.vibe.interactive.navigation.chooseSettingToModify",
@@ -983,7 +995,7 @@ export class InteractiveModeHandler {
   private async updateSetting(setting: string): Promise<void> {
     switch (setting) {
       case "output": {
-        const { t } = simpleT(this.session.locale || "en-GLOBAL");
+        const { t } = simpleT(this.session.locale);
         const chooseOutputFormatText = t(
           "app.api.v1.core.system.unifiedBackend.cli.vibe.interactive.navigation.chooseOutputFormat",
         );
@@ -1010,7 +1022,7 @@ export class InteractiveModeHandler {
       }
 
       case "verbose": {
-        const { t } = simpleT(this.session.locale || "en-GLOBAL");
+        const { t } = simpleT(this.session.locale);
         const enableVerboseOutputText = t(
           "app.api.v1.core.system.unifiedBackend.cli.vibe.interactive.navigation.enableVerboseOutput",
         );
@@ -1027,7 +1039,7 @@ export class InteractiveModeHandler {
       }
 
       case "locale": {
-        const { t } = simpleT(this.session.locale || "en-GLOBAL");
+        const { t } = simpleT(this.session.locale);
         const chooseLocaleText = t(
           "app.api.v1.core.system.unifiedBackend.cli.vibe.interactive.navigation.chooseLocale",
         );
@@ -1056,7 +1068,7 @@ export class InteractiveModeHandler {
       }
     }
 
-    const { t } = simpleT(this.session.locale || "en-GLOBAL");
+    const { t } = simpleT(this.session.locale);
     const settingUpdatedText = t(
       "app.api.v1.core.system.unifiedBackend.cli.vibe.interactive.navigation.settingUpdated",
     );

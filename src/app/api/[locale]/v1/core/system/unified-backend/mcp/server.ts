@@ -18,7 +18,7 @@ import { StdioTransport } from "./stdio-transport";
  * MCP Server Options
  */
 export interface MCPServerOptions {
-  locale?: CountryLanguage;
+  locale: CountryLanguage;
   debug?: boolean;
 }
 

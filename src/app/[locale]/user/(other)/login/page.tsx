@@ -69,7 +69,10 @@ export default async function LoginPage({
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
   // Check if user is already logged in using repository-first pattern
-  const verifiedUserResponse = await userRepository.getUserByAuth({}, logger);
+  const verifiedUserResponse = await userRepository.getUserByAuth(
+    { locale },
+    logger,
+  );
   // Redirect if already authenticated
   if (verifiedUserResponse.success && verifiedUserResponse.data) {
     // If there's a callback URL, use it

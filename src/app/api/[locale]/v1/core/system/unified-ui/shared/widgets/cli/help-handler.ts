@@ -140,8 +140,9 @@ export class HelpHandler {
   async generateHelp(
     routes: DiscoveredRoute[],
     options: HelpOptions = {},
+    locale: CountryLanguage,
   ): Promise<HelpContent> {
-    const { t } = simpleT("en-GLOBAL");
+    const { t } = simpleT(locale);
 
     const filteredRoutes = options.category
       ? routes.filter(
@@ -151,7 +152,9 @@ export class HelpHandler {
 
     const helpContent: HelpContent = {
       title: t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.title"),
-      description: t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.description"),
+      description: t(
+        "app.api.v1.core.system.unifiedBackend.cli.vibe.help.description",
+      ),
       usage: t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.usage"),
       commands: await this.generateCommandHelp(filteredRoutes, options),
       examples: this.generateExamples(),
@@ -191,8 +194,9 @@ export class HelpHandler {
   private async generateSingleCommandHelp(
     route: DiscoveredRoute,
     options: HelpOptions,
+    locale: CountryLanguage,
   ): Promise<CommandHelp> {
-    const { t } = simpleT("en-GLOBAL");
+    const { t } = simpleT(locale);
     const endpoint = await this.getEndpointDefinition(route);
 
     const commandHelp: CommandHelp = {
@@ -437,8 +441,8 @@ export class HelpHandler {
   /**
    * Generate global CLI options
    */
-  private generateGlobalOptions(): OptionHelp[] {
-    const { t } = simpleT("en-GLOBAL");
+  private generateGlobalOptions(locale: CountryLanguage): OptionHelp[] {
+    const { t } = simpleT(locale);
 
     return [
       {
@@ -508,8 +512,8 @@ export class HelpHandler {
   /**
    * Format help content as text
    */
-  formatAsText(help: HelpContent): string {
-    const { t } = simpleT("en-GLOBAL");
+  formatAsText(help: HelpContent, locale: CountryLanguage): string {
+    const { t } = simpleT(locale);
     let output = "";
 
     // eslint-disable-next-line i18next/no-literal-string

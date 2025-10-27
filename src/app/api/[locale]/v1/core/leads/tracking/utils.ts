@@ -73,7 +73,7 @@ export function generateTrackingLinkUrl(
 /**
  * Check if URL is already a tracking URL
  */
-export function isTrackingUrl(url: string, locale?: CountryLanguage): boolean {
+export function isTrackingUrl(url: string, locale: CountryLanguage): boolean {
   if (url.includes("/track?")) {
     return true;
   }

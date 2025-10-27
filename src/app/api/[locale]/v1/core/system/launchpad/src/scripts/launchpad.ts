@@ -74,7 +74,6 @@ program
         rootDir,
         options.target,
         options.tag,
-        locale,
       );
     } catch (error) {
       handleError(logger, "CI release failed:", error);
@@ -149,7 +148,7 @@ program
   .description("Continue release from previous state")
   .action(async () => {
     const logger = createEndpointLogger(true, Date.now(), locale);
-    const t = simpleT(locale);
+    const { t } = simpleT(locale);
     try {
       const rootDir = process.cwd();
       await continueReleaseCommand(logger, rootDir, t);
@@ -163,7 +162,7 @@ program
   .description("Show current release status")
   .action(() => {
     const logger = createEndpointLogger(true, Date.now(), locale);
-    const t = simpleT(locale);
+    const { t } = simpleT(locale);
     try {
       const rootDir = process.cwd();
       showReleaseStatusCommand(logger, rootDir, t);
@@ -197,7 +196,7 @@ function handleError(
 
 async function runInteractiveMode(): Promise<void> {
   const logger = createEndpointLogger(true, Date.now(), defaultLocale);
-  const t = simpleT(defaultLocale);
+  const { t } = simpleT(defaultLocale);
   logger.info("🚀 PWE Launchpad");
 
   const { action } = (await inquirer.prompt([
@@ -275,10 +274,10 @@ async function runInteractiveMode(): Promise<void> {
         await forceReleaseCommand(logger, rootDir);
         break;
       case "continue-release":
-        await continueReleaseCommand(logger, rootDir);
+        await continueReleaseCommand(logger, rootDir, t);
         break;
       case "show-status":
-        showReleaseStatusCommand(logger, rootDir);
+        showReleaseStatusCommand(logger, rootDir, t);
         break;
     }
 

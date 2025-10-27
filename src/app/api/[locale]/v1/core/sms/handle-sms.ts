@@ -17,13 +17,13 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
+import { batchSendSms, sendSms } from "./send-sms";
 import type {
   ProviderBaseOptions,
   SendSmsParams,
   SmsConfig,
   SmsHandlerOptions,
 } from "./utils";
-import { batchSendSms, sendSms } from "./send-sms";
 
 /**
  * Processes and handles SMS messages triggered by API responses
@@ -55,12 +55,6 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
   const maxMessageLength =
     options?.maxMessageLength || parseInt(env.SMS_MAX_LENGTH || "160", 10);
 
-  // Provide default values for t and locale if not provided
-  const defaultT: TFunction = (key: string) => key;
-  const defaultLocale: CountryLanguage = "en-GLOBAL";
-  const tFunction = t || defaultT;
-  const currentLocale = locale || defaultLocale;
-
   if (!sms?.afterHandlerSms || sms.afterHandlerSms.length === 0) {
     return { success: true, data: undefined };
   }
@@ -76,8 +70,8 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
             urlPathParams,
             requestData,
             responseData,
-            t: tFunction,
-            locale: currentLocale,
+            t: t,
+            locale: locale,
             logger,
           });
 

@@ -45,7 +45,7 @@ export const { GET, POST, PUT, DELETE, tools } = endpointsHandler({
   },
   [Methods.DELETE]: {
     email: undefined, // Email integration to be implemented when needed
-    handler: async ({ data, user, logger }) => {
+    handler: async ({ data, user, locale, logger }) => {
       logger.debug("Canceling subscription", {
         cancelAtPeriodEnd: data.cancelAtPeriodEnd,
         reason: data.reason,
@@ -59,6 +59,7 @@ export const { GET, POST, PUT, DELETE, tools } = endpointsHandler({
         data,
         userId,
         logger,
+        locale,
       );
     },
   },

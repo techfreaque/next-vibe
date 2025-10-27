@@ -65,7 +65,7 @@ export interface IDbUtilsRepository {
       fastDbReset?: boolean;
     },
     logger: EndpointLogger,
-    locale?: CountryLanguage,
+    locale: CountryLanguage,
   ): Promise<ResponseType<boolean>>;
 
   /**
@@ -241,7 +241,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
       fastDbReset?: boolean;
     } = {},
     logger: EndpointLogger,
-    locale: CountryLanguage = "en-GLOBAL",
+    locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
     try {
       const {

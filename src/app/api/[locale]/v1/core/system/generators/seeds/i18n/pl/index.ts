@@ -45,6 +45,10 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Wystąpił konflikt danych",
       },
+      unsavedChanges: {
+        title: "Niezapisane zmiany",
+        description: "Istnieją niezapisane zmiany",
+      },
     },
     success: {
       title: "Sukces",

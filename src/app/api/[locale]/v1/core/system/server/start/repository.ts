@@ -86,7 +86,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
         try {
           // Import and start the unified task runner
           const { unifiedTaskRunnerRepository } = await import(
-            "../../tasks/unified-runner/repository"
+            "../../unified-backend/tasks/unified-runner/repository"
           );
 
           // Set environment to production
@@ -190,7 +190,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           try {
             // Import task registry (this will auto-generate if needed)
             const { taskRegistry } = await import(
-              "../../tasks/generated/tasks-index"
+              "../../unified-backend/tasks/generated/tasks-index"
             );
 
             logger.info("Task registry loaded successfully", {
@@ -209,7 +209,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
             // Get task runner status
             const { unifiedTaskRunnerRepository } = await import(
-              "../../tasks/unified-runner/repository"
+              "../../unified-backend/tasks/unified-runner/repository"
             );
             const status = unifiedTaskRunnerRepository.getStatus();
 

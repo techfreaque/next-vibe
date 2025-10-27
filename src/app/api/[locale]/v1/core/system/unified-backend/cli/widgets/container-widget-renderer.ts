@@ -62,7 +62,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
 
     // Add container title if present
     if (field.label) {
-      const title = context.translate(field.label);
+      const title = field.label;
       const titleIcon = config.icon || "📊 ";
       const titleWithIcon = titleIcon + title;
       const styledTitle = this.styleText(titleWithIcon, "bold", context);
@@ -71,7 +71,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
 
     // Add container description if present
     if (field.description) {
-      const description = context.translate(field.description);
+      const description = field.description;
       result.push(`   ${description}`);
       result.push("");
     }

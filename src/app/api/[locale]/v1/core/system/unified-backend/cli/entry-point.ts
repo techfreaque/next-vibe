@@ -17,10 +17,7 @@ import type { TFunction } from "@/i18n/core/static-types";
 
 import { helpHandler } from "./widgets/help-handler";
 import { interactiveModeHandler } from "./widgets/interactive-mode-handler";
-import {
-  type CliUserType,
-  getCliUserForCommand,
-} from "../shared/auth/cli-user-factory";
+import { getCliUserForCommand } from "../shared/auth/cli-user-factory";
 import type { EndpointDefinition } from "../shared/core-types";
 import type { EndpointLogger } from "../shared/endpoint-logger";
 import { findRouteFiles } from "../shared/filesystem/directory-scanner";
@@ -37,7 +34,7 @@ interface CliExecutionOptions {
     positionalArgs: string[];
     namedArgs: Record<string, string>;
   };
-  user?: {
+  user: {
     isPublic: boolean;
     id?: string;
     email?: string;
@@ -45,7 +42,7 @@ interface CliExecutionOptions {
     iat?: number;
     exp?: number;
   };
-  locale?: CountryLanguage;
+  locale: CountryLanguage;
   dryRun?: boolean;
   interactive?: boolean;
   verbose?: boolean;
@@ -129,7 +126,7 @@ export class CliEntryPoint {
    */
   async executeCommand(
     command: string,
-    options: CliExecutionOptions = {},
+    options: CliExecutionOptions,
   ): Promise<RouteExecutionResult> {
     if (!this.initialized) {
       this.initialize();
@@ -168,16 +165,13 @@ export class CliEntryPoint {
     };
 
     // Get CLI user for authentication if not provided
-    let cliUser: CliUserType | undefined = options.user as
-      | CliUserType
-      | undefined;
-    if (!cliUser) {
-      cliUser = await getCliUserForCommand(
-        command,
-        this.logger,
-        options.locale || "en-GLOBAL",
-      );
-    }
+    const cliUser = options.user
+      ? options.user
+      : await getCliUserForCommand(
+          command,
+          this.logger,
+          options.locale || "en-GLOBAL",
+        );
 
     // Create execution context
     const context = {
@@ -185,12 +179,7 @@ export class CliEntryPoint {
       data: options.data,
       urlPathParams: options.urlPathParams,
       cliArgs: options.cliArgs, // Pass CLI arguments
-      user: cliUser
-        ? {
-            ...cliUser,
-            isPublic: cliUser.isPublic ?? false,
-          }
-        : undefined,
+      user: cliUser,
       locale: options.locale || this.locale,
       options: {
         dryRun: options.dryRun,
@@ -479,7 +468,7 @@ export class CliEntryPoint {
    * Show help using the help handler
    */
   private async showHelp(
-    options: CliExecutionOptions = {},
+    options: Partial<Pick<CliExecutionOptions, "format">>,
   ): Promise<RouteExecutionResult> {
     const helpOptions = {
       format: "text" as const,
@@ -517,7 +506,13 @@ export class CliEntryPoint {
     logger: EndpointLogger,
   ): Promise<RouteExecutionResult> {
     try {
-      await interactiveModeHandler.startInteractiveMode(this.routes, logger);
+      const cliUser = await getCliUserForCommand("interactive", logger, this.locale);
+      await interactiveModeHandler.startInteractiveMode(
+        cliUser,
+        this.locale,
+        this.routes,
+        logger,
+      );
       return { success: true };
     } catch (error) {
       const parsedError = parseError(error);

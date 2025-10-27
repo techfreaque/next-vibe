@@ -10,7 +10,7 @@ import type {
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
+import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
 /**
  * Valid primitive values that can be rendered
@@ -120,7 +120,7 @@ export interface CLIRenderingOptions {
 export interface WidgetRenderContext {
   options: CLIRenderingOptions;
   depth: number;
-  translate: TFunction;
+  translate: (key: TranslationKey | string, params?: Record<string, string | number>) => string;
   formatValue: (field: ResponseFieldMetadata, value: RenderableValue) => string;
   getFieldIcon: (type: FieldDataType) => string;
   renderEmptyState: (message: string) => string;
@@ -148,10 +148,11 @@ export interface DataFormatter {
   formatText(value: string, options?: { maxLength?: number }): string;
   formatNumber(
     value: number,
+    locale: CountryLanguage,
     options?: { precision?: number; unit?: string },
   ): string;
   formatBoolean(value: boolean): string;
-  formatDate(value: Date | string): string;
+  formatDate(value: Date | string, locale: CountryLanguage): string;
   formatArray(
     value: RenderableValue[],
     options?: { separator?: string; maxItems?: number },

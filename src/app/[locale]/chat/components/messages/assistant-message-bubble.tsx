@@ -19,7 +19,7 @@ import { ToolCallDisplay } from "./tool-call-display";
 interface AssistantMessageBubbleProps {
   message: ChatMessage;
   ttsAutoplay: boolean;
-  locale?: CountryLanguage;
+  locale: CountryLanguage;
   onAnswerAsModel?: (messageId: string) => void;
   onDelete?: (messageId: string) => void;
   showAuthor?: boolean;
@@ -29,7 +29,7 @@ interface AssistantMessageBubbleProps {
 export function AssistantMessageBubble({
   message,
   ttsAutoplay,
-  locale = "en-GLOBAL",
+  locale,
   onAnswerAsModel,
   onDelete,
   showAuthor = false,

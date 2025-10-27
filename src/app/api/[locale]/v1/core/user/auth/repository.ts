@@ -33,12 +33,12 @@ import { leadAuthService } from "../../leads/auth-service";
 import { leads, userLeads } from "../../leads/db";
 import { LeadSource, LeadStatus } from "../../leads/enum";
 import { db } from "../../system/db";
-import { users } from "../db";
 import {
   type AuthContext,
   type AuthPlatform,
   BaseAuthHandler,
 } from "../../system/unified-backend/shared/auth/base-auth-handler";
+import { users } from "../db";
 import type { CompleteUserType } from "../definition";
 import { UserDetailLevel } from "../enum";
 import { sessionRepository } from "../private/session/repository";
@@ -727,9 +727,7 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
 
       // Validate the payload structure
       if (!payload.id || typeof payload.id !== "string") {
-        logger.debug("app.api.v1.core.user.auth.debug.invalidTokenPayload", {
-          payload,
-        });
+        logger.debug("app.api.v1.core.user.auth.debug.invalidTokenPayload");
         return createErrorResponse(
           "app.api.v1.core.user.auth.errors.invalid_token_signature",
           ErrorResponseTypes.UNAUTHORIZED,
@@ -738,19 +736,14 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
 
       // Validate leadId is present
       if (!payload.leadId || typeof payload.leadId !== "string") {
-        logger.debug("app.api.v1.core.user.auth.debug.invalidTokenPayload", {
-          payload,
-          reason: "missing_leadId",
-        });
+        logger.debug("app.api.v1.core.user.auth.debug.invalidTokenPayload");
         return createErrorResponse(
           "app.api.v1.core.user.auth.errors.invalid_token_signature",
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
 
-      logger.debug("app.api.v1.core.user.auth.debug.jwtVerifiedSuccessfully", {
-        payload,
-      });
+      logger.debug("app.api.v1.core.user.auth.debug.jwtVerifiedSuccessfully");
 
       return createSuccessResponse({
         isPublic: false,
@@ -1518,6 +1511,7 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
             context.request,
             requiredRoles,
             logger,
+            context.locale,
           );
 
         case "cli":
@@ -1526,6 +1520,7 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
               context.token,
               requiredRoles,
               logger,
+              context.locale,
             );
           }
           return [];
@@ -1553,14 +1548,11 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
     request: NextRequest,
     requiredRoles: readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<(typeof UserRoleValue)[keyof typeof UserRoleValue][]> {
     try {
       // Get user from request (locale not needed for role check only)
-      const userResult = await this.getCurrentUserTrpc(
-        request,
-        "en-GLOBAL",
-        logger,
-      );
+      const userResult = await this.getCurrentUserTrpc(request, locale, logger);
       if (
         !userResult.success ||
         !userResult.data?.id ||
@@ -1595,14 +1587,11 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
     token: string,
     requiredRoles: readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<(typeof UserRoleValue)[keyof typeof UserRoleValue][]> {
     try {
       // Get user from token (locale not needed for role check only)
-      const userResult = await this.getCurrentUserCli(
-        token,
-        "en-GLOBAL",
-        logger,
-      );
+      const userResult = await this.getCurrentUserCli(token, locale, logger);
       if (
         !userResult.success ||
         !userResult.data?.id ||
@@ -1828,6 +1817,7 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
     // Check authentication
     const userResponse = await userRepository.getUserByAuth(
       {
+        locale,
         detailLevel: UserDetailLevel.COMPLETE,
       },
       logger,

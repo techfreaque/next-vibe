@@ -20,7 +20,7 @@ import {
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
 
-import { UserRole } from "../../../user/user-roles/enum";
+import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**
  * POST endpoint definition - Execute pulse

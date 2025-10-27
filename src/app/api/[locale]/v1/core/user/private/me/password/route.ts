@@ -10,11 +10,12 @@ export const { POST, tools } = endpointsHandler({
   endpoint: passwordEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ user, data, logger }) => {
+    handler: async ({ user, data, locale, logger }) => {
       // TODO has to ask for 2fa code if 2fa is enabled
       return await passwordUpdateRepository.updatePassword(
         user.id,
         data,
+        locale,
         logger,
       );
     },

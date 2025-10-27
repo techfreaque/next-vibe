@@ -3,6 +3,7 @@ import inquirer from "inquirer";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import type {
   ReleaseOrchestrationOptions,
@@ -74,7 +75,8 @@ export async function ciReleaseCommand(
     ciMode: true,
   };
 
-  const success = executor.executeReleaseTarget(targetToRelease, options);
+  const { t } = simpleT("en-GLOBAL");
+  const success = executor.executeReleaseTarget(targetToRelease, options, t);
   if (!success) {
     throw new Error(`Release failed for: ${targetToRelease.directory}`);
   }
@@ -106,7 +108,8 @@ export function forceUpdateAllCommand(
   }
 
   const executor = new ReleaseExecutor(logger, rootDir);
-  executor.executeForceUpdateAll(validTargets);
+  const { t } = simpleT("en-GLOBAL");
+  executor.executeForceUpdateAll(validTargets, t);
 }
 
 /**
@@ -139,7 +142,8 @@ export async function releaseAllCommand(
   };
 
   const executor = new ReleaseExecutor(logger, rootDir);
-  await executor.executeReleaseOrchestration(validTargets, options);
+  const { t } = simpleT("en-GLOBAL");
+  await executor.executeReleaseOrchestration(validTargets, options, t);
 }
 
 /**
@@ -206,7 +210,8 @@ export async function forceReleaseCommand(
   }
 
   const executor = new ReleaseExecutor(logger, rootDir);
-  await executor.executeForceRelease(validTargets, selectedVersionBump);
+  const { t } = simpleT("en-GLOBAL");
+  await executor.executeForceRelease(validTargets, selectedVersionBump, t);
 }
 
 /**
@@ -215,6 +220,7 @@ export async function forceReleaseCommand(
 export async function continueReleaseCommand(
   logger: EndpointLogger,
   rootDir: string,
+  t: ReturnType<typeof simpleT>["t"],
 ): Promise<void> {
   logger.info("🔄 Continue Release from Previous State");
 
@@ -261,7 +267,7 @@ export async function continueReleaseCommand(
   };
 
   const executor = new ReleaseExecutor(logger, rootDir);
-  await executor.executeReleaseOrchestration(existingState.targets, options);
+  await executor.executeReleaseOrchestration(existingState.targets, options, t);
 }
 
 /**
@@ -270,6 +276,7 @@ export async function continueReleaseCommand(
 export function showReleaseStatusCommand(
   logger: EndpointLogger,
   rootDir: string,
+  t: ReturnType<typeof simpleT>["t"],
 ): void {
   logger.info("📊 Release Status");
 
@@ -317,5 +324,6 @@ export async function weeklyUpdateCommand(
   logger.info("📅 Weekly Dependency Update");
 
   const executor = new ReleaseExecutor(logger, rootDir);
-  await executor.executeWeeklyUpdate(branchName);
+  const { t } = simpleT("en-GLOBAL");
+  await executor.executeWeeklyUpdate(branchName, t);
 }

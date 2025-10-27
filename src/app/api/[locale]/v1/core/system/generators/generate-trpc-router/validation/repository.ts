@@ -17,23 +17,10 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
-// Types for TRPC validation request/response
-export interface TRPCValidationRequestOutput {
-  operation: string[];
-  filePath?: string;
-  options?: {
-    apiDir?: string;
-    fix?: boolean;
-    verbose?: boolean;
-    generateReport?: boolean;
-  };
-}
-
-export interface TRPCValidationResponseOutput {
-  success: boolean;
-  operation: string;
-  result: ValidationResult;
-}
+import type {
+  TRPCValidationRequestOutput,
+  TRPCValidationResponseOutput,
+} from "./definition";
 
 /**
  * TRPC Validation Options interface
@@ -108,13 +95,13 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
   ): Promise<ResponseType<TRPCValidationResponseOutput>> {
     try {
       logger.info("Starting TRPC validation operation execution", {
-        operations: data.operation,
+        operations: data.operations,
         filePath: data.filePath,
         options: data.options,
       });
 
       // For multi-select operations, execute the first one (in real implementation, might execute all)
-      const operation = data.operation[0];
+      const operation = data.operations[0];
       const filePath = data.filePath;
       const options = (data.options || {}) as {
         apiDir?: string;

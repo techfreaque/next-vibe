@@ -1,6 +1,29 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  title: "TRPC-Validierung",
+  description: "Validieren Sie die TRPC-Integration über Routendateien",
+  category: "Generatoren",
+  tags: {
+    trpc: "tRPC",
+    validation: "Validierung",
+  },
+  operations: {
+    validateIntegration: "Integration validieren",
+    validateRouteFile: "Routendatei validieren",
+    generateReport: "Bericht generieren",
+    fixRoutes: "Routen reparieren",
+    checkRouterExists: "Router existiert prüfen",
+  },
+  severity: {
+    error: "Fehler",
+    warning: "Warnung",
+    info: "Info",
+  },
+  success: {
+    title: "TRPC-Validierung erfolgreich",
+    description: "TRPC-Validierung erfolgreich abgeschlossen",
+  },
   errors: {
     validation: {
       title: "Validierung fehlgeschlagen",
@@ -37,6 +60,10 @@ export const translations: typeof enTranslations = {
     network: {
       title: "Netzwerkfehler",
       description: "Ein Netzwerkfehler ist aufgetreten",
+    },
+    executionFailed: {
+      title: "Ausführung fehlgeschlagen",
+      description: "TRPC-Validierungsvorgang fehlgeschlagen",
     },
   },
 };

@@ -62,16 +62,16 @@ export interface DockerOperationsRepository {
 
   dockerComposeUp(
     logger: EndpointLogger,
+    locale: CountryLanguage,
     composeFile?: string,
     timeout?: number,
-    locale?: CountryLanguage,
   ): Promise<ResponseType<boolean>>;
 
   dockerComposeDown(
     logger: EndpointLogger,
+    locale: CountryLanguage,
     composeFile?: string,
     timeout?: number,
-    locale?: CountryLanguage,
   ): Promise<ResponseType<boolean>>;
 }
 
@@ -135,9 +135,9 @@ export class DockerOperationsRepositoryImpl
    */
   async dockerComposeDown(
     logger: EndpointLogger,
+    locale: CountryLanguage,
     composeFile = "docker-compose-dev.yml",
     timeout = 30000,
-    locale: CountryLanguage = "en-GLOBAL",
   ): Promise<ResponseType<boolean>> {
     try {
       const { t } = simpleT(locale);
@@ -178,9 +178,9 @@ export class DockerOperationsRepositoryImpl
    */
   async dockerComposeUp(
     logger: EndpointLogger,
+    locale: CountryLanguage,
     composeFile = "docker-compose-dev.yml",
     timeout = 60000,
-    locale: CountryLanguage = "en-GLOBAL",
   ): Promise<ResponseType<boolean>> {
     try {
       const { t } = simpleT(locale);
@@ -226,7 +226,7 @@ export class DockerOperationsRepositoryImpl
       timeout?: number;
       hideStandardLogs?: boolean;
       description?: string;
-      locale?: CountryLanguage;
+      locale: CountryLanguage;
       logger: EndpointLogger;
     },
   ): Promise<{ success: boolean; output: string; error?: string }> {
@@ -234,7 +234,7 @@ export class DockerOperationsRepositoryImpl
       timeout = 30000,
       hideStandardLogs = true,
       description,
-      locale = "en-GLOBAL",
+      locale,
       logger,
     } = options;
 

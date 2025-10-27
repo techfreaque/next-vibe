@@ -84,7 +84,7 @@ export interface UserFetchOptions {
   includeInactive?: boolean;
   roles?: (typeof UserRoleValue)[keyof typeof UserRoleValue][];
   detailLevel?: UserDetailLevelType;
-  locale?: CountryLanguage; // Required for lead creation in authentication
+  locale: CountryLanguage; // Required for lead creation in authentication
 }
 
 /**

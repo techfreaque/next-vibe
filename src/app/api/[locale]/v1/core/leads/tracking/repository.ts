@@ -176,11 +176,11 @@ export interface ILeadTrackingRepository {
     leadId: string,
     campaignId: string,
     stage: string,
+    locale: CountryLanguage,
     destinationUrl?: string,
-    locale?: CountryLanguage,
   ): string;
 
-  isTrackingUrl(url: string, locale?: CountryLanguage): boolean;
+  isTrackingUrl(url: string, locale: CountryLanguage): boolean;
 
   ensureFullUrl(url: string, baseUrl: string): string;
 
@@ -640,8 +640,8 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         "Content-Length": pixel.length.toString(),
         // eslint-disable-next-line i18next/no-literal-string
         "Cache-Control": "no-cache, no-store, must-revalidate",
-        Pragma: "no-cache",
-        Expires: "0",
+        "Pragma": "no-cache",
+        "Expires": "0",
       },
     });
   }
@@ -1284,8 +1284,8 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
     leadId: string,
     campaignId: string,
     stage: string,
+    locale: CountryLanguage,
     destinationUrl?: string,
-    locale: CountryLanguage = "en-GLOBAL",
   ): string {
     const finalDestinationUrl = destinationUrl || `${baseUrl}/`;
 
@@ -1312,7 +1312,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    * Check if URL is already a tracking URL
    * Migrated from utils.ts
    */
-  isTrackingUrl(url: string, locale?: CountryLanguage): boolean {
+  isTrackingUrl(url: string, locale: CountryLanguage): boolean {
     if (url.includes("/track?")) {
       return true;
     }

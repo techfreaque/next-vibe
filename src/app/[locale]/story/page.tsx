@@ -69,6 +69,7 @@ export default async function HomePage({
   // Get user with proper error handling
   const userResponse = await userRepository.getUserByAuth(
     {
+      locale,
       roles: [UserRole.CUSTOMER],
       detailLevel: UserDetailLevel.COMPLETE,
     },

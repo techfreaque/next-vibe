@@ -48,7 +48,6 @@ export class EmailService {
         lead.id,
         context.campaignId,
         stage,
-        undefined, // destinationUrl - use default
         context.locale, // Pass the locale from context
       );
 

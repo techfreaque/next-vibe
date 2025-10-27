@@ -7,6 +7,8 @@ import { z } from "zod";
 import { AwsSnsAwsRegions } from "@/app/api/[locale]/v1/core/sms/providers/aws-sns-enum";
 import { SmsProviders } from "@/app/api/[locale]/v1/core/sms/utils-enum";
 import { envClientSchema, envValidationLogger } from "@/config/env-client";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { defaultLocale } from "@/i18n/core/config";
 
 // We intentionally disable process at the type level for react native and typesafety
 declare const process: {
@@ -215,6 +217,10 @@ export const envSchema = envClientSchema.extend({
 
   // CLI Configuration
   VIBE_CLI_USER_EMAIL: z.string().email(),
+
+  VIBE_LOCALE: (z.string() as z.Schema<CountryLanguage>)
+    .optional()
+    .default(defaultLocale),
 });
 
 export type Env = z.infer<typeof envSchema>;

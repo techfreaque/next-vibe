@@ -6,32 +6,18 @@
 
 import "server-only";
 
+import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/handler-types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-
-/**
- * CLI User Type
- * Represents a CLI system user with admin privileges
- */
-export interface CliUserType {
-  isPublic: false;
-  id: string;
-  leadId?: string;
-  email?: string;
-  role?: string;
-  iat?: number;
-  exp?: number;
-}
 
 /**
  * Default CLI user configuration
  */
 const DEFAULT_CLI_USER_ID = "00000000-0000-0000-0000-000000000001";
-const DEFAULT_CLI_USER_EMAIL = "cli@system.local";
-const DEFAULT_CLI_USER_ROLE = "ADMIN";
 
 /**
  * Get CLI user email from environment or use default
@@ -44,15 +30,14 @@ export function getCliUserEmail(): string {
  * Create a default CLI user payload
  * Used as fallback when database user doesn't exist (e.g., before seeds)
  */
-export function createDefaultCliUser(): CliUserType {
+export function createDefaultCliUser(): InferJwtPayloadTypeFromRoles<
+  readonly (typeof UserRoleValue)[]
+> {
   return {
     isPublic: false,
     id: DEFAULT_CLI_USER_ID,
-    email: DEFAULT_CLI_USER_EMAIL,
-    role: DEFAULT_CLI_USER_ROLE,
-    iat: Math.floor(Date.now() / 1000),
-    exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour expiry
-  };
+    leadId: DEFAULT_CLI_USER_ID,
+  } as InferJwtPayloadTypeFromRoles<readonly (typeof UserRoleValue)[]>;
 }
 
 /**
@@ -60,18 +45,13 @@ export function createDefaultCliUser(): CliUserType {
  */
 export function createCliUserFromDb(
   userId: string,
-  email: string,
   leadId?: string,
-): CliUserType {
+): InferJwtPayloadTypeFromRoles<readonly (typeof UserRoleValue)[]> {
   return {
     isPublic: false,
     id: userId,
-    leadId,
-    email,
-    role: DEFAULT_CLI_USER_ROLE,
-    iat: Math.floor(Date.now() / 1000),
-    exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour expiry
-  };
+    leadId: leadId || userId,
+  } as InferJwtPayloadTypeFromRoles<readonly (typeof UserRoleValue)[]>;
 }
 
 /**
@@ -100,8 +80,8 @@ export function createMockUser(): {
  */
 export async function getCliUser(
   logger: EndpointLogger,
-  locale: CountryLanguage = "en-GLOBAL",
-): Promise<CliUserType> {
+  locale: CountryLanguage,
+): Promise<InferJwtPayloadTypeFromRoles<readonly (typeof UserRoleValue)[]>> {
   try {
     const cliUserEmail = getCliUserEmail();
 
@@ -126,10 +106,9 @@ export async function getCliUser(
     }
 
     // Fallback to default CLI user when database user doesn't exist
-    logger.debug(
-      "CLI user not found in database, using default CLI user",
-      { email: cliUserEmail },
-    );
+    logger.debug("CLI user not found in database, using default CLI user", {
+      email: cliUserEmail,
+    });
 
     return createDefaultCliUser();
   } catch (error) {
@@ -148,7 +127,9 @@ export async function getCliUser(
  *
  * @returns Default CLI user payload
  */
-export function getCliUserSync(): CliUserType {
+export function getCliUserSync(): InferJwtPayloadTypeFromRoles<
+  readonly (typeof UserRoleValue)[]
+> {
   return createDefaultCliUser();
 }
 
@@ -162,7 +143,6 @@ export function getCliUserSync(): CliUserType {
 export function needsFallbackAuth(command: string): boolean {
   const noDbCommands = [
     "seed",
-    "db:seed",
     "typecheck",
     "tc",
     "lint",
@@ -170,8 +150,7 @@ export function needsFallbackAuth(command: string): boolean {
     "check",
     "c",
     "vibe-check",
-    "db:",
-  ];
+  ] as const;
 
   return noDbCommands.some((cmd) => command.includes(cmd));
 }
@@ -188,8 +167,8 @@ export function needsFallbackAuth(command: string): boolean {
 export async function getCliUserForCommand(
   command: string,
   logger: EndpointLogger,
-  locale: CountryLanguage = "en-GLOBAL",
-): Promise<CliUserType> {
+  locale: CountryLanguage,
+): Promise<InferJwtPayloadTypeFromRoles<readonly (typeof UserRoleValue)[]>> {
   if (needsFallbackAuth(command)) {
     logger.debug("Using fallback CLI authentication for command", { command });
     return createDefaultCliUser();
@@ -197,4 +176,3 @@ export async function getCliUserForCommand(
 
   return await getCliUser(logger, locale);
 }
-

@@ -3,6 +3,7 @@
  * Abstract base class for all widget renderers with common utilities
  */
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import chalk from "chalk";
 
 import { getBaseFormatter } from "../../formatters/base-formatter";
@@ -185,11 +186,13 @@ class DefaultDataFormatter implements DataFormatter {
 
   formatNumber(
     value: number,
+    locale: CountryLanguage,
     options?: { precision?: number; unit?: string },
   ): string {
     return this.baseFormatter.formatNumber(value, {
       precision: options?.precision,
       unit: options?.unit,
+      locale,
     });
   }
 
@@ -197,9 +200,8 @@ class DefaultDataFormatter implements DataFormatter {
     return this.baseFormatter.formatBoolean(value, { style: "symbol" });
   }
 
-  formatDate(value: Date | string): string {
-    const date = typeof value === "string" ? new Date(value) : value;
-    return date.toLocaleDateString();
+  formatDate(value: Date | string, locale: CountryLanguage): string {
+    return this.baseFormatter.formatDate(value, locale, {});
   }
 
   formatArray(

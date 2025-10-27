@@ -29,7 +29,7 @@ export interface MCPExecuteRepository {
     data: MCPExecuteRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    locale?: CountryLanguage,
+    locale: CountryLanguage,
   ): Promise<MCPToolCallResult>;
 }
 
@@ -44,7 +44,7 @@ export class MCPExecuteRepositoryImpl implements MCPExecuteRepository {
     data: MCPExecuteRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    locale: CountryLanguage = "en-GLOBAL",
+    locale: CountryLanguage,
   ): Promise<MCPToolCallResult> {
     logger.info("[MCP Execute Repository] Executing tool", {
       toolName: data.name,

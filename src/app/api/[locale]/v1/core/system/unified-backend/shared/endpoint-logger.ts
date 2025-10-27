@@ -27,11 +27,9 @@ export function createEndpointLogger(
   };
 
   const formatMessage = (level: string, message: string): string => {
-    // Try to translate if it looks like a translation key, otherwise use as-is
-    const translatedMessage = message.includes(".")
-      ? t(message)
-      : message;
-    return `[${getElapsedTime()}] ${translatedMessage}`;
+    // Messages are plain strings, not translation keys
+    // Translation keys should be handled by the caller if needed
+    return `[${getElapsedTime()}] ${message}`;
   };
 
   return {
@@ -49,11 +47,8 @@ export function createEndpointLogger(
     },
 
     vibe(message: string, ...metadata: LoggerMetadata[]): void {
-      // Special vibe formatting
-      const translatedMessage = message.includes(".")
-        ? t(message)
-        : message;
-      console.log(`[${getElapsedTime()}] ${translatedMessage}`, ...metadata);
+      // Special vibe formatting - messages are plain strings
+      console.log(`[${getElapsedTime()}] ${message}`, ...metadata);
     },
 
     debug(message: string, ...metadata: LoggerMetadata[]): void {

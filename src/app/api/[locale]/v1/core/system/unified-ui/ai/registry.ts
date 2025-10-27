@@ -67,7 +67,7 @@ export class ToolRegistry extends BaseRegistry implements IToolRegistry {
    * @param criteria - Additional filter criteria (optional)
    */
   getEndpoints(
-    user?: AIToolExecutionContext["user"],
+    user: AIToolExecutionContext["user"],
     platform?: Platform,
     criteria?: ToolFilterCriteria,
   ): DiscoveredEndpoint[] {

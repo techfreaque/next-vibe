@@ -176,7 +176,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
       return createSuccessResponse(response);
     } catch (error) {
       return createErrorResponse(
-        "app.error.errorTypes.internal_error",
+        "app.api.v1.core.shared.errorTypes.internal_error",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -195,7 +195,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
       return createSuccessResponse(validation.valid);
     } catch (error) {
       return createErrorResponse(
-        "app.error.errorTypes.validation_error",
+        "app.api.v1.core.shared.errorTypes.validation_error",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );
@@ -211,7 +211,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
       return createSuccessResponse(help);
     } catch (error) {
       return createErrorResponse(
-        "app.error.errorTypes.internal_error",
+        "app.api.v1.core.shared.errorTypes.internal_error",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parseError(error).message },
       );

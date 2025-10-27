@@ -80,7 +80,7 @@ export class UnifiedTaskRunnerRepositoryImpl
   }> = [];
 
   // Execution context stored when runner starts
-  private locale: CountryLanguage = "en-GLOBAL";
+  private locale: CountryLanguage;
   private logger!: EndpointLogger;
   private cronUser: JwtPrivatePayloadType = CRON_SYSTEM_USER;
 

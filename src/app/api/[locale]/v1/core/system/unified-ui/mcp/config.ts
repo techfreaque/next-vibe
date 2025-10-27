@@ -9,6 +9,7 @@
 
 import "server-only";
 
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { MCP_CONFIG } from "../shared/config";
@@ -22,7 +23,7 @@ export const mcpConfig: MCPServerConfig = {
   // eslint-disable-next-line i18next/no-literal-string
   name: "Vibe MCP Server",
   version: "1.0.0",
-  locale: (process.env.VIBE_LOCALE as CountryLanguage) || "en-GLOBAL",
+  locale: env.VIBE_LOCALE,
   debug: process.env.DEBUG === "true" || process.env.VIBE_LOG_LEVEL === "debug",
   capabilities: (MCP_CONFIG.platformSpecific?.capabilities as {
     tools: boolean;

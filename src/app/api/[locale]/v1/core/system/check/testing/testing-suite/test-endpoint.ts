@@ -8,6 +8,7 @@ import type z from "zod";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/core-types";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import {
   UserRole,
   type UserRoleValue,
@@ -148,9 +149,21 @@ export function testEndpoint<
               : undefined;
 
             // Test with a user that has the endpoint's allowed roles
+            const mockUser: JwtPayloadType = endpoint.requiresAuthentication()
+              ? {
+                  isPublic: false,
+                  id: "test-user-id",
+                  leadId: "test-lead-id",
+                }
+              : {
+                  isPublic: true,
+                  leadId: "test-lead-id",
+                };
+
             const response = await testRunner.executeWith({
               data: payload,
               urlPathParams: exampleUrlPathParams as TUrlVariablesOutput,
+              user: mockUser,
             });
 
             // Expect success

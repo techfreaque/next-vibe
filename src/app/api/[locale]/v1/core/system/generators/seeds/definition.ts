@@ -36,7 +36,7 @@ export const seedsGenerationResponseSchema = z.object({
 /**
  * POST endpoint definition - Generate seeds
  */
-const POST = createEndpoint({
+const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "generators", "seeds"],
   title: "app.api.v1.core.system.generators.seeds.post.title",
@@ -173,40 +173,40 @@ const POST = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.v1.core.system.generators.seeds.post.errors.validation.title" as const,
-      description: "app.api.v1.core.system.generators.seeds.post.errors.validation.description" as const,
+      title: "app.api.v1.core.system.generators.seeds.post.errors.validation.title",
+      description: "app.api.v1.core.system.generators.seeds.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.v1.core.system.generators.seeds.post.errors.unauthorized.title" as const,
-      description: "app.api.v1.core.system.generators.seeds.post.errors.unauthorized.description" as const,
+      title: "app.api.v1.core.system.generators.seeds.post.errors.unauthorized.title",
+      description: "app.api.v1.core.system.generators.seeds.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.v1.core.system.generators.seeds.post.errors.forbidden.title" as const,
-      description: "app.api.v1.core.system.generators.seeds.post.errors.forbidden.description" as const,
+      title: "app.api.v1.core.system.generators.seeds.post.errors.forbidden.title",
+      description: "app.api.v1.core.system.generators.seeds.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.v1.core.system.generators.seeds.post.errors.notFound.title" as const,
-      description: "app.api.v1.core.system.generators.seeds.post.errors.notFound.description" as const,
+      title: "app.api.v1.core.system.generators.seeds.post.errors.notFound.title",
+      description: "app.api.v1.core.system.generators.seeds.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.v1.core.system.generators.seeds.post.errors.server.title" as const,
-      description: "app.api.v1.core.system.generators.seeds.post.errors.server.description" as const,
+      title: "app.api.v1.core.system.generators.seeds.post.errors.server.title",
+      description: "app.api.v1.core.system.generators.seeds.post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.v1.core.system.generators.seeds.post.errors.unknown.title" as const,
-      description: "app.api.v1.core.system.generators.seeds.post.errors.unknown.description" as const,
+      title: "app.api.v1.core.system.generators.seeds.post.errors.unknown.title",
+      description: "app.api.v1.core.system.generators.seeds.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.v1.core.system.generators.seeds.post.errors.unsavedChanges.title" as const,
-      description: "app.api.v1.core.system.generators.seeds.post.errors.unsavedChanges.description" as const,
+      title: "app.api.v1.core.system.generators.seeds.post.errors.unsavedChanges.title",
+      description: "app.api.v1.core.system.generators.seeds.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.v1.core.system.generators.seeds.post.errors.conflict.title" as const,
-      description: "app.api.v1.core.system.generators.seeds.post.errors.conflict.description" as const,
+      title: "app.api.v1.core.system.generators.seeds.post.errors.conflict.title",
+      description: "app.api.v1.core.system.generators.seeds.post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.v1.core.system.generators.seeds.post.errors.network.title" as const,
-      description: "app.api.v1.core.system.generators.seeds.post.errors.network.description" as const,
+      title: "app.api.v1.core.system.generators.seeds.post.errors.network.title",
+      description: "app.api.v1.core.system.generators.seeds.post.errors.network.description",
     },
   },
   successTypes: {
@@ -214,6 +214,12 @@ const POST = createEndpoint({
     description: "app.api.v1.core.system.generators.seeds.post.success.description",
   },
 });
+
+// Export types for repository usage
+export type SeedsGeneratorRequestInput = typeof POST.types.RequestInput;
+export type SeedsGeneratorRequestOutput = typeof POST.types.RequestOutput;
+export type SeedsGeneratorResponseInput = typeof POST.types.ResponseInput;
+export type SeedsGeneratorResponseOutput = typeof POST.types.ResponseOutput;
 
 const seedsGeneratorEndpoints = { POST };
 export default seedsGeneratorEndpoints;

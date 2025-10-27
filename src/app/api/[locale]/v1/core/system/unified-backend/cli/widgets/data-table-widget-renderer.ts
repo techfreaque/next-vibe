@@ -3,6 +3,7 @@
  * Handles DATA_TABLE widget type with column definitions and formatting
  */
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import {
   FieldDataType,
   WidgetType,
@@ -43,7 +44,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
       );
     }
 
-    const config = this.getTableConfig(field);
+    const config = this.getTableConfig(field, context.options.locale);
 
     if (config.columns && config.columns.length > 0) {
       return this.renderTableWithColumns(data, config, context);
@@ -52,7 +53,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
     }
   }
 
-  private getTableConfig(field: ResponseFieldMetadata): TableRenderConfig {
+  private getTableConfig(field: ResponseFieldMetadata, locale: CountryLanguage): TableRenderConfig {
     const columns =
       field.columns?.map((col) => ({
         key: col.key,
@@ -60,7 +61,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
         type: col.type,
         width: col.width,
         align: "left" as const,
-        formatter: this.getColumnFormatter(col.type),
+        formatter: this.getColumnFormatter(col.type, locale),
       })) || [];
 
     const config = field.config || {};
@@ -160,12 +161,13 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
 
   private getColumnFormatter(
     type: FieldDataType,
+    locale: CountryLanguage,
   ): (value: RenderableValue) => string {
     switch (type) {
       case FieldDataType.NUMBER:
         return (value) => {
           if (typeof value === "number") {
-            return this.formatter.formatNumber(value);
+            return this.formatter.formatNumber(value, locale);
           }
           return this.safeToString(value);
         };
@@ -179,7 +181,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
       case FieldDataType.DATE:
         return (value) => {
           if (typeof value === "string" || value instanceof Date) {
-            return this.formatter.formatDate(value);
+            return this.formatter.formatDate(value, locale);
           }
           return this.safeToString(value);
         };
@@ -352,7 +354,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
         label: key,
         type: fieldType,
         align: "left" as const,
-        formatter: this.getColumnFormatter(fieldType),
+        formatter: this.getColumnFormatter(fieldType, context.options.locale),
       };
     });
 

@@ -195,7 +195,7 @@ async function setPackageBuildConfig({
     dts({
       include: packageConfig.dtsInclude,
       entryRoot: packageConfig.dtsEntryRoot,
-    }),
+    }) as PluginOption,
   );
   const outPutFilesNameWithoutExtension = basename(
     fileConfig.options.output,

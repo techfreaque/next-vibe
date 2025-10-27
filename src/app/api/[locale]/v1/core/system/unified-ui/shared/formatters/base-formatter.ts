@@ -6,6 +6,8 @@
 
 import "server-only";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 /**
  * Renderable value types
  */
@@ -33,7 +35,7 @@ export interface TextFormatOptions {
 export interface NumberFormatOptions {
   precision?: number;
   unit?: string;
-  locale?: string;
+  locale: CountryLanguage;
   style?: "decimal" | "currency" | "percent";
   currency?: string;
 }
@@ -81,11 +83,11 @@ export class BaseDataFormatter {
   /**
    * Format number with precision and unit
    */
-  formatNumber(value: number, options: NumberFormatOptions = {}): string {
+  formatNumber(value: number, options: NumberFormatOptions): string {
     const {
       precision = 2,
       unit,
-      locale = "en-US",
+      locale,
       style = "decimal",
       currency,
     } = options;
@@ -158,9 +160,12 @@ export class BaseDataFormatter {
    */
   formatDate(
     value: Date | string | number,
-    options: { format?: "short" | "long" | "iso"; locale?: string } = {},
+    locale: CountryLanguage,
+    options: {
+      format?: "short" | "long" | "iso";
+    },
   ): string {
-    const { format = "short", locale = "en-US" } = options;
+    const { format = "short" } = options;
     const date = value instanceof Date ? value : new Date(value);
 
     if (format === "iso") {

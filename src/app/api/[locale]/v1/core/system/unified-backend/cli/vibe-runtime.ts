@@ -28,7 +28,7 @@ export const binaryStartTime = Date.now();
 interface CliOptions {
   data?: string;
   userType?: string;
-  locale?: CountryLanguage;
+  locale: CountryLanguage;
   output?: string;
   verbose?: boolean;
   interactive?: boolean;
@@ -44,7 +44,7 @@ interface ListOptions {
   examples?: boolean;
   parameters?: boolean;
   verbose?: boolean;
-  locale?: CountryLanguage;
+  locale: CountryLanguage;
 }
 
 /**
@@ -381,7 +381,7 @@ program
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-i, --interactive",
-    t("app.api.v1.core.system.unifiedBackend.cli.vibe.interactive"),
+    t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.interactive"),
     false,
   )
   .option("--dry-run", t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.dryRun"), false)
@@ -433,6 +433,10 @@ program
         if (!command) {
           logger.info(t("app.api.v1.core.system.unifiedBackend.cli.vibe.startingUp"));
           await cli.executeCommand("interactive", {
+            user: {
+              isPublic: false,
+              id: "00000000-0000-0000-0000-000000000001",
+            },
             locale: options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
             output: (options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT) as
               | "table"
@@ -536,7 +540,7 @@ program
 // Help command
 program
   .command("help")
-  .description(t("app.api.v1.core.system.unifiedBackend.cli.vibe.help"))
+  .description(t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.title"))
   .action(() => {
     program.help();
   });

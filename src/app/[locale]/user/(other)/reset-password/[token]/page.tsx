@@ -70,7 +70,10 @@ export default async function ResetPasswordConfirmPage({
 
   const logger = createEndpointLogger(false, Date.now(), locale);
   // Check if user is already logged in using repository-first pattern
-  const verifiedUserResponse = await userRepository.getUserByAuth({}, logger);
+  const verifiedUserResponse = await userRepository.getUserByAuth(
+    { locale },
+    logger,
+  );
 
   // Redirect to dashboard if already authenticated
   if (verifiedUserResponse.success && verifiedUserResponse.data) {

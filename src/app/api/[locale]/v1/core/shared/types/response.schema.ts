@@ -206,143 +206,143 @@ export type ErrorResponseTypesElements = {
 
 export const ErrorResponseTypes: ErrorResponseTypesElements = {
   EXTERNAL_SERVICE_ERROR: {
-    errorKey: "app.error.errorTypes.external_service_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.external_service_error",
     errorCode: 500,
   },
   TWO_FACTOR_REQUIRED: {
-    errorKey: "app.error.errorTypes.two_factor_required",
+    errorKey: "app.api.v1.core.shared.errorTypes.two_factor_required",
     errorCode: 202,
   },
   FORBIDDEN: {
-    errorKey: "app.error.errorTypes.forbidden",
+    errorKey: "app.api.v1.core.shared.errorTypes.forbidden",
     errorCode: 403,
   },
   BAD_REQUEST: {
-    errorKey: "app.error.errorTypes.bad_request",
+    errorKey: "app.api.v1.core.shared.errorTypes.bad_request",
     errorCode: 400,
   },
   UNKNOWN_ERROR: {
-    errorKey: "app.error.errorTypes.unknown_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.unknown_error",
     errorCode: 500,
   },
   DATABASE_ERROR: {
-    errorKey: "app.error.errorTypes.database_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.database_error",
     errorCode: 500,
   },
   VALIDATION_ERROR: {
-    errorKey: "app.error.errorTypes.validation_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.validation_error",
     errorCode: 400,
   },
   AUTH_ERROR: {
-    errorKey: "app.error.errorTypes.auth_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.auth_error",
     errorCode: 401,
   },
   UNAUTHORIZED: {
-    errorKey: "app.error.errorTypes.unauthorized",
+    errorKey: "app.api.v1.core.shared.errorTypes.unauthorized",
     errorCode: 403,
   },
   NOT_FOUND: {
-    errorKey: "app.error.errorTypes.not_found",
+    errorKey: "app.api.v1.core.shared.errorTypes.not_found",
     errorCode: 404,
   },
   EMAIL_ERROR: {
-    errorKey: "app.error.errorTypes.email_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.email_error",
     errorCode: 500,
   },
   INTERNAL_ERROR: {
-    errorKey: "app.error.errorTypes.internal_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.internal_error",
     errorCode: 500,
   },
   NO_RESPONSE_DATA: {
-    errorKey: "app.error.errorTypes.no_response_data",
+    errorKey: "app.api.v1.core.shared.errorTypes.no_response_data",
     errorCode: 500,
   },
   HTTP_ERROR: {
-    errorKey: "app.error.errorTypes.http_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.http_error",
     errorCode: 500,
   },
   SMS_ERROR: {
-    errorKey: "app.error.errorTypes.sms_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.sms_error",
     errorCode: 500,
   },
   TOKEN_EXPIRED_ERROR: {
-    errorKey: "app.error.errorTypes.token_expired_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.token_expired_error",
     errorCode: 401,
   },
   PERMISSION_ERROR: {
-    errorKey: "app.error.errorTypes.permission_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.permission_error",
     errorCode: 403,
   },
   INVALID_TOKEN_ERROR: {
-    errorKey: "app.error.errorTypes.invalid_token_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.invalid_token_error",
     errorCode: 401,
   },
   PERMISSION_DENIED: {
-    errorKey: "app.error.errorTypes.permission_denied",
+    errorKey: "app.api.v1.core.shared.errorTypes.permission_denied",
     errorCode: 403,
   },
   INVALID_CREDENTIALS_ERROR: {
-    errorKey: "app.error.errorTypes.invalid_credentials_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.invalid_credentials_error",
     errorCode: 401,
   },
   INVALID_REQUEST_ERROR: {
-    errorKey: "app.error.errorTypes.invalid_request_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.invalid_request_error",
     errorCode: 400,
   },
   INVALID_DATA_ERROR: {
-    errorKey: "app.error.errorTypes.invalid_data_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.invalid_data_error",
     errorCode: 400,
   },
   INVALID_INPUT_ERROR: {
-    errorKey: "app.error.errorTypes.invalid_input_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.invalid_input_error",
     errorCode: 400,
   },
   INVALID_PAYLOAD_ERROR: {
-    errorKey: "app.error.errorTypes.invalid_payload_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.invalid_payload_error",
     errorCode: 400,
   },
   INVALID_FORMAT_ERROR: {
-    errorKey: "app.error.errorTypes.invalid_format_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.invalid_format_error",
     errorCode: 400,
   },
   INVALID_PARAMETER_ERROR: {
-    errorKey: "app.error.errorTypes.invalid_parameter_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.invalid_parameter_error",
     errorCode: 400,
   },
   INVALID_QUERY_ERROR: {
-    errorKey: "app.error.errorTypes.invalid_query_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.invalid_query_error",
     errorCode: 400,
   },
   INVALID_URL_ERROR: {
-    errorKey: "app.error.errorTypes.invalid_url_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.invalid_url_error",
     errorCode: 400,
   },
   INVALID_PATH_ERROR: {
-    errorKey: "app.error.errorTypes.invalid_path_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.invalid_path_error",
     errorCode: 400,
   },
   INVALID_METHOD_ERROR: {
-    errorKey: "app.error.errorTypes.invalid_method_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.invalid_method_error",
     errorCode: 400,
   },
   INVALID_STATUS_ERROR: {
-    errorKey: "app.error.errorTypes.invalid_status_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.invalid_status_error",
     errorCode: 400,
   },
   INVALID_RESPONSE_ERROR: {
-    errorKey: "app.error.errorTypes.invalid_response_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.invalid_response_error",
     errorCode: 400,
   },
   PAYMENT_ERROR: {
-    errorKey: "app.error.errorTypes.payment_failed",
+    errorKey: "app.api.v1.core.shared.errorTypes.payment_failed",
     errorCode: 400,
   },
   PARTIAL_FAILURE: {
-    errorKey: "app.error.errorTypes.partial_failure",
+    errorKey: "app.api.v1.core.shared.errorTypes.partial_failure",
     errorCode: 207,
   },
   CONFLICT: {
-    errorKey: "app.error.errorTypes.unknown_error",
+    errorKey: "app.api.v1.core.shared.errorTypes.unknown_error",
     errorCode: 409,
   },
 } as const;

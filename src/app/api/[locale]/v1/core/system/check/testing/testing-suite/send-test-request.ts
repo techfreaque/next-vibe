@@ -53,7 +53,7 @@ export async function sendTestRequest<
   >;
   data: TRequestOutput;
   urlPathParams: TUrlVariablesOutput;
-  user?: JwtPayloadType;
+  user: JwtPayloadType;
 }): Promise<ResponseType<TResponseOutput>> {
   // Create default user based on endpoint configuration if not provided
   const testUser: JwtPayloadType =

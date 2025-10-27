@@ -179,16 +179,17 @@ export async function createAuthenticatedTRPCContext(opts: {
   req: NextRequest;
   urlPathParams?: Record<string, string>;
   requiredRoles?: string[];
+  locale: CountryLanguage;
 }): Promise<
   TRPCContext<Record<string, string>, readonly string[]> & {
     user: JwtPayloadType;
   }
 > {
-  const logger = createEndpointLogger(false, Date.now(), "en-GLOBAL");
+  const logger = createEndpointLogger(false, Date.now(), opts.locale);
   const context = await createTRPCContext({
     ...opts,
     logger,
-    locale: "en-GLOBAL",
+    locale: opts.locale,
   });
 
   if (!context.user) {

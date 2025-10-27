@@ -86,9 +86,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     logger.debug("Stopping Docker containers...");
     const downResult = await dockerOperationsRepository.dockerComposeDown(
       logger,
+      locale,
       "docker-compose-dev.yml",
       30000,
-      locale,
     );
 
     if (!downResult.success) {
@@ -102,9 +102,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     logger.debug("Starting Docker containers...");
     const upResult = await dockerOperationsRepository.dockerComposeUp(
       logger,
+      locale,
       "docker-compose-dev.yml",
       60000,
-      locale,
     );
 
     if (!upResult.success) {
@@ -259,9 +259,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
               const dbStartResult =
                 await dockerOperationsRepository.dockerComposeUp(
                   logger,
+                  locale,
                   "docker-compose-dev.yml",
                   60000, // Increased timeout for startup
-                  locale,
                 );
 
               if (!dbStartResult.success) {

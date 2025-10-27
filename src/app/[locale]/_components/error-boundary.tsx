@@ -28,7 +28,7 @@ interface FallbackProps {
 export function DefaultErrorFallback({
   error,
   reset,
-  locale = "en-GLOBAL",
+  locale,
 }: FallbackProps): JSX.Element {
   const { t } = simpleT(locale);
 

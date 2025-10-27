@@ -173,6 +173,7 @@ export function createTRPCProcedureFromEndpoint<
  */
 function selectBaseProcedure<TUserRoleValue extends readonly string[]>(
   allowedRoles: TUserRoleValue,
+  locale: CountryLanguage,
 ):
   | typeof publicProcedure
   | typeof authenticatedProcedure
@@ -199,7 +200,7 @@ function selectBaseProcedure<TUserRoleValue extends readonly string[]>(
 
   // For specific roles, create a custom procedure with role requirements
   if (allowedRoles.length > 0) {
-    const logger = createEndpointLogger(false, Date.now(), "en-GLOBAL");
+    const logger = createEndpointLogger(false, Date.now(), locale);
     return authenticatedProcedure.use(requireRoles(allowedRoles, logger));
   }
 

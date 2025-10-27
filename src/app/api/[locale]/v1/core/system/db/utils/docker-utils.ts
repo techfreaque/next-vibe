@@ -32,14 +32,14 @@ export function executeDockerCommand(
     timeout?: number; // timeout in milliseconds
     hideStandardLogs?: boolean; // whether to hide standard Docker logs
     description?: string;
-    locale?: CountryLanguage;
-  } = {},
+    locale: CountryLanguage;
+  },
 ): Promise<{ success: boolean; output: string; error?: string }> {
   const {
     timeout = 30000, // 30 seconds default timeout
     hideStandardLogs = true,
     description,
-    locale = "en-GLOBAL",
+    locale,
   } = options;
 
   const { t } = simpleT(locale);
@@ -185,7 +185,7 @@ export function executeDockerCommand(
 export async function dockerComposeDown(
   composeFile = "docker-compose-dev.yml",
   timeout = 30000,
-  locale: CountryLanguage = "en-GLOBAL",
+  locale: CountryLanguage,
 ): Promise<boolean> {
   const { t } = simpleT(locale);
   const result = await executeDockerCommand(
@@ -210,7 +210,7 @@ export async function dockerComposeDown(
 export async function dockerComposeUp(
   composeFile = "docker-compose-dev.yml",
   timeout = 60000,
-  locale: CountryLanguage = "en-GLOBAL",
+  locale: CountryLanguage,
 ): Promise<boolean> {
   const { t } = simpleT(locale);
   const result = await executeDockerCommand(

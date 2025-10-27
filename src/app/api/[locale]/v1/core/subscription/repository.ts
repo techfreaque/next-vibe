@@ -331,6 +331,7 @@ export interface SubscriptionRepository {
     data: SubscriptionDeleteRequestOutput,
     userId: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ success: boolean; message: string }>>;
 
   /**
@@ -615,11 +616,10 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
     data: SubscriptionDeleteRequestOutput,
     userId: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ success: boolean; message: string }>> {
     try {
-      // Use default locale for cancel operations since they don't have locale context
-      const defaultLocale: CountryLanguage = "en-GLOBAL" as CountryLanguage;
-      const { t } = simpleT(defaultLocale);
+      const { t } = simpleT(locale);
 
       // Get current subscription
       const currentSubscription: (typeof subscriptions.$inferSelect)[] =

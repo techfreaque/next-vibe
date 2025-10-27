@@ -58,7 +58,7 @@ export class ReleaseExecutor {
 
     try {
       // Build the release command
-      const command = this.buildReleaseCommand(target, options);
+      const command = this.buildReleaseCommand(target, options, t);
       this.logger.info(
         t("app.api.v1.core.system.launchpad.releaseExecutor.executing", {
           command,
@@ -250,7 +250,7 @@ export class ReleaseExecutor {
       }
 
       // Execute the release
-      const success = this.executeReleaseTarget(target, options);
+      const success = this.executeReleaseTarget(target, options, t);
 
       if (success) {
         this.stateManager.markCompleted(state, target.directory);
@@ -423,7 +423,7 @@ export class ReleaseExecutor {
         `🔄 ${t("app.api.v1.core.system.launchpad.releaseExecutor.weeklyUpdate.updatingPackages")}`,
       );
       const targets = this.discoverTargets();
-      this.executeForceUpdateAll(targets);
+      this.executeForceUpdateAll(targets, t);
 
       // 3. Run Snyk monitoring for all packages
       this.logger.info(

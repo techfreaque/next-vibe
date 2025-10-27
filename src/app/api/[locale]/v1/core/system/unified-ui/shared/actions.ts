@@ -205,7 +205,7 @@ export interface ActionContext {
   error?: Error;
   endpoint?: Record<string, string | number | boolean>;
   timestamp: string;
-  user?: {
+  user: {
     id: string;
     roles: string[];
   };

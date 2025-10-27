@@ -57,6 +57,7 @@ export default async function PricingPage({
   // Fetch user data
   const userResponse = await userRepository.getUserByAuth(
     {
+      locale,
       detailLevel: UserDetailLevel.COMPLETE,
     },
     logger,

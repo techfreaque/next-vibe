@@ -79,57 +79,15 @@ export const { POST } = createEndpoint({
     "generate-trpc-router",
     "validation",
   ],
-  examples: {
-    requests: {
-      validateIntegration: {
-        operation: TRPCValidationOperationType.VALIDATE_INTEGRATION,
-        options: {
-          apiDir: "src/app/api",
-          fix: false,
-          verbose: true,
-        },
-      },
-      validateRouteFile: {
-        operation: TRPCValidationOperationType.VALIDATE_ROUTE_FILE,
-        filePath: "src/app/api/v1/core/user/list/route.ts",
-        options: {
-          fix: true,
-          verbose: false,
-        },
-      },
-    },
-    response: {
-      success: {
-        success: true,
-        operation: "VALIDATE_INTEGRATION",
-        result: {
-          success: true,
-          errors: [],
-          warnings: ["Route uses old apiHandler"],
-          routeFiles: [
-            {
-              filePath: "src/app/api/v1/core/user/list/route.ts",
-              hasDefinition: true,
-              hasEnhancedHandler: false,
-              hasTRPCExport: false,
-              hasNextExport: true,
-              errors: [],
-              warnings: ["Route still uses old apiHandler"],
-            },
-          ],
-        },
-      },
-    },
-    urlPathParams: undefined,
-  },
   fields: objectField(
     {
       type: WidgetType.FORM_GROUP,
       layout: { type: LayoutType.GRID, columns: 1 },
     },
-    { request: "data" },
+    { request: "data", response: true },
     {
-      operation: requestDataField(
+      // === REQUEST ===
+      operations: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
@@ -191,15 +149,7 @@ export const { POST } = createEndpoint({
           })
           .optional(),
       ),
-    },
-  ),
-  responseSchema: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layout: { type: LayoutType.GRID, columns: 1 },
-    },
-    { response: true },
-    {
+      // === RESPONSE ===
       success: responseField(
         {
           type: WidgetType.TEXT,
@@ -249,60 +199,92 @@ export const { POST } = createEndpoint({
       ),
     },
   ),
+  examples: {
+    requests: {
+      validateAll: {
+        operations: [TRPCValidationOperationType.VALIDATE_INTEGRATION],
+        filePath: undefined,
+        options: {
+          apiDir: "src/app/api",
+          verbose: true,
+        },
+      },
+    },
+    responses: {
+      validateAll: {
+        success: true,
+        operation: TRPCValidationOperationType.VALIDATE_INTEGRATION,
+        result: {
+          success: true,
+          errors: [],
+          warnings: [],
+          totalFiles: 10,
+          validFiles: 10,
+          filesWithIssues: 0,
+        },
+      },
+    },
+  },
+  successTypes: {
+    title:
+      "app.api.v1.core.system.generators.generateTrpcRouter.validation.success.title",
+    description:
+      "app.api.v1.core.system.generators.generateTrpcRouter.validation.success.description",
+  },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.validation.title" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.validation.title",
       description:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.validation.description" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unauthorized.title" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unauthorized.description" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.forbidden.title" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.forbidden.description" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.notFound.title" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.notFound.title",
       description:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.notFound.description" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.server.title" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.server.title",
       description:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.server.description" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unknown.title" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unknown.title",
       description:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unknown.description" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unsavedChanges.title" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unsavedChanges.title",
       description:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unsavedChanges.description" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.conflict.title" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.conflict.title",
       description:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.conflict.description" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.network.title" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.network.title",
       description:
-        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.network.description" as const,
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.network.description",
     },
   },
 });

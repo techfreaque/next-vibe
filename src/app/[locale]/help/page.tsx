@@ -55,6 +55,7 @@ export default async function ContactPage({
   const logger = createEndpointLogger(false, Date.now(), locale);
   const userResponse = await userRepository.getUserByAuth(
     {
+      locale,
       detailLevel: UserDetailLevel.STANDARD,
     },
     logger,

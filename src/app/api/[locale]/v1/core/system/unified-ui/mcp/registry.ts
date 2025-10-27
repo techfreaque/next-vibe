@@ -381,16 +381,17 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
   }
 }
 
-export const getMCPRegistry = createKeyedSingletonGetter((key: string) => {
-  const locale = (key || "en-GLOBAL") as CountryLanguage;
-  const enabledResult = isMCPServerEnabled();
-  const logger = createEndpointLogger(
-    enabledResult.debug || false,
-    Date.now(),
-    locale,
-  );
-  return new MCPRegistry(logger);
-});
+export const getMCPRegistry = createKeyedSingletonGetter(
+  (key: string, locale: CountryLanguage) => {
+    const enabledResult = isMCPServerEnabled();
+    const logger = createEndpointLogger(
+      enabledResult.debug || false,
+      Date.now(),
+      locale,
+    );
+    return new MCPRegistry(logger);
+  },
+);
 
 /**
  * Export converter utilities for direct use

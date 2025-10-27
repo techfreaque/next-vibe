@@ -1,4 +1,27 @@
 export const translations = {
+  title: "TRPC Validation",
+  description: "Validate TRPC integration across route files",
+  category: "Generators",
+  tags: {
+    trpc: "tRPC",
+    validation: "Validation",
+  },
+  operations: {
+    validateIntegration: "Validate Integration",
+    validateRouteFile: "Validate Route File",
+    generateReport: "Generate Report",
+    fixRoutes: "Fix Routes",
+    checkRouterExists: "Check Router Exists",
+  },
+  severity: {
+    error: "Error",
+    warning: "Warning",
+    info: "Info",
+  },
+  success: {
+    title: "TRPC Validation Successful",
+    description: "TRPC validation completed successfully",
+  },
   errors: {
     validation: {
       title: "Validation Failed",
@@ -35,6 +58,10 @@ export const translations = {
     network: {
       title: "Network Error",
       description: "A network error occurred",
+    },
+    executionFailed: {
+      title: "Execution Failed",
+      description: "TRPC validation operation execution failed",
     },
   },
 };

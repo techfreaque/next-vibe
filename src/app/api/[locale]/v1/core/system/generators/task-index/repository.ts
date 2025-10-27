@@ -142,7 +142,7 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
 /* eslint-disable prettier/prettier */
 /* eslint-disable simple-import-sort/imports */
 
-import type { Task, TaskRegistry } from "../types/repository";
+import type { Task, TaskRegistry, TaskRunnerManager } from "../types/repository";
 import { UnifiedTaskRunnerRepositoryImpl } from "../unified-runner/repository";
 
 ${imports.join("\n")}
@@ -171,7 +171,7 @@ const tasksByName: Record<string, Task> = allTasks.reduce((acc, task) => {
 }, {});
 
 // Create single unified task runner instance as per spec.md
-const taskRunner = new UnifiedTaskRunnerRepositoryImpl();
+const taskRunner: TaskRunnerManager = new UnifiedTaskRunnerRepositoryImpl();
 
 export const taskRegistry: TaskRegistry = {
   cronTasks,

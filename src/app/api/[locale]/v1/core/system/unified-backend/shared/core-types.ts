@@ -621,7 +621,7 @@ export interface ActionContext {
   error?: Error;
   endpoint?: Record<string, FieldValue>;
   timestamp: string;
-  user?: {
+  user: {
     id: string;
     roles: string[];
   };

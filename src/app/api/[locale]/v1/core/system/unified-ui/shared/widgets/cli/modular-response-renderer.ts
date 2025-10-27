@@ -12,6 +12,7 @@ import {
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { getBaseFormatter } from "../../formatters/base-formatter";
 import type {
@@ -68,8 +69,22 @@ export class ModularCLIResponseRenderer {
     const context: WidgetRenderContext = {
       options: this.options,
       depth: 0,
-      translate: (key: string, params?: Record<string, string | number>) =>
-        t(key, params),
+      translate: (
+        key: TranslationKey | string,
+        params?: Record<string, string | number>,
+      ) => {
+        // If key looks like a translation key (contains dots), try to translate it
+        if (typeof key === "string" && key.includes(".")) {
+          try {
+            return t(key as TranslationKey, params);
+          } catch {
+            // If translation fails, return the key as-is
+            return key;
+          }
+        }
+        // Otherwise return the string as-is (it's a plain label)
+        return key;
+      },
       formatValue: (field, value) =>
         this.formatFieldValue(field, value as string | number | boolean | null),
       getFieldIcon: (type) => this.getFieldIcon(type),
@@ -254,7 +269,7 @@ export class ModularCLIResponseRenderer {
       return this.formatter.formatBoolean(value);
     }
     if (typeof value === "number") {
-      return this.formatter.formatNumber(value);
+      return this.formatter.formatNumber(value, this.options.locale);
     }
     if (typeof value === "string") {
       return value;
@@ -295,14 +310,14 @@ export class ModularCLIResponseRenderer {
           maxLength: field.config?.maxLength,
         });
       case FieldDataType.NUMBER:
-        return this.formatter.formatNumber(Number(value), {
+        return this.formatter.formatNumber(Number(value), this.options.locale, {
           precision: field.precision,
           unit: field.unit,
         });
       case FieldDataType.BOOLEAN:
         return this.formatter.formatBoolean(Boolean(value));
       case FieldDataType.DATE:
-        return this.formatter.formatDate(String(value));
+        return this.formatter.formatDate(String(value), this.options.locale);
       case FieldDataType.ARRAY:
         return this.formatter.formatArray(
           Array.isArray(value) ? value : [value],

@@ -19,7 +19,7 @@ import type {
   DataListWidgetConfig,
   FormGroupWidgetConfig,
   FormSectionWidgetConfig,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/shared/widgets/widgets";
+} from "@/app/api/[locale]/v1/core/system/unified-ui/shared/widgets";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 // Import types from core enums
@@ -205,7 +205,7 @@ export interface ActionContext {
   error?: Error;
   endpoint?: Record<string, string | number | boolean>;
   timestamp: string;
-  user?: {
+  user: {
     id: string;
     roles: string[];
   };

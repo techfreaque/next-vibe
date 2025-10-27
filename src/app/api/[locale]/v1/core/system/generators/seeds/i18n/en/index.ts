@@ -43,6 +43,10 @@ export const translations = {
         title: "Conflict",
         description: "Data conflict occurred",
       },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "There are unsaved changes",
+      },
     },
     success: {
       title: "Success",

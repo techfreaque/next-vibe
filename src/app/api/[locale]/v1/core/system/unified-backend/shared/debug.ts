@@ -458,7 +458,7 @@ export class CliResourceManager {
   async cleanupAndExit(
     logger: EndpointLogger,
     verbose = false,
-    locale: CountryLanguage = "en-GLOBAL",
+    locale: CountryLanguage,
   ): Promise<void> {
     try {
       // Mark end timing

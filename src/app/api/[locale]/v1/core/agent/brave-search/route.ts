@@ -3,39 +3,26 @@
  * Handles GET requests for web search
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import "server-only";
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handlers";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
-import type { ApiHandlerProps } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/handler-types";
 
-import type {
-  BraveSearchGetRequestOutput,
-  BraveSearchGetResponseOutput,
-  BraveSearchGetUrlVariablesOutput,
-} from "./definition";
 import braveSearchDefinition from "./definition";
 import { braveSearchRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: braveSearchDefinition,
   [Methods.GET]: {
-    email: undefined,
-    handler: async (
-      props: ApiHandlerProps<
-        BraveSearchGetRequestOutput,
-        BraveSearchGetUrlVariablesOutput,
-        typeof braveSearchDefinition.GET.allowedRoles
-      >,
-    ): Promise<ResponseType<BraveSearchGetResponseOutput>> => {
-      return await braveSearchRepository.search(
-        props.data.query,
+    handler: ({ data, logger }) => {
+      return braveSearchRepository.search(
+        data.query,
         {
-          maxResults: props.data.maxResults,
-          includeNews: props.data.includeNews,
-          freshness: props.data.freshness,
+          maxResults: data.maxResults,
+          includeNews: data.includeNews,
+          freshness: data.freshness,
         },
-        props.logger,
+        logger,
       );
     },
   },

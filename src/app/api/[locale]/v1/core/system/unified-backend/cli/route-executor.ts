@@ -6,35 +6,32 @@
 import { parseError } from "next-vibe/shared/utils";
 import type z from "zod";
 
-import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
-import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { modularCLIResponseRenderer } from "./widgets/modular-response-renderer";
-import { responseMetadataExtractor } from "./widgets/response-metadata-extractor";
-import { schemaUIHandler } from "./widgets/schema-ui-handler";
-import {
-  getCliUser,
-  type CliUserType,
-} from "../shared/auth/cli-user-factory";
+import { getCliUser } from "../shared/auth/cli-user-factory";
 import type { UnifiedField } from "../shared/core-types";
 import type { CreateApiEndpoint } from "../shared/create-endpoint";
 import type { EndpointLogger } from "../shared/endpoint-logger";
 import type { Methods } from "../shared/enums";
 import type {
-  CliHandlerReturnType,
   DefinitionModule,
+  InferJwtPayloadTypeFromRoles,
   RouteModule,
 } from "../shared/handler-types";
+import { modularCLIResponseRenderer } from "./widgets/modular-response-renderer";
+import { responseMetadataExtractor } from "./widgets/response-metadata-extractor";
+import { schemaUIHandler } from "./widgets/schema-ui-handler";
 
 // CLI handler function type - matches createCliHandler signature
-interface CliHandlerFunction {
+interface CliHandlerFunction<
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+> {
   (
     data: CliRequestData,
     urlPathParams: CliUrlParams,
-    user: CliUserType,
+    user: InferJwtPayloadTypeFromRoles<TUserRoleValue>,
     locale: CountryLanguage,
     verbose?: boolean,
   ): Promise<{
@@ -45,6 +42,13 @@ interface CliHandlerFunction {
 }
 
 // Endpoint definition interface - removed as we now use CreateApiEndpoint
+
+// Type for endpoint fields
+interface EndpointField {
+  type: string;
+  usage: string[];
+  config?: Record<string, string | number | boolean>;
+}
 
 // Input data interfaces
 interface InputData {
@@ -115,8 +119,8 @@ export interface RouteExecutionContext {
     positionalArgs: string[];
     namedArgs: CliNamedArgs;
   };
-  user?: CliUserType;
-  locale?: CountryLanguage;
+  user: InferJwtPayloadTypeFromRoles<readonly (typeof UserRoleValue)[]>;
+  locale: CountryLanguage;
   options?: {
     verbose?: boolean;
     dryRun?: boolean;
@@ -175,7 +179,9 @@ export class RouteDelegationHandler {
       if (!cliHandler) {
         return {
           success: false,
-          error: t("app.api.v1.core.system.unifiedBackend.cli.vibe.errors.routeNotFound"),
+          error: t(
+            "app.api.v1.core.system.unifiedBackend.cli.vibe.errors.routeNotFound",
+          ),
         };
       }
 
@@ -186,7 +192,8 @@ export class RouteDelegationHandler {
       const inputData = await this.collectInputData(endpoint, context, logger);
 
       // Create CLI user context
-      const cliUser = context.user || (await getCliUser(logger, context.locale));
+      const cliUser =
+        context.user || (await getCliUser(logger, context.locale));
 
       if (!cliUser) {
         logger.error("Failed to get CLI user for authentication");
@@ -249,7 +256,7 @@ export class RouteDelegationHandler {
       logger.debug("CLI handler execution", {
         locale: locale,
         localeType: typeof locale,
-        cliUserEmail: cliUser.email,
+        cliUserId: cliUser.isPublic ? cliUser.leadId : cliUser.id,
       });
 
       logger.debug("About to call CLI handler", {
@@ -301,7 +308,7 @@ export class RouteDelegationHandler {
   private async getCliHandler(
     route: DiscoveredRoute,
     logger: EndpointLogger,
-  ): Promise<CliHandlerFunction | null> {
+  ): Promise<CliHandlerFunction<readonly (typeof UserRoleValue)[]> | null> {
     try {
       logger.debug(`[Route Executor] Loading CLI handler`, {
         routePath: route.routePath,
@@ -629,20 +636,20 @@ export class RouteDelegationHandler {
     return result as InputData;
   }
 
-
-
   /**
    * Format execution result for display with enhanced rendering
    */
   formatResult(
     result: RouteExecutionResult,
     outputFormat = "pretty",
-    endpointDefinition: CreateApiEndpoint<
-      string,
-      Methods,
-      readonly (typeof UserRoleValue)[],
-      UnifiedField<z.ZodTypeAny>
-    > | null,
+    endpointDefinition: {
+      title?: string;
+      description?: string;
+      requestSchema?: z.ZodTypeAny;
+      requestUrlPathParamsSchema?: z.ZodTypeAny;
+      responseSchema?: z.ZodTypeAny;
+      fields?: Record<string, EndpointField>;
+    } | null,
     locale: CountryLanguage,
     verbose = false,
     logger: EndpointLogger,
@@ -774,10 +781,9 @@ export class RouteDelegationHandler {
       );
     } catch (error) {
       // Fallback to basic formatting
-      logger.warn(
-        "Enhanced rendering failed, falling back to basic format:",
-        { error: parseError(error) },
-      );
+      logger.warn("Enhanced rendering failed, falling back to basic format:", {
+        error: parseError(error),
+      });
       // eslint-disable-next-line i18next/no-literal-string
       return `📊 Result:\n${this.formatPretty(data, locale)}`;
     }

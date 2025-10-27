@@ -71,7 +71,7 @@ export interface TestRunner<
   executeWith: (options: {
     data: TRequestOutput;
     urlPathParams: TUrlVariablesOutput;
-    user?: JwtPayloadType;
+    user: JwtPayloadType;
   }) => Promise<ResponseType<TResponseOutput>>;
 
   /**

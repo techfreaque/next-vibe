@@ -6,6 +6,8 @@
 
 import "server-only";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 /**
  * Singleton factory options
  */
@@ -109,7 +111,7 @@ export function createSingletonGetter<T>(factory: () => T): () => T {
  * For singletons that need multiple instances by key
  */
 export function createKeyedSingletonGetter<T>(
-  factory: (key: string) => T,
+  factory: (key: string, locale: CountryLanguage) => T,
 ): (key?: string) => T {
   const instances = new Map<string, T>();
   const defaultKey = "default";
@@ -118,7 +120,7 @@ export function createKeyedSingletonGetter<T>(
     const instanceKey = key || defaultKey;
 
     if (!instances.has(instanceKey)) {
-      instances.set(instanceKey, factory(instanceKey));
+      instances.set(instanceKey, factory(instanceKey, locale));
     }
 
     return instances.get(instanceKey)!;

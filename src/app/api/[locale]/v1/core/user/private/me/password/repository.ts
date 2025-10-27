@@ -34,11 +34,14 @@ export interface PasswordUpdateRepository {
    * Update a user's password
    * @param userId - The user ID
    * @param passwords - The password data
+   * @param locale - The user's locale
+   * @param logger - Logger for debugging
    * @returns ResponseType with null data on success
    */
   updatePassword(
     userId: DbId,
     passwords: PasswordPostRequestOutput,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<PasswordPostResponseOutput>>;
 

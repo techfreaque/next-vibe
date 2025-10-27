@@ -148,10 +148,11 @@ export interface DataFormatter {
   formatText(value: string, options?: { maxLength?: number }): string;
   formatNumber(
     value: number,
+    locale: CountryLanguage,
     options?: { precision?: number; unit?: string },
   ): string;
   formatBoolean(value: boolean): string;
-  formatDate(value: Date | string): string;
+  formatDate(value: Date | string, locale: CountryLanguage): string;
   formatArray(
     value: RenderableValue[],
     options?: { separator?: string; maxItems?: number },

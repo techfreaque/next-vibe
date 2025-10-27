@@ -29,7 +29,7 @@ export interface PlatformContext {
   logger: EndpointLogger;
 
   /** User context (optional) */
-  user?: {
+  user: {
     id?: string;
     roles: string[];
     isPublic: boolean;
@@ -272,7 +272,7 @@ export function createCLIPlatform(
 
 export function createAIPlatform(
   logger: EndpointLogger,
-  user?: PlatformContext["user"],
+  user: PlatformContext["user"],
 ): UnifiedPlatformService {
   return createPlatformService({
     platform: Platform.AI,
@@ -283,7 +283,7 @@ export function createAIPlatform(
 
 export function createMCPPlatform(
   logger: EndpointLogger,
-  user?: PlatformContext["user"],
+  user: PlatformContext["user"],
 ): UnifiedPlatformService {
   return createPlatformService({
     platform: Platform.MCP,
@@ -294,7 +294,7 @@ export function createMCPPlatform(
 
 export function createWebPlatform(
   logger: EndpointLogger,
-  user?: PlatformContext["user"],
+  user: PlatformContext["user"],
 ): UnifiedPlatformService {
   return createPlatformService({
     platform: Platform.WEB,
@@ -305,7 +305,7 @@ export function createWebPlatform(
 
 export function createMobilePlatform(
   logger: EndpointLogger,
-  user?: PlatformContext["user"],
+  user: PlatformContext["user"],
 ): UnifiedPlatformService {
   return createPlatformService({
     platform: Platform.MOBILE,

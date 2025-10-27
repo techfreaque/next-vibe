@@ -25,7 +25,7 @@ import { ToolCallItem } from "./ToolCallItem";
 
 interface UnifiedToolDisplayProps {
   toolCalls: ToolCall[];
-  locale?: CountryLanguage;
+  locale: CountryLanguage;
   hasContent?: boolean; // Whether the message has content after tool calls
 }
 
@@ -35,7 +35,7 @@ interface UnifiedToolDisplayProps {
  */
 export function UnifiedToolDisplay({
   toolCalls,
-  locale = "en-GLOBAL",
+  locale,
   hasContent = false,
 }: UnifiedToolDisplayProps): JSX.Element | null {
   const { t } = simpleT(locale);

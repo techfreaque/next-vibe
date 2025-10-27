@@ -16,7 +16,7 @@ import { tasks as taskModule0 } from "../../newsletter/unsubscribe/task";
 import { tasks as taskModule1 } from "../../user/session-cleanup/task";
 import { taskRunners as runnerModule7 } from "../unified-backend/tasks/dev-watcher/task-runner";
 import { taskRunners as runnerModule6 } from "../unified-backend/tasks/pulse-runner/task-runner";
-import type { Task, TaskRegistry } from "../unified-backend/tasks/types/repository";
+import type { Task, TaskRegistry, TaskRunnerManager } from "../unified-backend/tasks/types/repository";
 import { UnifiedTaskRunnerRepositoryImpl } from "../unified-backend/tasks/unified-runner/repository";
 
 const allTasks: Task[] = [

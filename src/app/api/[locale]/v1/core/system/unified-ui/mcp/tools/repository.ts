@@ -34,7 +34,7 @@ export class MCPToolsRepositoryImpl extends BaseToolsRepositoryImpl<
     data: MCPToolsListRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    locale: CountryLanguage = "en-GLOBAL",
+    locale: CountryLanguage,
   ): Promise<MCPToolsListResponseOutput> {
     this.logFetchStart(logger, user);
 

@@ -20,13 +20,13 @@ import type { ToolCall } from "../../types";
 
 interface ToolCallDisplayProps {
   toolCalls: ToolCall[];
-  locale?: CountryLanguage;
+  locale: CountryLanguage;
   hasContent?: boolean; // Whether the message has content after tool calls
 }
 
 export function ToolCallDisplay({
   toolCalls,
-  locale = "en-GLOBAL",
+  locale,
   hasContent = false,
 }: ToolCallDisplayProps): JSX.Element | null {
   const { t } = simpleT(locale);

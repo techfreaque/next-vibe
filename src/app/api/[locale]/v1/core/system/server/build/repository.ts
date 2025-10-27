@@ -197,7 +197,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
               errors.push(MESSAGES.FAILED_PROD_MIGRATIONS);
               if (!data.force) {
                 return createErrorResponse(
-                  "app.error.errorTypes.database_error",
+                  "app.api.v1.core.shared.errorTypes.database_error",
                   ErrorResponseTypes.DATABASE_ERROR,
                   { error: MESSAGES.FAILED_PROD_MIGRATIONS },
                 );
@@ -225,7 +225,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
           errors.push(errorMsg);
           if (!data.force) {
             return createErrorResponse(
-              "app.error.errorTypes.database_error",
+              "app.api.v1.core.shared.errorTypes.database_error",
               ErrorResponseTypes.DATABASE_ERROR,
               {
                 error: errorMsg,
@@ -256,7 +256,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
 
       // Return error response with proper structure
       return createErrorResponse(
-        "app.error.errorTypes.internal_error",
+        "app.api.v1.core.shared.errorTypes.internal_error",
         ErrorResponseTypes.INTERNAL_ERROR,
         {
           error: parsedError.message,

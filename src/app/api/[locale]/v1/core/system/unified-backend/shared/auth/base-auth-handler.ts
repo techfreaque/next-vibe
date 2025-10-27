@@ -4,9 +4,10 @@ import type { NextRequest } from "next/server";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
+import type { JwtPayloadType, JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+
 import type { EndpointLogger } from "../logger-types";
-import type { ResponseType } from "../response-types";
-import type { JwtPayloadType, JwtPrivatePayloadType } from "../../../../user/auth/definition";
 
 export type AuthPlatform =
   | "next"
@@ -22,12 +23,12 @@ export interface AuthContext {
   request?: NextRequest;
   token?: string;
   jwtPayload?: JwtPayloadType;
-  locale?: CountryLanguage;
+  locale: CountryLanguage;
 }
 
 export interface AuthResult<T extends JwtPayloadType = JwtPayloadType> {
   success: boolean;
-  user?: T;
+  user: T;
   error?: string;
 }
 

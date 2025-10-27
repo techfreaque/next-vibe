@@ -68,10 +68,8 @@ export class ModularCLIResponseRenderer {
     const context: WidgetRenderContext = {
       options: this.options,
       depth: 0,
-      translate: (key: string, params?: Record<string, string | number>) =>
-        t(key, params),
-      formatValue: (field, value) =>
-        this.formatFieldValue(field, value as string | number | boolean | null),
+      translate: t,
+      formatValue: (field, value) => this.formatFieldValue(field, value),
       getFieldIcon: (type) => this.getFieldIcon(type),
       renderEmptyState: (message) => this.renderEmptyState(message),
     };
@@ -94,7 +92,7 @@ export class ModularCLIResponseRenderer {
     const result: string[] = [];
 
     if (container.title) {
-      const title = context.translate(container.title);
+      const title = container.title;
       // eslint-disable-next-line i18next/no-literal-string
       const titleIcon = "📋 ";
       const titleWithIcon = titleIcon + title;
@@ -104,7 +102,7 @@ export class ModularCLIResponseRenderer {
     }
 
     if (container.description) {
-      const description = context.translate(container.description);
+      const description = container.description;
       result.push(`   ${description}`);
       result.push("");
     }
@@ -254,7 +252,7 @@ export class ModularCLIResponseRenderer {
       return this.formatter.formatBoolean(value);
     }
     if (typeof value === "number") {
-      return this.formatter.formatNumber(value);
+      return this.formatter.formatNumber(value, this.options.locale);
     }
     if (typeof value === "string") {
       return value;
@@ -275,7 +273,7 @@ export class ModularCLIResponseRenderer {
    */
   private formatFieldValue(
     field: ResponseFieldMetadata,
-    value: string | number | boolean | null,
+    value: RenderableValue,
   ): string {
     if (value === null || value === undefined) {
       // eslint-disable-next-line i18next/no-literal-string
@@ -295,14 +293,14 @@ export class ModularCLIResponseRenderer {
           maxLength: field.config?.maxLength,
         });
       case FieldDataType.NUMBER:
-        return this.formatter.formatNumber(Number(value), {
+        return this.formatter.formatNumber(Number(value), this.options.locale, {
           precision: field.precision,
           unit: field.unit,
         });
       case FieldDataType.BOOLEAN:
         return this.formatter.formatBoolean(Boolean(value));
       case FieldDataType.DATE:
-        return this.formatter.formatDate(String(value));
+        return this.formatter.formatDate(String(value), this.options.locale);
       case FieldDataType.ARRAY:
         return this.formatter.formatArray(
           Array.isArray(value) ? value : [value],

@@ -139,7 +139,7 @@ export class SchemaUIHandler {
           defaultValue = value;
         }
       }
-      const innerType = zodInternal._def.innerType;
+      const innerType = currentSchema._def.innerType;
       if (innerType) {
         currentSchema = innerType;
       }
