@@ -1,4 +1,5 @@
 /// <reference types="node" />
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 
 import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
@@ -11,7 +12,7 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 /**
  * Runs Snyk vulnerability test for a package
@@ -50,7 +51,10 @@ export function runSnykTest(
     logger.info(`Snyk vulnerability test passed for ${packageName}`);
     return createSuccessResponse(undefined);
   } catch (error) {
-    logger.error(`Snyk vulnerability test failed for ${packageName}:`, error);
+    logger.error(
+      `Snyk vulnerability test failed for ${packageName}:`,
+      parseError(error),
+    );
     return createErrorResponse(
       "app.api.v1.core.system.releaseTool.snyk.testFailed",
       ErrorResponseTypes.INTERNAL_ERROR,
@@ -137,7 +141,7 @@ export function runSnykMonitor(
     logger.info(`Snyk monitor completed successfully for ${packageName}`);
     return createSuccessResponse(undefined);
   } catch (error) {
-    logger.error(`Snyk monitor failed for ${packageName}:`, error);
+    logger.error(`Snyk monitor failed for ${packageName}:`, parseError(error));
     return createErrorResponse(
       "app.api.v1.core.system.releaseTool.snyk.monitorFailed",
       ErrorResponseTypes.INTERNAL_ERROR,

@@ -1,7 +1,7 @@
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useEffect, useState } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 
 /**
  * Hook for managing favorites in localStorage

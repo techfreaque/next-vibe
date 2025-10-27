@@ -7,10 +7,10 @@
  * - Native: Validates Bearer token from Authorization header
  */
 
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handler";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/types";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { endpointsHandler } from "../../../system/unified-ui/cli/vibe/endpoints/endpoint-handler";
-import { Methods } from "../../../system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
 import endpoints from "./definition";
 
 /**

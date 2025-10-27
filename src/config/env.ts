@@ -212,6 +212,9 @@ export const envSchema = envClientSchema.extend({
 
   // Railway
   RAILWAY_ENVIRONMENT: z.string().optional(),
+
+  // CLI Configuration
+  VIBE_CLI_USER_EMAIL: z.string().email(),
 });
 
 export type Env = z.infer<typeof envSchema>;

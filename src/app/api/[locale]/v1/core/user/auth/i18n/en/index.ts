@@ -58,6 +58,7 @@ export const translations = {
     token_generation_failed: "Failed to generate authentication token",
     invalid_session: "The session is invalid or expired",
     missing_request_context: "Request context is missing",
+    missing_locale: "Locale is missing from request",
     unsupported_platform: "Platform is not supported",
     session_retrieval_failed: "Failed to retrieve session",
     missing_token: "Authentication token is missing",
@@ -95,6 +96,10 @@ export const translations = {
       validation: {
         title: "Validation Error",
         description: "Invalid request parameters",
+      },
+      missing_locale: {
+        title: "Missing Locale",
+        description: "Locale parameter is required",
       },
       server: {
         title: "Server Error",

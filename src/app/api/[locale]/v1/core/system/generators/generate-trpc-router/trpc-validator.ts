@@ -12,10 +12,9 @@ import path from "node:path";
 
 import { parseError } from "next-vibe/shared/utils";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import type { EndpointLogger } from "../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 /**
  * Constants for code pattern matching

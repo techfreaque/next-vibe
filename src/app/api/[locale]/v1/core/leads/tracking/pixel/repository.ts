@@ -3,14 +3,14 @@
  * Handles pixel tracking requests and engagement recording
  */
 
-import { parseError } from "next-vibe/shared/utils";
 import type { NextRequest } from "next/server";
+import { parseError } from "next-vibe/shared/utils";
 import { z } from "zod";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 
 import { leadId } from "../../definition";
-import { LeadTrackingRepository } from "../repository";
+import { leadTrackingRepository } from "../repository";
 
 const pixelTrackingRequestSchema = z.object({
   leadId: leadId,
@@ -30,20 +30,16 @@ export class PixelTrackingRepository {
    * Handle pixel tracking request
    * Returns a 1x1 transparent GIF and records engagement asynchronously
    */
-  static handlePixelRequest(
-    request: NextRequest,
-    logger: EndpointLogger,
-  ): Response {
+  handlePixelRequest(request: NextRequest, logger: EndpointLogger): Response {
     try {
       const { searchParams } = new URL(request.url);
 
       // Validate tracking parameters
-      const validationResult =
-        PixelTrackingRepository.validateTrackingParams(searchParams);
+      const validationResult = this.validateTrackingParams(searchParams);
 
       // Always return pixel first to avoid broken images, even on errors
       const pixelResponse =
-        LeadTrackingRepository.createTrackingPixelResponse();
+        leadTrackingRepository.createTrackingPixelResponse();
 
       if (!validationResult.success || !validationResult.data?.leadId) {
         logger.warn("tracking.pixel.request.invalid", {
@@ -67,13 +63,13 @@ export class PixelTrackingRepository {
         });
       }
 
-      const clientInfo = LeadTrackingRepository.extractClientInfo(request);
+      const clientInfo = leadTrackingRepository.extractClientInfo(request);
 
       // Record engagement asynchronously to avoid blocking pixel response
       // This ensures the pixel loads quickly even if database is slow
       setImmediate(async () => {
         try {
-          const result = await LeadTrackingRepository.handleTrackingPixel(
+          const result = await leadTrackingRepository.handleTrackingPixel(
             leadId,
             campaignId,
             clientInfo,
@@ -97,7 +93,7 @@ export class PixelTrackingRepository {
           }
         } catch (error) {
           logger.error("tracking.pixel.engagement.error", {
-            error,
+            error: parseError(error),
             leadId,
             campaignId,
             clientIp,
@@ -115,14 +111,14 @@ export class PixelTrackingRepository {
       return pixelResponse;
     } catch (error) {
       logger.error("tracking.pixel.serve.error", parseError(error));
-      return LeadTrackingRepository.createTrackingPixelResponse(); // Always return pixel to avoid broken images
+      return leadTrackingRepository.createTrackingPixelResponse(); // Always return pixel to avoid broken images
     }
   }
 
   /**
    * Validate tracking parameters from URL search params
    */
-  private static validateTrackingParams(searchParams: URLSearchParams): {
+  private validateTrackingParams(searchParams: URLSearchParams): {
     success: boolean;
     data?: PixelTrackingRequestType;
     error?: string;
@@ -173,3 +169,5 @@ export class PixelTrackingRepository {
     );
   }
 }
+
+export const pixelTrackingRepository = new PixelTrackingRepository();

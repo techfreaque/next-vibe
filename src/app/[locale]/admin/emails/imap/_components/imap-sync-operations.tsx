@@ -34,8 +34,8 @@ import imapAccountsListDefinition, {
 } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/definition";
 import { ImapSyncStatus } from "@/app/api/[locale]/v1/core/emails/imap-client/enum";
 import imapSyncDefinition from "@/app/api/[locale]/v1/core/emails/imap-client/sync/definition";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/use-endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
 /**

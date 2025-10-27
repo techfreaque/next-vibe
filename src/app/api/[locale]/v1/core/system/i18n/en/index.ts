@@ -6,14 +6,13 @@ import { translations as guardTranslations } from "../../guard/i18n/en";
 import { translations as launchpadTranslations } from "../../launchpad/i18n/en";
 import { translations as releaseToolTranslations } from "../../release-tool/i18n/en";
 import { translations as serverTranslations } from "../../server/i18n/en";
-import { translations as tasksTranslations } from "../../tasks/i18n/en";
 import { translations as translationsTranslations } from "../../translations/i18n/en";
+import { translations as unifiedBackendTranslations } from "../../unified-backend/i18n/en";
 import { translations as unifiedUiTranslations } from "../../unified-ui/i18n/en";
 
 export const translations = {
   builder: builderTranslations,
   check: checkTranslations,
-  cli: unifiedUiTranslations.cli, // Alias for CLI translations
   db: dbTranslations,
   dev: {
     category: "Development",
@@ -68,7 +67,7 @@ export const translations = {
   launchpad: launchpadTranslations,
   releaseTool: releaseToolTranslations,
   server: serverTranslations,
-  tasks: tasksTranslations,
   translations: translationsTranslations,
   unifiedUi: unifiedUiTranslations,
+  unifiedBackend: unifiedBackendTranslations,
 };

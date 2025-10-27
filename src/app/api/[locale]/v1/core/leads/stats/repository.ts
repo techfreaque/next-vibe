@@ -32,7 +32,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import {
   convertCountryFilter,
@@ -145,7 +145,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     let dateTo: Date | undefined;
 
     try {
-      logger.debug("Getting leads stats", { data, userId: user.id });
+      logger.debug("Getting leads stats", { userId: user.id });
 
       // Get date range from preset
       const dateRange = getDateRangeFromPreset(data.dateRangePreset);
@@ -199,7 +199,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       logger.error("Error getting leads stats", {
         error: errorDetails.message,
         stack: errorDetails.stack,
-        data,
         userId: user.id,
         dateRange: {
           from: dateFrom?.toISOString(),

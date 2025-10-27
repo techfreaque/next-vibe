@@ -3,8 +3,8 @@
 import { parseError } from "next-vibe/shared/utils";
 import { useEffect, useMemo } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { useTranslation } from "@/i18n/core/client";
 
 import { EngagementTypes } from "../../api/[locale]/v1/core/leads/enum";
@@ -62,7 +62,10 @@ export function LeadTrackingProvider(): null {
           });
         }
       } catch (error) {
-        logger.error("error.leads.tracking.engagement.fetch_error", parseError(error));
+        logger.error(
+          "error.leads.tracking.engagement.fetch_error",
+          parseError(error),
+        );
       }
     };
 

@@ -1,34 +1,46 @@
-import { translations as endpointTranslations } from "../../endpoint/i18n/de";
-import { translations as mutationFormTranslations } from "../../mutation-form/i18n/de";
-import { translations as queryTranslations } from "../../query/i18n/de";
-import { translations as queryFormTranslations } from "../../query-form/i18n/de";
-import { translations as storeTranslations } from "../../store/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  endpoint: endpointTranslations,
-  mutationForm: mutationFormTranslations,
-  queryForm: queryFormTranslations,
-  query: queryTranslations,
-  store: storeTranslations,
   apiUtils: {
     errors: {
-      http_error: {
-        title: "HTTP-Fehler",
-        description: "Kommunikation mit dem Server fehlgeschlagen",
+      http_error: "HTTP-Fehler",
+      validation_error: "Validierungsfehler",
+      internal_error: "Interner Fehler",
+      auth_required: "Authentifizierung erforderlich",
+    },
+  },
+  mutationForm: {
+    post: {
+      errors: {
+        mutation_failed: {
+          title: "Mutation fehlgeschlagen",
+        },
+        validation_error: {
+          title: "Validierungsfehler",
+        },
       },
-      validation_error: {
-        title: "Validierungsfehler",
-        description: "Die Serverantwort konnte nicht validiert werden",
-      },
-      internal_error: {
-        title: "Interner Fehler",
-        description: "Ein unerwarteter Fehler ist aufgetreten",
-      },
-      auth_required: {
-        title: "Authentifizierung erforderlich",
-        description: "Sie müssen angemeldet sein, um diese Aktion auszuführen",
-      },
+    },
+  },
+  queryForm: {
+    errors: {
+      network_failure: "Netzwerkfehler",
+      validation_failed: "Validierung fehlgeschlagen",
+    },
+  },
+  store: {
+    errors: {
+      validation_failed: "Validierung fehlgeschlagen",
+      request_failed: "Anfrage fehlgeschlagen",
+      mutation_failed: "Mutation fehlgeschlagen",
+      unexpected_failure: "Unerwarteter Fehler",
+      refetch_failed: "Erneutes Abrufen fehlgeschlagen",
+    },
+    status: {
+      loading_data: "Daten werden geladen...",
+      cached_data: "Zwischengespeicherte Daten werden verwendet",
+      success: "Erfolgreich",
+      mutation_pending: "Mutation ausstehend...",
+      mutation_success: "Mutation erfolgreich",
     },
   },
 };

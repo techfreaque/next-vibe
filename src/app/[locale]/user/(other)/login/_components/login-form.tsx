@@ -8,7 +8,8 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import type { JSX } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import loginDefinitions from "@/app/api/[locale]/v1/core/user/public/login/definition";
 import { useLogin } from "@/app/api/[locale]/v1/core/user/public/login/hooks";
 import type { LoginOptions } from "@/app/api/[locale]/v1/core/user/public/login/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -53,13 +54,8 @@ export function LoginForm({
           <Form form={form} onSubmit={submitForm} className="space-y-6">
             <EndpointFormField
               name="credentials.email"
-              config={{
-                type: "email",
-                label: "app.user.other.login.auth.login.emailLabel",
-                placeholder: "app.user.other.login.auth.login.emailPlaceholder",
-                disabled: isSubmitting || isAccountLocked,
-              }}
               control={form.control}
+              endpointFields={loginDefinitions.POST.fields}
               theme={{
                 style: "none",
                 showAllRequired: false,
@@ -68,14 +64,8 @@ export function LoginForm({
 
             <EndpointFormField
               name="credentials.password"
-              config={{
-                type: "password",
-                label: "app.user.other.login.auth.login.passwordLabel",
-                placeholder:
-                  "app.user.other.login.auth.login.passwordPlaceholder",
-                disabled: isSubmitting || isAccountLocked,
-              }}
               control={form.control}
+              endpointFields={loginDefinitions.POST.fields}
               theme={{
                 style: "none",
                 showAllRequired: false,
@@ -85,13 +75,8 @@ export function LoginForm({
             <div className="flex justify-between items-center">
               <EndpointFormField
                 name="options.rememberMe"
-                config={{
-                  type: "checkbox",
-                  label: undefined, // Empty label for checkbox
-                  checkboxLabel: "app.user.other.login.auth.login.rememberMe",
-                  disabled: isSubmitting || isAccountLocked,
-                }}
                 control={form.control}
+                endpointFields={loginDefinitions.POST.fields}
                 theme={{
                   style: "none",
                 }}

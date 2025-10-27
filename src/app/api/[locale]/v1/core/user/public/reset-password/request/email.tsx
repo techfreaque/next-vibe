@@ -164,6 +164,7 @@ export const renderResetPasswordMail: EmailFunctionType<
     const userResponse = await userRepository.getUserByEmail(
       requestData.emailInput.email,
       UserDetailLevel.STANDARD,
+      locale,
       logger,
     );
     if (!userResponse.success) {

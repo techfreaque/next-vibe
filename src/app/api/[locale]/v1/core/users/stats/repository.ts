@@ -31,7 +31,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { userLeads } from "@/app/api/[locale]/v1/core/leads/db";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { userRoles, users } from "@/app/api/[locale]/v1/core/user/db";
 import type { CountryLanguage } from "@/i18n/core/config";

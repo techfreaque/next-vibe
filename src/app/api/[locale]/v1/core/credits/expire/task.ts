@@ -11,16 +11,16 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
-} from "@/app/api/[locale]/v1/core/system/tasks/constants";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/constants";
 import {
   CronTaskPriority,
   TaskCategory,
-} from "@/app/api/[locale]/v1/core/system/tasks/enum";
-import type { Task } from "@/app/api/[locale]/v1/core/system/tasks/types/repository";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/enum";
+import type { Task } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/types/repository";
 
 import { creditRepository } from "../repository";
 
@@ -76,7 +76,7 @@ const creditExpirationTask: Task = {
   priority: CronTaskPriority.MEDIUM,
   timeout: TASK_TIMEOUTS.SHORT, // 1 minute
 
-  run: async ({ logger }) => {
+  run: async ({ logger }: { logger: EndpointLogger }) => {
     const result = await executeTask(logger);
 
     if (!result.success) {
@@ -88,7 +88,7 @@ const creditExpirationTask: Task = {
     // Returns void implicitly on success
   },
 
-  onError: ({ error, logger }) => {
+  onError: ({ error, logger }: { error: Error; logger: EndpointLogger }) => {
     logger.error("Credit expiration task failed", parseError(error));
   },
 };

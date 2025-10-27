@@ -9,7 +9,7 @@ import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { ImapAccount, ImapFolder } from "../../messages/db";
+import type { ImapAccount, ImapFolder } from "../db";
 
 /**
  * Sync Result Interface

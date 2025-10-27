@@ -19,7 +19,7 @@ import type { Address } from "nodemailer/lib/mailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { emailCampaigns } from "../../../leads/db";
@@ -315,7 +315,10 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
       // Fallback to first candidate
       return topCandidates[0].account;
     } catch (error) {
-      logger.error("Error getting SMTP account with criteria", parseError(error));
+      logger.error(
+        "Error getting SMTP account with criteria",
+        parseError(error),
+      );
       return null;
     }
   }
@@ -1103,7 +1106,11 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
           resolve();
         });
       } catch (error) {
-        logger.error("Error closing transport", { accountId }, parseError(error));
+        logger.error(
+          "Error closing transport",
+          { accountId },
+          parseError(error),
+        );
       }
     }
     this.transportCache.clear();

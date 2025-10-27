@@ -9,7 +9,7 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 
 import { leadsRepository } from "../repository";
@@ -80,7 +80,7 @@ export class LeadsListRepositoryImpl implements LeadsListRepository {
         },
       } satisfies ResponseType<LeadListGetResponseTypeOutput>;
     } else {
-      logger.error("Failed to list leads", result);
+      logger.error("Failed to list leads", { message: result.message });
       return createErrorResponse(
         "app.api.v1.core.leads.list.get.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,

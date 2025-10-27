@@ -9,12 +9,12 @@ import type {
 import { useToast } from "next-vibe-ui/ui";
 import { useMemo, useState } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type {
   FormAlertState,
   SubmitFormFunction,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
-import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation-form";
+} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint-types";
+import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-api-mutation-form";
 import type { ApiFormReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/types";
 import { useTranslation } from "@/i18n/core/client";
 

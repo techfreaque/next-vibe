@@ -10,13 +10,13 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import request from "supertest";
 import type z from "zod";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
+import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/core-types";
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
+import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { env } from "@/config/env";
 
 import type { UserRoleValue } from "../../../../user/user-roles/enum";
-import type { UnifiedField } from "../../../unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
-import type { Methods } from "../../../unified-ui/cli/vibe/endpoints/endpoint-types/types";
 
 /**
  * Call the api on the test server

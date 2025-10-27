@@ -2,7 +2,7 @@
  * MCP Server Configuration
  *
  * @deprecated This file is deprecated. Use the unified platform configuration instead:
- * import { MCP_CONFIG, getPlatformConfig, Platform } from "../shared/config/platform-config";
+ * import { MCP_CONFIG, getPlatformConfig, Platform } from "./config";
  *
  * This file is kept for backward compatibility only.
  */
@@ -11,7 +11,7 @@ import "server-only";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { MCP_CONFIG } from "../shared/config/platform-config";
+import { MCP_CONFIG } from "./config";
 import type { MCPServerConfig } from "./types";
 
 /**

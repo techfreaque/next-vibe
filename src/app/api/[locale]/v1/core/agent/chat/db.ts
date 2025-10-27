@@ -17,7 +17,7 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import type { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import type { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import { users } from "@/app/api/[locale]/v1/core/user/db";
 
 import type { DefaultFolderId } from "./config";

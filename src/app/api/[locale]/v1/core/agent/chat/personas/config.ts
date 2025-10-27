@@ -60,6 +60,14 @@ export const DEFAULT_CATEGORIES = [
 export type PersonaCategoryId = (typeof DEFAULT_CATEGORIES)[number]["id"];
 
 /**
+ * Category options for SELECT fields
+ */
+export const CategoryOptions = DEFAULT_CATEGORIES.map((cat) => ({
+  value: cat.id,
+  label: cat.name,
+})) as const;
+
+/**
  * Default personas available in the application
  * These are read-only and defined in code
  */

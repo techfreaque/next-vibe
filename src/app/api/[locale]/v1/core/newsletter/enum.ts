@@ -3,7 +3,7 @@
  * Defines the enums used in the newsletter module
  */
 
-import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/enum-helpers";
+import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enum-helpers";
 
 /**
  * Newsletter Preferences Enum

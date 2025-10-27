@@ -10,7 +10,10 @@ import { NextResponse } from "next/server";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { LOCALE_COOKIE_NAME } from "../../../shared/constants";
-import type { MiddlewareFunction, MiddlewareHandler } from "../core/types";
+import type {
+  MiddlewareFunction,
+  MiddlewareHandler,
+} from "../../unified-backend/shared/core-types";
 
 export interface LanguageMiddlewareOptions {
   /**

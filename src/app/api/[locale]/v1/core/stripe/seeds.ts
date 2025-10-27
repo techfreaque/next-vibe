@@ -4,9 +4,10 @@
  */
 
 import { parseError } from "next-vibe/shared/utils";
-import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 
-import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+
 import { cliStripeRepository } from "./repository";
 
 /**
@@ -62,7 +63,10 @@ export function test(logger: EndpointLogger): void {
       );
     }
   } catch (error) {
-    logger.error("Error validating test Stripe CLI configuration:", parseError(error));
+    logger.error(
+      "Error validating test Stripe CLI configuration:",
+      parseError(error),
+    );
   }
 }
 
@@ -94,7 +98,10 @@ export function prod(logger: EndpointLogger): void {
 
     logger.debug("✅ Production Stripe integration validated");
   } catch (error) {
-    logger.error("Error validating production Stripe integration:", parseError(error));
+    logger.error(
+      "Error validating production Stripe integration:",
+      parseError(error),
+    );
   }
 }
 

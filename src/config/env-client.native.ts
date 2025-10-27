@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable i18next/no-literal-string */
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { EnvFrontend, EnvFrontendInput } from "@/config/env-client";
 import { envClientSchema } from "@/config/env-client";
 import type { ExplicitAnyType } from "next-vibe/shared/types/utils";

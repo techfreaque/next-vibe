@@ -5,23 +5,23 @@
 
 import { z } from "zod";
 
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import {
   objectField,
   requestDataField,
   responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { DEFAULT_FOLDER_IDS } from "../chat/config";
-import { ModelId } from "../chat/model-access/models";
+import { ModelId, ModelIdOptions } from "../chat/model-access/models";
 
 /**
  * Chat message schema
@@ -219,6 +219,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.chat.aiStream.post.model.label",
           description:
             "app.api.v1.core.agent.chat.aiStream.post.model.description",
+          options: ModelIdOptions,
           layout: { columns: 4 },
         },
         z.nativeEnum(ModelId),

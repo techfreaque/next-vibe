@@ -1,147 +1,29 @@
 /**
- * Credit Deduction Utilities
- * Shared logic for deducting credits across agent features
+ * Shared Credit Deduction Utilities
+ * Provides a consistent interface for deducting credits across agent features
  */
 
 import "server-only";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+
 import { creditRepository } from "../../credits/repository";
-import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { JwtPayloadType } from "../../user/auth/definition";
 
 /**
- * Credit deduction context
+ * Deduct credits for a feature
+ * Wrapper around creditRepository.deductCreditsForFeature
  */
-export interface CreditDeductionContext {
+export async function deductCredits(params: {
   user: JwtPayloadType;
   cost: number;
   feature: string;
   logger: EndpointLogger;
-  // eslint-disable-next-line no-restricted-syntax
-  metadata?: Record<string, unknown>;
-}
-
-/**
- * Credit deduction result
- */
-export interface CreditDeductionResult {
-  success: boolean;
-  messageId?: string;
-  creditIdentifier?: string;
-}
-
-/**
- * Deduct credits for a feature
- */
-export async function deductCredits(
-  context: CreditDeductionContext,
-): Promise<CreditDeductionResult> {
-  const { user, cost, feature, logger } = context;
-
-  // Skip credit deduction for public users or zero cost
-  if (user.isPublic || cost <= 0) {
-    logger.debug(`Skipping credit deduction`, {
-      feature,
-      cost,
-      isPublic: user.isPublic,
-    });
-    return { success: true };
-  }
-
-  try {
-    const creditMessageId = crypto.randomUUID();
-
-    // Determine correct credit identifier based on user type
-    let creditIdentifier: { userId?: string; leadId?: string };
-
-    if (!user.isPublic && user.id && user.leadId) {
-      const identifierResult = await creditRepository.getCreditIdentifier(
-        user.id,
-        user.leadId,
-        logger,
-      );
-
-      if (identifierResult.success && identifierResult.data) {
-        if (identifierResult.data.creditType === "USER_SUBSCRIPTION") {
-          // User has subscription - deduct from user credits
-          creditIdentifier = { userId: user.id };
-        } else {
-          // User has no subscription - deduct from lead credits
-          creditIdentifier = { leadId: user.leadId };
-        }
-      } else {
-        // Fallback to lead credits if we can't determine subscription status
-        creditIdentifier = { leadId: user.leadId };
-      }
-    } else if (user.leadId) {
-      creditIdentifier = { leadId: user.leadId };
-    } else {
-      logger.error("No userId or leadId available for credit deduction");
-      return { success: false };
-    }
-
-    const deductResult = await creditRepository.deductCredits(
-      creditIdentifier,
-      cost,
-      feature,
-      creditMessageId,
-    );
-
-    if (!deductResult.success) {
-      logger.error(`Failed to deduct credits for ${feature}`, {
-        userId: user.isPublic ? undefined : user.id,
-        leadId: user.leadId,
-        cost,
-      });
-      return { success: false };
-    }
-
-    logger.info(`Credits deducted successfully for ${feature}`, {
-      userId: user.isPublic ? undefined : user.id,
-      leadId: user.leadId,
-      cost,
-      messageId: creditMessageId,
-    });
-
-    // Build creditIdentifier string for response
-    const creditIdentifierStr = creditIdentifier.userId
-      ? creditIdentifier.userId
-      : creditIdentifier.leadId;
-
-    return {
-      success: true,
-      messageId: creditMessageId,
-      creditIdentifier: creditIdentifierStr,
-    };
-  } catch (error) {
-    logger.error(`Error deducting credits for ${feature}`, {
-      error: error instanceof Error ? error.message : String(error),
-      userId: user.id,
-      cost,
-    });
-    return { success: false };
-  }
-}
-
-/**
- * Check if user has enough credits
- */
-export async function hasEnoughCredits(
-  userId: string,
-  requiredCredits: number,
-  logger: EndpointLogger,
-): Promise<boolean> {
-  try {
-    const balanceResult = await creditRepository.getBalance(userId);
-    if (!balanceResult.success || !balanceResult.data) {
-      return false;
-    }
-    return balanceResult.data.total >= requiredCredits;
-  } catch (error) {
-    logger.error("Error checking credit balance", {
-      error: error instanceof Error ? error.message : String(error),
-      userId,
-    });
-    return false;
-  }
+}): Promise<{ success: boolean; messageId?: string }> {
+  return await creditRepository.deductCreditsForFeature(
+    params.user,
+    params.cost,
+    params.feature,
+    params.logger,
+  );
 }

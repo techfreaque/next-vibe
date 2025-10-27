@@ -1,4 +1,5 @@
 /**
+import type { CountryLanguage } from "@/i18n/core/config";
  * Payment Seeds
  * Provides seed data for payment-related tables
  */
@@ -6,9 +7,10 @@
 import { parseError } from "next-vibe/shared/utils";
 
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { PaymentCreateRequestOutput } from "./definition";
 import { CheckoutMode, PaymentMethodType } from "./enum";
@@ -33,7 +35,10 @@ function createPaymentSeed(
 /**
  * Development seed function for payment module
  */
-export async function dev(logger: EndpointLogger): Promise<void> {
+export async function dev(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("🌱 Seeding payment data for development environment");
 
   try {
@@ -41,6 +46,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     const demoUserResponse = await userRepository.getUserByEmail(
       "demo@example.com",
       UserDetailLevel.STANDARD,
+      locale,
       logger,
     );
 
@@ -78,7 +84,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       `Created ${paymentTestCases.length} payment test case configurations`,
     );
   } catch (error) {
-    logger.error("Error preparing payment development seeds:", parseError(error));
+    logger.error(
+      "Error preparing payment development seeds:",
+      parseError(error),
+    );
     // Don't throw error - continue with other seeds
   }
 
@@ -88,20 +97,25 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 /**
  * Test seed function for payment module
  */
-export async function test(logger: EndpointLogger): Promise<void> {
+export async function test(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("🌱 Seeding payment data for test environment");
 
   try {
     // Get test users for payment testing
     const testUser1Response = await userRepository.getUserByEmail(
-      "test1@example.com",
+      "admin@example.com",
       UserDetailLevel.STANDARD,
+      locale,
       logger,
     );
 
     const testUser2Response = await userRepository.getUserByEmail(
       "test2@example.com",
       UserDetailLevel.STANDARD,
+      locale,
       logger,
     );
 

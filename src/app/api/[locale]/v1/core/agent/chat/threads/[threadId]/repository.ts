@@ -15,7 +15,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -102,25 +102,29 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
       // Map database fields to response fields
       // Exclude: rootFolderId (not in response), moderatorIds, searchVector
       // Map: defaultModel (ModelId -> string), defaultPersona -> persona (PersonaId -> string)
-      return createSuccessResponse({
+      const response: ThreadGetResponseOutput = {
         thread: {
           id: thread.id,
           userId: thread.userId,
           title: thread.title,
           folderId: thread.folderId,
           status: thread.status,
-          defaultModel: (thread.defaultModel as string | null) ?? null,
-          persona: (thread.defaultPersona as string | null) ?? null,
+          defaultModel: thread.defaultModel ?? null,
+          persona: thread.defaultPersona ?? null,
           systemPrompt: thread.systemPrompt,
           pinned: thread.pinned,
           archived: thread.archived,
-          tags: thread.tags,
+          tags: thread.tags ?? [],
           preview: thread.preview,
-          metadata: thread.metadata as Record<string, unknown>,
+          metadata: (thread.metadata ?? {}) as Record<
+            string,
+            string | number | boolean
+          >,
           createdAt: thread.createdAt,
           updatedAt: thread.updatedAt,
         },
-      });
+      };
+      return createSuccessResponse(response);
     } catch (error) {
       logger.error("Error getting thread by ID", parseError(error));
       return createErrorResponse(
@@ -227,25 +231,29 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
       // Map database fields to response fields
       // Exclude: rootFolderId (not in response), moderatorIds, searchVector
       // Map: defaultModel (ModelId -> string), defaultPersona -> persona (PersonaId -> string)
-      return createSuccessResponse({
+      const response: ThreadPatchResponseOutput = {
         thread: {
           id: updatedThread.id,
           userId: updatedThread.userId,
           title: updatedThread.title,
           folderId: updatedThread.folderId,
           status: updatedThread.status,
-          defaultModel: (updatedThread.defaultModel as string | null) ?? null,
-          persona: (updatedThread.defaultPersona as string | null) ?? null,
+          defaultModel: updatedThread.defaultModel ?? null,
+          persona: updatedThread.defaultPersona ?? null,
           systemPrompt: updatedThread.systemPrompt,
           pinned: updatedThread.pinned,
           archived: updatedThread.archived,
-          tags: updatedThread.tags,
+          tags: updatedThread.tags ?? [],
           preview: updatedThread.preview,
-          metadata: updatedThread.metadata as Record<string, unknown>,
+          metadata: (updatedThread.metadata ?? {}) as Record<
+            string,
+            string | number | boolean
+          >,
           createdAt: updatedThread.createdAt,
           updatedAt: updatedThread.updatedAt,
         },
-      });
+      };
+      return createSuccessResponse(response);
     } catch (error) {
       logger.error("Error updating thread", parseError(error));
       return createErrorResponse(

@@ -12,6 +12,9 @@ import { spawn } from "node:child_process";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { seedDatabase } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { Task } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/types/repository";
+import { unifiedTaskRunnerRepository } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/unified-runner/repository";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -19,9 +22,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { databaseMigrationRepository } from "../../db/migrate/repository";
 import { dockerOperationsRepository } from "../../db/utils/docker-operations/repository";
 import { dbUtilsRepository } from "../../db/utils/repository";
-import type { Task } from "../../tasks/types/repository";
-import { unifiedTaskRunnerRepository } from "../../tasks/unified-runner/repository";
-import type { EndpointLogger } from "../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type endpoints from "./definition";
 
 type RequestType = typeof endpoints.POST.types.RequestOutput;
@@ -370,7 +370,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     try {
       // Load the task registry
       const { taskRegistry } = await import(
-        "../../tasks/generated/tasks-index"
+        "@/app/api/[locale]/v1/core/system/unified-backend/tasks/generated/tasks-index"
       );
 
       // Filter tasks for development environment

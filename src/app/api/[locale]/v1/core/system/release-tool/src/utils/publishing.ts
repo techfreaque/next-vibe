@@ -6,7 +6,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import archiver from "archiver";
 import inquirer from "inquirer";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 import type { PackageJson, ReleasePackage } from "../types/index.js";
 import {

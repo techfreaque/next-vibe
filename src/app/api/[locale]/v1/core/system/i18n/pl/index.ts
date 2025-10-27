@@ -6,15 +6,14 @@ import { translations as guardTranslations } from "../../guard/i18n/pl";
 import { translations as launchpadTranslations } from "../../launchpad/i18n/pl";
 import { translations as releaseToolTranslations } from "../../release-tool/i18n/pl";
 import { translations as serverTranslations } from "../../server/i18n/pl";
-import { translations as tasksTranslations } from "../../tasks/i18n/pl";
 import { translations as translationsTranslations } from "../../translations/i18n/pl";
+import { translations as unifiedBackendTranslations } from "../../unified-backend/i18n/pl";
 import { translations as unifiedUiTranslations } from "../../unified-ui/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   builder: builderTranslations,
   check: checkTranslations,
-  cli: unifiedUiTranslations.cli, // Alias for CLI translations
   db: dbTranslations,
   dev: {
     category: "Rozwój",
@@ -69,7 +68,7 @@ export const translations: typeof enTranslations = {
   launchpad: launchpadTranslations,
   releaseTool: releaseToolTranslations,
   server: serverTranslations,
-  tasks: tasksTranslations,
   translations: translationsTranslations,
+  unifiedBackend: unifiedBackendTranslations,
   unifiedUi: unifiedUiTranslations,
 };

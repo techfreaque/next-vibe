@@ -3,12 +3,20 @@
  * Provides seed data for auth-related tables
  */
 
-import { parseError } from "next-vibe/shared/utils";
-import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
+import { and, eq } from "drizzle-orm";
+import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import { db } from "@/app/api/[locale]/v1/core/system/db";
+import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
+
+import { leads, userLeads } from "../leads/db";
+import { LeadSource, LeadStatus } from "../leads/enum";
+import { parseError } from "../shared/utils";
 import { authRepository } from "./auth/repository";
 import type { NewUser } from "./db";
+import { users } from "./db";
 import type { StandardUserType } from "./definition";
 import { UserDetailLevel } from "./enum";
 import { sessionRepository } from "./private/session/repository";
@@ -36,7 +44,10 @@ function createUserSeed(overrides?: Partial<NewUser>): NewUser {
 /**
  * Development seed function for auth module
  */
-export async function dev(logger: EndpointLogger): Promise<void> {
+export async function dev(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("🌱 Seeding auth data for development environment");
 
   // Create CLI system user with all roles
@@ -82,36 +93,124 @@ export async function dev(logger: EndpointLogger): Promise<void> {
   const allUsers = [cliUser, adminUser, demoUser, ...regularUsers];
 
   // Create users with hashed passwords using the repository
-  const createdUsers = await Promise.all(
-    allUsers.map(async (user) => {
-      try {
-        // Check if user already exists
-        const existingUserResponse = await userRepository.getUserByEmail(
-          user.email,
-          UserDetailLevel.STANDARD,
-          logger,
+  const createdUsers: StandardUserType[] = [];
+  for (const user of allUsers) {
+    try {
+      // Check if user already exists using emailExists (doesn't fetch full user)
+      const emailExistsResponse = await userRepository.emailExists(
+        user.email,
+        logger,
+      );
+      if (emailExistsResponse.success && emailExistsResponse.data) {
+        logger.debug(
+          `User with email ${user.email} already exists, skipping creation`,
         );
-        if (existingUserResponse.success && existingUserResponse.data) {
-          logger.debug(
-            `User with email ${user.email} already exists, skipping creation`,
-          );
-          return existingUserResponse.data;
+        // Get existing user ID to fetch later after leads are created
+        const results = await db
+          .select({ id: users.id })
+          .from(users)
+          .where(eq(users.email, user.email))
+          .limit(1);
+        if (results.length > 0) {
+          // Create minimal user object for now
+          const minimalUser: StandardUserType = {
+            id: results[0].id,
+            leadId: "",
+            isPublic: false,
+            privateName: user.privateName,
+            publicName: user.publicName,
+            email: user.email,
+            emailVerified: true,
+            isActive: true,
+            requireTwoFactor: false,
+            marketingConsent: false,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            userRoles: [],
+          };
+          createdUsers.push(minimalUser);
         }
-        // Create new user
-        const newUserResponse = await userRepository.createWithHashedPassword(
-          user,
-          logger,
-        );
-        if (!newUserResponse.success) {
-          throw new Error(`Failed to create user: ${newUserResponse.message}`);
-        }
-        return newUserResponse.data;
-      } catch (error) {
-        logger.error(`Error creating user ${user.email}:`, error);
-        throw error;
+        continue;
       }
-    }),
-  );
+      // Create new user
+      const newUserResponse = await userRepository.createWithHashedPassword(
+        user,
+        logger,
+      );
+      if (!newUserResponse.success) {
+        logger.error(
+          `Failed to create user ${user.email}: ${newUserResponse.message}`,
+        );
+        continue;
+      }
+      createdUsers.push(newUserResponse.data);
+    } catch (error) {
+      logger.error(`Error creating user ${user.email}:`, parseError(error));
+    }
+  }
+
+  // Create primary leads for all users
+  const { language, country } = getLanguageAndCountryFromLocale(locale);
+  for (const user of createdUsers) {
+    try {
+      // Check if lead already exists for this email
+      const existingLeads = await db
+        .select()
+        .from(leads)
+        .where(eq(leads.email, user.email))
+        .limit(1);
+
+      let leadId: string;
+      if (existingLeads.length > 0) {
+        leadId = existingLeads[0].id;
+        logger.debug(
+          `Lead already exists for ${user.email}, using existing lead ${leadId}`,
+        );
+      } else {
+        // Create lead
+        const leadData = {
+          email: user.email,
+          businessName: user.publicName || "",
+          status: LeadStatus.SIGNED_UP,
+          source: LeadSource.WEBSITE,
+          country,
+          language,
+        };
+        const [newLead] = await db.insert(leads).values(leadData).returning();
+        leadId = newLead.id;
+        logger.debug(`Created primary lead ${leadId} for user ${user.id}`);
+      }
+
+      // Check if user-lead link already exists
+      const existingUserLeads = await db
+        .select()
+        .from(userLeads)
+        .where(and(eq(userLeads.userId, user.id), eq(userLeads.leadId, leadId)))
+        .limit(1);
+
+      if (existingUserLeads.length === 0) {
+        // Link to user as primary
+        await db.insert(userLeads).values({
+          userId: user.id,
+          leadId,
+          isPrimary: true,
+        });
+        logger.debug(`Linked lead ${leadId} to user ${user.id}`);
+      } else {
+        logger.debug(
+          `User-lead link already exists for user ${user.id} and lead ${leadId}`,
+        );
+      }
+    } catch (error) {
+      const errorMsg = parseError(error).message;
+      if (!errorMsg.includes("duplicate key")) {
+        logger.error(
+          `Error creating lead for user ${user.id}:`,
+          parseError(error),
+        );
+      }
+    }
+  }
 
   // Create roles for users
   try {
@@ -141,16 +240,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
             );
             logger.debug(`Created ${role} role for CLI user ${cliUserId}`);
           } catch (roleError) {
-            const errorMessage =
-              roleError instanceof Error
-                ? roleError.message
-                : String(roleError);
-            if (!errorMessage.includes("duplicate key")) {
-              logger.error(
-                `Failed to create ${role} role for CLI user:`,
-                roleError,
-              );
-            }
+            logger.error(
+              `Failed to create ${role} role for CLI user:`,
+              parseError(roleError),
+            );
           }
         }
       }
@@ -224,6 +317,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       // Create CLI token
       const cliTokenResponse = await authRepository.createCliToken(
         cliUserId,
+        "en-GLOBAL",
         logger,
       );
       if (cliTokenResponse.success) {
@@ -249,7 +343,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
         logger.error("Failed to create CLI token:", cliTokenResponse);
       }
     } catch (cliError) {
-      logger.error("Failed to create CLI authentication:", cliError);
+      logger.error(
+        "Failed to create CLI authentication:",
+        parseError(cliError),
+      );
     }
   }
 
@@ -286,6 +383,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
         const existingUser = await userRepository.getUserByEmail(
           user.email,
           UserDetailLevel.STANDARD,
+          "en-GLOBAL",
           logger,
         );
         if (existingUser.success) {
@@ -304,7 +402,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
         }
         return userResponse.data;
       } catch (error) {
-        logger.error(`Error creating user ${user.email}:`, error);
+        logger.error(`Error creating user ${user.email}:`, parseError(error));
         throw error;
       }
     }),
@@ -378,6 +476,7 @@ export async function prod(logger: EndpointLogger): Promise<void> {
     const existingAdmin = await userRepository.getUserByEmail(
       adminUser.email,
       UserDetailLevel.STANDARD,
+      "en-GLOBAL",
       logger,
     );
     if (existingAdmin.success && existingAdmin.data) {

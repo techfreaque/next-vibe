@@ -9,7 +9,7 @@ import { promisify } from "node:util";
 import { exec } from "child_process";
 import { z } from "zod";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
 import {
@@ -17,8 +17,8 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "../../../shared/types/response.schema";
-import { parseJsonWithComments } from "../../../shared/utils/parse-json";
 import { parseError } from "../../../shared/utils/parse-error";
+import { parseJsonWithComments } from "../../../shared/utils/parse-json";
 import { TYPECHECK_PATTERNS } from "./constants";
 import type {
   TypecheckRequestOutput,
@@ -62,9 +62,7 @@ function createTempTsConfig(files: string[], tempConfigPath: string): void {
   let mainTsConfig: TsConfig;
   try {
     const tsConfigContent = readFileSync("tsconfig.json", "utf8");
-    mainTsConfig = TsConfigSchema.parse(
-      parseJsonWithComments(tsConfigContent),
-    );
+    mainTsConfig = TsConfigSchema.parse(parseJsonWithComments(tsConfigContent));
   } catch (error) {
     throw new Error(
       `Failed to read or parse tsconfig.json: ${error instanceof Error ? error.message : String(error)}`,

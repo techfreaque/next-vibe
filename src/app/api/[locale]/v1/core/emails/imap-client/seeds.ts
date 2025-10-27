@@ -11,8 +11,8 @@ import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-man
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 
-import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import { imapAccounts, type NewImapAccount } from "../messages/db";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import { imapAccounts, type NewImapAccount } from "./db";
 import { ImapAuthMethod, ImapSpecialUseType, ImapSyncStatus } from "./enum";
 
 /**

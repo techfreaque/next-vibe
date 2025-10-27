@@ -5,7 +5,7 @@ import { join } from "node:path";
 
 import inquirer from "inquirer";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 import type { ReleaseConfig, ReleasePackage } from "../types/index.js";
 import { getPackageJson } from "./package-json.js";

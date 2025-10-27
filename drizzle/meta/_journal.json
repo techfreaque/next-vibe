@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1760991199179,
-      "tag": "20251020201319_tired_saracen",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1760991389071,
-      "tag": "20251020201629_magenta_hulk",
+      "when": 1761511019875,
+      "tag": "20251026203659_empty_slipstream",
       "breakpoints": true
     }
   ]

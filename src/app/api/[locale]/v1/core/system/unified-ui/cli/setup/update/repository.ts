@@ -55,11 +55,11 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
 
       if (!uninstallResult.success) {
         return createErrorResponse(
-          "app.api.v1.core.system.cli.setup.update.post.errors.server.title",
+          "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.server.title",
           ErrorResponseTypes.INTERNAL_ERROR,
           {
             error: t(
-              "app.api.v1.core.system.cli.setup.update.post.errors.server.description",
+              "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.server.description",
             ),
           },
         );
@@ -79,7 +79,7 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
           version: installResult.data.version,
           path: installResult.data.path,
           message: t(
-            "app.api.v1.core.system.cli.setup.update.post.success.description",
+            "app.api.v1.core.system.unifiedUi.cli.setup.update.post.success.description",
           ),
           output: installResult.data.output,
         });
@@ -88,14 +88,14 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
           success: false,
           installed: false,
           message: t(
-            "app.api.v1.core.system.cli.setup.update.post.errors.server.description",
+            "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.server.description",
           ),
         });
       }
     } catch (err) {
       const parsedError = parseError(err);
       return createErrorResponse(
-        "app.api.v1.core.system.cli.setup.update.post.errors.server.title",
+        "app.api.v1.core.system.unifiedUi.cli.setup.update.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message },
       );

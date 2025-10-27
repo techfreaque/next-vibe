@@ -17,7 +17,7 @@ import { verifyPassword } from "next-vibe/shared/utils/password";
 import { leadAuthService } from "@/app/api/[locale]/v1/core/leads/auth-service";
 import { leadsRepository } from "@/app/api/[locale]/v1/core/leads/repository";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -159,6 +159,7 @@ export class LoginRepositoryImpl implements LoginRepository {
       const userResponse = await userRepository.getUserByEmail(
         email,
         UserDetailLevel.STANDARD,
+        locale,
         logger,
       );
 
@@ -339,6 +340,7 @@ export class LoginRepositoryImpl implements LoginRepository {
       const userResponse = await userRepository.getUserById(
         userId,
         UserDetailLevel.COMPLETE,
+        locale,
         logger,
       );
       if (!userResponse.success) {
@@ -492,6 +494,7 @@ export class LoginRepositoryImpl implements LoginRepository {
         const user = await userRepository.getUserByEmail(
           email,
           UserDetailLevel.STANDARD,
+          locale,
           logger,
         );
         if (!user.success) {

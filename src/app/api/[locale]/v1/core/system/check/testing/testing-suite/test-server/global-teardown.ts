@@ -4,9 +4,10 @@
  */
 
 import { parseError } from "next-vibe/shared/utils";
-import { closeDatabase } from "@/app/api/[locale]/v1/core/system/db";
 
-import type { EndpointLogger } from "../../../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { closeDatabase } from "@/app/api/[locale]/v1/core/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+
 import { stopServer } from "./test-server";
 
 export default async function teardown(logger: EndpointLogger): Promise<void> {

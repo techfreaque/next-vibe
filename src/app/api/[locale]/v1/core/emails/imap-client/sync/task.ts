@@ -18,16 +18,16 @@ import { z } from "zod";
 import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
-} from "@/app/api/[locale]/v1/core/system/tasks/constants";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/constants";
 import {
   CronTaskPriority,
   TaskCategory,
-} from "@/app/api/[locale]/v1/core/system/tasks/enum";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/enum";
 import type {
   Task,
   TaskExecutionContext,
-} from "@/app/api/[locale]/v1/core/system/tasks/types/repository";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/types/repository";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPrivatePayloadType } from "../../../user/auth/definition";

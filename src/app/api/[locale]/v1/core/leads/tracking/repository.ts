@@ -17,7 +17,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 // Removed unused import - using direct database operations instead
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { Countries, Languages } from "@/i18n/core/config";
 
@@ -72,6 +72,25 @@ export type ClickTrackingResult = ClickTrackingResponseOutput;
  * Lead Tracking Repository Interface
  */
 export interface ILeadTrackingRepository {
+  extractClientInfo(request: NextRequest): ClientInfo;
+
+  validateTrackingParams(searchParams: URLSearchParams): {
+    leadId?: string;
+    campaignId?: string;
+    error?: string;
+  };
+
+  recordEngagement(
+    data: {
+      leadId: string;
+      engagementType: EngagementType;
+      campaignId?: string;
+      metadata?: Record<string, string | number | boolean>;
+    },
+    clientInfo: ClientInfo | undefined,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<LeadEngagementResponseOutput>>;
+
   handleTrackingPixel(
     leadId: string,
     campaignId: string | undefined,
@@ -87,6 +106,40 @@ export interface ILeadTrackingRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ClickTrackingResult>>;
+
+  handleEngagementWithRelationship(
+    data: LeadEngagementRequestOutput,
+    clientInfo: ClientInfo,
+    locale: CountryLanguage,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<LeadEngagementResponseOutput>>;
+
+  trackConsultationBooking(
+    leadId: string,
+    clientInfo: ClientInfo,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<LeadEngagementResponseOutput>>;
+
+  trackSubscriptionConfirmation(
+    leadId: string,
+    clientInfo: ClientInfo,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<LeadEngagementResponseOutput>>;
+
+  createAnonymousLead(
+    clientInfo: ClientInfo,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<string>;
+
+  createTrackingPixelResponse(): Response;
+
+  transitionLeadStatus(
+    leadId: string,
+    newStatus: (typeof LeadStatus)[keyof typeof LeadStatus],
+    logger: EndpointLogger,
+  ): Promise<boolean>;
 
   generateTrackingPixelUrl(
     leadId: string | undefined,
@@ -137,19 +190,14 @@ export interface ILeadTrackingRepository {
  * Handles all server-side tracking operations
  */
 export class LeadTrackingRepository implements ILeadTrackingRepository {
-  private static readonly UUID_REGEX =
+  private readonly UUID_REGEX =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  private static readonly VALID_SOURCES = [
-    "email",
-    "social",
-    "website",
-    "referral",
-  ];
+  private readonly VALID_SOURCES = ["email", "social", "website", "referral"];
 
   /**
    * Extract client information from request
    */
-  static extractClientInfo(request: NextRequest): ClientInfo {
+  extractClientInfo(request: NextRequest): ClientInfo {
     const userAgent = request.headers.get("user-agent") || "";
     const referer = request.headers.get("referer") || "";
     const ip =
@@ -168,7 +216,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   /**
    * Validate tracking parameters from URL
    */
-  static validateTrackingParams(searchParams: URLSearchParams): {
+  validateTrackingParams(searchParams: URLSearchParams): {
     leadId?: string;
     campaignId?: string;
     error?: string;
@@ -182,11 +230,11 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
     }
 
     // Validate UUID format
-    if (!LeadTrackingRepository.UUID_REGEX.test(leadId)) {
+    if (!this.UUID_REGEX.test(leadId)) {
       return { error: "error.validation" };
     }
 
-    if (campaignId && !LeadTrackingRepository.UUID_REGEX.test(campaignId)) {
+    if (campaignId && !this.UUID_REGEX.test(campaignId)) {
       return { error: "error.validation" };
     }
 
@@ -197,7 +245,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    * Record engagement event
    * Returns LeadEngagementResponseOutput from definition
    */
-  static async recordEngagement(
+  async recordEngagement(
     data: {
       leadId: string;
       engagementType: EngagementType;
@@ -249,7 +297,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
 
       // Also update the email engagement in the emails table if campaign is present
       if (data.campaignId) {
-        await LeadTrackingRepository.updateEmailEngagementRecord(
+        await this.updateEmailEngagementRecord(
           data.campaignId,
           data.engagementType,
           logger,
@@ -270,15 +318,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       const action = actionMap[data.engagementType];
       if (action) {
         try {
-          await LeadTrackingRepository.transitionLeadStatus(
-            data.leadId,
-            action,
-            logger,
-            {
-              engagementId: engagementData.id,
-              ...(data.campaignId && { campaignId: data.campaignId }),
-            },
-          );
+          await this.transitionLeadStatus(data.leadId, action, logger, {
+            engagementId: engagementData.id,
+            ...(data.campaignId && { campaignId: data.campaignId }),
+          });
         } catch (error) {
           // Don't fail the engagement recording if status transition fails
           logger.warn(
@@ -315,7 +358,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   /**
    * Update email engagement record in the emails table
    */
-  private static async updateEmailEngagementRecord(
+  private async updateEmailEngagementRecord(
     campaignId: string,
     engagementType: EngagementType,
     logger: EndpointLogger,
@@ -386,7 +429,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   /**
    * Handle tracking pixel request
    */
-  static async handleTrackingPixel(
+  async handleTrackingPixel(
     leadId: string,
     campaignId: string | undefined,
     clientInfo: ClientInfo,
@@ -397,7 +440,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
 
       // Record email open engagement if campaign is present
       if (campaignId) {
-        const engagementResult = await LeadTrackingRepository.recordEngagement(
+        const engagementResult = await this.recordEngagement(
           {
             leadId,
             campaignId,
@@ -441,7 +484,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   /**
    * Handle click tracking with lead status update for logged-in users
    */
-  static async handleClickTracking(
+  async handleClickTracking(
     params: ClickTrackingRequestOutput,
     clientInfo: ClientInfo,
     logger: EndpointLogger,
@@ -478,7 +521,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
 
           // Track email open first (since click implies open) only if not already recorded
           if (!emailRecord?.openedAt) {
-            await LeadTrackingRepository.recordEngagement(
+            await this.recordEngagement(
               {
                 leadId,
                 campaignId,
@@ -494,7 +537,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           }
 
           // Track email click
-          const clickResult = await LeadTrackingRepository.recordEngagement(
+          const clickResult = await this.recordEngagement(
             {
               leadId,
               campaignId,
@@ -591,7 +634,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   /**
    * Track consultation booking
    */
-  static async trackConsultationBooking(
+  async trackConsultationBooking(
     leadId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ leadStatusUpdated: boolean }>> {
@@ -632,7 +675,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   /**
    * Track subscription confirmation (true conversion)
    */
-  static async trackSubscriptionConfirmation(
+  async trackSubscriptionConfirmation(
     leadId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ leadStatusUpdated: boolean }>> {
@@ -673,7 +716,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   /**
    * Create anonymous lead for website visitors
    */
-  static async createAnonymousLead(
+  async createAnonymousLead(
     clientInfo: ClientInfo,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -762,7 +805,10 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         leadId: createdLead.id,
       });
     } catch (error) {
-      logger.error("app.api.v1.core.leads.tracking.anonymous.error", parseError(error).message);
+      logger.error(
+        "app.api.v1.core.leads.tracking.anonymous.error",
+        parseError(error).message,
+      );
       return createErrorResponse(
         "app.api.v1.core.leads.tracking.errors.default",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -773,7 +819,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   /**
    * Create tracking pixel response (1x1 transparent GIF)
    */
-  static createTrackingPixelResponse(): Response {
+  createTrackingPixelResponse(): Response {
     // 1x1 transparent GIF in base64
     const pixel = Buffer.from(
       "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
@@ -797,7 +843,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    * Transition lead status based on user actions
    * Implements proper lead lifecycle management
    */
-  static async transitionLeadStatus(
+  async transitionLeadStatus(
     leadId: string,
     action:
       | "website_visit"
@@ -1003,7 +1049,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    * Handle engagement with relationship establishment
    * Combines engagement recording with lead-user relationship handling
    */
-  static async handleEngagementWithRelationship(
+  async handleEngagementWithRelationship(
     data: LeadEngagementRequestOutput,
     clientInfo: ClientInfo,
     locale: CountryLanguage,
@@ -1048,12 +1094,11 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       // Create anonymous lead if leadId is missing or invalid
       // This should rarely happen since leadAuthService ensures leadId in JWT
       if (!leadId) {
-        const anonymousLeadResult =
-          await LeadTrackingRepository.createAnonymousLead(
-            clientInfo,
-            locale,
-            logger,
-          );
+        const anonymousLeadResult = await this.createAnonymousLead(
+          clientInfo,
+          locale,
+          logger,
+        );
 
         if (anonymousLeadResult.success && anonymousLeadResult.data) {
           leadId = anonymousLeadResult.data.leadId;
@@ -1178,7 +1223,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       }
 
       // Record engagement
-      const result = await LeadTrackingRepository.recordEngagement(
+      const result = await this.recordEngagement(
         {
           leadId,
           engagementType: data.engagementType,

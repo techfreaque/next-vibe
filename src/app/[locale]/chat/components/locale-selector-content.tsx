@@ -14,19 +14,19 @@ import type { FC } from "react";
 import { useCallback, useState } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
-import type { Countries, Languages } from "@/i18n/core/config";
+import type { Countries, CountryInfo, Languages } from "@/i18n/core/config";
 import { getUniqueLanguages } from "@/i18n/core/language-utils";
 
 export const LocaleSelectorContent: FC = () => {
-  const {
-    countries,
-    currentCountry,
-    changeLocale,
-    language,
-    country,
-    setLanguage,
-    t,
-  } = useTranslation();
+  const translationContext = useTranslation();
+  const countries: readonly CountryInfo[] = translationContext.countries;
+  const currentCountry: CountryInfo = translationContext.currentCountry;
+  const changeLocale: (country: Countries) => void =
+    translationContext.changeLocale;
+  const language: Languages = translationContext.language;
+  const country: Countries = translationContext.country;
+  const setLanguage: (lang: Languages) => void = translationContext.setLanguage;
+  const t = translationContext.t;
   const [activeTab, setActiveTab] = useState<"country" | "language">("country");
   const [tabHover, setTabHover] = useState<"country" | "language" | null>(null);
 

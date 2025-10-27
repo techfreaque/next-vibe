@@ -29,12 +29,12 @@ import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { JSX } from "react";
 
-import { useCronStats } from "@/app/api/[locale]/v1/core/system/tasks/cron/stats/hooks";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { useCronStats } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/stats/hooks";
 import {
   CronTaskPriority,
   CronTaskStatus,
-} from "@/app/api/[locale]/v1/core/system/tasks/enum";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";

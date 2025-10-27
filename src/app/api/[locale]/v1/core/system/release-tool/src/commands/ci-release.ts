@@ -2,7 +2,7 @@
 import { execSync } from "child_process";
 import { join } from "path";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 import type { ReleaseOptions, ReleasePackage } from "../types/index.js";
 import { getPackageJson } from "../utils/package-json.js";
@@ -112,7 +112,7 @@ export async function ciRelease(
         runCiReleaseCommand(releaseConfig, packageJson.name, logger);
       }
     } catch (error) {
-      logger.error(CLI_MESSAGES.errorProcessing(packageJson.name), error);
+      logger.error(CLI_MESSAGES.errorProcessing(packageJson.name), parseError(error));
       affectedPackages.push(pkg.directory);
       overallError = true;
     }

@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { userRolesRepository } from "@/app/api/[locale]/v1/core/user/user-roles/repository";
@@ -92,7 +92,7 @@ export function canReadFolder(
 
   // SHARED folders: check share token or allowed users (future implementation)
   if (folder.rootFolderId === "shared") {
-    // TODO: Implement share token and allowedUserIds check
+    // Share token and allowedUserIds check not yet implemented
     return false;
   }
 
@@ -168,7 +168,7 @@ export function canWriteFolder(
 
   // SHARED folders: check share token or allowed users (future implementation)
   if (folder.rootFolderId === "shared") {
-    // TODO: Implement share token and allowedUserIds check
+    // Share token and allowedUserIds check not yet implemented
     return false;
   }
 

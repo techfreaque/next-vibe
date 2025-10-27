@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { join } from "node:path";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 import type { ReleaseConfig } from "../types/index.js";
 import { handleUncommittedChanges } from "../utils/git.js";
@@ -160,7 +160,7 @@ export async function localRelease(
         await publishPackage({ newTag, lastTag, packageJson, pkg, logger });
       }
     } catch (error) {
-      logger.error(`Error processing ${packageJson.name}:`, error);
+      logger.error(`Error processing ${packageJson.name}:`, parseError(error));
       affectedPackages.push(pkg.directory);
       overallError = true;
     }

@@ -53,11 +53,11 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
     // Validate user permissions for CLI uninstallation
     if (!user?.id) {
       return createErrorResponse(
-        "app.api.v1.core.system.cli.setup.uninstall.post.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.unauthorized.title",
         ErrorResponseTypes.UNAUTHORIZED,
         {
           error: t(
-            "app.api.v1.core.system.cli.setup.uninstall.post.errors.unauthorized.description",
+            "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.unauthorized.description",
           ),
         },
       );
@@ -72,7 +72,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
           success: true,
           installed: false,
           message: t(
-            "app.api.v1.core.system.cli.setup.uninstall.post.description",
+            "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.description",
           ),
         });
       }
@@ -92,17 +92,17 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
         installed: newStatus.installed,
         message: !newStatus.installed
           ? t(
-              "app.api.v1.core.system.cli.setup.uninstall.post.success.description",
+              "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.success.description",
             )
           : t(
-              "app.api.v1.core.system.cli.setup.uninstall.post.errors.server.description",
+              "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.server.description",
             ),
         output: data.verbose ? output : undefined,
       });
     } catch (error) {
       const parsedError = parseError(error);
       return createErrorResponse(
-        "app.api.v1.core.system.cli.setup.uninstall.post.errors.server.title",
+        "app.api.v1.core.system.unifiedUi.cli.setup.uninstall.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message },
       );

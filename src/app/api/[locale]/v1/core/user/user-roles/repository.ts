@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 
 import type { NewUserRole, UserRole } from "../db";
 import { insertUserRoleSchema, userRoles } from "../db";
@@ -204,7 +204,10 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
 
       return createSuccessResponse(results[0]);
     } catch (error) {
-      logger.error("Error finding user role by user ID and role", parseError(error));
+      logger.error(
+        "Error finding user role by user ID and role",
+        parseError(error),
+      );
       return createErrorResponse(
         "app.api.v1.core.user.userRoles.errors.lookup_failed",
         ErrorResponseTypes.DATABASE_ERROR,

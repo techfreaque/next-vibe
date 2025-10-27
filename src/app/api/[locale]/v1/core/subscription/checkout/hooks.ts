@@ -14,13 +14,13 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type {
   InferApiFormReturn,
   InferEnhancedMutationResult,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
-import { useApiMutation } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation";
+} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/types";
+import { useApiMutation } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-api-mutation";
+import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-api-mutation-form";
 import { useTranslation } from "@/i18n/core/client";
 
 import type { BillingIntervalValue, SubscriptionPlanValue } from "../enum";

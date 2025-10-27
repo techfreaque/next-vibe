@@ -4,4 +4,5 @@
 
 import { translations as enTranslations } from "../en";
 
-export const translations = enTranslations;
+// Use English translations as fallback for German
+export const translations: typeof enTranslations = enTranslations;

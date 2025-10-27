@@ -21,8 +21,9 @@ import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error"
 import { subscriptions } from "@/app/api/[locale]/v1/core/subscription/db";
 import { SubscriptionStatus } from "@/app/api/[locale]/v1/core/subscription/enum";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { CountriesArr, LanguagesArr } from "@/i18n/core/config";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { creditTransactions, userCredits } from "./db";
 import { CreditTypeIdentifier, type CreditTypeIdentifierValue } from "./enum";
@@ -60,6 +61,13 @@ export interface CreditRepositoryInterface {
 
   // Get lead's current credit balance
   getLeadBalance(leadId: string): Promise<ResponseType<number>>;
+
+  // Get credit balance for user (handles both subscription and lead credits)
+  getCreditBalanceForUser(
+    userId: string,
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CreditBalance>>;
 
   // Get or create lead by IP address
   getOrCreateLeadByIp(
@@ -111,6 +119,14 @@ export interface CreditRepositoryInterface {
       creditType: CreditTypeIdentifierValue;
     }>
   >;
+
+  // Deduct credits for a feature (high-level wrapper)
+  deductCreditsForFeature(
+    user: { id?: string; leadId?: string; isPublic: boolean },
+    cost: number,
+    feature: string,
+    logger: EndpointLogger,
+  ): Promise<{ success: boolean; messageId?: string }>;
 }
 
 /**
@@ -206,11 +222,77 @@ class CreditRepository implements CreditRepositoryInterface {
   }
 
   /**
+   * Get credit balance for user (handles both subscription and lead credits)
+   * Determines whether to use user credits or lead credits based on subscription status
+   */
+  async getCreditBalanceForUser(
+    userId: string,
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CreditBalance>> {
+    try {
+      // Get credit identifier (determines if we use user credits or lead credits)
+      const identifierResult = await this.getCreditIdentifier(
+        userId,
+        leadId,
+        logger,
+      );
+
+      if (!identifierResult.success) {
+        return identifierResult;
+      }
+
+      const { userId: effectiveUserId, leadId: effectiveLeadId } =
+        identifierResult.data;
+
+      // If user has subscription → return user credits
+      if (effectiveUserId) {
+        return await this.getBalance(effectiveUserId);
+      }
+
+      // If user has no subscription → return lead credits
+      if (effectiveLeadId) {
+        const leadBalanceResult = await this.getLeadBalance(effectiveLeadId);
+
+        if (!leadBalanceResult.success) {
+          return leadBalanceResult;
+        }
+
+        const leadBalance = leadBalanceResult.data;
+
+        // Format lead credits to match the expected response format
+        return createSuccessResponse({
+          total: leadBalance,
+          expiring: 0,
+          permanent: 0,
+          free: leadBalance,
+          expiresAt: null,
+        });
+      }
+
+      // Should never reach here
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.credits.errors.noCreditSource",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    } catch (error) {
+      logger.error("Failed to get credit balance for user", parseError(error), {
+        userId,
+        leadId,
+      });
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
+  }
+
+  /**
    * Get or create lead by IP address
    */
   async getOrCreateLeadByIp(
     ipAddress: string,
-    locale: string,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ leadId: string; credits: number }>> {
     try {
@@ -238,14 +320,15 @@ class CreditRepository implements CreditRepositoryInterface {
       }
 
       // Create new lead with IP
-      const [language, country] = locale.split("-") as [string, string];
+      const { language, country } = getLanguageAndCountryFromLocale(locale);
+
       const [newLead] = await db
         .insert(leads)
         .values({
           ipAddress,
           businessName: "",
-          country: (country || "GLOBAL") as (typeof CountriesArr)[number],
-          language: (language || "en") as (typeof LanguagesArr)[number],
+          country,
+          language,
           status: LeadStatus.WEBSITE_USER,
           source: LeadSource.WEBSITE,
         })
@@ -565,6 +648,91 @@ class CreditRepository implements CreditRepositoryInterface {
         "app.api.v1.core.agent.chat.credits.errors.getCreditIdentifierFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
+    }
+  }
+
+  /**
+   * Deduct credits for a feature (high-level wrapper)
+   */
+  async deductCreditsForFeature(
+    user: { id?: string; leadId?: string; isPublic: boolean },
+    cost: number,
+    feature: string,
+    logger: EndpointLogger,
+  ): Promise<{ success: boolean; messageId?: string }> {
+    if (user.isPublic || cost <= 0) {
+      logger.debug("Skipping credit deduction", {
+        feature,
+        cost,
+        isPublic: user.isPublic,
+      });
+      return { success: true };
+    }
+
+    try {
+      const creditMessageId = crypto.randomUUID();
+      let creditIdentifier: { userId?: string; leadId?: string };
+
+      if (user.id && user.leadId) {
+        // User is logged in and has a lead - check subscription status
+        const identifierResult = await this.getCreditIdentifier(
+          user.id,
+          user.leadId,
+          logger,
+        );
+
+        if (identifierResult.success && identifierResult.data) {
+          if (identifierResult.data.creditType === "USER_SUBSCRIPTION") {
+            creditIdentifier = { userId: user.id };
+          } else {
+            creditIdentifier = { leadId: user.leadId };
+          }
+        } else {
+          // Fallback to lead credits if getCreditIdentifier fails
+          creditIdentifier = { leadId: user.leadId };
+        }
+      } else if (user.id) {
+        // User is logged in but no lead - use user credits
+        creditIdentifier = { userId: user.id };
+      } else if (user.leadId) {
+        // No user but has lead - use lead credits
+        creditIdentifier = { leadId: user.leadId };
+      } else {
+        logger.error("No userId or leadId available for credit deduction");
+        return { success: false };
+      }
+
+      const deductResult = await this.deductCredits(
+        creditIdentifier,
+        cost,
+        feature,
+        creditMessageId,
+      );
+
+      if (!deductResult.success) {
+        logger.error(`Failed to deduct credits for ${feature}`, {
+          userId: user.isPublic ? undefined : user.id,
+          leadId: user.leadId,
+          cost,
+        });
+        return { success: false };
+      }
+
+      logger.info(`Credits deducted successfully for ${feature}`, {
+        userId: user.isPublic ? undefined : user.id,
+        leadId: user.leadId,
+        cost,
+        messageId: creditMessageId,
+      });
+
+      return { success: true, messageId: creditMessageId };
+    } catch (error) {
+      logger.error(`Error deducting credits for ${feature}`, {
+        error: error instanceof Error ? error.message : String(error),
+        userId: user.id,
+        cost,
+      });
+      return { success: false };
     }
   }
 }

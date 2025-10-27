@@ -14,7 +14,6 @@
  * All methods return ResponseType<T> for consistent error handling
  */
 
-import { parseError } from "next-vibe/shared/utils";
 import { AUTH_STATUS_COOKIE_NAME } from "next-vibe/shared/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -22,13 +21,14 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import {
   deleteCookie,
   getCookie,
   setCookie,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/react/storage/cookie-client";
+} from "@/app/api/[locale]/v1/core/system/unified-ui/react/storage-cookie-client";
 import { envClient } from "@/config/env-client";
 
 /**

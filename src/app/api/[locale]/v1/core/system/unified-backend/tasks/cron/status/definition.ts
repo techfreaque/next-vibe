@@ -1,0 +1,351 @@
+/**
+ * Cron Status API Definition
+ * Status monitoring for cron task system
+ */
+
+import { z } from "zod";
+
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+import {
+  objectField,
+  requestDataField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
+
+import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+
+/**
+ * GET endpoint definition - Get cron status
+ * Retrieves current status of cron system and tasks
+ */
+const cronStatusGetEndpoint = createEndpoint({
+  method: Methods.GET,
+  path: ["v1", "core", "system", "tasks", "cron", "status"],
+  title: "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.title",
+  description:
+    "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.description",
+  category: "app.api.v1.core.system.unifiedBackend.tasks.taskCategory.system",
+  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  aliases: ["cron:status", "tasks:cron:status"],
+  tags: ["app.api.v1.core.system.unifiedBackend.tasks.type.cron"],
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.validation.title",
+      description:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.validation.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.network.title",
+      description:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.network.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.forbidden.title",
+      description:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.notFound.title",
+      description:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.notFound.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.server.title",
+      description:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unknown.title",
+      description:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unknown.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.unsavedChanges.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.conflict.title",
+      description:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.errors.conflict.description",
+    },
+  },
+  successTypes: {
+    title:
+      "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.success.title",
+    description:
+      "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.description",
+  },
+
+  fields: objectField(
+    {
+      type: WidgetType.CONTAINER,
+      title:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.title",
+      description:
+        "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.description",
+      layout: { type: LayoutType.GRID, columns: 12 },
+    },
+    { request: "data", response: true },
+    {
+      // === REQUEST FIELDS ===
+      taskId: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label:
+            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.taskName",
+          description:
+            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.taskNamesDescription",
+          layout: { columns: 6 },
+        },
+        z.string().optional(),
+      ),
+
+      detailed: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label:
+            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.detailed",
+          description:
+            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.detailedDescription",
+          layout: { columns: 6 },
+        },
+        z.boolean().default(false),
+      ),
+
+      // === RESPONSE FIELDS ===
+      success: responseField(
+        {
+          type: WidgetType.TEXT,
+          content:
+            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.success.content",
+        },
+        z.boolean(),
+      ),
+
+      systemStatus: responseField(
+        {
+          type: WidgetType.TEXT,
+          content:
+            "app.api.v1.core.system.unifiedBackend.tasks.pulse.health.healthy",
+        },
+        z.enum(["healthy", "warning", "critical", "unknown"]),
+      ),
+
+      activeTasks: responseField(
+        {
+          type: WidgetType.TEXT,
+          content:
+            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.active",
+        },
+        z.number(),
+      ),
+
+      totalTasks: responseField(
+        {
+          type: WidgetType.TEXT,
+          content:
+            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.total",
+        },
+        z.number(),
+      ),
+
+      uptime: responseField(
+        {
+          type: WidgetType.TEXT,
+          content:
+            "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.uptime",
+        },
+        z.string(),
+      ),
+
+      tasks: responseArrayField(
+        {
+          type: WidgetType.DATA_TABLE,
+          columns: [
+            {
+              key: "id",
+              label:
+                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.id",
+              type: FieldDataType.TEXT,
+            },
+            {
+              key: "name",
+              label:
+                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.taskName",
+              type: FieldDataType.TEXT,
+            },
+            {
+              key: "status",
+              label:
+                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.status",
+              type: FieldDataType.TEXT,
+            },
+            {
+              key: "lastRun",
+              label:
+                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.lastRun",
+              type: FieldDataType.TEXT,
+            },
+            {
+              key: "nextRun",
+              label:
+                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.nextRun",
+              type: FieldDataType.TEXT,
+            },
+            {
+              key: "schedule",
+              label:
+                "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.schedule",
+              type: FieldDataType.TEXT,
+            },
+          ],
+        },
+        responseField(
+          {
+            type: WidgetType.TEXT,
+            content:
+              "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.status.common.taskName",
+          },
+          z.object({
+            id: z.string(),
+            name: z.string(),
+            status: z.string(),
+            lastRun: z.string().nullable(),
+            nextRun: z.string().nullable(),
+            schedule: z.string(),
+          }),
+        ),
+      ),
+    },
+  ),
+
+  examples: {
+    urlPathParams: undefined,
+    requests: {
+      basic: {
+        detailed: false,
+      },
+      detailed: {
+        detailed: true,
+      },
+      specific: {
+        taskId: "task-12345",
+        detailed: true,
+      },
+      success: {
+        detailed: false,
+      },
+    },
+    responses: {
+      basic: {
+        success: true,
+        systemStatus: "healthy" as const,
+        activeTasks: 3,
+        totalTasks: 15,
+        uptime: "2d 14h 30m",
+        tasks: [
+          {
+            id: "task-1",
+            name: "email-campaign",
+            status: "RUNNING",
+            lastRun: "2023-07-21T11:30:00Z",
+            nextRun: "2023-07-21T12:30:00Z",
+            schedule: "0 */30 * * *",
+          },
+        ],
+      },
+      detailed: {
+        success: true,
+        systemStatus: "healthy" as const,
+        activeTasks: 3,
+        totalTasks: 15,
+        uptime: "2d 14h 30m",
+        tasks: [
+          {
+            id: "task-1",
+            name: "email-campaign",
+            status: "RUNNING",
+            lastRun: "2023-07-21T11:30:00Z",
+            nextRun: "2023-07-21T12:30:00Z",
+            schedule: "0 */30 * * *",
+          },
+        ],
+      },
+      specific: {
+        success: true,
+        systemStatus: "healthy" as const,
+        activeTasks: 1,
+        totalTasks: 1,
+        uptime: "2d 14h 30m",
+        tasks: [
+          {
+            id: "task-12345",
+            name: "specific-task",
+            status: "RUNNING",
+            lastRun: "2023-07-21T11:30:00Z",
+            nextRun: "2023-07-21T12:30:00Z",
+            schedule: "0 */30 * * *",
+          },
+        ],
+      },
+      success: {
+        success: true,
+        systemStatus: "healthy" as const,
+        activeTasks: 3,
+        totalTasks: 15,
+        uptime: "2d 14h 30m",
+        tasks: [
+          {
+            id: "task-1",
+            name: "email-campaign",
+            status: "RUNNING",
+            lastRun: "2023-07-21T11:30:00Z",
+            nextRun: "2023-07-21T12:30:00Z",
+            schedule: "0 */30 * * *",
+          },
+        ],
+      },
+    },
+  },
+});
+
+export { cronStatusGetEndpoint as GET };
+export { cronStatusGetEndpoint };
+
+const endpoints = { GET: cronStatusGetEndpoint };
+export default endpoints;
+
+// Export types for repository using proper Output types from endpoint
+export type CronStatusRequestInput =
+  typeof cronStatusGetEndpoint.GET.types.RequestInput;
+export type CronStatusRequestOutput =
+  typeof cronStatusGetEndpoint.GET.types.RequestOutput;
+export type CronStatusResponseInput =
+  typeof cronStatusGetEndpoint.GET.types.ResponseInput;
+export type CronStatusResponseOutput =
+  typeof cronStatusGetEndpoint.GET.types.ResponseOutput;

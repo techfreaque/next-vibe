@@ -13,7 +13,7 @@
  */
 
 import PageComponent from "@/app/[locale]/[...notFound]/page";
-import { createPageWrapper } from "@/app/api/[locale]/v1/core/system/unified-ui/react-native/utils";
+import { createPageWrapper } from "@/app/api/[locale]/v1/core/system/unified-ui/react-native/platform-helpers";
 
 /**
  * Wrapper component that converts Expo Router's synchronous params

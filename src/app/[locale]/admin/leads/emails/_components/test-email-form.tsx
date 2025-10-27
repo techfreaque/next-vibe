@@ -25,7 +25,7 @@ import {
   LeadSource,
   LeadStatus,
 } from "@/app/api/[locale]/v1/core/leads/enum";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { useTranslation } from "@/i18n/core/client";
 import { Countries, Languages } from "@/i18n/core/config";
 import {

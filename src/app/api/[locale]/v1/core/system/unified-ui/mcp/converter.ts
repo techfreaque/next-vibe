@@ -11,7 +11,7 @@ import { zodToJsonSchema } from "zod-to-json-schema";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { DiscoveredEndpointMetadata } from "../shared/endpoint-registry/types";
+import type { DiscoveredEndpointMetadata } from "../shared/endpoint-registry-types";
 import type { MCPTool, MCPToolMetadata } from "./types";
 
 /**

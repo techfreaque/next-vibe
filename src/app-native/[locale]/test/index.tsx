@@ -13,7 +13,7 @@
  * - Type-safe params forwarding
  */
 
-import { createPageWrapper } from "@/app/api/[locale]/v1/core/system/unified-ui/react-native/utils";
+import { createPageWrapper } from "@/app/api/[locale]/v1/core/system/unified-ui/react-native/platform-helpers";
 
 import PageComponent from "./page";
 

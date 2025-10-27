@@ -3,7 +3,7 @@
  * Defines credit-related enumerations
  */
 
-import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/enum-helpers";
+import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enum-helpers";
 
 /**
  * Credit type identifier for tracking which credit pool is being used

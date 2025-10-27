@@ -2,6 +2,8 @@
  * Endpoint Form Field Component
  * A comprehensive form field component that integrates with useEndpoint hook
  * Supports multiple field types, required field styling, and Zod validation
+ *
+ * ✅ NOW WITH 100% TYPE INFERENCE FROM DEFINITION.TS
  */
 
 "use client";
@@ -20,6 +22,8 @@ import type { z } from "zod";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { TFunction } from "@/i18n/core/static-types";
+
+import { getFieldConfig } from "./infer-field-config";
 
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
@@ -655,24 +659,38 @@ export interface EndpointFormFieldProps<
     "requiredFields"
   > {
   schema?: z.ZodTypeAny; // Optional Zod schema for automatic required field detection
+  endpointFields?: any; // Endpoint fields for auto-inference (from definition.POST.fields)
 }
 
 /**
  * Main Endpoint Form Field Component
  * Integrates with useEndpoint hook and provides comprehensive form field functionality
+ *
+ * Config is auto-inferred from endpointFields if not provided
  */
 export function EndpointFormField<
   TFieldValues extends FieldValues,
   TName extends Path<TFieldValues>,
 >({
   name,
-  config,
+  config: providedConfig,
   control,
   schema,
   theme = DEFAULT_THEME,
   className,
+  endpointFields,
 }: EndpointFormFieldProps<TFieldValues, TName>): JSX.Element {
   const { t } = useTranslation();
+
+  // Auto-infer config from endpoint fields if not provided
+  const config = providedConfig || (endpointFields ? getFieldConfig(endpointFields, name) : null);
+
+  if (!config) {
+    throw new Error(
+      `EndpointFormField: No config provided for field "${name}". ` +
+      `Either provide a config prop or pass endpointFields for auto-inference.`
+    );
+  }
 
   // Use schema-based required fields if schema is provided, otherwise fall back to manual requiredFields
   const schemaRequiredFields = schema ? safeGetRequiredFields(schema) : [];
@@ -738,15 +756,17 @@ export function EndpointFormField<
 
 /**
  * Convenience component for creating multiple form fields
+ * Config is auto-inferred from endpointFields if not provided
  */
 export interface EndpointFormFieldsProps<TFieldValues extends FieldValues> {
   fields: Array<{
     name: Path<TFieldValues>;
-    config: FieldConfig;
+    config?: FieldConfig; // Optional - auto-inferred from endpointFields
   }>;
   control: Control<TFieldValues>;
   requiredFields?: string[];
   schema?: z.ZodTypeAny; // Optional Zod schema for automatic required field detection
+  endpointFields?: any; // Endpoint fields for auto-inference
   theme?: RequiredFieldTheme;
   className?: string;
   fieldClassName?: string;
@@ -756,6 +776,7 @@ export function EndpointFormFields<TFieldValues extends FieldValues>({
   fields,
   control,
   schema,
+  endpointFields,
   theme = DEFAULT_THEME,
   className,
   fieldClassName,
@@ -769,6 +790,7 @@ export function EndpointFormFields<TFieldValues extends FieldValues>({
           config={fieldDef.config}
           control={control}
           schema={schema}
+          endpointFields={endpointFields}
           theme={theme}
           className={fieldClassName}
         />

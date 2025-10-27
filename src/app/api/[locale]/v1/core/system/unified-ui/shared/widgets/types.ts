@@ -7,13 +7,12 @@
  * across all platforms (CLI, Web, Mobile).
  */
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
 import type {
   FieldDataType,
   WidgetType,
-} from "../../cli/vibe/endpoints/endpoint-types/core/enums";
-import type { ResponseFieldMetadata } from "../../cli/vibe/endpoints/renderers/cli-ui/widgets/types";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+import type { ResponseFieldMetadata } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/widgets/cli/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
  * Valid primitive values that can be rendered

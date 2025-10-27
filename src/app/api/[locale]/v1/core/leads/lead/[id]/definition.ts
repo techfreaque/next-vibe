@@ -5,20 +5,20 @@
 
 import { z } from "zod";
 
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import {
   objectField,
   requestDataField,
   requestUrlPathParamsField,
   responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { Countries, Languages } from "@/i18n/core/config";
 
@@ -620,7 +620,6 @@ const { PATCH } = createEndpoint({
               description:
                 "app.api.v1.core.leads.lead.id.patch.contactDetails.description",
               layout: { type: LayoutType.GRID, columns: 2 },
-              collapsed: true,
             },
             { request: "data" },
             {
@@ -700,7 +699,6 @@ const { PATCH } = createEndpoint({
               description:
                 "app.api.v1.core.leads.lead.id.patch.campaignManagement.description",
               layout: { type: LayoutType.STACKED },
-              collapsed: true,
             },
             { request: "data" },
             {
@@ -748,7 +746,6 @@ const { PATCH } = createEndpoint({
               description:
                 "app.api.v1.core.leads.lead.id.patch.additionalDetails.description",
               layout: { type: LayoutType.STACKED },
-              collapsed: true,
             },
             { request: "data" },
             {

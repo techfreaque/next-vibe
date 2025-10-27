@@ -8,10 +8,10 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import { env } from "@/config/env";
 import { Countries, Languages } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 // EmailJourneyVariant and EmailCampaignStage are defined as string arrays for seeding
 // to avoid cross-repository dependencies
 import { type NewSmtpAccount, smtpAccounts } from "./db";

@@ -24,7 +24,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { Environment, parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -67,15 +67,13 @@ export interface AuthContext {
   locale?: CountryLanguage; // Required for lead creation
 }
 
-/**
- * Type helper to infer user type based on roles
- * Returns union of possible user types
- */
 export type InferUserType<
   TRoles extends readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
-> = TRoles[number] extends typeof UserRole.PUBLIC
-  ? JWTPublicPayloadType | JwtPrivatePayloadType
-  : JwtPrivatePayloadType;
+> = Exclude<TRoles[number], "PUBLIC"> extends never
+  ? JWTPublicPayloadType
+  : Extract<TRoles[number], "PUBLIC"> extends never
+    ? JwtPrivatePayloadType
+    : JwtPayloadType;
 
 /**
  * Helper to create public user payload
@@ -705,7 +703,11 @@ class AuthRepositoryImpl implements AuthRepository {
               ErrorResponseTypes.INTERNAL_ERROR,
             );
           }
-          return await this.getCurrentUserTrpc(context.request, context.locale, logger);
+          return await this.getCurrentUserTrpc(
+            context.request,
+            context.locale,
+            logger,
+          );
 
         case "cli":
         case "ai":
@@ -717,7 +719,11 @@ class AuthRepositoryImpl implements AuthRepository {
               ErrorResponseTypes.UNAUTHORIZED,
             );
           }
-          return await this.getCurrentUserCli(context.token, context.locale, logger);
+          return await this.getCurrentUserCli(
+            context.token,
+            context.locale,
+            logger,
+          );
 
         default: {
           // Exhaustiveness check - TypeScript will error if a new platform is added but not handled
@@ -1094,7 +1100,6 @@ class AuthRepositoryImpl implements AuthRepository {
         );
       }
 
-
       // User is not authenticated - check if PUBLIC role is allowed
       if (roles.includes(UserRole.PUBLIC)) {
         // Get leadId for public user
@@ -1434,7 +1439,11 @@ class AuthRepositoryImpl implements AuthRepository {
   ): Promise<(typeof UserRoleValue)[keyof typeof UserRoleValue][]> {
     try {
       // Get user from request (locale not needed for role check only)
-      const userResult = await this.getCurrentUserTrpc(request, "en-GLOBAL", logger);
+      const userResult = await this.getCurrentUserTrpc(
+        request,
+        "en-GLOBAL",
+        logger,
+      );
       if (
         !userResult.success ||
         !userResult.data?.id ||
@@ -1472,7 +1481,11 @@ class AuthRepositoryImpl implements AuthRepository {
   ): Promise<(typeof UserRoleValue)[keyof typeof UserRoleValue][]> {
     try {
       // Get user from token (locale not needed for role check only)
-      const userResult = await this.getCurrentUserCli(token, "en-GLOBAL", logger);
+      const userResult = await this.getCurrentUserCli(
+        token,
+        "en-GLOBAL",
+        logger,
+      );
       if (
         !userResult.success ||
         !userResult.data?.id ||

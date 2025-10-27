@@ -5,7 +5,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { z } from "zod";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { env } from "@/config/env";
 
 import {
@@ -99,7 +99,7 @@ export function getHttpProvider(): SmsProvider {
         }
       } catch (error) {
         logger.warn("Invalid SMS_HTTP_PHONE_REGEX, falling back to default", {
-          error,
+          error: parseError(error),
         });
       }
 

@@ -24,7 +24,7 @@ import {
 } from "@/app/api/[locale]/v1/core/leads/enum";
 import type { LeadsStatsRequestOutput } from "@/app/api/[locale]/v1/core/leads/stats/definition";
 import type statsEndpoints from "@/app/api/[locale]/v1/core/leads/stats/definition";
-import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
+import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint-types";
 import { CountryFilter, type CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

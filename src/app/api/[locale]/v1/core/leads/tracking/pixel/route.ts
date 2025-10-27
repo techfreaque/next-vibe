@@ -6,11 +6,11 @@
 import type { NextRequest } from "next/server";
 import { Environment } from "next-vibe/shared/utils/env-util";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { PixelTrackingRepository } from "./repository";
+import { pixelTrackingRepository } from "./repository";
 
 /**
  * GET Handler
@@ -35,5 +35,5 @@ export const GET = (request: NextRequest): Response => {
     localeSegment,
   );
 
-  return PixelTrackingRepository.handlePixelRequest(request, logger);
+  return pixelTrackingRepository.handlePixelRequest(request, logger);
 };

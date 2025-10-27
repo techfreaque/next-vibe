@@ -22,7 +22,7 @@ import type { JSX } from "react";
 import { useImapAccountsList } from "@/app/api/[locale]/v1/core/emails/imap-client/accounts/list/hooks";
 import { useImapFoldersList } from "@/app/api/[locale]/v1/core/emails/imap-client/folders/list/hooks";
 import { useImapFoldersSync } from "@/app/api/[locale]/v1/core/emails/imap-client/folders/sync/hooks";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import { useTranslation } from "@/i18n/core/client";
 
 import { ImapFoldersList } from "./imap-folders-list";

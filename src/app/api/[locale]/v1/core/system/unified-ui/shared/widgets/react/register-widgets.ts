@@ -5,7 +5,8 @@
 
 "use client";
 
-import { WidgetType } from "../../../cli/vibe/endpoints/endpoint-types/core/enums";
+import { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+
 import { CodeOutputWidget } from "./CodeOutputWidget";
 import { ContainerWidget } from "./ContainerWidget";
 import { DataCardsWidget } from "./DataCardsWidget";

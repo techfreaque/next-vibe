@@ -1,3 +1,4 @@
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 /**
  * Password reset repository
  * Manages password reset tokens and operations
@@ -19,7 +20,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 
 import { UserDetailLevel } from "../../enum";
 import { passwordUpdateRepository } from "../../private/me/password/repository";
@@ -236,7 +237,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         );
       return createSuccessResponse(null);
     } catch (error) {
-      logger.error("Error deleting expired reset tokens", { error });
+      logger.error("Error deleting expired reset tokens", { error: parseError(error) });
       return createErrorResponse(
         "app.api.v1.core.user.public.resetPassword.errors.resetFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -371,7 +372,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         );
       }
     } catch (error) {
-      logger.error("Error verifying JWT token", { error });
+      logger.error("Error verifying JWT token", { error: parseError(error) });
       return createErrorResponse(
         "app.api.v1.core.user.public.resetPassword.errors.tokenVerificationFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -385,6 +386,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
    */
   async createResetToken(
     email: string,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<string>> {
     try {
@@ -394,6 +396,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
       const userResponse = await userRepository.getUserByEmail(
         email,
         UserDetailLevel.STANDARD,
+        locale,
         logger,
       );
       if (!userResponse.success) {
@@ -440,7 +443,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
 
       return createSuccessResponse(passwordResetResponse.data.userId);
     } catch (error) {
-      logger.error("Error verifying password reset token", { error });
+      logger.error("Error verifying password reset token", { error: parseError(error) });
       return createErrorResponse(
         "app.api.v1.core.user.public.resetPassword.errors.tokenVerificationFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -568,6 +571,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
       const userResponse = await userRepository.getUserById(
         resetPayload.userId,
         UserDetailLevel.STANDARD,
+        locale,
         logger,
       );
       if (!userResponse.success) {

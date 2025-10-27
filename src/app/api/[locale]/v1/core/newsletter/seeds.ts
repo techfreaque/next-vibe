@@ -7,7 +7,8 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 
-import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { UserDetailLevel } from "../user/enum";
 import { userRepository } from "../user/repository";
 import type { NewNewsletterSubscription } from "./db";
@@ -34,7 +35,7 @@ function createNewsletterSeed(
 /**
  * Development seed function for newsletter module
  */
-export async function dev(logger: EndpointLogger): Promise<void> {
+export async function dev(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
   logger.debug("🌱 Seeding newsletter data for development environment");
 
   try {
@@ -42,12 +43,14 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     const demoUserResponse = await userRepository.getUserByEmail(
       "demo@example.com",
       UserDetailLevel.STANDARD,
+      locale,
       logger,
     );
 
     const adminUserResponse = await userRepository.getUserByEmail(
       "admin@example.com",
       UserDetailLevel.STANDARD,
+      locale,
       logger,
     );
 
@@ -88,12 +91,9 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     // Note: Newsletter functionality may need repository implementation
     // For now, we'll just log the intended subscriptions
     for (const subscription of subscriptions) {
-      logger.debug(
-        `✅ Would create newsletter subscription for ${subscription.email}`,
-        {
-          subscription,
-        },
-      );
+      logger.debug(`✅ Would create newsletter subscription for ${subscription.email}`, {
+        subscription,
+      });
     }
 
     logger.debug("✅ Newsletter subscription data ready for development");

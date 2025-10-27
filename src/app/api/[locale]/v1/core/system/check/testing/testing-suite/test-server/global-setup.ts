@@ -4,11 +4,12 @@
  */
 
 import { parseError } from "next-vibe/shared/utils";
+
 import { closeDatabase } from "@/app/api/[locale]/v1/core/system/db";
 import { seedDatabase } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../../../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import teardown from "./global-teardown";
 import { startServer } from "./test-server";
 

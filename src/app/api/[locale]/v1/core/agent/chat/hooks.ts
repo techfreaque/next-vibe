@@ -11,15 +11,16 @@ import { AUTH_STATUS_COOKIE_PREFIX } from "next-vibe/shared/constants";
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/store";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { useAIStream } from "../ai-stream/hooks";
-import { useAIStreamStore } from "../ai-stream/store";
+import { useAIStream } from "../ai-stream/hooks/hooks";
+import { useAIStreamStore } from "../ai-stream/hooks/store";
 import type { DefaultFolderId } from "./config";
 import { createCreditUpdateCallback } from "./credit-updater";
+import { ChatMessageRole } from "./enum";
 import type { IconValue } from "./model-access/icons";
 import type { ModelId } from "./model-access/models";
 import type { PersonaListResponseOutput } from "./personas/definition";
@@ -471,7 +472,7 @@ export function useChat(
           depth: streamMsg.depth,
           authorId: null,
           authorName: null,
-          isAI: streamMsg.role === "assistant",
+          isAI: streamMsg.role === ChatMessageRole.ASSISTANT,
           model: streamMsg.model || null,
           persona: null,
           errorType: streamMsg.error

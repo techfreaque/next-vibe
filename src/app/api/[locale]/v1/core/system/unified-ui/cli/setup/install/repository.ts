@@ -143,11 +143,11 @@ exec bun "${vibeTsPath}" "$@"
     // Validate user permissions for CLI installation
     if (!user?.id) {
       return createErrorResponse(
-        "app.api.v1.core.system.cli.setup.install.post.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.unauthorized.title",
         ErrorResponseTypes.UNAUTHORIZED,
         {
           error: t(
-            "app.api.v1.core.system.cli.setup.install.post.errors.unauthorized.description",
+            "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.unauthorized.description",
           ),
         },
       );
@@ -165,10 +165,10 @@ exec bun "${vibeTsPath}" "$@"
           path: status.path,
           message: status.path
             ? t(
-                "app.api.v1.core.system.cli.setup.install.post.success.description",
+                "app.api.v1.core.system.unifiedUi.cli.setup.install.post.success.description",
               )
             : t(
-                "app.api.v1.core.system.cli.setup.install.post.success.description",
+                "app.api.v1.core.system.unifiedUi.cli.setup.install.post.success.description",
               ),
         });
       }
@@ -177,7 +177,7 @@ exec bun "${vibeTsPath}" "$@"
       const bunAvailable = await this.checkBunAvailable();
       if (!bunAvailable) {
         return createErrorResponse(
-          "app.api.v1.core.system.cli.setup.install.post.errors.server.title",
+          "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.title",
           ErrorResponseTypes.INTERNAL_ERROR,
           {
             error:
@@ -209,7 +209,7 @@ exec bun "${vibeTsPath}" "$@"
       // Verify vibe.ts exists
       if (!existsSync(vibeTsPath)) {
         return createErrorResponse(
-          "app.api.v1.core.system.cli.setup.install.post.errors.server.title",
+          "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.title",
           ErrorResponseTypes.INTERNAL_ERROR,
           // eslint-disable-next-line i18next/no-literal-string
           { error: `vibe.ts not found at ${vibeTsPath}` },
@@ -236,7 +236,7 @@ exec bun "${vibeTsPath}" "$@"
         mkdirSync(binDir, { recursive: true });
       } catch (error) {
         return createErrorResponse(
-          "app.api.v1.core.system.cli.setup.install.post.errors.server.title",
+          "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.title",
           ErrorResponseTypes.INTERNAL_ERROR,
           {
             // eslint-disable-next-line i18next/no-literal-string
@@ -278,17 +278,17 @@ exec bun "${vibeTsPath}" "$@"
         path: newStatus.path,
         message: newStatus.installed
           ? t(
-              "app.api.v1.core.system.cli.setup.install.post.success.description",
+              "app.api.v1.core.system.unifiedUi.cli.setup.install.post.success.description",
             )
           : t(
-              "app.api.v1.core.system.cli.setup.install.post.errors.server.description",
+              "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.description",
             ),
         output: data.verbose ? output : undefined,
       });
     } catch (error) {
       const parsedError = parseError(error);
       return createErrorResponse(
-        "app.api.v1.core.system.cli.setup.install.post.errors.server.title",
+        "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message },
       );

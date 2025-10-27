@@ -4,8 +4,8 @@
  * Optional route - only created because task management HTTP access is useful
  */
 
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handlers";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 
 import endpoints from "./definition";
 import { resetTaskManagementRepository as repository } from "./repository";

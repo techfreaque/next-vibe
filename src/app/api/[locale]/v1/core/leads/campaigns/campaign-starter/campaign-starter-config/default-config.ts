@@ -5,11 +5,10 @@
 
 import { Environment } from "next-vibe/shared/utils/env-util";
 
-import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/tasks/enum";
+import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/enum";
 import { env } from "@/config/env";
 
-import type { CampaignStarterConfigType } from "../types";
-import type { CampaignStarterConfigType as CampaignStarterConfigWithCronType } from "./definition";
+import type { CampaignStarterConfigType } from "./definition";
 
 /**
  * Interface for cron settings (all required fields)
@@ -95,7 +94,7 @@ export function getDefaultCronSettings(): CronSettings {
 /**
  * Get complete default configuration (campaign + cron settings)
  */
-export function getDefaultConfigWithCron(): CampaignStarterConfigWithCronType {
+export function getDefaultConfigWithCron(): CampaignStarterConfigType {
   const campaignConfig = getDefaultConfig();
   const cronConfig = getDefaultCronSettings();
 

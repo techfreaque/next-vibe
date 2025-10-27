@@ -11,9 +11,9 @@ import { useToast } from "next-vibe-ui/ui";
 import type { ChangeEvent } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import type { FormAlertState } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
-import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation-form";
+import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { FormAlertState } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint-types";
+import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-api-mutation-form";
 import type { ApiFormReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { TParams, TranslationKey } from "@/i18n/core/static-types";

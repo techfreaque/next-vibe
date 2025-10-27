@@ -2,12 +2,12 @@
  * Auth Utilities
  * Helper functions for authentication in server components
  */
-import { parseError } from "next-vibe/shared/utils";
 import "server-only";
 
 import { redirect } from "next/navigation";
+import { parseError } from "next-vibe/shared/utils";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CompleteUserType } from "../definition";
@@ -43,6 +43,7 @@ export async function requireAdminUser(
     const userResult = await userRepository.getUserById(
       minimalUser.id,
       UserDetailLevel.COMPLETE,
+      locale,
       logger,
     );
 
@@ -90,6 +91,7 @@ export async function requireUser(
     const userResult = await userRepository.getUserById(
       minimalUser.id,
       UserDetailLevel.COMPLETE,
+      locale,
       logger,
     );
 

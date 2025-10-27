@@ -1,7 +1,8 @@
 /// <reference types="node" />
+import type { CountryLanguage } from "@/i18n/core/config";
 import { join } from "node:path";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { LaunchpadConfig } from "../types/types.js";

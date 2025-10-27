@@ -1,12 +1,11 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import type z from "zod";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
-import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
+import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/core-types";
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
+import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
-
-import type { UnifiedField } from "../../../unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
 
 /**
  * Options for testing an API endpoint

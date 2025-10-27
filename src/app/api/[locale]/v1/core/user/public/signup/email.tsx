@@ -531,6 +531,7 @@ export const renderRegisterMail: EmailFunctionType<
   const userResponse = await userRepository.getUserByEmail(
     requestData.personalInfo.email,
     UserDetailLevel.STANDARD,
+    locale,
     logger,
   );
   if (!userResponse.success) {
@@ -991,6 +992,7 @@ export const renderAdminSignupNotification: EmailFunctionType<
   const userResponse = await userRepository.getUserByEmail(
     requestData.personalInfo.email,
     UserDetailLevel.STANDARD,
+    locale,
     logger,
   );
   if (!userResponse.success) {

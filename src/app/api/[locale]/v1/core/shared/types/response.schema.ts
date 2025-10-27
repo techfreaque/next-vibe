@@ -62,7 +62,7 @@ export function throwErrorResponse(
  */
 export function createSuccessResponse<TResponse>(
   data: TResponse,
-): SuccessResponseType<TResponse> {
+): ResponseType<TResponse> {
   return {
     success: true,
     data,
@@ -72,7 +72,7 @@ export function createSuccessResponse<TResponse>(
 export function createSuccessMessageResponse(
   message: TranslationKey,
   messageParams?: TParams,
-): SuccessResponseType<MessageResponseType> {
+): ResponseType<MessageResponseType> {
   return {
     success: true,
     data: {

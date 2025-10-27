@@ -1,4 +1,9 @@
 export const translations = {
+  parseJsonWithComments: {
+    errors: {
+      invalid_json: "Invalid JSON format",
+    },
+  },
   time: {
     errors: {
       invalid_time_format: {

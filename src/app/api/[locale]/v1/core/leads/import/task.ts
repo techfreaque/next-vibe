@@ -20,15 +20,15 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
-} from "@/app/api/[locale]/v1/core/system/tasks/constants";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/constants";
 import {
   CronTaskPriority,
   TaskCategory,
-} from "@/app/api/[locale]/v1/core/system/tasks/enum";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/enum";
 import type {
   Task,
   TaskExecutionContext,
-} from "@/app/api/[locale]/v1/core/system/tasks/types/repository";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/types/repository";
 
 import { csvImportJobs } from "./db";
 import { CsvImportJobStatus } from "./enum";

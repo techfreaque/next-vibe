@@ -4,6 +4,7 @@
  */
 
 import type { DefaultFolderId } from "../chat/config";
+import type { ChatMessageRole } from "../chat/enum";
 import type { ModelId } from "../chat/model-access/models";
 
 /**
@@ -23,6 +24,7 @@ export enum StreamEventType {
   CONTENT_DELTA = "content-delta",
   CONTENT_DONE = "content-done",
   TOOL_CALL = "tool-call",
+  TOOL_RESULT = "tool-result",
   ERROR = "error",
 }
 
@@ -42,7 +44,7 @@ export interface ThreadCreatedEventData {
 export interface MessageCreatedEventData {
   messageId: string;
   threadId: string;
-  role: "user" | "assistant" | "system";
+  role: ChatMessageRole;
   parentId: string | null;
   depth: number;
   content: string;
@@ -78,6 +80,21 @@ export interface ToolCallEventData {
 }
 
 /**
+ * Tool result event data
+ */
+export interface ToolResultEventData {
+  messageId: string;
+  toolName: string;
+  result:
+    | string
+    | number
+    | boolean
+    | null
+    | undefined
+    | Record<string, string | number | boolean | null>;
+}
+
+/**
  * Error event data
  */
 export interface ErrorEventData {
@@ -95,6 +112,7 @@ export interface StreamEventDataMap {
   [StreamEventType.CONTENT_DELTA]: ContentDeltaEventData;
   [StreamEventType.CONTENT_DONE]: ContentDoneEventData;
   [StreamEventType.TOOL_CALL]: ToolCallEventData;
+  [StreamEventType.TOOL_RESULT]: ToolResultEventData;
   [StreamEventType.ERROR]: ErrorEventData;
 }
 
@@ -142,6 +160,13 @@ export const createStreamEvent = {
     data: ToolCallEventData,
   ): StreamEvent<StreamEventType.TOOL_CALL> => ({
     type: StreamEventType.TOOL_CALL,
+    data,
+  }),
+
+  toolResult: (
+    data: ToolResultEventData,
+  ): StreamEvent<StreamEventType.TOOL_RESULT> => ({
+    type: StreamEventType.TOOL_RESULT,
     data,
   }),
 

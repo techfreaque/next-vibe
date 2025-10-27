@@ -16,6 +16,7 @@ export const translations: typeof enTranslations = {
       "Authentifizierungs-Token konnte nicht generiert werden",
     invalid_session: "Die Sitzung ist ungültig oder abgelaufen",
     missing_request_context: "Request-Kontext fehlt",
+    missing_locale: "Locale fehlt in der Anfrage",
     unsupported_platform: "Plattform wird nicht unterstützt",
     session_retrieval_failed: "Sitzung konnte nicht abgerufen werden",
     missing_token: "Authentifizierungs-Token fehlt",
@@ -56,6 +57,10 @@ export const translations: typeof enTranslations = {
         title: "Validierungsfehler",
         description: "Ungültige Anfrageparameter",
       },
+      missing_locale: {
+        title: "Fehlende Locale",
+        description: "Locale-Parameter ist erforderlich",
+      },
       server: {
         title: "Serverfehler",
         description: "Interner Serverfehler",
@@ -89,6 +94,7 @@ export const translations: typeof enTranslations = {
         description: "Die Sitzung ist ungültig oder abgelaufen",
       },
       missing_request_context: {
+        missing_locale: "Locale fehlt in der Anfrage",
         title: "Fehlender Anfrage-Kontext",
         description: "Anfrage-Kontext fehlt",
       },

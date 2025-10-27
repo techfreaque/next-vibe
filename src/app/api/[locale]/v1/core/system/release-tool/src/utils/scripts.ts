@@ -1,4 +1,5 @@
 /// <reference types="node" />
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 /* eslint-disable no-restricted-syntax */
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
@@ -11,7 +12,7 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 import type { PackageJson } from "../types/index.js";
 import { runSnykMonitor, runSnykTest } from "./snyk.js";
@@ -75,7 +76,7 @@ export function runTests(
     execSync(`yarn test`, { stdio: "inherit", cwd: packagePath });
     return createSuccessResponse(undefined);
   } catch (error) {
-    logger.error(`Tests failed in ${packagePath}`, error);
+    logger.error(`Tests failed in ${packagePath}`, parseError(error));
     return createErrorResponse(
       "app.api.v1.core.system.releaseTool.scripts.testsFailed",
       ErrorResponseTypes.INTERNAL_ERROR,
@@ -217,7 +218,7 @@ export const build = (
     execSync(`yarn build`, { stdio: "inherit", cwd });
     return createSuccessResponse(undefined);
   } catch (error) {
-    logger.error(`Build failed in ${cwd}`, error);
+    logger.error(`Build failed in ${cwd}`, parseError(error));
     return createErrorResponse(
       "app.api.v1.core.system.releaseTool.scripts.buildFailed",
       ErrorResponseTypes.INTERNAL_ERROR,

@@ -95,7 +95,7 @@ export async function createCustomPersona(
     .insert(customPersonas)
     .values({
       ...data,
-      source: "my",
+      source: "my" as const,
     } as typeof customPersonas.$inferInsert)
     .returning();
 

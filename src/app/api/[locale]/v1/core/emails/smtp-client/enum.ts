@@ -3,7 +3,7 @@
  * Enums for SMTP account configuration and management
  */
 
-import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/enum-helpers";
+import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enum-helpers";
 
 /**
  * SMTP Account Status

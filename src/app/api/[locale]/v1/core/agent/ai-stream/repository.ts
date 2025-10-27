@@ -20,19 +20,24 @@ import { parseError } from "next-vibe/shared/utils";
 import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository";
 import { creditValidator } from "@/app/api/[locale]/v1/core/credits/validator";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import { getToolRegistry } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool";
-import { getToolExecutor } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/executor";
-import { createToolsFromEndpoints } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/factory";
-import type {
-  CoreTool,
-  IToolExecutor,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/types";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { getToolExecutor } from "@/app/api/[locale]/v1/core/system/unified-ui/ai/executor";
+import { createToolsFromEndpoints } from "@/app/api/[locale]/v1/core/system/unified-ui/ai/factory";
+import { getToolRegistry } from "@/app/api/[locale]/v1/core/system/unified-ui/ai/registry";
+import type { CoreTool } from "@/app/api/[locale]/v1/core/system/unified-ui/ai/types";
+import { Platform } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/config";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { chatMessages, chatThreads, type MessageMetadata } from "../chat/db";
+import type { DefaultFolderId } from "../chat/config";
+import {
+  chatMessages,
+  chatThreads,
+  type MessageMetadata,
+  type ToolCall,
+} from "../chat/db";
 import { ChatMessageRole } from "../chat/enum";
 import { getModelCost } from "../chat/model-access/costs";
 import { getModelById, type ModelId } from "../chat/model-access/models";
@@ -51,14 +56,138 @@ import { handleUncensoredAI } from "./providers/uncensored-handler";
 export const maxDuration = 30;
 
 /**
+ * AI Stream Repository Interface
+ */
+export interface IAiStreamRepository {
+  createAiStream(params: {
+    data: AiStreamPostRequestOutput;
+    t: TFunction;
+    locale: CountryLanguage;
+    logger: EndpointLogger;
+    user: JwtPayloadType;
+    request: Request;
+  }): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse>;
+}
+
+/**
+ * Tool result type from DB
+ */
+type ToolResultValue =
+  | string
+  | number
+  | boolean
+  | null
+  | Record<string, string | number | boolean | null>;
+
+/**
+ * Type guard for tool args/result record
+ */
+function isToolArgsRecord(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value: any,
+): value is Record<string, string | number | boolean | null> {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return false;
+  }
+  // Validate all values in object are primitives
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  return Object.values(value).every(
+    (v) =>
+      v === null ||
+      typeof v === "string" ||
+      typeof v === "number" ||
+      typeof v === "boolean",
+  );
+}
+
+/**
+ * Type guard for tool result values
+ * Validates that value matches expected tool result types
+ */
+function isValidToolResult(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value: any,
+): value is ToolResultValue {
+  if (value === null || value === undefined) {
+    return true;
+  }
+  if (typeof value === "string") {
+    return true;
+  }
+  if (typeof value === "number") {
+    return true;
+  }
+  if (typeof value === "boolean") {
+    return true;
+  }
+  if (isToolArgsRecord(value)) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Convert lowercase role to ChatMessageRole enum
+ */
+function toChatMessageRole(
+  role: "user" | "assistant" | "system",
+):
+  | typeof ChatMessageRole.USER
+  | typeof ChatMessageRole.ASSISTANT
+  | typeof ChatMessageRole.SYSTEM {
+  switch (role) {
+    case "user":
+      return ChatMessageRole.USER;
+    case "assistant":
+      return ChatMessageRole.ASSISTANT;
+    case "system":
+      return ChatMessageRole.SYSTEM;
+  }
+}
+
+/**
+ * Extract user identifiers from request
+ */
+function extractUserIdentifiers(
+  user: JwtPayloadType,
+  request: Request,
+  logger: EndpointLogger,
+): {
+  userId?: string;
+  leadId?: string;
+  ipAddress?: string;
+} {
+  logger.debug("Extracting user identifiers", {
+    isPublic: user.isPublic,
+    hasId: "id" in user,
+    hasLeadId: "leadId" in user,
+  });
+
+  const userId = !user.isPublic && "id" in user ? user.id : undefined;
+  const leadId =
+    "leadId" in user && typeof user.leadId === "string"
+      ? user.leadId
+      : undefined;
+  const ipAddress =
+    request.headers.get("x-forwarded-for") ||
+    request.headers.get("x-real-ip") ||
+    undefined;
+
+  logger.debug("Extracted identifiers", { userId, leadId, ipAddress });
+
+  return { userId, leadId, ipAddress };
+}
+
+/**
  * Generate thread title from first message
  */
 function generateThreadTitle(content: string): string {
-  // Take first 50 chars, trim to last complete word
-  const truncated = content.substring(0, 50);
-  const lastSpace = truncated.lastIndexOf(" ");
+  const maxLength = 50;
+  const minLastSpace = 20;
   const ellipsis = "...";
-  return lastSpace > 20
+  const truncated = content.substring(0, maxLength);
+  const lastSpace = truncated.lastIndexOf(" ");
+  return lastSpace > minLastSpace
     ? `${truncated.substring(0, lastSpace)}${ellipsis}`
     : truncated;
 }
@@ -113,9 +242,9 @@ async function ensureThread({
       id: newThreadId,
       userId,
       title,
-      rootFolderId,
-      folderId: subFolderId || null,
-    } as typeof chatThreads.$inferInsert);
+      rootFolderId: rootFolderId as DefaultFolderId,
+      folderId: subFolderId ?? null,
+    });
 
     logger.debug("Created new thread", { threadId: newThreadId, title });
   } else {
@@ -170,10 +299,19 @@ async function fetchMessageHistory(
     messageCount: messages.length,
   });
 
-  return messages.map((msg) => ({
-    role: msg.role.toLowerCase() as "user" | "assistant" | "system",
-    content: msg.content,
-  }));
+  return messages.map((msg) => {
+    const roleLowercase = msg.role.toLowerCase();
+    const validRole: "user" | "assistant" | "system" =
+      roleLowercase === "user" ||
+      roleLowercase === "assistant" ||
+      roleLowercase === "system"
+        ? roleLowercase
+        : "user";
+    return {
+      role: validRole,
+      content: msg.content,
+    };
+  });
 }
 
 /**
@@ -188,7 +326,7 @@ async function getParentMessage(
 ): Promise<{
   id: string;
   threadId: string;
-  role: string;
+  role: "user" | "assistant" | "system";
   content: string;
   parentId: string | null;
   depth: number;
@@ -212,10 +350,19 @@ async function getParentMessage(
     authorId: message.authorId,
   });
 
+  // DB stores role as ChatMessageRole enum (uppercase), convert to lowercase
+  const roleLowercase = message.role.toLowerCase();
+  const validRole: "user" | "assistant" | "system" =
+    roleLowercase === "user" ||
+    roleLowercase === "assistant" ||
+    roleLowercase === "system"
+      ? roleLowercase
+      : "user";
+
   return {
     id: message.id,
     threadId: message.threadId,
-    role: message.role,
+    role: validRole,
     content: message.content,
     parentId: message.parentId,
     depth: message.depth,
@@ -223,939 +370,1087 @@ async function getParentMessage(
 }
 
 /**
- * Create AI streaming response with SSE events
- * Returns StreamingResponse for SSE stream or error ResponseType
+ * AI Stream Repository Implementation
  */
-export async function createAiStream({
-  data,
-  locale,
-  logger,
-  userId,
-  leadId,
-  ipAddress,
-}: {
-  data: AiStreamPostRequestOutput;
-  t: TFunction;
-  locale: CountryLanguage;
-  logger: EndpointLogger;
-  userId?: string;
-  leadId?: string;
-  ipAddress?: string;
-}): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse> {
-  const isIncognito = data.rootFolderId === "incognito";
+class AiStreamRepository implements IAiStreamRepository {
+  /**
+   * Handle send operation - normal message send
+   */
+  private handleSendOperation(data: AiStreamPostRequestOutput): {
+    threadId: string | null | undefined;
+    parentMessageId: string | null | undefined;
+    content: string;
+    role: "user" | "assistant" | "system";
+  } {
+    return {
+      threadId: data.threadId,
+      parentMessageId: data.parentMessageId,
+      content: data.content,
+      role: data.role,
+    };
+  }
 
-  logger.debug("Creating AI stream", {
-    operation: data.operation,
-    model: data.model,
-    rootFolderId: data.rootFolderId,
-    isIncognito,
-    userId,
-    leadId,
-  });
+  /**
+   * Handle edit operation - create branch from existing message
+   */
+  private async handleEditOperation(
+    data: AiStreamPostRequestOutput,
+    userId: string | undefined,
+    logger: EndpointLogger,
+  ): Promise<{
+    threadId: string;
+    parentMessageId: string | null;
+    content: string;
+    role: "user" | "assistant" | "system";
+  } | null> {
+    if (!data.parentMessageId) {
+      logger.error("Edit operation requires parentMessageId");
+      return null;
+    }
 
-  // Step 0: Validate that non-logged-in users can only use incognito mode
-  if (!userId && !isIncognito) {
-    logger.error("Non-logged-in user attempted to use non-incognito folder", {
-      rootFolderId: data.rootFolderId,
-      leadId,
+    const parentMessage = await getParentMessage(
+      data.parentMessageId,
+      userId ?? "",
+      logger,
+    );
+
+    if (!parentMessage) {
+      return null;
+    }
+
+    return {
+      threadId: parentMessage.threadId,
+      parentMessageId: parentMessage.parentId,
+      content: data.content,
+      role: data.role,
+    };
+  }
+
+  /**
+   * Handle retry operation - retry AI response
+   */
+  private async handleRetryOperation(
+    data: AiStreamPostRequestOutput,
+    userId: string | undefined,
+    logger: EndpointLogger,
+  ): Promise<{
+    threadId: string;
+    parentMessageId: string;
+    content: string;
+    role: "user" | "assistant" | "system";
+  } | null> {
+    if (!data.parentMessageId) {
+      logger.error("Retry operation requires parentMessageId");
+      return null;
+    }
+
+    const userMessage = await getParentMessage(
+      data.parentMessageId,
+      userId ?? "",
+      logger,
+    );
+
+    if (!userMessage) {
+      return null;
+    }
+
+    return {
+      threadId: userMessage.threadId,
+      parentMessageId: data.parentMessageId,
+      content: userMessage.content,
+      role: userMessage.role,
+    };
+  }
+
+  /**
+   * Handle answer-as-ai operation - user provides AI response
+   */
+  private handleAnswerAsAiOperation(data: AiStreamPostRequestOutput): {
+    threadId: string | null | undefined;
+    parentMessageId: string | null | undefined;
+    content: string;
+    role: "user" | "assistant" | "system";
+  } {
+    return {
+      threadId: data.threadId,
+      parentMessageId: data.parentMessageId,
+      content: data.content,
+      role: data.role,
+    };
+  }
+
+  /**
+   * Create user message in database
+   */
+  private async createUserMessage(params: {
+    messageId: string;
+    threadId: string;
+    role: "user" | "assistant" | "system";
+    content: string;
+    parentId: string | null;
+    depth: number;
+    userId: string;
+    logger: EndpointLogger;
+  }): Promise<void> {
+    await db.insert(chatMessages).values({
+      id: params.messageId,
+      threadId: params.threadId,
+      role: toChatMessageRole(params.role),
+      content: params.content,
+      parentId: params.parentId,
+      depth: params.depth,
+      authorId: params.userId,
+      isAI: false,
     });
-    return createErrorResponse(
-      "app.api.v1.core.agent.chat.aiStream.route.errors.authenticationRequired",
-      ErrorResponseTypes.AUTH_ERROR,
+
+    params.logger.debug("Created user message", {
+      messageId: params.messageId,
+      threadId: params.threadId,
+    });
+  }
+
+  /**
+   * Create AI message placeholder in database
+   */
+  private async createAiMessagePlaceholder(params: {
+    messageId: string;
+    threadId: string;
+    parentId: string | null;
+    depth: number;
+    userId: string;
+    model: ModelId;
+    persona: string | null | undefined;
+    logger: EndpointLogger;
+  }): Promise<void> {
+    await db.insert(chatMessages).values({
+      id: params.messageId,
+      threadId: params.threadId,
+      role: ChatMessageRole.ASSISTANT,
+      content: "",
+      parentId: params.parentId,
+      depth: params.depth,
+      isAI: true,
+      model: params.model,
+      persona: params.persona ?? null,
+    });
+
+    params.logger.info("Created AI message placeholder", {
+      messageId: params.messageId,
+      threadId: params.threadId,
+    });
+  }
+
+  /**
+   * Build message context for AI
+   */
+  private async buildMessageContext(params: {
+    operation: "send" | "retry" | "edit" | "answer-as-ai";
+    threadId: string | null | undefined;
+    parentMessageId: string | null | undefined;
+    content: string;
+    role: "user" | "assistant" | "system";
+    userId: string | undefined;
+    isIncognito: boolean;
+    logger: EndpointLogger;
+  }): Promise<
+    Array<{ role: "user" | "assistant" | "system"; content: string }>
+  > {
+    if (params.operation === "answer-as-ai") {
+      if (
+        !params.isIncognito &&
+        params.userId &&
+        params.threadId &&
+        params.parentMessageId
+      ) {
+        const allMessages = await db
+          .select()
+          .from(chatMessages)
+          .where(eq(chatMessages.threadId, params.threadId))
+          .orderBy(chatMessages.createdAt);
+
+        const parentIndex = allMessages.findIndex(
+          (msg) => msg.id === params.parentMessageId,
+        );
+
+        if (parentIndex !== -1) {
+          const contextMessages = allMessages.slice(0, parentIndex + 1);
+          const messages = contextMessages.map((msg) => {
+            const roleLowercase = msg.role.toLowerCase();
+            const validRole: "user" | "assistant" | "system" =
+              roleLowercase === "user" ||
+              roleLowercase === "assistant" ||
+              roleLowercase === "system"
+                ? roleLowercase
+                : "user";
+            return { role: validRole, content: msg.content };
+          });
+
+          if (params.content.trim()) {
+            messages.push({ role: "user", content: params.content });
+          } else {
+            messages.push({
+              role: "user",
+              content: CONTINUE_CONVERSATION_PROMPT,
+            });
+          }
+          return messages;
+        } else {
+          params.logger.error("Parent message not found in thread", {
+            parentMessageId: params.parentMessageId,
+            threadId: params.threadId,
+          });
+          return params.content.trim()
+            ? [{ role: "user", content: params.content }]
+            : [];
+        }
+      } else if (params.content.trim()) {
+        return [{ role: "user", content: params.content }];
+      } else {
+        return [];
+      }
+    } else if (!params.isIncognito && params.userId && params.threadId) {
+      const history = await fetchMessageHistory(
+        params.threadId,
+        params.userId,
+        params.logger,
+      );
+      return [...history, { role: params.role, content: params.content }];
+    } else {
+      return [{ role: params.role, content: params.content }];
+    }
+  }
+
+  /**
+   * Deduct credits after successful AI response
+   */
+  private async deductCreditsAfterCompletion(params: {
+    modelCost: number;
+    user: JwtPayloadType;
+    model: ModelId;
+    logger: EndpointLogger;
+  }): Promise<void> {
+    await creditRepository.deductCreditsForFeature(
+      params.user,
+      params.modelCost,
+      params.model,
+      params.logger,
     );
   }
 
-  // Step 1: Validate credits
-  const modelCost = getModelCost(data.model);
-  let validationResult;
-  let effectiveLeadId = leadId;
+  /**
+   * Load and prepare tools for AI
+   */
+  private loadTools(params: {
+    requestedTools: string[] | null | undefined;
+    user: JwtPayloadType;
+    locale: CountryLanguage;
+    logger: EndpointLogger;
+    systemPrompt: string;
+  }): {
+    tools: Record<string, CoreTool> | undefined;
+    systemPrompt: string;
+  } {
+    let tools: Record<string, CoreTool> | undefined = undefined;
+    let enhancedSystemPrompt = params.systemPrompt;
 
-  if (userId) {
-    // Authenticated user
-    validationResult = await creditValidator.validateUserCredits(
+    if (params.requestedTools === null) {
+      return { tools, systemPrompt: enhancedSystemPrompt };
+    }
+
+    try {
+      const registry = getToolRegistry();
+
+      // Get endpoints filtered by user permissions at framework level
+      // This ensures users only get tools they have permission to use
+      const userContext = {
+        id: params.user.isPublic ? undefined : params.user.id,
+        isPublic: params.user.isPublic,
+      };
+
+      const allEndpoints = registry.getEndpoints(userContext, Platform.AI);
+      const enabledEndpoints =
+        params.requestedTools && params.requestedTools.length > 0
+          ? allEndpoints.filter((endpoint) =>
+              params.requestedTools!.includes(endpoint.toolName),
+            )
+          : allEndpoints;
+
+      params.logger.debug("Loading tools", {
+        requestedCount: params.requestedTools?.length ?? "all",
+        enabledCount: enabledEndpoints.length,
+        enabledNames: enabledEndpoints.map((endpoint) => endpoint.toolName),
+      });
+
+      if (enabledEndpoints.length > 0) {
+        const toolExecutor = getToolExecutor();
+        const toolsMap = createToolsFromEndpoints(
+          enabledEndpoints,
+          toolExecutor,
+          {
+            user: {
+              id: params.user.isPublic ? undefined : params.user.id,
+              email: "",
+              isPublic: params.user.isPublic,
+            },
+            locale: params.locale,
+            logger: params.logger,
+          },
+        );
+
+        tools = Object.fromEntries(toolsMap.entries());
+
+        params.logger.info("Tools created", {
+          count: toolsMap.size,
+          toolNames: Array.from(toolsMap.keys()),
+        });
+
+        // Add tool instructions to system prompt
+        const toolInstructions = enabledEndpoints
+          .map((endpoint) => endpoint.definition.aiTool?.instructions)
+          .filter(
+            (instructions): instructions is string =>
+              typeof instructions === "string" && instructions.length > 0,
+          );
+
+        if (toolInstructions.length > 0) {
+          const combinedInstructions = toolInstructions.join("\n\n");
+          enhancedSystemPrompt = enhancedSystemPrompt
+            ? [enhancedSystemPrompt, combinedInstructions].join("\n\n")
+            : combinedInstructions;
+        }
+      }
+    } catch (error) {
+      params.logger.error("Failed to load tools from registry", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      // Continue without tools - don't fail the request
+    }
+
+    return { tools, systemPrompt: enhancedSystemPrompt };
+  }
+  /**
+   * Create AI streaming response with SSE events
+   * Returns StreamingResponse for SSE stream or error ResponseType
+   */
+  async createAiStream({
+    data,
+    locale,
+    logger,
+    user,
+    request,
+  }: {
+    data: AiStreamPostRequestOutput;
+    t: TFunction;
+    locale: CountryLanguage;
+    logger: EndpointLogger;
+    user: JwtPayloadType;
+    request: Request;
+  }): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse> {
+    // Extract user identifiers
+    const { userId, leadId, ipAddress } = extractUserIdentifiers(
+      user,
+      request,
+      logger,
+    );
+
+    const isIncognito = data.rootFolderId === "incognito";
+
+    logger.debug("Creating AI stream", {
+      operation: data.operation,
+      model: data.model,
+      rootFolderId: data.rootFolderId,
+      isIncognito,
       userId,
-      data.model,
-      logger,
-    );
-  } else if (leadId) {
-    // Known lead
-    validationResult = await creditValidator.validateLeadCredits(
       leadId,
-      data.model,
-      logger,
-    );
-  } else if (ipAddress) {
-    // New visitor - get or create lead by IP
-    const leadByIpResult = await creditValidator.validateLeadByIp(
-      ipAddress,
-      data.model,
-      locale,
-      logger,
-    );
+    });
 
-    if (!leadByIpResult.success) {
+    // Step 0: Validate that non-logged-in users can only use incognito mode
+    if (!userId && !isIncognito) {
+      logger.error("Non-logged-in user attempted to use non-incognito folder", {
+        rootFolderId: data.rootFolderId,
+        leadId,
+      });
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.aiStream.route.errors.authenticationRequired",
+        ErrorResponseTypes.AUTH_ERROR,
+      );
+    }
+
+    // Step 1: Validate credits
+    const modelCost = getModelCost(data.model);
+    let validationResult;
+    let effectiveLeadId = leadId;
+
+    if (userId) {
+      // Authenticated user
+      validationResult = await creditValidator.validateUserCredits(
+        userId,
+        data.model,
+        logger,
+      );
+    } else if (leadId) {
+      // Known lead
+      validationResult = await creditValidator.validateLeadCredits(
+        leadId,
+        data.model,
+        logger,
+      );
+    } else if (ipAddress) {
+      // New visitor - get or create lead by IP
+      const leadByIpResult = await creditValidator.validateLeadByIp(
+        ipAddress,
+        data.model,
+        locale,
+        logger,
+      );
+
+      if (!leadByIpResult.success) {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.aiStream.route.errors.creditValidationFailed",
+          ErrorResponseTypes.INTERNAL_ERROR,
+        );
+      }
+
+      effectiveLeadId = leadByIpResult.data.leadId;
+      validationResult = {
+        success: true,
+        data: leadByIpResult.data.validation,
+      };
+    } else {
+      // No identifier - should not happen
+      logger.error("No user, lead, or IP address provided");
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.aiStream.route.errors.noIdentifier",
+        ErrorResponseTypes.UNAUTHORIZED,
+      );
+    }
+
+    if (!validationResult.success) {
       return createErrorResponse(
         "app.api.v1.core.agent.chat.aiStream.route.errors.creditValidationFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
 
-    effectiveLeadId = leadByIpResult.data.leadId;
-    validationResult = {
-      success: true,
-      data: leadByIpResult.data.validation,
-    };
-  } else {
-    // No identifier - should not happen
-    logger.error("No user, lead, or IP address provided");
-    return createErrorResponse(
-      "app.api.v1.core.agent.chat.aiStream.route.errors.noIdentifier",
-      ErrorResponseTypes.UNAUTHORIZED,
-    );
-  }
+    // Step 2: Check if user has enough credits (unless free model)
+    if (!validationResult.data.canUseModel) {
+      logger.warn("Insufficient credits", {
+        userId,
+        leadId: effectiveLeadId,
+        model: data.model,
+        cost: modelCost,
+        balance: validationResult.data.balance,
+      });
 
-  if (!validationResult.success) {
-    return createErrorResponse(
-      "app.api.v1.core.agent.chat.aiStream.route.errors.creditValidationFailed",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
-  }
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.aiStream.route.errors.insufficientCredits",
+        ErrorResponseTypes.FORBIDDEN,
+        {
+          cost: modelCost.toString(),
+          balance: validationResult.data.balance.toString(),
+        },
+      );
+    }
 
-  // Step 2: Check if user has enough credits (unless free model)
-  if (!validationResult.data.canUseModel) {
-    logger.warn("Insufficient credits", {
+    logger.debug("Credit validation passed", {
       userId,
       leadId: effectiveLeadId,
-      model: data.model,
       cost: modelCost,
       balance: validationResult.data.balance,
     });
 
-    return createErrorResponse(
-      "app.api.v1.core.agent.chat.aiStream.route.errors.insufficientCredits",
-      ErrorResponseTypes.FORBIDDEN,
-      {
-        cost: modelCost.toString(),
-        balance: validationResult.data.balance.toString(),
-      },
-    );
-  }
+    // Step 3: Handle operation-specific logic
+    let operationResult: {
+      threadId: string | null | undefined;
+      parentMessageId: string | null | undefined;
+      content: string;
+      role: "user" | "assistant" | "system";
+    };
 
-  logger.debug("Credit validation passed", {
-    userId,
-    leadId: effectiveLeadId,
-    cost: modelCost,
-    balance: validationResult.data.balance,
-  });
+    switch (data.operation) {
+      case "send":
+        operationResult = this.handleSendOperation(data);
+        break;
 
-  // Step 3: Handle operation-specific logic
-  let effectiveThreadId = data.threadId;
-  let effectiveParentMessageId = data.parentMessageId;
-  let effectiveContent = data.content;
-  let effectiveRole = data.role;
+      case "retry":
+        if (isIncognito) {
+          // For incognito, client provides the context
+          logger.info("Retry operation in incognito mode", {
+            parentMessageId: data.parentMessageId,
+          });
+          operationResult = this.handleSendOperation(data);
+        } else {
+          const retryResult = await this.handleRetryOperation(
+            data,
+            userId,
+            logger,
+          );
+          if (!retryResult) {
+            return createErrorResponse(
+              "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
+              ErrorResponseTypes.NOT_FOUND,
+            );
+          }
+          operationResult = retryResult;
+        }
+        break;
 
-  switch (data.operation) {
-    case "send":
-      // Normal send - use data as-is
-      break;
+      case "edit":
+        if (isIncognito) {
+          // For incognito, use data as-is
+          operationResult = this.handleSendOperation(data);
+        } else {
+          const editResult = await this.handleEditOperation(
+            data,
+            userId,
+            logger,
+          );
+          if (!editResult) {
+            return createErrorResponse(
+              "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
+              ErrorResponseTypes.NOT_FOUND,
+            );
+          }
+          operationResult = editResult;
+        }
+        break;
 
-    case "retry": {
-      // Retry: Re-generate AI response for the same user message
-      // parentMessageId should point to the user message to retry
-      // The new AI message will be a sibling of existing AI messages (both children of the user message)
-      if (!data.parentMessageId) {
-        logger.error("Retry operation requires parentMessageId");
-        return createErrorResponse(
-          "app.api.v1.core.agent.chat.aiStream.route.errors.invalidRequestData",
-          ErrorResponseTypes.VALIDATION_ERROR,
-        );
-      }
-
-      if (isIncognito) {
-        // For incognito, client provides the context
-        logger.info("Retry operation in incognito mode", {
+      case "answer-as-ai":
+        operationResult = this.handleAnswerAsAiOperation(data);
+        logger.info("Answer-as-AI operation", {
+          threadId: data.threadId,
           parentMessageId: data.parentMessageId,
         });
-      } else if (userId) {
-        // For server mode, fetch the user message
-        const userMessage = await getParentMessage(
-          data.parentMessageId,
-          userId,
-          logger,
-        );
-
-        if (!userMessage) {
-          return createErrorResponse(
-            "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
-            ErrorResponseTypes.NOT_FOUND,
-          );
-        }
-
-        effectiveThreadId = userMessage.threadId;
-        effectiveContent = userMessage.content;
-        effectiveRole = userMessage.role.toLowerCase() as
-          | "user"
-          | "assistant"
-          | "system";
-        // For retry, the new AI message should be a child of the user message
-        // NOT a child of the user message's parent
-        effectiveParentMessageId = data.parentMessageId;
-
-        logger.info("Retry operation - using user message", {
-          userMessageId: data.parentMessageId,
-          threadId: effectiveThreadId,
-        });
-      }
-      break;
+        break;
     }
 
-    case "edit": {
-      // Edit: Create a branch with edited content
-      // parentMessageId should point to the message being edited
-      if (!data.parentMessageId) {
-        logger.error("Edit operation requires parentMessageId");
-        return createErrorResponse(
-          "app.api.v1.core.agent.chat.aiStream.route.errors.invalidRequestData",
-          ErrorResponseTypes.VALIDATION_ERROR,
-        );
-      }
+    const effectiveThreadId = operationResult.threadId;
+    const effectiveParentMessageId = operationResult.parentMessageId;
+    const effectiveContent = operationResult.content;
+    const effectiveRole = operationResult.role;
 
-      if (!isIncognito && userId) {
-        const parentMessage = await getParentMessage(
-          data.parentMessageId,
-          userId,
-          logger,
-        );
-
-        if (!parentMessage) {
-          return createErrorResponse(
-            "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
-            ErrorResponseTypes.NOT_FOUND,
-          );
-        }
-
-        effectiveThreadId = parentMessage.threadId;
-        // Use the parent's parent as the new parent (branching at same level)
-        effectiveParentMessageId = parentMessage.parentId;
-
-        logger.info("Edit operation - creating branch", {
-          originalMessageId: data.parentMessageId,
-          threadId: effectiveThreadId,
-          newParentId: effectiveParentMessageId,
-        });
-      }
-      // Content and role come from data (edited values)
-      break;
-    }
-
-    case "answer-as-ai": {
-      // Answer as AI: User provides AI response content
-      // This creates an AI message without calling the AI model
-      logger.info("Answer-as-AI operation", {
-        threadId: data.threadId,
-        parentMessageId: data.parentMessageId,
+    // Step 4: Ensure thread exists (create if needed)
+    let threadResult;
+    try {
+      threadResult = await ensureThread({
+        threadId: effectiveThreadId,
+        rootFolderId: data.rootFolderId,
+        subFolderId: data.subFolderId,
+        userId,
+        content: effectiveContent,
+        isIncognito,
+        logger,
       });
-      // For this operation, we'll skip the AI streaming and just create the message
-      // This will be handled later in the flow
-      break;
+    } catch (error) {
+      logger.error("Failed to ensure thread", {
+        error: parseError(error).message,
+      });
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
+        ErrorResponseTypes.NOT_FOUND,
+      );
     }
-  }
 
-  // Step 4: Ensure thread exists (create if needed)
-  let threadResult;
-  try {
-    threadResult = await ensureThread({
+    // Step 5: Calculate message depth
+    const messageDepth = await calculateMessageDepth(
+      effectiveParentMessageId,
+      isIncognito,
+    );
+
+    // Step 6: Create user message (skip for answer-as-ai and retry operations)
+    const userMessageId = crypto.randomUUID();
+    if (data.operation !== "answer-as-ai" && data.operation !== "retry") {
+      if (!isIncognito && userId) {
+        await this.createUserMessage({
+          messageId: userMessageId,
+          threadId: threadResult.threadId,
+          role: effectiveRole,
+          content: effectiveContent,
+          parentId: effectiveParentMessageId ?? null,
+          depth: messageDepth,
+          userId,
+          logger,
+        });
+      } else {
+        logger.debug("Generated incognito user message ID", {
+          messageId: userMessageId,
+          operation: data.operation,
+        });
+      }
+    }
+
+    // Step 7: Prepare AI message context
+    let systemPrompt = data.systemPrompt || "";
+    const messages = await this.buildMessageContext({
+      operation: data.operation,
       threadId: effectiveThreadId,
-      rootFolderId: data.rootFolderId,
-      subFolderId: data.subFolderId,
-      userId,
+      parentMessageId: data.parentMessageId,
       content: effectiveContent,
+      role: effectiveRole,
+      userId,
       isIncognito,
       logger,
     });
-  } catch (error) {
-    logger.error("Failed to ensure thread", {
-      error: parseError(error).message,
-    });
-    return createErrorResponse(
-      "app.api.v1.core.agent.chat.aiStream.post.errors.notFound.title",
-      ErrorResponseTypes.NOT_FOUND,
-    );
-  }
 
-  // Step 5: Calculate message depth
-  const messageDepth = await calculateMessageDepth(
-    effectiveParentMessageId,
-    isIncognito,
-  );
-
-  // Step 6: Create user message (skip for answer-as-ai and retry operations)
-  const userMessageId = crypto.randomUUID();
-  if (data.operation !== "answer-as-ai" && data.operation !== "retry") {
-    if (!isIncognito && userId) {
-      await db.insert(chatMessages).values({
-        id: userMessageId,
-        threadId: threadResult.threadId,
-        role: effectiveRole as (typeof ChatMessageRole)[keyof typeof ChatMessageRole],
-        content: effectiveContent,
-        parentId: effectiveParentMessageId || null,
-        depth: messageDepth,
-        authorId: userId,
-        isAI: false,
-      } as typeof chatMessages.$inferInsert);
-
-      logger.debug("Created user message", {
-        messageId: userMessageId,
-        threadId: threadResult.threadId,
-        operation: data.operation,
-      });
-    } else {
-      logger.debug("Generated incognito user message ID", {
-        messageId: userMessageId,
-        operation: data.operation,
-      });
-    }
-  }
-
-  // Step 7: Prepare AI message context
-  let messages: Array<{
-    role: "user" | "assistant" | "system";
-    content: string;
-  }>;
-
-  // System prompt will be set later after loading tools with their instructions
-  let systemPrompt = data.systemPrompt || "";
-
-  if (data.operation === "answer-as-ai") {
-    // For answer-as-ai, we need the full conversation context up to the parent message
-    // so the AI understands what it's responding to
-    if (!isIncognito && userId && effectiveThreadId && data.parentMessageId) {
-      // Fetch ALL messages in thread up to and including the parent message
-      const allMessages = await db
-        .select()
-        .from(chatMessages)
-        .where(eq(chatMessages.threadId, effectiveThreadId))
-        .orderBy(chatMessages.createdAt);
-
-      // Find the parent message index
-      const parentIndex = allMessages.findIndex(
-        (msg) => msg.id === data.parentMessageId,
-      );
-
-      if (parentIndex !== -1) {
-        // Get all messages up to and including the parent message
-        const contextMessages = allMessages.slice(0, parentIndex + 1);
-
-        messages = contextMessages.map((msg) => ({
-          role: msg.role.toLowerCase() as "user" | "assistant" | "system",
-          content: msg.content,
-        }));
-
-        // Add a user message to prompt the AI to respond
-        // This ensures the AI understands it should generate a response to the previous AI message
-        if (effectiveContent.trim()) {
-          // User provided custom prompt
-          messages.push({ role: "user" as const, content: effectiveContent });
-        } else {
-          // No custom prompt - ask AI to continue/elaborate
-          messages.push({
-            role: "user" as const,
-            content: CONTINUE_CONVERSATION_PROMPT,
-          });
-        }
-      } else {
-        logger.error("Parent message not found in thread", {
-          parentMessageId: data.parentMessageId,
-          threadId: effectiveThreadId,
-        });
-        // Fallback: just use the custom prompt
-        messages = effectiveContent.trim()
-          ? [{ role: "user" as const, content: effectiveContent }]
-          : [];
-      }
-    } else if (effectiveContent.trim()) {
-      // Incognito mode or no parent - just use the custom prompt
-      messages = [{ role: "user" as const, content: effectiveContent }];
-    } else {
-      // No context and no custom prompt - use empty context
-      messages = [];
-    }
-  } else if (!isIncognito && userId && effectiveThreadId) {
-    // Fetch full thread history for context
-    messages = await fetchMessageHistory(effectiveThreadId, userId, logger);
-
-    // Add system prompt if provided
-    if (systemPrompt) {
+    // Add system prompt for non-incognito mode
+    if (
+      !isIncognito &&
+      systemPrompt &&
+      messages.length > 0 &&
+      messages[0].role !== "system"
+    ) {
       messages.unshift({ role: "system", content: systemPrompt });
     }
 
-    // Add current message
-    messages.push({ role: effectiveRole, content: effectiveContent });
-  } else {
-    // Incognito mode - use only current message
-    messages = systemPrompt
-      ? [
-          { role: "system" as const, content: systemPrompt },
-          { role: effectiveRole, content: effectiveContent },
-        ]
-      : [{ role: effectiveRole, content: effectiveContent }];
-  }
+    // Step 8: Create AI message placeholder
+    const aiMessageId = crypto.randomUUID();
+    const parentForAiMessage =
+      data.operation === "answer-as-ai" || data.operation === "retry"
+        ? effectiveParentMessageId
+        : userMessageId;
+    const aiMessageDepth =
+      data.operation === "answer-as-ai" || data.operation === "retry"
+        ? messageDepth
+        : messageDepth + 1;
 
-  // Step 8: Create AI message placeholder
-  const aiMessageId = crypto.randomUUID();
-  const parentForAiMessage =
-    data.operation === "answer-as-ai" || data.operation === "retry"
-      ? effectiveParentMessageId
-      : userMessageId;
-
-  if (!isIncognito && userId) {
-    await db.insert(chatMessages).values({
-      id: aiMessageId,
-      threadId: threadResult.threadId,
-      role: ChatMessageRole.ASSISTANT,
-      content: "", // Always start with empty content - will be filled by AI streaming
-      parentId: parentForAiMessage,
-      depth:
-        data.operation === "answer-as-ai" || data.operation === "retry"
-          ? messageDepth
-          : messageDepth + 1,
-      isAI: true,
-      model: data.model,
-      persona: data.persona || null,
-    } as typeof chatMessages.$inferInsert);
-
-    logger.info("Created AI message placeholder", {
-      messageId: aiMessageId,
-      threadId: threadResult.threadId,
-      operation: data.operation,
-    });
-  } else {
-    logger.debug("Generated incognito AI message ID", {
-      messageId: aiMessageId,
-      operation: data.operation,
-    });
-  }
-
-  // Step 9: Start AI streaming (for all operations including answer-as-ai)
-  try {
-    // Special handling for Uncensored.ai - doesn't support streaming
-    if (isUncensoredAIModel(data.model)) {
-      if (!env.UNCENSORED_AI_API_KEY) {
-        logger.error("Uncensored.ai API key not configured");
-        return {
-          success: false,
-          message:
-            "app.api.v1.core.agent.chat.aiStream.route.errors.uncensoredApiKeyMissing",
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        };
-      }
-
-      const response = await handleUncensoredAI(
-        env.UNCENSORED_AI_API_KEY,
-        messages,
-        data.temperature,
-        data.maxTokens,
-        locale,
-      );
-
-      // Incognito mode: messages are not persisted, streaming handled client-side
-      return createStreamingResponse(response);
+    if (!isIncognito && userId) {
+      await this.createAiMessagePlaceholder({
+        messageId: aiMessageId,
+        threadId: threadResult.threadId,
+        parentId: parentForAiMessage ?? null,
+        depth: aiMessageDepth,
+        userId,
+        model: data.model,
+        persona: data.persona,
+        logger,
+      });
+    } else {
+      logger.debug("Generated incognito AI message ID", {
+        messageId: aiMessageId,
+        operation: data.operation,
+      });
     }
 
-    const provider = createOpenRouter({
-      apiKey: env.OPENROUTER_API_KEY,
-    });
-
-    logger.debug("Starting OpenRouter stream", {
-      model: data.model,
-      tools: data.tools,
-    });
-
-    // Get model config to check tool support
-    const modelConfig = getModelById(data.model as ModelId);
-
-    // Build tools object dynamically from registry
-    // Type is inferred from usage - DO NOT add type annotations
-    // as Tool generic types are incompatible between different tools
-    let tools: Record<string, CoreTool> | undefined = undefined;
-
-    // Handle tools array
-    // null = no tools
-    // undefined/[] = all available tools for user (filtered by permissions)
-    // ["search", "core_user_create"] = specific tools
-    // IMPORTANT: Only load tools if the model supports them
-    if (data.tools !== null && modelConfig?.supportsTools) {
-      try {
-        // Get tool registry
-        const registry = getToolRegistry();
-
-        // Get all endpoints from registry
-        const allEndpoints = registry.getEndpoints();
-
-        logger.info("Available endpoints from registry:", allEndpoints.length);
-
-        // Filter endpoints based on request
-        let enabledEndpoints: typeof allEndpoints;
-        if (!data.tools || data.tools.length === 0) {
-          // All available endpoints for user
-          enabledEndpoints = allEndpoints;
-        } else {
-          // Specific tools requested
-          enabledEndpoints = allEndpoints.filter((endpoint) =>
-            data.tools?.includes(endpoint.toolName),
-          );
+    // Step 9: Start AI streaming (for all operations including answer-as-ai)
+    try {
+      // Special handling for Uncensored.ai - doesn't support streaming
+      if (isUncensoredAIModel(data.model)) {
+        if (!env.UNCENSORED_AI_API_KEY) {
+          logger.error("Uncensored.ai API key not configured");
+          return {
+            success: false,
+            message:
+              "app.api.v1.core.agent.chat.aiStream.route.errors.uncensoredApiKeyMissing",
+            errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          };
         }
 
-        logger.info("Filtered to enabled endpoints", {
-          enabledCount: enabledEndpoints.length,
-          enabledNames: enabledEndpoints.map((e) => e.toolName),
-        });
+        const response = await handleUncensoredAI(
+          env.UNCENSORED_AI_API_KEY,
+          messages,
+          data.temperature,
+          data.maxTokens,
+          locale,
+        );
 
-        // Create CoreTools directly from endpoints using factory
-        if (enabledEndpoints.length > 0) {
-          // Create CoreTools directly using factory
-          const toolExecutor = getToolExecutor() as IToolExecutor;
-          const toolsMap = createToolsFromEndpoints(
-            enabledEndpoints,
-            toolExecutor,
-            {
-              user: {
-                id: userId,
-                email: "",
-                isPublic: !userId,
-              },
-              locale,
-              logger,
-            },
-          );
-
-          // Convert Map to Record
-          tools = Object.fromEntries(toolsMap.entries());
-
-          logger.info("[AI Stream] Tools created", {
-            count: toolsMap.size,
-            toolNames: Array.from(toolsMap.keys()),
-          });
-
-          // Add tool instructions to system prompt
-          const toolInstructions = enabledEndpoints
-            .map((endpoint) => endpoint.definition.aiTool?.instructions)
-            .filter((instructions): instructions is string => !!instructions);
-
-          if (toolInstructions.length > 0) {
-            const combinedInstructions = toolInstructions.join("\n\n");
-            systemPrompt = systemPrompt
-              ? [systemPrompt, combinedInstructions].join("\n\n")
-              : combinedInstructions;
-          }
-        }
-      } catch (error) {
-        logger.error("Failed to load tools from registry", {
-          error: error instanceof Error ? error.message : String(error),
-        });
-        // Continue without tools - don't fail the request
+        // Incognito mode: messages are not persisted, streaming handled client-side
+        return createStreamingResponse(response);
       }
-    }
 
-    // Create SSE stream
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      async start(controller): Promise<void> {
-        try {
-          // Emit thread-created event if new thread
-          if (threadResult.isNew) {
-            logger.debug("[DEBUG] Emitting THREAD_CREATED event", {
-              threadId: threadResult.threadId,
-              rootFolderId: data.rootFolderId,
-            });
-            const threadEvent = createStreamEvent.threadCreated({
-              threadId: threadResult.threadId,
-              title: generateThreadTitle(data.content),
-              rootFolderId: data.rootFolderId,
-              subFolderId: data.subFolderId || null,
-            });
-            controller.enqueue(encoder.encode(formatSSEEvent(threadEvent)));
-            logger.debug("[DEBUG] THREAD_CREATED event emitted", {
-              threadId: threadResult.threadId,
-            });
-          } else {
-            logger.debug(
-              "[DEBUG] Thread already exists, not emitting THREAD_CREATED",
-              {
+      const provider = createOpenRouter({
+        apiKey: env.OPENROUTER_API_KEY,
+      });
+
+      logger.debug("Starting OpenRouter stream", {
+        model: data.model,
+        tools: data.tools,
+      });
+
+      // Get model config to check tool support
+      const modelConfig = getModelById(data.model);
+
+      // Load tools if model supports them
+      let tools: Record<string, CoreTool> | undefined = undefined;
+      if (modelConfig?.supportsTools) {
+        const toolsResult = this.loadTools({
+          requestedTools: data.tools,
+          user,
+          locale,
+          logger,
+          systemPrompt,
+        });
+        tools = toolsResult.tools;
+        systemPrompt = toolsResult.systemPrompt;
+      }
+
+      // Create SSE stream
+      const encoder = new TextEncoder();
+      // Bind method to preserve 'this' context in async callback
+      const deductCredits = this.deductCreditsAfterCompletion.bind(this);
+      const stream = new ReadableStream({
+        async start(controller): Promise<void> {
+          try {
+            // Emit thread-created event if new thread
+            if (threadResult.isNew) {
+              logger.debug("[DEBUG] Emitting THREAD_CREATED event", {
                 threadId: threadResult.threadId,
-                isNew: threadResult.isNew,
-              },
-            );
-          }
+                rootFolderId: data.rootFolderId,
+              });
+              const threadEvent = createStreamEvent.threadCreated({
+                threadId: threadResult.threadId,
+                title: generateThreadTitle(data.content),
+                rootFolderId: data.rootFolderId,
+                subFolderId: data.subFolderId || null,
+              });
+              controller.enqueue(encoder.encode(formatSSEEvent(threadEvent)));
+              logger.debug("[DEBUG] THREAD_CREATED event emitted", {
+                threadId: threadResult.threadId,
+              });
+            } else {
+              logger.debug(
+                "[DEBUG] Thread already exists, not emitting THREAD_CREATED",
+                {
+                  threadId: threadResult.threadId,
+                  isNew: threadResult.isNew,
+                },
+              );
+            }
 
-          // For answer-as-ai, skip user message event and only emit AI message
-          // For regular operations, emit both user and AI message events
-          if (data.operation !== "answer-as-ai") {
-            // Emit user message-created event
-            logger.debug("[DEBUG] Emitting USER MESSAGE_CREATED event", {
-              messageId: userMessageId,
-              threadId: threadResult.threadId,
-              parentId: data.parentMessageId || null,
-            });
-            const userMessageEvent = createStreamEvent.messageCreated({
-              messageId: userMessageId,
-              threadId: threadResult.threadId,
-              role: data.role,
-              parentId: data.parentMessageId || null,
-              depth: messageDepth,
-              content: data.content,
-            });
-            const userMessageEventString = formatSSEEvent(userMessageEvent);
-            logger.debug("[DEBUG] USER MESSAGE_CREATED event formatted", {
-              messageId: userMessageId,
-              eventString: userMessageEventString.substring(0, 200),
-            });
-            controller.enqueue(encoder.encode(userMessageEventString));
-            logger.debug("[DEBUG] USER MESSAGE_CREATED event emitted", {
-              messageId: userMessageId,
-            });
-          } else {
-            logger.debug(
-              "[DEBUG] Skipping USER MESSAGE_CREATED event for answer-as-ai operation",
-              {
+            // For answer-as-ai, skip user message event and only emit AI message
+            // For regular operations, emit both user and AI message events
+            if (
+              data.operation !== "answer-as-ai" &&
+              data.operation !== "retry"
+            ) {
+              // Emit user message-created event
+              logger.debug("[DEBUG] Emitting USER MESSAGE_CREATED event", {
                 messageId: userMessageId,
-              },
-            );
-          }
-
-          // Emit AI message-created event
-          // For answer-as-ai, parent is the message we're responding to
-          // For regular operations, parent is the user message we just created
-          const aiParentId =
-            data.operation === "answer-as-ai"
-              ? (data.parentMessageId ?? null)
-              : userMessageId;
-          const aiDepth =
-            data.operation === "answer-as-ai" ? messageDepth : messageDepth + 1;
-
-          logger.debug("[DEBUG] Emitting AI MESSAGE_CREATED event", {
-            messageId: aiMessageId,
-            threadId: threadResult.threadId,
-            parentId: aiParentId,
-            operation: data.operation,
-          });
-          const aiMessageEvent = createStreamEvent.messageCreated({
-            messageId: aiMessageId,
-            threadId: threadResult.threadId,
-            role: "assistant",
-            parentId: aiParentId,
-            depth: aiDepth,
-            content: "",
-            model: data.model,
-            persona: data.persona ?? undefined,
-          });
-          controller.enqueue(encoder.encode(formatSSEEvent(aiMessageEvent)));
-          logger.debug("[DEBUG] AI MESSAGE_CREATED event emitted", {
-            messageId: aiMessageId,
-          });
-
-          // Start streaming
-          let fullContent = "";
-
-          // Get the OpenRouter model ID (use openRouterModel if available, otherwise use model ID directly)
-          const openRouterModelId = modelConfig?.openRouterModel || data.model;
-
-          // Use Vercel AI SDK's built-in multi-step tool calling with stopWhen
-          const streamResult = streamText({
-            model: provider(openRouterModelId),
-            messages,
-            temperature: data.temperature,
-            abortSignal: AbortSignal.timeout(maxDuration * 1000),
-            ...(tools ? { tools, stopWhen: stepCountIs(5) } : {}),
-          });
-
-          // Collect tool calls during streaming
-          const collectedToolCalls: Array<{
-            toolName: string;
-            displayName: string;
-            icon?: string;
-            args: Record<string, string | number | boolean | null>;
-            result?:
-              | string
-              | number
-              | boolean
-              | null
-              | Record<string, string | number | boolean | null>;
-            error?: string;
-            executionTime?: number;
-            widgetMetadata?: {
-              endpointId: string;
-              responseFields: Array<{
-                name: string;
-                widgetType: string;
-                label?: string;
-                description?: string;
-                layout?: Record<string, string | number | boolean>;
-                validation?: Record<string, string | number | boolean>;
-                options?: Array<{ value: string; label: string }>;
-              }>;
-            };
-            creditsUsed?: number;
-          }> = [];
-
-          // Get endpoint metadata for display info
-          const registry = getToolRegistry();
-          const allEndpoints = registry.getEndpoints();
-          const endpointMap = new Map(allEndpoints.map((e) => [e.toolName, e]));
-
-          // Stream the response
-          for await (const part of streamResult.fullStream) {
-            if (part.type === "text-delta") {
-              const textDelta = part.text;
-
-              if (
-                textDelta !== undefined &&
-                textDelta !== null &&
-                textDelta !== ""
-              ) {
-                fullContent += textDelta;
-
-                // Emit content-delta event
-                const deltaEvent = createStreamEvent.contentDelta({
-                  messageId: aiMessageId,
-                  delta: textDelta,
-                });
-                controller.enqueue(encoder.encode(formatSSEEvent(deltaEvent)));
-              }
-            } else if (part.type === "tool-call") {
-              // Get endpoint metadata for display info
-              const endpoint = endpointMap.get(part.toolName);
-              const definition = endpoint?.definition;
-
-              // Try to get widget metadata from endpoint definition
-              let widgetMetadata:
-                | {
-                    endpointId: string;
-                    responseFields: Array<{
-                      name: string;
-                      widgetType: string;
-                      label?: string;
-                      description?: string;
-                      layout?: Record<string, string | number | boolean>;
-                      validation?: Record<string, string | number | boolean>;
-                      options?: Array<{ value: string; label: string }>;
-                    }>;
-                  }
-                | null
-                | undefined;
-
-              // Widget metadata extraction removed - will be added back later
-              widgetMetadata = undefined;
-
-              // Collect tool call for database storage
-              const toolCallData = {
-                toolName: part.toolName,
-                displayName: definition?.title || part.toolName,
-                icon: definition?.aiTool?.icon,
-                args: ("input" in part ? part.input : {}) as Record<
-                  string,
-                  string | number | boolean | null
-                >,
-                creditsUsed: definition?.credits ?? 0,
-                widgetMetadata,
-              };
-              collectedToolCalls.push(toolCallData);
-
-              // Emit tool-call event to frontend
-              const toolCallEvent = createStreamEvent.toolCall({
-                messageId: aiMessageId,
-                toolName: toolCallData.toolName,
-                args: toolCallData.args,
+                threadId: threadResult.threadId,
+                parentId: effectiveParentMessageId || null,
               });
-              controller.enqueue(encoder.encode(formatSSEEvent(toolCallEvent)));
-            } else if (part.type === "tool-result") {
-              // Handle tool results - update the corresponding tool call with result and widget metadata
-              const toolCallIndex = collectedToolCalls.findIndex(
-                (tc) => tc.toolName === part.toolName,
+              const userMessageEvent = createStreamEvent.messageCreated({
+                messageId: userMessageId,
+                threadId: threadResult.threadId,
+                role: toChatMessageRole(effectiveRole),
+                parentId: effectiveParentMessageId || null,
+                depth: messageDepth,
+                content: effectiveContent,
+              });
+              const userMessageEventString = formatSSEEvent(userMessageEvent);
+              logger.debug("[DEBUG] USER MESSAGE_CREATED event formatted", {
+                messageId: userMessageId,
+                eventString: userMessageEventString.substring(0, 200),
+              });
+              controller.enqueue(encoder.encode(userMessageEventString));
+              logger.debug("[DEBUG] USER MESSAGE_CREATED event emitted", {
+                messageId: userMessageId,
+              });
+            } else {
+              logger.debug(
+                "[DEBUG] Skipping USER MESSAGE_CREATED event for answer-as-ai operation",
+                {
+                  messageId: userMessageId,
+                },
               );
-
-              if (toolCallIndex !== -1) {
-                // AI SDK uses 'output' property for tool results
-                // The output type is unknown from AI SDK, so we assert it to our expected types
-                const output = "output" in part ? part.output : undefined;
-                collectedToolCalls[toolCallIndex].result = output as
-                  | string
-                  | number
-                  | boolean
-                  | null
-                  | Record<string, string | number | boolean | null>;
-
-                // If we have widget metadata and result data, we could enhance it here
-                // For now, we just store the result
-                logger.debug("[AI Stream] Tool result received", {
-                  toolName: part.toolName,
-                  hasResult: !!output,
-                });
-              }
             }
-          }
 
-          // Wait for completion
-          const [finishReason, usage] = await Promise.all([
-            streamResult.finishReason,
-            streamResult.usage,
-          ]);
+            // Emit AI message-created event
+            // For answer-as-ai and retry, parent is the message we're responding to
+            // For regular operations, parent is the user message we just created
+            const aiParentId =
+              data.operation === "answer-as-ai" || data.operation === "retry"
+                ? (effectiveParentMessageId ?? null)
+                : userMessageId;
+            const aiDepth =
+              data.operation === "answer-as-ai" || data.operation === "retry"
+                ? messageDepth
+                : messageDepth + 1;
 
-          // Update AI message with final content (if not incognito)
-          if (!isIncognito && userId) {
-            await db
-              .update(chatMessages)
-              .set({
-                content: fullContent,
-                tokens: usage.totalTokens,
-                metadata: {
-                  totalTokens: usage.totalTokens,
-                  finishReason: finishReason || "unknown",
-                  ...(collectedToolCalls.length > 0
-                    ? {
-                        toolCalls: collectedToolCalls.map((tc) => ({
-                          toolName: tc.toolName,
-                          displayName: tc.displayName,
-                          icon: tc.icon,
-                          args: tc.args,
-                          result: tc.result,
-                          error: tc.error,
-                          executionTime: tc.executionTime,
-                          creditsUsed: tc.creditsUsed,
-                          widgetMetadata: tc.widgetMetadata,
-                        })),
-                      }
-                    : {}),
-                } as MessageMetadata,
-                updatedAt: new Date(),
-              })
-              .where(eq(chatMessages.id, aiMessageId));
-
-            logger.info("Updated AI message with final content", {
+            logger.debug("[DEBUG] Emitting AI MESSAGE_CREATED event", {
               messageId: aiMessageId,
-              contentLength: fullContent.length,
-              tokens: usage.totalTokens,
-              toolCallsCount: collectedToolCalls.length,
-              toolCallsWithWidgetMetadata: collectedToolCalls.filter(
-                (tc) => tc.widgetMetadata,
-              ).length,
+              threadId: threadResult.threadId,
+              parentId: aiParentId,
+              operation: data.operation,
             });
-          }
+            const aiMessageEvent = createStreamEvent.messageCreated({
+              messageId: aiMessageId,
+              threadId: threadResult.threadId,
+              role: ChatMessageRole.ASSISTANT,
+              parentId: aiParentId,
+              depth: aiDepth,
+              content: "",
+              model: data.model,
+              persona: data.persona ?? undefined,
+            });
+            controller.enqueue(encoder.encode(formatSSEEvent(aiMessageEvent)));
+            logger.debug("[DEBUG] AI MESSAGE_CREATED event emitted", {
+              messageId: aiMessageId,
+            });
 
-          // Emit content-done event
-          const doneEvent = createStreamEvent.contentDone({
-            messageId: aiMessageId,
-            content: fullContent,
-            totalTokens: usage.totalTokens ?? null,
-            finishReason: finishReason || null,
-          });
-          controller.enqueue(encoder.encode(formatSSEEvent(doneEvent)));
+            // Start streaming
+            let fullContent = "";
 
-          // Deduct credits AFTER successful completion (not optimistically)
-          if (modelCost > 0) {
-            const creditMessageId = crypto.randomUUID();
+            // Get the OpenRouter model ID (use openRouterModel if available, otherwise use model ID directly)
+            const openRouterModelId =
+              modelConfig?.openRouterModel || data.model;
 
-            // Determine correct credit identifier based on subscription status
-            let creditIdentifier: { userId?: string; leadId?: string };
-            if (userId && effectiveLeadId) {
-              const identifierResult =
-                await creditRepository.getCreditIdentifier(
-                  userId,
-                  effectiveLeadId,
-                  logger,
-                );
-              if (!identifierResult.success) {
-                logger.error("Failed to get credit identifier", {
-                  userId,
-                  leadId: effectiveLeadId,
-                });
-                creditIdentifier = { leadId: effectiveLeadId }; // Fallback to lead credits
-              } else {
-                creditIdentifier = {
-                  userId: identifierResult.data.userId,
-                  leadId: identifierResult.data.leadId,
-                };
-                const creditType = identifierResult.data.creditType as string;
-                logger.debug("Using credit identifier", {
-                  creditType,
-                  identifier: creditIdentifier,
-                });
-              }
-            } else if (effectiveLeadId) {
-              creditIdentifier = { leadId: effectiveLeadId };
-            } else {
-              // This should not happen as we validated credits earlier
-              logger.error(
-                "No effective leadId available for credit deduction",
-              );
-              creditIdentifier = { leadId: leadId ?? "" };
-            }
+            // Use Vercel AI SDK's built-in multi-step tool calling with stopWhen
+            const streamResult = streamText({
+              model: provider(openRouterModelId),
+              messages,
+              temperature: data.temperature,
+              abortSignal: AbortSignal.timeout(maxDuration * 1000),
+              ...(tools
+                ? {
+                    tools,
+                    stopWhen: stepCountIs(5),
+                    onStepFinish: ({
+                      text,
+                      toolCalls,
+                      toolResults,
+                      finishReason,
+                      usage,
+                    }): void => {
+                      logger.debug("[AI Stream] Step finished", {
+                        hasText: !!text,
+                        textLength: text?.length || 0,
+                        toolCallsCount: toolCalls.length,
+                        toolResultsCount: toolResults.length,
+                        finishReason,
+                        totalTokens: usage.totalTokens,
+                      });
+                    },
+                  }
+                : {}),
+            });
 
-            const deductResult = await creditRepository.deductCredits(
-              creditIdentifier,
-              modelCost,
-              data.model,
-              creditMessageId,
+            // Collect tool calls during streaming
+            const collectedToolCalls: ToolCall[] = [];
+
+            // Get endpoint metadata for display info
+            // Filter by user permissions to ensure we only show tools the user can access
+            const registry = getToolRegistry();
+            const userContext = {
+              id: user.isPublic ? undefined : user.id,
+              isPublic: user.isPublic,
+            };
+            const allEndpoints = registry.getEndpoints(
+              userContext,
+              Platform.AI,
+            );
+            const endpointMap = new Map(
+              allEndpoints.map((endpoint) => [endpoint.toolName, endpoint]),
             );
 
-            if (!deductResult.success) {
-              logger.error("Failed to deduct credits", {
-                userId,
-                leadId: effectiveLeadId,
-                cost: modelCost,
-              });
-            } else {
-              logger.debug("Credits deducted successfully", {
-                userId,
-                leadId: effectiveLeadId,
-                cost: modelCost,
-                messageId: creditMessageId,
-                creditIdentifier,
+            // Stream the response
+            for await (const part of streamResult.fullStream) {
+              if (part.type === "text-delta") {
+                const textDelta = part.text;
+
+                if (
+                  textDelta !== undefined &&
+                  textDelta !== null &&
+                  textDelta !== ""
+                ) {
+                  fullContent += textDelta;
+
+                  // Emit content-delta event
+                  const deltaEvent = createStreamEvent.contentDelta({
+                    messageId: aiMessageId,
+                    delta: textDelta,
+                  });
+                  controller.enqueue(
+                    encoder.encode(formatSSEEvent(deltaEvent)),
+                  );
+                }
+              } else if (part.type === "tool-call") {
+                // Get endpoint metadata for display info
+                const endpoint = endpointMap.get(part.toolName);
+                const definition = endpoint?.definition;
+
+                // Try to get widget metadata from endpoint definition
+                let widgetMetadata:
+                  | {
+                      endpointId: string;
+                      responseFields: Array<{
+                        name: string;
+                        widgetType: string;
+                        label?: string;
+                        description?: string;
+                        layout?: Record<string, string | number | boolean>;
+                        validation?: Record<string, string | number | boolean>;
+                        options?: Array<{ value: string; label: string }>;
+                      }>;
+                    }
+                  | null
+                  | undefined;
+
+                // Widget metadata extraction removed - will be added back later
+                widgetMetadata = undefined;
+
+                // Collect tool call for database storage
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const rawArgs = "input" in part ? part.input : {};
+                const validatedArgs = isToolArgsRecord(rawArgs) ? rawArgs : {};
+
+                const toolCallData = {
+                  toolName: part.toolName,
+                  displayName: definition?.title || part.toolName,
+                  icon: definition?.aiTool?.icon,
+                  args: validatedArgs,
+                  creditsUsed: definition?.credits ?? 0,
+                  widgetMetadata,
+                };
+                collectedToolCalls.push(toolCallData);
+
+                // Emit tool-call event to frontend
+                const toolCallEvent = createStreamEvent.toolCall({
+                  messageId: aiMessageId,
+                  toolName: toolCallData.toolName,
+                  args: toolCallData.args,
+                });
+                controller.enqueue(
+                  encoder.encode(formatSSEEvent(toolCallEvent)),
+                );
+              } else if (part.type === "tool-result") {
+                // Handle tool results - update the corresponding tool call with result and widget metadata
+                const toolCallIndex = collectedToolCalls.findIndex(
+                  (tc) => tc.toolName === part.toolName,
+                );
+
+                if (toolCallIndex !== -1) {
+                  // AI SDK returns 'output' as unknown type
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                  const output = "output" in part ? part.output : undefined;
+
+                  // Validate and type the output using type guard
+                  const validatedOutput = isValidToolResult(output)
+                    ? output
+                    : undefined;
+                  collectedToolCalls[toolCallIndex].result = validatedOutput;
+
+                  logger.debug("[AI Stream] Tool result received", {
+                    toolName: part.toolName,
+                    hasResult: !!validatedOutput,
+                  });
+
+                  // Emit tool-result event to frontend
+                  const toolResultEvent = createStreamEvent.toolResult({
+                    messageId: aiMessageId,
+                    toolName: part.toolName,
+                    result: validatedOutput,
+                  });
+                  controller.enqueue(
+                    encoder.encode(formatSSEEvent(toolResultEvent)),
+                  );
+                }
+              }
+            }
+
+            // Wait for completion
+            const [finishReason, usage] = await Promise.all([
+              streamResult.finishReason,
+              streamResult.usage,
+            ]);
+
+            // Update AI message with final content (if not incognito)
+            if (!isIncognito && userId) {
+              const metadata: MessageMetadata = {
+                totalTokens: usage.totalTokens,
+                finishReason: (finishReason ?? "unknown") as string,
+                ...(collectedToolCalls.length > 0
+                  ? {
+                      toolCalls: collectedToolCalls,
+                    }
+                  : {}),
+              };
+
+              await db
+                .update(chatMessages)
+                .set({
+                  content: fullContent,
+                  tokens: usage.totalTokens,
+                  metadata,
+                  updatedAt: new Date(),
+                })
+                .where(eq(chatMessages.id, aiMessageId));
+
+              logger.info("Updated AI message with final content", {
+                messageId: aiMessageId,
+                contentLength: fullContent.length,
+                tokens: usage.totalTokens,
+                toolCallsCount: collectedToolCalls.length,
+                toolCallsWithWidgetMetadata: collectedToolCalls.filter(
+                  (tc) => tc.widgetMetadata,
+                ).length,
               });
             }
+
+            // Emit content-done event
+            const doneEvent = createStreamEvent.contentDone({
+              messageId: aiMessageId,
+              content: fullContent,
+              totalTokens: usage.totalTokens ?? null,
+              finishReason: finishReason || null,
+            });
+            controller.enqueue(encoder.encode(formatSSEEvent(doneEvent)));
+
+            // Deduct credits AFTER successful completion (not optimistically)
+            await deductCredits({
+              modelCost,
+              user,
+              model: data.model,
+              logger,
+            });
+
+            controller.close();
+          } catch (error) {
+            const errorMessage =
+              error instanceof Error ? error.message : String(error);
+            logger.error("Stream error", { error: errorMessage });
+
+            // Emit error event
+            const errorEvent = createStreamEvent.error({
+              code: "STREAM_ERROR",
+              message: errorMessage,
+            });
+            controller.enqueue(encoder.encode(formatSSEEvent(errorEvent)));
+            controller.close();
           }
-
-          controller.close();
-        } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : String(error);
-          logger.error("Stream error", { error: errorMessage });
-
-          // Emit error event
-          const errorEvent = createStreamEvent.error({
-            code: "STREAM_ERROR",
-            message: errorMessage,
-          });
-          controller.enqueue(encoder.encode(formatSSEEvent(errorEvent)));
-          controller.close();
-        }
-      },
-    });
-
-    return createStreamingResponse(
-      new Response(stream, {
-        headers: {
-          "Content-Type": "text/event-stream",
-          "Cache-Control": "no-cache",
-          "Connection": "keep-alive",
         },
-      }),
-    );
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error("Failed to create AI stream", {
-      error: errorMessage,
-      model: data.model,
-    });
+      });
 
-    return {
-      success: false,
-      message:
-        "app.api.v1.core.agent.chat.aiStream.route.errors.streamCreationFailed",
-      errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-      messageParams: {
+      return createStreamingResponse(
+        new Response(stream, {
+          headers: {
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+          },
+        }),
+      );
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      logger.error("Failed to create AI stream", {
         error: errorMessage,
-      },
-    };
+        model: data.model,
+      });
+
+      return {
+        success: false,
+        message:
+          "app.api.v1.core.agent.chat.aiStream.route.errors.streamCreationFailed",
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: {
+          error: errorMessage,
+        },
+      };
+    }
   }
 }
+
+/**
+ * Singleton instance
+ */
+export const aiStreamRepository = new AiStreamRepository();

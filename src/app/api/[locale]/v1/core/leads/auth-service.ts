@@ -17,12 +17,12 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { Environment, parseError } from "next-vibe/shared/utils";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { db } from "../system/db";
-import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import { leadLinks, leads, userLeads } from "./db";
 import { LeadSource, LeadStatus } from "./enum";
 
@@ -70,7 +70,10 @@ class LeadAuthServiceImpl {
       logger.debug("app.api.v1.core.leads.auth.public.created", { leadId });
       return { leadId, isNew: true };
     } catch (error) {
-      logger.error("app.api.v1.core.leads.auth.public.error", parseError(error).message);
+      logger.error(
+        "app.api.v1.core.leads.auth.public.error",
+        parseError(error).message,
+      );
       // eslint-disable-next-line no-restricted-syntax
       throw error;
     }
@@ -95,28 +98,29 @@ class LeadAuthServiceImpl {
         .where(and(eq(userLeads.userId, userId), eq(userLeads.isPrimary, true)))
         .limit(1);
 
-      if (primaryUserLead) {
-        const shouldUpdate = cookieLeadId !== primaryUserLead.leadId;
-        logger.debug("app.api.v1.core.leads.auth.authenticated.primaryFound", {
+      if (!primaryUserLead) {
+        logger.error("app.api.v1.core.leads.auth.authenticated.noPrimary", {
           userId,
-          leadId: primaryUserLead.leadId,
-          shouldUpdateCookie: shouldUpdate,
         });
-        return {
-          leadId: primaryUserLead.leadId,
-          shouldUpdateCookie: shouldUpdate,
-        };
+        // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+        throw new Error(`User ${userId} has no primary leadId`);
       }
 
-      // No primary lead found - this shouldn't happen for authenticated users
-      // Create one as fallback with proper locale
-      logger.warn("app.api.v1.core.leads.auth.authenticated.noPrimary", {
+      const shouldUpdate = cookieLeadId !== primaryUserLead.leadId;
+      logger.debug("app.api.v1.core.leads.auth.authenticated.primaryFound", {
         userId,
+        leadId: primaryUserLead.leadId,
+        shouldUpdateCookie: shouldUpdate,
       });
-      const leadId = await this.createLeadForUser(userId, locale, logger);
-      return { leadId, shouldUpdateCookie: true };
+      return {
+        leadId: primaryUserLead.leadId,
+        shouldUpdateCookie: shouldUpdate,
+      };
     } catch (error) {
-      logger.error("app.api.v1.core.leads.auth.authenticated.error", parseError(error).message);
+      logger.error(
+        "app.api.v1.core.leads.auth.authenticated.error",
+        parseError(error).message,
+      );
       // eslint-disable-next-line no-restricted-syntax
       throw error;
     }
@@ -179,7 +183,10 @@ class LeadAuthServiceImpl {
         isPrimary,
       });
     } catch (error) {
-      logger.error("app.api.v1.core.leads.auth.link.error", parseError(error).message);
+      logger.error(
+        "app.api.v1.core.leads.auth.link.error",
+        parseError(error).message,
+      );
       // eslint-disable-next-line no-restricted-syntax
       throw error;
     }
@@ -201,7 +208,10 @@ class LeadAuthServiceImpl {
 
       return !!lead;
     } catch (error) {
-      logger.error("app.api.v1.core.leads.auth.validate.error", parseError(error).message);
+      logger.error(
+        "app.api.v1.core.leads.auth.validate.error",
+        parseError(error).message,
+      );
       return false;
     }
   }
@@ -231,7 +241,10 @@ class LeadAuthServiceImpl {
       // Create new lead
       return await this.createAnonymousLead(clientInfo, locale, logger);
     } catch (error) {
-      logger.error("app.api.v1.core.leads.auth.getOrCreate.error", parseError(error).message);
+      logger.error(
+        "app.api.v1.core.leads.auth.getOrCreate.error",
+        parseError(error).message,
+      );
       // eslint-disable-next-line no-restricted-syntax
       throw error;
     }
@@ -316,7 +329,10 @@ class LeadAuthServiceImpl {
       });
       return newLead.id;
     } catch (error) {
-      logger.error("app.api.v1.core.leads.auth.create.error", parseError(error).message);
+      logger.error(
+        "app.api.v1.core.leads.auth.create.error",
+        parseError(error).message,
+      );
       // eslint-disable-next-line no-restricted-syntax
       throw error;
     }
@@ -372,7 +388,10 @@ class LeadAuthServiceImpl {
       });
       return newLead.id;
     } catch (error) {
-      logger.error("app.api.v1.core.leads.auth.createForUser.error", parseError(error).message);
+      logger.error(
+        "app.api.v1.core.leads.auth.createForUser.error",
+        parseError(error).message,
+      );
       // eslint-disable-next-line no-restricted-syntax
       throw error;
     }
@@ -400,7 +419,10 @@ class LeadAuthServiceImpl {
       logger.debug("app.api.v1.core.leads.auth.cookie.set", { leadId });
       return createSuccessResponse(undefined);
     } catch (error) {
-      logger.error("app.api.v1.core.leads.auth.cookie.error", parseError(error).message);
+      logger.error(
+        "app.api.v1.core.leads.auth.cookie.error",
+        parseError(error).message,
+      );
       return createErrorResponse(
         "app.api.v1.core.leads.auth.cookie.error",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -425,7 +447,10 @@ class LeadAuthServiceImpl {
 
       return userLeadRecords.map((record) => record.leadId);
     } catch (error) {
-      logger.error("app.api.v1.core.leads.auth.getUserLeads.error", parseError(error).message);
+      logger.error(
+        "app.api.v1.core.leads.auth.getUserLeads.error",
+        parseError(error).message,
+      );
       return [];
     }
   }
@@ -490,7 +515,10 @@ class LeadAuthServiceImpl {
         reason,
       });
     } catch (error) {
-      logger.error("app.api.v1.core.leads.auth.linkLeads.error", parseError(error).message);
+      logger.error(
+        "app.api.v1.core.leads.auth.linkLeads.error",
+        parseError(error).message,
+      );
       // eslint-disable-next-line no-restricted-syntax
       throw error;
     }
@@ -529,7 +557,10 @@ class LeadAuthServiceImpl {
 
       return Array.from(linkedIds);
     } catch (error) {
-      logger.error("app.api.v1.core.leads.auth.getLinkedLeads.error", parseError(error).message);
+      logger.error(
+        "app.api.v1.core.leads.auth.getLinkedLeads.error",
+        parseError(error).message,
+      );
       return [];
     }
   }
@@ -565,7 +596,10 @@ class LeadAuthServiceImpl {
 
       return Array.from(allLeadIds);
     } catch (error) {
-      logger.error("app.api.v1.core.leads.auth.getAllLinkedLeads.error", parseError(error).message);
+      logger.error(
+        "app.api.v1.core.leads.auth.getAllLinkedLeads.error",
+        parseError(error).message,
+      );
       return [leadId]; // Return at least the input leadId
     }
   }

@@ -7,7 +7,7 @@ import "server-only";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { ImapAccount } from "../../messages/db";
+import type { ImapAccount } from "../db";
 import type { ImapConnectionStatus, ImapSpecialUseType } from "../enum";
 
 /**

@@ -6,19 +6,19 @@
 
 import { z } from "zod";
 
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import {
   EndpointErrorTypes,
   FieldDataType,
+  LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import {
   objectField,
   requestDataField,
   responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
-import { LayoutType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/types";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**

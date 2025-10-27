@@ -1,16 +1,19 @@
 /**
+import type { CountryLanguage } from "@/i18n/core/config";
  * Subscription Seeds
  * Provides seed data for subscription-related tables
  */
 
 import { parseError } from "next-vibe/shared/utils";
+
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { creditRepository } from "../credits/repository";
-import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import type { NewSubscription } from "./db";
 import { subscriptions } from "./db";
 import type { SubscriptionGetResponseOutput } from "./definition";
@@ -52,7 +55,10 @@ function createLocalSubscriptionSeed(
 /**
  * Development seed function for subscription module
  */
-export async function dev(logger: EndpointLogger): Promise<void> {
+export async function dev(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("🌱 Seeding subscription data for development environment");
 
   try {
@@ -60,6 +66,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     const demoUserResponse = await userRepository.getUserByEmail(
       "demo@example.com",
       UserDetailLevel.STANDARD,
+      locale,
       logger,
     );
 
@@ -150,6 +157,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     const adminUserResponse = await userRepository.getUserByEmail(
       "admin@example.com",
       UserDetailLevel.STANDARD,
+      locale,
       logger,
     );
 
@@ -241,7 +249,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       }
     }
   } catch (error) {
-    logger.error("Error creating development subscription seeds:", parseError(error));
+    logger.error(
+      "Error creating development subscription seeds:",
+      parseError(error),
+    );
     // Don't throw error - continue with other seeds
   }
 
@@ -250,6 +261,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     const lowCreditsUserResponse = await userRepository.getUserByEmail(
       "lowcredits@example.com",
       UserDetailLevel.STANDARD,
+      locale,
       logger,
     );
 
@@ -357,7 +369,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 /**
  * Test seed function for subscription module
  */
-export async function test(logger: EndpointLogger): Promise<void> {
+export async function test(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("🌱 Seeding subscription data for test environment");
 
   try {
@@ -365,12 +380,14 @@ export async function test(logger: EndpointLogger): Promise<void> {
     const testUser1Response = await userRepository.getUserByEmail(
       "test1@example.com",
       UserDetailLevel.STANDARD,
+      locale,
       logger,
     );
 
     const testUser2Response = await userRepository.getUserByEmail(
       "test2@example.com",
       UserDetailLevel.STANDARD,
+      locale,
       logger,
     );
 
@@ -429,7 +446,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
       } catch (subscriptionError) {
         logger.error(
           `Error creating test subscription for user ${subscriptionData.userId}:`,
-          subscriptionError,
+          parseError(subscriptionError),
         );
       }
     }
@@ -444,7 +461,10 @@ export async function test(logger: EndpointLogger): Promise<void> {
 /**
  * Production seed function for subscription module
  */
-export async function prod(logger: EndpointLogger): Promise<void> {
+export async function prod(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("🌱 Seeding subscription data for production environment");
 
   try {
@@ -456,6 +476,7 @@ export async function prod(logger: EndpointLogger): Promise<void> {
     const adminUserResponse = await userRepository.getUserByEmail(
       "hi@socialmediaservice.center",
       UserDetailLevel.STANDARD,
+      locale,
       logger,
     );
 

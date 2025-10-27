@@ -18,8 +18,8 @@ import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import type { JSX } from "react";
 
 import { useCampaignStarterConfigEndpoint } from "@/app/api/[locale]/v1/core/leads/campaigns/campaign-starter/campaign-starter-config/hooks";
-import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/tasks/enum";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { CountryLanguageValues } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

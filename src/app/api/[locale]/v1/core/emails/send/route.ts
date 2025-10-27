@@ -5,9 +5,9 @@
 
 import "server-only";
 
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handlers";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 
-import { endpointsHandler } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
 import definitions from "./definition";
 import { emailSendRepository } from "./repository";
 

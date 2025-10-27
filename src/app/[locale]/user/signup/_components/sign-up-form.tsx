@@ -17,6 +17,7 @@ import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type React from "react";
 
+import signupDefinitions from "@/app/api/[locale]/v1/core/user/public/signup/definition";
 import { SignupType } from "@/app/api/[locale]/v1/core/user/public/signup/enum";
 import { useRegister } from "@/app/api/[locale]/v1/core/user/public/signup/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -155,14 +156,8 @@ export default function SignUpForm({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <EndpointFormField
                 name="personalInfo.privateName"
-                config={{
-                  type: "text",
-                  label: "app.user.signup.auth.signup.privateName",
-                  placeholder:
-                    "app.user.signup.auth.signup.privateNamePlaceholder",
-                  disabled: isSubmitting,
-                }}
                 control={form.control}
+                endpointFields={signupDefinitions.POST.fields}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -171,14 +166,8 @@ export default function SignUpForm({
 
               <EndpointFormField
                 name="personalInfo.publicName"
-                config={{
-                  type: "text",
-                  label: "app.user.signup.auth.signup.publicName",
-                  placeholder:
-                    "app.user.signup.auth.signup.publicNamePlaceholder",
-                  disabled: isSubmitting,
-                }}
                 control={form.control}
+                endpointFields={signupDefinitions.POST.fields}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -188,13 +177,8 @@ export default function SignUpForm({
 
             <EndpointFormField
               name="personalInfo.email"
-              config={{
-                type: "email",
-                label: "app.user.signup.auth.signup.emailLabel",
-                placeholder: "app.user.signup.auth.signup.emailPlaceholder",
-                disabled: isSubmitting,
-              }}
               control={form.control}
+              endpointFields={signupDefinitions.POST.fields}
               theme={{
                 style: "none",
                 showAllRequired: false,
@@ -209,14 +193,8 @@ export default function SignUpForm({
                   <FormItem>
                     <EndpointFormField
                       name="security.password"
-                      config={{
-                        type: "password",
-                        label: "app.user.signup.auth.signup.passwordLabel",
-                        placeholder:
-                          "app.user.signup.auth.signup.passwordPlaceholder",
-                        disabled: isSubmitting,
-                      }}
                       control={form.control}
+                      endpointFields={signupDefinitions.POST.fields}
                       theme={{
                         style: "none",
                         showAllRequired: false,
@@ -232,14 +210,8 @@ export default function SignUpForm({
 
               <EndpointFormField
                 name="security.confirmPassword"
-                config={{
-                  type: "password",
-                  label: "app.user.signup.auth.signup.confirmPasswordLabel",
-                  placeholder:
-                    "app.user.signup.auth.signup.confirmPasswordPlaceholder",
-                  disabled: isSubmitting,
-                }}
                 control={form.control}
+                endpointFields={signupDefinitions.POST.fields}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -248,14 +220,8 @@ export default function SignUpForm({
 
               <EndpointFormField
                 name="consent.subscribeToNewsletter"
-                config={{
-                  type: "checkbox",
-                  label: undefined,
-                  checkboxLabel:
-                    "app.user.signup.auth.signup.newsletterSubscription",
-                  disabled: isSubmitting,
-                }}
                 control={form.control}
+                endpointFields={signupDefinitions.POST.fields}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -265,14 +231,8 @@ export default function SignUpForm({
               <div className="flex items-center">
                 <EndpointFormField
                   name="consent.acceptTerms"
-                  config={{
-                    type: "checkbox",
-                    label: undefined,
-                    checkboxLabelJsx: renderTermsCheckboxLabel(t, locale),
-
-                    disabled: isSubmitting,
-                  }}
                   control={form.control}
+                  endpointFields={signupDefinitions.POST.fields}
                   theme={{
                     style: "none",
                     showAllRequired: false,

@@ -12,12 +12,12 @@ import {
 } from "next-vibe/shared/types/stats-filtering.schema";
 import { useCallback, useMemo } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type {
   EndpointReturn,
   FormAlertState,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint";
-import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint";
+} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
+import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
 import { useTranslation } from "@/i18n/core/client";
 import {
   CountryFilter,

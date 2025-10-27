@@ -12,8 +12,8 @@ import { z } from "zod";
 
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
-import { createEndpointLogger } from "../../v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import { createTRPCContext } from "../../v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/trpc/trpc-context";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createTRPCContext } from "@/app/api/[locale]/v1/core/system/unified-ui/react/trpc-trpc-context";
 import { appRouter } from "./router";
 
 /**

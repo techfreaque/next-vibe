@@ -21,13 +21,13 @@ import {
   isDefaultFolderId,
 } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
 import { useTranslation } from "@/i18n/core/client";
 
 import { useChatContext } from "../features/chat/context";
 import { parseChatUrl } from "../lib/url-parser";
-import type { ChatThread, ModelId } from "../types";
+import type { ChatThread, ModelId } from "../shared/types";
 import { ChatArea } from "./layout/chat-area";
 import { SidebarWrapper } from "./layout/sidebar-wrapper";
 import { TopBar } from "./layout/top-bar";
@@ -489,7 +489,7 @@ export function ChatInterface({
 
   return (
     <>
-      <Div className="flex h-[100dvh] overflow-hidden bg-background">
+      <Div className="flex h-dvh overflow-hidden bg-background">
         {/* Top Bar - Menu, Search, Settings */}
         <TopBar
           theme={theme}
@@ -499,7 +499,7 @@ export function ChatInterface({
           onToggleTTSAutoplay={() => setTTSAutoplay(!ttsAutoplay)}
           ttsAutoplay={ttsAutoplay}
           onOpenSearch={() => {
-            // TODO: Implement search modal
+            // Search modal implementation pending Phase 2
           }}
           sidebarCollapsed={sidebarCollapsed}
           onNewChat={() => handleCreateThread(null)}

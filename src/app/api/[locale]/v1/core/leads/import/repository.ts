@@ -18,7 +18,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { Countries, Languages } from "@/i18n/core/config";
 
 import { importRepository } from "../../import/repository";
@@ -69,6 +69,65 @@ export interface DomainImportRepository<T extends DomainRecord> {
    * Get domain name for tracking
    */
   getDomainName(): string;
+
+  /**
+   * Update import job with formatted response
+   */
+  updateImportJobFormatted(
+    userId: string,
+    updates: {
+      jobId: string;
+      batchSize?: number;
+      maxRetries?: number;
+    },
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      job: {
+        info: {
+          id: string;
+          fileName: string;
+          status: string;
+        };
+        progress: {
+          totalRows: number | null;
+          processedRows: number;
+          successfulImports: number;
+          failedImports: number;
+          duplicateEmails: number;
+        };
+        configuration: {
+          currentBatchStart: number;
+          batchSize: number;
+          retryCount: number;
+          maxRetries: number;
+          error: string | null;
+        };
+        timestamps: {
+          createdAt: string;
+          updatedAt: string;
+          startedAt: string | null;
+          completedAt: string | null;
+        };
+      };
+    }>
+  >;
+
+  /**
+   * Delete import job with formatted response
+   */
+  deleteImportJobFormatted(
+    userId: string,
+    jobId: string,
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      result: {
+        success: boolean;
+        message: string;
+      };
+    }>
+  >;
 }
 
 /**
@@ -455,6 +514,119 @@ export class LeadsImportRepository implements ILeadsImportRepository {
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
+  }
+
+  /**
+   * Update import job with formatted response
+   */
+  async updateImportJobFormatted(
+    userId: string,
+    updates: {
+      jobId: string;
+      batchSize?: number;
+      maxRetries?: number;
+    },
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      job: {
+        info: {
+          id: string;
+          fileName: string;
+          status: string;
+        };
+        progress: {
+          totalRows: number | null;
+          processedRows: number;
+          successfulImports: number;
+          failedImports: number;
+          duplicateEmails: number;
+        };
+        configuration: {
+          currentBatchStart: number;
+          batchSize: number;
+          retryCount: number;
+          maxRetries: number;
+          error: string | null;
+        };
+        timestamps: {
+          createdAt: string;
+          updatedAt: string;
+          startedAt: string | null;
+          completedAt: string | null;
+        };
+      };
+    }>
+  > {
+    const response = await importRepository.updateImportJob(
+      userId,
+      updates,
+      logger,
+    );
+
+    if (!response.success) {
+      return response;
+    }
+
+    return createSuccessResponse({
+      job: {
+        info: {
+          id: response.data.id,
+          fileName: response.data.fileName,
+          status: response.data.status,
+        },
+        progress: {
+          totalRows: response.data.totalRows,
+          processedRows: response.data.processedRows,
+          successfulImports: response.data.successfulImports,
+          failedImports: response.data.failedImports,
+          duplicateEmails: response.data.duplicateEmails,
+        },
+        configuration: {
+          currentBatchStart: response.data.currentBatchStart,
+          batchSize: response.data.batchSize,
+          retryCount: response.data.retryCount,
+          maxRetries: response.data.maxRetries,
+          error: response.data.error || null,
+        },
+        timestamps: {
+          createdAt: response.data.createdAt,
+          updatedAt: response.data.updatedAt,
+          startedAt: response.data.startedAt,
+          completedAt: response.data.completedAt,
+        },
+      },
+    });
+  }
+
+  /**
+   * Delete import job with formatted response
+   */
+  async deleteImportJobFormatted(
+    userId: string,
+    jobId: string,
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      result: {
+        success: boolean;
+        message: string;
+      };
+    }>
+  > {
+    const response = await importRepository.deleteImportJob(
+      userId,
+      jobId,
+      logger,
+    );
+
+    if (!response.success) {
+      return response;
+    }
+
+    return createSuccessResponse({
+      result: response.data,
+    });
   }
 }
 

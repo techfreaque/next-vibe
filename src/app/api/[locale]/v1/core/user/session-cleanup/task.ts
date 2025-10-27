@@ -3,7 +3,6 @@
  * Handles background session and token cleanup using the proper task system
  * Runs via pulse route in production or task runner in development
  */
-import { parseError } from "next-vibe/shared/utils";
 import "server-only";
 
 import {
@@ -12,17 +11,18 @@ import {
   ErrorResponseTypes,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
-} from "@/app/api/[locale]/v1/core/system/tasks/constants";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/constants";
 import {
   CronTaskPriority,
   TaskCategory,
-} from "@/app/api/[locale]/v1/core/system/tasks/enum";
-import type { Task } from "@/app/api/[locale]/v1/core/system/tasks/types/repository";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/enum";
+import type { Task } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/types/repository";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import { defaultLocale } from "@/i18n/core/config";
 
 import type { JWTPublicPayloadType } from "../auth/definition";

@@ -13,7 +13,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../user/auth/definition";
@@ -140,7 +140,10 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
       // In a real implementation, this would check service availability
       return createSuccessResponse({ isValid: true });
     } catch (error) {
-      logger.error("IMAP sync validation failed", error instanceof Error ? error.message : String(error));
+      logger.error(
+        "IMAP sync validation failed",
+        error instanceof Error ? error.message : String(error),
+      );
       return createErrorResponse(
         "app.api.v1.core.emails.error.default",
         ErrorResponseTypes.INTERNAL_ERROR,

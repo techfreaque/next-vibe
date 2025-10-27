@@ -1,13 +1,17 @@
 /**
+import type { CountryLanguage } from "@/i18n/core/config";
  * Users Management Seeds
  * Provides seed data for users management functionality
  */
 
 import { parseError } from "next-vibe/shared/utils";
+
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import type { EndpointLogger } from "../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import { UserDetailLevel } from "../user/enum";
 import { userRepository } from "../user/repository";
 import { UserRole } from "../user/user-roles/enum";
 import type { UserCreateRequestOutput } from "./create/definition";
@@ -30,14 +34,18 @@ function createUserManagementSeed(
 /**
  * Development seed function for users management module
  */
-export async function dev(logger: EndpointLogger): Promise<void> {
+export async function dev(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("🌱 Seeding users management data for development environment");
 
   try {
     // Get admin user to act as creator
     const adminUserResponse = await userRepository.getUserByEmail(
       "admin@example.com",
-      undefined,
+      UserDetailLevel.STANDARD,
+      locale,
       logger,
     );
 
@@ -113,14 +121,13 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     let createdCount = 0;
     for (const userData of sampleUsers) {
       try {
-        // Check if user already exists
-        const existingUserResponse = await userRepository.getUserByEmail(
+        // Check if user already exists using emailExists (doesn't fetch full user)
+        const emailExistsResponse = await userRepository.emailExists(
           userData.basicInfo.email,
-          undefined,
           logger,
         );
 
-        if (existingUserResponse.success && existingUserResponse.data) {
+        if (emailExistsResponse.success && emailExistsResponse.data) {
           logger.debug(
             `User ${userData.basicInfo.email} already exists, skipping creation`,
           );
@@ -147,7 +154,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
           );
         }
       } catch (error) {
-        logger.error(`Error creating user ${userData.basicInfo.email}:`, error);
+        logger.error(
+          `Error creating user ${userData.basicInfo.email}:`,
+          parseError(error),
+        );
       }
     }
 
@@ -162,14 +172,18 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 /**
  * Test seed function for users management module
  */
-export async function test(logger: EndpointLogger): Promise<void> {
+export async function test(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("🌱 Seeding users management data for test environment");
 
   try {
     // Get admin user to act as creator
     const adminUserResponse = await userRepository.getUserByEmail(
       "admin@example.com",
-      undefined,
+      UserDetailLevel.STANDARD,
+      locale,
       logger,
     );
 
@@ -211,14 +225,13 @@ export async function test(logger: EndpointLogger): Promise<void> {
       },
     });
 
-    // Check if test user already exists
-    const existingUserResponse = await userRepository.getUserByEmail(
+    // Check if test user already exists using emailExists (doesn't fetch full user)
+    const emailExistsResponse = await userRepository.emailExists(
       testUserData.basicInfo.email,
-      undefined,
       logger,
     );
 
-    if (existingUserResponse.success && existingUserResponse.data) {
+    if (emailExistsResponse.success && emailExistsResponse.data) {
       logger.debug("Test management user already exists, skipping creation");
       return;
     }
@@ -242,14 +255,20 @@ export async function test(logger: EndpointLogger): Promise<void> {
       );
     }
   } catch (error) {
-    logger.error("Error seeding test users management data:", parseError(error));
+    logger.error(
+      "Error seeding test users management data:",
+      parseError(error),
+    );
   }
 }
 
 /**
  * Production seed function for users management module
  */
-export async function prod(logger: EndpointLogger): Promise<void> {
+export async function prod(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("🌱 Seeding users management data for production environment");
 
   try {
@@ -259,7 +278,10 @@ export async function prod(logger: EndpointLogger): Promise<void> {
 
     logger.debug("✅ Users management system ready for production use");
   } catch (error) {
-    logger.error("Error seeding production users management data:", parseError(error));
+    logger.error(
+      "Error seeding production users management data:",
+      parseError(error),
+    );
   }
 }
 

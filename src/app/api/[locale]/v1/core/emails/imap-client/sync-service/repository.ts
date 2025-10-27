@@ -18,14 +18,16 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../user/auth/definition";
-import type { NewEmail, NewImapFolder } from "../../messages/db";
-import { emails, imapAccounts, imapFolders } from "../../messages/db";
 import { EmailType } from "../../messages/enum";
 import { imapConnectionRepository } from "../connection/repository";
+import type { NewEmail } from "@/app/api/[locale]/v1/core/emails/messages/db";
+import { emails } from "@/app/api/[locale]/v1/core/emails/messages/db";
+import type { NewImapFolder } from "../db";
+import { imapAccounts, imapFolders } from "../db";
 import { ImapSyncStatus } from "../enum";
 import type {
   SyncAccountFoldersRequestOutput,
@@ -348,7 +350,10 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
               ErrorResponseTypes.UNKNOWN_ERROR,
             ),
           );
-          logger.error(`Error syncing folder ${folder.name}`, parseError(error));
+          logger.error(
+            `Error syncing folder ${folder.name}`,
+            parseError(error),
+          );
         }
       }
 
@@ -524,9 +529,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
         },
       };
 
-      logger.debug(
-        `Completed folder sync for account: ${data.account.email}`,
-      );
+      logger.debug(`Completed folder sync for account: ${data.account.email}`);
       return createSuccessResponse({ result });
     } catch (error) {
       logger.error(

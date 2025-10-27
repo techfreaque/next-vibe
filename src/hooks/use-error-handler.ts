@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { defaultLocale } from "@/i18n/core/config";
 
 type ErrorWithDigest = Error & { digest?: string };

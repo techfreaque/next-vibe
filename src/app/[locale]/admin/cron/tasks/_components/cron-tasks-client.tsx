@@ -11,8 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import type React from "react";
 import { useState } from "react";
 
-import { useCronTasksList } from "@/app/api/[locale]/v1/core/system/tasks/cron/tasks/hooks";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { useCronTasksList } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/tasks/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

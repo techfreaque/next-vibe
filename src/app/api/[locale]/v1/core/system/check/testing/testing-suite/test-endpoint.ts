@@ -5,9 +5,9 @@ import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { describe, expect, it } from "vitest";
 import type z from "zod";
 
-import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
+import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/types";
 import {
   UserRole,
   type UserRoleValue,

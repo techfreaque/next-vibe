@@ -7,14 +7,15 @@
 
 import type { FC } from "react";
 
-import type { WidgetType } from "../../../cli/vibe/endpoints/endpoint-types/core/enums";
+import type { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+
 import type { WidgetComponentProps } from "../types";
 
 /**
  * Widget component type
  * Accepts any data type to support typed widget components
  */
-export type WidgetComponent = FC<WidgetComponentProps<any>>;
+export type WidgetComponent = FC<WidgetComponentProps<Record<string, unknown>>>;
 
 /**
  * Widget registry entry
@@ -80,3 +81,6 @@ export class WidgetRegistry {
  * Global widget registry instance
  */
 export const widgetRegistry = new WidgetRegistry();
+
+// Re-export WidgetRenderer for convenience
+export { WidgetRenderer } from "./WidgetRenderer";

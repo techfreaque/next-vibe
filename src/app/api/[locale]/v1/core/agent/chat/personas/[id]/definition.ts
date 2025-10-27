@@ -5,24 +5,24 @@
 
 import { z } from "zod";
 
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import {
   objectField,
   requestDataField,
   requestUrlPathParamsField,
   responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { ModelId } from "../../model-access/models";
-import { DEFAULT_CATEGORIES } from "../config";
+import { ModelId, ModelIdOptions } from "../../model-access/models";
+import { CategoryOptions, DEFAULT_CATEGORIES } from "../config";
 
 /**
  * Get Single Persona Endpoint (GET)
@@ -344,6 +344,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.personas.id.patch.category.label" as const,
           description:
             "app.api.v1.core.agent.chat.personas.id.patch.category.description" as const,
+          options: CategoryOptions,
           layout: { columns: 6 },
         },
         z.enum(DEFAULT_CATEGORIES.map((c) => c.id)).optional(),
@@ -356,6 +357,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.personas.id.patch.preferredModel.label" as const,
           description:
             "app.api.v1.core.agent.chat.personas.id.patch.preferredModel.description" as const,
+          options: ModelIdOptions,
           layout: { columns: 6 },
         },
         z.enum(ModelId).optional(),

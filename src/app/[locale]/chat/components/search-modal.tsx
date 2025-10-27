@@ -17,7 +17,7 @@ import React, { useState } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { ChatThread } from "../types";
+import type { ChatThread } from "../shared/types";
 
 interface SearchModalProps {
   open: boolean;

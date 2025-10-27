@@ -7,7 +7,7 @@ import { and, count, eq, isNotNull, isNull, lt, sql } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import { emailCampaigns, leads } from "../../../db";
@@ -431,9 +431,13 @@ export class CampaignSchedulerService {
 
       return result.rowCount || 0;
     } catch (error) {
-      logger.error("campaign.cancel.scheduled.emails.error", parseError(error), {
-        leadId,
-      });
+      logger.error(
+        "campaign.cancel.scheduled.emails.error",
+        parseError(error),
+        {
+          leadId,
+        },
+      );
       return 0;
     }
   }

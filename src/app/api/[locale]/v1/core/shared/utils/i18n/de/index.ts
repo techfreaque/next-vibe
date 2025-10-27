@@ -1,6 +1,11 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  parseJsonWithComments: {
+    errors: {
+      invalid_json: "Ungültiges JSON-Format",
+    },
+  },
   time: {
     errors: {
       invalid_time_format: {

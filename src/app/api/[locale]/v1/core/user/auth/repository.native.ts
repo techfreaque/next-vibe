@@ -13,16 +13,16 @@
  * Storage methods (setAuthCookies/clearAuthCookies) use AsyncStorage on native.
  */
 
-import { parseError } from "next-vibe/shared/utils";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 import { storage } from "next-vibe-ui/ui/storage";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/definition";
 import type { CountryLanguage } from "@/i18n/core/config";

@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 import inquirer from "inquirer";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 import type {
   PackageJson,

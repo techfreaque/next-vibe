@@ -155,6 +155,7 @@ export const renderResetPasswordConfirmMail: EmailFunctionType<
   const userResponse = await userRepository.getUserByEmail(
     requestData.verification.email,
     UserDetailLevel.STANDARD,
+    locale,
     logger,
   );
   if (!userResponse.success) {

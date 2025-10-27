@@ -15,7 +15,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -128,15 +128,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
       // Map messages to include toolCalls from metadata
       const mappedMessages = messages.map((msg) => ({
         ...msg,
-        toolCalls:
-          (
-            msg.metadata as {
-              toolCalls?: Array<{
-                toolName: string;
-                args: Record<string, string | number | boolean | null>;
-              }>;
-            }
-          )?.toolCalls || null,
+        toolCalls: msg.metadata?.toolCalls || null,
       }));
 
       return createSuccessResponse({ messages: mappedMessages });

@@ -10,12 +10,12 @@
 
 import "server-only";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { toolFilter } from "../ai-tool/filter";
-import type { EndpointLogger } from "../cli/vibe/endpoints/endpoint-handler/logger";
-import { createEndpointLogger } from "../cli/vibe/endpoints/endpoint-handler/logger";
+import { toolFilter } from "../ai/filter";
 import { getEndpointRegistry } from "../shared/endpoint-registry";
 import { getMCPConfig, isMCPServerEnabled } from "./config";
 import { endpointToMCPToolMetadata, toolMetadataToMCPTool } from "./converter";

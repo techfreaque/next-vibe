@@ -17,7 +17,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 
 import type { NewUserRole, UserRole } from "../db";
 import type { UserRole as UserRoleEnum } from "./enum";

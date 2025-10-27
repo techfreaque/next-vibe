@@ -24,9 +24,9 @@ import {
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
-import { CRON_SCHEDULES } from "@/app/api/[locale]/v1/core/system/tasks/constants";
-import { formatCronScheduleShort } from "@/app/api/[locale]/v1/core/system/tasks/cron-formatter";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { CRON_SCHEDULES } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/constants";
+import { formatCronScheduleShort } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron-formatter";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";

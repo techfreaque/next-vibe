@@ -15,7 +15,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { users } from "@/app/api/[locale]/v1/core/user/db";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -215,7 +215,10 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<UserDeleteResponseOutput>> {
     try {
-      logger.debug("Deleting user", { id: data.id?.toISOString() || null, requestingUser: user.id });
+      logger.debug("Deleting user", {
+        id: data.id?.toISOString() || null,
+        requestingUser: user.id,
+      });
 
       // Check if user exists
       const [existingUser] = await db

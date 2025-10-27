@@ -4,8 +4,9 @@ import type { ExecException } from "node:child_process";
 import { exec, execSync } from "node:child_process";
 
 import inquirer from "inquirer";
+import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 export function getLastVersionFromGitTag(
   tagPrefix: string,
@@ -92,7 +93,7 @@ export function createGitTag(
   } catch (error) {
     // For commit errors (not status check errors)
 
-    logger.error("Failed to commit changes.", error);
+    logger.error("Failed to commit changes.", parseError(error));
     // eslint-disable-next-line i18next/no-literal-string
     throw new Error("Failed to commit changes");
   }
@@ -124,7 +125,7 @@ export function createGitTag(
       logger.info("Pushed tags to remote.");
     }
   } catch (error) {
-    logger.error("Failed during tag operations.", error);
+    logger.error("Failed during tag operations.", parseError(error));
     // eslint-disable-next-line i18next/no-literal-string
     throw new Error("Failed during tag operations");
   }
@@ -140,7 +141,10 @@ export function checkTagExists(
       `git tag --list ${tag}`,
       (error: ExecException | null, stdout: string) => {
         if (error) {
-          logger.error(`Error checking if tag exists: ${tag}`, error);
+          logger.error(
+            `Error checking if tag exists: ${tag}`,
+            parseError(error),
+          );
           return reject(error);
         }
         resolve(stdout.trim().length > 0);
@@ -251,7 +255,7 @@ export async function ensureMainBranch(logger: EndpointLogger): Promise<void> {
 
           logger.info("Switched to the main branch.");
         } catch (error) {
-          logger.error("Error switching to main branch:", error);
+          logger.error("Error switching to main branch:", parseError(error));
           process.exit(1);
         }
       } else if (shouldSwitch === "openRequest") {
@@ -299,7 +303,7 @@ export async function ensureMainBranch(logger: EndpointLogger): Promise<void> {
       }
     }
   } catch (error) {
-    logger.error("Error checking current branch:", error);
+    logger.error("Error checking current branch:", parseError(error));
     process.exit(1);
   }
 }
@@ -314,7 +318,7 @@ export async function handleUncommittedChanges(
       encoding: "utf8",
     });
   } catch (error) {
-    logger.error("Error checking git status:", error);
+    logger.error("Error checking git status:", parseError(error));
     process.exit(1);
   }
 
@@ -370,7 +374,7 @@ export async function handleUncommittedChanges(
           stdio: "inherit",
         });
       } catch (error) {
-        logger.error("Error during commit:", error);
+        logger.error("Error during commit:", parseError(error));
         process.exit(1);
       }
     }

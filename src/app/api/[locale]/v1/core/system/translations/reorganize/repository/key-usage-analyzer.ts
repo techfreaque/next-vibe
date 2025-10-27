@@ -3,7 +3,8 @@ import path from "node:path";
 
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "../../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+
 import {
   FILE_EXTENSIONS,
   IGNORED_DIRS,

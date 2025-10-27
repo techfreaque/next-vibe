@@ -3,14 +3,14 @@
  * Simplified hooks for interacting with the Payment Portal API
  */
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 
-import { useApiMutation } from "../../system/unified-ui/react/hooks/mutation";
-import { useApiForm } from "../../system/unified-ui/react/hooks/mutation-form";
 import type {
   InferApiFormReturn,
   InferEnhancedMutationResult,
 } from "../../system/unified-ui/react/hooks/types";
+import { useApiMutation } from "../../system/unified-ui/react/hooks/use-api-mutation";
+import { useApiForm } from "../../system/unified-ui/react/hooks/use-api-mutation-form";
 import type { PaymentPortalRequestOutput } from "./definition";
 import definitions from "./definition";
 

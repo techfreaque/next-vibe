@@ -288,7 +288,9 @@ export function validate(
     return createSuccessResponse(true);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error("Campaign starter validation error", { message: errorMessage });
+    logger.error("Campaign starter validation error", {
+      message: errorMessage,
+    });
 
     return createErrorResponse(
       "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title",

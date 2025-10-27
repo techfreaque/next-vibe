@@ -543,3 +543,11 @@ export function getModelById(modelId: ModelId): ModelOption {
 export function getAllModelIds(): ModelId[] {
   return modelOptions.map((model) => model.id);
 }
+
+/**
+ * Model ID options for SELECT fields
+ */
+export const ModelIdOptions = modelOptions.map((model) => ({
+  value: model.id,
+  label: model.name,
+})) as const;

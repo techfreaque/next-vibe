@@ -3,7 +3,6 @@
  * Business logic for listing and filtering users
  */
 
-import { parseError } from "next-vibe/shared/utils";
 import "server-only";
 
 import { and, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
@@ -13,9 +12,10 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { users } from "@/app/api/[locale]/v1/core/user/db";
 import type { CountryLanguage } from "@/i18n/core/config";

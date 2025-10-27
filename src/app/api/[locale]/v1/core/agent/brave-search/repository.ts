@@ -6,9 +6,13 @@
 import "server-only";
 
 import { tool } from "ai";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { z } from "zod";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import { env } from "@/config/env";
+
+import type { BraveSearchGetResponseOutput } from "./definition";
 
 /**
  * Search error and success messages for AI tool responses
@@ -504,3 +508,90 @@ Use this when:
  * Export search service for use in other parts of the application
  */
 export { getBraveSearchService };
+
+/**
+ * Brave Search Repository Interface
+ */
+export interface IBraveSearchRepository {
+  search(
+    query: string,
+    options: {
+      maxResults?: number;
+      includeNews?: boolean;
+      freshness?: "pd" | "pw" | "pm" | "py";
+    },
+    logger: EndpointLogger,
+  ): Promise<ResponseType<BraveSearchGetResponseOutput>>;
+}
+
+/**
+ * Brave Search Repository Implementation
+ */
+class BraveSearchRepository implements IBraveSearchRepository {
+  async search(
+    query: string,
+    options: {
+      maxResults?: number;
+      includeNews?: boolean;
+      freshness?: "pd" | "pw" | "pm" | "py";
+    },
+    logger: EndpointLogger,
+  ): Promise<ResponseType<BraveSearchGetResponseOutput>> {
+    const { createErrorResponse, createSuccessResponse, ErrorResponseTypes } =
+      await import("next-vibe/shared/types/response.schema");
+
+    try {
+      if (!query || typeof query !== "string" || query.trim() === "") {
+        return createErrorResponse(
+          "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.validation.title" as const,
+          ErrorResponseTypes.VALIDATION_ERROR,
+          { message: SEARCH_MESSAGES.QUERY_REQUIRED },
+        );
+      }
+
+      const searchService = getBraveSearchService();
+      const searchResults = await searchService.search(query, options);
+
+      if (searchResults.results.length === 0) {
+        return createSuccessResponse({
+          success: false,
+          message: `${SEARCH_MESSAGES.NO_RESULTS_PREFIX}: ${query}`,
+          results: [],
+        });
+      }
+
+      return createSuccessResponse({
+        success: true,
+        message: `${SEARCH_MESSAGES.FOUND_RESULTS_PREFIX} ${searchResults.results.length} ${SEARCH_MESSAGES.FOUND_RESULTS_SUFFIX}: ${query}`,
+        results: searchResults.results.map((result) => ({
+          title: result.title,
+          url: result.url,
+          snippet: result.description,
+          age: result.age,
+          source: result.source,
+        })),
+        cached: searchResults.cached,
+        timestamp: new Date(searchResults.timestamp).toISOString(),
+      });
+    } catch (error) {
+      const searchService = getBraveSearchService();
+      const braveError =
+        error instanceof Error
+          ? searchService.handleError(error)
+          : new Error(SEARCH_MESSAGES.UNKNOWN_ERROR);
+
+      logger.error("Brave Search error", {
+        error: braveError.message,
+        query,
+      });
+
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
+        ErrorResponseTypes.INTERNAL_ERROR,
+        { message: braveError.message },
+      );
+    }
+  }
+}
+
+export const braveSearchRepository = new BraveSearchRepository();

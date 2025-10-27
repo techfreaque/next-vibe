@@ -3,8 +3,10 @@
 import { Command } from "commander";
 import inquirer from "inquirer";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { defaultLocale } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared.js";
 
@@ -190,7 +192,7 @@ function handleError(
   message: string,
   error: unknown,
 ): never {
-  logger.error(message, error);
+  logger.error(message, parseError(error));
   process.exit(1);
 }
 

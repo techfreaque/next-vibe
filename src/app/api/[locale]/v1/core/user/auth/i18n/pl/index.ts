@@ -13,6 +13,7 @@ export const translations: typeof enTranslations = {
       "Nie udało się wygenerować tokenu uwierzytelniania",
     invalid_session: "Sesja jest nieprawidłowa lub wygasła",
     missing_request_context: "Kontekst żądania jest brakujący",
+    missing_locale: "Brak locale w żądaniu",
     unsupported_platform: "Platforma nie jest obsługiwana",
     session_retrieval_failed: "Nie udało się pobrać sesji",
     missing_token: "Token uwierzytelniania jest brakujący",
@@ -51,6 +52,10 @@ export const translations: typeof enTranslations = {
         title: "Błąd walidacji",
         description: "Nieprawidłowe parametry żądania",
       },
+      missing_locale: {
+        title: "Fehlende Locale",
+        description: "Locale-Parameter ist erforderlich",
+      },
       server: {
         title: "Błąd serwera",
         description: "Wystąpił wewnętrzny błąd serwera",
@@ -84,6 +89,7 @@ export const translations: typeof enTranslations = {
         description: "Sesja jest nieprawidłowa lub wygasła",
       },
       missing_request_context: {
+        missing_locale: "Brak locale w żądaniu",
         title: "Brak kontekstu żądania",
         description: "Kontekst żądania jest brakujący",
       },

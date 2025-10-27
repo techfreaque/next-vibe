@@ -10,7 +10,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 // Search tool ID from the unified-ui system
-const SEARCH_TOOL_ID = "core_agent_chat_tools_brave-search";
+const SEARCH_TOOL_ID = "core_agent_brave-search";
 
 interface SearchToggleProps {
   enabledToolIds: string[];
@@ -67,7 +67,7 @@ export function SearchToggle({
       )}
       title={titleText}
     >
-      <Search className="h-4 w-4 flex-shrink-0" />
+      <Search className="h-4 w-4 shrink-0" />
       <Span className="hidden sm:inline">
         {t("app.chat.searchToggle.search")}
       </Span>

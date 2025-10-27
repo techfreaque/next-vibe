@@ -10,9 +10,9 @@ import { Search } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 
 import type { ToolCall } from "@/app/api/[locale]/v1/core/agent/chat/db";
-import { FieldDataType } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import type { ResponseFieldMetadata } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/renderers/cli-ui/widgets/types";
-import { WidgetRenderer } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/widgets/react";
+import { FieldDataType } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+import type { ResponseFieldMetadata } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/widgets/cli/types";
+import { WidgetRenderer } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/widgets/react/WidgetRenderer";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

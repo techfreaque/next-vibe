@@ -9,12 +9,12 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { languageDefaults } from "@/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { EndpointLogger } from "../../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 import {
   API_TRANSLATIONS_IMPORT,
   API_TRANSLATIONS_KEY,
@@ -1505,7 +1505,7 @@ export class TranslationReorganizeRepositoryImpl {
         },
       });
     } catch (error) {
-      logger.error("Error getting translation stats", { error });
+      logger.error("Error getting translation stats", { error: parseError(error) });
       return createErrorResponse(
         "app.api.v1.core.system.translations.reorganize.repository.error.internal_error",
         ErrorResponseTypes.INTERNAL_ERROR,

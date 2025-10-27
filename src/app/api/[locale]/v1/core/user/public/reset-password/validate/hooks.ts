@@ -4,8 +4,8 @@
 
 import { useToast } from "next-vibe-ui/ui";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
-import { useApiQuery } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/query";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { useApiQuery } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
 import { resetPasswordValidateEndpoint } from "./definition";

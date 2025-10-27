@@ -30,9 +30,8 @@ export function createChatWidgetContext(
     // eslint-disable-next-line @typescript-eslint/require-await
     onAction: async (action): Promise<void> => {
       // Handle widget actions (e.g., retry, edit, delete)
-      // eslint-disable-next-line no-console, i18next/no-literal-string
-      console.log("[Chat Widget] Action triggered:", action);
-      // TODO: Implement action handlers when needed
+      // Action handlers will be implemented when widget actions are needed
+      void action;
     },
   };
 }

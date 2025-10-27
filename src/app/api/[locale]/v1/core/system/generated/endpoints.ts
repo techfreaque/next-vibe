@@ -5,7 +5,7 @@
 
 /* eslint-disable simple-import-sort/imports */
 
-import type { ApiSection } from "../unified-ui/cli/vibe/endpoints/endpoint-types/core/types";
+import type { ApiSection } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/core-types";
 import { setNestedPath } from "next-vibe/shared/utils/object-path";
 
 import { default as endpointDefinition0 } from "@/app/api/[locale]/v1/core/agent/chat/personas/[id]/definition";
@@ -35,14 +35,14 @@ import { default as endpointDefinition23 } from "@/app/api/[locale]/v1/core/syst
 import { default as endpointDefinition24 } from "@/app/api/[locale]/v1/core/system/translations/reorganize/definition";
 import { default as endpointDefinition25 } from "@/app/api/[locale]/v1/core/system/translations/restore-backup/definition";
 import { default as endpointDefinition26 } from "@/app/api/[locale]/v1/core/system/translations/stats/definition";
-import { default as endpointDefinition27 } from "@/app/api/[locale]/v1/core/system/tasks/cron/tasks/definition";
-import { default as endpointDefinition28 } from "@/app/api/[locale]/v1/core/system/tasks/cron/history/definition";
-import { default as endpointDefinition29 } from "@/app/api/[locale]/v1/core/system/tasks/cron/status/definition";
-import { default as endpointDefinition30 } from "@/app/api/[locale]/v1/core/system/tasks/cron/stats/definition";
-import { default as endpointDefinition31 } from "@/app/api/[locale]/v1/core/system/tasks/side-tasks/definition";
-import { default as endpointDefinition32 } from "@/app/api/[locale]/v1/core/system/tasks/types/definition";
-import { default as endpointDefinition33 } from "@/app/api/[locale]/v1/core/system/tasks/pulse/execute/definition";
-import { default as endpointDefinition34 } from "@/app/api/[locale]/v1/core/system/tasks/unified-runner/definition";
+import { default as endpointDefinition27 } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/tasks/definition";
+import { default as endpointDefinition28 } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/history/definition";
+import { default as endpointDefinition29 } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/status/definition";
+import { default as endpointDefinition30 } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/stats/definition";
+import { default as endpointDefinition31 } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/side-tasks/definition";
+import { default as endpointDefinition32 } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/types/definition";
+import { default as endpointDefinition33 } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/pulse/execute/definition";
+import { default as endpointDefinition34 } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/unified-runner/definition";
 import { default as endpointDefinition35 } from "@/app/api/[locale]/v1/core/system/db/schema-verify/definition";
 import { default as endpointDefinition36 } from "@/app/api/[locale]/v1/core/system/db/utils/docker-operations/definition";
 import { default as endpointDefinition37 } from "@/app/api/[locale]/v1/core/system/db/utils/definition";
@@ -60,7 +60,7 @@ import { default as endpointDefinition48 } from "@/app/api/[locale]/v1/core/syst
 import { default as endpointDefinition49 } from "@/app/api/[locale]/v1/core/system/check/testing/test/definition";
 import { default as endpointDefinition50 } from "@/app/api/[locale]/v1/core/system/check/vibe-check/definition";
 import { default as endpointDefinition51 } from "@/app/api/[locale]/v1/core/system/check/typecheck/definition";
-import { default as endpointDefinition52 } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/tools/definition";
+import { default as endpointDefinition52 } from "@/app/api/[locale]/v1/core/system/unified-ui/ai/tools/definition";
 import { default as endpointDefinition53 } from "@/app/api/[locale]/v1/core/system/unified-ui/mcp/tools/definition";
 import { default as endpointDefinition54 } from "@/app/api/[locale]/v1/core/system/unified-ui/mcp/execute/definition";
 import { default as endpointDefinition55 } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/setup/uninstall/definition";
@@ -183,14 +183,10 @@ export function setupEndpoints(): ApiSection {
   );
   setNestedPath(
     endpoints,
-    ["core", "agent", "chat", "tools", "brave-search"],
+    ["core", "agent", "brave-search"],
     endpointDefinition7,
   );
-  setNestedPath(
-    endpoints,
-    ["core", "agent", "chat", "ai-stream"],
-    endpointDefinition8,
-  );
+  setNestedPath(endpoints, ["core", "agent", "ai-stream"], endpointDefinition8);
   setNestedPath(
     endpoints,
     ["core", "agent", "chat", "folders", "[id]"],

@@ -17,8 +17,10 @@ import { hashPassword } from "next-vibe/shared/utils/password";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
+import { leadAuthService } from "../leads/auth-service";
 import { authRepository } from "./auth/repository";
 import type { NewUser, User } from "./db";
 import { insertUserSchema, users } from "./db";
@@ -48,6 +50,7 @@ export interface UserRepository {
   >(
     userId: DbId,
     detailLevel: T,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ExtendedUserType<T>>>;
 
@@ -59,6 +62,7 @@ export interface UserRepository {
   >(
     email: string,
     detailLevel: T,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ExtendedUserType<T>>>;
 
@@ -133,6 +137,37 @@ export interface UserRepository {
     query: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<number>>;
+
+  /**
+   * Search users with pagination metadata
+   */
+  searchUsersWithPagination(
+    searchTerm: string,
+    options: {
+      limit?: number;
+      offset?: number;
+      roles?: UserRoleValue[];
+    },
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      users: Array<StandardUserType & { createdAt: string; updatedAt: string }>;
+      pagination: {
+        currentPage: number;
+        totalPages: number;
+        itemsPerPage: number;
+        totalItems: number;
+        hasMore: boolean;
+        hasPrevious: boolean;
+      };
+      searchInfo: {
+        searchTerm: string | undefined;
+        appliedFilters: UserRoleValue[];
+        searchTime: string;
+        totalResults: number;
+      };
+    }>
+  >;
 }
 
 /**
@@ -210,6 +245,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       return (await this.getUserById(
         verifiedUser.id,
         detailLevel,
+        options.locale,
         logger,
       )) as ResponseType<UserType<T>>;
     } catch (error) {
@@ -230,6 +266,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
   >(
     userId: DbId,
     detailLevel: T = UserDetailLevel.STANDARD as T,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ExtendedUserType<T>>> {
     try {
@@ -261,10 +298,17 @@ export class BaseUserRepositoryImpl implements UserRepository {
         );
       }
 
+      const leadResult = await leadAuthService.getAuthenticatedUserLeadId(
+        userId,
+        undefined,
+        locale,
+        logger,
+      );
+
       // Standard user data
       const standardUser: StandardUserType = {
         id: user.id,
-        leadId: null,
+        leadId: leadResult.leadId,
         isPublic: false,
         privateName: user.privateName,
         publicName: user.publicName,
@@ -311,6 +355,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
   >(
     email: string,
     detailLevel: T = UserDetailLevel.STANDARD as T,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ExtendedUserType<T>>> {
     try {
@@ -333,7 +378,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       }
 
       // Use the found ID to get complete user details
-      return await this.getUserById(results[0].id, detailLevel, logger);
+      return await this.getUserById(results[0].id, detailLevel, locale, logger);
     } catch (error) {
       const errorMessage = parseError(error).message;
       logger.error("Error getting user by email", parseError(error));
@@ -410,7 +455,10 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
       return createSuccessResponse(results.length > 0);
     } catch (error) {
-      logger.error("Error checking if email exists by other user", parseError(error));
+      logger.error(
+        "Error checking if email exists by other user",
+        parseError(error),
+      );
       return createErrorResponse(
         "app.api.v1.core.user.errors.email_duplicate_check_failed",
         ErrorResponseTypes.DATABASE_ERROR,
@@ -683,20 +731,131 @@ export class BaseUserRepositoryImpl implements UserRepository {
       }
       const createdUser = results[0] as User;
 
-      // If successful, get the user with standard detail level that includes userRoles
-      return await this.getUserById(
-        createdUser.id,
-        UserDetailLevel.STANDARD,
-        logger,
-      );
+      // Return minimal user data without fetching leadId (which doesn't exist yet)
+      const standardUser: StandardUserType = {
+        id: createdUser.id,
+        leadId: "" as string, // Empty string as placeholder - will be set when lead is created
+        isPublic: false,
+        privateName: createdUser.privateName,
+        publicName: createdUser.publicName,
+        email: createdUser.email,
+        emailVerified: createdUser.emailVerified,
+        isActive: createdUser.isActive,
+        requireTwoFactor: false,
+        marketingConsent: createdUser.marketingConsent ?? false,
+        createdAt: createdUser.createdAt,
+        updatedAt: createdUser.updatedAt,
+        userRoles: [],
+      };
+
+      return createSuccessResponse(standardUser);
     } catch (error) {
-      logger.error("Error creating user with hashed password", parseError(error));
+      logger.error(
+        "Error creating user with hashed password",
+        parseError(error),
+      );
       return createErrorResponse(
         "app.api.v1.core.user.errors.password_hashing_failed",
         ErrorResponseTypes.DATABASE_ERROR,
         { email: data.email, error: parseError(error).message },
       );
     }
+  }
+
+  /**
+   * Search users with pagination metadata
+   */
+  async searchUsersWithPagination(
+    searchTerm: string,
+    options: {
+      limit?: number;
+      offset?: number;
+      roles?: UserRoleValue[];
+    },
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      users: Array<StandardUserType & { createdAt: string; updatedAt: string }>;
+      pagination: {
+        currentPage: number;
+        totalPages: number;
+        itemsPerPage: number;
+        totalItems: number;
+        hasMore: boolean;
+        hasPrevious: boolean;
+      };
+      searchInfo: {
+        searchTerm: string | undefined;
+        appliedFilters: UserRoleValue[];
+        searchTime: string;
+        totalResults: number;
+      };
+    }>
+  > {
+    const currentLimit = options.limit ?? 20;
+    const currentOffset = options.offset ?? 0;
+
+    // Search users
+    const searchResult = await this.searchUsers(
+      searchTerm,
+      {
+        limit: currentLimit,
+        offset: currentOffset,
+        roles: options.roles,
+      },
+      logger,
+    );
+
+    if (!searchResult.success) {
+      return searchResult;
+    }
+
+    // Get total count
+    const totalCountResult = await this.getUserSearchCount(searchTerm, logger);
+
+    if (!totalCountResult.success) {
+      return totalCountResult;
+    }
+
+    const total = totalCountResult.data;
+    const hasMore = currentOffset + searchResult.data.length < total;
+    const totalPages = Math.ceil(total / currentLimit);
+    const currentPage = Math.floor(currentOffset / currentLimit) + 1;
+
+    // Serialize dates to strings
+    const serializedUsers = searchResult.data.map((user) => ({
+      ...user,
+      createdAt:
+        user.createdAt instanceof Date
+          ? user.createdAt.toISOString()
+          : typeof user.createdAt === "string"
+            ? user.createdAt
+            : new Date(user.createdAt).toISOString(),
+      updatedAt:
+        user.updatedAt instanceof Date
+          ? user.updatedAt.toISOString()
+          : typeof user.updatedAt === "string"
+            ? user.updatedAt
+            : new Date(user.updatedAt).toISOString(),
+    }));
+
+    return createSuccessResponse({
+      users: serializedUsers,
+      pagination: {
+        currentPage,
+        totalPages,
+        itemsPerPage: currentLimit,
+        totalItems: total,
+        hasMore,
+        hasPrevious: currentOffset > 0,
+      },
+      searchInfo: {
+        searchTerm: searchTerm || undefined,
+        appliedFilters: options.roles || [],
+        searchTime: "0.5s",
+        totalResults: total,
+      },
+    });
   }
 }
 

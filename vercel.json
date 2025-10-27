@@ -1,8 +1,8 @@
 {
-    "buildCommand": "vibe build",
+    "buildCommand": "bun run build",
     "outputDirectory": ".next",
     "framework": "nextjs",
-    "installCommand": "yarn setup",
+    "installCommand": "bun run setup",
     "env": {},
     "crons": [
         {

@@ -448,8 +448,7 @@ function FolderItem({
   // Handle folder click to navigate
   const handleFolderClick = (e: React.MouseEvent<HTMLDivElement>): void => {
     // Don't navigate if clicking on buttons
-    const target = e.target as HTMLElement;
-    if (target.closest("button")) {
+    if (e.target instanceof HTMLElement && e.target.closest("button")) {
       return;
     }
 

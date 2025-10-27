@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 import Stripe from "stripe";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { users } from "@/app/api/[locale]/v1/core/user/db";
 import { env } from "@/config/env";
@@ -774,7 +774,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         paymentIntentId: paymentIntent.id,
       });
     } catch (error) {
-      logger.error("Failed to process payment succeeded", { error });
+      logger.error("Failed to process payment succeeded", { error: parseError(error) });
     }
   }
 
@@ -796,7 +796,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         paymentIntentId: paymentIntent.id,
       });
     } catch (error) {
-      logger.error("Failed to process payment failed", { error });
+      logger.error("Failed to process payment failed", { error: parseError(error) });
     }
   }
 

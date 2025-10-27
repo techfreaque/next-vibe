@@ -26,9 +26,9 @@ import {
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
-import { useAIToolsList } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/tools/hooks";
-import type { AIToolMetadataSerialized } from "@/app/api/[locale]/v1/core/system/unified-ui/ai-tool/types";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { useAIToolsList } from "@/app/api/[locale]/v1/core/system/unified-ui/ai/tools/hooks";
+import type { AIToolMetadataSerialized } from "@/app/api/[locale]/v1/core/system/unified-ui/ai/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -64,19 +64,24 @@ export function AIToolsModal({
     enabled: open, // Only fetch when modal is open
   });
 
-  // Extract tools from response
+  // Extract tools from response with explicit typing
   const availableTools = useMemo((): AIToolMetadataSerialized[] => {
-    const response = toolsEndpoint.read?.response;
+    const readState = toolsEndpoint.read;
+    if (!readState) {
+      return [];
+    }
+
+    const response = readState.response;
     if (response?.success && response.data?.tools) {
-      return response.data.tools;
+      return response.data.tools as AIToolMetadataSerialized[];
     }
     return [];
-  }, [toolsEndpoint.read?.response]);
+  }, [toolsEndpoint.read]);
 
   const isLoading = toolsEndpoint.read?.isLoading ?? false;
   const error =
     toolsEndpoint.read?.response?.success === false
-      ? toolsEndpoint.read.response.message
+      ? (toolsEndpoint.read.response.message as string)
       : null;
 
   // Filter tools by search query

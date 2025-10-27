@@ -1,14 +1,14 @@
-import { parseError } from "next-vibe/shared/utils";
 import { drizzle } from "drizzle-orm/node-postgres";
+import { parseError } from "next-vibe/shared/utils";
 import pg from "pg";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { env } from "@/config/env";
 
 import * as agentChatSchema from "../../agent/chat/db";
 import * as creditSchema from "../../credits/db";
 import * as leadsSchema from "../../leads/db";
 import * as userSchema from "../../user/db";
-import type { EndpointLogger } from "../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 const { Pool } = pg;
 
@@ -69,8 +69,9 @@ export async function closeDatabase(logger: EndpointLogger): Promise<void> {
     await pool.end();
   } catch (error) {
     // Ignore errors during shutdown - this is expected when pool is already closed
-    logger.error("app.api.v1.core.system.db.errors.pool_close_failed", parseError(error));
+    logger.error(
+      "app.api.v1.core.system.db.errors.pool_close_failed",
+      parseError(error),
+    );
   }
 }
-
-export * from "./types";

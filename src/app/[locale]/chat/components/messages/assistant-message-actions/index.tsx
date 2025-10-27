@@ -6,7 +6,7 @@ import { Bot, Loader2, Square, Trash2, Volume2 } from "next-vibe-ui/ui/icons";
 import type React from "react";
 
 import { useTTSAudio } from "@/app/api/[locale]/v1/core/agent/text-to-speech/hooks";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

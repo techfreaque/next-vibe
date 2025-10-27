@@ -2,7 +2,9 @@
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { parseError } from "next-vibe/shared/utils";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 import type { ReleaseState, ReleaseTarget } from "../types/types.js";
 
@@ -85,7 +87,7 @@ export class StateManager {
       logger.info(`Loaded existing state from ${this.stateFilePath}`);
       return parsedData;
     } catch (error) {
-      logger.error("Failed to load state file", error);
+      logger.error("Failed to load state file", parseError(error));
       return null;
     }
   }
@@ -99,7 +101,7 @@ export class StateManager {
       writeFileSync(this.stateFilePath, JSON.stringify(state, null, 2));
     } catch (error) {
       if (logger) {
-        logger.error("Failed to save state file", error);
+        logger.error("Failed to save state file", parseError(error));
       }
     }
   }
@@ -153,7 +155,7 @@ export class StateManager {
         unlinkSync(this.stateFilePath);
         logger.info("State file cleared");
       } catch (error) {
-        logger.error("Failed to clear state file", error);
+        logger.error("Failed to clear state file", parseError(error));
       }
     }
   }

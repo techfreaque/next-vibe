@@ -5,21 +5,22 @@
 
 import { z } from "zod";
 
-import { UserRole } from "../../../user/user-roles/enum";
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "../../unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import { createEndpoint } from "../../unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import {
   objectField,
   requestDataField,
   responseArrayField,
   responseField,
-} from "../../unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
+
+import { UserRole } from "../../../user/user-roles/enum";
 
 const { POST } = createEndpoint({
   method: Methods.POST,

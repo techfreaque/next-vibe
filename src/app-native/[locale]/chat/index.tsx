@@ -13,12 +13,13 @@
  */
 
 import { useLocalSearchParams } from "expo-router";
+import { parseError } from "next-vibe/shared/utils";
 import type React from "react";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -59,15 +60,11 @@ export default function LocaleIndexWrapper(): React.ReactElement {
           }
         } catch (err) {
           if (!cancelled) {
-            logger.error("Failed to load page", err);
+            logger.error("Failed to load page", parseError(err));
             setError(
               err instanceof Error
                 ? err
-                : new Error(
-                    t(
-                      "app.api.v1.core.system.unifiedUi.reactNative.app.index.failedToLoadPage",
-                    ),
-                  ),
+                : new Error(t("app-native.chat.failedToLoadPage")),
             );
           }
         }
@@ -91,9 +88,7 @@ export default function LocaleIndexWrapper(): React.ReactElement {
         }}
       >
         <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
-          {t(
-            "app.api.v1.core.system.unifiedUi.reactNative.app.index.failedToLoadPage",
-          )}
+          {t("app-native.chat.failedToLoadPage")}
         </Text>
         <Text style={{ fontSize: 14, color: "#666", textAlign: "center" }}>
           {error.message}

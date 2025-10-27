@@ -12,8 +12,9 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -265,7 +266,7 @@ function setupGuardJailEnvironment(
       message: `✅ Guard jail setup complete for ${config.project.name}`,
     };
   } catch (error) {
-    logger.error("Failed to setup guard jail:", error);
+    logger.error("Failed to setup guard jail:", parseError(error));
     return {
       success: false,
       message: `❌ Failed to setup guard jail: ${error instanceof Error ? error.message : String(error)}`,
@@ -346,7 +347,7 @@ function setupVSCodeIntegration(
       message: `✅ VSCode integration setup complete`,
     };
   } catch (error) {
-    logger.error("Failed to setup VSCode integration:", error);
+    logger.error("Failed to setup VSCode integration:", parseError(error));
     return {
       success: false,
       message: `❌ Failed to setup VSCode integration: ${error instanceof Error ? error.message : String(error)}`,
@@ -515,7 +516,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
       );
       return await this.startByProject(currentProjectPath, logger);
     } catch (error) {
-      logger.error("Guard start failed", error);
+      logger.error("Guard start failed", parseError(error));
       const parsedError =
         error instanceof Error ? error : new Error(String(error));
 

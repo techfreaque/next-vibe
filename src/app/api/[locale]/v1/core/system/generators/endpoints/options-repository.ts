@@ -21,7 +21,7 @@ import { simpleT } from "@/i18n/core/shared";
 import type {
   CliOptionsRequestOutput,
   CliOptionsResponseOutput,
-} from "../../unified-ui/cli/options/definition";
+} from "../../unified-ui/cli/config";
 
 // ===== OPTION TYPES =====
 

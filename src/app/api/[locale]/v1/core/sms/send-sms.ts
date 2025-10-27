@@ -1,4 +1,5 @@
 import "server-only";
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -7,15 +8,22 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { env } from "@/config/env";
 
+import type {
+  SendSmsParams,
+  SmsProvider,
+  SmsResult,
+} from "../system/unified-backend/shared/field-utils";
+import {
+  SmsProviders,
+  validateE164PhoneNumber,
+} from "../system/unified-backend/shared/field-utils";
 import { getAwsSnsProvider } from "./providers/aws-sns";
 import { getHttpProvider } from "./providers/http";
 import { getMessageBirdProvider } from "./providers/messagebird";
 import { getTwilioProvider } from "./providers/twilio";
-import type { SendSmsParams, SmsProvider, SmsResult } from "./utils";
-import { SmsProviders, validateE164PhoneNumber } from "./utils";
 
 /**
  * Cache to store provider instances
@@ -99,15 +107,12 @@ export async function sendSms(
   // Validate phone number
   const validation = validatePhoneNumber(params.to, logger);
   if (!validation.valid) {
-    logger.error(
-      "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
-      {
-        to: params.to,
-        reason: validation.reason,
-      },
-    );
+    logger.error("app.api.v1.core.sms.sms.error.invalid_phone_format", {
+      to: params.to,
+      reason: validation.reason,
+    });
     return createErrorResponse(
-      "packages.nextVibe.server.sms.sms.error.invalid_phone_format",
+      "app.api.v1.core.sms.sms.error.invalid_phone_format",
       ErrorResponseTypes.INVALID_REQUEST_ERROR,
       {
         reason: validation.reason || "",
@@ -171,24 +176,21 @@ export async function sendSms(
     }
 
     // If we get here, all attempts failed
-    logger.error("packages.nextVibe.server.sms.sms.error.delivery_failed", {
+    logger.error("app.api.v1.core.sms.sms.error.delivery_failed", {
       to: params.to,
       attempts: maxAttempts,
     });
     return createErrorResponse(
-      "packages.nextVibe.server.sms.sms.error.delivery_failed",
+      "app.api.v1.core.sms.sms.error.delivery_failed",
       ErrorResponseTypes.SMS_ERROR,
       {
         errorMessage: lastError?.message ?? "",
       },
     );
   } catch (error) {
-    logger.error(
-      "packages.nextVibe.server.sms.sms.error.unexpected_error",
-      error,
-    );
+    logger.error("app.api.v1.core.sms.sms.error.unexpected_error", parseError(error));
     return createErrorResponse(
-      "packages.nextVibe.server.sms.sms.error.unexpected_error",
+      "app.api.v1.core.sms.sms.error.unexpected_error",
       ErrorResponseTypes.SMS_ERROR,
       {
         errorMessage: error instanceof Error ? error.message : "",
@@ -235,11 +237,11 @@ export async function batchSendSms(
   const failureCount = results.filter((r) => !r.success).length;
 
   if (failureCount === results.length) {
-    logger.error("packages.nextVibe.server.sms.sms.error.all_failed", {
+    logger.error("app.api.v1.core.sms.sms.error.all_failed", {
       totalResults: results.length,
     });
     return createErrorResponse(
-      "packages.nextVibe.server.sms.sms.error.all_failed",
+      "app.api.v1.core.sms.sms.error.all_failed",
       ErrorResponseTypes.SMS_ERROR,
       {
         totalResults: results.length.toString(),
@@ -248,12 +250,12 @@ export async function batchSendSms(
   }
 
   if (failureCount > 0) {
-    logger.warn("packages.nextVibe.server.sms.sms.error.partial_failure", {
+    logger.warn("app.api.v1.core.sms.sms.error.partial_failure", {
       failureCount,
       totalCount: results.length,
     });
     return createErrorResponse(
-      "packages.nextVibe.server.sms.sms.error.partial_failure",
+      "app.api.v1.core.sms.sms.error.partial_failure",
       ErrorResponseTypes.SMS_ERROR,
       {
         failureCount: failureCount.toString(),

@@ -7,7 +7,7 @@ import { existsSync, promises as fs } from "node:fs";
 import { cpus, freemem, totalmem } from "node:os";
 import { dirname, extname, join, relative, resolve } from "node:path";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
@@ -137,7 +137,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
 
       // Get system resources and determine optimal worker count
       const resources = this.getSystemResources();
-      logger.debug("System resources detected", resources);
+      logger.debug("System resources detected", { cpus: resources.cpus, memory: resources.totalMemory });
 
       // Discover files to lint
       const filesToLint = await this.discoverFiles(data.path || "./", logger);
@@ -885,8 +885,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     } catch (error) {
       // Unexpected error during processing
       logger.error("Unexpected error processing ESLint results", {
-        error:
-          error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.message : String(error),
       });
     }
 

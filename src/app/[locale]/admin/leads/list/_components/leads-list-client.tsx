@@ -30,7 +30,7 @@ import {
 } from "@/app/api/[locale]/v1/core/leads/enum";
 import type { LeadListGetResponseTypeOutput } from "@/app/api/[locale]/v1/core/leads/list/definition";
 import { useLeadsListEndpoint } from "@/app/api/[locale]/v1/core/leads/list/hooks";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import {
   CountryFilter,
   type CountryLanguage,
@@ -139,7 +139,9 @@ export function LeadsListClient({
   }, [batchOperations, leadsEndpoint.read.form, handleRefresh]);
 
   const handleBatchDelete = useCallback(
-    async (scope: (typeof BatchOperationScope)[keyof typeof BatchOperationScope]) => {
+    async (
+      scope: (typeof BatchOperationScope)[keyof typeof BatchOperationScope],
+    ) => {
       const currentFilters = leadsEndpoint.read.form.getValues();
       await batchOperations.handleBatchDelete(currentFilters, scope);
     },

@@ -15,7 +15,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository";
 import { leadsRepository } from "@/app/api/[locale]/v1/core/leads/repository";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -304,6 +304,7 @@ export class SignupRepositoryImpl implements SignupRepository {
 
       const userResponse = await userRepository.createWithHashedPassword(
         userData,
+        locale,
         logger,
       );
       if (!userResponse.success) {
@@ -391,6 +392,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       const existingUserResponse = await userRepository.getUserByEmail(
         email,
         UserDetailLevel.STANDARD,
+        locale,
         logger,
       );
       return createSuccessResponse(existingUserResponse.success); // true if email exists

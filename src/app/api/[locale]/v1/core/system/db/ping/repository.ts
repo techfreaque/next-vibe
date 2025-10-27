@@ -10,9 +10,10 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 import { db, rawPool } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 import type { PingRequestOutput, PingResponseOutput } from "./definition";
 
@@ -109,7 +110,7 @@ export class DatabasePingRepositoryImpl implements DatabasePingRepository {
         };
       }
     } catch (error) {
-      logger.error("Database ping failed", error);
+      logger.error("Database ping failed", parseError(error));
       return {
         isAccessible: false,
         output: data.silent ? "" : CONNECTION_FAILED_MESSAGE,

@@ -53,11 +53,11 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
     // Validate user permissions for CLI status check
     if (!user?.id) {
       return createErrorResponse(
-        "app.api.v1.core.system.cli.setup.status.post.errors.unauthorized.title",
+        "app.api.v1.core.system.unifiedUi.cli.setup.status.post.errors.unauthorized.title",
         ErrorResponseTypes.UNAUTHORIZED,
         {
           error: t(
-            "app.api.v1.core.system.cli.setup.status.post.errors.unauthorized.description",
+            "app.api.v1.core.system.unifiedUi.cli.setup.status.post.errors.unauthorized.description",
           ),
         },
       );
@@ -73,14 +73,16 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
         path: status.path,
         message: status.installed
           ? t(
-              "app.api.v1.core.system.cli.setup.status.post.success.description",
+              "app.api.v1.core.system.unifiedUi.cli.setup.status.post.success.description",
             )
-          : t("app.api.v1.core.system.cli.setup.status.post.description"),
+          : t(
+              "app.api.v1.core.system.unifiedUi.cli.setup.status.post.description",
+            ),
       });
     } catch (error) {
       const parsedError = parseError(error);
       return createErrorResponse(
-        "app.api.v1.core.system.cli.setup.status.post.errors.server.title",
+        "app.api.v1.core.system.unifiedUi.cli.setup.status.post.errors.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
         { error: parsedError.message },
       );

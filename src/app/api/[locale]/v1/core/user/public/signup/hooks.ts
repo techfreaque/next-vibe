@@ -2,14 +2,14 @@ import { useRouter } from "next/navigation";
 import { useToast } from "next-vibe-ui/ui";
 import { useMemo } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type {
   FormAlertState,
   InferApiFormReturn,
   InferApiQueryReturn,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint/types";
-import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation-form";
-import { useApiQuery } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/query";
+} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint-types";
+import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
+import { useApiQuery } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
 import { envClient } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
 

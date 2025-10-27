@@ -5,17 +5,17 @@
 
 import { z } from "zod";
 
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import {
   FieldDataType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/endpoint/create";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import {
   objectField,
   requestDataField,
   responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/fields/utils";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**
@@ -38,8 +38,8 @@ export const seedsGenerationResponseSchema = z.object({
 const POST = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "generators", "seeds"],
-  title: "app.api.v1.core.system.db.seed.title",
-  description: "app.api.v1.core.system.db.seed.description",
+  title: "app.api.v1.core.system.generators.seeds.post.title",
+  description: "app.api.v1.core.system.generators.seeds.post.description",
 
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
 
@@ -47,7 +47,7 @@ const POST = createEndpoint({
     {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
-      label: "app.api.v1.core.system.db.seed.title",
+      label: "app.api.v1.core.system.db.seed.post.title",
       layout: { columns: 12 },
     },
     { request: "data", response: true },
@@ -56,8 +56,8 @@ const POST = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.v1.core.system.db.seed.title",
-          description: "app.api.v1.core.system.db.seed.description",
+          label: "app.api.v1.core.system.db.seed.post.title",
+          description: "app.api.v1.core.system.db.seed.post.description",
           layout: { columns: 6 },
         },
         z
@@ -69,8 +69,8 @@ const POST = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.v1.core.system.db.seed.title",
-          description: "app.api.v1.core.system.db.seed.description",
+          label: "app.api.v1.core.system.db.seed.post.title",
+          description: "app.api.v1.core.system.db.seed.post.description",
           layout: { columns: 3 },
         },
         z.boolean().default(true),
@@ -80,8 +80,8 @@ const POST = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.v1.core.system.db.seed.title",
-          description: "app.api.v1.core.system.db.seed.description",
+          label: "app.api.v1.core.system.db.seed.post.title",
+          description: "app.api.v1.core.system.db.seed.post.description",
           layout: { columns: 3 },
         },
         z.boolean().default(false),
@@ -91,8 +91,8 @@ const POST = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.v1.core.system.db.seed.title",
-          description: "app.api.v1.core.system.db.seed.description",
+          label: "app.api.v1.core.system.db.seed.post.title",
+          description: "app.api.v1.core.system.db.seed.post.description",
           layout: { columns: 6 },
         },
         z.boolean().default(false),
@@ -102,8 +102,8 @@ const POST = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.v1.core.system.db.seed.title",
-          description: "app.api.v1.core.system.db.seed.description",
+          label: "app.api.v1.core.system.db.seed.post.title",
+          description: "app.api.v1.core.system.db.seed.post.description",
           layout: { columns: 6 },
         },
         z.boolean().default(false),
@@ -113,35 +113,35 @@ const POST = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.system.db.seed.title",
+          content: "app.api.v1.core.system.db.seed.post.title",
         },
         z.boolean(),
       ),
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.system.db.seed.title",
+          content: "app.api.v1.core.system.db.seed.post.title",
         },
         z.string(),
       ),
       seedsFound: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.system.db.seed.title",
+          content: "app.api.v1.core.system.db.seed.post.title",
         },
         z.number(),
       ),
       duration: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.system.db.seed.title",
+          content: "app.api.v1.core.system.db.seed.post.title",
         },
         z.number(),
       ),
       outputPath: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.system.db.seed.title",
+          content: "app.api.v1.core.system.db.seed.post.title",
         },
         z.string(),
       ),

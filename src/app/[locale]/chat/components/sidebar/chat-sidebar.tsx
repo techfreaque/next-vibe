@@ -37,7 +37,7 @@ import type {
   UseChatReturn,
 } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
 import { useCredits } from "@/app/api/[locale]/v1/core/credits/hooks";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -102,9 +102,8 @@ export function ChatSidebar({
   const { t } = simpleT(locale);
   const router = useRouter();
   const endpoint = useCredits(logger);
-  const credits = endpoint.read?.response?.success
-    ? endpoint.read.response.data
-    : null;
+  const readState = endpoint.read;
+  const credits = readState?.response?.success ? readState.response.data : null;
   const [searchQuery, setSearchQuery] = useState("");
   const [newFolderDialogOpen, setNewFolderDialogOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);

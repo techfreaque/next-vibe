@@ -16,14 +16,14 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
 import { withTransaction } from "@/app/api/[locale]/v1/core/system/db/utils/repository-helpers";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import {
   convertCountryFilter,
   convertLanguageFilter,
-  CountryFilter,
-  LanguageFilter,
   type Countries,
+  type CountryFilter,
   type CountryLanguage,
+  type LanguageFilter,
   type Languages,
 } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
@@ -991,7 +991,10 @@ class LeadsRepositoryImpl implements LeadsRepository {
         unsubscribedAt: updatedLead.unsubscribedAt || undefined,
       });
     } catch (error) {
-      logger.error("Error unsubscribing lead and newsletter", parseError(error));
+      logger.error(
+        "Error unsubscribing lead and newsletter",
+        parseError(error),
+      );
       return createErrorResponse(
         "app.api.v1.core.leads.leadsErrors.leadsUnsubscribe.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -1051,7 +1054,10 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       logger.debug("Newsletter opt-out completed", { email });
     } catch (error) {
-      logger.error("Error unsubscribing from newsletter (internal)", parseError(error));
+      logger.error(
+        "Error unsubscribing from newsletter (internal)",
+        parseError(error),
+      );
       // Don't re-throw - we want lead opt-out to succeed even if newsletter fails
     }
   }

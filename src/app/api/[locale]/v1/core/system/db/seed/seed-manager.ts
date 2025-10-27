@@ -1,8 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { parseError } from "next-vibe/shared/utils";
+
 import { closeDatabase } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 export type SeedFn = (
@@ -79,7 +81,10 @@ async function discoverSeedFiles(logger: EndpointLogger): Promise<void> {
       await import(fullPath);
       logger.debug(`✅ Imported: ${modulePath}`);
     } catch (error) {
-      logger.error(`❌ Error importing seed file ${seedFile}:`, error);
+      logger.error(
+        `❌ Error importing seed file ${seedFile}:`,
+        parseError(error),
+      );
     }
   }
 
@@ -147,7 +152,7 @@ export async function runSeeds(
           await seedFn(logger, locale);
           logger.debug(`✅ Seeded ${moduleId} successfully`);
         } catch (error) {
-          logger.error(`❌ Error seeding ${moduleId}:`, error);
+          logger.error(`❌ Error seeding ${moduleId}:`, parseError(error));
           // Re-throw to propagate seeding errors to the main process
           // eslint-disable-next-line no-restricted-syntax
           throw error;
@@ -174,11 +179,10 @@ export async function seedDatabase(
   try {
     await runSeeds(environment, logger, locale);
   } catch (error) {
-    logger.error("❌ Error seeding database:", error);
+    logger.error("❌ Error seeding database:", parseError(error));
     // Don't call process.exit here - let the caller handle the error
     // eslint-disable-next-line no-restricted-syntax
     throw error;
-  } finally {
-    await closeDatabase(logger);
   }
+  // Don't close database here - it needs to stay open for the application
 }

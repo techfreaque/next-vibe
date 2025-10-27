@@ -7,7 +7,7 @@ import { usePathname, useRouter } from "next-vibe-ui/hooks";
 import type { JSX, ReactNode } from "react";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-import { setCookie } from "@/app/api/[locale]/v1/core/system/unified-ui/react/storage/cookie-client";
+import { setCookie } from "@/app/api/[locale]/v1/core/system/unified-ui/react/storage-cookie-client";
 
 import { languageConfig } from "..";
 import type { CountryInfo, CountryLanguage } from "./config";

@@ -12,8 +12,9 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -70,7 +71,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
       );
       return this.destroyByProject(currentProjectPath, logger);
     } catch (error) {
-      logger.error("Guard destruction failed", error);
+      logger.error("Guard destruction failed", parseError(error));
       const parsedError =
         error instanceof Error ? error : new Error(String(error));
 

@@ -99,7 +99,7 @@ export class GenerateTrpcRouterRepositoryImpl
 
       // Import the tRPC router generator
       const { generateTRPCRouter } = await import(
-        "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/trpc/trpc-router-generator"
+        "@/app/api/[locale]/v1/core/system/unified-ui/react/trpc-trpc-router-generator"
       );
 
       // Prepare options for the generator

@@ -7,10 +7,9 @@ import { validateData } from "next-vibe/shared/utils";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type z from "zod";
 
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
-
-import type { EndpointLogger } from "../../cli/vibe/endpoints/endpoint-handler/logger";
 
 // Type for values that can be in FormData
 type FormDataValue =

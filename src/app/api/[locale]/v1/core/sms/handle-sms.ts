@@ -11,19 +11,19 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { batchSendSms, sendSms } from "./send-sms";
 import type {
   ProviderBaseOptions,
   SendSmsParams,
   SmsConfig,
   SmsHandlerOptions,
-} from "./utils";
+} from "../system/unified-backend/shared/field-utils";
+import { batchSendSms, sendSms } from "./send-sms";
 
 /**
  * Processes and handles SMS messages triggered by API responses
@@ -167,7 +167,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
           }
         } catch (error) {
           const parsedError = parseError(error);
-          logger.error(parsedError.message, error);
+          logger.error(parsedError.message, parsedError);
 
           if (!smsData.ignoreErrors) {
             errors.push(
@@ -200,7 +200,10 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
   }
 
   if (errors.length) {
-    logger.error("SMS errors", errors);
+    logger.error("SMS errors", {
+      errorCount: errors.length,
+      errors: errors.map((e) => e.message),
+    });
     return createErrorResponse(
       "app.api.v1.core.sms.sms.error.delivery_failed",
       ErrorResponseTypes.SMS_ERROR,

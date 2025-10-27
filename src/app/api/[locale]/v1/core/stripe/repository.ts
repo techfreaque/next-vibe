@@ -19,7 +19,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -175,7 +175,10 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       logger.debug(`Stripe CLI installation status: ${installed}`);
       return createSuccessResponse(installed);
     } catch (error) {
-      logger.error("Error checking Stripe CLI installation:", parseError(error));
+      logger.error(
+        "Error checking Stripe CLI installation:",
+        parseError(error),
+      );
       return createErrorResponse(
         "app.api.v1.core.stripe.errors.serverError.title",
         ErrorResponseTypes.INTERNAL_ERROR,

@@ -1,6 +1,7 @@
 import path from "node:path";
 
-import type { EndpointLogger } from "../../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+
 import {
   FOLDER_TRANSFORMATIONS,
   SKIP_FOLDERS,

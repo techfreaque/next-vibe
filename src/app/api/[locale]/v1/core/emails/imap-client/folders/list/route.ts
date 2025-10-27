@@ -5,8 +5,8 @@
 
 import "server-only";
 
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/endpoints-handler";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-types/core/enums";
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handlers";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 
 import { ImapFolderSortField, SortOrder } from "../../enum";
 import { imapFoldersRepository } from "../repository";
@@ -19,17 +19,17 @@ export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: ({ urlPathParams, user, locale, logger }) =>
+    handler: ({ data, user, locale, logger }) =>
       imapFoldersRepository.listFolders(
         {
-          page: urlPathParams.page ?? 1,
-          limit: urlPathParams.limit ?? 20,
-          accountId: urlPathParams.accountId,
-          sortBy: urlPathParams.sortBy ?? [ImapFolderSortField.NAME],
-          sortOrder: urlPathParams.sortOrder ?? [SortOrder.ASC],
-          search: urlPathParams.search,
-          specialUseType: urlPathParams.specialUseType,
-          syncStatus: urlPathParams.syncStatus,
+          page: data.page ?? 1,
+          limit: data.limit ?? 20,
+          accountId: data.accountId,
+          sortBy: data.sortBy ?? [ImapFolderSortField.NAME],
+          sortOrder: data.sortOrder ?? [SortOrder.ASC],
+          search: data.search,
+          specialUseType: data.specialUseType,
+          syncStatus: data.syncStatus,
         },
         user,
         locale,

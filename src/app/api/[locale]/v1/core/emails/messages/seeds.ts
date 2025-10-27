@@ -6,8 +6,9 @@
 import { parseError } from "next-vibe/shared/utils";
 
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { EndpointLogger } from "../../system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
 import { UserDetailLevel } from "../../user/enum";
 import { userRepository } from "../../user/repository";
 import type { NewEmail } from "./db";
@@ -41,7 +42,7 @@ function createEmailSeed(overrides?: Partial<NewEmail>): NewEmail {
 /**
  * Development seed function for email messages module
  */
-export async function dev(logger: EndpointLogger): Promise<void> {
+export async function dev(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
   logger.debug("🌱 Seeding email messages data for development environment");
 
   try {
@@ -49,12 +50,14 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     const adminUserResponse = await userRepository.getUserByEmail(
       "admin@example.com",
       UserDetailLevel.STANDARD,
+      locale,
       logger,
     );
 
     const demoUserResponse = await userRepository.getUserByEmail(
       "demo@example.com",
       UserDetailLevel.STANDARD,
+      locale,
       logger,
     );
 
@@ -199,21 +202,27 @@ export async function dev(logger: EndpointLogger): Promise<void> {
             );
           }
         } catch (error) {
-          logger.error(`Error creating email ${email.subject}:`, parseError(error).message);
+          logger.error(
+            `Error creating email ${email.subject}:`,
+            parseError(error).message,
+          );
         }
       }
     }
 
     logger.debug("✅ Inserted development email messages data");
   } catch (error) {
-    logger.error("Error seeding email messages data:", parseError(error).message);
+    logger.error(
+      "Error seeding email messages data:",
+      parseError(error).message,
+    );
   }
 }
 
 /**
  * Test seed function for email messages module
  */
-export async function test(logger: EndpointLogger): Promise<void> {
+export async function test(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
   logger.debug("🌱 Seeding email messages data for test environment");
 
   try {
@@ -221,6 +230,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
     const testUserResponse = await userRepository.getUserByEmail(
       "test1@example.com",
       UserDetailLevel.STANDARD,
+      locale,
       logger,
     );
 
@@ -253,7 +263,10 @@ export async function test(logger: EndpointLogger): Promise<void> {
       }
     }
   } catch (error) {
-    logger.error("Error seeding test email messages data:", parseError(error).message);
+    logger.error(
+      "Error seeding test email messages data:",
+      parseError(error).message,
+    );
   }
 }
 
@@ -270,7 +283,10 @@ export function prod(logger: EndpointLogger): void {
       "✅ Email messages system ready for production email handling",
     );
   } catch (error) {
-    logger.error("Error seeding production email messages data:", parseError(error).message);
+    logger.error(
+      "Error seeding production email messages data:",
+      parseError(error).message,
+    );
   }
 }
 

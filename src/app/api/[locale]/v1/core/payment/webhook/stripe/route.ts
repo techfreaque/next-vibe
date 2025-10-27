@@ -11,7 +11,7 @@ import { NextResponse } from "next/server";
 import { parseError } from "next-vibe/shared/utils";
 import { Environment } from "next-vibe/shared/utils/env-util";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { env } from "@/config/env";
 
 import { paymentRepository } from "../../repository";
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
 
     if (!result.success) {
-      logger.error("payment.webhook.stripe.processing.failed", result);
+      logger.error("payment.webhook.stripe.processing.failed", { message: result.message });
       return NextResponse.json(
         { error: ERROR_WEBHOOK_PROCESSING_FAILED },
         { status: 400 },

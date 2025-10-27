@@ -1,7 +1,9 @@
 import "server-only";
 
+import { parseError } from "next-vibe/shared/utils";
+
 import { db } from "@/app/api/[locale]/v1/core/system/db/index";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 /**
  * Transaction Utilities
@@ -20,7 +22,7 @@ export async function withTransaction<T>(
   try {
     return (await db.transaction(fn)) as T;
   } catch (error) {
-    logger.error("Transaction error", error);
+    logger.error("Transaction error", parseError(error));
     // Re-throw the error to maintain compatibility with Drizzle's transaction API
     // This is a low-level utility that must preserve the original error handling behavior
     // eslint-disable-next-line no-restricted-syntax

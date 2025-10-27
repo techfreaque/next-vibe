@@ -6,7 +6,7 @@ import type { JSX } from "react";
 import { Suspense } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { passwordRepository } from "@/app/api/[locale]/v1/core/user/public/reset-password/repository";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";

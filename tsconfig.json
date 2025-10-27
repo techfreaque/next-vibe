@@ -38,7 +38,7 @@
         "./src/packages/next-vibe-ui/web/*"
       ],
       "server-only": [
-        "./src/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/server-only.ts"
+        "./src/app/api/[locale]/v1/core/system/unified-backend/shared/server-only.ts"
       ]
     }
   },
@@ -57,6 +57,6 @@
     ".next",
     "to_migrate/**/*.ts",
     "to_migrate/**/*.tsx"
-  ],
+  ]
   // "extends": "expo/tsconfig.base"
 }

@@ -3,7 +3,7 @@
  * Enums for database reset functionality
  */
 
-import { createEnumOptions } from "../../unified-ui/cli/vibe/endpoints/endpoint-types/fields/enum-helpers";
+import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enum-helpers";
 
 /**
  * Reset Type

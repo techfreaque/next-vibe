@@ -1,34 +1,46 @@
-import { translations as endpointTranslations } from "../../endpoint/i18n/pl";
-import { translations as mutationFormTranslations } from "../../mutation-form/i18n/pl";
-import { translations as queryTranslations } from "../../query/i18n/pl";
-import { translations as queryFormTranslations } from "../../query-form/i18n/pl";
-import { translations as storeTranslations } from "../../store/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  endpoint: endpointTranslations,
-  mutationForm: mutationFormTranslations,
-  queryForm: queryFormTranslations,
-  query: queryTranslations,
-  store: storeTranslations,
   apiUtils: {
     errors: {
-      http_error: {
-        title: "Błąd HTTP",
-        description: "Nie udało się skomunikować z serwerem",
+      http_error: "Błąd HTTP",
+      validation_error: "Błąd walidacji",
+      internal_error: "Błąd wewnętrzny",
+      auth_required: "Wymagana autoryzacja",
+    },
+  },
+  mutationForm: {
+    post: {
+      errors: {
+        mutation_failed: {
+          title: "Mutacja nie powiodła się",
+        },
+        validation_error: {
+          title: "Błąd walidacji",
+        },
       },
-      validation_error: {
-        title: "Błąd walidacji",
-        description: "Odpowiedź serwera nie mogła zostać zwalidowana",
-      },
-      internal_error: {
-        title: "Błąd wewnętrzny",
-        description: "Wystąpił nieoczekiwany błąd",
-      },
-      auth_required: {
-        title: "Wymagana autentykacja",
-        description: "Musisz być zalogowany, aby wykonać tę akcję",
-      },
+    },
+  },
+  queryForm: {
+    errors: {
+      network_failure: "Błąd sieci",
+      validation_failed: "Walidacja nie powiodła się",
+    },
+  },
+  store: {
+    errors: {
+      validation_failed: "Walidacja nie powiodła się",
+      request_failed: "Żądanie nie powiodło się",
+      mutation_failed: "Mutacja nie powiodła się",
+      unexpected_failure: "Nieoczekiwany błąd",
+      refetch_failed: "Ponowne pobieranie nie powiodło się",
+    },
+    status: {
+      loading_data: "Ładowanie danych...",
+      cached_data: "Używanie danych z pamięci podręcznej",
+      success: "Sukces",
+      mutation_pending: "Mutacja w toku...",
+      mutation_success: "Mutacja zakończona sukcesem",
     },
   },
 };

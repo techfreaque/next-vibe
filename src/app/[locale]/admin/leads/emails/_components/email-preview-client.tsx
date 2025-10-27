@@ -7,9 +7,9 @@
 
 import { render } from "@react-email/render";
 import { Mail, Send } from "lucide-react";
+import { parseError } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "next-vibe-ui/ui/dialog";
-import { parseError } from "next-vibe/shared/utils";
 import type React from "react";
 import { useEffect, useState } from "react";
 
@@ -18,7 +18,7 @@ import type {
   EmailCampaignStageValues,
   EmailJourneyVariantValues,
 } from "@/app/api/[locale]/v1/core/leads/enum";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 

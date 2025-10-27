@@ -18,12 +18,12 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { ImapFolder } from "../../messages/db";
-import { imapAccounts, imapFolders } from "../../messages/db";
+import type { ImapFolder } from "../db";
+import { imapAccounts, imapFolders } from "../db";
 // Note: Removed problematic type imports from definition.ts
 // These types should be defined locally or imported from proper sources
 import { ImapSyncStatus, ImapSyncStatusFilter } from "../enum";

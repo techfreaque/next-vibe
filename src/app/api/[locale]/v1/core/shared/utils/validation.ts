@@ -1,6 +1,6 @@
 import type { z, ZodError, ZodIssue } from "zod";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 import type { ResponseType } from "../types/response.schema";
 import {

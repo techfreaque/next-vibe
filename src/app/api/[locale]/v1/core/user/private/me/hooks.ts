@@ -5,21 +5,21 @@
  * Most of the implementation details are handled by the next-vibe package.
  */
 
-import { parseError } from "next-vibe/shared/utils";
 import type {
   ErrorResponseType,
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 import { useEffect } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
-import type { EnhancedMutationResult } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation";
-import { useApiMutation } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/mutation";
-import { useApiQuery } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/query";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { EnhancedMutationResult } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
 import {
   createCustomStateKey,
+  useApiMutation,
+  useApiQuery,
   useCustomState,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/store";
+} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/i18n/core/client";
 

@@ -1,16 +1,15 @@
 /* global NodeJS */
 
-import { parseError } from "next-vibe/shared/utils";
 import type { Server } from "node:http";
 import { createServer } from "node:http";
 import { cwd } from "node:process";
 import { parse } from "node:url";
 
 import next from "next";
+import { parseError } from "next-vibe/shared/utils";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { env } from "@/config/env";
-
-import type { EndpointLogger } from "../../../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 // Server state (singleton)
 let app: ReturnType<typeof next> | undefined;

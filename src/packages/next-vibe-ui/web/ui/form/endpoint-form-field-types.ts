@@ -229,7 +229,7 @@ export interface EndpointFormFieldProps<
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > {
   name: TName;
-  config: FieldConfig;
+  config?: FieldConfig; // Optional - auto-inferred from endpointFields if not provided
   control: Control<TFieldValues>; // Properly typed form control from useEndpoint
   requiredFields?: string[]; // List of required field names
   theme?: RequiredFieldTheme;

@@ -15,7 +15,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -278,7 +278,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
 
       const [dbThread] = await db
         .insert(chatThreads)
-        .values(threadData as typeof chatThreads.$inferInsert)
+        .values(threadData)
         .returning();
 
       // Map DB fields to API response format (DB has rootFolderId as DefaultFolderId, folderId as UUID)

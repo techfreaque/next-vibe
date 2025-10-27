@@ -6,7 +6,7 @@
 "use client";
 
 import creditsDefinition from "@/app/api/[locale]/v1/core/credits/definition";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/store";
 
 import type { ModelId } from "./model-access/models";
@@ -27,19 +27,35 @@ export function updateCreditBalance(
   }
 
   // Update the credit balance using the built-in helper
-  apiClient.updateEndpointData(creditsDefinition.GET, (oldData) => {
-    if (!oldData?.data) {
-      return oldData;
-    }
+  apiClient.updateEndpointData(
+    creditsDefinition.GET,
+    (
+      oldData:
+        | {
+            success: boolean;
+            data: {
+              total: number;
+              permanent: number;
+              expiring: number;
+              free: number;
+              expiresAt: string | null;
+            };
+          }
+        | undefined,
+    ) => {
+      if (!oldData?.data) {
+        return oldData;
+      }
 
-    return {
-      ...oldData,
-      data: {
-        ...oldData.data,
-        total: oldData.data.total - creditCost,
-      },
-    };
-  });
+      return {
+        ...oldData,
+        data: {
+          ...oldData.data,
+          total: oldData.data.total - creditCost,
+        },
+      };
+    },
+  );
 
   logger.debug("Credit balance updated in cache", {
     creditCost,

@@ -16,7 +16,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-ui/cli/vibe/endpoints/endpoint-handler/logger/types";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -116,6 +116,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       const userResponse = await userRepository.getUserById(
         userId,
         UserDetailLevel.COMPLETE,
+        locale,
         logger,
       );
       if (!userResponse.success) {
@@ -171,6 +172,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       const userResponse = await userRepository.getUserById(
         userId,
         UserDetailLevel.COMPLETE,
+        locale,
         logger,
       );
       if (!userResponse.success) {
@@ -242,6 +244,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       const updatedUserResponse = await userRepository.getUserById(
         userId,
         UserDetailLevel.COMPLETE,
+        locale,
         logger,
       );
       if (!updatedUserResponse.success) {
@@ -312,6 +315,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       const userResponse = await userRepository.getUserById(
         userId,
         UserDetailLevel.COMPLETE,
+        locale,
         logger,
       );
       if (!userResponse.success) {

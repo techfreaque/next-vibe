@@ -3,6 +3,8 @@
 import { existsSync } from "node:fs";
 import { dirname, join, parse, resolve } from "node:path";
 
+import { parseError } from "next-vibe/shared/utils";
+
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { LaunchpadConfig } from "../types/types";

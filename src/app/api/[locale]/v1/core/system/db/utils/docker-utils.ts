@@ -1,9 +1,8 @@
 import { spawn } from "node:child_process";
 
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { createEndpointLogger } from "../../unified-ui/cli/vibe/endpoints/endpoint-handler/logger";
 
 /**
  * Docker log patterns to hide in development mode
