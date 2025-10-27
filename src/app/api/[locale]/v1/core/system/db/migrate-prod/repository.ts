@@ -1,9 +1,7 @@
-import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 /**
  * Database Production Migration Repository
  * Handles production migration operations with safety checks
  */
-
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -11,6 +9,7 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -167,7 +166,9 @@ export class DatabaseMigrateProdRepositoryImpl
 
       if (result.status !== 0) {
         const error = result.stderr || result.error?.message || UNKNOWN_ERROR;
-        logger.error("Migration generation failed", { error: parseError(error) });
+        logger.error("Migration generation failed", {
+          error: parseError(error),
+        });
         return { success: false, error: String(error) };
       }
 

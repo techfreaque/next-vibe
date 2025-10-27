@@ -18,6 +18,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
+import { createDefaultCliUser } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/auth/cli-user-factory";
 
 import type { NewSession, Session } from "./db";
 import { sessions } from "./db";
@@ -89,9 +90,10 @@ export class SessionRepositoryImpl implements SessionRepository {
       if (token?.startsWith("eyJ")) {
         // This looks like a JWT token (starts with eyJ which is base64 for {"alg")
         // For CLI operations, we create a mock session that never expires
+        const defaultCliUser = createDefaultCliUser();
         const mockSession: Session = {
           id: "cli-session-id",
-          userId: "00000000-0000-0000-0000-000000000001",
+          userId: defaultCliUser.id,
           token: token,
           expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
           createdAt: new Date(),

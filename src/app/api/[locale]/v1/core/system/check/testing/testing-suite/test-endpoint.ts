@@ -7,7 +7,7 @@ import type z from "zod";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
-import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/types";
+import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/core-types";
 import {
   UserRole,
   type UserRoleValue,
@@ -141,7 +141,7 @@ export function testEndpoint<
 
         payloadEntries.forEach(([exampleName, payload]) => {
           it(`should handle ${exampleName} example`, async () => {
-            const urlPathParams = urlPathParams
+            const exampleUrlPathParams = urlPathParams
               ? (urlPathParams as Record<string, TUrlVariablesOutput>)[
                   exampleName
                 ]
@@ -150,7 +150,7 @@ export function testEndpoint<
             // Test with a user that has the endpoint's allowed roles
             const response = await testRunner.executeWith({
               data: payload,
-              urlPathParams: urlPathParams as TUrlVariablesOutput,
+              urlPathParams: exampleUrlPathParams as TUrlVariablesOutput,
             });
 
             // Expect success

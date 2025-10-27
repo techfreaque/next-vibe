@@ -59,7 +59,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
 
     if (!result.success) {
-      logger.error("payment.webhook.stripe.processing.failed", { message: result.message });
+      logger.error("payment.webhook.stripe.processing.failed", {
+        message: result.message,
+      });
       return NextResponse.json(
         { error: ERROR_WEBHOOK_PROCESSING_FAILED },
         { status: 400 },

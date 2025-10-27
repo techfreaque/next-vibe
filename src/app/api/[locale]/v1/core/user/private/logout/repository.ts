@@ -83,7 +83,6 @@ export class LogoutRepositoryImpl implements LogoutRepository {
       } else {
         logger.error(
           "app.api.v1.core.user.private.logout.debug.errorClearingAuthCookies",
-          cookieResult,
         );
         // Continue even if cookie deletion fails
       }
@@ -98,7 +97,7 @@ export class LogoutRepositoryImpl implements LogoutRepository {
       } catch (error) {
         logger.error(
           "app.api.v1.core.user.private.logout.debug.errorDeletingUserSessions",
-          error,
+          parseError(error),
         );
         // Use a specific error for session deletion failure
         return createErrorResponse(
@@ -125,7 +124,7 @@ export class LogoutRepositoryImpl implements LogoutRepository {
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.private.logout.debug.errorDuringLogoutProcess",
-        error,
+        parseError(error),
       );
       return createErrorResponse(
         "app.api.v1.core.user.private.logout.errors.internal.title",

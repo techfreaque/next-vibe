@@ -163,7 +163,6 @@ export function useLogin(
           if (!tokenResult.success) {
             logger.error(
               "app.api.v1.core.user.public.login.token.save.failed",
-              tokenResult,
             );
             toast({
               title: t("app.api.v1.core.user.public.login.errors.title"),
@@ -206,7 +205,7 @@ export function useLogin(
         } catch (error) {
           logger.error(
             "app.api.v1.core.user.public.login.process.failed",
-            error,
+            parseError(error),
           );
           toast({
             title: t("app.api.v1.core.user.public.login.errors.title"),

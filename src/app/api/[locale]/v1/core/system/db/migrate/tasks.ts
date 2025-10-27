@@ -4,7 +4,7 @@
  * MIGRATED TO NEW UNIFIED FORMAT
  */
 
-import type { Task } from "../../tasks/types/repository";
+import type { Task } from "../../unified-backend/tasks/types/repository";
 
 /**
  * Database Migration Health Check Cron Task
@@ -75,7 +75,7 @@ const migrationBackupMonitorTask: Task = {
   enabled: false, // Disabled by default
   priority: "LOW",
 
-  run: async (signal: AbortSignal) => {
+  run: async ({ signal }) => {
     const checkInterval = 3600000; // 1 hour
 
     while (!signal.aborted) {

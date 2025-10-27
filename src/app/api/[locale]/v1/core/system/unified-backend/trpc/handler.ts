@@ -12,14 +12,13 @@ import {
   convertToTRPCError,
   handleNextVibeResponse,
 } from "../../unified-ui/react/trpc-trpc";
-import type { TRPCContext } from "../../unified-ui/react/trpc-trpc-context";
-import { validateTrpcRequestData } from "../../unified-ui/react/trpc-validation";
+import { validateTrpcRequestData } from "./validation";
+import type { TRPCContext, TrpcHandlerReturnType as TrpcHandlerType } from "./types";
 import { createEndpointLogger } from "../shared/endpoint-logger";
 import type { Methods } from "../shared/enums";
 import { authenticateUser, executeHandler } from "../shared/execution-core";
 import type {
   ApiHandlerOptions,
-  TrpcHandlerReturnType as TrpcHandlerType,
 } from "../shared/handler-types";
 
 /**

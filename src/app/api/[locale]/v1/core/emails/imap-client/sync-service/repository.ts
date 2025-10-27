@@ -17,6 +17,8 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import type { NewEmail } from "@/app/api/[locale]/v1/core/emails/messages/db";
+import { emails } from "@/app/api/[locale]/v1/core/emails/messages/db";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -24,8 +26,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { JwtPayloadType } from "../../../user/auth/definition";
 import { EmailType } from "../../messages/enum";
 import { imapConnectionRepository } from "../connection/repository";
-import type { NewEmail } from "@/app/api/[locale]/v1/core/emails/messages/db";
-import { emails } from "@/app/api/[locale]/v1/core/emails/messages/db";
 import type { NewImapFolder } from "../db";
 import { imapAccounts, imapFolders } from "../db";
 import { ImapSyncStatus } from "../enum";

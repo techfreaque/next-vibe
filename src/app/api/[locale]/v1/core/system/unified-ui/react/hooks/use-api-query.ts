@@ -12,6 +12,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
@@ -171,7 +172,7 @@ export function useApiQuery<
         }
       } catch (err) {
         // If JSON stringification fails, use a fallback
-        logger.error("Failed to stringify request data:", err);
+        logger.error("Failed to stringify request data", parseError(err));
         requestDataKey =
           typeof requestData === "object"
             ? Object.keys(requestData).sort().join(",")
@@ -223,7 +224,7 @@ export function useApiQuery<
       } catch (err) {
         // If JSON stringification fails, use a fallback
         // Log the error for debugging
-        logger.error("Failed to stringify URL parameters:", err);
+        logger.error("Failed to stringify URL parameters", parseError(err));
         urlPathParamsKey =
           typeof urlPathParams === "object"
             ? Object.keys(urlPathParams).sort().join(",")
@@ -366,9 +367,7 @@ export function useApiQuery<
 
     // Check if we're already executing
     if (isExecutingRef.current) {
-      logger.debug("useApiQuery: Already executing, skipping", {
-        endpointPath: endpoint.path,
-      });
+      logger.debug("useApiQuery: Already executing, skipping");
 
       // Safety mechanism: If we've been executing for more than 5 seconds, force reset
       // Only check if lastExecutionTimeRef has been set (not 0)
@@ -378,13 +377,8 @@ export function useApiQuery<
         if (timeSinceLastExecution > 5000) {
           logger.error(
             "useApiQuery: Execution stuck, force resetting executing flag",
-            {
-              endpointPath: endpoint.path,
-              timeSinceLastExecution,
-            },
           );
           isExecutingRef.current = false;
-          // Don't return, let the execution continue
         } else {
           return;
         }
@@ -453,10 +447,10 @@ export function useApiQuery<
                 },
               );
             } catch (error) {
-              logger.error("useApiQuery: Throttled query execution failed", {
-                endpointPath: endpoint.path,
-                error,
-              });
+              logger.error(
+                "useApiQuery: Throttled query execution failed",
+                parseError(error),
+              );
             } finally {
               // Mark as no longer executing
               isExecutingRef.current = false;
@@ -490,7 +484,7 @@ export function useApiQuery<
       Date.now() - existingQuery.lastFetchTime <
         (queryOptions.staleTime || 60_000);
 
-    // Skip fetch if we have fresh data (even on initial mount if data exists)
+    // Skip fetch if we have fresh SUCCESSFUL data (don't skip if we have cached errors)
     if (hasValidData && isFresh) {
       return;
     }
@@ -502,9 +496,6 @@ export function useApiQuery<
     const safetyTimeoutId = setTimeout(() => {
       logger.error(
         "useApiQuery: Safety timeout triggered, resetting executing flag",
-        {
-          endpointPath: endpoint.path,
-        },
       );
       isExecutingRef.current = false;
     }, 2000); // 2 second safety timeout - queries should complete faster
@@ -550,10 +541,7 @@ export function useApiQuery<
         });
       } catch (error) {
         executionCompleted = true;
-        logger.error("useApiQuery: Query execution failed", {
-          endpointPath: endpoint.path,
-          error,
-        });
+        logger.error("useApiQuery: Query execution failed", parseError(error));
       } finally {
         // Clear the safety timeout
         clearTimeout(safetyTimeoutId);

@@ -13,7 +13,7 @@ import { LOCALE_COOKIE_NAME } from "../../../shared/constants";
 import type {
   MiddlewareFunction,
   MiddlewareHandler,
-} from "../../unified-backend/shared/core-types";
+} from "../core/types";
 
 export interface LanguageMiddlewareOptions {
   /**

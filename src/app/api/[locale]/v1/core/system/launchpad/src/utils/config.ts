@@ -3,8 +3,6 @@
 import { existsSync } from "node:fs";
 import { dirname, join, parse, resolve } from "node:path";
 
-import { parseError } from "next-vibe/shared/utils";
-
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { LaunchpadConfig } from "../types/types";
@@ -88,8 +86,8 @@ function isLaunchpadConfigModule(
 }
 
 export async function loadConfig(
-  explicitConfigPath?: string,
   t: TFunction,
+  explicitConfigPath?: string,
 ): Promise<LaunchpadConfig> {
   const configPath = explicitConfigPath || DEFAULT_CONFIG_PATH;
   let resolvedConfigPath: string;
@@ -128,7 +126,9 @@ export async function loadConfig(
 
   try {
     // const compiledConfigPath = await getCompiledConfigPath(resolvedConfigPath);
-    const importedModule = await import(`file://${resolvedConfigPath}`);
+    const importedModule: unknown = await import(
+      `file://${resolvedConfigPath}`
+    );
 
     if (!isLaunchpadConfigModule(importedModule)) {
       throw new Error(

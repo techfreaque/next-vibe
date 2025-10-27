@@ -29,7 +29,7 @@ import type {
   NewCsvImportJob,
   NewImportBatch,
 } from "../leads/import/definition";
-import { CsvImportJobStatus } from "../leads/import/definition";
+import { CsvImportJobStatus } from "../leads/import/enum";
 import type {
   ImportCsvResponseOutput,
   ListImportJobsRequestOutput,
@@ -232,7 +232,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         jobId: createdJob.id,
       });
     } catch (error) {
-      logger.error("Error creating chunked import job", parseError(error).message);
+      logger.error("Error creating chunked import job", parseError(error));
       return createErrorResponse(
         "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -288,7 +288,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         completedAt: jobData.completedAt?.toISOString() || null,
       });
     } catch (error) {
-      logger.error("Error getting CSV import job status", parseError(error).message);
+      logger.error("Error getting CSV import job status", parseError(error));
       return createErrorResponse(
         "app.admin.leads.leadsErrors.leads.get.error.server.title",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -584,7 +584,7 @@ export class ImportRepositoryImpl implements ImportRepository {
       // Build where conditions
       const whereConditions = [eq(csvImportJobs.uploadedBy, userId)];
 
-      if (status !== "all") {
+      if (status !== "all" && status !== undefined) {
         whereConditions.push(eq(csvImportJobs.status, status));
       }
 
@@ -603,7 +603,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         domain: job.domain,
         status: job.status,
         progress: {
-          totalRows: job.totalRows,
+          totalRows: job.totalRows ?? 0,
           processedRows: job.processedRows,
           currentBatchStart: job.currentBatchStart,
           batchSize: job.batchSize,

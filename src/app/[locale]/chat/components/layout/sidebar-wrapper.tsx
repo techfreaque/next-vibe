@@ -17,7 +17,7 @@ import { simpleT } from "@/i18n/core/shared";
 import type { ChatFolder, ChatThread, DefaultFolderId } from "../../types";
 import { ChatSidebar } from "../sidebar/chat-sidebar";
 
-const SIDEBAR_WIDTH = "w-80";
+const SIDEBAR_WIDTH = "w-65";
 
 interface SidebarWrapperProps {
   threads: Record<string, ChatThread>;

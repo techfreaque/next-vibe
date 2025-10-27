@@ -15,10 +15,15 @@ import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { helpHandler } from "../../unified-ui/shared/widgets/cli/help-handler";
-import { interactiveModeHandler } from "../../unified-ui/shared/widgets/cli/interactive-mode-handler";
+import { helpHandler } from "./widgets/help-handler";
+import { interactiveModeHandler } from "./widgets/interactive-mode-handler";
+import {
+  type CliUserType,
+  getCliUserForCommand,
+} from "../shared/auth/cli-user-factory";
 import type { EndpointDefinition } from "../shared/core-types";
 import type { EndpointLogger } from "../shared/endpoint-logger";
+import { findRouteFiles } from "../shared/filesystem/directory-scanner";
 import { memoryMonitor } from "../shared/performance";
 import { getConfig } from "./config";
 import type { CliRequestData, RouteExecutionResult } from "./route-executor";
@@ -88,9 +93,7 @@ export class CliEntryPoint {
     const config = getConfig();
 
     try {
-      this.logger.debug(
-        this.t("app.api.v1.core.system.cli.vibe.vibe.startingUp"),
-      );
+      this.logger.debug(this.t("app.api.v1.core.system.unifiedBackend.cli.vibe.startingUp"));
 
       memoryMonitor.snapshot();
 
@@ -146,12 +149,12 @@ export class CliEntryPoint {
     if (!route) {
       const availableCommands = this.routes.map((r) => r.alias).slice(0, 10);
       this.logger.error(
-        this.t("app.api.v1.core.system.cli.vibe.errors.routeNotFound"),
+        this.t("app.api.v1.core.system.unifiedBackend.cli.vibe.errors.routeNotFound"),
         { command, availableCommands },
       );
       return {
         success: false,
-        error: this.t("app.api.v1.core.system.cli.vibe.errors.routeNotFound"),
+        error: this.t("app.api.v1.core.system.unifiedBackend.cli.vibe.errors.routeNotFound"),
       };
     }
 
@@ -165,42 +168,15 @@ export class CliEntryPoint {
     };
 
     // Get CLI user for authentication if not provided
-    let cliUser = options.user;
+    let cliUser: CliUserType | undefined = options.user as
+      | CliUserType
+      | undefined;
     if (!cliUser) {
-      // Commands that don't need database access should use fallback authentication
-      const noDbCommands = [
-        "seed",
-        "db:seed",
-        "typecheck",
-        "tc",
-        "lint",
-        "l",
-        "check",
-        "c",
-        "vibe-check",
-      ];
-      const needsFallbackAuth =
-        noDbCommands.some((cmd) => command.includes(cmd)) ||
-        command.includes("seed") ||
-        command.includes("db:");
-
-      if (needsFallbackAuth) {
-        // Use fallback authentication for commands that don't need DB
-        this.logger.debug("Using fallback CLI authentication for command", {
-          command,
-        });
-        cliUser = {
-          isPublic: false,
-          id: "00000000-0000-0000-0000-000000000001",
-          email: "cli@system.local",
-          role: "ADMIN",
-          iat: Math.floor(Date.now() / 1000),
-          exp: Math.floor(Date.now() / 1000) + 3600,
-        };
-      } else {
-        // For other commands, try to get the real user from database
-        cliUser = (await this.getCliUser(this.logger)) || undefined;
-      }
+      cliUser = await getCliUserForCommand(
+        command,
+        this.logger,
+        options.locale || "en-GLOBAL",
+      );
     }
 
     // Create execution context
@@ -253,7 +229,7 @@ export class CliEntryPoint {
       return result;
     } catch (error) {
       process.stderr.write(
-        this.t("app.api.v1.core.system.cli.vibe.errors.executionFailed", {
+        this.t("app.api.v1.core.system.unifiedBackend.cli.vibe.errors.executionFailed", {
           error: error instanceof Error ? error.message : String(error),
         }),
       );
@@ -274,75 +250,21 @@ export class CliEntryPoint {
   private discoverRoutes(baseDir: string): void {
     const _baseDir = path.join(process.cwd(), baseDir);
 
-    // Collect all route files first
-    const routeFiles = this.findAllRouteFiles(_baseDir);
+    // Use consolidated directory scanner
+    const routeFiles = findRouteFiles(_baseDir, [
+      "system/builder",
+      "system/launchpad",
+      "system/release-tool",
+    ]);
 
     // Process each route file
-    for (const { pathSegments, routeFile } of routeFiles) {
+    for (const { pathSegments, fullPath: routeFile } of routeFiles) {
       this.addRoute(pathSegments, routeFile);
     }
   }
 
   /**
-   * Find all route.ts files recursively
-   */
-  private findAllRouteFiles(
-    dir: string,
-    currentPath: string[] = [],
-  ): Array<{ pathSegments: string[]; routeFile: string }> {
-    const results: Array<{ pathSegments: string[]; routeFile: string }> = [];
-
-    if (!fs.existsSync(dir)) {
-      return results;
-    }
-
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
-
-    for (const entry of entries) {
-      // Skip node_modules, .git, .next, and other common directories that should never contain route files
-      if (
-        entry.name === "node_modules" ||
-        entry.name === ".git" ||
-        entry.name === ".next" ||
-        entry.name === "dist" ||
-        entry.name === ".dist" ||
-        entry.name.startsWith(".")
-      ) {
-        continue;
-      }
-
-      if (entry.isDirectory()) {
-        const fullPath = path.join(dir, entry.name);
-        const newPath = [...currentPath, entry.name];
-
-        // Skip standalone package directories that have their own node_modules
-        // These are tools/packages that happen to be in the API directory but aren't API routes
-        const isStandalonePackage =
-          fullPath.includes("/system/builder") ||
-          fullPath.includes("/system/launchpad") ||
-          fullPath.includes("/system/release-tool");
-
-        if (isStandalonePackage) {
-          continue;
-        }
-
-        // Check if this directory has a route.ts file
-        const routeFile = path.join(fullPath, "route.ts");
-        if (fs.existsSync(routeFile)) {
-          results.push({ pathSegments: newPath, routeFile });
-        }
-
-        // Continue scanning subdirectories
-        results.push(...this.findAllRouteFiles(fullPath, newPath));
-      }
-    }
-
-    return results;
-  }
-
-  /**
-   * Add route - registers route with default aliases
-   * Aliases from definition.ts will be loaded lazily when needed
+   * Add route - registers route with actual methods from definition
    */
   private addRoute(pathSegments: string[], routeFile: string): void {
     // Generate default aliases
@@ -350,41 +272,74 @@ export class CliEntryPoint {
     const fullAlias = pathSegments.join(":");
     const apiPath = `/${pathSegments.join("/")}`;
 
-    // All possible HTTP methods - route-delegation-handler will check which ones exist
-    const allMethods = [
-      "GET",
-      "POST",
-      "PUT",
-      "PATCH",
-      "DELETE",
-      "HEAD",
-      "OPTIONS",
-    ];
+    // Try to load definition to get actual methods and aliases
+    const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
+    let actualMethods: string[] = [];
+    let customAliases: string[] = [];
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const definition = require(definitionPath);
+      const defaultExport = definition.default || definition;
+
+      // Extract methods from exported handlers
+      actualMethods = Object.keys(defaultExport).filter((key) =>
+        ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].includes(
+          key,
+        ),
+      );
+
+      // Extract custom aliases if available
+      if (actualMethods.length > 0) {
+        const firstMethod = defaultExport[actualMethods[0]];
+        if (firstMethod?.aliases) {
+          customAliases = firstMethod.aliases;
+        }
+      }
+    } catch {
+      // If definition can't be loaded, fall back to trying all methods
+      actualMethods = ["POST", "GET", "PUT", "PATCH", "DELETE"];
+    }
+
+    // Use actual methods or fallback
+    const methodsToRegister =
+      actualMethods.length > 0
+        ? actualMethods
+        : ["POST", "GET", "PUT", "PATCH", "DELETE"];
 
     // Register route with short alias
-    for (const method of allMethods) {
+    for (const method of methodsToRegister) {
       this.routes.push({
         alias: shortAlias,
         path: apiPath,
         method,
         routePath: routeFile,
-        description: this.t(
-          "app.api.v1.core.system.cli.vibe.vibe.executeCommand",
-        ),
+        description: this.t("app.api.v1.core.system.unifiedBackend.cli.vibe.executeCommand"),
       });
     }
 
     // Register route with full alias if different
     if (fullAlias !== shortAlias) {
-      for (const method of allMethods) {
+      for (const method of methodsToRegister) {
         this.routes.push({
           alias: fullAlias,
           path: apiPath,
           method,
           routePath: routeFile,
-          description: this.t(
-            "app.api.v1.core.system.cli.vibe.vibe.executeCommand",
-          ),
+          description: this.t("app.api.v1.core.system.unifiedBackend.cli.vibe.executeCommand"),
+        });
+      }
+    }
+
+    // Register custom aliases from definition
+    for (const customAlias of customAliases) {
+      for (const method of methodsToRegister) {
+        this.routes.push({
+          alias: customAlias,
+          path: apiPath,
+          method,
+          routePath: routeFile,
+          description: this.t("app.api.v1.core.system.unifiedBackend.cli.vibe.executeCommand"),
         });
       }
     }
@@ -567,75 +522,12 @@ export class CliEntryPoint {
     } catch (error) {
       const parsedError = parseError(error);
       logger.error(
-        "app.api.v1.core.system.cli.vibe.errors.executionFailed",
+        "app.api.v1.core.system.unifiedBackend.cli.vibe.errors.executionFailed",
         parsedError,
       );
       return {
         success: false,
         error: parsedError.message,
-      };
-    }
-  }
-
-  /**
-   * Get CLI user with fallback to default when database user doesn't exist
-   */
-  private async getCliUser(
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<{
-    isPublic: boolean;
-    id?: string;
-    email?: string;
-    role?: string;
-    iat?: number;
-    exp?: number;
-  } | null> {
-    try {
-      // Get CLI user from database by email
-      const CLI_USER_EMAIL = "cli@system.local";
-
-      const userResponse = await userRepository.getUserByEmail(
-        CLI_USER_EMAIL,
-        UserDetailLevel.COMPLETE,
-        locale,
-        logger,
-      );
-
-      if (userResponse.success && userResponse.data) {
-        const user = userResponse.data;
-
-        // Create a proper JWT payload for CLI authentication from database user
-        return {
-          isPublic: false,
-          id: user.id,
-          email: user.email,
-          role: "ADMIN", // CLI user has admin privileges
-          iat: Math.floor(Date.now() / 1000),
-          exp: Math.floor(Date.now() / 1000) + 3600,
-        };
-      } else {
-        // Fallback to default CLI user when database user doesn't exist (e.g., before seeds)
-        logger.debug("CLI user not found in database, using default CLI user");
-        return {
-          isPublic: false,
-          id: "00000000-0000-0000-0000-000000000001", // Valid UUID for CLI user
-          email: "cli@system.local",
-          role: "ADMIN",
-          iat: Math.floor(Date.now() / 1000),
-          exp: Math.floor(Date.now() / 1000) + 3600,
-        };
-      }
-    } catch (error) {
-      logger.debug("Error getting CLI user, using default:", parseError(error));
-      // Fallback to default CLI user on any error
-      return {
-        isPublic: false,
-        id: "00000000-0000-0000-0000-000000000001", // Valid UUID for CLI user
-        email: "cli@system.local",
-        role: "ADMIN",
-        iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000) + 3600,
       };
     }
   }

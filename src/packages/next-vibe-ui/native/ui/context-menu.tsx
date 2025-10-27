@@ -9,24 +9,26 @@ import {
   View,
   type ViewStyle,
 } from "react-native";
+import { styled } from "nativewind";
 
 import { Check } from "./icons/Check";
 import { ChevronDown } from "./icons/ChevronDown";
 import { ChevronRight } from "./icons/ChevronRight";
 import { ChevronUp } from "./icons/ChevronUp";
-import {
-  StyledContextMenuCheckboxItem,
-  StyledContextMenuContent,
-  StyledContextMenuItem,
-  StyledContextMenuItemIndicator,
-  StyledContextMenuLabel,
-  StyledContextMenuRadioItem,
-  StyledContextMenuSeparator,
-  StyledContextMenuSubContent,
-  StyledContextMenuSubTrigger,
-} from "../lib/styled";
 import { cn } from "../lib/utils";
 import { TextClassContext } from "./text";
+
+// Local styled components - use direct primitives to avoid type instantiation issues
+// The styled() function from nativewind has overly complex type inference for these components
+const StyledContextMenuSubTrigger = ContextMenuPrimitive.SubTrigger as any;
+const StyledContextMenuSubContent = ContextMenuPrimitive.SubContent as any;
+const StyledContextMenuContent = ContextMenuPrimitive.Content as any;
+const StyledContextMenuItem = ContextMenuPrimitive.Item as any;
+const StyledContextMenuCheckboxItem = ContextMenuPrimitive.CheckboxItem as any;
+const StyledContextMenuRadioItem = ContextMenuPrimitive.RadioItem as any;
+const StyledContextMenuLabel = ContextMenuPrimitive.Label as any;
+const StyledContextMenuSeparator = ContextMenuPrimitive.Separator as any;
+const StyledContextMenuItemIndicator = ContextMenuPrimitive.ItemIndicator as any;
 
 const ContextMenu = ContextMenuPrimitive.Root;
 const ContextMenuTrigger = ContextMenuPrimitive.Trigger;

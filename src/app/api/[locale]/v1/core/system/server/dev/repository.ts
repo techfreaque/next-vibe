@@ -140,7 +140,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         logger.debug("Postgres data volume not found or already deleted");
       }
     } catch (error) {
-      logger.warn("Failed to delete postgres data volume", { error });
+      logger.warn("Failed to delete postgres data volume", parseError(error));
       // Don't throw - continue anyway
     }
   }
@@ -407,7 +407,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
           taskNames: devTasks.map((t) => t.name),
         });
       } else {
-        logger.error("Failed to start unified task runner", startResult);
+        logger.error("Failed to start unified task runner");
       }
     } catch (error) {
       const errorMsg = parseError(error).message;

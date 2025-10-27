@@ -2,6 +2,7 @@
 import { execSync } from "child_process";
 import { join } from "path";
 
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 import type { ReleaseOptions, ReleasePackage } from "../types/index.js";
@@ -112,7 +113,10 @@ export async function ciRelease(
         runCiReleaseCommand(releaseConfig, packageJson.name, logger);
       }
     } catch (error) {
-      logger.error(CLI_MESSAGES.errorProcessing(packageJson.name), parseError(error));
+      logger.error(
+        CLI_MESSAGES.errorProcessing(packageJson.name),
+        parseError(error),
+      );
       affectedPackages.push(pkg.directory);
       overallError = true;
     }

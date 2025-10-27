@@ -22,7 +22,7 @@ import type {
   SendSmsParams,
   SmsConfig,
   SmsHandlerOptions,
-} from "../system/unified-backend/shared/field-utils";
+} from "./utils";
 import { batchSendSms, sendSms } from "./send-sms";
 
 /**

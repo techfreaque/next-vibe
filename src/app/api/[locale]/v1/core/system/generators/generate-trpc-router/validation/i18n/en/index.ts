@@ -1,54 +1,40 @@
 export const translations = {
-  title: "Validate tRPC Integration",
-  description: "Validate tRPC router integration with API endpoints",
-  category: "API Endpoint",
-  tags: {
-    trpc: "tRPC",
-    validation: "Validation",
-  },
-  operations: {
-    validateIntegration: "Validate Integration",
-    validateRouteFile: "Validate Route File",
-    generateReport: "Generate Report",
-    fixRoutes: "Fix Routes",
-    checkRouterExists: "Check Router Exists",
-  },
-  severity: {
-    error: "Error",
-    warning: "Warning",
-    info: "Info",
-  },
-  fields: {
-    operation: {
-      label: "Operation",
-      description: "Validation operation to perform",
-      placeholder: "Select validation operation",
-    },
-    filePath: {
-      label: "File Path",
-      description: "Optional specific file path to validate",
-      placeholder: "Enter file path",
-    },
-    options: {
-      label: "Options",
-      description: "Validation options",
-      placeholder: "Enter options",
-    },
-  },
-  response: {
-    success: {
-      label: "Success",
-    },
-    operation: {
-      label: "Operation",
-    },
-    result: {
-      label: "Result",
-    },
-  },
   errors: {
-    executionFailed: {
-      title: "TRPC Validation Execution Failed",
+    validation: {
+      title: "Validation Failed",
+      description: "TRPC validation failed",
+    },
+    unauthorized: {
+      title: "Unauthorized",
+      description: "You are not authorized to perform this action",
+    },
+    forbidden: {
+      title: "Forbidden",
+      description: "You do not have permission to perform this action",
+    },
+    notFound: {
+      title: "Not Found",
+      description: "The requested resource was not found",
+    },
+    server: {
+      title: "Server Error",
+      description: "An internal server error occurred",
+    },
+    unknown: {
+      title: "Unknown Error",
+      description: "An unknown error occurred",
+    },
+    unsavedChanges: {
+      title: "Unsaved Changes",
+      description: "There are unsaved changes",
+    },
+    conflict: {
+      title: "Conflict",
+      description: "A conflict occurred",
+    },
+    network: {
+      title: "Network Error",
+      description: "A network error occurred",
     },
   },
 };

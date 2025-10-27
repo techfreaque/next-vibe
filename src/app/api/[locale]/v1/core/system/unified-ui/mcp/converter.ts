@@ -1,17 +1,18 @@
 /**
  * MCP Converter
  * Converts endpoint definitions to MCP tool format
+ * Uses shared base converter to eliminate duplication
  */
 
 import "server-only";
 
-import type { z } from "zod";
-import { zodToJsonSchema } from "zod-to-json-schema";
-
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
-import type { DiscoveredEndpointMetadata } from "../shared/endpoint-registry-types";
+import {
+  safeTranslate,
+  zodSchemaToJsonSchema,
+} from "../shared/converters/base-converter";
+import type { DiscoveredEndpointMetadata } from "../../unified-backend/shared/discovery/endpoint-registry-types";
 import type { MCPTool, MCPToolMetadata } from "./types";
 
 /**
@@ -43,81 +44,37 @@ export function toolMetadataToMCPTool(
   metadata: MCPToolMetadata,
   locale: CountryLanguage,
 ): MCPTool {
-  const { t } = simpleT(locale);
-
-  // Safely translate a key
-  const safeTranslate = (key: string | undefined): string => {
-    if (!key) {
-      return "";
-    }
-    try {
-      return t(key as Parameters<typeof t>[0]);
-    } catch {
-      return key;
-    }
-  };
-
   // Convert Zod schema to JSON Schema
-  const inputSchema = metadata.requestSchema
+  const baseSchema = metadata.requestSchema
     ? zodSchemaToJsonSchema(metadata.requestSchema)
     : { type: "object" as const, properties: {}, required: [] };
 
+  interface JSONSchemaProperty {
+    type: string;
+    description?: string;
+    enum?: readonly string[];
+    items?: JSONSchemaProperty;
+    properties?: Record<string, JSONSchemaProperty>;
+    required?: readonly string[];
+  }
+
+  const inputSchema: {
+    type: "object";
+    properties?: Record<string, JSONSchemaProperty>;
+    required?: string[];
+    additionalProperties?: boolean;
+  } = {
+    type: "object",
+    properties: baseSchema.properties as Record<string, JSONSchemaProperty>,
+    required: baseSchema.required,
+    additionalProperties: baseSchema.additionalProperties,
+  };
+
   return {
     name: metadata.name,
-    description: safeTranslate(metadata.description) || metadata.name,
+    description: safeTranslate(metadata.description, locale, metadata.name),
     inputSchema,
   };
-}
-
-/**
- * Convert Zod schema to JSON Schema (MCP compatible)
- */
-function zodSchemaToJsonSchema(schema: z.ZodTypeAny): {
-  type: "object";
-  // eslint-disable-next-line no-restricted-syntax
-  properties?: Record<string, unknown>;
-  required?: string[];
-  additionalProperties?: boolean;
-} {
-  try {
-    const jsonSchema = zodToJsonSchema(schema, {
-      target: "jsonSchema7",
-      $refStrategy: "none",
-    });
-
-    // Ensure it's an object schema
-    if (typeof jsonSchema === "object" && jsonSchema !== null) {
-      return {
-        type: "object",
-        properties: (
-          jsonSchema as {
-            // eslint-disable-next-line no-restricted-syntax
-            properties?: Record<string, unknown>;
-          }
-        ).properties,
-        required: (jsonSchema as { required?: string[] }).required,
-        additionalProperties: (
-          jsonSchema as {
-            additionalProperties?: boolean;
-          }
-        ).additionalProperties,
-      };
-    }
-
-    // Fallback to empty object schema
-    return {
-      type: "object",
-      properties: {},
-      required: [],
-    };
-  } catch {
-    // If conversion fails, return empty object schema
-    return {
-      type: "object",
-      properties: {},
-      required: [],
-    };
-  }
 }
 
 /**

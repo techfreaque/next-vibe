@@ -9,6 +9,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-b
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { BaseToolsRepositoryImpl } from "../../shared/repositories/base-tools-repository";
 import { getMCPRegistry, toolMetadataToMCPTool } from "../registry";
 import type {
   MCPToolsListRequestOutput,
@@ -16,29 +17,16 @@ import type {
 } from "./definition";
 
 /**
- * MCP Tools repository interface
- */
-export interface MCPToolsRepository {
-  /**
-   * Get all available MCP tools for current user
-   * @param data - Request data (empty for GET)
-   * @param user - User from authentication
-   * @param logger - Logger instance for debugging and monitoring
-   * @param locale - Locale for translating tool descriptions
-   * @returns List of available MCP tools
-   */
-  getTools(
-    data: MCPToolsListRequestOutput,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-    locale?: CountryLanguage,
-  ): Promise<MCPToolsListResponseOutput>;
-}
-
-/**
  * MCP Tools repository implementation
+ * Extends BaseToolsRepositoryImpl to eliminate duplication
  */
-export class MCPToolsRepositoryImpl implements MCPToolsRepository {
+export class MCPToolsRepositoryImpl extends BaseToolsRepositoryImpl<
+  MCPToolsListRequestOutput,
+  MCPToolsListResponseOutput
+> {
+  constructor() {
+    super("MCP Tools Repository");
+  }
   /**
    * Get all available MCP tools for current user
    */
@@ -48,7 +36,7 @@ export class MCPToolsRepositoryImpl implements MCPToolsRepository {
     logger: EndpointLogger,
     locale: CountryLanguage = "en-GLOBAL",
   ): Promise<MCPToolsListResponseOutput> {
-    logger.info("[MCP Tools Repository] Fetching available tools");
+    this.logFetchStart(logger, user);
 
     // Get MCP registry
     const registry = getMCPRegistry(locale);
@@ -59,11 +47,9 @@ export class MCPToolsRepositoryImpl implements MCPToolsRepository {
     }
 
     // Get tools filtered by user permissions
-    const toolMetadata = await registry.getTools(user);
+    const toolMetadata = registry.getTools(user);
 
-    logger.info("[MCP Tools Repository] Found tools", {
-      count: toolMetadata.length,
-    });
+    this.logToolsFound(logger, toolMetadata.length);
 
     // Convert to MCP tool format (wire format)
     const tools = toolMetadata.map((meta) =>
@@ -74,11 +60,7 @@ export class MCPToolsRepositoryImpl implements MCPToolsRepository {
       tools,
     };
 
-    logger.info("[MCP Tools Repository] Returning result", {
-      resultKeys: Object.keys(result),
-      toolsCount: tools.length,
-      sampleTool: tools[0],
-    });
+    this.logResult(logger, result, tools.length, tools[0]);
 
     // Return plain object - route handler will wrap with createSuccessResponse
     return result;

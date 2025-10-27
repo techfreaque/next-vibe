@@ -51,11 +51,7 @@ function createUnsupportedError<T>(
   );
 }
 
-/**
- * Native Auth Repository Implementation
- */
 class AuthRepositoryNativeImpl implements AuthRepository {
-  // JWT signing/verification are server-only operations (can't be done on native)
   signJwt(
     payload: JwtPrivatePayloadType,
     logger: EndpointLogger,
@@ -74,6 +70,18 @@ class AuthRepositoryNativeImpl implements AuthRepository {
     return Promise.resolve(
       createUnsupportedError<JwtPrivatePayloadType>("verifyJwt", logger),
     );
+  }
+
+  async getLeadIdFromDb(): Promise<string> {
+    throw new Error("getLeadIdFromDb not implemented on native");
+  }
+
+  async getPrimaryLeadId(): Promise<string | null> {
+    throw new Error("getPrimaryLeadId not implemented on native");
+  }
+
+  async getAllLeadIds(): Promise<string[]> {
+    throw new Error("getAllLeadIds not implemented on native");
   }
 
   getCurrentUser(

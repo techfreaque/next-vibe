@@ -431,21 +431,30 @@ class LeadsRepositoryImpl implements LeadsRepository {
       }
 
       // Filter out null values from metadata (if exists in leadDetails)
-      const metadata: Record<string, string | number | boolean> = {};
+      const metadata: Record<string, string | number | boolean | null> = {};
       // Note: metadata is not in the current definition, keeping empty for now
 
       // Create lead directly in insert statement to avoid type inference issues
+      const country = data.locationPreferences?.country ?? "GLOBAL";
+      const language = data.locationPreferences?.language ?? "en";
+      const email = data.contactInfo?.email ?? null;
+      const businessName = data.contactInfo?.businessName ?? "";
+      const phone = data.contactInfo?.phone ?? null;
+      const website = data.contactInfo?.website ?? null;
+      const source = data.leadDetails?.source ?? null;
+      const notes = data.leadDetails?.notes ?? null;
+
       const [createdLead] = await db
         .insert(leads)
         .values({
-          email: data.contactInfo?.email ?? null,
-          businessName: data.contactInfo?.businessName ?? "",
-          phone: data.contactInfo?.phone ?? null,
-          website: data.contactInfo?.website ?? null,
-          country: data.locationPreferences?.country ?? "GLOBAL",
-          language: data.locationPreferences?.language ?? "en",
-          source: data.leadDetails?.source ?? null,
-          notes: data.leadDetails?.notes ?? null,
+          email,
+          businessName,
+          phone,
+          website,
+          country: country as typeof leads.$inferInsert.country,
+          language: language as typeof leads.$inferInsert.language,
+          source,
+          notes,
           status: LeadStatus.PENDING, // Default status for general lead creation
           currentCampaignStage: EmailCampaignStage.INITIAL,
           metadata,

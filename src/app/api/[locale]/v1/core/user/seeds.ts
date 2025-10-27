@@ -4,11 +4,12 @@
  */
 
 import { and, eq } from "drizzle-orm";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
+import { createMockUser, getCliUserEmail } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/auth/cli-user-factory";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { leads, userLeads } from "../leads/db";
@@ -52,7 +53,7 @@ export async function dev(
 
   // Create CLI system user with all roles
   const cliUser = createUserSeed({
-    email: "cli@system.local",
+    email: getCliUserEmail(),
     privateName: "CLI System",
     publicName: "System CLI",
   });
@@ -145,7 +146,7 @@ export async function dev(
       }
       createdUsers.push(newUserResponse.data);
     } catch (error) {
-      logger.error(`Error creating user ${user.email}:`, parseError(error));
+      logger.error(`Error creating user ${user.email}`, parseError(error));
     }
   }
 
@@ -205,7 +206,7 @@ export async function dev(
       const errorMsg = parseError(error).message;
       if (!errorMsg.includes("duplicate key")) {
         logger.error(
-          `Error creating lead for user ${user.id}:`,
+          `Error creating lead for user ${user.id}`,
           parseError(error),
         );
       }
@@ -241,7 +242,7 @@ export async function dev(
             logger.debug(`Created ${role} role for CLI user ${cliUserId}`);
           } catch (roleError) {
             logger.error(
-              `Failed to create ${role} role for CLI user:`,
+              `Failed to create ${role} role for CLI user`,
               parseError(roleError),
             );
           }
@@ -303,7 +304,7 @@ export async function dev(
       }
     }
   } catch (error) {
-    logger.error("Error creating user roles:", parseError(error));
+    logger.error("Error creating user roles", parseError(error));
     // Don't throw the error, just log it and continue
     // This allows the seed to complete even if roles can't be created
   }
@@ -337,14 +338,14 @@ export async function dev(
         if (sessionResult.success) {
           logger.debug(`✅ Created CLI session for user ${cliUserId}`);
         } else {
-          logger.error("Failed to create CLI session:", sessionResult);
+          logger.error("Failed to create CLI session");
         }
       } else {
-        logger.error("Failed to create CLI token:", cliTokenResponse);
+        logger.error("Failed to create CLI token");
       }
     } catch (cliError) {
       logger.error(
-        "Failed to create CLI authentication:",
+        "Failed to create CLI authentication",
         parseError(cliError),
       );
     }
@@ -402,7 +403,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
         }
         return userResponse.data;
       } catch (error) {
-        logger.error(`Error creating user ${user.email}:`, parseError(error));
+        logger.error(`Error creating user ${user.email}`, parseError(error));
         throw error;
       }
     }),
@@ -449,7 +450,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
       }
     }
   } catch (error) {
-    logger.error("Error creating test user roles:", parseError(error));
+    logger.error("Error creating test user roles", parseError(error));
     // Don't throw the error, just log it and continue
   }
 
@@ -534,7 +535,7 @@ export async function prod(logger: EndpointLogger): Promise<void> {
       }
     }
   } catch (error) {
-    logger.error("Error creating admin user or role:", parseError(error));
+    logger.error("Error creating admin user or role", parseError(error));
     // Don't throw the error, just log it and continue
   }
 

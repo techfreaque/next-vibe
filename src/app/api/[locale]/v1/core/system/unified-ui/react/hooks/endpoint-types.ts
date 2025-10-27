@@ -9,12 +9,12 @@ import type { UseFormReturn } from "react-hook-form";
 import type { ZodType } from "zod";
 import type { ZodTypeDef } from "zod/v3";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import type {
   ExtractOutput,
   FieldUsage,
   InferSchemaFromField,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/shared/types";
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/core-types";
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 
 import type {
   ApiFormOptions,

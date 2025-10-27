@@ -13,7 +13,7 @@ import { simpleT } from "@/i18n/core/shared";
 import type { BuildConfig, FileToCompile, PackageConfig } from "./config.js";
 
 // CLI tool uses English translations by default
-const { t } = simpleT("en");
+const { t } = simpleT("en-GLOBAL");
 
 const program = new Command();
 
@@ -114,12 +114,14 @@ export async function pweBuild(fileConfig: FileToCompile): Promise<void> {
 
   if (fileConfig.options?.type === "react-tailwind") {
     const tailwindcss = (await import("@tailwindcss/vite")).default;
-    plugins.push(tailwindcss());
+    const tailwindPlugin = tailwindcss() as PluginOption;
+    plugins.push(tailwindPlugin);
     if (fileConfig.options.inlineCss !== false) {
       const cssInjectedByJsPlugin = (
         await import("vite-plugin-css-injected-by-js")
       ).default;
-      plugins.push(cssInjectedByJsPlugin());
+      const cssPlugin = cssInjectedByJsPlugin() as PluginOption;
+      plugins.push(cssPlugin);
     }
   }
   if (fileConfig.options?.type?.includes("react")) {

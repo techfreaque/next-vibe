@@ -5,6 +5,7 @@
 
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -18,7 +19,6 @@ import { leadAuthService } from "@/app/api/[locale]/v1/core/leads/auth-service";
 import { leadsRepository } from "@/app/api/[locale]/v1/core/leads/repository";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { JWTPublicPayloadType } from "../../auth/definition";
@@ -82,11 +82,13 @@ export interface LoginRepository {
   /**
    * Get login options with ResponseType wrapper
    * @param logger - Logger instance for debugging and monitoring
+   * @param locale - User locale
    * @param email - Optional email to check user-specific options
    * @returns Login options wrapped in ResponseType
    */
   getLoginOptions(
     logger: EndpointLogger,
+    locale: CountryLanguage,
     email?: string,
   ): Promise<ResponseType<LoginOptions>>;
 
@@ -426,14 +428,14 @@ export class LoginRepositoryImpl implements LoginRepository {
           cookieType: rememberMe ? "persistent" : "session",
         });
       } else {
-        logger.error("Error setting auth cookies", cookieResult);
+        logger.error("Error setting auth cookies", parseError(cookieResult));
         // Continue even if cookie setting fails
       }
 
       // Return session data
       logger.debug("Login response data", { responseData });
       const finalResponse = createSuccessResponse(responseData);
-      logger.debug("Login final response", { finalResponse });
+      logger.debug("Login final response");
       return finalResponse;
     } catch (error) {
       logger.error("Session creation failed", {
@@ -459,6 +461,7 @@ export class LoginRepositoryImpl implements LoginRepository {
    */
   async getLoginOptions(
     logger: EndpointLogger,
+    locale: CountryLanguage,
     email?: string,
   ): Promise<ResponseType<LoginOptions>> {
     try {

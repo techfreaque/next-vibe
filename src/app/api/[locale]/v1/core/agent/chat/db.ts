@@ -90,7 +90,7 @@ export interface ToolCall {
   toolName: string;
   displayName: string;
   icon?: string;
-  args: Record<string, string | number | boolean | null>;
+  args: ToolCallResult; // Allow any JSON-serializable value
   result?: ToolCallResult;
   error?: string;
   executionTime?: number;

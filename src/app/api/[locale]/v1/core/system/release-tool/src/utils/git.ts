@@ -46,7 +46,7 @@ export function getLastVersionFromGitTag(
     // when there are no tags matching our prefix
     logger.error(
       "No previous tag found matching the prefix. Using 0.0.0 as the initial version.",
-      error,
+      parseError(error),
     );
 
     return "0.0.0";
@@ -192,7 +192,7 @@ export function hasNewCommitsSinceTag(
     // If any error occurs, log it and return true to allow the release process to continue
     logger.error(
       `Error checking for commits since tag ${tag}. Continuing with release.`,
-      error,
+      parseError(error),
     );
     return true;
   }

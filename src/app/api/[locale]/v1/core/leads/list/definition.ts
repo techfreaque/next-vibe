@@ -72,7 +72,7 @@ const { GET } = createEndpoint({
       // === SEARCH & PAGINATION ===
       searchPagination: objectField(
         {
-          type: WidgetType.FORM_SECTION,
+          type: WidgetType.CONTAINER,
           title:
             "app.api.v1.core.leads.list.get.searchPagination.title" as const,
           description:
@@ -128,7 +128,7 @@ const { GET } = createEndpoint({
       // === STATUS & CAMPAIGN FILTERS ===
       statusFilters: objectField(
         {
-          type: WidgetType.FORM_SECTION,
+          type: WidgetType.CONTAINER,
           title: "app.api.v1.core.leads.list.get.statusFilters.title" as const,
           description:
             "app.api.v1.core.leads.list.get.statusFilters.description" as const,
@@ -185,7 +185,7 @@ const { GET } = createEndpoint({
       // === LOCATION FILTERS ===
       locationFilters: objectField(
         {
-          type: WidgetType.FORM_SECTION,
+          type: WidgetType.CONTAINER,
           title:
             "app.api.v1.core.leads.list.get.locationFilters.title" as const,
           description:
@@ -228,7 +228,7 @@ const { GET } = createEndpoint({
       // === SORTING OPTIONS ===
       sortingOptions: objectField(
         {
-          type: WidgetType.FORM_SECTION,
+          type: WidgetType.CONTAINER,
           title: "app.api.v1.core.leads.list.get.sortingOptions.title" as const,
           description:
             "app.api.v1.core.leads.list.get.sortingOptions.description" as const,

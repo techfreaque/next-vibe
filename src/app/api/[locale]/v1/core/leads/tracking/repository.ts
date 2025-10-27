@@ -117,29 +117,41 @@ export interface ILeadTrackingRepository {
 
   trackConsultationBooking(
     leadId: string,
-    clientInfo: ClientInfo,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LeadEngagementResponseOutput>>;
+  ): Promise<ResponseType<{ leadStatusUpdated: boolean }>>;
 
   trackSubscriptionConfirmation(
     leadId: string,
-    clientInfo: ClientInfo,
     logger: EndpointLogger,
-  ): Promise<ResponseType<LeadEngagementResponseOutput>>;
+  ): Promise<ResponseType<{ leadStatusUpdated: boolean }>>;
 
   createAnonymousLead(
     clientInfo: ClientInfo,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<string>;
+  ): Promise<ResponseType<{ leadId: string }>>;
 
   createTrackingPixelResponse(): Response;
 
   transitionLeadStatus(
     leadId: string,
-    newStatus: (typeof LeadStatus)[keyof typeof LeadStatus],
+    action:
+      | "website_visit"
+      | "email_open"
+      | "email_click"
+      | "form_submit"
+      | "signup"
+      | "contact"
+      | "newsletter",
     logger: EndpointLogger,
-  ): Promise<boolean>;
+    metadata?: Record<string, string | number | boolean>,
+  ): Promise<
+    ResponseType<{
+      statusChanged: boolean;
+      newStatus: (typeof LeadStatus)[keyof typeof LeadStatus];
+      previousStatus: (typeof LeadStatus)[keyof typeof LeadStatus];
+    }>
+  >;
 
   generateTrackingPixelUrl(
     leadId: string | undefined,
@@ -427,211 +439,6 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   }
 
   /**
-   * Handle tracking pixel request
-   */
-  async handleTrackingPixel(
-    leadId: string,
-    campaignId: string | undefined,
-    clientInfo: ClientInfo,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<TrackingPixelResult>> {
-    try {
-      let engagementRecorded = false;
-
-      // Record email open engagement if campaign is present
-      if (campaignId) {
-        const engagementResult = await this.recordEngagement(
-          {
-            leadId,
-            campaignId,
-            engagementType: EngagementTypes.EMAIL_OPEN,
-            metadata: {
-              ...clientInfo,
-              trackingMethod: "pixel",
-            },
-          },
-          clientInfo,
-          logger,
-        );
-
-        engagementRecorded = engagementResult.success;
-      }
-
-      logger.debug("app.api.v1.core.leads.tracking.pixel.processed", {
-        leadId,
-        campaignId,
-        engagementRecorded,
-      });
-
-      return createSuccessResponse({
-        success: true,
-        leadId,
-        campaignId,
-        engagementRecorded,
-      });
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.leads.tracking.pixel.failed",
-        parseError(error).message,
-      );
-      return createErrorResponse(
-        "app.api.v1.core.leads.tracking.errors.default",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
-    }
-  }
-
-  /**
-   * Handle click tracking with lead status update for logged-in users
-   */
-  async handleClickTracking(
-    params: ClickTrackingRequestOutput,
-    clientInfo: ClientInfo,
-    logger: EndpointLogger,
-    isLoggedIn = false,
-    userEmail?: string,
-  ): Promise<ResponseType<ClickTrackingResult>> {
-    try {
-      const { id: leadId, campaignId, url } = params;
-      let engagementRecorded = false;
-      let leadStatusUpdated = false;
-
-      // Validate source parameter (currently unused but kept for future use)
-      // const validatedSource = this.VALID_SOURCES.includes(source) ? source : "email";
-
-      // Record both email open and click engagement if campaign is present
-      if (campaignId) {
-        const engagementMetadata: Record<string, string | number | boolean> = {
-          destinationUrl: url,
-          trackingMethod: "redirect",
-          isLoggedIn,
-          userEmail: userEmail || "",
-          userAgent: clientInfo.userAgent,
-          referer: clientInfo.referer,
-          ipAddress: clientInfo.ipAddress,
-        };
-
-        try {
-          // Check if email was already opened by checking the email record
-          const [emailRecord] = await db
-            .select({ openedAt: emails.openedAt })
-            .from(emails)
-            .where(sql`${emails.metadata}->>'campaignId' = ${campaignId}`)
-            .limit(1);
-
-          // Track email open first (since click implies open) only if not already recorded
-          if (!emailRecord?.openedAt) {
-            await this.recordEngagement(
-              {
-                leadId,
-                campaignId,
-                engagementType: EngagementTypes.EMAIL_OPEN,
-                metadata: {
-                  ...engagementMetadata,
-                  inferredFromClick: true,
-                },
-              },
-              clientInfo,
-              logger,
-            );
-          }
-
-          // Track email click
-          const clickResult = await this.recordEngagement(
-            {
-              leadId,
-              campaignId,
-              engagementType: EngagementTypes.EMAIL_CLICK,
-              metadata: engagementMetadata,
-            },
-            clientInfo,
-            logger,
-          );
-
-          engagementRecorded = clickResult.success;
-
-          logger.debug(
-            "app.api.v1.core.leads.tracking.click.engagement.recorded",
-            {
-              leadId,
-              campaignId,
-              engagementRecorded,
-            },
-          );
-        } catch (error) {
-          logger.error(
-            "app.api.v1.core.leads.tracking.click.engagement.failed",
-            parseError(error).message,
-          );
-        }
-      }
-
-      // Update lead status if user is logged in
-      if (isLoggedIn) {
-        try {
-          const leadResult = await leadsRepository.getLeadByIdInternal(
-            leadId,
-            logger,
-          );
-          if (leadResult.success) {
-            // For logged-in users clicking tracking links, mark as SIGNED_UP
-            // since they are already registered users
-            await leadsRepository.updateLeadInternal(
-              leadId,
-              {
-                status: LeadStatus.SIGNED_UP,
-              },
-              logger,
-            );
-
-            leadStatusUpdated = true;
-            logger.debug(
-              "app.api.v1.core.leads.tracking.click.status.updated",
-              {
-                leadId,
-                isLoggedIn,
-              },
-            );
-          }
-        } catch (error) {
-          logger.error(
-            "app.api.v1.core.leads.tracking.click.status.failed",
-            parseError(error).message,
-          );
-        }
-      }
-
-      const result: ClickTrackingResult = {
-        success: true,
-        redirectUrl: url,
-        responseLeadId: leadId,
-        responseCampaignId: campaignId,
-        engagementRecorded,
-        leadStatusUpdated,
-        isLoggedIn,
-      };
-
-      logger.debug("app.api.v1.core.leads.tracking.click.completed", {
-        leadId,
-        redirectUrl: url,
-        engagementRecorded,
-        leadStatusUpdated,
-        isLoggedIn,
-      });
-
-      return createSuccessResponse(result);
-    } catch (error) {
-      logger.error("app.api.v1.core.leads.tracking.click.failed", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      return createErrorResponse(
-        "app.api.v1.core.leads.tracking.errors.default",
-        ErrorResponseTypes.INTERNAL_ERROR,
-      );
-    }
-  }
-
-  /**
    * Track consultation booking
    */
   async trackConsultationBooking(
@@ -833,8 +640,8 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         "Content-Length": pixel.length.toString(),
         // eslint-disable-next-line i18next/no-literal-string
         "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Pragma": "no-cache",
-        "Expires": "0",
+        Pragma: "no-cache",
+        Expires: "0",
       },
     });
   }
@@ -1034,7 +841,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       });
     } catch (error) {
       logger.error("app.api.v1.core.leads.tracking.status.error", {
-        error,
+        error: parseError(error),
         leadId,
         action,
       });
@@ -1153,7 +960,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           logger.debug(
             "app.api.v1.core.leads.tracking.engagement.relationshipFailed",
             {
-              error,
+              error: parseError(error),
               leadId,
               userId: currentUserId,
             },
@@ -1247,8 +1054,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       logger.error(
         "app.api.v1.core.leads.tracking.engagement.relationship.error",
         {
-          error,
-          data,
+          error: parseError(error),
         },
       );
       return createErrorResponse(
@@ -1259,8 +1065,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   }
 
   /**
-   * Instance method: Handle tracking pixel request
-   * Delegates to static method
+   * Handle tracking pixel request
    */
   async handleTrackingPixel(
     leadId: string,
@@ -1270,17 +1075,54 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<TrackingPixelResult>> {
-    return await LeadTrackingRepository.handleTrackingPixel(
-      leadId,
-      campaignId,
-      clientInfo,
-      logger,
-    );
+    try {
+      let engagementRecorded = false;
+
+      // Record email open engagement if campaign is present
+      if (campaignId) {
+        const engagementResult = await this.recordEngagement(
+          {
+            leadId,
+            campaignId,
+            engagementType: EngagementTypes.EMAIL_OPEN,
+            metadata: {
+              ...clientInfo,
+              trackingMethod: "pixel",
+            },
+          },
+          clientInfo,
+          logger,
+        );
+
+        engagementRecorded = engagementResult.success;
+      }
+
+      logger.debug("app.api.v1.core.leads.tracking.pixel.processed", {
+        leadId,
+        campaignId,
+        engagementRecorded,
+      });
+
+      return createSuccessResponse({
+        success: true,
+        leadId,
+        campaignId,
+        engagementRecorded,
+      });
+    } catch (error) {
+      logger.error(
+        "app.api.v1.core.leads.tracking.pixel.failed",
+        parseError(error).message,
+      );
+      return createErrorResponse(
+        "app.api.v1.core.leads.tracking.errors.default",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
   }
 
   /**
-   * Instance method: Handle click tracking
-   * Delegates to static method
+   * Handle click tracking
    */
   async handleClickTracking(
     data: ClickTrackingRequestOutput,
@@ -1288,18 +1130,82 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ClickTrackingResult>> {
-    return await LeadTrackingRepository.handleClickTracking(
-      data,
-      {
+    try {
+      const { id: leadId, campaignId, url } = data;
+      const isLoggedIn = !user.isPublic;
+      let engagementRecorded = false;
+      let leadStatusUpdated = false;
+
+      const clientInfo: ClientInfo = {
         userAgent: "",
         referer: "",
         ipAddress: "",
         timestamp: new Date().toISOString(),
-      },
-      logger,
-      !user.isPublic,
-      undefined,
-    );
+      };
+
+      // Record email click engagement if campaign is present
+      if (campaignId) {
+        const clickResult = await this.recordEngagement(
+          {
+            leadId,
+            campaignId,
+            engagementType: EngagementTypes.EMAIL_CLICK,
+            metadata: {
+              destinationUrl: url,
+              trackingMethod: "redirect",
+              isLoggedIn,
+            },
+          },
+          clientInfo,
+          logger,
+        );
+
+        engagementRecorded = clickResult.success;
+      }
+
+      // Update lead status if user is logged in
+      if (isLoggedIn) {
+        try {
+          const leadResult = await leadsRepository.getLeadByIdInternal(
+            leadId,
+            logger,
+          );
+          if (leadResult.success) {
+            await leadsRepository.updateLeadInternal(
+              leadId,
+              {
+                status: LeadStatus.SIGNED_UP,
+              },
+              logger,
+            );
+            leadStatusUpdated = true;
+          }
+        } catch (error) {
+          logger.error(
+            "app.api.v1.core.leads.tracking.click.status.failed",
+            parseError(error).message,
+          );
+        }
+      }
+
+      return createSuccessResponse({
+        success: true,
+        redirectUrl: url,
+        responseLeadId: leadId,
+        responseCampaignId: campaignId,
+        engagementRecorded,
+        leadStatusUpdated,
+        isLoggedIn,
+      });
+    } catch (error) {
+      logger.error("app.api.v1.core.leads.tracking.click.failed", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return createErrorResponse(
+        "app.api.v1.core.leads.tracking.errors.default",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
   }
 
   /**

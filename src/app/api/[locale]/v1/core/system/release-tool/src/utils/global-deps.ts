@@ -5,6 +5,7 @@ import { join } from "node:path";
 
 import inquirer from "inquirer";
 
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 import type { ReleaseConfig, ReleasePackage } from "../types/index.js";
@@ -105,7 +106,7 @@ export async function handleGlobalDependencyUpdates(
     } catch (error) {
       logger.error(
         `Failed to update dependencies for ${packageJsonResponse.data.name}:`,
-        error,
+        parseError(error),
       );
       // Continue with other packages instead of failing completely
     }
@@ -167,10 +168,7 @@ function updatePackageDependencies(
 
     logger.info(`Successfully installed dependencies for ${packageName}`);
   } catch (error) {
-    logger.error(
-      `Error updating dependencies for ${packageName}. Continuing with release process.`,
-      error,
-    );
+    logger.error("Error updating global dependencies", parseError(error));
     throw error;
   }
 }

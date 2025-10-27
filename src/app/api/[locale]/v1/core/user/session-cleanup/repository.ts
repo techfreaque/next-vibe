@@ -107,7 +107,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
       } catch (error) {
         const errorMessage = parseError(error).message;
         errors.push(errorMessage);
-        logger.error("Session cleanup failed", { error: parseError(error) });
+        logger.error("Session cleanup failed", parseError(error));
       }
 
       // Clean up expired password reset tokens
@@ -136,7 +136,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
       } catch (error) {
         const errorMessage = parseError(error).message;
         errors.push(errorMessage);
-        logger.error("Token cleanup failed", { error: parseError(error) });
+        logger.error("Token cleanup failed", parseError(error));
       }
 
       totalProcessed = sessionsDeleted + tokensDeleted;
@@ -239,9 +239,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
       logger.debug("Session cleanup configuration validation passed");
       return createSuccessResponse(true);
     } catch (error) {
-      logger.error("Session cleanup configuration validation failed", {
-        error,
-      });
+      logger.error("Session cleanup configuration validation failed", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.session-cleanup.errors.validation_failed.title",
         ErrorResponseTypes.INTERNAL_ERROR,

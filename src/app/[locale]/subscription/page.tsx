@@ -57,9 +57,16 @@ export default async function SubscriptionPage({
     redirect(`/${locale}/user/login?callbackUrl=/${locale}/subscription`);
   }
 
+  // Redirect if user has no leadId
+  if (!userResponse.data.leadId) {
+    redirect(`/${locale}/user/login?callbackUrl=/${locale}/subscription`);
+  }
+
   // Fetch credit balance
-  const creditsResponse = await creditRepository.getBalance(
+  const creditsResponse = await creditRepository.getCreditBalanceForUser(
     userResponse.data.id,
+    userResponse.data.leadId,
+    createEndpointLogger(false, Date.now(), locale),
   );
   const credits = creditsResponse.success ? creditsResponse.data : null;
 

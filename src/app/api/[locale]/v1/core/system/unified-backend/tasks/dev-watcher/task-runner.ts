@@ -8,6 +8,7 @@ import "server-only";
 import type { FSWatcher } from "fs";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { createMockUser } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/auth/cli-user-factory";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 import { generateAllRepository } from "../../../generators/generate-all/repository";
@@ -148,11 +149,7 @@ const startSmartFileWatcher = async (
       );
 
       // Run generators with change detection
-      const mockUser = {
-        id: "00000000-0000-0000-0000-000000000000",
-        leadId: "00000000-0000-0000-0000-000000000000",
-        isPublic: false,
-      } as const;
+      const mockUser = createMockUser();
 
       await generateAllRepository.generateAll(
         {
@@ -264,11 +261,7 @@ const startPollingWatcher = async (
       logger.info(`⏰ Polling cycle #${watchCount} - Running generators...`);
 
       // Run generators
-      const mockUser = {
-        id: "00000000-0000-0000-0000-000000000000",
-        leadId: "00000000-0000-0000-0000-000000000000",
-        isPublic: false,
-      } as const;
+      const mockUser = createMockUser();
 
       await generateAllRepository.generateAll(
         {

@@ -6,16 +6,9 @@
 import { create } from "zustand";
 
 import type { DefaultFolderId } from "../../chat/config";
+import type { ToolCall, ToolCallResult } from "../../chat/db";
 import type { ChatMessageRole } from "../../chat/enum";
 import type { ModelId } from "../../chat/model-access/models";
-
-/**
- * Tool call information
- */
-export interface ToolCall {
-  toolName: string;
-  args: Record<string, string | number | boolean | null>;
-}
 
 /**
  * Streaming message state
@@ -71,6 +64,11 @@ interface AIStreamState {
   addMessage: (message: StreamingMessage) => void;
   updateMessageContent: (messageId: string, content: string) => void;
   addToolCall: (messageId: string, toolCall: ToolCall) => void;
+  updateToolCallResult: (
+    messageId: string,
+    toolCallIndex: number,
+    result: ToolCallResult,
+  ) => void;
   finalizeMessage: (
     messageId: string,
     content: string,
@@ -161,6 +159,34 @@ export const useAIStreamStore = create<AIStreamState>((set) => ({
           [messageId]: {
             ...message,
             toolCalls: [...(message.toolCalls || []), toolCall],
+          },
+        },
+      };
+    }),
+
+  updateToolCallResult: (
+    messageId: string,
+    toolCallIndex: number,
+    result: ToolCallResult,
+  ): void =>
+    set((state) => {
+      const message = state.streamingMessages[messageId];
+      if (!message || !message.toolCalls || !message.toolCalls[toolCallIndex]) {
+        return state;
+      }
+
+      const updatedToolCalls = [...message.toolCalls];
+      updatedToolCalls[toolCallIndex] = {
+        ...updatedToolCalls[toolCallIndex],
+        result,
+      };
+
+      return {
+        streamingMessages: {
+          ...state.streamingMessages,
+          [messageId]: {
+            ...message,
+            toolCalls: updatedToolCalls,
           },
         },
       };

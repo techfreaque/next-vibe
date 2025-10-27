@@ -7,8 +7,8 @@
  * - Native: Validates Bearer token from Authorization header
  */
 
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handler";
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/types";
+import { endpointHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handler";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import endpoints from "./definition";
@@ -17,7 +17,7 @@ import endpoints from "./definition";
  * GET /api/[locale]/v1/core/user/auth/check
  * Check authentication status for current user
  */
-export const { GET, tools } = endpointsHandler({
+export const { GET, tools } = endpointHandler({
   endpoint: endpoints,
   [Methods.GET]: {
     allowedRoles: [UserRole.PUBLIC],

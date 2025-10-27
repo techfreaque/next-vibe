@@ -1,5 +1,4 @@
 /// <reference types="node" />
-
 /* eslint-disable i18next/no-literal-string */
 /* eslint-disable no-restricted-syntax */
 import { execSync, spawn } from "node:child_process";
@@ -8,6 +7,7 @@ import { dirname, join } from "node:path";
 
 import inquirer from "inquirer";
 
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction } from "@/i18n/core/static-types";
@@ -83,7 +83,7 @@ export class ReleaseExecutor {
         t("app.api.v1.core.system.launchpad.releaseExecutor.failed", {
           directory: target.directory,
         }),
-        error,
+        parseError(error),
       );
       return false;
     }
@@ -349,7 +349,7 @@ export class ReleaseExecutor {
       } catch (error) {
         this.logger.error(
           `❌ ${t("app.api.v1.core.system.launchpad.releaseExecutor.forceUpdate.failed", { directory: target.directory })}:`,
-          error,
+          parseError(error),
         );
         // Continue with other targets
       }
@@ -480,7 +480,7 @@ export class ReleaseExecutor {
     } catch (error) {
       this.logger.error(
         `❌ ${t("app.api.v1.core.system.launchpad.releaseExecutor.weeklyUpdate.failed")}:`,
-        error,
+        parseError(error),
       );
       throw error;
     }
@@ -492,6 +492,7 @@ export class ReleaseExecutor {
 
   private runSnykMonitoring(branchName: string): void {
     const snykToken = process.env.SNYK_TOKEN;
+    const { t } = simpleT("en-GLOBAL");
     const snykOrgKey = process.env.SNYK_ORG_KEY;
 
     if (!snykToken || !snykOrgKey) {
@@ -571,6 +572,7 @@ This is an automated update. Please review changes before merging.`;
   }
 
   private async createOrUpdatePR(branchName: string): Promise<void> {
+    const { t } = simpleT("en-GLOBAL");
     const githubToken = process.env.GITHUB_TOKEN;
     if (!githubToken) {
       this.logger.info(
@@ -622,7 +624,7 @@ Check the [Snyk dashboard](https://app.snyk.io) for security vulnerabilities bef
       );
       this.logger.error(
         t("app.api.v1.core.system.launchpad.releaseExecutor.github.prError"),
-        error,
+        parseError(error),
       );
     }
   }
@@ -652,6 +654,7 @@ Check the [Snyk dashboard](https://app.snyk.io) for security vulnerabilities bef
     body: string,
     token: string,
   ): Promise<void> {
+    const { t } = simpleT("en-GLOBAL");
     const curlArgs = [
       "-X",
       "POST",

@@ -171,7 +171,11 @@ export function getTwilioProvider(): SmsProvider {
             // Error parsing response, will use default error
           }
 
-          const errorMessage = errorData.message ?? errorData.error_message;
+          const errorMessage =
+            errorData.message ??
+            errorData.error_message ??
+            // eslint-disable-next-line i18next/no-literal-string -- Technical error message from Twilio API
+            "Unknown Twilio error";
 
           const errorCode =
             errorData.code ?? errorData.error_code ?? response.status;
@@ -217,7 +221,9 @@ export function getTwilioProvider(): SmsProvider {
           data: responseData,
         };
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : undefined;
+        const errorMessage =
+          // eslint-disable-next-line i18next/no-literal-string -- Technical error message from exception
+          error instanceof Error ? error.message : "Unknown error";
         return createErrorResponse(
           "app.api.v1.core.sms.sms.error.delivery_failed",
           ErrorResponseTypes.SMS_ERROR,

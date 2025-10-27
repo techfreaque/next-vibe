@@ -10,10 +10,8 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/defini
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { getMCPRegistry } from "../registry";
-import type {
-  MCPExecuteRequestOutput,
-  MCPExecuteResponseOutput,
-} from "./definition";
+import type { MCPToolCallResult } from "../types";
+import type { MCPExecuteRequestOutput } from "./definition";
 
 /**
  * MCP Execute repository interface
@@ -32,7 +30,7 @@ export interface MCPExecuteRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     locale?: CountryLanguage,
-  ): Promise<MCPExecuteResponseOutput>;
+  ): Promise<MCPToolCallResult>;
 }
 
 /**
@@ -47,12 +45,11 @@ export class MCPExecuteRepositoryImpl implements MCPExecuteRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage = "en-GLOBAL",
-  ): Promise<MCPExecuteResponseOutput> {
-    const logData1 = {
+  ): Promise<MCPToolCallResult> {
+    logger.info("[MCP Execute Repository] Executing tool", {
       toolName: data.name,
-      argumentKeys: Object.keys(data.arguments || {}),
-    };
-    logger.info("[MCP Execute Repository] Executing tool", logData1);
+      argumentKeys: Object.keys(data.arguments),
+    });
 
     // Get MCP registry
     const registry = getMCPRegistry(locale);
@@ -65,20 +62,18 @@ export class MCPExecuteRepositoryImpl implements MCPExecuteRepository {
     // Execute tool
     const result = await registry.executeTool({
       toolName: data.name,
-      arguments: data.arguments || {},
+      arguments: data.arguments,
       user,
       locale,
       requestId: Date.now(),
     });
 
-    const logData2 = {
+    logger.info("[MCP Execute Repository] Tool execution complete", {
       toolName: data.name,
       isError: result.isError,
       contentLength: result.content.length,
-    };
-    logger.info("[MCP Execute Repository] Tool execution complete", logData2);
+    });
 
-    // Return plain object - route handler will wrap with createSuccessResponse
     return result;
   }
 }

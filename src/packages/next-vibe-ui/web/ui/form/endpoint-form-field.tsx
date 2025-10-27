@@ -291,7 +291,7 @@ function renderLabel(
           variant="secondary"
           className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
         >
-          {t("app.packages.nextVibeUi.web.common.required")}
+          {t("packages.nextVibeUi.web.common.required")}
         </Badge>
       )}
     </div>
@@ -502,7 +502,7 @@ function renderFieldInput<
                 <span>
                   {config.placeholder
                     ? t(config.placeholder)
-                    : t("app.packages.nextVibeUi.web.common.selectDate")}
+                    : t("packages.nextVibeUi.web.common.selectDate")}
                 </span>
               )}
             </Button>
@@ -570,7 +570,7 @@ function renderFieldInput<
           onBlur={field.onBlur}
           placeholder={
             config.placeholder ||
-            "app.packages.nextVibeUi.web.common.enterPhoneNumber"
+            "packages.nextVibeUi.web.common.enterPhoneNumber"
           }
           defaultCountry={config.defaultCountry || "DE"}
           preferredCountries={
@@ -643,7 +643,7 @@ function renderFieldInput<
           onBlur={field.onBlur}
           disabled={disabled || false}
           className={cn(inputClassName, "h-10")}
-          placeholder={t("app.packages.nextVibeUi.web.common.unknownFieldType")}
+          placeholder={t("packages.nextVibeUi.web.common.unknownFieldType")}
         />
       );
     }

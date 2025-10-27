@@ -1,5 +1,4 @@
 /// <reference types="node" />
-import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 /* eslint-disable no-restricted-syntax */
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
@@ -12,6 +11,7 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 import type { PackageJson } from "../types/index.js";
@@ -56,7 +56,7 @@ export function runTests(
 
   const parsedJson: unknown = JSON.parse(readFileSync(pkgPath, "utf8"));
   if (!isPackageJson(parsedJson)) {
-    logger.error(`Invalid package.json format in ${packagePath}`, undefined);
+    logger.error(`Invalid package.json format in ${packagePath}`);
     return createErrorResponse(
       "app.api.v1.core.system.releaseTool.scripts.invalidPackageJson",
       ErrorResponseTypes.INVALID_FORMAT_ERROR,
@@ -123,10 +123,9 @@ export const lint = (
       // eslint-disable-next-line i18next/no-literal-string
       lintOutput = "Unknown linting error.";
     }
-    logger.error(`\n${lintOutput}`, undefined);
+    logger.error(`\n${lintOutput}`);
     logger.error(
       `Linting errors detected in ${cwd}. Aborting release.`,
-      undefined,
     );
     // If there is any lint output (e.g. warnings), print it at the bottom
     if (lintOutput.trim().length > 0) {
@@ -172,7 +171,7 @@ export const typecheck = (
         readFileSync(join(cwd, "package.json"), "utf8"),
       );
       if (!isPackageJson(parsedJson)) {
-        logger.error(`Invalid package.json format in ${cwd}`, undefined);
+        logger.error(`Invalid package.json format in ${cwd}`);
         return createErrorResponse(
           "app.api.v1.core.system.releaseTool.scripts.invalidPackageJson",
           ErrorResponseTypes.INVALID_FORMAT_ERROR,
@@ -199,7 +198,7 @@ export const typecheck = (
   } catch (error) {
     logger.error(
       `TypeScript type checking failed in ${cwd}. Aborting release.`,
-      error,
+      parseError(error),
     );
     return createErrorResponse(
       "app.api.v1.core.system.releaseTool.scripts.typecheckFailed",
@@ -264,7 +263,7 @@ function getPackageJson(
 ): ResponseType<PackageJson> {
   const pkgPath = join(cwd, "package.json");
   if (!existsSync(pkgPath)) {
-    logger.error(`No package.json found in ${cwd}`, undefined);
+    logger.error(`No package.json found in ${cwd}`);
     return createErrorResponse(
       "app.api.v1.core.system.releaseTool.scripts.packageJsonNotFound",
       ErrorResponseTypes.NOT_FOUND,
@@ -273,7 +272,7 @@ function getPackageJson(
   }
   const parsedJson: unknown = JSON.parse(readFileSync(pkgPath, "utf8"));
   if (!isPackageJson(parsedJson)) {
-    logger.error(`Invalid package.json format in ${cwd}`, undefined);
+    logger.error(`Invalid package.json format in ${cwd}`);
     return createErrorResponse(
       "app.api.v1.core.system.releaseTool.scripts.invalidPackageJson",
       ErrorResponseTypes.INVALID_FORMAT_ERROR,

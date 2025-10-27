@@ -5,10 +5,6 @@
 
 import { z } from "zod";
 
-import {
-  CronTaskPriority,
-  CronTaskStatus,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/enum";
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import {
   EndpointErrorTypes,
@@ -22,6 +18,10 @@ import {
   requestDataField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
+import {
+  CronTaskPriority,
+  CronTaskStatus,
+} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 // Stats period enum

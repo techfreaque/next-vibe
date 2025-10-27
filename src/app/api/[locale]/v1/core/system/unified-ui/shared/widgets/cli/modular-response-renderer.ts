@@ -13,6 +13,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { getBaseFormatter } from "../../formatters/base-formatter";
 import type {
   CLIRenderingOptions,
   DataFormatter,
@@ -391,27 +392,29 @@ export class ModularCLIResponseRenderer {
 
 /**
  * Default data formatter implementation
+ * Uses shared base formatter to eliminate duplication
  */
 class DefaultDataFormatter implements DataFormatter {
+  private baseFormatter = getBaseFormatter();
+
   formatText(value: string, options?: { maxLength?: number }): string {
-    if (options?.maxLength && value.length > options.maxLength) {
-      return `${value.substring(0, options.maxLength - 3)}...`;
-    }
-    return value;
+    return this.baseFormatter.formatText(value, {
+      maxLength: options?.maxLength,
+    });
   }
 
   formatNumber(
     value: number,
     options?: { precision?: number; unit?: string },
   ): string {
-    const precision = options?.precision ?? 2;
-    const formatted = value.toFixed(precision);
-    return options?.unit ? `${formatted} ${options.unit}` : formatted;
+    return this.baseFormatter.formatNumber(value, {
+      precision: options?.precision,
+      unit: options?.unit,
+    });
   }
 
   formatDuration(milliseconds: number): string {
-    const seconds = milliseconds / 1000;
-    return `${seconds.toFixed(2)}s`;
+    return this.baseFormatter.formatDuration(milliseconds, { unit: "s" });
   }
 
   formatBoolean(value: boolean): string {

@@ -341,50 +341,50 @@ const { t } = simpleT(CLI_CONSTANTS.DEFAULT_LOCALE as CountryLanguage);
 
 program
   .name(CLI_CONSTANTS.CLI_NAME)
-  .description(t("app.api.v1.core.system.cli.vibe.help.description"))
+  .description(t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.description"))
   .version(CLI_CONSTANTS.CLI_VERSION);
 
 // Main command - execute any route with schema-driven UI
 program
   // eslint-disable-next-line i18next/no-literal-string
-  .argument("[command]", t("app.api.v1.core.system.cli.vibe.help.usage"))
-  .argument("[args...]", t("app.api.v1.core.system.cli.vibe.help.commands"))
+  .argument("[command]", t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.usage"))
+  .argument("[args...]", t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.commands"))
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-d, --data <json>",
-    t("app.api.v1.core.system.cli.vibe.vibe.executeCommand"),
+    t("app.api.v1.core.system.unifiedBackend.cli.vibe.executeCommand"),
   )
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-u, --user-type <type>",
-    t("app.api.v1.core.system.cli.vibe.help.userType"),
+    t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.userType"),
     "ADMIN",
   )
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-l, --locale <locale>",
-    t("app.api.v1.core.system.cli.vibe.help.locale"),
+    t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.locale"),
     CLI_CONSTANTS.DEFAULT_LOCALE,
   )
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-o, --output <format>",
-    t("app.api.v1.core.system.cli.vibe.vibe.output"),
+    t("app.api.v1.core.system.unifiedBackend.cli.vibe.output"),
     CLI_CONSTANTS.DEFAULT_OUTPUT,
   )
 
   .option(
     "-v, --verbose", // eslint-disable-line i18next/no-literal-string
-    t("app.api.v1.core.system.cli.vibe.help.verbose"),
+    t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.verbose"),
     false,
   )
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-i, --interactive",
-    t("app.api.v1.core.system.cli.vibe.vibe.interactive"),
+    t("app.api.v1.core.system.unifiedBackend.cli.vibe.interactive"),
     false,
   )
-  .option("--dry-run", t("app.api.v1.core.system.cli.vibe.help.dryRun"), false)
+  .option("--dry-run", t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.dryRun"), false)
   .allowUnknownOption() // Allow dynamic CLI arguments
   .action(
     async (
@@ -431,7 +431,7 @@ program
 
         // If no command provided, start interactive mode
         if (!command) {
-          logger.info(t("app.api.v1.core.system.cli.vibe.vibe.startingUp"));
+          logger.info(t("app.api.v1.core.system.unifiedBackend.cli.vibe.startingUp"));
           await cli.executeCommand("interactive", {
             locale: options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
             output: (options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT) as
@@ -514,10 +514,10 @@ program
 
         if (options.verbose) {
           logger.error(
-            t("app.api.v1.core.system.cli.vibe.errors.executionFailed"),
+            t("app.api.v1.core.system.unifiedBackend.cli.vibe.errors.executionFailed"),
             error as Error,
           );
-          logger.info(t("app.api.v1.core.system.cli.vibe.help.options"), {
+          logger.info(t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.options"), {
             memoryUsage: memoryMonitor.getFormattedUsage(),
           });
         }
@@ -536,7 +536,7 @@ program
 // Help command
 program
   .command("help")
-  .description(t("app.api.v1.core.system.cli.vibe.vibe.help"))
+  .description(t("app.api.v1.core.system.unifiedBackend.cli.vibe.help"))
   .action(() => {
     program.help();
   });
@@ -545,26 +545,26 @@ program
 program
   .command("list")
   .alias("ls")
-  .description(t("app.api.v1.core.system.cli.vibe.vibe.listCommands"))
+  .description(t("app.api.v1.core.system.unifiedBackend.cli.vibe.listCommands"))
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-c, --category <category>",
-    t("app.api.v1.core.system.cli.vibe.help.options"),
+    t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.options"),
   )
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-f, --format <format>",
-    t("app.api.v1.core.system.cli.vibe.vibe.output"),
+    t("app.api.v1.core.system.unifiedBackend.cli.vibe.output"),
     "text",
   )
   .option(
     "--examples",
-    t("app.api.v1.core.system.cli.vibe.help.examples"),
+    t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.examples"),
     false,
   )
   .option(
     "--parameters",
-    t("app.api.v1.core.system.cli.vibe.help.options"),
+    t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.options"),
     false,
   )
   .action(async (options: ListOptions) => {
@@ -593,7 +593,7 @@ program
       );
     } catch (error) {
       logger.error(
-        t("app.api.v1.core.system.cli.vibe.errors.executionFailed"),
+        t("app.api.v1.core.system.unifiedBackend.cli.vibe.errors.executionFailed"),
         error as Error,
       );
       process.exit(1);

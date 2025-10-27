@@ -497,8 +497,8 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
       logger.info("Starting guard environment");
       logger.debug("Guard start request data", { data });
 
-      if (data.guardId) {
-        return await this.startByGuardId(data.guardId, logger);
+      if (data.guardIdInput) {
+        return await this.startByGuardId(data.guardIdInput, logger);
       }
 
       if (data.projectPath) {
@@ -650,7 +650,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
       username,
       guardProjectPath: projectPath,
       scriptPath: startupScriptPath,
-      guardIdResponse: guardId,
+      guardId: guardId,
     };
 
     return createSuccessResponse(response);
@@ -683,7 +683,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
       username: mockGuards[0]?.username || "guard_unknown",
       guardProjectPath: mockGuards[0]?.projectPath || "/tmp/unknown",
       scriptPath: "/tmp/unknown/startup.sh",
-      guardIdResponse: mockGuards[0]?.guardId || "guard_unknown",
+      guardId: mockGuards[0]?.guardId || "guard_unknown",
     };
 
     return createSuccessResponse(response);

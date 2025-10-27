@@ -761,6 +761,7 @@ export const translations: typeof enTranslations = {
       query: "Zapytanie",
     },
     multiple: "{{count}} wywołań narzędzi",
+    result: "Wynik",
   },
   threadList: {
     deleteDialog: {

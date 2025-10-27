@@ -67,9 +67,9 @@ import type {
   MCPToolCallResult,
   MCPToolsListParams,
   MCPToolsListResult,
-} from "../../unified-ui/mcp/types";
-import type { NextHandlerReturnType } from "../../unified-ui/react/next-types";
-import type { TrpcHandlerReturnType } from "../../unified-ui/react/trpc-types";
+} from "../mcp/types";
+import type { NextHandlerReturnType } from "../next/types";
+import type { TrpcHandlerReturnType } from "../trpc/types";
 import type { CliHandlerReturnType } from "../cli/executor-types";
 import type { CreateApiEndpoint } from "./create-endpoint";
 import type { Methods } from "./enums";

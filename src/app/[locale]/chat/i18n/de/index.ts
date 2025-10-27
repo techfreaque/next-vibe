@@ -783,6 +783,7 @@ export const translations: typeof enTranslations = {
       query: "Anfrage",
     },
     multiple: "{{count}} Tool-Aufrufe",
+    result: "Ergebnis",
   },
   threadList: {
     deleteDialog: {

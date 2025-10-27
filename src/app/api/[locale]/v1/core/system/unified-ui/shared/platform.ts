@@ -14,7 +14,7 @@ import type { PlatformConfig } from "./config";
 import { getPlatformConfig, Platform } from "./config";
 import type { DiscoveryResult, UnifiedDiscoveryOptions } from "./discovery";
 import { getUnifiedDiscovery } from "./discovery";
-import type { DiscoveredEndpoint } from "./endpoint-registry-types";
+import type { DiscoveredEndpoint } from "../../unified-backend/shared/discovery/endpoint-registry-types";
 import type { EndpointGroup, GroupingOptions } from "./grouping";
 import { getUnifiedGrouping } from "./grouping";
 
@@ -138,6 +138,14 @@ export class UnifiedPlatformService {
     // Count by role
     const byRole: Record<string, number> = {};
     for (const endpoint of result.endpoints) {
+      // Safety check: skip if allowedRoles is undefined or not an array
+      if (
+        !endpoint.definition?.allowedRoles ||
+        !Array.isArray(endpoint.definition.allowedRoles)
+      ) {
+        continue;
+      }
+
       for (const role of endpoint.definition.allowedRoles) {
         byRole[role] = (byRole[role] || 0) + 1;
       }

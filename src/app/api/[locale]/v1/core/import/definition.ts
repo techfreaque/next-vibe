@@ -25,7 +25,10 @@ import { Countries, Languages } from "@/i18n/core/config";
 
 import {
   CsvImportJobStatus,
+  CsvImportJobStatusDB,
   CsvImportJobStatusOptions,
+} from "../leads/import/enum";
+import {
   ImportDomain,
   ImportDomainOptions,
 } from "./enum";
@@ -578,7 +581,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
             ...CsvImportJobStatusOptions,
           ],
         },
-        z.string().default("all"),
+        z.union([z.enum(CsvImportJobStatusDB), z.literal("all")]).optional(),
       ),
 
       limit: requestDataField(
@@ -735,7 +738,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
     urlPathParams: undefined,
     requests: {
       default: {
-        status: "all",
+        status:  CsvImportJobStatus.COMPLETED,
         limit: 20,
         offset: 0,
       },

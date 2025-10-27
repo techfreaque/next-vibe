@@ -50,10 +50,12 @@ export class ToolFilter implements IToolFilter {
 
     // Filter by roles
     if (criteria.roles && criteria.roles.length > 0) {
-      filtered = filtered.filter((e) =>
-        criteria.roles!.some((role) =>
-          e.definition.allowedRoles.includes(role),
-        ),
+      filtered = filtered.filter(
+        (e) =>
+          e.definition?.allowedRoles &&
+          criteria.roles!.some((role) =>
+            e.definition.allowedRoles.includes(role),
+          ),
       );
     }
 
@@ -106,6 +108,14 @@ export class ToolFilter implements IToolFilter {
     user: AIToolExecutionContext["user"],
     platform: Platform = Platform.AI,
   ): boolean {
+    // Safety check: if allowedRoles is undefined or not an array, deny access
+    if (
+      !endpoint.definition?.allowedRoles ||
+      !Array.isArray(endpoint.definition.allowedRoles)
+    ) {
+      return false;
+    }
+
     // Check platform opt-out first
     if (this.isEndpointOptedOutOfPlatform(endpoint, platform)) {
       return false;
@@ -113,7 +123,7 @@ export class ToolFilter implements IToolFilter {
 
     // Filter out opt-out roles from allowed roles for permission check
     const effectiveAllowedRoles = endpoint.definition.allowedRoles.filter(
-      (role) => !this.isOptOutRole(role),
+      (role: (typeof UserRoleValue)[number]) => !this.isOptOutRole(role),
     );
 
     // Public user - only public endpoints
@@ -138,6 +148,14 @@ export class ToolFilter implements IToolFilter {
     endpoint: DiscoveredEndpoint,
     platform: Platform,
   ): boolean {
+    // Safety check: if allowedRoles is undefined or not an array, not opted out
+    if (
+      !endpoint.definition?.allowedRoles ||
+      !Array.isArray(endpoint.definition.allowedRoles)
+    ) {
+      return false;
+    }
+
     // Normalize platform to lowercase string
     const platformStr = String(platform).toLowerCase();
 
@@ -231,10 +249,19 @@ export class ToolFilter implements IToolFilter {
     const counts: Record<string, number> = {};
 
     for (const endpoint of endpoints) {
+      // Safety check: skip if allowedRoles is undefined or not an array
+      if (
+        !endpoint.definition?.allowedRoles ||
+        !Array.isArray(endpoint.definition.allowedRoles)
+      ) {
+        continue;
+      }
+
       for (const role of endpoint.definition.allowedRoles) {
         // Only count actual user roles, not opt-out roles
-        if (!this.isOptOutRole(role)) {
-          counts[role] = (counts[role] || 0) + 1;
+        const roleValue = role as (typeof UserRoleValue)[number];
+        if (!this.isOptOutRole(roleValue)) {
+          counts[roleValue] = (counts[roleValue] || 0) + 1;
         }
       }
     }
@@ -275,6 +302,14 @@ export class ToolFilter implements IToolFilter {
    */
   getAvailablePlatforms(endpoint: DiscoveredEndpoint): Platform[] {
     const platforms: Platform[] = [];
+
+    // Safety check: if allowedRoles is undefined or not an array, return empty array
+    if (
+      !endpoint.definition?.allowedRoles ||
+      !Array.isArray(endpoint.definition.allowedRoles)
+    ) {
+      return platforms;
+    }
 
     if (!endpoint.definition.allowedRoles.includes(UserRole.CLI_OFF)) {
       platforms.push(Platform.CLI);

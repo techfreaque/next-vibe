@@ -317,6 +317,7 @@ export interface ExportQueryType {
   dateTo?: Date;
   includeMetadata: boolean;
   includeEngagementData: boolean;
+  limit?: number;
 }
 
 export interface ExportResponseType {

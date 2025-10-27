@@ -6,6 +6,7 @@
 import { create } from "zustand";
 
 import type { DefaultFolderId } from "./config";
+import type { ToolCall } from "./db";
 import type { IconValue } from "./model-access/icons";
 import { ModelId, type ModelId as ModelIdType } from "./model-access/models";
 
@@ -28,14 +29,6 @@ export interface ChatThread {
   preview: string | null;
   createdAt: Date;
   updatedAt: Date;
-}
-
-/**
- * Tool call information
- */
-export interface ToolCall {
-  toolName: string;
-  args: Record<string, string | number | boolean | null>;
 }
 
 /**

@@ -9,7 +9,7 @@ import "client-only";
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useRef } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { EndpointLogger, LoggerMetadata } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -21,12 +21,38 @@ import {
   type ErrorEventData,
   type MessageCreatedEventData,
   parseSSEEvent,
+  type ReasoningDeltaEventData,
+  type ReasoningDoneEventData,
   StreamEventType,
   type ThreadCreatedEventData,
   type ToolCallEventData,
+  type ToolResultEventData,
 } from "../events";
 import type { StreamingMessage, StreamingThread } from "./store";
 import { useAIStreamStore } from "./store";
+
+/**
+ * Helper function to create error messages in the chat thread
+ */
+function createErrorMessage(
+  store: ReturnType<typeof useAIStreamStore.getState>,
+  threadId: string,
+  errorMessage: string,
+): void {
+  const errorMessageId = crypto.randomUUID();
+  store.addMessage({
+    messageId: errorMessageId,
+    threadId,
+    role: ChatMessageRole.ERROR,
+    content: errorMessage,
+    parentId: null,
+    depth: 0,
+    model: null,
+    persona: null,
+    isStreaming: false,
+    error: errorMessage,
+  });
+}
 
 /**
  * SSE Stream Options
@@ -37,6 +63,7 @@ export interface StreamOptions {
   onContentDelta?: (data: ContentDeltaEventData) => void;
   onContentDone?: (data: ContentDoneEventData) => void;
   onToolCall?: (data: ToolCallEventData) => void;
+  onToolResult?: (data: ToolResultEventData) => void;
   onError?: (data: ErrorEventData) => void;
   signal?: AbortSignal;
 }
@@ -125,22 +152,7 @@ export function useAIStream(
             errorMessage,
           });
           store.setError(errorMessage);
-
-          // Create an error message in the chat thread so user can see what went wrong
-          const errorMessageId = crypto.randomUUID();
-          store.addMessage({
-            messageId: errorMessageId,
-            threadId: data.threadId || "",
-            role: ChatMessageRole.ERROR,
-            content: errorMessage,
-            parentId: null,
-            depth: 0,
-            model: null,
-            persona: null,
-            isStreaming: false,
-            error: errorMessage,
-          });
-
+          createErrorMessage(store, data.threadId || "", errorMessage);
           store.stopStream();
           return;
         }
@@ -151,22 +163,7 @@ export function useAIStream(
           );
           logger.error("Stream response has no body");
           store.setError(errorMessage);
-
-          // Create an error message in the chat thread
-          const errorMessageId = crypto.randomUUID();
-          store.addMessage({
-            messageId: errorMessageId,
-            threadId: data.threadId || "",
-            role: ChatMessageRole.ERROR,
-            content: errorMessage,
-            parentId: null,
-            depth: 0,
-            model: null,
-            persona: null,
-            isStreaming: false,
-            error: errorMessage,
-          });
-
+          createErrorMessage(store, data.threadId || "", errorMessage);
           store.stopStream();
           return;
         }
@@ -243,7 +240,10 @@ export function useAIStream(
                     return;
                   })
                   .catch((error: Error) => {
-                    logger.error("Failed to set active thread", { error: parseError(error) });
+                    logger.error(
+                      "Failed to set active thread",
+                      parseError(error),
+                    );
                     return;
                   });
 
@@ -438,8 +438,172 @@ export function useAIStream(
                   useAIStreamStore
                     .getState()
                     .updateMessageContent(eventData.messageId, newContent);
+
+                  // Save to localStorage incrementally for incognito mode
+                  void (async (): Promise<void> => {
+                    try {
+                      const { useChatStore } = await import("../../chat/store");
+                      const chatThread =
+                        useChatStore.getState().threads[currentMessage.threadId];
+                      const isIncognito =
+                        chatThread?.rootFolderId === "incognito";
+
+                      if (isIncognito) {
+                        const { saveMessage } = await import(
+                          "../../chat/incognito/storage"
+                        );
+                        saveMessage({
+                          id: eventData.messageId,
+                          threadId: currentMessage.threadId,
+                          role: currentMessage.role,
+                          content: newContent,
+                          parentId: currentMessage.parentId,
+                          depth: currentMessage.depth,
+                          authorId: "incognito",
+                          authorName: null,
+                          isAI: currentMessage.role === ChatMessageRole.ASSISTANT,
+                          model: currentMessage.model ?? null,
+                          persona: currentMessage.persona ?? null,
+                          errorType: null,
+                          errorMessage: null,
+                          edited: false,
+                          tokens: currentMessage.totalTokens ?? null,
+                          toolCalls: currentMessage.toolCalls ?? null,
+                          upvotes: null,
+                          downvotes: null,
+                          createdAt: new Date(),
+                          updatedAt: new Date(),
+                        });
+
+                        // Also update chat store
+                        useChatStore.getState().updateMessage(eventData.messageId, {
+                          content: newContent,
+                        });
+                      }
+                    } catch (error) {
+                      logger.error("Failed to save content delta to localStorage", {
+                        error: parseError(error).message,
+                      });
+                    }
+                  })();
                 }
                 options.onContentDelta?.(eventData);
+                break;
+              }
+
+              case StreamEventType.REASONING_DELTA: {
+                const eventData = event.data as ReasoningDeltaEventData;
+                // Get fresh state from store to avoid stale closure
+                const currentMessage =
+                  useAIStreamStore.getState().streamingMessages[
+                    eventData.messageId
+                  ];
+
+                logger.info("[DEBUG] REASONING_DELTA event received", {
+                  messageId: eventData.messageId,
+                  delta: eventData.delta,
+                  deltaLength: eventData.delta?.length,
+                  hasCurrentMessage: Boolean(currentMessage),
+                });
+
+                if (currentMessage && eventData.delta) {
+                  const newContent =
+                    (currentMessage.content || "") + eventData.delta;
+
+                  // Update streaming store
+                  useAIStreamStore
+                    .getState()
+                    .updateMessageContent(eventData.messageId, newContent);
+
+                  // Also update chat store and localStorage for incognito mode
+                  void (async (): Promise<void> => {
+                    try {
+                      const { useChatStore } = await import("../../chat/store");
+                      const chatMessage = useChatStore.getState().messages[eventData.messageId];
+
+                      if (chatMessage) {
+                        useChatStore.getState().updateMessage(eventData.messageId, {
+                          content: newContent,
+                        });
+
+                        // Save to localStorage for incognito mode
+                        const chatThread =
+                          useChatStore.getState().threads[currentMessage.threadId];
+                        const isIncognito =
+                          chatThread?.rootFolderId === "incognito";
+
+                        if (isIncognito) {
+                          const { saveMessage } = await import(
+                            "../../chat/incognito/storage"
+                          );
+                          saveMessage({
+                            id: eventData.messageId,
+                            threadId: currentMessage.threadId,
+                            role: currentMessage.role,
+                            content: newContent,
+                            parentId: currentMessage.parentId,
+                            depth: currentMessage.depth,
+                            authorId: "incognito",
+                            authorName: null,
+                            isAI: currentMessage.role === ChatMessageRole.ASSISTANT,
+                            model: currentMessage.model ?? null,
+                            persona: currentMessage.persona ?? null,
+                            errorType: null,
+                            errorMessage: null,
+                            edited: false,
+                            tokens: currentMessage.totalTokens ?? null,
+                            toolCalls: currentMessage.toolCalls ?? null,
+                            upvotes: null,
+                            downvotes: null,
+                            createdAt: new Date(),
+                            updatedAt: new Date(),
+                          });
+                        }
+                      }
+                    } catch (error) {
+                      logger.error("Failed to update reasoning in chat store", error as LoggerMetadata);
+                    }
+                  })();
+                }
+
+                break;
+              }
+
+              case StreamEventType.REASONING_DONE: {
+                const eventData = event.data as ReasoningDoneEventData;
+                logger.info("[DEBUG] REASONING_DONE event received", {
+                  messageId: eventData.messageId,
+                  contentLength: eventData.content?.length,
+                });
+
+                // Mark reasoning message as complete
+                const currentMessage =
+                  useAIStreamStore.getState().streamingMessages[
+                    eventData.messageId
+                  ];
+                if (currentMessage) {
+                  // Update streaming store
+                  useAIStreamStore
+                    .getState()
+                    .updateMessageContent(eventData.messageId, eventData.content);
+
+                  // Also update chat store so reasoning content is persisted
+                  void (async (): Promise<void> => {
+                    try {
+                      const { useChatStore } = await import("../../chat/store");
+                      const chatMessage = useChatStore.getState().messages[eventData.messageId];
+
+                      if (chatMessage) {
+                        useChatStore.getState().updateMessage(eventData.messageId, {
+                          content: eventData.content,
+                        });
+                      }
+                    } catch (error) {
+                      logger.error("Failed to finalize reasoning in chat store", error as LoggerMetadata);
+                    }
+                  })();
+                }
+
                 break;
               }
 
@@ -466,6 +630,7 @@ export function useAIStream(
                   });
                   store.addToolCall(eventData.messageId, {
                     toolName: eventData.toolName,
+                    displayName: eventData.toolName,
                     args: eventData.args,
                   });
                   // Verify it was added
@@ -487,6 +652,59 @@ export function useAIStream(
                 }
 
                 options.onToolCall?.(eventData);
+                break;
+              }
+
+              case StreamEventType.TOOL_RESULT: {
+                const eventData = event.data as ToolResultEventData;
+                logger.info("Tool result event received", {
+                  messageId: eventData.messageId,
+                  toolName: eventData.toolName,
+                  hasResult: !!eventData.result,
+                });
+
+                // Update the tool call with the result
+                const currentMessage =
+                  useAIStreamStore.getState().streamingMessages[
+                    eventData.messageId
+                  ];
+                if (currentMessage && currentMessage.toolCalls) {
+                  const toolCallIndex = currentMessage.toolCalls.findIndex(
+                    (tc) => tc.toolName === eventData.toolName,
+                  );
+                  if (toolCallIndex !== -1) {
+                    logger.info("[DEBUG] Updating tool call with result", {
+                      messageId: eventData.messageId,
+                      toolName: eventData.toolName,
+                      toolCallIndex,
+                    });
+                    // Only update if result is defined
+                    if (eventData.result !== undefined) {
+                      store.updateToolCallResult(
+                        eventData.messageId,
+                        toolCallIndex,
+                        eventData.result,
+                      );
+                    }
+                  } else {
+                    logger.warn(
+                      "[DEBUG] Tool call not found for result update",
+                      {
+                        messageId: eventData.messageId,
+                        toolName: eventData.toolName,
+                      },
+                    );
+                  }
+                } else {
+                  logger.warn(
+                    "[DEBUG] No streaming message or tool calls found for tool result",
+                    {
+                      messageId: eventData.messageId,
+                    },
+                  );
+                }
+
+                options.onToolResult?.(eventData);
                 break;
               }
 
@@ -557,6 +775,7 @@ export function useAIStream(
                             edited: false,
                             originalId: null,
                             tokens: eventData.totalTokens ?? null,
+                            toolCalls: message.toolCalls || null,
                             collapsed: false,
                             metadata: {},
                             upvotes: 0,
@@ -606,22 +825,11 @@ export function useAIStream(
               case StreamEventType.ERROR: {
                 const eventData = event.data as ErrorEventData;
                 store.setError(eventData.message);
-
-                // Create an error message in the chat thread
-                const errorMessageId = crypto.randomUUID();
-                store.addMessage({
-                  messageId: errorMessageId,
-                  threadId: data.threadId || "",
-                  role: ChatMessageRole.ERROR,
-                  content: eventData.message,
-                  parentId: null,
-                  depth: 0,
-                  model: null,
-                  persona: null,
-                  isStreaming: false,
-                  error: eventData.message,
-                });
-
+                createErrorMessage(
+                  store,
+                  data.threadId || "",
+                  eventData.message,
+                );
                 options.onError?.(eventData);
                 break;
               }
@@ -638,21 +846,7 @@ export function useAIStream(
           } else {
             logger.error("Stream error", { error: error.message });
             store.setError(error.message);
-
-            // Create an error message in the chat thread
-            const errorMessageId = crypto.randomUUID();
-            store.addMessage({
-              messageId: errorMessageId,
-              threadId: data.threadId || "",
-              role: ChatMessageRole.ERROR,
-              content: error.message,
-              parentId: null,
-              depth: 0,
-              model: null,
-              persona: null,
-              isStreaming: false,
-              error: error.message,
-            });
+            createErrorMessage(store, data.threadId || "", error.message);
           }
         }
         store.stopStream();

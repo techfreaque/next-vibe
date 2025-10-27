@@ -14,25 +14,29 @@ import { View } from "react-native";
 import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 
 import { cn } from "../lib/utils";
-// TODO: These components need to be implemented
-// import {
-//   BottomSheet,
-//   BottomSheetCloseTrigger,
-//   BottomSheetContent,
-//   BottomSheetOpenTrigger,
-//   BottomSheetView,
-// } from "./bottom-sheet";
-// import { Calendar } from "./calendar";
-// import type { ComboboxOption } from "./combobox";
-// import { Combobox } from "./combobox";
+import {
+  BottomSheet,
+  BottomSheetCloseTrigger,
+  BottomSheetContent,
+  BottomSheetOpenTrigger,
+  BottomSheetView,
+} from "./bottom-sheet";
 import { Button, buttonTextVariants } from "./button";
+import { Calendar } from "./calendar";
 import { Checkbox } from "./checkbox";
 import { Calendar as CalendarIcon } from "./icons/Calendar";
 import { X } from "./icons/X";
 import { Input } from "./input";
 import { Label } from "./label";
 import { RadioGroup } from "./radio-group";
-import { type Option, Select } from "./select";
+import {
+  type Option,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./select";
 import { Switch } from "./switch";
 import { Text } from "./text";
 import { Textarea } from "./textarea";
@@ -40,7 +44,7 @@ import { Textarea } from "./textarea";
 const Form = FormProvider;
 
 interface FormFieldContextValue<
-  TFieldValues = FieldValues,
+  TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > {
   name: TName;
@@ -51,7 +55,7 @@ const FormFieldContext = React.createContext<FormFieldContextValue>(
 );
 
 const FormField = <
-  TFieldValues = FieldValues,
+  TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
   ...props
@@ -427,17 +431,10 @@ const FormDatePicker = React.forwardRef<React.ElementRef<typeof Button>, any>(
           <BottomSheetContent>
             <BottomSheetView hadHeader={false} className="pt-2">
               <Calendar
-                style={{ height: 358 }}
-                onDayPress={(day) => {
-                  onChange?.(day.dateString === value ? "" : day.dateString);
+                selected={value ? new Date(value) : undefined}
+                onSelect={(date) => {
+                  onChange?.(date ? date.toISOString().split("T")[0] : "");
                 }}
-                markedDates={{
-                  [value ?? ""]: {
-                    selected: true,
-                  },
-                }}
-                current={value} // opens calendar on selected date
-                {...props}
               />
               <View className={"pb-2 pt-4"}>
                 <BottomSheetCloseTrigger asChild>
@@ -498,33 +495,33 @@ const FormRadioGroup = React.forwardRef<
 
 FormRadioGroup.displayName = "FormRadioGroup";
 
-// TODO: Implement Combobox component
+// TODO: Implement Combobox component - using Select as fallback
 const FormCombobox = React.forwardRef<any, any>(
-  ({ label, description, value, onChange, ...props }, ref) => {
-    const {
-      error,
-      formItemNativeID,
-      formDescriptionNativeID,
-      formMessageNativeID,
-    } = useFormField();
+  ({ label, description, value, onChange, options = [], ...props }, ref) => {
+    const { error, formItemNativeID, formDescriptionNativeID } = useFormField();
 
     return (
       <FormItem>
         {!!label && <FormLabel nativeID={formItemNativeID}>{label}</FormLabel>}
-        <Combobox
-          ref={ref}
-          placeholder="Select framework"
-          aria-labelledby={formItemNativeID}
-          aria-describedby={
-            error
-              ? `${formDescriptionNativeID} ${formMessageNativeID}`
-              : `${formDescriptionNativeID}`
-          }
-          aria-invalid={!!error}
-          selectedItem={value}
-          onSelectedItemChange={onChange}
-          {...props}
-        />
+        <Select value={value} onValueChange={onChange} {...props}>
+          <SelectTrigger ref={ref}>
+            <SelectValue placeholder="Select an option" />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((option: Option | undefined) => {
+              if (!option) {
+                return null;
+              }
+              return (
+                <SelectItem
+                  key={option.value}
+                  label={option.label}
+                  value={option.value}
+                />
+              );
+            })}
+          </SelectContent>
+        </Select>
         {!!description && <FormDescription>{description}</FormDescription>}
         <FormMessage />
       </FormItem>

@@ -12,6 +12,7 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 import type { PackageJson, ReleasePackage } from "../types/index.js";
@@ -58,10 +59,7 @@ export function getPackageJson(
     }
     return createSuccessResponse(parsedJson);
   } catch (error) {
-    logger.error("Error reading package.json", {
-      error,
-      path: packageJsonPath,
-    });
+    logger.error("Error reading package.json", parseError(error));
     return createErrorResponse(
       "app.api.v1.core.system.releaseTool.packageJson.errorReading",
       ErrorResponseTypes.INTERNAL_ERROR,
@@ -137,7 +135,7 @@ export async function updateDependencies(
   } catch (error) {
     logger.error(
       `Error updating dependencies for ${pkg.directory}. Continuing with release process.`,
-      error,
+      parseError(error),
     );
     return createErrorResponse(
       "app.api.v1.core.system.releaseTool.packageJson.errorUpdatingDeps",
@@ -216,10 +214,7 @@ export function updatePackageVersion(
 
     return createSuccessResponse(undefined);
   } catch (error) {
-    logger.error("Error updating package version", {
-      error,
-      directory: pkg.directory,
-    });
+    logger.error("Error updating package version", parseError(error));
     return createErrorResponse(
       "app.api.v1.core.system.releaseTool.packageJson.errorUpdatingVersion",
       ErrorResponseTypes.INTERNAL_ERROR,

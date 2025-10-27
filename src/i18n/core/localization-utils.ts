@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { de, enUS, type Locale, pl } from "date-fns/locale";
 
 import type { CountryLanguage, Currencies } from "./config";
+import { getCountryFromLocale } from "./language-utils";
 import { simpleT } from "./shared";
 
 /**
@@ -239,24 +240,8 @@ export function getCurrentTimeInTimezone(
  */
 export function getDefaultTimezone(locale: CountryLanguage): string {
   const { t } = simpleT(locale);
-
-  // Extract country from locale (e.g., "pl-PL" -> "PL", "de-DE" -> "DE")
-  const country = locale.split("-")[1];
-
-  // Use country-specific timezone mapping, same logic as consultation calendar
-  const timezone =
-    country === "PL"
-      ? t("app.i18n.common.calendar.timezone.zones.PL")
-      : country === "DE"
-        ? t("app.i18n.common.calendar.timezone.zones.DE")
-        : ((): string => {
-            const globalTimezone = t(
-              "app.i18n.common.calendar.timezone.zones.global",
-            );
-            // Handle UTC special case - convert to proper IANA timezone identifier
-            return globalTimezone === "UTC" ? "Etc/UTC" : globalTimezone;
-          })();
-
+  const country = getCountryFromLocale(locale);
+  const timezone = t(`i18n.core.timezone.${country}` as const);
   return timezone;
 }
 

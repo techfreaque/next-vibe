@@ -219,7 +219,7 @@ export default allTasks;
    * These files export tasks array with CronTask, SideTask, or TaskRunner objects
    */
   private async discoverTaskFiles(): Promise<string[]> {
-    const { glob } = await import("glob");
+    const { glob } = (await import("glob")) as { glob: (pattern: string, options?: unknown) => Promise<string[]> };
     const taskFiles = await glob("src/app/api/**/task.ts", {
       cwd: process.cwd(),
       absolute: true,
@@ -239,7 +239,7 @@ export default allTasks;
    * These are specialized side tasks that manage other tasks
    */
   private async discoverTaskRunnerFiles(): Promise<string[]> {
-    const { glob } = await import("glob");
+    const { glob } = (await import("glob")) as { glob: (pattern: string, options?: unknown) => Promise<string[]> };
     const runnerFiles = await glob("src/app/api/**/*task-runner.ts", {
       cwd: process.cwd(),
       absolute: true,
@@ -259,7 +259,7 @@ export default allTasks;
    * These files export sideTaskConfigs array as per spec.md
    */
   private async discoverSideTaskConfigs(): Promise<string[]> {
-    const { glob } = await import("glob");
+    const { glob } = (await import("glob")) as { glob: (pattern: string, options?: unknown) => Promise<string[]> };
     const fs = await import("fs/promises");
 
     // Look for files that might contain side task configurations

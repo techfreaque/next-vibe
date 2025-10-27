@@ -129,8 +129,8 @@ const { GET } = createEndpoint({
     responses: {
       default: {
         user: {
-          id: "user-id",
-          leadId: null,
+          id: "550e8400-e29b-41d4-a716-446655440000",
+          leadId: "550e8400-e29b-41d4-a716-446655440001",
           isPublic: false as const,
           email: "user@example.com",
           privateName: "John Doe",
@@ -499,8 +499,8 @@ const { POST } = createEndpoint({
           success: true,
           message: "Profile updated successfully",
           user: {
-            id: "user-id",
-            leadId: null,
+            id: "550e8400-e29b-41d4-a716-446655440000",
+            leadId: "550e8400-e29b-41d4-a716-446655440001",
             isPublic: false as const,
             email: "customer@example.com",
             privateName: "John Doe",
@@ -537,12 +537,12 @@ const { POST } = createEndpoint({
           message:
             "Profile update failed. Please check your inputs and try again.",
           user: {
-            id: "",
-            leadId: null,
+            id: "550e8400-e29b-41d4-a716-446655440000",
+            leadId: "550e8400-e29b-41d4-a716-446655440001",
             isPublic: false as const,
-            email: "",
-            privateName: "",
-            publicName: "",
+            email: "user@example.com",
+            privateName: "John Doe",
+            publicName: "JD",
             userRoles: [],
             createdAt: "",
             updatedAt: "",

@@ -215,7 +215,7 @@ export const renderResetPasswordMail: EmailFunctionType<
     });
   } catch (error) {
     // TODO: Replace with proper logger when email function interface supports it
-    logger.error("Error generating password reset email:", error);
+    logger.error("Error generating password reset email", parseError(error));
     const parsedError = parseError(error);
     return createErrorResponse(
       "app.api.v1.core.emails.errors.email_generation_failed",

@@ -25,14 +25,14 @@ import { useEndpointCreate } from "./use-endpoint-create";
 import { useEndpointDelete } from "./use-endpoint-delete";
 import { useEndpointRead } from "./use-endpoint-read";
 
-// Export commonly used hooks
-export { useApiQuery } from "./use-api-query";
-export { useApiMutation } from "./use-api-mutation";
-export { useApiQueryForm } from "./use-api-query-form";
-export { useApiForm } from "./use-api-mutation-form";
-
 // Export types that are commonly imported
 export type { EndpointReturn, FormAlertState, UseEndpointOptions };
+
+// Export commonly used hooks
+export { useApiForm } from "./use-api-mutation-form";
+export { useApiMutation } from "./use-api-mutation";
+export { useApiQuery } from "./use-api-query";
+export { useApiQueryForm } from "./use-api-query-form";
 
 /**
  * Utility function to normalize options with smart defaults and full type safety

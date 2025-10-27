@@ -4,7 +4,6 @@ import { Command } from "commander";
 import inquirer from "inquirer";
 
 import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
-
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { defaultLocale } from "@/i18n/core/config";
@@ -198,6 +197,7 @@ function handleError(
 
 async function runInteractiveMode(): Promise<void> {
   const logger = createEndpointLogger(true, Date.now(), defaultLocale);
+  const t = simpleT(defaultLocale);
   logger.info("🚀 PWE Launchpad");
 
   const { action } = (await inquirer.prompt([
@@ -244,12 +244,12 @@ async function runInteractiveMode(): Promise<void> {
       case "update-all":
       case "update-all-force":
       case "navigate-folders": {
-        const config = await loadConfig();
-        const configRootDir = getRootDirectory();
+        const config = await loadConfig(t);
+        const configRootDir = getRootDirectory(t);
 
         switch (action) {
           case "clone-missing":
-            await cloneMissingRepos(logger, configRootDir, config, locale);
+            await cloneMissingRepos(logger, configRootDir, config, t);
             break;
           case "update-all":
             await updateAllRepos(logger, false, configRootDir, config, locale);

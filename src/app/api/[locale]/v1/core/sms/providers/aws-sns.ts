@@ -267,7 +267,8 @@ export function getAwsSnsProvider(): SmsProvider {
 
           // Extract error message from XML response
           const errorMatch = errorText.match(/<Message>(.*?)<\/Message>/);
-          const errorMessage = errorMatch?.[1];
+          // eslint-disable-next-line i18next/no-literal-string -- Technical error message from AWS API
+          const errorMessage = errorMatch?.[1] ?? "Unknown AWS SNS error";
 
           return createErrorResponse(
             "app.api.v1.core.sms.sms.error.aws_sns_api_error",

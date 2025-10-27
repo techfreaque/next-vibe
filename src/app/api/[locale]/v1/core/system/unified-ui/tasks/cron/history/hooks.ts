@@ -10,7 +10,7 @@ import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-u
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
-import endpoints from "./definition";
+import endpoints from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/history/definition";
 
 /**
  * Hook for fetching task execution history

@@ -16,6 +16,7 @@ import {
 import {
   objectField,
   requestDataField,
+  responseArrayField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -40,7 +41,7 @@ const { POST } = createEndpoint({
         "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.description" as const,
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { response: false },
+    { request: "data", response: true },
     {
       name: requestDataField(
         {
@@ -62,66 +63,44 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.arguments.description" as const,
           placeholder: "{}",
         },
-        z.record(z.unknown()).optional().default({}),
+        z.record(z.string(), z.unknown()).optional().default({}),
       ),
-    },
-  ),
-
-  // Response fields
-  responseFields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.response.title" as const,
-      description:
-        "app.api.v1.core.system.unifiedUi.mcp.execute.post.response.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
-    },
-    { response: true },
-    {
-      content: responseField(
+      content: responseArrayField(
         {
           type: WidgetType.DATA_TABLE,
           columns: [
             {
               key: "type",
               label:
-                "app.api.v1.core.system.unifiedUi.mcp.execute.post.response.content.type" as const,
+                "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.result.content.type" as const,
               type: FieldDataType.TEXT,
             },
             {
               key: "text",
               label:
-                "app.api.v1.core.system.unifiedUi.mcp.execute.post.response.content.text" as const,
+                "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.result.content.text" as const,
               type: FieldDataType.TEXT,
             },
           ],
         },
-        z.array(
-          z.union([
-            z.object({
-              type: z.literal("text"),
-              text: z.string(),
-            }),
-            z.object({
-              type: z.literal("image"),
-              data: z.string(),
-              mimeType: z.string(),
-            }),
-            z.object({
-              type: z.literal("resource"),
-              uri: z.string(),
-              mimeType: z.string().optional(),
-            }),
-          ]),
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layout: { type: LayoutType.VERTICAL },
+          },
+          { response: true },
+          {
+            type: responseField({ type: WidgetType.TEXT }, z.literal("text")),
+            text: responseField({ type: WidgetType.TEXT }, z.string()),
+          },
         ),
       ),
       isError: responseField(
         {
           type: WidgetType.BADGE,
-          text: "app.api.v1.core.system.unifiedUi.mcp.execute.post.response.isError" as const,
+          text: "app.api.v1.core.system.unifiedUi.mcp.execute.post.fields.result.isError" as const,
         },
-        z.boolean().optional(),
+        z.boolean(),
       ),
     },
   ),
@@ -191,11 +170,12 @@ const { POST } = createEndpoint({
       "app.api.v1.core.system.unifiedUi.mcp.execute.post.success.description",
   },
 
-  // === EXAMPLES ===
   examples: {
-    request: {
-      name: "core:system:db:ping",
-      arguments: {},
+    requests: {
+      default: {
+        name: "core:system:db:ping",
+        arguments: {},
+      },
     },
     responses: {
       default: {
@@ -203,6 +183,7 @@ const { POST } = createEndpoint({
         isError: false,
       },
     },
+    urlPathParams: undefined,
   },
 });
 

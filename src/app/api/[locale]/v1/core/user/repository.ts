@@ -146,7 +146,7 @@ export interface UserRepository {
     options: {
       limit?: number;
       offset?: number;
-      roles?: UserRoleValue[];
+      roles?: (typeof UserRoleValue)[];
     },
     logger: EndpointLogger,
   ): Promise<
@@ -162,7 +162,7 @@ export interface UserRepository {
       };
       searchInfo: {
         searchTerm: string | undefined;
-        appliedFilters: UserRoleValue[];
+        appliedFilters: (typeof UserRoleValue)[];
         searchTime: string;
         totalResults: number;
       };
@@ -770,7 +770,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
     options: {
       limit?: number;
       offset?: number;
-      roles?: UserRoleValue[];
+      roles?: (typeof UserRoleValue)[];
     },
     logger: EndpointLogger,
   ): Promise<
@@ -786,7 +786,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       };
       searchInfo: {
         searchTerm: string | undefined;
-        appliedFilters: UserRoleValue[];
+        appliedFilters: (typeof UserRoleValue)[];
         searchTime: string;
         totalResults: number;
       };

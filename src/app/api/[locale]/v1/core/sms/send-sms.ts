@@ -1,5 +1,4 @@
 import "server-only";
-import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -8,18 +7,12 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { env } from "@/config/env";
 
-import type {
-  SendSmsParams,
-  SmsProvider,
-  SmsResult,
-} from "../system/unified-backend/shared/field-utils";
-import {
-  SmsProviders,
-  validateE164PhoneNumber,
-} from "../system/unified-backend/shared/field-utils";
+import type { SendSmsParams, SmsProvider, SmsResult } from "./utils";
+import { SmsProviders, validateE164PhoneNumber } from "./utils";
 import { getAwsSnsProvider } from "./providers/aws-sns";
 import { getHttpProvider } from "./providers/http";
 import { getMessageBirdProvider } from "./providers/messagebird";
@@ -165,7 +158,7 @@ export async function sendSms(
       } catch (error) {
         lastError =
           error instanceof Error ? error : new Error("error.general.unknown");
-        logger.error("SMS send attempt exception", error, { attempt });
+        logger.error("SMS send attempt exception", { error: parseError(error), attempt });
         if (attempt < maxAttempts) {
           // Wait before retry - fix promise executor issue
           await new Promise<void>((resolve) => {
@@ -188,7 +181,10 @@ export async function sendSms(
       },
     );
   } catch (error) {
-    logger.error("app.api.v1.core.sms.sms.error.unexpected_error", parseError(error));
+    logger.error(
+      "app.api.v1.core.sms.sms.error.unexpected_error",
+      parseError(error),
+    );
     return createErrorResponse(
       "app.api.v1.core.sms.sms.error.unexpected_error",
       ErrorResponseTypes.SMS_ERROR,
@@ -217,19 +213,21 @@ export async function batchSendSms(
 > {
   logger.info("Sending batch SMS", { count: messages.length });
 
-  const results: Array<{
-    to: string;
-    success: boolean;
-    messageId: string | undefined;
-    error: string | undefined;
-  }> = await Promise.all(
+  const results = await Promise.all(
     messages.map(async (params) => {
       const result = await sendSms(params, logger);
+      const to = params.to;
+      const success = result.success;
+      const messageId = result.success ? result.data.messageId : undefined;
+      const errorMessage: string | undefined = result.success
+        ? undefined
+        : (result.message as string);
+
       return {
-        to: params.to,
-        success: result.success,
-        messageId: result.success ? result.data.messageId : undefined,
-        error: result.success ? undefined : result.message,
+        to,
+        success,
+        messageId,
+        error: errorMessage,
       };
     }),
   );

@@ -204,7 +204,7 @@ const { PATCH } = createEndpoint({
         "app.api.v1.core.emails.imapClient.messages.id.patch.container.description",
       layout: { type: LayoutType.GRID, columns: 12 },
     },
-    { request: "data", response: true, urlPathParams: true },
+    { request: "data&urlPathParams", response: true },
     {
       // === URL PARAM FIELDS ===
       id: requestUrlPathParamsField(
@@ -328,6 +328,11 @@ const { PATCH } = createEndpoint({
   },
 
   examples: {
+    urlPathParams: {
+      default: {
+        id: "123e4567-e89b-12d3-a456-426614174000",
+      },
+    },
     requests: {
       default: {
         isRead: true,

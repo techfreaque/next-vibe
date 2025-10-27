@@ -7,18 +7,19 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils";
 
+import { getCliUser } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/auth/cli-user-factory";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { getMCPConfig } from "../../unified-ui/mcp/config";
+import { getMCPConfig } from "./config";
 import {
   getMCPRegistry,
   toolMetadataToMCPTool,
 } from "../../unified-ui/mcp/registry";
-import { MCPErrorCode, MCPMethod } from "../../unified-ui/mcp/types";
+import { MCPErrorCode, MCPMethod } from "./types";
 import type { EndpointLogger } from "../shared/endpoint-logger";
 import type {
   IMCPProtocolHandler,
@@ -290,38 +291,15 @@ export async function createMCPProtocolHandler(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<MCPProtocolHandler> {
-  // Get CLI user for authentication
-  const user = await getCliUser(logger, locale);
+  // Get CLI user for authentication using consolidated factory
+  const cliUser = await getCliUser(logger, locale);
+
+  // Convert to JwtPayloadType for MCP
+  const user: JwtPayloadType = {
+    isPublic: false,
+    id: cliUser.id,
+    leadId: cliUser.id, // Use same ID for leadId in CLI context
+  };
 
   return new MCPProtocolHandler(logger, locale, user);
-}
-
-async function getCliUser(
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<JwtPayloadType> {
-  const CLI_USER_EMAIL = env.VIBE_CLI_USER_EMAIL ?? "cli@system.local";
-
-  const userResponse = await userRepository.getUserByEmail(
-    CLI_USER_EMAIL,
-    UserDetailLevel.COMPLETE,
-    locale,
-    logger,
-  );
-
-  if (!userResponse.success || !userResponse.data) {
-    logger.error("[MCP Protocol] CLI user not found", {
-      email: CLI_USER_EMAIL,
-    });
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
-    throw new Error(`CLI user not found: ${CLI_USER_EMAIL}`);
-  }
-
-  const user = userResponse.data;
-
-  return {
-    isPublic: false,
-    id: user.id,
-    leadId: user.leadId,
-  };
 }

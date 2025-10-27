@@ -35,6 +35,9 @@ import type {
   LeadsImportRequestOutput,
   LeadsImportResponseOutput,
 } from "./definition";
+import { CsvImportJobStatus } from "./enum";
+import type { CsvImportJobStatusValue } from "./enum";
+import type { ImportJobsStatusGetResponseOutput } from "./status/definition";
 
 /**
  * Domain Repository Interface
@@ -71,6 +74,19 @@ export interface DomainImportRepository<T extends DomainRecord> {
   getDomainName(): string;
 
   /**
+   * List import jobs with formatted response
+   */
+  listImportJobsFormatted(
+    userId: string,
+    filters: {
+      status?: string;
+      limit?: number;
+      offset?: number;
+    },
+    logger: EndpointLogger,
+  ): Promise<ResponseType<unknown>>;
+
+  /**
    * Update import job with formatted response
    */
   updateImportJobFormatted(
@@ -87,7 +103,7 @@ export interface DomainImportRepository<T extends DomainRecord> {
         info: {
           id: string;
           fileName: string;
-          status: string;
+          status: (typeof CsvImportJobStatus)[keyof typeof CsvImportJobStatus];
         };
         progress: {
           totalRows: number | null;
@@ -209,10 +225,10 @@ export interface ImportResult {
 /**
  * CSV Import Job Status
  */
-export interface CsvImportJobStatus {
+export interface CsvImportJobStatusType {
   id: string;
   fileName: string;
-  status: CsvImportJobStatus;
+  status: (typeof CsvImportJobStatus)[keyof typeof CsvImportJobStatus];
   totalRows: number | null;
   processedRows: number;
   successfulImports: number;
@@ -517,6 +533,58 @@ export class LeadsImportRepository implements ILeadsImportRepository {
   }
 
   /**
+   * List import jobs with formatted response
+   */
+  async listImportJobsFormatted(
+    userId: string,
+    filters: {
+      status?: typeof CsvImportJobStatusValue | "all";
+      limit?: number;
+      offset?: number;
+    },
+    logger: EndpointLogger,
+  ) {
+    const response = await importRepository.listImportJobs(
+      userId,
+      {
+        status: filters.status,
+        limit: filters.limit || 50,
+        offset: filters.offset || 0,
+      },
+      logger,
+    );
+
+    if (!response.success) {
+      return response;
+    }
+
+    // Transform the response to match the expected format
+    return createSuccessResponse({
+      jobs: {
+        items: response.data.jobs.map((job) => ({
+          id: job.id,
+          fileName: job.fileName,
+          status: job.status,
+          totalRows: job.progress.totalRows,
+          processedRows: job.progress.processedRows,
+          successfulImports: job.results.successfulImports,
+          failedImports: job.results.failedImports,
+          duplicateEmails: job.results.duplicateEmails,
+          currentBatchStart: job.progress.currentBatchStart,
+          batchSize: job.progress.batchSize,
+          error: job.errorInfo.error,
+          retryCount: job.errorInfo.retryCount,
+          maxRetries: job.errorInfo.maxRetries,
+          createdAt: job.timing.createdAt,
+          updatedAt: job.timing.updatedAt,
+          startedAt: job.timing.startedAt,
+          completedAt: job.timing.completedAt,
+        })),
+      },
+    });
+  }
+
+  /**
    * Update import job with formatted response
    */
   async updateImportJobFormatted(
@@ -533,7 +601,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
         info: {
           id: string;
           fileName: string;
-          status: string;
+          status: (typeof CsvImportJobStatus)[keyof typeof CsvImportJobStatus];
         };
         progress: {
           totalRows: number | null;

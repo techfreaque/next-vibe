@@ -8,14 +8,14 @@
 import { type ChangeEvent, useCallback, useMemo } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
-import type { EnhancedMutationResult } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
+import type { EnhancedMutationResult } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-api-mutation";
 import { useApiMutation } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
 import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
 import { useApiQuery } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
 import {
   createCustomStateKey,
   useCustomState,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
+} from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/store";
 import type {
   ApiFormReturn,
   ApiQueryReturn,

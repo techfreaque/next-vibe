@@ -25,19 +25,12 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-b
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
+import { BaseCreditHandler } from "../system/unified-backend/shared/credits/base-credit-handler";
+import type { CreditBalance, CreditIdentifier } from "../system/unified-backend/shared/credits/base-credit-handler";
 import { creditTransactions, userCredits } from "./db";
 import { CreditTypeIdentifier, type CreditTypeIdentifierValue } from "./enum";
 
-/**
- * Credit Balance Interface
- */
-export interface CreditBalance {
-  total: number;
-  expiring: number;
-  permanent: number;
-  free: number;
-  expiresAt: string | null;
-}
+export type { CreditBalance };
 
 /**
  * Credit Transaction Interface
@@ -54,11 +47,30 @@ export interface CreditTransactionOutput {
 
 /**
  * Credit Repository Interface
+ * Extends BaseCreditHandler with repository-specific methods
  */
 export interface CreditRepositoryInterface {
-  // Get user's current credit balance
-  getBalance(userId: string): Promise<ResponseType<CreditBalance>>;
+  getBalance(
+    identifier: CreditIdentifier,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CreditBalance>>;
 
+  deductCredits(
+    identifier: CreditIdentifier,
+    amount: number,
+    modelId: string,
+    messageId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>>;
+
+  addCredits(
+    identifier: CreditIdentifier,
+    amount: number,
+    type: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>>;
+
+  // Repository-specific methods
   // Get lead's current credit balance
   getLeadBalance(leadId: string): Promise<ResponseType<number>>;
 
@@ -76,20 +88,12 @@ export interface CreditRepositoryInterface {
     logger: EndpointLogger,
   ): Promise<ResponseType<{ leadId: string; credits: number }>>;
 
-  // Add credits (purchase or subscription)
-  addCredits(
+  // Add credits (purchase or subscription) - legacy signature
+  addUserCredits(
     userId: string,
     amount: number,
     type: "subscription" | "permanent" | "free",
     expiresAt?: Date,
-  ): Promise<ResponseType<void>>;
-
-  // Deduct credits (for message usage) - works for both users and leads
-  deductCredits(
-    identifier: { userId?: string; leadId?: string },
-    amount: number,
-    modelId: string,
-    messageId: string,
   ): Promise<ResponseType<void>>;
 
   // Get transaction history
@@ -108,7 +112,7 @@ export interface CreditRepositoryInterface {
   expireCredits(): Promise<ResponseType<number>>;
 
   // Get correct credit identifier based on subscription status
-  getCreditIdentifier(
+  getCreditIdentifierBySubscription(
     userId: string,
     leadId: string,
     logger: EndpointLogger,
@@ -131,12 +135,42 @@ export interface CreditRepositoryInterface {
 
 /**
  * Credit Repository Implementation
+ * Extends BaseCreditHandler for shared logic
  */
-class CreditRepository implements CreditRepositoryInterface {
+class CreditRepository
+  extends BaseCreditHandler
+  implements CreditRepositoryInterface
+{
+  async getBalance(
+    identifier: CreditIdentifier,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CreditBalance>> {
+    if (!identifier.leadId) {
+      logger.error("getBalance requires leadId from DB");
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.credits.errors.invalidIdentifier",
+        ErrorResponseTypes.BAD_REQUEST,
+      );
+    }
+
+    if (identifier.userId) {
+      const identifierResult = await this.getCreditIdentifierBySubscription(
+        identifier.userId,
+        identifier.leadId,
+        logger,
+      );
+      if (identifierResult.success && identifierResult.data.userId) {
+        return this.getUserBalance(identifier.userId);
+      }
+    }
+
+    return this.getLeadBalanceAsBalance(identifier.leadId);
+  }
+
   /**
-   * Get user's current credit balance
+   * Get user's current credit balance (internal)
    */
-  async getBalance(userId: string): Promise<ResponseType<CreditBalance>> {
+  private async getUserBalance(userId: string): Promise<ResponseType<CreditBalance>> {
     try {
       const credits = await db
         .select()
@@ -180,6 +214,26 @@ class CreditRepository implements CreditRepositoryInterface {
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
+  }
+
+  /**
+   * Get lead's current credit balance as CreditBalance format
+   */
+  private async getLeadBalanceAsBalance(
+    leadId: string,
+  ): Promise<ResponseType<CreditBalance>> {
+    const result = await this.getLeadBalance(leadId);
+    if (!result.success) {
+      return result as ResponseType<CreditBalance>;
+    }
+
+    return createSuccessResponse({
+      total: result.data,
+      expiring: 0,
+      permanent: 0,
+      free: result.data,
+      expiresAt: null,
+    });
   }
 
   /**
@@ -232,7 +286,7 @@ class CreditRepository implements CreditRepositoryInterface {
   ): Promise<ResponseType<CreditBalance>> {
     try {
       // Get credit identifier (determines if we use user credits or lead credits)
-      const identifierResult = await this.getCreditIdentifier(
+      const identifierResult = await this.getCreditIdentifierBySubscription(
         userId,
         leadId,
         logger,
@@ -246,8 +300,8 @@ class CreditRepository implements CreditRepositoryInterface {
         identifierResult.data;
 
       // If user has subscription → return user credits
-      if (effectiveUserId) {
-        return await this.getBalance(effectiveUserId);
+      if (effectiveUserId && effectiveLeadId) {
+        return await this.getBalance({ leadId: effectiveLeadId, userId: effectiveUserId }, logger);
       }
 
       // If user has no subscription → return lead credits
@@ -370,15 +424,91 @@ class CreditRepository implements CreditRepositoryInterface {
 
   /**
    * Add credits to user account
+   * Overrides base implementation with database logic
+   * CRITICAL: leadId is from DB, userId determines if subscription credits
    */
   async addCredits(
+    identifier: CreditIdentifier,
+    amount: number,
+    type: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    // CRITICAL: Validate leadId from DB
+    if (!identifier.leadId) {
+      logger.error("CRITICAL: addCredits requires leadId from DB");
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.credits.errors.invalidIdentifier",
+        ErrorResponseTypes.BAD_REQUEST,
+      );
+    }
+
+    // If userId provided, add to user subscription credits
+    if (identifier.userId) {
+      return this.addUserCredits(
+        identifier.userId,
+        amount,
+        type as "subscription" | "permanent" | "free",
+      );
+    }
+
+    // Otherwise add to lead credits (public user)
+    return this.addLeadCredits(identifier.leadId, amount, logger);
+  }
+
+  /**
+   * Add credits to lead account
+   * For public users or when adding to specific lead
+   */
+  private async addLeadCredits(
+    leadId: string,
+    amount: number,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    try {
+      // Get current balance
+      const balanceResult = await this.getLeadBalance(leadId);
+      if (!balanceResult.success) {
+        return balanceResult;
+      }
+
+      const currentBalance = balanceResult.data;
+      const newBalance = currentBalance + amount;
+
+      // Update lead credits
+      await db
+        .update(leadCredits)
+        .set({ amount: newBalance, updatedAt: new Date() })
+        .where(eq(leadCredits.leadId, leadId));
+
+      // Create transaction record
+      await db.insert(creditTransactions).values({
+        leadId,
+        amount,
+        balanceAfter: newBalance,
+        type: "free_tier",
+      });
+
+      return createSuccessResponse(undefined);
+    } catch (error) {
+      logger.error("Failed to add lead credits", parseError(error), { leadId, amount });
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.credits.errors.addCreditsFailed",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Add credits to user account
+   * For subscription credits - gets leadId from lead auth service
+   */
+  async addUserCredits(
     userId: string,
     amount: number,
     type: "subscription" | "permanent" | "free",
     expiresAt?: Date,
   ): Promise<ResponseType<void>> {
     try {
-      // Add credits
       await db.insert(userCredits).values({
         userId,
         amount,
@@ -386,22 +516,15 @@ class CreditRepository implements CreditRepositoryInterface {
         expiresAt: expiresAt ?? null,
       });
 
-      // Get new balance
-      const balanceResult = await this.getBalance(userId);
-      const newBalance = balanceResult.success
-        ? balanceResult.data.total
-        : amount;
-
-      // Create transaction record
       await db.insert(creditTransactions).values({
         userId,
         amount,
-        balanceAfter: newBalance,
+        balanceAfter: amount,
         type: type === "subscription" ? "subscription" : "purchase",
       });
 
       return createSuccessResponse(undefined);
-    } catch {
+    } catch (error) {
       return createErrorResponse(
         "app.api.v1.core.agent.chat.credits.errors.addCreditsFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -411,15 +534,42 @@ class CreditRepository implements CreditRepositoryInterface {
 
   /**
    * Deduct credits (for message usage)
+   * Overrides base implementation with database logic
+   * CRITICAL: leadId is ALWAYS from DB
+   *
+   * Logic:
+   * - If userId + has subscription: Deduct from user subscription credits
+   * - Otherwise: Deduct from lead credits (leadId from DB)
    */
   async deductCredits(
-    identifier: { userId?: string; leadId?: string },
+    identifier: CreditIdentifier,
     amount: number,
     modelId: string,
     messageId: string,
+    logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
+    // CRITICAL: Validate leadId from DB
+    if (!identifier.leadId) {
+      logger.error("CRITICAL: deductCredits requires leadId from DB");
+      return createErrorResponse(
+        "app.api.v1.core.agent.chat.credits.errors.invalidIdentifier",
+        ErrorResponseTypes.BAD_REQUEST,
+      );
+    }
+
     try {
+      // Determine credit source based on subscription status
+      let useUserCredits = false;
       if (identifier.userId) {
+        const identifierResult = await this.getCreditIdentifierBySubscription(
+          identifier.userId,
+          identifier.leadId,
+          logger,
+        );
+        useUserCredits = identifierResult.success && !!identifierResult.data.userId;
+      }
+
+      if (useUserCredits && identifier.userId) {
         // Deduct from user credits (expiring first, then permanent)
         const credits = await db
           .select()
@@ -450,8 +600,11 @@ class CreditRepository implements CreditRepositoryInterface {
           remaining -= deduction;
         }
 
-        // Get new balance
-        const balanceResult = await this.getBalance(identifier.userId);
+        // Get new balance (identifier already has leadId)
+        const balanceResult = await this.getBalance(
+          identifier,
+          logger,
+        );
         const newBalance = balanceResult.success ? balanceResult.data.total : 0;
 
         // Create transaction record
@@ -463,8 +616,8 @@ class CreditRepository implements CreditRepositoryInterface {
           modelId,
           messageId,
         });
-      } else if (identifier.leadId) {
-        // Deduct from lead credits
+      } else {
+        // Deduct from lead credits (leadId from DB)
         const [credit] = await db
           .select()
           .from(leadCredits)
@@ -581,7 +734,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * - If user has active subscription → return { userId } (use user credits)
    * - If user has no subscription → return { leadId } (use lead credits)
    */
-  async getCreditIdentifier(
+  async getCreditIdentifierBySubscription(
     userId: string,
     leadId: string,
     logger: EndpointLogger,
@@ -671,11 +824,10 @@ class CreditRepository implements CreditRepositoryInterface {
 
     try {
       const creditMessageId = crypto.randomUUID();
-      let creditIdentifier: { userId?: string; leadId?: string };
+      let creditIdentifier: CreditIdentifier;
 
       if (user.id && user.leadId) {
-        // User is logged in and has a lead - check subscription status
-        const identifierResult = await this.getCreditIdentifier(
+        const identifierResult = await this.getCreditIdentifierBySubscription(
           user.id,
           user.leadId,
           logger,
@@ -683,22 +835,17 @@ class CreditRepository implements CreditRepositoryInterface {
 
         if (identifierResult.success && identifierResult.data) {
           if (identifierResult.data.creditType === "USER_SUBSCRIPTION") {
-            creditIdentifier = { userId: user.id };
+            creditIdentifier = { leadId: user.leadId, userId: user.id };
           } else {
             creditIdentifier = { leadId: user.leadId };
           }
         } else {
-          // Fallback to lead credits if getCreditIdentifier fails
           creditIdentifier = { leadId: user.leadId };
         }
-      } else if (user.id) {
-        // User is logged in but no lead - use user credits
-        creditIdentifier = { userId: user.id };
       } else if (user.leadId) {
-        // No user but has lead - use lead credits
-        creditIdentifier = { leadId: user.leadId };
+        creditIdentifier = { leadId: user.leadId, userId: user.id };
       } else {
-        logger.error("No userId or leadId available for credit deduction");
+        logger.error("No leadId available for credit deduction");
         return { success: false };
       }
 
@@ -707,6 +854,7 @@ class CreditRepository implements CreditRepositoryInterface {
         cost,
         feature,
         creditMessageId,
+        logger,
       );
 
       if (!deductResult.success) {

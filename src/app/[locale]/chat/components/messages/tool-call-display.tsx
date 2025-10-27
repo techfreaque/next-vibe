@@ -57,11 +57,11 @@ export function ToolCallDisplay({
               )}
             >
               {isOpen ? (
-                <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                <ChevronDown className="h-4 w-4 shrink-0" />
               ) : (
-                <ChevronRight className="h-4 w-4 flex-shrink-0" />
+                <ChevronRight className="h-4 w-4 shrink-0" />
               )}
-              <Search className="h-4 w-4 flex-shrink-0" />
+              <Search className="h-4 w-4 shrink-0" />
               <Span>
                 {toolCalls.length === 1
                   ? t("app.chat.toolCall.search.title")
@@ -71,7 +71,10 @@ export function ToolCallDisplay({
               </Span>
               {!isOpen &&
                 toolCalls.length === 1 &&
-                toolCalls[0]?.args.query &&
+                toolCalls[0]?.args &&
+                typeof toolCalls[0].args === "object" &&
+                !Array.isArray(toolCalls[0].args) &&
+                "query" in toolCalls[0].args &&
                 typeof toolCalls[0].args.query === "string" && (
                   <Span className="text-muted-foreground text-xs truncate">
                     - {toolCalls[0].args.query}
@@ -89,8 +92,8 @@ export function ToolCallDisplay({
                   className="flex items-start gap-2 px-3 py-2 rounded-md bg-background/50 border border-border/50 text-sm"
                 >
                   {/* Tool icon */}
-                  <Div className="flex-shrink-0 mt-0.5">
-                    {toolCall.toolName === "search" ? (
+                  <Div className="shrink-0 mt-0.5">
+                    {toolCall.toolName.includes("search") ? (
                       <Search className="h-4 w-4 text-blue-400" />
                     ) : (
                       // eslint-disable-next-line i18next/no-literal-string
@@ -101,13 +104,15 @@ export function ToolCallDisplay({
                   {/* Tool info */}
                   <Div className="flex-1 min-w-0">
                     <Div className="font-medium text-blue-400">
-                      {toolCall.toolName === "search"
-                        ? t("app.chat.toolCall.search.title")
-                        : toolCall.toolName}
+                      {toolCall.displayName ||
+                        (toolCall.toolName.includes("search")
+                          ? t("app.chat.toolCall.search.title")
+                          : toolCall.toolName)}
                     </Div>
                     <Div className="text-muted-foreground text-xs mt-1">
-                      {toolCall.toolName === "search" &&
-                      toolCall.args.query &&
+                      {toolCall.args &&
+                      typeof toolCall.args === "object" &&
+                      "query" in toolCall.args &&
                       typeof toolCall.args.query === "string" ? (
                         <Span>
                           {t("app.chat.toolCall.search.query")}:{" "}
@@ -121,6 +126,16 @@ export function ToolCallDisplay({
                         </Pre>
                       )}
                     </Div>
+                    {toolCall.result && (
+                      <Div className="mt-2 p-2 rounded bg-background/80 border border-border/30">
+                        <Div className="text-xs font-medium text-foreground/60 mb-1">
+                          {t("app.chat.toolCall.result")}:
+                        </Div>
+                        <Pre className="text-xs overflow-x-auto max-h-40">
+                          {JSON.stringify(toolCall.result, null, 2)}
+                        </Pre>
+                      </Div>
+                    )}
                   </Div>
                 </Div>
               ))}

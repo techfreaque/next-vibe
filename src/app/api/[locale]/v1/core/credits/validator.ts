@@ -99,10 +99,25 @@ class CreditValidator implements CreditValidatorInterface {
         hasActiveSubscription,
       });
 
-      // Step 2: Determine which credits to use
       if (hasActiveSubscription) {
-        // User has active subscription → use user credits
-        const balanceResult = await creditRepository.getBalance(userId);
+        const [userLead] = await db
+          .select()
+          .from(userLeads)
+          .where(eq(userLeads.userId, userId))
+          .limit(1);
+
+        if (!userLead) {
+          logger.error("No lead found for user", { userId });
+          return createErrorResponse(
+            "app.api.v1.core.agent.chat.credits.errors.noLeadFound",
+            ErrorResponseTypes.NOT_FOUND,
+          );
+        }
+
+        const balanceResult = await creditRepository.getBalance(
+          { leadId: userLead.leadId, userId },
+          logger,
+        );
         if (!balanceResult.success) {
           return createErrorResponse(
             "app.api.v1.core.agent.chat.credits.errors.getBalanceFailed",

@@ -25,7 +25,7 @@ import {
   createHTTPErrorResponse,
   createHTTPSuccessResponse,
 } from "../../unified-ui/react/next-endpoint-response";
-import { validateNextRequestData } from "../../unified-ui/react/next-validation";
+import { validateNextRequestData } from "./validation";
 import type { EndpointLogger } from "../shared/endpoint-logger";
 import { createEndpointLogger } from "../shared/endpoint-logger";
 import type { Methods } from "../shared/enums";

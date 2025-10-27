@@ -22,7 +22,7 @@ import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import type React from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
-import { useCreateCronTask } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/tasks/hooks";
+import { useCreateCronTask } from "@/app/api/[locale]/v1/core/system/unified-ui/tasks/cron/tasks/hooks";
 import { formatCronSchedule } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron-formatter";
 import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/enum";
 import type { CountryLanguage } from "@/i18n/core/config";

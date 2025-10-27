@@ -33,6 +33,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -128,7 +129,7 @@ export function createPageWrapper<
             }
           } catch (err) {
             if (!cancelled) {
-              logger.error("Failed to load page", err);
+              logger.error("Failed to load page", { error: parseError(err) });
               setError(
                 err instanceof Error
                   ? err
@@ -256,7 +257,7 @@ export function createLayoutWrapper<
             }
           } catch (err) {
             if (!cancelled) {
-              logger.error("Failed to load layout", err);
+              logger.error("Failed to load layout", { error: parseError(err) });
               // On error, just render Slot directly
               setContent(slotElement);
             }

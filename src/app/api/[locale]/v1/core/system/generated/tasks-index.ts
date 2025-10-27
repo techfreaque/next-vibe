@@ -14,10 +14,10 @@ import { tasks as taskModule5 } from "../../emails/imap-client/sync/task";
 import { tasks as taskModule2 } from "../../leads/import/task";
 import { tasks as taskModule0 } from "../../newsletter/unsubscribe/task";
 import { tasks as taskModule1 } from "../../user/session-cleanup/task";
-import { taskRunners as runnerModule7 } from "../tasks/dev-watcher/task-runner";
-import { taskRunners as runnerModule6 } from "../tasks/pulse-runner/task-runner";
-import type { Task, TaskRegistry } from "../tasks/types/repository";
-import { UnifiedTaskRunnerRepositoryImpl } from "../tasks/unified-runner/repository";
+import { taskRunners as runnerModule7 } from "../unified-backend/tasks/dev-watcher/task-runner";
+import { taskRunners as runnerModule6 } from "../unified-backend/tasks/pulse-runner/task-runner";
+import type { Task, TaskRegistry } from "../unified-backend/tasks/types/repository";
+import { UnifiedTaskRunnerRepositoryImpl } from "../unified-backend/tasks/unified-runner/repository";
 
 const allTasks: Task[] = [
   ...taskModule0,

@@ -1,10 +1,10 @@
 export const translations = {
   common: {
     newChat: "New Thread",
-    newPrivateChat: "New Private Thread",
-    newSharedChat: "New Shared Thread",
-    newPublicChat: "New Public Thread",
-    newIncognitoChat: "New Incognito Thread",
+    newPrivateChat: "Private Thread",
+    newSharedChat: "Shared Thread",
+    newPublicChat: "Public Thread",
+    newIncognitoChat: "Incognito Thread",
     newPrivateFolder: "New Private Folder",
     newSharedFolder: "New Shared Folder",
     newPublicFolder: "New Public Folder",
@@ -469,6 +469,7 @@ export const translations = {
       query: "Query",
     },
     multiple: "{{count}} tool calls",
+    result: "Result",
   },
   modelUtilities: {
     general: "General Chat",

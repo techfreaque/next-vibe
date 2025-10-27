@@ -117,11 +117,13 @@ export class ResourceCleanupRegistry {
       try {
         await cleanup();
       } catch (cleanupError) {
+        const error =
+          cleanupError instanceof Error
+            ? { message: cleanupError.message, stack: cleanupError.stack }
+            : { message: String(cleanupError) };
         logger.warn(
           "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.cleanupFunctionFailed",
-          {
-            cleanupError: cleanupError as CleanupError,
-          },
+          { cleanupError: error },
         );
       }
     }
@@ -249,12 +251,12 @@ export class ResourceMonitor {
     const handles = this.getActiveHandles();
 
     // Any handle that's not in the safe list is potentially problematic
-    return handles.some(
-      (handle) =>
-        !SAFE_HANDLE_TYPES.includes(
-          handle.type as (typeof SAFE_HANDLE_TYPES)[number],
-        ),
-    );
+    return handles.some((handle) => {
+      const handleType = handle.type;
+      return !SAFE_HANDLE_TYPES.includes(
+        handleType as (typeof SAFE_HANDLE_TYPES)[number],
+      );
+    });
   }
 
   /**
@@ -390,7 +392,7 @@ export class CliResourceManager {
     // Register database cleanup - this is critical for preventing hanging
     this.cleanupRegistry.register(async () => {
       try {
-        const { closeDatabase } = await import("../../../db");
+        const { closeDatabase } = await import("../../db");
         await closeDatabase(logger);
       } catch {
         // Database might not be imported yet
@@ -534,9 +536,13 @@ export class CliResourceManager {
         process.exit(0);
       }
     } catch (cleanupError) {
+      const error =
+        cleanupError instanceof Error
+          ? { message: cleanupError.message, stack: cleanupError.stack }
+          : { message: String(cleanupError) };
       logger.warn(
         "app.api.v1.core.system.unifiedUi.cli.vibe.utils.debug.cleanupError",
-        { cleanupError: cleanupError as CleanupError },
+        { cleanupError: error },
       );
       process.exit(1);
     }

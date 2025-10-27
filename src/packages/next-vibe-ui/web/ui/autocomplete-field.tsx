@@ -30,7 +30,7 @@ export enum FormFieldCategory {
 }
 
 const CATEGORY_TRANSLATION_KEYS: Record<FormFieldCategory, TranslationKey> = {
-  [FormFieldCategory.OTHER]: "app.packages.nextVibeUi.web.common.other",
+  [FormFieldCategory.OTHER]: "packages.nextVibeUi.web.common.other",
 };
 
 export interface AutocompleteOption {

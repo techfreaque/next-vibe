@@ -9,24 +9,26 @@ import {
   View,
   type ViewStyle,
 } from "react-native";
+import { styled } from "nativewind";
 
 import { Check } from "./icons/Check";
 import { ChevronDown } from "./icons/ChevronDown";
 import { ChevronRight } from "./icons/ChevronRight";
 import { ChevronUp } from "./icons/ChevronUp";
-import {
-  StyledDropdownMenuCheckboxItem,
-  StyledDropdownMenuContent,
-  StyledDropdownMenuItem,
-  StyledDropdownMenuItemIndicator,
-  StyledDropdownMenuLabel,
-  StyledDropdownMenuRadioItem,
-  StyledDropdownMenuSeparator,
-  StyledDropdownMenuSubContent,
-  StyledDropdownMenuSubTrigger,
-} from "../lib/styled";
 import { cn } from "../lib/utils";
 import { TextClassContext } from "./text";
+
+// Local styled components - use direct primitives to avoid type instantiation issues
+// The styled() function from nativewind has overly complex type inference for these components
+const StyledDropdownMenuSubTrigger = DropdownMenuPrimitive.SubTrigger as any;
+const StyledDropdownMenuSubContent = DropdownMenuPrimitive.SubContent as any;
+const StyledDropdownMenuContent = DropdownMenuPrimitive.Content as any;
+const StyledDropdownMenuItem = DropdownMenuPrimitive.Item as any;
+const StyledDropdownMenuCheckboxItem = DropdownMenuPrimitive.CheckboxItem as any;
+const StyledDropdownMenuRadioItem = DropdownMenuPrimitive.RadioItem as any;
+const StyledDropdownMenuLabel = DropdownMenuPrimitive.Label as any;
+const StyledDropdownMenuSeparator = DropdownMenuPrimitive.Separator as any;
+const StyledDropdownMenuItemIndicator = DropdownMenuPrimitive.ItemIndicator as any;
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -50,6 +52,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
   const { open } = DropdownMenuPrimitive.useSubContext();
   const Icon =
     Platform.OS === "web" ? ChevronRight : open ? ChevronUp : ChevronDown;
+  const renderedChildren = typeof children === "function" ? children({ open } as any) : children;
   return (
     <TextClassContext.Provider
       value={cn(
@@ -67,7 +70,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
         )}
         {...props}
       >
-        {children}
+        {renderedChildren}
         <Icon size={18} className="ml-auto text-foreground" />
       </StyledDropdownMenuSubTrigger>
     </TextClassContext.Provider>
@@ -174,49 +177,55 @@ DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;
 const DropdownMenuCheckboxItem = React.forwardRef<
   DropdownMenuPrimitive.CheckboxItemRef,
   DropdownMenuPrimitive.CheckboxItemProps & { className?: string }
->(({ className, children, checked, ...props }, ref) => (
-  <StyledDropdownMenuCheckboxItem
-    ref={ref}
-    className={cn(
-      "relative flex flex-row web:cursor-default items-center web:group rounded-sm py-1.5 native:py-2 pl-8 pr-2 web:outline-none web:focus:bg-accent active:bg-accent",
-      props.disabled && "web:pointer-events-none opacity-50",
-      className,
-    )}
-    checked={checked}
-    {...props}
-  >
-    <View className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-      <StyledDropdownMenuItemIndicator>
-        <Check size={14} strokeWidth={3} className="text-foreground" />
-      </StyledDropdownMenuItemIndicator>
-    </View>
-    {children}
-  </StyledDropdownMenuCheckboxItem>
-));
+>(({ className, children, checked, ...props }, ref) => {
+  const renderedChildren = typeof children === "function" ? children({ checked } as any) : children;
+  return (
+    <StyledDropdownMenuCheckboxItem
+      ref={ref}
+      className={cn(
+        "relative flex flex-row web:cursor-default items-center web:group rounded-sm py-1.5 native:py-2 pl-8 pr-2 web:outline-none web:focus:bg-accent active:bg-accent",
+        props.disabled && "web:pointer-events-none opacity-50",
+        className,
+      )}
+      checked={checked}
+      {...props}
+    >
+      <View className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+        <StyledDropdownMenuItemIndicator>
+          <Check size={14} strokeWidth={3} className="text-foreground" />
+        </StyledDropdownMenuItemIndicator>
+      </View>
+      {renderedChildren}
+    </StyledDropdownMenuCheckboxItem>
+  );
+});
 DropdownMenuCheckboxItem.displayName =
   DropdownMenuPrimitive.CheckboxItem.displayName;
 
 const DropdownMenuRadioItem = React.forwardRef<
   DropdownMenuPrimitive.RadioItemRef,
   DropdownMenuPrimitive.RadioItemProps & { className?: string }
->(({ className, children, ...props }, ref) => (
-  <StyledDropdownMenuRadioItem
-    ref={ref}
-    className={cn(
-      "relative flex flex-row web:cursor-default web:group items-center rounded-sm py-1.5 native:py-2 pl-8 pr-2 web:outline-none web:focus:bg-accent active:bg-accent",
-      props.disabled && "web:pointer-events-none opacity-50",
-      className,
-    )}
-    {...props}
-  >
-    <View className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-      <StyledDropdownMenuItemIndicator>
-        <View className="bg-foreground h-2 w-2 rounded-full" />
-      </StyledDropdownMenuItemIndicator>
-    </View>
-    {children}
-  </StyledDropdownMenuRadioItem>
-));
+>(({ className, children, ...props }, ref) => {
+  const renderedChildren = typeof children === "function" ? children({ checked: props.value === props.value } as any) : children;
+  return (
+    <StyledDropdownMenuRadioItem
+      ref={ref}
+      className={cn(
+        "relative flex flex-row web:cursor-default web:group items-center rounded-sm py-1.5 native:py-2 pl-8 pr-2 web:outline-none web:focus:bg-accent active:bg-accent",
+        props.disabled && "web:pointer-events-none opacity-50",
+        className,
+      )}
+      {...props}
+    >
+      <View className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+        <StyledDropdownMenuItemIndicator>
+          <View className="bg-foreground h-2 w-2 rounded-full" />
+        </StyledDropdownMenuItemIndicator>
+      </View>
+      {renderedChildren}
+    </StyledDropdownMenuRadioItem>
+  );
+});
 DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName;
 
 const DropdownMenuLabel = React.forwardRef<

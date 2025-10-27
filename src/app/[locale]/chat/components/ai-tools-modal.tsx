@@ -64,7 +64,7 @@ export function AIToolsModal({
     enabled: open, // Only fetch when modal is open
   });
 
-  // Extract tools from response with explicit typing
+  // Extract tools from response with proper type safety
   const availableTools = useMemo((): AIToolMetadataSerialized[] => {
     const readState = toolsEndpoint.read;
     if (!readState) {
@@ -72,17 +72,39 @@ export function AIToolsModal({
     }
 
     const response = readState.response;
-    if (response?.success && response.data?.tools) {
-      return response.data.tools as AIToolMetadataSerialized[];
+    if (!response) {
+      return [];
+    }
+
+    if (response.success && response.data && "tools" in response.data) {
+      const tools = response.data.tools;
+      if (Array.isArray(tools)) {
+        return tools as AIToolMetadataSerialized[];
+      }
     }
     return [];
   }, [toolsEndpoint.read]);
 
   const isLoading = toolsEndpoint.read?.isLoading ?? false;
-  const error =
-    toolsEndpoint.read?.response?.success === false
-      ? (toolsEndpoint.read.response.message as string)
-      : null;
+
+  // Extract error message with proper type safety
+  const error = useMemo((): string | null => {
+    const readState = toolsEndpoint.read;
+    if (!readState) {
+      return null;
+    }
+
+    const response = readState.response;
+    if (!response) {
+      return null;
+    }
+
+    if (response.success === false) {
+      return response.message;
+    }
+
+    return null;
+  }, [toolsEndpoint.read]);
 
   // Filter tools by search query
   const filteredTools = useMemo(() => {
@@ -300,9 +322,9 @@ export function AIToolsModal({
                   return (
                     <Div key={category} className="border rounded-lg">
                       {/* Category Header - Clickable to expand/collapse */}
-                      <button
+                      <Div
                         onClick={() => toggleCategory(category)}
-                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-accent/50 transition-colors rounded-t-lg"
+                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-accent/50 transition-colors rounded-t-lg cursor-pointer"
                       >
                         {isExpanded ? (
                           <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -326,7 +348,7 @@ export function AIToolsModal({
                           onClick={(e) => e.stopPropagation()}
                           className="shrink-0"
                         />
-                      </button>
+                      </Div>
 
                       {/* Tools in Category - Collapsible */}
                       {isExpanded && (
@@ -337,11 +359,11 @@ export function AIToolsModal({
                             );
 
                             return (
-                              <button
+                              <Div
                                 key={tool.name}
                                 onClick={() => handleToggleTool(tool.name)}
                                 className={cn(
-                                  "w-full text-left px-3 py-2 rounded-md border transition-all",
+                                  "w-full text-left px-3 py-2 rounded-md border transition-all cursor-pointer",
                                   "hover:border-primary/50 hover:bg-accent/50",
                                   "flex items-start gap-3",
                                   isEnabled && "border-primary bg-primary/5",
@@ -379,7 +401,7 @@ export function AIToolsModal({
                                     </Div>
                                   )}
                                 </Div>
-                              </button>
+                              </Div>
                             );
                           })}
                         </Div>

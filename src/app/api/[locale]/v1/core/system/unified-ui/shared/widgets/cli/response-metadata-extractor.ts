@@ -17,7 +17,7 @@ import {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
-import type { WidgetConfig } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/types";
+import type { WidgetConfig } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/widgets/widgets";
 import type { UserRoleDB } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type {

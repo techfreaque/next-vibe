@@ -3,8 +3,6 @@
  * Handles user avatar operations
  */
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
 import { revalidatePath } from "next/cache";
 import {
   createErrorResponse,
@@ -12,9 +10,11 @@ import {
   ErrorResponseTypes,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { UserDetailLevel } from "../../../enum";
 import { BaseUserRepositoryImpl, userRepository } from "../../../repository";
@@ -121,7 +121,7 @@ export class AvatarRepositoryImpl
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.private.me.avatar.debug.errorUploadingUserAvatar",
-        error,
+        parseError(error),
       );
       return createErrorResponse(
         "app.api.v1.core.user.private.me.avatar.errors.failed_to_upload_avatar",
@@ -190,7 +190,7 @@ export class AvatarRepositoryImpl
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.private.me.avatar.debug.errorDeletingUserAvatar",
-        error,
+        parseError(error),
       );
       return createErrorResponse(
         "app.api.v1.core.user.private.me.avatar.errors.failed_to_delete_avatar",

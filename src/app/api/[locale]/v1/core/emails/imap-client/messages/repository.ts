@@ -14,12 +14,15 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import {
+  type Email,
+  emails,
+} from "@/app/api/[locale]/v1/core/emails/messages/db";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { type Email, emails } from "@/app/api/[locale]/v1/core/emails/messages/db";
 import { imapAccounts } from "../db";
 import {
   ImapAccountFilter,
@@ -28,27 +31,14 @@ import {
   ImapSyncStatus,
   SortOrder,
 } from "../enum";
+import type {
+  ImapMessageByIdResponseOutput,
+  ImapMessageUpdateResponseOutput,
+} from "./[id]/definition";
 import type { ImapMessagesListGetResponseOutput } from "./list/definition";
 import type { ImapMessageSyncPostResponseOutput } from "./sync/definition";
 
-// Local type definitions to replace problematic imports
-interface ImapMessageResponseType {
-  id: string;
-  subject: string;
-  senderName: string | null;
-  senderEmail: string;
-  recipientName: string | null;
-  recipientEmail: string;
-  isRead: boolean;
-  isFlagged: boolean;
-  hasAttachments: boolean;
-  messageSize: number | null;
-  sentAt: string | null;
-  accountId: string;
-  folderId: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
+type ImapMessageResponseType = ImapMessageByIdResponseOutput["message"];
 
 interface ImapMessageQueryType {
   accountId?: string;
@@ -84,12 +74,26 @@ export interface ImapMessagesRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapMessageResponseType>>;
 
+  getMessageByIdFormatted(
+    data: { id: string },
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ImapMessageByIdResponseOutput>>;
+
   updateMessage(
     data: { messageId: string; updates: Partial<ImapMessageResponseType> },
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapMessageResponseType>>;
+
+  updateMessageFormatted(
+    data: { messageId: string; updates: Partial<ImapMessageResponseType> },
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ImapMessageUpdateResponseOutput>>;
 
   syncMessages(
     data: ImapMessageSyncType,
@@ -128,13 +132,31 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
       senderEmail: message.senderEmail,
       recipientName: message.recipientName || null,
       recipientEmail: message.recipientEmail,
+      sentAt: message.sentAt?.toISOString() || null,
+      receivedAt: message.deliveredAt?.toISOString() || null,
       isRead: message.isRead || false,
       isFlagged: message.isFlagged || false,
       hasAttachments: message.hasAttachments || false,
-      messageSize: message.messageSize || null,
-      sentAt: message.sentAt?.toISOString() || null,
+      folderName: "",
       accountId: message.imapAccountId || "",
-      folderId: message.imapFolderId || null,
+      size: message.messageSize ?? undefined,
+      imapMessageId: message.imapMessageId ?? undefined,
+      imapUid: message.imapUid ?? undefined,
+      imapFolderId: message.imapFolderId ?? undefined,
+      bodyText: message.bodyText ?? undefined,
+      bodyHtml: message.bodyHtml ?? undefined,
+      headers: message.headers ?? undefined,
+      isDeleted: message.isDeleted ?? undefined,
+      isDraft: message.isDraft ?? undefined,
+      isAnswered: message.isAnswered ?? undefined,
+      inReplyTo: message.inReplyTo ?? undefined,
+      references: message.references ?? undefined,
+      threadId: message.threadId ?? undefined,
+      messageSize: message.messageSize ?? undefined,
+      attachmentCount: message.attachmentCount ?? undefined,
+      lastSyncAt: message.lastSyncAt?.toISOString(),
+      syncStatus: message.syncStatus ?? undefined,
+      syncError: message.syncError ?? undefined,
       createdAt: message.createdAt.toISOString(),
       updatedAt: message.updatedAt.toISOString(),
     };
@@ -467,6 +489,42 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
+  }
+
+  /**
+   * Get IMAP message by ID with formatted response
+   */
+  async getMessageByIdFormatted(
+    data: { id: string },
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ImapMessageByIdResponseOutput>> {
+    const result = await this.getMessageById(data, user, locale, logger);
+    if (!result.success) {
+      return result;
+    }
+    return createSuccessResponse({
+      message: result.data,
+    });
+  }
+
+  /**
+   * Update IMAP message with formatted response
+   */
+  async updateMessageFormatted(
+    data: { messageId: string; updates: Partial<ImapMessageResponseType> },
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ImapMessageUpdateResponseOutput>> {
+    const result = await this.updateMessage(data, user, locale, logger);
+    if (!result.success) {
+      return result;
+    }
+    return createSuccessResponse({
+      message: result.data,
+    });
   }
 
   /**

@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { join } from "node:path";
 
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 import type { ReleaseConfig } from "../types/index.js";

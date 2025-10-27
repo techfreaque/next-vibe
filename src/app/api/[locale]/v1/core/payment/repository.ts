@@ -171,17 +171,17 @@ export class PaymentRepositoryImpl implements PaymentRepository {
 
       // Create Stripe checkout session
       // Map enum translation keys to Stripe API values
-      const paymentMethodTypes = data.paymentMethodTypes?.map((type) => {
+      const paymentMethodTypes = (data.paymentMethodTypes?.map((type) => {
         // Extract last part of translation key (e.g., "card" from "app.api.v1.core.payment.enums.paymentMethodType.card")
         const parts = type.split(".");
         const value = parts[parts.length - 1];
         // Convert camelCase to snake_case for Stripe (applePay -> apple_pay)
         return value.replace(/([A-Z])/g, "_$1").toLowerCase();
-      }) || ["card"];
+      }) || ["card"]) as Stripe.Checkout.SessionCreateParams.PaymentMethodType[];
 
       // Extract mode value from translation key
       const modeParts = data.mode.split(".");
-      const modeValue = modeParts[modeParts.length - 1];
+      const modeValue = modeParts[modeParts.length - 1] as Stripe.Checkout.SessionCreateParams.Mode;
 
       const sessionConfig: Stripe.Checkout.SessionCreateParams = {
         customer: stripeCustomerId,
@@ -368,7 +368,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
 
       return null;
     } catch (error) {
-      logger.error("Error finding Stripe customer", { error, userId });
+      logger.error("Error finding Stripe customer", { error: parseError(error), userId });
       return null;
     }
   }
@@ -774,7 +774,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         paymentIntentId: paymentIntent.id,
       });
     } catch (error) {
-      logger.error("Failed to process payment succeeded", { error: parseError(error) });
+      logger.error("Failed to process payment succeeded", {
+        error: parseError(error),
+      });
     }
   }
 
@@ -796,7 +798,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         paymentIntentId: paymentIntent.id,
       });
     } catch (error) {
-      logger.error("Failed to process payment failed", { error: parseError(error) });
+      logger.error("Failed to process payment failed", {
+        error: parseError(error),
+      });
     }
   }
 
@@ -811,15 +815,22 @@ export class PaymentRepositoryImpl implements PaymentRepository {
 
       // Retrieve the full subscription from Stripe using the invoice's subscription ID
       // Note: invoice.subscription is an expandable field (string | Subscription object)
-      const subscriptionId =
-        typeof invoice.subscription === "string"
-          ? invoice.subscription
-          : invoice.subscription.id;
+      const invoiceWithSubscription = invoice as Stripe.Invoice & { subscription?: string | Stripe.Subscription };
+      const subscriptionId = typeof invoiceWithSubscription.subscription === "string"
+        ? invoiceWithSubscription.subscription
+        : invoiceWithSubscription.subscription?.id;
+
+      if (!subscriptionId) {
+        logger.error("No subscription ID found in invoice", {
+          invoiceId: invoice.id,
+        });
+        return;
+      }
 
       const fullSubscription =
         await getStripe().subscriptions.retrieve(subscriptionId);
 
-      const userId = fullSubscription.metadata?.userId;
+      const userId = (fullSubscription as Stripe.Subscription & { metadata?: Record<string, string> }).metadata?.userId;
       if (!userId) {
         logger.error("No userId found in subscription metadata", {
           subscriptionId: fullSubscription.id,
@@ -828,15 +839,16 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       }
 
       // Calculate expiry date (end of current billing period)
-      const expiresAt = fullSubscription.current_period_end
-        ? new Date(fullSubscription.current_period_end * 1000)
+      const subscription = fullSubscription as Stripe.Subscription & { current_period_end?: number };
+      const expiresAt = subscription.current_period_end
+        ? new Date(subscription.current_period_end * 1000)
         : undefined;
 
       // Import credit repository dynamically to avoid circular dependencies
       const { creditRepository } = await import("../credits/repository");
 
       // Add 1000 expiring credits for the subscription
-      const result = await creditRepository.addCredits(
+      const result = await creditRepository.addUserCredits(
         userId,
         1000,
         "subscription",
@@ -893,7 +905,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         const { creditRepository } = await import("../credits/repository");
 
         // Add permanent credits to user account
-        const result = await creditRepository.addCredits(
+        const result = await creditRepository.addUserCredits(
           userId,
           totalCredits,
           "permanent",

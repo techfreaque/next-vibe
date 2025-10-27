@@ -15,7 +15,11 @@ import type {
   EndpointFilterCriteria,
   EndpointRegistryStats,
   IEndpointRegistry,
-} from "./endpoint-registry-types";
+} from "../../unified-backend/shared/discovery/endpoint-registry-types";
+/**
+ * Singleton instance using shared factory
+ */
+import { createSingletonGetter } from "./utils/singleton-factory";
 
 /**
  * Shared Endpoint Registry Implementation
@@ -223,14 +227,22 @@ export class EndpointRegistry implements IEndpointRegistry {
   }
 }
 
-/**
- * Create a singleton instance of the endpoint registry
- */
-let registryInstance: EndpointRegistry | null = null;
+const getRegistryInstance = createSingletonGetter(
+  () =>
+    new EndpointRegistry(
+      // Default logger - will be replaced on first use
+      {
+        debug: () => {},
+        info: () => {},
+        warn: () => {},
+        error: () => {},
+      } as EndpointLogger,
+    ),
+);
 
 export function getEndpointRegistry(logger: EndpointLogger): EndpointRegistry {
-  if (!registryInstance) {
-    registryInstance = new EndpointRegistry(logger);
-  }
-  return registryInstance;
+  const instance = getRegistryInstance();
+  // Update logger if provided
+  (instance as { logger: EndpointLogger }).logger = logger;
+  return instance;
 }

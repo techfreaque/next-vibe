@@ -25,8 +25,7 @@ export interface JsonWithComments {
  * Parse JSON with support for comments and trailing commas
  *
  * @param jsonString - JSON string potentially containing comments
- * @returns Parsed JSON object
- * @throws Error if JSON is invalid
+ * @returns Parsed JSON object or error response
  */
 export function parseJsonWithComments(
   jsonString: string,
@@ -42,7 +41,11 @@ export function parseJsonWithComments(
         },
       );
     }
-    return result as JsonWithComments;
+    // Type guard: result is an object, cast to JsonWithComments
+    return {
+      success: true,
+      data: result as JsonWithComments,
+    };
   } catch (error) {
     return createErrorResponse(
       "app.api.v1.core.shared.utils.parseJsonWithComments.errors.invalid_json",
@@ -63,9 +66,6 @@ export function parseJsonWithComments(
 export function tryParseJsonWithComments(
   jsonString: string,
 ): Record<string, unknown> | null {
-  try {
-    return parseJsonWithComments(jsonString);
-  } catch {
-    return null;
-  }
+  const result = parseJsonWithComments(jsonString);
+  return result.success ? result.data : null;
 }

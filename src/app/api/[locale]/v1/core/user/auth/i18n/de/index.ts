@@ -94,9 +94,8 @@ export const translations: typeof enTranslations = {
         description: "Die Sitzung ist ungültig oder abgelaufen",
       },
       missing_request_context: {
-        missing_locale: "Locale fehlt in der Anfrage",
-        title: "Fehlender Anfrage-Kontext",
-        description: "Anfrage-Kontext fehlt",
+        title: "Fehlender Request-Kontext",
+        description: "Request-Kontext fehlt",
       },
       unsupported_platform: {
         title: "Nicht unterstützte Plattform",
@@ -130,6 +129,12 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Erfolg",
       description: "Vorgang erfolgreich abgeschlossen",
+    },
+  },
+  check: {
+    get: {
+      title: "Authentifizierung prüfen",
+      description: "Aktuellen Authentifizierungsstatus prüfen",
     },
   },
   enums: {

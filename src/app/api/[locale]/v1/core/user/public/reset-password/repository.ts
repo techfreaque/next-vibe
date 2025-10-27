@@ -1,4 +1,3 @@
-import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 /**
  * Password reset repository
  * Manages password reset tokens and operations
@@ -10,7 +9,6 @@ import { randomBytes } from "node:crypto";
 
 import { and, eq, gt, lt, or } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
-import { env } from "@/config/env";
 import { RESET_TOKEN_EXPIRY } from "next-vibe/shared/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -19,8 +17,11 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import { env } from "@/config/env";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { UserDetailLevel } from "../../enum";
 import { passwordUpdateRepository } from "../../private/me/password/repository";
@@ -83,6 +84,7 @@ export interface PasswordRepository {
    */
   createResetToken(
     email: string,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<string>>;
 
@@ -99,6 +101,7 @@ export interface PasswordRepository {
    */
   requestPasswordReset(
     email: string,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<string>>;
 
@@ -109,6 +112,7 @@ export interface PasswordRepository {
     token: string,
     email: string,
     password: string,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<string>>;
 }
@@ -148,7 +152,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
 
       return createSuccessResponse(results.length > 0 ? results[0] : null);
     } catch (error) {
-      logger.error("Error finding valid reset token", { error, token });
+      logger.error("Error finding valid reset token", {
+        error: parseError(error),
+        token,
+      });
       return createErrorResponse(
         "app.api.v1.core.user.public.resetPassword.errors.tokenValidationFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -172,7 +179,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
 
       return createSuccessResponse(results.length > 0 ? results[0] : null);
     } catch (error) {
-      logger.error("Error finding reset by user ID", { error, userId });
+      logger.error("Error finding reset by user ID", {
+        error: parseError(error),
+        userId,
+      });
       return createErrorResponse(
         "app.api.v1.core.user.public.resetPassword.errors.userLookupFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -192,7 +202,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
       await db.delete(passwordResets).where(eq(passwordResets.token, token));
       return createSuccessResponse(null);
     } catch (error) {
-      logger.error("Error deleting reset token", { error, token });
+      logger.error("Error deleting reset token", {
+        error: parseError(error),
+        token,
+      });
       return createErrorResponse(
         "app.api.v1.core.user.public.resetPassword.errors.tokenDeletionFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -212,7 +225,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
       await db.delete(passwordResets).where(eq(passwordResets.userId, userId));
       return createSuccessResponse(null);
     } catch (error) {
-      logger.error("Error deleting reset by user ID", { error, userId });
+      logger.error("Error deleting reset by user ID", {
+        error: parseError(error),
+        userId,
+      });
       return createErrorResponse(
         "app.api.v1.core.user.public.resetPassword.errors.userDeletionFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -237,7 +253,9 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         );
       return createSuccessResponse(null);
     } catch (error) {
-      logger.error("Error deleting expired reset tokens", { error: parseError(error) });
+      logger.error("Error deleting expired reset tokens", {
+        error: parseError(error),
+      });
       return createErrorResponse(
         "app.api.v1.core.user.public.resetPassword.errors.resetFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -306,7 +324,11 @@ export class PasswordRepositoryImpl implements PasswordRepository {
 
       return createSuccessResponse(token);
     } catch (error) {
-      logger.error("Error generating JWT token", { error, email, userId });
+      logger.error("Error generating JWT token", {
+        error: parseError(error),
+        email,
+        userId,
+      });
       return createErrorResponse(
         "app.api.v1.core.user.public.resetPassword.errors.tokenCreationFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -365,14 +387,14 @@ export class PasswordRepositoryImpl implements PasswordRepository {
           userId: payload.userId,
         });
       } catch (jwtError) {
-        logger.debug("Invalid JWT token", jwtError);
+        logger.debug("Invalid JWT token", parseError(jwtError));
         return createErrorResponse(
           "app.api.v1.core.user.public.resetPassword.errors.tokenInvalid",
           ErrorResponseTypes.VALIDATION_ERROR,
         );
       }
     } catch (error) {
-      logger.error("Error verifying JWT token", { error: parseError(error) });
+      logger.error("Error verifying JWT token", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.public.resetPassword.errors.tokenVerificationFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -412,7 +434,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
       // Generate token using JWT
       return await this.generateJwtToken(email, userId, logger);
     } catch (error) {
-      logger.error("Error creating password reset token", { error, email });
+      logger.error("Error creating password reset token", {
+        error: parseError(error),
+        email,
+      });
       return createErrorResponse(
         "app.api.v1.core.user.public.resetPassword.errors.tokenCreationFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -443,7 +468,9 @@ export class PasswordRepositoryImpl implements PasswordRepository {
 
       return createSuccessResponse(passwordResetResponse.data.userId);
     } catch (error) {
-      logger.error("Error verifying password reset token", { error: parseError(error) });
+      logger.error("Error verifying password reset token", {
+        error: parseError(error),
+      });
       return createErrorResponse(
         "app.api.v1.core.user.public.resetPassword.errors.tokenVerificationFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -491,7 +518,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
 
       return createSuccessResponse(null);
     } catch (error) {
-      logger.error("Error resetting password with token", { error, token });
+      logger.error("Error resetting password with token", {
+        error: parseError(error),
+        token,
+      });
       return createErrorResponse(
         "app.api.v1.core.user.public.resetPassword.errors.passwordResetFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -505,13 +535,14 @@ export class PasswordRepositoryImpl implements PasswordRepository {
    */
   async requestPasswordReset(
     email: string,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<string>> {
     try {
       logger.debug("Password reset request received", { email });
 
       // Create a password reset token
-      await this.createResetToken(email, logger);
+      await this.createResetToken(email, locale, logger);
 
       // We don't want to reveal if the email exists or not for security reasons
       // So we always return a success message
@@ -519,7 +550,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         "app.api.v1.core.user.auth.resetPassword.emailSent",
       );
     } catch (error) {
-      logger.error("Error requesting password reset", { error, email });
+      logger.error("Error requesting password reset", {
+        error: parseError(error),
+        email,
+      });
       return createErrorResponse(
         "app.api.v1.core.user.public.resetPassword.errors.requestFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -535,6 +569,7 @@ export class PasswordRepositoryImpl implements PasswordRepository {
     token: string,
     email: string,
     password: string,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<string>> {
     try {
@@ -597,7 +632,10 @@ export class PasswordRepositoryImpl implements PasswordRepository {
         "app.api.v1.core.user.auth.resetPassword.success",
       );
     } catch (error) {
-      logger.error("Error confirming password reset", { error, email });
+      logger.error("Error confirming password reset", {
+        error: parseError(error),
+        email,
+      });
       return createErrorResponse(
         "app.api.v1.core.user.public.resetPassword.errors.confirmationFailed",
         ErrorResponseTypes.INTERNAL_ERROR,

@@ -11,36 +11,27 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { Platform } from "../../shared/config";
+import { BaseToolsRepositoryImpl } from "../../shared/repositories/base-tools-repository";
 import { getToolRegistry } from "../registry";
+import type { DiscoveredEndpoint } from "../types";
 import type {
   AIToolsListRequestOutput,
   AIToolsListResponseOutput,
 } from "./definition";
 
 /**
- * AI Tools repository interface
- */
-export interface AIToolsRepository {
-  /**
-   * Get all available AI tools for current user
-   * @param data - Request data (empty for GET)
-   * @param user - User from authentication (not used currently)
-   * @param logger - Logger instance for debugging and monitoring
-   * @param locale - Locale for translating tool descriptions
-   * @returns List of available AI tools
-   */
-  getTools(
-    data: AIToolsListRequestOutput,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-    locale?: CountryLanguage,
-  ): AIToolsListResponseOutput;
-}
-
-/**
  * AI Tools repository implementation
+ * Extends BaseToolsRepositoryImpl to eliminate duplication
  */
-export class AIToolsRepositoryImpl implements AIToolsRepository {
+export class AIToolsRepositoryImpl extends BaseToolsRepositoryImpl<
+  AIToolsListRequestOutput,
+  AIToolsListResponseOutput
+> {
+  constructor() {
+    // eslint-disable-next-line i18next/no-literal-string
+    super("AI Tools Repository");
+  }
+
   /**
    * Get all available AI tools for current user
    */
@@ -50,10 +41,7 @@ export class AIToolsRepositoryImpl implements AIToolsRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): AIToolsListResponseOutput {
-    logger.info("[AI Tools Repository] Fetching available tools", {
-      userId: user.isPublic ? undefined : user.id,
-      isPublic: user.isPublic,
-    });
+    this.logFetchStart(logger, user);
 
     // Get tool registry
     const registry = getToolRegistry();
@@ -69,12 +57,16 @@ export class AIToolsRepositoryImpl implements AIToolsRepository {
     // The registry will filter OTHER endpoints based on their allowedRoles:
     // - If user.isPublic === true → only return endpoints with PUBLIC in allowedRoles
     // - If user.isPublic === false → return endpoints with CUSTOMER, ADMIN, etc. (not PUBLIC-only)
-    const userContext = {
-      id: user.isPublic ? undefined : user.id,
-      isPublic: user.isPublic,
-    };
+    const userContext = this.createUserContext(user);
 
-    const filteredEndpoints = registry.getEndpoints(userContext, Platform.AI);
+    let filteredEndpoints: DiscoveredEndpoint[];
+    try {
+      filteredEndpoints = registry.getEndpoints(userContext, Platform.AI);
+    } catch (error) {
+      this.logError(logger, error);
+      // Return empty array on error - route handler will handle error response
+      filteredEndpoints = [];
+    }
 
     logger.info("[AI Tools Repository] Filtered endpoints by permissions", {
       totalEndpoints: registry.getStats().totalEndpoints,
@@ -86,65 +78,72 @@ export class AIToolsRepositoryImpl implements AIToolsRepository {
     const { t } = simpleT(locale);
 
     // Transform endpoints to serializable format and resolve translation keys
-    const serializableTools = filteredEndpoints.map((endpoint) => {
-      const definition = endpoint.definition;
+    const serializableTools = filteredEndpoints.map(
+      (endpoint: DiscoveredEndpoint) => {
+        const definition = endpoint.definition;
 
-      // Resolve translation keys to actual text
-      const descriptionKey = definition.description || definition.title || "";
-      const categoryKey = definition.category;
-      const tags = Array.isArray(definition.tags) ? definition.tags : [];
+        // Resolve translation keys to actual text
+        const descriptionKey: string = (definition.description ||
+          definition.title ||
+          "") as string;
+        const categoryKey: string = definition.category as string;
+        const tags: readonly string[] = Array.isArray(definition.tags)
+          ? definition.tags
+          : [];
 
-      let description: string = descriptionKey;
-      try {
-        // Try to translate description
-        if (descriptionKey) {
-          description = t(descriptionKey as never);
-        }
-      } catch {
-        // Keep original if translation fails
-      }
-
-      let category: string = categoryKey;
-      try {
-        // Try to translate category
-        if (categoryKey) {
-          category = t(categoryKey as never);
-        }
-      } catch {
-        // Keep original if translation fails
-      }
-
-      // Try to translate tags
-      const translatedTags = tags.map((tag) => {
+        let description: string = descriptionKey;
         try {
-          return t(tag as never);
+          // Try to translate description
+          if (descriptionKey) {
+            description = t(descriptionKey as never);
+          }
         } catch {
-          return tag as string;
+          // Keep original if translation fails
         }
-      });
 
-      return {
-        name: endpoint.toolName,
-        description: description || "",
-        category: category || undefined,
-        tags: translatedTags,
-        endpointId: endpoint.id,
-        allowedRoles: endpoint.definition.allowedRoles
-          ? Array.from(endpoint.definition.allowedRoles)
-          : [],
-        // Omit parameters as Zod schemas cannot be JSON serialized
-      };
-    });
+        let category: string = categoryKey;
+        try {
+          // Try to translate category
+          if (categoryKey) {
+            category = t(categoryKey as never);
+          }
+        } catch {
+          // Keep original if translation fails
+        }
+
+        // Try to translate tags
+        const translatedTags = tags.map((tag) => {
+          try {
+            return t(tag as never);
+          } catch {
+            return tag;
+          }
+        });
+
+        return {
+          name: endpoint.toolName,
+          description: description || "",
+          category: category || undefined,
+          tags: translatedTags,
+          endpointId: endpoint.id,
+          allowedRoles: endpoint.definition.allowedRoles
+            ? Array.from(endpoint.definition.allowedRoles)
+            : [],
+          // Omit parameters as Zod schemas cannot be JSON serialized
+        };
+      },
+    );
 
     const result = {
       tools: serializableTools,
     };
 
-    logger.info("[AI Tools Repository] Returning result", {
-      resultKeys: Object.keys(result),
-      toolsCount: serializableTools.length,
-      sampleTool: serializableTools[0],
-    });
+    this.logResult(
+      logger,
+      result,
+      serializableTools.length,
+      serializableTools[0],
+    );
 
     // Return plain object - route handler will wrap with createSuccessResponse
     return result;

@@ -63,13 +63,7 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
   },
   [Methods.DELETE]: {
     email: undefined,
-    handler: async (
-      props: ApiHandlerProps<
-        UserDeleteRequestOutput,
-        UserDeleteUrlParamsTypeOutput,
-        typeof definitions.DELETE.allowedRoles
-      >,
-    ): Promise<ResponseType<UserDeleteResponseOutput>> => {
+    handler: async (props): Promise<ResponseType<UserDeleteResponseOutput>> => {
       return await userByIdRepository.deleteUser(
         { id: props.urlPathParams.id },
         props.user,

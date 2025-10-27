@@ -4,6 +4,7 @@ import path from "node:path";
 import { parseError } from "next-vibe/shared/utils";
 
 import { closeDatabase } from "@/app/api/[locale]/v1/core/system/db";
+import { findSeedFiles as findSeedFilesUtil } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/filesystem/directory-scanner";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -103,27 +104,8 @@ const SEEDS_TS_PATTERN = "seeds.ts";
  * Find all seed files in a directory and its subdirectories
  */
 function findSeedFiles(dir: string): string[] {
-  const seedFiles: string[] = [];
-
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-
-    if (entry.isDirectory()) {
-      // Recursively search subdirectories
-      seedFiles.push(...findSeedFiles(fullPath));
-    } else if (
-      (entry.name.endsWith(SEED_TS_PATTERN) ||
-        entry.name.endsWith(SEEDS_TS_PATTERN)) &&
-      !entry.name.includes(TEST_FILE_PATTERN) &&
-      !entry.name.includes(SPEC_FILE_PATTERN)
-    ) {
-      seedFiles.push(fullPath);
-    }
-  }
-
-  return seedFiles;
+  // Use consolidated directory scanner
+  return findSeedFilesUtil(dir);
 }
 
 /**

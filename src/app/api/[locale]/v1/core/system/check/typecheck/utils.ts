@@ -12,7 +12,8 @@ import {
 } from "node:fs";
 import { extname, join, relative, resolve } from "node:path";
 
-import { parseJsonWithComments } from "../../../shared/utils/parse-json";
+import { parseJsonWithComments } from "@/app/api/[locale]/v1/core/shared/utils/parse-json";
+import { findTypeScriptFiles as findTypeScriptFilesUtil } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/filesystem/directory-scanner";
 
 /**
  * TypeScript file extensions

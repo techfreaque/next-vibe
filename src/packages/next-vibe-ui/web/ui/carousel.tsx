@@ -224,7 +224,7 @@ const CarouselPrevious = React.forwardRef<
         <ArrowLeftIcon className="h-4 w-4" />
         <span className="sr-only">
           {t(
-            "app.packages.nextVibeUi.web.common.accessibility.srOnly.previousSlide",
+            "packages.nextVibeUi.web.common.accessibility.srOnly.previousSlide",
           )}
         </span>
       </>
@@ -260,7 +260,7 @@ const CarouselNext = React.forwardRef<
         <ArrowRightIcon className="h-4 w-4" />
         <span className="sr-only">
           {t(
-            "app.packages.nextVibeUi.web.common.accessibility.srOnly.nextSlide",
+            "packages.nextVibeUi.web.common.accessibility.srOnly.nextSlide",
           )}
         </span>
       </>

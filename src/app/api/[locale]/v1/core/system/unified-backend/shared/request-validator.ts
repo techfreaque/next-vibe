@@ -102,10 +102,11 @@ export function validateUrlParametersWithSchema<TInput, TOutput>(
  * Specialized validation function for endpoint request schemas
  * Handles the specific schema structure used in endpoint definitions
  * Takes raw input data and produces validated output data
+ * Accepts unknown data and lets the schema validate it
  */
 export function validateEndpointRequestData<TRequestInput, TRequestOutput>(
-  data: TRequestInput,
-  schema: z.ZodSchema<TRequestOutput, TRequestInput>,
+  data: unknown,
+  schema: z.ZodSchema<TRequestOutput, z.ZodTypeDef, TRequestInput>,
   logger: EndpointLogger,
 ): ResponseType<TRequestOutput> {
   return validateData(data, schema, logger);
@@ -115,13 +116,14 @@ export function validateEndpointRequestData<TRequestInput, TRequestOutput>(
  * Specialized validation function for endpoint URL schemas
  * Handles the specific schema structure used in endpoint definitions
  * Takes raw input URL parameters and produces validated output parameters
+ * Accepts unknown data and lets the schema validate it
  */
 export function validateEndpointUrlParameters<
   TUrlVariablesInput,
   TUrlVariablesOutput,
 >(
-  urlParameters: TUrlVariablesInput,
-  schema: z.ZodSchema<TUrlVariablesOutput, TUrlVariablesInput>,
+  urlParameters: unknown,
+  schema: z.ZodSchema<TUrlVariablesOutput, z.ZodTypeDef, TUrlVariablesInput>,
   logger: EndpointLogger,
 ): ResponseType<TUrlVariablesOutput> {
   return validateData(urlParameters, schema, logger);

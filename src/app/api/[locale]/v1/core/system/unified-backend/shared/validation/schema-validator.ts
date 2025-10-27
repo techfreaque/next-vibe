@@ -1,0 +1,194 @@
+/**
+ * Schema Validation Core
+ * Shared validation logic for all platforms
+ * Eliminates duplication across CLI, Next.js, tRPC validators
+ */
+
+import "server-only";
+
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import { validateData } from "next-vibe/shared/utils/validation";
+import { z } from "zod";
+
+import type { CountryLanguage } from "@/i18n/core/config";
+import { CountryLanguageValues, defaultLocale } from "@/i18n/core/config";
+
+import type { EndpointLogger } from "../endpoint-logger";
+
+/**
+ * Validate locale using the standard schema
+ */
+export function validateLocale(
+  locale: CountryLanguage,
+  logger: EndpointLogger,
+): CountryLanguage {
+  const localeValidation = validateData(
+    locale,
+    z.enum(CountryLanguageValues).optional(),
+    logger,
+  );
+  const validatedLocale = localeValidation.success
+    ? localeValidation.data
+    : undefined;
+  if (!validatedLocale) {
+    logger.error("Invalid locale provided, using default", {
+      providedLocale: String(locale),
+      defaultLocale: String(defaultLocale),
+    });
+    return defaultLocale;
+  }
+  return validatedLocale;
+}
+
+/**
+ * Validate request data with schema
+ */
+export function validateRequestData<TInput, TOutput>(
+  data: TInput,
+  schema: z.ZodSchema<TOutput, z.ZodTypeDef, TInput>,
+  logger: EndpointLogger,
+): ResponseType<TOutput> {
+  return validateData(data, schema, logger);
+}
+
+/**
+ * Validate URL parameters with schema
+ */
+export function validateUrlParameters<TInput, TOutput>(
+  urlParameters: TInput,
+  schema: z.ZodSchema<TOutput, z.ZodTypeDef, TInput>,
+  logger: EndpointLogger,
+): ResponseType<TOutput> {
+  return validateData(urlParameters, schema, logger);
+}
+
+/**
+ * Check if schema expects no input (undefined or never)
+ */
+export function isEmptySchema(schema: z.ZodSchema): boolean {
+  return (
+    schema instanceof z.ZodUndefined ||
+    schema instanceof z.ZodNever ||
+    schema instanceof z.ZodVoid
+  );
+}
+
+/**
+ * Check if schema expects never type specifically
+ */
+export function isNeverSchema(schema: z.ZodSchema): boolean {
+  const testResult = schema.safeParse({});
+  return (
+    !testResult.success &&
+    testResult.error?.issues?.[0]?.code === "invalid_type"
+  );
+}
+
+/**
+ * Get missing required fields from validation error
+ */
+export function getMissingFields(
+  data: Record<string, unknown>,
+  schema: z.ZodSchema,
+  logger: EndpointLogger,
+): string[] {
+  const missing: string[] = [];
+
+  try {
+    const result = schema.safeParse(data);
+
+    if (!result.success && result.error) {
+      for (const issue of result.error.issues) {
+        if (issue.code === "invalid_type" && issue.received === "undefined") {
+          missing.push(issue.path.join("."));
+        }
+      }
+    }
+  } catch (error) {
+    logger.warn("Failed to extract missing fields", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  return missing;
+}
+
+/**
+ * Merge data with schema defaults
+ * Returns the merged data or the original data if merging fails
+ */
+export function mergeWithDefaults<T>(
+  data: Partial<T>,
+  schema: z.ZodSchema<T>,
+  logger: EndpointLogger,
+): Partial<T> | T {
+  try {
+    const defaultsResult = schema.safeParse({});
+    if (defaultsResult.success) {
+      return {
+        ...defaultsResult.data,
+        ...data,
+      };
+    }
+  } catch (error) {
+    logger.warn("Failed to merge with defaults", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  // Return partial data if defaults couldn't be extracted
+  return data;
+}
+
+/**
+ * Create validation error response
+ */
+export function createValidationError(
+  message: string,
+  error?: string,
+): ResponseType<never> {
+  return {
+    success: false,
+    message,
+    errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+    messageParams: {
+      error: error || "Validation failed",
+    },
+  };
+}
+
+/**
+ * Create URL validation error response
+ */
+export function createUrlValidationError(
+  error: string,
+): ResponseType<never> {
+  return {
+    success: false,
+    message:
+      "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_url_parameters",
+    errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
+    messageParams: {
+      error,
+    },
+  };
+}
+
+/**
+ * Create request validation error response
+ */
+export function createRequestValidationError(
+  error: string,
+): ResponseType<never> {
+  return {
+    success: false,
+    message:
+      "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
+    errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+    messageParams: {
+      error,
+    },
+  };
+}
+

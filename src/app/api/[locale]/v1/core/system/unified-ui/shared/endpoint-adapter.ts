@@ -14,7 +14,7 @@ import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unifie
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import type { DiscoveredEndpoint } from "./endpoint-registry-types";
+import type { DiscoveredEndpoint } from "../../unified-backend/shared/discovery/endpoint-registry-types";
 
 /**
  * Type for the nested endpoint structure from generated/endpoints.ts

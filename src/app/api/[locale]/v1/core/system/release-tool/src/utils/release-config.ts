@@ -10,6 +10,7 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 import type { ReleaseConfig } from "../types/index.js";
@@ -70,7 +71,7 @@ export async function loadConfig(
     logger.info("Successfully loaded config", { path: resolvedConfigPath });
     return createSuccessResponse(importedModule.default);
   } catch (error) {
-    logger.error("Error loading config", { error, path: resolvedConfigPath });
+    logger.error("Error loading config", { ...parseError(error), path: resolvedConfigPath });
     return createErrorResponse(
       "app.api.v1.core.system.releaseTool.config.errorLoading",
       ErrorResponseTypes.INTERNAL_ERROR,

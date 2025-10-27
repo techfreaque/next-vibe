@@ -22,7 +22,7 @@ import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import type React from "react";
 
 import type { CronHistoryResponseOutput } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/history/definition";
-import type { CronHistoryEndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/history/hooks";
+import type { CronHistoryEndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/tasks/cron/history/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

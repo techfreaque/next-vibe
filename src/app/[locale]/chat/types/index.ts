@@ -6,13 +6,13 @@
 
 // Core types from agent API
 export type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
+export type { ToolCall } from "@/app/api/[locale]/v1/core/agent/chat/db";
 export type { UseChatReturn } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
 export type { ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 export type {
   ChatFolder,
   ChatMessage,
   ChatThread,
-  ToolCall,
 } from "@/app/api/[locale]/v1/core/agent/chat/store";
 
 // View mode type (UI-only, not from API)

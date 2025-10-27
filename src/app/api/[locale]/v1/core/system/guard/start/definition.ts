@@ -55,7 +55,19 @@ const { POST } = createEndpoint({
         z.string().optional(),
       ),
 
-      guardId: requestDataField(
+      startAll: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.v1.core.system.guard.start.fields.startAll.title",
+          description:
+            "app.api.v1.core.system.guard.start.fields.startAll.description",
+          layout: { columns: 12 },
+        },
+        z.boolean().optional().default(false),
+      ),
+
+      guardIdInput: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -67,18 +79,6 @@ const { POST } = createEndpoint({
           layout: { columns: 6 },
         },
         z.string().optional(),
-      ),
-
-      startAll: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.v1.core.system.guard.start.fields.startAll.title",
-          description:
-            "app.api.v1.core.system.guard.start.fields.startAll.description",
-          layout: { columns: 12 },
-        },
-        z.boolean().optional().default(false),
       ),
 
       // === RESPONSE FIELDS ===
@@ -106,7 +106,7 @@ const { POST } = createEndpoint({
         z.string(),
       ),
 
-      guardIdResponse: responseField(
+      guardId: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.v1.core.system.guard.start.fields.guardId.title",
@@ -204,7 +204,7 @@ const { POST } = createEndpoint({
         projectPath: "/home/user/projects/my-project",
       },
       byGuardId: {
-        guardId: "guard_my_project_abc123",
+        guardIdInput: "guard_my_project_abc123",
       },
       startAll: {
         startAll: true,

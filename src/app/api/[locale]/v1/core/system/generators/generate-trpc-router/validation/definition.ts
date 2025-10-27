@@ -57,7 +57,7 @@ export const { enum: ValidationSeverity, options: ValidationSeverityOptions } =
 /**
  * TRPC Integration Validation Endpoint Definition
  */
-const { POST } = createEndpoint({
+export const { POST } = createEndpoint({
   title:
     "app.api.v1.core.system.generators.generateTrpcRouter.validation.title",
   description:
@@ -98,7 +98,7 @@ const { POST } = createEndpoint({
         },
       },
     },
-    responses: {
+    response: {
       success: {
         success: true,
         operation: "VALIDATE_INTEGRATION",
@@ -124,9 +124,10 @@ const { POST } = createEndpoint({
   },
   fields: objectField(
     {
-      type: WidgetType.FORM_CONTAINER,
+      type: WidgetType.FORM_GROUP,
       layout: { type: LayoutType.GRID, columns: 1 },
     },
+    { request: "data" },
     {
       operation: requestDataField(
         {
@@ -194,9 +195,10 @@ const { POST } = createEndpoint({
   ),
   responseSchema: objectField(
     {
-      type: WidgetType.RESPONSE_CONTAINER,
+      type: WidgetType.CONTAINER,
       layout: { type: LayoutType.GRID, columns: 1 },
     },
+    { response: true },
     {
       success: responseField(
         {
@@ -216,7 +218,7 @@ const { POST } = createEndpoint({
       ),
       result: responseField(
         {
-          type: WidgetType.JSON,
+          type: WidgetType.TEXT,
           content:
             "app.api.v1.core.system.generators.generateTrpcRouter.validation.response.result.label",
         },
@@ -247,13 +249,62 @@ const { POST } = createEndpoint({
       ),
     },
   ),
-  errorTypes: [
-    EndpointErrorTypes.UNAUTHORIZED,
-    EndpointErrorTypes.FORBIDDEN,
-    EndpointErrorTypes.SERVER_ERROR,
-    EndpointErrorTypes.VALIDATION_FAILED,
-    EndpointErrorTypes.NOT_FOUND,
-  ],
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.validation.title" as const,
+      description:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.validation.description" as const,
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unauthorized.title" as const,
+      description:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unauthorized.description" as const,
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.forbidden.title" as const,
+      description:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.forbidden.description" as const,
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.notFound.title" as const,
+      description:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.notFound.description" as const,
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.server.title" as const,
+      description:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unknown.title" as const,
+      description:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unknown.description" as const,
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unsavedChanges.title" as const,
+      description:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.unsavedChanges.description" as const,
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.conflict.title" as const,
+      description:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.conflict.description" as const,
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.network.title" as const,
+      description:
+        "app.api.v1.core.system.generators.generateTrpcRouter.validation.errors.network.description" as const,
+    },
+  },
 });
 
 /**

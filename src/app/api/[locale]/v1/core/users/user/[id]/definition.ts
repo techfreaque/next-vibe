@@ -784,59 +784,29 @@ const { DELETE } = createEndpoint({
         z.string().uuid("usersErrors.validation.id.invalid"),
       ),
 
-      // === DELETION RESULT ===
-      deletionResult: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.v1.core.users.user.id.id.delete.response.deletionResult.title" as const,
-          description:
-            "app.api.v1.core.users.user.id.id.delete.response.deletionResult.description" as const,
-          layout: { type: LayoutType.STACKED },
-        },
-        { response: true },
-        {
-          success: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.v1.core.users.user.id.id.delete.response.deletionResult.success.content" as const,
-            },
-            z.boolean().describe("Whether the deletion was successful"),
-          ),
-          message: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.users.user.id.id.delete.response.deletionResult.message.content" as const,
-            },
-            z.string().describe("Human-readable result message"),
-          ),
-          deletedAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.users.user.id.id.delete.response.deletionResult.deletedAt.content" as const,
-            },
-            z.string().datetime().describe("When the user was deleted"),
-          ),
-        },
-      ),
-
-      // === BACKWARD COMPATIBILITY ===
+      // === RESPONSE ===
       success: responseField(
         {
           type: WidgetType.BADGE,
-          text: "app.api.v1.core.users.user.id.id.delete.response.success.content" as const,
+          text: "app.api.v1.core.users.user.id.id.delete.response.deletionResult.success.content" as const,
         },
-        z.boolean(),
+        z.boolean().describe("Whether the deletion was successful"),
       ),
       message: responseField(
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.users.user.id.id.delete.response.message.content" as const,
+            "app.api.v1.core.users.user.id.id.delete.response.deletionResult.message.content" as const,
         },
-        z.string(),
+        z.string().describe("Human-readable result message"),
+      ),
+      deletedAt: responseField(
+        {
+          type: WidgetType.TEXT,
+          content:
+            "app.api.v1.core.users.user.id.id.delete.response.deletionResult.deletedAt.content" as const,
+        },
+        z.string().datetime().describe("When the user was deleted"),
       ),
     },
   ),
@@ -939,7 +909,7 @@ export type UserPutUrlParamsTypeInput = typeof PUT.types.UrlVariablesInput;
 export type UserPutUrlParamsTypeOutput = typeof PUT.types.UrlVariablesOutput;
 
 export type UserDeleteRequestInput = typeof DELETE.types.RequestInput;
-export type UserDeleteRequestOutput = typeof DELETE.types.RequestOutput;
+export type UserDeleteRequestOutput = typeof DELETE.types.UrlVariablesOutput;
 export type UserDeleteResponseInput = typeof DELETE.types.ResponseInput;
 export type UserDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
 export type UserDeleteUrlParamsTypeInput =

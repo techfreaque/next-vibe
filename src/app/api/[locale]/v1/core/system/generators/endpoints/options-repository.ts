@@ -18,10 +18,19 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/defini
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type {
-  CliOptionsRequestOutput,
-  CliOptionsResponseOutput,
-} from "../../unified-ui/cli/config";
+// CLI Options types
+export interface CliOptionsRequestOutput {
+  [key: string]: string | number | boolean | string[] | undefined;
+}
+
+export interface CliOptionsResponseOutput {
+  success: boolean;
+  options: string[];
+  validation: {
+    isValid: boolean;
+    errors: string[];
+  };
+}
 
 // ===== OPTION TYPES =====
 
@@ -112,13 +121,14 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
 
       switch (data.operation) {
         case "list":
-          response.options = Object.keys(this.listOptions(data.category));
+          const category = typeof data.category === "string" ? data.category : undefined;
+          response.options = Object.keys(this.listOptions(category));
           break;
         case "validate":
           if (data.optionName && data.optionValue !== undefined) {
             const validation = this.validateOptionValue(
-              data.optionName,
-              data.optionValue,
+              String(data.optionName),
+              data.optionValue as unknown,
             );
             response.validation = {
               isValid: validation.valid,

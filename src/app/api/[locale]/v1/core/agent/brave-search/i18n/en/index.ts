@@ -50,6 +50,7 @@ export const translations = {
       results: {
         title: "Results",
         description: "Array of search results",
+        result: "Result",
         item: {
           title: "Search Result",
           description: "Individual search result",

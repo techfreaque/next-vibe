@@ -65,7 +65,7 @@ export type PersonaCategoryId = (typeof DEFAULT_CATEGORIES)[number]["id"];
 export const CategoryOptions = DEFAULT_CATEGORIES.map((cat) => ({
   value: cat.id,
   label: cat.name,
-})) as const;
+}));
 
 /**
  * Default personas available in the application

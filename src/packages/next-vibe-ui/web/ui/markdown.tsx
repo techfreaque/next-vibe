@@ -129,11 +129,11 @@ export function Markdown({ content, className }: MarkdownProps): JSX.Element {
                   <Brain className="h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110" />
                   <span className="flex-1 text-left font-semibold">
                     {t(
-                      "app.packages.nextVibeUi.web.ui.markdown.reasoningProcess",
+                      "packages.nextVibeUi.web.ui.markdown.reasoningProcess",
                     )}
                     {isIncomplete && (
                       <span className="ml-2 text-xs font-normal text-purple-500 dark:text-purple-400">
-                        {t("app.packages.nextVibeUi.web.ui.markdown.streaming")}
+                        {t("packages.nextVibeUi.web.ui.markdown.streaming")}
                       </span>
                     )}
                   </span>
@@ -402,19 +402,19 @@ function CodeBlock({
           )}
           title={
             copied
-              ? t("app.packages.nextVibeUi.web.ui.markdown.copied")
-              : t("app.packages.nextVibeUi.web.ui.markdown.copyCode")
+              ? t("packages.nextVibeUi.web.ui.markdown.copied")
+              : t("packages.nextVibeUi.web.ui.markdown.copyCode")
           }
         >
           {copied ? (
             <>
               <Check className="h-3.5 w-3.5" />
-              {t("app.packages.nextVibeUi.web.ui.markdown.copied")}
+              {t("packages.nextVibeUi.web.ui.markdown.copied")}
             </>
           ) : (
             <>
               <Copy className="h-3.5 w-3.5" />
-              {t("app.packages.nextVibeUi.web.ui.markdown.copy")}
+              {t("packages.nextVibeUi.web.ui.markdown.copy")}
             </>
           )}
         </button>

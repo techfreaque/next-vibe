@@ -53,6 +53,7 @@ export const translations: typeof enTranslations = {
       results: {
         title: "Ergebnisse",
         description: "Array von Suchergebnissen",
+        result: "Ergebnis",
         item: {
           title: "Suchergebnis",
           description: "Einzelnes Suchergebnis",

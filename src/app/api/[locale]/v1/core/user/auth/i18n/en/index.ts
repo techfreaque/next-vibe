@@ -171,6 +171,12 @@ export const translations = {
       description: "Operation completed successfully",
     },
   },
+  check: {
+    get: {
+      title: "Check Authentication",
+      description: "Check current authentication status",
+    },
+  },
   enums: {
     webSocketErrorCode: {
       unauthorized: "Unauthorized",

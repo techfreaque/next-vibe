@@ -3,7 +3,7 @@
  * Tasks for database reset functionality
  */
 
-import type { Task } from "../../tasks/types/repository";
+import type { Task } from "../../unified-backend/tasks/types/repository";
 
 /**
  * Database Reset Safety Check Cron Task
@@ -72,7 +72,7 @@ const dbBackupVerificationTask: Task = {
   enabled: false, // Disabled by default
   priority: "HIGH",
 
-  run: async (signal: AbortSignal) => {
+  run: async ({ signal }) => {
     const checkInterval = 1800000; // 30 minutes
 
     while (!signal.aborted) {

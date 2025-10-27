@@ -27,6 +27,7 @@ import {
 } from "fs";
 import { dirname, join, relative } from "path";
 
+import { findFilesByName } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/filesystem/directory-scanner";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { defaultLocale } from "@/i18n/core/config";
@@ -136,26 +137,14 @@ function ensureDir(dirPath: string): void {
  * Recursively find all files matching a pattern
  */
 function findFiles(dir: string, pattern: string, basePath = ""): string[] {
-  const results: string[] = [];
+  // Use consolidated directory scanner
+  const results = findFilesByName(dir, pattern);
 
-  try {
-    const entries = readdirSync(dir, { withFileTypes: true });
-
-    for (const entry of entries) {
-      const fullPath = join(dir, entry.name);
-      const relativePath = basePath ? join(basePath, entry.name) : entry.name;
-
-      if (entry.isDirectory()) {
-        results.push(...findFiles(fullPath, pattern, relativePath));
-      } else if (entry.isFile() && entry.name === pattern) {
-        results.push(relativePath);
-      }
-    }
-  } catch {
-    // Ignore errors (permission denied, etc.)
-  }
-
-  return results;
+  // Convert to relative paths from basePath
+  return results.map((r) => {
+    const rel = relative(dir, r.fullPath);
+    return basePath ? join(basePath, rel) : rel;
+  });
 }
 
 /**

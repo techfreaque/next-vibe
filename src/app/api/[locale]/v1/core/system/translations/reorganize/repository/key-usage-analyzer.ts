@@ -3,6 +3,7 @@ import path from "node:path";
 
 import { parseError } from "next-vibe/shared/utils";
 
+import { scanDirectory } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/filesystem/directory-scanner";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 import {
@@ -124,43 +125,13 @@ export class KeyUsageAnalyzer {
    * @returns Array of file paths matching the extensions
    */
   private findFiles(dir: string, extensions: string[]): string[] {
-    const files: string[] = [];
+    // Use consolidated directory scanner
+    const results = scanDirectory(dir, {
+      extensions,
+      excludeDirs: IGNORED_DIRS,
+      excludeFiles: IGNORED_FILES,
+    });
 
-    const scanDirectory = (currentDir: string): void => {
-      try {
-        const entries = fs.readdirSync(currentDir, { withFileTypes: true });
-
-        for (const entry of entries) {
-          const fullPath = path.join(currentDir, entry.name);
-
-          if (entry.isDirectory()) {
-            // Skip ignored directories
-            if (
-              IGNORED_DIRS.includes(entry.name) ||
-              entry.name.startsWith(".")
-            ) {
-              continue;
-            }
-            scanDirectory(fullPath);
-          } else if (entry.isFile()) {
-            // Skip ignored files
-            if (IGNORED_FILES.includes(entry.name)) {
-              continue;
-            }
-
-            // Check if file has one of the target extensions
-            const ext = path.extname(entry.name);
-            if (extensions.includes(ext)) {
-              files.push(fullPath);
-            }
-          }
-        }
-      } catch {
-        // Skip directories we can't read
-      }
-    };
-
-    scanDirectory(dir);
-    return files;
+    return results.map((r) => r.fullPath);
   }
 }

@@ -1505,7 +1505,9 @@ export class TranslationReorganizeRepositoryImpl {
         },
       });
     } catch (error) {
-      logger.error("Error getting translation stats", { error: parseError(error) });
+      logger.error("Error getting translation stats", {
+        error: parseError(error),
+      });
       return createErrorResponse(
         "app.api.v1.core.system.translations.reorganize.repository.error.internal_error",
         ErrorResponseTypes.INTERNAL_ERROR,

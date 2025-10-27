@@ -16,6 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
+import { createDefaultCliUser } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/auth/cli-user-factory";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 
 import type { NewUserRole, UserRole } from "../db";
@@ -98,7 +99,8 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
       }
 
       // Handle CLI-only user without database access
-      if (userId === "00000000-0000-0000-0000-000000000001") {
+      const defaultCliUser = createDefaultCliUser();
+      if (userId === defaultCliUser.id) {
         // Return CLI_OFF role for the default CLI user
         const cliRole: UserRole = {
           id: "cli-role-id",
@@ -164,7 +166,8 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
       logger.debug("Finding user role by user ID and role", { userId, role });
 
       // Handle CLI-only user without database access
-      if (userId === "00000000-0000-0000-0000-000000000001") {
+      const defaultCliUser = createDefaultCliUser();
+      if (userId === defaultCliUser.id) {
         // CLI user can have CLI_OFF, ADMIN, or AI_TOOL_OFF roles
         if (
           role === UserRoleEnum.CLI_OFF ||

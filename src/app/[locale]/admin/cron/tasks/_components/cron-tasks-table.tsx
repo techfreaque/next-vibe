@@ -27,7 +27,7 @@ import {
   useCronTaskEndpoint,
   useDeleteCronTask,
   useToggleCronTask,
-} from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/tasks/hooks";
+} from "@/app/api/[locale]/v1/core/system/unified-ui/tasks/cron/tasks/hooks";
 import { formatCronSchedule } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron-formatter";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";

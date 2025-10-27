@@ -327,7 +327,7 @@ export const creditExpirationTask: Task = {
 
 ```typescript
 // page.tsx - Works on Web AND Native
-import { Button } from "@/packages/next-vibe-ui/web/ui/button";
+import { Button } from "next-vibe-ui/web/ui/button";
 import { useLogin } from "@/app/api/[locale]/v1/core/user/public/login/hooks";
 
 export default function LoginPage() {
@@ -346,13 +346,13 @@ export default function LoginPage() {
 
 **On Web:**
 
-- `@/packages/next-vibe-ui/web/ui/button` → shadcn/ui
+- `next-vibe-ui/web/ui/button` → shadcn/ui
 - `<Div>` → HTML div
 - Tailwind CSS works
 
 **On Native:**
 
-- Framework automatically resolves to `@/packages/next-vibe-ui/native/ui/...`
+- Framework automatically resolves to `next-vibe-ui/native/ui/...`
 - `<Div>` → React Native View (via NativeWind)
 - Same Tailwind classes work!
 
@@ -961,20 +961,41 @@ AI: git add . && git commit -m "Add user suspension endpoint"
 
 ---
 
-## 📖 Example Projects Built with NextVibe
+## 📖 Example: Unbottled.ai
 
-### [Unbottled.ai](./UNBOTTLED_AI.md)
+### Commercial Application Built in This Repository
 
-Full-featured AI chat platform built entirely with NextVibe:
+**[Unbottled.ai](./docs/unbottle.ai/UNBOTTLED_AI.md)** is a full-featured AI chat platform built in this same codebase:
 
-- 40+ AI models
-- Advanced folder system
-- Credit management
-- Email integration
+- **Same Repository** - Unbottled.ai and NextVibe share this codebase
+- **Reference Implementation** - Demonstrates NextVibe's production capabilities
+- **MIT Licensed** - All Unbottled.ai code (outside `core/`) is MIT
+- **Development Funding** - Revenue finances NextVibe's open-source development
+
+**Features:**
+
+- 40+ AI models (GPT-4, Claude, Gemini, etc.)
+- Advanced folder system (private, incognito, shared, public)
+- Credit management and payments (Stripe + crypto)
+- Email integration and campaigns
 - Lead tracking & CRM
 - Newsletter system
 
-**See [UNBOTTLED_AI.md](./UNBOTTLED_AI.md) for full details.**
+**When you fork this repository:**
+
+- ✅ You get the framework core (`core/` - GPL-3.0)
+- ✅ You get ALL Unbottled.ai code (MIT licensed)
+- ✅ You can study, modify, or replace Unbottled.ai features
+- ✅ You can build your own commercial application
+
+**What's NOT included:**
+
+- ❌ Unbottled.ai logo and branding (not in repo)
+- ❌ Unbottled.ai name and trademarks (proprietary)
+
+**Simple licensing:** Only `core/` folder is GPL-3.0. Everything else is MIT (except logo/name).
+
+**See [docs/unbottle.ai/UNBOTTLED_AI.md](./docs/unbottle.ai/UNBOTTLED_AI.md) for full details.**
 
 ---
 
@@ -1052,41 +1073,69 @@ NextVibe uses a dual licensing model to balance open-source contribution with fl
 
 ### Framework Core (GPL-3.0-only)
 
-The following directories are licensed under **GPL-3.0-only**:
+**Only these directories** are licensed under **GPL-3.0-only**:
 
-- `src/app/api/[locale]/v1/core/` - Core API framework
-- `src/packages/` - Framework packages and utilities
-
-**This means:**
-
-- ✅ You can fork and modify freely
-- ✅ You must share improvements if you distribute
-- ✅ Commercial use is allowed
-- ⚠️ Derivative works must be GPL-3.0
-
-### Your Application Code (MIT)
-
-Everything else is licensed under **MIT**:
-
-- `src/app/[locale]/` - Your Next.js pages and UI
-- Your custom endpoints outside of core
-- Your business logic and components
-- Database schemas and seeds you create
+- `src/app/api/[locale]/v1/core/` - Framework core system
+- `src/packages/` - Framework packages
 
 **This means:**
 
-- ✅ Maximum flexibility for your app
+- ✅ Use freely in any project (commercial or not)
+- ✅ Fork and modify as needed
+- ⚠️ If you distribute modifications to the core, they must be GPL-3.0
+- ✅ Your application code is NOT affected by GPL
+
+### Everything Else (MIT)
+
+**All code outside `core/`** is licensed under **MIT**:
+
+- `src/app/api/[locale]/v1/` (outside `core/`) - All API endpoints and logic
+- `src/app/[locale]/` - All pages, layouts, UI assembly
+- All components, hooks, utilities (stored in API folders)
+- Database schemas, seeds, migrations
+- **All Unbottled.ai code and features**
+
+**This means:**
+
+- ✅ Full freedom - use commercially
+- ✅ Modify without restrictions
+- ✅ Keep changes private
 - ✅ No copyleft requirements
-- ✅ Use in proprietary software
-- ✅ Modify freely without sharing
+- ✅ Build proprietary applications
+
+**Proprietary (Not in Code Repository):**
+
+- ❌ Unbottled.ai logo and branding assets (not included)
+- ❌ Unbottled.ai name and trademarks (proprietary)
+- **Everything else in the code is MIT**
+
+**Architecture Note:**
+All logic (client and server) lives in `src/app/api/` subfolders. The `src/app/[locale]/` pages just import and assemble components from API folders. This keeps related code together and licensing clear.
 
 ### Why This Model?
 
 - **Framework stays open** - Core improvements benefit everyone
-- **Your app is yours** - Build proprietary products freely
+- **Your app is yours** - Build proprietary products freely (like Unbottled.ai)
 - **Best of both worlds** - Community-driven core, flexible applications
+- **Sustainable development** - Commercial apps can finance open-source framework
 
-See [LICENSE](LICENSE) for full GPL-3.0 details and [LICENSE-MIT](LICENSE-MIT) for MIT details.
+### Example: Unbottled.ai
+
+**Unbottled.ai is built in this same repository.** It's a commercial AI chat platform that demonstrates:
+
+- You CAN build proprietary applications with GPL-3.0 framework core
+- All Unbottled.ai code (outside `core/`) is MIT licensed
+- When you fork this repo, you get both the framework AND Unbottled.ai's code
+- You can study, modify, or replace Unbottled.ai's features for your own app
+
+**What's proprietary:**
+
+- Only Unbottled.ai logo and name (not in code repository)
+- Everything else in the code is MIT
+
+**Simple rule:** Only `core/` folder is GPL-3.0. Everything else is MIT (except logo/name).
+
+See [LICENSE](LICENSE) for full MIT details and [src/packages/LICENSE](src/packages/LICENSE) for GPL-3.0 details.
 
 ---
 
@@ -1161,15 +1210,17 @@ Fork it. Build with it. Share your creations.
 - [Getting Started](#-quick-start)
 - [Revolutionary Features](#-revolutionary-features)
 - [Documentation](./docs/)
-- [Example: Unbottled.ai](./UNBOTTLED_AI.md)
+- [Example: Unbottled.ai](./docs/unbottle.ai/UNBOTTLED_AI.md)
 - [Vibe CLI](#%EF%B8%8F-vibe-cli)
 - [Contributing](#-contributing)
+- [License](#-license)
 
 ---
 
 **Ready to build the future?**
 
 ```bash
+# Fork this repository on GitHub, then:
 git clone https://github.com/YOUR_USERNAME/next-vibe
 cd next-vibe
 bun install
@@ -1177,3 +1228,13 @@ vibe dev
 ```
 
 **Welcome to NextVibe. 🎵**
+
+---
+
+## About
+
+**NextVibe** is an open-source full-stack framework (GPL-3.0) for building modern web and mobile applications with 100% type-safety.
+
+**Unbottled.ai** is a commercial AI chat platform built with NextVibe that finances the framework's open-source development.
+
+**Built with ❤️ by Marcus Brandstätter (Max B)**

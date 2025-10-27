@@ -550,4 +550,4 @@ export function getAllModelIds(): ModelId[] {
 export const ModelIdOptions = modelOptions.map((model) => ({
   value: model.id,
   label: model.name,
-})) as const;
+}));

@@ -14,7 +14,7 @@ import type {
   AutoPrefillConfig,
   FormDataPriority,
   FormDataSources,
-} from "./types";
+} from "./endpoint-types";
 
 /**
  * Utility to detect available HTTP methods from endpoints object

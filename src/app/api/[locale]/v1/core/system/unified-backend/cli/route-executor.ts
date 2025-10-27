@@ -12,9 +12,13 @@ import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/e
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { modularCLIResponseRenderer } from "../../unified-ui/shared/widgets/cli/modular-response-renderer";
-import { responseMetadataExtractor } from "../../unified-ui/shared/widgets/cli/response-metadata-extractor";
-import { schemaUIHandler } from "../../unified-ui/shared/widgets/cli/schema-ui-handler";
+import { modularCLIResponseRenderer } from "./widgets/modular-response-renderer";
+import { responseMetadataExtractor } from "./widgets/response-metadata-extractor";
+import { schemaUIHandler } from "./widgets/schema-ui-handler";
+import {
+  getCliUser,
+  type CliUserType,
+} from "../shared/auth/cli-user-factory";
 import type { UnifiedField } from "../shared/core-types";
 import type { CreateApiEndpoint } from "../shared/create-endpoint";
 import type { EndpointLogger } from "../shared/endpoint-logger";
@@ -24,16 +28,6 @@ import type {
   DefinitionModule,
   RouteModule,
 } from "../shared/handler-types";
-
-// CLI user type - simplified for CLI context
-interface CliUserType {
-  isPublic: boolean;
-  id?: string;
-  email?: string;
-  role?: string;
-  iat?: number;
-  exp?: number;
-}
 
 // CLI handler function type - matches createCliHandler signature
 interface CliHandlerFunction {
@@ -176,35 +170,12 @@ export class RouteDelegationHandler {
       // Get the CLI handler from the route
       let cliHandler = await this.getCliHandler(route, logger);
 
-      // If handler not found for this method, try other methods
-      if (!cliHandler) {
-        const allMethods = [
-          "POST",
-          "GET",
-          "PUT",
-          "PATCH",
-          "DELETE",
-          "HEAD",
-          "OPTIONS",
-        ];
-        for (const method of allMethods) {
-          if (method === route.method) {
-            continue;
-          } // Already tried this one
-          const altRoute = { ...route, method };
-          cliHandler = await this.getCliHandler(altRoute, logger);
-          if (cliHandler) {
-            // Found a handler with a different method
-            route = altRoute; // Update route to use the working method
-            break;
-          }
-        }
-      }
+      // Method is now explicit from route registration - no fallback needed
 
       if (!cliHandler) {
         return {
           success: false,
-          error: t("app.api.v1.core.system.cli.vibe.errors.routeNotFound"),
+          error: t("app.api.v1.core.system.unifiedBackend.cli.vibe.errors.routeNotFound"),
         };
       }
 
@@ -215,7 +186,7 @@ export class RouteDelegationHandler {
       const inputData = await this.collectInputData(endpoint, context, logger);
 
       // Create CLI user context
-      const cliUser = context.user || (await this.getCliUser(logger));
+      const cliUser = context.user || (await getCliUser(logger, context.locale));
 
       if (!cliUser) {
         logger.error("Failed to get CLI user for authentication");
@@ -332,8 +303,67 @@ export class RouteDelegationHandler {
     logger: EndpointLogger,
   ): Promise<CliHandlerFunction | null> {
     try {
-      // Import the route module dynamically
-      const routeModule: RouteModule = await import(route.routePath);
+      logger.debug(`[Route Executor] Loading CLI handler`, {
+        routePath: route.routePath,
+        method: route.method,
+        alias: route.alias,
+      });
+
+      // Try to get route module from registry first (for Next.js server bundle)
+      let routeModule: RouteModule | null = null;
+
+      try {
+        const { getRouteHandler } = await import(
+          "@/app/api/[locale]/v1/core/system/generated/route-handlers"
+        );
+        routeModule = getRouteHandler(route.routePath);
+
+        if (routeModule) {
+          logger.debug(`[Route Executor] Route module loaded from registry`);
+        }
+      } catch (registryError) {
+        logger.debug(
+          `[Route Executor] Registry not available, falling back to dynamic import`,
+          {
+            error: parseError(registryError),
+          },
+        );
+      }
+
+      // Fallback to dynamic import (for CLI context)
+      if (!routeModule) {
+        try {
+          const imported = await import(route.routePath);
+          routeModule = imported;
+          logger.debug(
+            `[Route Executor] Route module loaded via dynamic import`,
+          );
+        } catch (importError) {
+          logger.error(`[Route Executor] Failed to load route module`, {
+            routePath: route.routePath,
+            error: parseError(importError),
+          });
+          return null;
+        }
+      }
+
+      if (!routeModule) {
+        logger.warn(`[Route Executor] No route module found`, {
+          routePath: route.routePath,
+          method: route.method,
+        });
+        return null;
+      }
+
+      logger.debug(`[Route Executor] Route module loaded`, {
+        hasTools: !!routeModule.tools,
+        hasCli: !!routeModule.tools?.cli,
+        cliType: typeof routeModule.tools?.cli,
+        cliKeys:
+          routeModule.tools?.cli && typeof routeModule.tools.cli === "object"
+            ? Object.keys(routeModule.tools.cli)
+            : [],
+      });
 
       // Check for tools.cli[method] handler (endpointsHandler pattern)
       // The endpointsHandler assigns CLI handlers to tools.cli[method]
@@ -344,8 +374,12 @@ export class RouteDelegationHandler {
       ) {
         const cliHandlers = routeModule.tools.cli;
         const handler = cliHandlers[route.method];
+        logger.debug(`[Route Executor] Found CLI handler for method`, {
+          method: route.method,
+          handlerType: typeof handler,
+        });
         if (typeof handler === "function") {
-          return handler as CliHandlerFunction;
+          return handler;
         }
       }
 
@@ -354,14 +388,23 @@ export class RouteDelegationHandler {
         routeModule.tools?.cli &&
         typeof routeModule.tools.cli === "function"
       ) {
-        return routeModule.tools.cli as CliHandlerFunction;
+        logger.debug(`[Route Executor] Found direct CLI handler`);
+        return routeModule.tools.cli;
       }
 
+      logger.warn(`[Route Executor] No CLI handler found`, {
+        routePath: route.routePath,
+        method: route.method,
+      });
       return null;
     } catch (error) {
-      logger.warn(
-        `Failed to load CLI handler for ${route.routePath}:`,
-        parseError(error),
+      logger.error(
+        `[Route Executor] Failed to load CLI handler for ${route.routePath}`,
+        {
+          error: parseError(error),
+          method: route.method,
+          alias: route.alias,
+        },
       );
       return null;
     }
@@ -380,18 +423,44 @@ export class RouteDelegationHandler {
     UnifiedField<z.ZodTypeAny>
   > | null> {
     try {
-      // Import the route module dynamically
-      const routeModule: RouteModule<
+      // Try to get route module from registry first (for Next.js server bundle)
+      let routeModule: RouteModule<
         CreateApiEndpoint<
           string,
           Methods,
           readonly (typeof UserRoleValue)[],
           UnifiedField<z.ZodTypeAny>
         >
-      > = await import(route.routePath);
+      > | null = null;
+
+      try {
+        const { getRouteHandler } = await import(
+          "@/app/api/[locale]/v1/core/system/generated/route-handlers"
+        );
+        const handler = getRouteHandler(route.routePath);
+        if (handler) {
+          routeModule = handler;
+        }
+      } catch (registryError) {
+        logger.debug(`Registry not available for definition lookup`, {
+          error: parseError(registryError),
+        });
+      }
+
+      // Fallback to dynamic import (for CLI context)
+      if (!routeModule) {
+        try {
+          const imported = await import(route.routePath);
+          routeModule = imported;
+        } catch (importError) {
+          logger.debug(`Failed to import route module for definition`, {
+            error: parseError(importError),
+          });
+        }
+      }
 
       // Get the definitions from the tools export (new structure)
-      if (routeModule.tools?.definitions) {
+      if (routeModule?.tools?.definitions) {
         const definitions = routeModule.tools.definitions;
         return (
           definitions[route.method] ||
@@ -560,61 +629,7 @@ export class RouteDelegationHandler {
     return result as InputData;
   }
 
-  /**
-   * Get CLI user with fallback to default when database user doesn't exist
-   */
-  private async getCliUser(
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<CliUserType | null> {
-    try {
-      // Get CLI user from database by email
-      const CLI_USER_EMAIL = "cli@system.local";
 
-      const userResponse = await userRepository.getUserByEmail(
-        CLI_USER_EMAIL,
-        UserDetailLevel.COMPLETE,
-        locale,
-        logger,
-      );
-
-      if (userResponse.success && userResponse.data) {
-        const user = userResponse.data;
-
-        // Create a proper JWT payload for CLI authentication from database user
-        return {
-          isPublic: false,
-          id: user.id,
-          email: user.email,
-          role: "ADMIN", // CLI user has admin privileges
-          iat: Math.floor(Date.now() / 1000),
-          exp: Math.floor(Date.now() / 1000) + 3600,
-        } as CliUserType;
-      } else {
-        // Fallback to default CLI user when database user doesn't exist (e.g., before seeds)
-        logger.debug("CLI user not found in database, using default CLI user");
-        return {
-          isPublic: false,
-          id: "00000000-0000-0000-0000-000000000001", // Valid UUID for CLI user
-          email: "cli@system.local",
-          role: "ADMIN",
-          iat: Math.floor(Date.now() / 1000),
-          exp: Math.floor(Date.now() / 1000) + 3600,
-        } as CliUserType;
-      }
-    } catch (error) {
-      logger.debug("Error getting CLI user, using default:", error);
-      // Fallback to default CLI user on any error
-      return {
-        isPublic: false,
-        id: "00000000-0000-0000-0000-000000000001", // Valid UUID for CLI user
-        email: "cli@system.local",
-        role: "ADMIN",
-        iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000) + 3600,
-      } as CliUserType;
-    }
-  }
 
   /**
    * Format execution result for display with enhanced rendering
@@ -761,7 +776,7 @@ export class RouteDelegationHandler {
       // Fallback to basic formatting
       logger.warn(
         "Enhanced rendering failed, falling back to basic format:",
-        error,
+        { error: parseError(error) },
       );
       // eslint-disable-next-line i18next/no-literal-string
       return `📊 Result:\n${this.formatPretty(data, locale)}`;

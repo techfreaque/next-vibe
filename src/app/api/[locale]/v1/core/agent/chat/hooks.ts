@@ -601,6 +601,7 @@ export function useChat(
                 toolCalls: message.toolCalls
                   ? message.toolCalls.map((tc) => ({
                       toolName: tc.toolName,
+                      displayName: tc.displayName,
                       args: tc.args,
                     }))
                   : null,
@@ -715,7 +716,11 @@ export function useChat(
 
         setInput("");
       } catch (error) {
-        logger.error("useChat", "Failed to send message", parseError(error));
+        const errorMessage = parseError(error);
+        logger.error("useChat", "Failed to send message", {
+          error: errorMessage.message,
+          stack: errorMessage.stack,
+        });
       } finally {
         chatStore.setLoading(false);
       }
@@ -729,6 +734,7 @@ export function useChat(
       temperature,
       maxTokens,
       enabledToolIds,
+      setInput, // Add setInput to dependencies
       // locale is not used in this callback
     ],
   );

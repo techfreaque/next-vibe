@@ -171,7 +171,7 @@ export async function nativeEndpoint<
       try {
         endpoint.requestSchema.parse(requestData);
       } catch (validationError) {
-        logger.error("Request validation failed", validationError);
+        logger.error("Request validation failed", parseError(validationError));
         return createErrorResponse(
           "app.api.v1.core.system.unifiedUi.react-native.errors.validationFailed",
           ErrorResponseTypes.VALIDATION_ERROR,
@@ -246,7 +246,7 @@ export async function nativeEndpoint<
       >;
     } catch (parseError) {
       logger.error("Failed to parse response as JSON", {
-        error: parseError,
+        error: parseError instanceof Error ? parseError.message : String(parseError),
         responseText: responseText.substring(0, 500),
         contentType: fetchResponse.headers.get("content-type"),
       });

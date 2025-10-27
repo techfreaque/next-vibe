@@ -29,21 +29,6 @@ import type {
   WidgetType,
 } from "../../unified-backend/shared/enums";
 
-// Re-export commonly used enum types
-export type {
-  CardLayout,
-  ComponentSize,
-  ComponentVariant,
-  FieldDataType,
-  InterfaceContext,
-  LayoutType,
-  SpacingSize,
-  TableDensity,
-  TextAlign,
-  ValidationMode,
-  WidgetType,
-};
-
 // ============================================================================
 // LAYOUT CONFIGURATION
 // ============================================================================

@@ -5,6 +5,7 @@
 
 import chalk from "chalk";
 
+import { getBaseFormatter } from "../../formatters/base-formatter";
 import type {
   DataFormatter,
   RenderableValue,
@@ -171,27 +172,29 @@ export abstract class BaseWidgetRenderer implements WidgetRenderer {
 
 /**
  * Default data formatter implementation
+ * Uses shared base formatter to eliminate duplication
  */
 class DefaultDataFormatter implements DataFormatter {
+  private baseFormatter = getBaseFormatter();
+
   formatText(value: string, options?: { maxLength?: number }): string {
-    if (options?.maxLength && value.length > options.maxLength) {
-      return `${value.substring(0, options.maxLength - 3)}...`;
-    }
-    return value;
+    return this.baseFormatter.formatText(value, {
+      maxLength: options?.maxLength,
+    });
   }
 
   formatNumber(
     value: number,
     options?: { precision?: number; unit?: string },
   ): string {
-    const precision = options?.precision ?? 2;
-    const formatted = value.toFixed(precision);
-    return options?.unit ? `${formatted} ${options.unit}` : formatted;
+    return this.baseFormatter.formatNumber(value, {
+      precision: options?.precision,
+      unit: options?.unit,
+    });
   }
 
   formatBoolean(value: boolean): string {
-    // eslint-disable-next-line i18next/no-literal-string
-    return value ? "✓" : "✗";
+    return this.baseFormatter.formatBoolean(value, { style: "symbol" });
   }
 
   formatDate(value: Date | string): string {

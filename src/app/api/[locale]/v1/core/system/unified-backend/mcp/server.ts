@@ -8,7 +8,7 @@ import "server-only";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { getMCPConfig, isMCPServerEnabled } from "../../unified-ui/mcp/config";
+import { getMCPConfig, isMCPServerEnabled } from "./config";
 import type { EndpointLogger } from "../shared/endpoint-logger";
 import { createEndpointLogger } from "../shared/endpoint-logger";
 import { createMCPProtocolHandler } from "./protocol-handler";

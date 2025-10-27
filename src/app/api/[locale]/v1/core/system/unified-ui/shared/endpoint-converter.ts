@@ -10,7 +10,7 @@ import type { z } from "zod";
 
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 
-import type { DiscoveredEndpointMetadata } from "./endpoint-registry-types";
+import type { DiscoveredEndpointMetadata } from "../../unified-backend/shared/discovery/endpoint-registry-types";
 
 /**
  * Simplified endpoint definition type for registry conversion

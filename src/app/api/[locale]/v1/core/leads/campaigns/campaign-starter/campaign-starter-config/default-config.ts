@@ -39,6 +39,13 @@ export const PRODUCTION_CONFIG: CampaignStarterConfigType = {
     "de-DE": 0, // 50 leads per week for German (Germany)
     "pl-PL": 0, // 30 leads per week for Polish (Poland)
   },
+  // Cron settings
+  schedule: "*/3 * * * *",
+  enabled: true,
+  priority: CronTaskPriority.MEDIUM,
+  timeout: 300000,
+  retries: 3,
+  retryDelay: 30000,
 };
 
 /**
@@ -63,6 +70,13 @@ export const DEVELOPMENT_CONFIG: CampaignStarterConfigType = {
     "de-DE": 50,
     "pl-PL": 50,
   },
+  // Cron settings
+  schedule: "*/3 * * * *",
+  enabled: true,
+  priority: CronTaskPriority.MEDIUM,
+  timeout: 300000,
+  retries: 3,
+  retryDelay: 30000,
 };
 
 /**

@@ -34,6 +34,18 @@ export enum CsvImportJobStatus {
 }
 
 /**
+ * Database enum array for Drizzle ORM
+ */
+export const CsvImportJobStatusDB = [
+  CsvImportJobStatus.PENDING,
+  CsvImportJobStatus.PROCESSING,
+  CsvImportJobStatus.COMPLETED,
+  CsvImportJobStatus.FAILED,
+  CsvImportJobStatus.CANCELLED,
+  CsvImportJobStatus.PAUSED,
+] as const;
+
+/**
  * UI-optimized options for CSV Import Job Status
  * Human-readable labels with descriptions for better UX
  */

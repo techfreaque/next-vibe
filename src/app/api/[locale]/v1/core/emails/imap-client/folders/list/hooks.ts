@@ -22,7 +22,7 @@ export function useImapFoldersList(
     definitions,
     {
       queryOptions: {
-        urlPathParams: {
+        requestData: {
           accountId,
           page: 1,
           limit: 20,

@@ -16,6 +16,7 @@ import {
   requestDataField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
+import { EndpointErrorTypes } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**
@@ -40,7 +41,8 @@ const POST = createEndpoint({
   path: ["v1", "core", "system", "generators", "seeds"],
   title: "app.api.v1.core.system.generators.seeds.post.title",
   description: "app.api.v1.core.system.generators.seeds.post.description",
-
+  category: "app.api.v1.core.system.generators.category",
+  tags: ["app.api.v1.core.system.generators.seeds.success.generated"],
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
 
   fields: objectField(
@@ -167,6 +169,49 @@ const POST = createEndpoint({
         outputPath: "src/app/api/[locale]/v1/core/system/generated/seeds",
       },
     },
+    urlPathParams: undefined,
+  },
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "app.api.v1.core.system.generators.seeds.post.errors.validation.title" as const,
+      description: "app.api.v1.core.system.generators.seeds.post.errors.validation.description" as const,
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "app.api.v1.core.system.generators.seeds.post.errors.unauthorized.title" as const,
+      description: "app.api.v1.core.system.generators.seeds.post.errors.unauthorized.description" as const,
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "app.api.v1.core.system.generators.seeds.post.errors.forbidden.title" as const,
+      description: "app.api.v1.core.system.generators.seeds.post.errors.forbidden.description" as const,
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "app.api.v1.core.system.generators.seeds.post.errors.notFound.title" as const,
+      description: "app.api.v1.core.system.generators.seeds.post.errors.notFound.description" as const,
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "app.api.v1.core.system.generators.seeds.post.errors.server.title" as const,
+      description: "app.api.v1.core.system.generators.seeds.post.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "app.api.v1.core.system.generators.seeds.post.errors.unknown.title" as const,
+      description: "app.api.v1.core.system.generators.seeds.post.errors.unknown.description" as const,
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "app.api.v1.core.system.generators.seeds.post.errors.unsavedChanges.title" as const,
+      description: "app.api.v1.core.system.generators.seeds.post.errors.unsavedChanges.description" as const,
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "app.api.v1.core.system.generators.seeds.post.errors.conflict.title" as const,
+      description: "app.api.v1.core.system.generators.seeds.post.errors.conflict.description" as const,
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "app.api.v1.core.system.generators.seeds.post.errors.network.title" as const,
+      description: "app.api.v1.core.system.generators.seeds.post.errors.network.description" as const,
+    },
+  },
+  successTypes: {
+    title: "app.api.v1.core.system.generators.seeds.post.success.title",
+    description: "app.api.v1.core.system.generators.seeds.post.success.description",
   },
 });
 

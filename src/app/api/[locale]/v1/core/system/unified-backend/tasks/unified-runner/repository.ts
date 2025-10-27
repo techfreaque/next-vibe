@@ -247,7 +247,12 @@ export class UnifiedTaskRunnerRepositoryImpl
     this.markTaskAsRunning(taskName, "side");
 
     try {
-      await task.run(signal);
+      await task.run({
+        signal,
+        logger: this.logger,
+        locale: this.locale,
+        cronUser: this.cronUser,
+      });
       this.markTaskAsCompleted(taskName);
       return createSuccessResponse(undefined);
     } catch (error) {
@@ -256,7 +261,12 @@ export class UnifiedTaskRunnerRepositoryImpl
       if (task.onError) {
         const errorInstance =
           error instanceof Error ? error : new Error(errorMsg);
-        await task.onError(errorInstance);
+        await task.onError({
+          error: errorInstance,
+          logger: this.logger,
+          locale: this.locale,
+          cronUser: this.cronUser,
+        });
       }
       return createErrorResponse(
         "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.post.errors.internal.title",

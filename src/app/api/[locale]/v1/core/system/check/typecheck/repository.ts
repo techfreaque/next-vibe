@@ -33,6 +33,8 @@ import {
   type TypecheckConfig,
 } from "./utils";
 
+const INCLUDE_PATTERNS_BLACKLIST = ["**/*.ts", "**/*.tsx"];
+
 // TypeScript configuration Zod schema for runtime validation
 const TsConfigSchema = z.object({
   compilerOptions: z
@@ -57,21 +59,34 @@ const execAsync = promisify(exec);
  * This preserves all compiler options and path mappings from the main tsconfig
  * but limits the files to be checked to improve performance
  */
-function createTempTsConfig(files: string[], tempConfigPath: string): void {
+function createTempTsConfig(
+  filesToCheck: string[],
+  tempConfigPath: string,
+): void {
   // Read and validate the main tsconfig.json with Zod to avoid any type
   let mainTsConfig: TsConfig;
   try {
     const tsConfigContent = readFileSync("tsconfig.json", "utf8");
-    mainTsConfig = TsConfigSchema.parse(parseJsonWithComments(tsConfigContent));
+    const parsedJsonResult = parseJsonWithComments(tsConfigContent);
+    if (!parsedJsonResult.success) {
+      throw new Error("Failed to parse tsconfig.json");
+    }
+    mainTsConfig = TsConfigSchema.parse(parsedJsonResult.data);
   } catch (error) {
     throw new Error(
       `Failed to read or parse tsconfig.json: ${error instanceof Error ? error.message : String(error)}`,
     );
   }
+  const generalFilesToInclude = (mainTsConfig.include || []).filter(
+    (includePattern) =>
+      INCLUDE_PATTERNS_BLACKLIST.includes(includePattern)
+        ? undefined
+        : includePattern,
+  );
 
   // Convert relative file paths to be relative to the temp config location
   // Since temp config is in .tmp/, we need to go up one level (../) to reach project root
-  const adjustedFiles = files.map((file) => {
+  const adjustedFiles = filesToCheck.map((file) => {
     // If file is already relative to project root, prepend ../
     if (!file.startsWith("/")) {
       return `../${file}`;
@@ -132,7 +147,7 @@ function createTempTsConfig(files: string[], tempConfigPath: string): void {
         "*": ["./*"], // Replace baseUrl functionality for tsgo compatibility
       },
     },
-    include: adjustedFiles,
+    include: [...generalFilesToInclude, ...adjustedFiles],
     exclude: adjustedExcludes, // Preserve exclude patterns with adjusted paths
   };
 

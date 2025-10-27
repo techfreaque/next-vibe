@@ -1,6 +1,4 @@
 /// <reference types="node" />
-import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
-
 import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -12,6 +10,7 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
 /**
@@ -31,7 +30,7 @@ export function runSnykTest(
   } catch (error) {
     logger.error(
       "Snyk CLI not found. Please install it with: npm install -g snyk",
-      error,
+      parseError(error),
     );
     return createErrorResponse(
       "app.api.v1.core.system.releaseTool.snyk.cliNotFound",
@@ -80,7 +79,7 @@ export function runSnykMonitor(
   } catch (error) {
     logger.error(
       "Snyk CLI not found. Please install it with: npm install -g snyk",
-      error,
+      parseError(error),
     );
     return createErrorResponse(
       "app.api.v1.core.system.releaseTool.snyk.cliNotFound",

@@ -8,6 +8,7 @@ export type LoggerMetadata =
   | null
   | undefined
   | Error
+  | Date
   | { [key: string]: LoggerMetadata }
   | LoggerMetadata[];
 

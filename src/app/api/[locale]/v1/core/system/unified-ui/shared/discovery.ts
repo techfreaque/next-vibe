@@ -14,8 +14,13 @@ import "server-only";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 
+import { BaseCache, createCacheKey } from "./cache/base-cache";
 import { getStaticEndpoints } from "./endpoint-adapter";
-import type { DiscoveredEndpoint } from "./endpoint-registry-types";
+import type { DiscoveredEndpoint } from "../../unified-backend/shared/discovery/endpoint-registry-types";
+/**
+ * Singleton instance using shared factory
+ */
+import { createSingletonGetter } from "./utils/singleton-factory";
 
 /**
  * Discovery options (platform-agnostic)
@@ -81,14 +86,18 @@ export interface DiscoveryResult {
 /**
  * Unified Discovery Service
  * Single discovery system for all platforms
+ * Uses shared BaseCache to eliminate duplication
  */
 export class UnifiedDiscoveryService {
-  private cache: Map<string, { data: DiscoveredEndpoint[]; expiresAt: number }>;
+  private cache: BaseCache<DiscoveredEndpoint[]>;
   private logger: EndpointLogger;
 
   constructor(logger: EndpointLogger) {
     this.logger = logger;
-    this.cache = new Map();
+    this.cache = new BaseCache<DiscoveredEndpoint[]>({
+      ttl: 5 * 60 * 1000, // 5 minutes
+      maxSize: 100,
+    });
   }
 
   /**
@@ -96,11 +105,19 @@ export class UnifiedDiscoveryService {
    */
   discover(options: UnifiedDiscoveryOptions = {}): DiscoveryResult {
     const startTime = Date.now();
-    const cacheKey = this.getCacheKey(options);
+    const cacheKey = createCacheKey({
+      methods: options.includeMethods?.sort(),
+      roles: options.roles?.sort(),
+      categories: options.categories?.sort(),
+      tags: options.tags?.sort(),
+      search: options.searchQuery,
+      auth: options.requiresAuth,
+      exclude: options.excludePaths?.sort(),
+    });
 
     // Check cache
     if (options.cache) {
-      const cached = this.getFromCache(cacheKey);
+      const cached = this.cache.get(cacheKey);
       if (cached) {
         this.logger.debug("[Unified Discovery] Cache hit", { cacheKey });
         return {
@@ -127,7 +144,7 @@ export class UnifiedDiscoveryService {
 
     // Cache results
     if (options.cache && options.cacheTTL) {
-      this.setCache(cacheKey, filtered, options.cacheTTL);
+      this.cache.set(cacheKey, filtered, options.cacheTTL);
     }
 
     return {
@@ -173,9 +190,10 @@ export class UnifiedDiscoveryService {
    * Get cache statistics
    */
   getCacheStats(): { size: number; keys: string[] } {
+    const stats = this.cache.getStats();
     return {
-      size: this.cache.size,
-      keys: Array.from(this.cache.keys()),
+      size: stats.size,
+      keys: this.cache.keys(),
     };
   }
 
@@ -279,61 +297,26 @@ export class UnifiedDiscoveryService {
         return false;
     }
   }
-
-  /**
-   * Generate cache key from options
-   */
-  private getCacheKey(options: UnifiedDiscoveryOptions): string {
-    return JSON.stringify({
-      methods: options.includeMethods?.sort(),
-      roles: options.roles?.sort(),
-      categories: options.categories?.sort(),
-      tags: options.tags?.sort(),
-      search: options.searchQuery,
-      auth: options.requiresAuth,
-      exclude: options.excludePaths?.sort(),
-    });
-  }
-
-  /**
-   * Get from cache
-   */
-  private getFromCache(key: string): DiscoveredEndpoint[] | null {
-    const cached = this.cache.get(key);
-    if (!cached) {
-      return null;
-    }
-
-    if (Date.now() > cached.expiresAt) {
-      this.cache.delete(key);
-      return null;
-    }
-
-    return cached.data;
-  }
-
-  /**
-   * Set cache
-   */
-  private setCache(key: string, data: DiscoveredEndpoint[], ttl: number): void {
-    this.cache.set(key, {
-      data,
-      expiresAt: Date.now() + ttl,
-    });
-  }
 }
 
-/**
- * Singleton instance factory
- */
-const instances = new Map<string, UnifiedDiscoveryService>();
+const getDiscoveryInstance = createSingletonGetter(
+  () =>
+    new UnifiedDiscoveryService(
+      // Default logger - will be replaced on first use
+      {
+        debug: () => {},
+        info: () => {},
+        warn: () => {},
+        error: () => {},
+      } as EndpointLogger,
+    ),
+);
 
 export function getUnifiedDiscovery(
   logger: EndpointLogger,
 ): UnifiedDiscoveryService {
-  const key = "default";
-  if (!instances.has(key)) {
-    instances.set(key, new UnifiedDiscoveryService(logger));
-  }
-  return instances.get(key)!;
+  const instance = getDiscoveryInstance();
+  // Update logger if provided
+  (instance as { logger: EndpointLogger }).logger = logger;
+  return instance;
 }

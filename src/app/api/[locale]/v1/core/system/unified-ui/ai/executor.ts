@@ -5,21 +5,19 @@
 
 import "server-only";
 
+import type {
+  CliRequestData,
+  DiscoveredRoute,
+  RouteExecutionContext,
+} from "@/app/api/[locale]/v1/core/system/unified-backend/cli/route-executor";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { simpleT } from "@/i18n/core/shared";
 
-import {
-  type CliRequestData,
-  type DiscoveredRoute,
-  RouteDelegationHandler,
-  type RouteExecutionContext,
-} from "../../unified-backend/cli/route-executor";
+import { BaseExecutor } from "../shared/base-executor";
 import { AI_CONFIG } from "../shared/config";
-import { getDiscoveredEndpoints } from "../shared/endpoint-adapter";
 import type {
   AIToolExecutionContext,
   AIToolExecutionResult,
-  DiscoveredEndpoint,
   IToolExecutor,
   ToolExecutorOptions,
   ToolParameterValue,
@@ -27,12 +25,11 @@ import type {
 
 /**
  * Tool Executor Implementation
+ * Extends BaseExecutor to eliminate duplication
  */
-export class ToolExecutor implements IToolExecutor {
-  private routeHandler: RouteDelegationHandler;
-
+export class ToolExecutor extends BaseExecutor implements IToolExecutor {
   constructor() {
-    this.routeHandler = new RouteDelegationHandler();
+    super();
   }
 
   /**
@@ -150,17 +147,51 @@ export class ToolExecutor implements IToolExecutor {
         t,
       );
 
-      // Log result
+      // Log result with detailed data inspection
       context.logger.info(`[AI Tool Executor] Tool execution completed`, {
         toolName: context.toolName,
         success: result.success,
         executionTime: Date.now() - startTime,
+        hasData: !!result.data,
+        dataType: typeof result.data,
+        dataKeys:
+          result.data && typeof result.data === "object"
+            ? Object.keys(result.data)
+            : [],
+        // Log the actual data structure
+        resultDataStructure: JSON.stringify(result.data, null, 2),
+      });
+
+      // Extract the actual data from the ResponseType wrapper
+      // result.data is ResponseType<T> which has { success, data, message, errorType, ... }
+      // We need to check if it's a ResponseType wrapper and extract the inner data field
+      // A ResponseType has both 'success' and 'data' fields at the top level
+      const isResponseTypeWrapper =
+        result.data &&
+        typeof result.data === "object" &&
+        "success" in result.data &&
+        "data" in result.data;
+
+      const actualData = isResponseTypeWrapper
+        ? (result.data as { data: unknown }).data
+        : result.data;
+
+      context.logger.info(`[AI Tool Executor] Extracted data`, {
+        isResponseTypeWrapper,
+        hasActualData: !!actualData,
+        actualDataType: typeof actualData,
+        actualDataKeys:
+          actualData && typeof actualData === "object"
+            ? Object.keys(actualData)
+            : [],
+        // Log the extracted data structure
+        actualDataStructure: JSON.stringify(actualData, null, 2),
       });
 
       const resultPathSeparator = "/";
       return {
         success: result.success,
-        data: result.data,
+        data: actualData,
         error: result.error,
         metadata: {
           executionTime: Date.now() - startTime,
@@ -217,57 +248,13 @@ export class ToolExecutor implements IToolExecutor {
   }
 
   /**
-   * Validate tool parameters
+   * Validate tool parameters (override for AI-specific types)
    */
   validateParameters(
     toolName: string,
     parameters: Record<string, ToolParameterValue>,
   ): { valid: boolean; errors?: string[] } {
-    try {
-      // Get endpoint
-      const endpoint = this.getEndpointByToolName(toolName);
-
-      if (!endpoint) {
-        return {
-          valid: false,
-          // eslint-disable-next-line i18next/no-literal-string
-          errors: [`Tool not found: ${toolName}`],
-        };
-      }
-
-      // Validate using endpoint's request schema
-      if (endpoint.definition.requestSchema) {
-        const result = endpoint.definition.requestSchema.safeParse(parameters);
-
-        if (!result.success) {
-          const pathSeparator = ".";
-          const errorSeparator = ": ";
-          const zodError = result.error;
-          return {
-            valid: false,
-            errors: zodError.issues.map(
-              (issue) =>
-                `${issue.path.join(pathSeparator)}${errorSeparator}${issue.message}`,
-            ),
-          };
-        }
-      }
-
-      return { valid: true };
-    } catch (error) {
-      return {
-        valid: false,
-        errors: [error instanceof Error ? error.message : String(error)],
-      };
-    }
-  }
-
-  /**
-   * Get endpoint by tool name
-   */
-  private getEndpointByToolName(toolName: string): DiscoveredEndpoint | null {
-    const endpoints = getDiscoveredEndpoints();
-    return endpoints.find((e) => e.toolName === toolName) || null;
+    return super.validateParameters(toolName, parameters);
   }
 
   /**

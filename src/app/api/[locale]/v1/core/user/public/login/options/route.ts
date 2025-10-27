@@ -12,10 +12,11 @@ import loginOptionsDefinitions from "./definition";
 export const { GET, tools } = endpointsHandler({
   endpoint: loginOptionsDefinitions,
   [Methods.GET]: {
-    handler: async ({ data, logger }) => {
+    handler: async ({ data, logger, locale }) => {
       const email = data.email;
       const optionsResult = await loginRepository.getLoginOptions(
         logger,
+        locale,
         email,
       );
 

@@ -37,6 +37,7 @@ import {
   chatThreads,
   type MessageMetadata,
   type ToolCall,
+  type ToolCallResult,
 } from "../chat/db";
 import { ChatMessageRole } from "../chat/enum";
 import { getModelCost } from "../chat/model-access/costs";
@@ -53,7 +54,7 @@ import { handleUncensoredAI } from "./providers/uncensored-handler";
 /**
  * Maximum duration for streaming responses (in seconds)
  */
-export const maxDuration = 30;
+export const maxDuration = 300; // 5 minutes for multi-step tool calling
 
 /**
  * AI Stream Repository Interface
@@ -70,46 +71,16 @@ export interface IAiStreamRepository {
 }
 
 /**
- * Tool result type from DB
- */
-type ToolResultValue =
-  | string
-  | number
-  | boolean
-  | null
-  | Record<string, string | number | boolean | null>;
-
-/**
- * Type guard for tool args/result record
- */
-function isToolArgsRecord(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  value: any,
-): value is Record<string, string | number | boolean | null> {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) {
-    return false;
-  }
-  // Validate all values in object are primitives
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  return Object.values(value).every(
-    (v) =>
-      v === null ||
-      typeof v === "string" ||
-      typeof v === "number" ||
-      typeof v === "boolean",
-  );
-}
-
-/**
  * Type guard for tool result values
- * Validates that value matches expected tool result types
+ * Validates that value is JSON-serializable and matches ToolCallResult type
  */
-function isValidToolResult(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  value: any,
-): value is ToolResultValue {
-  if (value === null || value === undefined) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function isValidToolResult(value: any): value is ToolCallResult {
+  if (value === null) {
     return true;
+  }
+  if (value === undefined) {
+    return false; // ToolCallResult does not include undefined
   }
   if (typeof value === "string") {
     return true;
@@ -120,9 +91,17 @@ function isValidToolResult(
   if (typeof value === "boolean") {
     return true;
   }
-  if (isToolArgsRecord(value)) {
-    return true;
+  if (Array.isArray(value)) {
+    // Arrays are valid - recursively check elements
+
+    return value.every((item) => isValidToolResult(item));
   }
+  if (typeof value === "object") {
+    // Objects are valid - recursively check values
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    return Object.values(value).every((v) => isValidToolResult(v));
+  }
+  // Reject functions, symbols, etc.
   return false;
 }
 
@@ -714,9 +693,27 @@ class AiStreamRepository implements IAiStreamRepository {
 
         if (toolInstructions.length > 0) {
           const combinedInstructions = toolInstructions.join("\n\n");
+
+          // Add explicit instruction to generate text after tool calls
+          const toolUsageGuidelines = `
+IMPORTANT: When you use tools, you MUST follow this workflow:
+1. Call the necessary tools to gather information
+2. Wait for the tool results
+3. ALWAYS generate a comprehensive text response that:
+   - Summarizes the information from the tool results
+   - Answers the user's question based on the tool results
+   - Cites sources when applicable
+   - Provides context and explanation
+
+NEVER stop after calling tools without generating a final text response. The user expects a complete answer, not just tool calls.`;
+
           enhancedSystemPrompt = enhancedSystemPrompt
-            ? [enhancedSystemPrompt, combinedInstructions].join("\n\n")
-            : combinedInstructions;
+            ? [
+                enhancedSystemPrompt,
+                combinedInstructions,
+                toolUsageGuidelines,
+              ].join("\n\n")
+            : [combinedInstructions, toolUsageGuidelines].join("\n\n");
         }
       }
     } catch (error) {
@@ -1154,56 +1151,50 @@ class AiStreamRepository implements IAiStreamRepository {
               );
             }
 
-            // Emit AI message-created event
-            // For answer-as-ai and retry, parent is the message we're responding to
-            // For regular operations, parent is the user message we just created
-            const aiParentId =
+            // Calculate initial parent and depth for AI message
+            // This will be updated if reasoning occurs
+            const initialAiParentId =
               data.operation === "answer-as-ai" || data.operation === "retry"
                 ? (effectiveParentMessageId ?? null)
                 : userMessageId;
-            const aiDepth =
+            const initialAiDepth =
               data.operation === "answer-as-ai" || data.operation === "retry"
                 ? messageDepth
                 : messageDepth + 1;
 
-            logger.debug("[DEBUG] Emitting AI MESSAGE_CREATED event", {
-              messageId: aiMessageId,
-              threadId: threadResult.threadId,
-              parentId: aiParentId,
-              operation: data.operation,
-            });
-            const aiMessageEvent = createStreamEvent.messageCreated({
-              messageId: aiMessageId,
-              threadId: threadResult.threadId,
-              role: ChatMessageRole.ASSISTANT,
-              parentId: aiParentId,
-              depth: aiDepth,
-              content: "",
-              model: data.model,
-              persona: data.persona ?? undefined,
-            });
-            controller.enqueue(encoder.encode(formatSSEEvent(aiMessageEvent)));
-            logger.debug("[DEBUG] AI MESSAGE_CREATED event emitted", {
-              messageId: aiMessageId,
-            });
+            // Don't emit AI message-created event yet
+            // We'll emit it when we start getting content, so we can set the correct parent
+            // (if there's reasoning, the AI message should be a child of the reasoning message)
 
             // Start streaming
             let fullContent = "";
+            let fullReasoningContent = "";
+            let currentReasoningMessageId: string | null = null;
+            let hasReasoning = false; // Track if we have reasoning to chain messages properly
+            let aiMessageCreated = false; // Track if we've emitted the AI message-created event
+
+            // Track the current parent for chaining messages
+            // This gets updated as we create reasoning messages and tool calls
+            let currentParentId = initialAiParentId;
+            let currentDepth = initialAiDepth;
 
             // Get the OpenRouter model ID (use openRouterModel if available, otherwise use model ID directly)
             const openRouterModelId =
               modelConfig?.openRouterModel || data.model;
 
-            // Use Vercel AI SDK's built-in multi-step tool calling with stopWhen
+            // Use Vercel AI SDK's built-in multi-step tool calling
+            // stopWhen: allows up to 5 steps (tool call + text generation cycles)
+            // The model will continue until it generates text without tool calls or reaches the step limit
             const streamResult = streamText({
               model: provider(openRouterModelId),
               messages,
               temperature: data.temperature,
               abortSignal: AbortSignal.timeout(maxDuration * 1000),
+              system: systemPrompt || undefined,
               ...(tools
                 ? {
                     tools,
-                    stopWhen: stepCountIs(5),
+                    stopWhen: stepCountIs(5), // Allow up to 5 steps for multi-step tool calling
                     onStepFinish: ({
                       text,
                       toolCalls,
@@ -1211,7 +1202,7 @@ class AiStreamRepository implements IAiStreamRepository {
                       finishReason,
                       usage,
                     }): void => {
-                      logger.debug("[AI Stream] Step finished", {
+                      logger.info("[AI Stream] Step finished", {
                         hasText: !!text,
                         textLength: text?.length || 0,
                         toolCallsCount: toolCalls.length,
@@ -1243,7 +1234,13 @@ class AiStreamRepository implements IAiStreamRepository {
             );
 
             // Stream the response
+            logger.info("[AI Stream] Starting to process fullStream");
             for await (const part of streamResult.fullStream) {
+              logger.info("[AI Stream] Received stream part", {
+                type: part.type,
+                partData: JSON.stringify(part).substring(0, 200),
+              });
+
               if (part.type === "text-delta") {
                 const textDelta = part.text;
 
@@ -1252,7 +1249,43 @@ class AiStreamRepository implements IAiStreamRepository {
                   textDelta !== null &&
                   textDelta !== ""
                 ) {
+                  // Create AI message on first text delta if not already created
+                  if (!aiMessageCreated) {
+                    // Use current parent and depth (which may have been updated by reasoning messages)
+                    logger.debug("[DEBUG] Emitting AI MESSAGE_CREATED event", {
+                      messageId: aiMessageId,
+                      threadId: threadResult.threadId,
+                      parentId: currentParentId,
+                      depth: currentDepth,
+                      hasReasoning,
+                    });
+
+                    const aiMessageEvent = createStreamEvent.messageCreated({
+                      messageId: aiMessageId,
+                      threadId: threadResult.threadId,
+                      role: ChatMessageRole.ASSISTANT,
+                      parentId: currentParentId,
+                      depth: currentDepth,
+                      content: "",
+                      model: data.model,
+                      persona: data.persona ?? undefined,
+                    });
+                    controller.enqueue(
+                      encoder.encode(formatSSEEvent(aiMessageEvent)),
+                    );
+                    aiMessageCreated = true;
+
+                    logger.debug("[DEBUG] AI MESSAGE_CREATED event emitted", {
+                      messageId: aiMessageId,
+                    });
+                  }
+
                   fullContent += textDelta;
+
+                  logger.debug("[AI Stream] Text delta", {
+                    deltaLength: textDelta.length,
+                    totalContentLength: fullContent.length,
+                  });
 
                   // Emit content-delta event
                   const deltaEvent = createStreamEvent.contentDelta({
@@ -1262,6 +1295,81 @@ class AiStreamRepository implements IAiStreamRepository {
                   controller.enqueue(
                     encoder.encode(formatSSEEvent(deltaEvent)),
                   );
+                }
+              } else if (part.type === "reasoning-start") {
+                // Create a new reasoning message when reasoning starts
+                // This will be a child of the current parent (user message, previous reasoning, or tool call)
+                currentReasoningMessageId = crypto.randomUUID();
+                fullReasoningContent = "";
+                hasReasoning = true;
+
+                logger.debug("[AI Stream] Reasoning started", {
+                  reasoningMessageId: currentReasoningMessageId,
+                  parentId: currentParentId,
+                  depth: currentDepth,
+                });
+
+                // Emit reasoning message-created event
+                // Reasoning message is a child of the current parent
+                const reasoningMessageEvent = createStreamEvent.messageCreated({
+                  messageId: currentReasoningMessageId,
+                  threadId: threadResult.threadId,
+                  role: ChatMessageRole.ASSISTANT,
+                  parentId: currentParentId,
+                  depth: currentDepth,
+                  content: "",
+                  model: data.model,
+                  persona: data.persona ?? undefined,
+                });
+                controller.enqueue(
+                  encoder.encode(formatSSEEvent(reasoningMessageEvent)),
+                );
+
+                // Update current parent to this reasoning message for next message
+                currentParentId = currentReasoningMessageId;
+                currentDepth = currentDepth + 1;
+              } else if (part.type === "reasoning-delta") {
+                // Handle reasoning deltas - stream to the reasoning message
+                const reasoningText = "text" in part ? part.text : "";
+
+                if (
+                  reasoningText !== undefined &&
+                  reasoningText !== null &&
+                  reasoningText !== "" &&
+                  currentReasoningMessageId
+                ) {
+                  fullReasoningContent += reasoningText;
+
+                  logger.debug("[AI Stream] Reasoning delta", {
+                    deltaLength: reasoningText.length,
+                    totalReasoningLength: fullReasoningContent.length,
+                  });
+
+                  // Emit reasoning-delta event to the reasoning message
+                  const deltaEvent = createStreamEvent.reasoningDelta({
+                    messageId: currentReasoningMessageId,
+                    delta: reasoningText,
+                  });
+                  controller.enqueue(
+                    encoder.encode(formatSSEEvent(deltaEvent)),
+                  );
+                }
+              } else if (part.type === "reasoning-end") {
+                // Mark reasoning as done
+                if (currentReasoningMessageId) {
+                  logger.debug("[AI Stream] Reasoning ended", {
+                    reasoningMessageId: currentReasoningMessageId,
+                    totalLength: fullReasoningContent.length,
+                  });
+
+                  // Emit reasoning-done event
+                  const doneEvent = createStreamEvent.reasoningDone({
+                    messageId: currentReasoningMessageId,
+                    content: fullReasoningContent,
+                  });
+                  controller.enqueue(encoder.encode(formatSSEEvent(doneEvent)));
+
+                  currentReasoningMessageId = null;
                 }
               } else if (part.type === "tool-call") {
                 // Get endpoint metadata for display info
@@ -1289,11 +1397,13 @@ class AiStreamRepository implements IAiStreamRepository {
                 widgetMetadata = undefined;
 
                 // Collect tool call for database storage
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                const rawArgs = "input" in part ? part.input : {};
-                const validatedArgs = isToolArgsRecord(rawArgs) ? rawArgs : {};
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+                const rawArgs: any = "input" in part ? part.input : {};
+                const validatedArgs: ToolCallResult = isValidToolResult(rawArgs)
+                  ? rawArgs
+                  : {};
 
-                const toolCallData = {
+                const toolCallData: ToolCall = {
                   toolName: part.toolName,
                   displayName: definition?.title || part.toolName,
                   icon: definition?.aiTool?.icon,
@@ -1302,6 +1412,12 @@ class AiStreamRepository implements IAiStreamRepository {
                   widgetMetadata,
                 };
                 collectedToolCalls.push(toolCallData);
+
+                logger.info("[AI Stream] Tool call received", {
+                  toolName: part.toolName,
+                  argsStringified: JSON.stringify(validatedArgs),
+                  toolCallsCount: collectedToolCalls.length,
+                });
 
                 // Emit tool-call event to frontend
                 const toolCallEvent = createStreamEvent.toolCall({
@@ -1320,24 +1436,35 @@ class AiStreamRepository implements IAiStreamRepository {
 
                 if (toolCallIndex !== -1) {
                   // AI SDK returns 'output' as unknown type
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                  const output = "output" in part ? part.output : undefined;
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+                  const output: any =
+                    "output" in part ? part.output : undefined;
+
+                  logger.info("[AI Stream] Tool result RAW output", {
+                    toolName: part.toolName,
+                    hasOutput: "output" in part,
+                    outputType: typeof output,
+                    outputStringified: JSON.stringify(output).substring(0, 500),
+                  });
 
                   // Validate and type the output using type guard
-                  const validatedOutput = isValidToolResult(output)
-                    ? output
-                    : undefined;
+                  const validatedOutput: ToolCallResult | undefined =
+                    isValidToolResult(output) ? output : undefined;
+
                   collectedToolCalls[toolCallIndex].result = validatedOutput;
 
-                  logger.debug("[AI Stream] Tool result received", {
+                  logger.info("[AI Stream] Tool result validated", {
                     toolName: part.toolName,
                     hasResult: !!validatedOutput,
+                    resultType: typeof validatedOutput,
+                    isValid: isValidToolResult(output),
                   });
 
                   // Emit tool-result event to frontend
                   const toolResultEvent = createStreamEvent.toolResult({
                     messageId: aiMessageId,
                     toolName: part.toolName,
+
                     result: validatedOutput,
                   });
                   controller.enqueue(
@@ -1347,11 +1474,31 @@ class AiStreamRepository implements IAiStreamRepository {
               }
             }
 
+            logger.info("[AI Stream] Finished processing fullStream", {
+              totalContentLength: fullContent.length,
+              toolCallsCount: collectedToolCalls.length,
+            });
+
             // Wait for completion
-            const [finishReason, usage] = await Promise.all([
+            const [finishReason, usage, steps] = await Promise.all([
               streamResult.finishReason,
               streamResult.usage,
+              streamResult.steps,
             ]);
+
+            logger.info("[AI Stream] Stream completed", {
+              finishReason,
+              totalTokens: usage.totalTokens,
+              stepsCount: steps.length,
+              stepsDetails: steps.map((step, index) => ({
+                stepNumber: index + 1,
+                hasText: !!step.text,
+                textLength: step.text?.length || 0,
+                toolCallsCount: step.toolCalls.length,
+                toolResultsCount: step.toolResults.length,
+                finishReason: step.finishReason,
+              })),
+            });
 
             // Update AI message with final content (if not incognito)
             if (!isIncognito && userId) {

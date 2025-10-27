@@ -13,8 +13,9 @@ import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/e
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { BaseRegistryStats } from "../shared/base-registry";
 import type { Platform } from "../shared/config";
-import type { DiscoveredEndpoint } from "../shared/endpoint-registry-types";
+import type { DiscoveredEndpoint } from "../../unified-backend/shared/discovery/endpoint-registry-types";
 
 /**
  * CoreTool type from AI SDK
@@ -162,11 +163,9 @@ export interface ToolFilterCriteria {
 
 /**
  * Tool registry statistics
+ * Extends BaseRegistryStats to ensure compatibility
  */
-export interface ToolRegistryStats {
-  /** Total endpoints discovered */
-  totalEndpoints: number;
-
+export interface ToolRegistryStats extends BaseRegistryStats {
   /** Total AI tools available */
   totalTools: number;
 
@@ -212,7 +211,7 @@ export interface ToolExecutorOptions {
  */
 export interface IToolRegistry {
   /** Initialize the registry */
-  initialize(): void;
+  initialize(): Promise<void>;
 
   /**
    * Get all endpoints with optional filtering by user permissions and platform
@@ -239,7 +238,7 @@ export interface IToolRegistry {
   ): Promise<AIToolExecutionResult>;
 
   /** Refresh the registry (rediscover endpoints) */
-  refresh(): void;
+  refresh(): Promise<void>;
 
   /** Get registry statistics */
   getStats(): ToolRegistryStats;

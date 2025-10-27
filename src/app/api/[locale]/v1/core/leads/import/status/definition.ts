@@ -20,7 +20,12 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { CsvImportJobStatus, CsvImportJobStatusOptions } from "../enum";
+import type { ListImportJobsResponseOutput } from "../../../import/definition";
+import {
+  CsvImportJobStatus,
+  CsvImportJobStatusDB,
+  CsvImportJobStatusOptions,
+} from "../enum";
 
 /**
  * List Import Jobs Endpoint (GET)
@@ -73,7 +78,7 @@ const { GET } = createEndpoint({
               layout: { columns: 4 },
               options: CsvImportJobStatusOptions,
             },
-            z.enum(CsvImportJobStatus).optional(),
+            z.enum(CsvImportJobStatusDB).optional(),
           ),
           limit: requestDataField(
             {
@@ -128,7 +133,7 @@ const { GET } = createEndpoint({
                 // Job Identity
                 id: z.uuid(),
                 fileName: z.string(),
-                status: z.enum(CsvImportJobStatus),
+                status: z.enum(CsvImportJobStatusDB),
 
                 // Progress Tracking
                 totalRows: z.number().nullable(),

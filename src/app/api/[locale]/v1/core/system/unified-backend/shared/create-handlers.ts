@@ -81,7 +81,10 @@ export function endpointsHandler<const T>(
 
     // Merge the handler result into our result
     // The handler returns { [method]: nextHandler, tools: { trpc, cli } }
-    result[method] = handler[method as keyof typeof handler];
+    const methodHandler = handler[method];
+    if (methodHandler) {
+      result[method] = methodHandler;
+    }
 
     // Merge tools separately to avoid overwriting
     Object.assign(result.tools.trpc, handler.tools.trpc);

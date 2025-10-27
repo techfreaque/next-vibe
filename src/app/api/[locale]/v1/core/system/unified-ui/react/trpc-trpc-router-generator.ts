@@ -7,6 +7,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { findRouteFiles } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/filesystem/directory-scanner";
+
 import {
   type RouteFileStructure,
   validateRouteFileForTRPC,
@@ -182,41 +184,9 @@ function scanForRouteFiles(
   apiDir: string,
   excludePatterns: string[],
 ): string[] {
-  const routeFiles: string[] = [];
-
-  function scanDirectory(dir: string): void {
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
-
-    for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name);
-      const relativePath = path.relative(apiDir, fullPath);
-
-      // Skip node_modules, .git, .next, and other common directories that should never contain route files
-      if (
-        entry.name === "node_modules" ||
-        entry.name === ".git" ||
-        entry.name === ".next" ||
-        entry.name === "dist" ||
-        entry.name === ".dist"
-      ) {
-        continue;
-      }
-
-      // Check exclude patterns
-      if (excludePatterns.some((pattern) => relativePath.includes(pattern))) {
-        continue;
-      }
-
-      if (entry.isDirectory()) {
-        scanDirectory(fullPath);
-      } else if (entry.name === "route.ts") {
-        routeFiles.push(fullPath);
-      }
-    }
-  }
-
-  scanDirectory(apiDir);
-  return routeFiles;
+  // Use consolidated directory scanner
+  const results = findRouteFiles(apiDir, excludePatterns);
+  return results.map((r) => r.fullPath);
 }
 
 /**

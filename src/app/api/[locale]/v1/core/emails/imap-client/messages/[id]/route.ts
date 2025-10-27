@@ -16,7 +16,7 @@ export const { GET, PATCH, tools } = endpointsHandler({
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
     handler: async ({ urlPathParams, user, locale, logger }) => {
-      return await imapMessagesRepository.getMessageById(
+      return await imapMessagesRepository.getMessageByIdFormatted(
         { id: urlPathParams.id },
         user,
         locale,
@@ -27,7 +27,7 @@ export const { GET, PATCH, tools } = endpointsHandler({
   [Methods.PATCH]: {
     email: undefined,
     handler: async ({ urlPathParams, data, user, locale, logger }) => {
-      return await imapMessagesRepository.updateMessage(
+      return await imapMessagesRepository.updateMessageFormatted(
         { messageId: urlPathParams.id, updates: data },
         user,
         locale,

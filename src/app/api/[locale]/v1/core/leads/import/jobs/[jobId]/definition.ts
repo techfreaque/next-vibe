@@ -47,7 +47,7 @@ const { PATCH } = createEndpoint({
         "app.api.v1.core.leads.import.jobs.jobId.patch.form.description",
       layout: { type: LayoutType.STACKED },
     },
-    { request: "data", response: true },
+    { request: "data&urlPathParams", response: true },
     {
       // === URL PARAMETERS ===
       jobId: requestUrlPathParamsField(
@@ -377,7 +377,9 @@ const { PATCH } = createEndpoint({
   },
 
   examples: {
-    urlPathParams: undefined,
+    urlPathParams: {
+      default: { jobId: "550e8400-e29b-41d4-a716-446655440000" },
+    },
     requests: {
       default: { settings: { batchSize: 100, maxRetries: 3 } },
     },

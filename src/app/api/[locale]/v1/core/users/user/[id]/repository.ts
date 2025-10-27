@@ -21,6 +21,7 @@ import { users } from "@/app/api/[locale]/v1/core/user/db";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
+  UserDeleteRequestOutput,
   UserDeleteResponseOutput,
   UserGetResponseOutput,
   UserPutRequestOutput,
@@ -209,14 +210,14 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
   }
 
   async deleteUser(
-    data: { id: string },
+    data: UserDeleteRequestOutput,
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserDeleteResponseOutput>> {
     try {
       logger.debug("Deleting user", {
-        id: data.id?.toISOString() || null,
+        id: data.id,
         requestingUser: user.id,
       });
 
@@ -241,15 +242,9 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
       logger.debug("User deleted successfully", { userId: data.id });
 
       return createSuccessResponse({
-        // Structured response format
-        deletionResult: {
-          success: true,
-          message: "app.api.v1.core.users.user.delete.success.title",
-          deletedAt: new Date().toISOString(),
-        },
-        // Backward compatibility - flat fields
         success: true,
         message: "app.api.v1.core.users.user.delete.success.title",
+        deletedAt: new Date().toISOString(),
       });
     } catch (error) {
       logger.error("Error deleting user", parseError(error));

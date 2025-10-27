@@ -12,18 +12,32 @@ import {
   useDerivedValue,
   withTiming,
 } from "react-native-reanimated";
+import { styled } from "nativewind";
+import Animated from "react-native-reanimated";
 
 import { ChevronDown } from "./icons/ChevronDown";
-import {
-  StyledAccordionContent,
-  StyledAccordionHeader,
-  StyledAccordionItem,
-  StyledAccordionRoot,
-  StyledAccordionTrigger,
-  StyledAnimatedView,
-} from "../lib/styled";
 import { cn } from "../lib/utils";
 import { TextClassContext } from "./text";
+
+// Local styled components to avoid type instantiation issues
+const StyledAccordionRoot = styled(AccordionPrimitive.Root, {
+  className: "style",
+});
+const StyledAccordionItem = styled(AccordionPrimitive.Item, {
+  className: "style",
+});
+const StyledAccordionHeader = styled(AccordionPrimitive.Header, {
+  className: "style",
+});
+const StyledAccordionTrigger = styled(AccordionPrimitive.Trigger, {
+  className: "style",
+});
+const StyledAccordionContent = styled(AccordionPrimitive.Content, {
+  className: "style",
+});
+const StyledAnimatedView = styled(Animated.View, {
+  className: "style",
+});
 
 const Accordion = React.forwardRef<
   AccordionPrimitive.RootRef,
@@ -66,7 +80,7 @@ const Trigger = Platform.OS === "web" ? View : Pressable;
 
 const AccordionTrigger = React.forwardRef<
   AccordionPrimitive.TriggerRef,
-  AccordionPrimitive.TriggerProps & { className?: string }
+  AccordionPrimitive.TriggerProps & { className?: string; children: React.ReactNode }
 >(({ className, children, ...props }, ref) => {
   const { isExpanded } = AccordionPrimitive.useItemContext();
 

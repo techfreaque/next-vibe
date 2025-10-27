@@ -3,7 +3,7 @@ import type z from "zod";
 
 import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/core-types";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
-import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/types";
+import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 

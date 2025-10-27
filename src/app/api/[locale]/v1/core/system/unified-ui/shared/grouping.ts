@@ -6,7 +6,11 @@
 
 import "server-only";
 
-import type { DiscoveredEndpoint } from "./endpoint-registry-types";
+import type { DiscoveredEndpoint } from "../../unified-backend/shared/discovery/endpoint-registry-types";
+/**
+ * Singleton instance using shared factory
+ */
+import { createSingletonGetter } from "./utils/singleton-factory";
 
 /**
  * Grouping strategy
@@ -203,6 +207,14 @@ export class UnifiedGroupingService {
     const groups = new Map<string, DiscoveredEndpoint[]>();
 
     for (const endpoint of endpoints) {
+      // Safety check: skip if allowedRoles is undefined or not an array
+      if (
+        !endpoint.definition?.allowedRoles ||
+        !Array.isArray(endpoint.definition.allowedRoles)
+      ) {
+        continue;
+      }
+
       for (const role of endpoint.definition.allowedRoles) {
         if (!groups.has(role)) {
           groups.set(role, []);
@@ -365,14 +377,6 @@ export class UnifiedGroupingService {
   }
 }
 
-/**
- * Singleton instance
- */
-let instance: UnifiedGroupingService | null = null;
-
-export function getUnifiedGrouping(): UnifiedGroupingService {
-  if (!instance) {
-    instance = new UnifiedGroupingService();
-  }
-  return instance;
-}
+export const getUnifiedGrouping = createSingletonGetter(
+  () => new UnifiedGroupingService(),
+);

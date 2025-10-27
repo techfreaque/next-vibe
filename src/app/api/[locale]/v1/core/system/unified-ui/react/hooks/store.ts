@@ -24,6 +24,11 @@ import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/e
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
+import {
+  getStorageItem,
+  removeStorageItem,
+  setStorageItem,
+} from "../utils/storage";
 import { callApi, containsFile, objectToFormData } from "./api-utils";
 import type { ApiMutationOptions, ApiQueryOptions } from "./types";
 
@@ -653,7 +658,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               disableLocalCache: true,
               // Prevent infinite chain of background refreshes
               backgroundRefresh: false,
-            }).catch((err) => logger.error("Background refresh failed:", err));
+            }).catch((err) => logger.error("Background refresh failed", parseError(err)));
           }, refreshDelay);
 
           // Store the timeout ID so it can be cleaned up if needed
@@ -698,7 +703,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
         if (!requestValidation.success) {
           logger.error("executeQuery: request validation failed", {
-            endpointPath: endpoint.path,
+            endpointPath: endpoint.path.join("/"),
             error: requestValidation.error.message,
           });
           await removeStorageItem(queryId);
@@ -781,6 +786,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
                 ...state.queries,
                 [queryId]: {
                   ...(existingQuery ?? {}),
+                  response: response as ResponseType<AnyData>,
                   data: existingQuery?.data,
                   error: response,
                   isLoading: false,
@@ -973,8 +979,8 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       return createSuccessResponse(result);
     } catch (error) {
       logger.error("executeQuery: Error in await fetchPromise", {
-        endpointPath: endpoint.path,
-        error,
+        endpointPath: endpoint.path.join("/"),
+        error: parseError(error),
       });
       // Return error response instead of throwing
       const errorResponse = isErrorResponseType(error)

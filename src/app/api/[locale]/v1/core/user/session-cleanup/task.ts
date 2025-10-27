@@ -13,6 +13,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
@@ -22,7 +23,6 @@ import {
   TaskCategory,
 } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/enum";
 import type { Task } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/types/repository";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import { defaultLocale } from "@/i18n/core/config";
 
 import type { JWTPublicPayloadType } from "../auth/definition";
@@ -50,7 +50,6 @@ export async function executeTask(
   if (!validationResult.success) {
     logger.error(
       "Session cleanup configuration validation failed",
-      validationResult,
     );
     return createErrorResponse(
       "app.api.v1.core.user.session-cleanup.errors.default",

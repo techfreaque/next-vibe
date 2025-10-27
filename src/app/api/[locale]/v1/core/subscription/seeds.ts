@@ -119,10 +119,20 @@ export async function dev(
       }
     }
 
-    // Always ensure subscription credits exist (even if subscription already existed)
     if (subscription) {
-      // Check if user already has subscription credits
-      const balanceResult = await creditRepository.getBalance(demoUser.id);
+      const userLead = await db.query.userLeads.findFirst({
+        where: (userLeads, { eq }) => eq(userLeads.userId, demoUser.id),
+      });
+
+      if (!userLead) {
+        logger.error("Demo user missing leadId", { userId: demoUser.id });
+        return;
+      }
+
+      const balanceResult = await creditRepository.getBalance(
+        { leadId: userLead.leadId, userId: demoUser.id },
+        logger,
+      );
       const hasCredits = balanceResult.success && balanceResult.data.total > 0;
 
       if (!hasCredits) {
@@ -131,7 +141,7 @@ export async function dev(
           ? new Date(subscription.currentPeriodEnd)
           : undefined;
 
-        const creditsResult = await creditRepository.addCredits(
+        const creditsResult = await creditRepository.addUserCredits(
           demoUser.id,
           1000,
           "subscription",
@@ -211,10 +221,20 @@ export async function dev(
         adminSubscriptionData = adminSubscription.data;
       }
 
-      // Always ensure subscription credits exist (even if subscription already existed)
       if (adminSubscriptionData) {
-        // Check if user already has subscription credits
-        const balanceResult = await creditRepository.getBalance(adminUser.id);
+        const userLead = await db.query.userLeads.findFirst({
+          where: (userLeads, { eq }) => eq(userLeads.userId, adminUser.id),
+        });
+
+        if (!userLead) {
+          logger.error("Admin user missing leadId", { userId: adminUser.id });
+          return;
+        }
+
+        const balanceResult = await creditRepository.getBalance(
+          { leadId: userLead.leadId, userId: adminUser.id },
+          logger,
+        );
         const hasCredits =
           balanceResult.success && balanceResult.data.total > 0;
 
@@ -224,7 +244,7 @@ export async function dev(
             ? new Date(adminSubscriptionData.currentPeriodEnd)
             : undefined;
 
-          const creditsResult = await creditRepository.addCredits(
+          const creditsResult = await creditRepository.addUserCredits(
             adminUser.id,
             1000,
             "subscription",
@@ -315,11 +335,19 @@ export async function dev(
         }
       }
 
-      // Always ensure subscription credits exist (only 3 credits for testing)
       if (subscription) {
-        // Check if user already has subscription credits
+        const userLead = await db.query.userLeads.findFirst({
+          where: (userLeads, { eq }) => eq(userLeads.userId, lowCreditsUser.id),
+        });
+
+        if (!userLead) {
+          logger.error("Low credits user missing leadId", { userId: lowCreditsUser.id });
+          return;
+        }
+
         const balanceResult = await creditRepository.getBalance(
-          lowCreditsUser.id,
+          { leadId: userLead.leadId, userId: lowCreditsUser.id },
+          logger,
         );
         const hasCredits =
           balanceResult.success && balanceResult.data.total > 0;
@@ -331,7 +359,7 @@ export async function dev(
             : undefined;
 
           // Add only 3 subscription credits (not enough for DeepSeek V3.1 which costs 5)
-          const creditsResult = await creditRepository.addCredits(
+          const creditsResult = await creditRepository.addUserCredits(
             lowCreditsUser.id,
             3,
             "subscription",

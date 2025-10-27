@@ -19,7 +19,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-b
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-// import { newsletterSubscribeRepository } from "../../../../newsletter/subscribe/repository";
 import type { JwtPayloadType } from "../../auth/definition";
 import type { StandardUserType } from "../../definition";
 import { UserDetailLevel } from "../../enum";
@@ -111,6 +110,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       // Check if email already exists
       const emailCheckResponse = await this.checkEmailAvailabilityInternal(
         data.personalInfo.email,
+        locale,
         logger,
       );
       if (!emailCheckResponse.success) {
@@ -127,13 +127,10 @@ export class SignupRepositoryImpl implements SignupRepository {
         );
       }
 
-      // Get leadId from user prop (JWT payload) - always present
-      const leadId = user.leadId;
-
       // Create the user account
       const result = await this.createUserInternal(
         data,
-        leadId,
+        user.leadId,
         locale,
         logger,
       );
@@ -150,7 +147,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       logger.debug("User registration completed successfully", {
         email: data.personalInfo.email,
         userId: userData.id,
-        leadId,
+        leadId: user.leadId,
       });
 
       return createSuccessResponse<SignupPostResponseOutput>({
@@ -205,6 +202,7 @@ export class SignupRepositoryImpl implements SignupRepository {
 
       const isEmailTaken = await this.checkEmailAvailabilityInternal(
         data.email,
+        locale,
         logger,
       );
       if (!isEmailTaken.success) {
@@ -264,6 +262,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       // Check if email is already registered
       const emailCheckResult = await this.checkEmailAvailabilityInternal(
         email,
+        locale,
         logger,
       );
 
@@ -304,14 +303,12 @@ export class SignupRepositoryImpl implements SignupRepository {
 
       const userResponse = await userRepository.createWithHashedPassword(
         userData,
-        locale,
         logger,
       );
       if (!userResponse.success) {
         return userResponse;
       }
 
-      // Add role
       await userRolesRepository.addRole(
         {
           userId: userResponse.data.id,
@@ -320,12 +317,11 @@ export class SignupRepositoryImpl implements SignupRepository {
         logger,
       );
 
-      // Add 20 free credits for new users
       const creditsResult = await creditRepository.addCredits(
-        userResponse.data.id,
+        { leadId, userId: userResponse.data.id },
         20,
         "free",
-        undefined, // No expiry for free credits
+        logger,
       );
 
       if (creditsResult.success) {
@@ -386,6 +382,7 @@ export class SignupRepositoryImpl implements SignupRepository {
    */
   private async checkEmailAvailabilityInternal(
     email: string,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
     try {

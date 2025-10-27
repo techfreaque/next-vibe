@@ -189,7 +189,7 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
         ErrorResponseTypes.INTERNAL_ERROR,
         {
           error: parsedError.message,
-          operations,
+          operationsCount: operations.length,
           duration: Date.now() - startTime,
         },
       );

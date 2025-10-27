@@ -193,7 +193,14 @@ export function getMessagesForThread(threadId: string): ChatMessage[] {
 
   return Object.values(messages)
     .filter((msg) => msg.threadId === threadId)
-    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    .sort((a, b) => {
+      // Convert string dates to Date objects if needed
+      const aDate =
+        typeof a.createdAt === "string" ? new Date(a.createdAt) : a.createdAt;
+      const bDate =
+        typeof b.createdAt === "string" ? new Date(b.createdAt) : b.createdAt;
+      return aDate.getTime() - bDate.getTime();
+    });
 }
 
 /**

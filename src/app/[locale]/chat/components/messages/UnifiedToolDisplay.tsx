@@ -80,7 +80,10 @@ export function UnifiedToolDisplay({
               </Span>
               {!isOpen &&
                 toolCalls.length === 1 &&
-                toolCalls[0]?.args.query &&
+                toolCalls[0]?.args &&
+                typeof toolCalls[0].args === "object" &&
+                !Array.isArray(toolCalls[0].args) &&
+                "query" in toolCalls[0].args &&
                 typeof toolCalls[0].args.query === "string" && (
                   <Span className="text-muted-foreground text-xs truncate">
                     - {toolCalls[0].args.query}

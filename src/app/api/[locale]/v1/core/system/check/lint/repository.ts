@@ -137,7 +137,10 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
 
       // Get system resources and determine optimal worker count
       const resources = this.getSystemResources();
-      logger.debug("System resources detected", { cpus: resources.cpus, memory: resources.totalMemory });
+      logger.debug("System resources detected", {
+        cpus: resources.cpuCores,
+        memory: resources.availableMemoryMB,
+      });
 
       // Discover files to lint
       const filesToLint = await this.discoverFiles(data.path || "./", logger);

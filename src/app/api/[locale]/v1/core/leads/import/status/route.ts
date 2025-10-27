@@ -7,30 +7,24 @@ import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-back
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import { authRepository } from "@/app/api/[locale]/v1/core/user/auth/repository";
 
-import { importRepository } from "../../../import/repository";
+import { leadsImportRepository } from "../repository";
 import definitions from "./definition";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ user, urlPathParams, logger }) => {
+    handler: async ({ user, data, logger }) => {
       const userId = authRepository.requireUserId(user);
-      const response = await importRepository.listImportJobs(
+      return await leadsImportRepository.listImportJobsFormatted(
         userId,
-        urlPathParams.filters,
+        {
+          status: data.filters.status,
+          limit: data.filters.limit || 50,
+          offset: data.filters.offset || 0,
+        },
         logger,
       );
-
-      // Wrap response in jobs object to match definition
-      if (response.success) {
-        return {
-          success: true,
-
-          data: { jobs: { items: response.data } },
-        };
-      }
-      return response;
     },
   },
 });

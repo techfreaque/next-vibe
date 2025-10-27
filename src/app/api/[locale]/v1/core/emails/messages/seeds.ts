@@ -42,7 +42,10 @@ function createEmailSeed(overrides?: Partial<NewEmail>): NewEmail {
 /**
  * Development seed function for email messages module
  */
-export async function dev(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
+export async function dev(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("🌱 Seeding email messages data for development environment");
 
   try {
@@ -222,7 +225,10 @@ export async function dev(logger: EndpointLogger, locale: CountryLanguage): Prom
 /**
  * Test seed function for email messages module
  */
-export async function test(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
+export async function test(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("🌱 Seeding email messages data for test environment");
 
   try {

@@ -53,8 +53,8 @@ export const translations: typeof enTranslations = {
         description: "Nieprawidłowe parametry żądania",
       },
       missing_locale: {
-        title: "Fehlende Locale",
-        description: "Locale-Parameter ist erforderlich",
+        title: "Brak locale",
+        description: "Parametr locale jest wymagany",
       },
       server: {
         title: "Błąd serwera",
@@ -89,7 +89,6 @@ export const translations: typeof enTranslations = {
         description: "Sesja jest nieprawidłowa lub wygasła",
       },
       missing_request_context: {
-        missing_locale: "Brak locale w żądaniu",
         title: "Brak kontekstu żądania",
         description: "Kontekst żądania jest brakujący",
       },
@@ -125,6 +124,12 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Sukces",
       description: "Operacja zakończona pomyślnie",
+    },
+  },
+  check: {
+    get: {
+      title: "Sprawdź uwierzytelnianie",
+      description: "Sprawdź aktualny status uwierzytelniania",
     },
   },
   enums: {

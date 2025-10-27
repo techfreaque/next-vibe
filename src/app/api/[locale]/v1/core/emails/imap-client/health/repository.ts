@@ -19,8 +19,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-b
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../user/auth/definition";
-import { imapAccounts } from "../db";
 import { imapAccountsRepository } from "../accounts/repository";
+import { imapAccounts } from "../db";
 import {
   ImapAccountSortField,
   ImapAccountStatusFilter,
@@ -112,9 +112,7 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
         syncedAccounts,
         totalAccounts,
         activeConnections,
-        performanceMetrics: {
-          avgResponseTime: 0,
-        },
+        avgResponseTime: 0,
       });
     } catch (error) {
       const parsedError = parseError(error);

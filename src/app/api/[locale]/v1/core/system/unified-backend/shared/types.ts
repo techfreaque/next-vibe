@@ -19,7 +19,7 @@ import type {
   DataListWidgetConfig,
   FormGroupWidgetConfig,
   FormSectionWidgetConfig,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/shared/types";
+} from "@/app/api/[locale]/v1/core/system/unified-ui/shared/widgets/widgets";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 // Import types from core enums

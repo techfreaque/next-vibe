@@ -150,10 +150,7 @@ export function responseField<TSchema extends z.ZodTypeAny>(
  * Create an object field containing other fields
  * Accepts any object-like structure where all values are UnifiedFields
  */
-export function objectField<
-  C,
-  U extends FieldUsageConfig,
->(
+export function objectField<C, U extends FieldUsageConfig>(
   ui: WidgetConfig,
   usage: U,
   children: C,

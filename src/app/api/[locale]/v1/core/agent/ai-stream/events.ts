@@ -4,6 +4,7 @@
  */
 
 import type { DefaultFolderId } from "../chat/config";
+import type { ToolCallResult } from "../chat/db";
 import type { ChatMessageRole } from "../chat/enum";
 import type { ModelId } from "../chat/model-access/models";
 
@@ -23,6 +24,8 @@ export enum StreamEventType {
   MESSAGE_CREATED = "message-created",
   CONTENT_DELTA = "content-delta",
   CONTENT_DONE = "content-done",
+  REASONING_DELTA = "reasoning-delta",
+  REASONING_DONE = "reasoning-done",
   TOOL_CALL = "tool-call",
   TOOL_RESULT = "tool-result",
   ERROR = "error",
@@ -71,12 +74,28 @@ export interface ContentDoneEventData {
 }
 
 /**
+ * Reasoning delta event data
+ */
+export interface ReasoningDeltaEventData {
+  messageId: string;
+  delta: string;
+}
+
+/**
+ * Reasoning done event data
+ */
+export interface ReasoningDoneEventData {
+  messageId: string;
+  content: string;
+}
+
+/**
  * Tool call event data
  */
 export interface ToolCallEventData {
   messageId: string;
   toolName: string;
-  args: Record<string, string | number | boolean | null>;
+  args: ToolCallResult;
 }
 
 /**
@@ -85,13 +104,7 @@ export interface ToolCallEventData {
 export interface ToolResultEventData {
   messageId: string;
   toolName: string;
-  result:
-    | string
-    | number
-    | boolean
-    | null
-    | undefined
-    | Record<string, string | number | boolean | null>;
+  result: ToolCallResult | undefined;
 }
 
 /**
@@ -111,6 +124,8 @@ export interface StreamEventDataMap {
   [StreamEventType.MESSAGE_CREATED]: MessageCreatedEventData;
   [StreamEventType.CONTENT_DELTA]: ContentDeltaEventData;
   [StreamEventType.CONTENT_DONE]: ContentDoneEventData;
+  [StreamEventType.REASONING_DELTA]: ReasoningDeltaEventData;
+  [StreamEventType.REASONING_DONE]: ReasoningDoneEventData;
   [StreamEventType.TOOL_CALL]: ToolCallEventData;
   [StreamEventType.TOOL_RESULT]: ToolResultEventData;
   [StreamEventType.ERROR]: ErrorEventData;
@@ -153,6 +168,20 @@ export const createStreamEvent = {
     data: ContentDoneEventData,
   ): StreamEvent<StreamEventType.CONTENT_DONE> => ({
     type: StreamEventType.CONTENT_DONE,
+    data,
+  }),
+
+  reasoningDelta: (
+    data: ReasoningDeltaEventData,
+  ): StreamEvent<StreamEventType.REASONING_DELTA> => ({
+    type: StreamEventType.REASONING_DELTA,
+    data,
+  }),
+
+  reasoningDone: (
+    data: ReasoningDoneEventData,
+  ): StreamEvent<StreamEventType.REASONING_DONE> => ({
+    type: StreamEventType.REASONING_DONE,
     data,
   }),
 

@@ -1,16 +1,15 @@
-import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 /**
  * tRPC Context System
  * Provides context for tRPC procedures including authentication, locale, and request metadata
  * Integrates with existing next-vibe authentication and locale systems
  */
-
 import { TRPCError } from "@trpc/server";
 import type { NextRequest } from "next/server";
 import { validateData } from "next-vibe/shared/utils";
 import { z } from "zod";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/leads/definition";
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import { authRepository } from "@/app/api/[locale]/v1/core/user/auth/repository";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type {
@@ -150,7 +149,9 @@ export async function createTRPCContext<
     }
   } catch (error) {
     // Authentication failed - get public user with proper leadId
-    opts.logger.error("tRPC context: Authentication failed", { error: parseError(error) });
+    opts.logger.error("tRPC context: Authentication failed", {
+      error: parseError(error),
+    });
     user = await authRepository.getAuthMinimalUser(
       [UserRole.PUBLIC],
       { platform: "trpc", request: req, locale: opts.locale },

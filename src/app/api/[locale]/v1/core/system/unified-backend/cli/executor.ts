@@ -59,11 +59,12 @@ export function createCliHandler<
     const logger = createEndpointLogger(verbose, Date.now(), locale);
 
     // Authenticate user using unified core with CLI context
+    // Only pass jwtPayload if user is not public (CLI/AI platforms don't support public payloads)
     const authResult = await authenticateUser(
       endpoint,
       {
         platform: "cli",
-        jwtPayload: user,
+        jwtPayload: user.isPublic ? undefined : user,
         locale,
       },
       logger,

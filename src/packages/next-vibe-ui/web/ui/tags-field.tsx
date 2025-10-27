@@ -42,7 +42,7 @@ export function TagsField({
   onChange,
   onBlur,
   suggestions = [],
-  placeholder = "app.packages.nextVibeUi.web.common.addTags",
+  placeholder = "packages.nextVibeUi.web.common.addTags",
   maxTags,
   allowCustom = true,
   disabled = false,
@@ -228,7 +228,7 @@ export function TagsField({
                         >
                           <Plus className="h-3 w-3 mr-2" />
                           {t(
-                            "app.packages.nextVibeUi.web.common.addCustomValue",
+                            "packages.nextVibeUi.web.common.addCustomValue",
                             {
                               value: inputValue.trim(),
                             },
