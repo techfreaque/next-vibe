@@ -5,13 +5,13 @@
  */
 
 import { count, desc, eq, sql } from "drizzle-orm";
+import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
-  type ResponseType,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
+} from "@/app/api/[locale]/v1/core/shared/types/response.schema";
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
@@ -112,7 +112,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "app.error.errorTypes.database_error",
+        ErrorResponseTypes.DATABASE_ERROR.errorKey,
         ErrorResponseTypes.DATABASE_ERROR,
         { message: parsedError.message },
       );
@@ -140,7 +140,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "app.error.errorTypes.database_error",
+        ErrorResponseTypes.DATABASE_ERROR.errorKey,
         ErrorResponseTypes.DATABASE_ERROR,
         { message: parsedError.message },
       );
@@ -168,7 +168,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "app.error.errorTypes.database_error",
+        ErrorResponseTypes.DATABASE_ERROR.errorKey,
         ErrorResponseTypes.DATABASE_ERROR,
         { message: parsedError.message },
       );
@@ -194,7 +194,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return createErrorResponse(
-        "app.error.errorTypes.database_error",
+        ErrorResponseTypes.DATABASE_ERROR.errorKey,
         ErrorResponseTypes.DATABASE_ERROR,
         { message: parsedError.message },
       );
@@ -216,7 +216,7 @@ export class CronTasksRepository implements ICronTasksRepository {
 
       if (!updatedTask) {
         return createErrorResponse(
-          "app.error.errorTypes.not_found",
+          ErrorResponseTypes.NOT_FOUND.errorKey,
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -304,7 +304,7 @@ export class CronTasksRepository implements ICronTasksRepository {
 
       if (!updatedExecution) {
         return createErrorResponse(
-          "app.error.errorTypes.not_found",
+          ErrorResponseTypes.NOT_FOUND.errorKey,
           ErrorResponseTypes.NOT_FOUND,
         );
       }
@@ -422,7 +422,7 @@ export class CronTasksRepository implements ICronTasksRepository {
 
       if (!updatedSchedule) {
         return createErrorResponse(
-          "app.error.errorTypes.not_found",
+          ErrorResponseTypes.NOT_FOUND.errorKey,
           ErrorResponseTypes.NOT_FOUND,
         );
       }

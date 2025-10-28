@@ -20,7 +20,7 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
 
 import { UserRole } from "../../../../user/user-roles/enum";
-import { imapMessageResponseSchema } from "../../definition";
+import { imapMessageResponseSchema } from "../../types";
 
 /**
  * GET endpoint for IMAP message by ID

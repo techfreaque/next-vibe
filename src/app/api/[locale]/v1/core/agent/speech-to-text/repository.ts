@@ -17,7 +17,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-b
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../../user/auth/definition";
+import type { JwtPayloadType } from "../../user/auth/types";
 import { FEATURE_COSTS } from "../chat/model-access/costs";
 import { deductCredits } from "../shared/credit-deduction";
 import type {

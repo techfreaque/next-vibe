@@ -252,7 +252,7 @@ export interface ApiFormReturn<
   TResponse,
   TUrlVariables,
 > {
-  form: UseFormReturn<TRequest, ZodType<TRequest, z.ZodTypeDef, TRequest>>;
+  form: UseFormReturn<TRequest, z.ZodTypeAny>;
 
   /** The complete response including success/error state */
   response: ResponseType<TResponse> | undefined;
@@ -296,3 +296,7 @@ export interface SubmitFormFunctionOptions<TRequest, TResponse, TUrlVariables> {
     pathParams: TUrlVariables;
   }) => void;
 }
+
+const definitions = {};
+
+export default definitions;

@@ -39,6 +39,7 @@ import type {
 import { useCredits } from "@/app/api/[locale]/v1/core/credits/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -53,6 +54,7 @@ import { FolderList } from "./folder-list";
 import { NewFolderDialog } from "./new-folder-dialog";
 import { RootFolderBar } from "./root-folder-bar";
 import { ThreadList } from "./thread-list";
+import { UserMenu } from "./user-menu";
 
 interface ChatSidebarProps {
   chat: UseChatReturn;
@@ -75,6 +77,7 @@ interface ChatSidebarProps {
   onUpdateThreadTitle: (threadId: string, title: string) => void;
   searchThreads: (query: string) => Array<{ id: string; title: string }>;
   autoFocusSearch?: boolean;
+  user: JwtPayloadType;
 }
 
 export function ChatSidebar({
@@ -98,6 +101,7 @@ export function ChatSidebar({
   onUpdateThreadTitle,
   searchThreads,
   autoFocusSearch = false,
+  user,
 }: ChatSidebarProps): JSX.Element {
   const { t } = simpleT(locale);
   const router = useRouter();
@@ -433,6 +437,7 @@ export function ChatSidebar({
               {t("app.chat.credits.navigation.profile")}
             </Button>
           </Link>
+          <UserMenu user={user} locale={locale} logger={logger} />
           <Link href={`/${locale}/subscription`}>
             <Button
               variant="ghost"

@@ -8,11 +8,11 @@ import "server-only";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { DiscoveredEndpointMetadata } from "../../unified-backend/shared/discovery/endpoint-registry-types";
 import {
   safeTranslate,
   zodSchemaToJsonSchema,
 } from "../shared/converters/base-converter";
-import type { DiscoveredEndpointMetadata } from "../../unified-backend/shared/discovery/endpoint-registry-types";
 import type { MCPTool, MCPToolMetadata } from "./types";
 
 /**

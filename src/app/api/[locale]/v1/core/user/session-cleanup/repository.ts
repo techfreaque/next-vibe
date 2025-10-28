@@ -22,14 +22,14 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../auth/definition";
+import type { JwtPayloadType } from "../auth/types";
 import { sessions } from "../private/session/db";
 import { passwordResets } from "../public/reset-password/db";
 import type {
   SessionCleanupConfigType,
   SessionCleanupRequestOutput,
   SessionCleanupResponseOutput,
-} from "./definition";
+} from "./types";
 
 /**
  * Session Cleanup Repository Interface
@@ -239,7 +239,10 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
       logger.debug("Session cleanup configuration validation passed");
       return createSuccessResponse(true);
     } catch (error) {
-      logger.error("Session cleanup configuration validation failed", parseError(error));
+      logger.error(
+        "Session cleanup configuration validation failed",
+        parseError(error),
+      );
       return createErrorResponse(
         "app.api.v1.core.user.session-cleanup.errors.validation_failed.title",
         ErrorResponseTypes.INTERNAL_ERROR,

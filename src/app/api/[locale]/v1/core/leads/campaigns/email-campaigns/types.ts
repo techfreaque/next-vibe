@@ -5,8 +5,8 @@
 
 import { z } from "zod";
 
-import { leadId } from "../../definition";
 import { EmailCampaignStage } from "../../enum";
+import { leadId } from "../../types";
 
 /**
  * Email Campaign Task Configuration Schema
@@ -149,3 +149,7 @@ export interface EmailCampaignError {
   stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
   error: string;
 }
+
+const definitions = {};
+
+export default definitions;

@@ -11,6 +11,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -24,7 +25,7 @@ type ApiHandlerFunction<
   TRequestOutput,
   TResponseOutput,
   TUrlVariablesOutput,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
 > = (params: {
   data: TRequestOutput;
   urlPathParams: TUrlVariablesOutput;
@@ -50,7 +51,7 @@ export async function safeExecuteTRPC<
   TRequestOutput,
   TResponseOutput,
   TUrlVariablesOutput,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
 >(
   handler: ApiHandlerFunction<
     TRequestOutput,

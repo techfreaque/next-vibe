@@ -8,6 +8,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { ZodError } from "zod";
 
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type { EndpointLogger } from "../../unified-backend/shared/endpoint-logger";
@@ -17,7 +18,9 @@ import type { TRPCContext } from "./trpc-trpc-context";
  * Initialize tRPC with context
  */
 const t = initTRPC
-  .context<TRPCContext<Record<string, string>, readonly string[]>>()
+  .context<
+    TRPCContext<Record<string, string>, readonly (typeof UserRoleValue)[]>
+  >()
   .create({
     errorFormatter({ shape, error }) {
       return {
@@ -76,7 +79,7 @@ export const authenticatedProcedure = publicProcedure.use(isAuthenticated);
  * Creates middleware that checks for specific user roles
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export function requireRoles<TRoles extends readonly string[]>(
+export function requireRoles<TRoles extends readonly (typeof UserRoleValue)[]>(
   roles: TRoles,
   logger: EndpointLogger,
 ) {

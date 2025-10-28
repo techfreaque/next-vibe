@@ -8,11 +8,12 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { validateData } from "next-vibe/shared/utils/validation";
+import type { z } from "zod";
 
-import type { CreateApiEndpoint } from "../shared/create-endpoint";
-import type { Methods } from "../shared/enums";
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { EndpointLogger } from "../shared/endpoint-logger";
+import type { Methods } from "../shared/enums";
 import {
   type ValidatedRequestData,
   validateEndpointUrlParameters,
@@ -36,34 +37,24 @@ export interface TrpcValidationContext<TRequestOutput, TUrlParametersOutput> {
 
 /**
  * Validate tRPC request data
+ * Types flow naturally from endpoint schemas
  */
 export function validateTrpcRequestData<
-  TExampleKey extends string,
-  TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
-  TFields,
-  TRequestInput,
-  TRequestOutput,
-  TResponseInput,
-  TResponseOutput,
-  TUrlVariablesInput,
-  TUrlVariablesOutput,
+  TRequestSchema extends z.ZodTypeAny,
+  TUrlSchema extends z.ZodTypeAny,
 >(
-  endpoint: CreateApiEndpoint<
-    TExampleKey,
-    TMethod,
-    TUserRoleValue,
-    TFields,
-    TRequestInput,
-    TRequestOutput,
-    TResponseInput,
-    TResponseOutput,
-    TUrlVariablesInput,
-    TUrlVariablesOutput
+  endpoint: {
+    requestSchema: TRequestSchema;
+    requestUrlPathParamsSchema: TUrlSchema;
+  },
+  context: TrpcValidationContext<
+    z.output<TRequestSchema>,
+    z.output<TUrlSchema>
   >,
-  context: TrpcValidationContext<TRequestOutput, TUrlVariablesOutput>,
   logger: EndpointLogger,
-): ResponseType<ValidatedRequestData<TRequestOutput, TUrlVariablesOutput>> {
+): ResponseType<
+  ValidatedRequestData<z.output<TRequestSchema>, z.output<TUrlSchema>>
+> {
   try {
     // Validate locale
     const validatedLocale = validateLocale(context.locale, logger);
@@ -109,8 +100,8 @@ export function validateTrpcRequestData<
     return {
       success: true,
       data: {
-        requestData: requestValidation.data as TRequestOutput,
-        urlPathParams: urlValidation.data as TUrlVariablesOutput,
+        requestData: requestValidation.data,
+        urlPathParams: urlValidation.data,
         locale: validatedLocale,
       },
     };
@@ -129,4 +120,3 @@ export function validateTrpcRequestData<
     };
   }
 }
-

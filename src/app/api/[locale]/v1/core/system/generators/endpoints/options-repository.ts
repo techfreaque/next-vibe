@@ -14,7 +14,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -121,14 +121,15 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
 
       switch (data.operation) {
         case "list":
-          const category = typeof data.category === "string" ? data.category : undefined;
+          const category =
+            typeof data.category === "string" ? data.category : undefined;
           response.options = Object.keys(this.listOptions(category));
           break;
         case "validate":
           if (data.optionName && data.optionValue !== undefined) {
             const validation = this.validateOptionValue(
               String(data.optionName),
-              data.optionValue as unknown,
+              data.optionValue,
             );
             response.validation = {
               isValid: validation.valid,

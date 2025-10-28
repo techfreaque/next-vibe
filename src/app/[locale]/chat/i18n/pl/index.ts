@@ -1,6 +1,12 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  components: {
+    sidebar: {
+      login: "Zaloguj się",
+      logout: "Wyloguj",
+    },
+  },
   common: {
     newChat: "Nowy czat",
     newPrivateChat: "Nowy Prywatny Thread",

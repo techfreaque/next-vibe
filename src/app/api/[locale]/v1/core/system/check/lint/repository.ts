@@ -558,6 +558,9 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       // Cache directory already created in parallel during setup
 
       // Build ESLint command arguments using existing config
+      const projectRoot = process.cwd();
+      const eslintConfigPath = resolve(projectRoot, "eslint.config.mjs");
+
       const baseArgs = [
         "eslint",
         "--format=json",
@@ -566,9 +569,9 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         task.cacheDir,
         "--cache-strategy",
         "metadata",
-        // Use existing eslint.config.mjs
+        // Use existing eslint.config.mjs with absolute path
         "--config",
-        "eslint.config.mjs",
+        eslintConfigPath,
         ...task.files,
       ];
 

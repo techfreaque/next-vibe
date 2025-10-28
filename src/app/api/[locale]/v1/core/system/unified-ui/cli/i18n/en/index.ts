@@ -11,6 +11,18 @@ export const translations = {
     help: "Show help for commands",
     listCommands: "List all available commands",
     executing: "Executing command...",
+    utils: {
+      debug: {
+        executionSummary:
+          "\nExecution Summary\n─────────────────\n  Execution: {{executionSeconds}}s\n  Overhead: {{overheadSeconds}}s\n  Total: {{totalSeconds}}s",
+        executionTime: "⏱️  Execution completed in {{totalSeconds}}s",
+        performanceBreakdown: "📊 Performance Breakdown:",
+        remainingResources: "⚠️  Remaining resources detected",
+        activeHandles: "Active handles: {{count}}",
+        activeRequests: "Active requests: {{count}}",
+        handleTypes: "Handle types",
+      },
+    },
     endpoints: {
       endpointHandler: {
         error: {
@@ -61,11 +73,6 @@ export const translations = {
             },
           },
         },
-      },
-    },
-    utils: {
-      debug: {
-        executionSummary: "Execution Summary",
       },
     },
   },

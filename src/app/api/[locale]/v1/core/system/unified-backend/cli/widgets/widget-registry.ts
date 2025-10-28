@@ -6,13 +6,17 @@
 import { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 
 import { CodeOutputWidgetRenderer } from "./code-output-widget-renderer";
+import { CodeQualityListWidgetRenderer } from "./code-quality-list-widget-renderer";
 import { ContainerWidgetRenderer } from "./container-widget-renderer";
 import { DataCardsWidgetRenderer } from "./data-cards-widget-renderer";
+import { DataListWidgetRenderer } from "./data-list-widget-renderer";
 import { DataTableWidgetRenderer } from "./data-table-widget-renderer";
 import { GroupedListWidgetRenderer } from "./grouped-list-widget-renderer";
 import { MetricWidgetRenderer } from "./metric-widget-renderer";
+import { SectionWidgetRenderer } from "./section-widget-renderer";
 import { StatsGridWidgetRenderer } from "./stats-grid-widget-renderer";
 import { TextWidgetRenderer } from "./text-widget-renderer";
+import { TitleWidgetRenderer } from "./title-widget-renderer";
 import type {
   ResponseFieldMetadata,
   WidgetRenderContext,
@@ -35,10 +39,14 @@ export class WidgetRegistry {
    * Register default widget renderers
    */
   private registerDefaultRenderers(): void {
+    this.register(new TitleWidgetRenderer());
     this.register(new TextWidgetRenderer());
+    this.register(new SectionWidgetRenderer());
     this.register(new DataTableWidgetRenderer());
     this.register(new DataCardsWidgetRenderer());
+    this.register(new DataListWidgetRenderer());
     this.register(new GroupedListWidgetRenderer());
+    this.register(new CodeQualityListWidgetRenderer());
     this.register(new CodeOutputWidgetRenderer());
     this.register(new MetricWidgetRenderer());
     this.register(new StatsGridWidgetRenderer());

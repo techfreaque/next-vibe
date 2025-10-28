@@ -94,3 +94,7 @@ export const authVerificationResultSchema = z.object({
 export type AuthVerificationResultType = z.infer<
   typeof authVerificationResultSchema
 >;
+
+const definitions = {};
+
+export default definitions;

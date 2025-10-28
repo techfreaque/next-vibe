@@ -13,13 +13,11 @@ import { z } from "zod";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../endpoint-logger";
-import type {
-  ValidatedRequestData,
-  ValidationContext,
-} from "../request-validator";
+import type { ValidatedRequestData } from "../request-validator";
 import {
   validateEndpointRequestData,
   validateEndpointUrlParameters,
@@ -58,42 +56,36 @@ export interface TrpcValidationContext<TRequestData, TUrlParameters> {
 /**
  * Validate CLI request data
  * CLI passes data directly, no need to extract from request object
+ * Types flow naturally from the endpoint's schemas
  */
 export function validateCliRequestData<
-  TRequestInput,
-  TRequestOutput,
-  TResponseInput,
-  TUrlVariablesInput,
-  TUrlVariablesOutput,
-  TExampleKey extends string,
-  TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
-  TFields,
+  TRequestSchema extends z.ZodTypeAny,
+  TUrlSchema extends z.ZodTypeAny,
 >(
-  endpoint: CreateApiEndpoint<
-    TExampleKey,
-    TMethod,
-    TUserRoleValue,
-    TFields,
-    TRequestInput,
-    TRequestOutput,
-    TResponseInput,
-    TUrlVariablesInput,
-    TUrlVariablesOutput
-  >,
-  context: CliValidationContext<TRequestInput, TUrlVariablesInput>,
+  endpoint: {
+    requestSchema: TRequestSchema;
+    requestUrlPathParamsSchema: TUrlSchema;
+  },
+  context: CliValidationContext<z.input<TRequestSchema>, z.input<TUrlSchema>>,
   logger: EndpointLogger,
-): ResponseType<ValidatedRequestData<TRequestOutput, TUrlVariablesOutput>> {
+): ResponseType<
+  ValidatedRequestData<z.output<TRequestSchema>, z.output<TUrlSchema>>
+> {
   try {
     // Validate locale
     const validatedLocale = validateLocale(context.locale, logger);
 
     // Validate URL parameters
-    const urlValidation = validateEndpointUrlParameters(
-      context.urlParameters,
-      endpoint.requestUrlPathParamsSchema,
-      logger,
-    );
+    // Check if URL params schema is z.never() - if so, skip validation
+    const isUrlParamsNever = endpoint.requestUrlPathParamsSchema instanceof z.ZodNever;
+
+    const urlValidation = isUrlParamsNever
+      ? { success: true as const, data: undefined as z.output<TUrlSchema> }
+      : validateEndpointUrlParameters(
+          context.urlParameters,
+          endpoint.requestUrlPathParamsSchema,
+          logger,
+        );
     if (!urlValidation.success) {
       return {
         success: false,
@@ -139,7 +131,7 @@ export function validateCliRequestData<
     return {
       success: false,
       message:
-        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.validation_failed",
+        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
     };
   }
@@ -147,23 +139,23 @@ export function validateCliRequestData<
 
 /**
  * Extract and validate GET request query parameters from Next.js request
+ * Types flow naturally from the schema
  */
-export function validateGetRequestData<TRequestInput, TRequestOutput>(
-  endpoint: { requestSchema: z.ZodSchema<TRequestOutput, TRequestInput> },
+export function validateGetRequestData<TSchema extends z.ZodTypeAny>(
+  endpoint: { requestSchema: TSchema },
   request: NextRequest,
   logger: EndpointLogger,
-): ResponseType<TRequestOutput> {
+): ResponseType<z.output<TSchema>> {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const queryData: Record<string, unknown> = {};
+    const queryData: Record<string, string> = {};
 
     // Convert URLSearchParams to object
     for (const [key, value] of searchParams.entries()) {
       queryData[key] = value;
     }
 
-    // The schema will validate and transform the data to TRequestOutput
-    // We pass unknown and let the schema handle type safety
+    // Types flow naturally through validateEndpointRequestData
     return validateEndpointRequestData(
       queryData,
       endpoint.requestSchema,
@@ -175,8 +167,7 @@ export function validateGetRequestData<TRequestInput, TRequestOutput>(
     });
     return {
       success: false,
-      message:
-        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_query_parameters",
+      message: ErrorResponseTypes.INVALID_QUERY_ERROR.errorKey,
       errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
     };
   }
@@ -184,30 +175,26 @@ export function validateGetRequestData<TRequestInput, TRequestOutput>(
 
 /**
  * Extract and validate POST/PUT/PATCH/DELETE request body from Next.js request
+ * Types flow naturally from the schema
  */
-export async function validatePostRequestData<TRequestInput, TRequestOutput>(
-  endpoint: { requestSchema: z.ZodSchema<TRequestOutput, TRequestInput> },
+export async function validatePostRequestData<TSchema extends z.ZodTypeAny>(
+  endpoint: { requestSchema: TSchema },
   request: NextRequest,
   logger: EndpointLogger,
-): Promise<ResponseType<TRequestOutput>> {
+): Promise<ResponseType<z.output<TSchema>>> {
   try {
-    const body = await request.json();
+    // eslint-disable-next-line no-restricted-syntax
+    const body: unknown = await request.json();
 
-    // The schema will validate and transform the data to TRequestOutput
-    // We pass unknown and let the schema handle type safety
-    return validateEndpointRequestData(
-      body,
-      endpoint.requestSchema,
-      logger,
-    );
+    // Types flow naturally through validateEndpointRequestData
+    return validateEndpointRequestData(body, endpoint.requestSchema, logger);
   } catch (error) {
     logger.error("POST request validation error", {
       error: error instanceof Error ? error.message : String(error),
     });
     return {
       success: false,
-      message:
-        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_body",
+      message: ErrorResponseTypes.INVALID_REQUEST_ERROR.errorKey,
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
     };
   }
@@ -218,42 +205,35 @@ export async function validatePostRequestData<TRequestInput, TRequestOutput>(
  * Extracts data from request object based on HTTP method
  */
 export async function validateNextRequestData<
-  TRequestInput,
-  TRequestOutput,
-  TResponseInput,
-  TUrlVariablesInput,
-  TUrlVariablesOutput,
-  TExampleKey extends string,
-  TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
-  TFields,
+  TRequestSchema extends z.ZodTypeAny,
+  TUrlSchema extends z.ZodTypeAny,
 >(
-  endpoint: CreateApiEndpoint<
-    TExampleKey,
-    TMethod,
-    TUserRoleValue,
-    TFields,
-    TRequestInput,
-    TRequestOutput,
-    TResponseInput,
-    TUrlVariablesInput,
-    TUrlVariablesOutput
-  >,
-  context: NextValidationContext<TUrlVariablesInput>,
+  endpoint: {
+    requestSchema: TRequestSchema;
+    requestUrlPathParamsSchema: TUrlSchema;
+  },
+  context: NextValidationContext<z.input<TUrlSchema>>,
   logger: EndpointLogger,
 ): Promise<
-  ResponseType<ValidatedRequestData<TRequestOutput, TUrlVariablesOutput>>
+  ResponseType<
+    ValidatedRequestData<z.output<TRequestSchema>, z.output<TUrlSchema>>
+  >
 > {
   try {
     // Validate locale
     const validatedLocale = validateLocale(context.locale, logger);
 
     // Validate URL parameters
-    const urlValidation = validateEndpointUrlParameters(
-      context.urlParameters,
-      endpoint.requestUrlPathParamsSchema,
-      logger,
-    );
+    // Check if URL params schema is z.never() - if so, skip validation
+    const isUrlParamsNever = endpoint.requestUrlPathParamsSchema instanceof z.ZodNever;
+
+    const urlValidation = isUrlParamsNever
+      ? { success: true as const, data: undefined as z.output<TUrlSchema> }
+      : validateEndpointUrlParameters(
+          context.urlParameters,
+          endpoint.requestUrlPathParamsSchema,
+          logger,
+        );
     if (!urlValidation.success) {
       return {
         success: false,
@@ -267,20 +247,10 @@ export async function validateNextRequestData<
     }
 
     // Validate request data based on method
-    let requestValidation: ResponseType<TRequestOutput>;
-
-    if (context.method === Methods.GET) {
-      requestValidation = validateGetRequestData(
-        endpoint,
-        context.request,
-        logger,
-      );
-    } else {
-      requestValidation = await validatePostRequestData<
-        TRequestInput,
-        TRequestOutput
-      >(endpoint, context.request, logger);
-    }
+    const requestValidation =
+      context.method === Methods.GET
+        ? validateGetRequestData(endpoint, context.request, logger)
+        : await validatePostRequestData(endpoint, context.request, logger);
 
     if (!requestValidation.success) {
       return {
@@ -306,7 +276,7 @@ export async function validateNextRequestData<
     return {
       success: false,
       message:
-        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.validation_failed",
+        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
     };
   }
@@ -317,30 +287,16 @@ export async function validateNextRequestData<
  * tRPC data is already validated by tRPC, but we validate against endpoint schema
  */
 export function validateTrpcRequestData<
-  TRequestInput,
-  TRequestOutput,
-  TResponseInput,
-  TUrlVariablesInput,
-  TUrlVariablesOutput,
-  TExampleKey extends string,
-  TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
-  TFields,
+  TRequestSchema extends z.ZodTypeAny,
+  TUrlSchema extends z.ZodTypeAny,
 >(
-  endpoint: CreateApiEndpoint<
-    TExampleKey,
-    TMethod,
-    TUserRoleValue,
-    TFields,
-    TRequestInput,
-    TRequestOutput,
-    TResponseInput,
-    TUrlVariablesInput,
-    TUrlVariablesOutput
-  >,
-  context: TrpcValidationContext<TRequestOutput, TUrlVariablesOutput>,
+  endpoint: {
+    requestSchema: TRequestSchema;
+    requestUrlPathParamsSchema: TUrlSchema;
+  },
+  context: TrpcValidationContext<z.output<TRequestSchema>, z.output<TUrlSchema>>,
   logger: EndpointLogger,
-): ResponseType<ValidatedRequestData<TRequestOutput, TUrlVariablesOutput>> {
+): ResponseType<ValidatedRequestData<z.output<TRequestSchema>, z.output<TUrlSchema>>> {
   try {
     // Validate locale
     const validatedLocale = validateLocale(context.locale, logger);
@@ -362,9 +318,8 @@ export function validateTrpcRequestData<
     return {
       success: false,
       message:
-        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.validation_failed",
+        "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.form_validation_failed",
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
     };
   }
 }
-

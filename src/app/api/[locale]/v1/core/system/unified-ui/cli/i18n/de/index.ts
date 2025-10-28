@@ -12,6 +12,18 @@ export const translations: typeof enTranslations = {
     help: "Hilfe für Befehle anzeigen",
     listCommands: "Alle verfügbaren Befehle auflisten",
     executing: "Befehl wird ausgeführt...",
+    utils: {
+      debug: {
+        executionSummary:
+          "\nAusführungszusammenfassung\n──────────────────────────\n  Ausführung: {{executionSeconds}}s\n  Overhead: {{overheadSeconds}}s\n  Gesamt: {{totalSeconds}}s",
+        executionTime: "⏱️  Ausführung abgeschlossen in {{totalSeconds}}s",
+        performanceBreakdown: "📊 Leistungsaufschlüsselung:",
+        remainingResources: "⚠️  Verbleibende Ressourcen erkannt",
+        activeHandles: "Aktive Handles: {{count}}",
+        activeRequests: "Aktive Anfragen: {{count}}",
+        handleTypes: "Handle-Typen",
+      },
+    },
     endpoints: {
       endpointHandler: {
         error: {
@@ -62,11 +74,6 @@ export const translations: typeof enTranslations = {
             },
           },
         },
-      },
-    },
-    utils: {
-      debug: {
-        executionSummary: "Ausführungszusammenfassung",
       },
     },
   },

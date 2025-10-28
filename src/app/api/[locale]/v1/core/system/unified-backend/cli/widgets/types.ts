@@ -64,6 +64,7 @@ export interface ResponseFieldMetadata {
   widgetType: WidgetType;
   value: RenderableValue;
   label?: string;
+  title?: string;
   description?: string;
   required?: boolean;
   schema?: z.ZodTypeAny;
@@ -87,6 +88,8 @@ export interface ResponseFieldMetadata {
   maxItemsPerGroup?: number;
   // Widget-specific configuration
   config?: WidgetConfig;
+  // Nested structure for container/section widgets
+  children?: Record<string, ResponseFieldMetadata>;
 }
 
 /**
@@ -124,6 +127,7 @@ export interface WidgetRenderContext {
   formatValue: (field: ResponseFieldMetadata, value: RenderableValue) => string;
   getFieldIcon: (type: FieldDataType) => string;
   renderEmptyState: (message: string) => string;
+  getRenderer: (widgetType: WidgetType) => WidgetRenderer;
 }
 
 /**
@@ -225,3 +229,7 @@ export interface LayoutConfig {
   spacing?: "compact" | "normal" | "loose";
   alignment?: "left" | "center" | "right";
 }
+
+const definitions = {};
+
+export default definitions;

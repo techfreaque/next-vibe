@@ -16,7 +16,7 @@ import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import type React from "react";
 import type { JSX } from "react";
 
-import type { LeadDetailResponse } from "@/app/api/[locale]/v1/core/leads/definition";
+import type { LeadDetailResponse } from "@/app/api/[locale]/v1/core/leads/types";
 import {
   EmailCampaignStage,
   LeadStatus,

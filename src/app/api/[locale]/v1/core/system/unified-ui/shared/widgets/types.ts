@@ -166,7 +166,7 @@ export interface ToolResultWidgetConfig {
 /**
  * Link widget specific props
  */
-export interface LinkWidgetData {
+export interface LinkWidgetData extends Record<string, RenderableValue> {
   url: string;
   title?: string;
   description?: string;
@@ -177,7 +177,7 @@ export interface LinkWidgetData {
 /**
  * Markdown widget specific props
  */
-export interface MarkdownWidgetData {
+export interface MarkdownWidgetData extends Record<string, RenderableValue> {
   content: string;
   sanitize?: boolean;
   allowedTags?: string[];
@@ -201,7 +201,7 @@ export interface DataTableColumn {
 /**
  * Data table widget specific props
  */
-export interface DataTableWidgetData {
+export interface DataTableWidgetData extends Record<string, RenderableValue> {
   rows: Array<Record<string, RenderableValue>>;
   columns: DataTableColumn[];
   sortBy?: string;
@@ -214,7 +214,7 @@ export interface DataTableWidgetData {
 /**
  * Grouped list widget specific props
  */
-export interface GroupedListWidgetData {
+export interface GroupedListWidgetData extends Record<string, RenderableValue> {
   groups: Array<{
     key: string;
     label: string;
@@ -230,7 +230,7 @@ export interface GroupedListWidgetData {
 /**
  * Metric card widget specific props
  */
-export interface MetricCardWidgetData {
+export interface MetricCardWidgetData extends Record<string, RenderableValue> {
   value: string | number;
   label: string;
   icon?: string;
@@ -245,7 +245,7 @@ export interface MetricCardWidgetData {
 /**
  * Stats grid widget specific props
  */
-export interface StatsGridWidgetData {
+export interface StatsGridWidgetData extends Record<string, RenderableValue> {
   metrics: MetricCardWidgetData[];
   columns?: number;
   layout?: "grid" | "flex";
@@ -254,7 +254,7 @@ export interface StatsGridWidgetData {
 /**
  * Code output widget specific props
  */
-export interface CodeOutputWidgetData {
+export interface CodeOutputWidgetData extends Record<string, RenderableValue> {
   code: string;
   language?: string;
   showLineNumbers?: boolean;
@@ -265,7 +265,7 @@ export interface CodeOutputWidgetData {
 /**
  * Container widget specific props
  */
-export interface ContainerWidgetData {
+export interface ContainerWidgetData extends Record<string, RenderableValue> {
   children: Array<{
     type: WidgetType;
     data: RenderableValue;
@@ -308,3 +308,7 @@ export interface WidgetEmptyStateProps {
     onClick: () => void;
   };
 }
+
+const definitions = {};
+
+export default definitions;

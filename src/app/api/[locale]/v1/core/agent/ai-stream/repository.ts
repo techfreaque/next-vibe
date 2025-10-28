@@ -26,7 +26,7 @@ import { createToolsFromEndpoints } from "@/app/api/[locale]/v1/core/system/unif
 import { getToolRegistry } from "@/app/api/[locale]/v1/core/system/unified-ui/ai/registry";
 import type { CoreTool } from "@/app/api/[locale]/v1/core/system/unified-ui/ai/types";
 import { Platform } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/config";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";

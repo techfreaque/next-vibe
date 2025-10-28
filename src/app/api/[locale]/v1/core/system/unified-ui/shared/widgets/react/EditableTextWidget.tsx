@@ -21,7 +21,7 @@ export function EditableTextWidget({
   onAction,
   className,
   style,
-}: WidgetComponentProps<RenderableValue>): JSX.Element {
+}: WidgetComponentProps<Record<string, unknown>>): JSX.Element {
   const value =
     typeof data === "string" ||
     typeof data === "number" ||
@@ -39,9 +39,13 @@ export function EditableTextWidget({
 
   const handleSave = async (): Promise<void> => {
     try {
-      await handleAction("edit", editValue, {
-        fieldName: metadata.name,
-      });
+      await handleAction(
+        "edit",
+        { value: editValue },
+        {
+          fieldName: metadata.name,
+        },
+      );
       setIsEditing(false);
     } catch {
       // Error is handled by useWidgetActions

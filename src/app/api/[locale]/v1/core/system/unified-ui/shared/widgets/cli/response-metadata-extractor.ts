@@ -17,13 +17,13 @@ import {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
-import type { WidgetConfig } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/widgets/widgets";
 import type { UserRoleDB } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import type {
   RenderableValue,
   ResponseContainerMetadata,
   ResponseFieldMetadata,
+  WidgetConfig,
 } from "./types";
 
 /**
@@ -250,8 +250,16 @@ export class ResponseMetadataExtractor {
       "description" in ui && typeof ui.description === "string"
         ? ui.description
         : undefined;
-    const layout =
-      "layout" in ui && typeof ui.layout === "object" ? ui.layout : undefined;
+
+    // Extract layout properties if they exist
+    let layout: { columns?: number; spacing?: string; } | undefined = undefined;
+    if ("layout" in ui && typeof ui.layout === "object" && ui.layout !== null && !Array.isArray(ui.layout)) {
+      const layoutObj = ui.layout as Record<string, unknown>;
+      layout = {
+        columns: typeof layoutObj.columns === "number" ? layoutObj.columns : undefined,
+        spacing: typeof layoutObj.spacing === "string" ? layoutObj.spacing : undefined,
+      };
+    }
 
     return {
       type: containerType,
@@ -642,8 +650,8 @@ export class ResponseMetadataExtractor {
         ? definition.schema
         : undefined;
 
-    // Determine field type - pass ui (can be null)
-    const fieldType = this.determineFieldType(ui, schema);
+    // Determine field type - pass ui as WidgetConfig (compatible due to index signature)
+    const fieldType = this.determineFieldType(ui as WidgetConfig | null, schema);
 
     // Extract widget type from ui
     const widgetType =

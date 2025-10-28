@@ -19,7 +19,7 @@ import {
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
 
-import { completeUserSchema } from "../../definition";
+import { completeUserSchema } from "../../types";
 import { UserRole } from "../../user-roles/enum";
 
 /**

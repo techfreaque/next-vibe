@@ -5,6 +5,8 @@
 
 import "server-only";
 
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+
 import { createCliHandler } from "../cli/executor";
 import { createNextHandler } from "../next/handler";
 import type {
@@ -31,7 +33,7 @@ export function endpointHandler<
     TUrlVariablesOutput,
     string,
     Methods,
-    readonly string[],
+    readonly (typeof UserRoleValue)[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >,
@@ -44,7 +46,7 @@ export function endpointHandler<
     UrlVariablesOutput: infer TUrlVariablesOutput;
   };
   method: infer TMethod extends Methods;
-  allowedRoles: infer TUserRoleValue extends readonly string[];
+  allowedRoles: infer TUserRoleValue extends readonly (typeof UserRoleValue)[];
 }
   ? EndpointHandlerReturn<
       TRequestOutput,
@@ -78,7 +80,8 @@ export function endpointHandler<
       UrlVariablesOutput: infer TUrlVariablesOutput;
     };
     method: infer TMethod extends Methods;
-    allowedRoles: infer TUserRoleValue extends readonly string[];
+    allowedRoles: infer TUserRoleValue extends
+      readonly (typeof UserRoleValue)[];
   }
     ? EndpointHandlerReturn<
         TRequestOutput,

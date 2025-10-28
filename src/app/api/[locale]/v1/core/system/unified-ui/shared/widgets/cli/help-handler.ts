@@ -53,7 +53,7 @@ interface HelpEndpointDefinition {
 /**
  * Zod type with internal _def property (for schema introspection)
  */
-interface ZodWithDef {
+type ZodWithDef = z.ZodTypeAny & {
   _def?: {
     typeName?: string;
     innerType?: ZodWithDef;
@@ -62,7 +62,7 @@ interface ZodWithDef {
     description?: string;
   };
   shape?: Record<string, z.ZodTypeAny>;
-}
+};
 
 /**
  * Type guard to check if a Zod schema has shape property
@@ -156,9 +156,9 @@ export class HelpHandler {
         "app.api.v1.core.system.unifiedBackend.cli.vibe.help.description",
       ),
       usage: t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.usage"),
-      commands: await this.generateCommandHelp(filteredRoutes, options),
+      commands: await this.generateCommandHelp(filteredRoutes, options, locale),
       examples: this.generateExamples(),
-      options: this.generateGlobalOptions(),
+      options: this.generateGlobalOptions(locale),
     };
 
     return helpContent;
@@ -170,6 +170,7 @@ export class HelpHandler {
   async generateCommandHelp(
     routes: DiscoveredRoute[],
     options: HelpOptions = {},
+    locale: CountryLanguage,
   ): Promise<CommandHelp[]> {
     const commands: CommandHelp[] = [];
 
@@ -178,6 +179,7 @@ export class HelpHandler {
         const commandHelp = await this.generateSingleCommandHelp(
           route,
           options,
+          locale,
         );
         commands.push(commandHelp);
       } catch {

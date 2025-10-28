@@ -5,7 +5,26 @@ import { cn } from "next-vibe/shared/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import type { JSX } from "react";
 
-import type { MetricCardWidgetData, WidgetComponentProps } from "../types";
+import type {
+  MetricCardWidgetData,
+  RenderableValue,
+  WidgetComponentProps,
+} from "../types";
+
+/**
+ * Type guard for MetricCardWidgetData
+ */
+function isMetricCardWidgetData(
+  data: RenderableValue,
+): data is MetricCardWidgetData {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    !Array.isArray(data) &&
+    "value" in data &&
+    "label" in data
+  );
+}
 
 /**
  * Metric Card Widget Component
@@ -16,7 +35,18 @@ export function MetricCardWidget({
   context,
   className,
   style,
-}: WidgetComponentProps<MetricCardWidgetData>): JSX.Element {
+}: WidgetComponentProps<RenderableValue>): JSX.Element {
+  if (!isMetricCardWidgetData(data)) {
+    return (
+      <div
+        className={cn("text-muted-foreground italic", className)}
+        style={style}
+      >
+        —
+      </div>
+    );
+  }
+
   const { value, label, icon, color, trend, unit } = data;
 
   const displayValue =
@@ -25,14 +55,14 @@ export function MetricCardWidget({
       : String(value);
 
   /* eslint-disable i18next/no-literal-string */
-  const trendColor =
+  const trendColorClassName =
     trend?.direction === "up"
       ? "text-green-600 dark:text-green-400"
       : trend?.direction === "down"
         ? "text-red-600 dark:text-red-400"
         : "text-muted-foreground";
-  /* eslint-enable i18next/no-literal-string */
 
+  /* eslint-enable i18next/no-literal-string */
   const TrendIcon =
     trend?.direction === "up"
       ? TrendingUp
@@ -62,7 +92,12 @@ export function MetricCardWidget({
             {unit && <span className="ml-1 text-sm font-normal">{unit}</span>}
           </div>
           {trend && TrendIcon && (
-            <div className={cn("flex items-center gap-1 text-xs", trendColor)}>
+            <div
+              className={cn(
+                "flex items-center gap-1 text-xs",
+                trendColorClassName,
+              )}
+            >
               <TrendIcon className="h-3 w-3" />
               <span>{Math.abs(trend.value)}%</span>
             </div>

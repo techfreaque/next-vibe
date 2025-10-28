@@ -32,8 +32,8 @@ import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -135,7 +135,7 @@ export function createPageWrapper<
                   ? err
                   : new Error(
                       t(
-                        "packages.reactNativeComp.utils.nextjs-compat-wrapper.failedToLoadPage",
+                        "app.api.v1.core.system.unifiedUi.reactNative.errors.failedToLoadPage",
                       ),
                     ),
               );
@@ -162,7 +162,7 @@ export function createPageWrapper<
         >
           <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
             {t(
-              "packages.reactNativeComp.utils.nextjs-compat-wrapper.failedToLoadPage",
+              "app.api.v1.core.system.unifiedUi.reactNative.errors.failedToLoadPage",
             )}
           </Text>
           <Text style={{ fontSize: 14, color: "#666", textAlign: "center" }}>
@@ -341,7 +341,7 @@ export function createPageWrapperWithOptions<
                   ? err
                   : new Error(
                       t(
-                        "packages.reactNativeComp.utils.nextjs-compat-wrapper.failedToLoadPage",
+                        "app.api.v1.core.system.unifiedUi.reactNative.errors.failedToLoadPage",
                       ),
                     ),
               );
@@ -372,7 +372,7 @@ export function createPageWrapperWithOptions<
         >
           <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
             {t(
-              "packages.reactNativeComp.utils.nextjs-compat-wrapper.failedToLoadPage",
+              "app.api.v1.core.system.unifiedUi.reactNative.errors.failedToLoadPage",
             )}
           </Text>
           <Text style={{ fontSize: 14, color: "#666", textAlign: "center" }}>

@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { seedDatabase } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { databaseMigrationRepository } from "../../db/migrate/repository";
@@ -114,7 +114,10 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           } else {
             errors.push("Failed to start unified task runner");
             output.push("   ❌ Failed to start unified task runner");
-            logger.error("Failed to start task runner", startResult);
+            logger.error("Failed to start task runner", {
+              message: startResult.message,
+              errorCode: startResult.errorType.errorCode,
+            });
           }
         } catch (error) {
           const errorMsg = `Failed to initialize task runner: ${parseError(error).message}`;

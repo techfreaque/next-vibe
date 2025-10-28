@@ -216,7 +216,8 @@ export const envSchema = envClientSchema.extend({
   RAILWAY_ENVIRONMENT: z.string().optional(),
 
   // CLI Configuration
-  VIBE_CLI_USER_EMAIL: z.string().email(),
+  // Optional: If not provided, CLI/MCP will use public user with leadId
+  VIBE_CLI_USER_EMAIL: z.string().email().optional(),
 
   VIBE_LOCALE: (z.string() as z.Schema<CountryLanguage>)
     .optional()

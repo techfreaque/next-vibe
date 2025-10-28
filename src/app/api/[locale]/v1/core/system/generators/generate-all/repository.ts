@@ -19,7 +19,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../../../user/auth/definition";
+import type { JwtPayloadType } from "../../../user/auth/types";
 import type endpoints from "./definition";
 
 type RequestType = typeof endpoints.POST.types.RequestOutput;
@@ -63,45 +63,41 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       // Run all generators in parallel
       const generatorPromises = [];
 
-      // 1. Endpoints Generator - Generate endpoints and tRPC routers
+      // 1. Endpoints Generator - Generate endpoints index
       if (!data.skipEndpoints) {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              outputLines.push("📝 Running endpoints generator...");
-              const { functionalGeneratorsRepository } = await import(
-                "../endpoints/repository"
+              outputLines.push("📝 Generating endpoints index...");
+              const { endpointsIndexGeneratorRepository } = await import(
+                "../endpoints-index/repository"
               );
 
-              const result = await functionalGeneratorsRepository.runGenerators(
-                {
-                  skipEndpoints: false,
-                  skipSeeds: true,
-                  skipCronTasks: true,
-                  skipTRPCRouter: false,
-                  rootDir: "src",
-                  verbose: false,
-                },
-                user,
-                locale,
-                logger,
-              );
+              const result =
+                await endpointsIndexGeneratorRepository.generateEndpointsIndex(
+                  {
+                    outputFile:
+                      "src/app/api/[locale]/v1/core/system/generated/endpoints.ts",
+                    dryRun: false,
+                  },
+                  user,
+                  locale,
+                  logger,
+                );
 
               if (result.success) {
-                outputLines.push(
-                  "✅ Endpoints generator completed successfully",
-                );
+                outputLines.push("✅ Endpoints index generated successfully");
                 generatorsRun++;
                 return "endpoints";
               } else {
                 outputLines.push(
-                  `❌ Endpoints generator failed: ${result.message || "Unknown error"}`,
+                  `❌ Endpoints index generation failed: ${result.message || "Unknown error"}`,
                 );
                 return null;
               }
             } catch (error) {
               outputLines.push(
-                `❌ Endpoints generator failed: ${parseError(error).message}`,
+                `❌ Endpoints index generator failed: ${parseError(error).message}`,
               );
               return null;
             }
@@ -170,7 +166,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                 await taskIndexGeneratorRepository.generateTaskIndex(
                   {
                     outputFile:
-                      "src/app/api/[locale]/v1/core/system/tasks/generated/tasks-index.ts",
+                      "src/app/api/[locale]/v1/core/system/generated/tasks-index.ts",
                     dryRun: false,
                   },
                   user,

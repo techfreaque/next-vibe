@@ -49,7 +49,13 @@ export class TextWidgetRenderer extends BaseWidgetRenderer {
 
     // Default single-line text with improved formatting
     const displayValue = formattedValue === "(not set)" ? "—" : formattedValue;
-    return `${indent}${icon} ${label}: ${displayValue}`;
+
+    // If no label is explicitly set, just render the value without a label
+    if (!field.label) {
+      return `${indent}${displayValue}`;
+    }
+
+    return `${indent}${icon}${label}: ${displayValue}`;
   }
 
   private renderMultilineText(

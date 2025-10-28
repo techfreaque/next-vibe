@@ -31,14 +31,17 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer {
 
     // Handle single stat value
     const label = this.formatLabel(field, context);
-    const formattedValue = this.formatStatValue(value, context);
-    const icon = this.getStatIcon(value, context);
+    const formattedValue = this.formatStatValue(
+      value as string | number | boolean,
+      context,
+    );
+    const icon = this.getStatIcon(value as string | number | boolean, context);
 
     return `${indent}${icon}${label}: ${formattedValue}`;
   }
 
   private renderStatsGrid(
-    value: Record<string, string | number | boolean>,
+    value: { [key: string]: import("./types").RenderableValue },
     context: WidgetRenderContext,
     indent: string,
   ): string {
@@ -47,7 +50,7 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer {
 
     // Group stats into rows for better display
     const columns = 3; // Display 3 stats per row
-    const rows: Array<Array<[string, string | number | boolean]>> = [];
+    const rows: Array<Array<[string, import("./types").RenderableValue]>> = [];
 
     for (let i = 0; i < entries.length; i += columns) {
       rows.push(entries.slice(i, i + columns));
@@ -55,8 +58,14 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer {
 
     for (const row of rows) {
       const rowItems = row.map(([key, val]) => {
-        const formattedValue = this.formatStatValue(val, context);
-        const icon = this.getStatIcon(val, context);
+        const formattedValue = this.formatStatValue(
+          val as string | number | boolean,
+          context,
+        );
+        const icon = this.getStatIcon(
+          val as string | number | boolean,
+          context,
+        );
         const label = this.formatStatLabel(key);
         return `${icon}${label}: ${formattedValue}`;
       });
@@ -140,8 +149,6 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer {
   private getMetricConfig(): MetricConfig {
     return {
       format: "number",
-      showIcon: true,
-      showLabel: true,
       precision: 0,
     };
   }

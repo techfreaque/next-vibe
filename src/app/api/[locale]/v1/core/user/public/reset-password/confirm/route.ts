@@ -49,6 +49,7 @@ export const { POST, tools } = endpointsHandler({
         data.verification.token,
         data.verification.email,
         data.newPassword.password,
+        locale,
         logger,
       );
       if (!response.success) {

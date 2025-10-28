@@ -65,3 +65,7 @@ export interface ValidateImapSyncRequestOutput {
 export interface ValidateImapSyncResponseOutput {
   isValid: boolean;
 }
+
+const definitions = {};
+
+export default definitions;

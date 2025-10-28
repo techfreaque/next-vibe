@@ -7,6 +7,7 @@ import "server-only";
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handlers";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+
 import endpoints from "./definition";
 import { renderAdminNotificationMail, renderWelcomeMail } from "./email";
 import { newsletterSubscribeRepository as repository } from "./repository";

@@ -11,12 +11,12 @@ import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error"
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { env } from "@/config/env";
 
-import type { SendSmsParams, SmsProvider, SmsResult } from "./utils";
-import { SmsProviders, validateE164PhoneNumber } from "./utils";
 import { getAwsSnsProvider } from "./providers/aws-sns";
 import { getHttpProvider } from "./providers/http";
 import { getMessageBirdProvider } from "./providers/messagebird";
 import { getTwilioProvider } from "./providers/twilio";
+import type { SendSmsParams, SmsProvider, SmsResult } from "./utils";
+import { SmsProviders, validateE164PhoneNumber } from "./utils";
 
 /**
  * Cache to store provider instances
@@ -158,7 +158,10 @@ export async function sendSms(
       } catch (error) {
         lastError =
           error instanceof Error ? error : new Error("error.general.unknown");
-        logger.error("SMS send attempt exception", { error: parseError(error), attempt });
+        logger.error("SMS send attempt exception", {
+          error: parseError(error),
+          attempt,
+        });
         if (attempt < maxAttempts) {
           // Wait before retry - fix promise executor issue
           await new Promise<void>((resolve) => {

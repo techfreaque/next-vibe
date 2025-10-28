@@ -86,3 +86,7 @@ export interface ImportRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<{ processed: number; hasMore: boolean }>>;
 }
+
+const definitions = {};
+
+export default definitions;

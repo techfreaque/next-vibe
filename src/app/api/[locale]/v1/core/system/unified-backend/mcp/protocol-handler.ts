@@ -8,18 +8,16 @@ import "server-only";
 import { parseError } from "next-vibe/shared/utils";
 
 import { getCliUser } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/auth/cli-user-factory";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { getMCPConfig } from "./config";
 import {
   getMCPRegistry,
   toolMetadataToMCPTool,
 } from "../../unified-ui/mcp/registry";
-import { MCPErrorCode, MCPMethod } from "./types";
 import type { EndpointLogger } from "../shared/endpoint-logger";
 import type {
   IMCPProtocolHandler,
@@ -33,6 +31,8 @@ import type {
   MCPToolsListParams,
   MCPToolsListResult,
 } from "../shared/handler-types";
+import { getMCPConfig } from "./config";
+import { MCPErrorCode, MCPMethod } from "./types";
 
 /**
  * MCP Protocol Handler Implementation
@@ -293,6 +293,10 @@ export async function createMCPProtocolHandler(
 ): Promise<MCPProtocolHandler> {
   // Get CLI user for authentication using consolidated factory
   const cliUser = await getCliUser(logger, locale);
+
+  if (!cliUser.id) {
+    throw new Error("CLI user ID is required");
+  }
 
   // Convert to JwtPayloadType for MCP
   const user: JwtPayloadType = {

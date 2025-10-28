@@ -11,12 +11,13 @@ import { parseError } from "./parse-error";
 
 /**
  * Validate data against a schema
- * @param data - The data to validate
+ * Accepts any data (from HTTP, user input, etc.) and validates it
+ * @param data - The data to validate (can be any type from HTTP)
  * @param schema - The schema to validate against
  * @returns A response with the validated data or error
  */
 export function validateData<TSchema extends z.ZodType>(
-  data: z.input<TSchema>,
+  data: Parameters<TSchema["parse"]>[0],
   schema: TSchema,
   logger: EndpointLogger,
 ): ResponseType<z.infer<TSchema>> {
@@ -51,7 +52,7 @@ export function validateData<TSchema extends z.ZodType>(
     }
 
     // For API responses, don't wrap the response in a success object, return the data directly
-    return { data: result.data as z.infer<TSchema>, success: true };
+    return { data: result.data, success: true };
   } catch (error) {
     const parsedError = parseError(error);
     logger.error("Unexpected validation error", parsedError);

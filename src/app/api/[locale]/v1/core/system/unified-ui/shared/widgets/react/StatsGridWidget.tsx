@@ -3,8 +3,27 @@
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 
-import type { StatsGridWidgetData, WidgetComponentProps } from "../types";
+import type {
+  RenderableValue,
+  StatsGridWidgetData,
+  WidgetComponentProps,
+} from "../types";
 import { MetricCardWidget } from "./MetricCardWidget";
+
+/**
+ * Type guard for StatsGridWidgetData
+ */
+function isStatsGridWidgetData(
+  data: RenderableValue,
+): data is StatsGridWidgetData {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    !Array.isArray(data) &&
+    "metrics" in data &&
+    Array.isArray(data.metrics)
+  );
+}
 
 /**
  * Stats Grid Widget Component
@@ -16,17 +35,26 @@ export function StatsGridWidget({
   context,
   className,
   style,
-}: WidgetComponentProps<StatsGridWidgetData>): JSX.Element {
-  const { metrics, columns = 3, layout = "grid" } = data;
+}: WidgetComponentProps<RenderableValue>): JSX.Element {
+  if (!isStatsGridWidgetData(data)) {
+    return (
+      <div
+        className={cn("py-8 text-center text-muted-foreground", className)}
+        style={style}
+      >
+        —
+      </div>
+    );
+  }
 
+  const { metrics, columns = 3, layout = "grid" } = data;
   if (!metrics || metrics.length === 0) {
     return (
       <div
         className={cn("py-8 text-center text-muted-foreground", className)}
         style={style}
       >
-        {/* eslint-disable-next-line i18next/no-literal-string */}
-        <p>No metrics available</p>
+        —
       </div>
     );
   }

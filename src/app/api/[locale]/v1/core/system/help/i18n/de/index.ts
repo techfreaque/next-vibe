@@ -1,0 +1,193 @@
+export const translations = {
+  category: "Hilfe & Dokumentation",
+  tag: "Hilfe",
+  post: {
+    title: "Hilfeinformationen anzeigen",
+    description: "Hilfeinformationen über CLI-Befehle anzeigen",
+    form: {
+      title: "Hilfe-Optionen",
+      description: "Hilfe für bestimmte Befehle oder allgemeine Verwendung",
+    },
+    errors: {
+      validation: {
+        title: "Validierungsfehler",
+        description: "Ungültige Hilfe-Parameter",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Hilfeinformationen konnten nicht abgerufen werden",
+      },
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Sie sind nicht berechtigt, Hilfe anzuzeigen",
+      },
+      forbidden: {
+        title: "Verboten",
+        description: "Sie haben keine Berechtigung, Hilfe anzuzeigen",
+      },
+      notFound: {
+        title: "Befehl nicht gefunden",
+        description: "Der angegebene Befehl wurde nicht gefunden",
+      },
+      server: {
+        title: "Serverfehler",
+        description: "Hilfeinformationen konnten nicht generiert werden",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description:
+          "Ein unerwarteter Fehler ist beim Generieren der Hilfe aufgetreten",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Hilfe-Generierungskonflikt erkannt",
+      },
+    },
+    success: {
+      title: "Hilfe generiert",
+      description: "Hilfeinformationen erfolgreich generiert",
+    },
+  },
+  fields: {
+    command: {
+      label: "Befehl",
+      description:
+        "Spezifischer Befehl, für den Hilfe angezeigt werden soll (leer lassen für allgemeine Hilfe)",
+      placeholder: "z.B. check, list, db:ping",
+    },
+    header: {
+      title: "Kopfzeile",
+    },
+    title: {
+      label: "Titel",
+    },
+    description: {
+      label: "Beschreibung",
+    },
+    usage: {
+      title: "Verwendung",
+      patterns: "Verwendungsmuster",
+    },
+    commonCommands: {
+      title: "Häufige Befehle",
+      items: "Befehle",
+      command: "Befehl",
+      description: "Beschreibung",
+    },
+    options: {
+      title: "Optionen",
+      items: "Optionen",
+      flag: "Flag",
+      description: "Beschreibung",
+    },
+    examples: {
+      title: "Beispiele",
+      items: "Beispiele",
+      command: "Befehl",
+      description: "Beschreibung",
+    },
+    details: {
+      title: "Details",
+      category: "Kategorie",
+      path: "Pfad",
+      method: "Methode",
+      aliases: "Aliase",
+    },
+  },
+  list: {
+    post: {
+      title: "Verfügbare Befehle auflisten",
+      description:
+        "Zeigt alle verfügbaren CLI-Befehle mit Beschreibungen und Aliasen an",
+      form: {
+        title: "Befehlslisten-Optionen",
+        description: "Konfigurieren Sie, wie Befehle angezeigt werden",
+      },
+      errors: {
+        validation: {
+          title: "Validierungsfehler",
+          description: "Ungültige Listenbefehl-Parameter",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description: "Befehlsliste konnte nicht abgerufen werden",
+        },
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Sie sind nicht berechtigt, Befehle aufzulisten",
+        },
+        forbidden: {
+          title: "Verboten",
+          description: "Sie haben keine Berechtigung, Befehle aufzulisten",
+        },
+        notFound: {
+          title: "Nicht gefunden",
+          description: "Befehlsliste nicht gefunden",
+        },
+        server: {
+          title: "Serverfehler",
+          description: "Befehlsliste konnte nicht generiert werden",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description:
+            "Ein unerwarteter Fehler ist beim Auflisten der Befehle aufgetreten",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Befehlslisten-Konflikt erkannt",
+        },
+      },
+      success: {
+        title: "Befehle aufgelistet",
+        description: "Befehlsliste erfolgreich abgerufen",
+      },
+    },
+    tag: "Hilfe",
+    fields: {
+      category: {
+        label: "Nach Kategorie filtern",
+        description: "Nur Befehle in dieser Kategorie anzeigen",
+        placeholder: "z.B. system, database, user",
+      },
+      format: {
+        label: "Ausgabeformat",
+        description: "Wie die Befehlsliste angezeigt werden soll",
+        options: {
+          tree: "Baumansicht (verschachtelte Hierarchie)",
+          flat: "Flache Liste (einfache Auflistung)",
+          json: "JSON-Format (zum Parsen)",
+        },
+      },
+      showAliases: {
+        label: "Aliase anzeigen",
+        description: "Alle verfügbaren Befehlsaliase anzeigen",
+      },
+      showDescriptions: {
+        label: "Beschreibungen anzeigen",
+        description: "Befehlsbeschreibungen in die Ausgabe einbeziehen",
+      },
+      success: {
+        label: "Erfolg",
+      },
+      totalCommands: {
+        label: "Gesamtanzahl der Befehle",
+        description: "Anzahl der verfügbaren Befehle",
+      },
+    },
+    response: {
+      commands: {
+        title: "Verfügbare Befehle",
+        emptyState: {
+          description: "Keine Befehle gefunden",
+        },
+        alias: "Befehl",
+        path: "API-Pfad",
+        method: "HTTP-Methode",
+        category: "Kategorie",
+        description: "Beschreibung",
+        aliases: "Aliase",
+      },
+    },
+  },
+};

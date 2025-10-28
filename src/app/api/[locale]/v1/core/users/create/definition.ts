@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { leadId } from "@/app/api/[locale]/v1/core/leads/definition";
+import { leadId } from "@/app/api/[locale]/v1/core/leads/types";
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import {
   EndpointErrorTypes,

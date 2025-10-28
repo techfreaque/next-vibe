@@ -4,6 +4,11 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "../logger-types";
 
+/**
+ * Message ID prefix for credit operations
+ */
+const MESSAGE_ID_PREFIX = "msg_" as const;
+
 export interface CreditBalance {
   total: number;
   expiring: number;
@@ -75,25 +80,44 @@ export abstract class BaseCreditHandler {
       logger.error("Credit deduction requires leadId");
       return {
         success: false,
-        error: "Missing leadId for credit deduction",
+        error:
+          "app.api.v1.core.system.unifiedBackend.shared.credits.errors.missingLeadId",
       };
     }
 
-    const hasSufficient = await this.hasSufficientCredits(identifier, amount, logger);
+    const hasSufficient = await this.hasSufficientCredits(
+      identifier,
+      amount,
+      logger,
+    );
     if (!hasSufficient) {
-      return { success: false, error: "Insufficient credits" };
+      return {
+        success: false,
+        error:
+          "app.api.v1.core.system.unifiedBackend.shared.credits.errors.insufficientCredits",
+      };
     }
 
     const messageId = this.generateMessageId();
-    const result = await this.deductCredits(identifier, amount, modelId, messageId, logger);
+    const result = await this.deductCredits(
+      identifier,
+      amount,
+      modelId,
+      messageId,
+      logger,
+    );
     if (!result.success) {
-      return { success: false, error: "Failed to deduct credits" };
+      return {
+        success: false,
+        error:
+          "app.api.v1.core.system.unifiedBackend.shared.credits.errors.deductionFailed",
+      };
     }
     return { success: true, messageId };
   }
 
   protected generateMessageId(): string {
-    return `msg_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    return `${MESSAGE_ID_PREFIX}${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
   }
 
   protected getCreditIdentifier(user: {
@@ -110,11 +134,13 @@ export abstract class BaseCreditHandler {
     };
   }
 
-  protected createIdentifier(leadId: string, userId?: string): CreditIdentifier {
+  protected createIdentifier(
+    leadId: string,
+    userId?: string,
+  ): CreditIdentifier | null {
     if (!leadId) {
-      throw new Error("leadId required for credit operations");
+      return null;
     }
     return { leadId, userId };
   }
 }
-

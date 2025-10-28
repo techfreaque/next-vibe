@@ -53,8 +53,8 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.system.unifiedUi.cli.setup.status.post.success.title",
+          label:
+            "app.api.v1.core.system.unifiedUi.cli.setup.status.post.response.fields.success",
         },
         z.boolean(),
       ),
@@ -62,8 +62,8 @@ const { POST } = createEndpoint({
       installed: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.system.unifiedUi.cli.setup.status.post.title",
+          label:
+            "app.api.v1.core.system.unifiedUi.cli.setup.status.post.response.fields.installed",
         },
         z.boolean(),
       ),
@@ -71,8 +71,8 @@ const { POST } = createEndpoint({
       version: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.system.unifiedUi.cli.setup.status.post.description",
+          label:
+            "app.api.v1.core.system.unifiedUi.cli.setup.status.post.response.fields.version",
         },
         z.string().optional(),
       ),
@@ -80,8 +80,8 @@ const { POST } = createEndpoint({
       path: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.system.unifiedUi.cli.setup.status.post.title",
+          label:
+            "app.api.v1.core.system.unifiedUi.cli.setup.status.post.response.fields.path",
         },
         z.string().optional(),
       ),
@@ -89,8 +89,8 @@ const { POST } = createEndpoint({
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.system.unifiedUi.cli.setup.status.post.title",
+          label:
+            "app.api.v1.core.system.unifiedUi.cli.setup.status.post.response.fields.message",
         },
         z.string(),
       ),

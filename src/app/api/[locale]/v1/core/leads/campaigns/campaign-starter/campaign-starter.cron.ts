@@ -13,7 +13,7 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import {

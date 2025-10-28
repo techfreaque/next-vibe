@@ -25,8 +25,11 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-b
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
+import type {
+  CreditBalance,
+  CreditIdentifier,
+} from "../system/unified-backend/shared/credits/base-credit-handler";
 import { BaseCreditHandler } from "../system/unified-backend/shared/credits/base-credit-handler";
-import type { CreditBalance, CreditIdentifier } from "../system/unified-backend/shared/credits/base-credit-handler";
 import { creditTransactions, userCredits } from "./db";
 import { CreditTypeIdentifier, type CreditTypeIdentifierValue } from "./enum";
 
@@ -160,17 +163,19 @@ class CreditRepository
         logger,
       );
       if (identifierResult.success && identifierResult.data.userId) {
-        return this.getUserBalance(identifier.userId);
+        return await this.getUserBalance(identifier.userId);
       }
     }
 
-    return this.getLeadBalanceAsBalance(identifier.leadId);
+    return await this.getLeadBalanceAsBalance(identifier.leadId);
   }
 
   /**
    * Get user's current credit balance (internal)
    */
-  private async getUserBalance(userId: string): Promise<ResponseType<CreditBalance>> {
+  private async getUserBalance(
+    userId: string,
+  ): Promise<ResponseType<CreditBalance>> {
     try {
       const credits = await db
         .select()
@@ -301,7 +306,10 @@ class CreditRepository
 
       // If user has subscription → return user credits
       if (effectiveUserId && effectiveLeadId) {
-        return await this.getBalance({ leadId: effectiveLeadId, userId: effectiveUserId }, logger);
+        return await this.getBalance(
+          { leadId: effectiveLeadId, userId: effectiveUserId },
+          logger,
+        );
       }
 
       // If user has no subscription → return lead credits
@@ -444,7 +452,7 @@ class CreditRepository
 
     // If userId provided, add to user subscription credits
     if (identifier.userId) {
-      return this.addUserCredits(
+      return await this.addUserCredits(
         identifier.userId,
         amount,
         type as "subscription" | "permanent" | "free",
@@ -452,7 +460,7 @@ class CreditRepository
     }
 
     // Otherwise add to lead credits (public user)
-    return this.addLeadCredits(identifier.leadId, amount, logger);
+    return await this.addLeadCredits(identifier.leadId, amount, logger);
   }
 
   /**
@@ -490,7 +498,10 @@ class CreditRepository
 
       return createSuccessResponse(undefined);
     } catch (error) {
-      logger.error("Failed to add lead credits", parseError(error), { leadId, amount });
+      logger.error("Failed to add lead credits", parseError(error), {
+        leadId,
+        amount,
+      });
       return createErrorResponse(
         "app.api.v1.core.agent.chat.credits.errors.addCreditsFailed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -566,7 +577,8 @@ class CreditRepository
           identifier.leadId,
           logger,
         );
-        useUserCredits = identifierResult.success && !!identifierResult.data.userId;
+        useUserCredits =
+          identifierResult.success && !!identifierResult.data.userId;
       }
 
       if (useUserCredits && identifier.userId) {
@@ -601,10 +613,7 @@ class CreditRepository
         }
 
         // Get new balance (identifier already has leadId)
-        const balanceResult = await this.getBalance(
-          identifier,
-          logger,
-        );
+        const balanceResult = await this.getBalance(identifier, logger);
         const newBalance = balanceResult.success ? balanceResult.data.total : 0;
 
         // Create transaction record

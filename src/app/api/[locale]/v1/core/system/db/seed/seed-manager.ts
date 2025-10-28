@@ -1,11 +1,9 @@
-import fs from "node:fs";
 import path from "node:path";
 
 import { parseError } from "next-vibe/shared/utils";
 
-import { closeDatabase } from "@/app/api/[locale]/v1/core/system/db";
-import { findSeedFiles as findSeedFilesUtil } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/filesystem/directory-scanner";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { findSeedFiles as findSeedFilesUtil } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/filesystem/directory-scanner";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 export type SeedFn = (
@@ -93,18 +91,10 @@ async function discoverSeedFiles(logger: EndpointLogger): Promise<void> {
     `📦 Total modules registered: ${Object.keys(seedRegistry).length}`,
   );
 }
-
-// File patterns
-const TEST_FILE_PATTERN = ".test.";
-const SPEC_FILE_PATTERN = ".spec.";
-const SEED_TS_PATTERN = "seed.ts";
-const SEEDS_TS_PATTERN = "seeds.ts";
-
 /**
  * Find all seed files in a directory and its subdirectories
  */
 function findSeedFiles(dir: string): string[] {
-  // Use consolidated directory scanner
   return findSeedFilesUtil(dir);
 }
 

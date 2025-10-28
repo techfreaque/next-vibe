@@ -7,11 +7,9 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { NextRequest } from "next/server";
 import {
-  AUTH_STATUS_COOKIE_NAME,
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
   AUTH_TOKEN_COOKIE_NAME,
 } from "next-vibe/shared/constants";
@@ -22,7 +20,7 @@ import {
   ErrorResponseTypes,
   throwErrorResponse,
 } from "next-vibe/shared/types/response.schema";
-import { Environment, parseError } from "next-vibe/shared/utils";
+import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import { env } from "@/config/env";
@@ -36,13 +34,14 @@ import { db } from "../../system/db";
 import {
   type AuthContext,
   type AuthPlatform,
-  BaseAuthHandler,
 } from "../../system/unified-backend/shared/auth/base-auth-handler";
+import { getPlatformAuthHandler } from "../../system/unified-backend/shared/auth/platform-auth-factory";
+import { detectPlatformFromRequest } from "../../system/unified-backend/shared/auth/platform-detection";
 import { users } from "../db";
-import type { CompleteUserType } from "../definition";
 import { UserDetailLevel } from "../enum";
 import { sessionRepository } from "../private/session/repository";
 import { userRepository } from "../repository";
+import type { CompleteUserType } from "../types";
 import type { UserRoleValue } from "../user-roles/enum";
 import { UserRole } from "../user-roles/enum";
 import { userRolesRepository } from "../user-roles/repository";
@@ -50,7 +49,7 @@ import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
   JWTPublicPayloadType,
-} from "./definition";
+} from "./types";
 
 export type { AuthContext, AuthPlatform };
 
@@ -83,9 +82,9 @@ function createPrivateUser<
 
 /**
  * Unified Auth Repository Interface with type-safe authentication
- * Extends BaseAuthHandler for shared logic
+ * Platform-agnostic authentication business logic
  */
-export interface AuthRepository extends BaseAuthHandler {
+export interface AuthRepository {
   /**
    * Sign a JWT token
    */
@@ -141,18 +140,25 @@ export interface AuthRepository extends BaseAuthHandler {
   ): Promise<(typeof UserRoleValue)[keyof typeof UserRoleValue][]>;
 
   /**
-   * Set authentication cookies (Next.js only)
+   * Store authentication token using platform-specific handler
+   * Automatically detects platform from request context
    */
-  setAuthCookies(
+  storeAuthTokenForPlatform(
     token: string,
-    rememberMe: boolean,
+    userId: string,
+    leadId: string,
+    request: NextRequest,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>>;
 
   /**
-   * Clear authentication cookies (Next.js only)
+   * Clear authentication token using platform-specific handler
+   * Automatically detects platform from request context
    */
-  clearAuthCookies(logger: EndpointLogger): Promise<ResponseType<void>>;
+  clearAuthTokenForPlatform(
+    request: NextRequest,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>>;
 
   /**
    * Create CLI token
@@ -194,13 +200,12 @@ export interface AuthRepository extends BaseAuthHandler {
 /**
  * Unified Auth Repository Implementation
  * Contains all authentication business logic consolidated from handlers and core
- * Extends BaseAuthHandler for shared logic
+ * Platform-agnostic - delegates to platform handlers for storage
  */
-class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
+class AuthRepositoryImpl implements AuthRepository {
   private readonly secretKey: Uint8Array;
 
   constructor() {
-    super();
     if (!env.JWT_SECRET_KEY) {
       this.secretKey = new TextEncoder().encode("fallback-dev-key-only");
     } else {
@@ -208,22 +213,22 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
     }
   }
 
+  /**
+   * Get leadId from database (platform-agnostic)
+   * Note: This method should not access cookies directly - platform handlers manage storage
+   */
   async getLeadIdFromDb(
     userId: string | undefined,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    skipCookies = false,
-  ): Promise<string> {
+  ): Promise<string | null> {
     if (userId) {
-      return await this.getLeadIdForUser(userId, locale, logger, skipCookies);
+      return await this.getLeadIdForUser(userId, locale, logger);
     }
-    return await this.getLeadIdForPublicUser(locale, logger, skipCookies);
+    return await this.getLeadIdForPublicUser(locale, logger);
   }
 
-  async getPrimaryLeadId(
-    userId: string,
-    logger: EndpointLogger,
-  ): Promise<string | null> {
+  async getPrimaryLeadId(userId: string): Promise<string | null> {
     const [primaryUserLead] = await db
       .select()
       .from(userLeads)
@@ -243,10 +248,7 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
     return anyUserLead?.leadId || null;
   }
 
-  async getAllLeadIds(
-    userId: string,
-    logger: EndpointLogger,
-  ): Promise<string[]> {
+  async getAllLeadIds(userId: string): Promise<string[]> {
     const userLeadRecords = await db
       .select({ leadId: userLeads.leadId })
       .from(userLeads)
@@ -296,7 +298,11 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
         return null;
       }
 
-      const leadId = await this.getLeadIdFromDb(userId, locale, logger, true);
+      const leadId = await this.getLeadIdFromDb(userId, locale, logger);
+      if (!leadId) {
+        logger.error("Failed to get or create lead for user", { userId });
+        return null;
+      }
       return { isPublic: false, id: userId, leadId };
     } catch (error) {
       logger.error(
@@ -358,35 +364,19 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
   }
 
   /**
-   * Get leadId for authenticated user
+   * Get leadId for authenticated user (platform-agnostic)
    * @param userId - User ID
    * @param locale - User locale for lead creation fallback
    * @param logger - Logger for debugging
-   * @param skipCookies - Skip cookie reading (for CLI context)
    * @returns leadId
    */
   private async getLeadIdForUser(
     userId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    skipCookies = false,
-  ): Promise<string> {
+  ): Promise<string | null> {
     try {
-      // Get leadId from cookie (skip for CLI)
-      let cookieLeadId: string | undefined;
-      if (!skipCookies) {
-        try {
-          const cookieStore = await cookies();
-          cookieLeadId = cookieStore.get("leadId")?.value;
-        } catch (error) {
-          // Cookies not available (e.g., CLI context)
-          logger.debug(
-            "app.api.v1.core.user.auth.debug.cookiesNotAvailable",
-            parseError(error),
-          );
-        }
-      }
-
+      // Get primary lead for user
       const [primaryUserLead] = await db
         .select()
         .from(userLeads)
@@ -397,6 +387,7 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
         return primaryUserLead.leadId;
       }
 
+      // Fallback to any lead for user
       const [anyUserLead] = await db
         .select()
         .from(userLeads)
@@ -407,12 +398,14 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
         return anyUserLead.leadId;
       }
 
+      // Create new lead if none exists
       return await this.createLeadForUser(userId, locale, logger);
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.auth.debug.errorGettingLeadId",
         parseError(error),
       );
+      // Try to create lead as fallback
       return await this.createLeadForUser(userId, locale, logger);
     }
   }
@@ -421,7 +414,7 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
     userId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<string> {
+  ): Promise<string | null> {
     const [user] = await db
       .select({ email: users.email })
       .from(users)
@@ -429,7 +422,8 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
       .limit(1);
 
     if (!user) {
-      throw new Error(`User not found: ${userId}`);
+      logger.error("User not found when creating lead", { userId });
+      return null;
     }
 
     const { language, country } = getLanguageAndCountryFromLocale(locale);
@@ -456,52 +450,19 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
   }
 
   /**
-   * Get leadId for public user
+   * Get leadId for public user (platform-agnostic)
+   * Creates a new anonymous lead in the database
    * @param locale - Locale for lead creation
    * @param logger - Logger for debugging
-   * @param skipCookies - Skip cookie reading (for CLI context)
-   * @returns leadId
+   * @returns leadId or null if creation fails
    */
   private async getLeadIdForPublicUser(
     locale: CountryLanguage,
     logger: EndpointLogger,
-    skipCookies = false,
-  ): Promise<string> {
+  ): Promise<string | null> {
     try {
-      // Get leadId from cookie (skip for CLI)
-      let cookieLeadId: string | undefined;
-      if (!skipCookies) {
-        try {
-          const cookieStore = await cookies();
-          cookieLeadId = cookieStore.get("leadId")?.value;
-        } catch (error) {
-          // Cookies not available (e.g., CLI context)
-          logger.debug(
-            "app.api.v1.core.user.auth.debug.cookiesNotAvailable",
-            parseError(error),
-          );
-        }
-      }
-
-      // Get client info from headers
-      const clientInfo = {
-        userAgent: undefined,
-        ipAddress: undefined,
-        referer: undefined,
-      };
-
-      if (cookieLeadId) {
-        const [existingLead] = await db
-          .select()
-          .from(leads)
-          .where(eq(leads.id, cookieLeadId))
-          .limit(1);
-
-        if (existingLead) {
-          return existingLead.id;
-        }
-      }
-
+      // Always create a new lead for public users
+      // Platform handlers are responsible for checking/storing lead IDs
       const { language, country } = getLanguageAndCountryFromLocale(locale);
       const [newLead] = await db
         .insert(leads)
@@ -522,7 +483,7 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
         "app.api.v1.core.user.auth.debug.errorGettingPublicLeadId",
         parseError(error),
       );
-      throw error;
+      return null;
     }
   }
 
@@ -785,6 +746,7 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
 
   /**
    * Get current user with platform-aware handling
+   * Delegates to platform handlers for authentication
    */
   async getCurrentUser(
     context: AuthContext,
@@ -799,237 +761,37 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
         );
       }
 
-      if (!context.platform) {
-        // Default to Next.js behavior for backward compatibility
-        return await this.getCurrentUserNext(context.locale, logger);
+      // Default to Next.js platform for backward compatibility
+      const platform = context.platform || "next";
+
+      // Get platform-specific auth handler
+      const authHandler = getPlatformAuthHandler(platform);
+
+      // Authenticate using platform handler
+      const authResult = await authHandler.authenticate(context, logger);
+
+      if (!authResult.success) {
+        return createErrorResponse(
+          "app.api.v1.core.user.auth.errors.authentication_failed",
+          ErrorResponseTypes.UNAUTHORIZED,
+          { error: authResult.message },
+        );
       }
 
-      switch (context.platform) {
-        case "next":
-          return await this.getCurrentUserNext(context.locale, logger);
+      const jwtPayload = authResult.data;
 
-        case "trpc":
-        case "web":
-          if (!context.request) {
-            return createErrorResponse(
-              "app.api.v1.core.user.auth.errors.missing_request_context",
-              ErrorResponseTypes.INTERNAL_ERROR,
-            );
-          }
-          return await this.getCurrentUserTrpc(
-            context.request,
-            context.locale,
-            logger,
-          );
-
-        case "cli":
-        case "ai":
-        case "mcp":
-        case "mobile":
-          if (!context.token) {
-            return createErrorResponse(
-              "app.api.v1.core.user.auth.errors.missing_token",
-              ErrorResponseTypes.UNAUTHORIZED,
-            );
-          }
-          return await this.getCurrentUserCli(
-            context.token,
-            context.locale,
-            logger,
-          );
-
-        default: {
-          // Exhaustiveness check - TypeScript will error if a new platform is added but not handled
-          context.platform satisfies never;
-          return createErrorResponse(
-            "app.api.v1.core.user.auth.errors.unsupported_platform",
-            ErrorResponseTypes.INTERNAL_ERROR,
-          );
-        }
+      // Ensure we have a private user (not public)
+      if (jwtPayload.isPublic) {
+        return createErrorResponse(
+          "app.api.v1.core.user.auth.errors.user_not_authenticated",
+          ErrorResponseTypes.UNAUTHORIZED,
+        );
       }
+
+      return createSuccessResponse(jwtPayload);
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.auth.debug.errorInUnifiedGetCurrentUser",
-        parseError(error),
-      );
-      return createErrorResponse(
-        "app.api.v1.core.user.auth.errors.session_retrieval_failed",
-        ErrorResponseTypes.UNAUTHORIZED,
-        { error: parseError(error).message },
-      );
-    }
-  }
-
-  /**
-   * Get current user from Next.js cookies
-   * @param locale - Current locale from route context
-   * @param logger - Logger for debugging
-   * @returns ResponseType with the current user
-   */
-  private async getCurrentUserNext(
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<JwtPrivatePayloadType>> {
-    try {
-      logger.debug(
-        "app.api.v1.core.user.auth.debug.gettingCurrentUserFromNextjs",
-      );
-
-      // Get the token from cookies
-      const cookieStore = await cookies();
-      const token = cookieStore.get(AUTH_TOKEN_COOKIE_NAME)?.value;
-
-      if (!token) {
-        return createErrorResponse(
-          "app.api.v1.core.user.auth.errors.missing_token",
-          ErrorResponseTypes.UNAUTHORIZED,
-        );
-      }
-
-      // Verify the token
-      const verifyResult = await this.verifyJwt(token, logger);
-      if (!verifyResult.success) {
-        return verifyResult;
-      }
-
-      const user = await this.validateSession(
-        token,
-        verifyResult.data.id,
-        locale,
-        logger,
-      );
-      if (!user) {
-        // Clear invalid cookies
-        cookieStore.delete(AUTH_TOKEN_COOKIE_NAME);
-        cookieStore.delete(AUTH_STATUS_COOKIE_NAME);
-
-        return createErrorResponse(
-          "app.api.v1.core.user.auth.errors.invalid_session",
-          ErrorResponseTypes.UNAUTHORIZED,
-        );
-      }
-
-      return createSuccessResponse(user);
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.user.auth.debug.errorGettingAuthUserForNextjs",
-        parseError(error),
-      );
-      return createErrorResponse(
-        "app.api.v1.core.user.auth.errors.session_retrieval_failed",
-        ErrorResponseTypes.UNAUTHORIZED,
-        { error: parseError(error).message },
-      );
-    }
-  }
-
-  /**
-   * Get current user from tRPC request context
-   * @param request - NextRequest from tRPC context
-   * @param locale - Current locale from route context
-   * @param logger - Logger for debugging
-   * @returns ResponseType with the current user
-   */
-  private async getCurrentUserTrpc(
-    request: NextRequest,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<JwtPrivatePayloadType>> {
-    try {
-      logger.debug(
-        "app.api.v1.core.user.auth.debug.gettingCurrentUserFromTrpc",
-      );
-
-      // Extract token from request
-      const token = this.extractTokenFromRequest(request, logger);
-
-      if (!token) {
-        return createErrorResponse(
-          "app.api.v1.core.user.auth.errors.missing_token",
-          ErrorResponseTypes.UNAUTHORIZED,
-        );
-      }
-
-      // Verify the token
-      const verifyResult = await this.verifyJwt(token, logger);
-      if (!verifyResult.success) {
-        return verifyResult;
-      }
-
-      const user = await this.validateSession(
-        token,
-        verifyResult.data.id,
-        locale,
-        logger,
-      );
-      if (!user) {
-        return createErrorResponse(
-          "app.api.v1.core.user.auth.errors.invalid_session",
-          ErrorResponseTypes.UNAUTHORIZED,
-        );
-      }
-
-      return createSuccessResponse(user);
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.user.auth.debug.errorGettingAuthUserForTrpc",
-        parseError(error),
-      );
-      return createErrorResponse(
-        "app.api.v1.core.user.auth.errors.session_retrieval_failed",
-        ErrorResponseTypes.UNAUTHORIZED,
-        { error: parseError(error).message },
-      );
-    }
-  }
-
-  /**
-   * Get current user from JWT token (CLI)
-   * @param token - JWT token provided by CLI
-   * @param locale - Current locale from route context
-   * @param logger - Logger for debugging
-   * @returns ResponseType with the current user
-   */
-  private async getCurrentUserCli(
-    token: string,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<JwtPrivatePayloadType>> {
-    try {
-      logger.debug(
-        "app.api.v1.core.user.auth.debug.gettingCurrentUserFromToken",
-      );
-
-      if (!token) {
-        return createErrorResponse(
-          "app.api.v1.core.user.auth.errors.missing_token",
-          ErrorResponseTypes.UNAUTHORIZED,
-        );
-      }
-
-      // Verify the token
-      const verifyResult = await this.verifyJwt(token, logger);
-      if (!verifyResult.success) {
-        return verifyResult;
-      }
-
-      const user = await this.validateSession(
-        token,
-        verifyResult.data.id,
-        locale,
-        logger,
-      );
-      if (!user) {
-        return createErrorResponse(
-          "app.api.v1.core.user.auth.errors.invalid_session",
-          ErrorResponseTypes.UNAUTHORIZED,
-        );
-      }
-
-      return createSuccessResponse(user);
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.user.auth.debug.errorGettingCurrentUserFromCli",
         parseError(error),
       );
       return createErrorResponse(
@@ -1059,327 +821,77 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
         throw new Error("Locale is required in AuthContext for lead creation");
       }
 
-      if (!context.platform) {
-        // Default to Next.js behavior for backward compatibility
-        return await this.getAuthMinimalUserNext<TRoles>(
-          roles,
+      // Default to Next.js platform for backward compatibility
+      const platform = context.platform || "next";
+
+      // Get platform-specific auth handler
+      const authHandler = getPlatformAuthHandler(platform);
+
+      // Authenticate using platform handler
+      const authResult = await authHandler.authenticate(context, logger);
+
+      if (!authResult.success) {
+        logger.error("Platform authentication failed", {
+          platform,
+          error: authResult.message,
+        });
+        const leadId = await authHandler.getLeadIdFromDb(
+          undefined,
           context.locale,
           logger,
         );
-      }
-
-      switch (context.platform) {
-        case "next":
-          return await this.getAuthMinimalUserNext(
-            roles,
-            context.locale,
-            logger,
+        if (!leadId) {
+          logger.error("Failed to get lead ID for public user");
+          return throwErrorResponse(
+            "app.api.v1.core.user.auth.errors.session_retrieval_failed",
+            ErrorResponseTypes.INTERNAL_ERROR,
           );
-
-        case "trpc":
-        case "web":
-          if (!context.request) {
-            logger.error(
-              "app.api.v1.core.user.auth.debug.missingRequestContextForTrpc",
-            );
-            return { isPublic: true } as InferUserType<TRoles>;
-          }
-          return await this.getAuthMinimalUserTrpc(
-            context.request,
-            roles,
-            context.locale,
-            logger,
-          );
-
-        case "cli":
-        case "ai":
-        case "mcp":
-        case "mobile":
-          if (context.jwtPayload) {
-            // Direct payload authentication
-            // Ensure payload is private (has id and isPublic: false)
-            if (context.jwtPayload.isPublic) {
-              logger.error(
-                "app.api.v1.core.user.auth.debug.publicPayloadNotSupportedForCli",
-              );
-              return throwErrorResponse(
-                "app.api.v1.core.user.auth.errors.publicPayloadNotSupported",
-                ErrorResponseTypes.UNAUTHORIZED,
-              );
-            }
-            // TypeScript now knows this is JwtPrivatePayloadType after the check
-            return await this.authenticateWithPayload<TRoles>(
-              context.jwtPayload,
-              roles,
-              context.locale,
-              logger,
-            );
-          } else if (context.token) {
-            // Token-based authentication
-            return await this.getAuthMinimalUserCli<TRoles>(
-              context.token,
-              roles,
-              context.locale,
-              logger,
-            );
-          } else {
-            logger.error(
-              "app.api.v1.core.user.auth.debug.missingTokenOrPayloadForCli",
-            );
-            const leadId = await this.getLeadIdForPublicUser(
-              context.locale,
-              logger,
-            );
-            return createPublicUser<TRoles>(leadId);
-          }
-
-        default: {
-          const _exhaustiveCheck: never = context.platform;
-          logger.error(
-            "app.api.v1.core.user.auth.debug.unsupportedPlatformForAuth",
-            {
-              platform: _exhaustiveCheck,
-            },
-          );
-          return { isPublic: true } as InferUserType<TRoles>;
         }
+        return createPublicUser<TRoles>(leadId);
       }
+
+      const jwtPayload = authResult.data;
+
+      // If public user, return immediately if PUBLIC role is allowed
+      if (jwtPayload.isPublic) {
+        if (roles.includes(UserRole.PUBLIC as TRoles[number])) {
+          return jwtPayload as InferUserType<TRoles>;
+        }
+        logger.error("Public user not allowed for this endpoint", {
+          roles: JSON.stringify(roles),
+        });
+        return throwErrorResponse(
+          "app.api.v1.core.user.auth.errors.publicUserNotAllowed",
+          ErrorResponseTypes.UNAUTHORIZED,
+        );
+      }
+
+      // Authenticate with payload for private users
+      return await this.authenticateWithPayload<TRoles>(
+        jwtPayload,
+        roles,
+        context.locale,
+        logger,
+      );
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.auth.debug.errorInUnifiedGetAuthMinimalUser",
         parseError(error),
       );
-      return { isPublic: true } as InferUserType<TRoles>;
-    }
-  }
-
-  /**
-   * Get authenticated user with role checking for Next.js
-   * @param roles - Required roles
-   * @param locale - Locale for lead creation
-   * @param logger - Logger for debugging
-   * @returns Authenticated user
-   */
-  private async getAuthMinimalUserNext<
-    TRoles extends
-      readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
-  >(
-    roles: TRoles,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<InferUserType<TRoles>> {
-    try {
-      logger.info(
-        "app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.start",
+      const platform = context.platform || "next";
+      const authHandler = getPlatformAuthHandler(platform);
+      const leadId = await authHandler.getLeadIdFromDb(
+        undefined,
+        context.locale,
+        logger,
       );
-
-      // First, try to get authenticated user from cookies
-      const userResult = await this.getCurrentUserNext(locale, logger);
-
-      // If user is authenticated, proceed with authenticated user flow
-      if (
-        userResult.success &&
-        userResult.data?.id &&
-        !userResult.data.isPublic
-      ) {
-        logger.info(
-          "app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.authenticated",
-        );
-
-        // Get leadId for authenticated user
-        const leadId = await this.getLeadIdForUser(
-          userResult.data.id,
-          locale,
-          logger,
-        );
-
-        logger.info(
-          "app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.returningAuth",
-          {
-            userId: userResult.data.id,
-            leadId,
-          },
-        );
-
-        // Use internal method to check authentication with roles
-        return await this.getAuthenticatedUserInternal<TRoles>(
-          userResult.data.id,
-          leadId,
-          roles,
-          logger,
+      if (!leadId) {
+        logger.error("Failed to get lead ID for public user");
+        return throwErrorResponse(
+          "app.api.v1.core.user.auth.errors.session_retrieval_failed",
+          ErrorResponseTypes.INTERNAL_ERROR,
         );
       }
-
-      // User is not authenticated - check if PUBLIC role is allowed
-      if (roles.includes(UserRole.PUBLIC)) {
-        // Get leadId for public user
-        const leadId = await this.getLeadIdForPublicUser(locale, logger);
-        return createPublicUser<TRoles>(leadId);
-      }
-
-      // User not authenticated and PUBLIC role not allowed - return public user
-      // (will be rejected by role check in getAuthenticatedUserInternal)
-      const leadId = await this.getLeadIdForPublicUser(locale, logger);
-      logger.info(
-        "app.api.v1.core.user.auth.debug.getAuthMinimalUserNext.returningPublic",
-        {
-          leadId,
-        },
-      );
-      return createPublicUser<TRoles>(leadId);
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.user.auth.debug.errorGettingAuthUserForNextjs",
-        parseError(error),
-      );
-      // Fallback to public user with leadId if PUBLIC role is allowed
-      if (roles.includes(UserRole.PUBLIC)) {
-        const leadId = await this.getLeadIdForPublicUser(locale, logger);
-        return createPublicUser<TRoles>(leadId);
-      }
-      // Otherwise, return public user (will be rejected by role check)
-      const leadId = await this.getLeadIdForPublicUser(locale, logger);
-      return createPublicUser<TRoles>(leadId);
-    }
-  }
-
-  /**
-   * Get authenticated user with role checking for tRPC
-   * @param request - NextRequest from tRPC context
-   * @param roles - Required roles
-   * @param locale - Locale for lead creation
-   * @param logger - Logger for debugging
-   * @returns Authenticated user
-   */
-  private async getAuthMinimalUserTrpc<
-    TRoles extends
-      readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
-  >(
-    request: NextRequest,
-    roles: TRoles,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<InferUserType<TRoles>> {
-    try {
-      // First, try to get authenticated user from request
-      const userResult = await this.getCurrentUserTrpc(request, locale, logger);
-
-      // If user is authenticated, proceed with authenticated user flow
-      if (
-        userResult.success &&
-        userResult.data?.id &&
-        !userResult.data.isPublic
-      ) {
-        // Get leadId for authenticated user
-        const leadId = await this.getLeadIdForUser(
-          userResult.data.id,
-          locale,
-          logger,
-        );
-
-        // Use internal method to check authentication with roles
-        return await this.getAuthenticatedUserInternal<TRoles>(
-          userResult.data.id,
-          leadId,
-          roles,
-          logger,
-        );
-      }
-
-      // User is not authenticated - check if PUBLIC role is allowed
-      if (roles.includes(UserRole.PUBLIC)) {
-        // Get leadId for public user
-        const leadId = await this.getLeadIdForPublicUser(locale, logger);
-        return createPublicUser<TRoles>(leadId);
-      }
-
-      // User not authenticated and PUBLIC role not allowed - return public user
-      // (will be rejected by role check in getAuthenticatedUserInternal)
-      const leadId = await this.getLeadIdForPublicUser(locale, logger);
-      return createPublicUser<TRoles>(leadId);
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.user.auth.debug.errorGettingAuthUserForTrpc",
-        parseError(error),
-      );
-      // Fallback to public user with leadId if PUBLIC role is allowed
-      if (roles.includes(UserRole.PUBLIC)) {
-        const leadId = await this.getLeadIdForPublicUser(locale, logger);
-        return createPublicUser<TRoles>(leadId);
-      }
-      // Otherwise, return public user (will be rejected by role check)
-      const leadId = await this.getLeadIdForPublicUser(locale, logger);
-      return createPublicUser<TRoles>(leadId);
-    }
-  }
-
-  /**
-   * Get authenticated user with role checking for CLI
-   * @param token - JWT token provided by CLI
-   * @param roles - Required roles
-   * @param locale - Locale for lead creation
-   * @param logger - Logger for debugging
-   * @returns Authenticated user
-   */
-  private async getAuthMinimalUserCli<
-    TRoles extends
-      readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
-  >(
-    token: string,
-    roles: TRoles,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<InferUserType<TRoles>> {
-    try {
-      // First, try to get authenticated user from token
-      const userResult = await this.getCurrentUserCli(token, locale, logger);
-
-      // If user is authenticated, proceed with authenticated user flow
-      if (
-        userResult.success &&
-        userResult.data?.id &&
-        !userResult.data.isPublic
-      ) {
-        // Get leadId for authenticated user (skip cookies for CLI)
-        const leadId = await this.getLeadIdForUser(
-          userResult.data.id,
-          locale,
-          logger,
-          true,
-        );
-
-        // Use internal method to check authentication with roles
-        return await this.getAuthenticatedUserInternal(
-          userResult.data.id,
-          leadId,
-          roles,
-          logger,
-        );
-      }
-
-      // User is not authenticated - check if PUBLIC role is allowed
-      if (roles.includes(UserRole.PUBLIC) || roles.length === 0) {
-        // Get leadId for public user (skip cookies for CLI)
-        const leadId = await this.getLeadIdForPublicUser(locale, logger, true);
-        return createPublicUser<TRoles>(leadId);
-      }
-
-      // User not authenticated and PUBLIC role not allowed - return public user
-      // (will be rejected by role check in getAuthenticatedUserInternal)
-      const leadId = await this.getLeadIdForPublicUser(locale, logger, true);
-      return createPublicUser<TRoles>(leadId);
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.user.auth.debug.errorGettingAuthUserForCli",
-        parseError(error),
-      );
-      // Fallback to public user with leadId if PUBLIC role is allowed
-      if (roles.includes(UserRole.PUBLIC) || roles.length === 0) {
-        const leadId = await this.getLeadIdForPublicUser(locale, logger, true);
-        return createPublicUser<TRoles>(leadId);
-      }
-      // Otherwise, return public user (will be rejected by role check)
-      const leadId = await this.getLeadIdForPublicUser(locale, logger, true);
       return createPublicUser<TRoles>(leadId);
     }
   }
@@ -1439,7 +951,23 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
         "app.api.v1.core.user.auth.debug.errorAuthenticatingCliUserWithPayload",
         parseError(error),
       );
-      const leadId = await this.getLeadIdForPublicUser(locale, logger, true);
+      const leadId = await this.getLeadIdForPublicUser(locale, logger);
+      if (!leadId) {
+        // Try to use leadId from payload as last resort
+        if (jwtPayload.leadId) {
+          logger.warn("Using leadId from JWT payload as fallback", {
+            leadId: jwtPayload.leadId,
+          });
+          return createPublicUser<TRoles>(jwtPayload.leadId);
+        }
+        logger.error(
+          "Failed to create public lead and no payload leadId available",
+        );
+        return throwErrorResponse(
+          "app.api.v1.core.user.auth.errors.session_retrieval_failed",
+          ErrorResponseTypes.INTERNAL_ERROR,
+        );
+      }
       return createPublicUser<TRoles>(leadId);
     }
   }
@@ -1462,6 +990,7 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
 
   /**
    * Get user roles (platform-aware)
+   * Delegates to platform handlers for authentication
    */
   async getUserRoles(
     requiredRoles: readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
@@ -1475,59 +1004,19 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
         return [];
       }
 
-      if (!context.platform) {
-        // Default behavior - try to get user and return roles
-        const user = await this.getAuthMinimalUserNext(
-          requiredRoles,
-          context.locale,
-          logger,
-        );
-        return user && !user.isPublic
-          ? await this.getUserRolesInternal(user.id, requiredRoles, logger)
-          : [];
+      // Get user using platform handler
+      const user = await this.getAuthMinimalUser(
+        requiredRoles,
+        context,
+        logger,
+      );
+
+      // Return roles for authenticated users
+      if (user && !user.isPublic) {
+        return await this.getUserRolesInternal(user.id, requiredRoles, logger);
       }
 
-      switch (context.platform) {
-        case "next": {
-          const nextUser = await this.getAuthMinimalUserNext(
-            requiredRoles,
-            context.locale,
-            logger,
-          );
-          return nextUser && !nextUser.isPublic
-            ? await this.getUserRolesInternal(
-                nextUser.id,
-                requiredRoles,
-                logger,
-              )
-            : [];
-        }
-
-        case "trpc":
-          if (!context.request) {
-            return [];
-          }
-          return await this.getUserRolesTrpc(
-            context.request,
-            requiredRoles,
-            logger,
-            context.locale,
-          );
-
-        case "cli":
-          if (context.token) {
-            return await this.getUserRolesCli(
-              context.token,
-              requiredRoles,
-              logger,
-              context.locale,
-            );
-          }
-          return [];
-
-        default:
-          return [];
-      }
+      return [];
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.auth.debug.errorGettingUserRoles",
@@ -1538,123 +1027,28 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
   }
 
   /**
-   * Get user roles for tRPC context
-   * @param request - NextRequest from tRPC context
-   * @param requiredRoles - Roles to check for
-   * @param logger - Logger for debugging
-   * @returns User roles array
+   * Store authentication token using platform-specific handler
+   * Automatically detects platform from request context
    */
-  private async getUserRolesTrpc(
+  async storeAuthTokenForPlatform(
+    token: string,
+    userId: string,
+    leadId: string,
     request: NextRequest,
-    requiredRoles: readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<(typeof UserRoleValue)[keyof typeof UserRoleValue][]> {
-    try {
-      // Get user from request (locale not needed for role check only)
-      const userResult = await this.getCurrentUserTrpc(request, locale, logger);
-      if (
-        !userResult.success ||
-        !userResult.data?.id ||
-        userResult.data.isPublic
-      ) {
-        return [];
-      }
-
-      // Use internal method to get user roles
-      return await this.getUserRolesInternal(
-        userResult.data.id,
-        requiredRoles,
-        logger,
-      );
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.user.auth.debug.errorGettingUserRolesForTrpc",
-        parseError(error),
-      );
-      return [];
-    }
-  }
-
-  /**
-   * Get user roles for CLI context
-   * @param token - JWT token provided by CLI
-   * @param requiredRoles - Roles to check for
-   * @param logger - Logger for debugging
-   * @returns User roles array
-   */
-  private async getUserRolesCli(
-    token: string,
-    requiredRoles: readonly (typeof UserRoleValue)[keyof typeof UserRoleValue][],
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<(typeof UserRoleValue)[keyof typeof UserRoleValue][]> {
-    try {
-      // Get user from token (locale not needed for role check only)
-      const userResult = await this.getCurrentUserCli(token, locale, logger);
-      if (
-        !userResult.success ||
-        !userResult.data?.id ||
-        userResult.data.isPublic
-      ) {
-        return [];
-      }
-
-      // Use internal method to get user roles
-      return await this.getUserRolesInternal(
-        userResult.data.id,
-        requiredRoles,
-        logger,
-      );
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.user.auth.debug.errorGettingUserRolesForCli",
-        parseError(error),
-      );
-      return [];
-    }
-  }
-
-  /**
-   * Set authentication cookies (Next.js only)
-   */
-  async setAuthCookies(
-    token: string,
-    rememberMe = false,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {
-      logger.debug("app.api.v1.core.user.auth.debug.settingNextjsAuthCookies", {
-        rememberMe,
-      });
+      // Determine platform from request
+      const platform = detectPlatformFromRequest(request);
+      logger.debug("Storing auth token for platform", { platform, userId });
 
-      const cookiesStore = await cookies();
+      // Get platform-specific handler
+      const handler = getPlatformAuthHandler(platform);
 
-      const cookieOptions = {
-        name: AUTH_TOKEN_COOKIE_NAME,
-        value: token,
-        httpOnly: true,
-        path: "/",
-        secure: env.NODE_ENV === Environment.PRODUCTION,
-        sameSite: "lax" as const,
-        // If rememberMe is true, set maxAge for persistent cookie
-        // If rememberMe is false, omit maxAge for session cookie
-        ...(rememberMe && { maxAge: 30 * 24 * 60 * 60 }), // 30 days
-      };
-
-      // Set the main httpOnly token cookie for server-side security
-      cookiesStore.set(cookieOptions);
-
-      logger.debug("app.api.v1.core.user.auth.debug.settingNextjsAuthCookies", {
-        rememberMe,
-        cookieType: rememberMe ? "persistent" : "session",
-      });
-      return createSuccessResponse(undefined);
+      // Delegate to platform handler
+      return await handler.storeAuthToken(token, userId, leadId, logger);
     } catch (error) {
-      logger.error(
-        "app.api.v1.core.user.auth.debug.errorSettingAuthCookies",
-        parseError(error),
-      );
+      logger.error("Error storing auth token for platform", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.auth.errors.cookie_set_failed",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -1664,26 +1058,25 @@ class AuthRepositoryImpl extends BaseAuthHandler implements AuthRepository {
   }
 
   /**
-   * Clear authentication cookies (Next.js only)
+   * Clear authentication token using platform-specific handler
+   * Automatically detects platform from request context
    */
-  async clearAuthCookies(logger: EndpointLogger): Promise<ResponseType<void>> {
+  async clearAuthTokenForPlatform(
+    request: NextRequest,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
     try {
-      logger.debug("app.api.v1.core.user.auth.debug.clearingNextjsAuthCookies");
+      // Determine platform from request
+      const platform = detectPlatformFromRequest(request);
+      logger.debug("Clearing auth token for platform", { platform });
 
-      const cookiesStore = await cookies();
+      // Get platform-specific handler
+      const handler = getPlatformAuthHandler(platform);
 
-      // Delete the main httpOnly token cookie
-      cookiesStore.delete(AUTH_TOKEN_COOKIE_NAME);
-      // Delete the auth status cookie
-      cookiesStore.delete(AUTH_STATUS_COOKIE_NAME);
-
-      logger.debug("app.api.v1.core.user.auth.debug.clearingNextjsAuthCookies");
-      return createSuccessResponse(undefined);
+      // Delegate to platform handler
+      return await handler.clearAuthToken(logger);
     } catch (error) {
-      logger.error(
-        "app.api.v1.core.user.auth.debug.errorClearingAuthCookies",
-        parseError(error),
-      );
+      logger.error("Error clearing auth token for platform", parseError(error));
       return createErrorResponse(
         "app.api.v1.core.user.auth.errors.cookie_clear_failed",
         ErrorResponseTypes.INTERNAL_ERROR,

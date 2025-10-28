@@ -8,9 +8,10 @@ import type { NextRequest } from "next/server";
 import { validateData } from "next-vibe/shared/utils";
 import { z } from "zod";
 
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/leads/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/leads/types";
 import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import { authRepository } from "@/app/api/[locale]/v1/core/user/auth/repository";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type {
   CountryLanguage,
@@ -30,7 +31,7 @@ import type { InferJwtPayloadTypeFromRoles } from "./trpc-types";
  */
 export interface TRPCContext<
   TUrlParams,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
 > {
   user: InferJwtPayloadTypeFromRoles<TUserRoleValue> | null;
 
@@ -59,7 +60,7 @@ export interface TRPCContext<
  */
 export async function createTRPCContext<
   TUrlParams,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
 >(opts: {
   req: NextRequest;
   urlPathParams?: TUrlParams;
@@ -181,7 +182,7 @@ export async function createAuthenticatedTRPCContext(opts: {
   requiredRoles?: string[];
   locale: CountryLanguage;
 }): Promise<
-  TRPCContext<Record<string, string>, readonly string[]> & {
+  TRPCContext<Record<string, string>, readonly (typeof UserRoleValue)[]> & {
     user: JwtPayloadType;
   }
 > {

@@ -15,15 +15,33 @@ import type {
   CacheStrategy,
   ComponentSize,
   ComponentVariant,
-  FieldUsage,
   InterfaceContext,
   Methods,
 } from "./enums";
-import type { WidgetConfig } from "./types";
+import { FieldUsage } from "./enums";
 
-// Re-export for convenience
-export { EndpointErrorTypes, FieldUsage } from "./enums";
-export type { WidgetConfig };
+// Re-export FieldUsage for convenience
+export { FieldUsage };
+
+/**
+ * Recursive type for UI configuration values
+ */
+type FieldUIConfigValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | readonly FieldUIConfigValue[]
+  | { readonly [K in PropertyKey]?: FieldUIConfigValue };
+
+/**
+ * Constraint for UI configuration - accepts objects with any structure
+ * The actual type is preserved through generics in PrimitiveField/ObjectField/ArrayField
+ */
+export type FieldUIConfig = {
+  readonly [K in PropertyKey]?: FieldUIConfigValue;
+};
 
 // ============================================================================
 // ENDPOINT REGISTRY TYPES
@@ -40,7 +58,7 @@ export interface EndpointDefinition {
   requestSchema?: z.ZodTypeAny;
   requestUrlPathParamsSchema?: z.ZodTypeAny;
   responseSchema?: z.ZodTypeAny;
-  fields?: unknown;
+  fields?: Record<string, UnifiedField<z.ZodTypeAny>>;
 }
 
 /**
@@ -409,7 +427,7 @@ export type FieldValue = string | number | boolean | Date | null | undefined;
  * Supports both current format (backward compatible) and method-specific configuration
  */
 export type FieldUsageConfig =
-  // Current format (backward compatible) - applies to all methods
+  // applies to all methods
   | { request: "data"; response?: never }
   | { request: "urlPathParams"; response?: never }
   | { request: "data&urlPathParams"; response?: never }
@@ -417,7 +435,7 @@ export type FieldUsageConfig =
   | { request: "data"; response: true }
   | { request: "urlPathParams"; response: true }
   | { request: "data&urlPathParams"; response: true }
-  // New method-specific format - data request type
+  // method-specific format
   | {
       [Methods.GET]?: { request?: "data"; response?: true };
       [Methods.POST]?: { request?: "data"; response?: true };
@@ -719,16 +737,18 @@ export interface BulkAction {
 /**
  * Primitive field type with complete schema type preservation
  * Uses ExtractInputOutput to preserve Input, Output, and ZodType information
+ * TUIConfig preserves the exact UI configuration type passed in
  */
 export interface PrimitiveField<
   TSchema extends z.ZodTypeAny,
   TUsage extends FieldUsageConfig,
+  TUIConfig extends FieldUIConfig = FieldUIConfig,
 > {
   type: "primitive";
   schema: TSchema;
   usage: TUsage;
   cache?: CacheStrategy;
-  ui: WidgetConfig;
+  ui: TUIConfig;
   apiKey?: string;
   uiKey?: string;
 }
@@ -737,25 +757,35 @@ export interface PrimitiveField<
  * Object field type with children preservation
  * TChildren can be any object-like structure where all values are UnifiedFields
  * The constraint is checked at the value level, not the type level
+ * TUIConfig preserves the exact UI configuration type passed in
  */
-export interface ObjectField<TChildren, TUsage extends FieldUsageConfig> {
+export interface ObjectField<
+  TChildren,
+  TUsage extends FieldUsageConfig,
+  TUIConfig extends FieldUIConfig = FieldUIConfig,
+> {
   type: "object";
   schema?: z.ZodObject<Record<string, z.ZodTypeAny>>;
   usage: TUsage;
   cache?: CacheStrategy;
-  ui: WidgetConfig;
+  ui: TUIConfig;
   children: TChildren;
 }
 
 /**
  * Array field type with child preservation
+ * TUIConfig preserves the exact UI configuration type passed in
  */
-export interface ArrayField<TChild, TUsage extends FieldUsageConfig> {
+export interface ArrayField<
+  TChild,
+  TUsage extends FieldUsageConfig,
+  TUIConfig extends FieldUIConfig = FieldUIConfig,
+> {
   type: "array";
   schema?: z.ZodArray<z.ZodTypeAny>;
   usage: TUsage;
   cache?: CacheStrategy;
-  ui: WidgetConfig;
+  ui: TUIConfig;
   child: TChild;
 }
 

@@ -55,7 +55,7 @@ export async function createHTTPSuccessResponse<TResponse>({
       })`,
     );
     return createHTTPErrorResponse({
-      message: "app.error.errorTypes.invalid_response_error",
+      message: "app.api.v1.core.shared.errorTypes.invalid_response_error",
       errorType: ErrorResponseTypes.INVALID_RESPONSE_ERROR,
       messageParams: { message: validationResult.message },
       logger,
@@ -80,7 +80,7 @@ export async function createHTTPSuccessResponse<TResponse>({
         `Error in success callback: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
       return createHTTPErrorResponse({
-        message: "app.error.errorTypes.internal_error",
+        message: "app.api.v1.core.shared.errorTypes.internal_error",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parseError(error).message,
@@ -131,7 +131,7 @@ export function createHTTPErrorResponse({
     );
     return NextResponse.json(
       createErrorResponse(
-        "app.error.errorTypes.invalid_response_error",
+        "app.api.v1.core.shared.errorTypes.invalid_response_error",
         ErrorResponseTypes.INVALID_RESPONSE_ERROR,
         { message: validationResult.message },
       ),
@@ -176,7 +176,7 @@ export async function validatePostRequest<T>(
   } catch (error) {
     // For JSON parsing errors, use a specific error message
     return createErrorResponse(
-      "app.error.errors.invalid_request_data",
+      "app.api.v1.core.shared.errors.invalid_request_data",
       ErrorResponseTypes.INVALID_REQUEST_ERROR,
       {
         message: parseError(error).message,
@@ -279,7 +279,7 @@ export function validateGetRequest<T extends ZodSchema>(
       `Error validating query parameters: ${parseError(error).message}`,
     );
     return createErrorResponse(
-      "app.error.errors.invalid_url_parameters",
+      "app.api.v1.core.shared.errors.invalid_url_parameters",
       ErrorResponseTypes.INVALID_QUERY_ERROR,
       {
         message: parseError(error).message,

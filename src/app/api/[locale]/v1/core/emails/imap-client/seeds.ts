@@ -6,12 +6,11 @@
 import { eq } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
-import { env } from "@/config/env";
-import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
-
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-
+import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import { env } from "@/config/env";
+
 import { imapAccounts, type NewImapAccount } from "./db";
 import { ImapAuthMethod, ImapSpecialUseType, ImapSyncStatus } from "./enum";
 

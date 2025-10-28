@@ -332,7 +332,7 @@ export function useApiQuery<
     // Skip if query is disabled
     if (options.enabled === false) {
       logger.info("useApiQuery: Query disabled, skipping", {
-        endpointPath: endpoint.path,
+        endpointPath: [...endpoint.path],
       });
       return;
     }
@@ -342,7 +342,7 @@ export function useApiQuery<
       logger.info(
         "useApiQuery: Document hidden (navigation in progress), skipping",
         {
-          endpointPath: endpoint.path,
+          endpointPath: [...endpoint.path],
         },
       );
       return;
@@ -351,7 +351,7 @@ export function useApiQuery<
     // Skip initial fetch if requested
     if (isInitialMount.current && skipInitialFetch) {
       logger.debug("useApiQuery: Skipping initial fetch", {
-        endpointPath: endpoint.path,
+        endpointPath: [...endpoint.path],
       });
       isInitialMount.current = false;
       return;
@@ -360,7 +360,7 @@ export function useApiQuery<
     // Skip dependency-based refetch if requested
     if (!isInitialMount.current && !refetchOnDependencyChange) {
       logger.debug("useApiQuery: Skipping dependency-based refetch", {
-        endpointPath: endpoint.path,
+        endpointPath: [...endpoint.path],
       });
       return;
     }
@@ -396,7 +396,7 @@ export function useApiQuery<
       now - lastExecutionTimeRef.current < minExecutionInterval
     ) {
       logger.debug("useApiQuery: Executing too frequently, throttling", {
-        endpointPath: endpoint.path,
+        endpointPath: [...endpoint.path],
         timeSinceLastExecution: now - lastExecutionTimeRef.current,
         minInterval: minExecutionInterval,
       });
@@ -459,7 +459,7 @@ export function useApiQuery<
               logger.debug(
                 "useApiQuery: Throttled execution completed, reset isExecutingRef",
                 {
-                  endpointPath: endpoint.path,
+                  endpointPath: [...endpoint.path],
                 },
               );
             }
@@ -537,7 +537,7 @@ export function useApiQuery<
 
         executionCompleted = true;
         logger.debug("useApiQuery: Query execution successful", {
-          endpointPath: endpoint.path,
+          endpointPath: [...endpoint.path],
         });
       } catch (error) {
         executionCompleted = true;
@@ -550,7 +550,7 @@ export function useApiQuery<
         // Update execution time
         lastExecutionTimeRef.current = Date.now();
         logger.debug("useApiQuery: Execution completed, reset isExecutingRef", {
-          endpointPath: endpoint.path,
+          endpointPath: [...endpoint.path],
           executionCompleted,
           wasSuccessful: executionCompleted,
         });

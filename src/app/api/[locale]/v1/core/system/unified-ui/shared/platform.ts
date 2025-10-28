@@ -10,11 +10,11 @@ import "server-only";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 
+import type { DiscoveredEndpoint } from "../../unified-backend/shared/discovery/endpoint-registry-types";
 import type { PlatformConfig } from "./config";
 import { getPlatformConfig, Platform } from "./config";
 import type { DiscoveryResult, UnifiedDiscoveryOptions } from "./discovery";
 import { getUnifiedDiscovery } from "./discovery";
-import type { DiscoveredEndpoint } from "../../unified-backend/shared/discovery/endpoint-registry-types";
 import type { EndpointGroup, GroupingOptions } from "./grouping";
 import { getUnifiedGrouping } from "./grouping";
 
@@ -193,7 +193,7 @@ export class UnifiedPlatformService {
 
     // Check if user has any of the required roles
     return endpoint.definition.allowedRoles.some((role) =>
-      this.context.user!.roles.includes(role),
+      this.context.user.roles.includes(role),
     );
   }
 
@@ -267,6 +267,10 @@ export function createCLIPlatform(
   return createPlatformService({
     platform: Platform.CLI,
     logger,
+    user: {
+      isPublic: false,
+      roles: ["ADMIN", "CLI_OFF"],
+    },
   });
 }
 

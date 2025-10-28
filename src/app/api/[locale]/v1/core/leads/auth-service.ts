@@ -7,7 +7,6 @@
 import "server-only";
 
 import { and, desc, eq, isNull, or, sql } from "drizzle-orm";
-import { cookies } from "next/headers";
 import { LEAD_ID_COOKIE_NAME } from "next-vibe/shared/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -15,10 +14,9 @@ import {
   createSuccessResponse,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
-import { Environment, parseError } from "next-vibe/shared/utils";
+import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
-import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
@@ -399,36 +397,23 @@ class LeadAuthServiceImpl {
 
   /**
    * Set leadId cookie (server-side)
+   * @deprecated This method is platform-specific and should not be used directly.
+   * Lead ID storage is now handled by platform-specific auth handlers.
+   * For web: cookies are set automatically by web-auth-handler
+   * For CLI/MCP: lead ID is stored in .vibe.session file
+   * For mobile: lead ID is stored in AsyncStorage
    */
   async setLeadIdCookie(
     leadId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
-    try {
-      const cookiesStore = await cookies();
-      cookiesStore.set({
-        name: LEAD_ID_COOKIE_NAME,
-        value: leadId,
-        httpOnly: false, // Needs to be readable by client
-        path: "/",
-        secure: env.NODE_ENV === Environment.PRODUCTION,
-        sameSite: "lax",
-        maxAge: 30 * 24 * 60 * 60, // 30 days
-      });
-
-      logger.debug("app.api.v1.core.leads.auth.cookie.set", { leadId });
-      return createSuccessResponse(undefined);
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.leads.auth.cookie.error",
-        parseError(error).message,
-      );
-      return createErrorResponse(
-        "app.api.v1.core.leads.auth.cookie.error",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
-    }
+    logger.warn(
+      "setLeadIdCookie is deprecated - lead ID storage is now handled by platform-specific auth handlers",
+      { leadId },
+    );
+    // Return success to maintain backward compatibility
+    // Platform handlers will manage lead ID storage
+    return createSuccessResponse(undefined);
   }
 
   /**

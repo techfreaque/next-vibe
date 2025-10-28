@@ -120,7 +120,10 @@ export interface CLIRenderingOptions {
 export interface WidgetRenderContext {
   options: CLIRenderingOptions;
   depth: number;
-  translate: (key: TranslationKey | string, params?: Record<string, string | number>) => string;
+  translate: (
+    key: TranslationKey | string,
+    params?: Record<string, string | number>,
+  ) => string;
   formatValue: (field: ResponseFieldMetadata, value: RenderableValue) => string;
   getFieldIcon: (type: FieldDataType) => string;
   renderEmptyState: (message: string) => string;
@@ -225,3 +228,7 @@ export interface LayoutConfig {
   spacing?: "compact" | "normal" | "loose";
   alignment?: "left" | "center" | "right";
 }
+
+const definitions = {};
+
+export default definitions;

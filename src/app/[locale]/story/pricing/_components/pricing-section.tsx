@@ -32,7 +32,7 @@ import {
   SubscriptionPlan,
   SubscriptionStatus,
 } from "@/app/api/[locale]/v1/core/subscription/enum";
-import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/definition";
+import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";

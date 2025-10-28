@@ -307,7 +307,10 @@ export class ModularCLIResponseRenderer {
     switch (field.type) {
       case FieldDataType.TEXT:
         return this.formatter.formatText(String(value), {
-          maxLength: field.config?.maxLength,
+          maxLength:
+            typeof field.config?.maxLength === "number"
+              ? field.config.maxLength
+              : undefined,
         });
       case FieldDataType.NUMBER:
         return this.formatter.formatNumber(Number(value), this.options.locale, {
@@ -420,11 +423,13 @@ class DefaultDataFormatter implements DataFormatter {
 
   formatNumber(
     value: number,
+    locale: CountryLanguage,
     options?: { precision?: number; unit?: string },
   ): string {
     return this.baseFormatter.formatNumber(value, {
       precision: options?.precision,
       unit: options?.unit,
+      locale,
     });
   }
 

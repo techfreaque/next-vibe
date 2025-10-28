@@ -21,7 +21,6 @@ import {
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type {
-  EndpointErrorTypes,
   ExamplesList,
   ExtractInput,
   ExtractOutput,
@@ -30,7 +29,7 @@ import type {
   UnifiedField,
 } from "./core-types";
 import { FieldUsage } from "./core-types";
-import type { Methods } from "./enums";
+import type { EndpointErrorTypes, Methods } from "./enums";
 import { generateSchemaForUsage as generateSchemaFromUtils } from "./field-utils";
 
 // Extract schema type directly from field, bypassing complex field structure
@@ -65,7 +64,7 @@ export type ValidationMode =
 export interface ApiEndpoint<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
 > {
   // Core endpoint metadata - all required for type safety

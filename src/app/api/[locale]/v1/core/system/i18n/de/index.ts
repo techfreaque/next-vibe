@@ -3,6 +3,7 @@ import { translations as checkTranslations } from "../../check/i18n/de";
 import { translations as dbTranslations } from "../../db/i18n/de";
 import { translations as generatorsTranslations } from "../../generators/i18n/de";
 import { translations as guardTranslations } from "../../guard/i18n/de";
+import { translations as helpTranslations } from "../../help/i18n/de";
 import { translations as launchpadTranslations } from "../../launchpad/i18n/de";
 import { translations as releaseToolTranslations } from "../../release-tool/i18n/de";
 import { translations as serverTranslations } from "../../server/i18n/de";
@@ -32,6 +33,7 @@ export const translations: typeof enTranslations = {
     },
   },
   generators: generatorsTranslations,
+  help: helpTranslations,
   sideTasks: {
     category: "Nebenaufgaben",
     generators: {

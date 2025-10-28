@@ -8,7 +8,7 @@ import "server-only";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 
 import { creditRepository } from "../../credits/repository";
-import type { JwtPayloadType } from "../../user/auth/definition";
+import type { JwtPayloadType } from "../../user/auth/types";
 
 /**
  * Deduct credits for a feature

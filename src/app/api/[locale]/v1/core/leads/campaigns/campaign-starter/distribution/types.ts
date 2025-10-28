@@ -81,3 +81,7 @@ export const localeProcessingInfoOutputSchema = z.object({
 export type LocaleProcessingInfoOutputType = z.infer<
   typeof localeProcessingInfoOutputSchema
 >;
+
+const definitions = {};
+
+export default definitions;

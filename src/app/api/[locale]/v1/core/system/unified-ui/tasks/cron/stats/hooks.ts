@@ -6,10 +6,9 @@
 "use client";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import definitions from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/stats/definition";
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
-
-import definitions from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/stats/definition";
 
 /**
  * Hook for fetching cron statistics

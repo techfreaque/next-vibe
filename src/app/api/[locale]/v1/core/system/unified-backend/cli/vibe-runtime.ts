@@ -14,6 +14,7 @@ import { config } from "dotenv";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { createDefaultCliUser } from "../shared/auth/cli-user-factory";
 import type { EndpointLogger } from "../shared/endpoint-logger";
 import { createEndpointLogger } from "../shared/endpoint-logger";
 import { memoryMonitor } from "../shared/performance";
@@ -33,18 +34,6 @@ interface CliOptions {
   verbose?: boolean;
   interactive?: boolean;
   dryRun?: boolean;
-}
-
-/**
- * List command options interface
- */
-interface ListOptions {
-  category?: string;
-  format?: string;
-  examples?: boolean;
-  parameters?: boolean;
-  verbose?: boolean;
-  locale: CountryLanguage;
 }
 
 /**
@@ -333,22 +322,28 @@ function parseCliArguments(
   return { positionalArgs, namedArgs };
 }
 
-// setupModuleAliases(logger); // Temporarily disabled to debug config import issue
-
 const program = new Command();
 
-const { t } = simpleT(CLI_CONSTANTS.DEFAULT_LOCALE as CountryLanguage);
+const { t } = simpleT(CLI_CONSTANTS.DEFAULT_LOCALE);
 
 program
   .name(CLI_CONSTANTS.CLI_NAME)
-  .description(t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.description"))
+  .description(
+    t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.description"),
+  )
   .version(CLI_CONSTANTS.CLI_VERSION);
 
 // Main command - execute any route with schema-driven UI
+
 program
-  // eslint-disable-next-line i18next/no-literal-string
-  .argument("[command]", t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.usage"))
-  .argument("[args...]", t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.commands"))
+  .argument(
+    "[command]",
+    t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.usage"),
+  )
+  .argument(
+    "[args...]",
+    t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.commands"),
+  )
   .option(
     // eslint-disable-next-line i18next/no-literal-string
     "-d, --data <json>",
@@ -384,7 +379,11 @@ program
     t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.interactive"),
     false,
   )
-  .option("--dry-run", t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.dryRun"), false)
+  .option(
+    "--dry-run",
+    t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.dryRun"),
+    false,
+  )
   .allowUnknownOption() // Allow dynamic CLI arguments
   .action(
     async (
@@ -431,12 +430,11 @@ program
 
         // If no command provided, start interactive mode
         if (!command) {
-          logger.info(t("app.api.v1.core.system.unifiedBackend.cli.vibe.startingUp"));
+          logger.info(
+            t("app.api.v1.core.system.unifiedBackend.cli.vibe.startingUp"),
+          );
           await cli.executeCommand("interactive", {
-            user: {
-              isPublic: false,
-              id: "00000000-0000-0000-0000-000000000001",
-            },
+            user: createDefaultCliUser(),
             locale: options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
             output: (options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT) as
               | "table"
@@ -479,26 +477,22 @@ program
         performanceMonitor.mark("parseEnd");
 
         performanceMonitor.mark("routeStart");
-        await cli.executeCommand(
-          command,
-          {
-            data: parsedData,
-            cliArgs: {
-              positionalArgs: parsedArgs.positionalArgs,
-              namedArgs: parsedArgs.namedArgs,
-            },
-            userType: options.userType ?? CLI_CONSTANTS.ADMIN_USER_TYPE,
-            locale: options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
-            output: (options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT) as
-              | "table"
-              | "pretty"
-              | "json",
-            verbose: options.verbose ?? false,
-            interactive: options.interactive ?? false,
-            dryRun: options.dryRun ?? false,
+        await cli.executeCommand(command, {
+          data: parsedData,
+          cliArgs: {
+            positionalArgs: parsedArgs.positionalArgs,
+            namedArgs: parsedArgs.namedArgs,
           },
-          logger,
-        );
+          user: createDefaultCliUser(),
+          locale: options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
+          output: (options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT) as
+            | "table"
+            | "pretty"
+            | "json",
+          verbose: options.verbose ?? false,
+          interactive: options.interactive ?? false,
+          dryRun: options.dryRun ?? false,
+        });
         performanceMonitor.mark("routeEnd");
 
         performanceMonitor.mark("renderStart");
@@ -512,18 +506,26 @@ program
           options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
         );
       } catch (error) {
-        const handled = ErrorHandler.handleError(error, logger);
+        const handled = ErrorHandler.handleError(
+          error instanceof Error ? error : new Error(String(error)),
+          logger,
+        );
 
         logger.error(handled.message);
 
         if (options.verbose) {
           logger.error(
-            t("app.api.v1.core.system.unifiedBackend.cli.vibe.errors.executionFailed"),
+            t(
+              "app.api.v1.core.system.unifiedBackend.cli.vibe.errors.executionFailed",
+            ),
             error as Error,
           );
-          logger.info(t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.options"), {
-            memoryUsage: memoryMonitor.getFormattedUsage(),
-          });
+          logger.info(
+            t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.options"),
+            {
+              memoryUsage: memoryMonitor.getFormattedUsage(),
+            },
+          );
         }
 
         // Cleanup and exit with error code
@@ -536,73 +538,6 @@ program
       }
     },
   );
-
-// Help command
-program
-  .command("help")
-  .description(t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.title"))
-  .action(() => {
-    program.help();
-  });
-
-// List command - show all available routes using help system
-program
-  .command("list")
-  .alias("ls")
-  .description(t("app.api.v1.core.system.unifiedBackend.cli.vibe.listCommands"))
-  .option(
-    // eslint-disable-next-line i18next/no-literal-string
-    "-c, --category <category>",
-    t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.options"),
-  )
-  .option(
-    // eslint-disable-next-line i18next/no-literal-string
-    "-f, --format <format>",
-    t("app.api.v1.core.system.unifiedBackend.cli.vibe.output"),
-    "text",
-  )
-  .option(
-    "--examples",
-    t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.examples"),
-    false,
-  )
-  .option(
-    "--parameters",
-    t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.options"),
-    false,
-  )
-  .action(async (options: ListOptions) => {
-    const logger = createEndpointLogger(
-      options.verbose ?? false,
-      Date.now(),
-      options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
-    );
-    const { t } = simpleT(options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE);
-    try {
-      const defaultFormat = "text";
-      const cli = new CliEntryPoint(
-        logger,
-        t,
-        options.locale ?? CLI_CONSTANTS.DEFAULT_LOCALE,
-      );
-      await cli.executeCommand(
-        "help",
-        {
-          category: options.category,
-          format: options.format ?? defaultFormat,
-          examples: options.examples ?? false,
-          parameters: options.parameters ?? false,
-        },
-        logger,
-      );
-    } catch (error) {
-      logger.error(
-        t("app.api.v1.core.system.unifiedBackend.cli.vibe.errors.executionFailed"),
-        error as Error,
-      );
-      process.exit(1);
-    }
-  });
 
 // Parse command line arguments
 program.parse();

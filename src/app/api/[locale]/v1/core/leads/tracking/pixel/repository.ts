@@ -9,7 +9,7 @@ import { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 
-import { leadId } from "../../definition";
+import { leadId } from "../../types";
 import { leadTrackingRepository } from "../repository";
 
 const pixelTrackingRequestSchema = z.object({

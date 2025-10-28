@@ -16,21 +16,24 @@ import type {
   CreateApiEndpoint,
 } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { createEndpointLogger } from "../../unified-backend/shared/endpoint-logger";
+import type {
+  ApiHandlerFunction,
+  ApiHandlerOptions,
+} from "../../unified-backend/shared/handler-types";
 import { createTRPCHandler } from "../../unified-backend/trpc/handler";
 import {
   authenticatedProcedure,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   createAdminProcedure,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   createCustomerProcedure,
   publicProcedure,
   requireRoles,
 } from "./trpc-trpc";
 // import { endpointHandler } from "../endpoint-handler"; // Unused for now
-import type { ApiHandlerFunction, ApiHandlerOptions } from "./trpc-types";
 
 /**
  * Create a tRPC procedure from an ApiEndpoint definition
@@ -39,7 +42,7 @@ import type { ApiHandlerFunction, ApiHandlerOptions } from "./trpc-types";
 export function createTRPCProcedureFromEndpoint<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
   TRequestInput,
   TRequestOutput,
@@ -99,7 +102,8 @@ export function createTRPCProcedureFromEndpoint<
   });
 
   // Determine the base procedure based on endpoint roles
-  const baseProcedure = selectBaseProcedure(endpoint.allowedRoles);
+  // Using en-GLOBAL as default since this is deprecated code
+  const baseProcedure = selectBaseProcedure(endpoint.allowedRoles, "en-GLOBAL");
 
   // Create combined input schema that includes both request data and URL parameters
 
@@ -171,13 +175,17 @@ export function createTRPCProcedureFromEndpoint<
 /**
  * Select the appropriate base tRPC procedure based on required roles
  */
-function selectBaseProcedure<TUserRoleValue extends readonly string[]>(
+function selectBaseProcedure<
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
+>(
   allowedRoles: TUserRoleValue,
   locale: CountryLanguage,
 ):
   | typeof publicProcedure
   | typeof authenticatedProcedure
-  | typeof customerProcedure {
+  | ReturnType<typeof authenticatedProcedure.use> {
+  const logger = createEndpointLogger(false, Date.now(), locale);
+
   // If PUBLIC role is allowed, use public procedure
   if (allowedRoles.includes(UserRole.PUBLIC)) {
     return publicProcedure;
@@ -185,22 +193,21 @@ function selectBaseProcedure<TUserRoleValue extends readonly string[]>(
 
   // If only ADMIN role is allowed, use admin procedure
   if (allowedRoles.length === 1 && allowedRoles.includes(UserRole.ADMIN)) {
-    return adminProcedure;
+    return createAdminProcedure(logger);
   }
 
   // If ADMIN is included with other roles, use admin procedure
   if (allowedRoles.includes(UserRole.ADMIN)) {
-    return adminProcedure;
+    return createAdminProcedure(logger);
   }
 
   // If CUSTOMER role is allowed, use customer procedure
   if (allowedRoles.includes(UserRole.CUSTOMER)) {
-    return customerProcedure;
+    return createCustomerProcedure(logger);
   }
 
   // For specific roles, create a custom procedure with role requirements
   if (allowedRoles.length > 0) {
-    const logger = createEndpointLogger(false, Date.now(), locale);
     return authenticatedProcedure.use(requireRoles(allowedRoles, logger));
   }
 
@@ -216,7 +223,7 @@ export function createTRPCProceduresFromEndpoints<
   T extends Record<
     string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    CreateApiEndpoint<string, Methods, readonly string[], any>
+    CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
   >,
 >(
   endpoints: T,
@@ -287,7 +294,7 @@ export function createTRPCProceduresFromEndpoints<
 export function createTRPCProceduresFromRouteExports(routeExports: {
   definitions?: Record<
     string,
-    CreateApiEndpoint<string, Methods, readonly string[], any>
+    CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
   >;
   handlers?: Record<
     string,
@@ -344,7 +351,7 @@ export type ExtractTRPCProcedures<T> = {
   [K in keyof T]: T[K] extends ApiEndpoint<
     string,
     Methods,
-    readonly string[],
+    readonly (typeof UserRoleValue)[],
     any
   >
     ? T[K]["method"] extends Methods.GET
@@ -359,7 +366,7 @@ export type ExtractTRPCProcedures<T> = {
 export interface RouteFileStructure {
   definitions?: Record<
     string,
-    CreateApiEndpoint<string, Methods, readonly string[], any>
+    CreateApiEndpoint<string, Methods, readonly (typeof UserRoleValue)[], any>
   >;
   handlers?: Record<
     string,
@@ -399,8 +406,8 @@ export function validateRouteFileForTRPC(routeFile: RouteFileStructure): {
     errors.push("app.error.general.no_http_handlers");
   }
 
-  // For the new endpoint system, we don't require definitions or trpc exports
-  // The route is valid if it has HTTP method handlers from endpointsHandler
+  // For the new endpoint system, we require tools export from endpointsHandler
+  // The route is valid if it has HTTP method handlers AND tools export
   const hasEndpointsHandler =
     "GET" in routeFile ||
     "POST" in routeFile ||
@@ -408,13 +415,20 @@ export function validateRouteFileForTRPC(routeFile: RouteFileStructure): {
     "PATCH" in routeFile ||
     "DELETE" in routeFile;
 
-  if (hasEndpointsHandler) {
-    // This is a new-style endpoint, which is valid for tRPC generation
+  const hasToolsExport = "tools" in routeFile;
+
+  if (hasEndpointsHandler && hasToolsExport) {
+    // This is a new-style endpoint with tools.trpc export, valid for tRPC generation
     return {
       isValid: true,
       errors: [],
       warnings: [],
     };
+  }
+
+  if (hasEndpointsHandler && !hasToolsExport) {
+    // Has handlers but no tools export - likely a simple Next.js route, not valid for tRPC
+    errors.push("app.error.general.missing_tools_export");
   }
 
   // Check for old-style tRPC export (legacy support)
@@ -466,7 +480,7 @@ function createCombinedInputSchema<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
 >(
   endpoint: CreateApiEndpoint<

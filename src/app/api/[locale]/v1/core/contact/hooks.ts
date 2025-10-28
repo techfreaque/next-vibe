@@ -11,7 +11,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-b
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
 
-import type { StandardUserType } from "../user/definition";
+import type { StandardUserType } from "../user/types";
 import definitions from "./definition";
 import { ContactSubject } from "./enum";
 

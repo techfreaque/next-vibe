@@ -313,3 +313,5 @@ export const definitions = { GET };
 export type PathGetRequestOutput = typeof GET.types.RequestOutput;
 export type PathGetResponseOutput = typeof GET.types.ResponseOutput;
 export type PathGetUrlVariablesOutput = typeof GET.types.UrlVariablesOutput;
+
+export default definitions;

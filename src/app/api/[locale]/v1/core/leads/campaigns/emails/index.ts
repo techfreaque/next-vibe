@@ -7,9 +7,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-b
 import { type CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import type { LeadWithEmailType } from "../../definition";
 import type { EmailCampaignStage, EmailJourneyVariant } from "../../enum";
 import { leadTrackingRepository } from "../../tracking/repository";
+import type { LeadWithEmailType } from "../../types";
 import { abTestingService } from "./services/ab-testing";
 import { emailRendererService } from "./services/renderer";
 import { campaignSchedulerService } from "./services/scheduler";

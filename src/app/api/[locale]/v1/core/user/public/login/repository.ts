@@ -5,7 +5,7 @@
 
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -19,10 +19,11 @@ import { leadAuthService } from "@/app/api/[locale]/v1/core/leads/auth-service";
 import { leadsRepository } from "@/app/api/[locale]/v1/core/leads/repository";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { JWTPublicPayloadType } from "../../auth/definition";
 import { authRepository } from "../../auth/repository";
+import type { JWTPublicPayloadType } from "../../auth/types";
 import { users } from "../../db";
 import { UserDetailLevel } from "../../enum";
 import { sessionRepository } from "../../private/session/repository";
@@ -69,6 +70,7 @@ export interface LoginRepository {
    * @param data - Login request data
    * @param user - JWT payload (public user)
    * @param locale - User locale
+   * @param request - Next.js request object for platform detection
    * @param logger - Logger instance for debugging and monitoring
    * @returns Login response with boolean success
    */
@@ -76,6 +78,7 @@ export interface LoginRepository {
     data: LoginPostRequestOutput,
     user: JWTPublicPayloadType,
     locale: CountryLanguage,
+    request: NextRequest,
     logger: EndpointLogger,
   ): Promise<ResponseType<LoginPostResponseOutput>>;
 
@@ -119,6 +122,7 @@ export class LoginRepositoryImpl implements LoginRepository {
     data: LoginPostRequestOutput,
     user: JWTPublicPayloadType,
     locale: CountryLanguage,
+    request: NextRequest,
     logger: EndpointLogger,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     const headersList = await headers();
@@ -237,6 +241,7 @@ export class LoginRepositoryImpl implements LoginRepository {
         userResponse.data.id,
         rememberMe,
         locale,
+        request,
         logger,
       );
       if (!sessionResponse.success) {
@@ -270,6 +275,7 @@ export class LoginRepositoryImpl implements LoginRepository {
    * @param userId - User ID
    * @param rememberMe - Whether to extend session duration
    * @param locale - Locale for lead tracking
+   * @param request - Next.js request object for platform detection
    * @param logger - Logger instance
    * @returns Login response with user session
    */
@@ -277,6 +283,7 @@ export class LoginRepositoryImpl implements LoginRepository {
     userId: string,
     rememberMe = false,
     locale: CountryLanguage,
+    request: NextRequest,
     logger: EndpointLogger,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     return await this.createOrRenewSession(
@@ -284,6 +291,7 @@ export class LoginRepositoryImpl implements LoginRepository {
       false,
       rememberMe,
       locale,
+      request,
       logger,
     );
   }
@@ -293,6 +301,7 @@ export class LoginRepositoryImpl implements LoginRepository {
    * @param userId - User ID
    * @param rememberMe - Whether to extend session duration
    * @param locale - Locale for lead tracking
+   * @param request - Next.js request object for platform detection
    * @param logger - Logger instance
    * @returns Login response with renewed session
    */
@@ -300,6 +309,7 @@ export class LoginRepositoryImpl implements LoginRepository {
     userId: string,
     rememberMe = false,
     locale: CountryLanguage,
+    request: NextRequest,
     logger: EndpointLogger,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     return await this.createOrRenewSession(
@@ -307,6 +317,7 @@ export class LoginRepositoryImpl implements LoginRepository {
       true, // isRenewal
       rememberMe,
       locale,
+      request,
       logger,
     );
   }
@@ -318,6 +329,7 @@ export class LoginRepositoryImpl implements LoginRepository {
    * @param isRenewal - Whether this is a session renewal
    * @param rememberMe - Whether to extend session duration
    * @param locale - Locale for lead tracking
+   * @param request - Next.js request object for platform detection
    * @returns Login response with session data
    */
   private async createOrRenewSession(
@@ -325,6 +337,7 @@ export class LoginRepositoryImpl implements LoginRepository {
     isRenewal = false,
     rememberMe = false,
     locale: CountryLanguage,
+    request: NextRequest,
     logger: EndpointLogger,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     try {
@@ -414,22 +427,23 @@ export class LoginRepositoryImpl implements LoginRepository {
         ],
       };
 
-      // Set auth cookies if requested
-      const cookieResult = await authRepository.setAuthCookies(
+      // Store auth token using platform-specific handler
+      const storeResult = await authRepository.storeAuthTokenForPlatform(
         tokenResponse.data,
-        rememberMe ?? false,
+        userId,
+        leadIdResult.leadId,
+        request,
         logger,
       );
-      if (cookieResult.success) {
-        logger.debug("Auth cookies set successfully", {
+      if (storeResult.success) {
+        logger.debug("Auth token stored successfully", {
           userId,
           isRenewal,
           rememberMe,
-          cookieType: rememberMe ? "persistent" : "session",
         });
       } else {
-        logger.error("Error setting auth cookies", parseError(cookieResult));
-        // Continue even if cookie setting fails
+        logger.error("Error storing auth token", parseError(storeResult));
+        // Continue even if token storage fails
       }
 
       // Return session data

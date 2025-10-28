@@ -3,11 +3,11 @@
  * Handles DATA_TABLE widget type with column definitions and formatting
  */
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { BaseWidgetRenderer } from "./base-widget-renderer";
 import type {
@@ -53,7 +53,10 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer {
     }
   }
 
-  private getTableConfig(field: ResponseFieldMetadata, locale: CountryLanguage): TableRenderConfig {
+  private getTableConfig(
+    field: ResponseFieldMetadata,
+    locale: CountryLanguage,
+  ): TableRenderConfig {
     const columns =
       field.columns?.map((col) => ({
         key: col.key,

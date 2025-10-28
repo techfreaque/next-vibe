@@ -6,6 +6,7 @@
 
 import { z } from "zod";
 
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -13,7 +14,6 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import {
   objectField,
   requestDataField,
@@ -28,10 +28,7 @@ import {
   CsvImportJobStatusDB,
   CsvImportJobStatusOptions,
 } from "../leads/import/enum";
-import {
-  ImportDomain,
-  ImportDomainOptions,
-} from "./enum";
+import { ImportDomain, ImportDomainOptions } from "./enum";
 
 /**
  * Import from CSV Endpoint (POST)
@@ -413,15 +410,9 @@ const { POST: ImportCsvPost } = createEndpoint({
 
           // === NEXT STEPS ===
           nextSteps: responseArrayField(
-            {
-              type: WidgetType.DATA_LIST,
-              itemConfig: {
-                template: "default",
-              },
-            },
+            {},
             responseField(
               {
-                type: WidgetType.TEXT,
                 content:
                   "app.api.v1.core.import.csv.post.response.nextSteps.item.label",
               },
@@ -615,12 +606,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
 
       // === RESPONSE DATA ===
       jobs: responseArrayField(
-        {
-          type: WidgetType.DATA_LIST,
-          itemConfig: {
-            template: "default",
-          },
-        },
+        {},
         z.object({
           id: z.uuid().describe("Unique job identifier"),
           fileName: z.string().describe("Original CSV file name"),
@@ -692,7 +678,8 @@ const { GET: ListImportJobsGet } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.v1.core.import.csv.post.errors.validation.title",
-      description: "app.api.v1.core.import.csv.post.errors.validation.description",
+      description:
+        "app.api.v1.core.import.csv.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.v1.core.import.csv.post.errors.network.title",
@@ -705,11 +692,13 @@ const { GET: ListImportJobsGet } = createEndpoint({
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.v1.core.import.csv.post.errors.forbidden.title",
-      description: "app.api.v1.core.import.csv.post.errors.forbidden.description",
+      description:
+        "app.api.v1.core.import.csv.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.v1.core.import.csv.post.errors.notFound.title",
-      description: "app.api.v1.core.import.csv.post.errors.notFound.description",
+      description:
+        "app.api.v1.core.import.csv.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.v1.core.import.jobs.get.errors.server.title",
@@ -721,11 +710,13 @@ const { GET: ListImportJobsGet } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.v1.core.import.csv.post.errors.unsavedChanges.title",
-      description: "app.api.v1.core.import.csv.post.errors.unsavedChanges.description",
+      description:
+        "app.api.v1.core.import.csv.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.v1.core.import.csv.post.errors.conflict.title",
-      description: "app.api.v1.core.import.csv.post.errors.conflict.description",
+      description:
+        "app.api.v1.core.import.csv.post.errors.conflict.description",
     },
   },
 
@@ -738,7 +729,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
     urlPathParams: undefined,
     requests: {
       default: {
-        status:  CsvImportJobStatus.COMPLETED,
+        status: CsvImportJobStatus.COMPLETED,
         limit: 20,
         offset: 0,
       },

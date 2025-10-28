@@ -4,8 +4,6 @@
  * Eliminates 5+ duplicate implementations across the codebase
  */
 
-import "server-only";
-
 import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/handler-types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
@@ -23,7 +21,7 @@ const DEFAULT_CLI_USER_ID = "00000000-0000-0000-0000-000000000001";
  * Get CLI user email from environment or use default
  */
 export function getCliUserEmail(): string {
-  return env.VIBE_CLI_USER_EMAIL ?? DEFAULT_CLI_USER_EMAIL;
+  return env.VIBE_CLI_USER_EMAIL ?? DEFAULT_CLI_USER_ID;
 }
 
 /**
@@ -45,7 +43,7 @@ export function createDefaultCliUser(): InferJwtPayloadTypeFromRoles<
  */
 export function createCliUserFromDb(
   userId: string,
-  leadId?: string,
+  leadId?: string | null,
 ): InferJwtPayloadTypeFromRoles<readonly (typeof UserRoleValue)[]> {
   return {
     isPublic: false,
@@ -102,7 +100,7 @@ export async function getCliUser(
         email: user.email,
       });
 
-      return createCliUserFromDb(user.id, user.email, user.leadId);
+      return createCliUserFromDb(user.id, user.leadId ?? undefined);
     }
 
     // Fallback to default CLI user when database user doesn't exist

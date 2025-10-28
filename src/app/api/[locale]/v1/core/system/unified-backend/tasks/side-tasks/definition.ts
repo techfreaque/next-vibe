@@ -171,24 +171,6 @@ const sideTasksPostEndpoint = createEndpoint({
       ),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.tasks.side.response.success.title",
-        },
-        z.boolean(),
-      ),
-
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.tasks.side.response.message.title",
-        },
-        z.string(),
-      ),
-
       data: responseField(
         {
           type: WidgetType.TEXT,
@@ -229,24 +211,16 @@ const sideTasksPostEndpoint = createEndpoint({
     },
     responses: {
       list: {
-        success: true,
-        message: "Tasks listed successfully",
         data: [],
         count: 0,
       },
       get: {
-        success: true,
-        message: "Task retrieved successfully",
         data: { id: "task-12345", name: "example-task" },
       },
       stats: {
-        success: true,
-        message: "Stats retrieved successfully",
         data: { total: 5 },
       },
       success: {
-        success: true,
-        message: "Operation completed successfully",
         data: {
           tasks: [
             {
@@ -355,31 +329,40 @@ const sideTasksGetEndpoint = createEndpoint({
     { response: true },
     {
       // === RESPONSE FIELDS ONLY ===
-      success: responseField(
+      totalTasks: responseField(
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.tasks.side.response.success.title",
+            "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.get.response.totalTasks.title",
         },
-        z.boolean(),
+        z.number(),
       ),
 
-      message: responseField(
+      runningTasks: responseField(
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.tasks.side.response.message.title",
+            "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.get.response.runningTasks.title",
         },
-        z.string(),
+        z.number(),
       ),
 
-      data: responseField(
+      healthyTasks: responseField(
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.tasks.side.response.data.title",
+            "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.get.response.healthyTasks.title",
         },
-        z.unknown().optional(),
+        z.number(),
+      ),
+
+      unhealthyTasks: responseField(
+        {
+          type: WidgetType.TEXT,
+          content:
+            "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.get.response.unhealthyTasks.title",
+        },
+        z.number(),
       ),
     },
   ),
@@ -387,14 +370,10 @@ const sideTasksGetEndpoint = createEndpoint({
   examples: {
     responses: {
       status: {
-        success: true,
-        message: "Side tasks status retrieved",
-        data: {
-          totalTasks: 5,
-          runningTasks: 2,
-          healthyTasks: 4,
-          unhealthyTasks: 1,
-        },
+        totalTasks: 5,
+        runningTasks: 2,
+        healthyTasks: 4,
+        unhealthyTasks: 1,
       },
     },
   },
@@ -464,10 +443,10 @@ const sideTasksGetEndpoint = createEndpoint({
   },
 });
 
-export { sideTasksGetEndpoint as GET, sideTasksPostEndpoint as POST };
-export { sideTasksGetEndpoint, sideTasksPostEndpoint };
-
-const endpoints = { GET: sideTasksGetEndpoint, POST: sideTasksPostEndpoint };
+const endpoints = {
+  GET: sideTasksGetEndpoint.GET,
+  POST: sideTasksPostEndpoint.POST,
+};
 export default endpoints;
 
 // Export types for repository

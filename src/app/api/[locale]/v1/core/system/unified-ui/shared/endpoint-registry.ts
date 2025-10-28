@@ -8,7 +8,6 @@ import "server-only";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 
-import { getStaticEndpoints } from "./endpoint-adapter";
 import type {
   DiscoveredEndpointMetadata,
   EndpointDiscoveryOptions,
@@ -16,6 +15,7 @@ import type {
   EndpointRegistryStats,
   IEndpointRegistry,
 } from "../../unified-backend/shared/discovery/endpoint-registry-types";
+import { getStaticEndpoints } from "./endpoint-adapter";
 /**
  * Singleton instance using shared factory
  */

@@ -8,16 +8,43 @@
 import type { FC } from "react";
 import { useState } from "react";
 
-import type { GroupedListWidgetData, WidgetComponentProps } from "../types";
+import type {
+  GroupedListWidgetData,
+  RenderableValue,
+  WidgetComponentProps,
+} from "../types";
+
+/**
+ * Type guard for GroupedListWidgetData
+ */
+function isGroupedListWidgetData(
+  data: RenderableValue,
+): data is GroupedListWidgetData {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    !Array.isArray(data) &&
+    "groups" in data &&
+    Array.isArray(data.groups) &&
+    "groupBy" in data &&
+    typeof data.groupBy === "string"
+  );
+}
 
 /**
  * Grouped List Widget Component
  */
-export const GroupedListWidget: FC<
-  WidgetComponentProps<GroupedListWidgetData>
-> = ({ data, className = "" }) => {
+export const GroupedListWidget = ({
+  data,
+  className = "",
+}: WidgetComponentProps<RenderableValue>) => {
+  if (!isGroupedListWidgetData(data)) {
+    return <div className={className}>—</div>;
+  }
+
+  const typedData = data;
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
-    new Set(data.groups.map((g) => g.key)),
+    new Set(typedData.groups.map((g) => g.key)),
   );
 
   const toggleGroup = (groupKey: string): void => {
@@ -34,27 +61,28 @@ export const GroupedListWidget: FC<
 
   return (
     <div className={`space-y-4 ${className}`}>
-      {data.groups.map((group) => {
+      {typedData.groups.map((group) => {
         const isExpanded = expandedGroups.has(group.key);
         const itemCount = group.items.length;
         const displayItems =
-          data.maxItemsPerGroup && !isExpanded
-            ? group.items.slice(0, data.maxItemsPerGroup)
+          typedData.maxItemsPerGroup && !isExpanded
+            ? group.items.slice(0, typedData.maxItemsPerGroup)
             : group.items;
 
         return (
           <div
-            key={group.key}
+            key={String(group.key)}
             className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
           >
             {/* Group Header */}
             <button
-              onClick={() => toggleGroup(group.key)}
+              onClick={() => toggleGroup(String(group.key))}
               className="flex w-full items-center justify-between bg-gray-50 px-4 py-3 text-left hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600"
+              type="button"
             >
               <div className="flex items-center gap-3">
                 <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  {group.label}
+                  {String(group.label)}
                 </span>
                 <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                   {itemCount}
@@ -123,9 +151,9 @@ export const GroupedListWidget: FC<
                 ))}
 
                 {/* Show More Button */}
-                {data.maxItemsPerGroup &&
+                {typedData.maxItemsPerGroup &&
                   !isExpanded &&
-                  itemCount > data.maxItemsPerGroup && (
+                  itemCount > typedData.maxItemsPerGroup && (
                     <button
                       onClick={() => {
                         toggleGroup(group.key);
@@ -133,7 +161,7 @@ export const GroupedListWidget: FC<
                       className="w-full px-4 py-2 text-center text-sm font-medium text-blue-600 hover:bg-gray-50 dark:text-blue-400 dark:hover:bg-gray-750"
                     >
                       {/* eslint-disable-next-line i18next/no-literal-string */}
-                      {`Show ${itemCount - data.maxItemsPerGroup} more`}
+                      {`Show ${itemCount - (typedData.maxItemsPerGroup ?? 0)} more`}
                     </button>
                   )}
               </div>

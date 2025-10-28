@@ -3,11 +3,11 @@
  * Shared permission checking logic for all platforms
  */
 
-import "server-only";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { JwtPayloadType } from "../../../../user/auth/definition";
-import { UserRole } from "../../../../user/user-roles/enum";
+import type { JwtPayloadType } from "../../../../user/auth/types";
 import type { UserRoleValue } from "../../../../user/user-roles/enum";
+import { UserRole } from "../../../../user/user-roles/enum";
 import type { EndpointLogger } from "../logger-types";
 
 /**
@@ -15,7 +15,7 @@ import type { EndpointLogger } from "../logger-types";
  */
 export interface PermissionResult {
   allowed: boolean;
-  reason?: string;
+  reason?: TranslationKey;
 }
 
 /**
@@ -123,7 +123,10 @@ export abstract class BasePermissionHandler {
   async checkPermission(
     user: JwtPayloadType,
     action: string,
-    resource: { ownerId?: string; requiredRoles?: readonly (typeof UserRoleValue)[] },
+    resource: {
+      ownerId?: string;
+      requiredRoles?: readonly (typeof UserRoleValue)[];
+    },
     logger: EndpointLogger,
   ): Promise<PermissionResult> {
     // Public users have limited access
@@ -131,11 +134,19 @@ export abstract class BasePermissionHandler {
       if (resource.requiredRoles?.includes(UserRole.PUBLIC)) {
         return { allowed: true };
       }
-      return { allowed: false, reason: "Public users cannot access this resource" };
+      return {
+        allowed: false,
+        reason:
+          "app.api.v1.core.system.unifiedBackend.shared.permissions.publicUsersCannotAccess",
+      };
     }
 
     // Check if user is owner
-    if (resource.ownerId && user.id && this.isOwner(user.id, resource.ownerId)) {
+    if (
+      resource.ownerId &&
+      user.id &&
+      this.isOwner(user.id, resource.ownerId)
+    ) {
       return { allowed: true };
     }
 
@@ -145,11 +156,17 @@ export abstract class BasePermissionHandler {
     }
 
     // Check required roles
-    if (resource.requiredRoles && this.hasRequiredRoles(user, resource.requiredRoles)) {
+    if (
+      resource.requiredRoles &&
+      this.hasRequiredRoles(user, resource.requiredRoles)
+    ) {
       return { allowed: true };
     }
 
-    return { allowed: false, reason: "Insufficient permissions" };
+    return {
+      allowed: false,
+      reason:
+        "app.api.v1.core.system.unifiedBackend.shared.permissions.insufficientPermissions",
+    };
   }
 }
-

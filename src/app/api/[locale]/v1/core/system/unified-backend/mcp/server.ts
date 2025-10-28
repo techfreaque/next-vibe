@@ -8,9 +8,9 @@ import "server-only";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { getMCPConfig, isMCPServerEnabled } from "./config";
 import type { EndpointLogger } from "../shared/endpoint-logger";
 import { createEndpointLogger } from "../shared/endpoint-logger";
+import { getMCPConfig, isMCPServerEnabled } from "./config";
 import { createMCPProtocolHandler } from "./protocol-handler";
 import { StdioTransport } from "./stdio-transport";
 
@@ -18,7 +18,7 @@ import { StdioTransport } from "./stdio-transport";
  * MCP Server Options
  */
 export interface MCPServerOptions {
-  locale: CountryLanguage;
+  locale?: CountryLanguage;
   debug?: boolean;
 }
 

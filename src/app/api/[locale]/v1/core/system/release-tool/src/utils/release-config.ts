@@ -71,7 +71,10 @@ export async function loadConfig(
     logger.info("Successfully loaded config", { path: resolvedConfigPath });
     return createSuccessResponse(importedModule.default);
   } catch (error) {
-    logger.error("Error loading config", { ...parseError(error), path: resolvedConfigPath });
+    logger.error("Error loading config", {
+      ...parseError(error),
+      path: resolvedConfigPath,
+    });
     return createErrorResponse(
       "app.api.v1.core.system.releaseTool.config.errorLoading",
       ErrorResponseTypes.INTERNAL_ERROR,

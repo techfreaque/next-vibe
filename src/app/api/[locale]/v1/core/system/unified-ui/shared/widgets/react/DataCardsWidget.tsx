@@ -12,7 +12,7 @@ import type { RenderableValue, WidgetComponentProps } from "../types";
 /**
  * Data Cards Widget Data
  */
-export interface DataCardsWidgetData {
+export interface DataCardsWidgetData extends Record<string, RenderableValue> {
   items: Array<Record<string, RenderableValue>>;
   columns?: number;
   titleKey?: string;
@@ -21,13 +21,33 @@ export interface DataCardsWidgetData {
 }
 
 /**
+ * Type guard for DataCardsWidgetData
+ */
+function isDataCardsWidgetData(
+  data: RenderableValue,
+): data is DataCardsWidgetData {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    !Array.isArray(data) &&
+    "items" in data &&
+    Array.isArray(data.items)
+  );
+}
+
+/**
  * Data Cards Widget Component
  */
-export const DataCardsWidget: FC<WidgetComponentProps<DataCardsWidgetData>> = ({
+export const DataCardsWidget = ({
   data,
   className = "",
-}) => {
-  const columns = data.columns ?? 3;
+}: WidgetComponentProps<RenderableValue>) => {
+  if (!isDataCardsWidgetData(data)) {
+    return <div className={className}>—</div>;
+  }
+
+  const typedData = data;
+  const columns = typedData.columns ?? 3;
   /* eslint-disable i18next/no-literal-string */
   const gridCols =
     columns === 1
@@ -39,20 +59,22 @@ export const DataCardsWidget: FC<WidgetComponentProps<DataCardsWidgetData>> = ({
 
   return (
     <div className={`grid gap-4 ${gridCols} ${className}`}>
-      {data.items.map((item, index) => {
-        const titleValue = data.titleKey ? item[data.titleKey] : "";
+      {typedData.items.map((item, index) => {
+        const titleValue = typedData.titleKey ? item[typedData.titleKey] : "";
         const title =
           typeof titleValue === "object" && titleValue !== null
             ? JSON.stringify(titleValue)
             : String(titleValue ?? "");
 
-        const descValue = data.descriptionKey ? item[data.descriptionKey] : "";
+        const descValue = typedData.descriptionKey
+          ? item[typedData.descriptionKey]
+          : "";
         const description =
           typeof descValue === "object" && descValue !== null
             ? JSON.stringify(descValue)
             : String(descValue ?? "");
 
-        const imgValue = data.imageKey ? item[data.imageKey] : "";
+        const imgValue = typedData.imageKey ? item[typedData.imageKey] : "";
         const image =
           typeof imgValue === "object" && imgValue !== null
             ? JSON.stringify(imgValue)
@@ -87,9 +109,9 @@ export const DataCardsWidget: FC<WidgetComponentProps<DataCardsWidgetData>> = ({
                 {Object.entries(item).map(([key, value]) => {
                   // Skip keys used for title, description, image
                   if (
-                    key === data.titleKey ||
-                    key === data.descriptionKey ||
-                    key === data.imageKey
+                    key === typedData.titleKey ||
+                    key === typedData.descriptionKey ||
+                    key === typedData.imageKey
                   ) {
                     return null;
                   }

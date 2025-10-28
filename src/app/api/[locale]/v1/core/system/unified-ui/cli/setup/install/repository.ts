@@ -17,13 +17,14 @@ import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { JwtPayloadType } from "../../../../../user/auth/definition";
+import type { JwtPayloadType } from "../../../../../user/auth/types";
 import type { InstallRequestOutput, InstallResponseOutput } from "./definition";
 
 /**
@@ -176,15 +177,18 @@ exec bun "${vibeTsPath}" "$@"
       // Check if Bun is available
       const bunAvailable = await this.checkBunAvailable();
       if (!bunAvailable) {
-        return createErrorResponse(
-          "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          {
+        return fail({
+          message:
+            "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: {
             error:
               // eslint-disable-next-line i18next/no-literal-string
               "Bun is not installed or not in PATH. Please install Bun first: curl -fsSL https://bun.sh/install | bash",
+            // eslint-disable-next-line i18next/no-literal-string
+            command: "bun --version",
           },
-        );
+        });
       }
 
       // Get paths for Bun-based installation
@@ -199,21 +203,25 @@ exec bun "${vibeTsPath}" "$@"
         "v1",
         "core",
         "system",
-        "unified-ui",
+        "unified-backend",
         "cli",
-        "vibe",
-        "vibe.ts",
+        "vibe-runtime.ts",
       );
       /* eslint-enable i18next/no-literal-string */
 
-      // Verify vibe.ts exists
+      // Verify vibe-runtime.ts exists
       if (!existsSync(vibeTsPath)) {
-        return createErrorResponse(
-          "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          // eslint-disable-next-line i18next/no-literal-string
-          { error: `vibe.ts not found at ${vibeTsPath}` },
-        );
+        return fail({
+          message:
+            "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: {
+            // eslint-disable-next-line i18next/no-literal-string
+            error: `vibe-runtime.ts not found at ${vibeTsPath}`,
+
+            cwd: process.cwd(),
+          },
+        });
       }
 
       // Get binary installation paths
@@ -235,14 +243,20 @@ exec bun "${vibeTsPath}" "$@"
       try {
         mkdirSync(binDir, { recursive: true });
       } catch (error) {
-        return createErrorResponse(
-          "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.title",
-          ErrorResponseTypes.INTERNAL_ERROR,
-          {
+        const parsedError = parseError(error);
+        return fail({
+          message:
+            "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: {
             // eslint-disable-next-line i18next/no-literal-string
-            error: `Failed to create directory ${binDir}: ${error instanceof Error ? error.message : String(error)}`,
+            error: `Failed to create directory`,
+
+            directory: binDir,
+
+            reason: parsedError.message,
           },
-        );
+        });
       }
 
       // Create binary content
@@ -287,11 +301,19 @@ exec bun "${vibeTsPath}" "$@"
       });
     } catch (error) {
       const parsedError = parseError(error);
-      return createErrorResponse(
-        "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.title",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parsedError.message },
-      );
+      return fail({
+        message:
+          "app.api.v1.core.system.unifiedUi.cli.setup.install.post.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
+          // eslint-disable-next-line i18next/no-literal-string
+          error: "CLI installation failed",
+
+          reason: parsedError.message,
+          // eslint-disable-next-line i18next/no-literal-string
+          stack: parsedError.stack || "No stack trace available",
+        },
+      });
     }
   }
 

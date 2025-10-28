@@ -11,15 +11,6 @@
 
 import type { Route } from "next";
 
-import type {
-  ActionBarWidgetConfig,
-  AvatarWidgetConfig,
-  BadgeWidgetConfig,
-  ButtonGroupWidgetConfig,
-  DataListWidgetConfig,
-  FormGroupWidgetConfig,
-  FormSectionWidgetConfig,
-} from "@/app/api/[locale]/v1/core/system/unified-ui/shared/widgets";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 // Import types from core enums
@@ -708,5 +699,75 @@ export interface MarkdownWidgetConfig extends BaseWidgetConfig {
   sanitize?: boolean;
 }
 
+/**
+ * Form section widget configuration
+ */
+export interface FormSectionWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.SECTION;
+  title?: TranslationKey;
+  description?: TranslationKey;
+  fields?: string[];
+}
+
+/**
+ * Data list widget configuration
+ */
+export interface DataListWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.DATA_LIST;
+  items?: string[];
+  itemActions?: ButtonAction[];
+  itemConfig?: WidgetConfig;
+}
+
+/**
+ * Badge widget configuration
+ */
+export interface BadgeWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.BADGE;
+  text: TranslationKey;
+  variant?: ComponentVariant;
+}
+
+/**
+ * Avatar widget configuration
+ */
+export interface AvatarWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.AVATAR;
+  src?: string;
+  alt?: TranslationKey;
+  size?: ComponentSize;
+}
+
+/**
+ * Action bar widget configuration
+ */
+export interface ActionBarWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.ACTION_BAR;
+  actions: ButtonAction[];
+}
+
+/**
+ * Form group widget configuration
+ */
+export interface FormGroupWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.FORM_GROUP;
+  title?: TranslationKey;
+  description?: TranslationKey;
+  fields?: string[];
+}
+
+/**
+ * Button group widget configuration
+ */
+export interface ButtonGroupWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.BUTTON_GROUP;
+  buttons: ButtonAction[];
+  orientation?: "horizontal" | "vertical";
+}
+
 // WidgetConfig union type is declared at the top of the file (line ~300)
 // to resolve circular references with Container and Section widgets
+
+const definitions = {};
+
+export default definitions;

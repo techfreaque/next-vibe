@@ -2,9 +2,10 @@
  * STUB: form/form-section
  * Auto-generated placeholder for web-only form component
  */
+import type { ReactNode } from "react";
 import { Text, View } from "react-native";
 
-export function FormSection(props) {
+export function FormSection(props: { children?: ReactNode }): ReactNode {
   console.warn("🔶 Using stub: FormSection");
   return (
     <View style={{ padding: 8, backgroundColor: "#FEF3C7", marginVertical: 4 }}>

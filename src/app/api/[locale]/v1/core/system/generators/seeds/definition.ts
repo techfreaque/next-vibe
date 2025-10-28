@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import {
+  EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
@@ -16,7 +17,6 @@ import {
   requestDataField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
-import { EndpointErrorTypes } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**
@@ -173,45 +173,63 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.v1.core.system.generators.seeds.post.errors.validation.title",
-      description: "app.api.v1.core.system.generators.seeds.post.errors.validation.description",
+      title:
+        "app.api.v1.core.system.generators.seeds.post.errors.validation.title",
+      description:
+        "app.api.v1.core.system.generators.seeds.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.v1.core.system.generators.seeds.post.errors.unauthorized.title",
-      description: "app.api.v1.core.system.generators.seeds.post.errors.unauthorized.description",
+      title:
+        "app.api.v1.core.system.generators.seeds.post.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.system.generators.seeds.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.v1.core.system.generators.seeds.post.errors.forbidden.title",
-      description: "app.api.v1.core.system.generators.seeds.post.errors.forbidden.description",
+      title:
+        "app.api.v1.core.system.generators.seeds.post.errors.forbidden.title",
+      description:
+        "app.api.v1.core.system.generators.seeds.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.v1.core.system.generators.seeds.post.errors.notFound.title",
-      description: "app.api.v1.core.system.generators.seeds.post.errors.notFound.description",
+      title:
+        "app.api.v1.core.system.generators.seeds.post.errors.notFound.title",
+      description:
+        "app.api.v1.core.system.generators.seeds.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.v1.core.system.generators.seeds.post.errors.server.title",
-      description: "app.api.v1.core.system.generators.seeds.post.errors.server.description",
+      description:
+        "app.api.v1.core.system.generators.seeds.post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.v1.core.system.generators.seeds.post.errors.unknown.title",
-      description: "app.api.v1.core.system.generators.seeds.post.errors.unknown.description",
+      title:
+        "app.api.v1.core.system.generators.seeds.post.errors.unknown.title",
+      description:
+        "app.api.v1.core.system.generators.seeds.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.v1.core.system.generators.seeds.post.errors.unsavedChanges.title",
-      description: "app.api.v1.core.system.generators.seeds.post.errors.unsavedChanges.description",
+      title:
+        "app.api.v1.core.system.generators.seeds.post.errors.unsavedChanges.title",
+      description:
+        "app.api.v1.core.system.generators.seeds.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.v1.core.system.generators.seeds.post.errors.conflict.title",
-      description: "app.api.v1.core.system.generators.seeds.post.errors.conflict.description",
+      title:
+        "app.api.v1.core.system.generators.seeds.post.errors.conflict.title",
+      description:
+        "app.api.v1.core.system.generators.seeds.post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.v1.core.system.generators.seeds.post.errors.network.title",
-      description: "app.api.v1.core.system.generators.seeds.post.errors.network.description",
+      title:
+        "app.api.v1.core.system.generators.seeds.post.errors.network.title",
+      description:
+        "app.api.v1.core.system.generators.seeds.post.errors.network.description",
     },
   },
   successTypes: {
     title: "app.api.v1.core.system.generators.seeds.post.success.title",
-    description: "app.api.v1.core.system.generators.seeds.post.success.description",
+    description:
+      "app.api.v1.core.system.generators.seeds.post.success.description",
   },
 });
 

@@ -24,6 +24,7 @@ import { leadAuthService } from "../leads/auth-service";
 import { authRepository } from "./auth/repository";
 import type { NewUser, User } from "./db";
 import { insertUserSchema, users } from "./db";
+import { UserDetailLevel } from "./enum";
 import type {
   CompleteUserType,
   ExtendedUserDetailLevel,
@@ -32,8 +33,7 @@ import type {
   UserFetchOptions,
   UserSearchOptions,
   UserType,
-} from "./definition";
-import { UserDetailLevel } from "./enum";
+} from "./types";
 import { UserRole, type UserRoleValue } from "./user-roles/enum";
 import { userRolesRepository } from "./user-roles/repository";
 
@@ -194,7 +194,10 @@ export class BaseUserRepositoryImpl implements UserRepository {
         detailLevel = UserDetailLevel.MINIMAL as T,
       } = options;
 
-      logger.debug("Getting user by auth", { roles, detailLevel });
+      logger.debug("Getting user by auth", {
+        roles: roles.map(String),
+        detailLevel: String(detailLevel),
+      });
 
       // Locale is required for authentication
       if (!options.locale) {
@@ -585,7 +588,10 @@ export class BaseUserRepositoryImpl implements UserRepository {
         );
 
         if (!userRolesResponse.success) {
-          logger.error("Error getting user roles", userRolesResponse);
+          logger.error("Error getting user roles", {
+            message: userRolesResponse.message,
+            errorCode: userRolesResponse.errorType.errorCode,
+          });
           continue; // Skip this user if we can't get roles
         }
 

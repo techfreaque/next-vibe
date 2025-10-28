@@ -274,3 +274,5 @@ export const definitions = { POST };
 export type VotePostRequestOutput = typeof POST.types.RequestOutput;
 export type VotePostResponseOutput = typeof POST.types.ResponseOutput;
 export type VotePostUrlVariablesOutput = typeof POST.types.UrlVariablesOutput;
+
+export default definitions;

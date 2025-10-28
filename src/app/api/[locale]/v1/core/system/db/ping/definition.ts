@@ -70,7 +70,8 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.system.db.ping.fields.success.title",
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.v1.core.system.db.ping.fields.success.title",
         },
         z.boolean(),
       ),
@@ -78,7 +79,8 @@ const { POST } = createEndpoint({
       isAccessible: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.system.db.ping.fields.isAccessible.title",
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.v1.core.system.db.ping.fields.isAccessible.title",
         },
         z.boolean(),
       ),
@@ -86,7 +88,7 @@ const { POST } = createEndpoint({
       output: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.system.db.ping.fields.output.title",
+          label: "app.api.v1.core.system.db.ping.fields.output.title",
         },
         z.string(),
       ),
@@ -94,7 +96,8 @@ const { POST } = createEndpoint({
       totalConnections: responseField(
         {
           type: WidgetType.TEXT,
-          content:
+          fieldType: FieldDataType.NUMBER,
+          label:
             "app.api.v1.core.system.db.ping.fields.connectionInfo.totalConnections",
         },
         z.number(),
@@ -103,7 +106,8 @@ const { POST } = createEndpoint({
       idleConnections: responseField(
         {
           type: WidgetType.TEXT,
-          content:
+          fieldType: FieldDataType.NUMBER,
+          label:
             "app.api.v1.core.system.db.ping.fields.connectionInfo.idleConnections",
         },
         z.number(),
@@ -112,7 +116,8 @@ const { POST } = createEndpoint({
       waitingClients: responseField(
         {
           type: WidgetType.TEXT,
-          content:
+          fieldType: FieldDataType.NUMBER,
+          label:
             "app.api.v1.core.system.db.ping.fields.connectionInfo.waitingClients",
         },
         z.number(),

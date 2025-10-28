@@ -220,7 +220,7 @@ export function useApiQueryForm<
   const formConfig = {
     ...restFormOptions,
     resolver: zodResolver<FormData, FormData>(
-      endpoint.requestSchema as z.ZodType<FormData, z.ZodTypeDef, FormData>,
+      endpoint.requestSchema as z.ZodType<FormData, any, FormData>,
     ),
   };
 

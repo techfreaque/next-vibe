@@ -41,7 +41,7 @@ import type { JSX } from "react";
 import { useState } from "react";
 import { useInView } from "react-intersection-observer";
 
-import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/definition";
+import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 

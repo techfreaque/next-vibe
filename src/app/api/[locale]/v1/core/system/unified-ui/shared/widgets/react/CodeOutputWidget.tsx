@@ -3,7 +3,26 @@
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 
-import type { CodeOutputWidgetData, WidgetComponentProps } from "../types";
+import type {
+  CodeOutputWidgetData,
+  RenderableValue,
+  WidgetComponentProps,
+} from "../types";
+
+/**
+ * Type guard for CodeOutputWidgetData
+ */
+function isCodeOutputWidgetData(
+  data: RenderableValue,
+): data is CodeOutputWidgetData {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    !Array.isArray(data) &&
+    "code" in data &&
+    typeof data.code === "string"
+  );
+}
 
 /**
  * Code Output Widget Component
@@ -14,7 +33,18 @@ export function CodeOutputWidget({
   context,
   className,
   style,
-}: WidgetComponentProps<CodeOutputWidgetData>): JSX.Element {
+}: WidgetComponentProps<RenderableValue>): JSX.Element {
+  if (!isCodeOutputWidgetData(data)) {
+    return (
+      <div
+        className={cn("italic p-4 text-muted-foreground", className)}
+        style={style}
+      >
+        —
+      </div>
+    );
+  }
+
   const {
     code,
     language = "text",
@@ -29,8 +59,7 @@ export function CodeOutputWidget({
         className={cn("italic p-4 text-muted-foreground", className)}
         style={style}
       >
-        {/* eslint-disable-next-line i18next/no-literal-string */}
-        {"No code to display"}
+        —
       </div>
     );
   }

@@ -69,12 +69,7 @@ program
     const logger = createEndpointLogger(true, Date.now(), locale);
     try {
       const rootDir = process.cwd();
-      await ciReleaseCommand(
-        logger,
-        rootDir,
-        options.target,
-        options.tag,
-      );
+      await ciReleaseCommand(logger, rootDir, options.target, options.tag);
     } catch (error) {
       handleError(logger, "CI release failed:", error);
     }

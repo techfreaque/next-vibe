@@ -39,13 +39,13 @@ import type {
   StreamingResponse,
 } from "next-vibe/shared/types/response.schema";
 
-import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
+import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/types";
 import type { SmsFunctionType } from "@/app/api/[locale]/v1/core/sms/utils";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
   JWTPublicPayloadType,
-} from "@/app/api/[locale]/v1/core/user/auth/definition";
+} from "@/app/api/[locale]/v1/core/user/auth/types";
 import type {
   UserRole,
   UserRoleValue,
@@ -53,6 +53,7 @@ import type {
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
+import type { CliHandlerReturnType } from "../cli/executor-types";
 import type {
   IMCPProtocolHandler,
   IMCPTransport,
@@ -70,7 +71,6 @@ import type {
 } from "../mcp/types";
 import type { NextHandlerReturnType } from "../next/types";
 import type { TrpcHandlerReturnType } from "../trpc/types";
-import type { CliHandlerReturnType } from "../cli/executor-types";
 import type { CreateApiEndpoint } from "./create-endpoint";
 import type { Methods } from "./enums";
 import type { EndpointLogger } from "./logger-types";
@@ -118,10 +118,20 @@ export interface RouteModule<
   tools?: {
     definitions?: Record<string, TEndpoint>;
     cli?:
-      | CliHandlerReturnType<unknown, unknown, unknown, readonly string[]>
+      | CliHandlerReturnType<
+          unknown,
+          unknown,
+          unknown,
+          readonly (typeof UserRoleValue)[]
+        >
       | Record<
           string,
-          CliHandlerReturnType<unknown, unknown, unknown, readonly string[]>
+          CliHandlerReturnType<
+            unknown,
+            unknown,
+            unknown,
+            readonly (typeof UserRoleValue)[]
+          >
         >;
     trpc?: unknown;
     [key: string]: unknown;
@@ -172,7 +182,9 @@ export type InferJwtPayloadType<TUserRoleValue extends typeof UserRoleValue> =
  * - If TRoles[number] includes "PUBLIC" (check with Extract) → JwtPayloadType (mixed)
  * - Otherwise → JwtPrivatePayloadType (no PUBLIC, guaranteed authenticated)
  */
-export type InferJwtPayloadTypeFromRoles<TRoles extends readonly string[]> =
+export type InferJwtPayloadTypeFromRoles<
+  TRoles extends readonly (typeof UserRoleValue)[],
+> =
   Exclude<TRoles[number], "PUBLIC"> extends never
     ? JWTPublicPayloadType
     : Extract<TRoles[number], "PUBLIC"> extends never
@@ -222,7 +234,7 @@ export interface MethodHandlerConfig<
   TRequestOutput,
   TResponseOutput,
   TUrlVariablesOutput,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
 > {
   handler: ApiHandlerFunction<
     TRequestOutput,
@@ -253,7 +265,7 @@ export type EndpointHandlerConfig<T> = {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           UrlVariablesOutput: any;
         };
-        allowedRoles: readonly string[];
+        allowedRoles: readonly (typeof UserRoleValue)[];
       }
       ? MethodHandlerConfig<
           T[K]["types"]["RequestOutput"],
@@ -319,7 +331,7 @@ export type EndpointsHandlerReturn<T> = {
         Record<string, string | number | boolean>,
         Record<string, string | number | boolean>,
         Record<string, string | number | boolean>,
-        readonly string[]
+        readonly (typeof UserRoleValue)[]
       >
     >;
   };
@@ -333,7 +345,7 @@ export type EndpointsHandlerReturn<T> = {
 export interface ApiHandlerProps<
   TRequestOutput,
   TUrlVariablesOutput,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
 > {
   /** Request data (validated by Zod schema) */
   data: TRequestOutput;
@@ -370,7 +382,7 @@ export type ApiHandlerFunction<
   TRequestOutput,
   TResponseOutput,
   TUrlVariablesOutput,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
 > = (
   props: ApiHandlerProps<TRequestOutput, TUrlVariablesOutput, TUserRoleValue>,
 ) =>
@@ -426,7 +438,7 @@ export interface ApiHandlerOptions<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TRequestInput = any,
@@ -485,7 +497,7 @@ export type EndpointHandlerReturn<
   TResponseOutput,
   TUrlVariablesOutput,
   TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
 > = {
   [K in TMethod]: NextHandlerReturnType<TResponseOutput, TUrlVariablesOutput>;
 } & {

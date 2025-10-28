@@ -3,7 +3,7 @@
  * API routes for cron task statistics
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handlers";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";

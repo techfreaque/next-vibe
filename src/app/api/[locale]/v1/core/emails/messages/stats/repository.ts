@@ -34,7 +34,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { ActivityType, UserAssociation } from "../../../leads/enum";
 import { EngagementLevel } from "../../../leads/tracking/engagement/enum";
-import type { JwtPayloadType } from "../../../user/auth/definition";
+import type { JwtPayloadType } from "../../../user/auth/types";
 import { emails } from "../db";
 import {
   EmailProvider,

@@ -12,7 +12,7 @@ import { findRouteFiles } from "@/app/api/[locale]/v1/core/system/unified-backen
 import {
   type RouteFileStructure,
   validateRouteFileForTRPC,
-} from "./trpc-trpc-procedure-factory";
+} from "../../unified-ui/react/trpc-trpc-procedure-factory";
 
 /**
  * Router generation configuration
@@ -230,11 +230,10 @@ async function processRouteFile(
     const routeModule = (await import(importPath)) as RouteFileStructure;
 
     // Extract available HTTP methods
-
-    methods = ["GET", "POST", "PUT", "PATCH", "DELETE"].filter(
-      (method) =>
-        method in routeModule && typeof routeModule[method] === "function",
-    );
+    methods = ["GET", "POST", "PUT", "PATCH", "DELETE"].filter((method) => {
+      const moduleExport = routeModule[method as keyof RouteFileStructure];
+      return moduleExport && typeof moduleExport === "function";
+    });
 
     // Validate the route file structure
     validation = validateRouteFileForTRPC(routeModule);
@@ -255,13 +254,25 @@ async function processRouteFile(
  * Generate TypeScript code for the router with proper nested structure
  */
 function generateRouterCode(validRouteFiles: RouteFileInfo[]): string {
-  const imports: string[] = [];
   const routerStructure = buildNestedRouterStructure(validRouteFiles);
+
+  // Collect all routes that are actually used in the router structure
+  const usedRoutes = new Set<RouteFileInfo>();
+  collectUsedRoutes(routerStructure, usedRoutes);
+
+  const imports: string[] = [];
+  const constants: string[] = [];
   let importCounter = 0;
 
-  // Generate imports
+  // Only generate imports and constants for routes that are actually used
   for (const routeFile of validRouteFiles) {
+    if (!usedRoutes.has(routeFile)) {
+      continue;
+    }
+
     const varName = `route${importCounter++}`;
+    // eslint-disable-next-line i18next/no-literal-string
+    const toolsVarName = `${varName}Tools`;
     const importPath = path
       .relative(
         path.dirname(
@@ -275,7 +286,9 @@ function generateRouterCode(validRouteFiles: RouteFileInfo[]): string {
       .replace(/\\/g, "/");
 
     // eslint-disable-next-line i18next/no-literal-string
-    imports.push(`import { trpc as ${varName} } from '${importPath}';`);
+    imports.push(`import { tools as ${toolsVarName} } from '${importPath}';`);
+    // eslint-disable-next-line i18next/no-literal-string
+    constants.push(`const ${varName} = ${toolsVarName}.trpc;`);
 
     // Store the variable name for later use
     routeFile.varName = varName;
@@ -291,8 +304,13 @@ function generateRouterCode(validRouteFiles: RouteFileInfo[]): string {
  * DO NOT EDIT MANUALLY - This file is auto-generated
  */
 
+/* eslint-disable simple-import-sort/imports */
+/* eslint-disable prettier/prettier */
+
 import { router } from '@/app/api/[locale]/v1/core/system/unified-ui/react/trpc-trpc';
 ${imports.join("\n")}
+
+${constants.join("\n")}
 
 export const appRouter = router({
 ${routerCode}
@@ -300,6 +318,28 @@ ${routerCode}
 
 export type AppRouter = typeof appRouter;
 `;
+}
+
+/**
+ * Recursively collect all routes that are actually used in the router structure
+ */
+function collectUsedRoutes(
+  structure: NestedRouterStructure,
+  usedRoutes: Set<RouteFileInfo>,
+): void {
+  for (const [key, value] of Object.entries(structure)) {
+    if (key === "_root" && Array.isArray(value)) {
+      for (const route of value) {
+        usedRoutes.add(route);
+      }
+    } else if (Array.isArray(value)) {
+      for (const route of value) {
+        usedRoutes.add(route);
+      }
+    } else if (value && typeof value === "object") {
+      collectUsedRoutes(value, usedRoutes);
+    }
+  }
 }
 
 /**
@@ -372,16 +412,20 @@ function generateNestedRouterCode(
       continue;
     }
 
+    // Quote key if it contains hyphens or other special characters
+    // eslint-disable-next-line i18next/no-literal-string
+    const quotedKey = /[^a-zA-Z0-9_$]/.test(key) ? `"${key}"` : key;
+
     if (Array.isArray(value)) {
       // Direct procedures at this level
       if (value.length === 1) {
         // eslint-disable-next-line i18next/no-literal-string
-        entries.push(`${indent}${key}: router(${value[0].varName}),`);
+        entries.push(`${indent}${quotedKey}: router(${value[0].varName}),`);
       } else {
         // Multiple route files at same level - merge them
         const mergedProcedures = value.map((rf) => rf.varName).join(", ");
         // eslint-disable-next-line i18next/no-literal-string
-        entries.push(`${indent}${key}: router({ ${mergedProcedures} }),`);
+        entries.push(`${indent}${quotedKey}: router({ ${mergedProcedures} }),`);
       }
     } else if (value) {
       // Nested structure
@@ -391,7 +435,8 @@ function generateNestedRouterCode(
         `${indent}  `,
       );
       // eslint-disable-next-line i18next/no-literal-string
-      entries.push(`${indent}${key}: router({\n${nestedCode}\n${indent}}),`);
+      const nestedRouterEntry = `${indent}${quotedKey}: router({\n${nestedCode}\n${indent}}),`;
+      entries.push(nestedRouterEntry);
     }
   }
 

@@ -9,6 +9,7 @@ import { z } from "zod";
 
 import type {
   ArrayField,
+  FieldUIConfig,
   FieldUsageConfig,
   InferSchemaFromField,
   ObjectField,
@@ -17,7 +18,6 @@ import type {
 } from "./core-types";
 import type { CacheStrategy } from "./enums";
 import { FieldUsage } from "./enums";
-import type { WidgetConfig } from "./types";
 
 // ============================================================================
 // FIELD CREATORS
@@ -32,7 +32,7 @@ export function field<
 >(
   schema: TSchema,
   usage: TUsage,
-  ui: WidgetConfig,
+  ui: FieldUIConfig,
   cache?: CacheStrategy,
 ): PrimitiveField<TSchema, TUsage> {
   return {
@@ -48,7 +48,7 @@ export function field<
  * Create a field that can be both request and response
  */
 export function requestResponseField<TSchema extends z.ZodTypeAny>(
-  ui: WidgetConfig,
+  ui: FieldUIConfig,
   schema: TSchema,
   cache?: CacheStrategy,
   requestAsUrlParams?: false,
@@ -61,7 +61,7 @@ export function requestResponseField<TSchema extends z.ZodTypeAny>(
 >;
 // eslint-disable-next-line no-redeclare
 export function requestResponseField<TSchema extends z.ZodTypeAny>(
-  ui: WidgetConfig,
+  ui: FieldUIConfig,
   schema: TSchema,
   cache?: CacheStrategy,
   requestAsUrlParams?: true,
@@ -74,7 +74,7 @@ export function requestResponseField<TSchema extends z.ZodTypeAny>(
 >;
 // eslint-disable-next-line no-redeclare
 export function requestResponseField<TSchema extends z.ZodTypeAny>(
-  ui: WidgetConfig,
+  ui: FieldUIConfig,
   schema: TSchema,
   cache?: CacheStrategy,
   requestAsUrlParams?: boolean,
@@ -98,11 +98,14 @@ export function requestResponseField<TSchema extends z.ZodTypeAny>(
 /**
  * Create a request data field
  */
-export function requestDataField<TSchema extends z.ZodTypeAny>(
-  ui: WidgetConfig,
+export function requestDataField<
+  TSchema extends z.ZodTypeAny,
+  TUIConfig extends FieldUIConfig = FieldUIConfig,
+>(
+  ui: TUIConfig,
   schema: TSchema,
   cache?: CacheStrategy,
-): PrimitiveField<TSchema, { request: "data" }> {
+): PrimitiveField<TSchema, { request: "data" }, TUIConfig> {
   return {
     type: "primitive" as const,
     schema,
@@ -115,11 +118,18 @@ export function requestDataField<TSchema extends z.ZodTypeAny>(
 /**
  * Create a request URL params field
  */
-export function requestUrlPathParamsField<TSchema extends z.ZodTypeAny>(
-  ui: WidgetConfig,
+export function requestUrlPathParamsField<
+  TSchema extends z.ZodTypeAny,
+  TUIConfig extends FieldUIConfig = FieldUIConfig,
+>(
+  ui: TUIConfig,
   schema: TSchema,
   cache?: CacheStrategy,
-): PrimitiveField<TSchema, { request: "urlPathParams"; response?: never }> {
+): PrimitiveField<
+  TSchema,
+  { request: "urlPathParams"; response?: never },
+  TUIConfig
+> {
   return {
     type: "primitive" as const,
     schema,
@@ -132,11 +142,14 @@ export function requestUrlPathParamsField<TSchema extends z.ZodTypeAny>(
 /**
  * Create a response field
  */
-export function responseField<TSchema extends z.ZodTypeAny>(
-  ui: WidgetConfig,
+export function responseField<
+  TSchema extends z.ZodTypeAny,
+  TUIConfig extends FieldUIConfig = FieldUIConfig,
+>(
+  ui: TUIConfig,
   schema: TSchema,
   cache?: CacheStrategy,
-): PrimitiveField<TSchema, { response: true }> {
+): PrimitiveField<TSchema, { response: true }, TUIConfig> {
   return {
     type: "primitive" as const,
     schema,
@@ -150,12 +163,16 @@ export function responseField<TSchema extends z.ZodTypeAny>(
  * Create an object field containing other fields
  * Accepts any object-like structure where all values are UnifiedFields
  */
-export function objectField<C, U extends FieldUsageConfig>(
-  ui: WidgetConfig,
+export function objectField<
+  C,
+  U extends FieldUsageConfig,
+  TUIConfig extends FieldUIConfig = FieldUIConfig,
+>(
+  ui: TUIConfig,
   usage: U,
   children: C,
   cache?: CacheStrategy,
-): ObjectField<C, U> {
+): ObjectField<C, U, TUIConfig> {
   return {
     type: "object" as const,
     children,
@@ -168,18 +185,15 @@ export function objectField<C, U extends FieldUsageConfig>(
 /**
  * Create an array field containing repeated items
  */
-export function arrayField<Child>(
+export function arrayField<
+  Child,
+  TUIConfig extends FieldUIConfig = FieldUIConfig,
+>(
   usage: FieldUsageConfig,
-  ui: WidgetConfig,
+  ui: TUIConfig,
   child: Child,
   cache?: CacheStrategy,
-): {
-  type: "array";
-  child: Child;
-  usage: FieldUsageConfig;
-  ui: WidgetConfig;
-  cache?: CacheStrategy;
-} {
+): ArrayField<Child, FieldUsageConfig, TUIConfig> {
   return {
     type: "array" as const,
     child,
@@ -192,11 +206,14 @@ export function arrayField<Child>(
 /**
  * Create a request array field with specific request usage
  */
-export function requestDataArrayField<Child>(
-  ui: WidgetConfig,
+export function requestDataArrayField<
+  Child,
+  TUIConfig extends FieldUIConfig = FieldUIConfig,
+>(
+  ui: TUIConfig,
   child: Child,
   cache?: CacheStrategy,
-): ArrayField<Child, { request: "data" }> {
+): ArrayField<Child, { request: "data" }, TUIConfig> {
   return {
     type: "array" as const,
     child,
@@ -209,11 +226,14 @@ export function requestDataArrayField<Child>(
 /**
  * Create a response array field with specific response usage
  */
-export function responseArrayField<Child>(
-  ui: WidgetConfig,
+export function responseArrayField<
+  Child,
+  TUIConfig extends FieldUIConfig = FieldUIConfig,
+>(
+  ui: TUIConfig,
   child: Child,
   cache?: CacheStrategy,
-): ArrayField<Child, { response: true }> {
+): ArrayField<Child, { response: true }, TUIConfig> {
   return {
     type: "array" as const,
     child,

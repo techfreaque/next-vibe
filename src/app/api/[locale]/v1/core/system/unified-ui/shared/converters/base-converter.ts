@@ -197,13 +197,15 @@ export function endpointToMetadata(
     title: typeof definition.title === "string" ? definition.title : "",
     description:
       typeof definition.description === "string" ? definition.description : "",
-    category: typeof definition.category === "string" ? definition.category : "",
+    category:
+      typeof definition.category === "string" ? definition.category : "",
     tags: Array.isArray(definition.tags) ? definition.tags : [],
     allowedRoles: definition.allowedRoles,
     requiresAuth: !definition.allowedRoles.includes("PUBLIC"),
     requestSchema: definition.requestSchema,
     responseSchema: definition.responseSchema,
-    credits: typeof definition.credits === "number" ? definition.credits : undefined,
+    credits:
+      typeof definition.credits === "number" ? definition.credits : undefined,
     aiTool: definition.aiTool,
     aliases: definition.cli?.aliases,
   };

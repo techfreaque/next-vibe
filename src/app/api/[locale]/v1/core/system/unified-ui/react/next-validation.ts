@@ -13,6 +13,7 @@ import { z } from "zod";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../unified-backend/shared/endpoint-logger";
@@ -50,7 +51,7 @@ export async function validateNextRequestData<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
 >(
   endpoint: CreateApiEndpoint<
@@ -88,7 +89,7 @@ export async function validateNextRequestData<
     if (!urlValidation.success) {
       return {
         success: false,
-        message: "app.error.errors.invalid_url_parameters",
+        message: "app.api.v1.core.shared.errors.invalid_url_parameters",
         errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         messageParams: {
           error: urlValidation.message,
@@ -352,7 +353,7 @@ async function validatePostRequestData<TRequestInput, TRequestOutput>(
   } catch (error) {
     return {
       success: false,
-      message: "app.error.errors.invalid_request_data",
+      message: "app.api.v1.core.shared.errors.invalid_request_data",
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
         error:

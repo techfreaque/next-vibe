@@ -11,13 +11,13 @@ import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import { createTrackingContext } from "../../../../emails/smtp-client/components/tracking_context";
-import type { LeadWithEmailType } from "../../../definition";
 import {
   EmailCampaignStage,
   EmailJourneyVariant,
   LeadSource,
   LeadStatus,
 } from "../../../enum";
+import type { LeadWithEmailType } from "../../../types";
 import { personalJourneyTemplates } from "../journeys/personal";
 import { personalPracticalJourneyTemplates } from "../journeys/personal-results";
 import { resultsJourneyTemplates } from "../journeys/results/results";

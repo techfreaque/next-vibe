@@ -15,10 +15,7 @@ import type {
   EmailJourneyVariant,
 } from "../../../leads/enum";
 import type { CampaignType } from "../enum";
-import type {
-  SmtpSelectionCriteria,
-  SmtpSendResult,
-} from "../sending/definition";
+import type { SmtpSelectionCriteria, SmtpSendResult } from "../sending/types";
 
 /**
  * Email sending parameters with comprehensive SMTP selection criteria
@@ -73,3 +70,7 @@ export interface SendEmailRequestTypeOutput {
 export interface SendEmailResponseTypeOutput {
   result: SmtpSendResult;
 }
+
+const definitions = {};
+
+export default definitions;

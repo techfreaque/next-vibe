@@ -3,8 +3,8 @@ import path from "node:path";
 
 import { parseError } from "next-vibe/shared/utils";
 
-import { scanDirectory } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/filesystem/directory-scanner";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import { scanDirectory } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/filesystem/directory-scanner";
 
 import {
   FILE_EXTENSIONS,

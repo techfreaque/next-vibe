@@ -181,3 +181,7 @@ export interface EmailTrackingData {
   userAgent?: string;
   ipAddress?: string;
 }
+
+const definitions = {};
+
+export default definitions;

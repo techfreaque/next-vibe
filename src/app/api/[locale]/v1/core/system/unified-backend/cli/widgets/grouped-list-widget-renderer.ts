@@ -18,6 +18,8 @@ interface GroupedListConfig {
   maxItemsPerGroup: number;
   summaryTitle?: string;
   summaryStats?: StatConfig[];
+  renderMode?: 'code-quality' | 'simple'; // Data-driven mode selection
+  hierarchical?: boolean; // Enable hierarchical/tree rendering for nested paths
 }
 
 /**
@@ -51,6 +53,16 @@ interface StatConfig {
 }
 
 /**
+ * Tree node for hierarchical rendering
+ */
+interface TreeNode {
+  name: string;
+  fullPath: string;
+  items: GroupedListItem[];
+  children: Map<string, TreeNode>;
+}
+
+/**
  * Grouped list widget renderer for organized data display
  */
 export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
@@ -77,20 +89,25 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
     );
     const config = this.getGroupedListConfig(field);
 
-    // Group data by the specified field
-    const groups = this.groupData(typedData, config.groupBy, context);
-
     let output = "";
 
-    // Render each group
-    for (const [groupKey, items] of groups) {
-      output += this.renderGroup(groupKey, items, config, context);
-      output += "\n";
-    }
+    // Use hierarchical rendering if configured
+    if (config.hierarchical) {
+      output = this.renderHierarchical(typedData, config, context);
+    } else {
+      // Group data by the specified field
+      const groups = this.groupData(typedData, config.groupBy, context);
 
-    // Add summary if requested
-    if (config.showGroupSummary) {
-      output += this.renderSummary(typedData, groups, config, context);
+      // Render each group
+      for (const [groupKey, items] of groups) {
+        output += this.renderGroup(groupKey, items, config, context);
+        output += "\n";
+      }
+
+      // Add summary if requested
+      if (config.showGroupSummary) {
+        output += this.renderSummary(typedData, groups, config, context);
+      }
     }
 
     return output.trim();
@@ -169,7 +186,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
 
     // Render each item
     for (const item of sortedItems.slice(0, config.maxItemsPerGroup)) {
-      const itemLine = this.renderGroupItem(item, context);
+      const itemLine = this.renderGroupItem(item, context, config);
       output += `  ${itemLine}${String.fromCharCode(10)}`;
     }
 
@@ -217,35 +234,62 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
   }
 
   /**
-   * Render individual group item (lint issue)
+   * Render individual group item (lint issue or command)
    */
   private renderGroupItem(
     item: GroupedListItem,
     context: WidgetRenderContext,
+    config: GroupedListConfig,
   ): string {
     const parts: string[] = [];
 
-    // Location (line:column)
-    if (item.line || item.column) {
-      const location = this.formatLocation(item.line, item.column);
-      parts.push(this.styleText(location.padEnd(8), "blue", context));
-    }
+    // Use renderMode from config to determine rendering style
+    const isCodeQualityMode = config.renderMode === 'code-quality';
 
-    // Severity with icon and color
-    if (item.severity) {
-      const severity = this.formatSeverity(item.severity, context);
-      parts.push(severity.padEnd(12));
-    }
+    if (isCodeQualityMode) {
+      // Render as lint issue with line/column/severity
+      // Location (line:column)
+      if (item.line || item.column) {
+        const location = this.formatLocation(item.line, item.column);
+        parts.push(this.styleText(location.padEnd(8), "blue", context));
+      }
 
-    // Message
-    if (item.message) {
-      parts.push(item.message);
-    }
+      // Severity with icon and color
+      if (item.severity) {
+        const severity = this.formatSeverity(item.severity, context);
+        parts.push(severity.padEnd(12));
+      }
 
-    // Rule (if available)
-    if (item.rule && typeof item.rule === "string" && item.rule !== "unknown") {
-      const ruleText = this.styleText(`[${item.rule}]`, "dim", context);
-      parts.push(ruleText);
+      // Message
+      if (item.message) {
+        parts.push(item.message);
+      }
+
+      // Rule (if available)
+      if (
+        item.rule &&
+        typeof item.rule === "string" &&
+        item.rule !== "unknown"
+      ) {
+        const ruleText = this.styleText(`[${item.rule}]`, "dim", context);
+        parts.push(ruleText);
+      }
+    } else {
+      // Render as command or general item (simple mode)
+      // Message (description)
+      if (item.message) {
+        parts.push(item.message);
+      }
+
+      // Rule (command alias) in square brackets
+      if (
+        item.rule &&
+        typeof item.rule === "string" &&
+        item.rule !== "unknown"
+      ) {
+        const ruleText = this.styleText(`[${item.rule}]`, "dim", context);
+        parts.push(ruleText);
+      }
     }
 
     return parts.join(" ");
@@ -348,6 +392,11 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
     const t = context.translate;
     // Skip summary if not configured
     if (!config.showGroupSummary) {
+      return "";
+    }
+
+    // Only show affected files list and detailed summary for code quality mode
+    if (config.renderMode !== 'code-quality') {
       return "";
     }
 
@@ -551,5 +600,128 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
       const fieldValue = item[stat.field];
       return fieldValue === stat.value;
     }).length;
+  }
+
+  /**
+   * Render hierarchical tree structure for nested paths
+   */
+  private renderHierarchical(
+    data: GroupedListItem[],
+    config: GroupedListConfig,
+    context: WidgetRenderContext,
+  ): string {
+    // Build tree structure from flat data
+    const root: TreeNode = {
+      name: '',
+      fullPath: '',
+      items: [],
+      children: new Map(),
+    };
+
+    // Group items by category path
+    for (const item of data) {
+      const categoryPath = item[config.groupBy];
+      if (typeof categoryPath !== 'string') continue;
+
+      const parts = categoryPath.split('/').filter(p => p.length > 0);
+      let currentNode = root;
+
+      // Build/traverse tree
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        const fullPath = parts.slice(0, i + 1).join('/');
+
+        if (!currentNode.children.has(part)) {
+          currentNode.children.set(part, {
+            name: part,
+            fullPath,
+            items: [],
+            children: new Map(),
+          });
+        }
+        currentNode = currentNode.children.get(part)!;
+      }
+
+      // Add item to leaf node
+      currentNode.items.push(item);
+    }
+
+    // Render tree recursively
+    return this.renderTreeNode(root, 0, config, context);
+  }
+
+  /**
+   * Render a single tree node and its children
+   */
+  private renderTreeNode(
+    node: TreeNode,
+    depth: number,
+    config: GroupedListConfig,
+    context: WidgetRenderContext,
+  ): string {
+    const result: string[] = [];
+    const indent = '  '.repeat(depth);
+
+    // Sort children alphabetically
+    const sortedChildren = Array.from(node.children.entries()).sort((a, b) =>
+      a[0].localeCompare(b[0]),
+    );
+
+    // Render this node's items first if any
+    if (node.items.length > 0 && depth > 0) {
+      // Calculate total count including children
+      const totalCount = this.countItemsRecursive(node);
+      const itemText = `${totalCount} item${totalCount !== 1 ? 's' : ''}`;
+
+      const pathText = node.fullPath;
+      const styledPath = this.styleText(pathText, 'underline', context);
+      const countStyled = this.styleText(`(${itemText})`, 'dim', context);
+
+      result.push(`${indent}${styledPath} ${countStyled}`);
+
+      // Render items
+      const sortedItems = this.sortItems(node.items, config.sortBy);
+      for (const item of sortedItems.slice(0, config.maxItemsPerGroup)) {
+        const itemLine = this.renderGroupItem(item, context, config);
+        result.push(`${indent}  ${itemLine}`);
+      }
+
+      if (node.items.length > config.maxItemsPerGroup) {
+        const remaining = node.items.length - config.maxItemsPerGroup;
+        const t = context.translate;
+        const truncationMsg = this.styleText(
+          t(
+            'app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.andMoreItems',
+            { count: remaining.toString() },
+          ),
+          'dim',
+          context,
+        );
+        result.push(`${indent}  ${truncationMsg}`);
+      }
+
+      result.push('');
+    }
+
+    // Render children
+    for (const [_, childNode] of sortedChildren) {
+      const childOutput = this.renderTreeNode(childNode, depth + (node.items.length > 0 ? 1 : 0), config, context);
+      if (childOutput) {
+        result.push(childOutput);
+      }
+    }
+
+    return result.join('\n');
+  }
+
+  /**
+   * Count items recursively including all children
+   */
+  private countItemsRecursive(node: { items: GroupedListItem[]; children: Map<string, any> }): number {
+    let count = node.items.length;
+    for (const [_, child] of node.children) {
+      count += this.countItemsRecursive(child);
+    }
+    return count;
   }
 }

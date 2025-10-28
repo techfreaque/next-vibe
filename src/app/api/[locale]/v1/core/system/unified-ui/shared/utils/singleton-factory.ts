@@ -112,11 +112,11 @@ export function createSingletonGetter<T>(factory: () => T): () => T {
  */
 export function createKeyedSingletonGetter<T>(
   factory: (key: string, locale: CountryLanguage) => T,
-): (key?: string) => T {
+): (key?: string, locale?: CountryLanguage) => T {
   const instances = new Map<string, T>();
   const defaultKey = "default";
 
-  return (key?: string) => {
+  return (key?: string, locale: CountryLanguage = "en-GLOBAL") => {
     const instanceKey = key || defaultKey;
 
     if (!instances.has(instanceKey)) {

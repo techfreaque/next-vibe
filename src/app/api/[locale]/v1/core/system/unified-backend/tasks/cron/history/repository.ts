@@ -6,13 +6,13 @@
 import "server-only";
 
 import { and, avg, count, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+} from "@/app/api/[locale]/v1/core/shared/types/response.schema";
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import { z } from "zod";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
@@ -65,16 +65,20 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
 
       if (data?.status) {
         // Handle string status filter
-        // Data is already validated through Zod schema, so strings are valid enum values
         const statusStrings = data.status.split(",").map((s) => s.trim());
-        if (statusStrings.length > 0) {
-          // TypeScript can't infer enum types from string[], but Zod validation ensures correctness
-          conditions.push(
-            inArray(
-              cronTaskExecutions.status,
-              statusStrings as (typeof CronTaskStatus)[keyof typeof CronTaskStatus][],
-            ),
+        // Validate each status string is a valid CronTaskStatus
+        const validStatuses: (typeof CronTaskStatus)[keyof typeof CronTaskStatus][] =
+          [];
+        for (const statusStr of statusStrings) {
+          const statusEnum = Object.values(CronTaskStatus).find(
+            (val) => val === statusStr,
           );
+          if (statusEnum) {
+            validStatuses.push(statusEnum);
+          }
+        }
+        if (validStatuses.length > 0) {
+          conditions.push(inArray(cronTaskExecutions.status, validStatuses));
         }
       }
 

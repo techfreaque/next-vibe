@@ -75,14 +75,7 @@ const { GET } = createEndpoint({
 
       // === RESPONSE FIELDS ===
       transactions: responseArrayField(
-        {
-          type: WidgetType.DATA_LIST,
-          itemConfig: {
-            template: "transaction",
-            spacing: SpacingSize.NORMAL,
-            divider: true,
-          },
-        },
+        {},
         objectField(
           {
             type: WidgetType.CONTAINER,

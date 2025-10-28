@@ -11,6 +11,7 @@ import type {
   UseChatReturn,
 } from "@/app/api/[locale]/v1/core/agent/chat/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -38,6 +39,7 @@ interface SidebarWrapperProps {
   currentRootFolderId: string;
   currentSubFolderId: string | null;
   chat: UseChatReturn;
+  user: JwtPayloadType;
 }
 
 export function SidebarWrapper({
@@ -53,6 +55,7 @@ export function SidebarWrapper({
   onUpdateFolder,
   onUpdateThreadTitle,
   chat,
+  user,
 }: SidebarWrapperProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -170,7 +173,7 @@ export function SidebarWrapper({
         suppressHydrationWarning
         className={cn(
           // Desktop: flexible width with smooth transition, z-10 to stay below input (z-20)
-          "hidden md:block transition-all duration-200 ease-in-out overflow-hidden border-r border-border flex-shrink-0",
+          "hidden md:block transition-all duration-200 ease-in-out overflow-hidden border-r border-border shrink-0",
           collapsed ? "w-0 border-r-0" : SIDEBAR_WIDTH,
           // Mobile: fixed overlay with z-50 (same as top bar, above input z-20, above backdrop z-30)
           "md:relative md:z-10 fixed inset-y-0 left-0 z-50",
@@ -179,6 +182,7 @@ export function SidebarWrapper({
       >
         <Div className={`h-full ${SIDEBAR_WIDTH} bg-background`}>
           <ChatSidebar
+            user={user}
             chat={chat}
             activeThreadId={activeThreadId}
             activeFolderId={activeSubFolderId || undefined}

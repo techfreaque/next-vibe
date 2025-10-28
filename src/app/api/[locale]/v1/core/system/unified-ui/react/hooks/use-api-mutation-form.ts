@@ -292,7 +292,7 @@ export function useApiForm<
 
         if (result === undefined) {
           logger.error("Mutation result is undefined", {
-            endpoint: endpoint.path.join("/"),
+            endpoint: [...endpoint.path].join("/"),
           });
           return undefined;
         }
@@ -341,7 +341,7 @@ export function useApiForm<
     };
     void formMethods.handleSubmit(_submitForm, (errors) => {
       logger.error("Form validation errors", {
-        endpoint: endpoint.path.join("/"),
+        endpoint: [...endpoint.path].join("/"),
         errors,
       });
 

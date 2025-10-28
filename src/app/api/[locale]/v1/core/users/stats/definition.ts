@@ -159,7 +159,7 @@ const { GET } = createEndpoint({
       includeComparison: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.CHECKBOX,
+          fieldType: FieldDataType.BOOLEAN,
           label:
             "app.api.v1.core.users.stats.fields.includeComparison.label" as const,
           description:

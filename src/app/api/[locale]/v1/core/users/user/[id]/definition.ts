@@ -876,13 +876,9 @@ const { DELETE } = createEndpoint({
     },
     responses: {
       default: {
-        deletionResult: {
-          success: true,
-          message: "User successfully deleted",
-          deletedAt: "2024-01-07T14:30:00.000Z",
-        },
         success: true,
         message: "User successfully deleted",
+        deletedAt: "2024-01-07T14:30:00.000Z",
       },
     },
   },

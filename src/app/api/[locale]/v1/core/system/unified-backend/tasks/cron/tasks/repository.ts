@@ -7,18 +7,18 @@
 import "server-only";
 
 import { and, desc, eq, inArray } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
+} from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { cronTasks } from "../../db";
@@ -360,6 +360,17 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       });
 
       // Format the response
+      const defaultConfig =
+        typeof createdTask.defaultConfig === "object" &&
+        createdTask.defaultConfig !== null
+          ? createdTask.defaultConfig
+          : {};
+      const retryDelay =
+        "retryDelay" in defaultConfig &&
+        typeof defaultConfig.retryDelay === "number"
+          ? defaultConfig.retryDelay
+          : 5000;
+
       const response: CronTaskCreateResponseOutput = {
         task: {
           id: createdTask.id,
@@ -372,9 +383,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
           category: z.enum(TaskCategory).parse(createdTask.category),
           timeout: createdTask.timeout || 300000,
           retries: createdTask.retries || 3,
-          retryDelay:
-            (createdTask.defaultConfig as { retryDelay?: number })
-              ?.retryDelay || 5000,
+          retryDelay,
           version: parseInt(createdTask.version, 10) || 1,
           createdAt: createdTask.createdAt.toISOString(),
           updatedAt: createdTask.updatedAt.toISOString(),

@@ -22,7 +22,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { Countries, Languages } from "@/i18n/core/config";
 
 import { emails } from "../../emails/messages/db";
-import type { JwtPayloadType } from "../../user/auth/definition";
+import type { JwtPayloadType } from "../../user/auth/types";
 import { leads } from "../db";
 import {
   EmailCampaignStage,

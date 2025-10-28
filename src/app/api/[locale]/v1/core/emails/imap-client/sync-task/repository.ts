@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../../../user/auth/definition";
+import type { JwtPayloadType } from "../../../user/auth/types";
 import { imapSyncRepository } from "../sync-service/repository";
 import type {
   ExecuteImapSyncRequestOutput,
@@ -24,7 +24,7 @@ import type {
   TaskResultType,
   ValidateImapSyncRequestOutput,
   ValidateImapSyncResponseOutput,
-} from "./definition";
+} from "./types";
 
 /**
  * IMAP Sync Task Repository Interface

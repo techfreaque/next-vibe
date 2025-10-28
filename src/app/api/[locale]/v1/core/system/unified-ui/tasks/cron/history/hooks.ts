@@ -6,11 +6,10 @@
 "use client";
 
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import endpoints from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/history/definition";
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
 import { useTranslation } from "@/i18n/core/client";
-
-import endpoints from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/history/definition";
 
 /**
  * Hook for fetching task execution history

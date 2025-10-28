@@ -119,9 +119,14 @@ export class BaseDataFormatter {
    */
   formatBoolean(
     value: boolean,
-    options: { style?: "symbol" | "text" } = {},
+    options: { style?: "symbol" | "text" | "emoji" } = {},
   ): string {
-    const { style = "symbol" } = options;
+    const { style = "emoji" } = options;
+
+    if (style === "emoji") {
+      // Use colored emojis for better visual feedback
+      return value ? "✅" : "❌";
+    }
 
     if (style === "symbol") {
       const checkmark = "\u2713";

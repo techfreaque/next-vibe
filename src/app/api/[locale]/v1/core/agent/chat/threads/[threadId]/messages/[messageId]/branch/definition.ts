@@ -342,3 +342,5 @@ export const definitions = { POST };
 export type BranchPostRequestOutput = typeof POST.types.RequestOutput;
 export type BranchPostResponseOutput = typeof POST.types.ResponseOutput;
 export type BranchPostUrlVariablesOutput = typeof POST.types.UrlVariablesOutput;
+
+export default definitions;

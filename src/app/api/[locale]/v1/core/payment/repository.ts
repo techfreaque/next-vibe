@@ -17,7 +17,7 @@ import Stripe from "stripe";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { users } from "@/app/api/[locale]/v1/core/user/db";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -177,11 +177,15 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         const value = parts[parts.length - 1];
         // Convert camelCase to snake_case for Stripe (applePay -> apple_pay)
         return value.replace(/([A-Z])/g, "_$1").toLowerCase();
-      }) || ["card"]) as Stripe.Checkout.SessionCreateParams.PaymentMethodType[];
+      }) || [
+        "card",
+      ]) as Stripe.Checkout.SessionCreateParams.PaymentMethodType[];
 
       // Extract mode value from translation key
       const modeParts = data.mode.split(".");
-      const modeValue = modeParts[modeParts.length - 1] as Stripe.Checkout.SessionCreateParams.Mode;
+      const modeValue = modeParts[
+        modeParts.length - 1
+      ] as Stripe.Checkout.SessionCreateParams.Mode;
 
       const sessionConfig: Stripe.Checkout.SessionCreateParams = {
         customer: stripeCustomerId,
@@ -368,7 +372,10 @@ export class PaymentRepositoryImpl implements PaymentRepository {
 
       return null;
     } catch (error) {
-      logger.error("Error finding Stripe customer", { error: parseError(error), userId });
+      logger.error("Error finding Stripe customer", {
+        error: parseError(error),
+        userId,
+      });
       return null;
     }
   }
@@ -815,10 +822,13 @@ export class PaymentRepositoryImpl implements PaymentRepository {
 
       // Retrieve the full subscription from Stripe using the invoice's subscription ID
       // Note: invoice.subscription is an expandable field (string | Subscription object)
-      const invoiceWithSubscription = invoice as Stripe.Invoice & { subscription?: string | Stripe.Subscription };
-      const subscriptionId = typeof invoiceWithSubscription.subscription === "string"
-        ? invoiceWithSubscription.subscription
-        : invoiceWithSubscription.subscription?.id;
+      const invoiceWithSubscription = invoice as Stripe.Invoice & {
+        subscription?: string | Stripe.Subscription;
+      };
+      const subscriptionId =
+        typeof invoiceWithSubscription.subscription === "string"
+          ? invoiceWithSubscription.subscription
+          : invoiceWithSubscription.subscription?.id;
 
       if (!subscriptionId) {
         logger.error("No subscription ID found in invoice", {
@@ -830,7 +840,11 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       const fullSubscription =
         await getStripe().subscriptions.retrieve(subscriptionId);
 
-      const userId = (fullSubscription as Stripe.Subscription & { metadata?: Record<string, string> }).metadata?.userId;
+      const userId = (
+        fullSubscription as Stripe.Subscription & {
+          metadata?: Record<string, string>;
+        }
+      ).metadata?.userId;
       if (!userId) {
         logger.error("No userId found in subscription metadata", {
           subscriptionId: fullSubscription.id,
@@ -839,7 +853,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       }
 
       // Calculate expiry date (end of current billing period)
-      const subscription = fullSubscription as Stripe.Subscription & { current_period_end?: number };
+      const subscription = fullSubscription as Stripe.Subscription & {
+        current_period_end?: number;
+      };
       const expiresAt = subscription.current_period_end
         ? new Date(subscription.current_period_end * 1000)
         : undefined;

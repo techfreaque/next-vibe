@@ -11,6 +11,13 @@ export const translations: typeof enTranslations = {
     response: {
       title: "Antwort",
       description: "Antwortdaten",
+      fields: {
+        success: "Betriebsstatus",
+        installed: "Installiert",
+        version: "CLI-Version",
+        path: "Installationspfad",
+        message: "Statusmeldung",
+      },
     },
     errors: {
       unauthorized: {

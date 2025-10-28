@@ -3,10 +3,9 @@
  * Core types for Next.js route handlers - moved from unified-ui to backend
  */
 
-import "server-only";
-
 import type { NextRequest, NextResponse } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
+
 import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
@@ -20,3 +19,6 @@ export type NextHandlerReturnType<TResponseOutput, TUrlVariablesInput> = (
   }: { params: Promise<TUrlVariablesInput & { locale: CountryLanguage }> },
 ) => Promise<NextResponse<ResponseType<TResponseOutput>> | Response>;
 
+const definitions = {};
+
+export default definitions;

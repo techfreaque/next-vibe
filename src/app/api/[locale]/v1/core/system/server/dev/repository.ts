@@ -15,7 +15,7 @@ import { seedDatabase } from "@/app/api/[locale]/v1/core/system/db/seed/seed-man
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { Task } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/types/repository";
 import { unifiedTaskRunnerRepository } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/unified-runner/repository";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -396,7 +396,6 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         devTasks,
         signal,
         locale,
-        logger,
       );
 
       if (startResult.success) {

@@ -8,8 +8,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: logoutEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, logger }) => {
-      return await logoutRepository.logout(data, user, logger);
+    handler: async ({ data, user, request, logger }) => {
+      return await logoutRepository.logout(data, user, request, logger);
     },
   },
 });

@@ -6,7 +6,11 @@
 import { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 
 import { BaseWidgetRenderer } from "./base-widget-renderer";
-import type { ResponseFieldMetadata, WidgetRenderContext } from "./types";
+import type {
+  RenderableValue,
+  ResponseFieldMetadata,
+  WidgetRenderContext,
+} from "./types";
 
 /**
  * Container layout configuration
@@ -53,7 +57,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
    * Render container object with nested fields
    */
   private renderContainerObject(
-    value: Record<string, string | number | boolean>,
+    value: { [key: string]: RenderableValue },
     field: ResponseFieldMetadata,
     context: WidgetRenderContext,
   ): string {
@@ -62,7 +66,10 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
 
     // Add container title if present
     if (field.label) {
-      const title = field.label;
+      // Translate the label if it's a translation key
+      const title = field.label.includes(".")
+        ? context.translate(field.label as any)
+        : field.label;
       const titleIcon = config.icon || "📊 ";
       const titleWithIcon = titleIcon + title;
       const styledTitle = this.styleText(titleWithIcon, "bold", context);
@@ -71,13 +78,16 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
 
     // Add container description if present
     if (field.description) {
-      const description = field.description;
+      // Translate the description if it's a translation key
+      const description = field.description.includes(".")
+        ? context.translate(field.description as any)
+        : field.description;
       result.push(`   ${description}`);
       result.push("");
     }
 
     // Render fields based on layout
-    const fieldsOutput = this.renderFields(value, config, context);
+    const fieldsOutput = this.renderFields(value, config, context, field);
     result.push(fieldsOutput);
 
     return result.join("\n");
@@ -87,22 +97,45 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
    * Render fields within the container
    */
   private renderFields(
-    data: Record<string, string | number | boolean>,
+    data: { [key: string]: RenderableValue },
     config: ContainerConfig,
     context: WidgetRenderContext,
+    field?: ResponseFieldMetadata,
   ): string {
     const result: string[] = [];
-    const layout = config.layout || { type: "vertical", columns: 1 };
+    const layout = config.layout || { type: "vertical" as const, columns: 1 };
 
     // For grid layout with multiple columns, render in a grid format
-    if (layout.type === "grid" && layout.columns > 1) {
-      return this.renderGridLayout(data, layout.columns, context);
+    if (layout.type === "grid" && layout.columns && layout.columns > 1) {
+      return this.renderGridLayout(data, layout.columns, context, field);
     }
 
     // For vertical layout, render each field on its own line
     for (const [key, value] of Object.entries(data)) {
-      const formattedValue = this.formatContainerValue(key, value, context);
-      result.push(formattedValue);
+      if (value === undefined || value === null) {
+        continue;
+      }
+
+      // Check if this field has metadata in the children
+      const childMetadata = field?.children?.[key];
+
+      if (childMetadata) {
+        // Use appropriate renderer based on widget type
+        const renderer = context.getRenderer(childMetadata.widgetType);
+        if (renderer) {
+          const rendered = renderer.render(
+            { ...childMetadata, value },
+            context,
+          );
+          if (rendered) {
+            result.push(rendered);
+          }
+        }
+      } else {
+        // Fallback to basic formatting
+        const formattedValue = this.formatContainerValue(key, value, context);
+        result.push(formattedValue);
+      }
     }
 
     return result.join("\n");
@@ -112,9 +145,10 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
    * Render fields in a grid layout
    */
   private renderGridLayout(
-    data: Record<string, string | number | boolean>,
+    data: { [key: string]: RenderableValue },
     columns: number,
     context: WidgetRenderContext,
+    field?: ResponseFieldMetadata,
   ): string {
     const entries = Object.entries(data);
     const result: string[] = [];
@@ -123,7 +157,16 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
     for (let i = 0; i < entries.length; i += columns) {
       const chunk = entries.slice(i, i + columns);
       const row = chunk
-        .map(([key, value]) => this.formatContainerValue(key, value, context))
+        .map(([key, value]) => {
+          const childMetadata = field?.children?.[key];
+          if (childMetadata) {
+            const renderer = context.getRenderer(childMetadata.widgetType);
+            if (renderer) {
+              return renderer.render({ ...childMetadata, value }, context);
+            }
+          }
+          return this.formatContainerValue(key, value, context);
+        })
         .join("  ");
       result.push(row);
     }
@@ -136,15 +179,23 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
    */
   private formatContainerValue(
     key: string,
-    value: string | number | boolean,
+    value: RenderableValue,
     context: WidgetRenderContext,
   ): string {
-    // Format as metric card style
-    const icon = this.getMetricIcon(key, value, context);
-    const label = this.formatMetricLabel(key);
-    const formattedValue = this.formatMetricValue(value, context);
+    // Handle primitive values
+    if (
+      typeof value === "string" ||
+      typeof value === "number" ||
+      typeof value === "boolean"
+    ) {
+      const icon = this.getMetricIcon(key, value, context);
+      const label = this.formatMetricLabel(key);
+      const formattedValue = this.formatMetricValue(value, context);
+      return `${icon}${label}: ${formattedValue}`;
+    }
 
-    return `${icon}${label}: ${formattedValue}`;
+    // Handle complex values
+    return `${this.formatMetricLabel(key)}: ${JSON.stringify(value)}`;
   }
 
   /**
@@ -176,7 +227,10 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
   /**
    * Format metric value (handle integers properly)
    */
-  private formatMetricValue(value: string | number | boolean): string {
+  private formatMetricValue(
+    value: string | number | boolean,
+    context?: WidgetRenderContext,
+  ): string {
     if (typeof value === "number") {
       // For integers, don't show decimal places
       if (Number.isInteger(value)) {
@@ -203,11 +257,34 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
   private getContainerConfig(_field: ResponseFieldMetadata): ContainerConfig {
     const config = _field.config || {};
 
+    // Type guard for layout
+    const layout =
+      config.layout &&
+      typeof config.layout === "object" &&
+      !Array.isArray(config.layout) &&
+      "type" in config.layout
+        ? (config.layout as ContainerLayout)
+        : { type: "vertical" as const, columns: 1 };
+
+    // Type guard for icon
+    const icon = typeof config.icon === "string" ? config.icon : undefined;
+
+    // Type guard for border
+    const border = typeof config.border === "boolean" ? config.border : false;
+
+    // Type guard for spacing
+    const spacing =
+      config.spacing === "compact" ||
+      config.spacing === "normal" ||
+      config.spacing === "relaxed"
+        ? config.spacing
+        : "normal";
+
     return {
-      layout: config.layout || { type: "vertical", columns: 1 },
-      icon: config.icon,
-      border: config.border ?? false,
-      spacing: config.spacing || "normal",
+      layout,
+      icon,
+      border,
+      spacing,
     };
   }
 }

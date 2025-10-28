@@ -11,7 +11,7 @@ import {
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import { validateNoCircularReference } from "@/app/api/[locale]/v1/core/agent/chat/validation";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 
 import type {
   FolderDeleteResponseOutput,
@@ -51,12 +51,20 @@ export async function getFolder(
     return createSuccessResponse({
       response: {
         folder: {
-          ...folder,
+          id: folder.id,
+          userId: folder.userId,
+          name: folder.name,
+          icon: folder.icon,
+          color: folder.color,
+          parentId: folder.parentId,
+          expanded: folder.expanded,
+          sortOrder: folder.sortOrder,
+          metadata: (folder.metadata as Record<string, any>) || {},
           createdAt: new Date(folder.createdAt),
           updatedAt: new Date(folder.updatedAt),
         },
       },
-    }) as ResponseType<FolderGetResponseOutput>;
+    });
   } catch {
     return createErrorResponse(
       "app.api.v1.core.agent.chat.folders.id.get.errors.server.title",
@@ -127,12 +135,20 @@ export async function updateFolder(
     return createSuccessResponse({
       response: {
         folder: {
-          ...updatedFolder,
+          id: updatedFolder.id,
+          userId: updatedFolder.userId,
+          name: updatedFolder.name,
+          icon: updatedFolder.icon,
+          color: updatedFolder.color,
+          parentId: updatedFolder.parentId,
+          expanded: updatedFolder.expanded,
+          sortOrder: updatedFolder.sortOrder,
+          metadata: (updatedFolder.metadata as Record<string, any>) || {},
           createdAt: new Date(updatedFolder.createdAt),
           updatedAt: new Date(updatedFolder.updatedAt),
         },
       },
-    }) as ResponseType<FolderUpdateResponseOutput>;
+    });
   } catch {
     return createErrorResponse(
       "app.api.v1.core.agent.chat.folders.id.patch.errors.server.title",
@@ -182,7 +198,7 @@ export async function deleteFolder(
         success: true,
         deletedFolderId: id,
       },
-    }) as ResponseType<FolderDeleteResponseOutput>;
+    });
   } catch {
     return createErrorResponse(
       "app.api.v1.core.agent.chat.folders.id.delete.errors.server.title",

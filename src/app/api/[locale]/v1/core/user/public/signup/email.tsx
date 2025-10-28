@@ -1,5 +1,4 @@
 import { Button, Section, Text } from "@react-email/components";
-import { env } from "@/config/env";
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -7,7 +6,8 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import type React from "react";
 
-import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
+import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/types";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 

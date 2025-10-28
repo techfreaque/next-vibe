@@ -4,7 +4,24 @@ import { ExternalLink } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX, MouseEvent } from "react";
 
-import type { LinkWidgetData, WidgetComponentProps } from "../types";
+import type {
+  LinkWidgetData,
+  RenderableValue,
+  WidgetComponentProps,
+} from "../types";
+
+/**
+ * Type guard for LinkWidgetData
+ */
+function isLinkWidgetData(data: RenderableValue): data is LinkWidgetData {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    !Array.isArray(data) &&
+    "url" in data &&
+    typeof data.url === "string"
+  );
+}
 
 /**
  * Link Widget Component
@@ -15,7 +32,18 @@ export function LinkWidget({
   context,
   className,
   style,
-}: WidgetComponentProps<LinkWidgetData>): JSX.Element {
+}: WidgetComponentProps<RenderableValue>): JSX.Element {
+  if (!isLinkWidgetData(data)) {
+    return (
+      <span
+        className={cn("text-muted-foreground italic", className)}
+        style={style}
+      >
+        Invalid link data
+      </span>
+    );
+  }
+
   const { url, title, description, openInNewTab = true, rel } = data;
 
   const handleClick = (e: MouseEvent<HTMLAnchorElement>): void => {
@@ -45,7 +73,7 @@ export function LinkWidget({
     >
       <span className="truncate">{title ?? url}</span>
       {openInNewTab && (
-        <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 opacity-70" />
+        <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-70" />
       )}
       {description && <span className="sr-only">{description}</span>}
     </a>

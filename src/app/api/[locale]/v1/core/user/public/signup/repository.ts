@@ -19,10 +19,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-b
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { JwtPayloadType } from "../../auth/definition";
-import type { StandardUserType } from "../../definition";
+import type { JwtPayloadType } from "../../auth/types";
 import { UserDetailLevel } from "../../enum";
 import { userRepository } from "../../repository";
+import type { StandardUserType } from "../../types";
 import { UserRole, type UserRoleValue } from "../../user-roles/enum";
 import { userRolesRepository } from "../../user-roles/repository";
 import type {

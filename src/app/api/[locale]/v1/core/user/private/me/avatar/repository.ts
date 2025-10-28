@@ -17,7 +17,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-b
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { UserDetailLevel } from "../../../enum";
-import { BaseUserRepositoryImpl, userRepository } from "../../../repository";
+import { userRepository } from "../../../repository";
 import type {
   AvatarDeleteResponseOutput,
   AvatarPostResponseOutput,
@@ -33,6 +33,7 @@ export interface AvatarRepository {
   uploadAvatar(
     userId: DbId,
     file: File,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<AvatarPostResponseOutput>>;
 
@@ -41,6 +42,7 @@ export interface AvatarRepository {
    */
   deleteAvatar(
     userId: DbId,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<AvatarDeleteResponseOutput>>;
 }
@@ -49,10 +51,7 @@ export interface AvatarRepository {
  * Avatar Repository Implementation
  * Handles user avatar operations
  */
-export class AvatarRepositoryImpl
-  extends BaseUserRepositoryImpl
-  implements AvatarRepository
-{
+export class AvatarRepositoryImpl implements AvatarRepository {
   /**
    * Upload a user's avatar
    * @param userId - The user ID

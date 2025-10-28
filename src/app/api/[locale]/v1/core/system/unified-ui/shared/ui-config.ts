@@ -10,6 +10,10 @@ import type { z } from "zod";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type {
+  FieldDataType,
+  InterfaceContext,
+} from "../../unified-backend/shared/enums";
+import type {
   ActionConfig,
   BulkAction,
   ButtonAction,
@@ -18,7 +22,6 @@ import type {
   InteractiveActions,
   LifecycleActions,
 } from "./actions";
-import type { FieldDataType, InterfaceContext } from "./types";
 import type {
   ChartWidgetConfig,
   DataCardsWidgetConfig,

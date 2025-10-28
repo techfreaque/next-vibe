@@ -1,14 +1,21 @@
 export const translations = {
   post: {
-    title: "Status",
-    description: "Status endpoint",
+    title: "CLI Installation Status",
+    description: "Check the current installation status of the Vibe CLI",
     form: {
       title: "Status Configuration",
       description: "Configure status parameters",
     },
     response: {
-      title: "Response",
-      description: "Status response data",
+      title: "Installation Status",
+      description: "Current CLI installation details",
+      fields: {
+        success: "Operation Status",
+        installed: "Installed",
+        version: "CLI Version",
+        path: "Installation Path",
+        message: "Status Message",
+      },
     },
     errors: {
       unauthorized: {

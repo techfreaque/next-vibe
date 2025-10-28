@@ -5,4 +5,12 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   cli: cliTranslations,
   tasks: tasksTranslations,
+  shared: {
+    permissions: {
+      publicUsersCannotAccess:
+        "Öffentliche Benutzer können nicht auf diese Ressource zugreifen",
+      insufficientPermissions:
+        "Unzureichende Berechtigungen für den Zugriff auf diese Ressource",
+    },
+  },
 };

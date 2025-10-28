@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { existsSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 
 /**
@@ -68,6 +68,14 @@ export interface DirectoryScanOptions {
 }
 
 /**
+ * Constants for file patterns and extensions
+ */
+const GLOB_WILDCARD_PATTERN = /\*/g;
+const GLOB_REGEX_REPLACEMENT = ".*";
+const TYPESCRIPT_EXTENSIONS = [".ts", ".tsx"] as const;
+const TEST_FILE_PATTERNS = [".test.", ".spec."] as const;
+
+/**
  * Result of directory scan with full path
  */
 export interface ScanResultSimple {
@@ -114,8 +122,6 @@ export function scanDirectory(
     excludeDirs = DEFAULT_EXCLUDE_DIRS,
     excludeFiles = [],
     excludePatterns = [],
-    includeRelativePath = true,
-    includePathSegments = true,
     maxDepth,
     followSymlinks = false,
     customFilter,
@@ -150,10 +156,7 @@ export function scanDirectory(
 
         // Skip excluded directories
         if (entry.isDirectory()) {
-          if (
-            excludeDirs.includes(entry.name) ||
-            entry.name.startsWith(".")
-          ) {
+          if (excludeDirs.includes(entry.name) || entry.name.startsWith(".")) {
             continue;
           }
 
@@ -167,7 +170,10 @@ export function scanDirectory(
           // Recurse into subdirectory
           const newSegments = [...currentSegments, entry.name];
           scan(fullPath, newSegments, depth + 1);
-        } else if (entry.isFile() || (followSymlinks && entry.isSymbolicLink())) {
+        } else if (
+          entry.isFile() ||
+          (followSymlinks && entry.isSymbolicLink())
+        ) {
           // Skip excluded files
           if (excludeFiles.includes(entry.name)) {
             continue;
@@ -267,13 +273,14 @@ export function shouldExcludePath(
   return excludePatterns.some((pattern) => {
     if (pattern.includes("*")) {
       // Simple glob pattern support
-      const regexPattern = pattern.replace(/\*/g, ".*");
+      const regexPattern = pattern.replace(
+        GLOB_WILDCARD_PATTERN,
+        GLOB_REGEX_REPLACEMENT,
+      );
       return new RegExp(regexPattern).test(relativePath);
     }
     // Exact match or directory match
-    return (
-      relativePath === pattern || relativePath.startsWith(`${pattern}/`)
-    );
+    return relativePath === pattern || relativePath.startsWith(`${pattern}/`);
   });
 }
 
@@ -285,15 +292,9 @@ export function findTypeScriptFiles(
   excludePatterns: string[] = [],
 ): string[] {
   const results = scanDirectory(directory, {
-    extensions: [".ts", ".tsx"],
+    extensions: [...TYPESCRIPT_EXTENSIONS],
     excludePatterns,
-    excludeDirs: [
-      ...DEFAULT_EXCLUDE_DIRS,
-      ".next",
-      ".tmp",
-      "dist",
-      "build",
-    ],
+    excludeDirs: [...DEFAULT_EXCLUDE_DIRS, ".next", ".tmp", "dist", "build"],
   });
 
   return results.map((r) => r.fullPath);
@@ -309,28 +310,21 @@ export function findRouteFiles(
   return scanDirectory(directory, {
     filePattern: "route.ts",
     excludePatterns,
-    excludeDirs: [
-      ...DEFAULT_EXCLUDE_DIRS,
-      "trpc",
-      "generated",
-    ],
+    excludeDirs: [...DEFAULT_EXCLUDE_DIRS, "trpc", "generated"],
   });
 }
 
 /**
  * Get all seed files in a directory
  */
-export function findSeedFiles(
-  directory: string,
-): string[] {
+export function findSeedFiles(directory: string): string[] {
   const results = scanDirectory(directory, {
     filePattern: /^seeds?\.ts$/,
     customFilter: (fullPath) => {
       // Exclude test and spec files
-      return !fullPath.includes(".test.") && !fullPath.includes(".spec.");
+      return TEST_FILE_PATTERNS.every((pattern) => !fullPath.includes(pattern));
     },
   });
 
   return results.map((r) => r.fullPath);
 }
-

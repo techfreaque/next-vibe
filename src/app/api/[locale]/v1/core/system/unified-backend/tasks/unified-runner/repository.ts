@@ -8,19 +8,19 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
+} from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
-} from "@/app/api/[locale]/v1/core/user/auth/definition";
+} from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CronTaskStatus } from "../enum";
@@ -80,7 +80,7 @@ export class UnifiedTaskRunnerRepositoryImpl
   }> = [];
 
   // Execution context stored when runner starts
-  private locale: CountryLanguage;
+  private locale!: CountryLanguage;
   private logger!: EndpointLogger;
   private cronUser: JwtPrivatePayloadType = CRON_SYSTEM_USER;
 
@@ -313,12 +313,17 @@ export class UnifiedTaskRunnerRepositoryImpl
     tasks: Task[],
     signal: AbortSignal,
     locale: CountryLanguage,
-    logger: EndpointLogger,
   ): ResponseType<void> {
     try {
       // Store execution context
       this.locale = locale;
-      this.logger = logger;
+      if (!this.logger) {
+        return createErrorResponse(
+          "app.api.v1.core.system.unifiedBackend.tasks.unifiedRunner.post.errors.internal.title",
+          ErrorResponseTypes.INTERNAL_ERROR,
+          { error: "Logger not initialized" },
+        );
+      }
 
       this.logger.debug("Starting unified task runner", {
         taskCount: tasks.length,

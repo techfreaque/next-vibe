@@ -124,9 +124,7 @@ export const lint = (
       lintOutput = "Unknown linting error.";
     }
     logger.error(`\n${lintOutput}`);
-    logger.error(
-      `Linting errors detected in ${cwd}. Aborting release.`,
-    );
+    logger.error(`Linting errors detected in ${cwd}. Aborting release.`);
     // If there is any lint output (e.g. warnings), print it at the bottom
     if (lintOutput.trim().length > 0) {
       logger.info(`\n${lintOutput}`);

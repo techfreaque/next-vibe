@@ -10,9 +10,9 @@ import { parseError } from "next-vibe/shared/utils";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { CompleteUserType } from "../definition";
 import { UserDetailLevel } from "../enum";
 import { userRepository } from "../repository";
+import type { CompleteUserType } from "../types";
 import { UserRole } from "../user-roles/enum";
 import { authRepository } from "./repository";
 
@@ -81,7 +81,7 @@ export async function requireUser(
     );
 
     // Check if user is public (not authenticated)
-    if (minimalUser.isPublic) {
+    if (minimalUser.isPublic || !minimalUser.id) {
       redirect(
         `/${locale}/login?redirect=${encodeURIComponent(redirectPath || `/${locale}`)}`,
       );
@@ -89,7 +89,7 @@ export async function requireUser(
 
     // Fetch complete user details
     const userResult = await userRepository.getUserById(
-      minimalUser.id,
+      minimalUser.id ?? "",
       UserDetailLevel.COMPLETE,
       locale,
       logger,

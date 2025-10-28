@@ -5,17 +5,17 @@
  */
 
 import { count, desc, eq, sql } from "drizzle-orm";
+
+import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
-  type ResponseType,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
-
+} from "@/app/api/[locale]/v1/core/shared/types/response.schema";
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import {
@@ -29,26 +29,21 @@ import {
   type SideTaskRecord,
   sideTasks,
 } from "./db";
+import type {
+  SideTasksRequestOutput,
+  SideTasksResponseOutput,
+  SideTasksStatusResponseOutput,
+} from "./definition";
 
 /**
  * Type alias for action response data
  */
-type ActionResponseData =
-  | SideTaskRecord[]
-  | {
-      totalTasks: number;
-      runningTasks: number;
-      healthyTasks: number;
-      unhealthyTasks: number;
-    };
+type ActionResponseData = SideTasksResponseOutput;
 
 /**
  * Type alias for action request data
  */
-interface ActionRequestData {
-  action: string;
-  [key: string]: string | number | boolean | null | undefined;
-}
+type ActionRequestData = SideTasksRequestOutput;
 
 /**
  * Public Interface for Side Tasks Repository
@@ -118,14 +113,7 @@ export interface ISideTasksRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<
-    ResponseType<{
-      totalTasks: number;
-      runningTasks: number;
-      healthyTasks: number;
-      unhealthyTasks: number;
-    }>
-  >;
+  ): Promise<ResponseType<SideTasksStatusResponseOutput>>;
 
   handleAction(
     data: ActionRequestData,
@@ -150,7 +138,7 @@ export class SideTasksRepository implements ISideTasksRepository {
       logger.debug("Successfully fetched all side tasks", {
         count: tasks.length,
       });
-      return createSuccessResponse(tasks);
+      return createSuccessResponse<SideTaskRecord[]>(tasks);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch all side tasks", {
@@ -178,7 +166,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         id,
         found: !!task[0],
       });
-      return createSuccessResponse(task[0] || null);
+      return createSuccessResponse<SideTaskRecord | null>(task[0] || null);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch side task by ID", {
@@ -202,7 +190,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         .from(sideTasks)
         .where(eq(sideTasks.name, name))
         .limit(1);
-      return createSuccessResponse(task[0] || null);
+      return createSuccessResponse<SideTaskRecord | null>(task[0] || null);
     } catch (error) {
       const parsedError = parseError(error);
       return createErrorResponse(
@@ -224,7 +212,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         id: newTask.id,
         name: newTask.name,
       });
-      return createSuccessResponse(newTask);
+      return createSuccessResponse<SideTaskRecord>(newTask);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to create side task", {
@@ -257,7 +245,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         );
       }
 
-      return createSuccessResponse(updatedTask);
+      return createSuccessResponse<SideTaskRecord>(updatedTask);
     } catch (error) {
       const parsedError = parseError(error);
       return createErrorResponse(
@@ -319,7 +307,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         );
       }
 
-      return createSuccessResponse(updatedExecution);
+      return createSuccessResponse<SideTaskExecutionRecord>(updatedExecution);
     } catch (error) {
       const parsedError = parseError(error);
       return createErrorResponse(
@@ -343,7 +331,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         .orderBy(desc(sideTaskExecutions.startedAt))
         .limit(limit);
 
-      return createSuccessResponse(executions);
+      return createSuccessResponse<SideTaskExecutionRecord[]>(executions);
     } catch (error) {
       const parsedError = parseError(error);
       return createErrorResponse(
@@ -365,7 +353,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         .orderBy(desc(sideTaskExecutions.startedAt))
         .limit(limit);
 
-      return createSuccessResponse(executions);
+      return createSuccessResponse<SideTaskExecutionRecord[]>(executions);
     } catch (error) {
       const parsedError = parseError(error);
       return createErrorResponse(
@@ -406,7 +394,9 @@ export class SideTasksRepository implements ISideTasksRepository {
         .orderBy(desc(sideTaskHealthChecks.createdAt))
         .limit(1);
 
-      return createSuccessResponse(healthCheck[0] || null);
+      return createSuccessResponse<SideTaskHealthCheckRecord | null>(
+        healthCheck[0] || null,
+      );
     } catch (error) {
       const parsedError = parseError(error);
       return createErrorResponse(
@@ -430,7 +420,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         .orderBy(desc(sideTaskHealthChecks.createdAt))
         .limit(limit);
 
-      return createSuccessResponse(healthChecks);
+      return createSuccessResponse<SideTaskHealthCheckRecord[]>(healthChecks);
     } catch (error) {
       const parsedError = parseError(error);
       return createErrorResponse(
@@ -494,14 +484,7 @@ export class SideTasksRepository implements ISideTasksRepository {
     _user: JwtPayloadType,
     _locale: CountryLanguage,
     _logger: EndpointLogger,
-  ): Promise<
-    ResponseType<{
-      totalTasks: number;
-      runningTasks: number;
-      healthyTasks: number;
-      unhealthyTasks: number;
-    }>
-  > {
+  ): Promise<ResponseType<SideTasksStatusResponseOutput>> {
     try {
       // Get basic task statistics
       const stats = await this.getTaskStatistics();
@@ -509,7 +492,7 @@ export class SideTasksRepository implements ISideTasksRepository {
         return stats;
       }
 
-      return createSuccessResponse(stats.data);
+      return createSuccessResponse<SideTasksStatusResponseOutput>(stats.data);
     } catch (error) {
       const parsedError = parseError(error);
       return createErrorResponse(
@@ -530,10 +513,25 @@ export class SideTasksRepository implements ISideTasksRepository {
       const { action } = data;
 
       switch (action) {
-        case "list":
-          return await this.getAllTasks(_logger);
-        case "stats":
-          return await this.getTaskStatistics();
+        case "list": {
+          const tasksResult = await this.getAllTasks(_logger);
+          if (!tasksResult.success) {
+            return tasksResult;
+          }
+          return createSuccessResponse({
+            data: tasksResult.data,
+            count: tasksResult.data.length,
+          });
+        }
+        case "stats": {
+          const statsResult = await this.getTaskStatistics();
+          if (!statsResult.success) {
+            return statsResult;
+          }
+          return createSuccessResponse({
+            data: statsResult.data,
+          });
+        }
         default:
           return createErrorResponse(
             "app.api.v1.core.system.unifiedBackend.tasks.sideTasks.errors.fetchStatisticsFailed" as const,

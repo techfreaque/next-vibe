@@ -18,12 +18,12 @@ import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repo
 import { CampaignType } from "@/app/api/[locale]/v1/core/emails/smtp-client/enum";
 import { smtpSendingRepository } from "@/app/api/[locale]/v1/core/emails/smtp-client/sending/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { LeadWithEmailType } from "../../../definition";
+import type { LeadWithEmailType } from "../../../types";
 import { emailService } from "../index";
 import type {
   TestEmailRequestOutput,

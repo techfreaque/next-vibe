@@ -10,6 +10,7 @@ import type { z } from "zod";
 
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 
+import type { UserRoleValue } from "../../../user/user-roles/enum";
 import type { DiscoveredEndpointMetadata } from "../../unified-backend/shared/discovery/endpoint-registry-types";
 
 /**
@@ -21,7 +22,7 @@ interface SimpleEndpointDefinition {
   description?: string;
   category?: string;
   tags?: readonly string[];
-  allowedRoles?: readonly string[];
+  allowedRoles?: readonly (typeof UserRoleValue)[];
   requestSchema?: z.ZodTypeAny;
   responseSchema?: z.ZodTypeAny;
   credits?: number;

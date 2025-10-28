@@ -19,7 +19,6 @@ import {
   requestDataField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/field-utils";
-
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**
@@ -367,3 +366,10 @@ export type PulseStatusResponseOutput =
 
 export { pulseStatusEndpoint as GET, pulseExecuteEndpoint as POST };
 export { pulseExecuteEndpoint, pulseStatusEndpoint };
+
+const definitions = {
+  GET: pulseStatusEndpoint.GET,
+  POST: pulseExecuteEndpoint.POST,
+};
+
+export default definitions;

@@ -41,7 +41,7 @@ import {
   LanguageFilter,
 } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../../user/auth/definition";
+import type { JwtPayloadType } from "../../user/auth/types";
 import { emailCampaigns, leads } from "../db";
 import type { LeadSource } from "../enum";
 import {

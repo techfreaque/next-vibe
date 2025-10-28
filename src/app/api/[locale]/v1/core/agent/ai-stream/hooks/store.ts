@@ -171,7 +171,7 @@ export const useAIStreamStore = create<AIStreamState>((set) => ({
   ): void =>
     set((state) => {
       const message = state.streamingMessages[messageId];
-      if (!message || !message.toolCalls || !message.toolCalls[toolCallIndex]) {
+      if (!message?.toolCalls?.[toolCallIndex]) {
         return state;
       }
 

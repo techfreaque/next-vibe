@@ -8,18 +8,44 @@
 import type { FC } from "react";
 import { useState } from "react";
 
-import type { DataTableWidgetData, WidgetComponentProps } from "../types";
+import type {
+  DataTableWidgetData,
+  RenderableValue,
+  WidgetComponentProps,
+} from "../types";
+
+/**
+ * Type guard for DataTableWidgetData
+ */
+function isDataTableWidgetData(
+  data: RenderableValue,
+): data is DataTableWidgetData {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    !Array.isArray(data) &&
+    "rows" in data &&
+    Array.isArray(data.rows) &&
+    "columns" in data &&
+    Array.isArray(data.columns)
+  );
+}
 
 /**
  * Data Table Widget Component
  */
-export const DataTableWidget: FC<WidgetComponentProps<DataTableWidgetData>> = ({
+export const DataTableWidget = ({
   data,
   className = "",
-}) => {
-  const [sortBy, setSortBy] = useState<string | null>(data.sortBy ?? null);
+}: WidgetComponentProps<RenderableValue>) => {
+  if (!isDataTableWidgetData(data)) {
+    return <div className={className}>—</div>;
+  }
+
+  const typedData = data;
+  const [sortBy, setSortBy] = useState<string | null>(typedData.sortBy ?? null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">(
-    data.sortOrder ?? "asc",
+    typedData.sortOrder ?? "asc",
   );
 
   // Handle column sort
@@ -33,7 +59,7 @@ export const DataTableWidget: FC<WidgetComponentProps<DataTableWidgetData>> = ({
   };
 
   // Sort rows
-  const sortedRows = [...data.rows].sort((a, b) => {
+  const sortedRows = [...typedData.rows].sort((a, b) => {
     if (!sortBy) {
       return 0;
     }
@@ -60,7 +86,7 @@ export const DataTableWidget: FC<WidgetComponentProps<DataTableWidgetData>> = ({
       <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
         <thead className="bg-gray-50 dark:bg-gray-800">
           <tr>
-            {data.columns.map((column) => (
+            {typedData.columns.map((column) => (
               <th
                 key={column.key}
                 className={`px-6 py-3 text-${column.align ?? "left"} text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 ${
@@ -94,7 +120,7 @@ export const DataTableWidget: FC<WidgetComponentProps<DataTableWidgetData>> = ({
               key={rowIndex}
               className="hover:bg-gray-50 dark:hover:bg-gray-800"
             >
-              {data.columns.map((column) => {
+              {typedData.columns.map((column) => {
                 const value = row[column.key];
                 const formattedValue = column.format
                   ? column.format(value)
@@ -116,14 +142,15 @@ export const DataTableWidget: FC<WidgetComponentProps<DataTableWidgetData>> = ({
         </tbody>
       </table>
 
-      {data.totalRows !== undefined && data.totalRows > data.rows.length && (
-        <div className="mt-4 flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-700">
-          {/* eslint-disable-next-line i18next/no-literal-string */}
-          <div className="text-sm text-gray-700 dark:text-gray-300">
-            Showing {data.rows.length} of {data.totalRows} results
+      {typedData.totalRows !== undefined &&
+        typedData.totalRows > typedData.rows.length && (
+          <div className="mt-4 flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-700">
+            {/* eslint-disable-next-line i18next/no-literal-string */}
+            <div className="text-sm text-gray-700 dark:text-gray-300">
+              Showing {typedData.rows.length} of {typedData.totalRows} results
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 };

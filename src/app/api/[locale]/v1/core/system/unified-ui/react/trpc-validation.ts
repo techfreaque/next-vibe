@@ -11,6 +11,7 @@ import { validateData } from "next-vibe/shared/utils/validation";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../unified-backend/shared/endpoint-logger";
@@ -41,7 +42,7 @@ export interface TrpcValidationContext<TRequestOutput, TUrlParametersOutput> {
 export function validateTrpcRequestData<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
   TRequestInput,
   TRequestOutput,

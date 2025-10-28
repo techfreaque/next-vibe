@@ -9,7 +9,10 @@ import "client-only";
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useRef } from "react";
 
-import type { EndpointLogger, LoggerMetadata } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import type {
+  EndpointLogger,
+  LoggerMetadata,
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -444,7 +447,9 @@ export function useAIStream(
                     try {
                       const { useChatStore } = await import("../../chat/store");
                       const chatThread =
-                        useChatStore.getState().threads[currentMessage.threadId];
+                        useChatStore.getState().threads[
+                          currentMessage.threadId
+                        ];
                       const isIncognito =
                         chatThread?.rootFolderId === "incognito";
 
@@ -461,7 +466,8 @@ export function useAIStream(
                           depth: currentMessage.depth,
                           authorId: "incognito",
                           authorName: null,
-                          isAI: currentMessage.role === ChatMessageRole.ASSISTANT,
+                          isAI:
+                            currentMessage.role === ChatMessageRole.ASSISTANT,
                           model: currentMessage.model ?? null,
                           persona: currentMessage.persona ?? null,
                           errorType: null,
@@ -476,14 +482,19 @@ export function useAIStream(
                         });
 
                         // Also update chat store
-                        useChatStore.getState().updateMessage(eventData.messageId, {
-                          content: newContent,
-                        });
+                        useChatStore
+                          .getState()
+                          .updateMessage(eventData.messageId, {
+                            content: newContent,
+                          });
                       }
                     } catch (error) {
-                      logger.error("Failed to save content delta to localStorage", {
-                        error: parseError(error).message,
-                      });
+                      logger.error(
+                        "Failed to save content delta to localStorage",
+                        {
+                          error: parseError(error).message,
+                        },
+                      );
                     }
                   })();
                 }
@@ -519,16 +530,21 @@ export function useAIStream(
                   void (async (): Promise<void> => {
                     try {
                       const { useChatStore } = await import("../../chat/store");
-                      const chatMessage = useChatStore.getState().messages[eventData.messageId];
+                      const chatMessage =
+                        useChatStore.getState().messages[eventData.messageId];
 
                       if (chatMessage) {
-                        useChatStore.getState().updateMessage(eventData.messageId, {
-                          content: newContent,
-                        });
+                        useChatStore
+                          .getState()
+                          .updateMessage(eventData.messageId, {
+                            content: newContent,
+                          });
 
                         // Save to localStorage for incognito mode
                         const chatThread =
-                          useChatStore.getState().threads[currentMessage.threadId];
+                          useChatStore.getState().threads[
+                            currentMessage.threadId
+                          ];
                         const isIncognito =
                           chatThread?.rootFolderId === "incognito";
 
@@ -545,7 +561,8 @@ export function useAIStream(
                             depth: currentMessage.depth,
                             authorId: "incognito",
                             authorName: null,
-                            isAI: currentMessage.role === ChatMessageRole.ASSISTANT,
+                            isAI:
+                              currentMessage.role === ChatMessageRole.ASSISTANT,
                             model: currentMessage.model ?? null,
                             persona: currentMessage.persona ?? null,
                             errorType: null,
@@ -561,7 +578,10 @@ export function useAIStream(
                         }
                       }
                     } catch (error) {
-                      logger.error("Failed to update reasoning in chat store", error as LoggerMetadata);
+                      logger.error(
+                        "Failed to update reasoning in chat store",
+                        error as LoggerMetadata,
+                      );
                     }
                   })();
                 }
@@ -585,21 +605,30 @@ export function useAIStream(
                   // Update streaming store
                   useAIStreamStore
                     .getState()
-                    .updateMessageContent(eventData.messageId, eventData.content);
+                    .updateMessageContent(
+                      eventData.messageId,
+                      eventData.content,
+                    );
 
                   // Also update chat store so reasoning content is persisted
                   void (async (): Promise<void> => {
                     try {
                       const { useChatStore } = await import("../../chat/store");
-                      const chatMessage = useChatStore.getState().messages[eventData.messageId];
+                      const chatMessage =
+                        useChatStore.getState().messages[eventData.messageId];
 
                       if (chatMessage) {
-                        useChatStore.getState().updateMessage(eventData.messageId, {
-                          content: eventData.content,
-                        });
+                        useChatStore
+                          .getState()
+                          .updateMessage(eventData.messageId, {
+                            content: eventData.content,
+                          });
                       }
                     } catch (error) {
-                      logger.error("Failed to finalize reasoning in chat store", error as LoggerMetadata);
+                      logger.error(
+                        "Failed to finalize reasoning in chat store",
+                        error as LoggerMetadata,
+                      );
                     }
                   })();
                 }
@@ -668,7 +697,7 @@ export function useAIStream(
                   useAIStreamStore.getState().streamingMessages[
                     eventData.messageId
                   ];
-                if (currentMessage && currentMessage.toolCalls) {
+                if (currentMessage?.toolCalls) {
                   const toolCallIndex = currentMessage.toolCalls.findIndex(
                     (tc) => tc.toolName === eventData.toolName,
                   );

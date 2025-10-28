@@ -10,8 +10,27 @@ import {
 } from "next-vibe-ui/ui/card";
 import type { JSX } from "react";
 
-import type { ContainerWidgetData, WidgetComponentProps } from "../types";
+import type {
+  ContainerWidgetData,
+  RenderableValue,
+  WidgetComponentProps,
+} from "../types";
 import { WidgetRenderer } from "./WidgetRenderer";
+
+/**
+ * Type guard for ContainerWidgetData
+ */
+function isContainerWidgetData(
+  data: RenderableValue,
+): data is ContainerWidgetData {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    !Array.isArray(data) &&
+    "children" in data &&
+    Array.isArray(data.children)
+  );
+}
 
 /**
  * Container Widget Component
@@ -22,7 +41,18 @@ export function ContainerWidget({
   context,
   className,
   style,
-}: WidgetComponentProps<ContainerWidgetData>): JSX.Element {
+}: WidgetComponentProps<RenderableValue>): JSX.Element {
+  if (!isContainerWidgetData(data)) {
+    return (
+      <div
+        className={cn("text-muted-foreground italic", className)}
+        style={style}
+      >
+        —
+      </div>
+    );
+  }
+
   const { children, title, description, layout = { type: "stack" } } = data;
 
   if (!children || children.length === 0) {

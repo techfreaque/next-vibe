@@ -11,12 +11,12 @@ import {
 } from "next-vibe-ui/ui/card";
 import type { JSX, MouseEvent } from "react";
 
-import type { WidgetComponentProps } from "../types";
+import type { RenderableValue, WidgetComponentProps } from "../types";
 
 /**
  * Link Card Data Interface
  */
-export interface LinkCardData {
+export interface LinkCardData extends Record<string, RenderableValue> {
   url: string;
   title: string;
   snippet?: string;
@@ -28,6 +28,21 @@ export interface LinkCardData {
 }
 
 /**
+ * Type guard for LinkCardData
+ */
+function isLinkCardData(data: RenderableValue): data is LinkCardData {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    !Array.isArray(data) &&
+    "url" in data &&
+    typeof data.url === "string" &&
+    "title" in data &&
+    typeof data.title === "string"
+  );
+}
+
+/**
  * Link Card Widget Component
  * Renders a card with link information, perfect for search results
  */
@@ -36,7 +51,16 @@ export function LinkCardWidget({
   context,
   className,
   style,
-}: WidgetComponentProps<LinkCardData>): JSX.Element {
+}: WidgetComponentProps<RenderableValue>): JSX.Element {
+  if (!isLinkCardData(data)) {
+    return (
+      <Card className={cn("overflow-hidden", className)} style={style}>
+        <CardContent className="p-4">
+          <span className="text-muted-foreground italic">—</span>
+        </CardContent>
+      </Card>
+    );
+  }
   const {
     url,
     title,

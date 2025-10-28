@@ -72,6 +72,7 @@ export class ModularCLIResponseRenderer {
       formatValue: (field, value) => this.formatFieldValue(field, value),
       getFieldIcon: (type) => this.getFieldIcon(type),
       renderEmptyState: (message) => this.renderEmptyState(message),
+      getRenderer: (widgetType) => this.widgetRegistry.getRenderer(widgetType),
     };
 
     if (Array.isArray(metadata)) {
@@ -92,7 +93,8 @@ export class ModularCLIResponseRenderer {
     const result: string[] = [];
 
     if (container.title) {
-      const title = container.title;
+      // Translate the title if it's a translation key
+      const title = context.translate(container.title as any);
       // eslint-disable-next-line i18next/no-literal-string
       const titleIcon = "📋 ";
       const titleWithIcon = titleIcon + title;
@@ -102,7 +104,8 @@ export class ModularCLIResponseRenderer {
     }
 
     if (container.description) {
-      const description = container.description;
+      // Translate the description if it's a translation key
+      const description = context.translate(container.description as any);
       result.push(`   ${description}`);
       result.push("");
     }
@@ -287,10 +290,18 @@ export class ModularCLIResponseRenderer {
       return this.formatter.formatDuration(value);
     }
 
+    // Auto-detect boolean values even if field type is wrong
+    if (typeof value === "boolean") {
+      return this.formatter.formatBoolean(value);
+    }
+
     switch (field.type) {
       case FieldDataType.TEXT:
         return this.formatter.formatText(String(value), {
-          maxLength: field.config?.maxLength,
+          maxLength:
+            typeof field.config?.maxLength === "number"
+              ? field.config.maxLength
+              : undefined,
         });
       case FieldDataType.NUMBER:
         return this.formatter.formatNumber(Number(value), this.options.locale, {
@@ -308,7 +319,9 @@ export class ModularCLIResponseRenderer {
         );
       case FieldDataType.OBJECT:
         return this.formatter.formatObject(
-          typeof value === "object" && value !== null ? value : {},
+          typeof value === "object" && value !== null && !Array.isArray(value)
+            ? value
+            : {},
         );
       default:
         return String(value);
@@ -403,11 +416,13 @@ class DefaultDataFormatter implements DataFormatter {
 
   formatNumber(
     value: number,
+    locale: CountryLanguage,
     options?: { precision?: number; unit?: string },
   ): string {
     return this.baseFormatter.formatNumber(value, {
       precision: options?.precision,
       unit: options?.unit,
+      locale,
     });
   }
 

@@ -6,8 +6,8 @@
 import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-handlers";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 
-import type { LeadUpdateType } from "../../definition";
 import { leadsRepository } from "../../repository";
+import type { LeadUpdateType } from "../../types";
 import definitions from "./definition";
 
 export const { GET, PATCH, tools } = endpointsHandler({

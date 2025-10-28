@@ -13,7 +13,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
+import type { ErrorResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import type { z } from "zod";
 
 import { PulseExecutionStatusDB, PulseHealthStatusDB } from "../enum";

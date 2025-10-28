@@ -22,7 +22,7 @@ import { envClient } from "@/config/env-client";
 import type { Countries, CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { JwtPrivatePayloadType } from "../../user/auth/definition";
+import type { JwtPrivatePayloadType } from "../../user/auth/types";
 import { users } from "../../user/db";
 import type { BillingIntervalValue, SubscriptionPlanValue } from "../enum";
 import { BillingInterval, SubscriptionPlan } from "../enum";

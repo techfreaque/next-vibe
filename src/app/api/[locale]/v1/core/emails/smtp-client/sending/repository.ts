@@ -23,7 +23,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-b
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { emailCampaigns } from "../../../leads/db";
-import type { JwtPayloadType } from "../../../user/auth/definition";
+import type { JwtPayloadType } from "../../../user/auth/types";
 import { emails } from "../../messages/db";
 import { EmailStatus, EmailType } from "../../messages/enum";
 import type { SmtpAccount } from "../db";
@@ -42,7 +42,7 @@ import type {
   SmtpSendRequestOutput,
   SmtpSendResponseOutput,
   SmtpSendResult,
-} from "./definition";
+} from "./types";
 /**
  * SMTP Sending Repository Interface
  */

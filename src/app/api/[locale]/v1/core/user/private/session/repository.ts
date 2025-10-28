@@ -93,7 +93,7 @@ export class SessionRepositoryImpl implements SessionRepository {
         const defaultCliUser = createDefaultCliUser();
         const mockSession: Session = {
           id: "cli-session-id",
-          userId: defaultCliUser.id,
+          userId: defaultCliUser.id ?? "cli-user-id",
           token: token,
           expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
           createdAt: new Date(),

@@ -12,13 +12,13 @@ import type {
 import type { JSX } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { EmailType } from "../../messages/enum";
 import type { CampaignType } from "../enum";
-import type { SmtpSelectionCriteria } from "../sending/definition";
+import type { SmtpSelectionCriteria } from "../sending/types";
 
 /**
  * Email Template Return Type
@@ -95,3 +95,7 @@ export interface EmailHandleRequestOutput<TRequest, TResponse, TUrlVariables> {
 export interface EmailHandleResponseOutput {
   success: boolean;
 }
+
+const definitions = {};
+
+export default definitions;

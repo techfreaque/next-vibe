@@ -15,16 +15,16 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 
 import { CampaignType } from "../enum";
-import type { SmtpSelectionCriteria } from "../sending/definition";
 import { smtpSendingRepository } from "../sending/repository";
+import type { SmtpSelectionCriteria } from "../sending/types";
 import type {
   SendEmailRequestTypeOutput,
   SendEmailResponseTypeOutput,
-} from "./definition";
+} from "./types";
 
 // Type aliases for consistency
 type SendEmailRequestOutput = SendEmailRequestTypeOutput;

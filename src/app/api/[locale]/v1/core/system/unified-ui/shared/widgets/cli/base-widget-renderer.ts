@@ -3,8 +3,9 @@
  * Abstract base class for all widget renderers with common utilities
  */
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import chalk from "chalk";
+
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { getBaseFormatter } from "../../formatters/base-formatter";
 import type {
@@ -93,7 +94,7 @@ export abstract class BaseWidgetRenderer implements WidgetRenderer {
   ): string {
     const rawLabel = field.label || field.name;
     const label = rawLabel.includes(".")
-      ? context.translate(rawLabel as Parameters<typeof context.translate>[0])
+      ? context.translate(rawLabel)
       : rawLabel;
     return this.styleText(label, "bold", context);
   }

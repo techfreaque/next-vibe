@@ -7,7 +7,7 @@
  * SelectOption interface for UI components
  * Used for dropdown selections, radio buttons, and other option-based inputs
  */
-interface SelectOption {
+export interface SelectOption {
   value: string;
   label: string;
   description?: string;
@@ -111,7 +111,7 @@ export enum ImportDomain {
  * UI-optimized options for Import Domain
  * Clear labels with helpful descriptions for each domain
  */
-export const ImportDomainOptions: SelectOption[] = [
+export const ImportDomainOptions = [
   {
     label: "app.api.v1.core.import.enum.domain.leads.label",
     value: ImportDomain.LEADS,

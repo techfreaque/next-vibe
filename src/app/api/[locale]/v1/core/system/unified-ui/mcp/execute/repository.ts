@@ -5,13 +5,17 @@
 
 import "server-only";
 
+import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
+import { createSuccessResponse } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { getMCPRegistry } from "../registry";
-import type { MCPToolCallResult } from "../types";
-import type { MCPExecuteRequestOutput } from "./definition";
+import type {
+  MCPExecuteRequestOutput,
+  MCPExecuteResponseOutput,
+} from "./definition";
 
 /**
  * MCP Execute repository interface
@@ -30,7 +34,7 @@ export interface MCPExecuteRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<MCPToolCallResult>;
+  ): Promise<ResponseType<MCPExecuteResponseOutput>>;
 }
 
 /**
@@ -45,7 +49,7 @@ export class MCPExecuteRepositoryImpl implements MCPExecuteRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<MCPToolCallResult> {
+  ): Promise<ResponseType<MCPExecuteResponseOutput>> {
     logger.info("[MCP Execute Repository] Executing tool", {
       toolName: data.name,
       argumentKeys: Object.keys(data.arguments),
@@ -74,7 +78,7 @@ export class MCPExecuteRepositoryImpl implements MCPExecuteRepository {
       contentLength: result.content.length,
     });
 
-    return result;
+    return createSuccessResponse(result);
   }
 }
 

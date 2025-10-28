@@ -17,8 +17,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-b
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { getDiscoveredEndpoints } from "./endpoint-adapter";
 import type { DiscoveredEndpoint } from "../../unified-backend/shared/discovery/endpoint-registry-types";
+import { getDiscoveredEndpoints } from "./endpoint-adapter";
 
 /**
  * Base execution context

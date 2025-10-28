@@ -1,5 +1,4 @@
 import { Button, Section, Text } from "@react-email/components";
-import { env } from "@/config/env";
 import type { UndefinedType } from "next-vibe/shared/types/common.schema";
 import {
   createErrorResponse,
@@ -9,7 +8,8 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import type React from "react";
 
-import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
+import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/types";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -181,6 +181,7 @@ export const renderResetPasswordMail: EmailFunctionType<
     // Create a reset token
     const tokenResponse = await passwordRepository.createResetToken(
       requestData.emailInput.email,
+      locale,
       logger,
     );
     if (!tokenResponse.success) {

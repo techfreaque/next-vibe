@@ -24,6 +24,10 @@ export const translations: typeof enTranslations = {
     publicPayloadNotSupported:
       "Publiczny payload JWT nie jest obsługiwany dla uwierzytelniania CLI",
     jwt_signing_failed: "Nie udało się podpisać tokenu JWT",
+    authentication_failed: "Uwierzytelnianie nie powiodło się",
+    user_not_authenticated: "Użytkownik nie jest uwierzytelniony",
+    publicUserNotAllowed:
+      "Użytkownik publiczny nie jest dozwolony dla tego endpointu",
     validation_failed: "Walidacja nie powiodła się",
     native: {
       unsupported:

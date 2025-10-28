@@ -7,14 +7,15 @@
 
 import type { Route } from "next";
 import { useRouter } from "next/navigation";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import { useToast } from "next-vibe-ui/ui";
 import type { ChangeEvent } from "react";
 import { useCallback, useMemo, useState } from "react";
 
 import { type EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import type { FormAlertState } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint-types";
-import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-api-mutation-form";
 import type { ApiFormReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/types";
+import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-api-mutation-form";
 import { useTranslation } from "@/i18n/core/client";
 import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
@@ -161,9 +162,7 @@ export function useLogin(
           // No need to clear first since the server has already set the httpOnly cookie
           const tokenResult = authClientRepository.setAuthStatus(logger);
           if (!tokenResult.success) {
-            logger.error(
-              "app.api.v1.core.user.public.login.token.save.failed",
-            );
+            logger.error("app.api.v1.core.user.public.login.token.save.failed");
             toast({
               title: t("app.api.v1.core.user.public.login.errors.title"),
               description: t(

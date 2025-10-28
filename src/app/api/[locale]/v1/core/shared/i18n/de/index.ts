@@ -1,4 +1,5 @@
 import type { translations as enTranslations } from "../en";
+
 export const translations: typeof enTranslations = {
   stats: {
     timePeriod: {
@@ -67,5 +68,9 @@ export const translations: typeof enTranslations = {
     invalid_response_error: "Ungültige Antwort",
     payment_failed: "Zahlung fehlgeschlagen",
     partial_failure: "Teilweiser Fehler",
+  },
+  errors: {
+    invalid_request_data: "Ungültige Anfragedaten",
+    invalid_url_parameters: "Ungültige URL-Parameter",
   },
 };

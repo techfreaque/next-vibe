@@ -24,7 +24,18 @@ export const { GET, tools } = endpointsHandler({
         {
           limit: data.pagination?.limit,
           offset: data.pagination?.offset,
-          roles: data.filters?.roles,
+          roles: data.filters?.roles as
+            | (
+                | "ADMIN"
+                | "AI_TOOL_OFF"
+                | "CLI_OFF"
+                | "CUSTOMER"
+                | "PARTNER_ADMIN"
+                | "PARTNER_EMPLOYEE"
+                | "PUBLIC"
+                | "WEB_OFF"
+              )[]
+            | undefined,
         },
         logger,
       );

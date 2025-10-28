@@ -10,14 +10,12 @@ import * as fs from "fs";
 import { parseError } from "next-vibe/shared/utils";
 import * as path from "path";
 
-import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
-import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { helpHandler } from "./widgets/help-handler";
-import { interactiveModeHandler } from "./widgets/interactive-mode-handler";
 import { getCliUserForCommand } from "../shared/auth/cli-user-factory";
+import type { InferJwtPayloadTypeFromRoles } from "../shared/handler-types";
 import type { EndpointDefinition } from "../shared/core-types";
 import type { EndpointLogger } from "../shared/endpoint-logger";
 import { findRouteFiles } from "../shared/filesystem/directory-scanner";
@@ -25,6 +23,8 @@ import { memoryMonitor } from "../shared/performance";
 import { getConfig } from "./config";
 import type { CliRequestData, RouteExecutionResult } from "./route-executor";
 import { routeDelegationHandler } from "./route-executor";
+import { helpHandler } from "./widgets/help-handler";
+import { interactiveModeHandler } from "./widgets/interactive-mode-handler";
 
 // Types for CLI execution - compatible with RouteExecutionContext
 interface CliExecutionOptions {
@@ -32,17 +32,10 @@ interface CliExecutionOptions {
   urlPathParams?: Record<string, string | number | boolean | null | undefined>;
   cliArgs?: {
     positionalArgs: string[];
-    namedArgs: Record<string, string>;
+    namedArgs: Record<string, string | number | boolean>;
   };
-  user: {
-    isPublic: boolean;
-    id?: string;
-    email?: string;
-    role?: string;
-    iat?: number;
-    exp?: number;
-  };
-  locale: CountryLanguage;
+  user?: InferJwtPayloadTypeFromRoles<readonly (typeof UserRoleValue)[]>;
+  locale?: CountryLanguage;
   dryRun?: boolean;
   interactive?: boolean;
   verbose?: boolean;
@@ -90,7 +83,9 @@ export class CliEntryPoint {
     const config = getConfig();
 
     try {
-      this.logger.debug(this.t("app.api.v1.core.system.unifiedBackend.cli.vibe.startingUp"));
+      this.logger.debug(
+        this.t("app.api.v1.core.system.unifiedBackend.cli.vibe.startingUp"),
+      );
 
       memoryMonitor.snapshot();
 
@@ -133,10 +128,6 @@ export class CliEntryPoint {
     }
 
     // Handle special commands
-    if (command === "help") {
-      return await this.showHelp(options);
-    }
-
     if (command === "interactive" || !command) {
       return await this.startInteractiveMode(this.logger);
     }
@@ -146,12 +137,16 @@ export class CliEntryPoint {
     if (!route) {
       const availableCommands = this.routes.map((r) => r.alias).slice(0, 10);
       this.logger.error(
-        this.t("app.api.v1.core.system.unifiedBackend.cli.vibe.errors.routeNotFound"),
+        this.t(
+          "app.api.v1.core.system.unifiedBackend.cli.vibe.errors.routeNotFound",
+        ),
         { command, availableCommands },
       );
       return {
         success: false,
-        error: this.t("app.api.v1.core.system.unifiedBackend.cli.vibe.errors.routeNotFound"),
+        error: this.t(
+          "app.api.v1.core.system.unifiedBackend.cli.vibe.errors.routeNotFound",
+        ),
       };
     }
 
@@ -218,9 +213,12 @@ export class CliEntryPoint {
       return result;
     } catch (error) {
       process.stderr.write(
-        this.t("app.api.v1.core.system.unifiedBackend.cli.vibe.errors.executionFailed", {
-          error: error instanceof Error ? error.message : String(error),
-        }),
+        this.t(
+          "app.api.v1.core.system.unifiedBackend.cli.vibe.errors.executionFailed",
+          {
+            error: error instanceof Error ? error.message : String(error),
+          },
+        ),
       );
       this.logger.error("Command execution failed", {
         command,
@@ -265,6 +263,7 @@ export class CliEntryPoint {
     const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
     let actualMethods: string[] = [];
     let customAliases: string[] = [];
+    let endpointDescription: string | undefined;
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -278,16 +277,30 @@ export class CliEntryPoint {
         ),
       );
 
-      // Extract custom aliases if available
+      // Extract custom aliases and description if available
       if (actualMethods.length > 0) {
         const firstMethod = defaultExport[actualMethods[0]];
-        if (firstMethod?.aliases) {
-          customAliases = firstMethod.aliases;
+        if (firstMethod?.aliases && Array.isArray(firstMethod.aliases)) {
+          customAliases = [...firstMethod.aliases];
+        }
+        // Extract description from endpoint definition
+        if (
+          firstMethod?.description &&
+          typeof firstMethod.description === "string"
+        ) {
+          endpointDescription = firstMethod.description;
         }
       }
-    } catch {
+    } catch (error) {
       // If definition can't be loaded, fall back to trying all methods
       actualMethods = ["POST", "GET", "PUT", "PATCH", "DELETE"];
+      // Log error for debugging if verbose
+      if (this.logger) {
+        this.logger.debug?.("Failed to load definition for aliases", {
+          definitionPath,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
     }
 
     // Use actual methods or fallback
@@ -296,6 +309,26 @@ export class CliEntryPoint {
         ? actualMethods
         : ["POST", "GET", "PUT", "PATCH", "DELETE"];
 
+    // Get description - use endpoint description if available, with translation fallback
+    const getDescription = () => {
+      if (endpointDescription) {
+        // Try to translate if it's a translation key
+        if (endpointDescription.includes(".")) {
+          try {
+            return this.t(endpointDescription as any);
+          } catch {
+            return endpointDescription;
+          }
+        }
+        return endpointDescription;
+      }
+      return this.t(
+        "app.api.v1.core.system.unifiedBackend.cli.vibe.executeCommand",
+      );
+    };
+
+    const description = getDescription();
+
     // Register route with short alias
     for (const method of methodsToRegister) {
       this.routes.push({
@@ -303,7 +336,7 @@ export class CliEntryPoint {
         path: apiPath,
         method,
         routePath: routeFile,
-        description: this.t("app.api.v1.core.system.unifiedBackend.cli.vibe.executeCommand"),
+        description,
       });
     }
 
@@ -315,7 +348,7 @@ export class CliEntryPoint {
           path: apiPath,
           method,
           routePath: routeFile,
-          description: this.t("app.api.v1.core.system.unifiedBackend.cli.vibe.executeCommand"),
+          description,
         });
       }
     }
@@ -328,7 +361,7 @@ export class CliEntryPoint {
           path: apiPath,
           method,
           routePath: routeFile,
-          description: this.t("app.api.v1.core.system.unifiedBackend.cli.vibe.executeCommand"),
+          description,
         });
       }
     }
@@ -506,7 +539,11 @@ export class CliEntryPoint {
     logger: EndpointLogger,
   ): Promise<RouteExecutionResult> {
     try {
-      const cliUser = await getCliUserForCommand("interactive", logger, this.locale);
+      const cliUser = await getCliUserForCommand(
+        "interactive",
+        logger,
+        this.locale,
+      );
       await interactiveModeHandler.startInteractiveMode(
         cliUser,
         this.locale,

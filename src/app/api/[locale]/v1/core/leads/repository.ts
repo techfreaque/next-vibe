@@ -30,7 +30,7 @@ import type { TFunction } from "@/i18n/core/static-types";
 
 import { newsletterSubscriptions } from "../newsletter/db";
 import { NewsletterSubscriptionStatus } from "../newsletter/enum";
-import type { JwtPayloadType } from "../user/auth/definition";
+import type { JwtPayloadType } from "../user/auth/types";
 import {
   emailCampaigns,
   type Lead,
@@ -38,16 +38,6 @@ import {
   leads,
   userLeads,
 } from "./db";
-import type {
-  LeadCreateType,
-  LeadDetailResponse,
-  LeadListResponseType,
-  LeadQueryType,
-  LeadResponseType,
-  LeadUpdateType,
-  LeadWithEmailType,
-  UnsubscribeType,
-} from "./definition";
 import type {
   BatchOperationScopeValues,
   EmailCampaignStageValues,
@@ -74,6 +64,16 @@ import {
 } from "./enum";
 import type { ExportQueryType, ExportResponseType } from "./export/definition";
 import type { LeadEngagementResponseOutput } from "./tracking/engagement/definition";
+import type {
+  LeadCreateType,
+  LeadDetailResponse,
+  LeadListResponseType,
+  LeadQueryType,
+  LeadResponseType,
+  LeadUpdateType,
+  LeadWithEmailType,
+  UnsubscribeType,
+} from "./types";
 
 // Type aliases for enum values
 type LeadSortFieldType = typeof LeadSortFieldValues;

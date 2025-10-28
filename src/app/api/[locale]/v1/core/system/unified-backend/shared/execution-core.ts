@@ -7,13 +7,11 @@
 import "server-only";
 
 import type { NextRequest } from "next/server";
-import type {
-  ResponseType,
-  StreamingResponse,
-} from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
   ErrorResponseTypes,
+  type ResponseType,
+  type StreamingResponse,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
@@ -21,6 +19,7 @@ import {
   type AuthContext,
   authRepository,
 } from "@/app/api/[locale]/v1/core/user/auth/repository";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -42,7 +41,7 @@ export interface HandlerContext<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
 > {
   endpoint: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>;
@@ -80,7 +79,7 @@ export async function executeHandler<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
 >(
   context: HandlerContext<
@@ -147,7 +146,7 @@ export async function executeHandler<
 export async function authenticateUser<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
 >(
   endpoint: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
@@ -199,7 +198,7 @@ export async function authenticateUser<
 export async function authenticateTypedUser<
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
 >(
   endpoint: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,

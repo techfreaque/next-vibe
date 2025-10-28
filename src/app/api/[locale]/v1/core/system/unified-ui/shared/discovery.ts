@@ -14,9 +14,9 @@ import "server-only";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 
+import type { DiscoveredEndpoint } from "../../unified-backend/shared/discovery/endpoint-registry-types";
 import { BaseCache, createCacheKey } from "./cache/base-cache";
 import { getStaticEndpoints } from "./endpoint-adapter";
-import type { DiscoveredEndpoint } from "../../unified-backend/shared/discovery/endpoint-registry-types";
 /**
  * Singleton instance using shared factory
  */

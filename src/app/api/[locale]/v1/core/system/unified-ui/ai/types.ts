@@ -13,9 +13,9 @@ import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/e
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { DiscoveredEndpoint } from "../../unified-backend/shared/discovery/endpoint-registry-types";
 import type { BaseRegistryStats } from "../shared/base-registry";
 import type { Platform } from "../shared/config";
-import type { DiscoveredEndpoint } from "../../unified-backend/shared/discovery/endpoint-registry-types";
 
 /**
  * CoreTool type from AI SDK
@@ -295,3 +295,7 @@ export interface IToolExecutor {
     parameters: Record<string, ToolParameterValue>,
   ): { valid: boolean; errors?: string[] };
 }
+
+const definitions = {};
+
+export default definitions;

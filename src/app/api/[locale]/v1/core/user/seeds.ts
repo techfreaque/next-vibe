@@ -7,7 +7,10 @@ import { and, eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import { registerSeed } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
-import { createMockUser, getCliUserEmail } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/auth/cli-user-factory";
+import {
+  createMockUser,
+  getCliUserEmail,
+} from "@/app/api/[locale]/v1/core/system/unified-backend/shared/auth/cli-user-factory";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
@@ -18,10 +21,10 @@ import { parseError } from "../shared/utils";
 import { authRepository } from "./auth/repository";
 import type { NewUser } from "./db";
 import { users } from "./db";
-import type { StandardUserType } from "./definition";
 import { UserDetailLevel } from "./enum";
 import { sessionRepository } from "./private/session/repository";
 import { userRepository } from "./repository";
+import type { StandardUserType } from "./types";
 import { UserRole } from "./user-roles/enum";
 import { userRolesRepository } from "./user-roles/repository";
 
@@ -344,10 +347,7 @@ export async function dev(
         logger.error("Failed to create CLI token");
       }
     } catch (cliError) {
-      logger.error(
-        "Failed to create CLI authentication",
-        parseError(cliError),
-      );
+      logger.error("Failed to create CLI authentication", parseError(cliError));
     }
   }
 

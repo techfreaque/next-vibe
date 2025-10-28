@@ -13,7 +13,7 @@ import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import { canCreateFolder } from "@/app/api/[locale]/v1/core/agent/chat/permissions/permissions";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -58,11 +58,24 @@ export async function getFolders(
 
     return createSuccessResponse({
       folders: folders.map((folder) => ({
-        ...folder,
+        id: folder.id,
+        userId: folder.userId,
+        rootFolderId: folder.rootFolderId as
+          | "private"
+          | "shared"
+          | "public"
+          | "incognito",
+        name: folder.name,
+        icon: folder.icon,
+        color: folder.color,
+        parentId: folder.parentId,
+        expanded: folder.expanded,
+        sortOrder: folder.sortOrder,
+        metadata: (folder.metadata as Record<string, any>) || {},
         createdAt: new Date(folder.createdAt),
         updatedAt: new Date(folder.updatedAt),
       })),
-    }) as ResponseType<FolderListResponseOutput>;
+    });
   } catch {
     return createErrorResponse(
       "app.api.v1.core.agent.chat.folders.get.errors.server.title",
@@ -175,12 +188,25 @@ export async function createFolder(
     return createSuccessResponse({
       response: {
         folder: {
-          ...newFolder,
+          id: newFolder.id,
+          userId: newFolder.userId,
+          rootFolderId: newFolder.rootFolderId as
+            | "private"
+            | "shared"
+            | "public"
+            | "incognito",
+          name: newFolder.name,
+          icon: newFolder.icon,
+          color: newFolder.color,
+          parentId: newFolder.parentId,
+          expanded: newFolder.expanded,
+          sortOrder: newFolder.sortOrder,
+          metadata: (newFolder.metadata as Record<string, any>) || {},
           createdAt: new Date(newFolder.createdAt),
           updatedAt: new Date(newFolder.updatedAt),
         },
       },
-    }) as ResponseType<FolderCreateResponseOutput>;
+    });
   } catch (error) {
     logger.error("Failed to create folder", parseError(error));
     return createErrorResponse(

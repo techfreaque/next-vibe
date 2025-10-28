@@ -13,9 +13,9 @@ import { parseError } from "next-vibe/shared/utils";
 import { useEffect } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
-import type { EnhancedMutationResult } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
 import {
   createCustomStateKey,
+  type EnhancedMutationResult,
   useApiMutation,
   useApiQuery,
   useCustomState,
@@ -111,7 +111,10 @@ export function useUser(logger: EndpointLogger): UseUserReturn {
         // Set auth status when user data is successfully fetched
         const authStatusResult = authClientRepository.setAuthStatus(logger);
         if (!authStatusResult.success) {
-          logger.error("user.auth.status.set.failed", authStatusResult);
+          logger.error("user.auth.status.set.failed", {
+            message: authStatusResult.message,
+            errorCode: authStatusResult.errorType.errorCode,
+          });
         }
       },
     },

@@ -43,23 +43,25 @@ export function validateLocale(
 
 /**
  * Validate request data with schema
+ * Types flow naturally from the schema without explicit constraints
  */
-export function validateRequestData<TInput, TOutput>(
-  data: TInput,
-  schema: z.ZodSchema<TOutput, z.ZodTypeDef, TInput>,
+export function validateRequestData<TSchema extends z.ZodTypeAny>(
+  data: z.input<TSchema>,
+  schema: TSchema,
   logger: EndpointLogger,
-): ResponseType<TOutput> {
+): ResponseType<z.output<TSchema>> {
   return validateData(data, schema, logger);
 }
 
 /**
  * Validate URL parameters with schema
+ * Types flow naturally from the schema without explicit constraints
  */
-export function validateUrlParameters<TInput, TOutput>(
-  urlParameters: TInput,
-  schema: z.ZodSchema<TOutput, z.ZodTypeDef, TInput>,
+export function validateUrlParameters<TSchema extends z.ZodTypeAny>(
+  urlParameters: z.input<TSchema>,
+  schema: TSchema,
   logger: EndpointLogger,
-): ResponseType<TOutput> {
+): ResponseType<z.output<TSchema>> {
   return validateData(urlParameters, schema, logger);
 }
 
@@ -89,7 +91,7 @@ export function isNeverSchema(schema: z.ZodSchema): boolean {
  * Get missing required fields from validation error
  */
 export function getMissingFields(
-  data: Record<string, unknown>,
+  data: Record<string, string | number | boolean | null>,
   schema: z.ZodSchema,
   logger: EndpointLogger,
 ): string[] {
@@ -100,7 +102,11 @@ export function getMissingFields(
 
     if (!result.success && result.error) {
       for (const issue of result.error.issues) {
-        if (issue.code === "invalid_type" && issue.received === "undefined") {
+        if (
+          issue.code === "invalid_type" &&
+          "received" in issue &&
+          issue.received === "undefined"
+        ) {
           missing.push(issue.path.join("."));
         }
       }
@@ -144,30 +150,22 @@ export function mergeWithDefaults<T>(
 /**
  * Create validation error response
  */
-export function createValidationError(
-  message: string,
-  error?: string,
-): ResponseType<never> {
+export function createValidationError(error?: string): ResponseType<never> {
   return {
     success: false,
-    message,
+    message: ErrorResponseTypes.INVALID_REQUEST_ERROR.errorKey,
     errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-    messageParams: {
-      error: error || "Validation failed",
-    },
+    messageParams: error ? { error } : undefined,
   };
 }
 
 /**
  * Create URL validation error response
  */
-export function createUrlValidationError(
-  error: string,
-): ResponseType<never> {
+export function createUrlValidationError(error: string): ResponseType<never> {
   return {
     success: false,
-    message:
-      "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_url_parameters",
+    message: ErrorResponseTypes.INVALID_QUERY_ERROR.errorKey,
     errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
     messageParams: {
       error,
@@ -183,12 +181,10 @@ export function createRequestValidationError(
 ): ResponseType<never> {
   return {
     success: false,
-    message:
-      "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_request_data",
+    message: ErrorResponseTypes.INVALID_REQUEST_ERROR.errorKey,
     errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
     messageParams: {
       error,
     },
   };
 }
-

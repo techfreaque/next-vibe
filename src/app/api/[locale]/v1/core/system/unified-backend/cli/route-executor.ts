@@ -8,7 +8,8 @@ import type z from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
+import { simpleT } from "@/i18n/core/shared";
+import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
 import { getCliUser } from "../shared/auth/cli-user-factory";
 import type { UnifiedField } from "../shared/core-types";
@@ -136,6 +137,7 @@ export interface RouteExecutionResult {
   success: boolean;
   data?: CliResponseData;
   error?: string;
+  errorParams?: Record<string, string | number>;
   metadata?: {
     executionTime?: number;
     route?: string;
@@ -283,6 +285,10 @@ export class RouteDelegationHandler {
         success: result.success,
         data: result.data,
         error: result.success ? undefined : result.message,
+        errorParams: result.success
+          ? undefined
+          : (result as { messageParams?: Record<string, string | number> })
+              .messageParams,
         metadata: {
           executionTime: Date.now() - startTime,
           route: route.path,
@@ -317,13 +323,27 @@ export class RouteDelegationHandler {
       });
 
       // Try to get route module from registry first (for Next.js server bundle)
-      let routeModule: RouteModule | null = null;
+      let routeModule: RouteModule<
+        CreateApiEndpoint<
+          string,
+          Methods,
+          readonly (typeof UserRoleValue)[],
+          unknown
+        >
+      > | null = null;
 
       try {
         const { getRouteHandler } = await import(
           "@/app/api/[locale]/v1/core/system/generated/route-handlers"
         );
-        routeModule = getRouteHandler(route.routePath);
+        routeModule = getRouteHandler(route.routePath) as RouteModule<
+          CreateApiEndpoint<
+            string,
+            Methods,
+            readonly (typeof UserRoleValue)[],
+            unknown
+          >
+        > | null;
 
         if (routeModule) {
           logger.debug(`[Route Executor] Route module loaded from registry`);
@@ -341,7 +361,14 @@ export class RouteDelegationHandler {
       if (!routeModule) {
         try {
           const imported = await import(route.routePath);
-          routeModule = imported;
+          routeModule = imported as RouteModule<
+            CreateApiEndpoint<
+              string,
+              Methods,
+              readonly (typeof UserRoleValue)[],
+              unknown
+            >
+          >;
           logger.debug(
             `[Route Executor] Route module loaded via dynamic import`,
           );
@@ -386,7 +413,9 @@ export class RouteDelegationHandler {
           handlerType: typeof handler,
         });
         if (typeof handler === "function") {
-          return handler;
+          return handler as CliHandlerFunction<
+            readonly (typeof UserRoleValue)[]
+          >;
         }
       }
 
@@ -396,7 +425,9 @@ export class RouteDelegationHandler {
         typeof routeModule.tools.cli === "function"
       ) {
         logger.debug(`[Route Executor] Found direct CLI handler`);
-        return routeModule.tools.cli;
+        return routeModule.tools.cli as CliHandlerFunction<
+          readonly (typeof UserRoleValue)[]
+        >;
       }
 
       logger.warn(`[Route Executor] No CLI handler found`, {
@@ -446,7 +477,14 @@ export class RouteDelegationHandler {
         );
         const handler = getRouteHandler(route.routePath);
         if (handler) {
-          routeModule = handler;
+          routeModule = handler as RouteModule<
+            CreateApiEndpoint<
+              string,
+              Methods,
+              readonly (typeof UserRoleValue)[],
+              UnifiedField<z.ZodTypeAny>
+            >
+          >;
         }
       } catch (registryError) {
         logger.debug(`Registry not available for definition lookup`, {
@@ -458,7 +496,14 @@ export class RouteDelegationHandler {
       if (!routeModule) {
         try {
           const imported = await import(route.routePath);
-          routeModule = imported;
+          routeModule = imported as RouteModule<
+            CreateApiEndpoint<
+              string,
+              Methods,
+              readonly (typeof UserRoleValue)[],
+              UnifiedField<z.ZodTypeAny>
+            >
+          >;
         } catch (importError) {
           logger.debug(`Failed to import route module for definition`, {
             error: parseError(importError),
@@ -655,16 +700,44 @@ export class RouteDelegationHandler {
     logger: EndpointLogger,
   ): string {
     if (!result.success) {
+      // Translate error message if it's a translation key
+      const { t } = simpleT(locale);
+      let errorMessage =
+        result.error ||
+        t("app.api.v1.core.system.unifiedBackend.cli.vibe.errors.unknownError");
+
+      // Try to translate if it looks like a translation key (contains dots)
+      if (errorMessage.includes(".")) {
+        try {
+          errorMessage = t(errorMessage as TranslationKey, result.errorParams);
+        } catch {
+          // If translation fails, use the key as-is
+        }
+      }
+
+      // Build detailed error message with errorParams
+      let detailedError = errorMessage;
+
+      // Always show error details from errorParams, even in non-verbose mode
+      if (result.errorParams && Object.keys(result.errorParams).length > 0) {
+        // eslint-disable-next-line i18next/no-literal-string
+        detailedError += "\n\nDetails:";
+        for (const [key, value] of Object.entries(result.errorParams)) {
+          // eslint-disable-next-line i18next/no-literal-string
+          detailedError += `\n  ${key}: ${value}`;
+        }
+      }
+
       if (verbose) {
         // eslint-disable-next-line i18next/no-literal-string
-        return `❌ Error: ${result.error}\n\n${JSON.stringify(
+        return `❌ Error: ${detailedError}\n\nFull Response:\n${JSON.stringify(
           result,
           null,
           2,
         )}`;
       }
       // eslint-disable-next-line i18next/no-literal-string
-      return `❌ Error: ${result.error}`;
+      return `❌ Error: ${detailedError}`;
     }
 
     let output = "";
@@ -743,7 +816,9 @@ export class RouteDelegationHandler {
         // Preserve arrays for proper widget rendering (grouped lists, tables, etc.)
         sanitized[key] = value;
       } else if (typeof value === "object") {
-        sanitized[key] = JSON.stringify(value);
+        // Preserve objects for proper widget rendering (sections, containers, nested data)
+        // This allows SECTION and CONTAINER widgets to render nested structures properly
+        sanitized[key] = value;
       } else {
         sanitized[key] = String(value);
       }
@@ -770,7 +845,9 @@ export class RouteDelegationHandler {
       // Extract response metadata from endpoint definition
       const metadata = responseMetadataExtractor.extractResponseMetadata(
         endpointDefinition,
-        data,
+        data as Parameters<
+          typeof responseMetadataExtractor.extractResponseMetadata
+        >[1],
       );
 
       // Use enhanced modular renderer with locale

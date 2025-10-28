@@ -3,10 +3,10 @@
  * Abstract base class for all widget renderers with common utilities
  */
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import chalk from "chalk";
 
 import { getBaseFormatter } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/formatters/base-formatter";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   DataFormatter,
@@ -198,7 +198,7 @@ class DefaultDataFormatter implements DataFormatter {
   }
 
   formatBoolean(value: boolean): string {
-    return this.baseFormatter.formatBoolean(value, { style: "symbol" });
+    return this.baseFormatter.formatBoolean(value, { style: "emoji" });
   }
 
   formatDate(value: Date | string, locale: CountryLanguage): string {

@@ -8,8 +8,8 @@ import "server-only";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 
-import { getDiscoveredEndpoints } from "./endpoint-adapter";
 import type { DiscoveredEndpoint } from "../../unified-backend/shared/discovery/endpoint-registry-types";
+import { getDiscoveredEndpoints } from "./endpoint-adapter";
 
 /**
  * Base registry configuration

@@ -17,13 +17,13 @@ import {
   createTrackingContext,
   EmailTemplate,
 } from "@/app/api/[locale]/v1/core/emails/smtp-client/components";
-import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
+import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import type { LeadCreateType } from "../definition";
 import { LeadSourceOptions, LeadStatusOptions } from "../enum";
+import type { LeadCreateType } from "../types";
 import type { LeadCreatePostResponseOutput } from "./definition";
 
 /**

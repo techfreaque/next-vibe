@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -7,7 +8,6 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/create-endpoint";
 import {
   objectField,
   requestDataField,

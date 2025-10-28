@@ -658,7 +658,9 @@ export const useApiStore = create<ApiStore>((set, get) => ({
               disableLocalCache: true,
               // Prevent infinite chain of background refreshes
               backgroundRefresh: false,
-            }).catch((err) => logger.error("Background refresh failed", parseError(err)));
+            }).catch((err) =>
+              logger.error("Background refresh failed", parseError(err)),
+            );
           }, refreshDelay);
 
           // Store the timeout ID so it can be cleaned up if needed

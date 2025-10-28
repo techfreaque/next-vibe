@@ -8,18 +8,21 @@ import {
   isStreamingResponse,
 } from "next-vibe/shared/types/response.schema";
 
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+
 import {
   convertToTRPCError,
   handleNextVibeResponse,
 } from "../../unified-ui/react/trpc-trpc";
-import { validateTrpcRequestData } from "./validation";
-import type { TRPCContext, TrpcHandlerReturnType as TrpcHandlerType } from "./types";
 import { createEndpointLogger } from "../shared/endpoint-logger";
 import type { Methods } from "../shared/enums";
 import { authenticateUser, executeHandler } from "../shared/execution-core";
+import type { ApiHandlerOptions } from "../shared/handler-types";
 import type {
-  ApiHandlerOptions,
-} from "../shared/handler-types";
+  TRPCContext,
+  TrpcHandlerReturnType as TrpcHandlerType,
+} from "./types";
+import { validateTrpcRequestData } from "./validation";
 
 /**
  * Create a tRPC procedure
@@ -35,7 +38,7 @@ export function createTRPCHandler<
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
 >(
   options: ApiHandlerOptions<
@@ -55,7 +58,7 @@ export function createTRPCHandler<
 
   return async (
     input: TRequestOutput & { urlPathParams?: TUrlVariablesOutput },
-    ctx: TRPCContext<Record<string, string>, readonly string[]>,
+    ctx: TRPCContext<Record<string, string>, readonly (typeof UserRoleValue)[]>,
   ): Promise<TResponseOutput> => {
     try {
       // tRPC procedure execution - debug info available in endpoint logger
@@ -66,6 +69,7 @@ export function createTRPCHandler<
         {
           platform: "trpc",
           request: ctx.request,
+          locale: ctx.locale,
         },
         createEndpointLogger(false, Date.now(), ctx.locale),
       );
@@ -84,25 +88,12 @@ export function createTRPCHandler<
 
       // tRPC data is already validated by tRPC's own validators
       // We validate again to ensure it matches our endpoint schema
-      // TypeScript structural typing: input contains all properties of TRequestOutput plus optional urlPathParams
-      // So we can pass input directly where TRequestOutput is expected
-      const validationResult = validateTrpcRequestData<
-        TExampleKey,
-        TMethod,
-        TUserRoleValue,
-        TFields,
-        TRequestInput,
-        TRequestOutput,
-        TResponseInput,
-        TResponseOutput,
-        TUrlVariablesInput,
-        TUrlVariablesOutput
-      >(
+      const validationResult = validateTrpcRequestData(
         endpoint,
         {
           method: endpoint.method,
           requestData: input,
-          urlParameters: (input.urlPathParams ?? {}) as TUrlVariablesOutput,
+          urlParameters: input.urlPathParams ?? {},
           locale: ctx.locale,
         },
         logger,
@@ -122,8 +113,8 @@ export function createTRPCHandler<
       const result = await executeHandler({
         endpoint,
         handler,
-        validatedData: validationResult.data.requestData,
-        urlPathParams: validationResult.data.urlPathParams,
+        validatedData: validationResult.data.requestData as TRequestOutput,
+        urlPathParams: validationResult.data.urlPathParams as TUrlVariablesOutput,
         user: authResult.data,
         t: ctx.t,
         locale: ctx.locale,

@@ -149,10 +149,10 @@ const { POST } = createEndpoint({
 
       issues: responseArrayField(
         {
-          type: WidgetType.GROUPED_LIST,
+          type: WidgetType.CODE_QUALITY_LIST,
           groupBy: "file",
           sortBy: "severity",
-          showGroupSummary: true,
+          showSummary: true,
           layout: {
             type: LayoutType.GRID,
             columns: 1,

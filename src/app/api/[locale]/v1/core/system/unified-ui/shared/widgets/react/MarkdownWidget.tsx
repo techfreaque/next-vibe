@@ -4,7 +4,26 @@ import { cn } from "next-vibe/shared/utils";
 import { Markdown } from "next-vibe-ui/ui";
 import type { JSX } from "react";
 
-import type { MarkdownWidgetData, WidgetComponentProps } from "../types";
+import type {
+  MarkdownWidgetData,
+  RenderableValue,
+  WidgetComponentProps,
+} from "../types";
+
+/**
+ * Type guard for MarkdownWidgetData
+ */
+function isMarkdownWidgetData(
+  data: RenderableValue,
+): data is MarkdownWidgetData {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    !Array.isArray(data) &&
+    "content" in data &&
+    typeof data.content === "string"
+  );
+}
 
 /**
  * Markdown Widget Component
@@ -14,7 +33,18 @@ export function MarkdownWidget({
   data,
   className,
   style,
-}: WidgetComponentProps<MarkdownWidgetData>): JSX.Element {
+}: WidgetComponentProps<RenderableValue>): JSX.Element {
+  if (!isMarkdownWidgetData(data)) {
+    return (
+      <div
+        className={cn("text-muted-foreground italic", className)}
+        style={style}
+      >
+        —
+      </div>
+    );
+  }
+
   const { content } = data;
 
   if (!content) {

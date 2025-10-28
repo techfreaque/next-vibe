@@ -89,3 +89,7 @@ export interface SyncFolderMessagesRequestOutput {
 export interface SyncFolderMessagesResponseOutput {
   result: SyncResult;
 }
+
+const definitions = {};
+
+export default definitions;

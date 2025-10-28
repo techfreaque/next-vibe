@@ -7,7 +7,10 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { TaskCategory } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/enum";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { TaskRunner } from "../types/repository";
 
@@ -47,7 +50,13 @@ const pulseTaskRunner: TaskRunner = {
   enabled: true,
   priority: "HIGH",
 
-  async run(signal: AbortSignal): Promise<void> {
+  async run(props: {
+    signal: AbortSignal;
+    logger: EndpointLogger;
+    locale: CountryLanguage;
+    cronUser: JwtPrivatePayloadType;
+  }): Promise<void> {
+    const { signal, logger } = props;
     logger.info("Starting pulse task runner...");
 
     const PULSE_INTERVAL = 60 * 1000; // 1 minute
@@ -100,13 +109,24 @@ const pulseTaskRunner: TaskRunner = {
     logger.info("Pulse task runner stopped");
   },
 
-  async onError(error: Error): Promise<void> {
+  async onError(props: {
+    error: Error;
+    logger: EndpointLogger;
+    locale: CountryLanguage;
+    cronUser: JwtPrivatePayloadType;
+  }): Promise<void> {
+    const { error, logger } = props;
     logger.error("Pulse task runner error", parseError(error));
     // Could send alerts or notifications here
     await Promise.resolve();
   },
 
-  async onShutdown(): Promise<void> {
+  async onShutdown(props: {
+    logger: EndpointLogger;
+    locale: CountryLanguage;
+    cronUser: JwtPrivatePayloadType;
+  }): Promise<void> {
+    const { logger } = props;
     logger.info("Pulse task runner shutting down gracefully...");
     // Perform any cleanup if needed
     await Promise.resolve();

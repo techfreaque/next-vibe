@@ -18,7 +18,7 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../../../../user/auth/definition";
+import type { JwtPayloadType } from "../../../../user/auth/types";
 import { smtpAccounts } from "../../db";
 import type { CampaignType, SmtpSecurityType } from "../../enum";
 import type {

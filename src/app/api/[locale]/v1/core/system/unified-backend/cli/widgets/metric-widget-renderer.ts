@@ -33,14 +33,22 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
 
     // Handle single metric value
     const label = this.formatLabel(field, context);
-    const formattedValue = this.formatMetricValue(value, config, context);
-    const icon = this.getMetricIcon(config, value, context);
+    const formattedValue = this.formatMetricValue(
+      value as string | number | boolean,
+      config,
+      context,
+    );
+    const icon = this.getMetricIcon(
+      config,
+      value as string | number | boolean,
+      context,
+    );
 
     return `${indent}${icon}${label}: ${formattedValue}`;
   }
 
   private renderMetricObject(
-    value: Record<string, string | number | boolean>,
+    value: { [key: string]: import("./types").RenderableValue },
     config: MetricConfig,
     context: WidgetRenderContext,
     indent: string,
@@ -55,8 +63,16 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
     // Generic object rendering
     for (const [key, val] of Object.entries(value)) {
       const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
-      const formattedValue = this.formatMetricValue(val, config, context);
-      const icon = this.getMetricIcon(config, val, context);
+      const formattedValue = this.formatMetricValue(
+        val as string | number | boolean,
+        config,
+        context,
+      );
+      const icon = this.getMetricIcon(
+        config,
+        val as string | number | boolean,
+        context,
+      );
       lines.push(`${indent}${icon}${formattedKey}: ${formattedValue}`);
     }
 
@@ -64,17 +80,17 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
   }
 
   private renderLintSummary(
-    summary: {
-      total: number;
-      errors: number;
-      warnings: number;
-      info: number;
-      hasIssues: boolean;
-    },
+    summary: { [key: string]: import("./types").RenderableValue },
     context: WidgetRenderContext,
     indent: string,
   ): string {
-    if (!summary.hasIssues) {
+    // Type guard for summary properties
+    const total = summary.total as number;
+    const errors = summary.errors as number;
+    const warnings = summary.warnings as number;
+    const info = summary.info as number;
+    const hasIssues = summary.hasIssues as boolean;
+    if (!hasIssues) {
       // eslint-disable-next-line i18next/no-literal-string
       const icon = context.options.useEmojis ? "✨ " : "";
       const text = context.translate(
@@ -85,40 +101,40 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
 
     const parts: string[] = [];
 
-    if (summary.errors > 0) {
+    if (errors > 0) {
       // eslint-disable-next-line i18next/no-literal-string
       const icon = context.options.useEmojis ? "✖ " : "";
       const errorWord =
-        summary.errors === 1
+        errors === 1
           ? context.translate(
               "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.error",
             )
           : context.translate(
               "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.errors",
             );
-      const text = `${summary.errors} ${errorWord}`;
+      const text = `${errors} ${errorWord}`;
       parts.push(`${indent}${icon}${this.styleText(text, "red", context)}`);
     }
 
-    if (summary.warnings > 0) {
+    if (warnings > 0) {
       // eslint-disable-next-line i18next/no-literal-string
       const icon = context.options.useEmojis ? "⚠ " : "";
       const warningWord =
-        summary.warnings === 1
+        warnings === 1
           ? context.translate(
               "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.warning",
             )
           : context.translate(
               "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.warnings",
             );
-      const text = `${summary.warnings} ${warningWord}`;
+      const text = `${warnings} ${warningWord}`;
       parts.push(`${indent}${icon}${this.styleText(text, "yellow", context)}`);
     }
 
-    if (summary.info > 0) {
+    if (info > 0) {
       // eslint-disable-next-line i18next/no-literal-string
       const icon = context.options.useEmojis ? "ℹ " : "";
-      const text = `${summary.info} ${context.translate("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.info")}`;
+      const text = `${info} ${context.translate("app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.renderers.cliUi.widgets.common.info")}`;
       parts.push(`${indent}${icon}${this.styleText(text, "blue", context)}`);
     }
 
@@ -128,12 +144,22 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
   private getMetricConfig(field: ResponseFieldMetadata): MetricConfig {
     const config = field.config || {};
 
+    // Validate format to ensure it's one of the allowed values
+    const formatValue = (config.format as string | undefined) || field.format || "number";
+    const validFormats: Array<"bytes" | "currency" | "number" | "percentage"> = ["bytes", "currency", "number", "percentage"];
+    const format: "bytes" | "currency" | "number" | "percentage" = validFormats.includes(formatValue as "bytes" | "currency" | "number" | "percentage")
+      ? (formatValue as "bytes" | "currency" | "number" | "percentage")
+      : "number";
+
     return {
-      icon: config.icon,
-      unit: config.unit || field.unit,
-      precision: config.precision ?? field.precision ?? 2,
-      threshold: config.threshold,
-      format: config.format || field.format || "number",
+      icon: config.icon as string | undefined,
+      unit: (config.unit as string | undefined) || field.unit,
+      precision:
+        (config.precision as number | undefined) ?? field.precision ?? 2,
+      threshold: config.threshold as
+        | { warning?: number; error?: number }
+        | undefined,
+      format,
     };
   }
 

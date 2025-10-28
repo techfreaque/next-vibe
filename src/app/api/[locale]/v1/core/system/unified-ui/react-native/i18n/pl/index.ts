@@ -7,5 +7,6 @@ export const translations: typeof enTranslations = {
     validationFailed: "Walidacja nie powiodła się",
     htmlResponseReceived: "Otrzymano odpowiedź HTML zamiast JSON",
     networkError: "Wystąpił błąd sieci",
+    failedToLoadPage: "Nie udało się załadować strony",
   },
 };

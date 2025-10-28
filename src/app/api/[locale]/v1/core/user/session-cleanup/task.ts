@@ -25,9 +25,9 @@ import {
 import type { Task } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/types/repository";
 import { defaultLocale } from "@/i18n/core/config";
 
-import type { JWTPublicPayloadType } from "../auth/definition";
-import type { SessionCleanupResponseOutput } from "./definition";
+import type { JWTPublicPayloadType } from "../auth/types";
 import { sessionCleanupRepository } from "./repository";
+import type { SessionCleanupResponseOutput } from "./types";
 
 /**
  * Main task execution - runs via pulse route in production
@@ -48,9 +48,7 @@ export async function executeTask(
   );
 
   if (!validationResult.success) {
-    logger.error(
-      "Session cleanup configuration validation failed",
-    );
+    logger.error("Session cleanup configuration validation failed");
     return createErrorResponse(
       "app.api.v1.core.user.session-cleanup.errors.default",
       ErrorResponseTypes.VALIDATION_ERROR,

@@ -28,7 +28,7 @@ const ToggleGroup = React.forwardRef<
 
 ToggleGroup.displayName = ToggleGroupPrimitive.Root.displayName;
 
-function useToggleGroupContext(): ToggleGroupContextProps {
+function useToggleGroupContext(): VariantProps<typeof toggleVariants> {
   const context = React.useContext(ToggleGroupContext);
   if (context === null) {
     // eslint-disable-next-line no-restricted-syntax -- Error handling for context

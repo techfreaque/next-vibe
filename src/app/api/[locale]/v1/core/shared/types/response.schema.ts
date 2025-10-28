@@ -4,6 +4,7 @@ import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
 /**
  * Create a standardized error response with a translation key
+ * @deprecated Use new object style fail({ ... }) instead
  * @param message - The already translated error message
  * @param translationKey - The translation key for the error message
  * @param errorType - The type of error
@@ -20,6 +21,34 @@ export function createErrorResponse(
     message,
     messageParams,
     errorType,
+  };
+}
+
+/**
+ * Create a standardized error response with a translation key
+ * @param message - The already translated error message
+ * @param errorType - The type of error
+ * @param messageParams - Optional parameters for the translation
+ * @param cause - Optional cause of the error to aid debugging
+ * @returns A standardized error response with translation key
+ */
+export function fail({
+  message,
+  errorType,
+  messageParams,
+  cause,
+}: {
+  message: TranslationKey;
+  errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
+  messageParams?: TParams;
+  cause?: ErrorResponseType;
+}): ErrorResponseType {
+  return {
+    success: false,
+    message,
+    messageParams,
+    errorType,
+    cause,
   };
 }
 
@@ -150,6 +179,7 @@ export interface ErrorResponseType {
   message: TranslationKey;
   messageParams?: TParams;
   errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
+  cause?: ErrorResponseType;
 }
 
 export interface SuccessResponseType<TResponseData> {
@@ -158,6 +188,7 @@ export interface SuccessResponseType<TResponseData> {
   message?: never;
   messageParams?: never;
   errorType?: never;
+  cause?: never;
 }
 
 export type ErrorTypes =

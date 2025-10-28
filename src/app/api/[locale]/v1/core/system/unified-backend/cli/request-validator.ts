@@ -7,10 +7,10 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import { z } from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { CreateApiEndpoint } from "../shared/create-endpoint";
 import type { EndpointLogger } from "../shared/endpoint-logger";
 import type { Methods } from "../shared/enums";
 import {
@@ -19,11 +19,6 @@ import {
   validateEndpointUrlParameters,
   validateLocale,
 } from "../shared/request-validator";
-
-// Schema data interface for type safety
-interface SchemaData {
-  [key: string]: string | number | boolean | null | undefined;
-}
 
 /**
  * CLI validation context
@@ -41,42 +36,24 @@ export interface CliValidationContext<TRequestData, TUrlParameters> {
 
 /**
  * Validate CLI request data
+ * Types flow naturally from schemas - no explicit type parameters needed
  */
 export function validateCliRequestData<
-  TRequestInput,
-  TUrlVariablesInput,
-  TExampleKey extends string,
-  TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
-  TFields,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TRequestInputInferred = any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TRequestOutputInferred = any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TResponseInputInferred = any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TResponseOutputInferred = any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TUrlVariablesInputInferred = any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TUrlVariablesOutputInferred = any,
+  TRequestSchema extends z.ZodTypeAny,
+  TUrlSchema extends z.ZodTypeAny,
 >(
-  endpoint: CreateApiEndpoint<
-    TExampleKey,
-    TMethod,
-    TUserRoleValue,
-    TFields,
-    TRequestInputInferred,
-    TRequestOutputInferred,
-    TResponseInputInferred,
-    TResponseOutputInferred,
-    TUrlVariablesInputInferred,
-    TUrlVariablesOutputInferred
+  endpoint: {
+    requestSchema: TRequestSchema;
+    requestUrlPathParamsSchema: TUrlSchema;
+  },
+  context: CliValidationContext<
+    Parameters<TRequestSchema["parse"]>[0],
+    Parameters<TUrlSchema["parse"]>[0]
   >,
-  context: CliValidationContext<TRequestInput, TUrlVariablesInput>,
   logger: EndpointLogger,
-): ResponseType<ValidatedRequestData<TRequestInput, TUrlVariablesInput>> {
+): ResponseType<
+  ValidatedRequestData<z.output<TRequestSchema>, z.output<TUrlSchema>>
+> {
   try {
     // Validate locale
     const validatedLocale = validateLocale(context.locale, logger);
@@ -87,19 +64,25 @@ export function validateCliRequestData<
       typeof context.requestData === "object" &&
       context.requestData !== null &&
       Object.keys(context.requestData).length === 0;
-    // Check if schema is z.never() by examining its _def
-    const isNeverSchema = endpoint.requestSchema?._def?.type === "never";
+    // Check if schema is z.never() using instanceof
+    const isNeverSchema = endpoint.requestSchema instanceof z.ZodNever;
 
     if (isEmptyObject && isNeverSchema) {
       // This is a GET/HEAD/OPTIONS endpoint that expects no input
       // Check if URL params schema is also z.never()
       const isUrlParamsNever =
-        endpoint.requestUrlPathParamsSchema?._def?.type === "never";
+        endpoint.requestUrlPathParamsSchema instanceof z.ZodNever;
 
-      let urlPathParams: TUrlVariablesInput;
       if (isUrlParamsNever) {
         // URL params also expect no input
-        urlPathParams = undefined as TUrlVariablesInput;
+        return {
+          success: true,
+          data: {
+            requestData: endpoint.requestSchema.parse({}),
+            urlPathParams: endpoint.requestUrlPathParamsSchema.parse(undefined),
+            locale: validatedLocale,
+          },
+        };
       } else {
         // Validate URL parameters normally
         const urlValidation = validateEndpointUrlParameters(
@@ -118,17 +101,16 @@ export function validateCliRequestData<
             },
           };
         }
-        urlPathParams = urlValidation.data;
-      }
 
-      return {
-        success: true,
-        data: {
-          requestData: undefined as TRequestInput,
-          urlPathParams,
-          locale: validatedLocale,
-        },
-      };
+        return {
+          success: true,
+          data: {
+            requestData: endpoint.requestSchema.parse({}),
+            urlPathParams: urlValidation.data,
+            locale: validatedLocale,
+          },
+        };
+      }
     }
 
     // For CLI, we need to preserve explicitly provided arguments and only apply defaults for missing fields
@@ -138,14 +120,20 @@ export function validateCliRequestData<
     let finalRequestData = context.requestData;
     if (rawValidation.success) {
       // Use the validated data which includes defaults
-      finalRequestData = rawValidation.data as TRequestInput;
+      finalRequestData = rawValidation.data;
     } else {
       // If validation fails, still try to preserve CLI args by merging with defaults
       const defaultsResult = endpoint.requestSchema.safeParse({});
-      if (defaultsResult.success) {
+      if (
+        defaultsResult.success &&
+        typeof defaultsResult.data === "object" &&
+        defaultsResult.data !== null &&
+        typeof context.requestData === "object" &&
+        context.requestData !== null
+      ) {
         // Merge defaults with CLI data, but preserve CLI values
         finalRequestData = {
-          ...(defaultsResult.data as SchemaData),
+          ...defaultsResult.data,
           ...context.requestData,
         };
       }
@@ -169,49 +157,34 @@ export function validateCliRequestData<
       };
     }
 
-    // Validate URL parameters if schema exists and expects parameters
-    let urlValidation: ResponseType<TUrlVariablesInput>;
-    if (endpoint.requestUrlPathParamsSchema) {
-      // Check if schema expects never (no parameters)
-      const testResult = endpoint.requestUrlPathParamsSchema.safeParse({});
-      const isNeverSchema =
-        !testResult.success &&
-        testResult.error?.issues?.[0]?.code === "invalid_type";
+    // Validate URL parameters if schema exists
+    // Check if URL params schema is z.never() - if so, skip validation
+    const isUrlParamsNever =
+      endpoint.requestUrlPathParamsSchema instanceof z.ZodNever;
 
-      if (isNeverSchema) {
-        // Schema expects never, don't validate URL parameters
-        urlValidation = {
-          success: true,
-          data: undefined as TUrlVariablesInput,
-        };
-      } else {
-        // Schema expects parameters, validate them
-        urlValidation = validateEndpointUrlParameters(
+    const urlValidation = isUrlParamsNever
+      ? { success: true as const, data: undefined as z.output<TUrlSchema> }
+      : validateEndpointUrlParameters(
           context.urlParameters,
           endpoint.requestUrlPathParamsSchema,
           logger,
-        ) as ResponseType<TUrlVariablesInput>;
-        if (!urlValidation.success) {
-          return {
-            success: false,
-            message:
-              "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_url_parameters",
-            errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-            messageParams: {
-              error: urlValidation.message,
-            },
-          };
-        }
-      }
-    } else {
-      // No URL schema, use empty object
-      urlValidation = { success: true, data: {} as TUrlVariablesInput };
+        );
+    if (!urlValidation.success) {
+      return {
+        success: false,
+        message:
+          "app.api.v1.core.system.unifiedUi.cli.vibe.endpoints.endpointHandler.error.errors.invalid_url_parameters",
+        errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+        messageParams: {
+          error: urlValidation.message,
+        },
+      };
     }
 
     return {
       success: true,
       data: {
-        requestData: requestValidation.data as TRequestInput,
+        requestData: requestValidation.data,
         urlPathParams: urlValidation.data,
         locale: validatedLocale,
       },

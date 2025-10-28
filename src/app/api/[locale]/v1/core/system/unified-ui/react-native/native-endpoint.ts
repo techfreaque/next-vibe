@@ -102,7 +102,7 @@ function constructUrl<
 
         if (paramValue === undefined) {
           return createErrorResponse(
-            "app.api.v1.core.system.unifiedUi.react-native.errors.missingUrlParam",
+            "app.api.v1.core.system.unifiedUi.reactNative.errors.missingUrlParam",
             ErrorResponseTypes.INTERNAL_ERROR,
             { paramName, endpoint: endpoint.title },
           );
@@ -117,7 +117,7 @@ function constructUrl<
     return { success: true, data: urlPath, message: "" };
   } catch (error) {
     return createErrorResponse(
-      "app.api.v1.core.system.unifiedUi.react-native.errors.urlConstructionFailed",
+      "app.api.v1.core.system.unifiedUi.reactNative.errors.urlConstructionFailed",
       ErrorResponseTypes.INTERNAL_ERROR,
       { error: String(error) },
     );
@@ -135,7 +135,7 @@ function constructUrl<
  * @example
  * ```typescript
  * import { nativeEndpoint } from './native-endpoint';
- * import { getUserByIdEndpoint } from './definition';
+ * import { getUserByIdEndpoint } from './types';
  *
  * // TypeScript automatically infers:
  * // - params must be: { urlPathParams: { id: string } }
@@ -173,7 +173,7 @@ export async function nativeEndpoint<
       } catch (validationError) {
         logger.error("Request validation failed", parseError(validationError));
         return createErrorResponse(
-          "app.api.v1.core.system.unifiedUi.react-native.errors.validationFailed",
+          "app.api.v1.core.system.unifiedUi.reactNative.errors.validationFailed",
           ErrorResponseTypes.VALIDATION_ERROR,
           { error: String(validationError) },
         ) as ResponseType<InferResponseOutput<TEndpoint>>;
@@ -246,7 +246,8 @@ export async function nativeEndpoint<
       >;
     } catch (parseError) {
       logger.error("Failed to parse response as JSON", {
-        error: parseError instanceof Error ? parseError.message : String(parseError),
+        error:
+          parseError instanceof Error ? parseError.message : String(parseError),
         responseText: responseText.substring(0, 500),
         contentType: fetchResponse.headers.get("content-type"),
       });
@@ -259,7 +260,7 @@ export async function nativeEndpoint<
         responseText.includes("<html")
       ) {
         return createErrorResponse(
-          "app.api.v1.core.system.unifiedUi.react-native.errors.htmlResponseReceived",
+          "app.api.v1.core.system.unifiedUi.reactNative.errors.htmlResponseReceived",
           ErrorResponseTypes.INTERNAL_ERROR,
           {
             url: fetchUrl,
@@ -289,7 +290,7 @@ export async function nativeEndpoint<
   } catch (error) {
     logger.error("Native endpoint call failed", parseError(error));
     return createErrorResponse(
-      "app.api.v1.core.system.unifiedUi.react-native.errors.networkError",
+      "app.api.v1.core.system.unifiedUi.reactNative.errors.networkError",
       ErrorResponseTypes.INTERNAL_ERROR,
       { error: String(error) },
     ) as ResponseType<InferResponseOutput<TEndpoint>>;

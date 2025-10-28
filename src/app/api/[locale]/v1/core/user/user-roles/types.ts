@@ -32,3 +32,7 @@ export const userRoleResponseSchema = z.object({
   role: userRoleTypeSchema,
 });
 export type UserRoleResponseType = z.input<typeof userRoleResponseSchema>;
+
+const definitions = {};
+
+export default definitions;

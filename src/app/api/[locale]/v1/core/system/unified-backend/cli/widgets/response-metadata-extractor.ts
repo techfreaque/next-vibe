@@ -312,8 +312,8 @@ export class ResponseMetadataExtractor {
         required: false,
       };
 
-      // Add grouping properties for grouped lists
-      if (widgetType === WidgetType.GROUPED_LIST) {
+      // Add grouping properties for grouped lists and code quality lists
+      if (widgetType === WidgetType.GROUPED_LIST || widgetType === WidgetType.CODE_QUALITY_LIST) {
         if ("groupBy" in ui && typeof ui.groupBy === "string") {
           arrayField.groupBy = ui.groupBy;
         }
@@ -327,14 +327,80 @@ export class ResponseMetadataExtractor {
           arrayField.showGroupSummary = ui.showGroupSummary;
         }
         if (
+          "showSummary" in ui &&
+          typeof ui.showSummary === "boolean"
+        ) {
+          arrayField.showGroupSummary = ui.showSummary;
+        }
+        if (
           "maxItemsPerGroup" in ui &&
           typeof ui.maxItemsPerGroup === "number"
         ) {
           arrayField.maxItemsPerGroup = ui.maxItemsPerGroup;
         }
+        if ("renderMode" in ui && typeof ui.renderMode === "string") {
+          arrayField.config = { ...(arrayField.config || {}), renderMode: ui.renderMode };
+        }
+        if ("hierarchical" in ui && typeof ui.hierarchical === "boolean") {
+          arrayField.config = { ...(arrayField.config || {}), hierarchical: ui.hierarchical };
+        }
       }
 
       return arrayField;
+    }
+
+    // Handle object fields (SECTION/CONTAINER widgets) - need to extract children
+    if (field.type === "object" && isObjectField(field)) {
+      const uiType =
+        "type" in ui && typeof ui.type === "string" ? ui.type : "container";
+      const widgetType = this.mapUiTypeToWidgetType(uiType);
+      const fieldType = FieldDataType.OBJECT;
+
+      // Get value from response data
+      let value: ExtractOutput<z.ZodTypeAny> = undefined;
+      if (isRecord(responseData) && fieldName in responseData) {
+        value = responseData[fieldName];
+      }
+
+      // Extract children metadata
+      const children: Record<string, ResponseFieldMetadata> = {};
+      const childResponseData = isRecord(value) ? value : undefined;
+
+      for (const [childName, childDef] of Object.entries(field.children)) {
+        const childMetadata = this.extractFieldFromCreateEndpointField(
+          childName,
+          childDef,
+          childResponseData,
+        );
+        if (childMetadata) {
+          children[childName] = childMetadata;
+        }
+      }
+
+      const title =
+        "title" in ui && typeof ui.title === "string" ? ui.title : undefined;
+      const label =
+        "title" in ui && typeof ui.title === "string"
+          ? ui.title
+          : "label" in ui && typeof ui.label === "string"
+            ? ui.label
+            : undefined;
+      const description =
+        "description" in ui && typeof ui.description === "string"
+          ? ui.description
+          : undefined;
+
+      return {
+        name: fieldName,
+        type: fieldType,
+        widgetType,
+        value: toRenderableValue(value),
+        title,
+        label,
+        description,
+        required: false,
+        children,
+      };
     }
 
     // Handle regular fields
@@ -405,6 +471,8 @@ export class ResponseMetadataExtractor {
       }));
     }
 
+    const regularTitle =
+      "title" in ui && typeof ui.title === "string" ? ui.title : undefined;
     const regularLabel =
       "title" in ui && typeof ui.title === "string"
         ? ui.title
@@ -423,6 +491,7 @@ export class ResponseMetadataExtractor {
       type: fieldType,
       widgetType,
       value: toRenderableValue(regularValue),
+      title: regularTitle,
       label: regularLabel,
       description: regularDescription,
       required: false,
@@ -556,8 +625,8 @@ export class ResponseMetadataExtractor {
       }
     }
 
-    if (type === WidgetType.GROUPED_LIST) {
-      // For grouped lists, look for array fields and transfer grouping properties
+    if (type === WidgetType.GROUPED_LIST || type === WidgetType.CODE_QUALITY_LIST) {
+      // For grouped lists and code quality lists, look for array fields and transfer grouping properties
       const arrayField = fields.find((field) => {
         if (!isRecord(responseData)) {
           return false;
@@ -583,10 +652,22 @@ export class ResponseMetadataExtractor {
           arrayField.showGroupSummary = ui.showGroupSummary;
         }
         if (
+          "showSummary" in ui &&
+          typeof ui.showSummary === "boolean"
+        ) {
+          arrayField.showGroupSummary = ui.showSummary;
+        }
+        if (
           "maxItemsPerGroup" in ui &&
           typeof ui.maxItemsPerGroup === "number"
         ) {
           arrayField.maxItemsPerGroup = ui.maxItemsPerGroup;
+        }
+        if ("renderMode" in ui && typeof ui.renderMode === "string") {
+          arrayField.config = { ...(arrayField.config || {}), renderMode: ui.renderMode };
+        }
+        if ("hierarchical" in ui && typeof ui.hierarchical === "boolean") {
+          arrayField.config = { ...(arrayField.config || {}), hierarchical: ui.hierarchical };
         }
       }
     }
@@ -792,7 +873,7 @@ export class ResponseMetadataExtractor {
     widget: WidgetConfig | null,
     schema?: z.ZodTypeAny,
   ): FieldDataType {
-    // Check widget fieldType first
+    // Check widget fieldType first (explicit type override)
     if (
       widget &&
       "fieldType" in widget &&
@@ -801,14 +882,19 @@ export class ResponseMetadataExtractor {
       return this.mapFieldDataType(widget.fieldType);
     }
 
-    // Check widget type
-    if (widget && "type" in widget && typeof widget.type === "string") {
-      return this.mapWidgetTypeToFieldType(widget.type);
+    // Try schema analysis first for better type inference
+    // Schema analysis is more accurate than widget type for TEXT widgets with boolean data
+    if (schema) {
+      const schemaType = this.mapZodTypeToFieldType(schema);
+      // If schema gives us a specific type (not TEXT), use it
+      if (schemaType !== FieldDataType.TEXT) {
+        return schemaType;
+      }
     }
 
-    // Fallback to schema analysis
-    if (schema) {
-      return this.mapZodTypeToFieldType(schema);
+    // Check widget type as fallback
+    if (widget && "type" in widget && typeof widget.type === "string") {
+      return this.mapWidgetTypeToFieldType(widget.type);
     }
 
     return FieldDataType.TEXT;
@@ -933,8 +1019,11 @@ export class ResponseMetadataExtractor {
       container: WidgetType.CONTAINER,
       data_table: WidgetType.DATA_TABLE,
       data_cards: WidgetType.DATA_CARDS,
+      data_list: WidgetType.DATA_LIST,
       grouped_list: WidgetType.GROUPED_LIST,
+      code_quality_list: WidgetType.CODE_QUALITY_LIST,
       text: WidgetType.TEXT,
+      title: WidgetType.TITLE,
       badge: WidgetType.BADGE,
       metric_card: WidgetType.METRIC_CARD,
       stats_grid: WidgetType.STATS_GRID,

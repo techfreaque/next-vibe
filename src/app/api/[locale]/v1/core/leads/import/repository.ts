@@ -23,7 +23,7 @@ import type { Countries, Languages } from "@/i18n/core/config";
 
 import { importRepository } from "../../import/repository";
 import type { DomainRecord } from "../../import/types";
-import type { JwtPrivatePayloadType } from "../../user/auth/definition";
+import type { JwtPrivatePayloadType } from "../../user/auth/types";
 import { leads, type NewLead } from "../db";
 import type {
   EmailCampaignStageValues,
@@ -35,8 +35,7 @@ import type {
   LeadsImportRequestOutput,
   LeadsImportResponseOutput,
 } from "./definition";
-import { CsvImportJobStatus } from "./enum";
-import type { CsvImportJobStatusValue } from "./enum";
+import type { CsvImportJobStatus, CsvImportJobStatusValue } from "./enum";
 import type { ImportJobsStatusGetResponseOutput } from "./status/definition";
 
 /**

@@ -16,17 +16,21 @@
  * This allows the SAME code to work on both platforms!
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
   createErrorResponse,
   ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
-
+} from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import { nativeEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react-native/native-endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { NewUser, User } from "./db";
+import type { UserDetailLevel } from "./enum";
+import { GET as getUserMeEndpoint } from "./private/me/definition";
+// Import the interface for type compatibility
+import type { UserRepository } from "./repository";
 import type {
   ExtendedUserDetailLevel,
   ExtendedUserType,
@@ -34,11 +38,8 @@ import type {
   UserFetchOptions,
   UserSearchOptions,
   UserType,
-} from "./definition";
-import type { UserDetailLevel } from "./enum";
-import { GET as getUserMeEndpoint } from "./private/me/definition";
-// Import the interface for type compatibility
-import type { UserRepository } from "./repository";
+} from "./types";
+import type { UserRole, UserRoleValue } from "./user-roles/enum";
 
 /**
  * Native User Repository Implementation
@@ -58,6 +59,7 @@ class UserRepositoryNativeImpl implements UserRepository {
   >(
     userId: DbId,
     detailLevel: T,
+    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ExtendedUserType<T>>> {
     logger.warn("getUserById not implemented on native - not used in page.tsx");
@@ -71,6 +73,7 @@ class UserRepositoryNativeImpl implements UserRepository {
   >(
     email: string,
     detailLevel: T,
+    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ExtendedUserType<T>>> {
     logger.warn(
@@ -200,6 +203,59 @@ class UserRepositoryNativeImpl implements UserRepository {
     );
     return await Promise.resolve(
       this.createNotImplementedError<number>("getUserSearchCount"),
+    );
+  }
+
+  async searchUsersWithPagination(
+    searchTerm: string,
+    options: {
+      limit?: number;
+      offset?: number;
+      roles?: (typeof UserRoleValue)[];
+    },
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      users: Array<StandardUserType & { createdAt: string; updatedAt: string }>;
+      pagination: {
+        currentPage: number;
+        totalPages: number;
+        itemsPerPage: number;
+        totalItems: number;
+        hasMore: boolean;
+        hasPrevious: boolean;
+      };
+      searchInfo: {
+        searchTerm: string | undefined;
+        appliedFilters: (typeof UserRoleValue)[];
+        searchTime: string;
+        totalResults: number;
+      };
+    }>
+  > {
+    logger.warn(
+      "searchUsersWithPagination not implemented on native - not used in page.tsx",
+    );
+    return await Promise.resolve(
+      this.createNotImplementedError<{
+        users: Array<
+          StandardUserType & { createdAt: string; updatedAt: string }
+        >;
+        pagination: {
+          currentPage: number;
+          totalPages: number;
+          itemsPerPage: number;
+          totalItems: number;
+          hasMore: boolean;
+          hasPrevious: boolean;
+        };
+        searchInfo: {
+          searchTerm: string | undefined;
+          appliedFilters: (typeof UserRole)[];
+          searchTime: string;
+          totalResults: number;
+        };
+      }>("searchUsersWithPagination"),
     );
   }
 }

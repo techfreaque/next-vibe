@@ -6,10 +6,9 @@
 "use client";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
+import endpoints from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/task/[id]/definition";
 import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-ui/react/hooks/use-endpoint";
-
-import endpoints from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/cron/task/[id]/definition";
 
 /**
  * Hook for individual task operations (GET, PUT, DELETE)

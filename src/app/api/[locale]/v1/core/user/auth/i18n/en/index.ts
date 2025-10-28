@@ -69,6 +69,9 @@ export const translations = {
     publicPayloadNotSupported:
       "Public JWT payload is not supported for CLI authentication",
     jwt_signing_failed: "Failed to sign JWT token",
+    authentication_failed: "Authentication failed",
+    user_not_authenticated: "User is not authenticated",
+    publicUserNotAllowed: "Public user is not allowed for this endpoint",
     validation_failed: "Validation failed",
     native: {
       unsupported:

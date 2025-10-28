@@ -7,18 +7,18 @@
 import { dateSchema } from "next-vibe/shared/types/common.schema";
 import { z } from "zod";
 
-import { leadId } from "@/app/api/[locale]/v1/core/leads/definition";
+import { leadId } from "@/app/api/[locale]/v1/core/leads/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "./auth/definition";
+import type { JwtPayloadType } from "./auth/types";
 import {
   Language,
   Theme,
   type UserDetailLevel,
   type UserDetailLevelValue,
 } from "./enum";
-import { userRoleResponseSchema } from "./user-roles/definition";
 import type { UserRoleValue } from "./user-roles/enum";
+import { userRoleResponseSchema } from "./user-roles/types";
 
 /**
  * User Preferences Schema
@@ -117,3 +117,7 @@ export interface UserSearchOptions {
   offset?: number;
   roles?: (typeof UserRoleValue)[keyof typeof UserRoleValue][];
 }
+
+const definitions = {};
+
+export default definitions;

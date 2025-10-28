@@ -74,3 +74,7 @@ export interface SmtpCapacityResponseOutput {
   totalCapacity: number;
   remainingCapacity: number;
 }
+
+const definitions = {};
+
+export default definitions;

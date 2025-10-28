@@ -17,7 +17,7 @@ import { parseError } from "next-vibe/shared/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { JwtPayloadType } from "../../../../../user/auth/definition";
+import type { JwtPayloadType } from "../../../../../user/auth/types";
 import { setupInstallRepository } from "../install/repository";
 import { setupUninstallRepository } from "../uninstall/repository";
 import type { UpdateRequestOutput, UpdateResponseOutput } from "./definition";

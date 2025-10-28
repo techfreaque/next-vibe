@@ -373,3 +373,5 @@ const { GET } = createEndpoint({
 export const definitions = { GET };
 export type ThreadSearchGetRequestOutput = typeof GET.types.RequestOutput;
 export type ThreadSearchGetResponseOutput = typeof GET.types.ResponseOutput;
+
+export default definitions;

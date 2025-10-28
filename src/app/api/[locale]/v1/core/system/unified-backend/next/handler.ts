@@ -13,11 +13,12 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { z } from "zod";
 
+import { EmailHandlingRepositoryImpl } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/repository";
 import type {
   EmailHandleRequestOutput,
   EmailHandleResponseOutput,
-} from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/definition";
-import { EmailHandlingRepositoryImpl } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/repository";
+} from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/types";
+import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -25,7 +26,6 @@ import {
   createHTTPErrorResponse,
   createHTTPSuccessResponse,
 } from "../../unified-ui/react/next-endpoint-response";
-import { validateNextRequestData } from "./validation";
 import type { EndpointLogger } from "../shared/endpoint-logger";
 import { createEndpointLogger } from "../shared/endpoint-logger";
 import type { Methods } from "../shared/enums";
@@ -34,6 +34,7 @@ import type {
   ApiHandlerOptions,
   NextHandlerReturnType,
 } from "../shared/handler-types";
+import { validateNextRequestData } from "./validation";
 
 // Create email handling repository instance
 const emailHandlingRepository = new EmailHandlingRepositoryImpl();
@@ -65,14 +66,12 @@ async function handleEmails<
  * @returns Next.js route handler function
  */
 export function createNextHandler<
-  TRequestInput,
   TRequestOutput,
-  TResponseInput,
   TResponseOutput,
   TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
-  TUserRoleValue extends readonly string[],
+  TUserRoleValue extends readonly (typeof UserRoleValue)[],
   TFields,
 >(
   options: ApiHandlerOptions<
@@ -109,24 +108,15 @@ export function createNextHandler<
       );
       if (!authResult.success) {
         return createHTTPErrorResponse({
-          message: "app.error.unauthorized",
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
+          message: authResult.message,
+          errorType: authResult.errorType,
+          messageParams: authResult.messageParams,
           logger,
         });
       }
 
       // Validate request data using unified core
-      const validationResult = await validateNextRequestData<
-        TRequestInput,
-        TRequestOutput,
-        TResponseInput,
-        Record<string, string>,
-        TUrlVariablesOutput,
-        TExampleKey,
-        TMethod,
-        TUserRoleValue,
-        TFields
-      >(
+      const validationResult = await validateNextRequestData(
         endpoint,
         {
           method: endpoint.method,
@@ -146,11 +136,9 @@ export function createNextHandler<
           })`,
         );
         return createHTTPErrorResponse({
-          message: "app.error.errors.invalid_request_data",
-          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-          messageParams: {
-            message: validationResult.message,
-          },
+          message: validationResult.message,
+          errorType: validationResult.errorType,
+          messageParams: validationResult.messageParams,
           logger,
         });
       }
@@ -159,8 +147,8 @@ export function createNextHandler<
       const result = await executeHandler({
         endpoint,
         handler,
-        validatedData: validationResult.data.requestData,
-        urlPathParams: validationResult.data.urlPathParams,
+        validatedData: validationResult.data.requestData as TRequestOutput,
+        urlPathParams: validationResult.data.urlPathParams as TUrlVariablesOutput,
         user: authResult.data,
         t,
         locale: validationResult.data.locale,
@@ -199,8 +187,8 @@ export function createNextHandler<
               email,
               user: authResult.data,
               responseData: data,
-              urlPathParams: validationResult.data.urlPathParams,
-              requestData: validationResult.data.requestData,
+              urlPathParams: validationResult.data.urlPathParams as TUrlVariablesOutput,
+              requestData: validationResult.data.requestData as TRequestOutput,
               t,
               locale: validationResult.data.locale,
             },
@@ -214,7 +202,7 @@ export function createNextHandler<
       // Handle unexpected errors
       // Handle unexpected errors - error details are included in messageParams
       return createHTTPErrorResponse({
-        message: "app.error.general.internal_server_error",
+        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parseError(error).message,

@@ -13,6 +13,7 @@
  * Storage methods (setAuthCookies/clearAuthCookies) use AsyncStorage on native.
  */
 
+import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -23,8 +24,8 @@ import { parseError } from "next-vibe/shared/utils";
 import { storage } from "next-vibe-ui/ui/storage";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
-import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/definition";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
+import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { UserRoleValue } from "../user-roles/enum";
@@ -72,16 +73,29 @@ class AuthRepositoryNativeImpl implements AuthRepository {
     );
   }
 
-  async getLeadIdFromDb(): Promise<string> {
-    throw new Error("getLeadIdFromDb not implemented on native");
+  verifyToken(
+    token: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<JwtPrivatePayloadType>> {
+    return this.verifyJwt(token, logger);
   }
 
-  async getPrimaryLeadId(): Promise<string | null> {
-    throw new Error("getPrimaryLeadId not implemented on native");
+  getLeadIdFromDb(): Promise<string | null> {
+    // Native implementation should use AsyncStorage or similar
+    // For now, return null to indicate not implemented
+    return Promise.resolve(null);
   }
 
-  async getAllLeadIds(): Promise<string[]> {
-    throw new Error("getAllLeadIds not implemented on native");
+  getPrimaryLeadId(): Promise<string | null> {
+    // Native implementation should use AsyncStorage or similar
+    // For now, return null to indicate not implemented
+    return Promise.resolve(null);
+  }
+
+  getAllLeadIds(): Promise<string[]> {
+    // Native implementation should use AsyncStorage or similar
+    // For now, return empty array to indicate not implemented
+    return Promise.resolve([]);
   }
 
   getCurrentUser(
@@ -192,8 +206,37 @@ class AuthRepositoryNativeImpl implements AuthRepository {
     }
   }
 
+  /**
+   * Store authentication token using platform-specific handler
+   * For native, this delegates to setAuthCookies which uses AsyncStorage
+   */
+  async storeAuthTokenForPlatform(
+    token: string,
+    userId: string,
+    leadId: string,
+    _request: NextRequest,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    // On native, we always use AsyncStorage (no platform detection needed)
+    // Default to rememberMe=true for native (30 days)
+    return await this.setAuthCookies(token, true, logger);
+  }
+
+  /**
+   * Clear authentication token using platform-specific handler
+   * For native, this delegates to clearAuthCookies which uses AsyncStorage
+   */
+  async clearAuthTokenForPlatform(
+    _request: NextRequest,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    // On native, we always use AsyncStorage (no platform detection needed)
+    return await this.clearAuthCookies(logger);
+  }
+
   createCliToken(
     userId: string,
+    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<string>> {
     return Promise.resolve(
@@ -216,7 +259,8 @@ class AuthRepositoryNativeImpl implements AuthRepository {
   requireUserId(payload: JwtPrivatePayloadType): string {
     const userId = this.extractUserId(payload);
     if (!userId) {
-      return "";
+      // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string
+      throw new Error("User ID is required but not present in JWT payload");
     }
     return userId;
   }

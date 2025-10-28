@@ -534,7 +534,6 @@ const { POST } = createEndpoint({
       // Response - return the created task
       task: responseField(
         {
-          type: WidgetType.CONTAINER,
           title:
             "app.api.v1.core.system.unifiedBackend.tasks.cronSystem.tasks.post.response.task.title",
         },

@@ -21,7 +21,7 @@ import type SMTPTransport from "nodemailer/lib/smtp-transport";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { Countries } from "@/i18n/core/config";
 
 import { emails } from "../messages/db";
@@ -42,13 +42,13 @@ import type {
   SmtpSelectionCriteria,
   SmtpSendRequestOutput,
   SmtpSendResponseOutput,
-} from "./sending/definition";
+} from "./sending/types";
 
 // Type alias for locale
 type CountryLanguage = Countries;
 
 // Re-export SmtpSelectionCriteria for external use
-export type { SmtpSelectionCriteria } from "./sending/definition";
+export type { SmtpSelectionCriteria } from "./sending/types";
 
 /**
  * SMTP Repository Interface

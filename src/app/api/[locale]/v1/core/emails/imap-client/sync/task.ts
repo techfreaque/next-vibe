@@ -15,6 +15,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import { z } from "zod";
 
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
@@ -27,10 +28,9 @@ import type {
   Task,
   TaskExecutionContext,
 } from "@/app/api/[locale]/v1/core/system/unified-backend/tasks/types/repository";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPrivatePayloadType } from "../../../user/auth/definition";
+import type { JwtPrivatePayloadType } from "../../../user/auth/types";
 import { imapSyncTaskRepository } from "../sync-task/repository";
 
 /**

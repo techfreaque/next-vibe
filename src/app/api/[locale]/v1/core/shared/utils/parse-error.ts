@@ -1,7 +1,5 @@
+import type { ErrorResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import type { TParams, TranslationKey } from "@/i18n/core/static-types";
-
-import type { ErrorResponseType } from "../types/response.schema";
-import { ErrorResponseError } from "../types/response.schema";
 
 /**
  * Custom error class that preserves error type and translation parameters
@@ -52,23 +50,11 @@ export function isErrorResponseType(
 type ParseableError = unknown;
 
 /**
- * Check if an error is an ErrorResponseError instance
- */
-export function isErrorResponseError(
-  error: ParseableError,
-): error is ErrorResponseError {
-  return error instanceof ErrorResponseError;
-}
-
-/**
- * Extract ErrorResponseType from an ErrorResponseError or return null
+ * Extract ErrorResponseType from an error or return null
  */
 export function extractErrorResponse(
   error: ParseableError,
 ): ErrorResponseType | null {
-  if (isErrorResponseError(error)) {
-    return error.errorResponse;
-  }
   if (isErrorResponseType(error)) {
     return error;
   }
@@ -83,15 +69,6 @@ export function extractErrorResponse(
  * @returns A proper Error object
  */
 export function parseError(error: ParseableError): Error {
-  // Handle ErrorResponseError instances (thrown by createThrowableErrorResponse)
-  if (error instanceof ErrorResponseError) {
-    return new ApiError({
-      errorType: error.errorResponse.errorType.errorKey,
-      messageParams: error.errorResponse.messageParams,
-      translationKey: error.errorResponse.message,
-    });
-  }
-
   // Handle standard Error instances
   if (error instanceof Error) {
     return error;

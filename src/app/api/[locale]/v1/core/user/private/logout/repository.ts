@@ -5,6 +5,7 @@
 
 import "server-only";
 
+import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -15,8 +16,8 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 
-import type { JwtPrivatePayloadType } from "../../auth/definition";
 import { authRepository } from "../../auth/repository";
+import type { JwtPrivatePayloadType } from "../../auth/types";
 import { sessionRepository } from "../session/repository";
 import type {
   LogoutPostRequestOutput,
@@ -31,13 +32,14 @@ export interface LogoutRepository {
    * Logout a user
    * @param data - Request data (empty for logout)
    * @param user - User from JWT
-   * @param locale - User locale
+   * @param request - Next.js request object for platform detection
    * @param logger - Logger instance for debugging and monitoring
    * @returns Success message
    */
   logout(
     data: LogoutPostRequestOutput,
     user: JwtPrivatePayloadType,
+    request: NextRequest,
     logger: EndpointLogger,
   ): Promise<ResponseType<LogoutPostResponseOutput>>;
 }
@@ -50,13 +52,14 @@ export class LogoutRepositoryImpl implements LogoutRepository {
    * Logout a user
    * @param data - Request data (empty for logout)
    * @param user - User from JWT
-   * @param locale - User locale
+   * @param request - Next.js request object for platform detection
    * @param logger - Logger instance for debugging and monitoring
    * @returns Success message
    */
   async logout(
     data: LogoutPostRequestOutput,
     user: JwtPrivatePayloadType,
+    request: NextRequest,
     logger: EndpointLogger,
   ): Promise<ResponseType<LogoutPostResponseOutput>> {
     // Removed locale parameter - translation keys handled by client
@@ -73,18 +76,21 @@ export class LogoutRepositoryImpl implements LogoutRepository {
         userId,
       });
 
-      // Clear auth cookies
-      const cookieResult = await authRepository.clearAuthCookies(logger);
-      if (cookieResult.success) {
+      // Clear auth token using platform-specific handler
+      const clearResult = await authRepository.clearAuthTokenForPlatform(
+        request,
+        logger,
+      );
+      if (clearResult.success) {
         logger.debug(
-          "app.api.v1.core.user.private.logout.debug.authCookiesClearedSuccessfully",
+          "app.api.v1.core.user.private.logout.debug.authTokenClearedSuccessfully",
           { userId },
         );
       } else {
         logger.error(
-          "app.api.v1.core.user.private.logout.debug.errorClearingAuthCookies",
+          "app.api.v1.core.user.private.logout.debug.errorClearingAuthToken",
         );
-        // Continue even if cookie deletion fails
+        // Continue even if token deletion fails
       }
 
       // Remove sessions from database

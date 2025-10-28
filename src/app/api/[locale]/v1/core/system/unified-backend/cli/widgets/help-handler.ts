@@ -151,7 +151,9 @@ export class HelpHandler {
 
     const helpContent: HelpContent = {
       title: t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.title"),
-      description: t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.description"),
+      description: t(
+        "app.api.v1.core.system.unifiedBackend.cli.vibe.help.description",
+      ),
       usage: t("app.api.v1.core.system.unifiedBackend.cli.vibe.help.usage"),
       commands: await this.generateCommandHelp(filteredRoutes, options),
       examples: this.generateExamples(),
@@ -259,7 +261,7 @@ export class HelpHandler {
         for (const [key, fieldSchema] of Object.entries(schema.shape)) {
           const param = this.extractParameterFromField(
             key,
-            fieldSchema,
+            fieldSchema as ZodWithDef,
             prefix,
           );
           parameters.push(param);

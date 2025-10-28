@@ -9,12 +9,12 @@ import "server-only";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "next-vibe/shared/types/response.schema";
+} from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
+} from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { z } from "zod";
 
@@ -24,7 +24,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
-} from "../../../user/auth/definition";
+} from "../../../../user/auth/types";
 import type { CronTaskPriority, TaskCategory } from "../enum";
 import type {
   TaskTypesRequestOutput,

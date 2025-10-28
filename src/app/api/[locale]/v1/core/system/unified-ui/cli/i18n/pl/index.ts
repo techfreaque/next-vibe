@@ -12,6 +12,18 @@ export const translations: typeof enTranslations = {
     help: "Pokaż pomoc dla poleceń",
     listCommands: "Wyświetl wszystkie dostępne polecenia",
     executing: "Wykonywanie polecenia...",
+    utils: {
+      debug: {
+        executionSummary:
+          "\nPodsumowanie wykonania\n──────────────────────\n  Wykonanie: {{executionSeconds}}s\n  Narzut: {{overheadSeconds}}s\n  Łącznie: {{totalSeconds}}s",
+        executionTime: "⏱️  Wykonanie zakończone w {{totalSeconds}}s",
+        performanceBreakdown: "📊 Podział wydajności:",
+        remainingResources: "⚠️  Wykryto pozostałe zasoby",
+        activeHandles: "Aktywne uchwyty: {{count}}",
+        activeRequests: "Aktywne żądania: {{count}}",
+        handleTypes: "Typy uchwytów",
+      },
+    },
     endpoints: {
       endpointHandler: {
         error: {
@@ -62,11 +74,6 @@ export const translations: typeof enTranslations = {
             },
           },
         },
-      },
-    },
-    utils: {
-      debug: {
-        executionSummary: "Podsumowanie wykonania",
       },
     },
   },

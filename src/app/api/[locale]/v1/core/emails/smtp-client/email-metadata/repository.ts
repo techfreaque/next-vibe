@@ -18,7 +18,7 @@ import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../../../user/auth/definition";
+import type { JwtPayloadType } from "../../../user/auth/types";
 import { emails } from "../../messages/db";
 import { EmailStatus } from "../../messages/enum";
 import type {
@@ -26,7 +26,7 @@ import type {
   StoreEmailMetadataResponseOutput,
   UpdateEmailEngagementRequestOutput,
   UpdateEmailEngagementResponseOutput,
-} from "./definition";
+} from "./types";
 
 /**
  * Email Metadata Repository Interface

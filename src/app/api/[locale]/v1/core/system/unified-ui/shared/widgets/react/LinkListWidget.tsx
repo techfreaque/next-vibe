@@ -3,19 +3,32 @@
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 
-import type { WidgetComponentProps } from "../types";
+import type { RenderableValue, WidgetComponentProps } from "../types";
 import type { LinkCardData } from "./LinkCardWidget";
 import { LinkCardWidget } from "./LinkCardWidget";
 
 /**
  * Link List Data Interface
  */
-export interface LinkListData {
+export interface LinkListData extends Record<string, RenderableValue> {
   items: LinkCardData[];
   title?: string;
   description?: string;
   layout?: "grid" | "list";
   columns?: number;
+}
+
+/**
+ * Type guard for LinkListData
+ */
+function isLinkListData(data: RenderableValue): data is LinkListData {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    !Array.isArray(data) &&
+    "items" in data &&
+    Array.isArray(data.items)
+  );
 }
 
 /**
@@ -28,7 +41,17 @@ export function LinkListWidget({
   context,
   className,
   style,
-}: WidgetComponentProps<LinkListData>): JSX.Element {
+}: WidgetComponentProps<RenderableValue>): JSX.Element {
+  if (!isLinkListData(data)) {
+    return (
+      <div
+        className={cn("text-muted-foreground italic", className)}
+        style={style}
+      >
+        —
+      </div>
+    );
+  }
   const { items, title, description, layout = "list", columns = 1 } = data;
 
   if (!items || items.length === 0) {

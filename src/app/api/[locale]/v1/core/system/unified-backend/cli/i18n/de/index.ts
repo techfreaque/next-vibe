@@ -1,4 +1,5 @@
 import type { translations as enTranslations } from "../en";
+
 export const translations: typeof enTranslations = {
   vibe: {
     startingUp: "Vibe CLI wird gestartet...",
@@ -22,6 +23,22 @@ export const translations: typeof enTranslations = {
     errors: {
       routeNotFound: "Route nicht gefunden",
       executionFailed: "Ausführung fehlgeschlagen",
+      unknownError: "Unbekannter Fehler aufgetreten",
+      publicPayloadNotSupported: "Öffentliche Nutzlast nicht unterstützt",
+      invalidTokenPayload: "Ungültige Token-Nutzlast",
+      invalidToken: "Ungültiges Token",
+      signingFailed: "Token-Signierung fehlgeschlagen",
+      userNotFound: "Benutzer nicht gefunden",
+      authenticationFailed: "Authentifizierung fehlgeschlagen",
+      invalidFormat: "Ungültiges Sitzungsformat",
+      sessionExpired: "Sitzung abgelaufen",
+      notFound: "Sitzung nicht gefunden",
+      readFailed: "Sitzung konnte nicht gelesen werden",
+      invalidData: "Ungültige Sitzungsdaten",
+      writeFailed: "Sitzung konnte nicht geschrieben werden",
+      deleteFailed: "Sitzung konnte nicht gelöscht werden",
+      storeFailed: "Sitzung konnte nicht gespeichert werden",
+      clearFailed: "Sitzung konnte nicht gelöscht werden",
     },
     interactive: {
       welcome: "Willkommen im Vibe Interaktiven Modus",

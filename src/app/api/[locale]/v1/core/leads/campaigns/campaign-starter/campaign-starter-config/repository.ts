@@ -20,7 +20,7 @@ import { CronTaskPriority } from "@/app/api/[locale]/v1/core/system/unified-back
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../../../../user/auth/definition";
+import type { JwtPayloadType } from "../../../../user/auth/types";
 import { type CampaignStarterConfig, campaignStarterConfigs } from "./db";
 import {
   type CronSettings,

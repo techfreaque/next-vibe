@@ -15,7 +15,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { performance } from "perf_hooks";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { getCurrentEnvironmentInfo } from "../environment";

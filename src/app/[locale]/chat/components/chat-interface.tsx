@@ -23,6 +23,7 @@ import {
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/endpoint-logger";
 import { authClientRepository } from "@/app/api/[locale]/v1/core/user/auth/repository-client";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 
 import { useChatContext } from "../features/chat/context";
@@ -90,13 +91,15 @@ interface ChatInterfaceProps {
   initialThreadId?: string;
   /** URL path segments from /threads/[...path] route */
   urlPath?: string[];
+  user: JwtPrivatePayloadType;
 }
 
 export function ChatInterface({
   initialFolderId: deprecatedFolderId,
   initialThreadId: deprecatedThreadId,
   urlPath,
-}: ChatInterfaceProps = {}): JSX.Element {
+  user,
+}: ChatInterfaceProps): JSX.Element {
   const chat = useChatContext();
 
   // Destructure what we need from the chat context
@@ -510,6 +513,7 @@ export function ChatInterface({
 
         {/* Sidebar */}
         <SidebarWrapper
+          user={user}
           threads={threads}
           folders={chat.folders}
           activeThreadId={activeThread?.id || null}

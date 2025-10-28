@@ -64,3 +64,7 @@ export interface MiddlewareConfig {
    */
   debug: boolean;
 }
+
+const definitions = {};
+
+export default definitions;

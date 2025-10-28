@@ -7,7 +7,6 @@ import "server-only";
 
 import { and, asc, count, desc, eq, ilike, ne, or } from "drizzle-orm";
 import Imap from "imap";
-import { withTransaction } from "@/app/api/[locale]/v1/core/system/db/utils/repository-helpers";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   createErrorResponse,
@@ -17,8 +16,9 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
+import { withTransaction } from "@/app/api/[locale]/v1/core/system/db/utils/repository-helpers";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/logger-types";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ImapAccount, NewImapAccount } from "../db";

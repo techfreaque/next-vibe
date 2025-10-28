@@ -341,7 +341,9 @@ export async function dev(
         });
 
         if (!userLead) {
-          logger.error("Low credits user missing leadId", { userId: lowCreditsUser.id });
+          logger.error("Low credits user missing leadId", {
+            userId: lowCreditsUser.id,
+          });
           return;
         }
 

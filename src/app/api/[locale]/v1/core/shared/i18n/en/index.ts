@@ -67,4 +67,8 @@ export const translations = {
     payment_failed: "Payment Failed",
     partial_failure: "Partial Failure",
   },
+  errors: {
+    invalid_request_data: "Invalid request data",
+    invalid_url_parameters: "Invalid URL parameters",
+  },
 };

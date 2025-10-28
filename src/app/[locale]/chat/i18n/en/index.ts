@@ -1,4 +1,10 @@
 export const translations = {
+  components: {
+    sidebar: {
+      login: "Login",
+      logout: "Logout",
+    },
+  },
   common: {
     newChat: "New Thread",
     newPrivateChat: "Private Thread",

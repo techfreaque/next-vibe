@@ -5,20 +5,11 @@ import type { JSX } from "react";
 import { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-backend/shared/enums";
 import type { ResponseFieldMetadata } from "@/app/api/[locale]/v1/core/system/unified-ui/shared/widgets/cli/types";
 
-import type {
-  CodeOutputWidgetData,
-  ContainerWidgetData,
-  LinkWidgetData,
-  MarkdownWidgetData,
-  MetricCardWidgetData,
-  RenderableValue,
-  StatsGridWidgetData,
-  WidgetRenderContext,
-} from "../types";
+import type { RenderableValue, WidgetRenderContext } from "../types";
 import { CodeOutputWidget } from "./CodeOutputWidget";
 import { ContainerWidget } from "./ContainerWidget";
-import { type LinkCardData, LinkCardWidget } from "./LinkCardWidget";
-import { type LinkListData, LinkListWidget } from "./LinkListWidget";
+import { LinkCardWidget } from "./LinkCardWidget";
+import { LinkListWidget } from "./LinkListWidget";
 import { LinkWidget } from "./LinkWidget";
 import { MarkdownWidget } from "./MarkdownWidget";
 import { MetricCardWidget } from "./MetricCardWidget";
@@ -41,14 +32,16 @@ export interface WidgetRendererProps {
  * Widget Renderer Component
  * Dynamically renders the appropriate widget based on type
  */
-export function WidgetRenderer({
+export function WidgetRenderer<
+  TData extends RenderableValue = RenderableValue,
+>({
   widgetType,
   data,
   metadata,
   context,
   className,
   style,
-}: WidgetRendererProps): JSX.Element {
+}: WidgetRendererProps & { data: TData }): JSX.Element {
   const baseProps = { metadata, context, className, style };
 
   switch (widgetType) {
@@ -57,43 +50,33 @@ export function WidgetRenderer({
       return <TextWidget {...baseProps} data={data} />;
 
     case WidgetType.MARKDOWN:
-      return (
-        <MarkdownWidget {...baseProps} data={data as MarkdownWidgetData} />
-      );
+      return <MarkdownWidget {...baseProps} data={data} />;
 
     // Link widgets
     case WidgetType.LINK:
-      return <LinkWidget {...baseProps} data={data as LinkWidgetData} />;
+      return <LinkWidget {...baseProps} data={data} />;
 
     // Code widgets
     case WidgetType.CODE_OUTPUT:
-      return (
-        <CodeOutputWidget {...baseProps} data={data as CodeOutputWidgetData} />
-      );
+      return <CodeOutputWidget {...baseProps} data={data} />;
 
     // Metric widgets
     case WidgetType.METRIC_CARD:
-      return (
-        <MetricCardWidget {...baseProps} data={data as MetricCardWidgetData} />
-      );
+      return <MetricCardWidget {...baseProps} data={data} />;
 
     case WidgetType.STATS_GRID:
-      return (
-        <StatsGridWidget {...baseProps} data={data as StatsGridWidgetData} />
-      );
+      return <StatsGridWidget {...baseProps} data={data} />;
 
     // Layout widgets
     case WidgetType.CONTAINER:
-      return (
-        <ContainerWidget {...baseProps} data={data as ContainerWidgetData} />
-      );
+      return <ContainerWidget {...baseProps} data={data} />;
 
     // Custom widget types for search results
     case WidgetType.LINK_CARD:
-      return <LinkCardWidget {...baseProps} data={data as LinkCardData} />;
+      return <LinkCardWidget {...baseProps} data={data} />;
 
     case WidgetType.LINK_LIST:
-      return <LinkListWidget {...baseProps} data={data as LinkListData} />;
+      return <LinkListWidget {...baseProps} data={data} />;
 
     // Fallback to text widget
     default:

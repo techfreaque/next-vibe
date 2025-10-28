@@ -437,3 +437,7 @@ export interface UIConfig {
     behavior?: "hide" | "collapse" | "stack" | "scroll";
   };
 }
+
+const definitions = {};
+
+export default definitions;
